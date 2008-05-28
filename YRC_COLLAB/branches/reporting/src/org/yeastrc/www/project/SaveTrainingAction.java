@@ -34,8 +34,8 @@ public class SaveTrainingAction extends Action {
 		int researcherC = 0;
 		int researcherD = 0;
 		String[] groups = null;
-		String[] fundingTypes = null;
-		String[] federalFundingTypes = null;
+//		String[] fundingTypes = null;
+//		String[] federalFundingTypes = null;
 		String comments = null;
 		String description = null;
 		int hours = 0;
@@ -106,8 +106,8 @@ public class SaveTrainingAction extends Action {
 		researcherC = ((EditTrainingForm)(form)).getResearcherC();
 		researcherD = ((EditTrainingForm)(form)).getResearcherD();
 		groups = ((EditTrainingForm)(form)).getGroups();
-		fundingTypes = ((EditTrainingForm)(form)).getFundingTypes();
-		federalFundingTypes = ((EditTrainingForm)(form)).getFederalFundingTypes();
+//		fundingTypes = ((EditTrainingForm)(form)).getFundingTypes();
+//		federalFundingTypes = ((EditTrainingForm)(form)).getFederalFundingTypes();
 		comments = ((EditTrainingForm)(form)).getComments();
 		description = ((EditTrainingForm)(form)).getDescription();
 		hours = ((EditTrainingForm)(form)).getHours();
@@ -158,26 +158,26 @@ public class SaveTrainingAction extends Action {
 		}
 
 		// Set up the funding types
-		project.clearFundingTypes();
-		
-		if (fundingTypes != null) {
-			if (fundingTypes.length > 0) {
-				for (int i = 0; i < fundingTypes.length; i++) {
-					project.setFundingType(fundingTypes[i]);
-				}
-			}
-		}
-		
-		// Set up the federal funding types
-		project.clearFederalFundingTypes();
-		
-		if (federalFundingTypes != null) {
-			if (federalFundingTypes.length > 0) {
-				for (int i = 0; i < federalFundingTypes.length; i++) {
-					project.setFederalFundingType(federalFundingTypes[i]);
-				}
-			}
-		}
+//		project.clearFundingTypes();
+//		
+//		if (fundingTypes != null) {
+//			if (fundingTypes.length > 0) {
+//				for (int i = 0; i < fundingTypes.length; i++) {
+//					project.setFundingType(fundingTypes[i]);
+//				}
+//			}
+//		}
+//		
+//		// Set up the federal funding types
+//		project.clearFederalFundingTypes();
+//		
+//		if (federalFundingTypes != null) {
+//			if (federalFundingTypes.length > 0) {
+//				for (int i = 0; i < federalFundingTypes.length; i++) {
+//					project.setFederalFundingType(federalFundingTypes[i]);
+//				}
+//			}
+//		}
 
 		// Set up the groups
 		project.clearGroups();

@@ -49,32 +49,10 @@
   <!-- List the Researchers here: -->
   <%@ include file="researcherList.jsp" %>
 
-  <yrcwww:colorrow>
-   <TD valign="top" width="25%">Funding Source(s):</TD>
-   <TD valign="top" width="75%"><bean:write name="project" property="fundingTypes"/>
-  </yrcwww:colorrow>
-
-  <yrcwww:colorrow>
-   <TD valign="top" width="25%">Federal Funding:</TD>
-   <TD valign="top" width="75%"><bean:write name="project" property="federalFundingTypes"/>
-  </yrcwww:colorrow>
-
-  <logic:notEmpty name="project" property="foundationName">
-	  <yrcwww:colorrow>
-	   <TD valign="top" width="25%">Foundation Name:</TD>
-	   <TD valign="top" width="75%"><bean:write name="project" property="foundationName"/></TD>
-	  </yrcwww:colorrow>
-  </logic:notEmpty>
-  
-  <yrcwww:colorrow>
-   <TD valign="top" width="25%">Grant number:</TD>
-   <TD valign="top" width="75%"><bean:write name="project" property="grantNumber"/></TD>
-  </yrcwww:colorrow>
-  <yrcwww:colorrow>
-   <TD valign="top" width="25%">Annual Budget:</TD>
-   <TD valign="top" width="75%"><bean:write name="project" property="grantAmount"/></TD>
-  </yrcwww:colorrow>
-
+	<!-- ========================================================================================= -->
+	<!-- List Grants here -->
+	<%@ include file="grantList.jsp" %>
+	<!-- ========================================================================================= -->
 
    <yrcwww:member group="any">
     <yrcwww:colorrow>

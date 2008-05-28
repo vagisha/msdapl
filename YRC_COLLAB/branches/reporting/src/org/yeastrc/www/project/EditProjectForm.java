@@ -9,6 +9,9 @@
 
 package org.yeastrc.www.project;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.*;
 
@@ -44,17 +47,17 @@ public class EditProjectForm extends ActionForm {
 	/** Set the public abstract */
 	public void setPublicAbstract(String arg) { this.publicAbstract = arg; }
 
-	/** Set the funding types */
-	public void setFundingTypes(String[] arg) {
-		if (arg != null)
-			this.fundingTypes = arg;
-	}
-
-	/** Set the federal funding types */
-	public void setFederalFundingTypes(String[] arg) {
-		if (arg != null)
-			this.federalFundingTypes = arg;
-	}
+//	/** Set the funding types */
+//	public void setFundingTypes(String[] arg) {
+//		if (arg != null)
+//			this.fundingTypes = arg;
+//	}
+//
+//	/** Set the federal funding types */
+//	public void setFederalFundingTypes(String[] arg) {
+//		if (arg != null)
+//			this.federalFundingTypes = arg;
+//	}
 
 	/** Set the progress */
 	public void setProgress(String arg) { this.progress = arg; }
@@ -100,11 +103,11 @@ public class EditProjectForm extends ActionForm {
 	/** Get the public abstract */
 	public String getPublicAbstract() { return this.publicAbstract; }
 
-	/** Get the funding types */
-	public String[] getFundingTypes() { return this.fundingTypes; }
-
-	/** Get the federal funding types */
-	public String[] getFederalFundingTypes() { return this.federalFundingTypes; }
+//	/** Get the funding types */
+//	public String[] getFundingTypes() { return this.fundingTypes; }
+//
+//	/** Get the federal funding types */
+//	public String[] getFederalFundingTypes() { return this.federalFundingTypes; }
 
 	/** Get the progress */
 	public String getProgress() { return this.progress; }
@@ -141,48 +144,48 @@ public class EditProjectForm extends ActionForm {
 
 	
 
-	/**
-	 * @return Returns the foundationName.
-	 */
-	public String getFoundationName() {
-		return foundationName;
-	}
-	/**
-	 * @param foundationName The foundationName to set.
-	 */
-	public void setFoundationName(String foundationName) {
-		this.foundationName = foundationName;
-	}
-	/**
-	 * @return Returns the grantAmount.
-	 */
-	public String getGrantAmount() {
-		return grantAmount;
-	}
-	/**
-	 * @param grantAmount The grantAmount to set.
-	 */
-	public void setGrantAmount(String grantAmount) {
-		this.grantAmount = grantAmount;
-	}
-	/**
-	 * @return Returns the grantNumber.
-	 */
-	public String getGrantNumber() {
-		return grantNumber;
-	}
-	/**
-	 * @param grantNumber The grantNumber to set.
-	 */
-	public void setGrantNumber(String grantNumber) {
-		this.grantNumber = grantNumber;
-	}
+//	/**
+//	 * @return Returns the foundationName.
+//	 */
+//	public String getFoundationName() {
+//		return foundationName;
+//	}
+//	/**
+//	 * @param foundationName The foundationName to set.
+//	 */
+//	public void setFoundationName(String foundationName) {
+//		this.foundationName = foundationName;
+//	}
+//	/**
+//	 * @return Returns the grantAmount.
+//	 */
+//	public String getGrantAmount() {
+//		return grantAmount;
+//	}
+//	/**
+//	 * @param grantAmount The grantAmount to set.
+//	 */
+//	public void setGrantAmount(String grantAmount) {
+//		this.grantAmount = grantAmount;
+//	}
+//	/**
+//	 * @return Returns the grantNumber.
+//	 */
+//	public String getGrantNumber() {
+//		return grantNumber;
+//	}
+//	/**
+//	 * @param grantNumber The grantNumber to set.
+//	 */
+//	public void setGrantNumber(String grantNumber) {
+//		this.grantNumber = grantNumber;
+//	}
 	// The form variables we'll be tracking
 	private String title = null;
 	private String projectAbstract = null;
 	private String publicAbstract = null;
-	private String[] fundingTypes = new String[0];
-	private String[] federalFundingTypes = new String[0];
+//	private String[] fundingTypes = new String[0];
+//	private String[] federalFundingTypes = new String[0];
 	private String progress = null;
 	private String keywords = null;
 	private String comments = null;
@@ -196,8 +199,41 @@ public class EditProjectForm extends ActionForm {
 	private int researcherC = 0;
 	private int researcherD = 0;
 
-	private String foundationName = null;
-	private String grantNumber = null;
-	private String grantAmount = null;
+//	private String foundationName = null;
+//	private String grantNumber = null;
+//	private String grantAmount = null;
 	
+	protected List<Integer> grants = new ArrayList<Integer>();
+
+	public void setGrant(int index, Integer grantID) {
+		while(index >= grants.size())
+			grants.add(null);
+		grants.set(index, grantID);
+	}
+	
+	public Integer getGrant(int index) {
+		while(index >= grants.size())
+			grants.add(null);
+		return grants.get(index);
+	}
+	
+	public List <Integer> getGrants() {
+		List<Integer> validGrants = new ArrayList<Integer>();
+		for (Integer grantID: grants)
+			if (grantID != null && grantID > 0)
+				validGrants.add(grantID);
+		return validGrants;
+	}
+	
+	public void setGrants(List <Integer> grants) {
+		this.grants = grants;
+	}
+	
+	public int validGrantCount() {
+		int i = 0;
+		for (Integer grantID: grants) {
+			if (grantID != null && grantID > 0)	i++;
+		}
+		return i;
+	}
 }

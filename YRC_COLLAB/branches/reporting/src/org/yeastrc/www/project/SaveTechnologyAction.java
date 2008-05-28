@@ -8,12 +8,15 @@
 
 package org.yeastrc.www.project;
 
+import java.util.List;
+
 import javax.servlet.http.*;
 import org.apache.struts.action.*;
 
 import org.yeastrc.project.*;
 import org.yeastrc.www.user.*;
 import org.yeastrc.data.*;
+import org.yeastrc.grant.ProjectGrantRecord;
 
 /**
  * Controller class for saving a project.
@@ -34,8 +37,8 @@ public class SaveTechnologyAction extends Action {
 		int researcherC = 0;
 		int researcherD = 0;
 		String[] groups = null;
-		String[] fundingTypes = null;
-		String[] federalFundingTypes = null;
+//		String[] fundingTypes = null;
+//		String[] federalFundingTypes = null;
 		String projectAbstract = null;
 		String publicAbstract = null;
 		String progress = null;
@@ -45,9 +48,9 @@ public class SaveTechnologyAction extends Action {
 		float bta = (float)0.0;
 		String axisI = null;
 		String axisII = null;
-		String grantNumber = null;
-		String grantAmount = null;
-		String foundationName = null;
+//		String grantNumber = null;
+//		String grantAmount = null;
+//		String foundationName = null;
 		
 		// User making this request
 		User user = UserUtils.getUser(request);
@@ -110,8 +113,8 @@ public class SaveTechnologyAction extends Action {
 		researcherC = ((EditTechnologyForm)(form)).getResearcherC();
 		researcherD = ((EditTechnologyForm)(form)).getResearcherD();
 		groups = ((EditTechnologyForm)(form)).getGroups();
-		fundingTypes = ((EditTechnologyForm)(form)).getFundingTypes();
-		federalFundingTypes = ((EditTechnologyForm)(form)).getFederalFundingTypes();
+//		fundingTypes = ((EditTechnologyForm)(form)).getFundingTypes();
+//		federalFundingTypes = ((EditTechnologyForm)(form)).getFederalFundingTypes();
 		projectAbstract = ((EditTechnologyForm)(form)).getAbstract();
 		publicAbstract = ((EditTechnologyForm)(form)).getPublicAbstract();
 		//keywords = ((EditTechnologyForm)(form)).getKeywords();
@@ -121,9 +124,9 @@ public class SaveTechnologyAction extends Action {
 		bta = ((EditTechnologyForm)(form)).getBTA();
 		axisI = ((EditTechnologyForm)(form)).getAxisI();
 		axisII = ((EditTechnologyForm)(form)).getAxisII();
-		foundationName = ((EditTechnologyForm)(form)).getFoundationName();
-		grantNumber = ((EditTechnologyForm)(form)).getGrantNumber();
-		grantAmount = ((EditTechnologyForm)(form)).getGrantAmount();
+//		foundationName = ((EditTechnologyForm)(form)).getFoundationName();
+//		grantNumber = ((EditTechnologyForm)(form)).getGrantNumber();
+//		grantAmount = ((EditTechnologyForm)(form)).getGrantAmount();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
@@ -169,26 +172,26 @@ public class SaveTechnologyAction extends Action {
 		}
 
 		// Set up the funding types
-		project.clearFundingTypes();
-		
-		if (fundingTypes != null) {
-			if (fundingTypes.length > 0) {
-				for (int i = 0; i < fundingTypes.length; i++) {
-					project.setFundingType(fundingTypes[i]);
-				}
-			}
-		}
-		
-		// Set up the federal funding types
-		project.clearFederalFundingTypes();
-		
-		if (federalFundingTypes != null) {
-			if (federalFundingTypes.length > 0) {
-				for (int i = 0; i < federalFundingTypes.length; i++) {
-					project.setFederalFundingType(federalFundingTypes[i]);
-				}
-			}
-		}
+//		project.clearFundingTypes();
+//		
+//		if (fundingTypes != null) {
+//			if (fundingTypes.length > 0) {
+//				for (int i = 0; i < fundingTypes.length; i++) {
+//					project.setFundingType(fundingTypes[i]);
+//				}
+//			}
+//		}
+//		
+//		// Set up the federal funding types
+//		project.clearFederalFundingTypes();
+//		
+//		if (federalFundingTypes != null) {
+//			if (federalFundingTypes.length > 0) {
+//				for (int i = 0; i < federalFundingTypes.length; i++) {
+//					project.setFederalFundingType(federalFundingTypes[i]);
+//				}
+//			}
+//		}
 
 		// Set up the groups
 		project.clearGroups();
@@ -222,13 +225,17 @@ public class SaveTechnologyAction extends Action {
 		project.setPublications(publications);
 		project.setComments(comments);
 		project.setBTA(bta);
-		project.setGrantAmount( grantAmount );
-		project.setGrantNumber( grantNumber );
-		project.setFoundationName( foundationName );
+//		project.setGrantAmount( grantAmount );
+//		project.setGrantNumber( grantNumber );
+//		project.setFoundationName( foundationName );
 		
 		// Save the project
 		project.save();
 
+		// save the project grants
+		List<Integer> grants = ((EditTechnologyForm)(form)).getGrants();
+		ProjectGrantRecord.saveProjectGrants(project.getID(), grants);
+		
 		// Go!
 		return mapping.findForward("viewProject");
 

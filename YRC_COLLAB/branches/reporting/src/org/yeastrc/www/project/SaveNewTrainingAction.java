@@ -39,8 +39,8 @@ public class SaveNewTrainingAction extends Action {
 		int researcherC = 0;
 		int researcherD = 0;
 		String[] groups = null;
-		String[] fundingTypes = null;
-		String[] federalFundingTypes = null;
+//		String[] fundingTypes = null;
+//		String[] federalFundingTypes = null;
 		String comments = null;
 		String description = null;
 		int hours = 0;
@@ -71,8 +71,8 @@ public class SaveNewTrainingAction extends Action {
 		researcherC = ((EditTrainingForm)(form)).getResearcherC();
 		researcherD = ((EditTrainingForm)(form)).getResearcherD();
 		groups = ((EditTrainingForm)(form)).getGroups();
-		fundingTypes = ((EditTrainingForm)(form)).getFundingTypes();
-		federalFundingTypes = ((EditTrainingForm)(form)).getFederalFundingTypes();
+//		fundingTypes = ((EditTrainingForm)(form)).getFundingTypes();
+//		federalFundingTypes = ((EditTrainingForm)(form)).getFederalFundingTypes();
 		comments = ((EditTrainingForm)(form)).getComments();
 		description = ((EditTrainingForm)(form)).getDescription();
 		hours = ((EditTrainingForm)(form)).getHours();

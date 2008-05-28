@@ -9,6 +9,7 @@
 package org.yeastrc.www.project;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.grant.Grant;
+import org.yeastrc.grant.GrantRecord;
 import org.yeastrc.project.Dissemination;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
@@ -97,6 +100,10 @@ public class EditProjectAction extends Action {
 		// Set this project in the request, as a bean to be displayed on the view
 		request.setAttribute("project", project);
 
+		// get the grants for this project and set them in the request
+		List<Grant> grants = GrantRecord.getGrantsForProject(project.getID());
+		request.setAttribute("grants", grants);
+		
 		// Where do you want to go from here?
 		String forwardStr = "";
 
@@ -113,11 +120,11 @@ public class EditProjectAction extends Action {
 			String[] groups = project.getGroupsArray();
 			((EditCollaborationForm)(newForm)).setGroups(groups);
 
-			newForm.setFundingTypes(project.getFundingTypesArray());
-			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
-			newForm.setGrantAmount( project.getGrantAmount() );
-			newForm.setGrantNumber( project.getGrantNumber() );
-			newForm.setFoundationName( project.getFoundationName() );
+//			newForm.setFundingTypes(project.getFundingTypesArray());
+//			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
+//			newForm.setGrantAmount( project.getGrantAmount() );
+//			newForm.setGrantNumber( project.getGrantNumber() );
+//			newForm.setFoundationName( project.getFoundationName() );
 			
 			
 		}
@@ -149,11 +156,11 @@ public class EditProjectAction extends Action {
 			String[] groups = project.getGroupsArray();
 			((EditTechnologyForm)(newForm)).setGroups(groups);
 
-			newForm.setFundingTypes(project.getFundingTypesArray());
-			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
-			newForm.setGrantAmount( project.getGrantAmount() );
-			newForm.setGrantNumber( project.getGrantNumber() );
-			newForm.setFoundationName( project.getFoundationName() );
+//			newForm.setFundingTypes(project.getFundingTypesArray());
+//			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
+//			newForm.setGrantAmount( project.getGrantAmount() );
+//			newForm.setGrantNumber( project.getGrantNumber() );
+//			newForm.setFoundationName( project.getFoundationName() );
 			
 		
 		}
