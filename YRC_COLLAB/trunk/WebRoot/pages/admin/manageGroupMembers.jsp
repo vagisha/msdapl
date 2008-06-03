@@ -19,7 +19,7 @@
 
  <P>Listed below are members of the group: <B><bean:write name="groupName" scope="request"/></B>.
 
- <P></UL>Current members:</UL><BR>
+ <P>Current members:<BR>
 
   <TABLE BORDER="0" WIDTH="80%">
 

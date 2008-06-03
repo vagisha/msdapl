@@ -82,14 +82,12 @@
 
    <TD valign="top" width="25%">Comments:
    
-   		<yrcwww:member group="any">
    			<logic:empty name="run" property="comments">
    				<br><font style="font-size:8pt;">[<a href="javascript:showEditBox()">Add Comments</a>]<font>
    			</logic:empty>
    			<logic:notEmpty name="run" property="comments">
    				<br><font style="font-size:8pt;">[<a href="javascript:showEditBox()">Edit Comments</a>]<font>
 			</logic:notEmpty>   
-		</yrcwww:member>
 		
    </TD>
    
