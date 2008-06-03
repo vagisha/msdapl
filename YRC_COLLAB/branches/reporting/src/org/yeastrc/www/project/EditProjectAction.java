@@ -116,8 +116,6 @@ public class EditProjectAction extends Action {
 			String[] groups = project.getGroupsArray();
 			((EditCollaborationForm)(newForm)).setGroups(groups);
 			
-			newForm.setID(project.getID());
-			newForm.setSubmitDate(project.getSubmitDate());
 			newForm.setGrantList(grants);
 		}
 
@@ -148,8 +146,6 @@ public class EditProjectAction extends Action {
 			String[] groups = project.getGroupsArray();
 			((EditTechnologyForm)(newForm)).setGroups(groups);
 
-			newForm.setID(project.getID());
-			newForm.setSubmitDate(project.getSubmitDate());
 			newForm.setGrantList(grants);
 		
 		}
@@ -190,6 +186,9 @@ public class EditProjectAction extends Action {
 		//newForm.setAxisI(project.getAxisI());
 		//newForm.setAxisII(project.getAxisII());
 
+		newForm.setID(project.getID());
+		newForm.setSubmitDate(project.getSubmitDate());
+		
 		// Set the Researchers
 		Researcher res = project.getPI();
 		if (res != null) newForm.setPI(res.getID());

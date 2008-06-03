@@ -36,7 +36,7 @@
   <html:form action="saveCollaboration" method="post" styleId="form1">
   <html:hidden name="editCollaborationForm" property="ID"/>
   <yrcwww:notmember group="any">
-   <html:hidden name="project" property="BTA"/>
+   <html:hidden name="editCollaborationForm" property="BTA"/>
   </yrcwww:notmember>
   
   <TABLE CELLPADDING="no" CELLSPACING="0">
