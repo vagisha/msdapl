@@ -16,6 +16,7 @@ import org.apache.struts.action.*;
 import org.yeastrc.project.*;
 import org.yeastrc.www.user.*;
 import org.yeastrc.data.*;
+import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.ProjectGrantRecord;
 
 /**
@@ -37,8 +38,6 @@ public class SaveCollaborationAction extends Action {
 		int researcherC = 0;
 		int researcherD = 0;
 		String[] groups = null;
-//		String[] fundingTypes = null;
-//		String[] federalFundingTypes = null;
 		String projectAbstract = null;
 		String publicAbstract = null;
 		String progress = null;
@@ -48,9 +47,6 @@ public class SaveCollaborationAction extends Action {
 		float bta = (float)0.0;
 		String axisI = null;
 		String axisII = null;
-//		String grantNumber = null;
-//		String grantAmount = null;
-//		String foundationName = null;
 
 		
 		// User making this request
@@ -114,8 +110,6 @@ public class SaveCollaborationAction extends Action {
 		researcherC = ((EditCollaborationForm)(form)).getResearcherC();
 		researcherD = ((EditCollaborationForm)(form)).getResearcherD();
 		groups = ((EditCollaborationForm)(form)).getGroups();
-//		fundingTypes = ((EditCollaborationForm)(form)).getFundingTypes();
-//		federalFundingTypes = ((EditCollaborationForm)(form)).getFederalFundingTypes();
 		projectAbstract = ((EditCollaborationForm)(form)).getAbstract();
 		publicAbstract = ((EditCollaborationForm)(form)).getPublicAbstract();
 		//keywords = ((EditCollaborationForm)(form)).getKeywords();
@@ -125,9 +119,6 @@ public class SaveCollaborationAction extends Action {
 		bta = ((EditCollaborationForm)(form)).getBTA();
 		axisI = ((EditCollaborationForm)(form)).getAxisI();
 		axisII = ((EditCollaborationForm)(form)).getAxisII();
-//		foundationName = ((EditCollaborationForm)(form)).getFoundationName();
-//		grantNumber = ((EditCollaborationForm)(form)).getGrantNumber();
-//		grantAmount = ((EditCollaborationForm)(form)).getGrantAmount();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
@@ -172,28 +163,6 @@ public class SaveCollaborationAction extends Action {
 			return mapping.findForward("Failure");
 		}
 
-		// Set up the funding types
-//		project.clearFundingTypes();
-//		
-//		if (fundingTypes != null) {
-//			if (fundingTypes.length > 0) {
-//				for (int i = 0; i < fundingTypes.length; i++) {
-//					project.setFundingType(fundingTypes[i]);
-//				}
-//			}
-//		}
-//		
-//		// Set up the federal funding types
-//		project.clearFederalFundingTypes();
-//		
-//		if (federalFundingTypes != null) {
-//			if (federalFundingTypes.length > 0) {
-//				for (int i = 0; i < federalFundingTypes.length; i++) {
-//					project.setFederalFundingType(federalFundingTypes[i]);
-//				}
-//			}
-//		}
-
 		// Set up the groups
 		project.clearGroups();
 		
@@ -228,17 +197,14 @@ public class SaveCollaborationAction extends Action {
 		project.setBTA(bta);
 		project.setAxisI(axisI);
 		project.setAxisII(axisII);
-//		project.setGrantAmount( grantAmount );
-//		project.setGrantNumber( grantNumber );
-//		project.setFoundationName( foundationName );
 		
 		
 		// Save the project
 		project.save();
 
 		// save the project grants
-		List<Integer> grants = ((EditCollaborationForm)(form)).getGrants();
-		ProjectGrantRecord.saveProjectGrants(project.getID(), grants);
+		List<Grant> grants = ((EditCollaborationForm)(form)).getGrantList();
+		ProjectGrantRecord.getInstance().saveProjectGrants(project.getID(), grants);
 		
 		// Go!
 		return mapping.findForward("viewProject");

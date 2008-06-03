@@ -1,6 +1,7 @@
 package org.yeastrc.www.project;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.FundingSourceType;
 import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.GrantRecord;
-import org.yeastrc.grant.FundingSourceType.SourceName;
+import org.yeastrc.grant.FundingSourceName;
 import org.yeastrc.project.Projects;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.user.User;
@@ -43,7 +44,7 @@ public class EditGrantAction extends Action {
 		request.getSession().setAttribute("sourceTypes", sources);
 		
 		// get the federal funding agency names
-		List<SourceName> federalSources = FundingSourceType.FEDERAL.getAcceptedSourceNames();
+		List<FundingSourceName> federalSources = FundingSourceType.FEDERAL.getAcceptedSourceNames();
 		request.getSession().setAttribute("federalSources", federalSources);
 		
 		// Set up a Collection of all the Researchers to use in the form as a pull-down menu for researchers
@@ -62,24 +63,32 @@ public class EditGrantAction extends Action {
 
 	private ActionForward newGrantForm(ActionMapping mapping,
 			HttpServletRequest request, User user) {
-		// if a PI ID was sent with the request, use this in the grant form
+		// if PI IDs were sent with the request, use the first one in the list in the form
+		List<Integer> piIDs = piIDs(request.getParameter("PIs"));
+		
 		int PI = 0;
-		try {
-			PI = Integer.parseInt(request.getParameter("PI"));
-		}
-		catch (NumberFormatException e) {}
 		
-		// if no PI ID was found in the request, use the ID of the user
-		if (PI == 0) {
+		// if no PI IDs were found in the request, use the ID of the user
+		if (piIDs.size() == 0) {
 			PI = user.getResearcher().getID();
+			piIDs.add(PI);
 		}
+		else
+			PI = piIDs.get(0);
 		
+		// put the PIs in the session for future use
+		request.getSession().setAttribute("PIs", commaSeparated(piIDs));
+		
+		// if some selected grant IDs were sent with this request save them in the session for future use
+		if (request.getParameter("selectedGrants") != null) {
+			String selectedGrants = request.getParameter("selectedGrants");
+			// save in session for future use
+			request.getSession().setAttribute("selectedGrants", selectedGrants);
+		}
 		// Create a new form and set the selected PI
 		EditGrantForm grantForm = new EditGrantForm();
 		grantForm.setPI(PI);
 		request.setAttribute("editGrantForm", grantForm);
-		
-		request.setAttribute("newGrant", "true");
 		
 		return mapping.findForward("Success");
 	}
@@ -101,7 +110,7 @@ public class EditGrantAction extends Action {
 		}
 		
 		// get the grant for the given ID;
-		Grant grant = GrantRecord.load(grantID);
+		Grant grant = GrantRecord.getInstance().load(grantID);
 		if (grant == null) {
 			ActionErrors errors = new ActionErrors();
 			errors.add("grant", new ActionMessage("error.grant.notfound"));
@@ -113,13 +122,15 @@ public class EditGrantAction extends Action {
 		EditGrantForm grantForm = new EditGrantForm();
 		grantForm.setGrantID(grant.getID());
 		grantForm.setGrantTitle(grant.getTitle());
-		grantForm.setPI(grant.getPIID());
-		grantForm.setFundingType(grant.getFundingSource().getTypeName());
+		grantForm.setPI(grant.getGrantPI().getID());
+		FundingSourceType sourceType = grant.getFundingSource().getSourceType();
+		grantForm.setFundingType(sourceType.getName());
+		FundingSourceName sourceName = grant.getFundingSource().getSourceName();
 		if (grant.getFundingSource().isFederal()) {
-			grantForm.setFedFundingAgencyName(grant.getFundingSource().getName());
+			grantForm.setFedFundingAgencyName(sourceName.getName());
 		}
 		else {
-			grantForm.setFundingAgencyName(grant.getFundingSource().getDisplayName());
+			grantForm.setFundingAgencyName(sourceName.getDisplayName());
 		}
 		grantForm.setGrantNumber(grant.getGrantNumber());
 		grantForm.setGrantAmount(grant.getGrantAmount());
@@ -127,5 +138,31 @@ public class EditGrantAction extends Action {
 		request.setAttribute("editGrantForm", grantForm);
 		
 		return mapping.findForward("Success");
+	}
+	
+	private List <Integer> piIDs(String piIDStr) {
+		if (piIDStr == null || piIDStr.length() == 0)
+			return new ArrayList<Integer>(0);
+		String[] tokens = piIDStr.split(",");
+		List <Integer> ids = new ArrayList<Integer>(tokens.length);
+		for (String tok: tokens) {
+			try {
+				int id = Integer.parseInt(tok);
+				ids.add(id);
+			}
+			catch (NumberFormatException e){}
+		}
+		return ids;
+	}
+	
+	private String commaSeparated(List <Integer> piIDs) {
+		StringBuilder buf = new StringBuilder();
+		for (Integer id: piIDs) {
+			buf.append(",");
+			buf.append(id);
+		}
+		if (buf.length() > 0)
+			buf.deleteCharAt(0); // remove first comma
+		return buf.toString();
 	}
 }

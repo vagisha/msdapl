@@ -106,7 +106,7 @@ public class ViewProjectAction extends Action {
 		request.setAttribute("project", project);
 		
 		// get the grants for this project and set them in the request
-		List<Grant> grants = GrantRecord.getGrantsForProject(project.getID());
+		List<Grant> grants = GrantRecord.getInstance().getGrantsForProject(project.getID());
 		request.setAttribute("grants", grants);
 		
 		// Check for experiment data for this project

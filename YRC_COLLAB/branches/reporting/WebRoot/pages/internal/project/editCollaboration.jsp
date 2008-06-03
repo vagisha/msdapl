@@ -7,12 +7,10 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:empty name="project">
-  <logic:forward name="editProject" />
-</logic:empty>
+<logic:notPresent name="editCollaborationForm">
+	<logic:forward name="editProject" />
+</logic:notPresent>
  
-<jsp:useBean id="project" class="org.yeastrc.project.Collaboration" scope="request"/>
-
 <%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
@@ -20,7 +18,7 @@
 <SCRIPT LANGUAGE="javascript">
 	function openAXISWindow(type) {
 	 var AXISI_WIN, AXISII_WIN;
-	 var doc = "/yrc/AXIS.do?ID=<bean:write name="project" property="ID"/>&type=" + type;
+	 var doc = "/yrc/AXIS.do?ID=<bean:write name="editCollaborationForm" property="ID"/>&type=" + type;
 
 	 if(type == "I") {
 		AXISI_WIN = window.open(doc, "AXISI_WIN",
@@ -32,13 +30,11 @@
 	}
 </SCRIPT>
 
-<script type="text/javascript" src="/yrc/js/grants.js" ></script>
-
 <yrcwww:contentbox title="Edit Collaboration Details" centered="true" width="750">
 
  <CENTER>
   <html:form action="saveCollaboration" method="post" styleId="form1">
-  <html:hidden name="project" property="ID"/>
+  <html:hidden name="editCollaborationForm" property="ID"/>
   <yrcwww:notmember group="any">
    <html:hidden name="project" property="BTA"/>
   </yrcwww:notmember>
@@ -47,7 +43,7 @@
   
    <TR>
     <TD WIDTH="25%" VALIGN="top"><B>Submit Date:</B></TD>
-    <TD WIDTH="75%" VALIGN="top"><B><bean:write name="project" property="submitDate"/></B></TD>
+    <TD WIDTH="75%" VALIGN="top"><B><bean:write name="editCollaborationForm" property="submitDate"/></B></TD>
    </TR>
 
    <TR>
@@ -163,14 +159,17 @@
   </TABLE>
 
  <P><NOBR>
- <html:image src="/yrc/images/buttons/project-save.gif" value="save" property="action"/>
-
- <html:link href="/yrc/viewProject.do" paramId="ID" paramName="project" paramProperty="ID">
- <html:img src="/yrc/images/buttons/project-cancel.gif" width="200" height="33" border="0"/></html:link>
+ <html:submit value="Save Changes" styleClass="button" />
+ <input type="button" class="button" onclick="javascript:onCancel(<bean:write name="editCollaborationForm" property="ID"/>);" value="Cancel"/>
  </NOBR>
  
   </html:form>
 
+<script type="text/javascript">
+	function onCancel(projectID) {
+		document.location = "/yrc/viewProject.do?ID="+projectID;
+	}
+</script>
 
  </CENTER>
 

@@ -97,12 +97,8 @@ public class EditProjectAction extends Action {
 		}
 
 
-		// Set this project in the request, as a bean to be displayed on the view
-		request.setAttribute("project", project);
-
 		// get the grants for this project and set them in the request
-		List<Grant> grants = GrantRecord.getGrantsForProject(project.getID());
-		request.setAttribute("grants", grants);
+		List<Grant> grants = GrantRecord.getInstance().getGrantsForProject(project.getID());
 		
 		// Where do you want to go from here?
 		String forwardStr = "";
@@ -119,14 +115,10 @@ public class EditProjectAction extends Action {
 			
 			String[] groups = project.getGroupsArray();
 			((EditCollaborationForm)(newForm)).setGroups(groups);
-
-//			newForm.setFundingTypes(project.getFundingTypesArray());
-//			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
-//			newForm.setGrantAmount( project.getGrantAmount() );
-//			newForm.setGrantNumber( project.getGrantNumber() );
-//			newForm.setFoundationName( project.getFoundationName() );
 			
-			
+			newForm.setID(project.getID());
+			newForm.setSubmitDate(project.getSubmitDate());
+			newForm.setGrantList(grants);
 		}
 
 
@@ -156,12 +148,9 @@ public class EditProjectAction extends Action {
 			String[] groups = project.getGroupsArray();
 			((EditTechnologyForm)(newForm)).setGroups(groups);
 
-//			newForm.setFundingTypes(project.getFundingTypesArray());
-//			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
-//			newForm.setGrantAmount( project.getGrantAmount() );
-//			newForm.setGrantNumber( project.getGrantNumber() );
-//			newForm.setFoundationName( project.getFoundationName() );
-			
+			newForm.setID(project.getID());
+			newForm.setSubmitDate(project.getSubmitDate());
+			newForm.setGrantList(grants);
 		
 		}
 		

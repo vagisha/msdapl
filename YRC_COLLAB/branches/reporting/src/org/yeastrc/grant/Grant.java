@@ -2,7 +2,7 @@ package org.yeastrc.grant;
 
 import org.yeastrc.project.Researcher;
 
-public class Grant {
+public class Grant implements IsSelectable {
 
 	private int ID;
 	private String title;
@@ -11,12 +11,19 @@ public class Grant {
 	private String grantNumber;
 	private String grantAmount;
 	
+	private boolean selected = false;
+	
+	public Grant() {
+		grantPI = new Researcher();
+		fundingSource = new FundingSource();
+	}
 	/**
 	 * @return the fundingSource
 	 */
 	public FundingSource getFundingSource() {
 		return fundingSource;
 	}
+	
 	/**
 	 * @param fundingSource the fundingSource to set
 	 */
@@ -47,14 +54,6 @@ public class Grant {
 	 */
 	public void setGrantPI(Researcher grantPI) {
 		this.grantPI = grantPI;
-	}
-	
-	public int getPIID() {
-		return grantPI.getID();
-	}
-	
-	public String getPILastName() {
-		return grantPI.getLastName();
 	}
 	
 	/**
@@ -93,5 +92,13 @@ public class Grant {
 	 */
 	public void setGrantAmount(String grantAmount) {
 		this.grantAmount = grantAmount;
+	}
+	
+	public boolean isSelected() {
+		return this.selected;
+	}
+	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 }

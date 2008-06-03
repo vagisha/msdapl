@@ -10,16 +10,21 @@ import java.util.List;
 
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.db.DBConnectionManager;
-import org.yeastrc.grant.FundingSourceType.SourceName;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.user.User;
 
 public class GrantRecord {
 
+	private static GrantRecord instance = new GrantRecord();
+	
 	private GrantRecord(){}
 
-	public static void save(Grant grant) throws Exception {
+	public static GrantRecord getInstance() {
+		return instance;
+	}
+	
+	public void save(Grant grant) throws Exception {
 
 		if (grant == null)
 			return;
@@ -47,9 +52,11 @@ public class GrantRecord {
 			}
 
 			rs.updateString("title", grant.getTitle());
-			rs.updateInt("PI", grant.getPIID());
-			rs.updateString("sourceType", grant.getFundingSource().getTypeName());
-			rs.updateString("sourceName", grant.getFundingSource().getName());
+			rs.updateInt("PI", grant.getGrantPI().getID());
+			FundingSourceType sourceType = grant.getFundingSource().getSourceType();
+			rs.updateString("sourceType", sourceType.getName());
+			FundingSourceName sourceName = grant.getFundingSource().getSourceName();
+			rs.updateString("sourceName", sourceName.getName());
 			rs.updateString("grantNum", grant.getGrantNumber());
 			rs.updateString("grantAmount", grant.getGrantAmount());
 
@@ -84,7 +91,7 @@ public class GrantRecord {
 		}
 	}
 
-	public static Grant load(int grantID) throws SQLException, InvalidIDException {
+	public Grant load(int grantID) throws SQLException, InvalidIDException {
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -102,7 +109,7 @@ public class GrantRecord {
 				Grant grant = new Grant();
 				grant.setID(rs.getInt("id"));
 				grant.setGrantPI(getPI(rs.getInt("PI")));
-				grant.setFundingSource(getFundingSource(rs.getString("sourceType"), rs.getString("sourceName")));
+				grant.setFundingSource(FundingSource.getFundingSource(rs.getString("sourceType"), rs.getString("sourceName")));
 				grant.setGrantNumber(rs.getString("grantNum"));
 				grant.setGrantAmount(rs.getString("grantAmount"));
 				grant.setTitle(rs.getString("title"));
@@ -129,7 +136,7 @@ public class GrantRecord {
 		return null;
 	}
 	
-	public static List<Grant> getGrantsForProject(int projectID) throws SQLException, InvalidIDException {
+	public List<Grant> getGrantsForProject(int projectID) throws SQLException, InvalidIDException {
 
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -153,7 +160,7 @@ public class GrantRecord {
 				Grant grant = new Grant();
 				grant.setID(rs.getInt("id"));
 				grant.setGrantPI(getPI(rs.getInt("PI")));
-				grant.setFundingSource(getFundingSource(rs.getString("sourceType"), rs.getString("sourceName")));
+				grant.setFundingSource(FundingSource.getFundingSource(rs.getString("sourceType"), rs.getString("sourceName")));
 				grant.setGrantNumber(rs.getString("grantNum"));
 				grant.setGrantAmount(rs.getString("grantAmount"));
 				grant.setTitle(rs.getString("title"));
@@ -180,18 +187,25 @@ public class GrantRecord {
 		}
 	}
 
-	public static List<Grant> getGrantForUserAndPI(User user, int piID) throws SQLException, InvalidIDException {
+	public List<Grant> getGrantForUserAndPIs(User user, List<Integer> piIDs) throws SQLException, InvalidIDException {
 		
 		// get a list of all the projects for this user
 		List<Project> projects = user.getProjects();
-		String projIDStr = "";
+		StringBuilder projIDStr = new StringBuilder();
 		for (Project proj: projects) {
-			projIDStr += ","+proj.getID();
+			projIDStr.append(","+proj.getID());
 		}
 		if (projIDStr.length() > 0)
-			projIDStr = projIDStr.substring(1); // remove the first comma
+			projIDStr.deleteCharAt(0); // remove the first comma
 		
 		Researcher thisResearcher = user.getResearcher();
+		StringBuilder piIDStr = new StringBuilder();
+		piIDStr.append(thisResearcher.getID());
+		for(Integer piID: piIDs) {
+			piIDStr.append(",");
+			piIDStr.append(piID);
+		}
+		
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -202,9 +216,9 @@ public class GrantRecord {
 			StringBuilder sql = new StringBuilder("SELECT grants.id, grants.PI, grants.title, grants.sourceType, grants.sourceName, grants.grantNum, grants.grantAmount, projectGrant.projectID ");
 			sql.append("FROM grants ");
 			sql.append("LEFT JOIN projectGrant ON grants.id=projectGrant.grantID ");
-			sql.append("WHERE grants.PI in ("+piID+", "+thisResearcher.getID()+") ");
+			sql.append("WHERE grants.PI in ("+piIDStr.toString()+") ");
 			if (projIDStr.length() > 0)
-				sql.append("OR projectGrant.projectID in ("+projIDStr+") ");
+				sql.append("OR projectGrant.projectID in ("+projIDStr.toString()+") ");
 					
 			sql.append("GROUP BY grants.id ");
 			sql.append("ORDER BY grants.id");
@@ -219,7 +233,7 @@ public class GrantRecord {
 				Grant grant = new Grant();
 				grant.setID(rs.getInt("id"));
 				grant.setGrantPI(getPI(rs.getInt("PI")));
-				grant.setFundingSource(getFundingSource(rs.getString("sourceType"), rs.getString("sourceName")));
+				grant.setFundingSource(FundingSource.getFundingSource(rs.getString("sourceType"), rs.getString("sourceName")));
 				grant.setGrantNumber(rs.getString("grantNum"));
 				grant.setGrantAmount(rs.getString("grantAmount"));
 				grant.setTitle(rs.getString("title"));
@@ -246,19 +260,9 @@ public class GrantRecord {
 		}
 	}
 
-	private static Researcher getPI(int researcherID) throws InvalidIDException, SQLException {
+	private Researcher getPI(int researcherID) throws InvalidIDException, SQLException {
 		Researcher PI = new Researcher();
 		PI.load(researcherID);
 		return PI;
-	}
-	
-	public static FundingSource getFundingSource(String type, String name) {
-		FundingSourceType sourceType = FundingSourceType.getSourceType(type);
-		if (type != null) {
-			SourceName sourceName = sourceType.getSourceName(name);
-			if (sourceName != null)
-				return new FundingSource(sourceType, sourceName);
-		}
-		return null;
 	}
 }

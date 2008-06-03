@@ -1,6 +1,7 @@
 
 <%@page import="org.yeastrc.grant.FundingSourceType"%>
-<%@page import="org.yeastrc.grant.FundingSourceType.SourceName"%><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@page import="org.yeastrc.grant.FundingSourceName"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-bean" prefix="bean" %>
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-html" prefix="html" %>
@@ -46,16 +47,37 @@
 			if (hideRow.style.display == '')
 				 hideRow.style.display = 'none';
 		}
+		
+		<%	String PIs = (String)request.getSession().getAttribute("PIs"); 
+			if (PIs == null) PIs = "0";
+			String selectedGrants = (String)request.getSession().getAttribute("selectedGrants");
+			if (selectedGrants == null)	selectedGrants = "";
+		%>
+		
+		function onCancel() {
+			if (window.opener.EDIT_CLICKED) {
+				window.close();
+			}
+			else {
+				var url = '/yrc/viewGrants.do?PIs=<%=PIs%>&selectedGrants=<%=selectedGrants%>';
+				document.location = url;
+			}
+		}
+		
 	</script>
   </head>
   
   <body>
   <%@ include file="/includes/errors.jsp" %>
   
-  	<% String title = "Edit Grant"; %>
+  	<% String title = "New Grant"; %>
   	
-  	<logic:present name="newGrant">
-  		<% title = "New Grant"; %>
+  	<logic:present name="editGrantForm">
+  		<logic:greaterThan name="editGrantForm" property="grantID" value="0">
+  			<%
+  				title = "Edit Grant";
+  			%>
+  		</logic:greaterThan>
   	</logic:present>
 	 
 	<yrcwww:contentbox title="<%=title%>" width="500">
@@ -81,8 +103,8 @@
 	 			<tr>
 	 				<td style="padding:5px;" WIDTH="25%" VALIGN="top">Funding Source:</td>
 	 				<td style="padding:5px;" WIDTH="75%" VALIGN="top">
-	 				<logic:iterate name="sourceTypes" id="source">
-	 					<nobr><html:radio property="fundingType" value="<%=((FundingSourceType)source).getType() %>" onclick="displaySourceName(this)" ><bean:write name="source" property="displayName" /></html:radio></nobr>
+	 				<logic:iterate name="sourceTypes" id="sourceType">
+	 					<nobr><html:radio property="fundingType" value="<%=((FundingSourceType)sourceType).getName()%>" onclick="displaySourceName(this)" ><bean:write name="sourceType" property="displayName" /></html:radio></nobr>
 	 				</logic:iterate>
 	 				</td>
 	 			</tr>
@@ -90,7 +112,7 @@
 	 				<td style="padding:5px;" WIDTH="25%" VALIGN="top">Federal Funding Source:</td>
 	 				<td style="padding:5px;" WIDTH="75%" VALIGN="top">
 	 				<logic:iterate name="federalSources" id="fedSource">
-	 					<nobr><html:radio property="fedFundingAgencyName" value="<%=((SourceName)fedSource).getName() %>"><bean:write name="fedSource" property="displayName" /></html:radio></nobr>
+	 					<nobr><html:radio property="fedFundingAgencyName" value="<%=((FundingSourceName)fedSource).getName()%>"><bean:write name="fedSource" property="displayName" /></html:radio></nobr>
 	 				</logic:iterate>
 	 				</td>
 	 			</tr>
@@ -111,7 +133,7 @@
 	 				<td colspan="2"" align="center">
 	 					<html:submit>Save</html:submit>
 	 					&nbsp;&nbsp;
-	 					<input type="button" value="Cancel" onClick="window.close()">
+ 						<input type="button" value="Cancel" onClick="javascript:onCancel();">
 	 				</td>
 	 			</tr>
 	 		</table>

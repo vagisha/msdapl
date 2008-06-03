@@ -135,10 +135,6 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
 
 	<tr><td colspan="2"><hr width="85%"></td></tr>
 
-	<tr>
-		<td colspan="2" align="left"><p><b>The following funding information is used by us when filing our annual report
-										with NCRR and NIH, and is used to derive summary statistics only.</b><br><br>
-
 	<!-- ===================================================================================== -->
 	<!--  List grants here -->
 	<%@ include file="grantListForm.jsp" %>
@@ -157,7 +153,7 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
   </TABLE>
 
  <P><NOBR>
- <html:submit value="Request/Save Collaboration"/>
+ <html:submit value="Request/Save Collaboration" styleClass="button"/>
  </NOBR>
  
   </html:form>

@@ -10,9 +10,15 @@ import org.yeastrc.db.DBConnectionManager;
 
 public class ProjectGrantRecord {
 
+	private static ProjectGrantRecord instance = new ProjectGrantRecord();
+	
 	private ProjectGrantRecord(){}
 	
-	public static void saveProjectGrants(int projectID, List<Integer> grantIDs) throws SQLException {
+	public static ProjectGrantRecord getInstance() {
+		return instance;
+	}
+	
+	public void saveProjectGrants(int projectID, List<Grant> grants) throws SQLException {
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -34,9 +40,9 @@ public class ProjectGrantRecord {
 			// now save the given grants
 			conn = DBConnectionManager.getConnection("yrc");
 			stmt = conn.createStatement();
-			for(Integer grantID: grantIDs) {
-				if (grantID <= 0)	continue; // this grant is not valid
-				sql = "INSERT into projectGrant values(0,"+projectID+","+grantID+")";
+			for(Grant grant: grants) {
+				if (grant.getID() <= 0)	continue;
+				sql = "INSERT into projectGrant values(0,"+projectID+","+grant.getID()+")";
 				stmt.executeUpdate(sql);
 			}
 			stmt.close(); stmt = null;

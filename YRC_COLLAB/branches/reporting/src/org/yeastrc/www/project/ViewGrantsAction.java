@@ -1,6 +1,7 @@
 package org.yeastrc.www.project;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.GrantRecord;
-import org.yeastrc.grant.GrantUtils;
+import org.yeastrc.grant.GrantSorter;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -36,46 +37,77 @@ public class ViewGrantsAction extends Action {
 			return mapping.findForward("authenticate");
 		}
 
-		int PI = 0;
-		try {
-			PI = Integer.parseInt(request.getParameter("PI"));
-		}
-		catch (NumberFormatException e) {
-			PI = 0;
-		}
-		
-		// put the PI in the request for future use
-		request.setAttribute("PI", PI);
+		String piIDStr = request.getParameter("PIs");
+		List<Integer> piIdList = piIDs(piIDStr);
 		
 		// get all the grants associated with this user and given PI
-		List<Grant> grants = GrantRecord.getGrantForUserAndPI(user, PI);
+		List<Grant> grants = GrantRecord.getInstance().getGrantForUserAndPIs(user, piIdList);
 		if (request.getParameter("sortby") != null) {
 			sortGrantsBy(grants, request.getParameter("sortby"));
 		}
+		
+		// if a list of selected grant IDs was sent with the request, grab them
+		List <Integer> grantIDs = new ArrayList<Integer>();
+		String selGrantParam = request.getParameter("selectedGrants");
+		if (selGrantParam != null && selGrantParam.length() > 0) {
+			String[] selectedGrants = request.getParameter("selectedGrants").split(",");
+			for (String idStr: selectedGrants) {
+				grantIDs.add(Integer.parseInt(idStr));
+			}
+		}
+		// select the given grants
+		selectGrants(grants, grantIDs);
+		
+		// remove this just in case it is hanging around (from EditGrantAction)
+		request.getSession().removeAttribute("selectedGrants");
+		request.getSession().removeAttribute("PIs");
+		
 		request.setAttribute("grants", grants);
 		
 		return mapping.findForward("Success");
 		
 	}
 	
+	private void selectGrants(List<Grant> grants, List<Integer> selectedGrants) {
+		for (Grant grant: grants) {
+			if (selectedGrants.contains(grant.getID()))
+				grant.setSelected(true);
+		}
+	}
+	
 	private void sortGrantsBy(List<Grant> grants, String sortBy) {
 		if (sortBy.equalsIgnoreCase("title")) 
-			Collections.sort(grants, new GrantUtils.GrantTitleComparator());
-			
+			GrantSorter.getInstance().sortByTitle(grants);
+		
 		else if (sortBy.equalsIgnoreCase("pi"))
-			Collections.sort(grants, new GrantUtils.GrantPIComparator());
+			GrantSorter.getInstance().sortByPI(grants);
 		
 		else if (sortBy.equalsIgnoreCase("sourceType"))
-			Collections.sort(grants, new GrantUtils.GrantSourceTypeComparator());
+			GrantSorter.getInstance().sortBySourceType(grants);
 		
 		else if (sortBy.equalsIgnoreCase("sourceName"))
-			Collections.sort(grants, new GrantUtils.GrantSourceNameComparator());
+			GrantSorter.getInstance().sortBySourceName(grants);
 		
 		else if (sortBy.equalsIgnoreCase("grantNum"))
-			Collections.sort(grants, new GrantUtils.GrantNumberComparator());
+			GrantSorter.getInstance().sortByGrantNumber(grants);
 		
 		else if (sortBy.equalsIgnoreCase("grantAmount"))
-			Collections.sort(grants, new GrantUtils.GrantAmountComparator());
+			GrantSorter.getInstance().sortByGrantAmount(grants);
 		
+	}
+	
+	private List <Integer> piIDs(String piIDStr) {
+		if (piIDStr == null || piIDStr.length() == 0)
+			return new ArrayList<Integer>(0);
+		String[] tokens = piIDStr.split(",");
+		List <Integer> ids = new ArrayList<Integer>(tokens.length);
+		for (String tok: tokens) {
+			try {
+				int id = Integer.parseInt(tok);
+				ids.add(id);
+			}
+			catch (NumberFormatException e){}
+		}
+		return ids;
 	}
 }

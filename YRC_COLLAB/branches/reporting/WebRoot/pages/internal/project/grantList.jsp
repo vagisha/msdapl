@@ -12,15 +12,13 @@
 			</tr>
 		</logic:notEmpty>
 		<logic:iterate name="grants" id="grant">
-			<bean:define name="grant" property="grantPI" id="PI"></bean:define>
-			<bean:define name="grant" property="fundingSource" id="fundingSource"></bean:define>
 			<tr>
 				<td style="font-size:8pt;padding: 3px;padding-left:0px;"><bean:write name="grant" property="title" /></td>
 				<td style="font-size:8pt;padding: 3px;">
-				<html:link href="/yrc/viewResearcher.do" paramId="id" paramName="grant" paramProperty="PIID"><bean:write name="PI" property="lastName" /></html:link>
+				<html:link href="/yrc/viewResearcher.do" paramId="id" paramName="grant" paramProperty="grantPI.ID"><bean:write name="grant" property="grantPI.lastName" /></html:link>
 				</td>
-				<td style="font-size:8pt;padding: 3px;"><bean:write name="fundingSource" property="typeDisplayName" /></td>
-				<td style="font-size:8pt;padding: 3px;"><bean:write name="fundingSource" property="displayName" /></td>
+				<td style="font-size:8pt;padding: 3px;"><bean:write name="grant" property="fundingSource.sourceType.displayName" /></td>
+				<td style="font-size:8pt;padding: 3px;"><bean:write name="grant" property="fundingSource.sourceName.displayName" /></td>
 				<td style="font-size:8pt;padding: 3px;"><bean:write name="grant" property="grantNumber" /></td>
 			</tr>
 		</logic:iterate>

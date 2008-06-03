@@ -4,21 +4,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FundingSourceType {
+public final class FundingSourceType {
 	
-	private String type;
+	private String name;
 	private String displayName;
-	private List<SourceName> acceptedSourceNames;
+	private List<FundingSourceName> acceptedSourceNames;
 	
 	// Federal Source names
-	private static final SourceName[] federalSources = new SourceName[] {new SourceName("NASA"),
-															new SourceName("NIH"), 
-															new SourceName("NSF"), 
-															new SourceName("DOE"), 
-															new SourceName("DOD"),
-															new SourceName("NIST"),
-															new SourceName("DVA"),
-															new SourceName("OTHER", "Other")};
+	private static final FundingSourceName[] federalSources = new FundingSourceName[] {new FundingSourceName("NASA"),
+															new FundingSourceName("NIH"), 
+															new FundingSourceName("NSF"), 
+															new FundingSourceName("DOE"), 
+															new FundingSourceName("DOD"),
+															new FundingSourceName("NIST"),
+															new FundingSourceName("DVA"),
+															new FundingSourceName("OTHER", "Other")};
 	
 	// Funding source types
 	public static final FundingSourceType OTHER = new FundingSourceType("OTHER", "Other");
@@ -31,14 +31,24 @@ public class FundingSourceType {
 	private static final FundingSourceType[] sourceTypes = new FundingSourceType[]{FEDERAL, FOUNDATION, INDUSTRY, PROFASSOC, LOCGOV, OTHER};
 	
 	// -------------------------------------------------------------------------------------
+	// Empty public constructor -- creates a federal funding source
+	// -------------------------------------------------------------------------------------
+	/**
+	 * Creates a new Federal funding source
+	 */
+	public FundingSourceType() {
+		this("FEDERAL", "U.S. Federal", Arrays.asList(federalSources));
+	}
+	
+	// -------------------------------------------------------------------------------------
 	// Private constructors
 	// -------------------------------------------------------------------------------------
 	private FundingSourceType(String type, String displayName) {
-		this(type, displayName, new ArrayList<SourceName>(0));
+		this(type, displayName, new ArrayList<FundingSourceName>(0));
 	}
 	
-	private FundingSourceType(String type, String displayName, List<SourceName> acceptedValues) {
-		this.type = type;
+	private FundingSourceType(String type, String displayName, List<FundingSourceName> acceptedValues) {
+		this.name = type;
 		this.displayName = displayName;
 		this.acceptedSourceNames = acceptedValues;
 	}
@@ -51,7 +61,7 @@ public class FundingSourceType {
 	}
 	
 	public static boolean isFederal(String sourceType) {
-		return sourceType.equalsIgnoreCase(FEDERAL.getType());
+		return sourceType.equalsIgnoreCase(FEDERAL.getName());
 	}
 	
 	public static boolean isValidSourceName(String sourceType, String sourceName) {
@@ -63,7 +73,7 @@ public class FundingSourceType {
 	
 	public static FundingSourceType getSourceType(String sourceType) {
 		for (FundingSourceType source: sourceTypes) {
-			if (source.getType().equals(sourceType))
+			if (source.getName().equals(sourceType))
 				return source;
 		}
 		return null;
@@ -74,30 +84,30 @@ public class FundingSourceType {
 	
 	
 	/**
-	 * @return the type
+	 * @return the name
 	 */
-	public String getType() {
-		return type;
+	public String getName() {
+		return name;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param name the name to set
 	 */
-	public void setType(String type) {
-		this.type = type;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
 	 * @return the acceptedSourceNames
 	 */
-	public List<SourceName> getAcceptedSourceNames() {
+	public List<FundingSourceName> getAcceptedSourceNames() {
 		return acceptedSourceNames;
 	}
 
 	/**
 	 * @param acceptedSourceNames the acceptedSourceNames to set
 	 */
-	public void setAcceptedSourceNames(List<SourceName> acceptedSourceNames) {
+	public void setAcceptedSourceNames(List<FundingSourceName> acceptedSourceNames) {
 		this.acceptedSourceNames = acceptedSourceNames;
 	}
 
@@ -121,64 +131,20 @@ public class FundingSourceType {
 			return true;
 		if (sourceName == null)
 			return false;
-		for (SourceName source: acceptedSourceNames) {
+		for (FundingSourceName source: acceptedSourceNames) {
 			if (source.getName().equals(sourceName))
 				return true;
 		}
 		return false;
 	}
 	
-	public SourceName getSourceName(String name) {
+	public FundingSourceName getSourceName(String name) {
 		if (acceptedSourceNames.size() == 0)
-			return new SourceName(name);
-		for (SourceName source: acceptedSourceNames) {
+			return new FundingSourceName(name);
+		for (FundingSourceName source: acceptedSourceNames) {
 			if (source.getName().equals(name))
 				return source;
 		}
 		return null;
-	}
-	
-	public static final class SourceName {
-		private String name;
-		private String displayName;
-		
-		public SourceName(String name) {
-			this(name, name);
-		}
-		
-		public SourceName(String name, String displayName) {
-			this.name = name;
-			this.displayName = displayName;
-		}
-
-		/**
-		 * @return the name
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * @param name the name to set
-		 */
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		/**
-		 * @return the displayName
-		 */
-		public String getDisplayName() {
-			return displayName;
-		}
-
-		/**
-		 * @param displayName the displayName to set
-		 */
-		public void setDisplayName(String displayName) {
-			this.displayName = displayName;
-		}
-		
-		
 	}
 }
