@@ -114,6 +114,8 @@ public class ViewProjectAction extends Action {
 			// Check for yates MS data
 			YatesRunSearcher yrs = new YatesRunSearcher();
 			yrs.setProjectID(project.getID());
+			yrs.setMostRecent( true );
+			
 			request.setAttribute("yatesdata", yrs.search());
 			
 			ExperimentSearcher es = ExperimentSearcher.getInstance();
