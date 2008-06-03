@@ -64,7 +64,7 @@ public class YatesRunSearcher {
 			
 			
 			if (this.mostRecent)
-				sqlStr += " ORDER BY uploadDate DESC";
+				sqlStr += " ORDER BY runDate DESC";
 			else 
 				sqlStr += " ORDER BY run.id";
 
