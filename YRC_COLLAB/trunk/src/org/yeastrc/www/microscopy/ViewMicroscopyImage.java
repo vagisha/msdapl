@@ -6,7 +6,7 @@
 
 package org.yeastrc.www.microscopy;
 
-import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,15 +47,15 @@ public class ViewMicroscopyImage  extends Action {
 		Experiment experiment = null;
 		
 		int id = Integer.parseInt(strid);
-		RenderedImage ri = null;
+		BufferedImage bi = null;
 		
 		if (type.equals("FF")) {
 			FullFieldImage ff = FullFieldImageFactory.getInstance().getFullFieldImage(id);
-			ri = ImageDataRetriever.getInstance().getImage(ff);
+			bi = ImageDataRetriever.getInstance().getImage(ff);
 			experiment = ff.getExperiment();
 		} else if (type.equals("SR")) {
 			SelectedRegionImage sr = SelectedRegionImageFactory.getInstance().getSelectedRegionImage(id);
-			ri = ImageDataRetriever.getInstance().getImage(sr);
+			bi = ImageDataRetriever.getInstance().getImage(sr);
 			experiment = sr.getFullFieldImage().getExperiment();
 		}
 
@@ -93,7 +93,7 @@ public class ViewMicroscopyImage  extends Action {
 		}		
 		    
 		
-	    request.setAttribute("image", ri);
+	    request.setAttribute("image", bi);
 		
 		return mapping.findForward("Success");
 	}

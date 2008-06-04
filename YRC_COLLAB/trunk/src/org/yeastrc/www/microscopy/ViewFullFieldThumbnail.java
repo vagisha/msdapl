@@ -98,8 +98,8 @@ public class ViewFullFieldThumbnail  extends Action {
 		pb.add(0.0F);           // The y translation
 		pb.add(new InterpolationBilinear()); // The interpolation 
 
-		ri = JAI.create("scale", pb, null);
-	    request.setAttribute("image", ri);
+		//ri = JAI.create("scale", pb, null);
+	    request.setAttribute("image", JAI.create("scale", pb, null).getAsBufferedImage() );
 		
 		return mapping.findForward("Success");
 	}
