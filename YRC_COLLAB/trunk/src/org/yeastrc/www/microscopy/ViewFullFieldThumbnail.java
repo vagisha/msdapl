@@ -6,7 +6,7 @@
 
 package org.yeastrc.www.microscopy;
 
-import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
 
 import javax.media.jai.InterpolationBilinear;
@@ -85,13 +85,13 @@ public class ViewFullFieldThumbnail  extends Action {
 		
 		
 		
-		RenderedImage ri = ImageDataRetriever.getInstance().getImage(ff);	    
+		BufferedImage bi = ImageDataRetriever.getInstance().getImage(ff);	    
 	    
-		float yScale = (float)MAX_HEIGHT / (float)ri.getHeight();
+		float yScale = (float)MAX_HEIGHT / (float)bi.getHeight();
 		float xScale = yScale;
 		
 		ParameterBlock pb = new ParameterBlock();
-		pb.addSource(ri); // The source image
+		pb.addSource(bi); // The source image
 		pb.add(xScale);         // The xScale
 		pb.add(yScale);         // The yScale
 		pb.add(0.0F);           // The x translation

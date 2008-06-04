@@ -6,7 +6,7 @@
 
 package org.yeastrc.www.microscopy;
 
-import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
 
 import javax.media.jai.InterpolationBilinear;
@@ -86,21 +86,21 @@ public class ViewSelectedRegionThumbnail  extends Action {
 		
 		
 		
-		RenderedImage ri = ImageDataRetriever.getInstance().getImage(sr);	    
+		BufferedImage bi = ImageDataRetriever.getInstance().getImage(sr);	    
 	    
-		float yScale = (float)MAX_HEIGHT / (float)ri.getHeight();
+		float yScale = (float)MAX_HEIGHT / (float)bi.getHeight();
 		float xScale = yScale;
 		
 		ParameterBlock pb = new ParameterBlock();
-		pb.addSource(ri); // The source image
+		pb.addSource(bi); // The source image
 		pb.add(xScale);         // The xScale
 		pb.add(yScale);         // The yScale
 		pb.add(0.0F);           // The x translation
 		pb.add(0.0F);           // The y translation
 		pb.add(new InterpolationBilinear()); // The interpolation 
 
-		ri = JAI.create("scale", pb, null);
-	    request.setAttribute("image", ri);
+		bi = JAI.create("scale", pb, null).getAsBufferedImage();
+	    request.setAttribute("image", bi);
 		
 		return mapping.findForward("Success");
 	}
