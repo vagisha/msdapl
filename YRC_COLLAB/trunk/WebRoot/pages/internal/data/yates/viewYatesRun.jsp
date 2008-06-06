@@ -41,7 +41,7 @@
    <TD valign="top" width="25%">Organism:</TD>
    <TD valign="top" width="75%">
     <a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="run" property="targetSpecies.id"/>">
-    <i><bean:write name="run" property="targetSpecies.name" /></a></i>
+    <i><bean:write name="run" property="targetSpecies.name" /></i></a>
    </TD>
   </yrcwww:colorrow>
   <yrcwww:colorrow scheme="ms">
