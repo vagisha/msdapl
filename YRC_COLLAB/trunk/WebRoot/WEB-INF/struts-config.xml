@@ -1009,6 +1009,13 @@
 	  <forward name="Success" path="/pages/admin/upload/uploadProjectSearch.jsp" redirect="false"/>
 	</action>
 
+	<action
+	  path="/projectPhosphoStats"
+	  type="org.yeastrc.www.sandbox.ProjectPhosphoStatsAction"
+	  validate="false">
+		<forward name="Success" path="/pages/utils/showText.jsp" redirect="false"/>
+		<forward name="Failure" path="/pages/internal/front.jsp" redirect="true"/>
+	</action>
 
     </action-mappings>
 
