@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsExperiment"> 
+
+	<typeAlias alias="MsExperiment" type="org.yeastrc.ms.MsExperiment"/>
+	
+	<resultMap class="MsExperiment" id="MsExperimentResult">
+		<result property="id" column="id" />
+		<result property="date" column="date" />
+		<result property="serverAddress" column="serverAddress" />
+		<result property="serverDirectory" column="serverDirectory" />
+	</resultMap>
+	
+	<parameterMap class="MsExperiment" id="MsExperimentParam">
+		<parameter property="date" jdbcType="DATE"/>
+		<parameter property="serverAddress" jdbcType="VARCHAR"/>
+		<parameter property="serverDirectory" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+    <select id="selectAll" resultMap="MsExperimentResult"> 
+        SELECT * FROM msExperiment
+    </select> 
+    
+    <select id="select" resultMap="MsExperimentResult" parameterClass="Integer">
+    	SELECT * FROM msExperiment WHERE id= #id#
+    </select>
+    
+    <insert id="insert" parameterMap="MsExperimentParam">
+    	INSERT INTO msExperiment (expDate, serverAddress, serverDirectory) VALUES (?,?,?)
+    	<selectKey resultClass="int" keyProperty="id">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="deleteById" parameterClass="Integer">
+		DELETE FROM msExperiment WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

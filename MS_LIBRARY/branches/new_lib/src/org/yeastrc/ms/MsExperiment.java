@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +17,9 @@ import java.util.List;
 public class MsExperiment {
 
     private int id;
+    private Date date;
     private String serverAddress;
-    private String serverDir;
+    private String serverDirectory;
     
     private List <MsRun> runs; // runs for this experiments;
     
@@ -50,16 +52,16 @@ public class MsExperiment {
         this.serverAddress = serverAddress;
     }
     /**
-     * @return the serverDir
+     * @return the serverDirectory
      */
-    public String getServerDir() {
-        return serverDir;
+    public String getServerDirectory() {
+        return serverDirectory;
     }
     /**
-     * @param serverDir the serverDir to set
+     * @param directory the serverDirectory to set
      */
-    public void setServerDir(String serverDir) {
-        this.serverDir = serverDir;
+    public void setServerDirectory(String directory) {
+        this.serverDirectory = directory;
     }
 
     /**
@@ -74,6 +76,20 @@ public class MsExperiment {
      */
     public void setRuns(List<MsRun> runs) {
         this.runs = runs;
+    }
+
+    /**
+     * @return the date
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
+     * @param date the date to set
+     */
+    public void setDate(Date date) {
+        this.date = date;
     }
     
     

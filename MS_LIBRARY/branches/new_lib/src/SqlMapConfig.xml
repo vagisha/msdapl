@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-config-2.dtd" > 
+
+<sqlMapConfig>
+
+	<properties resource="msDataDB.properties" />
+	
+	<settings useStatementNamespaces="true" />
+	
+	<transactionManager type="JDBC">
+		<dataSource type="SIMPLE"> 
+      		<property name="JDBC.Driver" 
+                value="${db.driver}"/> 
+      		<property name="JDBC.ConnectionURL" 
+                value="${db.url}"/> 
+      		<property name="JDBC.Username" 
+                value="${db.user}"/> 
+      		<property name="JDBC.Password" 
+                value="${db.password}"/> 
+    	</dataSource>
+		
+	</transactionManager>
+	
+	<sqlMap resource="org/yeastrc/ms/dao/MsExperimentSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/MsRunSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/MsScanChargeSqlMap.xml"/>
+	
+	<sqlMap resource="org/yeastrc/ms/dao/ms2File/Ms2FileRunHeadersSqlMap.xml"/>
+	
+</sqlMapConfig>	

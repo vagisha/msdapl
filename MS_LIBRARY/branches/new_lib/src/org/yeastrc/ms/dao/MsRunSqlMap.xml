@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsRun"> 
+
+	<typeAlias alias="MsRun" type="org.yeastrc.ms.MsRun"/>
+	
+	<resultMap class="MsRun" id="MsRunResult">
+		<result property="id" column="id" />
+		<result property="msExperimentId" column="experimentID" />
+		<result property="fileName" column="filename" />
+		<result property="creationDate" column="creationTime" />
+		<result property="conversionSW" column="extractor" />
+		<result property="conversionSWVersion" column="extractorVersion" />
+		<result property="conversionSWOptions" column="extractorOptions" />
+		<result property="instrumentVendor" column="instrumentVendor" />
+		<result property="instrumentModel" column="instrumentType" />
+		<result property="instrumentSN" column="instrumentSN" />
+		<result property="fragmentationType" column="fragmentationType" />
+		<result property="fileFormat" column="originalFileType" />
+		<result property="comment" column="comments" />
+	</resultMap>
+	
+	<parameterMap class="MsRun" id="MsRunParam">
+		<parameter property="msExperimentId" jdbcType="INTEGER" />
+		<parameter property="fileName" jdbcType="VARCHAR"/>
+		<parameter property="creationDate" jdbcType="VARCHAR"/>
+		<parameter property="conversionSW" jdbcType="VARCHAR"/>
+		<parameter property="conversionSWVersion" jdbcType="VARCHAR"/>
+		<parameter property="conversionSWOptions" jdbcType="VARCHAR"/>
+		<parameter property="instrumentModel" jdbcType="VARCHAR"/>
+		<parameter property="instrumentVendor" jdbcType="VARCHAR"/>
+		<parameter property="instrumentSN" jdbcType="VARCHAR"/>
+		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
+		<parameter property="fileFormat" jdbcType="VARCHAR"/>
+		<parameter property="comment" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+    <select id="selectAll" resultMap="MsRunResult"> 
+        SELECT * FROM msRun
+    </select> 
+    
+    <select id="select" resultMap="MsRunResult" parameterClass="Integer">
+    	SELECT * FROM MsRun WHERE id= #id#
+    </select>
+    
+    <insert id="insert" parameterMap="MsRunParam">
+    	INSERT INTO MsRun (experimentID, 
+    						filename, 
+    						creationTime, 
+    						extractor, 
+    						extractorVersion, 
+    						extractorOptions, 
+    						instrumentType, 
+    						instrumentVendor, 
+    						instrumentSN,
+    						fragmentationType,
+    						originalFileType, 
+    						comment) 
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+    	<selectKey resultClass="int" keyProperty="id">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="deleteById" parameterClass="Integer">
+		DELETE FROM MsRun WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

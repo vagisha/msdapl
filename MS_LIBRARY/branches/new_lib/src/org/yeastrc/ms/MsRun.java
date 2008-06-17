@@ -10,12 +10,12 @@ public class MsRun {
     
     private int id; // unique id (database) for this run
     
-    private int msExperimentID; // id (database) of the experiment this run belongs to
+    private int msExperimentId; // id (database) of the experiment this run belongs to
     
     // File for this run
     private String fileName; 
     private RunFileFormat fileFormat;
-    private String creationTime;
+    private String creationDate;
     
     // conversion software
     private String conversionSW; // software used to convert the RAW file
@@ -37,7 +37,7 @@ public class MsRun {
     }
     
     
-    public static RunFileFormat getFileFormat(String extString) {
+    public static RunFileFormat getFileFormatForString(String extString) {
         if (extString.equalsIgnoreCase(RunFileFormat.MS2.name()))
             return RunFileFormat.MS2;
         else if (extString.equals(RunFileFormat.MZXML.name()))
@@ -52,29 +52,33 @@ public class MsRun {
     /**
      * @return the fileFormat
      */
-    public RunFileFormat getFileFormat() {
+    public RunFileFormat getRunFileFormat() {
         return fileFormat;
     }
 
+    public String getFileFormat() {
+        return fileFormat.name();
+    }
+    
     /**
      * @param fileFormat the fileFormat to set
      */
     public void setFileFormat(String fileFormatStr) {
-        this.fileFormat = getFileFormat(fileFormatStr);
+        this.fileFormat = getFileFormatForString(fileFormatStr);
     }
 
     /**
-     * @return the msExperimentID
+     * @return the msExperimentId
      */
-    public int getMsExperimentID() {
-        return msExperimentID;
+    public int getMsExperimentId() {
+        return msExperimentId;
     }
 
     /**
-     * @param msExperimentID the msExperimentID to set
+     * @param msExperimentId the msExperimentId to set
      */
-    public void setMsExperimentID(int msExperimentID) {
-        this.msExperimentID = msExperimentID;
+    public void setMsExperimentId(int msExperimentId) {
+        this.msExperimentId = msExperimentId;
     }
 
     /**
@@ -92,17 +96,17 @@ public class MsRun {
     }
 
     /**
-     * @return the creationTime
+     * @return the creationDate
      */
-    public String getCreationTime() {
-        return creationTime;
+    public String getCreationDate() {
+        return creationDate;
     }
 
     /**
-     * @param creationTime the creationTime to set
+     * @param creationDate the creationDate to set
      */
-    public void setCreationTime(String creationTime) {
-        this.creationTime = creationTime;
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
     }
 
     /**

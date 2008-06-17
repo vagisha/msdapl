@@ -10,6 +10,8 @@ H	DataType	Centroid
 H	IsolationWindow	
 H	FirstScan	1
 H	LastScan	17903
+H	IAnalyzer	iDummy
+H	DAnalyzer	dDummy
 S	000002	000002	475.42000
 I	RetTime	0.01
 I	ActivationType	CID

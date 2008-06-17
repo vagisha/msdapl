@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsScanCharge"> 
+
+	<typeAlias alias="MsScanCharge" type="org.yeastrc.ms.MsScanCharge"/>
+	
+	<resultMap class="MsScanCharge" id="MsScanChargeResult">
+		<result property="id" column="id" />
+		<result property="scanId" column="scan" />
+		<result property="charge" column="charge" />
+		<result property="mass" column="mass" />
+	</resultMap>
+	
+	<parameterMap class="MsScanCharge" id="MsScanChargeParam">
+		<parameter property="scanId" jdbcType="NUMBER"/>
+		<parameter property="charge" jdbcType="NUMBER"/>
+		<parameter property="mass" jdbcType="NUMBER"/>
+	</parameterMap>
+	
+    <select id="selectAll" resultMap="MsScanChargeResult"> 
+        SELECT * FROM msScanCharge
+    </select> 
+    
+    <select id="select" resultMap="MsScanChargeResult" parameterClass="Integer">
+    	SELECT * FROM msScanCharge WHERE id= #id#
+    </select>
+    
+    <insert id="insert" parameterMap="MsScanChargeParam">
+    	INSERT INTO msScanCharge (scan, charge, mass) VALUES (?,?,?)
+    </insert>
+    
+    <delete id="deleteById" parameterClass="Integer">
+		DELETE FROM msScanCharge WHERE id=#id#		    
+    </delete>
+    
+    <delete id="deleteByScanId" parameterClass="Integer">
+		DELETE FROM msScanCharge WHERE scan=#scanId#		    
+    </delete>
+    
+    <update id="update" parameterMap="MsScanChargeParam">
+    	UPDATE msScanCharge
+    </update>
+    
+</sqlMap>

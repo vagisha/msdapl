@@ -15,6 +15,7 @@ import java.util.TreeMap;
  */
 public class Ms2FileHeader {
 
+    private static final String ACTIVATION_TYPE = "ActivationType";
     private static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
     private static final String DANALYZER_VERSION = "DAnalyzerVersion";
     private static final String DANALYZER = "DAnalyzer";
@@ -99,6 +100,18 @@ public class Ms2FileHeader {
     public String getDAnalyzerOptions() {
         return getHeaderValueForLabel(DANALYZER_OPTIONS);
     }
+    
+    public String getActivationType() {
+        return getHeaderValueForLabel(ACTIVATION_TYPE);
+    }
+    
+    public String getComments() {
+        String comments = getHeaderValueForLabel("Comments");
+        if (comments == null)
+            comments = getHeaderValueForLabel("Comment");
+        return comments;
+    }
+    
     
     public String toString() {
         Map<String, String> sortedItems = new TreeMap<String, String>(headerItems);

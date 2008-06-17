@@ -40,7 +40,7 @@ public class Ms2FileReader {
         
         Ms2FileHeader header = new Ms2FileHeader();
         while (isHeaderLine(currentLine)) {
-            String[] tokens = currentLine.split("\\s");
+            String[] tokens = currentLine.split("\\t");
             if (tokens.length >= 3) {
                 header.addHeaderItem(tokens[1], tokens[2]);
             }

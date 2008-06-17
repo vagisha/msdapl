@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="Ms2FileRunHeaders"> 
+
+	<typeAlias alias="headers" type="org.yeastrc.ms.ms2File.db.Ms2FileHeaders"/>
+	
+	<resultMap class="headers" id="headersResult">
+		<result property="runId" column="runID" />
+		<result property="iAnalyzer" column="IAnalyzer" />
+		<result property="iAnalyzerVersion" column="IAnalyzerVersion" />
+		<result property="iAnalyzerOptions" column="IAnalyzerOptions" />
+		<result property="dAnalyzer" column="DAnalyzer" />
+		<result property="dAnalyzerVersion" column="DAnalyzerVersion" />
+		<result property="dAnalyzerOptions" column="DAnalyzerOptions" />
+	</resultMap>
+	
+	<parameterMap class="headers" id="headersParam">
+		<parameter property="runId" jdbcType="INTEGER" />
+		<parameter property="iAnalyzer" jdbcType="VARCHAR"/>
+		<parameter property="iAnalyzerVersion" jdbcType="VARCHAR"/>
+		<parameter property="iAnalyzerOptions" jdbcType="VARCHAR"/>
+		<parameter property="dAnalyzer" jdbcType="VARCHAR"/>
+		<parameter property="dAnalyzerVersion" jdbcType="VARCHAR"/>
+		<parameter property="dAnalyzerOptions" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+    <select id="selectAll" resultMap="headersResult"> 
+        SELECT * FROM msExperument
+    </select> 
+    
+    <select id="select" resultMap="headersResult" parameterClass="Integer">
+    	SELECT * FROM MS2FileRunHeaders WHERE id= #id#
+    </select>
+    
+    <insert id="insert" parameterMap="headersParam">
+    	INSERT INTO MS2FileRunHeaders (runID, 
+    						IAnalyzer, 
+    						IAnalyzerVersion, 
+    						IAnalyzerOptions, 
+    						DAnalyzer,
+    						DAnalyzerVersion, 
+    						DAnalyzerOptions) 
+    	VALUES (?,?,?,?,?,?,?)
+    </insert>
+    
+    <delete id="deleteById" parameterClass="Integer">
+		DELETE FROM MS2FileRunHeaders WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

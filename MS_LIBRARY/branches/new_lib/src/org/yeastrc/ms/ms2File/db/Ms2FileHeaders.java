@@ -36,73 +36,73 @@ public class Ms2FileHeaders {
     /**
      * @return the iAnalyzer
      */
-    public String getIAnalyzer() {
+    public String getiAnalyzer() {
         return iAnalyzer;
     }
     /**
      * @param analyzer the iAnalyzer to set
      */
-    public void setIAnalyzer(String analyzer) {
+    public void setiAnalyzer(String analyzer) {
         iAnalyzer = analyzer;
     }
     /**
      * @return the iAnalyzerVersion
      */
-    public String getIAnalyzerVersion() {
+    public String getiAnalyzerVersion() {
         return iAnalyzerVersion;
     }
     /**
      * @param analyzerVersion the iAnalyzerVersion to set
      */
-    public void setIAnalyzerVersion(String analyzerVersion) {
+    public void setiAnalyzerVersion(String analyzerVersion) {
         iAnalyzerVersion = analyzerVersion;
     }
     /**
      * @return the iAnalyzerOptions
      */
-    public String getIAnalyzerOptions() {
+    public String getiAnalyzerOptions() {
         return iAnalyzerOptions;
     }
     /**
      * @param analyzerOptions the iAnalyzerOptions to set
      */
-    public void setIAnalyzerOptions(String analyzerOptions) {
+    public void setiAnalyzerOptions(String analyzerOptions) {
         iAnalyzerOptions = analyzerOptions;
     }
     /**
      * @return the dAnalyzer
      */
-    public String getDAnalyzer() {
+    public String getdAnalyzer() {
         return dAnalyzer;
     }
     /**
      * @param analyzer the dAnalyzer to set
      */
-    public void setDAnalyzer(String analyzer) {
+    public void setdAnalyzer(String analyzer) {
         dAnalyzer = analyzer;
     }
     /**
      * @return the dAnalyzerVersion
      */
-    public String getDAnalyzerVersion() {
+    public String getdAnalyzerVersion() {
         return dAnalyzerVersion;
     }
     /**
      * @param analyzerVersion the dAnalyzerVersion to set
      */
-    public void setDAnalyzerVersion(String analyzerVersion) {
+    public void setdAnalyzerVersion(String analyzerVersion) {
         dAnalyzerVersion = analyzerVersion;
     }
     /**
      * @return the dAnalyzerOptions
      */
-    public String getDAnalyzerOptions() {
+    public String getdAnalyzerOptions() {
         return dAnalyzerOptions;
     }
     /**
      * @param analyzerOptions the dAnalyzerOptions to set
      */
-    public void setDAnalyzerOptions(String analyzerOptions) {
+    public void setdAnalyzerOptions(String analyzerOptions) {
         dAnalyzerOptions = analyzerOptions;
     }
 }
