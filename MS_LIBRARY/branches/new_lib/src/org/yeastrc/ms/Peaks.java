@@ -28,4 +28,8 @@ public class Peaks {
     public Iterator<Peak> getIterator() {
         return peaks.iterator();
     }
+    
+    public void addPeak(float mz, double intensity) {
+        peaks.add(new Peak(mz, intensity));
+    }
 }

@@ -11,30 +11,37 @@ package org.yeastrc.ms;
  */
 public class Peak {
 
-    private int intensity;
-    private double mz;
+    private double intensity;
+    private float mz;
+    
+    public Peak() {}
+    
+    public Peak(float mz, double intensity) {
+        this.mz = mz;
+        this.intensity = intensity;
+    }
     /**
      * @return the intensity
      */
-    public int getIntensity() {
+    public double getIntensity() {
         return intensity;
     }
     /**
      * @param intensity the intensity to set
      */
-    public void setIntensity(int intensity) {
+    public void setIntensity(double intensity) {
         this.intensity = intensity;
     }
     /**
      * @return the mz
      */
-    public double getMz() {
+    public float getMz() {
         return mz;
     }
     /**
      * @param mz the mz to set
      */
-    public void setMz(double mz) {
+    public void setMz(float mz) {
         this.mz = mz;
     }
     
