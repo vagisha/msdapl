@@ -10,7 +10,7 @@ public class MsRun {
     
     private int id; // unique id (database) for this run
     
-    private int experimentID; // id (database) of the experiment this run belongs to
+    private int msExperimentID; // id (database) of the experiment this run belongs to
     
     // File for this run
     private String fileName; 
@@ -64,17 +64,17 @@ public class MsRun {
     }
 
     /**
-     * @return the experimentID
+     * @return the msExperimentID
      */
-    public int getExperimentID() {
-        return experimentID;
+    public int getMsExperimentID() {
+        return msExperimentID;
     }
 
     /**
-     * @param experimentID the experimentID to set
+     * @param msExperimentID the msExperimentID to set
      */
-    public void setExperimentID(int experimentID) {
-        this.experimentID = experimentID;
+    public void setMsExperimentID(int msExperimentID) {
+        this.msExperimentID = msExperimentID;
     }
 
     /**

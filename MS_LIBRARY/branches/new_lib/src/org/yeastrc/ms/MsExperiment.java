@@ -13,7 +13,7 @@ import java.util.List;
  * @param <MsRun>
  * 
  */
-public class Experiment {
+public class MsExperiment {
 
     private int id;
     private String serverAddress;
@@ -21,7 +21,7 @@ public class Experiment {
     
     private List <MsRun> runs; // runs for this experiments;
     
-    public Experiment() {
+    public MsExperiment() {
         runs = new ArrayList<MsRun>();
     }
     
