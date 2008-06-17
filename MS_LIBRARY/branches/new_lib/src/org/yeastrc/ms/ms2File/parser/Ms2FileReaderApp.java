@@ -16,12 +16,12 @@ public class Ms2FileReaderApp {
      * @param args
      */
     public static void main(String[] args) {
-        String file = "./sample.ms2";
+        String file = "./resources/sample.ms2";
         Ms2FileReader reader = new Ms2FileReader();
         try {
             reader.open(file);
             Ms2FileHeader header = reader.getHeader();
-            //System.out.println(header.toString());
+            System.out.println(header.toString());
             while (reader.hasScans()) {
                 Ms2FileScan scan = reader.getNextScan();
                 System.out.println(scan.toString());

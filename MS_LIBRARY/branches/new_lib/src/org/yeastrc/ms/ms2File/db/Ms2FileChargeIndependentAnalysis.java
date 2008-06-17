@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.ms2File;
+package org.yeastrc.ms.ms2File.db;
 
 /**
  * Represents an "I" line in the MS2 file.  Charge independent analysis for a particular scan.
