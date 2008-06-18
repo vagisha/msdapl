@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.ms2File;
+package org.yeastrc.ms.dto.ms2File;
 
 /**
  * Represents a "D" line in the MS2 file.  Charge dependent analysis for a particular scan.
