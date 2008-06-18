@@ -8,13 +8,13 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.sql.SQLException;
 
-import org.yeastrc.ms.dao.BaseDAO;
+import org.yeastrc.ms.dao.BaseSqlMapDAO;
 import org.yeastrc.ms.ms2File.Ms2FileHeaders;
 
 /**
  * 
  */
-public class Ms2FileRunHeadersDAO extends BaseDAO {
+public class Ms2FileRunHeadersDAO extends BaseSqlMapDAO {
 
     public void insert(Ms2FileHeaders headers) {
         try {

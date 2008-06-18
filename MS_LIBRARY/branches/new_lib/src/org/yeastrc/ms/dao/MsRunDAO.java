@@ -13,7 +13,7 @@ import org.yeastrc.ms.MsRun;
 /**
  * 
  */
-public class MsRunDAO extends BaseDAO {
+public class MsRunDAO extends BaseSqlMapDAO {
 
     public int insertMsRun(MsRun run) {
         try {
