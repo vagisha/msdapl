@@ -6,6 +6,11 @@
  */
 package org.yeastrc.ms;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,17 +71,17 @@ public class MsScan {
     }
 
     /**
-     * @return the scanScanNum
+     * @return the startScanNum
      */
-    public int getScanScanNum() {
+    public int getStartScanNum() {
         return startScanNum;
     }
 
     /**
-     * @param scanScanNum the scanScanNum to set
+     * @param startScanNum the startScanNum to set
      */
-    public void setScanScanNum(int scanScanNum) {
-        this.startScanNum = scanScanNum;
+    public void setStartScanNum(int startScanNum) {
+        this.startScanNum = startScanNum;
     }
 
     /**
@@ -163,6 +168,49 @@ public class MsScan {
         this.peaks = peaks;
     }
 
+    public void setPeaksBinary(byte[] peakData) {
+        ByteArrayInputStream bais = new ByteArrayInputStream(peakData);
+        ObjectInputStream ois = null;
+        try {
+            ois = new ObjectInputStream(bais);
+            peaks = (Peaks) ois.readObject();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (ois != null) {
+                try {ois.close();} 
+                catch (IOException e) {e.printStackTrace();}
+            }
+        }
+    }
+    
+    public byte[] getPeaksBinary() {
+        ByteArrayOutputStream baos = null;
+        ObjectOutputStream oos = null;
+        baos = new ByteArrayOutputStream();
+        try {
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(peaks);
+            oos.flush();
+            return baos.toByteArray();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (oos != null) {
+                try {oos.close();}
+                catch (IOException e) {e.printStackTrace();}
+            }
+        }
+        return null;
+    }
+    
     /**
      * @return the scanCharges
      */

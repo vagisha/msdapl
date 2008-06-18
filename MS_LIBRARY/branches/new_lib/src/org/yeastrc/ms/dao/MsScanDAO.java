@@ -6,12 +6,12 @@ import org.yeastrc.ms.MsScan;
 
 public interface MsScanDAO {
 
-    public abstract int save(MsScan run);
+    public abstract int save(MsScan scan);
 
     public abstract MsScan load(int scanId);
     
     public abstract List<Integer> loadScanIdsForRun(int runId);
 
-    public abstract void update(MsScan run);
+    public abstract void update(MsScan scan);
 
 }

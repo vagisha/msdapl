@@ -7,15 +7,23 @@
 package org.yeastrc.ms;
 
 import java.io.File;
+import java.util.HashMap;
 
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.dao.MsRunDAOImpl;
-import org.yeastrc.ms.dao.ms2File.Ms2FileRunHeadersDAOImpl;
+import org.yeastrc.ms.dao.MsScanChargeDAO;
+import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileRunHeadersDAO;
+import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.ms2File.Ms2FileChargeDependentAnalysis;
+import org.yeastrc.ms.ms2File.Ms2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.ms2File.Ms2FileHeaders;
-import org.yeastrc.ms.parser.ms2File.Ms2FileHeader;
+import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReaderException;
-import org.yeastrc.ms.parser.ms2File.Ms2FileScan;
+import org.yeastrc.ms.parser.ms2File.Scan;
+import org.yeastrc.ms.parser.ms2File.ScanCharge;
 
 
 /**
@@ -32,14 +40,14 @@ public class Ms2FileToDbUploader {
         Ms2FileReader reader = new Ms2FileReader();
         try {
             reader.open(file);
-            Ms2FileHeader header = reader.getHeader();
+            Header header = reader.getHeader();
             // insert a run into the database and get the run Id
-            int runId = insertMs2Header(header, 18, file);
+            int runId = saveMs2Header(header, 18, file);
             
             while (reader.hasScans()) {
-                Ms2FileScan scan = reader.getNextScan();
+                Scan scan = reader.getNextScan();
                 // insert a scan into the database for the given run
-                insertScan(scan, runId);
+                saveScan(scan, runId);
             }
             
         }
@@ -48,7 +56,7 @@ public class Ms2FileToDbUploader {
         }
     }
     
-    private int insertMs2Header(Ms2FileHeader header, int experimentId, String fileName) {
+    private int saveMs2Header(Header header, int experimentId, String fileName) {
         
         MsRun run = new MsRun();
         run.setId(0); // new run set id to 0
@@ -66,8 +74,9 @@ public class Ms2FileToDbUploader {
         run.setComment(header.getComments());
         
         // save the run
-        MsRunDAO rundao = new MsRunDAOImpl();
+        MsRunDAO rundao = DAOFactory.instance().getMsRunDAO();
         int runID = rundao.save(run);
+        
         if (runID != 0) {
             // save the other headers from the ms2 file
             Ms2FileHeaders headers = new Ms2FileHeaders();
@@ -78,14 +87,66 @@ public class Ms2FileToDbUploader {
             headers.setdAnalyzerVersion(header.getDAnalyzerVersion());
             headers.setdAnalyzerOptions(header.getDAnalyzerOptions());
             headers.setRunId(runID);
-            Ms2FileRunHeadersDAOImpl headersDao = new Ms2FileRunHeadersDAOImpl();
+            MS2FileRunHeadersDAO headersDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
             headersDao.save(headers);
         }
         return runID;
     }
     
-    private void insertScan(Ms2FileScan scan, int runId) {
+    private void saveScan(Scan ms2Scan, int runId) {
+        MsScan scan = new MsScan();
+        scan.setRunId(runId);
+        scan.setStartScanNum(ms2Scan.getStartScan());
+        scan.setEndScanNum(ms2Scan.getEndScan());
+        scan.setMsLevel(2);
+        scan.setRetentionTime(ms2Scan.getRetentionTime());
+        scan.setPrecursorMz(ms2Scan.getPrecursorMz());
+        scan.setPrecursorScanId(ms2Scan.getPrecursorScanNumber());
+        Peaks peaks = new Peaks();
+        peaks.addPeak(100.0f, 200.0f);
+        scan.setPeaksBinary(ms2Scan.getPeaksBinary());
         
+        // save the scan
+        MsScanDAO scanDAO = DAOFactory.instance().getMsScanDAO();
+        int scanId = scanDAO.save(scan);
+        
+        // save the scan charges
+        for (ScanCharge scanCharge: ms2Scan.getChargeStates()) {
+            saveScanCharge(scanCharge, scanId);
+        }
+        
+        // save the charge independent analysis
+        Ms2FileChargeIndependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
+        HashMap<String, String> analysisItems = ms2Scan.getAnalysisItems();
+        for (String label: analysisItems.keySet()) {
+            Ms2FileChargeIndependentAnalysis analysis = new Ms2FileChargeIndependentAnalysis();
+            analysis.setScanId(scanId);
+            analysis.setHeader(label);
+            analysis.setValue(analysisItems.get(label));
+            analysisDAO.save(analysis);
+        }
+    }
+    
+    private void saveScanCharge(ScanCharge ms2ScanCharge, int scanId) {
+        MsScanCharge scanCharge = new MsScanCharge();
+        scanCharge.setScanId(scanId);
+        scanCharge.setCharge(ms2ScanCharge.getCharge());
+        scanCharge.setMass(ms2ScanCharge.getMass());
+        
+        // save the scan charge
+        MsScanChargeDAO sChgDAO = DAOFactory.instance().getMsScanChargeDAO();
+        int sChgId = sChgDAO.save(scanCharge);
+        
+        // save the charge dependent analysis associated with this charge state
+        Ms2FileChargeDependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
+        HashMap<String, String> analysisItems = ms2ScanCharge.getAnalysisItems();
+        for (String label: analysisItems.keySet()) {
+            Ms2FileChargeDependentAnalysis analysis = new Ms2FileChargeDependentAnalysis();
+            analysis.setScanChargeId(sChgId);
+            analysis.setHeader(label);
+            analysis.setValue(analysisItems.get(label));
+            analysisDAO.save(analysis);
+        }
     }
     
     

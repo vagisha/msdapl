@@ -36,9 +36,9 @@ public class Ms2FileReader {
         }
     }
     
-    public Ms2FileHeader getHeader() throws Ms2FileReaderException {
+    public Header getHeader() throws Ms2FileReaderException {
         
-        Ms2FileHeader header = new Ms2FileHeader();
+        Header header = new Header();
         while (isHeaderLine(currentLine)) {
             String[] tokens = currentLine.split("\\t");
             if (tokens.length >= 3) {
@@ -64,9 +64,9 @@ public class Ms2FileReader {
         return currentLine != null;
     }
     
-    public Ms2FileScan getNextScan() throws Ms2FileReaderException {
+    public Scan getNextScan() throws Ms2FileReaderException {
         
-        Ms2FileScan scan = parseScan();
+        Scan scan = parseScan();
         
         try {
             currentLine = reader.readLine(); // go to the next line
@@ -95,7 +95,7 @@ public class Ms2FileReader {
         return scan;
     }
 
-    private void parseIAnalysis(Ms2FileScan scan)
+    private void parseIAnalysis(Scan scan)
             throws Ms2FileReaderException, IOException {
         String[] tokens = currentLine.split("\\t");
         if (tokens.length < 3)
@@ -105,7 +105,7 @@ public class Ms2FileReader {
         currentLine = reader.readLine();
     }
     
-    private Ms2FileScan parseScan() throws Ms2FileReaderException {
+    private Scan parseScan() throws Ms2FileReaderException {
         
         // make sure we have a scan line
         if (!isScanLine(currentLine))
@@ -125,7 +125,7 @@ public class Ms2FileReader {
         try {precursorMz = Float.parseFloat(tokens[3]);}
         catch(NumberFormatException e) {throw new Ms2FileReaderException("Invalid precursor m/z in scan line: "+currentLine);}
         
-        Ms2FileScan scan = new Ms2FileScan();
+        Scan scan = new Scan();
         scan.setStartScan(firstScan);
         scan.setEndScan(lastScan);
         scan.setPrecursorMz(precursorMz);
@@ -133,7 +133,7 @@ public class Ms2FileReader {
         return scan;
     }
     
-    private void parseScanCharge(Ms2FileScan scan) throws Ms2FileReaderException {
+    private void parseScanCharge(Scan scan) throws Ms2FileReaderException {
         String tokens[] = currentLine.split("\\s");
         if (tokens.length < 3)
             throw new Ms2FileReaderException("2 fields expected for charge line: "+currentLine);
@@ -146,7 +146,7 @@ public class Ms2FileReader {
         try {mass = Float.parseFloat(tokens[2]);}
         catch(NumberFormatException e) {throw new Ms2FileReaderException("Invalid mass in line: "+currentLine);}
         
-        Ms2FileScanCharge scanCharge = new Ms2FileScanCharge();
+        ScanCharge scanCharge = new ScanCharge();
         scanCharge.setCharge(charge);
         scanCharge.setMass(mass);
         
@@ -166,7 +166,7 @@ public class Ms2FileReader {
         scan.addChargeState(scanCharge);
     }
     
-    public void parsePeaks(Ms2FileScan scan) throws Ms2FileReaderException {
+    public void parsePeaks(Scan scan) throws Ms2FileReaderException {
         
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s");

@@ -11,13 +11,13 @@ import java.util.HashMap;
 /**
  * 
  */
-public class Ms2FileScanCharge {
+public class ScanCharge {
 
     private int charge;
     private float mass;
     private HashMap<String, String> analysisItems;
     
-    public Ms2FileScanCharge() {
+    public ScanCharge() {
         analysisItems = new HashMap<String, String>();
     }
     
@@ -51,7 +51,11 @@ public class Ms2FileScanCharge {
         analysisItems.put(label, value);
     }
     
-    public String getValueForAnalysisLavel(String label) {
+    public HashMap<String, String> getAnalysisItems() {
+        return analysisItems;
+    }
+    
+    public String getValueForAnalysisLabel(String label) {
         return analysisItems.get(label);
     }
     

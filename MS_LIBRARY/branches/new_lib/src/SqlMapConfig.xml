@@ -4,10 +4,13 @@
 
 <sqlMapConfig>
 
+	<!-- 
 	<properties resource="msDataDB.properties" />
+	-->
 	
 	<settings useStatementNamespaces="true" />
 	
+	<!--  
 	<transactionManager type="JDBC">
 		<dataSource type="SIMPLE"> 
       		<property name="JDBC.Driver" 
@@ -19,13 +22,16 @@
       		<property name="JDBC.Password" 
                 value="${db.password}"/> 
     	</dataSource>
-		
 	</transactionManager>
+	-->
 	
 	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsExperimentSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsRunSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsScanSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsScanChargeSqlMap.xml"/>
 	
 	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/Ms2FileRunHeadersSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/Ms2FileChargeIndependentAnalysisSqlMap.xml"/>
+		<sqlMap resource="org/yeastrc/ms/dao/sqlmap/Ms2FileChargeDependentAnalysisSqlMap.xml"/>
 	
 </sqlMapConfig>	

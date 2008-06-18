@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="Ms2FileChargeIndependentAnalysis"> 
+
+	<typeAlias alias="ianalysis" type="org.yeastrc.ms.ms2File.Ms2FileChargeIndependentAnalysis"/>
+	
+	<resultMap class="ianalysis" id="ianalysisResult">
+		<result property="scanId" column="scan" />
+		<result property="header" column="header" />
+		<result property="value" column="value" />
+	</resultMap>
+	
+	<parameterMap class="ianalysis" id="ianalysisParam">
+		<parameter property="scanId" jdbcType="INTEGER"/>
+		<parameter property="header" jdbcType="VARCHAR"/>
+		<parameter property="value" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+    <select id="selectAnalysisForScan" resultMap="ianalysisResult" parameterClass="Integer"> 
+        SELECT * FROM MS2FileChargeIndependentAnalysis where scan=#id#
+    </select> 
+    
+    <insert id="insert" parameterMap="ianalysisParam">
+    	INSERT INTO MS2FileChargeIndependentAnalysis (scan, header, value) 
+    	VALUES (?,?,?)
+    </insert>
+    
+    <delete id="deleteById" parameterClass="Integer">
+		DELETE FROM MS2FileChargeIndependentAnalysis WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

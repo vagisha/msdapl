@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+	"http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:msDataDB.properties"/>
+    </bean>
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.user}"/>
+        <property name="password" value="${db.password}"/>
+    </bean>
+    
+    <bean id="sqlMapClient"
+          class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+        <property name="configLocation">
+            <value>classpath:SqlMapConfig.xml</value>
+        </property>
+        <property name="useTransactionAwareDataSource">
+            <value>true</value>
+        </property>
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+    </bean>
+
+    <bean id="sqlMapClientTemplate"
+    	class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+    	<property name="sqlMapClient">
+    		<ref bean="sqlMapClient" />
+    	</property>
+    </bean>
+
+	<!-- ============================================================================== -->
+	<!-- DAOs -->
+	<!-- ============================================================================== -->
+	<bean id="msExperimentDAO"
+        class="org.yeastrc.ms.dao.MsExperimentDAOImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    
+    <bean id="msRunDAO"
+        class="org.yeastrc.ms.dao.MsRunDAOImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    
+    <bean id="msScanDAO"
+        class="org.yeastrc.ms.dao.MsScanDAOImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    
+    <bean id="msScanChargeDAO"
+        class="org.yeastrc.ms.dao.MsScanChargeDAOImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    
+    <bean id="ms2FileRunHeadersDAO"
+        class="org.yeastrc.ms.dao.ms2File.Ms2FileRunHeadersDAOImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    
+    <bean id="ms2FileChargeDependentAnalysisDAO"
+        class="org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAOImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    
+    <bean id="ms2FileChargeIndependentAnalysisDAO"
+        class="org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAOImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    
+</beans>

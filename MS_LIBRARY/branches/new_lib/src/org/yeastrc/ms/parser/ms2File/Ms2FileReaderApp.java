@@ -20,10 +20,10 @@ public class Ms2FileReaderApp {
         Ms2FileReader reader = new Ms2FileReader();
         try {
             reader.open(file);
-            Ms2FileHeader header = reader.getHeader();
+            Header header = reader.getHeader();
             System.out.println(header.toString());
             while (reader.hasScans()) {
-                Ms2FileScan scan = reader.getNextScan();
+                Scan scan = reader.getNextScan();
                 System.out.println(scan.toString());
             }
             

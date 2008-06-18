@@ -6,10 +6,12 @@
  */
 package org.yeastrc.ms;
 
+import java.io.Serializable;
+
 /**
  * 
  */
-public class Peak {
+public class Peak implements Serializable{
 
     private double intensity;
     private float mz;

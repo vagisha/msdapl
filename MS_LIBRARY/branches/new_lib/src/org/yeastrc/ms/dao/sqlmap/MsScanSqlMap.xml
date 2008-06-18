@@ -14,7 +14,7 @@
 		<result property="retentionTime" column="retentionTime" />
 		<result property="precursorMz" column="preMZ" />
 		<result property="precursorScanId" column="preScanID" />
-		<result property="peaks" column="data" />
+		<result property="peaksBinary" column="data" />
 	</resultMap>
 	
 	<parameterMap class="MsScan" id="MsScanParam">
@@ -25,7 +25,7 @@
 		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="precursorMz" jdbcType="DECIMAL" />
 		<parameter property="precursorScanId" jdbcType="INTEGER" />
-		<parameter property="peaks" jdbcType="BLOB" />
+		<parameter property="peaksBinary" jdbcType="BLOB" />
 	</parameterMap>
 	
     <select id="selectScansIdsForRun" resultClass="Integer" parameterClass="Integer"> 

@@ -13,7 +13,7 @@ import java.util.TreeMap;
 /**
  * 
  */
-public class Ms2FileHeader {
+public class Header {
 
     private static final String ACTIVATION_TYPE = "ActivationType";
     private static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
@@ -31,7 +31,7 @@ public class Ms2FileHeader {
     
     private HashMap<String, String> headerItems;
     
-    public Ms2FileHeader() {
+    public Header() {
         headerItems = new HashMap<String, String>();
     }
     

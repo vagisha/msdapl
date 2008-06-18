@@ -6,16 +6,26 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.Peak;
+import org.yeastrc.ms.Peaks;
+
 /**
  * 
  */
-public class Ms2FileScan {
+public class Scan {
 
+    public static final String PRECURSOR_SCAN = "PrecursorScan";
+    public static final String ACTIVATION_TYPE = "ActivationType";
+    public static final String RET_TIME = "RetTime";
+    
     private int startScan;
     private int endScan;
     
@@ -23,12 +33,12 @@ public class Ms2FileScan {
     
     private Peaks peaks;
     
-    private List<Ms2FileScanCharge> chargeStates;
+    private List<ScanCharge> chargeStates;
     
     private HashMap<String, String> analysisItems;
     
-    public Ms2FileScan() {
-        chargeStates = new ArrayList<Ms2FileScanCharge>();
+    public Scan() {
+        chargeStates = new ArrayList<ScanCharge>();
         analysisItems = new HashMap<String, String>();
         peaks = new Peaks();
     }
@@ -37,17 +47,43 @@ public class Ms2FileScan {
         peaks.addPeak(mz, intensity);
     }
     
+    public byte[] getPeaksBinary() {
+        ByteArrayOutputStream baos = null;
+        ObjectOutputStream oos = null;
+        baos = new ByteArrayOutputStream();
+        try {
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(peaks);
+            oos.flush();
+            return baos.toByteArray();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (oos != null) {
+                try {oos.close();}
+                catch (IOException e) {e.printStackTrace();}
+            }
+        }
+        return null;
+    }
+    
     public void addAnalysisItem(String label, String value) {
         if (label == null || value == null)   return;
         analysisItems.put(label, value);
     }
     
-    public String getValueForAnalysisLavel(String label) {
+    public HashMap<String, String> getAnalysisItems() {
+        return analysisItems;
+    }
+    
+    public String getValueForAnalysisLabel(String label) {
         return analysisItems.get(label);
     }
     
     public float getRetentionTime() {
-        String rtStr = getValueForAnalysisLavel("RetTime");
+        String rtStr = getValueForAnalysisLabel(RET_TIME);
         if (rtStr == null)
             return -1;
         else
@@ -56,11 +92,11 @@ public class Ms2FileScan {
     }
     
     public String getActivationType() {
-        return getValueForAnalysisLavel("ActivationType");
+        return getValueForAnalysisLabel(ACTIVATION_TYPE);
     }
     
     public int getPrecursorScanNumber() {
-        String scanNumStr = getValueForAnalysisLavel("PrecursorScan");
+        String scanNumStr = getValueForAnalysisLabel(PRECURSOR_SCAN);
         if (scanNumStr == null)
             return -1;
         else
@@ -71,7 +107,7 @@ public class Ms2FileScan {
     /**
      * @return the chargeStates
      */
-    public List<Ms2FileScanCharge> getChargeStates() {
+    public List<ScanCharge> getChargeStates() {
         return chargeStates;
     }
 
@@ -79,7 +115,7 @@ public class Ms2FileScan {
     /**
      * @param chargeState the chargeState to add
      */
-    public void addChargeState(Ms2FileScanCharge chargeState) {
+    public void addChargeState(ScanCharge chargeState) {
         chargeStates.add(chargeState);
     }
 
@@ -144,7 +180,7 @@ public class Ms2FileScan {
             buf.append("\n");
         }
         // charge states along with their charge dependent analysis
-        for (Ms2FileScanCharge charge: chargeStates) {
+        for (ScanCharge charge: chargeStates) {
             buf.append(charge.toString());
             buf.append("\n");
         }
