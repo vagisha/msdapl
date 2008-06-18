@@ -156,7 +156,8 @@ public class Ms2FileToDbUploader {
     
     public static void main(String[] args) {
        Ms2FileToDbUploader uploader = new Ms2FileToDbUploader();
-       String file = "./resources/sample.ms2";
+       //String file = "./resources/sample.ms2";
+       String file = "./resources/PARC_p75_01_itms.ms2";
        uploader.uploadMs2File(file);
     }
 }

@@ -22,9 +22,9 @@
 		<parameter property="startScanNum" jdbcType="INTEGER" />
 		<parameter property="endScanNum" jdbcType="INTEGER" />
 		<parameter property="msLevel" jdbcType="TINYINT" />
-		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="precursorMz" jdbcType="DECIMAL" />
 		<parameter property="precursorScanId" jdbcType="INTEGER" />
+		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="peaksBinary" jdbcType="BLOB" />
 	</parameterMap>
 	
@@ -33,7 +33,7 @@
     </select> 
     
     <select id="select" resultMap="MsScanResult" parameterClass="Integer">
-    	SELECT * FROM MsScan WHERE id= #id#
+    	SELECT id, runID, startScanNumber, endScanNumber, level, retentionTime, preMZ, preScanID, UNCOMPRESS(data) as data FROM MsScan WHERE id= #id#
     </select>
     
     <insert id="insert" parameterMap="MsScanParam">
@@ -45,7 +45,7 @@
     						preScanID, 
     						retentionTime, 
     						data) 
-    	VALUES (?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,COMPRESS(?))
     	<selectKey resultClass="int" keyProperty="id">
       		select last_insert_id() as id
     	</selectKey>
