@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao;
 /**
  * 
  */
-public class MsScanChargeDAO {
+public class MsScanChargeDAOImpl {
 
     
 }

@@ -9,6 +9,6 @@ package org.yeastrc.ms.dao;
 /**
  * 
  */
-public class MsScanDAO {
+public class MsScanDAOImpl {
 
 }

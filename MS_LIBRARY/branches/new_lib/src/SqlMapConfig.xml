@@ -22,10 +22,10 @@
 		
 	</transactionManager>
 	
-	<sqlMap resource="org/yeastrc/ms/dao/MsExperimentSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/dao/MsRunSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/dao/MsScanChargeSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsExperimentSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsRunSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsScanChargeSqlMap.xml"/>
 	
-	<sqlMap resource="org/yeastrc/ms/dao/ms2File/Ms2FileRunHeadersSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/Ms2FileRunHeadersSqlMap.xml"/>
 	
 </sqlMapConfig>	
