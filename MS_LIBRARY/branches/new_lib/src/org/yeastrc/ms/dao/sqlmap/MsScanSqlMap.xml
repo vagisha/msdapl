@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsScan"> 
+
+	<typeAlias alias="MsScan" type="org.yeastrc.ms.MsScan"/>
+	
+	<resultMap class="MsScan" id="MsScanResult">
+		<result property="id" column="id" />
+		<result property="runId" column="runID" />
+		<result property="startScanNum" column="startScanNumber" />
+		<result property="endScanNum" column="endScanNumber" />
+		<result property="msLevel" column="level" />
+		<result property="retentionTime" column="retentionTime" />
+		<result property="precursorMz" column="preMZ" />
+		<result property="precursorScanId" column="preScanID" />
+		<result property="peaks" column="data" />
+	</resultMap>
+	
+	<parameterMap class="MsScan" id="MsScanParam">
+		<parameter property="runId" jdbcType="INTEGER" />
+		<parameter property="startScanNum" jdbcType="INTEGER" />
+		<parameter property="endScanNum" jdbcType="INTEGER" />
+		<parameter property="msLevel" jdbcType="TINYINT" />
+		<parameter property="retentionTime" jdbcType="DECIMAL" />
+		<parameter property="precursorMz" jdbcType="DECIMAL" />
+		<parameter property="precursorScanId" jdbcType="INTEGER" />
+		<parameter property="peaks" jdbcType="BLOB" />
+	</parameterMap>
+	
+    <select id="selectScansIdsForRun" resultClass="Integer" parameterClass="Integer"> 
+        SELECT id FROM msRun WHERE experimentID = #id#
+    </select> 
+    
+    <select id="select" resultMap="MsScanResult" parameterClass="Integer">
+    	SELECT * FROM MsScan WHERE id= #id#
+    </select>
+    
+    <insert id="insert" parameterMap="MsScanParam">
+    	INSERT INTO MsScan (runID, 
+    						startScanNumber, 
+    						endScanNumber, 
+    						level, 
+    						preMZ, 
+    						preScanID, 
+    						retentionTime, 
+    						data) 
+    	VALUES (?,?,?,?,?,?,?,?)
+    	<selectKey resultClass="int" keyProperty="id">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="deleteById" parameterClass="Integer">
+		DELETE FROM MsScan WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

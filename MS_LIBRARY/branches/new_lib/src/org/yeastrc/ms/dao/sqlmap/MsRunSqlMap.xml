@@ -36,8 +36,8 @@
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
-    <select id="selectAll" resultMap="MsRunResult"> 
-        SELECT * FROM msRun
+    <select id="selectRunsForExperiment" resultMap="MsRunResult" parameterClass="Integer"> 
+        SELECT * FROM msRun WHERE experimentID = #id#
     </select> 
     
     <select id="select" resultMap="MsRunResult" parameterClass="Integer">

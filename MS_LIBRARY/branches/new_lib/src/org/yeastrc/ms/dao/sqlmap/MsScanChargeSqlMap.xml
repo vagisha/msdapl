@@ -18,8 +18,8 @@
 		<parameter property="mass" jdbcType="NUMBER"/>
 	</parameterMap>
 	
-    <select id="selectAll" resultMap="MsScanChargeResult"> 
-        SELECT * FROM msScanCharge
+    <select id="selectChargesForScan" resultMap="MsScanChargeResult"> 
+        SELECT * FROM msScanCharge WHERE scan=#scanId#
     </select> 
     
     <select id="select" resultMap="MsScanChargeResult" parameterClass="Integer">
@@ -28,6 +28,9 @@
     
     <insert id="insert" parameterMap="MsScanChargeParam">
     	INSERT INTO msScanCharge (scan, charge, mass) VALUES (?,?,?)
+    	<selectKey resultClass="int" keyProperty="id">
+      		select last_insert_id() as id
+    	</selectKey>
     </insert>
     
     <delete id="deleteById" parameterClass="Integer">

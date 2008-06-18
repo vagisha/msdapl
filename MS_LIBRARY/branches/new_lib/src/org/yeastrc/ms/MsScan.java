@@ -18,7 +18,7 @@ public class MsScan {
     
     private int id;     // unique id (database) of this scan
     
-    private int scanScanNum;
+    private int startScanNum;
     private int endScanNum;
     
     private int msLevel; // 1 for MS1, 2 for MS2 and so on
@@ -69,14 +69,14 @@ public class MsScan {
      * @return the scanScanNum
      */
     public int getScanScanNum() {
-        return scanScanNum;
+        return startScanNum;
     }
 
     /**
      * @param scanScanNum the scanScanNum to set
      */
     public void setScanScanNum(int scanScanNum) {
-        this.scanScanNum = scanScanNum;
+        this.startScanNum = scanScanNum;
     }
 
     /**

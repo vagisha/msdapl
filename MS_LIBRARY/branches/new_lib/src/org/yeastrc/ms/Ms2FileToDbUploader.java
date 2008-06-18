@@ -8,8 +8,9 @@ package org.yeastrc.ms;
 
 import java.io.File;
 
+import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsRunDAOImpl;
-import org.yeastrc.ms.dao.ms2File.Ms2FileRunHeadersDAO;
+import org.yeastrc.ms.dao.ms2File.Ms2FileRunHeadersDAOImpl;
 import org.yeastrc.ms.ms2File.Ms2FileHeaders;
 import org.yeastrc.ms.parser.ms2File.Ms2FileHeader;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
@@ -65,7 +66,7 @@ public class Ms2FileToDbUploader {
         run.setComment(header.getComments());
         
         // save the run
-        MsRunDAOImpl rundao = new MsRunDAOImpl();
+        MsRunDAO rundao = new MsRunDAOImpl();
         int runID = rundao.save(run);
         if (runID != 0) {
             // save the other headers from the ms2 file
@@ -77,7 +78,7 @@ public class Ms2FileToDbUploader {
             headers.setdAnalyzerVersion(header.getDAnalyzerVersion());
             headers.setdAnalyzerOptions(header.getDAnalyzerOptions());
             headers.setRunId(runID);
-            Ms2FileRunHeadersDAO headersDao = new Ms2FileRunHeadersDAO();
+            Ms2FileRunHeadersDAOImpl headersDao = new Ms2FileRunHeadersDAOImpl();
             headersDao.save(headers);
         }
         return runID;

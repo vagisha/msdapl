@@ -25,13 +25,9 @@
 		<parameter property="dAnalyzerOptions" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
-    <select id="selectAll" resultMap="headersResult"> 
-        SELECT * FROM msExperument
+    <select id="selectHeadersForRun" resultMap="headersResult" parameterClass="Integer"> 
+        SELECT * FROM MS2FileRunHeaders where runID=#id#
     </select> 
-    
-    <select id="select" resultMap="headersResult" parameterClass="Integer">
-    	SELECT * FROM MS2FileRunHeaders WHERE id= #id#
-    </select>
     
     <insert id="insert" parameterMap="headersParam">
     	INSERT INTO MS2FileRunHeaders (runID, 

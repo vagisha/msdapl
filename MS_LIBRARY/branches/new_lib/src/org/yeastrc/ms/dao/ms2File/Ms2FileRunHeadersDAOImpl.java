@@ -12,9 +12,14 @@ import org.yeastrc.ms.ms2File.Ms2FileHeaders;
 /**
  * 
  */
-public class Ms2FileRunHeadersDAO extends BaseSqlMapDAO {
+public class Ms2FileRunHeadersDAOImpl extends BaseSqlMapDAO {
 
     public void save(Ms2FileHeaders headers) {
         insert("Ms2FileRunHeaders.insert", headers);
     }
+    
+    public Ms2FileHeaders loadHeadersForRun(int runId) {
+        return (Ms2FileHeaders) queryForObject("Ms2FileRunHeaders.selectHeadersForRun", runId);
+    }
+    
 }
