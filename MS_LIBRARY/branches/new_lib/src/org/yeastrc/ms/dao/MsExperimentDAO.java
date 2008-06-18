@@ -1,6 +1,6 @@
 package org.yeastrc.ms.dao;
 
-import org.yeastrc.ms.MsExperiment;
+import org.yeastrc.ms.dto.MsExperiment;
 
 public interface MsExperimentDAO {
 

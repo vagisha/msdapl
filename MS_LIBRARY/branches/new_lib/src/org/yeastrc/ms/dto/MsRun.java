@@ -1,4 +1,4 @@
-package org.yeastrc.ms;
+package org.yeastrc.ms.dto;
 
 import java.util.ArrayList;
 import java.util.Iterator;

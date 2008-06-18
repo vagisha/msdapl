@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.yeastrc.ms.Peak;
-import org.yeastrc.ms.Peaks;
+import org.yeastrc.ms.dto.Peak;
+import org.yeastrc.ms.dto.Peaks;
 
 /**
  * 

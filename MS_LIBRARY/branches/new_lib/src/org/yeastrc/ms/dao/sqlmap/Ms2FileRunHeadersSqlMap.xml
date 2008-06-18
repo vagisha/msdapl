@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="Ms2FileRunHeaders"> 
 
-	<typeAlias alias="headers" type="org.yeastrc.ms.ms2File.Ms2FileHeaders"/>
+	<typeAlias alias="headers" type="org.yeastrc.ms.dto.ms2File.Ms2FileHeaders"/>
 	
 	<resultMap class="headers" id="headersResult">
 		<result property="runId" column="runID" />

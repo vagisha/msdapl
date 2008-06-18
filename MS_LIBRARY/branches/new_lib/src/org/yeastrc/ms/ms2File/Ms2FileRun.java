@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.ms2File;
 
-import org.yeastrc.ms.MsRun;
+import org.yeastrc.ms.dto.MsRun;
 
 /**
  * 

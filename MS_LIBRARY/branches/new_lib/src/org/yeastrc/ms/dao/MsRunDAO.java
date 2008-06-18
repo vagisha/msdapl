@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.MsRun;
+import org.yeastrc.ms.dto.MsRun;
 
 public interface MsRunDAO {
 

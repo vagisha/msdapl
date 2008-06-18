@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRun"> 
 
-	<typeAlias alias="MsRun" type="org.yeastrc.ms.MsRun"/>
+	<typeAlias alias="MsRun" type="org.yeastrc.ms.dto.MsRun"/>
 	
 	<resultMap class="MsRun" id="MsRunResult">
 		<result property="id" column="id" />

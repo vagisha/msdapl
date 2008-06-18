@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.MsScanCharge;
+import org.yeastrc.ms.dto.MsScanCharge;
 
 public interface MsScanChargeDAO {
 

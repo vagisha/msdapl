@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="Ms2FileChargeDependentAnalysis"> 
 
-	<typeAlias alias="danalysis" type="org.yeastrc.ms.ms2File.Ms2FileChargeDependentAnalysis"/>
+	<typeAlias alias="danalysis" type="org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis"/>
 	
 	<resultMap class="danalysis" id="danalysisResult">
 		<result property="scanChargeId" column="scan" />

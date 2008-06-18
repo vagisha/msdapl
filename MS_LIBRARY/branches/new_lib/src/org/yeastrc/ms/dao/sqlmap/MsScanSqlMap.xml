@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsScan"> 
 
-	<typeAlias alias="MsScan" type="org.yeastrc.ms.MsScan"/>
+	<typeAlias alias="MsScan" type="org.yeastrc.ms.dto.MsScan"/>
 	
 	<resultMap class="MsScan" id="MsScanResult">
 		<result property="id" column="id" />

@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms;
+package org.yeastrc.ms.dto;
 
 import java.sql.Date;
 import java.util.ArrayList;

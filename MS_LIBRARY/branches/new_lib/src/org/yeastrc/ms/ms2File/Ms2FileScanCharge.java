@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.yeastrc.ms.MsScanCharge;
+import org.yeastrc.ms.dto.MsScanCharge;
 
 /**
  * Represents a "Z" line from a MS2 file.  Describes the charge for a scan.
