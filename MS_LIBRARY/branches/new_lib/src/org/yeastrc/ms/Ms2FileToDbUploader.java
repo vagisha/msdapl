@@ -10,11 +10,11 @@ import java.io.File;
 
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileRunHeadersDAO;
-import org.yeastrc.ms.ms2File.db.Ms2FileHeaders;
-import org.yeastrc.ms.ms2File.parser.Ms2FileHeader;
-import org.yeastrc.ms.ms2File.parser.Ms2FileReader;
-import org.yeastrc.ms.ms2File.parser.Ms2FileReaderException;
-import org.yeastrc.ms.ms2File.parser.Ms2FileScan;
+import org.yeastrc.ms.ms2File.Ms2FileHeaders;
+import org.yeastrc.ms.parser.ms2File.Ms2FileHeader;
+import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
+import org.yeastrc.ms.parser.ms2File.Ms2FileReaderException;
+import org.yeastrc.ms.parser.ms2File.Ms2FileScan;
 
 
 /**

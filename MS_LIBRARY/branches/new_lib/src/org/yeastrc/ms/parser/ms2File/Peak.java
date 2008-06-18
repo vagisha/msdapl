@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.ms2File.parser;
+package org.yeastrc.ms.parser.ms2File;
 
 /**
  * 

@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao.ms2File;
 import java.sql.SQLException;
 
 import org.yeastrc.ms.dao.BaseDAO;
-import org.yeastrc.ms.ms2File.db.Ms2FileHeaders;
+import org.yeastrc.ms.ms2File.Ms2FileHeaders;
 
 /**
  * 
