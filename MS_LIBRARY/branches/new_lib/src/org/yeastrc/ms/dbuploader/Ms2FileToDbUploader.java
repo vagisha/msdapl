@@ -36,10 +36,6 @@ import org.yeastrc.ms.parser.ms2File.ScanCharge;
  */
 public class Ms2FileToDbUploader {
 
-    public Ms2FileToDbUploader() {
-        
-    }
-    
     public void uploadMs2File(String filePath) {
         
         Ms2FileReader reader = new Ms2FileReader();
