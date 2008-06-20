@@ -4,7 +4,7 @@
  * Jun 17, 2008
  * @version 1.0
  */
-package org.yeastrc.ms;
+package org.yeastrc.ms.dbuploader;
 
 import java.io.File;
 import java.io.InputStream;

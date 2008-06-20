@@ -25,13 +25,13 @@
 	</transactionManager>
 	-->
 	
-	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsExperimentSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsRunSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsScanSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/MsScanChargeSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsExperimentSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanChargeSqlMap.xml"/>
 	
-	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/Ms2FileRunHeadersSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/dao/sqlmap/Ms2FileChargeIndependentAnalysisSqlMap.xml"/>
-		<sqlMap resource="org/yeastrc/ms/dao/sqlmap/Ms2FileChargeDependentAnalysisSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/Ms2FileRunHeadersSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/Ms2FileChargeIndependentAnalysisSqlMap.xml"/>
+		<sqlMap resource="org/yeastrc/ms/sqlmap/Ms2FileChargeDependentAnalysisSqlMap.xml"/>
 	
 </sqlMapConfig>	
