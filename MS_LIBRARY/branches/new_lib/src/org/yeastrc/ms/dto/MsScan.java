@@ -27,10 +27,10 @@ public class MsScan {
     private int endScanNum = -1;
     
     private int msLevel = -1; // 1 for MS1, 2 for MS2 and so on
-    private double retentionTime = -1;
+    private float retentionTime = -1;
     private String fragmentationType; 
     
-    private double precursorMz;  // 0 if this is a MS1 scan
+    private float precursorMz;  // 0 if this is a MS1 scan
     private int precursorScanId = -1; // id (database) of the precursor scan.  0 if this is a MS1 scan
     private int precursorScanNum = -1; // scan number of the precursor scan
     
@@ -130,28 +130,28 @@ public class MsScan {
     /**
      * @return the retentionTime
      */
-    public double getRetentionTime() {
+    public float getRetentionTime() {
         return retentionTime;
     }
 
     /**
      * @param retentionTime the retentionTime to set
      */
-    public void setRetentionTime(double retentionTime) {
+    public void setRetentionTime(float retentionTime) {
         this.retentionTime = retentionTime;
     }
 
     /**
      * @return the precursorMz
      */
-    public double getPrecursorMz() {
+    public float getPrecursorMz() {
         return precursorMz;
     }
 
     /**
      * @param precursorMz the precursorMz to set
      */
-    public void setPrecursorMz(double precursorMz) {
+    public void setPrecursorMz(float precursorMz) {
         this.precursorMz = precursorMz;
     }
 

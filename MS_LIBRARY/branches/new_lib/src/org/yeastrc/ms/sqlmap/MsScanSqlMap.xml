@@ -12,7 +12,7 @@
 		<result property="endScanNum" column="endScanNumber" />
 		<result property="msLevel" column="level" />
 		<result property="precursorMz" column="preMZ" />
-		<result property="precursorScanId" column="preScanID" />
+		<result property="precursorScanId" column="preScanID" nullValue="-1"/>
 		<result property="precursorScanNum" column="prescanNumber" />
 		<result property="retentionTime" column="retentionTime" />
 		<result property="fragmentationType" column="fragmentationType" />

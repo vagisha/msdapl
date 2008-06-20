@@ -20,7 +20,6 @@ import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.MsScanCharge;
-import org.yeastrc.ms.dto.Peaks;
 import org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.Ms2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.Ms2FileHeaders;
@@ -34,7 +33,7 @@ import org.yeastrc.ms.parser.ms2File.ScanCharge;
 /**
  * 
  */
-public class Ms2FileToDbUploader {
+public class Ms2FileToDbConverter {
 
     public void uploadMs2File(String filePath) {
         
@@ -167,10 +166,11 @@ public class Ms2FileToDbUploader {
     
     
     public static void main(String[] args) {
-       Ms2FileToDbUploader uploader = new Ms2FileToDbUploader();
+       Ms2FileToDbConverter uploader = new Ms2FileToDbConverter();
        //String file = "./resources/sample.ms2";
        //String file = "./resources/PARC_p75_01_itms.ms2";
-       String file = "./resources/NE063005ph8s01.ms2";
+       String file = "/Users/vagisha/WORK/MS_LIBRARY/sample_MS2_data/p75/p75_01_itms.ms2";
+//       String file = "./resources/NE063005ph8s01.ms2";
        uploader.uploadMs2File(file);
     }
 }

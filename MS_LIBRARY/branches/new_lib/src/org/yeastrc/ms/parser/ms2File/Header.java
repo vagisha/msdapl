@@ -15,18 +15,18 @@ import java.util.TreeMap;
  */
 public class Header {
 
-    private static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
-    private static final String DANALYZER_VERSION = "DAnalyzerVersion";
-    private static final String DANALYZER = "DAnalyzer";
-    private static final String IANALYZER_OPTIONS = "IAnalyzerOptions";
-    private static final String IANALYZER_VERSION = "IAnalyzerVersion";
-    private static final String IANALYZER = "IAnalyzer";
-    private static final String INSTRUMENT_SN = "InstrumentSN";
-    private static final String INSTRUMENT_TYPE = "InstrumentType";
-    private static final String EXTRACTOR_OPTIONS = "ExtractorOptions";
-    private static final String EXTRACTOR_VERSION = "ExtractorVersion";
-    private static final String EXTRACTOR = "Extractor";
-    private static final String CREATION_DATE = "CreationDate";
+    public static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
+    public static final String DANALYZER_VERSION = "DAnalyzerVersion";
+    public static final String DANALYZER = "DAnalyzer";
+    public static final String IANALYZER_OPTIONS = "IAnalyzerOptions";
+    public static final String IANALYZER_VERSION = "IAnalyzerVersion";
+    public static final String IANALYZER = "IAnalyzer";
+    public static final String INSTRUMENT_SN = "InstrumentSN";
+    public static final String INSTRUMENT_TYPE = "InstrumentType";
+    public static final String EXTRACTOR_OPTIONS = "ExtractorOptions";
+    public static final String EXTRACTOR_VERSION = "ExtractorVersion";
+    public static final String EXTRACTOR = "Extractor";
+    public static final String CREATION_DATE = "CreationDate";
     
     private HashMap<String, String> headerItems;
     

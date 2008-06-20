@@ -51,7 +51,7 @@ public class MsExperimentUploader {
         if (filenames.size() == 0)
             return;
         
-        Ms2FileToDbUploader ms2Uploader = new Ms2FileToDbUploader();
+        Ms2FileToDbConverter ms2Uploader = new Ms2FileToDbConverter();
         
         for (String filename: filenames) {
             

@@ -17,7 +17,7 @@
 		<result property="instrumentModel" column="instrumentType" />
 		<result property="instrumentSN" column="instrumentSN" />
 		<result property="fileFormat" column="originalFileType" />
-		<result property="comment" column="comments" />
+		<result property="comment" column="comment" />
 	</resultMap>
 	
 	<parameterMap class="MsRun" id="MsRunParam">
