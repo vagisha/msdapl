@@ -28,10 +28,11 @@ public class MsScan {
     
     private int msLevel; // 1 for MS1, 2 for MS2 and so on
     private double retentionTime;
-    
+    private String fragmentationType; 
     
     private double precursorMz;  // 0 if this is a MS1 scan
     private int precursorScanId; // id (database) of the precursor scan.  0 if this is a MS1 scan
+    private int precursorScanNum; // scan number of the precursor scan
     
     private Peaks peaks;
     
@@ -112,6 +113,20 @@ public class MsScan {
         this.msLevel = msLevel;
     }
 
+    /**
+     * @return the fragmentationType
+     */
+    public String getFragmentationType() {
+        return fragmentationType;
+    }
+
+    /**
+     * @param fragmentationType the fragmentationType to set
+     */
+    public void setFragmentationType(String fragmentationType) {
+        this.fragmentationType = fragmentationType;
+    }
+    
     /**
      * @return the retentionTime
      */
@@ -223,6 +238,20 @@ public class MsScan {
      */
     public void setScanCharges(List<MsScanCharge> scanCharges) {
         this.scanCharges = scanCharges;
+    }
+
+    /**
+     * @return the precursorScanNum
+     */
+    public int getPrecursorScanNum() {
+        return precursorScanNum;
+    }
+
+    /**
+     * @param precursorScanNum the precursorScanNum to set
+     */
+    public void setPrecursorScanNum(int precursorScanNum) {
+        this.precursorScanNum = precursorScanNum;
     }
     
     

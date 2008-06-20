@@ -26,7 +26,6 @@ public class MsRun {
     private String instrumentVendor;
     private String instrumentModel;
     private String instrumentSN; // serial number of the instrument
-    private String fragmentationType; 
     
     private String comment;
     
@@ -195,19 +194,6 @@ public class MsRun {
         this.instrumentSN = instrumentSN;
     }
 
-    /**
-     * @return the fragmentationType
-     */
-    public String getFragmentationType() {
-        return fragmentationType;
-    }
-
-    /**
-     * @param fragmentationType the fragmentationType to set
-     */
-    public void setFragmentationType(String fragmentationType) {
-        this.fragmentationType = fragmentationType;
-    }
 
     /**
      * @return the comment

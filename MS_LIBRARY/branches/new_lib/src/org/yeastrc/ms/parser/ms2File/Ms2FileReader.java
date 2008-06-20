@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 
 /**
@@ -28,7 +30,22 @@ public class Ms2FileReader {
         }
         catch (FileNotFoundException e) {
             close();
-            throw new Ms2FileReaderException("File not found: "+filePath);
+            throw new Ms2FileReaderException(e.getMessage());
+        }
+        catch (IOException e) {
+            close();
+            throw new Ms2FileReaderException(e.getMessage());
+        }
+    }
+    
+    public void open(InputStream inStream) throws Ms2FileReaderException {
+        try {
+            reader = new BufferedReader(new InputStreamReader(inStream));
+            currentLine = reader.readLine();
+        }
+        catch (FileNotFoundException e) {
+            close();
+            throw new Ms2FileReaderException(e.getMessage());
         }
         catch (IOException e) {
             close();

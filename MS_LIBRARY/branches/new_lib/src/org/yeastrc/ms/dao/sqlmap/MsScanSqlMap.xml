@@ -11,9 +11,11 @@
 		<result property="startScanNum" column="startScanNumber" />
 		<result property="endScanNum" column="endScanNumber" />
 		<result property="msLevel" column="level" />
-		<result property="retentionTime" column="retentionTime" />
 		<result property="precursorMz" column="preMZ" />
 		<result property="precursorScanId" column="preScanID" />
+		<result property="precursorScanNum" column="prescanNumber" />
+		<result property="retentionTime" column="retentionTime" />
+		<result property="fragmentationType" column="fragmentationType" />
 		<result property="peaksBinary" column="data" />
 	</resultMap>
 	
@@ -24,16 +26,29 @@
 		<parameter property="msLevel" jdbcType="TINYINT" />
 		<parameter property="precursorMz" jdbcType="DECIMAL" />
 		<parameter property="precursorScanId" jdbcType="INTEGER" />
+		<parameter property="precursorScanNum" jdbcType="INTEGER" />
 		<parameter property="retentionTime" jdbcType="DECIMAL" />
+		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
 		<parameter property="peaksBinary" jdbcType="BLOB" />
 	</parameterMap>
 	
-    <select id="selectScansIdsForRun" resultClass="Integer" parameterClass="Integer"> 
-        SELECT id FROM msRun WHERE experimentID = #id#
+    <select id="selectScanIdsForRun" resultClass="Integer" parameterClass="Integer"> 
+        SELECT id FROM msScan WHERE runID = #id#
     </select> 
     
     <select id="select" resultMap="MsScanResult" parameterClass="Integer">
-    	SELECT id, runID, startScanNumber, endScanNumber, level, retentionTime, preMZ, preScanID, UNCOMPRESS(data) as data FROM MsScan WHERE id= #id#
+    	SELECT id, 
+    			runID, 
+    			startScanNumber, 
+    			endScanNumber, 
+    			level, 
+    			preMZ, 
+    			preScanID, 
+    			prescanNumber, 
+    			retentionTime,
+    			fragmentationType,
+    			UNCOMPRESS(data) as data 
+    			FROM MsScan WHERE id= #id#
     </select>
     
     <insert id="insert" parameterMap="MsScanParam">
@@ -43,9 +58,11 @@
     						level, 
     						preMZ, 
     						preScanID, 
+    						prescanNumber,
     						retentionTime, 
+    						fragmentationType,
     						data) 
-    	VALUES (?,?,?,?,?,?,?,COMPRESS(?))
+    	VALUES (?,?,?,?,?,?,?,?,?,COMPRESS(?))
     	<selectKey resultClass="int" keyProperty="id">
       		select last_insert_id() as id
     	</selectKey>

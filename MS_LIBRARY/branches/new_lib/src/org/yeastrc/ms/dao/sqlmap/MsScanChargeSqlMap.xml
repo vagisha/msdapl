@@ -7,7 +7,7 @@
 	
 	<resultMap class="MsScanCharge" id="MsScanChargeResult">
 		<result property="id" column="id" />
-		<result property="scanId" column="scan" />
+		<result property="scanId" column="scanID" />
 		<result property="charge" column="charge" />
 		<result property="mass" column="mass" />
 	</resultMap>
@@ -19,7 +19,7 @@
 	</parameterMap>
 	
     <select id="selectChargesForScan" resultMap="MsScanChargeResult"> 
-        SELECT * FROM msScanCharge WHERE scan=#scanId#
+        SELECT * FROM msScanCharge WHERE scanID=#scanId#
     </select> 
     
     <select id="select" resultMap="MsScanChargeResult" parameterClass="Integer">
@@ -27,7 +27,7 @@
     </select>
     
     <insert id="insert" parameterMap="MsScanChargeParam">
-    	INSERT INTO msScanCharge (scan, charge, mass) VALUES (?,?,?)
+    	INSERT INTO msScanCharge (scanID, charge, mass) VALUES (?,?,?)
     	<selectKey resultClass="int" keyProperty="id">
       		select last_insert_id() as id
     	</selectKey>

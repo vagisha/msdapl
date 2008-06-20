@@ -16,7 +16,6 @@
 		<result property="instrumentVendor" column="instrumentVendor" />
 		<result property="instrumentModel" column="instrumentType" />
 		<result property="instrumentSN" column="instrumentSN" />
-		<result property="fragmentationType" column="fragmentationType" />
 		<result property="fileFormat" column="originalFileType" />
 		<result property="comment" column="comments" />
 	</resultMap>
@@ -31,7 +30,6 @@
 		<parameter property="instrumentModel" jdbcType="VARCHAR"/>
 		<parameter property="instrumentVendor" jdbcType="VARCHAR"/>
 		<parameter property="instrumentSN" jdbcType="VARCHAR"/>
-		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
 		<parameter property="fileFormat" jdbcType="VARCHAR"/>
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>
@@ -54,10 +52,9 @@
     						instrumentType, 
     						instrumentVendor, 
     						instrumentSN,
-    						fragmentationType,
     						originalFileType, 
     						comment) 
-    	VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
     	<selectKey resultClass="int" keyProperty="id">
       		select last_insert_id() as id
     	</selectKey>

@@ -6,7 +6,7 @@
 	<typeAlias alias="ianalysis" type="org.yeastrc.ms.dto.ms2File.Ms2FileChargeIndependentAnalysis"/>
 	
 	<resultMap class="ianalysis" id="ianalysisResult">
-		<result property="scanId" column="scan" />
+		<result property="scanId" column="scanID" />
 		<result property="header" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
@@ -18,11 +18,11 @@
 	</parameterMap>
 	
     <select id="selectAnalysisForScan" resultMap="ianalysisResult" parameterClass="Integer"> 
-        SELECT * FROM MS2FileChargeIndependentAnalysis where scan=#id#
+        SELECT * FROM MS2FileChargeIndependentAnalysis where scanID=#id#
     </select> 
     
     <insert id="insert" parameterMap="ianalysisParam">
-    	INSERT INTO MS2FileChargeIndependentAnalysis (scan, header, value) 
+    	INSERT INTO MS2FileChargeIndependentAnalysis (scanID, header, value) 
     	VALUES (?,?,?)
     </insert>
     

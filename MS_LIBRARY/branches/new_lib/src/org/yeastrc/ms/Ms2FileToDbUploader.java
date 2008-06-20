@@ -7,6 +7,7 @@
 package org.yeastrc.ms;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 
 import org.yeastrc.ms.dao.DAOFactory;
@@ -39,24 +40,41 @@ public class Ms2FileToDbUploader {
         
     }
     
-    private void uploadMs2File(String file) {
+    public void uploadMs2File(String filePath) {
         
         Ms2FileReader reader = new Ms2FileReader();
         try {
-            reader.open(file);
-            Header header = reader.getHeader();
-            // insert a run into the database and get the run Id
-            int runId = saveMs2Header(header, 18, file);
-            
-            while (reader.hasScans()) {
-                Scan scan = reader.getNextScan();
-                // insert a scan into the database for the given run
-                saveScan(scan, runId);
-            }
+            reader.open(filePath);
+            uploadMs2File(filePath, reader);
             
         }
         catch (Ms2FileReaderException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void uploadMs2File(InputStream inStream, String fileName) {
+        Ms2FileReader reader = new Ms2FileReader();
+        try {
+            reader.open(inStream);
+            uploadMs2File(fileName, reader);
+            
+        }
+        catch (Ms2FileReaderException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void uploadMs2File(String file, Ms2FileReader reader)
+            throws Ms2FileReaderException {
+        Header header = reader.getHeader();
+        // insert a run into the database and get the run Id
+        int runId = saveMs2Header(header, 18, file);
+        
+        while (reader.hasScans()) {
+            Scan scan = reader.getNextScan();
+            // insert a scan into the database for the given run
+            saveScan(scan, runId);
         }
     }
     
@@ -74,7 +92,6 @@ public class Ms2FileToDbUploader {
 //        run.setInstrumentVendor("");
         run.setInstrumentModel(header.getInstrumentType());
         run.setInstrumentSN(header.getInstrumentSN());
-        run.setFragmentationType(header.getActivationType());
         run.setComment(header.getComments());
         
         // save the run
@@ -104,8 +121,9 @@ public class Ms2FileToDbUploader {
         scan.setEndScanNum(ms2Scan.getEndScan());
         scan.setMsLevel(2);
         scan.setRetentionTime(ms2Scan.getRetentionTime());
+        scan.setFragmentationType(ms2Scan.getActivationType());
         scan.setPrecursorMz(ms2Scan.getPrecursorMz());
-        scan.setPrecursorScanId(ms2Scan.getPrecursorScanNumber());
+        scan.setPrecursorScanNum(ms2Scan.getPrecursorScanNumber());
         Peaks peaks = new Peaks();
         peaks.addPeak(100.0f, 200.0f);
         scan.setPeaksBinary(ms2Scan.getPeaksBinary());

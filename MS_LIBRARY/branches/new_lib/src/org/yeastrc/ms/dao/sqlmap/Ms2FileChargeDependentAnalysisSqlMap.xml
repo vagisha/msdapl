@@ -6,7 +6,7 @@
 	<typeAlias alias="danalysis" type="org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis"/>
 	
 	<resultMap class="danalysis" id="danalysisResult">
-		<result property="scanChargeId" column="scan" />
+		<result property="scanChargeId" column="scanChargeID" />
 		<result property="header" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
@@ -18,11 +18,11 @@
 	</parameterMap>
 	
     <select id="selectAnalysisForCharge" resultMap="danalysisResult" parameterClass="Integer"> 
-        SELECT * FROM MS2FileChargeDependentAnalysis where scanCharge=#id#
+        SELECT * FROM MS2FileChargeDependentAnalysis where scanChargeID=#id#
     </select> 
     
     <insert id="insert" parameterMap="danalysisParam">
-    	INSERT INTO MS2FileChargeDependentAnalysis (scanCharge, header, value) 
+    	INSERT INTO MS2FileChargeDependentAnalysis (scanChargeID, header, value) 
     	VALUES (?,?,?)
     </insert>
     

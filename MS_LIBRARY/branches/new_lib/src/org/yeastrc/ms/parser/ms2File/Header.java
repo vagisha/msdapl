@@ -15,7 +15,6 @@ import java.util.TreeMap;
  */
 public class Header {
 
-    private static final String ACTIVATION_TYPE = "ActivationType";
     private static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
     private static final String DANALYZER_VERSION = "DAnalyzerVersion";
     private static final String DANALYZER = "DAnalyzer";
@@ -99,10 +98,6 @@ public class Header {
     
     public String getDAnalyzerOptions() {
         return getHeaderValueForLabel(DANALYZER_OPTIONS);
-    }
-    
-    public String getActivationType() {
-        return getHeaderValueForLabel(ACTIVATION_TYPE);
     }
     
     public String getComments() {
