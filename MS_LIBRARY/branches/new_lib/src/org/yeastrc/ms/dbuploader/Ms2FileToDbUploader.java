@@ -120,8 +120,6 @@ public class Ms2FileToDbUploader {
         scan.setFragmentationType(ms2Scan.getActivationType());
         scan.setPrecursorMz(ms2Scan.getPrecursorMz());
         scan.setPrecursorScanNum(ms2Scan.getPrecursorScanNumber());
-        Peaks peaks = new Peaks();
-        peaks.addPeak(100.0f, 200.0f);
         scan.setPeaksBinary(ms2Scan.getPeaksBinary());
         
         // save the scan
@@ -171,7 +169,8 @@ public class Ms2FileToDbUploader {
     public static void main(String[] args) {
        Ms2FileToDbUploader uploader = new Ms2FileToDbUploader();
        //String file = "./resources/sample.ms2";
-       String file = "./resources/PARC_p75_01_itms.ms2";
+       //String file = "./resources/PARC_p75_01_itms.ms2";
+       String file = "./resources/NE063005ph8s01.ms2";
        uploader.uploadMs2File(file);
     }
 }

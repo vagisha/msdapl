@@ -21,13 +21,13 @@
 	
 	<parameterMap class="MsScan" id="MsScanParam">
 		<parameter property="runId" jdbcType="INTEGER" />
-		<parameter property="startScanNum" jdbcType="INTEGER" />
-		<parameter property="endScanNum" jdbcType="INTEGER" />
-		<parameter property="msLevel" jdbcType="TINYINT" />
-		<parameter property="precursorMz" jdbcType="DECIMAL" />
-		<parameter property="precursorScanId" jdbcType="INTEGER" />
-		<parameter property="precursorScanNum" jdbcType="INTEGER" />
-		<parameter property="retentionTime" jdbcType="DECIMAL" />
+		<parameter property="startScanNum" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="endScanNum" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="msLevel" jdbcType="TINYINT" nullValue="-1"/>
+		<parameter property="precursorMz" jdbcType="DECIMAL" nullValue="-1"/>
+		<parameter property="precursorScanId" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="precursorScanNum" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="retentionTime" jdbcType="DECIMAL" nullValue="-1"/>
 		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
 		<parameter property="peaksBinary" jdbcType="BLOB" />
 	</parameterMap>

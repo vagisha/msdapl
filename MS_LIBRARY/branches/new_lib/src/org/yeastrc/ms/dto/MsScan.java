@@ -23,16 +23,16 @@ public class MsScan {
     
     private int id;     // unique id (database) of this scan
     
-    private int startScanNum;
-    private int endScanNum;
+    private int startScanNum = -1;
+    private int endScanNum = -1;
     
-    private int msLevel; // 1 for MS1, 2 for MS2 and so on
-    private double retentionTime;
+    private int msLevel = -1; // 1 for MS1, 2 for MS2 and so on
+    private double retentionTime = -1;
     private String fragmentationType; 
     
     private double precursorMz;  // 0 if this is a MS1 scan
-    private int precursorScanId; // id (database) of the precursor scan.  0 if this is a MS1 scan
-    private int precursorScanNum; // scan number of the precursor scan
+    private int precursorScanId = -1; // id (database) of the precursor scan.  0 if this is a MS1 scan
+    private int precursorScanNum = -1; // scan number of the precursor scan
     
     private Peaks peaks;
     

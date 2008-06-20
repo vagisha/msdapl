@@ -13,9 +13,9 @@
 	</resultMap>
 	
 	<parameterMap class="MsScanCharge" id="MsScanChargeParam">
-		<parameter property="scanId" jdbcType="NUMBER"/>
-		<parameter property="charge" jdbcType="NUMBER"/>
-		<parameter property="mass" jdbcType="NUMBER"/>
+		<parameter property="scanId" jdbcType="INTEGER"/>
+		<parameter property="charge" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="mass" jdbcType="DECIMAL" nullValue="-1"/>
 	</parameterMap>
 	
     <select id="selectChargesForScan" resultMap="MsScanChargeResult"> 

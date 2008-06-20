@@ -26,10 +26,10 @@ public class Scan {
     public static final String ACTIVATION_TYPE = "ActivationType";
     public static final String RET_TIME = "RetTime";
     
-    private int startScan;
-    private int endScan;
+    private int startScan = -1;
+    private int endScan = -1;
     
-    private float precursorMz;
+    private float precursorMz = -1;
     
     private Peaks peaks;
     
