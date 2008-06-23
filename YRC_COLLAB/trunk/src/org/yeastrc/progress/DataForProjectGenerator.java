@@ -50,8 +50,8 @@ public class DataForProjectGenerator {
 		//String startDate = (start.getYear() + 1900) + "-" + (start.getMonth() + 1) + "-" + start.getDay();
 		//String endDate = (end.getYear() + 1900)  + "-" + (end.getMonth() + 1) + "-" + end.getDay();
 		
-		String startDate = "2006-07-01";
-		String endDate = "2007-07-01";
+		String startDate = "2007-07-01";
+		String endDate = "2008-07-01";
 		
 		if (p.getGroups().contains( Projects.MACCOSS ) || p.getGroups().contains( Projects.YATES )) {
 

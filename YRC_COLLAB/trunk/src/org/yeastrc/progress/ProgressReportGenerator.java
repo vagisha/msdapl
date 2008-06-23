@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,6 +27,14 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.*;
+
+import org.w3c.dom.*;
+//JAXP 1.1
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;
+import javax.xml.transform.dom.*; 
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -203,6 +212,7 @@ public class ProgressReportGenerator {
 		elem.appendChild(doc.createTextNode("P41"));
 		grantInfo.appendChild(elem);
 		
+		/*
 		elem = doc.createElement("Director_Name");
 		elem.appendChild(doc.createTextNode(this.grantDirectorName));
 		grantInfo.appendChild(elem);
@@ -221,6 +231,12 @@ public class ProgressReportGenerator {
 
 		elem = doc.createElement("Director_Email_Address");
 		elem.appendChild(doc.createTextNode(this.grantDirectorEmail));
+		grantInfo.appendChild(elem);
+		*/
+		
+		// new element for 2008
+		elem = doc.createElement("Director_Person_ID");
+		elem.appendChild(doc.createTextNode( String.valueOf( this.directorPersonID) ) );
 		grantInfo.appendChild(elem);
 
 		elem = doc.createElement("Health_Professional_School_Name");
@@ -336,18 +352,16 @@ public class ProgressReportGenerator {
 			publication.appendChild(elem);
 			publication.insertBefore(doc.createTextNode("\n"), elem);
 
-			
-			elem = doc.createElement("Body");
-			tmpStr = p.getCitation();
-			if (tmpStr == null) tmpStr = "";
-			elem.appendChild(doc.createTextNode(tmpStr));
-			publication.appendChild(elem);
-			publication.insertBefore(doc.createTextNode("\n"), elem);
-			
-
 			if (p.getPubMedID() != 0) {
 				elem = doc.createElement("PM_UID");
 				tmpStr = String.valueOf(p.getPubMedID());
+				elem.appendChild(doc.createTextNode(tmpStr));
+				publication.appendChild(elem);
+				publication.insertBefore(doc.createTextNode("\n"), elem);
+			} else {
+				elem = doc.createElement("Body");
+				tmpStr = p.getCitation();
+				if (tmpStr == null) tmpStr = "";
 				elem.appendChild(doc.createTextNode(tmpStr));
 				publication.appendChild(elem);
 				publication.insertBefore(doc.createTextNode("\n"), elem);
@@ -495,15 +509,43 @@ public class ProgressReportGenerator {
 
 			// handle funding for this Person
 			Map<Funding, Set<Integer>> fundingMap = this.getFundingForResearcher( researcher );
-			for ( Funding fundingObject : fundingMap.keySet() ) {
+			List<Funding> fkeys = new ArrayList<Funding>( fundingMap.keySet() );
+			Collections.sort( fkeys );
+			
+			for ( Funding fundingObject : fkeys ) {
 
+				// they no longer accept 'OTH' as funding agency (why?  i have NO idea)
+				if ( fundingObject.isFederal() && fundingObject.getSourceName().equals( "OTH" ) )
+					continue;
+				
+				/*
 				// Create a Funding element
 				Element funding = doc.createElement("Funding");
-
-				Element sElem = doc.createElement("Source_Type");
-				sElem.appendChild(doc.createTextNode( fundingObject.getSourceType() ) );
-				funding.appendChild(sElem);
-
+				*/
+				
+				Element funding = null;
+				if (!fundingObject.isFederal() )
+					funding = doc.createElement( "Non_Federal_Funding" );
+				else if (!fundingObject.isPHS() )
+					funding = doc.createElement( "Federal_Non_PHS_Funding" );
+				else
+					funding = doc.createElement( "Federal_PHS_Funding" );
+				
+				Element sElem = null;
+				if ( !fundingObject.isFederal() ) {
+					sElem = doc.createElement("Source_Type");
+					sElem.appendChild(doc.createTextNode( fundingObject.getSourceType() ) );
+					funding.appendChild(sElem);
+				} else {
+					
+					String sn = fundingObject.getSourceName();
+					if ( sn.equals( "DVA" ) ) sn = "VA";
+					
+					sElem = doc.createElement("Organization");
+					sElem.appendChild(doc.createTextNode( sn ) );
+					funding.appendChild(sElem);
+				}
+				
 				// Get the projects associated with this
 				Iterator fpIter = fundingMap.get( fundingObject ).iterator();
 				while (fpIter.hasNext()) {
@@ -513,20 +555,49 @@ public class ProgressReportGenerator {
 					funding.appendChild(sElem);
 				}
 				
-				if ( fundingObject.getGrantNumber() != null ) {
-					sElem = doc.createElement("Grant_Or_Contract_Number");
-					sElem.appendChild(doc.createTextNode( fundingObject.getGrantNumber() ) );
+				if ( !fundingObject.isFederal() ) {
+					sElem = doc.createElement("Organization_Name");
+					sElem.appendChild(doc.createTextNode( fundingObject.getSourceName() ) );
 					funding.appendChild(sElem);
 				}
 				
+				if ( fundingObject.getGrantNumber() != null ) {
+					String gm = fundingObject.getGrantNumber();
+					if ( gm.length() > 50 )
+						gm = gm.substring(0, 49 );
+					
+					sElem = doc.createElement("Grant_Or_Contract_Number");
+					sElem.appendChild(doc.createTextNode( gm ) );
+					funding.appendChild(sElem);
+				} else {
+					sElem = doc.createElement("Grant_Or_Contract_Number");
+					sElem.appendChild(doc.createTextNode( "n/a" ) );
+					funding.appendChild(sElem);
+				}
 				
+				/*
 				sElem = doc.createElement("Source_Name");
 				sElem.appendChild(doc.createTextNode( fundingObject.getSourceName() ) );
 				funding.appendChild(sElem);
-
+				*/
+				
 				if ( fundingObject.getGrantAmount() != null ) {
+					String tsf = fundingObject.getGrantAmount();
+					int amt = 0;
+					try {
+						tsf = tsf.replace( "$", "" );
+						tsf = tsf.replaceAll( ",", "" );
+						amt = Integer.valueOf( tsf );
+					} catch ( Exception e ) { 
+						System.out.println( "Throwing out: " + fundingObject.getGrantAmount() );
+					}
+					
 					sElem = doc.createElement("Total_Support_Funds");
-					sElem.appendChild(doc.createTextNode( fundingObject.getGrantAmount() ) );
+					sElem.appendChild(doc.createTextNode( String.valueOf( amt ) ) );
+					funding.appendChild(sElem);
+				} else {
+					sElem = doc.createElement("Total_Support_Funds");
+					sElem.appendChild(doc.createTextNode( "0" ) );
 					funding.appendChild(sElem);
 				}
 				
@@ -712,7 +783,7 @@ public class ProgressReportGenerator {
 			subproject.appendChild(elem);
 			subproject.insertBefore(doc.createTextNode("\n"), elem);
 			
-			
+			/*
 			// add in the progress element
 			if (project.getProgress() != null || DataForProjectGenerator.getInstance().generateDataForProject( project, this.startDate, this.endDate ) != null) {
 				
@@ -730,6 +801,7 @@ public class ProgressReportGenerator {
 				subproject.insertBefore(doc.createTextNode("\n"), elem);
 				
 			}
+			*/
 			
 			
 			// Set up the investigator elements
@@ -801,6 +873,12 @@ public class ProgressReportGenerator {
 			elem.appendChild(doc.createTextNode(tmpStr));
 			subproject.appendChild(elem);
 			subproject.insertBefore(doc.createTextNode("\n"), elem);			
+			
+			elem = doc.createElement("Resource_ID");
+			tmpStr = String.valueOf( project.getID() );
+			elem.appendChild(doc.createTextNode(tmpStr));
+			subproject.appendChild(elem);
+			subproject.insertBefore(doc.createTextNode("\n"), elem);
 			
 			/*
 			// Handle the keywords
@@ -1619,6 +1697,10 @@ public class ProgressReportGenerator {
     
 		// Write the DOM document to the file
 		Transformer xformer = TransformerFactory.newInstance().newTransformer();
+		//xformer.setOutputProperty( OutputKeys.ENCODING, "ISO-8859-1" );
+		xformer.setOutputProperty(OutputKeys.INDENT,"yes");
+		
+		
 		xformer.transform(source, result);
 		
 		this.XML = sw.toString();
@@ -1669,7 +1751,7 @@ public class ProgressReportGenerator {
 	 * @throws Exception
 	 */
 	private void buildProjects() throws Exception {
-		this.projects = ReportProjectsSearcher.search(2007);
+		this.projects = ReportProjectsSearcher.search(2008);
 	}
 
 	/**
@@ -1774,6 +1856,8 @@ public class ProgressReportGenerator {
 		Properties props = new Properties();
 		props.load(is);
 		
+		this.directorPersonID = Integer.parseInt( props.getProperty( "director.id" ) );
+		
 		this.hostOrganization = props.getProperty("institution.host");
 		
 		this.twoHybridTitle = props.getProperty("title.plasmid.twohybrid");
@@ -1864,14 +1948,14 @@ public class ProgressReportGenerator {
 	
 	// Define the members of these groups... this shouldn't really be here, but is here for the interest of time
 	// Will later be moved out of the source
-	private final int[] microMembers = { 137, 194, 1124, 1212 };
-	private final int[] y2hMembers = { 272, 1181, 1534 };
-	private final int[] pspMembers = { 268, 1395, 1396 };
-	private final int[] infoMembers = { 254 };
-	private final int[] yatesMembers = { 262, 1337, 1416, 1417 };
-	private final int[] nobleMembers = { 1122, 1377 };
-	private final int[] maccossMembers = { 1049, 1114, 1304, 1640};
-	private final int[] coreMembers = { 137, 1212, 1398 };
+	private final int[] microMembers = { 137, 194 };
+	private final int[] y2hMembers = { 272 };
+	private final int[] pspMembers = { 268 };
+	private final int[] infoMembers = { 254, 137 };
+	private final int[] yatesMembers = { 262 };
+	private final int[] nobleMembers = { 1122 };
+	private final int[] maccossMembers = { 1049 };
+	private final int[] coreMembers = { 137 };
 	//private final int[] aebersoldMembers = { 283, 143, 817, 282 };
 	
 	/*
@@ -1939,6 +2023,8 @@ public class ProgressReportGenerator {
 	private String grantRecipientInstitution;
 	private String grantHealthSchoolName;
 	private String grantPatent;
+	
+	private int directorPersonID;
 	
 	/**
 	 * @return The date, after which, projects submitted to the YRC won't be included.

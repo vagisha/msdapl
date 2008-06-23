@@ -33,7 +33,7 @@ public class PublicationUtils {
 
 		try{
 			// Our SQL statement
-			String sqlStr = "SELECT id FROM tblPublications WHERE reportYear = 2007 ORDER BY reportYear, id";
+			String sqlStr = "SELECT id FROM tblPublications WHERE reportYear = 2008 ORDER BY reportYear, id";
 			stmt = conn.prepareStatement(sqlStr);
 			
 			// Our results
@@ -88,7 +88,7 @@ public class PublicationUtils {
 
 		try{
 			// Our SQL statement
-			String sqlStr = "SELECT id FROM tblPublications WHERE reportYear = 2007 AND projectID = ? ORDER BY reportYear, id";
+			String sqlStr = "SELECT id FROM tblPublications WHERE reportYear = 2008 AND projectID = ? ORDER BY reportYear, id";
 			stmt = conn.prepareStatement(sqlStr);
 			stmt.setInt(1, projectID);
 			
