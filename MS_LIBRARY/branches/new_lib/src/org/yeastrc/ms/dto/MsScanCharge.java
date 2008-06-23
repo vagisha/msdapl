@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.dto;
 
+import java.math.BigDecimal;
+
 
 /**
  * 
@@ -15,7 +17,7 @@ public class MsScanCharge {
     private int id;         // unique id (database)
     private int scanId;     // the id (database) of the scan to which this charge corresponds
     private int charge;     // the charge state
-    private float mass;     // predicted [M+H]+ (mass)
+    private BigDecimal mass;     // predicted [M+H]+ (mass)
     /**
      * @return the id
      */
@@ -55,13 +57,13 @@ public class MsScanCharge {
     /**
      * @return the mass
      */
-    public float getMass() {
+    public BigDecimal getMass() {
         return mass;
     }
     /**
      * @param mass the mass to set
      */
-    public void setMass(float mass) {
+    public void setMass(BigDecimal mass) {
         this.mass = mass;
     }
     

@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,19 +28,19 @@ public class MsScan {
     private int endScanNum = -1;
     
     private int msLevel = -1; // 1 for MS1, 2 for MS2 and so on
-    private float retentionTime = -1;
+    private BigDecimal retentionTime;
     private String fragmentationType; 
     
-    private float precursorMz;  // 0 if this is a MS1 scan
+    private BigDecimal precursorMz;  // 0 if this is a MS1 scan
     private int precursorScanId = -1; // id (database) of the precursor scan.  0 if this is a MS1 scan
     private int precursorScanNum = -1; // scan number of the precursor scan
     
-    private Peaks peaks;
+    private List <BigDecimal[]> peaks;
     
     private List <MsScanCharge> scanCharges; // charge states for this scan
     
     public MsScan() {
-        peaks = new Peaks();
+        peaks = new ArrayList<BigDecimal[]>();
         scanCharges = new ArrayList<MsScanCharge>();
     }
 
@@ -130,28 +131,28 @@ public class MsScan {
     /**
      * @return the retentionTime
      */
-    public float getRetentionTime() {
+    public BigDecimal getRetentionTime() {
         return retentionTime;
     }
-
+    
     /**
      * @param retentionTime the retentionTime to set
      */
-    public void setRetentionTime(float retentionTime) {
+    public void setRetentionTime(BigDecimal retentionTime) {
         this.retentionTime = retentionTime;
     }
-
+    
     /**
      * @return the precursorMz
      */
-    public float getPrecursorMz() {
+    public BigDecimal getPrecursorMz() {
         return precursorMz;
     }
 
     /**
      * @param precursorMz the precursorMz to set
      */
-    public void setPrecursorMz(float precursorMz) {
+    public void setPrecursorMz(BigDecimal precursorMz) {
         this.precursorMz = precursorMz;
     }
 
@@ -170,25 +171,22 @@ public class MsScan {
     }
 
     /**
-     * @return the peaks
-     */
-    public Peaks getPeaks() {
-        return peaks;
-    }
-
-    /**
      * @param peaks the peaks to set
      */
-    public void setPeaks(Peaks peaks) {
+    public void setPeaks(List<BigDecimal[]> peaks) {
         this.peaks = peaks;
     }
 
+    public List<BigDecimal[]> getPeaks() {
+        return peaks;
+    }
+    
     public void setPeaksBinary(byte[] peakData) {
         ByteArrayInputStream bais = new ByteArrayInputStream(peakData);
         ObjectInputStream ois = null;
         try {
             ois = new ObjectInputStream(bais);
-            peaks = (Peaks) ois.readObject();
+            peaks = (List<BigDecimal[]>) ois.readObject();
         }
         catch (IOException e) {
             e.printStackTrace();

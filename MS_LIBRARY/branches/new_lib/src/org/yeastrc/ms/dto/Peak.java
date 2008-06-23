@@ -7,6 +7,7 @@
 package org.yeastrc.ms.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 
@@ -14,11 +15,11 @@ import java.io.Serializable;
 public class Peak implements Serializable{
 
     private double intensity;
-    private float mz;
+    private double mz;
     
     public Peak() {}
     
-    public Peak(float mz, double intensity) {
+    public Peak(double mz, double intensity) {
         this.mz = mz;
         this.intensity = intensity;
     }
@@ -37,13 +38,13 @@ public class Peak implements Serializable{
     /**
      * @return the mz
      */
-    public float getMz() {
+    public double getMz() {
         return mz;
     }
     /**
      * @param mz the mz to set
      */
-    public void setMz(float mz) {
+    public void setMz(double mz) {
         this.mz = mz;
     }
     

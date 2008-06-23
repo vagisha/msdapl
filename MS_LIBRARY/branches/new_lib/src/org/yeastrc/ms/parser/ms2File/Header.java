@@ -27,6 +27,7 @@ public class Header {
     public static final String EXTRACTOR_VERSION = "ExtractorVersion";
     public static final String EXTRACTOR = "Extractor";
     public static final String CREATION_DATE = "CreationDate";
+    public static final String COMMENTS = "Comments";
     
     private HashMap<String, String> headerItems;
     
@@ -101,8 +102,9 @@ public class Header {
     }
     
     public String getComments() {
-        String comments = getHeaderValueForLabel("Comments");
+        String comments = getHeaderValueForLabel(COMMENTS);
         if (comments == null)
+            // older versions may have Comment instead of Comments
             comments = getHeaderValueForLabel("Comment");
         return comments;
     }

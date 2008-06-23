@@ -7,30 +7,40 @@
 package org.yeastrc.ms.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * 
  */
 public class Peaks implements Serializable {
 
-    List <Peak> peaks;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
+//    List <Peak> peaks;
+    double[][] peaks;
     
     public Peaks() {
-        peaks = new ArrayList<Peak>();
+//        peaks = new ArrayList<Peak>();
     }
     
     public int getPeaksCount() {
-        return peaks.size();
+//        return peaks.size();
+        return peaks.length;
     }
     
-    public Iterator<Peak> getIterator() {
-        return peaks.iterator();
+    public double[] getPeakAtIndex(int index) {
+        if (index < 0 || index >= getPeaksCount())
+            throw new ArrayIndexOutOfBoundsException("Invalid peak index: "+index);
+        double[] peak = new double[2];
+        peak[0] = peaks[index][0];
+        peak[1] = peaks[index][1];
+        return peak;
     }
     
-    public void addPeak(float mz, double intensity) {
-        peaks.add(new Peak(mz, intensity));
+    public void setPeaks(double[][] peaks) {
+        if (peaks != null)
+            this.peaks = peaks;
     }
 }

@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 /**
@@ -14,7 +15,7 @@ import java.util.HashMap;
 public class ScanCharge {
 
     private int charge;
-    private float mass;
+    private BigDecimal mass;
     private HashMap<String, String> analysisItems;
     
     public ScanCharge() {
@@ -36,16 +37,20 @@ public class ScanCharge {
     /**
      * @return the mass
      */
-    public float getMass() {
+    public BigDecimal getMass() {
         return mass;
     }
     /**
      * @param mass the mass to set
      */
-    public void setMass(float mass) {
+    public void setMass(BigDecimal mass) {
         this.mass = mass;
     }
    
+    public void setMass(String mass) {
+        this.mass = new BigDecimal(mass);
+    }
+    
     public void addAnalysisItem(String label, String value) {
         if (label == null || value == null)   return;
         analysisItems.put(label, value);
@@ -65,6 +70,7 @@ public class ScanCharge {
         buf.append(charge);
         buf.append("\t");
         buf.append(mass);
+        buf.append("\n");
         for (String label: analysisItems.keySet()) {
             buf.append("D\t");
             buf.append(label);

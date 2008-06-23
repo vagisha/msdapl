@@ -6,16 +6,10 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-
-import org.yeastrc.ms.dto.Peak;
-import org.yeastrc.ms.dto.Peaks;
 
 /**
  * 
@@ -29,9 +23,9 @@ public class Scan {
     private int startScan = -1;
     private int endScan = -1;
     
-    private float precursorMz = -1;
+    private BigDecimal precursorMz;
     
-    private Peaks peaks;
+    private List <BigDecimal[]> peaks;
     
     private List<ScanCharge> chargeStates;
     
@@ -40,33 +34,33 @@ public class Scan {
     public Scan() {
         chargeStates = new ArrayList<ScanCharge>();
         analysisItems = new HashMap<String, String>();
-        peaks = new Peaks();
+        peaks = new ArrayList<BigDecimal[]>();
     }
 
-    public void addPeak(float mz, double intensity) {
-        peaks.addPeak(mz, intensity);
+    public void setPeaks(List <BigDecimal[]> peaks) {
+        this.peaks = peaks;
     }
     
-    public byte[] getPeaksBinary() {
-        ByteArrayOutputStream baos = null;
-        ObjectOutputStream oos = null;
-        baos = new ByteArrayOutputStream();
-        try {
-            oos = new ObjectOutputStream(baos);
-            oos.writeObject(peaks);
-            oos.flush();
-            return baos.toByteArray();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (oos != null) {
-                try {oos.close();}
-                catch (IOException e) {e.printStackTrace();}
-            }
-        }
-        return null;
+    public List<BigDecimal[]> getPeaks() {
+        return peaks;
+    }
+    
+    public void addPeak(BigDecimal mz, BigDecimal intensity) {
+        BigDecimal[] peak = new BigDecimal[] {mz, intensity};
+        peaks.add(peak);
+    }
+    
+    public void addPeak(String mz, String intensity) {
+        BigDecimal[] peak = new BigDecimal[2];
+        peak[0] = new BigDecimal(mz);
+        peak[1] = new BigDecimal(intensity);
+        peaks.add(peak);
+    }
+    
+    public BigDecimal[] getPeakAtIndex(int index) {
+        if (index < 1 || index >= peaks.size())
+            throw new ArrayIndexOutOfBoundsException("invalid peak index: "+index);
+        return peaks.get(index);
     }
     
     public void addAnalysisItem(String label, String value) {
@@ -82,13 +76,12 @@ public class Scan {
         return analysisItems.get(label);
     }
     
-    public float getRetentionTime() {
+    public BigDecimal getRetentionTime() {
         String rtStr = getValueForAnalysisLabel(RET_TIME);
-        if (rtStr == null)
-            return -1;
+        if (rtStr != null)
+            return new BigDecimal(rtStr);
         else
-            try { return Float.parseFloat(rtStr);}
-            catch (NumberFormatException e) {return -1;}
+            return null;
     }
     
     public String getActivationType() {
@@ -151,25 +144,31 @@ public class Scan {
     /**
      * @return the precursorMz
      */
-    public float getPrecursorMz() {
+    public BigDecimal getPrecursorMz() {
         return precursorMz;
     }
 
     /**
      * @param precursorMz the precursorMz to set
      */
-    public void setPrecursorMz(float precursorMz) {
+    public void setPrecursorMz(BigDecimal precursorMz) {
         this.precursorMz = precursorMz;
+    }
+    
+    public void setPrecursorMz(String precursorMz) {
+        this.precursorMz = new BigDecimal(precursorMz);
     }
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("S\t");
-        buf.append(startScan);
+        buf.append(String.format("%06d", startScan));
         buf.append("\t");
-        buf.append(endScan);
-        buf.append("\t");
-        buf.append(precursorMz);
+        buf.append(String.format("%06d", endScan));
+        if (precursorMz != null) {
+            buf.append("\t");
+            buf.append(precursorMz);
+        }
         buf.append("\n");
         // charge independent analysis
         for (String label: analysisItems.keySet()) {
@@ -185,12 +184,11 @@ public class Scan {
             buf.append("\n");
         }
         // peak data
-        Iterator<Peak> peakIterator = peaks.getIterator();
-        while (peakIterator.hasNext()) {
-            Peak peak = peakIterator.next();
-            buf.append(peak.getMz());
+        for (BigDecimal[] peak: peaks) {
+            if (peak == null)   continue;
+            buf.append(peak[0]);
             buf.append(" ");
-            buf.append(peak.getIntensity());
+            buf.append(peak[1]);
             buf.append("\n");
         }
         buf.deleteCharAt(buf.length() - 1); // remove last new-line character

@@ -119,7 +119,7 @@ public class Ms2FileToDbConverter {
         scan.setFragmentationType(ms2Scan.getActivationType());
         scan.setPrecursorMz(ms2Scan.getPrecursorMz());
         scan.setPrecursorScanNum(ms2Scan.getPrecursorScanNumber());
-        scan.setPeaksBinary(ms2Scan.getPeaksBinary());
+        scan.setPeaks(ms2Scan.getPeaks());
         
         // save the scan
         MsScanDAO scanDAO = DAOFactory.instance().getMsScanDAO();
@@ -167,7 +167,7 @@ public class Ms2FileToDbConverter {
     
     public static void main(String[] args) {
        Ms2FileToDbConverter uploader = new Ms2FileToDbConverter();
-       //String file = "./resources/sample.ms2";
+//       String file = "./resources/sample.ms2";
        //String file = "./resources/PARC_p75_01_itms.ms2";
        String file = "/Users/vagisha/WORK/MS_LIBRARY/sample_MS2_data/p75/p75_01_itms.ms2";
 //       String file = "./resources/NE063005ph8s01.ms2";

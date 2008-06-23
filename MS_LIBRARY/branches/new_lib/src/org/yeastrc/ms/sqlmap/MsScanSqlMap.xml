@@ -24,10 +24,10 @@
 		<parameter property="startScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="endScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="msLevel" jdbcType="TINYINT" nullValue="-1"/>
-		<parameter property="precursorMz" jdbcType="DECIMAL" nullValue="-1"/>
+		<parameter property="precursorMz" jdbcType="DECIMAL" />
 		<parameter property="precursorScanId" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="precursorScanNum" jdbcType="INTEGER" nullValue="-1"/>
-		<parameter property="retentionTime" jdbcType="DECIMAL" nullValue="-1"/>
+		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
 		<parameter property="peaksBinary" jdbcType="BLOB" />
 	</parameterMap>

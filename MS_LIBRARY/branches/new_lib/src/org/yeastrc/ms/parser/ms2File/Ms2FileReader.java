@@ -12,6 +12,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.yeastrc.ms.dto.Peak;
 
 
 /**
@@ -134,18 +138,20 @@ public class Ms2FileReader {
         
         int firstScan;
         int lastScan;
-        float precursorMz;
         try {firstScan = Integer.parseInt(tokens[1]);}
         catch(NumberFormatException e) {throw new Ms2FileReaderException("Invalid first scan num in scan line: "+currentLine);}
         try {lastScan = Integer.parseInt(tokens[2]);}
         catch(NumberFormatException e) {throw new Ms2FileReaderException("Invalid last scan num in scan line: "+currentLine);}
-        try {precursorMz = Float.parseFloat(tokens[3]);}
-        catch(NumberFormatException e) {throw new Ms2FileReaderException("Invalid precursor m/z in scan line: "+currentLine);}
         
         Scan scan = new Scan();
         scan.setStartScan(firstScan);
         scan.setEndScan(lastScan);
-        scan.setPrecursorMz(precursorMz);
+        try {
+            scan.setPrecursorMz(tokens[3]);
+        }
+        catch (NumberFormatException e) {
+            throw new Ms2FileReaderException("Invalid precursor m/z in scan line: "+currentLine);
+        }
         
         return scan;
     }
@@ -157,15 +163,17 @@ public class Ms2FileReader {
         
         // get the charge and mass
         int charge;
-        float mass;
         try {charge = Integer.parseInt(tokens[1]);}
         catch(NumberFormatException e) {throw new Ms2FileReaderException("Invalid charge in line: "+currentLine);}
-        try {mass = Float.parseFloat(tokens[2]);}
-        catch(NumberFormatException e) {throw new Ms2FileReaderException("Invalid mass in line: "+currentLine);}
         
         ScanCharge scanCharge = new ScanCharge();
         scanCharge.setCharge(charge);
-        scanCharge.setMass(mass);
+        try {
+            scanCharge.setMass(tokens[2]);
+        }
+        catch(NumberFormatException e) {
+            throw new Ms2FileReaderException("Invalid mass in line: "+currentLine);
+        }
         
         // parse any charge dependent analysis associated with this charge state
         try {
@@ -189,14 +197,13 @@ public class Ms2FileReader {
             String[] tokens = currentLine.split("\\s");
             if (tokens.length < 2)
                 throw new Ms2FileReaderException("missing charge and/or mass in line: "+currentLine);
-            float mz;
-            double intensity;
-            try {mz = Float.parseFloat(tokens[0]);}
-            catch (NumberFormatException e) {throw new Ms2FileReaderException("Invalid m/z in line: "+currentLine);}
-            try {intensity = Double.parseDouble(tokens[1]);}
-            catch (NumberFormatException e){throw new Ms2FileReaderException("Invalid intensity in line: "+currentLine);}
             
-            scan.addPeak(mz, intensity);
+            try {
+                scan.addPeak(tokens[0], tokens[1]);
+            }
+            catch (NumberFormatException e) {
+                throw new Ms2FileReaderException("Invalid m/z or intensity in line: "+currentLine);
+            }
             
             try {
                 currentLine = reader.readLine();
@@ -206,6 +213,7 @@ public class Ms2FileReader {
                 throw new Ms2FileReaderException(e.getMessage());
             }
         }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
     }
     
     private boolean isScanLine(String line) {
