@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dto.Peak;
+import org.yeastrc.ms.dto.Peaks;
 
 
 /**
@@ -193,17 +193,23 @@ public class Ms2FileReader {
     
     public void parsePeaks(Scan scan) throws Ms2FileReaderException {
         
+        List <String> mzList = new ArrayList<String>();
+        List <String> intensityList = new ArrayList<String>();
+        
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s");
             if (tokens.length < 2)
                 throw new Ms2FileReaderException("missing charge and/or mass in line: "+currentLine);
             
-            try {
-                scan.addPeak(tokens[0], tokens[1]);
-            }
-            catch (NumberFormatException e) {
-                throw new Ms2FileReaderException("Invalid m/z or intensity in line: "+currentLine);
-            }
+            // make sure the m/z and intensity values are valid
+            if (!Peaks.isValidPeakMz(tokens[0]))
+                throw new Ms2FileReaderException("Invalid m/z value in line: "+currentLine);
+            if (!Peaks.isValidPeakIntensity(tokens[1]))
+                throw new Ms2FileReaderException("Invalid intensity value in line: "+currentLine);
+            
+            // values are valid; go ahead and add them to the list.
+            mzList.add(tokens[0]);
+            intensityList.add(tokens[1]);
             
             try {
                 currentLine = reader.readLine();
@@ -213,7 +219,16 @@ public class Ms2FileReader {
                 throw new Ms2FileReaderException(e.getMessage());
             }
         }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+        
+        // add peak data to the scan
+        Peaks peaks = new Peaks();
+        try {
+            peaks.setPeakData(mzList, intensityList);
+        }
+        catch (Exception e) {
+            throw new Ms2FileReaderException("Error adding peak data to scan: "+e.getMessage());
+        }
+        scan.setPeaks(peaks);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     }
     
     private boolean isScanLine(String line) {

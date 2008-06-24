@@ -6,14 +6,11 @@
  */
 package org.yeastrc.ms.dto;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.yeastrc.ms.dto.Peaks.PeaksIterator;
 
 /**
  * 
@@ -35,12 +32,12 @@ public class MsScan {
     private int precursorScanId = -1; // id (database) of the precursor scan.  0 if this is a MS1 scan
     private int precursorScanNum = -1; // scan number of the precursor scan
     
-    private List <BigDecimal[]> peaks;
+    private Peaks peaks;
     
     private List <MsScanCharge> scanCharges; // charge states for this scan
     
     public MsScan() {
-        peaks = new ArrayList<BigDecimal[]>();
+        peaks = new Peaks();
         scanCharges = new ArrayList<MsScanCharge>();
     }
 
@@ -173,55 +170,24 @@ public class MsScan {
     /**
      * @param peaks the peaks to set
      */
-    public void setPeaks(List<BigDecimal[]> peaks) {
+    public void setPeaks(Peaks peaks) {
         this.peaks = peaks;
     }
 
-    public List<BigDecimal[]> getPeaks() {
+    public Peaks getPeaks() {
         return peaks;
     }
     
     public void setPeaksBinary(byte[] peakData) {
-        ByteArrayInputStream bais = new ByteArrayInputStream(peakData);
-        ObjectInputStream ois = null;
-        try {
-            ois = new ObjectInputStream(bais);
-            peaks = (List<BigDecimal[]>) ois.readObject();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (ois != null) {
-                try {ois.close();} 
-                catch (IOException e) {e.printStackTrace();}
-            }
-        }
+        peaks.setPeakDataBinary(peakData);
     }
     
     public byte[] getPeaksBinary() {
-        ByteArrayOutputStream baos = null;
-        ObjectOutputStream oos = null;
-        baos = new ByteArrayOutputStream();
-        try {
-            oos = new ObjectOutputStream(baos);
-            oos.writeObject(peaks);
-            oos.flush();
-            return baos.toByteArray();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (oos != null) {
-                try {oos.close();}
-                catch (IOException e) {e.printStackTrace();}
-            }
-        }
-        return null;
+        return peaks.getPeakDataBinary();
+    }
+    
+    public PeaksIterator getPeaksIterator() {
+        return peaks.iterator();
     }
     
     /**

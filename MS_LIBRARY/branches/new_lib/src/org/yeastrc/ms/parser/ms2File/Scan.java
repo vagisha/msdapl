@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.yeastrc.ms.dto.Peaks;
+import org.yeastrc.ms.dto.Peaks.Peak;
+import org.yeastrc.ms.dto.Peaks.PeaksIterator;
+
 /**
  * 
  */
@@ -25,7 +29,7 @@ public class Scan {
     
     private BigDecimal precursorMz;
     
-    private List <BigDecimal[]> peaks;
+    private Peaks peaks;
     
     private List<ScanCharge> chargeStates;
     
@@ -34,33 +38,19 @@ public class Scan {
     public Scan() {
         chargeStates = new ArrayList<ScanCharge>();
         analysisItems = new HashMap<String, String>();
-        peaks = new ArrayList<BigDecimal[]>();
+        peaks = new Peaks();
     }
 
-    public void setPeaks(List <BigDecimal[]> peaks) {
+    public void setPeaks(Peaks peaks) {
         this.peaks = peaks;
     }
     
-    public List<BigDecimal[]> getPeaks() {
+    public Peaks getPeaks() {
         return peaks;
     }
     
-    public void addPeak(BigDecimal mz, BigDecimal intensity) {
-        BigDecimal[] peak = new BigDecimal[] {mz, intensity};
-        peaks.add(peak);
-    }
-    
-    public void addPeak(String mz, String intensity) {
-        BigDecimal[] peak = new BigDecimal[2];
-        peak[0] = new BigDecimal(mz);
-        peak[1] = new BigDecimal(intensity);
-        peaks.add(peak);
-    }
-    
-    public BigDecimal[] getPeakAtIndex(int index) {
-        if (index < 1 || index >= peaks.size())
-            throw new ArrayIndexOutOfBoundsException("invalid peak index: "+index);
-        return peaks.get(index);
+    public PeaksIterator getPeaksIterator() {
+        return peaks.iterator();
     }
     
     public void addAnalysisItem(String label, String value) {
@@ -184,11 +174,12 @@ public class Scan {
             buf.append("\n");
         }
         // peak data
-        for (BigDecimal[] peak: peaks) {
-            if (peak == null)   continue;
-            buf.append(peak[0]);
+        PeaksIterator iterator = getPeaksIterator();
+        while (iterator.hasNext()) {
+            Peak peak = iterator.next();
+            buf.append(peak.getMzString());
             buf.append(" ");
-            buf.append(peak[1]);
+            buf.append(peak.getIntensityString());
             buf.append("\n");
         }
         buf.deleteCharAt(buf.length() - 1); // remove last new-line character
