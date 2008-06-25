@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Peaks {
 
-    private BigDecimal[] mzList;
+    private double[] mzList;
     private float[] intensityList;
     
     
@@ -44,10 +44,10 @@ public class Peaks {
     }
     
     private void setMzList(List <String> mzStrList) throws Exception {
-        mzList = new BigDecimal[mzStrList.size()];
+        mzList = new double[mzStrList.size()];
         int i = 0;
         for (String mz: mzStrList) 
-            mzList[i++] = new BigDecimal(mz);
+            mzList[i++] = Double.parseDouble(mz);
     }
     
     private void setIntensityList(List <String> intStrList) throws Exception {
@@ -86,7 +86,7 @@ public class Peaks {
         ObjectInputStream ois = null;
         try {
             ois = new ObjectInputStream(bais);
-            mzList = (BigDecimal[]) ois.readObject();
+            mzList = (double[]) ois.readObject();
             intensityList = (float[]) ois.readObject();
         }
         catch (IOException e) {
@@ -139,7 +139,9 @@ public class Peaks {
         @Override
         public Peak next() {
             if (hasNext()) {
-                return new Peak(mzList[index], intensityList[index]);
+                Peak p = new Peak((mzList[index]), intensityList[index]);
+                index++;
+                return p;
             }
             throw new IndexOutOfBoundsException("Only "+getPeaksCount()+" peaks!");
         }
@@ -153,9 +155,9 @@ public class Peaks {
     public class Peak {
 
         private float intensity;
-        private BigDecimal mz;
+        private double mz;
         
-        public Peak(BigDecimal mz, float intensity) {
+        private Peak(double mz, float intensity) {
             this.mz = mz;
             this.intensity = intensity;
         }
@@ -172,12 +174,12 @@ public class Peaks {
         /**
          * @return the mz
          */
-        public BigDecimal getMz() {
+        public double getMz() {
             return mz;
         }
         
         public String getMzString() {
-            return mz.toString();
+            return String.valueOf(mz);
         }
     }
 }
