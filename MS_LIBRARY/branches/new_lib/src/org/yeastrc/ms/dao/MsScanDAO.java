@@ -12,6 +12,4 @@ public interface MsScanDAO {
     
     public abstract List<Integer> loadScanIdsForRun(int runId);
 
-    public abstract void update(MsScan scan);
-
 }

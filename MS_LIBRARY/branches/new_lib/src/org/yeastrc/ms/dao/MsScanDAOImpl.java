@@ -28,13 +28,6 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     public MsScan load(int runId) {
         return (MsScan) queryForObject("MsScan.select", runId);
     }
-    
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsScanDAO#update(org.yeastrc.ms.MsScan)
-     */
-    public void update(MsScan run) {
-        
-    }
 
     @Override
     public List<Integer> loadScanIdsForRun(int runId) {
