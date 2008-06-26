@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="scanCharge"> 
 
-	<typeAlias alias="scanCharge" type="org.yeastrc.ms.dto.ms2File.MS2FileScanCharge"/>
+	<typeAlias alias="scanCharge" type="org.yeastrc.ms.dto.ms2File.Ms2FileScanCharge"/>
 	
 	<resultMap class="scanCharge" id="scanChargeResult">
 		<result property="id" column="id" />

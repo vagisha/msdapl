@@ -35,17 +35,12 @@ import org.yeastrc.ms.parser.ms2File.ScanCharge;
  */
 public class Ms2FileToDbConverter {
 
-    public void uploadMs2File(String filePath) {
+    public void uploadMs2File(String filePath) throws Ms2FileReaderException {
         
         Ms2FileReader reader = new Ms2FileReader();
-        try {
-            reader.open(filePath);
-            uploadMs2File(filePath, reader);
+        reader.open(filePath);
+        uploadMs2File(filePath, reader);
             
-        }
-        catch (Ms2FileReaderException e) {
-            e.printStackTrace();
-        }
     }
 
     public void uploadMs2File(InputStream inStream, String fileName) {
@@ -171,6 +166,11 @@ public class Ms2FileToDbConverter {
        //String file = "./resources/PARC_p75_01_itms.ms2";
        String file = "/Users/vagisha/WORK/MS_LIBRARY/sample_MS2_data/p75/p75_01_itms.ms2";
 //       String file = "./resources/NE063005ph8s01.ms2";
-       uploader.uploadMs2File(file);
+       try {
+           uploader.uploadMs2File(file);
+       }
+       catch (Ms2FileReaderException e) {
+           e.printStackTrace();
+       }
     }
 }

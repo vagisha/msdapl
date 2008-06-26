@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dto.MsExperiment;
@@ -13,20 +14,36 @@ import org.yeastrc.ms.dto.MsRun.RunFileFormat;
 
 public class MsExperimentUploader {
 
+    private static final Logger log = Logger.getLogger(MsExperimentUploader.class);
+    
     private MsRun.RunFileFormat runFormat;
     
     public MsExperimentUploader(MsRun.RunFileFormat runFormat) {
         this.runFormat = runFormat;
     }
     
-    public void uploadExperiment(String remoteServer, String remoteDirectory, String fileDirectory) throws Exception {
+    /**
+     * @param remoteServer
+     * @param remoteDirectory
+     * @param fileDirectory
+     * @return true if experiment was uploaded to the database successfully, false otherwise
+     */
+    public boolean uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
         
         // right now we only know how to save runs in the .ms2 file format.
-        if (!runFormat.equals(RunFileFormat.MS2))
-            throw new Exception("Don't know how to save runs in format: "+runFormat);
+        if (!runFormat.equals(RunFileFormat.MS2)) {
+            log.error("Don't know how to save runs in format: "+runFormat);
+            return false;
+        }
         
-        int expId = saveExperiment(remoteServer, remoteDirectory, fileDirectory);
-        saveMs2RunsInDirectory(expId, fileDirectory);
+        
+        int expId = 0;
+        try {expId = saveExperiment(remoteServer, remoteDirectory, fileDirectory);}
+        catch(Exception e) {log.error("ERROR SAVING EXPERIMENT", e); return false;}
+        
+        uploadMs2FilesToDb(expId, fileDirectory);
+        
+        return true;
     }
 
     private int saveExperiment(String remoteServer, String remoteDirectory,
@@ -39,25 +56,30 @@ public class MsExperimentUploader {
         return expDao.save(experiment);
     }
     
-    private void saveMs2RunsInDirectory(int experimentId, String fileDirectory) throws Exception {
+    private boolean uploadMs2FilesToDb(int experimentId, String fileDirectory) {
         
         File directory = new File (fileDirectory);
-        if (!directory.exists())
-            throw new Exception ("Invalid directory name.");
+        if (!directory.exists()) {
+            log.error ("Invalid directory name.");
+            return false;
+        }
         
         Set<String> filenames = getMs2FileNamesInDirectory(directory);
         
         // If we didn't find anything, just leave
-        if (filenames.size() == 0)
-            return;
+        if (filenames.size() == 0) {
+            log.error("No files found to upload");
+            return false;
+        }
         
         Ms2FileToDbConverter ms2Uploader = new Ms2FileToDbConverter();
         
         for (String filename: filenames) {
             
             File file = new File (fileDirectory, filename + ".ms2");
-            ms2Uploader.uploadMs2File(file.getAbsolutePath());
+           // ms2Uploader.uploadMs2File(file.getAbsolutePath());
         }
+        return true;
     }
 
     private Set<String> getMs2FileNamesInDirectory(File directory) {

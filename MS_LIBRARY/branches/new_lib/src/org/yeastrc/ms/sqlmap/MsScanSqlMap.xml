@@ -7,7 +7,7 @@
 	
 	<resultMap class="MsScan" id="MsScanResult">
 		<result property="id" column="id" />
-		<result property="runId" column="runID" />
+		<result property="runId" column="runID" nullValue="0" />
 		<result property="startScanNum" column="startScanNumber" />
 		<result property="endScanNum" column="endScanNumber" />
 		<result property="msLevel" column="level" />
@@ -20,7 +20,7 @@
 	</resultMap>
 	
 	<parameterMap class="MsScan" id="MsScanParam">
-		<parameter property="runId" jdbcType="INTEGER" />
+		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="startScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="endScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="msLevel" jdbcType="TINYINT" nullValue="-1"/>

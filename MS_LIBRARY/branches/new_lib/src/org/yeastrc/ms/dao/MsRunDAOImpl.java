@@ -31,13 +31,6 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
     }
     
     /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsRunDAO#update(org.yeastrc.ms.MsRun)
-     */
-    public void update(MsRun run) {
-        
-    }
-
-    /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsRunDAO#loadRunsForExperiment(int)
      */
     public List<MsRun> loadRunsForExperiment(int msExperimentId) {

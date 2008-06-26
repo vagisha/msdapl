@@ -12,6 +12,4 @@ public interface MsRunDAO {
     
     public abstract List<MsRun> loadRunsForExperiment(int msExperimentId);
 
-    public abstract void update(MsRun run);
-
 }
