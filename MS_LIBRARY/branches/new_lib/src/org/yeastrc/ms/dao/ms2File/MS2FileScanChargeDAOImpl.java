@@ -4,10 +4,12 @@
  * Jun 17, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dto.MsScanCharge;
 
 public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileScanChargeDAO {

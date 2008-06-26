@@ -28,10 +28,12 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsExperimentSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanChargeSqlMap.xml"/>
 	
-	<sqlMap resource="org/yeastrc/ms/sqlmap/Ms2FileRunHeadersSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/Ms2FileChargeIndependentAnalysisSqlMap.xml"/>
-		<sqlMap resource="org/yeastrc/ms/sqlmap/Ms2FileChargeDependentAnalysisSqlMap.xml"/>
+	<!-- Related to MS2 files -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/Ms2FileScanChargeSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/Ms2FileRunHeadersSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/Ms2FileChargeIndependentAnalysisSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/Ms2FileChargeDependentAnalysisSqlMap.xml"/>
+	
 	
 </sqlMapConfig>	

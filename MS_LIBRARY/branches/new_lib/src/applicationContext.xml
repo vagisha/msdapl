@@ -52,8 +52,8 @@
         <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
     
-    <bean id="msScanChargeDAO"
-        class="org.yeastrc.ms.dao.MsScanChargeDAOImpl">
+    <bean id="ms2FileScanChargeDAO"
+        class="org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl">
         <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
     
