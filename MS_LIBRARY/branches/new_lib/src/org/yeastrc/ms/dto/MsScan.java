@@ -8,9 +8,10 @@ package org.yeastrc.ms.dto;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import org.yeastrc.ms.dto.Peaks.PeaksIterator;
+import org.yeastrc.ms.dto.Peaks.Peak;
 
 /**
  * 
@@ -178,7 +179,7 @@ public class MsScan {
         return peaks;
     }
     
-    public void setPeaksBinary(byte[] peakData) {
+    public void setPeaksBinary(byte[] peakData) throws Exception {
         peaks.setPeakDataBinary(peakData);
     }
     
@@ -186,7 +187,7 @@ public class MsScan {
         return peaks.getPeakDataBinary();
     }
     
-    public PeaksIterator getPeaksIterator() {
+    public Iterator<Peak> getPeaksIterator() {
         return peaks.iterator();
     }
     

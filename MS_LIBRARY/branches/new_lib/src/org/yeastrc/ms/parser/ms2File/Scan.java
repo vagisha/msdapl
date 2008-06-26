@@ -9,11 +9,11 @@ package org.yeastrc.ms.parser.ms2File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.dto.Peaks;
 import org.yeastrc.ms.dto.Peaks.Peak;
-import org.yeastrc.ms.dto.Peaks.PeaksIterator;
 
 /**
  * 
@@ -49,7 +49,7 @@ public class Scan {
         return peaks;
     }
     
-    public PeaksIterator getPeaksIterator() {
+    public Iterator<Peak> getPeaksIterator() {
         return peaks.iterator();
     }
     
@@ -174,7 +174,7 @@ public class Scan {
             buf.append("\n");
         }
         // peak data
-        PeaksIterator iterator = getPeaksIterator();
+        Iterator<Peak> iterator = getPeaksIterator();
         while (iterator.hasNext()) {
             Peak peak = iterator.next();
             buf.append(peak.getMzString());

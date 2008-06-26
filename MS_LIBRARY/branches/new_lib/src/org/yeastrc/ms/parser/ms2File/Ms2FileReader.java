@@ -193,9 +193,7 @@ public class Ms2FileReader {
     
     public void parsePeaks(Scan scan) throws Ms2FileReaderException {
         
-        List <String> mzList = new ArrayList<String>();
-        List <String> intensityList = new ArrayList<String>();
-        
+        Peaks peaks = new Peaks();
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s");
             if (tokens.length < 2)
@@ -208,8 +206,12 @@ public class Ms2FileReader {
                 throw new Ms2FileReaderException("Invalid intensity value in line: "+currentLine);
             
             // values are valid; go ahead and add them to the list.
-            mzList.add(tokens[0]);
-            intensityList.add(tokens[1]);
+            try {
+                peaks.addPeak(tokens[0], tokens[1]);
+            }
+            catch (Exception e) {
+                throw new Ms2FileReaderException("Error adding peak data to scan: "+e.getMessage());
+            }
             
             try {
                 currentLine = reader.readLine();
@@ -220,14 +222,6 @@ public class Ms2FileReader {
             }
         }
         
-        // add peak data to the scan
-        Peaks peaks = new Peaks();
-        try {
-            peaks.setPeakData(mzList, intensityList);
-        }
-        catch (Exception e) {
-            throw new Ms2FileReaderException("Error adding peak data to scan: "+e.getMessage());
-        }
         scan.setPeaks(peaks);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     }
     

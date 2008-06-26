@@ -12,49 +12,43 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.util.NumberUtils;
+
 /**
- * 
+ * Class encapsulating the peak data (m/z and intensity pairs) for a scan. 
  */
 public class Peaks {
 
-    private double[] mzList;
-    private float[] intensityList;
+    List<Peak> peaks;
     
+    public Peaks() {
+        peaks = new ArrayList<Peak>();
+    }
     
     public int getPeaksCount() {
-        if (mzList != null)
-            return mzList.length;
-        return 0;
+        return peaks.size();
     }
     
-    // method will be used by parsers
-    public void setPeakData(List<String> mzList, List<String> intensityList) throws Exception {
-        if (mzList == null)
-            throw new Exception("m/z list cannot be null");
-        if (intensityList == null)
-            throw new Exception("intensity list cannot be null");
-        if (mzList.size() != intensityList.size()) 
-            throw new Exception("m/z list and intensity list must have the same number of elements");
-        
-        setMzList(mzList);
-        setIntensityList(intensityList);
-    }
-    
-    private void setMzList(List <String> mzStrList) throws Exception {
-        mzList = new double[mzStrList.size()];
-        int i = 0;
-        for (String mz: mzStrList) 
-            mzList[i++] = Double.parseDouble(mz);
-    }
-    
-    private void setIntensityList(List <String> intStrList) throws Exception {
-        intensityList = new float[intStrList.size()];
-        int i = 0;
-        for (String intensity: intStrList)
-            intensityList[i++] = Float.parseFloat(intensity);
+    public void addPeak(String mz, String intensity) throws Exception {
+        BigDecimal mzNum = null;
+        BigDecimal intensityNum = null;
+        try {
+            mzNum = new BigDecimal(mz);
+        }
+        catch (NumberFormatException e) {
+            throw new Exception("Invalid mz value: "+mz);
+        }
+        try {
+            intensityNum = new BigDecimal(intensity);
+        }
+        catch (NumberFormatException e) {
+            throw new Exception("Invalid intensity value: "+mz);
+        }
+        peaks.add(new Peak(mzNum, intensityNum));
     }
     
     // used for storing to database
@@ -64,8 +58,7 @@ public class Peaks {
         baos = new ByteArrayOutputStream();
         try {
             oos = new ObjectOutputStream(baos);
-            oos.writeObject(mzList);
-            oos.writeObject(intensityList);
+            oos.writeObject(peaksAsString());
             oos.flush();
             return baos.toByteArray();
         }
@@ -81,13 +74,25 @@ public class Peaks {
         return null;
     }
     
-    protected void setPeakDataBinary(byte[] data) {
+    private String peaksAsString() {
+        StringBuilder buf = new StringBuilder();
+        for (Peak peak: peaks) {
+            buf.append(NumberUtils.trimTrailingZeros(peak.getMzString()));
+            buf.append(":");
+            buf.append(NumberUtils.trimTrailingZeros(peak.getIntensityString()));
+            buf.append(";");
+        }
+        if (buf.length() > 0)
+            buf.deleteCharAt(buf.length() -1);
+        return buf.toString();
+    }
+    
+    protected void setPeakDataBinary(byte[] data) throws Exception {
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         ObjectInputStream ois = null;
         try {
             ois = new ObjectInputStream(bais);
-            mzList = (double[]) ois.readObject();
-            intensityList = (float[]) ois.readObject();
+            parsePeaksAsString((String) ois.readObject());
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -101,6 +106,22 @@ public class Peaks {
                 catch (IOException e) {e.printStackTrace();}
             }
         }
+    }
+    
+    private void parsePeaksAsString(String peaksString) throws Exception {
+        String[] peaks = peaksString.split(";");
+        for (String peak: peaks) {
+            String[] peakVals = splitPeakVals(peak);
+            addPeak(peakVals[0], peakVals[1]);
+        }
+    }
+    
+    private String[] splitPeakVals(String peak) {
+        int i = peak.indexOf(":");
+        String[] vals = new String[2];
+        vals[0] = peak.substring(0, i);
+        vals[1] = peak.substring(i+1, peak.length());
+        return vals;
     }
     
     public static boolean isValidPeakMz(String mz) {
@@ -123,63 +144,38 @@ public class Peaks {
         return true;
     }
     
-    public PeaksIterator iterator() {
-        return new PeaksIterator();
-    }
-    
-    public class PeaksIterator implements Iterator<Peak> {
-
-        private int index = 0;
-        
-        @Override
-        public boolean hasNext() {
-            return index < getPeaksCount();
-        }
-
-        @Override
-        public Peak next() {
-            if (hasNext()) {
-                Peak p = new Peak((mzList[index]), intensityList[index]);
-                index++;
-                return p;
-            }
-            throw new IndexOutOfBoundsException("Only "+getPeaksCount()+" peaks!");
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("PeakIterator does not implement remove()");
-        }
+    public Iterator<Peak> iterator() {
+        return peaks.iterator();
     }
     
     public class Peak {
 
-        private float intensity;
-        private double mz;
+        private BigDecimal intensity;
+        private BigDecimal mz;
         
-        private Peak(double mz, float intensity) {
+        private Peak(BigDecimal mz, BigDecimal intensity) {
             this.mz = mz;
             this.intensity = intensity;
         }
         /**
          * @return the intensity
          */
-        public float getIntensity() {
+        public BigDecimal getIntensity() {
             return intensity;
         }
        
         public String getIntensityString() {
-            return String.valueOf(intensity);
+            return intensity.toString();
         }
         /**
          * @return the mz
          */
-        public double getMz() {
+        public BigDecimal getMz() {
             return mz;
         }
         
         public String getMzString() {
-            return String.valueOf(mz);
+            return mz.toString();
         }
     }
 }
