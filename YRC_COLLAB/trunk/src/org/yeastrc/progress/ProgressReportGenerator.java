@@ -783,8 +783,6 @@ public class ProgressReportGenerator {
 			subproject.appendChild(elem);
 			subproject.insertBefore(doc.createTextNode("\n"), elem);
 			
-			/*
-			// add in the progress element
 			if (project.getProgress() != null || DataForProjectGenerator.getInstance().generateDataForProject( project, this.startDate, this.endDate ) != null) {
 				
 				elem = doc.createElement("Progress");
@@ -801,8 +799,6 @@ public class ProgressReportGenerator {
 				subproject.insertBefore(doc.createTextNode("\n"), elem);
 				
 			}
-			*/
-			
 			
 			// Set up the investigator elements
 			Set projectResearchers = new HashSet();
