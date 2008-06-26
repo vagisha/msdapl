@@ -6,7 +6,7 @@ import java.util.List;
 
 public class MsRun {
 
-    public static enum RunFileFormat {MS2, MZXML, MZDATA, MZML};
+    public static enum RunFileFormat {MS2, MZXML, MZDATA, MZML, UNKNOWN};
     
     private int id; // unique id (database) for this run
     
@@ -15,17 +15,21 @@ public class MsRun {
     // File for this run
     private String fileName; 
     private RunFileFormat fileFormat;
+    private String sha1Sum;
     private String creationDate;
     
     // conversion software
     private String conversionSW; // software used to convert the RAW file
     private String conversionSWVersion; // version of the conversion software used
     private String conversionSWOptions; // options used for conversion
+    private String dataType; // centroid / profile etc. 
     
     // acquisition instrument
     private String instrumentVendor;
     private String instrumentModel;
     private String instrumentSN; // serial number of the instrument
+    private String acquisitionMethod;
+    
     
     private String comment;
     
@@ -45,7 +49,7 @@ public class MsRun {
             return RunFileFormat.MZDATA;
         else if (extString.equalsIgnoreCase(RunFileFormat.MZML.name()))
             return RunFileFormat.MZML;
-        else return null;
+        else return RunFileFormat.UNKNOWN;
     }
 
     /**
@@ -249,5 +253,53 @@ public class MsRun {
      */
     public Iterator<MsScan> getScanIterator() {
         return scanList.iterator();
+    }
+
+
+    /**
+     * @return the sha1Sum
+     */
+    public String getSha1Sum() {
+        return sha1Sum;
+    }
+
+
+    /**
+     * @param sha1Sum the sha1Sum to set
+     */
+    public void setSha1Sum(String sha1Sum) {
+        this.sha1Sum = sha1Sum;
+    }
+
+
+    /**
+     * @return the dataType
+     */
+    public String getDataType() {
+        return dataType;
+    }
+
+
+    /**
+     * @param dataType the dataType to set
+     */
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
+
+
+    /**
+     * @return the acquisitionMethod
+     */
+    public String getAcquisitionMethod() {
+        return acquisitionMethod;
+    }
+
+
+    /**
+     * @param acquisitionMethod the acquisitionMethod to set
+     */
+    public void setAcquisitionMethod(String acquisitionMethod) {
+        this.acquisitionMethod = acquisitionMethod;
     }
 }

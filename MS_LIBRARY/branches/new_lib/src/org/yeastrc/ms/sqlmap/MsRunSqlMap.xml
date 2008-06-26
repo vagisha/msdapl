@@ -9,20 +9,24 @@
 		<result property="id" column="id" />
 		<result property="msExperimentId" column="experimentID" />
 		<result property="fileName" column="filename" />
+		<result property="fileFormat" column="originalFileType" />
+		<result property="sha1Sum" column="sha1Sum" />
 		<result property="creationDate" column="creationTime" />
 		<result property="conversionSW" column="extractor" />
 		<result property="conversionSWVersion" column="extractorVersion" />
+		<result property="dataType" column="dataType" />
 		<result property="conversionSWOptions" column="extractorOptions" />
 		<result property="instrumentVendor" column="instrumentVendor" />
 		<result property="instrumentModel" column="instrumentType" />
 		<result property="instrumentSN" column="instrumentSN" />
-		<result property="fileFormat" column="originalFileType" />
+		<result property="acquisitionMethod" column="acquisitionMethod" />
 		<result property="comment" column="comment" />
 	</resultMap>
 	
 	<parameterMap class="MsRun" id="MsRunParam">
 		<parameter property="msExperimentId" jdbcType="INTEGER" />
 		<parameter property="fileName" jdbcType="VARCHAR"/>
+		<parameter property="sha1Sum" jdbcType="CHAR"/>
 		<parameter property="creationDate" jdbcType="VARCHAR"/>
 		<parameter property="conversionSW" jdbcType="VARCHAR"/>
 		<parameter property="conversionSWVersion" jdbcType="VARCHAR"/>
@@ -30,6 +34,8 @@
 		<parameter property="instrumentModel" jdbcType="VARCHAR"/>
 		<parameter property="instrumentVendor" jdbcType="VARCHAR"/>
 		<parameter property="instrumentSN" jdbcType="VARCHAR"/>
+		<parameter property="dataType" jdbcType="VARCHAR"/>
+		<parameter property="acquisitionMethod" jdbcType="VARCHAR" />
 		<parameter property="fileFormat" jdbcType="VARCHAR"/>
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>
@@ -45,6 +51,7 @@
     <insert id="insert" parameterMap="MsRunParam">
     	INSERT INTO MsRun (experimentID, 
     						filename, 
+    						sha1Sum,
     						creationTime, 
     						extractor, 
     						extractorVersion, 
@@ -52,9 +59,11 @@
     						instrumentType, 
     						instrumentVendor, 
     						instrumentSN,
+    						dataType,
+    						acquisitionMethod,
     						originalFileType, 
     						comment) 
-    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     	<selectKey resultClass="int" keyProperty="id">
       		select last_insert_id() as id
     	</selectKey>
