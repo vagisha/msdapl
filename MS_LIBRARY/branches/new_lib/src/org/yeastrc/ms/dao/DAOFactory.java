@@ -12,7 +12,7 @@ public class DAOFactory {
     private MsExperimentDAO expDAO;
     private MsRunDAO runDAO;
     private MsScanDAO scanDAO;
-    private MsScanChargeDAO scanChargeDAO;
+    private MS2FileScanChargeDAO scanChargeDAO;
     
     private MS2FileRunHeadersDAO ms2FileHeadersDAO;
     private Ms2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
@@ -29,7 +29,7 @@ public class DAOFactory {
         expDAO = (MsExperimentDAO)ctx.getBean("msExperimentDAO");
         runDAO = (MsRunDAO)ctx.getBean("msRunDAO");
         scanDAO = (MsScanDAO)ctx.getBean("msScanDAO");
-        scanChargeDAO = (MsScanChargeDAO)ctx.getBean("msScanChargeDAO");
+        scanChargeDAO = (MS2FileScanChargeDAO)ctx.getBean("msScanChargeDAO");
         ms2FileHeadersDAO = (MS2FileRunHeadersDAO)ctx.getBean("ms2FileRunHeadersDAO");
         ms2ChgDAnalysisDAO = (Ms2FileChargeDependentAnalysisDAO)ctx.getBean("ms2FileChargeDependentAnalysisDAO");
         ms2ChgIAnalysisDAO = (Ms2FileChargeIndependentAnalysisDAO)ctx.getBean("ms2FileChargeIndependentAnalysisDAO");
@@ -51,7 +51,7 @@ public class DAOFactory {
         return scanDAO;
     }
     
-    public MsScanChargeDAO getMsScanChargeDAO() {
+    public MS2FileScanChargeDAO getMsScanChargeDAO() {
         return scanChargeDAO;
     }
     

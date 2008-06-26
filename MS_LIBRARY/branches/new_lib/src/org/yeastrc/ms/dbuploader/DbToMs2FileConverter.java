@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.dao.MsScanChargeDAO;
+import org.yeastrc.ms.dao.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileRunHeadersDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
@@ -82,7 +82,7 @@ public class DbToMs2FileConverter {
     }
 
     private List<ScanCharge> getChargeStates(MsScan scan) {
-        MsScanChargeDAO scDao = DAOFactory.instance().getMsScanChargeDAO();
+        MS2FileScanChargeDAO scDao = DAOFactory.instance().getMsScanChargeDAO();
         List <MsScanCharge> msChgStates = scDao.loadChargesForScan(scan.getId());
         List <ScanCharge> chgStates = new ArrayList<ScanCharge>(msChgStates.size());
         for (MsScanCharge msChg: msChgStates) {

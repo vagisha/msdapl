@@ -4,14 +4,12 @@ import java.util.List;
 
 import org.yeastrc.ms.dto.MsScanCharge;
 
-public interface MsScanChargeDAO {
+public interface MS2FileScanChargeDAO {
 
     public abstract int save(MsScanCharge scanCharge);
 
     public abstract MsScanCharge load(int scanChargeId);
     
     public abstract List<MsScanCharge> loadChargesForScan(int scanId);
-
-    public abstract void update(MsScanCharge run);
 
 }

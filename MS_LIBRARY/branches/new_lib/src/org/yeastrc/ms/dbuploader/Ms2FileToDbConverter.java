@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.dao.MsScanChargeDAO;
+import org.yeastrc.ms.dao.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileRunHeadersDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
@@ -149,7 +149,7 @@ public class Ms2FileToDbConverter {
         scanCharge.setMass(ms2ScanCharge.getMass());
         
         // save the scan charge
-        MsScanChargeDAO sChgDAO = DAOFactory.instance().getMsScanChargeDAO();
+        MS2FileScanChargeDAO sChgDAO = DAOFactory.instance().getMsScanChargeDAO();
         int sChgId = sChgDAO.save(scanCharge);
         
         // save the charge dependent analysis associated with this charge state
