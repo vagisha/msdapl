@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
 
-public interface MS2FileRunHeadersDAO {
+public interface MS2FileHeaderDAO {
 
     public abstract boolean save(MS2FileHeader headers);
 

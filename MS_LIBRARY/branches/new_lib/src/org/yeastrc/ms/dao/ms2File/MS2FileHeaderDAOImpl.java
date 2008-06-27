@@ -16,9 +16,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class Ms2FileRunHeadersDAOImpl extends BaseSqlMapDAO implements MS2FileRunHeadersDAO {
+public class MS2FileHeaderDAOImpl extends BaseSqlMapDAO implements MS2FileHeaderDAO {
 
-    public Ms2FileRunHeadersDAOImpl(SqlMapClient sqlMap) {
+    public MS2FileHeaderDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 

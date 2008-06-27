@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileRunHeadersDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
@@ -95,7 +95,7 @@ public class Ms2FileToDbConverter {
         
         if (runID != 0) {
             // save all the headers from the MS2 file (some headers are already a part of the MsRun object created above)
-            MS2FileRunHeadersDAO headersDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
+            MS2FileHeaderDAO headersDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
             Iterator<Entry<String,String>> headerIterator = header.iterator();
             while(headerIterator.hasNext()) {
                 Entry<String, String> headerEntry = headerIterator.next();

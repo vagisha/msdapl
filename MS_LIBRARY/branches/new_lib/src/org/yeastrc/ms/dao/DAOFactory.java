@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.ms2File.MS2FileRunHeadersDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAOImpl;
-import org.yeastrc.ms.dao.ms2File.Ms2FileRunHeadersDAOImpl;
+import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAOImpl;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -25,7 +25,7 @@ public class DAOFactory {
     
     // related to MS2 files. 
     private MS2FileScanChargeDAO ms2FileScanChargeDAO;
-    private MS2FileRunHeadersDAO ms2FileHeadersDAO;
+    private MS2FileHeaderDAO ms2FileHeadersDAO;
     private Ms2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
     private Ms2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
@@ -61,7 +61,7 @@ public class DAOFactory {
         scanDAO = new MsScanDAOImpl(sqlMap);
         
         ms2FileScanChargeDAO = new MS2FileScanChargeDAOImpl(sqlMap);
-        ms2FileHeadersDAO = new Ms2FileRunHeadersDAOImpl(sqlMap);
+        ms2FileHeadersDAO = new MS2FileHeaderDAOImpl(sqlMap);
         ms2ChgDAnalysisDAO = new Ms2FileChargeDependentAnalysisDAOImpl(sqlMap);
         ms2ChgIAnalysisDAO = new Ms2FileChargeIndependentAnalysisDAOImpl(sqlMap);
     }
@@ -86,7 +86,7 @@ public class DAOFactory {
         return ms2FileScanChargeDAO;
     }
     
-    public MS2FileRunHeadersDAO getMS2FileRunHeadersDAO() {
+    public MS2FileHeaderDAO getMS2FileRunHeadersDAO() {
         return ms2FileHeadersDAO;
     }
     

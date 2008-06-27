@@ -9,7 +9,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileRunHeadersDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dto.MsRun;
@@ -119,7 +119,7 @@ public class DbToMs2FileConverter {
         ms2Header.addHeaderItem("LastScan", "17903");
         
         // add any MS2 file specific IAnalyzer and DAnalyzer headers
-        MS2FileRunHeadersDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
+        MS2FileHeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
         List<MS2FileHeader> headers = headerDao.loadHeadersForRun(run.getId());
         for (MS2FileHeader header: headers) {
             ms2Header.addHeaderItem(header.getHeaderName(), header.getValue());
