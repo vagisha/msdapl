@@ -8,18 +8,16 @@ package org.yeastrc.ms.dbuploader;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
-import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
@@ -153,7 +151,7 @@ public class Ms2FileToDbConverter {
         int sChgId = sChgDAO.save(scanCharge);
         
         // save the charge dependent analysis associated with this charge state
-        Ms2FileChargeDependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
+        MS2FileChargeDependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
         HashMap<String, String> analysisItems = ms2ScanCharge.getAnalysisItems();
         for (String label: analysisItems.keySet()) {
             Ms2FileChargeDependentAnalysis analysis = new Ms2FileChargeDependentAnalysis();

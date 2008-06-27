@@ -17,7 +17,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * 
  */
 public class Ms2FileChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
-        implements Ms2FileChargeDependentAnalysisDAO {
+        implements MS2FileChargeDependentAnalysisDAO {
 
     public Ms2FileChargeDependentAnalysisDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);

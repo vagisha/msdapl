@@ -9,13 +9,13 @@ import java.util.List;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
-import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
-import org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
+import org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.Ms2FileScanCharge;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
@@ -92,7 +92,7 @@ public class DbToMs2FileConverter {
             chgStates.add(chg);
             
             // add any charge dependent analysis for this charge state
-            Ms2FileChargeDependentAnalysisDAO chgDao = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
+            MS2FileChargeDependentAnalysisDAO chgDao = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
             List <Ms2FileChargeDependentAnalysis> analysisList = chgDao.loadAnalysisForScanCharge(msChg.getId());
             for (Ms2FileChargeDependentAnalysis analysis: analysisList) {
                 chg.addAnalysisItem(analysis.getHeader(), analysis.getValue());
