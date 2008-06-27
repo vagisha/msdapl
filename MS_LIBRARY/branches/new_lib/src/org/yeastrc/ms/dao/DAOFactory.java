@@ -5,13 +5,13 @@ import java.io.Reader;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAOImpl;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
-import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAOImpl;
-import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAOImpl;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -27,7 +27,7 @@ public class DAOFactory {
     private MS2FileScanChargeDAO ms2FileScanChargeDAO;
     private MS2FileHeaderDAO ms2FileHeadersDAO;
     private MS2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
-    private Ms2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
+    private MS2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
     
     private static final Logger log = Logger.getLogger(DAOFactory.class);
@@ -62,8 +62,8 @@ public class DAOFactory {
         
         ms2FileScanChargeDAO = new MS2FileScanChargeDAOImpl(sqlMap);
         ms2FileHeadersDAO = new MS2FileHeaderDAOImpl(sqlMap);
-        ms2ChgDAnalysisDAO = new Ms2FileChargeDependentAnalysisDAOImpl(sqlMap);
-        ms2ChgIAnalysisDAO = new Ms2FileChargeIndependentAnalysisDAOImpl(sqlMap);
+        ms2ChgDAnalysisDAO = new MS2FileChargeDependentAnalysisDAOImpl(sqlMap);
+        ms2ChgIAnalysisDAO = new MS2FileChargeIndependentAnalysisDAOImpl(sqlMap);
     }
     
     public static DAOFactory instance() {
@@ -94,7 +94,7 @@ public class DAOFactory {
         return ms2ChgDAnalysisDAO;
     }
     
-    public Ms2FileChargeIndependentAnalysisDAO getMs2FileChargeIAnalysisDAO() {
+    public MS2FileChargeIndependentAnalysisDAO getMs2FileChargeIAnalysisDAO() {
         return ms2ChgIAnalysisDAO;
     }
 }

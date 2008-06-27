@@ -16,9 +16,9 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
-import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
@@ -129,7 +129,7 @@ public class Ms2FileToDbConverter {
         }
         
         // save the charge independent analysis
-        Ms2FileChargeIndependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
+        MS2FileChargeIndependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
         HashMap<String, String> analysisItems = ms2Scan.getAnalysisItems();
         for (String label: analysisItems.keySet()) {
             Ms2FileChargeIndependentAnalysis analysis = new Ms2FileChargeIndependentAnalysis();
