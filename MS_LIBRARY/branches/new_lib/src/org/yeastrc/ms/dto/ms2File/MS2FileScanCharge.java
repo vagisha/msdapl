@@ -15,7 +15,7 @@ import java.util.List;
  * Represents a "Z" line (and any following "D" lines) from a MS2 file.  Describes the charge for a scan.
  * A scan can have multiple predicted charges
  */
-public class Ms2FileScanCharge {
+public class MS2FileScanCharge {
 
     
     private int id;         // unique id (database)
@@ -23,10 +23,10 @@ public class Ms2FileScanCharge {
     private int charge;     // the charge state
     private BigDecimal mass;     // predicted [M+H]+ (mass)
     
-    private List<Ms2FileChargeDependentAnalysis> chargeDepAnalysis;
+    private List<MS2FileChargeDependentAnalysis> chargeDepAnalysis;
  
-    public Ms2FileScanCharge() {
-        chargeDepAnalysis = new ArrayList<Ms2FileChargeDependentAnalysis>();
+    public MS2FileScanCharge() {
+        chargeDepAnalysis = new ArrayList<MS2FileChargeDependentAnalysis>();
     }
     
     /**
@@ -81,7 +81,7 @@ public class Ms2FileScanCharge {
     /**
      * @return the chargeDepAnalysis
      */
-    public List<Ms2FileChargeDependentAnalysis> getChargeDepAnalysis() {
+    public List<MS2FileChargeDependentAnalysis> getChargeDepAnalysis() {
         return chargeDepAnalysis;
     }
 
@@ -89,7 +89,7 @@ public class Ms2FileScanCharge {
      * @param chargeDepAnalysis the chargeDepAnalysis to set
      */
     public void setChargeDepAnalysis(
-            List<Ms2FileChargeDependentAnalysis> chargeDepAnalysis) {
+            List<MS2FileChargeDependentAnalysis> chargeDepAnalysis) {
         this.chargeDepAnalysis = chargeDepAnalysis;
     }
     
@@ -104,7 +104,7 @@ public class Ms2FileScanCharge {
      * @return {@link Iterator} for the list of {@link Ms2FileChargeDependentAnalysis} for this
      * predicted scan.
      */
-    public Iterator<Ms2FileChargeDependentAnalysis> getAnalysisIterator() {
+    public Iterator<MS2FileChargeDependentAnalysis> getAnalysisIterator() {
         return chargeDepAnalysis.iterator();
     }
 }

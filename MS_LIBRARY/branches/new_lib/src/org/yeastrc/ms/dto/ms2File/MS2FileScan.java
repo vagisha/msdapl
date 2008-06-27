@@ -14,21 +14,21 @@ import org.yeastrc.ms.dto.MsScan;
 /**
  * 
  */
-public class Ms2FileScan extends MsScan {
+public class MS2FileScan extends MsScan {
 
     
-    private List<Ms2FileChargeIndependentAnalysis> chargeIndepAnalysis;
-    private List <Ms2FileScanCharge> scanCharges; // charge states for this scan
+    private List<MS2FileChargeIndependentAnalysis> chargeIndepAnalysis;
+    private List <MS2FileScanCharge> scanCharges; // charge states for this scan
     
-    public Ms2FileScan() {
-        chargeIndepAnalysis = new ArrayList<Ms2FileChargeIndependentAnalysis>();
-        scanCharges = new ArrayList<Ms2FileScanCharge>();
+    public MS2FileScan() {
+        chargeIndepAnalysis = new ArrayList<MS2FileChargeIndependentAnalysis>();
+        scanCharges = new ArrayList<MS2FileScanCharge>();
     }
 
     /**
      * @return the chargeIndepAnalysis
      */
-    public List<Ms2FileChargeIndependentAnalysis> getChargeIndepAnalysis() {
+    public List<MS2FileChargeIndependentAnalysis> getChargeIndepAnalysis() {
         return chargeIndepAnalysis;
     }
 
@@ -36,21 +36,21 @@ public class Ms2FileScan extends MsScan {
      * @param chargeIndepAnalysis the chargeIndepAnalysis to set
      */
     public void setChargeIndepAnalysis(
-            List<Ms2FileChargeIndependentAnalysis> chargeIndepAnalysis) {
+            List<MS2FileChargeIndependentAnalysis> chargeIndepAnalysis) {
         this.chargeIndepAnalysis = chargeIndepAnalysis;
     }
     
     /**
      * @return the scanCharges
      */
-    public List<Ms2FileScanCharge> getScanCharges() {
+    public List<MS2FileScanCharge> getScanCharges() {
         return scanCharges;
     }
 
     /**
      * @param scanCharges the scanCharges to set
      */
-    public void setScanCharges(List<Ms2FileScanCharge> scanCharges) {
+    public void setScanCharges(List<MS2FileScanCharge> scanCharges) {
         this.scanCharges = scanCharges;
     }
 

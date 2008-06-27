@@ -10,7 +10,7 @@ package org.yeastrc.ms.dto.ms2File;
  * Represents a "D" line in the MS2 file.  Charge dependent analysis for a particular scan.
  * A "D" line should follow a "Z" line in the MS2 file.
  */
-public class Ms2FileChargeDependentAnalysis {
+public class MS2FileChargeDependentAnalysis {
 
     private int id;                         // unique id (used for database)
     private int scanChargeId;               // the predicated charge for a particular scan to which

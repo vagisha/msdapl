@@ -14,9 +14,9 @@ import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
+import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
-import org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis;
-import org.yeastrc.ms.dto.ms2File.Ms2FileScanCharge;
+import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
 import org.yeastrc.ms.parser.ms2File.ScanCharge;
@@ -83,9 +83,9 @@ public class DbToMs2FileConverter {
 
     private List<ScanCharge> getChargeStates(MsScan scan) {
         MS2FileScanChargeDAO scDao = DAOFactory.instance().getMsScanChargeDAO();
-        List <Ms2FileScanCharge> msChgStates = scDao.loadChargesForScan(scan.getId());
+        List <MS2FileScanCharge> msChgStates = scDao.loadChargesForScan(scan.getId());
         List <ScanCharge> chgStates = new ArrayList<ScanCharge>(msChgStates.size());
-        for (Ms2FileScanCharge msChg: msChgStates) {
+        for (MS2FileScanCharge msChg: msChgStates) {
             ScanCharge chg = new ScanCharge();
             chg.setCharge(msChg.getCharge());
             chg.setMass(msChg.getMass());
@@ -93,8 +93,8 @@ public class DbToMs2FileConverter {
             
             // add any charge dependent analysis for this charge state
             MS2FileChargeDependentAnalysisDAO chgDao = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
-            List <Ms2FileChargeDependentAnalysis> analysisList = chgDao.loadAnalysisForScanCharge(msChg.getId());
-            for (Ms2FileChargeDependentAnalysis analysis: analysisList) {
+            List <MS2FileChargeDependentAnalysis> analysisList = chgDao.loadAnalysisForScanCharge(msChg.getId());
+            for (MS2FileChargeDependentAnalysis analysis: analysisList) {
                 chg.addAnalysisItem(analysis.getHeader(), analysis.getValue());
             }
         }

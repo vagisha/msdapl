@@ -8,14 +8,14 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
-import org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis;
+import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
 
 /**
  * 
  */
 public interface MS2FileChargeDependentAnalysisDAO {
 
-    public abstract boolean save(Ms2FileChargeDependentAnalysis analysis);
+    public abstract boolean save(MS2FileChargeDependentAnalysis analysis);
 
-    public abstract List<Ms2FileChargeDependentAnalysis> loadAnalysisForScanCharge(int scanChargeId);
+    public abstract List<MS2FileChargeDependentAnalysis> loadAnalysisForScanCharge(int scanChargeId);
 }

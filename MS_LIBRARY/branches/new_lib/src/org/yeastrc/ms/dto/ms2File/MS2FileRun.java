@@ -14,11 +14,11 @@ import org.yeastrc.ms.dto.MsRun;
 /**
  * 
  */
-public class Ms2FileRun extends MsRun {
+public class MS2FileRun extends MsRun {
 
     private List<MS2FileHeader> ms2FileHeaders;
 
-    public Ms2FileRun() {
+    public MS2FileRun() {
         ms2FileHeaders = new ArrayList<MS2FileHeader>();
     }
     

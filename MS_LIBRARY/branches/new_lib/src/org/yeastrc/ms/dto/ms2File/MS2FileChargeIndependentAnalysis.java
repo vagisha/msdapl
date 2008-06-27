@@ -10,7 +10,7 @@ package org.yeastrc.ms.dto.ms2File;
  * Represents an "I" line in the MS2 file.  Charge independent analysis for a particular scan.
  * There can be multiple "I" lines in the MS2 file for a single scan.
  */
-public class Ms2FileChargeIndependentAnalysis {
+public class MS2FileChargeIndependentAnalysis {
 
     private int id;             // unique id (database)
     private int scanId;         // id (database) of the scan that was analyzed
