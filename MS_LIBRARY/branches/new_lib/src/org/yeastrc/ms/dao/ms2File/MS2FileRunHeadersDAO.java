@@ -1,11 +1,13 @@
 package org.yeastrc.ms.dao.ms2File;
 
-import org.yeastrc.ms.dto.ms2File.Ms2FileHeaders;
+import java.util.List;
+
+import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
 
 public interface MS2FileRunHeadersDAO {
 
-    public abstract boolean save(Ms2FileHeaders headers);
+    public abstract boolean save(MS2FileHeader headers);
 
-    public abstract Ms2FileHeaders loadHeadersForRun(int runId);
+    public abstract List<MS2FileHeader> loadHeadersForRun(int runId);
 
 }

@@ -14,9 +14,9 @@ import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
-import org.yeastrc.ms.dto.MsScanCharge;
 import org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis;
-import org.yeastrc.ms.dto.ms2File.Ms2FileHeaders;
+import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
+import org.yeastrc.ms.dto.ms2File.Ms2FileScanCharge;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
 import org.yeastrc.ms.parser.ms2File.ScanCharge;
@@ -83,9 +83,9 @@ public class DbToMs2FileConverter {
 
     private List<ScanCharge> getChargeStates(MsScan scan) {
         MS2FileScanChargeDAO scDao = DAOFactory.instance().getMsScanChargeDAO();
-        List <MsScanCharge> msChgStates = scDao.loadChargesForScan(scan.getId());
+        List <Ms2FileScanCharge> msChgStates = scDao.loadChargesForScan(scan.getId());
         List <ScanCharge> chgStates = new ArrayList<ScanCharge>(msChgStates.size());
-        for (MsScanCharge msChg: msChgStates) {
+        for (Ms2FileScanCharge msChg: msChgStates) {
             ScanCharge chg = new ScanCharge();
             chg.setCharge(msChg.getCharge());
             chg.setMass(msChg.getMass());
@@ -120,14 +120,10 @@ public class DbToMs2FileConverter {
         
         // add any MS2 file specific IAnalyzer and DAnalyzer headers
         MS2FileRunHeadersDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-        Ms2FileHeaders headers = headerDao.loadHeadersForRun(run.getId());
-        ms2Header.addHeaderItem(Header.IANALYZER, headers.getiAnalyzer());
-        ms2Header.addHeaderItem(Header.IANALYZER_VERSION, headers.getiAnalyzerVersion());
-        ms2Header.addHeaderItem(Header.IANALYZER_OPTIONS, headers.getiAnalyzerOptions());
-        ms2Header.addHeaderItem(Header.DANALYZER, headers.getdAnalyzer());
-        ms2Header.addHeaderItem(Header.DANALYZER_VERSION, headers.getdAnalyzerVersion());
-        ms2Header.addHeaderItem(Header.DANALYZER_OPTIONS, headers.getdAnalyzerOptions());
-        
+        List<MS2FileHeader> headers = headerDao.loadHeadersForRun(run.getId());
+        for (MS2FileHeader header: headers) {
+            ms2Header.addHeaderItem(header.getHeaderName(), header.getValue());
+        }
         outFile.write(ms2Header.toString());
         
        

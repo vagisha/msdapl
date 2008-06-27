@@ -287,4 +287,8 @@ public class MsRun {
         this.enzymeList = enzymeList;
     }
     
+    public void addEnzyme(MsDigestionEnzyme enzyme) {
+        enzymeList.add(enzyme);
+    }
+    
 }

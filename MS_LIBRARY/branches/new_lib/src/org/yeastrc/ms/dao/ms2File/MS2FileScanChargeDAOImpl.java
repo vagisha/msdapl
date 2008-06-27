@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao.ms2File;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseSqlMapDAO;
-import org.yeastrc.ms.dto.MsScanCharge;
+import org.yeastrc.ms.dto.ms2File.Ms2FileScanCharge;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -19,15 +19,15 @@ public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileSc
         super(sqlMap);
     }
 
-    public int save(MsScanCharge scanCharge) {
+    public int save(Ms2FileScanCharge scanCharge) {
         return saveAndReturnId("scanCharge.insert", scanCharge);
     }
     
-    public MsScanCharge load(int scanChargeId) {
-        return (MsScanCharge) queryForObject("scanCharge.select", scanChargeId);
+    public Ms2FileScanCharge load(int scanChargeId) {
+        return (Ms2FileScanCharge) queryForObject("scanCharge.select", scanChargeId);
     }
     
-    public List<MsScanCharge> loadChargesForScan(int scanId) {
+    public List<Ms2FileScanCharge> loadChargesForScan(int scanId) {
         return queryForList("scanCharge.selectChargesForScan", scanId);
     }
 }

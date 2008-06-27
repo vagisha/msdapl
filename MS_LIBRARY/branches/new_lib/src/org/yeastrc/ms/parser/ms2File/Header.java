@@ -7,14 +7,17 @@
 package org.yeastrc.ms.parser.ms2File;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 /**
  * 
  */
 public class Header {
 
+    // These are header items we know and care about
     public static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
     public static final String DANALYZER_VERSION = "DAnalyzerVersion";
     public static final String DANALYZER = "DAnalyzer";
@@ -38,6 +41,10 @@ public class Header {
     public void addHeaderItem(String label, String value) {
         if (label == null || value == null)   return;
         headerItems.put(label, value);
+    }
+    
+    public Iterator<Entry<String,String>> iterator() {
+        return headerItems.entrySet().iterator();
     }
     
     public boolean isHeaderValid() {

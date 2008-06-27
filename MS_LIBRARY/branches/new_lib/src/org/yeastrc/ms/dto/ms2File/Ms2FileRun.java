@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.dto.ms2File;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.yeastrc.ms.dto.MsRun;
 
 /**
@@ -13,19 +16,27 @@ import org.yeastrc.ms.dto.MsRun;
  */
 public class Ms2FileRun extends MsRun {
 
-    private Ms2FileHeaders ms2FileHeaders;
+    private List<MS2FileHeader> ms2FileHeaders;
 
+    public Ms2FileRun() {
+        ms2FileHeaders = new ArrayList<MS2FileHeader>();
+    }
+    
     /**
      * @return the ms2FileHeaders
      */
-    public Ms2FileHeaders getMs2FileHeaders() {
+    public List<MS2FileHeader> getMs2FileHeaders() {
         return ms2FileHeaders;
     }
 
     /**
      * @param ms2FileHeaders the ms2FileHeaders to set
      */
-    public void setMs2FileHeaders(Ms2FileHeaders ms2FileHeaders) {
+    public void setMs2FileHeaders(List<MS2FileHeader> ms2FileHeaders) {
         this.ms2FileHeaders = ms2FileHeaders;
+    }
+    
+    public void addMs2FileHeader(MS2FileHeader header) {
+        ms2FileHeaders.add(header);
     }
 }

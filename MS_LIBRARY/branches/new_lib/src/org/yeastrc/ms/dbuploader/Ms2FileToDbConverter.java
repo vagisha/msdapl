@@ -8,7 +8,11 @@ package org.yeastrc.ms.dbuploader;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
@@ -19,10 +23,11 @@ import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
-import org.yeastrc.ms.dto.MsScanCharge;
+import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
 import org.yeastrc.ms.dto.ms2File.Ms2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.Ms2FileChargeIndependentAnalysis;
-import org.yeastrc.ms.dto.ms2File.Ms2FileHeaders;
+import org.yeastrc.ms.dto.ms2File.Ms2FileRun;
+import org.yeastrc.ms.dto.ms2File.Ms2FileScanCharge;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReaderException;
@@ -70,7 +75,7 @@ public class Ms2FileToDbConverter {
     
     private int saveMs2Header(Header header, int experimentId, String fileName) {
         
-        MsRun run = new MsRun();
+        Ms2FileRun run = new Ms2FileRun();
         run.setId(0); // new run set id to 0
         run.setMsExperimentId(experimentId);
         run.setFileName(new File(fileName).getName());
@@ -89,17 +94,17 @@ public class Ms2FileToDbConverter {
         int runID = rundao.save(run);
         
         if (runID != 0) {
-            // save the other headers from the ms2 file
-            Ms2FileHeaders headers = new Ms2FileHeaders();
-            headers.setiAnalyzer(header.getIAnalyzer());
-            headers.setiAnalyzerVersion(header.getIAnalyzerVersion());
-            headers.setiAnalyzerOptions(header.getIAnalyzerOptions());
-            headers.setdAnalyzer(header.getDAnalyzer());
-            headers.setdAnalyzerVersion(header.getDAnalyzerVersion());
-            headers.setdAnalyzerOptions(header.getDAnalyzerOptions());
-            headers.setRunId(runID);
+            // save all the headers from the MS2 file (some headers are already a part of the MsRun object created above)
             MS2FileRunHeadersDAO headersDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-            headersDao.save(headers);
+            Iterator<Entry<String,String>> headerIterator = header.iterator();
+            while(headerIterator.hasNext()) {
+                Entry<String, String> headerEntry = headerIterator.next();
+                MS2FileHeader h = new MS2FileHeader();
+                h.setHeaderName(headerEntry.getKey());
+                h.setValue(headerEntry.getValue());
+                h.setRunId(runID);
+                headersDao.save(h);
+            }
         }
         return runID;
     }
@@ -138,7 +143,7 @@ public class Ms2FileToDbConverter {
     }
     
     private void saveScanCharge(ScanCharge ms2ScanCharge, int scanId) {
-        MsScanCharge scanCharge = new MsScanCharge();
+        Ms2FileScanCharge scanCharge = new Ms2FileScanCharge();
         scanCharge.setScanId(scanId);
         scanCharge.setCharge(ms2ScanCharge.getCharge());
         scanCharge.setMass(ms2ScanCharge.getMass());

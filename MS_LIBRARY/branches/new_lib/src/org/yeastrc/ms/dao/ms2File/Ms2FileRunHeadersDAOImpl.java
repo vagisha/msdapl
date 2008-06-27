@@ -6,8 +6,10 @@
  */
 package org.yeastrc.ms.dao.ms2File;
 
+import java.util.List;
+
 import org.yeastrc.ms.dao.BaseSqlMapDAO;
-import org.yeastrc.ms.dto.ms2File.Ms2FileHeaders;
+import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -20,12 +22,11 @@ public class Ms2FileRunHeadersDAOImpl extends BaseSqlMapDAO implements MS2FileRu
         super(sqlMap);
     }
 
-    public boolean save(Ms2FileHeaders headers) {
+    public boolean save(MS2FileHeader headers) {
         return save("Ms2FileRunHeaders.insert", headers);
     }
     
-    public Ms2FileHeaders loadHeadersForRun(int runId) {
-        return (Ms2FileHeaders) queryForObject("Ms2FileRunHeaders.selectHeadersForRun", runId);
+    public List<MS2FileHeader> loadHeadersForRun(int runId) {
+        return queryForList("Ms2FileRunHeaders.selectHeadersForRun", runId);
     }
-    
 }
