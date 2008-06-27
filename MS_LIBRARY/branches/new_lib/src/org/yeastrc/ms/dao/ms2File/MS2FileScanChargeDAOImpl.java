@@ -9,7 +9,6 @@ package org.yeastrc.ms.dao.ms2File;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dto.MsScanCharge;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

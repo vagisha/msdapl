@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
