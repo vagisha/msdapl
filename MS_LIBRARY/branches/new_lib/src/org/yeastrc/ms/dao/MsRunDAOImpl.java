@@ -10,29 +10,22 @@ import java.util.List;
 
 import org.yeastrc.ms.dto.MsRun;
 
-/**
- * 
- */
+import com.ibatis.sqlmap.client.SqlMapClient;
+
 public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
 
-    
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsRunDAO#save(org.yeastrc.ms.MsRun)
-     */
+    public MsRunDAOImpl(SqlMapClient sqlMap) {
+        super(sqlMap);
+    }
+
     public int save(MsRun run) {
-        return (Integer)insert("MsRun.insert", run);
+        return saveAndReturnId("MsRun.insert", run);
     }
     
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsRunDAO#load(int)
-     */
     public MsRun load(int runId) {
         return (MsRun) queryForObject("MsRun.select", runId);
     }
     
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsRunDAO#loadRunsForExperiment(int)
-     */
     public List<MsRun> loadRunsForExperiment(int msExperimentId) {
         return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
     }

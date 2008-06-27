@@ -12,10 +12,16 @@ import org.yeastrc.ms.dao.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dto.MsScanCharge;
 
+import com.ibatis.sqlmap.client.SqlMapClient;
+
 public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileScanChargeDAO {
 
+    public MS2FileScanChargeDAOImpl(SqlMapClient sqlMap) {
+        super(sqlMap);
+    }
+
     public int save(MsScanCharge scanCharge) {
-        return (Integer)insert("scanCharge.insert", scanCharge);
+        return saveAndReturnId("scanCharge.insert", scanCharge);
     }
     
     public MsScanCharge load(int scanChargeId) {
@@ -25,5 +31,4 @@ public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileSc
     public List<MsScanCharge> loadChargesForScan(int scanId) {
         return queryForList("scanCharge.selectChargesForScan", scanId);
     }
-    
 }

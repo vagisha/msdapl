@@ -1,40 +1,68 @@
 package org.yeastrc.ms.dao;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import java.io.IOException;
+import java.io.Reader;
+
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ms2File.MS2FileRunHeadersDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.Ms2FileChargeDependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.Ms2FileChargeIndependentAnalysisDAOImpl;
+import org.yeastrc.ms.dao.ms2File.Ms2FileRunHeadersDAOImpl;
+
+import com.ibatis.common.resources.Resources;
+import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
 public class DAOFactory {
 
-    private ApplicationContext ctx;
-    
     private MsExperimentDAO expDAO;
     private MsRunDAO runDAO;
     private MsScanDAO scanDAO;
     
     // related to MS2 files. 
-    private MS2FileScanChargeDAO ms2FilecanChargeDAO;
+    private MS2FileScanChargeDAO ms2FileScanChargeDAO;
     private MS2FileRunHeadersDAO ms2FileHeadersDAO;
     private Ms2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
     private Ms2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
     
+    private static final Logger log = Logger.getLogger(DAOFactory.class);
+    
+    // initialize the SqlMapClient
+    private static SqlMapClient sqlMap;
+    
+    static {
+        Reader reader = null;
+        String ibatisConfigFile = "SqlMapConfig.xml";
+        try {
+            reader = Resources.getResourceAsReader(ibatisConfigFile);
+            sqlMap = SqlMapClientBuilder.buildSqlMapClient(reader);
+        }
+        catch (IOException e) {
+            log.error("Error reading Ibatis config xml: "+ibatisConfigFile, e);
+            throw new RuntimeException("Error reading Ibatis config xml: "+ibatisConfigFile, e);
+        }
+        catch (Exception e) {
+            log.error("Error initializing "+DAOFactory.class.getName()+" class: ", e);
+            throw new RuntimeException("Error initializing "+DAOFactory.class.getName()+" class: ", e);
+        }
+    }
+    
     private static DAOFactory instance = new DAOFactory();
     
     private DAOFactory() {
-        // load spring beans
-        ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-        System.out.println("Classpath loaded");
         
-        expDAO = (MsExperimentDAO)ctx.getBean("msExperimentDAO");
-        runDAO = (MsRunDAO)ctx.getBean("msRunDAO");
-        scanDAO = (MsScanDAO)ctx.getBean("msScanDAO");
-        ms2FilecanChargeDAO = (MS2FileScanChargeDAO)ctx.getBean("ms2FileScanChargeDAO");
-        ms2FileHeadersDAO = (MS2FileRunHeadersDAO)ctx.getBean("ms2FileRunHeadersDAO");
-        ms2ChgDAnalysisDAO = (Ms2FileChargeDependentAnalysisDAO)ctx.getBean("ms2FileChargeDependentAnalysisDAO");
-        ms2ChgIAnalysisDAO = (Ms2FileChargeIndependentAnalysisDAO)ctx.getBean("ms2FileChargeIndependentAnalysisDAO");
+        expDAO = new MsExperimentDAOImpl(sqlMap);
+        runDAO = new MsRunDAOImpl(sqlMap);
+        scanDAO = new MsScanDAOImpl(sqlMap);
+        
+        ms2FileScanChargeDAO = new MS2FileScanChargeDAOImpl(sqlMap);
+        ms2FileHeadersDAO = new Ms2FileRunHeadersDAOImpl(sqlMap);
+        ms2ChgDAnalysisDAO = new Ms2FileChargeDependentAnalysisDAOImpl(sqlMap);
+        ms2ChgIAnalysisDAO = new Ms2FileChargeIndependentAnalysisDAOImpl(sqlMap);
     }
     
     public static DAOFactory instance() {
@@ -54,7 +82,7 @@ public class DAOFactory {
     }
     
     public MS2FileScanChargeDAO getMsScanChargeDAO() {
-        return ms2FilecanChargeDAO;
+        return ms2FileScanChargeDAO;
     }
     
     public MS2FileRunHeadersDAO getMS2FileRunHeadersDAO() {

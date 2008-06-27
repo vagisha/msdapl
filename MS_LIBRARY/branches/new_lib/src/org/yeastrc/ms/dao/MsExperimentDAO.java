@@ -8,6 +8,4 @@ public interface MsExperimentDAO {
 
     public abstract int save(MsExperiment experiment);
 
-    public abstract void update(MsExperiment experiment);
-
 }

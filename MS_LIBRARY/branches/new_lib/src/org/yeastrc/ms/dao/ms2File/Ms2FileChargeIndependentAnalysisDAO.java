@@ -15,7 +15,7 @@ import org.yeastrc.ms.dto.ms2File.Ms2FileChargeIndependentAnalysis;
  */
 public interface Ms2FileChargeIndependentAnalysisDAO {
 
-    public abstract void save(Ms2FileChargeIndependentAnalysis analysis);
+    public abstract boolean save(Ms2FileChargeIndependentAnalysis analysis);
 
     public abstract List<Ms2FileChargeIndependentAnalysis> loadAnalysisForScan(int scanId);
 }
