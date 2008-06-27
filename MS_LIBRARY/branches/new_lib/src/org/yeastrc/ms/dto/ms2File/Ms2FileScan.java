@@ -16,10 +16,13 @@ import org.yeastrc.ms.dto.MsScan;
  */
 public class Ms2FileScan extends MsScan {
 
+    
     private List<Ms2FileChargeIndependentAnalysis> chargeIndepAnalysis;
+    private List <Ms2FileScanCharge> scanCharges; // charge states for this scan
     
     public Ms2FileScan() {
         chargeIndepAnalysis = new ArrayList<Ms2FileChargeIndependentAnalysis>();
+        scanCharges = new ArrayList<Ms2FileScanCharge>();
     }
 
     /**
@@ -36,6 +39,21 @@ public class Ms2FileScan extends MsScan {
             List<Ms2FileChargeIndependentAnalysis> chargeIndepAnalysis) {
         this.chargeIndepAnalysis = chargeIndepAnalysis;
     }
+    
+    /**
+     * @return the scanCharges
+     */
+    public List<Ms2FileScanCharge> getScanCharges() {
+        return scanCharges;
+    }
+
+    /**
+     * @param scanCharges the scanCharges to set
+     */
+    public void setScanCharges(List<Ms2FileScanCharge> scanCharges) {
+        this.scanCharges = scanCharges;
+    }
+
     
     
 }

@@ -1,7 +1,6 @@
 package org.yeastrc.ms.dto;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class MsRun {
@@ -33,10 +32,10 @@ public class MsRun {
     
     private String comment;
     
-    private List<MsScan> scanList; // list of scans in this run
+    private List <MsDigestionEnzyme> enzymeList;
     
     public MsRun() {
-        scanList = new ArrayList<MsScan>();
+        enzymeList = new ArrayList<MsDigestionEnzyme>();
     }
     
     
@@ -228,35 +227,6 @@ public class MsRun {
     }
 
     /**
-     * @return the scanList
-     */
-    public List<MsScan> getScanList() {
-        return scanList;
-    }
-
-    /**
-     * @param scanList the scanList to set
-     */
-    public void setScanList(List<MsScan> scanList) {
-        this.scanList = scanList;
-    }
-    
-    /**
-     * @return the number of scans in this run
-     */
-    public int getScanCount() {
-        return scanList.size();
-    }
-    
-    /**
-     * @return {@link Iterator} for the scan list in this run
-     */
-    public Iterator<MsScan> getScanIterator() {
-        return scanList.iterator();
-    }
-
-
-    /**
      * @return the sha1Sum
      */
     public String getSha1Sum() {
@@ -302,4 +272,19 @@ public class MsRun {
     public void setAcquisitionMethod(String acquisitionMethod) {
         this.acquisitionMethod = acquisitionMethod;
     }
+
+    /**
+     * @return the enzymeList
+     */
+    public List<MsDigestionEnzyme> getEnzymeList() {
+        return enzymeList;
+    }
+
+    /**
+     * @param enzymeList the enzymeList to set
+     */
+    public void setEnzymeList(List<MsDigestionEnzyme> enzymeList) {
+        this.enzymeList = enzymeList;
+    }
+    
 }

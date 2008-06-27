@@ -7,9 +7,7 @@
 package org.yeastrc.ms.dto;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.yeastrc.ms.dto.Peaks.Peak;
 
@@ -35,11 +33,8 @@ public class MsScan {
     
     private Peaks peaks;
     
-    private List <MsScanCharge> scanCharges; // charge states for this scan
-    
     public MsScan() {
         peaks = new Peaks();
-        scanCharges = new ArrayList<MsScanCharge>();
     }
 
     /**
@@ -191,20 +186,6 @@ public class MsScan {
         return peaks.iterator();
     }
     
-    /**
-     * @return the scanCharges
-     */
-    public List<MsScanCharge> getScanCharges() {
-        return scanCharges;
-    }
-
-    /**
-     * @param scanCharges the scanCharges to set
-     */
-    public void setScanCharges(List<MsScanCharge> scanCharges) {
-        this.scanCharges = scanCharges;
-    }
-
     /**
      * @return the precursorScanNum
      */
