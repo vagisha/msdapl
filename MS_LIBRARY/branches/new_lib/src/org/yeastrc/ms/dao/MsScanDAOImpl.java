@@ -21,12 +21,12 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         super(sqlMap);
     }
 
-    public int save(MsScan run) {
-        return saveAndReturnId("MsScan.insert", run);
+    public int save(MsScan scan) {
+        return saveAndReturnId("MsScan.insert", scan);
     }
     
-    public MsScan load(int runId) {
-        return (MsScan) queryForObject("MsScan.select", runId);
+    public MsScan load(int scanId) {
+        return (MsScan) queryForObject("MsScan.select", scanId);
     }
 
     public List<Integer> loadScanIdsForRun(int runId) {

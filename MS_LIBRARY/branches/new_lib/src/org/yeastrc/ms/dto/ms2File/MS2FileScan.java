@@ -28,14 +28,14 @@ public class MS2FileScan extends MsScan {
     /**
      * @return the chargeIndepAnalysis
      */
-    public List<MS2FileChargeIndependentAnalysis> getChargeIndepAnalysis() {
+    public List<MS2FileChargeIndependentAnalysis> getChargeIndepAnalysisList() {
         return chargeIndepAnalysis;
     }
 
     /**
      * @param chargeIndepAnalysis the chargeIndepAnalysis to set
      */
-    public void setChargeIndepAnalysis(
+    public void setChargeIndepAnalysisList(
             List<MS2FileChargeIndependentAnalysis> chargeIndepAnalysis) {
         this.chargeIndepAnalysis = chargeIndepAnalysis;
     }
@@ -43,17 +43,15 @@ public class MS2FileScan extends MsScan {
     /**
      * @return the scanCharges
      */
-    public List<MS2FileScanCharge> getScanCharges() {
+    public List<MS2FileScanCharge> getScanChargeList() {
         return scanCharges;
     }
 
     /**
      * @param scanCharges the scanCharges to set
      */
-    public void setScanCharges(List<MS2FileScanCharge> scanCharges) {
+    public void setScanChargeList(List<MS2FileScanCharge> scanCharges) {
         this.scanCharges = scanCharges;
     }
-
-    
     
 }

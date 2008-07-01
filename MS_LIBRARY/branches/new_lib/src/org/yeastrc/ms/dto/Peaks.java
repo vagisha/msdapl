@@ -23,7 +23,7 @@ import org.yeastrc.ms.util.NumberUtils;
  */
 public class Peaks {
 
-    List<Peak> peaks;
+    private List<Peak> peaks;
     
     public Peaks() {
         peaks = new ArrayList<Peak>();
@@ -122,26 +122,6 @@ public class Peaks {
         vals[0] = peak.substring(0, i);
         vals[1] = peak.substring(i+1, peak.length());
         return vals;
-    }
-    
-    public static boolean isValidPeakMz(String mz) {
-        try {
-            new BigDecimal(mz);
-        }
-        catch(NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
-    
-    public static boolean isValidPeakIntensity(String intensity) {
-        try {
-            Float.parseFloat(intensity);
-        }
-        catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
     }
     
     public Iterator<Peak> iterator() {

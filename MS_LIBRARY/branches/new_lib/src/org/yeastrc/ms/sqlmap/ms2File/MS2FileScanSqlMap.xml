@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ms2Scan"> 
+
+	<typeAlias alias="ms2Scan" type="org.yeastrc.ms.dto.ms2File.MS2FileScan"/>
+	
+	<resultMap class="ms2Scan" id="scanResult" groupBy="id">
+		<result property="id" column="id" />
+		<result property="runId" column="runID" nullValue="0" />
+		<result property="startScanNum" column="startScanNumber" />
+		<result property="endScanNum" column="endScanNumber" />
+		<result property="msLevel" column="level" />
+		<result property="precursorMz" column="preMZ" />
+		<result property="precursorScanId" column="preScanID" nullValue="-1"/>
+		<result property="precursorScanNum" column="prescanNumber" />
+		<result property="retentionTime" column="retentionTime" />
+		<result property="fragmentationType" column="fragmentationType" />
+		<result property="peaksBinary" column="data" />
+		<result property="chargeIndepAnalysisList" resultMap="Ms2FileChargeIndependentAnalysis.selectAnalysisForScan"/>
+		<result property="scanChargeList" resultMap=""/>
+	</resultMap>
+	
+	<parameterMap class="ms2Scan" id="scanParam">
+		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="startScanNum" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="endScanNum" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="msLevel" jdbcType="TINYINT" nullValue="-1"/>
+		<parameter property="precursorMz" jdbcType="DECIMAL" />
+		<parameter property="precursorScanId" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="precursorScanNum" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="retentionTime" jdbcType="DECIMAL" />
+		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
+		<parameter property="peaksBinary" jdbcType="BLOB" />
+	</parameterMap>
+	
+    <select id="select" resultMap="scanResult" parameterClass="Integer">
+    	SELECT id, 
+    			runID, 
+    			startScanNumber, 
+    			endScanNumber, 
+    			level, 
+    			preMZ, 
+    			preScanID, 
+    			prescanNumber, 
+    			retentionTime,
+    			fragmentationType,
+    			UNCOMPRESS(data) as data 
+    			FROM MsScan WHERE id= #id#
+    </select>
+    
+    <insert id="insert" parameterMap="MsScanParam">
+    	INSERT INTO MsScan (runID, 
+    						startScanNumber, 
+    						endScanNumber, 
+    						level, 
+    						preMZ, 
+    						preScanID, 
+    						prescanNumber,
+    						retentionTime, 
+    						fragmentationType,
+    						data) 
+    	VALUES (?,?,?,?,?,?,?,?,?,COMPRESS(?))
+    	<selectKey resultClass="int" keyProperty="id">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+</sqlMap>

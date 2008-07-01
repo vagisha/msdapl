@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.dao;
 
+import java.util.List;
+
 import org.yeastrc.ms.dto.MsExperiment;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -25,6 +27,18 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     
     public int save(MsExperiment experiment) {
         return saveAndReturnId("MsExperiment.insert", experiment);
+    }
+    
+    public List<Integer> selectAllExperimentIds() {
+        return queryForList("MsExperiment.selectAll");
+    }
+    
+    public void delete(int msExperimentId) {
+        delete("MsExperiment.delete", msExperimentId);
+    }
+    
+    public void deleteAll() {
+        deleteAll("MsExperiment.deleteAll");
     }
     
 }

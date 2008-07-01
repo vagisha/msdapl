@@ -10,8 +10,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
@@ -28,9 +30,9 @@ import org.yeastrc.ms.dto.ms2File.MS2FileRun;
 import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
-import org.yeastrc.ms.parser.ms2File.Ms2FileReaderException;
 import org.yeastrc.ms.parser.ms2File.Scan;
 import org.yeastrc.ms.parser.ms2File.ScanCharge;
+import org.yeastrc.ms.util.Sha1SumCalculator;
 
 
 /**
@@ -38,31 +40,65 @@ import org.yeastrc.ms.parser.ms2File.ScanCharge;
  */
 public class Ms2FileToDbConverter {
 
-    public void uploadMs2File(String filePath) throws Ms2FileReaderException {
+    private static final Logger log = Logger.getLogger(Ms2FileToDbConverter.class);
+    
+    /**
+     * @param filePath
+     * @param experimentId
+     * @return true if file was uploaded to the database; false otherwise
+     * @throws Ms2FileReaderException if an error occurs while parsing the file
+     */
+    public boolean convertMs2File(String filePath, int experimentId) throws Exception {
+        
+        String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+        
+        String justFileName = new File(filePath).getName();
+        if (fileIsInDb(justFileName, sha1Sum)) {
+            log.warn("Aborting upload of file: "+filePath+". This run already exists in the database");
+            return false;
+        }
         
         Ms2FileReader reader = new Ms2FileReader();
         reader.open(filePath);
-        uploadMs2File(filePath, reader);
-            
+        
+        convertMs2File(filePath, reader, experimentId, sha1Sum);
+        return true;
     }
 
-    public void uploadMs2File(InputStream inStream, String fileName) {
+    public boolean convertMs2File(InputStream inStream, String fileName, int experimentId) throws Exception {
+        
+        String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(inStream);
+        
+        if (fileIsInDb(fileName, sha1Sum)) {
+            log.warn("Aborting upload of file: "+fileName+". This run already exists in the database");
+            return false;
+        }
+        
         Ms2FileReader reader = new Ms2FileReader();
-        try {
-            reader.open(inStream);
-            uploadMs2File(fileName, reader);
-            
-        }
-        catch (Ms2FileReaderException e) {
-            e.printStackTrace();
-        }
+        reader.open(inStream);
+        
+        convertMs2File(fileName, reader, experimentId, sha1Sum);
+        return true;  
     }
     
-    private void uploadMs2File(String file, Ms2FileReader reader)
-            throws Ms2FileReaderException {
+    boolean fileIsInDb(String fileName, String sha1Sum) {
+        
+        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
+        List <MsRun> runs = runDao.loadRunsForFileNameAndSha1Sum(fileName, sha1Sum);
+        // if a run with the same file name and SHA-1 hash code already exists in the 
+        // database we will not upload this run
+        
+        if (runs.size() > 0)
+            return true;
+        return false;
+        
+    }
+
+    private void convertMs2File(String file, Ms2FileReader reader, int experimentId, String sha1Sum)
+            throws Exception {
         Header header = reader.getHeader();
         // insert a run into the database and get the run Id
-        int runId = saveMs2Header(header, 18, file);
+        int runId = saveMs2Header(header, experimentId, file, sha1Sum);
         
         while (reader.hasScans()) {
             Scan scan = reader.getNextScan();
@@ -71,17 +107,19 @@ public class Ms2FileToDbConverter {
         }
     }
     
-    private int saveMs2Header(Header header, int experimentId, String fileName) {
+    private int saveMs2Header(Header header, int experimentId, String fileName, String sha1Sum) {
         
         MS2FileRun run = new MS2FileRun();
-        run.setId(0); // new run set id to 0
+        run.setId(0); // new run; set id to 0
         run.setMsExperimentId(experimentId);
         run.setFileName(new File(fileName).getName());
         run.setFileFormat(MsRun.RunFileFormat.MS2.name());
+        run.setSha1Sum(sha1Sum);
         run.setCreationDate(header.getCreationDate());
         run.setConversionSW(header.getExtractor());
         run.setConversionSWVersion(header.getExtractorVersion());
         run.setConversionSWOptions(header.getExtractorOptions());
+        // MS2 files don't have instrument vendor information, AFAIK
 //        run.setInstrumentVendor("");
         run.setInstrumentModel(header.getInstrumentType());
         run.setInstrumentSN(header.getInstrumentSN());
@@ -166,14 +204,19 @@ public class Ms2FileToDbConverter {
     public static void main(String[] args) {
        Ms2FileToDbConverter uploader = new Ms2FileToDbConverter();
 //       String file = "./resources/sample.ms2";
-       //String file = "./resources/PARC_p75_01_itms.ms2";
-       String file = "/Users/vagisha/WORK/MS_LIBRARY/sample_MS2_data/p75/p75_01_itms.ms2";
+       String file = "./resources/PARC_p75_01_itms.ms2";
+//       String file = "/Users/vagisha/WORK/MS_LIBRARY/sample_MS2_data/p75/p75_01_itms.ms2";
 //       String file = "./resources/NE063005ph8s01.ms2";
+       long start = System.currentTimeMillis();
        try {
-           uploader.uploadMs2File(file);
+           uploader.convertMs2File(file, 18);
        }
-       catch (Ms2FileReaderException e) {
+       catch (Exception e) {
            e.printStackTrace();
        }
+       long end = System.currentTimeMillis();
+       long timeElapsed = (end - start)/1000;
+       System.out.println("Seconds to upload: "+timeElapsed);
+       
     }
 }

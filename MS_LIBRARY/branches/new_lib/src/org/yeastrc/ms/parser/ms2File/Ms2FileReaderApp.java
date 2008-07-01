@@ -28,7 +28,7 @@ public class Ms2FileReaderApp {
             }
             
         }
-        catch (Ms2FileReaderException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
     }

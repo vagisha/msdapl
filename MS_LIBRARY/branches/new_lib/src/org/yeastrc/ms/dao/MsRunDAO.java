@@ -10,6 +10,10 @@ public interface MsRunDAO {
 
     public abstract MsRun load(int runId);
     
+    public abstract List<Integer> loadRunIdsForExperiment(int msExperimentId);
+    
     public abstract List<MsRun> loadRunsForExperiment(int msExperimentId);
+    
+    public abstract List<MsRun> loadRunsForFileNameAndSha1Sum(String fileName, String sha1Sum);
 
 }

@@ -5,7 +5,7 @@
 
 	<typeAlias alias="MsRun" type="org.yeastrc.ms.dto.MsRun"/>
 	
-	<resultMap class="MsRun" id="MsRunResult">
+	<resultMap class="MsRun" id="msRunResult">
 		<result property="id" column="id" />
 		<result property="msExperimentId" column="experimentID" />
 		<result property="fileName" column="filename" />
@@ -23,7 +23,7 @@
 		<result property="comment" column="comment" />
 	</resultMap>
 	
-	<parameterMap class="MsRun" id="MsRunParam">
+	<parameterMap class="MsRun" id="msRunParam">
 		<parameter property="msExperimentId" jdbcType="INTEGER" />
 		<parameter property="fileName" jdbcType="VARCHAR"/>
 		<parameter property="sha1Sum" jdbcType="CHAR"/>
@@ -40,15 +40,23 @@
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
-    <select id="selectRunsForExperiment" resultMap="MsRunResult" parameterClass="Integer"> 
+    <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer"> 
         SELECT * FROM msRun WHERE experimentID = #id#
     </select> 
     
-    <select id="select" resultMap="MsRunResult" parameterClass="Integer">
+    <select id="selectRunIdsForExperiment" resultClass="Integer"> 
+        SELECT id FROM msRun WHERE experimentID = #id#
+    </select> 
+    
+    <select id="selectRunsForFileNameAndSha1Sum" resultMap="msRunResult" parameterMap="MsRunParam"> 
+        SELECT * FROM msRun WHERE filename = #fileName# AND sha1Sum = #sha1Sum#
+    </select> 
+    
+    <select id="select" resultMap="msRunResult" parameterClass="Integer">
     	SELECT * FROM MsRun WHERE id= #id#
     </select>
     
-    <insert id="insert" parameterMap="MsRunParam">
+    <insert id="insert" parameterMap="msRunParam">
     	INSERT INTO MsRun (experimentID, 
     						filename, 
     						sha1Sum,

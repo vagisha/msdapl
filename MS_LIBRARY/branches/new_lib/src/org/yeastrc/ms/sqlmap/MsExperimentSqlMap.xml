@@ -5,36 +5,40 @@
 
 	<typeAlias alias="MsExperiment" type="org.yeastrc.ms.dto.MsExperiment"/>
 	
-	<resultMap class="MsExperiment" id="MsExperimentResult">
+	<resultMap class="MsExperiment" id="msExperimentResult">
 		<result property="id" column="id" />
-		<result property="date" column="date" />
+		<result property="date" column="expDate" />
 		<result property="serverAddress" column="serverAddress" />
 		<result property="serverDirectory" column="serverDirectory" />
 	</resultMap>
 	
-	<parameterMap class="MsExperiment" id="MsExperimentParam">
+	<parameterMap class="MsExperiment" id="msExperimentParam">
 		<parameter property="date" jdbcType="DATE"/>
 		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverDirectory" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
-    <select id="selectAll" resultMap="MsExperimentResult"> 
-        SELECT * FROM msExperiment
+    <select id="selectAll" resultClass="Integer"> 
+        SELECT id FROM msExperiment
     </select> 
     
-    <select id="select" resultMap="MsExperimentResult" parameterClass="Integer">
+    <select id="select" resultMap="msExperimentResult" parameterClass="Integer">
     	SELECT * FROM msExperiment WHERE id= #id#
     </select>
     
-    <insert id="insert" parameterMap="MsExperimentParam">
+    <insert id="insert" parameterMap="msExperimentParam">
     	INSERT INTO msExperiment (expDate, serverAddress, serverDirectory) VALUES (?,?,?)
     	<selectKey resultClass="int" keyProperty="id">
       		select last_insert_id() as id
     	</selectKey>
     </insert>
     
-    <delete id="deleteById" parameterClass="Integer">
+    <delete id="delete" parameterClass="Integer">
 		DELETE FROM msExperiment WHERE id=#id#		    
+    </delete>
+    
+    <delete id="deleteAll" parameterClass="Integer">
+		DELETE FROM msExperiment	    
     </delete>
     
 </sqlMap>

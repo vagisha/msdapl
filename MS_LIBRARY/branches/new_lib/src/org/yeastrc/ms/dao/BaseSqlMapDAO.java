@@ -27,61 +27,106 @@ public class BaseSqlMapDAO {
      * @param statementName
      * @param parameterObject
      * @return returns the object matching the query parameters; null if no matching object was found
-     * or if the query failed.
+     * @throws RuntimeException if query execution failed
      */
     public Object queryForObject(String statementName, Object parameterObject) {
         try {
             return sqlMap.queryForObject(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Could not execute select statement", e);
-            return null;
+            log.error("Failed to execute select statement", e);
+            throw new RuntimeException("Failed to execute select statement", e);
         }
     }
     
     /**
      * @param statementName
      * @param parameterObject
-     * @return returns a List of objects matching the query parameters; null if the query failed
+     * @return returns a List of objects matching the query parameters.
+     * @throws RuntimeException if query execution failed
      */
     public List queryForList(String statementName, Object parameterObject) {
         try {
             return sqlMap.queryForList(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Could not execute select list statement", e);
-            return null;
+            log.error("Failed to execute select list statement", e);
+            throw new RuntimeException("Failed to execute select list statement", e);
+        }
+    }
+    
+    /**
+     * @param statementName
+     * @return returns a List of objects matching the query parameters.
+     * @throws RuntimeException if query execution failed
+     */
+    public List queryForList(String statementName) {
+        try {
+            return sqlMap.queryForList(statementName);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select list statement", e);
+            throw new RuntimeException("Failed to execute select list statement", e);
         }
     }
     
     /**
      * @param statementName
      * @param parameterObject
-     * @return returns the database id of the saved object; 0 if the object could not be saved.
+     * @return returns the database id of the saved object.
+     * @throws RuntimeException if query execution failed
      */
     public int saveAndReturnId(String statementName, Object parameterObject) {
         try {
             return (Integer) sqlMap.insert(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Could not execute save statement", e);
-            return 0;
+            log.error("Failed to execute save statement", e);
+            throw new RuntimeException("Failed to execute save statement", e);
         }
     }
     
     /**
      * @param statementName
      * @param parameterObject
-     * @return true if the object was saved successfully in the database; 0 otherwise. 
+     * @throws RuntimeException if query execution failed
      */
-    public boolean save(String statementName, Object parameterObject) {
+    public void save(String statementName, Object parameterObject) {
         try {
             sqlMap.insert(statementName, parameterObject);
-            return true;
         }
         catch (SQLException e) {
-            log.error("Could not execute save statement", e);
-            return false;
+            log.error("Failed to execute save statement", e);
+            throw new RuntimeException("Failed to execute save statement", e);
+        }
+    }
+    
+    /**
+     * @param statementName
+     * @param parameterObject
+     * @throws RuntimeException if query execution failed
+     */
+    public void delete(String statementName, Object parameterObject) {
+        try {
+            sqlMap.delete(statementName, parameterObject);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute delete statement", e);
+            throw new RuntimeException("Failed to execute delete statement", e);
+        }
+    }
+    
+    /**
+     * @param statementName
+     * @throws RuntimeException if query execution failed
+     */
+    public void deleteAll(String statementName) {
+        try {
+            sqlMap.delete(statementName);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute deleteAll statement", e);
+            throw new RuntimeException("Failed to execute deleteAll statement", e);
         }
     }
 }

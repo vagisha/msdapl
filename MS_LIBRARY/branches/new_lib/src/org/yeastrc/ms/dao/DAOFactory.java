@@ -50,6 +50,7 @@ public class DAOFactory {
             log.error("Error initializing "+DAOFactory.class.getName()+" class: ", e);
             throw new RuntimeException("Error initializing "+DAOFactory.class.getName()+" class: ", e);
         }
+        System.out.println("Loaded Ibatis SQL map config");
     }
     
     private static DAOFactory instance = new DAOFactory();

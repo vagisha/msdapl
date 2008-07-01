@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
-<sqlMap namespace="Ms2FileRunHeaders"> 
+<sqlMap namespace="ms2Headers"> 
 
 	<typeAlias alias="headers" type="org.yeastrc.ms.dto.ms2File.Ms2FileHeaders"/>
 	

@@ -21,12 +21,6 @@ public class MsExperiment {
     private String serverAddress;
     private String serverDirectory;
     
-    private List <MsRun> runs; // runs for this experiments;
-    
-    public MsExperiment() {
-        runs = new ArrayList<MsRun>();
-    }
-    
     /**
      * @return the id
      */
@@ -62,20 +56,6 @@ public class MsExperiment {
      */
     public void setServerDirectory(String directory) {
         this.serverDirectory = directory;
-    }
-
-    /**
-     * @return the runs
-     */
-    public List<MsRun> getRuns() {
-        return runs;
-    }
-
-    /**
-     * @param runs the runs to set
-     */
-    public void setRuns(List<MsRun> runs) {
-        this.runs = runs;
     }
 
     /**

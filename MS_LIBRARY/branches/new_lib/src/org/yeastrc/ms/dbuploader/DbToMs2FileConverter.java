@@ -132,7 +132,11 @@ public class DbToMs2FileConverter {
     public static void main (String[] args) {
         DbToMs2FileConverter converter = new DbToMs2FileConverter();
         try {
-            converter.convertToMs2(1, "db2ms2.ms2");
+            long start = System.currentTimeMillis();
+            converter.convertToMs2(1, "db2ms2_string.ms2");
+            long end = System.currentTimeMillis();
+            long timeElapsed = (end - start)/1000;
+            System.out.println("Seconds to convert to MS2: "+timeElapsed);
         }
         catch (IOException e) {
             e.printStackTrace();
