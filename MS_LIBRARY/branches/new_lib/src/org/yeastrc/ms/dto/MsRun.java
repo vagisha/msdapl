@@ -1,7 +1,5 @@
 package org.yeastrc.ms.dto;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class MsRun {
 
@@ -31,12 +29,6 @@ public class MsRun {
     
     
     private String comment;
-    
-    private List <MsDigestionEnzyme> enzymeList;
-    
-    public MsRun() {
-        enzymeList = new ArrayList<MsDigestionEnzyme>();
-    }
     
     
     public static RunFileFormat getFileFormatForString(String extString) {
@@ -273,22 +265,4 @@ public class MsRun {
         this.acquisitionMethod = acquisitionMethod;
     }
 
-    /**
-     * @return the enzymeList
-     */
-    public List<MsDigestionEnzyme> getEnzymeList() {
-        return enzymeList;
-    }
-
-    /**
-     * @param enzymeList the enzymeList to set
-     */
-    public void setEnzymeList(List<MsDigestionEnzyme> enzymeList) {
-        this.enzymeList = enzymeList;
-    }
-    
-    public void addEnzyme(MsDigestionEnzyme enzyme) {
-        enzymeList.add(enzyme);
-    }
-    
 }

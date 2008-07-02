@@ -84,7 +84,7 @@ public class Ms2FileToDbConverter {
     boolean fileIsInDb(String fileName, String sha1Sum) {
         
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-        List <MsRun> runs = runDao.loadRunsForFileNameAndSha1Sum(fileName, sha1Sum);
+        List <MsRun> runs = runDao.loadRuns(fileName, sha1Sum);
         // if a run with the same file name and SHA-1 hash code already exists in the 
         // database we will not upload this run
         
@@ -127,7 +127,7 @@ public class Ms2FileToDbConverter {
         
         // save the run
         MsRunDAO rundao = DAOFactory.instance().getMsRunDAO();
-        int runID = rundao.save(run);
+        int runID = rundao.saveRun(run);
         
         if (runID != 0) {
             // save all the headers from the MS2 file (some headers are already a part of the MsRun object created above)

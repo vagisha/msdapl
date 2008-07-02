@@ -22,8 +22,9 @@
 	</transactionManager>
 	
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsExperimentSqlMap.xml"/>
-	<!-- 
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsDigestionEnzymeSqlMap.xml"/>
+	<!-- 
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanSqlMap.xml"/>
 	-->
 	

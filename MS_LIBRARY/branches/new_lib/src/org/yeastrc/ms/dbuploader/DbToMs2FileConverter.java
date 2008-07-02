@@ -31,7 +31,7 @@ public class DbToMs2FileConverter {
             outFile = new BufferedWriter(new FileWriter(output));
 
             MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-            MsRun run = runDao.load(dbRunId);
+            MsRun run = runDao.loadRun(dbRunId);
             if (run == null) {
                 System.err.println("No run found with id: "+dbRunId);
                 return;

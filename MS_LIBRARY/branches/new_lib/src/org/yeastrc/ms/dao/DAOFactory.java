@@ -20,6 +20,7 @@ import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 public class DAOFactory {
 
     private MsExperimentDAO expDAO;
+    private MsDigestionEnzymeDAO enzymeDAO;
     private MsRunDAO runDAO;
     private MsScanDAO scanDAO;
     
@@ -58,6 +59,7 @@ public class DAOFactory {
     private DAOFactory() {
         
         expDAO = new MsExperimentDAOImpl(sqlMap);
+        enzymeDAO = new MsDigestionEnzymeDAOImpl(sqlMap);
         runDAO = new MsRunDAOImpl(sqlMap);
         scanDAO = new MsScanDAOImpl(sqlMap);
         
@@ -77,6 +79,10 @@ public class DAOFactory {
     
     public MsRunDAO getMsRunDAO() {
         return runDAO;
+    }
+    
+    public MsDigestionEnzymeDAO getEnzymeDAO() {
+        return enzymeDAO;
     }
     
     public MsScanDAO getMsScanDAO() {
