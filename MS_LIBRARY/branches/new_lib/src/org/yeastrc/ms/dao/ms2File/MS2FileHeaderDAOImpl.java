@@ -22,11 +22,11 @@ public class MS2FileHeaderDAOImpl extends BaseSqlMapDAO implements MS2FileHeader
         super(sqlMap);
     }
 
-    public boolean save(MS2FileHeader headers) {
-        return save("Ms2FileRunHeaders.insert", headers);
+    public void save(MS2FileHeader header) {
+        save("Ms2Header.insert", header);
     }
     
     public List<MS2FileHeader> loadHeadersForRun(int runId) {
-        return queryForList("Ms2FileRunHeaders.selectHeadersForRun", runId);
+        return queryForList("Ms2Header.selectHeadersForRun", runId);
     }
 }
