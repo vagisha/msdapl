@@ -51,6 +51,8 @@ public class MsRun {
     }
 
     public String getFileFormat() {
+        if (fileFormat == null)
+            return null;
         return fileFormat.name();
     }
     

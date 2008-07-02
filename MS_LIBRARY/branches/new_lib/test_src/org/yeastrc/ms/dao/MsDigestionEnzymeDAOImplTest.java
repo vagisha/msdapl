@@ -74,7 +74,7 @@ public class MsDigestionEnzymeDAOImplTest extends TestCase {
         
         // clean up 
         // remove entries from the msRunEnzyme table
-        enzymeDao.deleteRunEnzymes(runId);
+        enzymeDao.deleteEnzymesByRunId(runId);
         // remove the new entry we created in the msDigestionEnzyme table
         enzymeDao.deleteEnzymeById(enzymeId);
         
@@ -107,7 +107,7 @@ public class MsDigestionEnzymeDAOImplTest extends TestCase {
         
         // clean up
         // remove entries from the msRunEnzyme table
-        enzymeDao.deleteRunEnzymes(runId);
+        enzymeDao.deleteEnzymesByRunId(runId);
         // remove the new entry we created in the msDigestionEnzyme table
         enzymeDao.deleteEnzymeById(enzyme.getId());
     }

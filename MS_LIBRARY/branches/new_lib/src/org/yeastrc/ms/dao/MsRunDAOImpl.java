@@ -81,9 +81,11 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
     
     public void deleteRunsForExperiment(int msExperimentId) {
         List<Integer> runIds = loadRunIdsForExperiment(msExperimentId);
+        if (runIds.size() == 0) return;
         delete("MsRun.deleteByExperimentId", msExperimentId);
         MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
-        for (Integer runId: runIds) 
-            enzymeDao.deleteRunEnzymes(runId);
+        enzymeDao.deleteEnzymesByRunIds(runIds);
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        scanDao.deleteScansForRuns(runIds);
     }
 }

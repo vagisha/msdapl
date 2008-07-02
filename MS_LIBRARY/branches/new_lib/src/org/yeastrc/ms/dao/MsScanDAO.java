@@ -11,5 +11,9 @@ public interface MsScanDAO {
     public abstract MsScan load(int scanId);
     
     public abstract List<Integer> loadScanIdsForRun(int runId);
+    
+    public abstract void deleteScansForRun(int runId);
+    
+    public abstract void deleteScansForRuns(List<Integer> runIds);
 
 }

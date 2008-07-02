@@ -99,7 +99,14 @@ public class MsDigestionEnzymeDAOImpl extends BaseSqlMapDAO implements MsDigesti
         delete("MsDigestionEnzyme.deleteEnzymeById", enzymeId);
     }
 
-    public void deleteRunEnzymes(int runId) {
-        delete("MsDigestionEnzyme.deleteRunEnzymes", runId);
+    public void deleteEnzymesByRunId(int runId) {
+        delete("MsDigestionEnzyme.deleteEnzymesByRunId", runId);
+    }
+
+    public void deleteEnzymesByRunIds(List<Integer> runIds) {
+        if (runIds == null || runIds.size() == 0) return;
+        Map<String, List<Integer>> map = new HashMap<String, List<Integer>>(1);
+        map.put("runIdList", runIds);
+        delete("MsDigestionEnzyme.deleteEnzymesByRunIds", map);
     }
 }

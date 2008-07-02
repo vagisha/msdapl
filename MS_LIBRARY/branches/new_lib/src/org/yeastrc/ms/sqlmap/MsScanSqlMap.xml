@@ -68,8 +68,15 @@
     	</selectKey>
     </insert>
     
-    <delete id="deleteById" parameterClass="Integer">
-		DELETE FROM MsScan WHERE id=#id#		    
+    <delete id="deleteByRunId" parameterClass="Integer">
+		DELETE FROM MsScan WHERE runID=#runId#		    
+    </delete>
+    
+    <delete id="deleteByRunIds" parameterClass="java.util.Map">
+		DELETE FROM MsScan WHERE 
+		<iterate property="runIdList" open="runID IN(" close=")" conjunction=",">
+			#runIdList[]#
+		</iterate>    
     </delete>
     
 </sqlMap>

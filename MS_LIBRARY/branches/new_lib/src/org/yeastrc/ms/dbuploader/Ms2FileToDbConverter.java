@@ -26,7 +26,6 @@ import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
-import org.yeastrc.ms.dto.ms2File.MS2FileRun;
 import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
@@ -109,7 +108,7 @@ public class Ms2FileToDbConverter {
     
     private int saveMs2Header(Header header, int experimentId, String fileName, String sha1Sum) {
         
-        MS2FileRun run = new MS2FileRun();
+        MsRun run = new MsRun();
         run.setId(0); // new run; set id to 0
         run.setMsExperimentId(experimentId);
         run.setFileName(new File(fileName).getName());

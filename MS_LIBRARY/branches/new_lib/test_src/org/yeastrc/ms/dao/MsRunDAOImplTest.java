@@ -3,22 +3,28 @@ package org.yeastrc.ms.dao;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsRunWithEnzymeInfo;
+import org.yeastrc.ms.dto.MsScan;
 
 public class MsRunDAOImplTest extends TestCase {
 
     private MsRunDAO runDao;
+    private MsDigestionEnzymeDAO enzymeDao;
+    private MsScanDAO scanDao;
     private static final int msExperimentId_1 = 1;
     private static final int msExperimentId_2 = 25;
     
     protected void setUp() throws Exception {
         super.setUp();
         runDao = DAOFactory.instance().getMsRunDAO();
+        enzymeDao = DAOFactory.instance().getEnzymeDAO();
+        scanDao = DAOFactory.instance().getMsScanDAO();
     }
     
     protected void tearDown() throws Exception {
@@ -125,7 +131,6 @@ public class MsRunDAOImplTest extends TestCase {
         MsRunWithEnzymeInfo run = createRunWEnzymeInfo(msExperimentId_1);
         
         // get a list of the enzymes currently in the database
-        MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
         MsDigestionEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
         assertNotNull(enzyme1);
         MsDigestionEnzyme enzyme2 = enzymeDao.loadEnzyme(2);
@@ -179,7 +184,6 @@ public class MsRunDAOImplTest extends TestCase {
         MsRunWithEnzymeInfo run = createRunWEnzymeInfo(msExperimentId_1);
         
         // get a list of the enzymes currently in the database
-        MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
         MsDigestionEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
         assertNotNull(enzyme1);
         MsDigestionEnzyme enzyme2 = enzymeDao.loadEnzyme(2);
@@ -192,20 +196,37 @@ public class MsRunDAOImplTest extends TestCase {
         // save the run
         int runId = runDao.saveRunWithEnzymeInfo(run);
         
+        // save some scans for the run
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            int scanNum = random.nextInt(100);
+            MsScan scan = new MsScan();
+            scan.setRunId(runId);
+            scan.setStartScanNum(scanNum);
+            scanDao.save(scan);
+        }
+        
         // make sure the run and associated enzyme information got saved
         List<MsRunWithEnzymeInfo> runsWenzymes = runDao.loadExperimentRunsWithEnzymeInfo(msExperimentId_1);
         assertEquals(1, runsWenzymes.size());
         List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymesForRun(runId);
         assertEquals(2, enzymes.size());
+        List<Integer> scanIdList = scanDao.loadScanIdsForRun(runId);
+        assertEquals(10, scanIdList.size());
         
         // now delete the run
         runDao.deleteRunsForExperiment(msExperimentId_1);
         
-        // make sure the run and associated enzyme information got deleted
+        // make sure the run is deleted ...
         runsWenzymes = runDao.loadExperimentRunsWithEnzymeInfo(msExperimentId_1);
         assertEquals(0, runsWenzymes.size());
+        // ... and the associated enzyme information is deleted ...
         enzymes = enzymeDao.loadEnzymesForRun(runId);
         assertEquals(0, enzymes.size());
+        // ... and all scans for the run are deleted.
+        scanIdList = scanDao.loadScanIdsForRun(runId);
+        assertEquals(0, scanIdList.size());
+        
     }
 
     private MsRunWithEnzymeInfo createRunWEnzymeInfo(int msExperimentId) {

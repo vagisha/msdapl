@@ -88,8 +88,19 @@
     	DELETE FROM msDigestionEnzyme WHERE id=#id#
     </delete>
     
-    <delete id="deleteRunEnzymes" parameterClass="Integer">
+    <delete id="deleteEnzymesByRunId" parameterClass="Integer">
     	DELETE FROM msRunEnzyme WHERE runID=#id#
+    </delete>
+    
+    <delete id="deleteEnzymesByRunIds" parameterClass="java.util.Map">
+    	DELETE FROM msRunEnzyme 
+    		<iterate property="runIdList"
+    			open="WHERE runID IN("
+    			close=")"
+    			conjunction=","
+    			>
+    			#runIdList[]#
+    		</iterate>
     </delete>
     
     

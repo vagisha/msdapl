@@ -22,5 +22,7 @@ public interface MsDigestionEnzymeDAO {
     
     public void deleteEnzymeById(int enzymeId);
     
-    public void deleteRunEnzymes(int runId);
+    public void deleteEnzymesByRunId(int runId);
+    
+    public void deleteEnzymesByRunIds(List<Integer> runIds);
 }

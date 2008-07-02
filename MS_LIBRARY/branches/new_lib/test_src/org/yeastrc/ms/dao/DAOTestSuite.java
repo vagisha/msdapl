@@ -11,6 +11,7 @@ public class DAOTestSuite {
         suite.addTestSuite(MsExperimentDAOImplTest.class);
         suite.addTestSuite(MsDigestionEnzymeDAOImplTest.class);
         suite.addTestSuite(MsRunDAOImplTest.class);
+        suite.addTestSuite(MsScanDAOImplTest.class);
         //$JUnit-END$
         return suite;
     }
