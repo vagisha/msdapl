@@ -21,6 +21,8 @@ import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
+import org.yeastrc.ms.dto.IMsRun;
+import org.yeastrc.ms.dto.IMsScan;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
@@ -108,11 +110,11 @@ public class Ms2FileToDbConverter {
     
     private int saveMs2Header(Header header, int experimentId, String fileName, String sha1Sum) {
         
-        MsRun run = new MsRun();
+        IMsRun run = new MsRun();
         run.setId(0); // new run; set id to 0
         run.setMsExperimentId(experimentId);
         run.setFileName(new File(fileName).getName());
-        run.setFileFormat(MsRun.RunFileFormat.MS2.name());
+        run.setFileFormat(IMsRun.RunFileFormat.MS2.name());
         run.setSha1Sum(sha1Sum);
         run.setCreationDate(header.getCreationDate());
         run.setConversionSW(header.getExtractor());
@@ -145,7 +147,7 @@ public class Ms2FileToDbConverter {
     }
     
     private void saveScan(Scan ms2Scan, int runId) {
-        MsScan scan = new MsScan();
+        IMsScan scan = new MsScan();
         scan.setRunId(runId);
         scan.setStartScanNum(ms2Scan.getStartScan());
         scan.setEndScanNum(ms2Scan.getEndScan());
@@ -184,7 +186,7 @@ public class Ms2FileToDbConverter {
         scanCharge.setMass(ms2ScanCharge.getMass());
         
         // save the scan charge
-        MS2FileScanChargeDAO sChgDAO = DAOFactory.instance().getMsScanChargeDAO();
+        MS2FileScanChargeDAO sChgDAO = DAOFactory.instance().getMS2FileScanChargeDAO();
         int sChgId = sChgDAO.save(scanCharge);
         
         // save the charge dependent analysis associated with this charge state

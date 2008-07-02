@@ -29,8 +29,15 @@
     	VALUES (?,?,?)
     </insert>
     
-    <delete id="deleteById" parameterClass="Integer">
-		DELETE FROM MS2FileHeader WHERE id=#id#		    
+    <delete id="deleteByRunId" parameterClass="Integer">
+		DELETE FROM MS2FileHeader WHERE runID=#runId#		    
+    </delete>
+    
+    <delete id="deleteByRunIds" parameterClass="java.uril.Map">
+		DELETE FROM MS2FileHeader WHERE 
+		<iterate open="runID in(" close=")" conjunction=",">
+			#runIdList[]#
+		</iterate>
     </delete>
     
 </sqlMap>

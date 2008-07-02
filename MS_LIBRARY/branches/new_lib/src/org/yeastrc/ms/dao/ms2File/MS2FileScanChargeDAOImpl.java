@@ -20,14 +20,18 @@ public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileSc
     }
 
     public int save(MS2FileScanCharge scanCharge) {
-        return saveAndReturnId("scanCharge.insert", scanCharge);
+        return saveAndReturnId("MS2ScanCharge.insert", scanCharge);
     }
     
     public MS2FileScanCharge load(int scanChargeId) {
-        return (MS2FileScanCharge) queryForObject("scanCharge.select", scanChargeId);
+        return (MS2FileScanCharge) queryForObject("MS2ScanCharge.select", scanChargeId);
     }
     
     public List<MS2FileScanCharge> loadChargesForScan(int scanId) {
-        return queryForList("scanCharge.selectChargesForScan", scanId);
+        return queryForList("MS2ScanCharge.selectChargesForScan", scanId);
+    }
+
+    public void deleteByRunId(int runId) {
+        delete("MS2ScanCharge.deleteByRunId", runId);
     }
 }

@@ -33,12 +33,12 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         return queryForList("MsExperiment.selectAll");
     }
     
+    /**
+     * Deletes the experiment and all its associated runs
+     */
     public void delete(int msExperimentId) {
         delete("MsExperiment.delete", msExperimentId);
+        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
+        runDao.deleteRunsForExperiment(msExperimentId);
     }
-    
-    public void deleteAll() {
-        deleteAll("MsExperiment.deleteAll");
-    }
-    
 }

@@ -14,7 +14,7 @@ import org.yeastrc.ms.dto.Peaks.Peak;
 /**
  * 
  */
-public class MsScan {
+public class MsScan implements IMsScan {
 
     private int runId;  // id (database) of the run this scan belongs to
     
@@ -37,164 +37,176 @@ public class MsScan {
         peaks = new Peaks();
     }
 
-    /**
-     * @return the runId
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getRunId()
      */
     public int getRunId() {
         return runId;
     }
 
-    /**
-     * @param runId the runId to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setRunId(int)
      */
     public void setRunId(int runId) {
         this.runId = runId;
     }
 
-    /**
-     * @return the id
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getId()
      */
     public int getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setId(int)
      */
     public void setId(int id) {
         this.id = id;
     }
 
-    /**
-     * @return the startScanNum
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getStartScanNum()
      */
     public int getStartScanNum() {
         return startScanNum;
     }
 
-    /**
-     * @param startScanNum the startScanNum to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setStartScanNum(int)
      */
     public void setStartScanNum(int startScanNum) {
         this.startScanNum = startScanNum;
     }
 
-    /**
-     * @return the endScanNum
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getEndScanNum()
      */
     public int getEndScanNum() {
         return endScanNum;
     }
 
-    /**
-     * @param endScanNum the endScanNum to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setEndScanNum(int)
      */
     public void setEndScanNum(int endScanNum) {
         this.endScanNum = endScanNum;
     }
 
-    /**
-     * @return the msLevel
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getMsLevel()
      */
     public int getMsLevel() {
         return msLevel;
     }
 
-    /**
-     * @param msLevel the msLevel to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setMsLevel(int)
      */
     public void setMsLevel(int msLevel) {
         this.msLevel = msLevel;
     }
 
-    /**
-     * @return the fragmentationType
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getFragmentationType()
      */
     public String getFragmentationType() {
         return fragmentationType;
     }
 
-    /**
-     * @param fragmentationType the fragmentationType to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setFragmentationType(java.lang.String)
      */
     public void setFragmentationType(String fragmentationType) {
         this.fragmentationType = fragmentationType;
     }
     
-    /**
-     * @return the retentionTime
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getRetentionTime()
      */
     public BigDecimal getRetentionTime() {
         return retentionTime;
     }
     
-    /**
-     * @param retentionTime the retentionTime to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setRetentionTime(java.math.BigDecimal)
      */
     public void setRetentionTime(BigDecimal retentionTime) {
         this.retentionTime = retentionTime;
     }
     
-    /**
-     * @return the precursorMz
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getPrecursorMz()
      */
     public BigDecimal getPrecursorMz() {
         return precursorMz;
     }
 
-    /**
-     * @param precursorMz the precursorMz to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setPrecursorMz(java.math.BigDecimal)
      */
     public void setPrecursorMz(BigDecimal precursorMz) {
         this.precursorMz = precursorMz;
     }
 
-    /**
-     * @return the precursorScanId
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getPrecursorScanId()
      */
     public int getPrecursorScanId() {
         return precursorScanId;
     }
 
-    /**
-     * @param precursorScanId the precursorScanId to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setPrecursorScanId(int)
      */
     public void setPrecursorScanId(int precursorScanId) {
         this.precursorScanId = precursorScanId;
     }
 
-    /**
-     * @param peaks the peaks to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setPeaks(org.yeastrc.ms.dto.Peaks)
      */
     public void setPeaks(Peaks peaks) {
         this.peaks = peaks;
     }
 
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getPeaks()
+     */
     public Peaks getPeaks() {
         return peaks;
     }
     
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setPeaksBinary(byte[])
+     */
     public void setPeaksBinary(byte[] peakData) throws Exception {
         peaks.setPeakDataBinary(peakData);
     }
     
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getPeaksBinary()
+     */
     public byte[] getPeaksBinary() {
         return peaks.getPeakDataBinary();
     }
     
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getPeaksIterator()
+     */
     public Iterator<Peak> getPeaksIterator() {
         return peaks.iterator();
     }
     
-    /**
-     * @return the precursorScanNum
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#getPrecursorScanNum()
      */
     public int getPrecursorScanNum() {
         return precursorScanNum;
     }
 
-    /**
-     * @param precursorScanNum the precursorScanNum to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsScan#setPrecursorScanNum(int)
      */
     public void setPrecursorScanNum(int precursorScanNum) {
         this.precursorScanNum = precursorScanNum;

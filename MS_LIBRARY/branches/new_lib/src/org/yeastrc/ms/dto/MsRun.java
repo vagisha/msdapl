@@ -1,7 +1,10 @@
 package org.yeastrc.ms.dto;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class MsRun {
+
+public class MsRun implements IMsRun {
 
     public static enum RunFileFormat {MS2, MZXML, MZDATA, MZML, UNKNOWN};
     
@@ -30,6 +33,11 @@ public class MsRun {
     
     private String comment;
     
+  private List <MsDigestionEnzyme> enzymeList;
+    
+    public MsRun() {
+        enzymeList = new ArrayList<MsDigestionEnzyme>();
+    }
     
     public static RunFileFormat getFileFormatForString(String extString) {
         if (extString.equalsIgnoreCase(RunFileFormat.MS2.name()))
@@ -43,228 +51,252 @@ public class MsRun {
         else return RunFileFormat.UNKNOWN;
     }
 
-    /**
-     * @return the fileFormat
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getRunFileFormat()
      */
     public RunFileFormat getRunFileFormat() {
         return fileFormat;
     }
 
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getFileFormat()
+     */
     public String getFileFormat() {
         if (fileFormat == null)
             return null;
         return fileFormat.name();
     }
     
-    /**
-     * @param fileFormat the fileFormat to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setFileFormat(java.lang.String)
      */
     public void setFileFormat(String fileFormatStr) {
         this.fileFormat = getFileFormatForString(fileFormatStr);
     }
 
-    /**
-     * @return the msExperimentId
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getMsExperimentId()
      */
     public int getMsExperimentId() {
         return msExperimentId;
     }
 
-    /**
-     * @param msExperimentId the msExperimentId to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setMsExperimentId(int)
      */
     public void setMsExperimentId(int msExperimentId) {
         this.msExperimentId = msExperimentId;
     }
 
-    /**
-     * @return the fileName
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getFileName()
      */
     public String getFileName() {
         return fileName;
     }
 
-    /**
-     * @param fileName the fileName to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setFileName(java.lang.String)
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
-    /**
-     * @return the creationDate
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getCreationDate()
      */
     public String getCreationDate() {
         return creationDate;
     }
 
-    /**
-     * @param creationDate the creationDate to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setCreationDate(java.lang.String)
      */
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
 
-    /**
-     * @return the conversionSW
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getConversionSW()
      */
     public String getConversionSW() {
         return conversionSW;
     }
 
-    /**
-     * @param conversionSW the conversionSW to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setConversionSW(java.lang.String)
      */
     public void setConversionSW(String conversionSW) {
         this.conversionSW = conversionSW;
     }
 
 
-    /**
-     * @return the conversionSWVersion
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getConversionSWVersion()
      */
     public String getConversionSWVersion() {
         return conversionSWVersion;
     }
 
 
-    /**
-     * @param conversionSWVersion the conversionSWVersion to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setConversionSWVersion(java.lang.String)
      */
     public void setConversionSWVersion(String conversionSWVersion) {
         this.conversionSWVersion = conversionSWVersion;
     }
 
-    /**
-     * @return the conversionSWOptions
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getConversionSWOptions()
      */
     public String getConversionSWOptions() {
         return conversionSWOptions;
     }
 
-    /**
-     * @param conversionSWOptions the conversionSWOptions to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setConversionSWOptions(java.lang.String)
      */
     public void setConversionSWOptions(String conversionSWOptions) {
         this.conversionSWOptions = conversionSWOptions;
     }
 
-    /**
-     * @return the instrumentVendor
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getInstrumentVendor()
      */
     public String getInstrumentVendor() {
         return instrumentVendor;
     }
 
-    /**
-     * @param instrumentVendor the instrumentVendor to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setInstrumentVendor(java.lang.String)
      */
     public void setInstrumentVendor(String instrumentVendor) {
         this.instrumentVendor = instrumentVendor;
     }
 
-    /**
-     * @return the instrumentModel
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getInstrumentModel()
      */
     public String getInstrumentModel() {
         return instrumentModel;
     }
 
-    /**
-     * @param instrumentModel the instrumentModel to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setInstrumentModel(java.lang.String)
      */
     public void setInstrumentModel(String instrumentModel) {
         this.instrumentModel = instrumentModel;
     }
 
-    /**
-     * @return the instrumentSN
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getInstrumentSN()
      */
     public String getInstrumentSN() {
         return instrumentSN;
     }
 
-    /**
-     * @param instrumentSN the instrumentSN to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setInstrumentSN(java.lang.String)
      */
     public void setInstrumentSN(String instrumentSN) {
         this.instrumentSN = instrumentSN;
     }
 
 
-    /**
-     * @return the comment
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getComment()
      */
     public String getComment() {
         return comment;
     }
 
-    /**
-     * @param comment the comment to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setComment(java.lang.String)
      */
     public void setComment(String comment) {
         this.comment = comment;
     }
 
-    /**
-     * @return the id
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getId()
      */
     public int getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setId(int)
      */
     public void setId(int id) {
         this.id = id;
     }
 
-    /**
-     * @return the sha1Sum
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getSha1Sum()
      */
     public String getSha1Sum() {
         return sha1Sum;
     }
 
 
-    /**
-     * @param sha1Sum the sha1Sum to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setSha1Sum(java.lang.String)
      */
     public void setSha1Sum(String sha1Sum) {
         this.sha1Sum = sha1Sum;
     }
 
 
-    /**
-     * @return the dataType
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getDataType()
      */
     public String getDataType() {
         return dataType;
     }
 
 
-    /**
-     * @param dataType the dataType to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setDataType(java.lang.String)
      */
     public void setDataType(String dataType) {
         this.dataType = dataType;
     }
 
 
-    /**
-     * @return the acquisitionMethod
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getAcquisitionMethod()
      */
     public String getAcquisitionMethod() {
         return acquisitionMethod;
     }
 
 
-    /**
-     * @param acquisitionMethod the acquisitionMethod to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setAcquisitionMethod(java.lang.String)
      */
     public void setAcquisitionMethod(String acquisitionMethod) {
         this.acquisitionMethod = acquisitionMethod;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#getEnzymeList()
+     */
+    public List<MsDigestionEnzyme> getEnzymeList() {
+        return enzymeList;
+    }
+
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#setEnzymeList(java.util.List)
+     */
+    public void setEnzymeList(List<MsDigestionEnzyme> enzymeList) {
+        this.enzymeList = enzymeList;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsRun#addEnzyme(org.yeastrc.ms.dto.MsDigestionEnzyme)
+     */
+    public void addEnzyme(MsDigestionEnzyme enzyme) {
+        enzymeList.add(enzyme);
     }
 
 }

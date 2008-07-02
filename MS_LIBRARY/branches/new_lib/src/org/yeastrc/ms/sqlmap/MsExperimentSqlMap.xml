@@ -37,8 +37,4 @@
 		DELETE FROM msExperiment WHERE id=#id#		    
     </delete>
     
-    <delete id="deleteAll" parameterClass="Integer">
-		DELETE FROM msExperiment	    
-    </delete>
-    
 </sqlMap>

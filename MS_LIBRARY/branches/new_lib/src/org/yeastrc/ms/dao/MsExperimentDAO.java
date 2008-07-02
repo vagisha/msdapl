@@ -14,6 +14,4 @@ public interface MsExperimentDAO {
 
     public abstract void delete(int msExperimentId);
 
-    public abstract void deleteAll();
-
 }

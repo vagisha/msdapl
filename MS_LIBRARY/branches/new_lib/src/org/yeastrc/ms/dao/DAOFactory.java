@@ -89,7 +89,7 @@ public class DAOFactory {
         return scanDAO;
     }
     
-    public MS2FileScanChargeDAO getMsScanChargeDAO() {
+    public MS2FileScanChargeDAO getMS2FileScanChargeDAO() {
         return ms2FileScanChargeDAO;
     }
     

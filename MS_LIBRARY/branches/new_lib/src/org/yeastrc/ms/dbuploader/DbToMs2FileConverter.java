@@ -12,8 +12,8 @@ import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
-import org.yeastrc.ms.dto.MsRun;
-import org.yeastrc.ms.dto.MsScan;
+import org.yeastrc.ms.dto.IMsRun;
+import org.yeastrc.ms.dto.IMsScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
 import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
@@ -31,7 +31,7 @@ public class DbToMs2FileConverter {
             outFile = new BufferedWriter(new FileWriter(output));
 
             MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-            MsRun run = runDao.loadRun(dbRunId);
+            IMsRun run = runDao.loadRun(dbRunId);
             if (run == null) {
                 System.err.println("No run found with id: "+dbRunId);
                 return;
@@ -43,7 +43,7 @@ public class DbToMs2FileConverter {
             List<Integer> scanIds = scanDao.loadScanIdsForRun(dbRunId);
 
             for (Integer scanId: scanIds) {
-                MsScan scan = scanDao.load(scanId);
+                IMsScan scan = scanDao.load(scanId);
                 printMs2Scan(scan);
                 outFile.write("\n");
             }
@@ -57,7 +57,7 @@ public class DbToMs2FileConverter {
         
     }
     
-    private void printMs2Scan(MsScan scan) throws IOException {
+    private void printMs2Scan(IMsScan scan) throws IOException {
        Scan ms2scan = new Scan();
        ms2scan.setStartScan(scan.getStartScanNum());
        ms2scan.setEndScan(scan.getEndScanNum());
@@ -81,8 +81,8 @@ public class DbToMs2FileConverter {
        outFile.write(ms2scan.toString());
     }
 
-    private List<ScanCharge> getChargeStates(MsScan scan) {
-        MS2FileScanChargeDAO scDao = DAOFactory.instance().getMsScanChargeDAO();
+    private List<ScanCharge> getChargeStates(IMsScan scan) {
+        MS2FileScanChargeDAO scDao = DAOFactory.instance().getMS2FileScanChargeDAO();
         List <MS2FileScanCharge> msChgStates = scDao.loadChargesForScan(scan.getId());
         List <ScanCharge> chgStates = new ArrayList<ScanCharge>(msChgStates.size());
         for (MS2FileScanCharge msChg: msChgStates) {
@@ -101,7 +101,7 @@ public class DbToMs2FileConverter {
         return chgStates;
     }
 
-    private void printMs2Header(MsRun run) throws IOException {
+    private void printMs2Header(IMsRun run) throws IOException {
         Header ms2Header = new Header();
         ms2Header.addHeaderItem(Header.CREATION_DATE, run.getCreationDate());
         ms2Header.addHeaderItem(Header.EXTRACTOR, run.getConversionSW());

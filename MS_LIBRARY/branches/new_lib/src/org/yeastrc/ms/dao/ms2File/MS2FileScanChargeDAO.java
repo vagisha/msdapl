@@ -11,5 +11,7 @@ public interface MS2FileScanChargeDAO {
     public abstract MS2FileScanCharge load(int scanChargeId);
     
     public abstract List<MS2FileScanCharge> loadChargesForScan(int scanId);
+    
+    public abstract void deleteByRunId(int runId);
 
 }

@@ -6,6 +6,8 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.dto.IMsRun;
+import org.yeastrc.ms.dto.IMsScan;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
 
@@ -26,7 +28,7 @@ public class MsScanDAOImplTest extends TestCase {
 
     public final void testLoadScanIdsForRun() {
         // insert a run
-        MsRun run = new MsRun();
+        IMsRun run = new MsRun();
         run.setMsExperimentId(1124);
         int runId = runDao.saveRun(run);
         assertTrue(runId > 0);
@@ -36,7 +38,7 @@ public class MsScanDAOImplTest extends TestCase {
         int[] scanIds = new int[10];
         for (int i = 0; i < 10; i++) {
             int scanNum = random.nextInt(100);
-            MsScan scan = new MsScan();
+            IMsScan scan = new MsScan();
             scan.setRunId(runId);
             scan.setStartScanNum(scanNum);
             scanIds[i] = scanDao.save(scan);

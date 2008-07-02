@@ -9,5 +9,9 @@ public interface MS2FileHeaderDAO {
     public abstract void save(MS2FileHeader header);
 
     public abstract List<MS2FileHeader> loadHeadersForRun(int runId);
+    
+    public abstract void deleteHeadersForRunId(int runId);
+    
+    public abstract void deleteHeadersForRunIds(List<Integer> runIds);
 
 }

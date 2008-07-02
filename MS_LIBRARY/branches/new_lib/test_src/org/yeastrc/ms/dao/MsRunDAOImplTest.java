@@ -7,6 +7,8 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.dto.IMsRun;
+import org.yeastrc.ms.dto.IMsScan;
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsRunWithEnzymeInfo;
@@ -37,7 +39,7 @@ public class MsRunDAOImplTest extends TestCase {
         List<Integer> runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
         assertEquals(0, runIdList.size());
         
-        MsRun run = createRun(msExperimentId_1);
+        IMsRun run = createRun(msExperimentId_1);
         runDao.saveRun(run);
         
         runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
@@ -61,7 +63,7 @@ public class MsRunDAOImplTest extends TestCase {
     }
 
     public void testLoadRunsForExperiment() {
-        MsRun run = createRun(msExperimentId_1);
+        IMsRun run = createRun(msExperimentId_1);
         runDao.saveRun(run);
         List <MsRun> runs = runDao.loadExperimentRuns(msExperimentId_1);
         assertEquals(1, runs.size());
@@ -70,16 +72,16 @@ public class MsRunDAOImplTest extends TestCase {
     }
     
     public void testLoad() {
-        MsRun run = createRun(msExperimentId_1);
+        IMsRun run = createRun(msExperimentId_1);
         runDao.saveRun(run);
         List<Integer> runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
         run = runDao.loadRun(runIdList.get(0));
         checkRun(run);
     }
 
-    private void checkRun(MsRun run) {
+    private void checkRun(IMsRun run) {
         assertEquals(msExperimentId_1, run.getMsExperimentId());
-        assertEquals(MsRun.RunFileFormat.MS2.toString(), run.getFileFormat());
+        assertEquals(IMsRun.RunFileFormat.MS2.toString(), run.getFileFormat());
         assertEquals("my_file1.ms2", run.getFileName());
         assertEquals("Data dependent", run.getAcquisitionMethod());
         assertEquals("Dummy run", run.getComment());
@@ -94,7 +96,7 @@ public class MsRunDAOImplTest extends TestCase {
     }
 
     public void testLoadRunsForFileNameAndSha1Sum() {
-        MsRun run = createRun(msExperimentId_1);
+        IMsRun run = createRun(msExperimentId_1);
         runDao.saveRun(run);
         run = createRun(msExperimentId_2);
         runDao.saveRun(run);
@@ -112,7 +114,7 @@ public class MsRunDAOImplTest extends TestCase {
     
     
     public void testDeleteRunsForExperiment() {
-        MsRun run = createRun(msExperimentId_1);
+        IMsRun run = createRun(msExperimentId_1);
         runDao.saveRun(run);
         run = createRun(msExperimentId_2);
         runDao.saveRun(run);
@@ -144,7 +146,7 @@ public class MsRunDAOImplTest extends TestCase {
         int runId_1 = runDao.saveRunWithEnzymeInfo(run);
         
         // now read back the run and make sure it has the enzyme information
-        MsRunWithEnzymeInfo runFromDb = runDao.loadRunWithEmzymeInfo(runId_1);
+        MsRunWithEnzymeInfo runFromDb = runDao.loadRunForFormat(runId_1);
         List<MsDigestionEnzyme> enzymes = runFromDb.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());
@@ -200,7 +202,7 @@ public class MsRunDAOImplTest extends TestCase {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
             int scanNum = random.nextInt(100);
-            MsScan scan = new MsScan();
+            IMsScan scan = new MsScan();
             scan.setRunId(runId);
             scan.setStartScanNum(scanNum);
             scanDao.save(scan);
@@ -232,7 +234,7 @@ public class MsRunDAOImplTest extends TestCase {
     private MsRunWithEnzymeInfo createRunWEnzymeInfo(int msExperimentId) {
         MsRunWithEnzymeInfo run = new MsRunWithEnzymeInfo();
         run.setMsExperimentId(msExperimentId);
-        run.setFileFormat(MsRun.RunFileFormat.MS2.toString());
+        run.setFileFormat(IMsRun.RunFileFormat.MS2.toString());
         run.setFileName("my_file1.ms2");
         run.setAcquisitionMethod("Data dependent");
         run.setComment("Dummy run");
@@ -247,10 +249,10 @@ public class MsRunDAOImplTest extends TestCase {
     }
     
     
-    private MsRun createRun(int msExperimentId) {
-        MsRun run = new MsRun();
+    private IMsRun createRun(int msExperimentId) {
+        IMsRun run = new MsRun();
         run.setMsExperimentId(msExperimentId);
-        run.setFileFormat(MsRun.RunFileFormat.MS2.toString());
+        run.setFileFormat(IMsRun.RunFileFormat.MS2.toString());
         run.setFileName("my_file1.ms2");
         run.setAcquisitionMethod("Data dependent");
         run.setComment("Dummy run");

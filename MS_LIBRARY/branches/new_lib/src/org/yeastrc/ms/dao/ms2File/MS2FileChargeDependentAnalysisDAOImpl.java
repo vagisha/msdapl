@@ -24,11 +24,11 @@ public class MS2FileChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     public List<MS2FileChargeDependentAnalysis> loadAnalysisForScanCharge(int scanChargeId) {
-        return queryForList("Ms2FileChargeDependentAnalysis.selectAnalysisForCharge", scanChargeId);
+        return queryForList("MS2ChgDAnalysis.selectAnalysisForCharge", scanChargeId);
     }
 
-    public boolean save(MS2FileChargeDependentAnalysis analysis) {
-        return save("Ms2FileChargeDependentAnalysis.insert", analysis);
+    public void save(MS2FileChargeDependentAnalysis analysis) {
+        save("MS2ChgDAnalysis.insert", analysis);
     }
 
 }

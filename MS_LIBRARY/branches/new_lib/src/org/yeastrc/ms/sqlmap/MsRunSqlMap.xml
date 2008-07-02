@@ -4,28 +4,9 @@
 <sqlMap namespace="MsRun"> 
 
 	<typeAlias alias="MsRun" type="org.yeastrc.ms.dto.MsRun"/>
-	<typeAlias alias="MsRunWEnz" type="org.yeastrc.ms.dto.MsRunWithEnzymeInfo"/>
 	
 	<resultMap class="MsRun" id="msRunResult">
 		<result property="id" column="id" />
-		<result property="msExperimentId" column="experimentID" />
-		<result property="fileName" column="filename" />
-		<result property="fileFormat" column="originalFileType" />
-		<result property="sha1Sum" column="sha1Sum" />
-		<result property="creationDate" column="creationTime" />
-		<result property="conversionSW" column="extractor" />
-		<result property="conversionSWVersion" column="extractorVersion" />
-		<result property="dataType" column="dataType" />
-		<result property="conversionSWOptions" column="extractorOptions" />
-		<result property="instrumentVendor" column="instrumentVendor" />
-		<result property="instrumentModel" column="instrumentType" />
-		<result property="instrumentSN" column="instrumentSN" />
-		<result property="acquisitionMethod" column="acquisitionMethod" />
-		<result property="comment" column="comment" />
-	</resultMap>
-	
-	<resultMap class="MsRunWEnz" id="msRunWEnzResult" groupBy="id">
-		<result property="id" column="runID" />
 		<result property="msExperimentId" column="experimentID" />
 		<result property="fileName" column="filename" />
 		<result property="fileFormat" column="originalFileType" />
@@ -60,11 +41,8 @@
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
-    <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer"> 
-        SELECT * FROM msRun WHERE experimentID = #id#
-    </select> 
     
-    <select id="selectRunsForExperiment_wEnzyme" resultMap="msRunWEnzResult" parameterClass="Integer">
+    <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer">
     	SELECT 
     	r.id AS runID, 
     	r.experimentID AS experimentID, 
@@ -98,46 +76,11 @@
         SELECT id FROM msRun WHERE experimentID = #id#
     </select> 
     
-    <select id="selectRunsForFileNameAndSha1Sum" resultMap="msRunResult" parameterClass="java.util.Map"> 
-        SELECT * FROM msRun WHERE filename = #fileName# AND sha1Sum = #sha1Sum#
+    <select id="selectRunIdsForFileNameAndSha1Sum" resultMap="msRunResult" parameterClass="java.util.Map"> 
+        SELECT id FROM msRun WHERE filename = #fileName# AND sha1Sum = #sha1Sum#
     </select> 
     
-    <select id="selectRunsForFileNameAndSha1Sum_wEnzyme" resultMap="msRunWEnzResult" parameterClass="java.util.Map">
-    	SELECT 
-    	r.id AS runID, 
-    	r.experimentID AS experimentID, 
-    	r.filename AS filename, 
-    	r.sha1Sum AS sha1Sum, 
-    	r.creationTime AS creationTime, 
-    	r.extractor AS extractor,
-    	r.extractorVersion AS extractorVersion,
-    	r.extractorOptions AS extractorOptions,
-    	r.instrumentType AS instrumentType, 
-    	r.instrumentVendor AS instrumentVendor,
-    	r.instrumentSN AS instrumentSN, 
-    	r.dataType AS dataType, 
-    	r.acquisitionMethod AS acquisitionMethod,
-    	r.originalFileType AS originalFileType,
-    	r.comment AS comment,
-    	e.id AS id, 
-    	e.name AS name, 
-    	e.sense AS sense, 
-    	e.cut AS cut, 
-    	e.nocut AS nocut, 
-    	e.description AS description 
-    	FROM msRun AS r, msRunEnzyme, msDigestionEnzyme AS e 
-    	WHERE  r.id = MsRunEnzyme.runID 
-    	AND msRunEnzyme.enzymeID = e.id 
-    	AND r.filename = #fileName#
-    	AND r.sha1Sum = #sha1Sum#
-    	ORDER BY runID;
-    </select>
-    
     <select id="select" resultMap="msRunResult" parameterClass="Integer">
-    	SELECT * FROM MsRun WHERE id= #id#
-    </select>
-    
-    <select id="select_wEnzyme" resultMap="msRunWEnzResult" parameterClass="Integer">
     	SELECT 
     	r.id AS runID, 
     	r.experimentID AS experimentID, 
@@ -187,10 +130,6 @@
       		select last_insert_id() as id
     	</selectKey>
     </insert>
-    
-    <delete id="deleteById" parameterClass="Integer">
-		DELETE FROM MsRun WHERE id=#id#		    
-    </delete>
     
     <delete id="deleteByExperimentId" parameterClass="Integer">
 		DELETE FROM MsRun WHERE experimentID=#id#		    

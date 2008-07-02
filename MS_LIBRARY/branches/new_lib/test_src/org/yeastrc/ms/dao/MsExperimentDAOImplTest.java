@@ -65,17 +65,4 @@ public class MsExperimentDAOImplTest extends TestCase {
         assertEquals(0, expIds.size());
     }
     
-    public void testDeleteAll() {
-        MsExperiment experiment = createMsExperiment();
-        expDao.save(experiment);
-        experiment = createMsExperiment();
-        expDao.save(experiment);
-        
-        List<Integer> expIds = expDao.selectAllExperimentIds();
-        assertNotSame(0, expIds.size());
-        
-        expDao.deleteAll();
-        expIds = expDao.selectAllExperimentIds();
-        assertEquals(0, expIds.size());
-    }
 }

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
-<sqlMap namespace="ms2ScanCharge"> 
+<sqlMap namespace="MS2ScanCharge"> 
 
-	<typeAlias alias="scanCharge" type="org.yeastrc.ms.dto.ms2File.Ms2FileScanCharge"/>
+	<typeAlias alias="ScanCharge" type="org.yeastrc.ms.dto.ms2File.MS2FileScanCharge"/>
 	
-	<resultMap class="scanCharge" id="scanChargeResult">
+	<resultMap class="ScanCharge" id="scanChargeResult">
 		<result property="id" column="id" />
 		<result property="scanId" column="scanID" />
 		<result property="charge" column="charge" />
 		<result property="mass" column="mass" />
 	</resultMap>
 	
-	<parameterMap class="scanCharge" id="scanChargeParam">
+	<parameterMap class="ScanCharge" id="scanChargeParam">
 		<parameter property="scanId" jdbcType="INTEGER"/>
 		<parameter property="charge" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="mass" jdbcType="DECIMAL" />
@@ -33,12 +33,12 @@
     	</selectKey>
     </insert>
     
-    <delete id="deleteById" parameterClass="Integer">
-		DELETE FROM MS2FileScanCharge WHERE id=#id#		    
-    </delete>
-    
-    <delete id="deleteByScanId" parameterClass="Integer">
-		DELETE FROM MS2FileScanCharge WHERE scan=#scanId#		    
+    <delete id="deleteByRunId" parameterClass="Integer">
+		DELETE MS2FileScanCharge, MS2FileChargeDependentAnalysis 
+		FROM msScan, MS2FileScanCharge, MS2FileChargeDependentAnalysis
+		WHERE msScan.id = MS2FileScanCharge.scanID
+		AND MS2FileScanCharge.id = MS2FileChargeDependentAnalysis.scanChargeID
+		AND msScan.runID = #runID#	    
     </delete>
     
 </sqlMap>
