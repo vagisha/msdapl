@@ -17,10 +17,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dto.IMsRun;
 import org.yeastrc.ms.dto.IMsScan;
 import org.yeastrc.ms.dto.MsRun;
@@ -28,6 +24,8 @@ import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
+import org.yeastrc.ms.dto.ms2File.MS2FileRun;
+import org.yeastrc.ms.dto.ms2File.MS2FileScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
@@ -85,11 +83,11 @@ public class Ms2FileToDbConverter {
     boolean fileIsInDb(String fileName, String sha1Sum) {
         
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-        List <MsRun> runs = runDao.loadRuns(fileName, sha1Sum);
+        List <Integer> runsIds = runDao.runIdsFor(fileName, sha1Sum);
         // if a run with the same file name and SHA-1 hash code already exists in the 
         // database we will not upload this run
         
-        if (runs.size() > 0)
+        if (runsIds.size() > 0)
             return true;
         return false;
         
@@ -114,91 +112,89 @@ public class Ms2FileToDbConverter {
         run.setId(0); // new run; set id to 0
         run.setMsExperimentId(experimentId);
         run.setFileName(new File(fileName).getName());
-        run.setFileFormat(IMsRun.RunFileFormat.MS2.name());
+        run.setFileFormat(MsRun.RunFileFormat.MS2.name());
         run.setSha1Sum(sha1Sum);
         run.setCreationDate(header.getCreationDate());
         run.setConversionSW(header.getExtractor());
         run.setConversionSWVersion(header.getExtractorVersion());
         run.setConversionSWOptions(header.getExtractorOptions());
         // MS2 files don't have instrument vendor information, AFAIK
-//        run.setInstrumentVendor("");
+        // run.setInstrumentVendor("");
         run.setInstrumentModel(header.getInstrumentType());
         run.setInstrumentSN(header.getInstrumentSN());
         run.setComment(header.getComments());
         
-        // save the run
-        MsRunDAO rundao = DAOFactory.instance().getMsRunDAO();
-        int runID = rundao.saveRun(run);
         
-        if (runID != 0) {
-            // save all the headers from the MS2 file (some headers are already a part of the MsRun object created above)
-            MS2FileHeaderDAO headersDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-            Iterator<Entry<String,String>> headerIterator = header.iterator();
-            while(headerIterator.hasNext()) {
-                Entry<String, String> headerEntry = headerIterator.next();
-                MS2FileHeader h = new MS2FileHeader();
-                h.setHeaderName(headerEntry.getKey());
-                h.setValue(headerEntry.getValue());
-                h.setRunId(runID);
-                headersDao.save(h);
-            }
+        // create a MS2FileRun; this is what we will save eventually
+        MS2FileRun ms2Run = new MS2FileRun(run);
+        
+        // add all the headers from the MS2 file (some headers are already a part of the MsRun object created above)
+        Iterator<Entry<String,String>> headerIterator = header.iterator();
+        while(headerIterator.hasNext()) {
+            Entry<String, String> headerEntry = headerIterator.next();
+            MS2FileHeader h = new MS2FileHeader();
+            h.setHeaderName(headerEntry.getKey());
+            h.setValue(headerEntry.getValue());
         }
-        return runID;
+        
+        // save the MS2FileRun
+        MsRunDAO rundao = DAOFactory.instance().getMsRunDAO();
+        return rundao.saveRun(ms2Run);
+            
     }
     
-    private void saveScan(Scan ms2Scan, int runId) {
+    private void saveScan(Scan readScan, int runId) {
         IMsScan scan = new MsScan();
         scan.setRunId(runId);
-        scan.setStartScanNum(ms2Scan.getStartScan());
-        scan.setEndScanNum(ms2Scan.getEndScan());
+        scan.setStartScanNum(readScan.getStartScan());
+        scan.setEndScanNum(readScan.getEndScan());
         scan.setMsLevel(2);
-        scan.setRetentionTime(ms2Scan.getRetentionTime());
-        scan.setFragmentationType(ms2Scan.getActivationType());
-        scan.setPrecursorMz(ms2Scan.getPrecursorMz());
-        scan.setPrecursorScanNum(ms2Scan.getPrecursorScanNumber());
-        scan.setPeaks(ms2Scan.getPeaks());
+        scan.setRetentionTime(readScan.getRetentionTime());
+        scan.setFragmentationType(readScan.getActivationType());
+        scan.setPrecursorMz(readScan.getPrecursorMz());
+        scan.setPrecursorScanNum(readScan.getPrecursorScanNumber());
+        scan.setPeaks(readScan.getPeaks());
+        
+        // create a new MS2FileScan
+        MS2FileScan ms2Scan = new MS2FileScan(scan);
+        
+        // add the scan charges
+        for (ScanCharge scanCharge: readScan.getChargeStates()) {
+            addScanCharge(ms2Scan, scanCharge);
+        }
+        
+        // add any charge independent analysis to this scan
+        HashMap<String, String> analysisItems = readScan.getAnalysisItems();
+        for (String label: analysisItems.keySet()) {
+            MS2FileChargeIndependentAnalysis analysis = new MS2FileChargeIndependentAnalysis();
+            analysis.setHeader(label);
+            analysis.setValue(analysisItems.get(label));
+            ms2Scan.addChargeIndependentAnalysis(analysis);
+        }
         
         // save the scan
         MsScanDAO scanDAO = DAOFactory.instance().getMsScanDAO();
-        int scanId = scanDAO.save(scan);
+        int scanId = scanDAO.save(ms2Scan);
         
-        // save the scan charges
-        for (ScanCharge scanCharge: ms2Scan.getChargeStates()) {
-            saveScanCharge(scanCharge, scanId);
-        }
-        
-        // save the charge independent analysis
-        MS2FileChargeIndependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
-        HashMap<String, String> analysisItems = ms2Scan.getAnalysisItems();
-        for (String label: analysisItems.keySet()) {
-            MS2FileChargeIndependentAnalysis analysis = new MS2FileChargeIndependentAnalysis();
-            analysis.setScanId(scanId);
-            analysis.setHeader(label);
-            analysis.setValue(analysisItems.get(label));
-            analysisDAO.save(analysis);
-        }
     }
     
-    private void saveScanCharge(ScanCharge ms2ScanCharge, int scanId) {
+    private void addScanCharge(MS2FileScan ms2Scan, ScanCharge ms2ScanCharge) {
         MS2FileScanCharge scanCharge = new MS2FileScanCharge();
-        scanCharge.setScanId(scanId);
         scanCharge.setCharge(ms2ScanCharge.getCharge());
         scanCharge.setMass(ms2ScanCharge.getMass());
         
-        // save the scan charge
-        MS2FileScanChargeDAO sChgDAO = DAOFactory.instance().getMS2FileScanChargeDAO();
-        int sChgId = sChgDAO.save(scanCharge);
         
-        // save the charge dependent analysis associated with this charge state
-        MS2FileChargeDependentAnalysisDAO analysisDAO = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
+        // add any charge dependent analysis associated with this charge state
         HashMap<String, String> analysisItems = ms2ScanCharge.getAnalysisItems();
         for (String label: analysisItems.keySet()) {
             MS2FileChargeDependentAnalysis analysis = new MS2FileChargeDependentAnalysis();
-            analysis.setScanChargeId(sChgId);
             analysis.setHeader(label);
             analysis.setValue(analysisItems.get(label));
-            analysisDAO.save(analysis);
+            scanCharge.addChargeDependentAnalysis(analysis);
         }
+        
+        // add the scan charge to the scan
+        ms2Scan.addScanCharge(scanCharge);
     }
     
     

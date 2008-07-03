@@ -189,7 +189,10 @@ public class MS2FileScan implements IMsScan {
         return scanChargeList;
     }
 
-
+    public void addScanCharge(MS2FileScanCharge scanCharge) {
+        scanChargeList.add(scanCharge);
+    }
+    
     /**
      * @param scanChargeList the scanChargeList to set
      */
@@ -205,7 +208,10 @@ public class MS2FileScan implements IMsScan {
         return chargeIndependentAnalysisList;
     }
 
-
+    public void addChargeIndependentAnalysis(MS2FileChargeIndependentAnalysis analysis) {
+        chargeIndependentAnalysisList.add(analysis);
+    }
+    
     /**
      * @param chargeIndependentAnalysisList the chargeIndependentAnalysisList to set
      */

@@ -85,6 +85,10 @@ public class MS2FileScanCharge {
         return chargeDepAnalysis;
     }
 
+    public void addChargeDependentAnalysis(MS2FileChargeDependentAnalysis analysis) {
+        chargeDepAnalysis.add(analysis);
+    }
+    
     /**
      * @param chargeDepAnalysis the chargeDepAnalysis to set
      */
