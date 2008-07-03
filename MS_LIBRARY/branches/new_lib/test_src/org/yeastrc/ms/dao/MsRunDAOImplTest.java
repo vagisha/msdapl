@@ -121,6 +121,16 @@ public class MsRunDAOImplTest extends TestCase {
         assertEquals(0, runDao.loadRunIdsForExperiment(msExperimentId_1).size());
     }
     
+    public void testSaveAndLoadRunWithNoEnzymes() {
+        // create a run and save it
+        IMsRun run = createRun(msExperimentId_1);
+        int runId = runDao.saveRun(run);
+        
+        // read back the run
+        IMsRun dbRun = runDao.loadRun(runId);
+        assertEquals(0, dbRun.getEnzymeList().size());
+    }
+    
     public void testSaveAndLoadRunWithEnzymeInfo() {
         IMsRun run = createRunWEnzymeInfo(msExperimentId_1);
         
@@ -173,7 +183,7 @@ public class MsRunDAOImplTest extends TestCase {
         
     }
     
-    public void testDeleteRunsWithEnzymeInfoAndScans() {
+    public void testSaveAndDeleteRunsWithEnzymeInfoAndScans() {
         
         IMsRun run = createRunWEnzymeInfo(msExperimentId_1);
         
