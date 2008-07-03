@@ -28,9 +28,9 @@
     
     <delete id="deleteByRunId" parameterClass="Integer">
 		DELETE MS2FileChargeIndependentAnalysis 
-		FROM MS2FileChargeDependentAnalysis, MsScan
-		WHERE MsScan.id = MS2FileChargeDependentAnalysis.scanID
-		AND MS2FileChargeDependentAnalysis.runID=#runId#
+		FROM MS2FileChargeIndependentAnalysis, MsScan
+		WHERE MsScan.id = MS2FileChargeIndependentAnalysis.scanID
+		AND msScan.runID=#runId#
     </delete>
     
      <delete id="deleteByScanId" parameterClass="Integer">

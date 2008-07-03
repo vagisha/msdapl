@@ -1,7 +1,5 @@
 package org.yeastrc.ms.dao;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -11,7 +9,6 @@ import org.yeastrc.ms.dto.IMsRun;
 import org.yeastrc.ms.dto.IMsScan;
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsRun;
-import org.yeastrc.ms.dto.MsRunWithEnzymeInfo;
 import org.yeastrc.ms.dto.MsScan;
 
 public class MsRunDAOImplTest extends TestCase {
@@ -53,6 +50,7 @@ public class MsRunDAOImplTest extends TestCase {
         runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
         assertEquals(1, runIdList.size());
         run = runDao.loadRun(runIdList.get(0));
+        assertNotNull(run);
         assertEquals(msExperimentId_1, run.getMsExperimentId());
         
         // make sure there is only 1 run with the other experiment id
@@ -65,7 +63,7 @@ public class MsRunDAOImplTest extends TestCase {
     public void testLoadRunsForExperiment() {
         IMsRun run = createRun(msExperimentId_1);
         runDao.saveRun(run);
-        List <MsRun> runs = runDao.loadExperimentRuns(msExperimentId_1);
+        List <IMsRun> runs = runDao.loadExperimentRuns(msExperimentId_1);
         assertEquals(1, runs.size());
         run = runs.get(0);
         checkRun(run);
@@ -75,13 +73,14 @@ public class MsRunDAOImplTest extends TestCase {
         IMsRun run = createRun(msExperimentId_1);
         runDao.saveRun(run);
         List<Integer> runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
+        assertTrue(runIdList.size() > 0);
         run = runDao.loadRun(runIdList.get(0));
         checkRun(run);
     }
 
     private void checkRun(IMsRun run) {
         assertEquals(msExperimentId_1, run.getMsExperimentId());
-        assertEquals(IMsRun.RunFileFormat.MS2.toString(), run.getFileFormat());
+        assertEquals(MsRun.RunFileFormat.MS2.toString(), run.getFileFormat());
         assertEquals("my_file1.ms2", run.getFileName());
         assertEquals("Data dependent", run.getAcquisitionMethod());
         assertEquals("Dummy run", run.getComment());
@@ -101,15 +100,8 @@ public class MsRunDAOImplTest extends TestCase {
         run = createRun(msExperimentId_2);
         runDao.saveRun(run);
         
-        List<MsRun> runs = runDao.loadRuns("my_file1.ms2", "sha1sum");
+        List<Integer> runs = runDao.runIdsFor("my_file1.ms2", "sha1sum");
         assertEquals(2, runs.size());
-        Collections.sort(runs, new Comparator<MsRun>() {
-            @Override
-            public int compare(MsRun o1, MsRun o2) {
-                return new Integer(o1.getMsExperimentId()).compareTo(new Integer(o2.getMsExperimentId())); 
-            }});
-        assertEquals(msExperimentId_1, runs.get(0).getMsExperimentId());
-        assertEquals(msExperimentId_2, runs.get(1).getMsExperimentId());
     }
     
     
@@ -130,7 +122,7 @@ public class MsRunDAOImplTest extends TestCase {
     }
     
     public void testSaveAndLoadRunWithEnzymeInfo() {
-        MsRunWithEnzymeInfo run = createRunWEnzymeInfo(msExperimentId_1);
+        IMsRun run = createRunWEnzymeInfo(msExperimentId_1);
         
         // get a list of the enzymes currently in the database
         MsDigestionEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
@@ -138,15 +130,15 @@ public class MsRunDAOImplTest extends TestCase {
         MsDigestionEnzyme enzyme2 = enzymeDao.loadEnzyme(2);
         assertNotNull(enzyme2);
         
-        // add the enzymes to the run
+        // add some enzymes to the run
         run.addEnzyme(enzyme1);
         run.addEnzyme(enzyme2);
         
         // save the run
-        int runId_1 = runDao.saveRunWithEnzymeInfo(run);
+        int runId_1 = runDao.saveRun(run);
         
         // now read back the run and make sure it has the enzyme information
-        MsRunWithEnzymeInfo runFromDb = runDao.loadRunForFormat(runId_1);
+        IMsRun runFromDb = runDao.loadRunForFormat(runId_1);
         List<MsDigestionEnzyme> enzymes = runFromDb.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());
@@ -163,9 +155,9 @@ public class MsRunDAOImplTest extends TestCase {
         run.addEnzyme(enzyme4);
         
         // save the run
-        int runId_2 = runDao.saveRunWithEnzymeInfo(run);
+        int runId_2 = runDao.saveRun(run);
         
-        List<MsRunWithEnzymeInfo> runsWenzymes = runDao.loadExperimentRunsWithEnzymeInfo(msExperimentId_1);
+        List<IMsRun> runsWenzymes = runDao.loadExperimentRuns(msExperimentId_1);
         assertEquals(2, runsWenzymes.size());
         
         // make sure the enzymes associated with the runs are right;
@@ -181,9 +173,9 @@ public class MsRunDAOImplTest extends TestCase {
         
     }
     
-    public void testDeleteRunsWithEnzymeInfo() {
+    public void testDeleteRunsWithEnzymeInfoAndScans() {
         
-        MsRunWithEnzymeInfo run = createRunWEnzymeInfo(msExperimentId_1);
+        IMsRun run = createRunWEnzymeInfo(msExperimentId_1);
         
         // get a list of the enzymes currently in the database
         MsDigestionEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
@@ -196,7 +188,7 @@ public class MsRunDAOImplTest extends TestCase {
         run.addEnzyme(enzyme2);
         
         // save the run
-        int runId = runDao.saveRunWithEnzymeInfo(run);
+        int runId = runDao.saveRun(run);
         
         // save some scans for the run
         Random random = new Random();
@@ -209,7 +201,7 @@ public class MsRunDAOImplTest extends TestCase {
         }
         
         // make sure the run and associated enzyme information got saved
-        List<MsRunWithEnzymeInfo> runsWenzymes = runDao.loadExperimentRunsWithEnzymeInfo(msExperimentId_1);
+        List<IMsRun> runsWenzymes = runDao.loadExperimentRuns(msExperimentId_1);
         assertEquals(1, runsWenzymes.size());
         List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymesForRun(runId);
         assertEquals(2, enzymes.size());
@@ -220,7 +212,7 @@ public class MsRunDAOImplTest extends TestCase {
         runDao.deleteRunsForExperiment(msExperimentId_1);
         
         // make sure the run is deleted ...
-        runsWenzymes = runDao.loadExperimentRunsWithEnzymeInfo(msExperimentId_1);
+        runsWenzymes = runDao.loadExperimentRuns(msExperimentId_1);
         assertEquals(0, runsWenzymes.size());
         // ... and the associated enzyme information is deleted ...
         enzymes = enzymeDao.loadEnzymesForRun(runId);
@@ -231,10 +223,10 @@ public class MsRunDAOImplTest extends TestCase {
         
     }
 
-    private MsRunWithEnzymeInfo createRunWEnzymeInfo(int msExperimentId) {
-        MsRunWithEnzymeInfo run = new MsRunWithEnzymeInfo();
+    private IMsRun createRunWEnzymeInfo(int msExperimentId) {
+        MsRun run = new MsRun();
         run.setMsExperimentId(msExperimentId);
-        run.setFileFormat(IMsRun.RunFileFormat.MS2.toString());
+        run.setFileFormat(MsRun.RunFileFormat.MS2.toString());
         run.setFileName("my_file1.ms2");
         run.setAcquisitionMethod("Data dependent");
         run.setComment("Dummy run");
@@ -252,7 +244,7 @@ public class MsRunDAOImplTest extends TestCase {
     private IMsRun createRun(int msExperimentId) {
         IMsRun run = new MsRun();
         run.setMsExperimentId(msExperimentId);
-        run.setFileFormat(IMsRun.RunFileFormat.MS2.toString());
+        run.setFileFormat(MsRun.RunFileFormat.MS2.toString());
         run.setFileName("my_file1.ms2");
         run.setAcquisitionMethod("Data dependent");
         run.setComment("Dummy run");

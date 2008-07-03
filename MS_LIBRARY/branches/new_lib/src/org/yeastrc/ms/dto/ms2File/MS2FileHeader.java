@@ -11,7 +11,8 @@ package org.yeastrc.ms.dto.ms2File;
  */
 public class MS2FileHeader {
 
-    private int runId;                  // id (database) of the run
+    private int id; // id(database) of the header
+    private int runId;                  
     private String name;
     private String value;
     
@@ -50,6 +51,18 @@ public class MS2FileHeader {
      */
     public void setValue(String value) {
         this.value = value;
+    }
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
     }
     
 }

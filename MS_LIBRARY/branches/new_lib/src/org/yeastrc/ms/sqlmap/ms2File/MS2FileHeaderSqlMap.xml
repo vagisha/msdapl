@@ -8,13 +8,13 @@
 	<resultMap class="Header" id="headerResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" />
-		<result property="header" column="header" />
+		<result property="headerName" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
 	
 	<parameterMap class="Header" id="headerParam">
 		<parameter property="runId" jdbcType="INTEGER" />
-		<parameter property="header" jdbcType="VARCHAR"/>
+		<parameter property="headerName" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
@@ -33,11 +33,15 @@
 		DELETE FROM MS2FileHeader WHERE runID=#runId#		    
     </delete>
     
-    <delete id="deleteByRunIds" parameterClass="java.uril.Map">
-		DELETE FROM MS2FileHeader WHERE 
-		<iterate open="runID in(" close=")" conjunction=",">
-			#runIdList[]#
-		</iterate>
+    <delete id="deleteByRunIds" parameterClass="java.util.Map">
+		DELETE FROM MS2FileHeader
+		<iterate property="runIdList"
+    			open="WHERE runID IN("
+    			close=")"
+    			conjunction=","
+    			>
+    			#runIdList[]#
+    		</iterate>
     </delete>
     
 </sqlMap>

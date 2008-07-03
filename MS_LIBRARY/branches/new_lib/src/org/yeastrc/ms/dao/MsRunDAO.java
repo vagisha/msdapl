@@ -9,6 +9,7 @@ public interface MsRunDAO {
 
     /**
      * Saves the given run in the database and returns the database id for the run.
+     * Any enzyme information is saved
      * Any file-format specific information in the run is also saved.
      * @param run
      * @return

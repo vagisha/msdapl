@@ -5,8 +5,8 @@
 
 	<typeAlias alias="MsRun" type="org.yeastrc.ms.dto.MsRun"/>
 	
-	<resultMap class="MsRun" id="msRunResult">
-		<result property="id" column="id" />
+	<resultMap class="MsRun" id="msRunResult" groupBy="id">
+		<result property="id" column="runID" />
 		<result property="msExperimentId" column="experimentID" />
 		<result property="fileName" column="filename" />
 		<result property="fileFormat" column="originalFileType" />
@@ -24,6 +24,10 @@
 		<result property="enzymeList" resultMap="MsDigestionEnzyme.msEnzymeResult"/>
 	</resultMap>
 	
+	<!--  
+		<result property="enzymeList" resultMap="MsDigestionEnzyme.msEnzymeResult"/>
+		-->
+		
 	<parameterMap class="MsRun" id="msRunParam">
 		<parameter property="msExperimentId" jdbcType="INTEGER" />
 		<parameter property="fileName" jdbcType="VARCHAR"/>
@@ -65,10 +69,10 @@
     	e.cut AS cut, 
     	e.nocut AS nocut, 
     	e.description AS description 
-    	FROM msRun AS r, msRunEnzyme, msDigestionEnzyme AS e 
-    	WHERE  r.id = MsRunEnzyme.runID 
-    	AND msRunEnzyme.enzymeID = e.id 
-    	AND r.experimentId=#id#
+    	FROM msRun AS r 
+    	LEFT JOIN msRunEnzyme ON(r.id = MsRunEnzyme.runID)
+    	LEFT JOIN msDigestionEnzyme AS e ON(msRunEnzyme.enzymeID = e.id)
+    	WHERE r.experimentID=#id#
     	ORDER BY runID;
     </select>
     
@@ -76,12 +80,12 @@
         SELECT id FROM msRun WHERE experimentID = #id#
     </select> 
     
-    <select id="selectRunIdsForFileNameAndSha1Sum" resultMap="msRunResult" parameterClass="java.util.Map"> 
+    <select id="selectRunIdsForFileNameAndSha1Sum" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT id FROM msRun WHERE filename = #fileName# AND sha1Sum = #sha1Sum#
     </select> 
     
-    <select id="select" resultMap="msRunResult" parameterClass="Integer">
-    	SELECT 
+    <select id="select" resultMap="msRunResult" parameterClass="Integer"> 
+        SELECT 
     	r.id AS runID, 
     	r.experimentID AS experimentID, 
     	r.filename AS filename, 
@@ -103,12 +107,12 @@
     	e.cut AS cut, 
     	e.nocut AS nocut, 
     	e.description AS description 
-    	FROM msRun AS r, msRunEnzyme, msDigestionEnzyme AS e 
-    	WHERE  r.id = MsRunEnzyme.runID 
-    	AND msRunEnzyme.enzymeID = e.id 
-    	AND r.id=#id#
+    	FROM msRun AS r 
+    	LEFT JOIN msRunEnzyme ON(r.id = MsRunEnzyme.runID)
+    	LEFT JOIN msDigestionEnzyme AS e ON(msRunEnzyme.enzymeID = e.id)
+    	WHERE r.id=#id#
     	ORDER BY runID;
-    </select>
+    </select> 
     
     <insert id="insert" parameterMap="msRunParam">
     	INSERT INTO MsRun (experimentID, 

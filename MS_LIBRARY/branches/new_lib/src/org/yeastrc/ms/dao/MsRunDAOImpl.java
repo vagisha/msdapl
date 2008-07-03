@@ -105,7 +105,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
     public List<Integer> deleteRunsForExperiment(int msExperimentId) {
         List<Integer> runIds = loadRunIdsForExperiment(msExperimentId);
         
-        if (runIds.size() > 1) {
+        if (runIds.size() > 0) {
             // delete any file-format specific information
             deleteFileFormatSpecificData(runIds);
             

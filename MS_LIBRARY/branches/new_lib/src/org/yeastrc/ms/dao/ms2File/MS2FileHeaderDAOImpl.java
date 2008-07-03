@@ -37,6 +37,7 @@ public class MS2FileHeaderDAOImpl extends BaseSqlMapDAO implements MS2FileHeader
     }
 
     public void deleteHeadersForRunIds(List<Integer> runIds) {
+        if (runIds == null || runIds.size() == 0)   return;
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>(1);
         map.put("runIdList", runIds);
         delete("Ms2Header.deleteByRunIds", map);
