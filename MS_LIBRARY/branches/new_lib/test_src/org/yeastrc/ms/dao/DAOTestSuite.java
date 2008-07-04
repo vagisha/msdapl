@@ -3,6 +3,8 @@ package org.yeastrc.ms.dao;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImplTest;
+
 public class DAOTestSuite {
 
     public static Test suite() {
@@ -16,6 +18,8 @@ public class DAOTestSuite {
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);
         suite.addTestSuite(MsSearchModDAOImplTest.class);
         suite.addTestSuite(MsSequenceDatabaseDAOImplTest.class);
+        
+        suite.addTestSuite(SQTSearchHeaderDAOImplTest.class);
         //$JUnit-END$
         return suite;
     }

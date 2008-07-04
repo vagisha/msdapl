@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dto.ms2File;
+package org.yeastrc.ms.dto.sqtFile;
 
 import java.util.ArrayList;
 import java.util.List;

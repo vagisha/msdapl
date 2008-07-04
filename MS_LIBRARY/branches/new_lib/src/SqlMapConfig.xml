@@ -39,5 +39,8 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsProteinMatchSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchModSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSequenceDatabaseSqlMap.xml"/>
+	
+	<!-- Related to SQT files -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchHeaderSqlMap.xml"/>
 
 </sqlMapConfig>	

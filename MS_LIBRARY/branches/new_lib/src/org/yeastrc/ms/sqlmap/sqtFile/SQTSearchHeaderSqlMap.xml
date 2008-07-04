@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="SqtHeader"> 
+
+
+	<typeAlias alias="SqtHeader" type="org.yeastrc.ms.dto.sqtFile.SQTSearchHeader"/>
+	
+	
+	<resultMap class="SqtHeader" id="headerResult">
+		<result property="id" column="id"/>
+		<result property="searchId" column="searchID"/>
+		<result property="name" column="header"/>
+		<result property="value" column="value"/>
+	</resultMap>
+	
+    
+    <select id="selectHeadersForSearch" resultMap="headerResult" parameterClass="Integer">
+		SELECT * FROM SQTSearchHeader WHERE searchID = #id#
+	</select>
+	
+    
+    <insert id="insertHeader" parameterClass="SqtHeader">
+    	INSERT INTO SQTSearchHeader (searchID, header, value) 
+    	VALUES (#searchId#, #name#, #value#)
+    </insert>
+    
+    
+    <delete id="deleteHeadersForSearch" parameterClass="Integer">
+		DELETE FROM SQTSearchHeader WHERE searchID=#id#
+    </delete>
+    
+</sqlMap>

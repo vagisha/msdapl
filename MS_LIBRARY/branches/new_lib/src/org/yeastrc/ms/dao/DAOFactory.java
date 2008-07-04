@@ -12,6 +12,8 @@ import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImpl;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -36,6 +38,9 @@ public class DAOFactory {
     private MsProteinMatchDAO resultProteinDAO;
     private MsSearchModDAO modDAO;
     private MsSequenceDatabaseDAO seqDbDao;
+    
+    // DAOs for SQT file related objects
+    private SQTSearchHeaderDAO sqtHeaderDao;
     
     private static final Logger log = Logger.getLogger(DAOFactory.class);
     
@@ -78,6 +83,8 @@ public class DAOFactory {
         resultProteinDAO = new MsProteinMatchDAOImpl(sqlMap);
         modDAO = new MsSearchModDAOImpl(sqlMap);
         seqDbDao = new MsSequenceDatabaseDAOImpl(sqlMap);
+        
+        sqtHeaderDao = new SQTSearchHeaderDAOImpl(sqlMap);
     }
     
     public static DAOFactory instance() {
@@ -130,5 +137,9 @@ public class DAOFactory {
     
     public MsSequenceDatabaseDAO getMsSequenceDatabaseDAO() {
         return seqDbDao;
+    }
+    
+    public SQTSearchHeaderDAO getSqtHeaderDAO() {
+        return sqtHeaderDao;
     }
 }

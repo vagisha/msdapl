@@ -1,4 +1,6 @@
-package org.yeastrc.ms.dto.ms2File;
+package org.yeastrc.ms.dto.sqtFile;
+
+import org.yeastrc.ms.dto.ms2File.BaseHeader;
 
 public class SQTSearchHeader extends BaseHeader {
 
