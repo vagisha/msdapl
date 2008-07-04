@@ -11,8 +11,8 @@
 		<result property="id" column="id"/>
 		<result property="serverAddress" column="serverAddress"/>
 		<result property="serverPath" column="serverPath"/>
-		<result property="sequenceLength" column="sequenceLength" nullValue="-1"/>
-		<result property="proteinCount" column="proteinCount" nullValue="-1"/>
+		<result property="sequenceLength" column="sequenceLength" nullValue="0"/>
+		<result property="proteinCount" column="proteinCount" nullValue="0"/>
 	</resultMap>
 	
 	
@@ -20,35 +20,46 @@
 	<parameterMap class="MsDatabase" id="msDatabaseParam">
 		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverPath" jdbcType="VARCHAR"/>
-		<parameter property="sequenceLength" jdbcType="INTEGER" nullValue="-1"/>
-		<parameter property="proteinCount" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="sequenceLength" jdbcType="INTEGER" />
+		<parameter property="proteinCount" jdbcType="INTEGER" />
 	</parameterMap>
 	
 	
 	<!-- ================================================================================= -->
 	<!-- QUERIES INVOLVING ONLY msSequenceDatabaseDetails TABLE -->
 	<!-- ================================================================================= -->
-    <select id="selectDatabaseIdByServerAddressAndPath" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msSequenceDatabaseDetails WHERE 
-    	serverAddress = #serverAddress#
-    	AND serverPath = #serverPath#
-    </select>
-    
-    <select id="selectDatabaseIdMatchAllCols" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msSequenceDatabaseDetails WHERE 
-    	serverAddress = #serverAddress#
-    	AND serverPath = #serverPath#
-    	AND sequenceLength = #sequenceLength#
+    <select id="selectDatabaseIdMatchAllCols" resultClass="Integer" parameterClass="MsDatabase">
+    	SELECT id FROM msSequenceDatabaseDetail WHERE 
+    	<dynamic open="serverAddress">
+    		<isNull property="serverAddress">
+    			IS NULL
+    		</isNull>
+    		<isNotNull property="serverAddress">
+    			= #serverAddress#
+    		</isNotNull>
+    	</dynamic>
+    	<dynamic open="AND serverPath">
+    		<isNull property="serverPath">
+    			IS NULL
+    		</isNull>
+    		<isNotNull property="serverPath">
+    			= #serverPath#
+    		</isNotNull>
+    	</dynamic>
+    	AND sequenceLength= #sequenceLength#
     	AND proteinCount = #proteinCount#
     </select>
     
-    <insert id="insert" parameterMap="msDatabaseParam">
-    	INSERT INTO msSequenceDatabaseDetails (
+    <insert id="insertDatabase" parameterMap="msDatabaseParam">
+    	INSERT INTO msSequenceDatabaseDetail (
     	serverAddress,
     	serverPath,
     	sequenceLength,
     	proteinCount)
     	VALUES (?,?,?,?)
+    	<selectKey keyProperty="id" resultClass="int">
+    		select last_insert_id() as id
+    	</selectKey>
     </insert>
     
     <!-- ================================================================================= -->
@@ -65,10 +76,10 @@
 	<!-- ================================================================================= -->
 	<!-- QUERIES INVOLVING BOTH msSearchDatabase AND msSequenceDatabaseDetails TABLEs -->
 	<!-- ================================================================================= -->
-	<select id="selectSearchDatabases" resultMap="MsDatabase" parameterClass="Integer">
-		SELECT * FROM msSequenceDatabaseDetails as db, msSearchDatabase as searchDb
-		WHERE db.id = searchDb.searchID
-		AND db.id = #id#
+	<select id="selectSearchDatabases" resultMap="msDatabaseResult" parameterClass="Integer">
+		SELECT * FROM msSequenceDatabaseDetail as db, msSearchDatabase as searchDb
+		WHERE db.id = searchDb.databaseID
+		AND searchDb.searchID = #id#
 	</select>
     
 </sqlMap>

@@ -15,6 +15,7 @@ public class DAOTestSuite {
         
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);
         suite.addTestSuite(MsSearchModDAOImplTest.class);
+        suite.addTestSuite(MsSequenceDatabaseDAOImplTest.class);
         //$JUnit-END$
         return suite;
     }
