@@ -8,7 +8,7 @@ public class MsSearchResultDynamicMod {
     private char modifiedResidue;
     private BigDecimal modificationMass;
     private int modPosition;
-    private char modSymbol;
+    private char modificationSymbol;
     
     /**
      * @return the modPosition
@@ -27,13 +27,29 @@ public class MsSearchResultDynamicMod {
      * @return the modSymbol
      */
     public char getModificationSymbol() {
-        return modSymbol;
+        return modificationSymbol;
     }
     /**
      * @param modSymbol the modSymbol to set
      */
     public void setModificationSymbol(char modSymbol) {
-        this.modSymbol = modSymbol;
+        this.modificationSymbol = modSymbol;
+    }
+    
+    /**
+     * JDBC does not understand Character, so we need to return a String
+     * @return
+     */
+    public String getModificationSymbolString() {
+        return new Character(modificationSymbol).toString();
+    }
+    /**
+     * JDBC does not understand Character so we will get the value as String
+     * @param modificationSymbol
+     */
+    public void setModificationSymbolString(String modificationSymbol) {
+        if (modificationSymbol.length() > 0)
+            this.modificationSymbol = modificationSymbol.charAt(0);
     }
     
     /**

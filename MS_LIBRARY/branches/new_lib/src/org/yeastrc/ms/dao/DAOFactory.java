@@ -34,6 +34,7 @@ public class DAOFactory {
     // DAOs for peptide search related objects
     private MsPeptideSearchResultDAO searchResultDAO;
     private MsProteinMatchDAO resultProteinDAO;
+    private MsSearchModDAO modDAO;
     
     private static final Logger log = Logger.getLogger(DAOFactory.class);
     
@@ -74,6 +75,7 @@ public class DAOFactory {
         
         searchResultDAO = new MsPeptideSearchResultDAOImpl(sqlMap);
         resultProteinDAO = new MsProteinMatchDAOImpl(sqlMap);
+        modDAO = new MsSearchModDAOImpl(sqlMap);
     }
     
     public static DAOFactory instance() {
@@ -118,5 +120,9 @@ public class DAOFactory {
     
     public MsProteinMatchDAO getMsProteinmatchDAO() {
         return resultProteinDAO;
+    }
+    
+    public MsSearchModDAO getMsSearchModDAO() {
+        return modDAO;
     }
 }

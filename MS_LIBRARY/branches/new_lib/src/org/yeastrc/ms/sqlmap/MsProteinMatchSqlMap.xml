@@ -20,7 +20,7 @@
 	</parameterMap>
 	
     <select id="selectResultProteins" resultMap="msResultProteinResult" parameterClass="Integer">
-    	SELECT * FROM msProteinMatch WHERE resultID= #id# ORDER BY id
+    	SELECT * FROM msProteinMatch WHERE resultID= #id#
     </select>
     
     

@@ -1,5 +1,7 @@
 package org.yeastrc.ms.dao;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dto.MsProteinMatch;
@@ -7,6 +9,7 @@ import org.yeastrc.ms.dto.MsProteinMatch;
 import junit.framework.TestCase;
 
 public class MsProteinMatchDAOImplTest extends TestCase {
+
 
     private MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinmatchDAO();
     
@@ -67,7 +70,11 @@ public class MsProteinMatchDAOImplTest extends TestCase {
            List<MsProteinMatch> result2_matchList = matchDao.loadResultProteins(2);
            assertEquals(3, result2_matchList.size());
            
-           // results are ordered by id so this should work
+           // order results by id
+           Collections.sort(result1_matchList, new MsProteinMatchComparator());
+           Collections.sort(result2_matchList, new MsProteinMatchComparator());
+           
+           //make sure the column values were saved and read back accurately
            for (int resultId = 1; resultId < 3; resultId++) {
                List<MsProteinMatch> resultProteins = resultId == 1 ? result1_matchList : result2_matchList;
                for (int matchId = 1; matchId < 4; matchId++) {
@@ -92,6 +99,12 @@ public class MsProteinMatchDAOImplTest extends TestCase {
            matchDao.delete(2);
            result2_matchList = matchDao.loadResultProteins(2);
            assertEquals(0, result2_matchList.size());
+    }
+    
+    private static final class MsProteinMatchComparator implements Comparator<MsProteinMatch> {
+        public int compare(MsProteinMatch o1, MsProteinMatch o2) {
+            return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
+        }
     }
     
     private MsProteinMatch getResultProtein(int resultId, int matchId, boolean useNullDescription) {

@@ -37,5 +37,6 @@
 
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchResultSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsProteinMatchSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchModSqlMap.xml" />
 
 </sqlMapConfig>	
