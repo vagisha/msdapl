@@ -16,11 +16,11 @@
 	<parameterMap class="MsResultProtein" id="msResultProteinParam">
 		<parameter property="resultId" jdbcType="INTEGER"/>
 		<parameter property="accession" jdbcType="VARCHAR"/>
-		<parameter property="description" jdbcType="TEXT"/>
+		<parameter property="description" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
     <select id="selectResultProteins" resultMap="msResultProteinResult" parameterClass="Integer">
-    	SELECT * FROM msProteinMatch WHERE resultID= #id#
+    	SELECT * FROM msProteinMatch WHERE resultID= #id# ORDER BY id
     </select>
     
     
