@@ -8,13 +8,13 @@
 	<resultMap class="Header" id="headerResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" />
-		<result property="headerName" column="header" />
+		<result property="name" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
 	
 	<parameterMap class="Header" id="headerParam">
 		<parameter property="runId" jdbcType="INTEGER" />
-		<parameter property="headerName" jdbcType="VARCHAR"/>
+		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>
 	</parameterMap>
 	

@@ -7,13 +7,13 @@
 	
 	<resultMap class="Ianalysis" id="ianalysisResult">
 		<result property="scanId" column="scanID" />
-		<result property="header" column="header" />
+		<result property="name" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
 	
 	<parameterMap class="Ianalysis" id="ianalysisParam">
 		<parameter property="scanId" jdbcType="INTEGER"/>
-		<parameter property="header" jdbcType="VARCHAR"/>
+		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>
 	</parameterMap>
 	

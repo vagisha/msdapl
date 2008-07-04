@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsSearchResult"> 
+
+	<typeAlias alias="MsSearchResult" type="org.yeastrc.ms.dto.MsPeptideSearchResult"/>
+	
+	<resultMap class="MsSearchResult" id="msSearchResult">
+		<result property="id" column="id" />
+		<result property="searchId" column="searchID" />
+		<result property="charge" column="charge" />
+		<result property="peptide" column="peptide" />
+		<result property="calculatedMass" column="calculatedMass" />
+		<result property="numIonsMatched" column="matchingIons" />
+		<result property="numIonsPredicted" column="predictedIons" />
+		<result property="preResidueString" column="preResidue" javaType="java.lang.String"/>
+		<result property="postResidueString" column="postResidue" javaType="java.lang.String"/>
+		<result property="validationStatusString" column="validationStatus" javaType="java.lang.String"/>
+		<result property="proteinMatchList" select="MsResultProtein.selectResultProteins" column="id"/>
+	</resultMap>
+	
+	
+	<parameterMap class="MsSearchResult" id="msSearchResultParam">
+		<parameter property="searchId" jdbcType="INTEGER"/>
+		<parameter property="charge" jdbcType="SMALLINT"/>
+		<parameter property="peptide" jdbcType="VARCHAR"/>
+		<parameter property="calculatedMass" jdbcType="DECIMAL" />
+		<parameter property="numIonsMatched" jdbcType="INTEGER"/>
+		<parameter property="numIonsPredicted" jdbcType="INTEGER"/>
+		<parameter property="preResidueString" jdbcType="CHAR"/>
+		<parameter property="postResidueString" jdbcType="CHAR"/>
+		<parameter property="validationStatusString" jdbcType="CHAR"/>
+	</parameterMap>
+	
+    <select id="select" resultMap="msSearchResult" parameterClass="Integer">
+    	SELECT * FROM msPeptideSearchResult WHERE id= #id#
+    </select>
+    
+    <insert id="insert" parameterMap="msSearchResultParam">
+    	INSERT INTO msPeptideSearchResult (
+    	searchID,
+    	charge,
+    	peptide,
+    	calculatedMass,
+    	matchingIons,
+    	predictedIons,
+    	preResidue,
+    	postResidue,
+    	validationStatus) 
+    	VALUES (?,?,?,?,?,?,?,?,?)
+    	<selectKey resultClass="int" keyProperty="id">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM msPeptideSearchResult WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

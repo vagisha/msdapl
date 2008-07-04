@@ -122,7 +122,7 @@ public class DbToMs2FileConverter {
         MS2FileHeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
         List<MS2FileHeader> headers = headerDao.loadHeadersForRun(run.getId());
         for (MS2FileHeader header: headers) {
-            ms2Header.addHeaderItem(header.getHeaderName(), header.getValue());
+            ms2Header.addHeaderItem(header.getName(), header.getValue());
         }
         outFile.write(ms2Header.toString());
         

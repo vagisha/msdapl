@@ -1,5 +1,5 @@
 /**
- * MsScan.java
+ * MsPeptideSearchResult.java
  * @author Vagisha Sharma
  * July 2, 2008
  * @version 1.0
@@ -7,20 +7,39 @@
 package org.yeastrc.ms.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MsPeptideSearchResult {
 
-    private int id; // unique id (database) for this search
-    private String originalFileType;
-    private String searchEngineName;
-    private String searchEngineVersion;
-    private Date searchDate;
-    private int searchDuration;
-    private String precursorMassType; // monoisotopic or average
-    private BigDecimal precursorMassTolerance;
-    private String fragmentMassType; // monoisotopic or average
-    private BigDecimal fragmentMassTolerance;
+    private int id; // unique id (database) for this search result
+    private int searchId; // id (database) of the search this result belongs to
+    private int scanId; // id (database) of the scan with which this result is associated
+    
+    private int charge; 
+    private BigDecimal calculatedMass;
+    private int numIonsMatched;
+    private int numIonsPredicted;
+    private char preResidue; // residue to the left of the N-term cleavage side
+    private char postResidue; // residue to the right of the C-term cleavage side
+    private char validationStatus;
+    
+    private String peptide;
+    
+    private List<MsSearchResultDynamicMod> dynaMods;
+    private List<MsSearchMod> staticMods;
+    private PeptideResultSequence peptideResult;
+    
+    private List<MsProteinMatch> proteinMatchList;
+    
+    
+    public MsPeptideSearchResult() {
+        proteinMatchList = new ArrayList<MsProteinMatch>();
+        dynaMods = new ArrayList<MsSearchResultDynamicMod>();
+        staticMods = new ArrayList<MsSearchMod>();
+    }
+    
     /**
      * @return the id
      */
@@ -33,115 +52,236 @@ public class MsPeptideSearchResult {
     public void setId(int id) {
         this.id = id;
     }
+    
     /**
-     * @return the originalFileType
+     * @return the searchId
      */
-    public String getOriginalFileType() {
-        return originalFileType;
+    public int getSearchId() {
+        return searchId;
     }
+
     /**
-     * @param originalFileType the originalFileType to set
+     * @param searchId the searchId to set
      */
-    public void setOriginalFileType(String originalFileType) {
-        this.originalFileType = originalFileType;
+    public void setSearchId(int searchId) {
+        this.searchId = searchId;
     }
+
     /**
-     * @return the searchEngineName
+     * @return the scanId
      */
-    public String getSearchEngineName() {
-        return searchEngineName;
+    public int getScanId() {
+        return scanId;
     }
+
     /**
-     * @param searchEngineName the searchEngineName to set
+     * @param scanId the scanId to set
      */
-    public void setSearchEngineName(String searchEngineName) {
-        this.searchEngineName = searchEngineName;
+    public void setScanId(int scanId) {
+        this.scanId = scanId;
     }
+
     /**
-     * @return the searchEngineVersion
+     * @return the charge
      */
-    public String getSearchEngineVersion() {
-        return searchEngineVersion;
+    public int getCharge() {
+        return charge;
     }
+
     /**
-     * @param searchEngineVersion the searchEngineVersion to set
+     * @param charge the charge to set
      */
-    public void setSearchEngineVersion(String searchEngineVersion) {
-        this.searchEngineVersion = searchEngineVersion;
+    public void setCharge(int charge) {
+        this.charge = charge;
     }
+
     /**
-     * @return the searchDate
+     * @return the calculatedMass
      */
-    public Date getSearchDate() {
-        return searchDate;
+    public BigDecimal getCalculatedMass() {
+        return calculatedMass;
     }
+
     /**
-     * @param searchDate the searchDate to set
+     * @param calculatedMass the calculatedMass to set
      */
-    public void setSearchDate(Date searchDate) {
-        this.searchDate = searchDate;
+    public void setCalculatedMass(BigDecimal calculatedMass) {
+        this.calculatedMass = calculatedMass;
     }
+
     /**
-     * @return the searchDuration
+     * @return the numIonsMatched
      */
-    public int getSearchDuration() {
-        return searchDuration;
+    public int getNumIonsMatched() {
+        return numIonsMatched;
     }
+
     /**
-     * @param searchDuration the searchDuration to set
+     * @param numIonsMatched the numIonsMatched to set
      */
-    public void setSearchDuration(int searchDuration) {
-        this.searchDuration = searchDuration;
+    public void setNumIonsMatched(int numIonsMatched) {
+        this.numIonsMatched = numIonsMatched;
     }
+
     /**
-     * @return the precursorMassType
+     * @return the numPredictedIons
      */
-    public String getPrecursorMassType() {
-        return precursorMassType;
+    public int getNumIonsPredicted() {
+        return numIonsPredicted;
     }
+
     /**
-     * @param precursorMassType the precursorMassType to set
+     * @param numPredictedIons the numPredictedIons to set
      */
-    public void setPrecursorMassType(String precursorMassType) {
-        this.precursorMassType = precursorMassType;
+    public void setNumIonsPredicted(int numPredictedIons) {
+        this.numIonsPredicted = numPredictedIons;
     }
+
     /**
-     * @return the precursorMassTolerance
+     * @return the preResidue
      */
-    public BigDecimal getPrecursorMassTolerance() {
-        return precursorMassTolerance;
+    public char getPreResidue() {
+        return preResidue;
     }
-    /**
-     * @param precursorMassTolerance the precursorMassTolerance to set
-     */
-    public void setPrecursorMassTolerance(BigDecimal precursorMassTolerance) {
-        this.precursorMassTolerance = precursorMassTolerance;
+
+    public String getPreResidueString() {
+        return new Character(preResidue).toString();
     }
+    
     /**
-     * @return the fragmentMassType
+     * @param preResidue the preResidue to set
      */
-    public String getFragmentMassType() {
-        return fragmentMassType;
+    public void setPreResidue(char preResidue) {
+        this.preResidue = preResidue;
     }
-    /**
-     * @param fragmentMassType the fragmentMassType to set
-     */
-    public void setFragmentMassType(String fragmentMassType) {
-        this.fragmentMassType = fragmentMassType;
+
+    public void setPreResidueString(String preResidue) {
+        if (preResidue.length() > 0)
+            this.preResidue = preResidue.charAt(0);
     }
+    
     /**
-     * @return the fragmentMassTolerance
+     * @return the postResidue
      */
-    public BigDecimal getFragmentMassTolerance() {
-        return fragmentMassTolerance;
+    public char getPostResidue() {
+        return postResidue;
     }
+    
+    public String getPostResidueString() {
+        return new Character(postResidue).toString();
+    }
+
     /**
-     * @param fragmentMassTolerance the fragmentMassTolerance to set
+     * @param postResidue the postResidue to set
      */
-    public void setFragmentMassTolerance(BigDecimal fragmentMassTolerance) {
-        this.fragmentMassTolerance = fragmentMassTolerance;
+    public void setPostResidue(char postResidue) {
+        this.postResidue = postResidue;
+    }
+
+    public void setPostResidueString(String postResidue) {
+        if (postResidue.length() > 0)
+            this.postResidue = postResidue.charAt(0);
+    }
+    
+    /**
+     * @return the validationStatus
+     */
+    public char getValidationStatus() {
+        return validationStatus;
+    }
+
+    public String getValidationStatusString() {
+        return new Character(validationStatus).toString();
+    }
+    
+    /**
+     * @param validationStatus the validationStatus to set
+     */
+    public void setValidationStatus(char validationStatus) {
+        this.validationStatus = validationStatus;
+    }
+
+    public void setValidationStatusString(String status) {
+        if (status.length() > 0)
+            this.validationStatus = status.charAt(0);
+    }
+    
+    /**
+     * @return the proteinMatchList
+     */
+    public List<MsProteinMatch> getProteinMatchList() {
+        return proteinMatchList;
+    }
+
+    /**
+     * @param proteinMatchList the proteinMatchList to set
+     */
+    public void setProteinMatchList(List<MsProteinMatch> proteinMatchList) {
+        this.proteinMatchList = proteinMatchList;
+    }
+    
+    public void addProteinMatch(MsProteinMatch match) {
+        proteinMatchList.add(match);
     }
     
     
-   
+    //-----------------------------------------------------------------------------------------
+    // PEPTIDE SEQUENCE
+    //-----------------------------------------------------------------------------------------
+    
+    /**
+     * @return the peptideResult
+     */
+    public PeptideResultSequence getPeptideResult() {
+        if (peptideResult != null)
+            return peptideResult;
+        
+        peptideResult = new PeptideResultSequence(getPeptide().toCharArray());
+        
+        for (MsSearchResultDynamicMod mod: dynaMods)
+            peptideResult.addDynamicModification(mod.getModificationPosition(), mod);
+        
+        for(MsSearchMod mod: staticMods)
+            peptideResult.addStaticModification(mod.getModifiedResidue(), mod.getModificationMass());
+        
+        return peptideResult;
+    }
+    
+    public String getPeptide() {
+        return peptide;
+    }
+    
+    public void setPeptide(String peptide) {
+        this.peptide = peptide;
+    }
+    
+    //-----------------------------------------------------------------------------------------
+    // DYNAMIC MODIFICATIONS
+    //-----------------------------------------------------------------------------------------
+    public void addDynamicModification(MsSearchResultDynamicMod modification) {
+        this.dynaMods.add(modification);
+    }
+    
+    public void setDynamicModifications(List<MsSearchResultDynamicMod> dynaMods) {
+        this.dynaMods = dynaMods;
+    }
+    
+    public List<MsSearchResultDynamicMod> getDynamicModifications() {
+        return this.dynaMods;
+    }
+    
+    //-----------------------------------------------------------------------------------------
+    // STATIC MODIFICATIONS
+    //-----------------------------------------------------------------------------------------
+    public void addStaticModification(MsSearchMod staticMod) {
+       staticMods.add(staticMod);
+    }
+    
+    public void setStaticModifications(List<MsSearchMod> staticMods) {
+        this.staticMods = staticMods;
+    }
+    
+    public List<MsSearchMod> getStaticModifications() {
+        return staticMods;
+    }
 }

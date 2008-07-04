@@ -6,7 +6,10 @@
 
 	<properties resource="msDataDB.properties" />
 	
-	<settings useStatementNamespaces="true" />
+	<settings 
+		useStatementNamespaces="true"
+		lazyLoadingEnabled="true"
+	/>
 	
 	<transactionManager type="JDBC">
 		<dataSource type="SIMPLE"> 
@@ -31,6 +34,8 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2FileChargeIndependentAnalysisSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2FileScanChargeSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2FileChargeDependentAnalysisSqlMap.xml"/>
-	
-	
+
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchResultSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsProteinMatchSqlMap.xml" />
+
 </sqlMapConfig>	

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsDatabase"> 
+
+
+	<typeAlias alias="MsDatabase" type="org.yeastrc.ms.dto.MsSequenceDatabase"/>
+	
+	
+	<resultMap class="MsDatabase" id="msDatabaseResult">
+		<result property="id" column="id"/>
+		<result property="serverAddress" column="serverAddress"/>
+		<result property="serverPath" column="serverPath"/>
+		<result property="sequenceLength" column="sequenceLength" nullValue="-1"/>
+		<result property="proteinCount" column="proteinCount" nullValue="-1"/>
+	</resultMap>
+	
+	
+	
+	<parameterMap class="MsDatabase" id="msDatabaseParam">
+		<parameter property="serverAddress" jdbcType="VARCHAR"/>
+		<parameter property="serverPath" jdbcType="VARCHAR"/>
+		<parameter property="sequenceLength" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="proteinCount" jdbcType="INTEGER" nullValue="-1"/>
+	</parameterMap>
+	
+	
+	<!-- ================================================================================= -->
+	<!-- QUERIES INVOLVING ONLY msSequenceDatabaseDetails TABLE -->
+	<!-- ================================================================================= -->
+    <select id="selectDatabaseIdByServerAddressAndPath" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msSequenceDatabaseDetails WHERE 
+    	serverAddress = #serverAddress#
+    	AND serverPath = #serverPath#
+    </select>
+    
+    <select id="selectDatabaseIdMatchAllCols" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msSequenceDatabaseDetails WHERE 
+    	serverAddress = #serverAddress#
+    	AND serverPath = #serverPath#
+    	AND sequenceLength = #sequenceLength#
+    	AND proteinCount = #proteinCount#
+    </select>
+    
+    <insert id="insert" parameterMap="msDatabaseParam">
+    	INSERT INTO msSequenceDatabaseDetails (
+    	serverAddress,
+    	serverPath,
+    	sequenceLength,
+    	proteinCount)
+    	VALUES (?,?,?,?)
+    </insert>
+    
+    <!-- ================================================================================= -->
+	<!-- QUERIES INVOLVING ONLY msSearchDatabase TABLE -->
+	<!-- ================================================================================= -->
+    <insert id="insertSearchDatabase" parameterClass="java.util.Map">
+    	INSERT INTO msSearchDatabase (searchID, databaseID) values(#searchId#, #databaseId#)
+    </insert>
+    
+    <delete id="deleteSearchDatabases" parameterClass="Integer">
+		DELETE FROM msSearchDatabase WHERE searchID=#id#
+    </delete>
+	
+	<!-- ================================================================================= -->
+	<!-- QUERIES INVOLVING BOTH msSearchDatabase AND msSequenceDatabaseDetails TABLEs -->
+	<!-- ================================================================================= -->
+	<select id="selectSearchDatabases" resultMap="MsDatabase" parameterClass="Integer">
+		SELECT * FROM msSequenceDatabaseDetails as db, msSearchDatabase as searchDb
+		WHERE db.id = searchDb.searchID
+		AND db.id = #id#
+	</select>
+    
+</sqlMap>

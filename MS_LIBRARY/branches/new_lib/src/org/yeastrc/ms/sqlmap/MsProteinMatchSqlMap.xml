@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsResultProtein"> 
+
+	<typeAlias alias="MsResultProtein" type="org.yeastrc.ms.dto.MsProteinMatch"/>
+	
+	
+	<resultMap class="MsResultProtein" id="msResultProteinResult">
+		<result property="id" column="id"/>
+		<result property="resultId" column="resultID"/>
+		<result property="accession" column="accession"/>
+		<result property="description" column="description"/>
+	</resultMap>
+	
+	<parameterMap class="MsResultProtein" id="msResultProteinParam">
+		<parameter property="resultId" jdbcType="INTEGER"/>
+		<parameter property="accession" jdbcType="VARCHAR"/>
+		<parameter property="description" jdbcType="TEXT"/>
+	</parameterMap>
+	
+    <select id="selectResultProteins" resultMap="msResultProteinResult" parameterClass="Integer">
+    	SELECT * FROM msProteinMatch WHERE resultID= #id#
+    </select>
+    
+    
+    <insert id="insert" parameterMap="msResultProteinParam">
+    	INSERT INTO msProteinMatch (
+    	resultID,
+    	accession,
+    	description)
+    	VALUES (?,?,?)
+    </insert>
+    
+    <delete id="deleteForResultId" parameterClass="Integer">
+		DELETE FROM msProteinMatch WHERE resultID=#id#
+    </delete>
+    
+</sqlMap>

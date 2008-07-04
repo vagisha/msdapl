@@ -19,6 +19,7 @@ import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
 public class DAOFactory {
 
+    // DAOs for run related objects
     private MsExperimentDAO expDAO;
     private MsDigestionEnzymeDAO enzymeDAO;
     private MsRunDAO runDAO;
@@ -30,6 +31,9 @@ public class DAOFactory {
     private MS2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
     private MS2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
+    // DAOs for peptide search related objects
+    private MsPeptideSearchResultDAO searchResultDAO;
+    private MsProteinMatchDAO resultProteinDAO;
     
     private static final Logger log = Logger.getLogger(DAOFactory.class);
     
@@ -67,6 +71,9 @@ public class DAOFactory {
         ms2FileHeadersDAO = new MS2FileHeaderDAOImpl(sqlMap);
         ms2ChgDAnalysisDAO = new MS2FileChargeDependentAnalysisDAOImpl(sqlMap);
         ms2ChgIAnalysisDAO = new MS2FileChargeIndependentAnalysisDAOImpl(sqlMap);
+        
+        searchResultDAO = new MsPeptideSearchResultDAOImpl(sqlMap);
+        resultProteinDAO = new MsProteinMatchDAOImpl(sqlMap);
     }
     
     public static DAOFactory instance() {
@@ -103,5 +110,13 @@ public class DAOFactory {
     
     public MS2FileChargeIndependentAnalysisDAO getMs2FileChargeIAnalysisDAO() {
         return ms2ChgIAnalysisDAO;
+    }
+    
+    public MsPeptideSearchResultDAO getMsPeptideSearchResultDAO() {
+        return searchResultDAO;
+    }
+    
+    public MsProteinMatchDAO getMsProteinmatchDAO() {
+        return resultProteinDAO;
     }
 }

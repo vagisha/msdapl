@@ -133,7 +133,7 @@ public class Ms2FileToDbConverter {
         while(headerIterator.hasNext()) {
             Entry<String, String> headerEntry = headerIterator.next();
             MS2FileHeader h = new MS2FileHeader();
-            h.setHeaderName(headerEntry.getKey());
+            h.setName(headerEntry.getKey());
             h.setValue(headerEntry.getValue());
         }
         

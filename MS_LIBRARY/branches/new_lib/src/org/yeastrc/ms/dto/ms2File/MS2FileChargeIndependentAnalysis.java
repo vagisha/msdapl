@@ -10,12 +10,11 @@ package org.yeastrc.ms.dto.ms2File;
  * Represents an "I" line in the MS2 file.  Charge independent analysis for a particular scan.
  * There can be multiple "I" lines in the MS2 file for a single scan.
  */
-public class MS2FileChargeIndependentAnalysis {
+public class MS2FileChargeIndependentAnalysis extends BaseHeader {
 
     private int id;             // unique id (database)
     private int scanId;         // id (database) of the scan that was analyzed
-    private String header;      // the label of the analysis data
-    private String value;       // the value of the analysis data
+    
     /**
      * @return the id
      */
@@ -40,30 +39,4 @@ public class MS2FileChargeIndependentAnalysis {
     public void setScanId(int scanId) {
         this.scanId = scanId;
     }
-    /**
-     * @return the header
-     */
-    public String getHeader() {
-        return header;
-    }
-    /**
-     * @param header the header to set
-     */
-    public void setHeader(String header) {
-        this.header = header;
-    }
-    /**
-     * @return the value
-     */
-    public String getValue() {
-        return value;
-    }
-    /**
-     * @param value the value to set
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
-    
-    
 }
