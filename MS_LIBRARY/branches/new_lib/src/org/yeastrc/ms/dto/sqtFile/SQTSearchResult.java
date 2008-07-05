@@ -12,16 +12,17 @@ public class SQTSearchResult extends MsPeptideSearchResult {
     private BigDecimal xCorr;
     private BigDecimal sp;
     
+    
     /**
      * @return the xCorrRank
      */
-    public int getXCorrRank() {
+    public int getxCorrRank() {
         return xCorrRank;
     }
     /**
      * @param corrRank the xCorrRank to set
      */
-    public void setXCorrRank(int corrRank) {
+    public void setxCorrRank(int corrRank) {
         xCorrRank = corrRank;
     }
     /**
@@ -51,13 +52,13 @@ public class SQTSearchResult extends MsPeptideSearchResult {
     /**
      * @return the xCorr
      */
-    public BigDecimal getXCorr() {
+    public BigDecimal getxCorr() {
         return xCorr;
     }
     /**
      * @param corr the xCorr to set
      */
-    public void setXCorr(BigDecimal corr) {
+    public void setxCorr(BigDecimal corr) {
         xCorr = corr;
     }
     /**

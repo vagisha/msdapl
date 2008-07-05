@@ -13,6 +13,8 @@ import java.util.List;
 
 public class MsPeptideSearchResult {
 
+    private static final char EMPTY_CHAR = '\u0000';
+    
     private int id; // unique id (database) for this search result
     private int searchId; // id (database) of the search this result belongs to
     private int scanId; // id (database) of the scan with which this result is associated
@@ -21,9 +23,9 @@ public class MsPeptideSearchResult {
     private BigDecimal calculatedMass;
     private int numIonsMatched;
     private int numIonsPredicted;
-    private char preResidue; // residue to the left of the N-term cleavage side
-    private char postResidue; // residue to the right of the C-term cleavage side
-    private char validationStatus;
+    private char preResidue = EMPTY_CHAR; // residue to the left of the N-term cleavage side
+    private char postResidue = EMPTY_CHAR; // residue to the right of the C-term cleavage side
+    private char validationStatus = EMPTY_CHAR;
     
     private String peptide;
     
@@ -145,6 +147,8 @@ public class MsPeptideSearchResult {
     }
 
     public String getPreResidueString() {
+        if (preResidue == EMPTY_CHAR)
+            return null;
         return new Character(preResidue).toString();
     }
     
@@ -156,7 +160,7 @@ public class MsPeptideSearchResult {
     }
 
     public void setPreResidueString(String preResidue) {
-        if (preResidue.length() > 0)
+        if (preResidue == null || preResidue.length() > 0)
             this.preResidue = preResidue.charAt(0);
     }
     
@@ -168,6 +172,8 @@ public class MsPeptideSearchResult {
     }
     
     public String getPostResidueString() {
+        if (postResidue == EMPTY_CHAR)
+            return null;
         return new Character(postResidue).toString();
     }
 
@@ -179,7 +185,7 @@ public class MsPeptideSearchResult {
     }
 
     public void setPostResidueString(String postResidue) {
-        if (postResidue.length() > 0)
+        if (postResidue == null || postResidue.length() > 0)
             this.postResidue = postResidue.charAt(0);
     }
     
@@ -191,6 +197,8 @@ public class MsPeptideSearchResult {
     }
 
     public String getValidationStatusString() {
+        if (validationStatus == EMPTY_CHAR)
+            return null;
         return new Character(validationStatus).toString();
     }
     
@@ -202,7 +210,7 @@ public class MsPeptideSearchResult {
     }
 
     public void setValidationStatusString(String status) {
-        if (status.length() > 0)
+        if (status == null || status.length() > 0)
             this.validationStatus = status.charAt(0);
     }
     

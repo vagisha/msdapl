@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 public class MsProteinMatchDAOImplTest extends TestCase {
 
 
-    private MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinmatchDAO();
+    private MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
     
     private MsProteinMatch match1_1;
     private MsProteinMatch match1_2;

@@ -66,12 +66,12 @@ public class MsSearchModDAOImpl extends BaseSqlMapDAO implements MsSearchModDAO 
     public void deleteDynamicModificationsForSearch(int searchId) {
         List<Integer> modIds = queryForList("MsSearchMod.selectDynaModIdsForSearch", searchId);
         // delete entries linking these dynamic modifications to search results
-        deleteDynamicModificationsForSearchResult(modIds);
+        deleteResultDynaModsForModIds(modIds);
         // delete the dynamic modifications
         delete("MsSearchMod.deleteDynaModsForSearch", searchId);
     }
     
-    private void deleteDynamicModificationsForSearchResult(List<Integer> modIds) {
+    private void deleteResultDynaModsForModIds(List<Integer> modIds) {
         if (modIds.size() > 0) {
             StringBuilder buf = new StringBuilder();
             buf.append("(");
@@ -82,7 +82,7 @@ public class MsSearchModDAOImpl extends BaseSqlMapDAO implements MsSearchModDAO 
             buf.deleteCharAt(buf.length() - 1); // remove the last comma
             buf.append(")");
             String idListString = buf.toString();
-            delete("MsSearchMod.deleteDynaModsForSearchResult", idListString);
+            delete("MsSearchMod.deleteDynaModsForModIds", idListString);
         }
     }
 
@@ -98,5 +98,9 @@ public class MsSearchModDAOImpl extends BaseSqlMapDAO implements MsSearchModDAO 
         map.put("modId", modificationId);
         map.put("position", position);
         save("MsSearchMod.insertResultDynaMod", map);
+    }
+
+    public void deleteDynamicModificationsForResult(int resultId) {
+        delete("MsSearchMod.deleteDynaModsForSearchResult", resultId);
     }
 }

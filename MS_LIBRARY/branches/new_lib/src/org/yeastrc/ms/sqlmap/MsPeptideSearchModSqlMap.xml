@@ -24,6 +24,8 @@
 	</resultMap>
 	
 	<resultMap class="MsSearchResultDynaMod" id="msResultDynaModResult">
+		<result property="modificationId" column="modID"/>
+		<result property="resultId" column="resultID"/>
 		<result property="modifiedResidueString" column="residue" javaType="java.lang.String"/>
 		<result property="modificationMass" column="modifier"/>
 		<result property="modificationSymbolString" column="symbol" javaType="java.lang.String" nullValue=""/>
@@ -77,7 +79,7 @@
     </select>
     
     <select id="selectDynaModsForSearchResult" resultMap="msResultDynaModResult" parameterClass="Integer">
-    	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.position
+    	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID, rMod.position
     	FROM msPeptideSearchDynamicMod as sMod,
     	msDynamicModResult as rMod
     	WHERE sMod.id = rMod.modID
@@ -109,8 +111,12 @@
 		DELETE FROM msPeptideSearchDynamicMod WHERE searchID=#id#
     </delete>
     
-    <delete id="deleteDynaModsForSearchResult" parameterClass="String">
+    <delete id="deleteDynaModsForModIds" parameterClass="String">
 		DELETE FROM msDynamicModResult WHERE modID IN $idString$
+    </delete>
+    
+    <delete id="deleteDynaModsForSearchResult" parameterClass="Integer">
+		DELETE FROM msDynamicModResult WHERE resultID = #resultId#
     </delete>
     
 </sqlMap>

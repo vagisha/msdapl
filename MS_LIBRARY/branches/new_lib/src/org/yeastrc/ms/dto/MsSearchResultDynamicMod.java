@@ -5,10 +5,38 @@ import java.math.BigDecimal;
 
 public class MsSearchResultDynamicMod {
 
+    private int modId;
+    private int resultId;
     private char modifiedResidue;
     private BigDecimal modificationMass;
     private int modPosition;
     private char modificationSymbol;
+    
+    
+    /**
+     * @return the modId
+     */
+    public int getModificationId() {
+        return modId;
+    }
+    /**
+     * @param modId the modId to set
+     */
+    public void setModificationId(int modId) {
+        this.modId = modId;
+    }
+    /**
+     * @return the resultId
+     */
+    public int getResultId() {
+        return resultId;
+    }
+    /**
+     * @param resultId the resultId to set
+     */
+    public void setResultId(int resultId) {
+        this.resultId = resultId;
+    }
     
     /**
      * @return the modPosition
@@ -96,5 +124,4 @@ public class MsSearchResultDynamicMod {
     public void setModificationMass(BigDecimal modificationMass) {
         this.modificationMass = modificationMass;
     }
-
 }

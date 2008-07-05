@@ -14,6 +14,8 @@ import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImpl;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -21,27 +23,6 @@ import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
 public class DAOFactory {
 
-    // DAOs for run related objects
-    private MsExperimentDAO expDAO;
-    private MsDigestionEnzymeDAO enzymeDAO;
-    private MsRunDAO runDAO;
-    private MsScanDAO scanDAO;
-    
-    // related to MS2 files. 
-    private MS2FileScanChargeDAO ms2FileScanChargeDAO;
-    private MS2FileHeaderDAO ms2FileHeadersDAO;
-    private MS2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
-    private MS2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
-    
-    // DAOs for peptide search related objects
-    private MsPeptideSearchResultDAO searchResultDAO;
-    private MsProteinMatchDAO resultProteinDAO;
-    private MsSearchModDAO modDAO;
-    private MsSequenceDatabaseDAO seqDbDao;
-    
-    // DAOs for SQT file related objects
-    private SQTSearchHeaderDAO sqtHeaderDao;
-    
     private static final Logger log = Logger.getLogger(DAOFactory.class);
     
     // initialize the SqlMapClient
@@ -67,6 +48,28 @@ public class DAOFactory {
     
     private static DAOFactory instance = new DAOFactory();
     
+    // DAOs for run related objects
+    private MsExperimentDAO expDAO;
+    private MsDigestionEnzymeDAO enzymeDAO;
+    private MsRunDAO runDAO;
+    private MsScanDAO scanDAO;
+    
+    // related to MS2 files. 
+    private MS2FileScanChargeDAO ms2FileScanChargeDAO;
+    private MS2FileHeaderDAO ms2FileHeadersDAO;
+    private MS2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
+    private MS2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
+    
+    // DAOs for peptide search related objects
+    private MsPeptideSearchResultDAO searchResultDAO;
+    private MsProteinMatchDAO resultProteinDAO;
+    private MsSearchModDAO modDAO;
+    private MsSequenceDatabaseDAO seqDbDao;
+    
+    // DAOs for SQT file related objects
+    private SQTSearchHeaderDAO sqtHeaderDao;
+    private SQTSearchResultDAO sqtResultDao;
+    
     private DAOFactory() {
         
         expDAO = new MsExperimentDAOImpl(sqlMap);
@@ -85,6 +88,7 @@ public class DAOFactory {
         seqDbDao = new MsSequenceDatabaseDAOImpl(sqlMap);
         
         sqtHeaderDao = new SQTSearchHeaderDAOImpl(sqlMap);
+        sqtResultDao = new SQTSearchResultDAOImpl(sqlMap);
     }
     
     public static DAOFactory instance() {
@@ -127,7 +131,7 @@ public class DAOFactory {
         return searchResultDAO;
     }
     
-    public MsProteinMatchDAO getMsProteinmatchDAO() {
+    public MsProteinMatchDAO getMsProteinMatchDAO() {
         return resultProteinDAO;
     }
     
@@ -141,5 +145,9 @@ public class DAOFactory {
     
     public SQTSearchHeaderDAO getSqtHeaderDAO() {
         return sqtHeaderDao;
+    }
+    
+    public SQTSearchResultDAO getSqtResultDAO() {
+        return sqtResultDao;
     }
 }

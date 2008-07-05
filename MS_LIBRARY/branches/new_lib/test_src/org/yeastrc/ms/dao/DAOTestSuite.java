@@ -15,11 +15,18 @@ public class DAOTestSuite {
         suite.addTestSuite(MsRunDAOImplTest.class);
         suite.addTestSuite(MsScanDAOImplTest.class);
         
+        // search results
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);
         suite.addTestSuite(MsSearchModDAOImplTest.class);
+        suite.addTestSuite(MsPeptideSearchResultDAOImplTest.class);
+        
+        // search
         suite.addTestSuite(MsSequenceDatabaseDAOImplTest.class);
         
+        // SQT search
         suite.addTestSuite(SQTSearchHeaderDAOImplTest.class);
+        
+        
         //$JUnit-END$
         return suite;
     }

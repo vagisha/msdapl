@@ -21,7 +21,7 @@ public interface MsSearchModDAO {
     public abstract int saveDynamicModification(MsSearchDynamicMod mod);
 
     /**
-     * This will delete all dynamic modifications for a search.
+     * This will delete all dynamic modifications for a search result.
      * If any of the modifications are related to results from the search 
      * they are deleted as well (from the msDynamicModResult table).
      * @param searchId
@@ -32,5 +32,7 @@ public interface MsSearchModDAO {
             int resultId);
     
     public abstract void saveDynamicModificationForSearchResult(int resultId, int modificationId, int position);
+
+    public void deleteDynamicModificationsForResult(int resultId);
 
 }

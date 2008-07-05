@@ -42,5 +42,6 @@
 	
 	<!-- Related to SQT files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchHeaderSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchResultSqlMap.xml"/>
 
 </sqlMapConfig>	
