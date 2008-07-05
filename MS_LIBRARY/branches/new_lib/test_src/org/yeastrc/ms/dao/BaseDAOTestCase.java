@@ -24,11 +24,11 @@ import junit.framework.TestCase;
  */
 public class BaseDAOTestCase extends TestCase {
 
-    MsPeptideSearchDAO searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
-    MsPeptideSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
-    MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
-    MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-    MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
+    protected MsPeptideSearchDAO searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
+    protected MsPeptideSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
+    protected MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
+    protected MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
+    protected MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
 
     protected void setUp() throws Exception {
         super.setUp();

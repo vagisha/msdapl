@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImplTest;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImplTest;
 
 public class DAOTestSuite {
 
@@ -27,7 +28,7 @@ public class DAOTestSuite {
         
         // SQT search
         suite.addTestSuite(SQTSearchHeaderDAOImplTest.class);
-        
+        suite.addTestSuite(SQTSearchResultDAOImplTest.class);
         
         //$JUnit-END$
         return suite;

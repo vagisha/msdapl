@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="SqtResult"> 
+
+
+	<typeAlias alias="SqtResult" type="org.yeastrc.ms.dto.sqtFile.SQTSearchResult"/>
+	
+	
+	<resultMap class="SqtResult" id="sqtResult" extends="MsSearchResult.msSearchResult">
+		<result property="resultId" column="resultID"/>
+		<result property="xCorrRank" column="XCorrRank"/>
+		<result property="spRank" column="spRank"/>
+		<result property="deltaCN" column="deltaCN"/>
+		<result property="xCorr" column="XCorr"/>
+		<result property="sp" column="sp"/>
+	</resultMap>
+	
+	<!-- None of the columns in SQTSearchResult can be null but in case
+		 we try to save a SqtResult object with resultId or xCorrRank or spRank == 0
+		 we should use NULL in the INSERT statement. This will result in a RuntimeException
+	 -->
+	<parameterMap class="SqtResult" id="sqtResultParam">
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="spRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="deltaCN" jdbcType="DECIMAL"/>
+		<parameter property="xCorr" jdbcType="DECIMAL"/>
+		<parameter property="sp" jdbcType="DECIMAL"/>
+		
+	</parameterMap>
+	
+    
+    <select id="select" resultMap="sqtResult" parameterClass="Integer">
+		SELECT * FROM SQTSearchResult
+		LEFT JOIN msPeptideSearchResult
+		ON (SQTSearchResult.resultID = msPeptideSearchResult.id)
+		WHERE resultID = #id#
+	</select>
+	
+    
+    <insert id="insert" parameterMap="sqtResultParam">
+    	INSERT INTO SQTSearchResult (resultID, XCorrRank, spRank, deltaCN, XCorr, sp) 
+    	VALUES (?,?,?,?,?,?)
+    </insert>
+    
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM SQTSearchResult WHERE resultID=#id#
+    </delete>
+    
+</sqlMap>
