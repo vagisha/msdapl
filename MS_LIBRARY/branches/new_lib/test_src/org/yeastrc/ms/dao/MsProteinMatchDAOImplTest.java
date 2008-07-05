@@ -6,13 +6,9 @@ import java.util.List;
 
 import org.yeastrc.ms.dto.MsProteinMatch;
 
-import junit.framework.TestCase;
-
-public class MsProteinMatchDAOImplTest extends TestCase {
+public class MsProteinMatchDAOImplTest extends BaseDAOTestCase {
 
 
-    private MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
-    
     private MsProteinMatch match1_1;
     private MsProteinMatch match1_2;
     private MsProteinMatch match1_3;

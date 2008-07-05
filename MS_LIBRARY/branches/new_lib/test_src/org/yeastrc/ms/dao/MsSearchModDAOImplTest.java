@@ -6,15 +6,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.yeastrc.ms.dto.MsSearchDynamicMod;
 import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
 
-public class MsSearchModDAOImplTest extends TestCase {
+public class MsSearchModDAOImplTest extends BaseDAOTestCase {
 
-    private MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
     private MsSearchDynamicMod mod1_1;
     private MsSearchDynamicMod mod1_2;
     private MsSearchDynamicMod mod2_1;

@@ -19,9 +19,11 @@ public class DAOTestSuite {
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);
         suite.addTestSuite(MsSearchModDAOImplTest.class);
         suite.addTestSuite(MsPeptideSearchResultDAOImplTest.class);
+        suite.addTestSuite(MsPeptideSearchDAOImplTest.class);
         
         // search
         suite.addTestSuite(MsSequenceDatabaseDAOImplTest.class);
+        
         
         // SQT search
         suite.addTestSuite(SQTSearchHeaderDAOImplTest.class);

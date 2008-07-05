@@ -8,6 +8,7 @@ package org.yeastrc.ms.dto;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class MsPeptideSearch {
     private String searchEngineName;
     private String searchEngineVersion;
     private Date searchDate;
-    private int searchDuration;
+    private int searchDuration; // number of minutes for the search
     private String precursorMassType; // monoisotopic or average
     private BigDecimal precursorMassTolerance;
     private String fragmentMassType; // monoisotopic or average

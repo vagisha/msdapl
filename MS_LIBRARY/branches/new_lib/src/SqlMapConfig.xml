@@ -36,6 +36,7 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2FileChargeDependentAnalysisSqlMap.xml"/>
 
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchResultSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsProteinMatchSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchModSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSequenceDatabaseSqlMap.xml"/>

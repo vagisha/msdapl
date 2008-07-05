@@ -61,6 +61,7 @@ public class DAOFactory {
     private MS2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
     // DAOs for peptide search related objects
+    private MsPeptideSearchDAO searchDAO;
     private MsPeptideSearchResultDAO searchResultDAO;
     private MsProteinMatchDAO resultProteinDAO;
     private MsSearchModDAO modDAO;
@@ -82,6 +83,7 @@ public class DAOFactory {
         ms2ChgDAnalysisDAO = new MS2FileChargeDependentAnalysisDAOImpl(sqlMap);
         ms2ChgIAnalysisDAO = new MS2FileChargeIndependentAnalysisDAOImpl(sqlMap);
         
+        searchDAO = new MsPeptideSearchDAOImpl(sqlMap);
         searchResultDAO = new MsPeptideSearchResultDAOImpl(sqlMap);
         resultProteinDAO = new MsProteinMatchDAOImpl(sqlMap);
         modDAO = new MsSearchModDAOImpl(sqlMap);
@@ -125,6 +127,10 @@ public class DAOFactory {
     
     public MS2FileChargeIndependentAnalysisDAO getMs2FileChargeIAnalysisDAO() {
         return ms2ChgIAnalysisDAO;
+    }
+    
+    public MsPeptideSearchDAO getMsPeptideSearchDAO() {
+        return searchDAO;
     }
     
     public MsPeptideSearchResultDAO getMsPeptideSearchResultDAO() {

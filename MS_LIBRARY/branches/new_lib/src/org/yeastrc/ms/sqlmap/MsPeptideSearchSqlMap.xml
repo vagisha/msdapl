@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsSearch"> 
+
+	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dto.MsPeptideSearch"/>
+	
+	<resultMap class="MsSearch" id="msSearchResult">
+		<result property="id" column="id" />
+		<result property="runId" column="runID" />
+		<result property="originalFileType" column="originalFileType" />
+		<result property="searchEngineName" column="analysisProgramName" />
+		<result property="searchEngineVersion" column="analysisProgramVersion" />
+		<result property="searchDate" column="searchDate" />
+		<result property="searchDuration" column="searchDuration" nullValue="0"/>
+		<result property="precursorMassType" column="precursorMassMethod" />
+		<result property="precursorMassTolerance" column="precursorMassTolerance"/>
+		<result property="fragmentMassType" column="fragmentMassMethod" />
+		<result property="fragmentMassTolerance" column="fragmentMassTolerance"/>
+		<result property="searchDatabases" 
+				select="MsDatabase.selectSearchDatabases" 
+				column="id"/>
+		<result property="staticModifications" 
+				select="MsSearchMod.selectStaticModsForSearch" 
+				column="id" />
+		<result property="dynamicModifications"
+				select="MsSearchMod.selectDynaModsForSearch"
+				column="id" />
+	</resultMap>
+	
+	
+	<parameterMap class="MsSearch" id="msSearchParam">
+		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="originalFileType" jdbcType="VARCHAR" />
+		<parameter property="searchEngineName" jdbcType="VARCHAR" />
+		<parameter property="searchEngineVersion" jdbcType="VARCHAR"/>
+		<parameter property="searchDate" jdbcType="DATE" />
+		<parameter property="searchDuration" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="precursorMassType" jdbcType="VARCHAR" />
+		<parameter property="precursorMassTolerance" jdbcType="DECIMAL" />
+		<parameter property="fragmentMassType" jdbcType="VARCHAR" />
+		<parameter property="fragmentMassTolerance" jdbcType="DECIMAL" />
+	</parameterMap>
+	
+    <select id="select" resultMap="msSearchResult" parameterClass="Integer">
+    	SELECT * FROM msPeptideSearch WHERE id = #id#
+    </select>
+    
+    <select id="selectSearchesForRun" resultMap="msSearchResult" parameterClass="Integer">
+    	SELECT * FROM msPeptideSearch WHERE runID = #id#
+    </select>
+    
+     <select id="selectSearchIdsForRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msPeptideSearch WHERE runID = #id#
+    </select>
+    
+    
+    <insert id="insert" parameterMap="msSearchParam">
+    	INSERT INTO msPeptideSearch (
+    	runID,
+    	originalFileType,
+    	analysisProgramName,
+    	analysisProgramVersion,
+    	searchDate,
+    	searchDuration,
+    	precursorMassMethod,
+    	precursorMassTolerance,
+    	fragmentMassMethod,
+    	fragmentMassTolerance) 
+    	VALUES (?,?,?,?,?,?,?,?,?,?)
+    	<selectKey resultClass="int" keyProperty="id">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM msPeptideSearch WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

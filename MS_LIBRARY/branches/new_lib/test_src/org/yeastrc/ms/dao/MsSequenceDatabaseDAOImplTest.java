@@ -12,15 +12,11 @@ import java.util.List;
 
 import org.yeastrc.ms.dto.MsSequenceDatabase;
 
-import junit.framework.TestCase;
-
 /**
  * 
  */
-public class MsSequenceDatabaseDAOImplTest extends TestCase {
+public class MsSequenceDatabaseDAOImplTest extends BaseDAOTestCase {
 
-    private MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
-    
     protected void setUp() throws Exception {
         super.setUp();
     }
@@ -42,11 +38,7 @@ public class MsSequenceDatabaseDAOImplTest extends TestCase {
         assertEquals(0, dbs_2.size());
         
         // create a sequence database and assign it to both the search ids
-        MsSequenceDatabase db1 = new MsSequenceDatabase();
-        db1.setServerAddress("serverAddress_1");
-        db1.setServerPath("serverPath_1");
-        db1.setProteinCount(20);
-        db1.setSequenceLength(100);
+        MsSequenceDatabase db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1", 100, 20);
         
         // assign this database to searchId_1; this will return the id from the msSequenceDatabaseDetails table
         int db1_id = seqDbDao.saveSearchDatabase(db1, searchId_1);
@@ -55,9 +47,7 @@ public class MsSequenceDatabaseDAOImplTest extends TestCase {
         assertEquals(db1_id, seqDbDao.saveSearchDatabase(db1, searchId_2));
         
         // create another dababase with some null values
-        MsSequenceDatabase db2 = new MsSequenceDatabase();
-        db2.setServerAddress("serverAddress_1");
-        db2.setProteinCount(20);
+        MsSequenceDatabase db2 = makeSequenceDatabase("serverAddress_1", null, null, 20);
         
         // assign the database to searchId_1; we should get a different id since a new entry will be
         // created in msSequenceDatabaseDetails
