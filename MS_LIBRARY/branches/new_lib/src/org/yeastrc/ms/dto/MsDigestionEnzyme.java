@@ -2,9 +2,11 @@ package org.yeastrc.ms.dto;
 
 public class MsDigestionEnzyme {
 
-    private int id; // id (database) fro the enzyme
+    private int id; // id (database) from the enzyme
     private String name; // Name of the enzyme
-    private short sense; // a value of 0 means the enzyme cleaves on the C-terminal end; 1 means it cleaves on the N-terminal
+    private short sense = -1;   // a value of 0 means the enzyme cleaves on the C-terminal end; 
+                                // 1 means it cleaves on the N-terminal;
+                                // -1 indicates that we don't know where the enzyme cleaves
     private String cut; // amino acid residue(s) where the enzyme cleaves
     private String nocut; // amino acid(s), which when present next to the cleavage site result in no cleavage. 
     private String description; 

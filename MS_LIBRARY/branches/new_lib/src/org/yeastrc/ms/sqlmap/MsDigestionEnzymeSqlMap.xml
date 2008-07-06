@@ -8,7 +8,7 @@
 	<resultMap class="MsEnzyme" id="msEnzymeResult">
 		<result property="id" column="id" />
 		<result property="name" column="name" />
-		<result property="sense" column="sense" />
+		<result property="sense" column="sense" nullValue="-1"/>
 		<result property="cut" column="cut" />
 		<result property="nocut" column="nocut" />
 		<result property="description" column="description" />
@@ -16,7 +16,7 @@
 	
 	<parameterMap class="MsEnzyme" id="msEnzymeParam">
 		<parameter property="name" jdbcType="VARCHAR" />
-		<parameter property="sense" jdbcType="SMALLINT"/>
+		<parameter property="sense" jdbcType="SMALLINT" nullValue="-1"/>
 		<parameter property="cut" jdbcType="VARCHAR"/>
 		<parameter property="nocut" jdbcType="VARCHAR"/>
 		<parameter property="description" jdbcType="TEXT"/>
@@ -30,33 +30,45 @@
         SELECT * FROM msDigestionEnzyme WHERE name = #name#
     </select> 
     
-    <select id="selectEnzyme" resultMap="msEnzymeResult" parameterClass="java.util.Map"> 
-        SELECT * FROM msDigestionEnzyme WHERE 
-        name = #name# 
-        <dynamic prepend="AND">
+    <select id="selectEnzymes" resultMap="msEnzymeResult" parameterClass="java.util.Map"> 
+    	
+        SELECT * FROM msDigestionEnzyme WHERE
+        
+        <isPropertyAvailable property="name">
+        	<isNull property="name">
+        		name IS NULL
+        	</isNull>
+        	<isNotNull property="name">
+        		name = #name#
+        	</isNotNull>
+        </isPropertyAvailable>
+        
+        <isPropertyAvailable prepend="AND" property="sense">
         	<isNull property="sense">
         		sense IS NULL
         	</isNull>
         	<isNotNull property="sense">
         		sense = #sense#
         	</isNotNull>
-        </dynamic>
-        <dynamic prepend="AND">
+        </isPropertyAvailable>
+        
+        <isPropertyAvailable prepend="AND" property="cut">
         	<isNull property="cut">
         		cut IS NULL
         	</isNull>
         	<isNotNull  property="cut">
         		cut = #cut#
         	</isNotNull>
-        </dynamic>
-        <dynamic prepend="AND">
+        </isPropertyAvailable>
+        
+        <isPropertyAvailable prepend="AND" property="nocut">
         	<isNull property="nocut">
         		nocut IS NULL
         	</isNull>
         	<isNotNull property="nocut">
         		nocut = #nocut#
         	</isNotNull>
-        </dynamic>
+        </isPropertyAvailable>
     </select> 
     
     <select id="selectEnzymesForRun" resultMap="msEnzymeResult" parameterClass="Integer">

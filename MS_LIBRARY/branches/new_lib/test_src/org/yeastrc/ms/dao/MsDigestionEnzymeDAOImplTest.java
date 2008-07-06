@@ -1,10 +1,12 @@
 package org.yeastrc.ms.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.yeastrc.ms.dto.MsDigestionEnzyme;
-
 import junit.framework.TestCase;
+
+import org.yeastrc.ms.dao.MsDigestionEnzymeDAO.EnzymeProperties;
+import org.yeastrc.ms.dto.MsDigestionEnzyme;
 
 public class MsDigestionEnzymeDAOImplTest extends TestCase {
 
@@ -20,96 +22,84 @@ public class MsDigestionEnzymeDAOImplTest extends TestCase {
     }
 
     public void testLoadEnzymeString() {
-        MsDigestionEnzyme enzyme = enzymeDao.loadEnzyme("trypsin");
-        assertNotNull(enzyme);
+        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin");
+        assertNotNull(enzymes);
+        assertEquals(1, enzymes.size());
         
-        enzyme = enzymeDao.loadEnzyme("xyz");
-        assertNull(enzyme);
+        enzymes = enzymeDao.loadEnzymes("xyz");
+        assertEquals(0, enzymes.size());
     }
 
     public void testLoadEnzymeStringIntStringString() {
-        MsDigestionEnzyme enzyme = enzymeDao.loadEnzyme("trypsin", 1, "KR", "P");
+        // load an enzyme we know exists in the database
+        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", 1, "KR", "P");
+        assertEquals(1, enzymes.size());
+        MsDigestionEnzyme enzyme = enzymes.get(0);
         assertNotNull(enzyme);
         assertEquals("trypsin".toUpperCase(), enzyme.getName().toUpperCase());
         assertEquals(1, enzyme.getSense());
         assertEquals("KR", enzyme.getCut());
         assertEquals("P", enzyme.getNocut());
         
-        enzyme = enzymeDao.loadEnzyme("trypsin", 0, "KR", "P");
-        assertNull(enzyme);
+        // thi senzyme does not exist in the database.
+        enzymes = enzymeDao.loadEnzymes("trypsin", 0, "KR", "P");
+        assertEquals(0, enzymes.size());
     }
     
-    public void testSaveEnzymeForRun() {
-        // this is an enzyme that should already be in the database
-        MsDigestionEnzyme enzyme = enzymeDao.loadEnzyme("trypsin", 1, "KR", "P");
-        assertNotNull(enzyme);
+    public void testSaveEnzymeForRunCheckName() {
+        // load an enzyme we know exists in the database
+        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", 1, "KR", "P");
+        assertEquals(1, enzymes.size());
+        MsDigestionEnzyme enzyme = enzymes.get(0);
+        int enzyme_db_id = enzyme.getId();
         
-        int eid1 = enzyme.getId();
+        int runId = 20; 
         
-        int runId = 20;
+        // try to link a runid with with this enzyme
+        // the database id returned by the save method should be the same as for the enzyme above
+        int enzymeId_1 = enzymeDao.saveEnzymeforRun(enzyme, runId);
+        assertEquals(enzymeId_1, enzyme_db_id);
         
-        // create a link between the enzyme and the runId
-        int enzymeId = enzymeDao.saveEnzymeforRun(enzyme, runId);
-        // make sure no new entry was created for the enzyme
-        assertEquals(eid1, enzymeId);
+        // we know this enzyme does not exist in the database
+        enzymes = enzymeDao.loadEnzymes("Dummy", 0, "ABC", null);
+        assertEquals(0, enzymes.size());
         
-        // this enzyme should NOT be in the database
-        enzyme = enzymeDao.loadEnzyme("Dummy", 0, "ABC", null);
-        assertNull(enzyme);
-        
+        // save the enzyme
         enzyme = new MsDigestionEnzyme();
         enzyme.setName("Dummy");
         enzyme.setCut("ABC");
         enzyme.setSense((short)0);
         
-        // create a link beween the enzyme and the runID
-        enzymeId = enzymeDao.saveEnzymeforRun(enzyme, runId);
+        // create a link between the enzyme and the runID
+        // this should also save a new entry in the msDigestionEnzyme table
+        int enzymeId_2 = enzymeDao.saveEnzymeforRun(enzyme, runId);
         // make sure a new entry was created for the enzyme
-        assertNotSame(eid1, enzymeId);
-        
+        assertNotSame(enzymeId_1, enzymeId_2);
+
         // make sure we now have two enzyme entries for this run;
-        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymesForRun(20);
+        enzymes = enzymeDao.loadEnzymesForRun(20);
         assertEquals(2, enzymes.size());
+
+
+        // try to create another link for this enzyme to another runId. 
+        // This time specify the parameters that will be used to look for 
+        // a matching run in the database;
+        enzyme = new MsDigestionEnzyme();
+        enzyme.setName("Dummy");
+        EnzymeProperties[] properties = new EnzymeProperties[]{EnzymeProperties.NAME};
+        int enzymeId_3 = enzymeDao.saveEnzymeforRun(enzyme, 30, Arrays.asList(properties));
+        // this should not have saved a new enzyme so the returned id should the the same as before
+        assertEquals(enzymeId_3, enzymeId_2);
         
         
         // clean up 
         // remove entries from the msRunEnzyme table
         enzymeDao.deleteEnzymesByRunId(runId);
+        enzymeDao.deleteEnzymesByRunId(30);
         // remove the new entry we created in the msDigestionEnzyme table
-        enzymeDao.deleteEnzymeById(enzymeId);
+        enzymeDao.deleteEnzymeById(enzymeId_2);
         
-    }
-    
-    public void testSaveEnzymeForRunEnzymeName() {
-        // an enzyme with this name should not exist in the database;
-        MsDigestionEnzyme enzyme = enzymeDao.loadEnzyme("Dummy");
-        assertNull(enzyme);
         
-        int runId = 20;
-        // trying to link this run and enzyme should not succeed.
-        assertFalse(enzymeDao.saveEnzymeForRun("Dummy", runId));
-        
-        // this is an enzyme that exists in the database
-        enzyme = new MsDigestionEnzyme();
-        enzyme.setName("Dummy2");
-        enzyme.setCut("ABC");
-        enzyme.setSense((short)0);
-        enzymeDao.saveEnzyme(enzyme);
-        enzyme = enzymeDao.loadEnzyme("Dummy2", 0, "ABC", null);
-        assertNotNull(enzyme);
-        
-        // we should be able to link this enzyme to the run
-        assertTrue(enzymeDao.saveEnzymeForRun("Dummy2", runId));
-        
-        // make sure we have a single enzyme entry for this run;
-        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymesForRun(20);
-        assertEquals(1, enzymes.size());
-        
-        // clean up
-        // remove entries from the msRunEnzyme table
-        enzymeDao.deleteEnzymesByRunId(runId);
-        // remove the new entry we created in the msDigestionEnzyme table
-        enzymeDao.deleteEnzymeById(enzyme.getId());
     }
     
 }

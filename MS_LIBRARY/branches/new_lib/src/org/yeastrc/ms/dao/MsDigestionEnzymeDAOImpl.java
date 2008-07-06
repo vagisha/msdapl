@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,39 +28,79 @@ public class MsDigestionEnzymeDAOImpl extends BaseSqlMapDAO implements MsDigesti
         return queryForList("MsDigestionEnzyme.selectEnzymesForRun", runId);
     }
 
+    //------------------------------------------------------------------------------------------------
+    // LOAD methods
+    //------------------------------------------------------------------------------------------------
     public MsDigestionEnzyme loadEnzyme(int enzymeId) {
         return (MsDigestionEnzyme) queryForObject("MsDigestionEnzyme.selectEnzymeById", enzymeId);
     }
 
-    public MsDigestionEnzyme loadEnzyme(String name) {
-        return (MsDigestionEnzyme) queryForObject("MsDigestionEnzyme.selectEnzymeByName", name);
+    public List<MsDigestionEnzyme> loadEnzymes(String name) {
+//        return (MsDigestionEnzyme) queryForObject("MsDigestionEnzyme.selectEnzymeByName", name);
+        Map<String, Object> properties = new HashMap<String, Object>(1);
+        properties.put("name", name);
+        return loadEnzymes(properties);
     }
 
-    public MsDigestionEnzyme loadEnzyme(String name, int sense, String cut,
+    public List<MsDigestionEnzyme> loadEnzymes(String name, int sense, String cut,
             String nocut) {
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("name", name);
         map.put("sense", sense);
         map.put("cut", cut);
         map.put("nocut", nocut);
-        return (MsDigestionEnzyme) queryForObject("MsDigestionEnzyme.selectEnzyme", map);
+        return loadEnzymes(map);
     }
 
+    private List<MsDigestionEnzyme> loadEnzymes(Map<String, Object> properties) {
+        if (properties == null || properties.size() == 0)
+            return null;
+        return queryForList("MsDigestionEnzyme.selectEnzymes", properties);
+    }
+    
+    
+    //------------------------------------------------------------------------------------------------
+    // SAVE methods
+    //------------------------------------------------------------------------------------------------
     public int saveEnzyme(MsDigestionEnzyme enzyme) {
+        return saveEnzyme(enzyme, Arrays.asList(EnzymeProperties.values()));
+    }
+    
+    public int saveEnzyme(MsDigestionEnzyme enzyme, List<EnzymeProperties> params) {
+        
+        // TODO if the enzyme given to us already has a database id
+        // exucute an update.  If no database entry was found for the id
+        // throw an exception
+        
+        Map<String, Object> properties = new HashMap<String, Object>(params.size());
+        for (EnzymeProperties param: params) {
+            if (param == EnzymeProperties.NAME)
+                properties.put("name", enzyme.getName());
+            else if (param == EnzymeProperties.SENSE)
+                properties.put("sense", enzyme.getSense());
+            else if (param == EnzymeProperties.CUT)
+                properties.put("cut", enzyme.getCut());
+            else if (param == EnzymeProperties.NOTCUT)
+                properties.put("nocut", enzyme.getNocut());
+        }
+        
+        List<MsDigestionEnzyme> enzymesFromDb = loadEnzymes(properties);
+        // if we found an enzyme return its database id
+        if (enzymesFromDb.size() > 0)   
+            return enzymesFromDb.get(0).getId();
+        
+        // otherwise save the enzyme and returns its database id
         return saveAndReturnId("MsDigestionEnzyme.insert", enzyme);
     }
     
     public int saveEnzymeforRun(MsDigestionEnzyme enzyme, int runId) {
         
-        // check if the enzyme already exists in the database
-        MsDigestionEnzyme enzymeFromDb = loadEnzyme(enzyme.getName(), enzyme.getSense(), enzyme.getCut(), enzyme.getNocut());
+        return saveEnzymeforRun(enzyme, runId, Arrays.asList(EnzymeProperties.values()));
+    }
+    
+    public int saveEnzymeforRun(MsDigestionEnzyme enzyme, int runId, List<EnzymeProperties> properties) {
         
-        int enzymeId = 0;
-        if (enzymeFromDb == null)
-            // if the enzyme does not exist in the database save it first
-            enzymeId = saveEnzyme(enzyme);
-        else 
-            enzymeId = enzymeFromDb.getId();
+        int enzymeId = saveEnzyme(enzyme, properties);
         
         // now save an entry in the msRunEnzyme table liking this enzyme to the given runId
         Map<String, Integer> map = new HashMap<String, Integer>(2);
@@ -70,31 +111,11 @@ public class MsDigestionEnzymeDAOImpl extends BaseSqlMapDAO implements MsDigesti
         return enzymeId;
     }
 
-    /**
-     * First checks if an enzyme by the given name exists in the database. 
-     * If it does, it saves an entry on the msRunEnzyme table linking the enzyme and the run
-     * 
-     * @return true if the an entry was saved in the msRunEnzyme table. This method returns false
-     * if no enzyme by the given name exists in the database.
-     */
-    public boolean saveEnzymeForRun(String enzymeName, int runId) {
-        
-        // check if the enzyme by the given name already exists in the database
-        MsDigestionEnzyme enzymeFromDb = loadEnzyme(enzymeName);
-        
-        if (enzymeFromDb == null)   return false;
-        
-        int enzymeId = enzymeFromDb.getId();
-        
-        // now save an entry in the msRunEnzyme table liking this enzyme to the given runId
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("runID", runId);
-        map.put("enzymeID", enzymeId);
-        save("MsDigestionEnzyme.insertRunEnzyme", map);
-        
-        return true;
-    }
-
+    
+    
+    //------------------------------------------------------------------------------------------------
+    // DELETE methods
+    //------------------------------------------------------------------------------------------------
     public void deleteEnzymeById(int enzymeId) {
         delete("MsDigestionEnzyme.deleteEnzymeById", enzymeId);
     }
