@@ -2,19 +2,18 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.dto.IMsRun;
+import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsRun.RunFileFormat;
 
-public interface MsRunDAO {
+public interface MsRunDAO <T extends MsRun>{
 
     /**
      * Saves the given run in the database and returns the database id for the run.
      * Any enzyme information is saved
-     * Any file-format specific information in the run is also saved.
      * @param run
      * @return
      */
-    public abstract int saveRun(IMsRun run);
+    public abstract int saveRun(T run);
     
     
     /**
@@ -22,25 +21,16 @@ public interface MsRunDAO {
      * @param runId
      * @return
      */
-    public abstract IMsRun loadRun(int runId);
-    
-    /**
-     * Returns a run from the database, along with any file-format specific information 
-     * associated with the run. 
-     * @param runId
-     * @return
-     */
-    public abstract IMsRun loadRunForFormat(int runId);
+    public abstract T loadRun(int runId);
     
     
     /**
      * Returns the list of runs for the given experiment ID.
-     * The returned runs have associated enzyme related information, but NOT any
-     * file-format specific information.
+     * The returned runs have associated enzyme related information
      * @param msExperimentId
      * @return
      */
-    public abstract List<IMsRun> loadExperimentRuns(int msExperimentId);
+    public abstract List<T> loadExperimentRuns(int msExperimentId);
     
     
     /**
@@ -62,9 +52,15 @@ public interface MsRunDAO {
     
     
     /**
+     * Deletes the run with the given id. Enzyme information and scans are also deleted
+     * @param runId
+     */
+    public abstract void delete(int runId);
+    
+    /**
      * This will delete all the runs associated with this experiment, along with
-     * any enzyme entries (msRunEnzyme table) associated with the runs.
-     * File-format specific information associated with the runs is also deleted. 
+     * any enzyme entries (msRunEnzyme table) associated with the runs as well as
+     * the scans.
      * @param msExperimentId
      * @return List of run IDs that were deleted
      */
@@ -75,8 +71,8 @@ public interface MsRunDAO {
      * Returns the original file format for the run.
      * @param runId
      * @return
-     * @throws RuntimeException if a run with the given id is not found in the database
+     * @throws Exception if a run with the given id is not found in the database
      */
-    public abstract RunFileFormat getRunFileFormat(int runId);
+    public abstract RunFileFormat getRunFileFormat(int runId) throws Exception;
 
 }

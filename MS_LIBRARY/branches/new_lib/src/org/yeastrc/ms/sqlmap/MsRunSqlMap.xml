@@ -4,10 +4,11 @@
 <sqlMap namespace="MsRun"> 
 
 	<typeAlias alias="MsRun" type="org.yeastrc.ms.dto.MsRun"/>
+	<typeAlias alias="MS2Run" type="org.yeastrc.ms.dto.ms2File.MS2FileRun"/>
 	
-	<resultMap class="MsRun" id="msRunResult" groupBy="id">
-		<result property="id" column="runID" />
-		<result property="msExperimentId" column="experimentID" />
+	<resultMap class="MsRun" id="msRunResult">
+		<result property="id" column="id" />
+		<result property="msExperimentId" column="experimentID" nullValue="0"/>
 		<result property="fileName" column="filename" />
 		<result property="fileFormat" column="originalFileType" />
 		<result property="sha1Sum" column="sha1Sum" />
@@ -21,15 +22,23 @@
 		<result property="instrumentSN" column="instrumentSN" />
 		<result property="acquisitionMethod" column="acquisitionMethod" />
 		<result property="comment" column="comment" />
-		<result property="enzymeList" resultMap="MsDigestionEnzyme.msEnzymeResult"/>
+		<result property="enzymeList" 
+				column="id" 
+				select="MsDigestionEnzyme.selectEnzymesForRun"/>
+		<discriminator javaType="String" column="originalFileType">
+			<subMap value="MS2" resultMap="ms2RunResult"/>
+		</discriminator>
 	</resultMap>
 	
-	<!--  
-		<result property="enzymeList" resultMap="MsDigestionEnzyme.msEnzymeResult"/>
-		-->
-		
+	<resultMap class="MS2Run" id="ms2RunResult" extends="MsRun.msRunResult">
+		<result property="headerList" 
+				column="id" 
+				select="MS2Header.selectHeadersForRun" />
+	</resultMap>
+	
+	
 	<parameterMap class="MsRun" id="msRunParam">
-		<parameter property="msExperimentId" jdbcType="INTEGER" />
+		<parameter property="msExperimentId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="fileName" jdbcType="VARCHAR"/>
 		<parameter property="sha1Sum" jdbcType="CHAR"/>
 		<parameter property="creationDate" jdbcType="VARCHAR"/>
@@ -46,36 +55,6 @@
 	</parameterMap>
 	
     
-    <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer">
-    	SELECT 
-    	r.id AS runID, 
-    	r.experimentID AS experimentID, 
-    	r.filename AS filename, 
-    	r.sha1Sum AS sha1Sum, 
-    	r.creationTime AS creationTime, 
-    	r.extractor AS extractor,
-    	r.extractorVersion AS extractorVersion,
-    	r.extractorOptions AS extractorOptions,
-    	r.instrumentType AS instrumentType, 
-    	r.instrumentVendor AS instrumentVendor,
-    	r.instrumentSN AS instrumentSN, 
-    	r.dataType AS dataType, 
-    	r.acquisitionMethod AS acquisitionMethod,
-    	r.originalFileType AS originalFileType,
-    	r.comment AS comment,
-    	e.id AS id, 
-    	e.name AS name, 
-    	e.sense AS sense, 
-    	e.cut AS cut, 
-    	e.nocut AS nocut, 
-    	e.description AS description 
-    	FROM msRun AS r 
-    	LEFT JOIN msRunEnzyme ON(r.id = MsRunEnzyme.runID)
-    	LEFT JOIN msDigestionEnzyme AS e ON(msRunEnzyme.enzymeID = e.id)
-    	WHERE r.experimentID=#id#
-    	ORDER BY runID;
-    </select>
-    
     <select id="selectRunIdsForExperiment" resultClass="Integer"> 
         SELECT id FROM msRun WHERE experimentID = #id#
     </select> 
@@ -84,34 +63,13 @@
         SELECT id FROM msRun WHERE filename = #fileName# AND sha1Sum = #sha1Sum#
     </select> 
     
+    <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer">
+    	SELECT * FROM msRun WHERE experimentID=#id#;
+    </select>
+    
+    
     <select id="select" resultMap="msRunResult" parameterClass="Integer"> 
-        SELECT 
-    	r.id AS runID, 
-    	r.experimentID AS experimentID, 
-    	r.filename AS filename, 
-    	r.sha1Sum AS sha1Sum, 
-    	r.creationTime AS creationTime, 
-    	r.extractor AS extractor,
-    	r.extractorVersion AS extractorVersion,
-    	r.extractorOptions AS extractorOptions,
-    	r.instrumentType AS instrumentType, 
-    	r.instrumentVendor AS instrumentVendor,
-    	r.instrumentSN AS instrumentSN, 
-    	r.dataType AS dataType, 
-    	r.acquisitionMethod AS acquisitionMethod,
-    	r.originalFileType AS originalFileType,
-    	r.comment AS comment,
-    	e.id AS id, 
-    	e.name AS name, 
-    	e.sense AS sense, 
-    	e.cut AS cut, 
-    	e.nocut AS nocut, 
-    	e.description AS description 
-    	FROM msRun AS r 
-    	LEFT JOIN msRunEnzyme ON(r.id = MsRunEnzyme.runID)
-    	LEFT JOIN msDigestionEnzyme AS e ON(msRunEnzyme.enzymeID = e.id)
-    	WHERE r.id=#id#
-    	ORDER BY runID;
+        SELECT * FROM msRun WHERE id=#id#
     </select> 
     
     <insert id="insert" parameterMap="msRunParam">
@@ -134,6 +92,10 @@
       		select last_insert_id() as id
     	</selectKey>
     </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM MsRun WHERE id=#id#		    
+    </delete>
     
     <delete id="deleteByExperimentId" parameterClass="Integer">
 		DELETE FROM MsRun WHERE experimentID=#id#		    

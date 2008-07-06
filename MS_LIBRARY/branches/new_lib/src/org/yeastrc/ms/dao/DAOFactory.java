@@ -21,6 +21,7 @@ import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAOImpl;
+import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileScan;
 
@@ -58,7 +59,7 @@ public class DAOFactory {
     // DAOs for run related objects
     private MsExperimentDAO expDAO;
     private MsDigestionEnzymeDAO enzymeDAO;
-    private MsRunDAO runDAO;
+    private MsRunDAO<MsRun> runDAO;
     private MsScanDAO<MsScan> scanDAO;
     
     // related to MS2 files. 
@@ -116,7 +117,7 @@ public class DAOFactory {
         return expDAO;
     }
     
-    public MsRunDAO getMsRunDAO() {
+    public MsRunDAO<MsRun> getMsRunDAO() {
         return runDAO;
     }
     

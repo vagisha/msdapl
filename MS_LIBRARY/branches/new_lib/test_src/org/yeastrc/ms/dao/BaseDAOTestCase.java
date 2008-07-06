@@ -13,25 +13,26 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
 import org.yeastrc.ms.dto.MsProteinMatch;
+import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.MsSearchDynamicMod;
 import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
 import org.yeastrc.ms.dto.MsSequenceDatabase;
 
-import junit.framework.TestCase;
-
 /**
  * 
  */
 public class BaseDAOTestCase extends TestCase {
 
-    protected MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
-    protected MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
+    protected MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
+    protected MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
     
     protected MsPeptideSearchDAO searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
     protected MsPeptideSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
