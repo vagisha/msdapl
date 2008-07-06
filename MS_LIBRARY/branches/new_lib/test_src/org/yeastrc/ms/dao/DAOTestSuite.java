@@ -3,8 +3,10 @@ package org.yeastrc.ms.dao;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImplTest;
+import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAOImplTest;
 
 public class DAOTestSuite {
 
@@ -28,7 +30,10 @@ public class DAOTestSuite {
         
         // SQT search
         suite.addTestSuite(SQTSearchHeaderDAOImplTest.class);
+        suite.addTestSuite(SQTSpectrumDataDAOImplTest.class);
         suite.addTestSuite(SQTSearchResultDAOImplTest.class);
+        suite.addTestSuite(SQTPeptideSearchDAOImplTest.class);
+        
         
         //$JUnit-END$
         return suite;
