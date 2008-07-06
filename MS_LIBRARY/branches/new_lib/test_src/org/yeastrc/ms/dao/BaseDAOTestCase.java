@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
 import org.yeastrc.ms.dto.MsProteinMatch;
@@ -33,6 +34,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
     protected MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
     protected MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
+    protected MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -223,4 +225,15 @@ public class BaseDAOTestCase extends TestCase {
         }
         return cal.getTimeInMillis();
     }
+
+    protected MsDigestionEnzyme makeDigestionEnzyme(String name, int sense,
+            String cut, String nocut) {
+                MsDigestionEnzyme enzyme;
+                enzyme = new MsDigestionEnzyme();
+                enzyme.setName(name);
+                enzyme.setCut(cut);
+                enzyme.setSense((short)sense);
+                enzyme.setNocut(nocut);
+                return enzyme;
+            }
 }

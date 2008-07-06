@@ -3,18 +3,14 @@ package org.yeastrc.ms.dao;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO.EnzymeProperties;
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 
-public class MsDigestionEnzymeDAOImplTest extends TestCase {
+public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
 
-    private MsDigestionEnzymeDAO enzymeDao;
     
     protected void setUp() throws Exception {
         super.setUp();
-        enzymeDao = DAOFactory.instance().getEnzymeDAO();
     }
 
     protected void tearDown() throws Exception {
@@ -65,10 +61,7 @@ public class MsDigestionEnzymeDAOImplTest extends TestCase {
         assertEquals(0, enzymes.size());
         
         // save the enzyme
-        enzyme = new MsDigestionEnzyme();
-        enzyme.setName("Dummy");
-        enzyme.setCut("ABC");
-        enzyme.setSense((short)0);
+        enzyme = makeDigestionEnzyme("Dummy", 0, "ABC", null);
         
         // create a link between the enzyme and the runID
         // this should also save a new entry in the msDigestionEnzyme table
@@ -99,6 +92,22 @@ public class MsDigestionEnzymeDAOImplTest extends TestCase {
         // remove the new entry we created in the msDigestionEnzyme table
         enzymeDao.deleteEnzymeById(enzymeId_2);
         
+    }
+    
+    public void testSenseValue() {
+        MsDigestionEnzyme enzyme = new MsDigestionEnzyme();
+        assertEquals(-1, enzyme.getSense());
+        
+        enzyme.setName("Dummy");
+        
+        int enzymeId = enzymeDao.saveEnzyme(enzyme);
+        
+        MsDigestionEnzyme enzyme_db = enzymeDao.loadEnzyme(enzymeId);
+        assertEquals(-1, enzyme_db.getSense());
+        
+        // clean up
+        enzymeDao.deleteEnzymeById(enzymeId);
+        assertNull(enzymeDao.loadEnzyme(enzymeId));
         
     }
     
