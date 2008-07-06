@@ -109,6 +109,8 @@ public class Peaks {
     }
     
     private void parsePeaksAsString(String peaksString) throws Exception {
+        if (peaksString == null || peaksString.length() == 0)
+            return;
         String[] peaks = peaksString.split(";");
         for (String peak: peaks) {
             String[] peakVals = splitPeakVals(peak);
@@ -116,8 +118,10 @@ public class Peaks {
         }
     }
     
-    private String[] splitPeakVals(String peak) {
+    private String[] splitPeakVals(String peak) throws Exception {
         int i = peak.indexOf(":");
+        if (i < 1)
+            throw new Exception("Error parsing peak data: "+peak);
         String[] vals = new String[2];
         vals[0] = peak.substring(0, i);
         vals[1] = peak.substring(i+1, peak.length());
