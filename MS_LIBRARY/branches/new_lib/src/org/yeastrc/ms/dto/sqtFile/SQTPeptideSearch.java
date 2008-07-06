@@ -13,6 +13,19 @@ public class SQTPeptideSearch extends MsPeptideSearch {
         headers = new ArrayList<SQTSearchHeader>();
     }
 
+    public SQTPeptideSearch(MsPeptideSearch search) {
+        this();
+        setRunId(search.getRunId());
+        setOriginalFileType(search.getOriginalFileType());
+        setSearchEngineName(search.getSearchEngineName());
+        setSearchEngineVersion(search.getSearchEngineVersion());
+        setSearchDate(search.getSearchDate());
+        setSearchDuration(search.getSearchDuration());
+        setPrecursorMassType(search.getPrecursorMassType());
+        setPrecursorMassTolerance(search.getPrecursorMassTolerance());
+        setFragmentMassType(search.getFragmentMassType());
+        setFragmentMassTolerance(search.getFragmentMassTolerance());
+    }
     /**
      * @return the headers
      */

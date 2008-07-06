@@ -2,15 +2,11 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchResult;
 
-public class SQTSearchResultDAOImplTest extends BaseDAOTestCase {
+public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 
-    private SQTSearchResultDAO sqtResDao = DAOFactory.instance().getSqtResultDAO();
-    
     protected void setUp() throws Exception {
         super.setUp();
     }

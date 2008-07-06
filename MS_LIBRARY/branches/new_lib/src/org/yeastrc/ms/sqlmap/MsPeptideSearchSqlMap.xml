@@ -5,6 +5,9 @@
 
 	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dto.MsPeptideSearch"/>
 	
+	<typeAlias alias="SqtSearch" type="org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch"/>
+
+	
 	<resultMap class="MsSearch" id="msSearchResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" />
@@ -26,8 +29,17 @@
 		<result property="dynamicModifications"
 				select="MsSearchMod.selectDynaModsForSearch"
 				column="id" />
+		<discriminator column="analysisProgramName" 
+						javaType="java.lang.String">
+			<subMap value="Sequest" resultMap="sqtSearchResult" />						
+		</discriminator>
 	</resultMap>
 	
+	<resultMap class="SqtSearch" id="sqtSearchResult" extends="MsSearch.msSearchResult">
+		<result property="headers" 
+				select="SqtHeader.selectHeadersForSearch" 
+				column="id"/>
+	</resultMap> 
 	
 	<parameterMap class="MsSearch" id="msSearchParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>

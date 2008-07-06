@@ -12,6 +12,8 @@ import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
@@ -68,8 +70,9 @@ public class DAOFactory {
     private MsSequenceDatabaseDAO seqDbDao;
     
     // DAOs for SQT file related objects
-    private SQTSearchHeaderDAO sqtHeaderDao;
-    private SQTSearchResultDAO sqtResultDao;
+    private SQTSearchHeaderDAO sqtHeaderDAO;
+    private SQTSearchResultDAO sqtResultDAO;
+    private SQTPeptideSearchDAO sqtSearchDAO;
     
     private DAOFactory() {
         
@@ -89,8 +92,10 @@ public class DAOFactory {
         modDAO = new MsSearchModDAOImpl(sqlMap);
         seqDbDao = new MsSequenceDatabaseDAOImpl(sqlMap);
         
-        sqtHeaderDao = new SQTSearchHeaderDAOImpl(sqlMap);
-        sqtResultDao = new SQTSearchResultDAOImpl(sqlMap);
+        sqtHeaderDAO = new SQTSearchHeaderDAOImpl(sqlMap);
+        sqtResultDAO = new SQTSearchResultDAOImpl(sqlMap);
+        sqtSearchDAO = new SQTPeptideSearchDAOImpl(sqlMap);
+        
     }
     
     public static DAOFactory instance() {
@@ -150,10 +155,14 @@ public class DAOFactory {
     }
     
     public SQTSearchHeaderDAO getSqtHeaderDAO() {
-        return sqtHeaderDao;
+        return sqtHeaderDAO;
     }
     
     public SQTSearchResultDAO getSqtResultDAO() {
-        return sqtResultDao;
+        return sqtResultDAO;
+    }
+    
+    public SQTPeptideSearchDAO getSqtSearchDAO() {
+        return sqtSearchDAO;
     }
 }

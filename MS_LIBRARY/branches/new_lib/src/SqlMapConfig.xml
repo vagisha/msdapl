@@ -24,10 +24,18 @@
     	</dataSource>
 	</transactionManager>
 	
+	<!-- Related to experiments and runs -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsExperimentSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsDigestionEnzymeSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanSqlMap.xml"/>
+	
+	<!-- Related to peptide searches -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchResultSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsProteinMatchSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchModSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSequenceDatabaseSqlMap.xml"/>
 	
 	<!-- Related to MS2 files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2FileHeaderSqlMap.xml"/>
@@ -35,12 +43,6 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2FileScanChargeSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2FileChargeDependentAnalysisSqlMap.xml"/>
 
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchResultSqlMap.xml" />
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchSqlMap.xml" />
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsProteinMatchSqlMap.xml" />
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsPeptideSearchModSqlMap.xml" />
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSequenceDatabaseSqlMap.xml"/>
-	
 	<!-- Related to SQT files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchHeaderSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchResultSqlMap.xml"/>

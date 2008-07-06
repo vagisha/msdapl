@@ -6,6 +6,8 @@ import org.yeastrc.ms.dto.MsPeptideSearch;
 
 public interface MsPeptideSearchDAO {
 
+    public abstract MsPeptideSearch loadSearch(int searchId);
+    
     public abstract List<MsPeptideSearch> loadSearchesForRun(int runId);
 
     public abstract List<Integer> loadSearchIdsForRun(int runId);
