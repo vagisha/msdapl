@@ -35,6 +35,10 @@ public class SQTSearchResultDAOImpl extends MsPeptideSearchResultDAOImpl impleme
         return resultId;
     }
     
+    /**
+     * Deletes the search result and any SQT specific information associated with the result
+     * @param resultId
+     */
     public void delete(int resultId) {
         
         // delete the parent entry in the msPeptideSearchResult table

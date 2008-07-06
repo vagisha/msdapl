@@ -9,6 +9,4 @@ public interface SQTSearchResultDAO extends MsPeptideSearchResultDAO {
 
     public abstract int save(SQTSearchResult sqtResult);
 
-    public abstract void delete(int resultId);
-
 }

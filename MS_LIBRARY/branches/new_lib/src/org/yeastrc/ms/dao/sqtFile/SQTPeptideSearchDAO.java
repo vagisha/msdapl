@@ -18,10 +18,4 @@ public interface SQTPeptideSearchDAO extends MsPeptideSearchDAO {
      */
     public abstract int saveSearch(SQTPeptideSearch search);
 
-    /**
-     * Deletes the search and any SQT search headers associated with the run.
-     * @param searchId
-     */
-    public abstract void deleteSearch(int searchId);
-
 }
