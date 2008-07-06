@@ -81,7 +81,7 @@ public class MS2FileScanCharge {
     /**
      * @return the chargeDepAnalysis
      */
-    public List<MS2FileChargeDependentAnalysis> getChargeDepAnalysis() {
+    public List<MS2FileChargeDependentAnalysis> getChargeDependentAnalysis() {
         return chargeDepAnalysis;
     }
 
@@ -92,7 +92,7 @@ public class MS2FileScanCharge {
     /**
      * @param chargeDepAnalysis the chargeDepAnalysis to set
      */
-    public void setChargeDepAnalysis(
+    public void setChargeDependentAnalysis(
             List<MS2FileChargeDependentAnalysis> chargeDepAnalysis) {
         this.chargeDepAnalysis = chargeDepAnalysis;
     }
@@ -102,13 +102,5 @@ public class MS2FileScanCharge {
      */
     public int getChargeDependentAnalysisCount() {
         return chargeDepAnalysis.size();
-    }
-
-    /**
-     * @return {@link Iterator} for the list of {@link Ms2FileChargeDependentAnalysis} for this
-     * predicted scan.
-     */
-    public Iterator<MS2FileChargeDependentAnalysis> getAnalysisIterator() {
-        return chargeDepAnalysis.iterator();
     }
 }

@@ -3,6 +3,8 @@ package org.yeastrc.ms.dao;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAOImplTest;
+import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImplTest;
@@ -17,6 +19,10 @@ public class DAOTestSuite {
         suite.addTestSuite(MsDigestionEnzymeDAOImplTest.class);
         suite.addTestSuite(MsRunDAOImplTest.class);
         suite.addTestSuite(MsScanDAOImplTest.class);
+        
+        // MS2 file data
+        suite.addTestSuite(MS2FileChargeDependentAnalysisDAOImplTest.class);
+        suite.addTestSuite(MS2FileScanChargeDAOImplTest.class);
         
         // search results
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);

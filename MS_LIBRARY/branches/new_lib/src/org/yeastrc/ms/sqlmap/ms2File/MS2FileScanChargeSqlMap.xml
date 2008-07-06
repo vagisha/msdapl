@@ -7,24 +7,31 @@
 	
 	<resultMap class="ScanCharge" id="scanChargeResult">
 		<result property="id" column="id" />
-		<result property="scanId" column="scanID" />
-		<result property="charge" column="charge" />
+		<result property="scanId" column="scanID" nullValue="0"/>
+		<result property="charge" column="charge" nullValue="0"/>
 		<result property="mass" column="mass" />
+		<result property="chargeDependentAnalysis" column="id" select="MS2ChgDAnalysis.selectAnalysisForCharge" />
 	</resultMap>
 	
 	<parameterMap class="ScanCharge" id="scanChargeParam">
-		<parameter property="scanId" jdbcType="INTEGER"/>
-		<parameter property="charge" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="charge" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="mass" jdbcType="DECIMAL" />
 	</parameterMap>
 	
-    <select id="selectChargesForScan" resultMap="scanChargeResult"> 
-        SELECT * FROM MS2FileScanCharge WHERE scanID=#scanId#
-    </select> 
-    
-    <select id="select" resultMap="scanChargeResult" parameterClass="Integer">
-    	SELECT * FROM MS2FileScanCharge WHERE id= #id#
+	
+	<select id="selectIdsForScan" resultClass="Integer"> 
+        SELECT id FROM MS2FileScanCharge WHERE scanID=#scanId#
     </select>
+    
+    <select id="selectForScan" resultMap="scanChargeResult"> 
+        SELECT * FROM MS2FileScanCharge WHERE scanID=#scanId#
+    </select>
+    
+    <select id="selectForScanAndCharge" resultMap="scanChargeResult" parameterClass="java.util.Map">
+    	SELECT * FROM MS2FileScanCharge WHERE scanId = #id# AND charge = #charge#
+    </select>
+    
     
     <insert id="insert" parameterMap="scanChargeParam">
     	INSERT INTO MS2FileScanCharge (scanID, charge, mass) VALUES (?,?,?)
@@ -33,12 +40,17 @@
     	</selectKey>
     </insert>
     
-    <delete id="deleteByRunId" parameterClass="Integer">
-		DELETE MS2FileScanCharge, MS2FileChargeDependentAnalysis 
-		FROM msScan, MS2FileScanCharge, MS2FileChargeDependentAnalysis
-		WHERE msScan.id = MS2FileScanCharge.scanID
-		AND MS2FileScanCharge.id = MS2FileChargeDependentAnalysis.scanChargeID
-		AND msScan.runID = #runID#	    
+    
+    <delete id="deleteByScanId" parameterClass="Integer">
+    	DELETE FROM MS2FileScanCharge WHERE scanID=#id#
+    </delete>
+    
+    <delete id="deleteByScanId_cascade" parameterClass="Integer">
+    	DELETE s, a
+    	FROM MS2FileScanCharge as s
+    	LEFT JOIN MS2FileChargeDependentAnalysis as a
+    	ON (s.id = a.scanChargeID)
+    	WHERE scanID=#id#
     </delete>
     
 </sqlMap>

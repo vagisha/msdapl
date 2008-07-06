@@ -62,18 +62,4 @@ public class MS2FileChargeDependentAnalysisDAOImplTest extends MS2BaseDAOtestCas
         assertEquals(0, dAnalDao.loadAnalysisForScanCharge(3).size());
         
     }
-    
-    protected void compare(MS2FileChargeDependentAnalysis a1, MS2FileChargeDependentAnalysis a2) {
-        assertEquals(a1.getScanChargeId(), a2.getScanChargeId());
-        assertEquals(a1.getName(), a2.getName());
-        assertEquals(a1.getValue(), a2.getValue());
-    }
-    
-    protected MS2FileChargeDependentAnalysis makeDAnalysis(int scanChargeId, String name, String value) {
-        MS2FileChargeDependentAnalysis dAnalysis = new MS2FileChargeDependentAnalysis();
-        dAnalysis.setScanChargeId(scanChargeId);
-        dAnalysis.setName(name);
-        dAnalysis.setValue(value);
-        return dAnalysis;
-    }
 }
