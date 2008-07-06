@@ -18,4 +18,6 @@ public interface MS2FileChargeDependentAnalysisDAO {
     public abstract void save(MS2FileChargeDependentAnalysis analysis);
 
     public abstract List<MS2FileChargeDependentAnalysis> loadAnalysisForScanCharge(int scanChargeId);
+    
+    public abstract void deleteByScanChargeId(int scanChargeId);
 }

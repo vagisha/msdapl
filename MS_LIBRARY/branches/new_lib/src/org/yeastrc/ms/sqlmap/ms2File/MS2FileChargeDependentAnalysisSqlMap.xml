@@ -6,13 +6,14 @@
 	<typeAlias alias="DAnalysis" type="org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis"/>
 	
 	<resultMap class="DAnalysis" id="danalysisResult">
-		<result property="scanChargeId" column="scanChargeID" />
+		<result property="id" column="id" />
+		<result property="scanChargeId" column="scanChargeID" nullValue="0" />
 		<result property="name" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
 	
 	<parameterMap class="DAanalysis" id="danalysisParam">
-		<parameter property="scanChargeId" jdbcType="INTEGER"/>
+		<parameter property="scanChargeId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>
 	</parameterMap>
@@ -26,8 +27,8 @@
     	VALUES (?,?,?)
     </insert>
     
-    <delete id="deleteById" parameterClass="Integer">
-		DELETE FROM MS2FileChargeDependentAnalysis WHERE id=#id#		    
+    <delete id="deleteByScanChargeId" parameterClass="Integer" >
+    	DELETE FROM MS2FileChargeDependentAnalysis WHERE scanChargeID = #id#
     </delete>
     
 </sqlMap>

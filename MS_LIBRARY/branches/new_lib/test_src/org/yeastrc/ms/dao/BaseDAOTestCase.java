@@ -17,6 +17,7 @@ import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
 import org.yeastrc.ms.dto.MsProteinMatch;
+import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.MsSearchDynamicMod;
 import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
@@ -29,6 +30,9 @@ import junit.framework.TestCase;
  */
 public class BaseDAOTestCase extends TestCase {
 
+    protected MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+    protected MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
+    
     protected MsPeptideSearchDAO searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
     protected MsPeptideSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
     protected MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
@@ -236,4 +240,11 @@ public class BaseDAOTestCase extends TestCase {
                 enzyme.setNocut(nocut);
                 return enzyme;
             }
+
+    protected MsScan makeMsScan(int runId, int scanNum) {
+        MsScan scan = new MsScan();
+        scan.setRunId(runId);
+        scan.setStartScanNum(scanNum);
+        return scan;
+    }
 }

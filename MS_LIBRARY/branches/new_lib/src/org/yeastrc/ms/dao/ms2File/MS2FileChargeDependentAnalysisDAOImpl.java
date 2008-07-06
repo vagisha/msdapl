@@ -31,4 +31,8 @@ public class MS2FileChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
         save("MS2ChgDAnalysis.insert", analysis);
     }
 
+    public void deleteByScanChargeId(int scanChargeId) {
+        delete("MS2ChgDAnalysis.deleteByScanChargeId", scanChargeId);
+    }
+
 }

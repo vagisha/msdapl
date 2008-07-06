@@ -12,6 +12,8 @@ import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
+import org.yeastrc.ms.dao.ms2File.MS2FileScanDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileScanDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
@@ -59,6 +61,7 @@ public class DAOFactory {
     private MsScanDAO scanDAO;
     
     // related to MS2 files. 
+    private MS2FileScanDAO ms2ScanDAO;
     private MS2FileScanChargeDAO ms2FileScanChargeDAO;
     private MS2FileHeaderDAO ms2FileHeadersDAO;
     private MS2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
@@ -84,6 +87,7 @@ public class DAOFactory {
         runDAO = new MsRunDAOImpl(sqlMap);
         scanDAO = new MsScanDAOImpl(sqlMap);
         
+        ms2ScanDAO = new MS2FileScanDAOImpl(sqlMap);
         ms2FileScanChargeDAO = new MS2FileScanChargeDAOImpl(sqlMap);
         ms2FileHeadersDAO = new MS2FileHeaderDAOImpl(sqlMap);
         ms2ChgDAnalysisDAO = new MS2FileChargeDependentAnalysisDAOImpl(sqlMap);
@@ -121,6 +125,10 @@ public class DAOFactory {
     
     public MsScanDAO getMsScanDAO() {
         return scanDAO;
+    }
+    
+    public MS2FileScanDAO getMS2FileScanDAO() {
+        return ms2ScanDAO;
     }
     
     public MS2FileScanChargeDAO getMS2FileScanChargeDAO() {
