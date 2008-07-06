@@ -67,18 +67,4 @@ public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {
         assertEquals(0, iAnalDao.loadAnalysisForScan(scanId).size());
         
     }
-    
-    protected MS2FileScan makeMS2FileScan(int runId, int startScanNum, boolean addScanCharges, boolean addChgIAnalysis) {
-        MS2FileScan scan = new MS2FileScan(makeMsScan(runId, startScanNum));
-        if (addScanCharges) {
-            scan.addScanCharge(makeMS2ScanCharge(2, "100.0", true));
-            scan.addScanCharge(makeMS2ScanCharge(3, "200.0", true));
-        }
-        if (addChgIAnalysis) {
-            scan.addChargeIndependentAnalysis(makeIAnalysis("name_1", "value_1"));
-            scan.addChargeIndependentAnalysis(makeIAnalysis("name_2", "value_2"));
-            scan.addChargeIndependentAnalysis(makeIAnalysis("name_3", "value_3"));
-        }
-        return scan;
-    }
 }

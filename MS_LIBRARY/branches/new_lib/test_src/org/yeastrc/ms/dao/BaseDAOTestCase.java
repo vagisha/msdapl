@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Random;
 
 import junit.framework.TestCase;
 
@@ -247,5 +248,61 @@ public class BaseDAOTestCase extends TestCase {
         scan.setRunId(runId);
         scan.setStartScanNum(scanNum);
         return scan;
+    }
+
+    //---------------------------------------------------------------------------------
+    // RUN
+    //---------------------------------------------------------------------------------
+    protected void checkRun(MsRun r1, MsRun r2) {
+        assertEquals(r1.getMsExperimentId(), r2.getMsExperimentId());
+        assertEquals(r1.getFileFormat(), r2.getFileFormat());
+        assertEquals(r1.getFileName(), r2.getFileName());
+        assertEquals(r1.getSha1Sum(), r2.getSha1Sum());
+        assertEquals(r1.getCreationDate(), r2.getCreationDate());
+        assertEquals(r1.getConversionSW(), r2.getConversionSW());
+        assertEquals(r1.getConversionSWOptions(), r2.getConversionSWOptions());
+        assertEquals(r1.getConversionSWVersion(), r2.getConversionSWVersion());
+        assertEquals(r1.getInstrumentModel(), r2.getInstrumentModel());
+        assertEquals(r1.getInstrumentSN(), r2.getInstrumentSN());
+        assertEquals(r1.getInstrumentVendor(), r2.getInstrumentVendor());
+        assertEquals(r1.getDataType(), r2.getDataType());
+        assertEquals(r1.getAcquisitionMethod(), r2.getAcquisitionMethod());
+        assertEquals(r1.getComment(), r2.getComment());
+    }
+
+    protected MsRun createRunWEnzymeInfo(int msExperimentId, List<MsDigestionEnzyme> enzymes) {
+        
+        MsRun run = createRun(msExperimentId);
+        for (MsDigestionEnzyme e: enzymes)
+            run.addEnzyme(e);
+        return run;
+    }
+
+    protected MsRun createRun(int msExperimentId) {
+        MsRun run = new MsRun();
+        run.setMsExperimentId(msExperimentId);
+        run.setFileFormat(MsRun.RunFileFormat.MS2.toString());
+        run.setFileName("my_file1.ms2");
+        run.setAcquisitionMethod("Data dependent");
+        run.setComment("Dummy run");
+        run.setConversionSW("ms2Convert");
+        run.setConversionSWVersion("1.0");
+        run.setConversionSWOptions("options string");
+        run.setDataType("profile");
+        run.setInstrumentModel("ETD");
+        run.setInstrumentVendor("Thermo");
+        run.setSha1Sum("sha1sum");
+        return run;
+    }
+
+    protected void saveScansForRun(int runId, int scanCount) {
+        Random random = new Random();
+        for (int i = 0; i < scanCount; i++) {
+            int scanNum = random.nextInt(100);
+            MsScan scan = new MsScan();
+            scan.setRunId(runId);
+            scan.setStartScanNum(scanNum);
+            scanDao.save(scan);
+        }
     }
 }

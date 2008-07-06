@@ -83,7 +83,7 @@ public class DbToMs2FileConverter {
 
     private List<ScanCharge> getChargeStates(IMsScan scan) {
         MS2FileScanChargeDAO scDao = DAOFactory.instance().getMS2FileScanChargeDAO();
-        List <MS2FileScanCharge> msChgStates = scDao.loadChargesForScan(scan.getId());
+        List <MS2FileScanCharge> msChgStates = scDao.loadScanChargesForScan(scan.getId());
         List <ScanCharge> chgStates = new ArrayList<ScanCharge>(msChgStates.size());
         for (MS2FileScanCharge msChg: msChgStates) {
             ScanCharge chg = new ScanCharge();

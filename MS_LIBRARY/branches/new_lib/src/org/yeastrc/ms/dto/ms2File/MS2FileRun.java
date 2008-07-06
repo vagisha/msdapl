@@ -38,6 +38,7 @@ public class MS2FileRun extends MsRun {
         setDataType(run.getDataType());
         setAcquisitionMethod(run.getAcquisitionMethod());
         setComment(run.getComment());
+        setEnzymeList(run.getEnzymeList());
     }
     
     public void setHeaderList(List<MS2FileHeader> headers) {

@@ -10,6 +10,7 @@ import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAOImpl;
+import org.yeastrc.ms.dao.ms2File.MS2FileRunDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanDAOImpl;
@@ -23,6 +24,7 @@ import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAOImpl;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
+import org.yeastrc.ms.dto.ms2File.MS2FileRun;
 import org.yeastrc.ms.dto.ms2File.MS2FileScan;
 
 import com.ibatis.common.resources.Resources;
@@ -63,6 +65,7 @@ public class DAOFactory {
     private MsScanDAO<MsScan> scanDAO;
     
     // related to MS2 files. 
+    private MsRunDAO<MS2FileRun> ms2RunDAO;
     private MsScanDAO<MS2FileScan> ms2ScanDAO;
     private MS2FileScanChargeDAO ms2FileScanChargeDAO;
     private MS2FileHeaderDAO ms2FileHeadersDAO;
@@ -89,6 +92,7 @@ public class DAOFactory {
         runDAO = new MsRunDAOImpl(sqlMap);
         scanDAO = new MsScanDAOImpl(sqlMap);
         
+        ms2RunDAO = new MS2FileRunDAOImpl(sqlMap);
         ms2ScanDAO = new MS2FileScanDAOImpl(sqlMap);
         ms2FileScanChargeDAO = new MS2FileScanChargeDAOImpl(sqlMap);
         ms2FileHeadersDAO = new MS2FileHeaderDAOImpl(sqlMap);
@@ -127,6 +131,10 @@ public class DAOFactory {
     
     public MsScanDAO<MsScan> getMsScanDAO() {
         return scanDAO;
+    }
+    
+    public MsRunDAO<MS2FileRun> getMS2FileRunDAO() {
+        return ms2RunDAO;
     }
     
     public MsScanDAO<MS2FileScan> getMS2FileScanDAO() {

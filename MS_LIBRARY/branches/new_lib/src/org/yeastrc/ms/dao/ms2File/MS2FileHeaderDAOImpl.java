@@ -25,21 +25,21 @@ public class MS2FileHeaderDAOImpl extends BaseSqlMapDAO implements MS2FileHeader
     }
 
     public void save(MS2FileHeader header) {
-        save("Ms2Header.insert", header);
+        save("MS2Header.insert", header);
     }
     
     public List<MS2FileHeader> loadHeadersForRun(int runId) {
-        return queryForList("Ms2Header.selectHeadersForRun", runId);
+        return queryForList("MS2Header.selectHeadersForRun", runId);
     }
 
     public void deleteHeadersForRunId(int runId) {
-        delete("Ms2Header.deleteByRunId", runId);
+        delete("MS2Header.deleteByRunId", runId);
     }
 
     public void deleteHeadersForRunIds(List<Integer> runIds) {
         if (runIds == null || runIds.size() == 0)   return;
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>(1);
         map.put("runIdList", runIds);
-        delete("Ms2Header.deleteByRunIds", map);
+        delete("MS2Header.deleteByRunIds", map);
     }
 }
