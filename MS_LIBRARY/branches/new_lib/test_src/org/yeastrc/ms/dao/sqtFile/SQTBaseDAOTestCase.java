@@ -11,6 +11,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
     protected SQTSearchHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
     protected SQTSearchResultDAO sqtResDao = DAOFactory.instance().getSqtResultDAO();
     protected SQTPeptideSearchDAO sqtSearchDao = DAOFactory.instance().getSqtSearchDAO();
+    protected SQTSpectrumDataDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
     
     protected void setUp() throws Exception {
         super.setUp();

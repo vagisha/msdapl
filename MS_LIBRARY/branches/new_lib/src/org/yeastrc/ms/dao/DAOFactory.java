@@ -18,6 +18,8 @@ import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAOImpl;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -70,8 +72,9 @@ public class DAOFactory {
     private MsSequenceDatabaseDAO seqDbDao;
     
     // DAOs for SQT file related objects
-    private SQTSearchHeaderDAO sqtHeaderDAO;
     private SQTSearchResultDAO sqtResultDAO;
+    private SQTSpectrumDataDAO sqtSpectrumDAO;
+    private SQTSearchHeaderDAO sqtHeaderDAO;
     private SQTPeptideSearchDAO sqtSearchDAO;
     
     private DAOFactory() {
@@ -92,8 +95,10 @@ public class DAOFactory {
         modDAO = new MsSearchModDAOImpl(sqlMap);
         seqDbDao = new MsSequenceDatabaseDAOImpl(sqlMap);
         
-        sqtHeaderDAO = new SQTSearchHeaderDAOImpl(sqlMap);
+
         sqtResultDAO = new SQTSearchResultDAOImpl(sqlMap);
+        sqtSpectrumDAO = new SQTSpectrumDataDAOImpl(sqlMap);
+        sqtHeaderDAO = new SQTSearchHeaderDAOImpl(sqlMap);
         sqtSearchDAO = new SQTPeptideSearchDAOImpl(sqlMap);
         
     }
@@ -164,5 +169,9 @@ public class DAOFactory {
     
     public SQTPeptideSearchDAO getSqtSearchDAO() {
         return sqtSearchDAO;
+    }
+    
+    public SQTSpectrumDataDAO getSqtSpectrumDAO() {
+        return sqtSpectrumDAO;
     }
 }
