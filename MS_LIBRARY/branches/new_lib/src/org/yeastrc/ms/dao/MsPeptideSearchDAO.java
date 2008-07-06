@@ -8,7 +8,7 @@ public interface MsPeptideSearchDAO {
 
     public abstract MsPeptideSearch loadSearch(int searchId);
     
-    public abstract List<MsPeptideSearch> loadSearchesForRun(int runId);
+    public abstract List<? extends MsPeptideSearch> loadSearchesForRun(int runId);
 
     public abstract List<Integer> loadSearchIdsForRun(int runId);
 

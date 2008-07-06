@@ -18,7 +18,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public void testOperationsOnSqtSearchResult() {
         
         // try to get the result for a result id that does not exist in the table
-        SQTSearchResult res = sqtResDao.loadSQTResult(1);
+        SQTSearchResult res = sqtResDao.load(1);
         assertNull(res);
         
         // insert one result in to the table
@@ -46,7 +46,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         
         // make sure everything got saved
         assertNotNull(resultDao.load(resultId));
-        SQTSearchResult sqtResult_db = sqtResDao.loadSQTResult(resultId);
+        SQTSearchResult sqtResult_db = sqtResDao.load(resultId);
         assertNotNull(sqtResult_db);
         assertEquals(sqtResult_db.getSearchId(), parentResult.getSearchId());
         assertEquals(sqtResult_db.getScanId(), parentResult.getScanId());
@@ -68,9 +68,9 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         
         
         // delete the result
-        sqtResDao.deleteSQTResult(resultId);
+        sqtResDao.delete(resultId);
         assertNull(resultDao.load(resultId));
         assertEquals(0, resultDao.loadResultIdsForSearch(1).size());
-        assertNull(sqtResDao.loadSQTResult(resultId));
+        assertNull(sqtResDao.load(resultId));
     }
 }

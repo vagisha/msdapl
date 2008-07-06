@@ -23,7 +23,7 @@ public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
         // create and save a search with no seq. db information or modifications
         MsPeptideSearch search_1 = makePeptideSearch(1, false, false, false);
         int searchId_1 = searchDao.saveSearch(search_1);
-        List<MsPeptideSearch> searchList = searchDao.loadSearchesForRun(1);
+        List<MsPeptideSearch> searchList = (List<MsPeptideSearch>) searchDao.loadSearchesForRun(1);
         assertEquals(1, searchList.size());
         assertEquals(search_1.getSearchDate().toString(), searchList.get(0).getSearchDate().toString());
         assertEquals(167, searchList.get(0).getSearchDuration());
@@ -35,7 +35,7 @@ public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
         // create and save a search with seq. db information and modifications
         MsPeptideSearch search_2 = makePeptideSearch(1, true, true, true);
         int searchId_2 = searchDao.saveSearch(search_2);
-        searchList = searchDao.loadSearchesForRun(1);
+        searchList = (List<MsPeptideSearch>) searchDao.loadSearchesForRun(1);
         assertEquals(2, searchList.size());
         assertEquals(2, seqDbDao.loadSearchDatabases(searchId_2).size());
         assertEquals(2, modDao.loadStaticModificationsForSearch(searchId_2).size());

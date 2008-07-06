@@ -28,7 +28,7 @@ public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSe
         return (MsPeptideSearch) queryForObject("MsSearch.select", searchId);
     }
     
-    public List<MsPeptideSearch> loadSearchesForRun(int runId) {
+    public List<? extends MsPeptideSearch> loadSearchesForRun(int runId) {
         return queryForList("MsSearch.selectSearchesForRun", runId);
     }
     

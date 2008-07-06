@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.sqtFile;
 
-import org.yeastrc.ms.dao.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
+import org.yeastrc.ms.dao.MsPeptideSearchResultDAOImpl;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchResult;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -16,21 +14,20 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchResultDAO {
+public class SQTSearchResultDAOImpl extends MsPeptideSearchResultDAOImpl implements SQTSearchResultDAO {
 
     public SQTSearchResultDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
     
-    public SQTSearchResult loadSQTResult(int resultId) {
+    public SQTSearchResult load(int resultId) {
         return (SQTSearchResult) queryForObject("SqtResult.select", resultId);
     }
     
     public int save(SQTSearchResult sqtResult) {
         
         // first save the parent result
-        MsPeptideSearchResultDAO resDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
-        int resultId = resDao.save(sqtResult);
+        int resultId = super.save(sqtResult);
         
         // now save the SQT specific information
         sqtResult.setResultId(resultId);
@@ -38,11 +35,10 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
         return resultId;
     }
     
-    public void deleteSQTResult(int resultId) {
+    public void delete(int resultId) {
         
         // delete the parent entry in the msPeptideSearchResult table
-        MsPeptideSearchResultDAO resDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
-        resDao.delete(resultId);
+        super.delete(resultId);
         
         delete("SqtResult.delete", resultId);
     }
