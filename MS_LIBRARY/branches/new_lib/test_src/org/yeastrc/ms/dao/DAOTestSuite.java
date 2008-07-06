@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAOImplTest;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAOImplTest;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImplTest;
@@ -23,6 +24,7 @@ public class DAOTestSuite {
         // MS2 file data
         suite.addTestSuite(MS2FileChargeDependentAnalysisDAOImplTest.class);
         suite.addTestSuite(MS2FileScanChargeDAOImplTest.class);
+        suite.addTestSuite(MS2FileChargeIndependentAnalysisDAOImplTest.class);
         
         // search results
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);

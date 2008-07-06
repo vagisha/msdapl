@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
+import org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
 
 public class MS2BaseDAOtestCase extends BaseDAOTestCase {
@@ -22,6 +23,28 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         super.tearDown();
     }
 
+    //---------------------------------------------------------------------------------------
+    // charge INdependent analysis
+    //---------------------------------------------------------------------------------------
+    protected MS2FileChargeIndependentAnalysis makeIAnalysis(int scanId, String name, String value) {
+        MS2FileChargeIndependentAnalysis iAnalysis = makeIAnalysis(name, value);
+        iAnalysis.setScanId(scanId);
+        return iAnalysis;
+    }
+
+    protected MS2FileChargeIndependentAnalysis makeIAnalysis(String name, String value) {
+        MS2FileChargeIndependentAnalysis iAnalysis = new MS2FileChargeIndependentAnalysis();
+        iAnalysis.setName(name);
+        iAnalysis.setValue(value);
+        return iAnalysis;
+    }
+
+    protected void compare(MS2FileChargeIndependentAnalysis a1, MS2FileChargeIndependentAnalysis a2) {
+        assertEquals(a1.getScanId(), a2.getScanId());
+        assertEquals(a1.getName(), a2.getName());
+        assertEquals(a1.getValue(), a2.getValue());
+    }
+    
     //---------------------------------------------------------------------------------------
     // charge dependent analysis
     //---------------------------------------------------------------------------------------

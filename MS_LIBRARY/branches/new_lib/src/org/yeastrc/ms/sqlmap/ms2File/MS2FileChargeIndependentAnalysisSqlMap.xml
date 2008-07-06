@@ -6,6 +6,7 @@
 	<typeAlias alias="Ianalysis" type="org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis"/>
 	
 	<resultMap class="Ianalysis" id="ianalysisResult">
+		<result property="id" column="id" />
 		<result property="scanId" column="scanID" />
 		<result property="name" column="header" />
 		<result property="value" column="value" />
@@ -26,22 +27,10 @@
     	VALUES (?,?,?)
     </insert>
     
-    <delete id="deleteByRunId" parameterClass="Integer">
-		DELETE MS2FileChargeIndependentAnalysis 
-		FROM MS2FileChargeIndependentAnalysis, MsScan
-		WHERE MsScan.id = MS2FileChargeIndependentAnalysis.scanID
-		AND msScan.runID=#runId#
-    </delete>
     
      <delete id="deleteByScanId" parameterClass="Integer">
 		DELETE FROM MS2FileChargeIndependentAnalysis WHERE scanId=#scanId#		    
     </delete>
     
-    <delete id="deleteByScanIds" parameterClass="java.util.Map">
-		DELETE FROM MS2FileChargeIndependentAnalysis WHERE 
-		<iterate open="scanID in(" close=")" conjunction=",">
-			#scanIdList[]#
-		</iterate>
-    </delete>
     
 </sqlMap>

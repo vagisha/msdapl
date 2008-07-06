@@ -12,9 +12,5 @@ public interface MS2FileChargeIndependentAnalysisDAO {
     public abstract void save(MS2FileChargeIndependentAnalysis analysis);
     
     public abstract void deleteByScanId(int scanId);
-    
-    public abstract void deleteByScanIds(List<Integer> scanIds);
-    
-    public abstract void deleteByRunId(int runId);
 
 }

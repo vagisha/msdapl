@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.ms2File;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.BaseSqlMapDAO;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis;
@@ -26,7 +24,7 @@ public class MS2FileChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     public List<MS2FileChargeIndependentAnalysis> loadAnalysisForScan(int scanId) {
-        return queryForList("MS2ChgIAnalysis.selectAnalysisForCharge", scanId);
+        return queryForList("MS2ChgIAnalysis.selectAnalysisForScan", scanId);
     }
 
     public void save(MS2FileChargeIndependentAnalysis analysis) {
@@ -35,18 +33,6 @@ public class MS2FileChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
 
     public void deleteByScanId(int scanId) {
         delete("MS2ChgIAnalysis.deleteByScanId", scanId);
-    }
-
-    public void deleteByScanIds(List<Integer> scanIds) {
-        if (scanIds == null || scanIds.size() == 0)
-            return;
-        Map<String, List<Integer>> map = new HashMap<String, List<Integer>>(1);
-        map.put("scanIdList", scanIds);
-        delete("MS2ChgIAnalysis.deleteByScanIds", map);
-    }
-
-    public void deleteByRunId(int runId) {
-        delete("MS2ChgIAnalysis.deleteByRunId", runId);
     }
 
 }
