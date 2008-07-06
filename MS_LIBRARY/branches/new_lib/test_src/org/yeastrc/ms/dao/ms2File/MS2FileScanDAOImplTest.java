@@ -1,13 +1,10 @@
 package org.yeastrc.ms.dao.ms2File;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileScan;
-import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
 
 
 public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {
@@ -66,37 +63,22 @@ public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {
         // delete the scan and make sure everything got deleted
         ms2ScanDao.deleteScansForRun(runId);
         assertNull(ms2ScanDao.load(scanId));
-        assertEquals(0, chargeDao.loadChargesForScan(scanId).size());
-        assertEquals(0, this.iAnalDao.loadAnalysisForScan(scanId).size());
+        assertEquals(0, chargeDao.loadScanChargesForScan(scanId).size());
+        assertEquals(0, iAnalDao.loadAnalysisForScan(scanId).size());
         
-            
     }
     
     protected MS2FileScan makeMS2FileScan(int runId, int startScanNum, boolean addScanCharges, boolean addChgIAnalysis) {
         MS2FileScan scan = new MS2FileScan(makeMsScan(runId, startScanNum));
         if (addScanCharges) {
-            scan.addScanCharge(makeScanCharge(2, "100.0"));
-            scan.addScanCharge(makeScanCharge(3, "200.0"));
+            scan.addScanCharge(makeMS2ScanCharge(2, "100.0", true));
+            scan.addScanCharge(makeMS2ScanCharge(3, "200.0", true));
         }
         if (addChgIAnalysis) {
-            scan.addChargeIndependentAnalysis(makeChargeIndependentAnalysis("name_1", "value_1"));
-            scan.addChargeIndependentAnalysis(makeChargeIndependentAnalysis("name_2", "value_2"));
-            scan.addChargeIndependentAnalysis(makeChargeIndependentAnalysis("name_3", "value_3"));
+            scan.addChargeIndependentAnalysis(makeIAnalysis("name_1", "value_1"));
+            scan.addChargeIndependentAnalysis(makeIAnalysis("name_2", "value_2"));
+            scan.addChargeIndependentAnalysis(makeIAnalysis("name_3", "value_3"));
         }
         return scan;
-    }
-    
-    protected MS2FileChargeIndependentAnalysis makeChargeIndependentAnalysis(String name, String value) {
-        MS2FileChargeIndependentAnalysis analysis = new MS2FileChargeIndependentAnalysis();
-        analysis.setName(name);
-        analysis.setValue(value);
-        return analysis;
-    }
-    
-    protected MS2FileScanCharge makeScanCharge(int chg, String mass) {
-        MS2FileScanCharge charge = new MS2FileScanCharge();
-        charge.setCharge(chg);
-        charge.setMass(new BigDecimal(mass));
-        return charge;
     }
 }

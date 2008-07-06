@@ -12,7 +12,6 @@ import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImpl;
-import org.yeastrc.ms.dao.ms2File.MS2FileScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAOImpl;
@@ -22,6 +21,8 @@ import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAOImpl;
+import org.yeastrc.ms.dto.MsScan;
+import org.yeastrc.ms.dto.ms2File.MS2FileScan;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -58,10 +59,10 @@ public class DAOFactory {
     private MsExperimentDAO expDAO;
     private MsDigestionEnzymeDAO enzymeDAO;
     private MsRunDAO runDAO;
-    private MsScanDAO scanDAO;
+    private MsScanDAO<MsScan> scanDAO;
     
     // related to MS2 files. 
-    private MS2FileScanDAO ms2ScanDAO;
+    private MsScanDAO<MS2FileScan> ms2ScanDAO;
     private MS2FileScanChargeDAO ms2FileScanChargeDAO;
     private MS2FileHeaderDAO ms2FileHeadersDAO;
     private MS2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
@@ -123,11 +124,11 @@ public class DAOFactory {
         return enzymeDAO;
     }
     
-    public MsScanDAO getMsScanDAO() {
+    public MsScanDAO<MsScan> getMsScanDAO() {
         return scanDAO;
     }
     
-    public MS2FileScanDAO getMS2FileScanDAO() {
+    public MsScanDAO<MS2FileScan> getMS2FileScanDAO() {
         return ms2ScanDAO;
     }
     

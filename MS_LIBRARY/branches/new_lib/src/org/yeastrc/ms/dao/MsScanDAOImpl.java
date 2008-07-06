@@ -15,7 +15,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
+public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan> {
 
     public MsScanDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
@@ -33,8 +33,12 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         return queryForList("MsScan.selectScanIdsForRun", runId);
     }
 
+    public void delete(int scanId) {
+        delete("MsScan.delete", scanId);
+    }
+    
     public void deleteScansForRun(int runId) {
         delete("MsScan.deleteByRunId", runId);
     }
-   
+
 }

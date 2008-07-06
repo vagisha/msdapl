@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis;
+import org.yeastrc.ms.dto.ms2File.MS2FileScan;
 import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
 
 public class MS2BaseDAOtestCase extends BaseDAOTestCase {
@@ -13,7 +15,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
     protected MS2FileScanChargeDAO chargeDao = DAOFactory.instance().getMS2FileScanChargeDAO();
     protected MS2FileChargeDependentAnalysisDAO dAnalDao = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
     protected MS2FileChargeIndependentAnalysisDAO iAnalDao = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
-    protected MS2FileScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
+    protected MsScanDAO<MS2FileScan> ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -78,7 +80,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         return scanCharge;
     }
 
-    private MS2FileScanCharge makeMS2ScanCharge(Integer charge, String mass,
+    protected MS2FileScanCharge makeMS2ScanCharge(Integer charge, String mass,
             boolean addChgDepAnalysis) {
         MS2FileScanCharge scanCharge = new MS2FileScanCharge();
         

@@ -71,6 +71,10 @@
     	</selectKey>
     </insert>
     
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM MsScan WHERE scanID=#scanId#		    
+    </delete>
+    
     <delete id="deleteByRunId" parameterClass="Integer">
 		DELETE FROM MsScan WHERE runID=#runId#		    
     </delete>
