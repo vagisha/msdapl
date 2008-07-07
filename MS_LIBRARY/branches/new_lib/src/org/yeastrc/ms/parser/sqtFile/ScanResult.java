@@ -1,0 +1,204 @@
+package org.yeastrc.ms.parser.sqtFile;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Represents a 'S' line in the SQT file
+ */
+public class ScanResult {
+
+    private int startScan;
+    private int endScan;
+    private int charge;
+    private int processingTime; // seconds
+    private String server; // server handling this scan
+    private BigDecimal observedMass; // Observed M+H+ value (calculated from m/z) 
+    private BigDecimal totalIntensity; 
+    private BigDecimal lowestSp; // Lowest Sp value for top 500 spectra
+    private int numMatching; // Number of sequences matching this precursor ion
+    
+    private List<PeptideResult> resultList;
+    
+    public ScanResult() {
+        resultList = new ArrayList<PeptideResult>();
+    }
+
+    /**
+     * @return the startScan
+     */
+    public int getStartScan() {
+        return startScan;
+    }
+
+    /**
+     * @param startScan the startScan to set
+     */
+    public void setStartScan(int startScan) {
+        this.startScan = startScan;
+    }
+
+    /**
+     * @return the endScan
+     */
+    public int getEndScan() {
+        return endScan;
+    }
+
+    /**
+     * @param endScan the endScan to set
+     */
+    public void setEndScan(int endScan) {
+        this.endScan = endScan;
+    }
+
+    /**
+     * @return the charge
+     */
+    public int getCharge() {
+        return charge;
+    }
+
+    /**
+     * @param charge the charge to set
+     */
+    public void setCharge(int charge) {
+        this.charge = charge;
+    }
+
+    /**
+     * @return the processingTime
+     */
+    public int getProcessingTime() {
+        return processingTime;
+    }
+
+    /**
+     * @param processingTime the processingTime to set
+     */
+    public void setProcessingTime(int processingTime) {
+        this.processingTime = processingTime;
+    }
+
+    /**
+     * @return the server
+     */
+    public String getServer() {
+        return server;
+    }
+
+    /**
+     * @param server the server to set
+     */
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    /**
+     * @return the observedMass
+     */
+    public BigDecimal getObservedMass() {
+        return observedMass;
+    }
+
+    /**
+     * @param observedMass the observedMass to set
+     */
+    public void setObservedMass(BigDecimal observedMass) {
+        this.observedMass = observedMass;
+    }
+
+    /**
+     * @return the totalIntensity
+     */
+    public BigDecimal getTotalIntensity() {
+        return totalIntensity;
+    }
+
+    /**
+     * @param totalIntensity the totalIntensity to set
+     */
+    public void setTotalIntensity(BigDecimal totalIntensity) {
+        this.totalIntensity = totalIntensity;
+    }
+
+    /**
+     * @return the lowestSp
+     */
+    public BigDecimal getLowestSp() {
+        return lowestSp;
+    }
+
+    /**
+     * @param lowestSp the lowestSp to set
+     */
+    public void setLowestSp(BigDecimal lowestSp) {
+        this.lowestSp = lowestSp;
+    }
+
+    /**
+     * @return the numMatching
+     */
+    public int getNumMatching() {
+        return numMatching;
+    }
+
+    /**
+     * @param numMatching the numMatching to set
+     */
+    public void setNumMatching(int numMatching) {
+        this.numMatching = numMatching;
+    }
+
+    /**
+     * @return the resultList
+     */
+    public List<PeptideResult> getResultList() {
+        return resultList;
+    }
+
+    /**
+     * @param resultList the resultList to set
+     */
+    public void setResultList(List<PeptideResult> resultList) {
+        this.resultList = resultList;
+    }
+    
+    public void addPeptideResult(PeptideResult result) {
+        resultList.add(result);
+    }
+    
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("S\t");
+        buf.append(startScan);
+        buf.append("\t");
+        buf.append(endScan);
+        buf.append("\t");
+        buf.append(charge);
+        buf.append("\t");
+        buf.append(processingTime);
+        buf.append("\t");
+        buf.append(server);
+        buf.append("\t");
+        buf.append(observedMass);
+        buf.append("\t");
+        buf.append(totalIntensity);
+        buf.append("\t");
+        buf.append(lowestSp);
+        buf.append("\t");
+        buf.append(numMatching);
+        
+        buf.append("\n");
+        
+        for (PeptideResult res: resultList) {
+            buf.append(res.toString());
+            buf.append("\n");
+        }
+        
+        buf.deleteCharAt(buf.length() -1);
+        return buf.toString();        
+        
+    }
+}
