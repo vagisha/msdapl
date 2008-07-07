@@ -4,19 +4,24 @@ import java.io.File;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.MsSearchModDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
 import org.yeastrc.ms.dto.MsProteinMatch;
+import org.yeastrc.ms.dto.MsSearchDynamicMod;
+import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchHeader;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.dto.sqtFile.SQTSpectrumData;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
+import org.yeastrc.ms.parser.sqtFile.DynamicModification;
 import org.yeastrc.ms.parser.sqtFile.Header;
 import org.yeastrc.ms.parser.sqtFile.PeptideResult;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.ScanResult;
+import org.yeastrc.ms.parser.sqtFile.StaticModification;
 import org.yeastrc.ms.parser.sqtFile.Header.HeaderItem;
 
 public class SqtFileToDbConverter {
@@ -87,11 +92,11 @@ public class SqtFileToDbConverter {
             sqtResult.addProteinMatch(match);
         }
         
+        // TODO add dynamic modifications
+        
+        
         SQTSearchResultDAO resultDao = DAOFactory.instance().getSqtResultDAO();
         return resultDao.save(sqtResult);
-        
-        
-        
     }
 
     private String getOnlyPeptide(String sequence) {
@@ -108,6 +113,7 @@ public class SqtFileToDbConverter {
     private void saveSpectrumData(ScanResult scan, int searchId, int scanId) {
         SQTSpectrumData scanData = new SQTSpectrumData();
         scanData.setSearchId(searchId);
+        scanData.setCharge(scan.getCharge());
         scanData.setProcessTime(scan.getProcessingTime());
         scanData.setScanId(scanId);
         scanData.setServerName(scan.getServer());
@@ -128,15 +134,45 @@ public class SqtFileToDbConverter {
         search.setFragmentMassType(header.getFragmentMassType());
         search.setFragmentMassTolerance(header.getFragmentMassTolerance());
         
+        // add headers
         for (HeaderItem item: header.getHeaderItems()) {
             SQTSearchHeader h = new SQTSearchHeader();
             h.setName(item.getName());
             h.setValue(item.getValue());
             search.addHeader(h);
         }
+        
+        //TODO add enzyme information
+        
+        //TODO add search database information
+        
+        
         // save and return id
         SQTPeptideSearchDAO searchDao = DAOFactory.instance().getSqtSearchDAO();
-        return searchDao.saveSearch(search);
+        int searchId = searchDao.saveSearch(search);
+        
+        
+        // TODO these should be added to the search and saved directly
+        // add static modifications
+        MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
+        for (StaticModification sMod: header.getStaticMods()) {
+            MsSearchMod mod = new MsSearchMod();
+            mod.setModifiedResidue(sMod.getModificationChar());
+            mod.setModificationMass(sMod.getModificationMass());
+            mod.setSearchId(searchId);
+            modDao.saveStaticModification(mod);
+        }
+        // add dynamic modifications
+        for (DynamicModification dMod: header.getDynaMods()) {
+            MsSearchDynamicMod mod = new MsSearchDynamicMod();
+            mod.setModifiedResidue(dMod.getModificationChar());
+            mod.setModificationMass(dMod.getModificationMass());
+            mod.setModificationSymbol(dMod.getModificationSymbol());
+            mod.setSearchId(searchId);
+            modDao.saveDynamicModification(mod);
+        }
+        
+        return searchId;
     }
 
     /**
