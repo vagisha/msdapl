@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAOImplTest;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAOImplTest;
+import org.yeastrc.ms.dao.ms2File.MS2FileRunDAOImplTest;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAOImplTest;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAOImplTest;
@@ -25,14 +26,15 @@ public class DAOTestSuite {
         suite.addTestSuite(MS2FileChargeDependentAnalysisDAOImplTest.class);
         suite.addTestSuite(MS2FileScanChargeDAOImplTest.class);
         suite.addTestSuite(MS2FileChargeIndependentAnalysisDAOImplTest.class);
+        suite.addTestSuite(MS2FileScanChargeDAOImplTest.class);
+        suite.addTestSuite(MS2FileRunDAOImplTest.class);
         
-        // search results
+        
+        // search 
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);
         suite.addTestSuite(MsSearchModDAOImplTest.class);
         suite.addTestSuite(MsPeptideSearchResultDAOImplTest.class);
         suite.addTestSuite(MsPeptideSearchDAOImplTest.class);
-        
-        // search
         suite.addTestSuite(MsSequenceDatabaseDAOImplTest.class);
         
         
