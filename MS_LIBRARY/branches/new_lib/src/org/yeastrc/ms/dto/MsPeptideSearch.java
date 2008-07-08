@@ -8,7 +8,6 @@ package org.yeastrc.ms.dto;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -206,6 +205,10 @@ public class MsPeptideSearch {
     public void setStaticModifications(List<MsSearchMod> staticModifications) {
         this.staticModifications = staticModifications;
     }
+    
+    public void addStaticModification(MsSearchMod mod) {
+        staticModifications.add(mod);
+    }
 
     /**
      * @return the dynamicModifications
@@ -220,6 +223,10 @@ public class MsPeptideSearch {
     public void setDynamicModifications(
             List<MsSearchDynamicMod> dynamicModifications) {
         this.dynamicModifications = dynamicModifications;
+    }
+    
+    public void addDynamicModification(MsSearchDynamicMod mod) {
+        dynamicModifications.add(mod);
     }
   
 }

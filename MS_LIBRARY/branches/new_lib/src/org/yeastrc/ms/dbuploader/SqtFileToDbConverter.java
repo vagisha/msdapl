@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsSearchModDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
@@ -39,7 +38,7 @@ public class SqtFileToDbConverter {
     throws Exception {
         Header header = reader.getHeader();
 
-        // insert a run into the database and get the run Id
+        // insert a search into the database and get the search Id
         int searchId = saveSQTSearch(header, file, runId);
 
         int scanId = 1;
@@ -152,15 +151,12 @@ public class SqtFileToDbConverter {
         int searchId = searchDao.saveSearch(search);
         
         
-        // TODO these should be added to the search and saved directly
         // add static modifications
-        MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
         for (StaticModification sMod: header.getStaticMods()) {
             MsSearchMod mod = new MsSearchMod();
             mod.setModifiedResidue(sMod.getModificationChar());
             mod.setModificationMass(sMod.getModificationMass());
-            mod.setSearchId(searchId);
-            modDao.saveStaticModification(mod);
+            search.addStaticModification(mod);
         }
         // add dynamic modifications
         for (DynamicModification dMod: header.getDynaMods()) {
@@ -168,8 +164,7 @@ public class SqtFileToDbConverter {
             mod.setModifiedResidue(dMod.getModificationChar());
             mod.setModificationMass(dMod.getModificationMass());
             mod.setModificationSymbol(dMod.getModificationSymbol());
-            mod.setSearchId(searchId);
-            modDao.saveDynamicModification(mod);
+            search.addDynamicModification(mod);
         }
         
         return searchId;

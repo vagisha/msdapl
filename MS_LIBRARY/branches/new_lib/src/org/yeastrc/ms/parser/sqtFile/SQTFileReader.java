@@ -72,7 +72,6 @@ public class SQTFileReader {
         // skip over blank lines
         while(currentLine != null && currentLine.trim().length() == 0) {
             currentLine = reader.readLine();
-//            System.out.println("Advancing: "+currentLine);
         }
     }
     

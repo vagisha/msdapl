@@ -8,7 +8,6 @@ package org.yeastrc.ms.dto.ms2File;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
