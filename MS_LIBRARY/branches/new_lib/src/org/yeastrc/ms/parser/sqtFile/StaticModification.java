@@ -2,7 +2,9 @@ package org.yeastrc.ms.parser.sqtFile;
 
 import java.math.BigDecimal;
 
-public class StaticModification {
+import org.yeastrc.ms.dto.IMsSearchMod;
+
+public class StaticModification implements IMsSearchMod {
 
     private char modificationChar;
     private BigDecimal modificationMass;
@@ -15,7 +17,7 @@ public class StaticModification {
     /**
      * @return the modificationChar
      */
-    public char getModificationChar() {
+    public char getModifiedResidue() {
         return modificationChar;
     }
 

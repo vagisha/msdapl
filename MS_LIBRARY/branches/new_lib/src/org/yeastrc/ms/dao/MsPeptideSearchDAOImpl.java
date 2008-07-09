@@ -8,10 +8,11 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
+import org.yeastrc.ms.dto.IMsPeptideSearch;
+import org.yeastrc.ms.dto.IMsSearchDynamicMod;
+import org.yeastrc.ms.dto.IMsSearchMod;
+import org.yeastrc.ms.dto.IMsSequenceDatabase;
 import org.yeastrc.ms.dto.MsPeptideSearch;
-import org.yeastrc.ms.dto.MsSearchDynamicMod;
-import org.yeastrc.ms.dto.MsSearchMod;
-import org.yeastrc.ms.dto.MsSequenceDatabase;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -24,8 +25,8 @@ public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSe
         super(sqlMap);
     }
     
-    public MsPeptideSearch loadSearch(int searchId) {
-        return (MsPeptideSearch) queryForObject("MsSearch.select", searchId);
+    public IMsPeptideSearch loadSearch(int searchId) {
+        return (IMsPeptideSearch) queryForObject("MsSearch.select", searchId);
     }
     
     public List<? extends MsPeptideSearch> loadSearchesForRun(int runId) {
@@ -36,24 +37,24 @@ public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSe
         return queryForList("MsSearch.selectSearchIdsForRun", runId);
     }
     
-    public int saveSearch(MsPeptideSearch search) {
+    public int saveSearch(IMsPeptideSearch search) {
         int searchId = saveAndReturnId("MsSearch.insert", search);
         
         // save any database information associated with the search 
         MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
-        for (MsSequenceDatabase seqDb: search.getSearchDatabases()) {
+        for (IMsSequenceDatabase seqDb: search.getSearchDatabases()) {
             seqDbDao.saveSearchDatabase(seqDb, searchId);
         }
         
         // save any static modifications used for the search
         MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-        for (MsSearchMod staticMod: search.getStaticModifications()) {
+        for (IMsSearchMod staticMod: search.getStaticModifications()) {
             staticMod.setSearchId(searchId);
             modDao.saveStaticModification(staticMod);
         }
         
         // save any dynamic modifications used for the search
-        for (MsSearchDynamicMod dynaMod: search.getDynamicModifications()) {
+        for (IMsSearchDynamicMod dynaMod: search.getDynamicModifications()) {
             dynaMod.setSearchId(searchId);
             modDao.saveDynamicModification(dynaMod);
         }

@@ -17,11 +17,11 @@ import org.yeastrc.ms.dto.sqtFile.SQTSpectrumData;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.DynamicModification;
 import org.yeastrc.ms.parser.sqtFile.Header;
+import org.yeastrc.ms.parser.sqtFile.HeaderItem;
 import org.yeastrc.ms.parser.sqtFile.PeptideResult;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.ScanResult;
 import org.yeastrc.ms.parser.sqtFile.StaticModification;
-import org.yeastrc.ms.parser.sqtFile.Header.HeaderItem;
 
 public class SqtFileToDbConverter {
 
@@ -154,14 +154,14 @@ public class SqtFileToDbConverter {
         // add static modifications
         for (StaticModification sMod: header.getStaticMods()) {
             MsSearchMod mod = new MsSearchMod();
-            mod.setModifiedResidue(sMod.getModificationChar());
+            mod.setModifiedResidue(sMod.getModifiedResidue());
             mod.setModificationMass(sMod.getModificationMass());
             search.addStaticModification(mod);
         }
         // add dynamic modifications
         for (DynamicModification dMod: header.getDynaMods()) {
             MsSearchDynamicMod mod = new MsSearchDynamicMod();
-            mod.setModifiedResidue(dMod.getModificationChar());
+            mod.setModifiedResidue(dMod.getModifiedResidue());
             mod.setModificationMass(dMod.getModificationMass());
             mod.setModificationSymbol(dMod.getModificationSymbol());
             search.addDynamicModification(mod);

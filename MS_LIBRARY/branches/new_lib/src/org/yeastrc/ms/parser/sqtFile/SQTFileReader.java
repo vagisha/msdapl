@@ -48,8 +48,8 @@ public class SQTFileReader {
                 header.addHeaderItem(tokens[1], tokens[2]);
             }
             else if (tokens.length >= 2){
-                // if the value for this header is missing, add the header with a null value
-                header.addHeaderItem(tokens[1], null);
+                // if the value for this header is missing, add the header with a empty String
+                header.addHeaderItem(tokens[1], "");
             }
             else {
                 // ignore if both label and value for this header item are missing

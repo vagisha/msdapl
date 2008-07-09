@@ -11,7 +11,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MsPeptideSearch {
+public class MsPeptideSearch implements IMsPeptideSearch {
 
     private int id; // unique id (database) for this search result
     private int runId; // MS run on which the search was performed
@@ -65,8 +65,8 @@ public class MsPeptideSearch {
         this.runId = runId;
     }
     
-    /**
-     * @return the originalFileType
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getOriginalFileType()
      */
     public String getOriginalFileType() {
         return originalFileType;
@@ -77,8 +77,8 @@ public class MsPeptideSearch {
     public void setOriginalFileType(String originalFileType) {
         this.originalFileType = originalFileType;
     }
-    /**
-     * @return the searchEngineName
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getSearchEngineName()
      */
     public String getSearchEngineName() {
         return searchEngineName;
@@ -89,8 +89,8 @@ public class MsPeptideSearch {
     public void setSearchEngineName(String searchEngineName) {
         this.searchEngineName = searchEngineName;
     }
-    /**
-     * @return the searchEngineVersion
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getSearchEngineVersion()
      */
     public String getSearchEngineVersion() {
         return searchEngineVersion;
@@ -101,8 +101,8 @@ public class MsPeptideSearch {
     public void setSearchEngineVersion(String searchEngineVersion) {
         this.searchEngineVersion = searchEngineVersion;
     }
-    /**
-     * @return the searchDate
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getSearchDate()
      */
     public Date getSearchDate() {
         return searchDate;
@@ -113,8 +113,8 @@ public class MsPeptideSearch {
     public void setSearchDate(Date searchDate) {
         this.searchDate = searchDate;
     }
-    /**
-     * @return the searchDuration
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getSearchDuration()
      */
     public int getSearchDuration() {
         return searchDuration;
@@ -125,8 +125,8 @@ public class MsPeptideSearch {
     public void setSearchDuration(int searchDuration) {
         this.searchDuration = searchDuration;
     }
-    /**
-     * @return the precursorMassType
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getPrecursorMassType()
      */
     public String getPrecursorMassType() {
         return precursorMassType;
@@ -137,8 +137,8 @@ public class MsPeptideSearch {
     public void setPrecursorMassType(String precursorMassType) {
         this.precursorMassType = precursorMassType;
     }
-    /**
-     * @return the precursorMassTolerance
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getPrecursorMassTolerance()
      */
     public BigDecimal getPrecursorMassTolerance() {
         return precursorMassTolerance;
@@ -149,8 +149,8 @@ public class MsPeptideSearch {
     public void setPrecursorMassTolerance(BigDecimal precursorMassTolerance) {
         this.precursorMassTolerance = precursorMassTolerance;
     }
-    /**
-     * @return the fragmentMassType
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getFragmentMassType()
      */
     public String getFragmentMassType() {
         return fragmentMassType;
@@ -161,8 +161,8 @@ public class MsPeptideSearch {
     public void setFragmentMassType(String fragmentMassType) {
         this.fragmentMassType = fragmentMassType;
     }
-    /**
-     * @return the fragmentMassTolerance
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getFragmentMassTolerance()
      */
     public BigDecimal getFragmentMassTolerance() {
         return fragmentMassTolerance;
@@ -174,8 +174,8 @@ public class MsPeptideSearch {
         this.fragmentMassTolerance = fragmentMassTolerance;
     }
 
-    /**
-     * @return the searchDatabases
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getSearchDatabases()
      */
     public List<MsSequenceDatabase> getSearchDatabases() {
         return searchDatabases;
@@ -192,8 +192,8 @@ public class MsPeptideSearch {
         searchDatabases.add(database);
     }
 
-    /**
-     * @return the staticModifications
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getStaticModifications()
      */
     public List<MsSearchMod> getStaticModifications() {
         return staticModifications;
@@ -210,8 +210,8 @@ public class MsPeptideSearch {
         staticModifications.add(mod);
     }
 
-    /**
-     * @return the dynamicModifications
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsPeptideSearch#getDynamicModifications()
      */
     public List<MsSearchDynamicMod> getDynamicModifications() {
         return dynamicModifications;

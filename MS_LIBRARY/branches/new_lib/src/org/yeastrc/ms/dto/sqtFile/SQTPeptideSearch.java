@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dto.MsPeptideSearch;
 
-public class SQTPeptideSearch extends MsPeptideSearch {
+public class SQTPeptideSearch extends MsPeptideSearch implements ISQTPeptideSearch {
 
     private List<SQTSearchHeader> headers;
     
@@ -26,9 +26,7 @@ public class SQTPeptideSearch extends MsPeptideSearch {
         setFragmentMassType(search.getFragmentMassType());
         setFragmentMassTolerance(search.getFragmentMassTolerance());
     }
-    /**
-     * @return the headers
-     */
+    
     public List<SQTSearchHeader> getHeaders() {
         return headers;
     }

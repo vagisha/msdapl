@@ -6,16 +6,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.dto.IMsSearchDynamicMod;
+import org.yeastrc.ms.dto.IMsSearchMod;
 import org.yeastrc.ms.dto.MsSearchDynamicMod;
 import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
 
 public class MsSearchModDAOImplTest extends BaseDAOTestCase {
 
-    private MsSearchDynamicMod mod1_1;
-    private MsSearchDynamicMod mod1_2;
-    private MsSearchDynamicMod mod2_1;
-    private MsSearchDynamicMod mod2_2;
+    private IMsSearchDynamicMod mod1_1;
+    private IMsSearchDynamicMod mod1_2;
+    private IMsSearchDynamicMod mod2_1;
+    private IMsSearchDynamicMod mod2_2;
     
     protected void setUp() throws Exception {
         super.setUp();
@@ -29,14 +31,14 @@ public class MsSearchModDAOImplTest extends BaseDAOTestCase {
         
         // create some static modification objects
         BigDecimal mass1_1 = new BigDecimal("123.4");
-        MsSearchMod mod1_1 = getStaticMod(1, 'A', mass1_1);
+        IMsSearchMod mod1_1 = getStaticMod(1, 'A', mass1_1);
         BigDecimal mass1_2 = new BigDecimal("56.7");
-        MsSearchMod mod1_2 = getStaticMod(1, 'B', mass1_2);
+        IMsSearchMod mod1_2 = getStaticMod(1, 'B', mass1_2);
         
         BigDecimal mass2_1 = new BigDecimal("987.6");
-        MsSearchMod mod2_1 = getStaticMod(2, 'X', mass2_1);
+        IMsSearchMod mod2_1 = getStaticMod(2, 'X', mass2_1);
         BigDecimal mass2_2 = new BigDecimal("54.3");
-        MsSearchMod mod2_2 = getStaticMod(2, 'Y', mass2_2);
+        IMsSearchMod mod2_2 = getStaticMod(2, 'Y', mass2_2);
         
         // save them to the database
         modDao.saveStaticModification(mod1_1);
@@ -232,7 +234,7 @@ public class MsSearchModDAOImplTest extends BaseDAOTestCase {
         
     }
     
-    private MsSearchMod getStaticMod(int searchId, char residue, BigDecimal mass) {
+    private IMsSearchMod getStaticMod(int searchId, char residue, BigDecimal mass) {
         MsSearchMod mod = new MsSearchMod();
         mod.setSearchId(searchId);
         mod.setModifiedResidue(residue);
@@ -240,7 +242,7 @@ public class MsSearchModDAOImplTest extends BaseDAOTestCase {
         return mod;
     }
     
-    private MsSearchDynamicMod getDynamicMod(int searchId, char residue, BigDecimal mass, char symbol) {
+    private IMsSearchDynamicMod getDynamicMod(int searchId, char residue, BigDecimal mass, char symbol) {
         MsSearchDynamicMod mod = new MsSearchDynamicMod();
         mod.setSearchId(searchId);
         mod.setModifiedResidue(residue);

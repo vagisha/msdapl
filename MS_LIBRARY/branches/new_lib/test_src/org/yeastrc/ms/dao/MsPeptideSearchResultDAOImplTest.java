@@ -1,9 +1,9 @@
 package org.yeastrc.ms.dao;
 
 
+import org.yeastrc.ms.dto.IMsSearchDynamicMod;
+import org.yeastrc.ms.dto.IMsSearchMod;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
-import org.yeastrc.ms.dto.MsSearchDynamicMod;
-import org.yeastrc.ms.dto.MsSearchMod;
 
 public class MsPeptideSearchResultDAOImplTest extends BaseDAOTestCase {
 
@@ -15,27 +15,27 @@ public class MsPeptideSearchResultDAOImplTest extends BaseDAOTestCase {
         super.setUp();
         
         // modifications for searchId_1
-        MsSearchMod mod1 = makeStaticMod(searchId_1, 'C', "50.0");
+        IMsSearchMod mod1 = makeStaticMod(searchId_1, 'C', "50.0");
         modDao.saveStaticModification(mod1);
-        MsSearchMod mod2 = makeStaticMod(searchId_1, 'S', "80.0");
+        IMsSearchMod mod2 = makeStaticMod(searchId_1, 'S', "80.0");
         modDao.saveStaticModification(mod2);
         
-        MsSearchDynamicMod dmod1 = makeDynamicMod(searchId_1, 'A', "10.0", '*');
+        IMsSearchDynamicMod dmod1 = makeDynamicMod(searchId_1, 'A', "10.0", '*');
         modDao.saveDynamicModification(dmod1);
-        MsSearchDynamicMod dmod2 = makeDynamicMod(searchId_1, 'B', "20.0", '#');
+        IMsSearchDynamicMod dmod2 = makeDynamicMod(searchId_1, 'B', "20.0", '#');
         modDao.saveDynamicModification(dmod2);
         
         // modifications for searchId_2
-        MsSearchMod mod3 = makeStaticMod(searchId_2, 'M', "16.0");
+        IMsSearchMod mod3 = makeStaticMod(searchId_2, 'M', "16.0");
         modDao.saveStaticModification(mod3);
-        MsSearchMod mod4 = makeStaticMod(searchId_2, 'S', "80.0");
+        IMsSearchMod mod4 = makeStaticMod(searchId_2, 'S', "80.0");
         modDao.saveStaticModification(mod4);
         
-        MsSearchDynamicMod dmod3 = makeDynamicMod(searchId_2, 'X', "100.0", '*');
+        IMsSearchDynamicMod dmod3 = makeDynamicMod(searchId_2, 'X', "100.0", '*');
         modDao.saveDynamicModification(dmod3);
-        MsSearchDynamicMod dmod4 = makeDynamicMod(searchId_2, 'Y', "90.0", '\u0000');
+        IMsSearchDynamicMod dmod4 = makeDynamicMod(searchId_2, 'Y', "90.0", '\u0000');
         modDao.saveDynamicModification(dmod4);
-        MsSearchDynamicMod dmod5 = makeDynamicMod(searchId_2, 'A', "10.0", '#');
+        IMsSearchDynamicMod dmod5 = makeDynamicMod(searchId_2, 'A', "10.0", '#');
         modDao.saveDynamicModification(dmod5);
         
     }

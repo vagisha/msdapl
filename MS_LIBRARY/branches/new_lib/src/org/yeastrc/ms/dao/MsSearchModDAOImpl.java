@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dto.IMsSearchDynamicMod;
+import org.yeastrc.ms.dto.IMsSearchMod;
 import org.yeastrc.ms.dto.MsSearchDynamicMod;
 import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
@@ -35,7 +37,7 @@ public class MsSearchModDAOImpl extends BaseSqlMapDAO implements MsSearchModDAO 
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsSearchModDAO#saveStaticModification(org.yeastrc.ms.dto.MsSearchMod)
      */
-    public void saveStaticModification(MsSearchMod mod) {
+    public void saveStaticModification(IMsSearchMod mod) {
         save("MsSearchMod.insertStaticMod", mod);
     }
     
@@ -56,7 +58,7 @@ public class MsSearchModDAOImpl extends BaseSqlMapDAO implements MsSearchModDAO 
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsSearchModDAO#saveDynamicModification(org.yeastrc.ms.dto.MsSearchDynamicMod)
      */
-    public int saveDynamicModification(MsSearchDynamicMod mod) {
+    public int saveDynamicModification(IMsSearchDynamicMod mod) {
         return saveAndReturnId("MsSearchMod.insertDynaMod", mod);
     }
     

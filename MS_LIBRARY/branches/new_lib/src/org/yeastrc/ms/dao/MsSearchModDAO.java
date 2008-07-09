@@ -2,6 +2,8 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
+import org.yeastrc.ms.dto.IMsSearchDynamicMod;
+import org.yeastrc.ms.dto.IMsSearchMod;
 import org.yeastrc.ms.dto.MsSearchDynamicMod;
 import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
@@ -11,14 +13,14 @@ public interface MsSearchModDAO {
     public abstract List<MsSearchMod> loadStaticModificationsForSearch(
             int searchId);
 
-    public abstract void saveStaticModification(MsSearchMod mod);
+    public abstract void saveStaticModification(IMsSearchMod mod);
 
     public abstract void deleteStaticModificationsForSearch(int searchId);
 
     public abstract List<MsSearchDynamicMod> loadDynamicModificationsForSearch(
             int searchId);
 
-    public abstract int saveDynamicModification(MsSearchDynamicMod mod);
+    public abstract int saveDynamicModification(IMsSearchDynamicMod mod);
 
     /**
      * This will delete all dynamic modifications for a search result.

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dto.IMsSequenceDatabase;
 import org.yeastrc.ms.dto.MsSequenceDatabase;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -40,7 +41,7 @@ public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSequen
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsSequenceDatabaseDAO#saveSearchDatabase(org.yeastrc.ms.dto.MsSequenceDatabase, int)
      */
-    public int saveSearchDatabase(MsSequenceDatabase database, int searchId) {
+    public int saveSearchDatabase(IMsSequenceDatabase database, int searchId) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("searchId", searchId);
@@ -57,11 +58,11 @@ public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSequen
     }
     
     
-    private List<Integer> loadMatchingDatabaseIds(MsSequenceDatabase database) {
+    private List<Integer> loadMatchingDatabaseIds(IMsSequenceDatabase database) {
         return queryForList("MsDatabase.selectDatabaseIdMatchAllCols", database);
     }
     
-    private int saveDatabase(MsSequenceDatabase database) {
+    private int saveDatabase(IMsSequenceDatabase database) {
         return saveAndReturnId("MsDatabase.insertDatabase", database);
     }
     

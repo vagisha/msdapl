@@ -10,12 +10,12 @@ package org.yeastrc.ms.dto;
 /**
  * 
  */
-public class MsSearchDynamicMod extends MsSearchMod {
+public class MsSearchDynamicMod extends MsSearchMod implements IMsSearchDynamicMod {
 
     private char modificationSymbol = '\u0000';
     
-    /**
-     * @return the modificationSymbol
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSearchDynamicMOd#getModificationSymbol()
      */
     public char getModificationSymbol() {
         return modificationSymbol;

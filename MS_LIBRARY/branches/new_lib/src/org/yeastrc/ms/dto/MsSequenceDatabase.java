@@ -9,7 +9,7 @@ package org.yeastrc.ms.dto;
 /**
  * 
  */
-public class MsSequenceDatabase {
+public class MsSequenceDatabase implements IMsSequenceDatabase {
 
     private int id;
     private String serverAddress;
@@ -28,8 +28,8 @@ public class MsSequenceDatabase {
     public void setId(int id) {
         this.id = id;
     }
-    /**
-     * @return the serverAddress
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSequenceDatabase#getServerAddress()
      */
     public String getServerAddress() {
         return serverAddress;
@@ -40,8 +40,8 @@ public class MsSequenceDatabase {
     public void setServerAddress(String serverAddress) {
         this.serverAddress = serverAddress;
     }
-    /**
-     * @return the serverPath
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSequenceDatabase#getServerPath()
      */
     public String getServerPath() {
         return serverPath;
@@ -52,8 +52,8 @@ public class MsSequenceDatabase {
     public void setServerPath(String serverPath) {
         this.serverPath = serverPath;
     }
-    /**
-     * @return the sequenceLength
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSequenceDatabase#getSequenceLength()
      */
     public long getSequenceLength() {
         return sequenceLength;
@@ -64,8 +64,8 @@ public class MsSequenceDatabase {
     public void setSequenceLength(long sequenceLength) {
         this.sequenceLength = sequenceLength;
     }
-    /**
-     * @return the proteinCount
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSequenceDatabase#getProteinCount()
      */
     public int getProteinCount() {
         return proteinCount;

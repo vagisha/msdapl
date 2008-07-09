@@ -2,7 +2,7 @@ package org.yeastrc.ms.dto;
 
 import java.math.BigDecimal;
 
-public class MsSearchMod {
+public class MsSearchMod implements IMsSearchMod {
 
     private int id;
     private int searchId;
@@ -42,8 +42,8 @@ public class MsSearchMod {
         this.searchId = searchId;
     }
     
-    /**
-     * @return the modifiedResidue
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSearchMod#getModifiedResidue()
      */
     public char getModifiedResidue() {
         return modifiedResidue;
@@ -73,8 +73,8 @@ public class MsSearchMod {
             this.modifiedResidue = modifiedResidue.charAt(0);
     }
 
-    /**
-     * @return the modificationMass
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSearchMod#getModificationMass()
      */
     public BigDecimal getModificationMass() {
         return modificationMass;

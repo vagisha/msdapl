@@ -1,6 +1,6 @@
 package org.yeastrc.ms.dto.ms2File;
 
-public class BaseHeader {
+public class BaseHeader implements IHeader {
 
     private String name;
     private String value;
@@ -9,8 +9,8 @@ public class BaseHeader {
         super();
     }
 
-    /**
-     * @return the name of the header
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.ms2File.IHeader#getName()
      */
     public String getName() {
         return name;
@@ -23,8 +23,8 @@ public class BaseHeader {
         this.name = name;
     }
 
-    /**
-     * @return the value of the header
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.ms2File.IHeader#getValue()
      */
     public String getValue() {
         return value;

@@ -249,7 +249,7 @@ public class MsPeptideSearchResult {
         for (MsSearchResultDynamicMod mod: dynaMods)
             peptideResult.addDynamicModification(mod.getModificationPosition(), mod);
         
-        for(MsSearchMod mod: staticMods)
+        for(IMsSearchMod mod: staticMods)
             peptideResult.addStaticModification(mod.getModifiedResidue(), mod.getModificationMass());
         
         return peptideResult;
