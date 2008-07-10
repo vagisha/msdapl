@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.sqtFile.SQTSearchHeader;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
 
 public interface SQTSearchHeaderDAO {
 

@@ -4,7 +4,7 @@
  * Jul 2, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.ms2File;
+package org.yeastrc.ms.domain.ms2File.db;
 
 import java.util.ArrayList;
 import java.util.List;

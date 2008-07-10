@@ -17,9 +17,9 @@ import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.domain.db.MsScan;
 import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
-import org.yeastrc.ms.domain.ms2File.MS2FileChargeIndependentAnalysis;
-import org.yeastrc.ms.domain.ms2File.MS2FileScan;
-import org.yeastrc.ms.domain.ms2File.MS2FileScanCharge;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

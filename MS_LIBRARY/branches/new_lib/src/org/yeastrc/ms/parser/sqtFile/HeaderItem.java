@@ -1,6 +1,6 @@
 package org.yeastrc.ms.parser.sqtFile;
 
-import org.yeastrc.ms.domain.ms2File.db.IHeader;
+import org.yeastrc.ms.domain.ms2File.IHeader;
 
 public class HeaderItem implements IHeader {
     

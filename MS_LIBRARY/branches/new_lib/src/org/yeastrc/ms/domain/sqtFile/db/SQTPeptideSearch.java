@@ -1,10 +1,10 @@
-package org.yeastrc.ms.domain.sqtFile;
+package org.yeastrc.ms.domain.sqtFile.db;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.db.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
 
 public class SQTPeptideSearch extends MsPeptideSearch implements ISQTPeptideSearch {
 

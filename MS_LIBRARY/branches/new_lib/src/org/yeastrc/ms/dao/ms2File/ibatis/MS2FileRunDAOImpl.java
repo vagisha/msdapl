@@ -10,9 +10,9 @@ import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.domain.db.MsRun;
 import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
-import org.yeastrc.ms.domain.ms2File.MS2FileHeader;
-import org.yeastrc.ms.domain.ms2File.MS2FileRun;
-import org.yeastrc.ms.domain.ms2File.MS2FileScan;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

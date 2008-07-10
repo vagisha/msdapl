@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchHeader;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

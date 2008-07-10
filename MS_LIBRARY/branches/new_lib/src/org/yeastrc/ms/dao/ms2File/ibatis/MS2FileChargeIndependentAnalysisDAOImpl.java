@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.domain.ms2File.MS2FileChargeIndependentAnalysis;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

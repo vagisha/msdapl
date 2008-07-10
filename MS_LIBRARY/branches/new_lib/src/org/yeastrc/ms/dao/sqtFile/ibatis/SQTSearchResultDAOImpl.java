@@ -8,7 +8,7 @@ package org.yeastrc.ms.dao.sqtFile.ibatis;
 
 import org.yeastrc.ms.dao.ibatis.MsPeptideSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResult;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

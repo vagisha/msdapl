@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.ms2File.MS2FileHeader;
-import org.yeastrc.ms.domain.ms2File.MS2FileRun;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
 
 public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
 

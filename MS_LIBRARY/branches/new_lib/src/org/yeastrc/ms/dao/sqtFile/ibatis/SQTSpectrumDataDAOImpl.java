@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
-import org.yeastrc.ms.domain.sqtFile.SQTSpectrumData;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSpectrumData;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

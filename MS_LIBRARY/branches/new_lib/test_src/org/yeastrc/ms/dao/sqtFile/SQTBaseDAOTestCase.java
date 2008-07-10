@@ -3,8 +3,8 @@ package org.yeastrc.ms.dao.sqtFile;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchHeader;
+import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
 
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 

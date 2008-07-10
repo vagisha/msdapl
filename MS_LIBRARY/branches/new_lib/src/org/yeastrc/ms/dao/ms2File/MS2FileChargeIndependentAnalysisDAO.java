@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.MS2FileChargeIndependentAnalysis;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
 
 public interface MS2FileChargeIndependentAnalysisDAO {
 

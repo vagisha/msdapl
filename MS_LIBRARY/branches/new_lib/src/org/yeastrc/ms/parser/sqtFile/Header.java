@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yeastrc.ms.domain.sqtFile.db.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
 
 
 public class Header implements ISQTPeptideSearch {

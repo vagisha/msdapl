@@ -1,6 +1,6 @@
-package org.yeastrc.ms.domain.sqtFile;
+package org.yeastrc.ms.domain.sqtFile.db;
 
-import org.yeastrc.ms.domain.ms2File.BaseHeader;
+import org.yeastrc.ms.domain.ms2File.db.BaseHeader;
 
 public class SQTSearchHeader extends BaseHeader {
 

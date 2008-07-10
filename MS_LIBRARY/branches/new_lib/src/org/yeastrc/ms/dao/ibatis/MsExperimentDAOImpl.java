@@ -13,7 +13,7 @@ import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.domain.db.MsExperiment;
 import org.yeastrc.ms.domain.db.MsRun;
 import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
-import org.yeastrc.ms.domain.ms2File.MS2FileRun;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

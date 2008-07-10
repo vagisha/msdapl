@@ -1,6 +1,6 @@
 package org.yeastrc.ms.dao.sqtFile;
 
-import org.yeastrc.ms.domain.sqtFile.SQTSpectrumData;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSpectrumData;
 
 public class SQTSpectrumDataDAOImplTest extends SQTBaseDAOTestCase {
 

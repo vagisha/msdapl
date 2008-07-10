@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.MS2FileChargeIndependentAnalysis;
+import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
 
 
 public class MS2FileChargeIndependentAnalysisDAOImplTest extends MS2BaseDAOtestCase {
