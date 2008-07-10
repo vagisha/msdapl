@@ -137,7 +137,7 @@ public class Ms2FileToDbConverter {
         
         // save the MS2FileRun
         MsRunDAO<MS2FileRun> rundao = DAOFactory.instance().getMS2FileRunDAO();
-        return rundao.saveRun(ms2Run);
+        return rundao.saveRun(ms2Run, 0);
             
     }
     

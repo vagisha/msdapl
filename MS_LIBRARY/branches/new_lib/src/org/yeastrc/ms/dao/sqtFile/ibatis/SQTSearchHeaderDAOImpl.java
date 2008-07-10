@@ -6,10 +6,13 @@
  */
 package org.yeastrc.ms.dao.sqtFile.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
+import org.yeastrc.ms.domain.ms2File.IHeader;
 import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -33,8 +36,12 @@ public class SQTSearchHeaderDAOImpl extends BaseSqlMapDAO implements SQTSearchHe
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO#saveSQTHeader(org.yeastrc.ms.dto.sqtFile.SQTSearchHeader)
      */
-    public void saveSQTHeader(SQTSearchHeader header) {
-        save("SqtHeader.insertHeader", header);
+    public void saveSQTHeader(IHeader header, int searchId) {
+        Map<String, Object> map = new HashMap<String, Object>(3);
+        map.put("searchId", searchId);
+        map.put("name", header.getName());
+        map.put("value", header.getValue());
+        save("SqtHeader.insertHeader", map);
     }
     
     /* (non-Javadoc)

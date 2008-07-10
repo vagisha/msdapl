@@ -28,7 +28,7 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
         assertTrue(run.getEnzymeList().size() > 0);
         
         
-        int runId = ms2RunDao.saveRun(run); // save the run
+        int runId = ms2RunDao.saveRun(run, 0); // save the run
         saveScansForRun(runId, 20); // add scans for this run
         
         
@@ -61,9 +61,9 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
     public void testLoadExperimentRuns() {
         // do we get a list of type List<MS2FileRun>?
         IMS2Run run = makeMS2Run(1, true, true); // run with enzyme info and headers
-        ms2RunDao.saveRun(run);
+        ms2RunDao.saveRun(run, 0);
         run = makeMS2Run(1, true, true);
-        ms2RunDao.saveRun(run);
+        ms2RunDao.saveRun(run, 0);
         
         List<MS2FileRun> runList = ms2RunDao.loadExperimentRuns(1);
         assertEquals(2, runList.size());

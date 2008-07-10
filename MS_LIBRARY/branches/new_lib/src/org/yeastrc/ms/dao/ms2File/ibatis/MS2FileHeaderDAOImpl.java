@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
+import org.yeastrc.ms.domain.ms2File.IHeader;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -25,8 +26,12 @@ public class MS2FileHeaderDAOImpl extends BaseSqlMapDAO implements MS2FileHeader
         super(sqlMap);
     }
 
-    public void save(MS2FileHeader header) {
-        save("MS2Header.insert", header);
+    public void save(IHeader header, int runId) {
+        Map<String, Object> map = new HashMap<String, Object>(3);
+        map.put("runId", runId);
+        map.put("name", header.getName());
+        map.put("value", header.getValue());
+        save("MS2Header.insert", map);
     }
     
     public List<MS2FileHeader> loadHeadersForRun(int runId) {

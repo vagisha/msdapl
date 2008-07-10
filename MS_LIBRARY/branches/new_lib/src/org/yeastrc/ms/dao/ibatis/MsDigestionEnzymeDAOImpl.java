@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
-import org.yeastrc.ms.dao.MsDigestionEnzymeDAO.EnzymeProperties;
+import org.yeastrc.ms.domain.IMsEnzyme;
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -64,11 +64,11 @@ public class MsDigestionEnzymeDAOImpl extends BaseSqlMapDAO implements MsDigesti
     //------------------------------------------------------------------------------------------------
     // SAVE methods
     //------------------------------------------------------------------------------------------------
-    public int saveEnzyme(MsDigestionEnzyme enzyme) {
+    public int saveEnzyme(IMsEnzyme enzyme) {
         return saveEnzyme(enzyme, Arrays.asList(EnzymeProperties.values()));
     }
     
-    public int saveEnzyme(MsDigestionEnzyme enzyme, List<EnzymeProperties> params) {
+    public int saveEnzyme(IMsEnzyme enzyme, List<EnzymeProperties> params) {
         
         // TODO if the enzyme given to us already has a database id
         // exucute an update.  If no database entry was found for the id
@@ -95,12 +95,12 @@ public class MsDigestionEnzymeDAOImpl extends BaseSqlMapDAO implements MsDigesti
         return saveAndReturnId("MsDigestionEnzyme.insert", enzyme);
     }
     
-    public int saveEnzymeforRun(MsDigestionEnzyme enzyme, int runId) {
+    public int saveEnzymeforRun(IMsEnzyme enzyme, int runId) {
         
         return saveEnzymeforRun(enzyme, runId, Arrays.asList(EnzymeProperties.values()));
     }
     
-    public int saveEnzymeforRun(MsDigestionEnzyme enzyme, int runId, List<EnzymeProperties> properties) {
+    public int saveEnzymeforRun(IMsEnzyme enzyme, int runId, List<EnzymeProperties> properties) {
         
         int enzymeId = saveEnzyme(enzyme, properties);
         

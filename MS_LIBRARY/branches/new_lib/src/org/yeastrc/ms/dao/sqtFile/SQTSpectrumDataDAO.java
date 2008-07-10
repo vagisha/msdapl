@@ -7,7 +7,7 @@ public interface SQTSpectrumDataDAO {
 
     public abstract SQTSpectrumData load(int searchId, int scanId, int charge);
 
-    public abstract void save(ISQTSearchScan scanData);
+    public abstract void save(ISQTSearchScan scanData, int searchId, int scanId);
 
     public abstract void deleteForSearch(int searchId);
 

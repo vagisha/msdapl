@@ -33,7 +33,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, runIdList.size());
         
         MsRun run1 = createRun(msExperimentId_1);
-        int runId1 = runDao.saveRun(run1);
+        int runId1 = runDao.saveRun(run1, 0);
         
         // lets make sure it got saved
         runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
@@ -44,7 +44,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         // create a run with a different experiment id and save it
         MsRun run2 = createRun(msExperimentId_2);
-        int runId2 = runDao.saveRun(run2);
+        int runId2 = runDao.saveRun(run2, 0);
         
         // make sure there is only one run with our original experiment id
         runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
@@ -60,7 +60,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
 
     public void testLoadRunsForExperiment() {
         MsRun run = createRun(msExperimentId_1);
-        runDao.saveRun(run);
+        runDao.saveRun(run, 0);
         List <MsRun> runs = runDao.loadExperimentRuns(msExperimentId_1);
         assertEquals(1, runs.size());
         checkRun(run, runs.get(0));
@@ -69,9 +69,9 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
 
     public void testLoadRunsForFileNameAndSha1Sum() {
         MsRun run = createRun(msExperimentId_1);
-        runDao.saveRun(run);
+        runDao.saveRun(run, 0);
         run = createRun(msExperimentId_2);
-        runDao.saveRun(run);
+        runDao.saveRun(run, 0);
         
         List<Integer> runs = runDao.runIdsFor("my_file1.ms2", "sha1sum");
         assertEquals(2, runs.size());
@@ -80,11 +80,11 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     public void testDeleteRunsForExperiment() {
         MsRun run = createRun(msExperimentId_1);
-        runDao.saveRun(run);
+        runDao.saveRun(run, 0);
         run = createRun(msExperimentId_1);
-        runDao.saveRun(run);
+        runDao.saveRun(run, 0);
         run = createRun(msExperimentId_2); // different experiment
-        runDao.saveRun(run);
+        runDao.saveRun(run, 0);
         
         int origSize = runDao.loadRunIdsForExperiment(msExperimentId_1).size();
         assertTrue(origSize == 2);
@@ -100,7 +100,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     public void testSaveAndLoadRunWithNoEnzymes() {
         // create a run and save it
         MsRun run = createRun(msExperimentId_1);
-        int runId = runDao.saveRun(run);
+        int runId = runDao.saveRun(run, 0);
         
         // read back the run
         IMsRun dbRun = runDao.loadRun(runId);
@@ -126,7 +126,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         MsRun run1 = createRunWEnzymeInfo(msExperimentId_1, enzymeList1);
         
         // save the run
-        int runId_1 = runDao.saveRun(run1);
+        int runId_1 = runDao.saveRun(run1, 0);
         
         // now read back the run and make sure it has the enzyme information
         IMsRun runFromDb_1 = runDao.loadRun(runId_1);
@@ -142,7 +142,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         
         // save the run
-        int runId_2 = runDao.saveRun(run2);
+        int runId_2 = runDao.saveRun(run2, 0);
         
         // now read back the run and make sure it has the enzyme information
         IMsRun runFromDb_2 = runDao.loadRun(runId_2);
@@ -177,7 +177,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         MsRun run1 = createRunWEnzymeInfo(msExperimentId_1, enzymeList1);
         
         // save the run
-        int runId_1 = runDao.saveRun(run1);
+        int runId_1 = runDao.saveRun(run1, 0);
         
         // now read back the run and make sure it has the enzyme information
         IMsRun runFromDb_1 = runDao.loadRun(runId_1);
@@ -193,7 +193,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         
         // save the run
-        int runId_2 = runDao.saveRun(run2);
+        int runId_2 = runDao.saveRun(run2, 0);
         
         
         // save some scans for the runs

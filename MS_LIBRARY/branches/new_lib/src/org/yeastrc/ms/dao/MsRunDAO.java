@@ -3,17 +3,19 @@ package org.yeastrc.ms.dao;
 import java.util.List;
 
 import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.IMsRun.RunFileFormat;
+import org.yeastrc.ms.domain.db.MsRun;
 
-public interface MsRunDAO <T extends IMsRun>{
+public interface MsRunDAO <I extends IMsRun, O extends MsRun>{
 
     /**
      * Saves the given run in the database and returns the database id for the run.
      * Any enzyme information is saved
      * @param run
+     * @param msExperimentId 
      * @return
      */
-    public abstract int saveRun(T run);
+    public abstract int saveRun(I run, int msExperimentId);
     
     
     /**
@@ -21,7 +23,7 @@ public interface MsRunDAO <T extends IMsRun>{
      * @param runId
      * @return
      */
-    public abstract T loadRun(int runId);
+    public abstract O loadRun(int runId);
     
     
     /**
@@ -30,7 +32,7 @@ public interface MsRunDAO <T extends IMsRun>{
      * @param msExperimentId
      * @return
      */
-    public abstract List<T> loadExperimentRuns(int msExperimentId);
+    public abstract List<O> loadExperimentRuns(int msExperimentId);
     
     
     /**

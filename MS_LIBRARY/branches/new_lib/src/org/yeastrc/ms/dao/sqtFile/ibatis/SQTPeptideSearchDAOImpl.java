@@ -10,8 +10,11 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.MsPeptideSearchDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
+import org.yeastrc.ms.domain.IMsSearch;
+import org.yeastrc.ms.domain.db.MsPeptideSearch;
+import org.yeastrc.ms.domain.ms2File.IHeader;
 import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
 import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
 
@@ -20,25 +23,33 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSearchDAO<ISQTSearch> {
+public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO 
+    implements MsPeptideSearchDAO<ISQTSearch, SQTPeptideSearch> {
 
-    public SQTPeptideSearchDAOImpl(SqlMapClient sqlMap) {
+    private MsPeptideSearchDAO<IMsSearch, MsPeptideSearch> searchDao;
+    private SQTSearchHeaderDAO headerDao;
+    private SQTSpectrumDataDAO spectrumDao;
+    
+    public SQTPeptideSearchDAOImpl(SqlMapClient sqlMap,
+            MsPeptideSearchDAO<IMsSearch, MsPeptideSearch> searchDao,
+            SQTSearchHeaderDAO headerDao,
+            SQTSpectrumDataDAO spectrumDao) {
         super(sqlMap);
+        this.searchDao = searchDao;
+        this.headerDao = headerDao;
+        this.spectrumDao = spectrumDao;
     }
     
     public SQTPeptideSearch loadSearch(int searchId) {
-//        return (SQTPeptideSearch) super.loadSearch(searchId);
         return (SQTPeptideSearch) queryForObject("MsSearch.select", searchId);
     }
     
     @Override
     public List<Integer> loadSearchIdsForRun(int runId) {
-        // TODO Auto-generated method stub
-        return null;
+        return searchDao.loadSearchIdsForRun(runId);
     }
     
     public List<SQTPeptideSearch> loadSearchesForRun(int runId) {
-//        return (List<SQTPeptideSearch>) super.loadSearchesForRun(runId);
         return queryForList("MsSearch.selectSearchesForRun", runId);
     }
     
@@ -47,21 +58,17 @@ public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideS
      * @param search
      * @return
      */
-    public int saveSearch (ISQTSearch search) {
+    public int saveSearch (ISQTSearch search, int runId) {
         
         // save the search
-//        int searchId = super.saveSearch(search);
+        int searchId = searchDao.saveSearch(search, runId);
         
         // save the headers
-        SQTSearchHeaderDAO headerDao = DAOFactory.instance().getSqtHeaderDAO();
-//        List<IHeader> headers = search.getHeaders();
-//        for (SQTSearchHeader h: headers) {
-//            h.setSearchId(searchId);
-//            headerDao.saveSQTHeader(h);
-//        }
+        for (IHeader h: search.getHeaders()) {
+            headerDao.saveSQTHeader(h, searchId);
+        }
         
-//        return searchId;
-        return 0;
+        return searchId;
     }
     
     /**
@@ -70,11 +77,13 @@ public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideS
      */
     public void deleteSearch (int searchId) {
         // delete headers first
-        SQTSearchHeaderDAO headerDao = DAOFactory.instance().getSqtHeaderDAO();
         headerDao.deleteSQTHeadersForSearch(searchId);
         
+        // delete the spectrum data
+        spectrumDao.deleteForSearch(searchId);
+        
         // now delete the search
-//        super.deleteSearch(searchId);
+        searchDao.deleteSearch(searchId);
     }
   
 }

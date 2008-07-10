@@ -9,6 +9,7 @@ package org.yeastrc.ms.dao.ibatis;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.domain.IMsScan;
 import org.yeastrc.ms.domain.db.MsScan;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -16,14 +17,15 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan> {
+public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<IMsScan, MsScan> {
 
     public MsScanDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
-    public int save(MsScan scan) {
-        return saveAndReturnId("MsScan.insert", scan);
+    public int save(IMsScan scan, int runId) {
+        MsScanDb scanDb = new MsScanDb(runId, scan);
+        return saveAndReturnId("MsScan.insert", scanDb);
     }
     
     public MsScan load(int scanId) {

@@ -15,28 +15,33 @@ import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.domain.IMsEnzyme;
 import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.IMsScan;
+import org.yeastrc.ms.domain.IMsRun.RunFileFormat;
 import org.yeastrc.ms.domain.db.MsRun;
 import org.yeastrc.ms.domain.db.MsScan;
-import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun> {
+public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMsRun, MsRun> {
 
-    public MsRunDAOImpl(SqlMapClient sqlMap) {
+    private MsScanDAO<IMsScan, MsScan> msScanDao;
+    private MsDigestionEnzymeDAO enzymeDao;
+    
+    public MsRunDAOImpl(SqlMapClient sqlMap, MsDigestionEnzymeDAO enzymeDao , 
+            MsScanDAO<IMsScan, MsScan> msScanDAO) {
         super(sqlMap);
+        this.enzymeDao = enzymeDao;
+        this.msScanDao = msScanDAO;
     }
 
-    public int saveRun(MsRun run) {
+    public int saveRun(IMsRun run, int msExperimentId) {
         
+        MsRunDb runDb = new MsRunDb(msExperimentId, run);
         // save the run
-        int runId = saveAndReturnId("MsRun.insert", run);
-        run.setId(runId);
+        int runId = saveAndReturnId("MsRun.insert", runDb);
         
         // save the enzyme information
-        List<MsDigestionEnzyme> enzymes = run.getEnzymeList();
-        MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
+        List<? extends IMsEnzyme> enzymes = run.getEnzymeList();
         for (IMsEnzyme enzyme: enzymes) 
             enzymeDao.saveEnzymeforRun(enzyme, runId);
         
@@ -68,12 +73,10 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun> {
     public void delete(int runId) {
         
         // delete enzyme information first
-        MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
         enzymeDao.deleteEnzymesByRunId(runId);
         
         // delete scans
-        MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
-        scanDao.deleteScansForRun(runId);
+        msScanDao.deleteScansForRun(runId);
         
         // delete the run
         delete("MsRun.delete", runId);
@@ -92,14 +95,12 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun> {
         
         if (runIds.size() > 0) {
             // delete enzyme associations
-            MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
             enzymeDao.deleteEnzymesByRunIds(runIds);
         }
         
         for (Integer runId: runIds) {
             // delete scans for this run
-            MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
-            scanDao.deleteScansForRun(runId);
+            msScanDao.deleteScansForRun(runId);
         }
         
         // finally, delete the runs
@@ -116,5 +117,5 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun> {
         }
         return run.getRunFileFormat();
     }
-
+    
 }

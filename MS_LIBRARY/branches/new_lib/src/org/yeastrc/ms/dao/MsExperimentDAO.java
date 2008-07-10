@@ -3,10 +3,11 @@ package org.yeastrc.ms.dao;
 import java.util.List;
 
 import org.yeastrc.ms.domain.IMsExperiment;
+import org.yeastrc.ms.domain.db.MsExperiment;
 
 public interface MsExperimentDAO {
 
-    public abstract IMsExperiment load(int msExperimentId);
+    public abstract MsExperiment load(int msExperimentId);
 
     public abstract List<Integer> selectAllExperimentIds();
     

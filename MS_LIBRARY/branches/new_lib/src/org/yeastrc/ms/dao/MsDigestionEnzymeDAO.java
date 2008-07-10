@@ -2,6 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
+import org.yeastrc.ms.domain.IMsEnzyme;
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 
 public interface MsDigestionEnzymeDAO {
@@ -26,7 +27,7 @@ public interface MsDigestionEnzymeDAO {
      * @param enzyme
      * @return
      */
-    public int saveEnzyme(MsDigestionEnzyme enzyme);
+    public int saveEnzyme(IMsEnzyme enzyme);
     
     /**
      * Saves the enzyme if it does not already exist in the database.
@@ -34,7 +35,7 @@ public interface MsDigestionEnzymeDAO {
      * @param properties -- list of properties used to look for a matching enzyme before saving
      * @return
      */
-    public int saveEnzyme(MsDigestionEnzyme enzyme, List<EnzymeProperties> properties);
+    public int saveEnzyme(IMsEnzyme enzyme, List<EnzymeProperties> properties);
     
     
     /**
@@ -46,7 +47,7 @@ public interface MsDigestionEnzymeDAO {
      * @param runId
      * @return
      */
-    public int saveEnzymeforRun(MsDigestionEnzyme enzyme, int runId);
+    public int saveEnzymeforRun(IMsEnzyme enzyme, int runId);
     
     /**
      * Saves an entry in msRunEnzyme linking the enzyme with the runId.
@@ -58,7 +59,7 @@ public interface MsDigestionEnzymeDAO {
      * @param properties
      * @return
      */
-    public int saveEnzymeforRun(MsDigestionEnzyme enzyme, int runId, List<EnzymeProperties> properties);
+    public int saveEnzymeforRun(IMsEnzyme enzyme, int runId, List<EnzymeProperties> properties);
     
     
     

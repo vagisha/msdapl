@@ -12,18 +12,33 @@ import org.yeastrc.ms.dao.MsPeptideSearchDAO;
 import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
 import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
 import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
+import org.yeastrc.ms.domain.IMsSearch;
+import org.yeastrc.ms.domain.IMsSearchDatabase;
+import org.yeastrc.ms.domain.IMsSearchModification;
+import org.yeastrc.ms.domain.IMsSearchResult;
 import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.db.MsSequenceDatabase;
+import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSearchDAO<MsPeptideSearch> {
+public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO 
+        implements MsPeptideSearchDAO<IMsSearch, MsPeptideSearch> {
 
-    public MsPeptideSearchDAOImpl(SqlMapClient sqlMap) {
+    private MsSequenceDatabaseDAO seqDbDao;
+    private MsPeptideSearchModDAO modDao;
+    private MsPeptideSearchResultDAO<IMsSearchResult, MsPeptideSearchResult> resultDao;
+    
+    public MsPeptideSearchDAOImpl(SqlMapClient sqlMap, 
+            MsPeptideSearchResultDAO<IMsSearchResult, MsPeptideSearchResult> resultDao,
+            MsSequenceDatabaseDAO seqDbDao,
+            MsPeptideSearchModDAO modDao) {
         super(sqlMap);
+        this.resultDao = resultDao;
+        this.seqDbDao = seqDbDao;
+        this.modDao = modDao;
     }
     
     public MsPeptideSearch loadSearch(int searchId) {
@@ -38,28 +53,24 @@ public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSe
         return queryForList("MsSearch.selectSearchIdsForRun", runId);
     }
     
-    public int saveSearch(MsPeptideSearch search) {
-        int searchId = saveAndReturnId("MsSearch.insert", search);
+    public int saveSearch(IMsSearch search, int runId) {
+        MsSearchDb searchDb = new MsSearchDb(runId, search);
+        int searchId = saveAndReturnId("MsSearch.insert", searchDb);
         
         // save any database information associated with the search 
-        MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
-        for (MsSequenceDatabase seqDb: search.getSearchDatabases()) {
+        for (IMsSearchDatabase seqDb: search.getSearchDatabases()) {
             seqDbDao.saveSearchDatabase(seqDb, searchId);
         }
         
         // save any static modifications used for the search
-//        MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-//        List<? extends IMsSearchMod> mods = search.getStaticModifications();
-//        for (IMsSearchMod staticMod: mods) {
-//            staticMod.setSearchId(searchId);
-//            modDao.saveStaticModification(staticMod);
-//        }
-//        
-//        // save any dynamic modifications used for the search
-//        for (MsSearchDynamicMod dynaMod: search.getDynamicModifications()) {
-//            dynaMod.setSearchId(searchId);
-//            modDao.saveDynamicModification(dynaMod);
-//        }
+        for (IMsSearchModification staticMod: search.getStaticModifications()) {
+            modDao.saveStaticModification(staticMod, searchId);
+        }
+        
+        // save any dynamic modifications used for the search
+        for (IMsSearchModification dynaMod: search.getDynamicModifications()) {
+            modDao.saveDynamicModification(dynaMod, searchId);
+        }
         
         return searchId;
     }
@@ -67,15 +78,12 @@ public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSe
     public void deleteSearch(int searchId) {
         
         // delete all results for this search
-        MsPeptideSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
         resultDao.deleteResultsForSearch(searchId);
         
         // delete any sequence database(s) associated with this search
-        MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
         seqDbDao.deleteSearchDatabases(searchId);
         
         // delete any static and dynamic modifications used for this search
-        MsPeptideSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
         modDao.deleteStaticModificationsForSearch(searchId);
         modDao.deleteDynamicModificationsForSearch(searchId);
         

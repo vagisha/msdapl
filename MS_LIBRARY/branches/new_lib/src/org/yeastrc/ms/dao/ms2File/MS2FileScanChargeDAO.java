@@ -20,7 +20,7 @@ public interface MS2FileScanChargeDAO {
      * @param scanCharge
      * @return database id of the saved MS2FileScanCharge
      */
-    public abstract int save(IMS2ScanCharge scanCharge);
+    public abstract int save(IMS2ScanCharge scanCharge, int scanId);
 
     
     /**

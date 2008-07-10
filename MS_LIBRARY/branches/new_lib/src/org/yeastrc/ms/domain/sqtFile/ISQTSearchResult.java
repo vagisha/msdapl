@@ -2,7 +2,9 @@ package org.yeastrc.ms.domain.sqtFile;
 
 import java.math.BigDecimal;
 
-public interface ISQTSearchResult {
+import org.yeastrc.ms.domain.IMsSearchResult;
+
+public interface ISQTSearchResult extends IMsSearchResult {
 
     /**
      * @return the xCorrRank

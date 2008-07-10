@@ -2,47 +2,53 @@ package org.yeastrc.ms.dao.ms2File.ibatis;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
+import org.yeastrc.ms.domain.IMsRun;
+import org.yeastrc.ms.domain.IMsRun.RunFileFormat;
 import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.IHeader;
 import org.yeastrc.ms.domain.ms2File.IMS2Run;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
+import org.yeastrc.ms.domain.ms2File.IMS2Scan;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2FileRun> {
+public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMS2Run, MS2FileRun> {
 
-    public MS2FileRunDAOImpl(SqlMapClient sqlMap) {
+    private MsRunDAO<IMsRun, MsRun> msRunDao;
+    private MS2FileHeaderDAO ms2HeaderDao;
+    private MsScanDAO<IMS2Scan, MS2FileScan> ms2ScanDao;
+    
+    
+    
+    public MS2FileRunDAOImpl(SqlMapClient sqlMap, MsRunDAO<IMsRun, MsRun> msRunDao,
+            MS2FileHeaderDAO ms2HeaderDao, MsScanDAO<IMS2Scan, MS2FileScan> ms2ScanDao) {
         super(sqlMap);
+        this.msRunDao = msRunDao;
+        this.ms2HeaderDao = ms2HeaderDao;
+        this.ms2ScanDao = ms2ScanDao;
     }
 
-
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
-        MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
-        return runDao.getRunFileFormat(runId);
+        return msRunDao.getRunFileFormat(runId);
     }
 
     /**
      * Saves the run along with MS2 file specific information
      */
-    public int saveRun(IMS2Run run) {
+    public int saveRun(IMS2Run run, int msExperimentId) {
 
         // save the run
-        MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
-        int runId = runDao.saveRun(run);
+        int runId = msRunDao.saveRun(run, 0);
 
         MS2FileHeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-        List<MS2FileHeader> headers = run.getHeaderList();
-        for (MS2FileHeader header: headers) {
-            header.setRunId(runId);
-            headerDao.save(header);
+        for (IHeader header: run.getHeaderList()) {
+            headerDao.save(header, runId);
         }
         return runId;
     }
@@ -60,14 +66,12 @@ public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2File
     }
 
     public List<Integer> loadRunIdsForExperiment(int msExperimentId) {
-        MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
-        return runDao.loadRunIdsForExperiment(msExperimentId);
+        return msRunDao.loadRunIdsForExperiment(msExperimentId);
     }
 
     public List<Integer> runIdsFor(String fileName, String sha1Sum) {
 
-        MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
-        return runDao.runIdsFor(fileName, sha1Sum);
+        return msRunDao.runIdsFor(fileName, sha1Sum);
     }
 
 
@@ -82,47 +86,21 @@ public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2File
     public List<Integer> deleteRunsForExperiment(int msExperimentId) {
 
         List<Integer> runIds = loadRunIdsForExperiment(msExperimentId);
-
-        if (runIds.size() > 0) {
-            // delete enzyme associations
-            MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
-            enzymeDao.deleteEnzymesByRunIds(runIds);
-            
-            // delete any MS2 header data for the given run ids
-            MS2FileHeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-            headerDao.deleteHeadersForRunIds(runIds);
-        }
-
-        for (Integer runId: runIds) {
-            // delete scans for this run
-            MsScanDAO<MS2FileScan> scanDao = DAOFactory.instance().getMS2FileScanDAO();
-            scanDao.deleteScansForRun(runId);
-        }
-
-        // finally, delete the runs
-        delete("MsRun.deleteByExperimentId", msExperimentId);
+        for (Integer runId: runIds)
+            delete(runId);
+        
         return runIds;
     }
 
     public void delete(int runId) {
 
         // delete any headers
-        MS2FileHeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-        headerDao.deleteHeadersForRunId(runId);
-
-        // delete enzyme information
-        MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
-        enzymeDao.deleteEnzymesByRunId(runId);
+        ms2HeaderDao.deleteHeadersForRunId(runId);
 
         // delete any scans
-        MsScanDAO<MS2FileScan> scanDao = DAOFactory.instance().getMS2FileScanDAO();
-        scanDao.deleteScansForRun(runId);
+        ms2ScanDao.deleteScansForRun(runId);
 
-        MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
-        runDao.delete(runId);
-
-        // delete the run
-        delete("MsRun.delete", runId);
+        msRunDao.delete(runId);
 
     }
 }

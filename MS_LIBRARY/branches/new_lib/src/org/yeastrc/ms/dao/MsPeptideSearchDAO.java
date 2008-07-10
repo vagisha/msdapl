@@ -5,11 +5,11 @@ import java.util.List;
 import org.yeastrc.ms.domain.IMsSearch;
 import org.yeastrc.ms.domain.db.MsPeptideSearch;
 
-public interface MsPeptideSearchDAO <T extends IMsSearch>{
+public interface MsPeptideSearchDAO <I extends IMsSearch, O extends MsPeptideSearch>{
 
-    public abstract MsPeptideSearch loadSearch(int searchId);
+    public abstract O loadSearch(int searchId);
     
-    public abstract List<? extends MsPeptideSearch> loadSearchesForRun(int runId);
+    public abstract List<O> loadSearchesForRun(int runId);
 
     public abstract List<Integer> loadSearchIdsForRun(int runId);
 
@@ -21,7 +21,7 @@ public interface MsPeptideSearchDAO <T extends IMsSearch>{
      * @param search
      * @return database id of the search
      */
-    public abstract int saveSearch(T search);
+    public abstract int saveSearch(I search, int runId);
 
     /**
      * Deletes the search. Also deletes: 

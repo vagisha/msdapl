@@ -6,32 +6,36 @@
  */
 package org.yeastrc.ms.dao.ms2File.ibatis;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
+import org.yeastrc.ms.domain.IMsScan;
 import org.yeastrc.ms.domain.db.MsScan;
-import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.IHeader;
 import org.yeastrc.ms.domain.ms2File.IMS2Scan;
 import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2FileScan> {
+public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<IMS2Scan, MS2FileScan> {
 
-    public MS2FileScanDAOImpl(SqlMapClient sqlMap) {
+    private MsScanDAO<IMsScan, MsScan> msScanDao;
+    private MS2FileChargeIndependentAnalysisDAO iAnalDao;
+    private MS2FileScanChargeDAO chargeDao;
+    
+    public MS2FileScanDAOImpl(SqlMapClient sqlMap, MsScanDAO<IMsScan, MsScan> msScanDAO,
+            MS2FileChargeIndependentAnalysisDAO iAnalDao, MS2FileScanChargeDAO chargeDao) {
         super(sqlMap);
+        this.msScanDao = msScanDAO;
+        this.iAnalDao = iAnalDao;
+        this.chargeDao = chargeDao;
     }
 
     /**
@@ -47,38 +51,26 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Fi
      */
     public List<Integer> loadScanIdsForRun(int runId) {
         
-//        // first check if the original file format for this run was MS2
-//        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-//        if (runDao.getRunFileFormat(runId) != RunFileFormat.MS2)
-//            return new ArrayList<Integer>(0);
-        
-        MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
-        return scanDao.loadScanIdsForRun(runId);
+        // TODO: should we check if the run for the given id is a MS2 run?
+        return msScanDao.loadScanIdsForRun(runId);
     }
     
     /**
      * Saves the scan along with any MS2 file format specific data.
      */
-    public int save(IMS2Scan scan) {
+    public int save(IMS2Scan scan, int runId) {
         
         // save the parent scan first
-        MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
-        int scanId = scanDao.save(scan);
+        int scanId = msScanDao.save(scan, runId);
         
         // save the charge independent analysis
-        MS2FileChargeIndependentAnalysisDAO iAnalDao = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
-        List<MS2FileChargeIndependentAnalysis> iAnalysisList = scan.getChargeIndependentAnalysisList();
-        for (MS2FileChargeIndependentAnalysis iAnalysis: iAnalysisList) {
-            iAnalysis.setScanId(scanId);
-            iAnalDao.save(iAnalysis);
+        for (IHeader iAnalysis: scan.getChargeIndependentAnalysisList()) {
+            iAnalDao.save(iAnalysis, scanId);
         }
         
         // save the charge dependent analysis
-        MS2FileScanChargeDAO chargeDao = DAOFactory.instance().getMS2FileScanChargeDAO();
-        List<MS2FileScanCharge> scanChargeList = scan.getScanChargeList();
-        for (IMS2ScanCharge charge: scanChargeList) {
-            charge.setScanId(scanId);
-            chargeDao.save(charge);
+        for (IMS2ScanCharge charge: scan.getScanChargeList()) {
+            chargeDao.save(charge, scanId);
         }
         
         return scanId;
@@ -97,8 +89,7 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Fi
         }
         
         // delete all parent scans
-        MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
-        scanDao.deleteScansForRun(runId);
+        msScanDao.deleteScansForRun(runId);
     }
 
     /**
@@ -109,20 +100,14 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Fi
         deleteMS2Data(scanId);
         
         // delete the parent scan
-        MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
-        scanDao.delete(scanId);
+        msScanDao.delete(scanId);
     }
 
     private void deleteMS2Data(int scanId) {
         // delete any charge independent analysis associated with the scans in the run.
-        MS2FileChargeIndependentAnalysisDAO iAnalDao = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
         iAnalDao.deleteByScanId(scanId);
         
         // delete any scan charge information associated with the scan.
-        MS2FileScanChargeDAO chargeDao = DAOFactory.instance().getMS2FileScanChargeDAO();
         chargeDao.deleteByScanId(scanId);
     }
-
-   
-   
 }

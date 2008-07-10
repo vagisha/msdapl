@@ -8,6 +8,7 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
+import org.yeastrc.ms.domain.ms2File.IHeader;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeDependentAnalysis;
 
 /**
@@ -15,7 +16,7 @@ import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeDependentAnalysis;
  */
 public interface MS2FileChargeDependentAnalysisDAO {
 
-    public abstract void save(MS2FileChargeDependentAnalysis analysis);
+    public abstract void save(IHeader analysis, int scanChargeId);
 
     public abstract List<MS2FileChargeDependentAnalysis> loadAnalysisForScanCharge(int scanChargeId);
     

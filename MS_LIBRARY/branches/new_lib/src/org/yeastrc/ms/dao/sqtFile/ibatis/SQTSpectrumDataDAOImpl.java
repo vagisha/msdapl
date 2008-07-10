@@ -33,8 +33,9 @@ public class SQTSpectrumDataDAOImpl extends BaseSqlMapDAO implements SQTSpectrum
         return (SQTSpectrumData) queryForObject("SqtSpectrum.select", map);
     }
     
-    public void save(ISQTSearchScan scanData) {
-        save("SqtSpectrum.insert", scanData);
+    public void save(ISQTSearchScan scanData, int searchId, int scanId) {
+        SQTSpectrumDataDb scanDataDb = new SQTSpectrumDataDb(searchId, scanId, scanData);
+        save("SqtSpectrum.insert", scanDataDb);
     }
     
     public void deleteForSearch(int searchId) {

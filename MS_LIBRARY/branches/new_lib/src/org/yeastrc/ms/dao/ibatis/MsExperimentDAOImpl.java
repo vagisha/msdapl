@@ -11,8 +11,11 @@ import java.util.List;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.domain.IMsExperiment;
+import org.yeastrc.ms.domain.IMsRun;
+import org.yeastrc.ms.domain.IMsRun.RunFileFormat;
+import org.yeastrc.ms.domain.db.MsExperiment;
 import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.IMS2Run;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -26,8 +29,8 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         super(sqlMap);
     }
 
-    public IMsExperiment load(int msExperimentId) {
-        return (IMsExperiment)queryForObject("MsExperiment.select", msExperimentId);
+    public MsExperiment load(int msExperimentId) {
+        return (MsExperiment)queryForObject("MsExperiment.select", msExperimentId);
     }
     
     public int save(IMsExperiment experiment) {
@@ -46,7 +49,7 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     public void delete(int msExperimentId) {
         
         // delete the runs for this experiment
-        MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
+        MsRunDAO<IMsRun, MsRun> runDao = DAOFactory.instance().getMsRunDAO();
         List<Integer> runIds = runDao.loadRunIdsForExperiment(msExperimentId);
         
         if (runIds != null && runIds.size() > 0) {
@@ -66,7 +69,7 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
             }
             
             if (format == RunFileFormat.MS2) {
-                MsRunDAO<MS2FileRun> ms2RunDao = DAOFactory.instance().getMS2FileRunDAO();
+                MsRunDAO<IMS2Run, MS2FileRun> ms2RunDao = DAOFactory.instance().getMS2FileRunDAO();
                 ms2RunDao.deleteRunsForExperiment(msExperimentId);
             }
             else {
