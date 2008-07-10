@@ -60,7 +60,7 @@ public interface IMsSearchResult {
     /**
      * @return the peptideResult
      */
-    public abstract MsSearchResultPeptide getResultPeptide();
+    public abstract IMsSearchResultPeptide getResultPeptide();
     
 
 }

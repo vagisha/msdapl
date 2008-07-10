@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
 
 
-public class Header implements ISQTPeptideSearch {
+public class Header implements ISQTSearch {
 
     
     private static final Pattern multiDbPattern = Pattern.compile(".*[,:;\\s]+.*");

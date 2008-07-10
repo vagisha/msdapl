@@ -1,8 +1,8 @@
 package org.yeastrc.ms.parser.sqtFile;
 
-import org.yeastrc.ms.domain.IMsSequenceDatabase;
+import org.yeastrc.ms.domain.IMsSearchDatabase;
 
-public class Database implements IMsSequenceDatabase {
+public class Database implements IMsSearchDatabase {
     
     private String serverPath;
     private String serverAddress;

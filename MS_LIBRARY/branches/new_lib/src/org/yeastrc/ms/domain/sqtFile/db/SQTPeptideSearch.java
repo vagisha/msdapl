@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
 
-public class SQTPeptideSearch extends MsPeptideSearch implements ISQTPeptideSearch {
+public class SQTPeptideSearch extends MsPeptideSearch implements ISQTSearch {
 
     private List<SQTSearchHeader> headers;
     

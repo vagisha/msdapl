@@ -3,8 +3,9 @@ package org.yeastrc.ms.domain.sqtFile.db;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.sqtFile.ISQTSearchResult;
 
-public class SQTSearchResult extends MsPeptideSearchResult {
+public class SQTSearchResult extends MsPeptideSearchResult implements ISQTSearchResult {
 
     private int resultId; 
     private int xCorrRank;
@@ -19,12 +20,10 @@ public class SQTSearchResult extends MsPeptideSearchResult {
         setSearchId(result.getSearchId());
         setScanId(result.getScanId());
         setCharge(result.getCharge());
-        setPeptide(result.getPeptide());
+        setResultPeptide(result.getResultPeptide());
         setCalculatedMass(result.getCalculatedMass());
         setNumIonsMatched(result.getNumIonsMatched());
         setNumIonsPredicted(result.getNumIonsPredicted());
-        setPreResidue(result.getPreResidue());
-        setPostResidue(result.getPostResidue());
         setValidationStatus(result.getValidationStatus());
     }
     /**

@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.IMsSequenceDatabase;
+import org.yeastrc.ms.domain.IMsSearchDatabase;
 import org.yeastrc.ms.domain.db.MsSequenceDatabase;
 
 public interface MsSequenceDatabaseDAO {
@@ -20,7 +20,7 @@ public interface MsSequenceDatabaseDAO {
      * @param searchId
      * @return id of the sequence database that was linked to the searchId
      */
-    public abstract int saveSearchDatabase(IMsSequenceDatabase database,
+    public abstract int saveSearchDatabase(IMsSearchDatabase database,
             int searchId);
 
 }

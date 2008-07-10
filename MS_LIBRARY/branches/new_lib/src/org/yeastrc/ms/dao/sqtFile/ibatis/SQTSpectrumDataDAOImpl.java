@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
+import org.yeastrc.ms.domain.sqtFile.ISQTSearchScan;
 import org.yeastrc.ms.domain.sqtFile.db.SQTSpectrumData;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -32,7 +33,7 @@ public class SQTSpectrumDataDAOImpl extends BaseSqlMapDAO implements SQTSpectrum
         return (SQTSpectrumData) queryForObject("SqtSpectrum.select", map);
     }
     
-    public void save(SQTSpectrumData scanData) {
+    public void save(ISQTSearchScan scanData) {
         save("SqtSpectrum.insert", scanData);
     }
     

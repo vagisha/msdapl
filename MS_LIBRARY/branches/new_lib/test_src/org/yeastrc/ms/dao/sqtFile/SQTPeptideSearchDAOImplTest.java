@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
 import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
 
 
@@ -29,11 +29,11 @@ public class SQTPeptideSearchDAOImplTest extends SQTBaseDAOTestCase {
         
         // load the search using the general MsPeptideSearch DAO and make sure
         // the class of the returned object is SQTSearchResult
-        assertTrue(searchDao.loadSearch(searchId_1) instanceof ISQTPeptideSearch);
-        assertFalse(null instanceof ISQTPeptideSearch);
+        assertTrue(searchDao.loadSearch(searchId_1) instanceof ISQTSearch);
+        assertFalse(null instanceof ISQTSearch);
         
         // load using our specialized SQTSearchDAO
-        ISQTPeptideSearch search_1_db = sqtSearchDao.loadSearch(searchId_1);
+        ISQTSearch search_1_db = sqtSearchDao.loadSearch(searchId_1);
         assertNotNull(search_1_db);
         assertEquals(0, search_1_db.getHeaders().size());
         
@@ -60,8 +60,8 @@ public class SQTPeptideSearchDAOImplTest extends SQTBaseDAOTestCase {
         // load both searches; make sure the right object types are returned
         List<SQTPeptideSearch> searches = sqtSearchDao.loadSearchesForRun(1);
         assertEquals(2, searches.size());
-        assertTrue(searches.get(0) instanceof ISQTPeptideSearch);
-        assertTrue(searches.get(1) instanceof ISQTPeptideSearch);
+        assertTrue(searches.get(0) instanceof ISQTSearch);
+        assertTrue(searches.get(1) instanceof ISQTSearch);
         
         // delete the searches
         sqtSearchDao.deleteSearch(searchId_1);

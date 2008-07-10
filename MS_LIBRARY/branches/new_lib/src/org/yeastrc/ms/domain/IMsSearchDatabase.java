@@ -1,6 +1,6 @@
 package org.yeastrc.ms.domain;
 
-public interface IMsSequenceDatabase {
+public interface IMsSearchDatabase {
 
     /**
      * @return the serverAddress

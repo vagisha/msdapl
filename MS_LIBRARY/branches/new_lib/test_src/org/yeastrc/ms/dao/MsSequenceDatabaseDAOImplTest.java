@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.IMsSequenceDatabase;
+import org.yeastrc.ms.domain.IMsSearchDatabase;
 import org.yeastrc.ms.domain.db.MsSequenceDatabase;
 
 /**
@@ -39,7 +39,7 @@ public class MsSequenceDatabaseDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, dbs_2.size());
         
         // create a sequence database and assign it to both the search ids
-        IMsSequenceDatabase db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1", 100, 20);
+        IMsSearchDatabase db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1", 100, 20);
         
         // assign this database to searchId_1; this will return the id from the msSequenceDatabaseDetails table
         int db1_id = seqDbDao.saveSearchDatabase(db1, searchId_1);
@@ -48,7 +48,7 @@ public class MsSequenceDatabaseDAOImplTest extends BaseDAOTestCase {
         assertEquals(db1_id, seqDbDao.saveSearchDatabase(db1, searchId_2));
         
         // create another dababase with some null values
-        IMsSequenceDatabase db2 = makeSequenceDatabase("serverAddress_1", null, null, 20);
+        IMsSearchDatabase db2 = makeSequenceDatabase("serverAddress_1", null, null, 20);
         
         // assign the database to searchId_1; we should get a different id since a new entry will be
         // created in msSequenceDatabaseDetails

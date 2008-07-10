@@ -3,10 +3,10 @@ package org.yeastrc.ms.dao.sqtFile;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsPeptideSearchDAO;
-import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
 import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
 
-public interface SQTPeptideSearchDAO extends MsPeptideSearchDAO<ISQTPeptideSearch> {
+public interface SQTPeptideSearchDAO extends MsPeptideSearchDAO<ISQTSearch> {
 
     public abstract SQTPeptideSearch loadSearch(int searchId);
 

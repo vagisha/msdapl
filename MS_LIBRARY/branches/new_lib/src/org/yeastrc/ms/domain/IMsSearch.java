@@ -54,7 +54,7 @@ public interface IMsSearch {
     /**
      * @return the searchDatabases
      */
-    public abstract List<? extends IMsSequenceDatabase> getSearchDatabases();
+    public abstract List<? extends IMsSearchDatabase> getSearchDatabases();
 
     /**
      * @return the staticModifications

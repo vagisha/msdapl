@@ -8,10 +8,12 @@ package org.yeastrc.ms.domain.sqtFile.db;
 
 import java.math.BigDecimal;
 
+import org.yeastrc.ms.domain.sqtFile.ISQTSearchScan;
+
 /**
  * 
  */
-public class SQTSpectrumData {
+public class SQTSpectrumData implements ISQTSearchScan {
 
     private int scanId;
     private int charge;

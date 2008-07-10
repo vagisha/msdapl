@@ -5,7 +5,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.IMsSearch;
 import org.yeastrc.ms.domain.ms2File.IHeader;
 
-public interface ISQTPeptideSearch extends IMsSearch {
+public interface ISQTSearch extends IMsSearch {
 
     public abstract List<? extends IHeader> getHeaders();
 

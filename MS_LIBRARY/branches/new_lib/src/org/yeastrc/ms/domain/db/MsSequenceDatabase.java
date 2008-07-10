@@ -6,12 +6,12 @@
  */
 package org.yeastrc.ms.domain.db;
 
-import org.yeastrc.ms.domain.IMsSequenceDatabase;
+import org.yeastrc.ms.domain.IMsSearchDatabase;
 
 /**
  * 
  */
-public class MsSequenceDatabase implements IMsSequenceDatabase {
+public class MsSequenceDatabase implements IMsSearchDatabase {
 
     private int id;
     private String serverAddress;

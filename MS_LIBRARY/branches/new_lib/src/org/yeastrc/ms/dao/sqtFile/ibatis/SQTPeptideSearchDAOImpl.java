@@ -12,7 +12,7 @@ import org.yeastrc.ms.dao.MsPeptideSearchDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
-import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
 import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -20,7 +20,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSearchDAO<ISQTPeptideSearch> {
+public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSearchDAO<ISQTSearch> {
 
     public SQTPeptideSearchDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
@@ -47,7 +47,7 @@ public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideS
      * @param search
      * @return
      */
-    public int saveSearch (ISQTPeptideSearch search) {
+    public int saveSearch (ISQTSearch search) {
         
         // save the search
 //        int searchId = super.saveSearch(search);
