@@ -10,6 +10,7 @@ import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.domain.db.MsRun;
 import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.IMS2Run;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
@@ -31,7 +32,7 @@ public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2File
     /**
      * Saves the run along with MS2 file specific information
      */
-    public int saveRun(MS2FileRun run) {
+    public int saveRun(IMS2Run run) {
 
         // save the run
         MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();

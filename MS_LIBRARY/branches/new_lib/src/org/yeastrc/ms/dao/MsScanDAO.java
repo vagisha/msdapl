@@ -2,9 +2,9 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.db.MsScan;
+import org.yeastrc.ms.domain.IMsScan;
 
-public interface MsScanDAO <T extends MsScan> {
+public interface MsScanDAO <T extends IMsScan> {
 
     /**
      * Saves the given scan in the database.

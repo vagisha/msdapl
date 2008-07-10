@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.domain.IPeaks;
 import org.yeastrc.ms.domain.db.Peaks;
 import org.yeastrc.ms.domain.db.Peaks.Peak;
 
@@ -45,7 +46,7 @@ public class Scan {
         this.peaks = peaks;
     }
     
-    public Peaks getPeaks() {
+    public IPeaks getPeaks() {
         return peaks;
     }
     

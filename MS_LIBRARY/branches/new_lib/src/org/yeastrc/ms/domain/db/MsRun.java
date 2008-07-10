@@ -3,53 +3,40 @@ package org.yeastrc.ms.domain.db;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.IMsRun;
 
 
-public class MsRun {
+public class MsRun implements IMsRun {
 
-    public static enum RunFileFormat {MS2, MZXML, MZDATA, MZML, UNKNOWN};
-    
     private int id; // unique id (database) for this run
-    
+
     private int msExperimentId; // id (database) of the experiment this run belongs to
-    
+
     // File for this run
     private String fileName; 
-    private RunFileFormat fileFormat;
+    private RunFileFormat fileFormat = RunFileFormat.UNKNOWN;
     private String sha1Sum;
     private String creationDate;
-    
+
     // conversion software
     private String conversionSW; // software used to convert the RAW file
     private String conversionSWVersion; // version of the conversion software used
     private String conversionSWOptions; // options used for conversion
     private String dataType; // centroid / profile etc. 
-    
+
     // acquisition instrument
     private String instrumentVendor;
     private String instrumentModel;
     private String instrumentSN; // serial number of the instrument
     private String acquisitionMethod;
-    
-    
+
+
     private String comment;
-    
-  private List <MsDigestionEnzyme> enzymeList;
-    
+
+    private List <MsDigestionEnzyme> enzymeList;
+
     public MsRun() {
         enzymeList = new ArrayList<MsDigestionEnzyme>();
-    }
-    
-    public static RunFileFormat getFileFormatForString(String extString) {
-        if (extString.equalsIgnoreCase(RunFileFormat.MS2.name()))
-            return RunFileFormat.MS2;
-        else if (extString.equals(RunFileFormat.MZXML.name()))
-            return RunFileFormat.MZXML;
-        else if (extString.equalsIgnoreCase(RunFileFormat.MZDATA.name()))
-            return RunFileFormat.MZDATA;
-        else if (extString.equalsIgnoreCase(RunFileFormat.MZML.name()))
-            return RunFileFormat.MZML;
-        else return RunFileFormat.UNKNOWN;
     }
 
     public RunFileFormat getRunFileFormat() {
@@ -57,13 +44,11 @@ public class MsRun {
     }
 
     public String getFileFormat() {
-        if (fileFormat == null)
-            return null;
-        return fileFormat.name();
+        return fileFormat.toString();
     }
-    
-    public void setFileFormat(String fileFormatStr) {
-        this.fileFormat = getFileFormatForString(fileFormatStr);
+
+    public void setRunFileFormat(String fileFormatStr) {
+        this.fileFormat = RunFileFormat.getFileFormatForString(fileFormatStr);
     }
 
     public int getMsExperimentId() {
@@ -177,7 +162,7 @@ public class MsRun {
     public void setAcquisitionMethod(String acquisitionMethod) {
         this.acquisitionMethod = acquisitionMethod;
     }
-    
+
     public List<MsDigestionEnzyme> getEnzymeList() {
         return enzymeList;
     }
@@ -185,7 +170,7 @@ public class MsRun {
     public void setEnzymeList(List<MsDigestionEnzyme> enzymeList) {
         this.enzymeList = enzymeList;
     }
-    
+
     public void addEnzyme(MsDigestionEnzyme enzyme) {
         enzymeList.add(enzyme);
     }

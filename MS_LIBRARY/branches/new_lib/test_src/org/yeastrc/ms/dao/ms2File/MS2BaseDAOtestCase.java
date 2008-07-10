@@ -7,6 +7,8 @@ import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
+import org.yeastrc.ms.domain.ms2File.IMS2Scan;
+import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
@@ -77,7 +79,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
     //---------------------------------------------------------------------------------------
     // MS2 scan charge
     //---------------------------------------------------------------------------------------
-    protected MS2FileScanCharge makeMS2ScanCharge(Integer scanId, Integer charge, String mass,
+    protected IMS2ScanCharge makeMS2ScanCharge(Integer scanId, Integer charge, String mass,
             boolean addChgDepAnalysis) {
 
         MS2FileScanCharge scanCharge = makeMS2ScanCharge(charge, mass, addChgDepAnalysis);
@@ -105,7 +107,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
     //---------------------------------------------------------------------------------------
     // MS2 scan 
     //---------------------------------------------------------------------------------------
-    protected MS2FileScan makeMS2FileScan(int runId, int startScanNum, boolean addScanCharges,
+    protected IMS2Scan makeMS2FileScan(int runId, int startScanNum, boolean addScanCharges,
             boolean addChgIAnalysis) {
         MS2FileScan scan = new MS2FileScan(makeMsScan(runId, startScanNum));
         if (addScanCharges) {
@@ -124,7 +126,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         Random random = new Random();
         for (int i = 0; i < scanCount; i++) {
             int scanNum = random.nextInt(100);
-            MS2FileScan scan = makeMS2FileScan(runId, scanNum, true, true);
+            IMS2Scan scan = makeMS2FileScan(runId, scanNum, true, true);
             ms2ScanDao.save(scan);
         }
     }

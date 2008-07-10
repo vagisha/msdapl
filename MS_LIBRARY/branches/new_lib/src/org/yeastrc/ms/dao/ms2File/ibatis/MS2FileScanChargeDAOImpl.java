@@ -14,6 +14,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
+import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
 
@@ -40,13 +41,13 @@ public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileSc
         return queryForList("MS2ScanCharge.selectForScanAndCharge", map);
     }
     
-    public int save(MS2FileScanCharge scanCharge) {
+    public int save(IMS2ScanCharge scanCharge) {
         
         int id = saveAndReturnId("MS2ScanCharge.insert", scanCharge);
         
         // save any charge dependent anaysis with the scan charge object
         MS2FileChargeDependentAnalysisDAO dAnalysisDao = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
-        for (MS2FileChargeDependentAnalysis dAnalysis: scanCharge.getChargeDependentAnalysis()) {
+        for (MS2FileChargeDependentAnalysis dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
             dAnalysis.setScanChargeId(id);
             dAnalysisDao.save(dAnalysis);
         }

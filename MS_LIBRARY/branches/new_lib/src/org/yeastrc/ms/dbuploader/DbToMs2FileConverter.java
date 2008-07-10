@@ -12,6 +12,7 @@ import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
+import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
@@ -85,7 +86,7 @@ public class DbToMs2FileConverter {
         MS2FileScanChargeDAO scDao = DAOFactory.instance().getMS2FileScanChargeDAO();
         List <MS2FileScanCharge> msChgStates = scDao.loadScanChargesForScan(scan.getId());
         List <ScanCharge> chgStates = new ArrayList<ScanCharge>(msChgStates.size());
-        for (MS2FileScanCharge msChg: msChgStates) {
+        for (IMS2ScanCharge msChg: msChgStates) {
             ScanCharge chg = new ScanCharge();
             chg.setCharge(msChg.getCharge());
             chg.setMass(msChg.getMass());

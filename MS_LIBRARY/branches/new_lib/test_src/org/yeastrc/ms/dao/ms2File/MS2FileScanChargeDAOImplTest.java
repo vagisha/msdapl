@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
 
 
@@ -24,7 +25,7 @@ public class MS2FileScanChargeDAOImplTest extends MS2BaseDAOtestCase {
         assertEquals(0, chargeDao.loadScanChargeIdsForScan(1).size());
         
         // put some data in (don't add any charge dependent data)
-        MS2FileScanCharge sc11 = makeMS2ScanCharge(1, 1, "100.0", false);
+        IMS2ScanCharge sc11 = makeMS2ScanCharge(1, 1, "100.0", false);
         int sc11_id = chargeDao.save(sc11);
         
         // read it back
@@ -32,10 +33,10 @@ public class MS2FileScanChargeDAOImplTest extends MS2BaseDAOtestCase {
         assertEquals(1, sclist1.size());
         
         // make sure NO charge dependent data was saved 
-        assertEquals(0, sclist1.get(0).getChargeDependentAnalysis().size());
+        assertEquals(0, sclist1.get(0).getChargeDependentAnalysisList().size());
         
         // put some data in (ADD charge dependent data)
-        MS2FileScanCharge sc12 = makeMS2ScanCharge(1, 2, "200.0", true);
+        IMS2ScanCharge sc12 = makeMS2ScanCharge(1, 2, "200.0", true);
         int sc12_id = chargeDao.save(sc12);
         
         // read it back
@@ -48,7 +49,7 @@ public class MS2FileScanChargeDAOImplTest extends MS2BaseDAOtestCase {
             }});
         
         // make sure charge dependent data was saved (this will be for the second object in the list)
-        assertEquals(2, sclist1.get(1).getChargeDependentAnalysis().size());
+        assertEquals(2, sclist1.get(1).getChargeDependentAnalysisList().size());
         
         // delete everything
         chargeDao.deleteByScanId(1);
@@ -57,7 +58,7 @@ public class MS2FileScanChargeDAOImplTest extends MS2BaseDAOtestCase {
     }
     
     public void testNullValues() {
-        MS2FileScanCharge sc = makeMS2ScanCharge(0, 0, null, false);
+        IMS2ScanCharge sc = makeMS2ScanCharge(0, 0, null, false);
         try {
             chargeDao.save(sc);
             fail("Should not be able to save with null scan id");
@@ -73,7 +74,7 @@ public class MS2FileScanChargeDAOImplTest extends MS2BaseDAOtestCase {
     }
     
     public void testDelete() {
-        MS2FileScanCharge sc = makeMS2ScanCharge(1, 2, "200.0", true);
+        IMS2ScanCharge sc = makeMS2ScanCharge(1, 2, "200.0", true);
         int scanChargeId = chargeDao.save(sc);
         assertEquals(2, dAnalDao.loadAnalysisForScanCharge(scanChargeId).size());
         
@@ -86,7 +87,7 @@ public class MS2FileScanChargeDAOImplTest extends MS2BaseDAOtestCase {
     }
     
     public void testDeleteCascade1() {
-        MS2FileScanCharge sc1 = makeMS2ScanCharge(1, 1, "100.0", true);
+        IMS2ScanCharge sc1 = makeMS2ScanCharge(1, 1, "100.0", true);
         int scanChargeId_1 = chargeDao.save(sc1);
         assertEquals(2, dAnalDao.loadAnalysisForScanCharge(scanChargeId_1).size());
         
@@ -105,17 +106,17 @@ public class MS2FileScanChargeDAOImplTest extends MS2BaseDAOtestCase {
         // save scan charges for scanId_1
         int scanId_1 = 1;
         // one WITH charge dependent data
-        MS2FileScanCharge sc11 = makeMS2ScanCharge(scanId_1, 1, "100.0", true);
+        IMS2ScanCharge sc11 = makeMS2ScanCharge(scanId_1, 1, "100.0", true);
         int scanChargeId_11 = chargeDao.save(sc11);
         assertEquals(2, dAnalDao.loadAnalysisForScanCharge(scanChargeId_11).size());
         // one WITHOUT charge dependent data
-        MS2FileScanCharge sc12 = makeMS2ScanCharge(scanId_1, 1, "100.0", false);
+        IMS2ScanCharge sc12 = makeMS2ScanCharge(scanId_1, 1, "100.0", false);
         int scanChargeId_12 = chargeDao.save(sc12);
         assertEquals(0, dAnalDao.loadAnalysisForScanCharge(scanChargeId_12).size());
         
         // insert a scan charge for another scan id
         int scanId_2 = 2;
-        MS2FileScanCharge sc2 = makeMS2ScanCharge(scanId_2, 2, "200.0", true);
+        IMS2ScanCharge sc2 = makeMS2ScanCharge(scanId_2, 2, "200.0", true);
         int scanChargeId_2 = chargeDao.save(sc2);
         assertEquals(1, chargeDao.loadScanChargesForScan(scanId_2).size());
         assertEquals(2, dAnalDao.loadAnalysisForScanCharge(scanChargeId_2).size());

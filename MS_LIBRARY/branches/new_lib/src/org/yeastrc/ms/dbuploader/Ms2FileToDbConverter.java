@@ -17,7 +17,8 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.IMsRun;
+import org.yeastrc.ms.domain.ms2File.IMS2Run;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeDependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
@@ -109,7 +110,7 @@ public class Ms2FileToDbConverter {
         run.setId(0); // new run; set id to 0
         run.setMsExperimentId(experimentId);
         run.setFileName(new File(fileName).getName());
-        run.setFileFormat(MsRun.RunFileFormat.MS2.name());
+        run.setRunFileFormat(org.yeastrc.ms.domain.MS2.name());
         run.setSha1Sum(sha1Sum);
         run.setCreationDate(header.getCreationDate());
         run.setConversionSW(header.getExtractor());
@@ -123,7 +124,7 @@ public class Ms2FileToDbConverter {
         
         
         // create a MS2FileRun; this is what we will save eventually
-        MS2FileRun ms2Run = new MS2FileRun(run);
+        IMS2Run ms2Run = new MS2FileRun(run);
         
         // add all the headers from the MS2 file (some headers are already a part of the MsRun object created above)
         Iterator<Entry<String,String>> headerIterator = header.iterator();

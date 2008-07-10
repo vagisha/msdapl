@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.ms2File.IMS2Run;
 
 /**
  * 
  */
-public class MS2FileRun extends MsRun {
+public class MS2FileRun extends MsRun implements IMS2Run {
 
     private List<MS2FileHeader> headers;
     
@@ -26,7 +27,7 @@ public class MS2FileRun extends MsRun {
         this();
         setMsExperimentId(run.getMsExperimentId());
         setFileName(run.getFileName());
-        setFileFormat(run.getFileFormat());
+        setRunFileFormat(run.getFileFormat());
         setSha1Sum(run.getSha1Sum());
         setCreationDate(run.getCreationDate());
         setConversionSW(run.getConversionSW());

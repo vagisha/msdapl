@@ -9,12 +9,14 @@ package org.yeastrc.ms.domain.db;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
+import org.yeastrc.ms.domain.IMsScan;
+import org.yeastrc.ms.domain.IPeaks;
 import org.yeastrc.ms.domain.db.Peaks.Peak;
 
 /**
  * 
  */
-public class MsScan {
+public class MsScan implements IMsScan {
 
     private int runId;  // id (database) of the run this scan belongs to
     
@@ -109,24 +111,16 @@ public class MsScan {
         this.precursorScanId = precursorScanId;
     }
 
-    public void setPeaks(Peaks peaks) {
+    protected void setPeaks(Peaks peaks) {
         this.peaks = peaks;
     }
 
-    public Peaks getPeaks() {
+    public IPeaks getPeaks() {
         return peaks;
     }
     
     public void setPeaksBinary(byte[] peakData) throws Exception {
         peaks.setPeakDataBinary(peakData);
-    }
-    
-    public byte[] getPeaksBinary() {
-        return peaks.getPeakDataBinary();
-    }
-    
-    public Iterator<Peak> getPeaksIterator() {
-        return peaks.iterator();
     }
     
     public int getPrecursorScanNum() {

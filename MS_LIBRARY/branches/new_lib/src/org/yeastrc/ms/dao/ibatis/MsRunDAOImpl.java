@@ -13,6 +13,8 @@ import java.util.Map;
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.domain.IMsEnzyme;
+import org.yeastrc.ms.domain.IMsRun;
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 import org.yeastrc.ms.domain.db.MsRun;
 import org.yeastrc.ms.domain.db.MsScan;
@@ -35,7 +37,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun> {
         // save the enzyme information
         List<MsDigestionEnzyme> enzymes = run.getEnzymeList();
         MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
-        for (MsDigestionEnzyme enzyme: enzymes) 
+        for (IMsEnzyme enzyme: enzymes) 
             enzymeDao.saveEnzymeforRun(enzyme, runId);
         
         return runId;
@@ -107,7 +109,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun> {
 
     
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
-        MsRun run = loadRun(runId);
+        IMsRun run = loadRun(runId);
         
         if (run == null) {
             throw new Exception("No run found for runId: "+runId);

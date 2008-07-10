@@ -17,6 +17,8 @@ import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
 import org.yeastrc.ms.domain.db.MsScan;
 import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.IMS2Scan;
+import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
@@ -57,7 +59,7 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Fi
     /**
      * Saves the scan along with any MS2 file format specific data.
      */
-    public int save(MS2FileScan scan) {
+    public int save(IMS2Scan scan) {
         
         // save the parent scan first
         MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
@@ -74,7 +76,7 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Fi
         // save the charge dependent analysis
         MS2FileScanChargeDAO chargeDao = DAOFactory.instance().getMS2FileScanChargeDAO();
         List<MS2FileScanCharge> scanChargeList = scan.getScanChargeList();
-        for (MS2FileScanCharge charge: scanChargeList) {
+        for (IMS2ScanCharge charge: scanChargeList) {
             charge.setScanId(scanId);
             chargeDao.save(charge);
         }

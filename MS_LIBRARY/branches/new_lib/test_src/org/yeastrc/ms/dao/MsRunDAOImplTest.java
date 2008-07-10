@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
+import org.yeastrc.ms.domain.IMsRun;
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 import org.yeastrc.ms.domain.db.MsRun;
 
@@ -102,7 +103,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         int runId = runDao.saveRun(run);
         
         // read back the run
-        MsRun dbRun = runDao.loadRun(runId);
+        IMsRun dbRun = runDao.loadRun(runId);
         assertEquals(0, dbRun.getEnzymeList().size());
     }
     
@@ -128,7 +129,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         int runId_1 = runDao.saveRun(run1);
         
         // now read back the run and make sure it has the enzyme information
-        MsRun runFromDb_1 = runDao.loadRun(runId_1);
+        IMsRun runFromDb_1 = runDao.loadRun(runId_1);
         List<MsDigestionEnzyme> enzymes = runFromDb_1.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());
@@ -144,7 +145,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         int runId_2 = runDao.saveRun(run2);
         
         // now read back the run and make sure it has the enzyme information
-        MsRun runFromDb_2 = runDao.loadRun(runId_2);
+        IMsRun runFromDb_2 = runDao.loadRun(runId_2);
         enzymes = runFromDb_2.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(1, enzymes.size());
@@ -179,7 +180,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         int runId_1 = runDao.saveRun(run1);
         
         // now read back the run and make sure it has the enzyme information
-        MsRun runFromDb_1 = runDao.loadRun(runId_1);
+        IMsRun runFromDb_1 = runDao.loadRun(runId_1);
         List<MsDigestionEnzyme> enzymes = runFromDb_1.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());

@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.db.MsScan;
+import org.yeastrc.ms.domain.db.Peaks;
+import org.yeastrc.ms.domain.ms2File.IMS2Scan;
 
 /**
  * 
  */
-public class MS2FileScan extends MsScan {
+public class MS2FileScan extends MsScan implements IMS2Scan {
 
    
     private List<MS2FileScanCharge> scanChargeList;
@@ -36,7 +38,8 @@ public class MS2FileScan extends MsScan {
         setPrecursorScanNum(scan.getPrecursorScanNum());
         setRetentionTime(scan.getRetentionTime());
         setFragmentationType(scan.getFragmentationType());
-        setPeaks(scan.getPeaks());
+        setPeaks((Peaks) scan.getPeaks());  // scan.getPeaks returns IPeaks. 
+                                            // But we know that peaks in MsScan are of type Peaks
     }
     
     /**

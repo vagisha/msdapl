@@ -17,6 +17,8 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
+import org.yeastrc.ms.domain.IMsEnzyme;
+import org.yeastrc.ms.domain.IMsRun;
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 import org.yeastrc.ms.domain.db.MsPeptideSearch;
 import org.yeastrc.ms.domain.db.MsPeptideSearchDynamicMod;
@@ -274,7 +276,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsRun createRunWEnzymeInfo(int msExperimentId, List<MsDigestionEnzyme> enzymes) {
         
         MsRun run = createRun(msExperimentId);
-        for (MsDigestionEnzyme e: enzymes)
+        for (IMsEnzyme e: enzymes)
             run.addEnzyme(e);
         return run;
     }
@@ -282,7 +284,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsRun createRun(int msExperimentId) {
         MsRun run = new MsRun();
         run.setMsExperimentId(msExperimentId);
-        run.setFileFormat(MsRun.RunFileFormat.MS2.toString());
+        run.setRunFileFormat(org.yeastrc.ms.domain.MS2.toString());
         run.setFileName("my_file1.ms2");
         run.setAcquisitionMethod("Data dependent");
         run.setComment("Dummy run");

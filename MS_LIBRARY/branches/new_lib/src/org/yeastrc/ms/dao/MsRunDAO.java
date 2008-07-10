@@ -2,10 +2,10 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.IMsRun;
 import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
 
-public interface MsRunDAO <T extends MsRun>{
+public interface MsRunDAO <T extends IMsRun>{
 
     /**
      * Saves the given run in the database and returns the database id for the run.

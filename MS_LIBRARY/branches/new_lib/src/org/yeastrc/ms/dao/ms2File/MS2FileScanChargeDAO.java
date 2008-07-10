@@ -2,6 +2,7 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
+import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
 
 public interface MS2FileScanChargeDAO {
@@ -19,7 +20,7 @@ public interface MS2FileScanChargeDAO {
      * @param scanCharge
      * @return database id of the saved MS2FileScanCharge
      */
-    public abstract int save(MS2FileScanCharge scanCharge);
+    public abstract int save(IMS2ScanCharge scanCharge);
 
     
     /**

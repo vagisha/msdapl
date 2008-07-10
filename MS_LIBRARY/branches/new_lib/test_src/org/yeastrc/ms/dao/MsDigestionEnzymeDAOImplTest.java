@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO.EnzymeProperties;
+import org.yeastrc.ms.domain.IMsEnzyme;
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 
 public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
@@ -102,7 +103,7 @@ public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
         
         int enzymeId = enzymeDao.saveEnzyme(enzyme);
         
-        MsDigestionEnzyme enzyme_db = enzymeDao.loadEnzyme(enzymeId);
+        IMsEnzyme enzyme_db = enzymeDao.loadEnzyme(enzymeId);
         assertEquals(-1, enzyme_db.getSense());
         
         // clean up

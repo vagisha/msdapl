@@ -8,11 +8,13 @@ package org.yeastrc.ms.domain.db;
 
 import java.sql.Date;
 
+import org.yeastrc.ms.domain.IMsExperiment;
+
 /**
  * @param <MsRun>
  * 
  */
-public class MsExperiment {
+public class MsExperiment implements IMsExperiment {
 
     private int id;
     private Date date;

@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.domain.db.MsExperiment;
+import org.yeastrc.ms.domain.IMsExperiment;
 import org.yeastrc.ms.domain.db.MsRun;
 import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
@@ -26,11 +26,11 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         super(sqlMap);
     }
 
-    public MsExperiment load(int msExperimentId) {
-        return (MsExperiment)queryForObject("MsExperiment.select", msExperimentId);
+    public IMsExperiment load(int msExperimentId) {
+        return (IMsExperiment)queryForObject("MsExperiment.select", msExperimentId);
     }
     
-    public int save(MsExperiment experiment) {
+    public int save(IMsExperiment experiment) {
         return saveAndReturnId("MsExperiment.insert", experiment);
     }
     

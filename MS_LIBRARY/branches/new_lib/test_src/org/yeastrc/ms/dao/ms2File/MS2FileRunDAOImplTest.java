@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.ms2File.IMS2Run;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
 import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
 
@@ -59,7 +60,7 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
     
     public void testLoadExperimentRuns() {
         // do we get a list of type List<MS2FileRun>?
-        MS2FileRun run = makeMS2Run(1, true, true); // run with enzyme info and headers
+        IMS2Run run = makeMS2Run(1, true, true); // run with enzyme info and headers
         ms2RunDao.saveRun(run);
         run = makeMS2Run(1, true, true);
         ms2RunDao.saveRun(run);
@@ -67,7 +68,7 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
         List<MS2FileRun> runList = ms2RunDao.loadExperimentRuns(1);
         assertEquals(2, runList.size());
         
-        for (MS2FileRun r: runList) {
+        for (IMS2Run r: runList) {
             assertEquals(3, r.getHeaderList().size());
         }
         

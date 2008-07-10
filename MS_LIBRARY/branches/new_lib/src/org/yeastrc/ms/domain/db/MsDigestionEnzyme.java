@@ -1,12 +1,12 @@
 package org.yeastrc.ms.domain.db;
 
-public class MsDigestionEnzyme {
+import org.yeastrc.ms.domain.IMsEnzyme;
+
+public class MsDigestionEnzyme implements IMsEnzyme {
 
     private int id; // id (database) from the enzyme
     private String name; // Name of the enzyme
-    private short sense = -1;   // a value of 0 means the enzyme cleaves on the C-terminal end; 
-                                // 1 means it cleaves on the N-terminal;
-                                // -1 indicates that we don't know where the enzyme cleaves
+    private Sense sense = Sense.UNKNOWN; // terminal at which the enzyme cleaves.
     private String cut; // amino acid residue(s) where the enzyme cleaves
     private String nocut; // amino acid(s), which when present next to the cleavage site result in no cleavage. 
     private String description; 
@@ -39,14 +39,19 @@ public class MsDigestionEnzyme {
     /**
      * @return the sense
      */
-    public short getSense() {
+    public Sense getSense() {
         return sense;
     }
+    
+    public byte  getSenseByteVal() {
+        return sense.getByteVal();
+    }
+    
     /**
      * @param sense the sense to set
      */
-    public void setSense(short sense) {
-        this.sense = sense;
+    public void setSense(byte sense) {
+        this.sense = Sense.getSenseForByteVal(sense);
     }
     /**
      * @return the cut

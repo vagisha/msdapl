@@ -6,6 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
+import org.yeastrc.ms.domain.IMsExperiment;
 import org.yeastrc.ms.domain.db.MsExperiment;
 
 public class MsExperimentDAOImplTest extends TestCase {
@@ -17,7 +18,7 @@ public class MsExperimentDAOImplTest extends TestCase {
     }
     
     public void testSave() {
-        MsExperiment experiment = createMsExperiment();
+        IMsExperiment experiment = createMsExperiment();
         try {
             int expId = expDao.save(experiment);
             System.out.println("Inserted experiment id: "+expId);
@@ -29,7 +30,7 @@ public class MsExperimentDAOImplTest extends TestCase {
         }
     }
 
-    private MsExperiment createMsExperiment() {
+    private IMsExperiment createMsExperiment() {
         MsExperiment experiment = new MsExperiment();
         experiment.setDate(new Date(new java.util.Date().getTime()));
         experiment.setServerAddress("server/address");
@@ -44,7 +45,7 @@ public class MsExperimentDAOImplTest extends TestCase {
     
     public void testLoad() {
         try {
-            MsExperiment experiment = expDao.load(0);
+            IMsExperiment experiment = expDao.load(0);
             assertNull(experiment);
             List<Integer> expIds = expDao.selectAllExperimentIds();
             assertEquals(1, expIds.size());

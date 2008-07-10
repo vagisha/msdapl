@@ -10,12 +10,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
+
 
 /**
  * Represents a "Z" line (and any following "D" lines) from a MS2 file.  Describes the charge for a scan.
  * A scan can have multiple predicted charges
  */
-public class MS2FileScanCharge {
+public class MS2FileScanCharge implements IMS2ScanCharge {
 
     
     private int id;         // unique id (database)
@@ -81,7 +83,7 @@ public class MS2FileScanCharge {
     /**
      * @return the chargeDepAnalysis
      */
-    public List<MS2FileChargeDependentAnalysis> getChargeDependentAnalysis() {
+    public List<MS2FileChargeDependentAnalysis> getChargeDependentAnalysisList() {
         return chargeDepAnalysis;
     }
 

@@ -16,12 +16,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.domain.IPeaks;
 import org.yeastrc.ms.util.NumberUtils;
 
 /**
  * Class encapsulating the peak data (m/z and intensity pairs) for a scan. 
  */
-public class Peaks {
+public class Peaks implements IPeaks {
 
     private List<Peak> peaks;
     
@@ -58,7 +59,7 @@ public class Peaks {
         baos = new ByteArrayOutputStream();
         try {
             oos = new ObjectOutputStream(baos);
-            oos.writeObject(peaksAsString());
+            oos.writeObject(getPeaksAsString());
             oos.flush();
             return baos.toByteArray();
         }
@@ -74,7 +75,7 @@ public class Peaks {
         return null;
     }
     
-    private String peaksAsString() {
+    public String getPeaksAsString() {
         StringBuilder buf = new StringBuilder();
         for (Peak peak: peaks) {
             buf.append(NumberUtils.trimTrailingZeros(peak.getMzString()));
