@@ -2,17 +2,13 @@ package org.yeastrc.ms.dto;
 
 import java.math.BigDecimal;
 
-public class MsSearchMod implements IMsSearchMod {
+public class MsPeptideSearchStaticMod implements IMsSearchModification {
 
     private int id;
     private int searchId;
     private char modifiedResidue;
     private BigDecimal modificationMass;
     
-
-    public MsSearchMod() {
-        super();
-    }
 
     /**
      * @return the id
@@ -85,6 +81,18 @@ public class MsSearchMod implements IMsSearchMod {
      */
     public void setModificationMass(BigDecimal modificationMass) {
         this.modificationMass = modificationMass;
+    }
+
+    @Override
+    /**
+     * Static modifications are not associated with a symbol. This method will return a null character '\u0000'
+     */
+    public char getModificationSymbol() {
+        return nullCharacter;
+    }
+
+    public ModificationType getModificationType() {
+        return ModificationType.STATIC;
     }
 
 }

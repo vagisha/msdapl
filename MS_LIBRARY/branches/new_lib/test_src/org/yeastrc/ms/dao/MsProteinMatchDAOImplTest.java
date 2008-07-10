@@ -4,18 +4,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.dto.IMsSearchResultProtein;
 import org.yeastrc.ms.dto.MsProteinMatch;
 
 public class MsProteinMatchDAOImplTest extends BaseDAOTestCase {
 
 
-    private MsProteinMatch match1_1;
-    private MsProteinMatch match1_2;
-    private MsProteinMatch match1_3;
+    private IMsSearchResultProtein match1_1;
+    private IMsSearchResultProtein match1_2;
+    private IMsSearchResultProtein match1_3;
     
-    private MsProteinMatch match2_1;
-    private MsProteinMatch match2_2;
-    private MsProteinMatch match2_3;
+    private IMsSearchResultProtein match2_1;
+    private IMsSearchResultProtein match2_2;
+    private IMsSearchResultProtein match2_3;
     
     protected void setUp() throws Exception {
         super.setUp();
@@ -52,12 +53,12 @@ public class MsProteinMatchDAOImplTest extends BaseDAOTestCase {
 
     private void doTest(boolean useNullDescription) {
         // save the result proteins
-           matchDao.save(match1_1);
-           matchDao.save(match1_2);
-           matchDao.save(match1_3);
-           matchDao.save(match2_1);
-           matchDao.save(match2_2);
-           matchDao.save(match2_3);
+           matchDao.save(match1_1, 1);
+           matchDao.save(match1_2, 1);
+           matchDao.save(match1_3, 1);
+           matchDao.save(match2_1, 2);
+           matchDao.save(match2_2, 2);
+           matchDao.save(match2_3, 2);
            
            // load them back
            List<MsProteinMatch> result1_matchList = matchDao.loadResultProteins(1);
@@ -70,20 +71,16 @@ public class MsProteinMatchDAOImplTest extends BaseDAOTestCase {
            Collections.sort(result1_matchList, new MsProteinMatchComparator());
            Collections.sort(result2_matchList, new MsProteinMatchComparator());
            
+           
            //make sure the column values were saved and read back accurately
-           for (int resultId = 1; resultId < 3; resultId++) {
-               List<MsProteinMatch> resultProteins = resultId == 1 ? result1_matchList : result2_matchList;
-               for (int matchId = 1; matchId < 4; matchId++) {
-                   MsProteinMatch match = resultProteins.get(matchId-1);
-                   System.out.println(match.getAccession()+";  "+match.getDescription()+";  "+match.getId());
-                   assertEquals(resultId, match.getResultId());
-                   assertEquals("res_"+resultId+"_accession_"+matchId, match.getAccession());
-                   if (useNullDescription)
-                       assertNull(match.getDescription());
-                   else
-                       assertEquals("res_"+resultId+"_description_"+matchId, match.getDescription());
-               }
-           }
+           compareMatches(1, match1_1, result1_matchList.get(0));
+           compareMatches(1, match1_2, result1_matchList.get(1));
+           compareMatches(1, match1_3, result1_matchList.get(2));
+           
+           compareMatches(2, match2_1, result2_matchList.get(0));
+           compareMatches(2, match2_2, result2_matchList.get(1));
+           compareMatches(2, match2_3, result2_matchList.get(2));
+           
            
            // now delete the results
            matchDao.delete(1);
@@ -97,21 +94,33 @@ public class MsProteinMatchDAOImplTest extends BaseDAOTestCase {
            assertEquals(0, result2_matchList.size());
     }
     
+    private void compareMatches(int resultId, IMsSearchResultProtein original, MsProteinMatch fromDb) {
+        assertEquals(resultId, fromDb.getResultId());
+        assertEquals(original.getAccession(), fromDb.getAccession());
+        assertEquals(original.getDescription(), fromDb.getDescription());
+    }
+    
     private static final class MsProteinMatchComparator implements Comparator<MsProteinMatch> {
         public int compare(MsProteinMatch o1, MsProteinMatch o2) {
             return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
         }
     }
     
-    private MsProteinMatch getResultProtein(int resultId, int matchId, boolean useNullDescription) {
-        MsProteinMatch match = new MsProteinMatch();
-        match.setResultId(resultId);
-        match.setAccession("res_"+resultId+"_accession_"+matchId);
+    private IMsSearchResultProtein getResultProtein(int resultId, int matchId, boolean useNullDescription) {
         if (useNullDescription)
-            match.setDescription(null);
+            return getResultProtein(makeAccessionString(resultId, matchId), null);
         else
-            match.setDescription("res_"+resultId+"_description_"+matchId);
+            return getResultProtein(makeAccessionString(resultId, matchId), makeDescriptionString(resultId, matchId));
+    }
+    
+    private MsProteinMatch getResultProtein(String acc, String desc) {
+        MsProteinMatch match = new MsProteinMatch();
+        match.setAccession(acc);
+        match.setDescription(desc);
         return match;
     }
+
+    private String makeAccessionString(int resultId, int matchId){ return "res_"+resultId+"_accession_"+matchId;}
+    private String makeDescriptionString(int resultId, int matchId){ return "res_"+resultId+"_description_"+matchId;}
    
 }

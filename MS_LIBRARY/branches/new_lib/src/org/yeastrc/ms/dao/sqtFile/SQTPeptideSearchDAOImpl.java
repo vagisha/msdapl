@@ -8,30 +8,37 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsPeptideSearchDAOImpl;
+import org.yeastrc.ms.dao.MsPeptideSearchDAO;
+import org.yeastrc.ms.dto.sqtFile.ISQTPeptideSearch;
 import org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch;
-import org.yeastrc.ms.dto.sqtFile.SQTSearchHeader;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class SQTPeptideSearchDAOImpl extends MsPeptideSearchDAOImpl implements SQTPeptideSearchDAO {
+public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO implements MsPeptideSearchDAO<ISQTPeptideSearch> {
 
     public SQTPeptideSearchDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
     
     public SQTPeptideSearch loadSearch(int searchId) {
-        return (SQTPeptideSearch) super.loadSearch(searchId);
-//        return (SQTPeptideSearch) queryForObject("MsSearch.select", searchId);
+//        return (SQTPeptideSearch) super.loadSearch(searchId);
+        return (SQTPeptideSearch) queryForObject("MsSearch.select", searchId);
+    }
+    
+    @Override
+    public List<Integer> loadSearchIdsForRun(int runId) {
+        // TODO Auto-generated method stub
+        return null;
     }
     
     public List<SQTPeptideSearch> loadSearchesForRun(int runId) {
-        return (List<SQTPeptideSearch>) super.loadSearchesForRun(runId);
-//        return queryForList("MsSearch.selectSearchesForRun", runId);
+//        return (List<SQTPeptideSearch>) super.loadSearchesForRun(runId);
+        return queryForList("MsSearch.selectSearchesForRun", runId);
     }
     
     /**
@@ -39,20 +46,21 @@ public class SQTPeptideSearchDAOImpl extends MsPeptideSearchDAOImpl implements S
      * @param search
      * @return
      */
-    public int saveSearch (SQTPeptideSearch search) {
+    public int saveSearch (ISQTPeptideSearch search) {
         
         // save the search
-        int searchId = super.saveSearch(search);
+//        int searchId = super.saveSearch(search);
         
         // save the headers
         SQTSearchHeaderDAO headerDao = DAOFactory.instance().getSqtHeaderDAO();
-        List<SQTSearchHeader> headers = search.getHeaders();
-        for (SQTSearchHeader h: headers) {
-            h.setSearchId(searchId);
-            headerDao.saveSQTHeader(h);
-        }
+//        List<IHeader> headers = search.getHeaders();
+//        for (SQTSearchHeader h: headers) {
+//            h.setSearchId(searchId);
+//            headerDao.saveSQTHeader(h);
+//        }
         
-        return searchId;
+//        return searchId;
+        return 0;
     }
     
     /**
@@ -65,6 +73,7 @@ public class SQTPeptideSearchDAOImpl extends MsPeptideSearchDAOImpl implements S
         headerDao.deleteSQTHeadersForSearch(searchId);
         
         // now delete the search
-        super.deleteSearch(searchId);
+//        super.deleteSearch(searchId);
     }
+  
 }

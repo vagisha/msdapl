@@ -2,6 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
+import org.yeastrc.ms.dto.IMsSearchResultProtein;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
 import org.yeastrc.ms.dto.MsProteinMatch;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
@@ -36,19 +37,18 @@ public class MsPeptideSearchResultDAOImpl extends BaseSqlMapDAO implements MsPep
         // save any protein matches
         MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
         List<MsProteinMatch> resultProteins = searchResult.getProteinMatchList();
-        for(MsProteinMatch protein: resultProteins) {
-            protein.setResultId(resultId);
-            matchDao.save(protein);
+        for(IMsSearchResultProtein protein: resultProteins) {
+            matchDao.save(protein, resultId);
         }
         
         // save any dynamic modifications for this result
-        MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-        List<MsSearchResultDynamicMod> dynaMods = searchResult.getDynamicModifications();
-        for (MsSearchResultDynamicMod mod: dynaMods) {
-            modDao.saveDynamicModificationForSearchResult(resultId, 
-                            mod.getModificationId(), 
-                            mod.getModificationPosition());
-        }
+//        MsPeptideSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
+//        List<MsSearchResultDynamicMod> dynaMods = searchResult.getResultPeptide().get
+//        for (MsSearchResultDynamicMod mod: dynaMods) {
+//            modDao.saveDynamicModificationForSearchResult(resultId, 
+//                            mod.getModificationId(), 
+//                            mod.getModifiedPosition());
+//        }
         
         return resultId;
     }
@@ -65,7 +65,7 @@ public class MsPeptideSearchResultDAOImpl extends BaseSqlMapDAO implements MsPep
         matchDao.delete(resultId);
         
         // delete any dynamic modifications associated with this result
-        MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
+        MsPeptideSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
         modDao.deleteDynamicModificationsForResult(resultId);
     }
 

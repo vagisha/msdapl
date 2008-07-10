@@ -11,37 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MsPeptideSearchResult {
+public class MsPeptideSearchResult implements IMsSearchResult {
 
-    private static final char EMPTY_CHAR = '\u0000';
-    
     private int id; // unique id (database) for this search result
     private int searchId; // id (database) of the search this result belongs to
     private int scanId; // id (database) of the scan with which this result is associated
-    
+
     private int charge; 
     private BigDecimal calculatedMass;
     private int numIonsMatched;
     private int numIonsPredicted;
-    private char preResidue = EMPTY_CHAR; // residue to the left of the N-term cleavage side
-    private char postResidue = EMPTY_CHAR; // residue to the right of the C-term cleavage side
-    private char validationStatus = EMPTY_CHAR;
-    
-    private String peptide;
-    
-    private List<MsSearchResultDynamicMod> dynaMods;
-    private List<MsSearchMod> staticMods;
-    private PeptideResultSequence peptideResult;
-    
+    private ValidationStatus validationStatus = ValidationStatus.UNVALIDATED;
+
     private List<MsProteinMatch> proteinMatchList;
-    
-    
+
+    private MsSearchResultPeptide resultPeptide;
+
+
     public MsPeptideSearchResult() {
         proteinMatchList = new ArrayList<MsProteinMatch>();
-        dynaMods = new ArrayList<MsSearchResultDynamicMod>();
-        staticMods = new ArrayList<MsSearchMod>();
     }
-    
+
     /**
      * @return the id
      */
@@ -54,7 +44,7 @@ public class MsPeptideSearchResult {
     public void setId(int id) {
         this.id = id;
     }
-    
+
     /**
      * @return the searchId
      */
@@ -126,7 +116,7 @@ public class MsPeptideSearchResult {
     }
 
     /**
-     * @return the numPredictedIons
+     * @return the numIonsPredicted
      */
     public int getNumIonsPredicted() {
         return numIonsPredicted;
@@ -139,157 +129,70 @@ public class MsPeptideSearchResult {
         this.numIonsPredicted = numPredictedIons;
     }
 
-    /**
-     * @return the preResidue
-     */
-    public char getPreResidue() {
-        return preResidue;
-    }
-
-    public String getPreResidueString() {
-        if (preResidue == EMPTY_CHAR)
-            return null;
-        return new Character(preResidue).toString();
-    }
     
-    /**
-     * @param preResidue the preResidue to set
-     */
-    public void setPreResidue(char preResidue) {
-        this.preResidue = preResidue;
-    }
-
-    public void setPreResidueString(String preResidue) {
-        if (preResidue == null || preResidue.length() > 0)
-            this.preResidue = preResidue.charAt(0);
-    }
-    
-    /**
-     * @return the postResidue
-     */
-    public char getPostResidue() {
-        return postResidue;
-    }
-    
-    public String getPostResidueString() {
-        if (postResidue == EMPTY_CHAR)
-            return null;
-        return new Character(postResidue).toString();
-    }
-
-    /**
-     * @param postResidue the postResidue to set
-     */
-    public void setPostResidue(char postResidue) {
-        this.postResidue = postResidue;
-    }
-
-    public void setPostResidueString(String postResidue) {
-        if (postResidue == null || postResidue.length() > 0)
-            this.postResidue = postResidue.charAt(0);
-    }
-    
-    /**
-     * @return the validationStatus
-     */
-    public char getValidationStatus() {
-        return validationStatus;
-    }
-
-    public String getValidationStatusString() {
-        if (validationStatus == EMPTY_CHAR)
-            return null;
-        return new Character(validationStatus).toString();
-    }
-    
+    // ----------------------------------------------------------------------------------------
+    // Validation status for this result
+    // ----------------------------------------------------------------------------------------
     /**
      * @param validationStatus the validationStatus to set
      */
-    public void setValidationStatus(char validationStatus) {
+    public void setValidationStatus(ValidationStatus validationStatus) {
         this.validationStatus = validationStatus;
     }
 
     public void setValidationStatusString(String status) {
-        if (status == null || status.length() > 0)
-            this.validationStatus = status.charAt(0);
-    }
-    
-    /**
-     * @return the proteinMatchList
-     */
-    public List<MsProteinMatch> getProteinMatchList() {
-        return proteinMatchList;
+        if (status != null && status.length() > 0)
+            this.validationStatus = ValidationStatus.getStatusForChar(Character.valueOf(status.charAt(0)));
     }
 
+    public ValidationStatus getValidationStatus() {
+        return validationStatus;
+    }
+
+    public String getValidationStatusString() {
+        if (validationStatus == null)
+            return null;
+        return String.valueOf(validationStatus.getStatusChar());
+    }
+   
+    // ----------------------------------------------------------------------------------------
+    // Peptide sequence information for this result
+    // ----------------------------------------------------------------------------------------
+    public MsSearchResultPeptide getResultPeptide() {
+        return resultPeptide;
+    }
+    
+    public void setResultPeptide(MsSearchResultPeptide peptide) {
+        this.resultPeptide = peptide;
+    }
+    
+    public char getPreResidue() {
+        return resultPeptide.getPreResidue();
+    }
+    
+    public char getPostResidue() {
+        return resultPeptide.getPostResidue();
+    }
+
+    public String getPeptideSequence() {
+        return resultPeptide.getPeptideSequence();
+    }
+
+    // ----------------------------------------------------------------------------------------
+    // Protein matches to this result
+    // ----------------------------------------------------------------------------------------
     /**
      * @param proteinMatchList the proteinMatchList to set
      */
     public void setProteinMatchList(List<MsProteinMatch> proteinMatchList) {
         this.proteinMatchList = proteinMatchList;
     }
-    
+
     public void addProteinMatch(MsProteinMatch match) {
         proteinMatchList.add(match);
     }
-    
-    
-    //-----------------------------------------------------------------------------------------
-    // PEPTIDE SEQUENCE
-    //-----------------------------------------------------------------------------------------
-    
-    /**
-     * @return the peptideResult
-     */
-    public PeptideResultSequence getPeptideResult() {
-        if (peptideResult != null)
-            return peptideResult;
-        
-        peptideResult = new PeptideResultSequence(getPeptide().toCharArray());
-        
-        for (MsSearchResultDynamicMod mod: dynaMods)
-            peptideResult.addDynamicModification(mod.getModificationPosition(), mod);
-        
-        for(IMsSearchMod mod: staticMods)
-            peptideResult.addStaticModification(mod.getModifiedResidue(), mod.getModificationMass());
-        
-        return peptideResult;
-    }
-    
-    public String getPeptide() {
-        return peptide;
-    }
-    
-    public void setPeptide(String peptide) {
-        this.peptide = peptide;
-    }
-    
-    //-----------------------------------------------------------------------------------------
-    // DYNAMIC MODIFICATIONS
-    //-----------------------------------------------------------------------------------------
-    public void addDynamicModification(MsSearchResultDynamicMod modification) {
-        this.dynaMods.add(modification);
-    }
-    
-    public void setDynamicModifications(List<MsSearchResultDynamicMod> dynaMods) {
-        this.dynaMods = dynaMods;
-    }
-    
-    public List<MsSearchResultDynamicMod> getDynamicModifications() {
-        return this.dynaMods;
-    }
-    
-    //-----------------------------------------------------------------------------------------
-    // STATIC MODIFICATIONS
-    //-----------------------------------------------------------------------------------------
-    public void addStaticModification(MsSearchMod staticMod) {
-       staticMods.add(staticMod);
-    }
-    
-    public void setStaticModifications(List<MsSearchMod> staticMods) {
-        this.staticMods = staticMods;
-    }
-    
-    public List<MsSearchMod> getStaticModifications() {
-        return staticMods;
+
+    public List<MsProteinMatch> getProteinMatchList() {
+        return proteinMatchList;
     }
 }

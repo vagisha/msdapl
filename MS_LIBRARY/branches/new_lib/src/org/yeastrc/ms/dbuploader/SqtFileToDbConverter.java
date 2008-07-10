@@ -8,8 +8,8 @@ import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
 import org.yeastrc.ms.dto.MsProteinMatch;
-import org.yeastrc.ms.dto.MsSearchDynamicMod;
-import org.yeastrc.ms.dto.MsSearchMod;
+import org.yeastrc.ms.dto.MsPeptideSearchDynamicMod;
+import org.yeastrc.ms.dto.MsPeptideSearchStaticMod;
 import org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchHeader;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchResult;
@@ -153,14 +153,14 @@ public class SqtFileToDbConverter {
         
         // add static modifications
         for (StaticModification sMod: header.getStaticMods()) {
-            MsSearchMod mod = new MsSearchMod();
+            MsPeptideSearchStaticMod mod = new MsPeptideSearchStaticMod();
             mod.setModifiedResidue(sMod.getModifiedResidue());
             mod.setModificationMass(sMod.getModificationMass());
             search.addStaticModification(mod);
         }
         // add dynamic modifications
         for (DynamicModification dMod: header.getDynaMods()) {
-            MsSearchDynamicMod mod = new MsSearchDynamicMod();
+            MsPeptideSearchDynamicMod mod = new MsPeptideSearchDynamicMod();
             mod.setModifiedResidue(dMod.getModifiedResidue());
             mod.setModificationMass(dMod.getModificationMass());
             mod.setModificationSymbol(dMod.getModificationSymbol());

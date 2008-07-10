@@ -8,7 +8,6 @@ import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dto.MsRun;
-import org.yeastrc.ms.dto.MsScan;
 import org.yeastrc.ms.dto.MsRun.RunFileFormat;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
 import org.yeastrc.ms.dto.ms2File.MS2FileRun;

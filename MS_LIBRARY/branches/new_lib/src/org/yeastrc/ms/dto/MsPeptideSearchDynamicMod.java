@@ -7,12 +7,13 @@
 package org.yeastrc.ms.dto;
 
 
+
 /**
  * 
  */
-public class MsSearchDynamicMod extends MsSearchMod implements IMsSearchDynamicMod {
+public class MsPeptideSearchDynamicMod extends MsPeptideSearchStaticMod {
 
-    private char modificationSymbol = '\u0000';
+    private char modificationSymbol = nullCharacter;
     
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dto.IMsSearchDynamicMOd#getModificationSymbol()
@@ -42,5 +43,9 @@ public class MsSearchDynamicMod extends MsSearchMod implements IMsSearchDynamicM
     public void setModificationSymbolString(String modificationSymbol) {
         if (modificationSymbol.length() > 0)
             this.modificationSymbol = modificationSymbol.charAt(0);
+    }
+    
+    public ModificationType getModificationType() {
+        return ModificationType.DYNAMIC;
     }
 }

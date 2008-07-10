@@ -2,12 +2,12 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.dto.IMsPeptideSearch;
+import org.yeastrc.ms.dto.IMsSearch;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 
-public interface MsPeptideSearchDAO {
+public interface MsPeptideSearchDAO <T extends IMsSearch>{
 
-    public abstract IMsPeptideSearch loadSearch(int searchId);
+    public abstract MsPeptideSearch loadSearch(int searchId);
     
     public abstract List<? extends MsPeptideSearch> loadSearchesForRun(int runId);
 
@@ -21,7 +21,7 @@ public interface MsPeptideSearchDAO {
      * @param search
      * @return database id of the search
      */
-    public abstract int saveSearch(IMsPeptideSearch search);
+    public abstract int saveSearch(T search);
 
     /**
      * Deletes the search. Also deletes: 

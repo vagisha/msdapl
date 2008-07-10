@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
-public interface IMsPeptideSearch {
+public interface IMsSearch {
 
     /**
      * @return the originalFileType
@@ -59,11 +59,11 @@ public interface IMsPeptideSearch {
     /**
      * @return the staticModifications
      */
-    public abstract List<? extends IMsSearchMod> getStaticModifications();
+    public abstract List<? extends IMsSearchModification> getStaticModifications();
 
     /**
      * @return the dynamicModifications
      */
-    public abstract List<? extends IMsSearchDynamicMod> getDynamicModifications();
+    public abstract List<? extends IMsSearchModification> getDynamicModifications();
 
 }

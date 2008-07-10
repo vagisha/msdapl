@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.dto.IMsPeptideSearch;
+import org.yeastrc.ms.dto.IMsSearch;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
 
@@ -22,7 +22,7 @@ public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchDao.loadSearchIdsForRun(1).size());
         
         // create and save a search with no seq. db information or modifications
-        IMsPeptideSearch search_1 = makePeptideSearch(1, false, false, false);
+        IMsSearch search_1 = makePeptideSearch(1, false, false, false);
         int searchId_1 = searchDao.saveSearch(search_1);
         List<MsPeptideSearch> searchList = (List<MsPeptideSearch>) searchDao.loadSearchesForRun(1);
         assertEquals(1, searchList.size());
@@ -34,7 +34,7 @@ public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, resultDao.loadResultIdsForSearch(searchId_1).size());
         
         // create and save a search with seq. db information and modifications
-        IMsPeptideSearch search_2 = makePeptideSearch(1, true, true, true);
+        IMsSearch search_2 = makePeptideSearch(1, true, true, true);
         int searchId_2 = searchDao.saveSearch(search_2);
         searchList = (List<MsPeptideSearch>) searchDao.loadSearchesForRun(1);
         assertEquals(2, searchList.size());

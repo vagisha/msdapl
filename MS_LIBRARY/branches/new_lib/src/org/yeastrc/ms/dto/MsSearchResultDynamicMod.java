@@ -3,7 +3,7 @@ package org.yeastrc.ms.dto;
 import java.math.BigDecimal;
 
 
-public class MsSearchResultDynamicMod {
+public class MsSearchResultDynamicMod implements IMsSearchModification {
 
     private int modId;
     private int resultId;
@@ -41,13 +41,13 @@ public class MsSearchResultDynamicMod {
     /**
      * @return the modPosition
      */
-    public int getModificationPosition() {
+    public int getModifiedPosition() {
         return modPosition;
     }
     /**
      * @param modPosition the modPosition to set
      */
-    public void setModificationPosition(int modPosition) {
+    public void setModifiedPosition(int modPosition) {
         this.modPosition = modPosition;
     }
    
@@ -123,5 +123,10 @@ public class MsSearchResultDynamicMod {
      */
     public void setModificationMass(BigDecimal modificationMass) {
         this.modificationMass = modificationMass;
+    }
+    
+    @Override
+    public ModificationType getModificationType() {
+        return ModificationType.DYNAMIC;
     }
 }

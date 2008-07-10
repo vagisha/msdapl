@@ -32,7 +32,7 @@ public class DAOTestSuite {
         
         // search 
         suite.addTestSuite(MsProteinMatchDAOImplTest.class);
-        suite.addTestSuite(MsSearchModDAOImplTest.class);
+        suite.addTestSuite(MsPeptideSearchModDAOImplTest.class);
         suite.addTestSuite(MsPeptideSearchResultDAOImplTest.class);
         suite.addTestSuite(MsPeptideSearchDAOImplTest.class);
         suite.addTestSuite(MsSequenceDatabaseDAOImplTest.class);

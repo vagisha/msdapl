@@ -1,11 +1,17 @@
 package org.yeastrc.ms.dto;
 
-public class MsProteinMatch {
+import org.yeastrc.ms.dao.MsProteinMatchDAOImpl.MsProteinMatchDb;
+
+
+
+
+public class MsProteinMatch implements IMsSearchResultProtein {
 
     private int id; // unique id (database) for this protein match
     private int resultId;
     private String accession;
     private String description;
+    
     /**
      * @return the id
      */
@@ -18,8 +24,8 @@ public class MsProteinMatch {
     public void setId(int id) {
         this.id = id;
     }
-    /**
-     * @return the resultId
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSearchResultProtein#getResultId()
      */
     public int getResultId() {
         return resultId;
@@ -36,8 +42,8 @@ public class MsProteinMatch {
     public String getAccession() {
         return accession;
     }
-    /**
-     * @param accession the accession to set
+    /* (non-Javadoc)
+     * @see org.yeastrc.ms.dto.IMsSearchResultProtein#setAccession(java.lang.String)
      */
     public void setAccession(String accession) {
         this.accession = accession;

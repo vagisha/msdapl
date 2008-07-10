@@ -6,8 +6,11 @@
  */
 package org.yeastrc.ms.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.yeastrc.ms.dto.IMsSearchResultProtein;
 import org.yeastrc.ms.dto.MsProteinMatch;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -16,6 +19,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * 
  */
 public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsProteinMatchDAO {
+
 
     public MsProteinMatchDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
@@ -31,8 +35,11 @@ public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsProteinMat
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsProteinMatchDAO#save(org.yeastrc.ms.dto.MsProteinMatch)
      */
-    public void save(MsProteinMatch proteinMatch) {
-        save("MsResultProtein.insert", proteinMatch);
+    public void save(IMsSearchResultProtein proteinMatch, int resultId) {
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("match", proteinMatch);
+        map.put("resultId", resultId);
+        save("MsResultProtein.insert", map);
     }
     
     /* (non-Javadoc)
@@ -41,4 +48,29 @@ public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsProteinMat
     public void delete(int resultId) {
         delete("MsResultProtein.deleteForResultId", resultId);
     }
+ 
+    //-------------------------------------------------------------------------------------------------
+    // Class used for iBatis parametermap
+    //-------------------------------------------------------------------------------------------------
+    public class MsProteinMatchDb {
+        
+        int resultId;
+        IMsSearchResultProtein resultProtein;
+        
+        /**
+         * @return the resultId
+         */
+        public int getResultId() {
+            return resultId;
+        }
+        /**
+         * @return the resultProtein
+         */
+        public IMsSearchResultProtein getResultProtein() {
+            return resultProtein;
+        }
+
+    }
 }
+
+

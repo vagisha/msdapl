@@ -11,7 +11,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MsPeptideSearch implements IMsPeptideSearch {
+public class MsPeptideSearch implements IMsSearch {
 
     private int id; // unique id (database) for this search result
     private int runId; // MS run on which the search was performed
@@ -28,14 +28,14 @@ public class MsPeptideSearch implements IMsPeptideSearch {
     
     private List<MsSequenceDatabase> searchDatabases;
     
-    private List<MsSearchMod> staticModifications;
+    private List<MsPeptideSearchStaticMod> staticModifications;
     
-    private List<MsSearchDynamicMod> dynamicModifications;
+    private List<MsPeptideSearchDynamicMod> dynamicModifications;
     
     public MsPeptideSearch() {
         searchDatabases = new ArrayList<MsSequenceDatabase>();
-        staticModifications = new ArrayList<MsSearchMod>();
-        dynamicModifications = new ArrayList<MsSearchDynamicMod>();
+        staticModifications = new ArrayList<MsPeptideSearchStaticMod>();
+        dynamicModifications = new ArrayList<MsPeptideSearchDynamicMod>();
     }
     
     /**
@@ -195,25 +195,25 @@ public class MsPeptideSearch implements IMsPeptideSearch {
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dto.IMsPeptideSearch#getStaticModifications()
      */
-    public List<MsSearchMod> getStaticModifications() {
+    public List<MsPeptideSearchStaticMod> getStaticModifications() {
         return staticModifications;
     }
 
     /**
      * @param staticModifications the staticModifications to set
      */
-    public void setStaticModifications(List<MsSearchMod> staticModifications) {
+    public void setStaticModifications(List<MsPeptideSearchStaticMod> staticModifications) {
         this.staticModifications = staticModifications;
     }
     
-    public void addStaticModification(MsSearchMod mod) {
+    public void addStaticModification(MsPeptideSearchStaticMod mod) {
         staticModifications.add(mod);
     }
 
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dto.IMsPeptideSearch#getDynamicModifications()
      */
-    public List<MsSearchDynamicMod> getDynamicModifications() {
+    public List<MsPeptideSearchDynamicMod> getDynamicModifications() {
         return dynamicModifications;
     }
 
@@ -221,11 +221,11 @@ public class MsPeptideSearch implements IMsPeptideSearch {
      * @param dynamicModifications the dynamicModifications to set
      */
     public void setDynamicModifications(
-            List<MsSearchDynamicMod> dynamicModifications) {
+            List<MsPeptideSearchDynamicMod> dynamicModifications) {
         this.dynamicModifications = dynamicModifications;
     }
     
-    public void addDynamicModification(MsSearchDynamicMod mod) {
+    public void addDynamicModification(MsPeptideSearchDynamicMod mod) {
         dynamicModifications.add(mod);
     }
   

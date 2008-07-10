@@ -76,7 +76,7 @@ public class DAOFactory {
     private MsPeptideSearchDAO searchDAO;
     private MsPeptideSearchResultDAO searchResultDAO;
     private MsProteinMatchDAO resultProteinDAO;
-    private MsSearchModDAO modDAO;
+    private MsPeptideSearchModDAO modDAO;
     private MsSequenceDatabaseDAO seqDbDao;
     
     // DAOs for SQT file related objects
@@ -102,14 +102,14 @@ public class DAOFactory {
         searchDAO = new MsPeptideSearchDAOImpl(sqlMap);
         searchResultDAO = new MsPeptideSearchResultDAOImpl(sqlMap);
         resultProteinDAO = new MsProteinMatchDAOImpl(sqlMap);
-        modDAO = new MsSearchModDAOImpl(sqlMap);
+        modDAO = new MsPeptideSearchModDAOImpl(sqlMap);
         seqDbDao = new MsSequenceDatabaseDAOImpl(sqlMap);
         
 
         sqtResultDAO = new SQTSearchResultDAOImpl(sqlMap);
         sqtSpectrumDAO = new SQTSpectrumDataDAOImpl(sqlMap);
         sqtHeaderDAO = new SQTSearchHeaderDAOImpl(sqlMap);
-        sqtSearchDAO = new SQTPeptideSearchDAOImpl(sqlMap);
+//        sqtSearchDAO = new SQTPeptideSearchDAOImpl(sqlMap);
         
     }
     
@@ -169,7 +169,7 @@ public class DAOFactory {
         return resultProteinDAO;
     }
     
-    public MsSearchModDAO getMsSearchModDAO() {
+    public MsPeptideSearchModDAO getMsSearchModDAO() {
         return modDAO;
     }
     

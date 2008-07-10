@@ -18,12 +18,12 @@ import junit.framework.TestCase;
 
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsPeptideSearch;
+import org.yeastrc.ms.dto.MsPeptideSearchDynamicMod;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
+import org.yeastrc.ms.dto.MsPeptideSearchStaticMod;
 import org.yeastrc.ms.dto.MsProteinMatch;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;
-import org.yeastrc.ms.dto.MsSearchDynamicMod;
-import org.yeastrc.ms.dto.MsSearchMod;
 import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
 import org.yeastrc.ms.dto.MsSequenceDatabase;
 
@@ -38,7 +38,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsPeptideSearchDAO searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
     protected MsPeptideSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
     protected MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
-    protected MsSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
+    protected MsPeptideSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
     protected MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
     protected MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
 
@@ -105,15 +105,15 @@ public class BaseDAOTestCase extends TestCase {
 
     protected void addResultDynamicModifications(MsPeptideSearchResult result, int searchId) {
 
-        List<MsSearchDynamicMod> dynaMods = modDao.loadDynamicModificationsForSearch(searchId);
+        List<MsPeptideSearchDynamicMod> dynaMods = modDao.loadDynamicModificationsForSearch(searchId);
 
         List<MsSearchResultDynamicMod> resultDynaMods = new ArrayList<MsSearchResultDynamicMod>(dynaMods.size());
         int pos = 1;
-        for (MsSearchDynamicMod mod: dynaMods) {
+        for (MsPeptideSearchDynamicMod mod: dynaMods) {
             MsSearchResultDynamicMod resMod = new MsSearchResultDynamicMod();
             resMod.setModificationId(mod.getId());
             resMod.setModificationMass(mod.getModificationMass());
-            resMod.setModificationPosition(pos++);
+            resMod.setModifiedPosition(pos++);
             resMod.setModificationSymbol(mod.getModificationSymbol());
             resMod.setModifiedResidue(mod.getModifiedResidue());
             resultDynaMods.add(resMod);
@@ -122,8 +122,8 @@ public class BaseDAOTestCase extends TestCase {
         result.setDynamicModifications(resultDynaMods);
     }
 
-    protected MsSearchMod makeStaticMod(Integer searchId, char modChar, String modMass) {
-        MsSearchMod mod = new MsSearchMod();
+    protected MsPeptideSearchStaticMod makeStaticMod(Integer searchId, char modChar, String modMass) {
+        MsPeptideSearchStaticMod mod = new MsPeptideSearchStaticMod();
         if (searchId != null)
             mod.setSearchId(searchId);
         mod.setModifiedResidue(modChar);
@@ -131,9 +131,9 @@ public class BaseDAOTestCase extends TestCase {
         return mod;
     }
 
-    protected MsSearchDynamicMod makeDynamicMod(Integer searchId, char modChar, String modMass,
+    protected MsPeptideSearchDynamicMod makeDynamicMod(Integer searchId, char modChar, String modMass,
             char modSymbol) {
-        MsSearchDynamicMod mod = new MsSearchDynamicMod();
+        MsPeptideSearchDynamicMod mod = new MsPeptideSearchDynamicMod();
         if (searchId != null)
             mod.setSearchId(searchId);
         mod.setModifiedResidue(modChar);
@@ -167,19 +167,19 @@ public class BaseDAOTestCase extends TestCase {
         }
 
         if (addStaticMods) {
-            MsSearchMod mod1 = makeStaticMod(null, 'C', "50.0");
-            MsSearchMod mod2 = makeStaticMod(null, 'S', "80.0");
-            List<MsSearchMod> staticMods = new ArrayList<MsSearchMod>(2);
+            MsPeptideSearchStaticMod mod1 = makeStaticMod(null, 'C', "50.0");
+            MsPeptideSearchStaticMod mod2 = makeStaticMod(null, 'S', "80.0");
+            List<MsPeptideSearchStaticMod> staticMods = new ArrayList<MsPeptideSearchStaticMod>(2);
             staticMods.add(mod1);
             staticMods.add(mod2);
             search.setStaticModifications(staticMods);
         }
 
         if (addDynaMods) {
-            MsSearchDynamicMod dmod1 = makeDynamicMod(null, 'A', "10.0", '*');
-            MsSearchDynamicMod dmod2 = makeDynamicMod(null, 'B', "20.0", '#');
-            MsSearchDynamicMod dmod3 = makeDynamicMod(null, 'C', "30.0", '@');
-            List<MsSearchDynamicMod> dynaMods = new ArrayList<MsSearchDynamicMod>(2);
+            MsPeptideSearchDynamicMod dmod1 = makeDynamicMod(null, 'A', "10.0", '*');
+            MsPeptideSearchDynamicMod dmod2 = makeDynamicMod(null, 'B', "20.0", '#');
+            MsPeptideSearchDynamicMod dmod3 = makeDynamicMod(null, 'C', "30.0", '@');
+            List<MsPeptideSearchDynamicMod> dynaMods = new ArrayList<MsPeptideSearchDynamicMod>(2);
             dynaMods.add(dmod1);
             dynaMods.add(dmod2);
             dynaMods.add(dmod3);

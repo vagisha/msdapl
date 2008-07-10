@@ -41,17 +41,17 @@
 				column="id"/>
 	</resultMap> 
 	
-	<parameterMap class="MsSearch" id="msSearchParam">
+	<parameterMap class="java.util.Map" id="msSearchParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="originalFileType" jdbcType="VARCHAR" />
-		<parameter property="searchEngineName" jdbcType="VARCHAR" />
-		<parameter property="searchEngineVersion" jdbcType="VARCHAR"/>
-		<parameter property="searchDate" jdbcType="DATE" />
-		<parameter property="searchDuration" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="precursorMassType" jdbcType="VARCHAR" />
-		<parameter property="precursorMassTolerance" jdbcType="DECIMAL" />
-		<parameter property="fragmentMassType" jdbcType="VARCHAR" />
-		<parameter property="fragmentMassTolerance" jdbcType="DECIMAL" />
+		<parameter property="search.originalFileType" jdbcType="VARCHAR" />
+		<parameter property="search.searchEngineName" jdbcType="VARCHAR" />
+		<parameter property="search.searchEngineVersion" jdbcType="VARCHAR"/>
+		<parameter property="search.searchDate" jdbcType="DATE" />
+		<parameter property="search.searchDuration" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="search.precursorMassType" jdbcType="VARCHAR" />
+		<parameter property="search.precursorMassTolerance" jdbcType="DECIMAL" />
+		<parameter property="search.fragmentMassType" jdbcType="VARCHAR" />
+		<parameter property="search.fragmentMassTolerance" jdbcType="DECIMAL" />
 	</parameterMap>
 	
     <select id="select" resultMap="msSearchResult" parameterClass="Integer">

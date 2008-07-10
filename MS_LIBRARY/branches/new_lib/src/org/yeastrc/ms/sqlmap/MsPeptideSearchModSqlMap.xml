@@ -4,12 +4,13 @@
 <sqlMap namespace="MsSearchMod"> 
 
 
-	<typeAlias alias="MsSearchMod" type="org.yeastrc.ms.dto.MsSearchMod"/>
-	<typeAlias alias="MsSearchDynaMod" type="org.yeastrc.ms.dto.MsSearchDynamicMod"/>
+	<typeAlias alias="MsSearchStaticMod" type="org.yeastrc.ms.dto.MsPeptideSearchStaticMod"/>
+	<typeAlias alias="MsSearchDynaMod" type="org.yeastrc.ms.dto.MsPeptideSearchDynamicMod"/>
 	<typeAlias alias="MsSearchResultDynaMod" type="org.yeastrc.ms.dto.MsSearchResultDynamicMod"/>
+	<typeAlias alias="MsSearchModDb" type="org.yeastrc.ms.dto.MsPeptideSearchModDB" />
 	
 	
-	<resultMap class="MsSearchMod" id="msModResult">
+	<resultMap class="MsSearchStaticMod" id="msStaticModResult">
 		<result property="id" column="id"/>
 		<result property="searchId" column="searchID"/>
 		<result property="modifiedResidueString" column="residue" javaType="java.lang.String"/>
@@ -19,7 +20,7 @@
 	<!-- if symbol is NULL we will return an empty String and the default value (\u0000)
 	     for modificationSymbol will be used 
 	-->
-	<resultMap class="MsSearchDynaMod" extends="msModResult" id="msDynaModResult">
+	<resultMap class="MsSearchDynaMod" extends="msStaticModResult" id="msDynaModResult">
 		<result property="modificationSymbolString" column="symbol" javaType="java.lang.String" nullValue=""/>
 	</resultMap>
 	
@@ -29,32 +30,32 @@
 		<result property="modifiedResidueString" column="residue" javaType="java.lang.String"/>
 		<result property="modificationMass" column="modifier"/>
 		<result property="modificationSymbolString" column="symbol" javaType="java.lang.String" nullValue=""/>
-		<result property="modificationPosition" column="position"/>
+		<result property="modifiedPosition" column="position"/>
 		
 		
 	</resultMap>
 	
-	<parameterMap class="MsSearchMod" id="msModParam">
-		<parameter property="searchId" jdbcType="INTEGER"/>
-		<parameter property="modifiedResidueString" jdbcType="CHAR"/>
-		<parameter property="modificationMass" jdbcType="DECIMAL"/>
+	<parameterMap class="MsSearchModDb" id="msStaticModParam">
+		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="mod.modifiedResidueString" jdbcType="CHAR"/>
+		<parameter property="mod.modificationMass" jdbcType="DECIMAL"/>
 	</parameterMap>
 	
-	<parameterMap class="MsDynaSearchMod" id="msDynaModParam">
-		<parameter property="searchId" jdbcType="INTEGER"/>
-		<parameter property="modifiedResidueString" jdbcType="CHAR"/>
-		<parameter property="modificationMass" jdbcType="DECIMAL"/>
-		<parameter property="modificationSymbolString" jdbcType="CHAR"/>
+	<parameterMap class="MsSearchModDb" id="msDynaModParam">
+		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="mod.modifiedResidueString" jdbcType="CHAR"/>
+		<parameter property="mod.modificationMass" jdbcType="DECIMAL"/>
+		<parameter property="mod.modificationSymbolString" jdbcType="CHAR"/>
 	</parameterMap>
 	
 	<!-- ================================================================================= -->
 	<!-- QUERIES FOR STATIC MODIFICATIONS -->
 	<!-- ================================================================================= -->
-    <select id="selectStaticModsForSearch" resultMap="msModResult" parameterClass="Integer">
+    <select id="selectStaticModsForSearch" resultMap="msStaticModResult" parameterClass="Integer">
     	SELECT * FROM msPeptideSearchStaticMod WHERE searchID= #id#
     </select>
     
-    <insert id="insertStaticMod" parameterMap="msModParam">
+    <insert id="insertStaticMod" parameterMap="msStaticModParam">
     	INSERT INTO msPeptideSearchStaticMod (
     	searchID,
     	residue,
@@ -78,15 +79,6 @@
     	SELECT * FROM msPeptideSearchDynamicMod WHERE searchID= #id#
     </select>
     
-    <select id="selectDynaModsForSearchResult" resultMap="msResultDynaModResult" parameterClass="Integer">
-    	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID, rMod.position
-    	FROM msPeptideSearchDynamicMod as sMod,
-    	msDynamicModResult as rMod
-    	WHERE sMod.id = rMod.modID
-    	AND rMod.resultID= #id#
-    </select>
-    
-    
     <insert id="insertDynaMod" parameterMap="msDynaModParam">
     	INSERT INTO msPeptideSearchDynamicMod (
     	searchID,
@@ -94,10 +86,26 @@
     	modifier,
     	symbol)
     	VALUES (?,?,?,?)
-    	<selectKey resultClass="int" keyProperty="id">
+    	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>
+    
+     <delete id="deleteDynaModsForSearch" parameterClass="Integer">
+		DELETE FROM msPeptideSearchDynamicMod WHERE searchID=#id#
+    </delete>
+    
+    
+    <!-- ================================================================================= -->
+	<!-- QUERIES FOR DYNAMIC MODIFICATIONS (FOR A SEARCH RESULT) -->
+	<!-- ================================================================================= -->
+    <select id="selectDynaModsForSearchResult" resultMap="msResultDynaModResult" parameterClass="Integer">
+    	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID, rMod.position
+    	FROM msPeptideSearchDynamicMod AS sMod, msDynamicModResult AS rMod
+    	WHERE sMod.id = rMod.modID
+    	AND rMod.resultID= #id#
+    </select>
+    
     
     <insert id="insertResultDynaMod" parameterClass="java.util.Map">
     	INSERT INTO msDynamicModResult (
@@ -106,10 +114,6 @@
     	position)
     	VALUES (#modId#, #resultId#, #position#)
     </insert>
-    
-    <delete id="deleteDynaModsForSearch" parameterClass="Integer">
-		DELETE FROM msPeptideSearchDynamicMod WHERE searchID=#id#
-    </delete>
     
     <delete id="deleteDynaModsForModIds" parameterClass="String">
 		DELETE FROM msDynamicModResult WHERE modID IN $idString$
