@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsExperiment;
+import org.yeastrc.ms.domain.db.MsExperiment;
 
 public interface MsExperimentDAO {
 

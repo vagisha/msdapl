@@ -3,8 +3,8 @@ package org.yeastrc.ms.dao.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsDigestionEnzyme;
-import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.db.MsRun;
 import org.yeastrc.ms.domain.ms2File.MS2FileHeader;
 import org.yeastrc.ms.domain.ms2File.MS2FileRun;
 

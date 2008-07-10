@@ -3,7 +3,7 @@ package org.yeastrc.ms.dao;
 import java.util.List;
 
 import org.yeastrc.ms.domain.IMsSearch;
-import org.yeastrc.ms.domain.MsPeptideSearch;
+import org.yeastrc.ms.domain.db.MsPeptideSearch;
 
 public interface MsPeptideSearchDAO <T extends IMsSearch>{
 

@@ -6,9 +6,9 @@ import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
 import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
 import org.yeastrc.ms.dao.MsProteinMatchDAO;
 import org.yeastrc.ms.domain.IMsSearchResultProtein;
-import org.yeastrc.ms.domain.MsPeptideSearchResult;
-import org.yeastrc.ms.domain.MsProteinMatch;
-import org.yeastrc.ms.domain.MsSearchResultDynamicMod;
+import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.db.MsProteinMatch;
+import org.yeastrc.ms.domain.db.MsSearchResultDynamicMod;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

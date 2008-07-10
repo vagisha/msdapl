@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
 
 public interface MsRunDAO <T extends MsRun>{
 

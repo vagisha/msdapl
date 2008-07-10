@@ -4,7 +4,10 @@
  * Jul 3, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
+
+import org.yeastrc.ms.domain.IMsSearchModification;
+import org.yeastrc.ms.domain.IMsSearchModification.ModificationType;
 
 
 

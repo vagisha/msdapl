@@ -8,9 +8,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.MsExperiment;
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.db.MsExperiment;
+import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
 
 public class MsExperimentUploader {
 

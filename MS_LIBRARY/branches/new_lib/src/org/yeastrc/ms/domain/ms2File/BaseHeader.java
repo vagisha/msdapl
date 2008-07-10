@@ -1,5 +1,7 @@
 package org.yeastrc.ms.domain.ms2File;
 
+import org.yeastrc.ms.domain.ms2File.db.IHeader;
+
 public class BaseHeader implements IHeader {
 
     private String name;

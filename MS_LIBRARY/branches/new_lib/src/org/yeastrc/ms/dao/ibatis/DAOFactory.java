@@ -30,8 +30,8 @@ import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchHeaderDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSpectrumDataDAOImpl;
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.db.MsScan;
 import org.yeastrc.ms.domain.ms2File.MS2FileRun;
 import org.yeastrc.ms.domain.ms2File.MS2FileScan;
 

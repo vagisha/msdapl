@@ -1,6 +1,9 @@
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 import java.math.BigDecimal;
+
+import org.yeastrc.ms.domain.IMsSearchModification;
+import org.yeastrc.ms.domain.IMsSearchModification.ModificationType;
 
 public class MsPeptideSearchStaticMod implements IMsSearchModification {
 

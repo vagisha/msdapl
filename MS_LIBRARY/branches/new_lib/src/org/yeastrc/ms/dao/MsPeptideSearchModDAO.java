@@ -3,9 +3,9 @@ package org.yeastrc.ms.dao;
 import java.util.List;
 
 import org.yeastrc.ms.domain.IMsSearchModification;
-import org.yeastrc.ms.domain.MsPeptideSearchDynamicMod;
-import org.yeastrc.ms.domain.MsPeptideSearchStaticMod;
-import org.yeastrc.ms.domain.MsSearchResultDynamicMod;
+import org.yeastrc.ms.domain.db.MsPeptideSearchDynamicMod;
+import org.yeastrc.ms.domain.db.MsPeptideSearchStaticMod;
+import org.yeastrc.ms.domain.db.MsSearchResultDynamicMod;
 
 public interface MsPeptideSearchModDAO {
 

@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 
 public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {

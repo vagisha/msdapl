@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
 
 public interface MsDigestionEnzymeDAO {
 

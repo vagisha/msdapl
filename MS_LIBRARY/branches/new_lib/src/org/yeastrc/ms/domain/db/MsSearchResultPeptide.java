@@ -1,9 +1,12 @@
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.yeastrc.ms.domain.IMsSearchModification;
+import org.yeastrc.ms.domain.IMsSearchResultPeptide;
 
 public class MsSearchResultPeptide implements IMsSearchResultPeptide {
 

@@ -4,11 +4,12 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
 
+import org.yeastrc.ms.domain.Peaks;
 import org.yeastrc.ms.domain.Peaks.Peak;
 
 /**

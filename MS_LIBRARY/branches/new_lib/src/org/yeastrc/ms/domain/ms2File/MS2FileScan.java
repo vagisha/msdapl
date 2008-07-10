@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.db.MsScan;
 
 /**
  * 

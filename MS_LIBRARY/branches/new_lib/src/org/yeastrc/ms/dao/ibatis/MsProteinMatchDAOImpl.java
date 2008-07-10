@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.MsProteinMatchDAO;
 import org.yeastrc.ms.domain.IMsSearchResultProtein;
-import org.yeastrc.ms.domain.MsProteinMatch;
+import org.yeastrc.ms.domain.db.MsProteinMatch;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

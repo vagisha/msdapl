@@ -3,6 +3,8 @@ package org.yeastrc.ms.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.yeastrc.ms.domain.db.MsSearchResultPeptide;
+
 public interface IMsSearchResult {
 
     

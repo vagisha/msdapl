@@ -12,8 +12,8 @@ import org.yeastrc.ms.dao.MsPeptideSearchDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
-import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.db.ISQTPeptideSearch;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

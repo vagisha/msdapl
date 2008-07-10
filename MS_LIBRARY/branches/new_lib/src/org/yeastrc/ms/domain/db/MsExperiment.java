@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 import java.sql.Date;
 

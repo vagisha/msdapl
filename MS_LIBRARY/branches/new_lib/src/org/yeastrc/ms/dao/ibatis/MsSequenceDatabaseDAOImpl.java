@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
 import org.yeastrc.ms.domain.IMsSequenceDatabase;
-import org.yeastrc.ms.domain.MsSequenceDatabase;
+import org.yeastrc.ms.domain.db.MsSequenceDatabase;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

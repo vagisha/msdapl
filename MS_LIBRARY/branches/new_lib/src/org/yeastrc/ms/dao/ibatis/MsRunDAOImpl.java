@@ -13,10 +13,10 @@ import java.util.Map;
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.domain.MsDigestionEnzyme;
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsScan;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.db.MsScan;
+import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

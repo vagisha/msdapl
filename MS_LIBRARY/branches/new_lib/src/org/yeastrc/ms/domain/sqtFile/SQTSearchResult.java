@@ -2,7 +2,7 @@ package org.yeastrc.ms.domain.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
 
 public class SQTSearchResult extends MsPeptideSearchResult {
 

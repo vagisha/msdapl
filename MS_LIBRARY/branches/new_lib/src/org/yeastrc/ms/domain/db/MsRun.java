@@ -1,7 +1,8 @@
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 public class MsRun {

@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain.ms2File;
+package org.yeastrc.ms.domain.ms2File.db;
 
 public interface IHeader {
 

@@ -3,7 +3,7 @@ package org.yeastrc.ms.dao;
 import java.util.List;
 
 import org.yeastrc.ms.domain.IMsSearchResultProtein;
-import org.yeastrc.ms.domain.MsProteinMatch;
+import org.yeastrc.ms.domain.db.MsProteinMatch;
 
 public interface MsProteinMatchDAO {
 

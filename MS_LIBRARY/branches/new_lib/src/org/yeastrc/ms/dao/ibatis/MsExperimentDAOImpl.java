@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.domain.MsExperiment;
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.db.MsExperiment;
+import org.yeastrc.ms.domain.db.MsRun;
+import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2FileRun;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

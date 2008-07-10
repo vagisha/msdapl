@@ -1,6 +1,7 @@
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 import org.yeastrc.ms.dao.ibatis.MsProteinMatchDAOImpl.MsProteinMatchDb;
+import org.yeastrc.ms.domain.IMsSearchResultProtein;
 
 
 

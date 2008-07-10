@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 public class MsDigestionEnzyme {
 

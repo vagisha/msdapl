@@ -4,12 +4,14 @@
  * July 2, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.db;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.yeastrc.ms.domain.IMsSearch;
 
 public class MsPeptideSearch implements IMsSearch {
 
