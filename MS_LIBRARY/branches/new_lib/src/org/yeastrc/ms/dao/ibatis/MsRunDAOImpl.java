@@ -4,12 +4,15 @@
  * Jun 17, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
+import org.yeastrc.ms.dao.MsRunDAO;
+import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsScan;

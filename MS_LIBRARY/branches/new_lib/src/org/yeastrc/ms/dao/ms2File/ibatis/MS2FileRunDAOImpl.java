@@ -1,12 +1,13 @@
-package org.yeastrc.ms.dao.ms2File;
+package org.yeastrc.ms.dao.ms2File.ibatis;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.ibatis.DAOFactory;
+import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsRun.RunFileFormat;
 import org.yeastrc.ms.dto.ms2File.MS2FileHeader;

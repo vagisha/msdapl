@@ -1,6 +1,6 @@
 package org.yeastrc.ms.dto;
 
-import org.yeastrc.ms.dao.MsProteinMatchDAOImpl.MsProteinMatchDb;
+import org.yeastrc.ms.dao.ibatis.MsProteinMatchDAOImpl.MsProteinMatchDb;
 
 
 

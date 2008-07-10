@@ -1,7 +1,10 @@
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
+import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
+import org.yeastrc.ms.dao.MsProteinMatchDAO;
 import org.yeastrc.ms.dto.IMsSearchResultProtein;
 import org.yeastrc.ms.dto.MsPeptideSearchResult;
 import org.yeastrc.ms.dto.MsProteinMatch;

@@ -4,10 +4,12 @@
  * Jun 17, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.MsExperimentDAO;
+import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dto.MsExperiment;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsRun.RunFileFormat;

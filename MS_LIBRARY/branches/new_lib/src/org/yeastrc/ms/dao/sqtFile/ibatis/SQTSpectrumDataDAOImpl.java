@@ -4,12 +4,13 @@
  * Jul 5, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.sqtFile;
+package org.yeastrc.ms.dao.sqtFile.ibatis;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.yeastrc.ms.dao.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
 import org.yeastrc.ms.dto.sqtFile.SQTSpectrumData;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

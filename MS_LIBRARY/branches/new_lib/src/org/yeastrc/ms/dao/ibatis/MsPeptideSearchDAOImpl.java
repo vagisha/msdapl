@@ -4,10 +4,14 @@
  * Jul 4, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.MsPeptideSearchDAO;
+import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
+import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
+import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 import org.yeastrc.ms.dto.MsSequenceDatabase;
 

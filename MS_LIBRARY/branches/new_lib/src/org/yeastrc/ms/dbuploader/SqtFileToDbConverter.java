@@ -3,7 +3,7 @@ package org.yeastrc.ms.dbuploader;
 import java.io.File;
 import java.util.List;
 
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;

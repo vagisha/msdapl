@@ -4,7 +4,7 @@
  * Jun 17, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.sql.SQLException;
 import java.util.List;

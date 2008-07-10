@@ -4,12 +4,13 @@
  * Jul 3, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.MsProteinMatchDAO;
 import org.yeastrc.ms.dto.IMsSearchResultProtein;
 import org.yeastrc.ms.dto.MsProteinMatch;
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dto.MsExperiment;
 
 public class MsExperimentDAOImplTest extends TestCase {

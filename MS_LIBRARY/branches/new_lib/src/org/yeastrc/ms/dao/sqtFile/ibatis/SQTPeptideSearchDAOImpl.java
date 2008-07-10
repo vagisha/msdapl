@@ -4,13 +4,14 @@
  * Jul 5, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.sqtFile;
+package org.yeastrc.ms.dao.sqtFile.ibatis;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsPeptideSearchDAO;
+import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.ibatis.DAOFactory;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
 import org.yeastrc.ms.dto.sqtFile.ISQTPeptideSearch;
 import org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch;
 

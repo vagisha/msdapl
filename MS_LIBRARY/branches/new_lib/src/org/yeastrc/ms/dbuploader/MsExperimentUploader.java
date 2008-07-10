@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsExperimentDAO;
+import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dto.MsExperiment;
 import org.yeastrc.ms.dto.MsRun;
 import org.yeastrc.ms.dto.MsRun.RunFileFormat;

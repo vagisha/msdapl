@@ -4,9 +4,10 @@
  * Jul 4, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.sqtFile;
+package org.yeastrc.ms.dao.sqtFile.ibatis;
 
-import org.yeastrc.ms.dao.MsPeptideSearchResultDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsPeptideSearchResultDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchResult;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

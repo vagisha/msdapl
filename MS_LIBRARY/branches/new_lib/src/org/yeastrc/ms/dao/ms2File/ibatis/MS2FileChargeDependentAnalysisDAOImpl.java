@@ -4,11 +4,12 @@
  * Jun 18, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.ms2File;
+package org.yeastrc.ms.dao.ms2File.ibatis;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

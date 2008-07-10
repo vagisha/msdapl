@@ -4,10 +4,11 @@
  * Jun 17, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dto.MsScan;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

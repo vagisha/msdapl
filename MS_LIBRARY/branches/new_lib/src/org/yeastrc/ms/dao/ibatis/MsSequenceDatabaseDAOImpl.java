@@ -4,12 +4,13 @@
  * Jul 4, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.ibatis;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
 import org.yeastrc.ms.dto.IMsSequenceDatabase;
 import org.yeastrc.ms.dto.MsSequenceDatabase;
 

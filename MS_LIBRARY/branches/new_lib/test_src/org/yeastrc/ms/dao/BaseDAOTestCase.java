@@ -16,6 +16,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dto.MsDigestionEnzyme;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 import org.yeastrc.ms.dto.MsPeptideSearchDynamicMod;

@@ -1,7 +1,7 @@
 package org.yeastrc.ms.dao.sqtFile;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dto.MsPeptideSearch;
 import org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch;
 import org.yeastrc.ms.dto.sqtFile.SQTSearchHeader;
