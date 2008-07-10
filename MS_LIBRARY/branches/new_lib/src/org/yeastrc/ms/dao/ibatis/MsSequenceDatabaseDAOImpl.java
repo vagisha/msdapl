@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
-import org.yeastrc.ms.dto.IMsSequenceDatabase;
-import org.yeastrc.ms.dto.MsSequenceDatabase;
+import org.yeastrc.ms.domain.IMsSequenceDatabase;
+import org.yeastrc.ms.domain.MsSequenceDatabase;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

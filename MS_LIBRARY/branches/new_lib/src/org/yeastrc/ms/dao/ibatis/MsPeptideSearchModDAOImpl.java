@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
-import org.yeastrc.ms.dto.IMsSearchModification;
-import org.yeastrc.ms.dto.MsPeptideSearchDynamicMod;
-import org.yeastrc.ms.dto.MsPeptideSearchStaticMod;
-import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
+import org.yeastrc.ms.domain.IMsSearchModification;
+import org.yeastrc.ms.domain.MsPeptideSearchDynamicMod;
+import org.yeastrc.ms.domain.MsPeptideSearchStaticMod;
+import org.yeastrc.ms.domain.MsSearchResultDynamicMod;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

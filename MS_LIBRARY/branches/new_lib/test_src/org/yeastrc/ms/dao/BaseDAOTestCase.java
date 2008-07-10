@@ -17,16 +17,16 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.dto.MsDigestionEnzyme;
-import org.yeastrc.ms.dto.MsPeptideSearch;
-import org.yeastrc.ms.dto.MsPeptideSearchDynamicMod;
-import org.yeastrc.ms.dto.MsPeptideSearchResult;
-import org.yeastrc.ms.dto.MsPeptideSearchStaticMod;
-import org.yeastrc.ms.dto.MsProteinMatch;
-import org.yeastrc.ms.dto.MsRun;
-import org.yeastrc.ms.dto.MsScan;
-import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
-import org.yeastrc.ms.dto.MsSequenceDatabase;
+import org.yeastrc.ms.domain.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.MsPeptideSearch;
+import org.yeastrc.ms.domain.MsPeptideSearchDynamicMod;
+import org.yeastrc.ms.domain.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.MsPeptideSearchStaticMod;
+import org.yeastrc.ms.domain.MsProteinMatch;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsSearchResultDynamicMod;
+import org.yeastrc.ms.domain.MsSequenceDatabase;
 
 /**
  * 

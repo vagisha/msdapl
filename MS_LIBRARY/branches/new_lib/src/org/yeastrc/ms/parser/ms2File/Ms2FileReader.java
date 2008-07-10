@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.yeastrc.ms.dto.Peaks;
+import org.yeastrc.ms.domain.Peaks;
 
 
 /**

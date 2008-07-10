@@ -2,7 +2,7 @@ package org.yeastrc.ms.parser.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.dto.IMsSearchDynamicMod;
+import org.yeastrc.ms.domain.IMsSearchDynamicMod;
 
 public class DynamicModification implements IMsSearchDynamicMod {
 

@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao.ibatis;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dto.MsScan;
+import org.yeastrc.ms.domain.MsScan;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

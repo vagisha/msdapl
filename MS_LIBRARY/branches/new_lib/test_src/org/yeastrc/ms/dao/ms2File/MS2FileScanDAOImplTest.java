@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.yeastrc.ms.dto.ms2File.MS2FileScan;
+import org.yeastrc.ms.domain.ms2File.MS2FileScan;
 
 
 public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {

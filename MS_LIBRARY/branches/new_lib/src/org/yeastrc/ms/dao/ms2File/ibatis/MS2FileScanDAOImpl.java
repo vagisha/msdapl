@@ -15,11 +15,11 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
-import org.yeastrc.ms.dto.MsScan;
-import org.yeastrc.ms.dto.MsRun.RunFileFormat;
-import org.yeastrc.ms.dto.ms2File.MS2FileChargeIndependentAnalysis;
-import org.yeastrc.ms.dto.ms2File.MS2FileScan;
-import org.yeastrc.ms.dto.ms2File.MS2FileScanCharge;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.MS2FileChargeIndependentAnalysis;
+import org.yeastrc.ms.domain.ms2File.MS2FileScan;
+import org.yeastrc.ms.domain.ms2File.MS2FileScanCharge;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

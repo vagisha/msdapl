@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO.EnzymeProperties;
-import org.yeastrc.ms.dto.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.MsDigestionEnzyme;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

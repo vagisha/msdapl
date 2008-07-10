@@ -8,7 +8,7 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
-import org.yeastrc.ms.dto.ms2File.MS2FileChargeDependentAnalysis;
+import org.yeastrc.ms.domain.ms2File.MS2FileChargeDependentAnalysis;
 
 /**
  * 

@@ -12,8 +12,8 @@ import org.yeastrc.ms.dao.MsPeptideSearchDAO;
 import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
 import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
 import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
-import org.yeastrc.ms.dto.MsPeptideSearch;
-import org.yeastrc.ms.dto.MsSequenceDatabase;
+import org.yeastrc.ms.domain.MsPeptideSearch;
+import org.yeastrc.ms.domain.MsSequenceDatabase;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

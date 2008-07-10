@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsDigestionEnzymeDAO.EnzymeProperties;
-import org.yeastrc.ms.dto.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.MsDigestionEnzyme;
 
 public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
 

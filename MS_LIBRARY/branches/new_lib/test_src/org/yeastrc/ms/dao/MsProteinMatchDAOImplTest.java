@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.dto.IMsSearchResultProtein;
-import org.yeastrc.ms.dto.MsProteinMatch;
+import org.yeastrc.ms.domain.IMsSearchResultProtein;
+import org.yeastrc.ms.domain.MsProteinMatch;
 
 public class MsProteinMatchDAOImplTest extends BaseDAOTestCase {
 

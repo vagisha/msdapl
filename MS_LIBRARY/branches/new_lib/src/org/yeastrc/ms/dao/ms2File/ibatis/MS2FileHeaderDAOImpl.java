@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
-import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
+import org.yeastrc.ms.domain.ms2File.MS2FileHeader;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

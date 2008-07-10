@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.dto.IMsSequenceDatabase;
-import org.yeastrc.ms.dto.MsSequenceDatabase;
+import org.yeastrc.ms.domain.IMsSequenceDatabase;
+import org.yeastrc.ms.domain.MsSequenceDatabase;
 
 public interface MsSequenceDatabaseDAO {
 

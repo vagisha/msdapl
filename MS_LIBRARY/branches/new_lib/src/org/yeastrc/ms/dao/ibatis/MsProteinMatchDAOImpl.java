@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsProteinMatchDAO;
-import org.yeastrc.ms.dto.IMsSearchResultProtein;
-import org.yeastrc.ms.dto.MsProteinMatch;
+import org.yeastrc.ms.domain.IMsSearchResultProtein;
+import org.yeastrc.ms.domain.MsProteinMatch;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

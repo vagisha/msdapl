@@ -2,7 +2,7 @@ package org.yeastrc.ms.parser.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.dto.IMsSearchModification;
+import org.yeastrc.ms.domain.IMsSearchModification;
 
 public class StaticModification implements IMsSearchModification {
 

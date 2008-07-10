@@ -5,10 +5,10 @@ import java.util.List;
 import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
 import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
 import org.yeastrc.ms.dao.MsProteinMatchDAO;
-import org.yeastrc.ms.dto.IMsSearchResultProtein;
-import org.yeastrc.ms.dto.MsPeptideSearchResult;
-import org.yeastrc.ms.dto.MsProteinMatch;
-import org.yeastrc.ms.dto.MsSearchResultDynamicMod;
+import org.yeastrc.ms.domain.IMsSearchResultProtein;
+import org.yeastrc.ms.domain.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.MsProteinMatch;
+import org.yeastrc.ms.domain.MsSearchResultDynamicMod;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

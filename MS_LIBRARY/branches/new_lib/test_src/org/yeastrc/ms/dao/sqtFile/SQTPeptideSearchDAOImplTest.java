@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.util.List;
 
-import org.yeastrc.ms.dto.sqtFile.ISQTPeptideSearch;
-import org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.ISQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTPeptideSearch;
 
 
 public class SQTPeptideSearchDAOImplTest extends SQTBaseDAOTestCase {

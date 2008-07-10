@@ -3,10 +3,10 @@ package org.yeastrc.ms.dao.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dto.MsDigestionEnzyme;
-import org.yeastrc.ms.dto.MsRun;
-import org.yeastrc.ms.dto.ms2File.MS2FileHeader;
-import org.yeastrc.ms.dto.ms2File.MS2FileRun;
+import org.yeastrc.ms.domain.MsDigestionEnzyme;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.ms2File.MS2FileHeader;
+import org.yeastrc.ms.domain.ms2File.MS2FileRun;
 
 public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
 
