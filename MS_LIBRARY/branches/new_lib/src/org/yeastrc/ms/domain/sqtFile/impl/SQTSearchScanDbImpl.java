@@ -4,7 +4,7 @@
  * Jul 5, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.sqtFile.db;
+package org.yeastrc.ms.domain.sqtFile.impl;
 
 import java.math.BigDecimal;
 

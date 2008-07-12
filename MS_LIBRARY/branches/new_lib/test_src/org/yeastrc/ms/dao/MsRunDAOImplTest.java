@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.db.MsDigestionEnzymeDb;
-import org.yeastrc.ms.domain.db.MsRunDbImpl;
+import org.yeastrc.ms.domain.impl.MsDigestionEnzymeDb;
+import org.yeastrc.ms.domain.impl.MsRunDbImpl;
 
 public class MsRunDAOImplTest extends BaseDAOTestCase {
 

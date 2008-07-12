@@ -13,8 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.MsPeakData;
-import org.yeastrc.ms.domain.db.Peaks;
-import org.yeastrc.ms.domain.db.Peaks.Peak;
+import org.yeastrc.ms.domain.impl.Peaks;
+import org.yeastrc.ms.domain.impl.Peaks.Peak;
 
 /**
  * 

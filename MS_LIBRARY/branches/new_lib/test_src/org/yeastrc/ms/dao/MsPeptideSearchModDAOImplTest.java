@@ -7,9 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.db.MsPeptideSearchDynamicMod;
-import org.yeastrc.ms.domain.db.MsSearchStaticModification;
-import org.yeastrc.ms.domain.db.MsSearchResultDynamicModDbImpl;
+import org.yeastrc.ms.domain.impl.MsPeptideSearchDynamicMod;
+import org.yeastrc.ms.domain.impl.MsSearchResultDynamicModDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchStaticModification;
 
 public class MsPeptideSearchModDAOImplTest extends BaseDAOTestCase {
 

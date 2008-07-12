@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain.ms2File.db;
+package org.yeastrc.ms.domain.ms2File.impl;
 
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 

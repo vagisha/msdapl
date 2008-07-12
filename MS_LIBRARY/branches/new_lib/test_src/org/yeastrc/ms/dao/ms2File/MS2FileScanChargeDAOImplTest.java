@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.db.MS2ScanChargeDbImpl;
+import org.yeastrc.ms.domain.ms2File.impl.MS2ScanChargeDbImpl;
 
 
 

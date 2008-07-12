@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain.db;
+package org.yeastrc.ms.domain.impl;
 
 import org.yeastrc.ms.domain.MsEnzymeDb;
 

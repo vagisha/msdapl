@@ -19,16 +19,15 @@ import junit.framework.TestCase;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.db.MsDigestionEnzymeDb;
-import org.yeastrc.ms.domain.db.MsSearchDbImpl;
-import org.yeastrc.ms.domain.db.MsSearchDbImpl;
-import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
-import org.yeastrc.ms.domain.db.MsSearchStaticModification;
-import org.yeastrc.ms.domain.db.MsSearchResultProteinDbImpl;
-import org.yeastrc.ms.domain.db.MsRunDbImpl;
-import org.yeastrc.ms.domain.db.MsScanDbImpl;
-import org.yeastrc.ms.domain.db.MsSearchResultDynamicModDbImpl;
-import org.yeastrc.ms.domain.db.MsSearchDatabaseDbImpl;
+import org.yeastrc.ms.domain.impl.MsDigestionEnzymeDb;
+import org.yeastrc.ms.domain.impl.MsRunDbImpl;
+import org.yeastrc.ms.domain.impl.MsScanDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchDatabaseDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultDynamicModDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultProteinDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchStaticModification;
 
 /**
  * 

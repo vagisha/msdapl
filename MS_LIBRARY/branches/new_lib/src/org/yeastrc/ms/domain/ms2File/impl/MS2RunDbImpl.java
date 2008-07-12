@@ -4,12 +4,12 @@
  * Jul 2, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.ms2File.db;
+package org.yeastrc.ms.domain.ms2File.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.db.MsRunDbImpl;
+import org.yeastrc.ms.domain.impl.MsRunDbImpl;
 import org.yeastrc.ms.domain.ms2File.MS2HeaderDb;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 

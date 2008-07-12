@@ -9,11 +9,11 @@ import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.db.MS2ChargeDependentAnalysisDbImpl;
-import org.yeastrc.ms.domain.ms2File.db.MS2ChargeIndependentAnalysisDbImpl;
-import org.yeastrc.ms.domain.ms2File.db.MS2RunDbImpl;
-import org.yeastrc.ms.domain.ms2File.db.MS2ScanDbImpl;
-import org.yeastrc.ms.domain.ms2File.db.MS2ScanChargeDbImpl;
+import org.yeastrc.ms.domain.ms2File.impl.MS2ChargeDependentAnalysisDbImpl;
+import org.yeastrc.ms.domain.ms2File.impl.MS2ChargeIndependentAnalysisDbImpl;
+import org.yeastrc.ms.domain.ms2File.impl.MS2RunDbImpl;
+import org.yeastrc.ms.domain.ms2File.impl.MS2ScanChargeDbImpl;
+import org.yeastrc.ms.domain.ms2File.impl.MS2ScanDbImpl;
 
 public class MS2BaseDAOtestCase extends BaseDAOTestCase {
 

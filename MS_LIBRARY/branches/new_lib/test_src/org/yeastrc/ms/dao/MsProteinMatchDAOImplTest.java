@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.MsSearchResultProtein;
-import org.yeastrc.ms.domain.db.MsSearchResultProteinDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultProteinDbImpl;
 
 public class MsProteinMatchDAOImplTest extends BaseDAOTestCase {
 

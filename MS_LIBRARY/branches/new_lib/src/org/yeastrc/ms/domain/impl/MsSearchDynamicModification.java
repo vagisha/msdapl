@@ -4,7 +4,7 @@
  * Jul 3, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.db;
+package org.yeastrc.ms.domain.impl;
 
 public class MsSearchDynamicModification extends MsSearchModificationDbImpl {
 

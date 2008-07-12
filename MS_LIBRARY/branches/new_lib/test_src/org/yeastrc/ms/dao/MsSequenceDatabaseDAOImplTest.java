@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.MsSearchDatabase;
-import org.yeastrc.ms.domain.db.MsSearchDatabaseDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchDatabaseDbImpl;
 
 /**
  * 

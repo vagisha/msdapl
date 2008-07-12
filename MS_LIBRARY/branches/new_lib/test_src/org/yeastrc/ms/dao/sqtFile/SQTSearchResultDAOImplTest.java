@@ -2,9 +2,9 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultDbImpl;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResultDbImpl;
+import org.yeastrc.ms.domain.sqtFile.impl.SQTSearchResultDbImpl;
 
 public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 

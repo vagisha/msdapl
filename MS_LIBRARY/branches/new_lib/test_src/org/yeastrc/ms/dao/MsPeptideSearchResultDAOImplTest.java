@@ -1,7 +1,7 @@
 package org.yeastrc.ms.dao;
 
 
-import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultDbImpl;
 
 public class MsPeptideSearchResultDAOImplTest extends BaseDAOTestCase {
 

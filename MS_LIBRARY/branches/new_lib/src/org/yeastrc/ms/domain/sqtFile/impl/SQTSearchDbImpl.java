@@ -1,9 +1,9 @@
-package org.yeastrc.ms.domain.sqtFile.db;
+package org.yeastrc.ms.domain.sqtFile.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.db.MsSearchDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchDbImpl;
 import org.yeastrc.ms.domain.sqtFile.SQTHeaderDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 

@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.MsExperiment;
-import org.yeastrc.ms.domain.db.MsExperimentDbImpl;
+import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
 
 public class MsExperimentDAOImplTest extends TestCase {
 

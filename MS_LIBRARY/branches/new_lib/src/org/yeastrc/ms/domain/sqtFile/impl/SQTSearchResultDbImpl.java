@@ -1,8 +1,8 @@
-package org.yeastrc.ms.domain.sqtFile.db;
+package org.yeastrc.ms.domain.sqtFile.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultDbImpl;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 
 public class SQTSearchResultDbImpl extends MsSearchResultDbImpl implements SQTSearchResultDb {

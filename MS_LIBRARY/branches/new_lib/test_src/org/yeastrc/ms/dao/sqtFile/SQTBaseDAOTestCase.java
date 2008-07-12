@@ -2,9 +2,9 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.db.MsSearchDbImpl;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchDbImpl;
-import org.yeastrc.ms.domain.sqtFile.db.SQTHeaderDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchDbImpl;
+import org.yeastrc.ms.domain.sqtFile.impl.SQTHeaderDbImpl;
+import org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl;
 
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 

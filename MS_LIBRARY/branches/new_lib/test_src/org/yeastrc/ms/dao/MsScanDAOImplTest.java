@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.yeastrc.ms.domain.db.MsScanDbImpl;
+import org.yeastrc.ms.domain.impl.MsScanDbImpl;
 
 public class MsScanDAOImplTest extends BaseDAOTestCase {
 

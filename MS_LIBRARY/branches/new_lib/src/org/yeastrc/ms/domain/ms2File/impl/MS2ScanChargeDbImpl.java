@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.ms2File.db;
+package org.yeastrc.ms.domain.ms2File.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

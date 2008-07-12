@@ -4,7 +4,7 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.db;
+package org.yeastrc.ms.domain.impl;
 
 import java.math.BigDecimal;
 

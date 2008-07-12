@@ -3,8 +3,8 @@ package org.yeastrc.ms.dao;
 import java.util.List;
 
 import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.db.MsSearchDbImpl;
-import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchDbImpl;
+import org.yeastrc.ms.domain.impl.MsSearchResultDbImpl;
 
 public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
 

@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain.sqtFile.db;
+package org.yeastrc.ms.domain.sqtFile.impl;
 
 import org.yeastrc.ms.domain.sqtFile.SQTHeaderDb;
 
