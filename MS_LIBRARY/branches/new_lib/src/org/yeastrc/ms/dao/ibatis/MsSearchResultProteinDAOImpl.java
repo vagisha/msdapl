@@ -49,29 +49,7 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
     public void delete(int resultId) {
         delete("MsResultProtein.deleteForResultId", resultId);
     }
- 
-    //-------------------------------------------------------------------------------------------------
-    // Class used for iBatis parametermap
-    //-------------------------------------------------------------------------------------------------
-    public class MsProteinMatchDb {
-        
-        int resultId;
-        MsSearchResultProtein resultProtein;
-        
-        /**
-         * @return the resultId
-         */
-        public int getResultId() {
-            return resultId;
-        }
-        /**
-         * @return the resultProtein
-         */
-        public MsSearchResultProtein getResultProtein() {
-            return resultProtein;
-        }
-
-    }
+   
 }
 
 
