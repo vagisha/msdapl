@@ -6,28 +6,28 @@ import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
-import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.IMsRun.RunFileFormat;
-import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.ms2File.IHeader;
-import org.yeastrc.ms.domain.ms2File.IMS2Run;
-import org.yeastrc.ms.domain.ms2File.IMS2Scan;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
+import org.yeastrc.ms.dao.ms2File.MS2HeaderDAO;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.ms2File.MS2Run;
+import org.yeastrc.ms.domain.ms2File.MS2RunDb;
+import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMS2Run, MS2FileRun> {
+public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2RunDb> {
 
-    private MsRunDAO<IMsRun, MsRun> msRunDao;
-    private MS2FileHeaderDAO ms2HeaderDao;
-    private MsScanDAO<IMS2Scan, MS2FileScan> ms2ScanDao;
+    private MsRunDAO<MsRun, MsRunDb> msRunDao;
+    private MS2HeaderDAO ms2HeaderDao;
+    private MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDao;
     
     
     
-    public MS2FileRunDAOImpl(SqlMapClient sqlMap, MsRunDAO<IMsRun, MsRun> msRunDao,
-            MS2FileHeaderDAO ms2HeaderDao, MsScanDAO<IMS2Scan, MS2FileScan> ms2ScanDao) {
+    public MS2FileRunDAOImpl(SqlMapClient sqlMap, MsRunDAO<MsRun, MsRunDb> msRunDao,
+            MS2HeaderDAO ms2HeaderDao, MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDao) {
         super(sqlMap);
         this.msRunDao = msRunDao;
         this.ms2HeaderDao = ms2HeaderDao;
@@ -41,27 +41,27 @@ public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMS2Run
     /**
      * Saves the run along with MS2 file specific information
      */
-    public int saveRun(IMS2Run run, int msExperimentId) {
+    public int saveRun(MS2Run run, int msExperimentId) {
 
         // save the run
         int runId = msRunDao.saveRun(run, 0);
 
-        MS2FileHeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-        for (IHeader header: run.getHeaderList()) {
+        MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
+        for (MS2Field header: run.getHeaderList()) {
             headerDao.save(header, runId);
         }
         return runId;
     }
 
 
-    public MS2FileRun loadRun(int runId) {
+    public MS2RunDb loadRun(int runId) {
         // MsRun.select has a discriminator and will instantiate the
         // appropriate type of run object
-        return (MS2FileRun) queryForObject("MsRun.select", runId);
+        return (MS2RunDb) queryForObject("MsRun.select", runId);
     }
 
 
-    public List<MS2FileRun> loadExperimentRuns(int msExperimentId) {
+    public List<MS2RunDb> loadExperimentRuns(int msExperimentId) {
         return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
     }
 

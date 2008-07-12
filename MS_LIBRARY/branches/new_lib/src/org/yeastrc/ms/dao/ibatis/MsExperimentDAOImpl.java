@@ -10,13 +10,13 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.domain.IMsExperiment;
-import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.IMsRun.RunFileFormat;
-import org.yeastrc.ms.domain.db.MsExperiment;
-import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.ms2File.IMS2Run;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
+import org.yeastrc.ms.domain.MsExperiment;
+import org.yeastrc.ms.domain.MsExperimentDb;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.ms2File.MS2Run;
+import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -29,11 +29,11 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         super(sqlMap);
     }
 
-    public MsExperiment load(int msExperimentId) {
-        return (MsExperiment)queryForObject("MsExperiment.select", msExperimentId);
+    public MsExperimentDb load(int msExperimentId) {
+        return (MsExperimentDb)queryForObject("MsExperiment.select", msExperimentId);
     }
     
-    public int save(IMsExperiment experiment) {
+    public int save(MsExperiment experiment) {
         return saveAndReturnId("MsExperiment.insert", experiment);
     }
     
@@ -49,7 +49,7 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     public void delete(int msExperimentId) {
         
         // delete the runs for this experiment
-        MsRunDAO<IMsRun, MsRun> runDao = DAOFactory.instance().getMsRunDAO();
+        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
         List<Integer> runIds = runDao.loadRunIdsForExperiment(msExperimentId);
         
         if (runIds != null && runIds.size() > 0) {
@@ -69,7 +69,7 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
             }
             
             if (format == RunFileFormat.MS2) {
-                MsRunDAO<IMS2Run, MS2FileRun> ms2RunDao = DAOFactory.instance().getMS2FileRunDAO();
+                MsRunDAO<MS2Run, MS2RunDb> ms2RunDao = DAOFactory.instance().getMS2FileRunDAO();
                 ms2RunDao.deleteRunsForExperiment(msExperimentId);
             }
             else {

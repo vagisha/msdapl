@@ -3,11 +3,11 @@ package org.yeastrc.ms.dao.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
-import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.ms2File.IMS2Run;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
+import org.yeastrc.ms.domain.db.MsDigestionEnzymeDb;
+import org.yeastrc.ms.domain.db.MsRunDbImpl;
+import org.yeastrc.ms.domain.ms2File.MS2Run;
+import org.yeastrc.ms.domain.ms2File.db.MS2HeaderDbImpl;
+import org.yeastrc.ms.domain.ms2File.db.MS2RunDbImpl;
 
 public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
 
@@ -22,7 +22,7 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
 
     public void testSaveLoadAndDelete() {
         
-        MS2FileRun run = makeMS2Run(1, true, true); // run with enzyme info and headers
+        MS2RunDbImpl run = makeMS2Run(1, true, true); // run with enzyme info and headers
         
         assertTrue(run.getHeaderList().size() > 0);
         assertTrue(run.getEnzymeList().size() > 0);
@@ -32,7 +32,7 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
         saveScansForRun(runId, 20); // add scans for this run
         
         
-        MS2FileRun run_db = ms2RunDao.loadRun(runId);
+        MS2RunDbImpl run_db = ms2RunDao.loadRun(runId);
         assertEquals(run.getEnzymeList().size(), run_db.getEnzymeList().size());
         assertEquals(run.getHeaderList().size(), run_db.getHeaderList().size());
         assertEquals(run.getEnzymeList().size(), enzymeDao.loadEnzymesForRun(runId).size());
@@ -60,15 +60,15 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
     
     public void testLoadExperimentRuns() {
         // do we get a list of type List<MS2FileRun>?
-        IMS2Run run = makeMS2Run(1, true, true); // run with enzyme info and headers
+        MS2Run run = makeMS2Run(1, true, true); // run with enzyme info and headers
         ms2RunDao.saveRun(run, 0);
         run = makeMS2Run(1, true, true);
         ms2RunDao.saveRun(run, 0);
         
-        List<MS2FileRun> runList = ms2RunDao.loadExperimentRuns(1);
+        List<MS2RunDbImpl> runList = ms2RunDao.loadExperimentRuns(1);
         assertEquals(2, runList.size());
         
-        for (IMS2Run r: runList) {
+        for (MS2Run r: runList) {
             assertEquals(3, r.getHeaderList().size());
         }
         
@@ -78,29 +78,29 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
     }
     
     
-    private MS2FileRun makeMS2Run(int msExperimentId, boolean addEnzymes, boolean addHeaders) {
+    private MS2RunDbImpl makeMS2Run(int msExperimentId, boolean addEnzymes, boolean addHeaders) {
         
-        MS2FileRun run = null;
+        MS2RunDbImpl run = null;
         if (addEnzymes) {
             // load some enzymes from the database
-            MsDigestionEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
-            MsDigestionEnzyme enzyme2 = enzymeDao.loadEnzyme(2);
-            MsDigestionEnzyme enzyme3 = enzymeDao.loadEnzyme(3);
+            MsDigestionEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
+            MsDigestionEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
+            MsDigestionEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
             
             assertNotNull(enzyme1);
             assertNotNull(enzyme2);
             assertNotNull(enzyme3);
-            List<MsDigestionEnzyme> enzymes = new ArrayList<MsDigestionEnzyme>(3);
+            List<MsDigestionEnzymeDb> enzymes = new ArrayList<MsDigestionEnzymeDb>(3);
             enzymes.add(enzyme1);
             enzymes.add(enzyme2);
             enzymes.add(enzyme3);
             
-            MsRun msRun = createRunWEnzymeInfo(msExperimentId, enzymes);
-            run = new MS2FileRun(msRun);
+            MsRunDbImpl msRun = createRunWEnzymeInfo(msExperimentId, enzymes);
+            run = new MS2RunDbImpl(msRun);
             checkRun(msRun, run);
         }
         else {
-            run = new MS2FileRun(this.createRun(msExperimentId));
+            run = new MS2RunDbImpl(this.createRun(msExperimentId));
         }
         if (addHeaders) {
             run.addMS2Header(makeMS2Header("name1", "value1"));
@@ -110,8 +110,8 @@ public class MS2FileRunDAOImplTest extends MS2BaseDAOtestCase {
         return run;
     }
     
-    private MS2FileHeader makeMS2Header(String name, String value) {
-        MS2FileHeader header = new MS2FileHeader();
+    private MS2HeaderDbImpl makeMS2Header(String name, String value) {
+        MS2HeaderDbImpl header = new MS2HeaderDbImpl();
         header.setName(name);
         header.setValue(value);
         return header;

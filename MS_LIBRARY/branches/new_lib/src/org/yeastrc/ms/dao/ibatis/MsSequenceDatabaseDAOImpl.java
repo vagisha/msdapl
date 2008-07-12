@@ -10,16 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
-import org.yeastrc.ms.domain.IMsSearchDatabase;
-import org.yeastrc.ms.domain.db.MsSequenceDatabase;
+import org.yeastrc.ms.dao.MsSearchDatabaseDAO;
+import org.yeastrc.ms.domain.MsSearchDatabase;
+import org.yeastrc.ms.domain.MsSearchDatabaseDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSequenceDatabaseDAO {
+public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDatabaseDAO {
 
     public MsSequenceDatabaseDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
@@ -28,7 +28,7 @@ public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSequen
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsSequenceDatabaseDAO#loadSearchDatabases(int)
      */
-    public List<MsSequenceDatabase> loadSearchDatabases(int searchId) {
+    public List<MsSearchDatabaseDb> loadSearchDatabases(int searchId) {
         return queryForList("MsDatabase.selectSearchDatabases", searchId);
     }
     
@@ -42,7 +42,7 @@ public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSequen
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsSequenceDatabaseDAO#saveSearchDatabase(org.yeastrc.ms.dto.MsSequenceDatabase, int)
      */
-    public int saveSearchDatabase(IMsSearchDatabase database, int searchId) {
+    public int saveSearchDatabase(MsSearchDatabase database, int searchId) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("searchId", searchId);
@@ -59,11 +59,11 @@ public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSequen
     }
     
     
-    private List<Integer> loadMatchingDatabaseIds(IMsSearchDatabase database) {
+    private List<Integer> loadMatchingDatabaseIds(MsSearchDatabase database) {
         return queryForList("MsDatabase.selectDatabaseIdMatchAllCols", database);
     }
     
-    private int saveDatabase(IMsSearchDatabase database) {
+    private int saveDatabase(MsSearchDatabase database) {
         return saveAndReturnId("MsDatabase.insertDatabase", database);
     }
     

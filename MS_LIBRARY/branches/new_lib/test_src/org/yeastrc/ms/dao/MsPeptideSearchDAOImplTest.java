@@ -2,9 +2,9 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.IMsSearch;
-import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.MsSearch;
+import org.yeastrc.ms.domain.db.MsSearchDbImpl;
+import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
 
 public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
 
@@ -22,9 +22,9 @@ public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchDao.loadSearchIdsForRun(1).size());
         
         // create and save a search with no seq. db information or modifications
-        IMsSearch search_1 = makePeptideSearch(1, false, false, false);
+        MsSearch search_1 = makePeptideSearch(1, false, false, false);
         int searchId_1 = searchDao.saveSearch(search_1);
-        List<MsPeptideSearch> searchList = (List<MsPeptideSearch>) searchDao.loadSearchesForRun(1);
+        List<MsSearchDbImpl> searchList = (List<MsSearchDbImpl>) searchDao.loadSearchesForRun(1);
         assertEquals(1, searchList.size());
         assertEquals(search_1.getSearchDate().toString(), searchList.get(0).getSearchDate().toString());
         assertEquals(167, searchList.get(0).getSearchDuration());
@@ -34,17 +34,17 @@ public class MsPeptideSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, resultDao.loadResultIdsForSearch(searchId_1).size());
         
         // create and save a search with seq. db information and modifications
-        IMsSearch search_2 = makePeptideSearch(1, true, true, true);
+        MsSearch search_2 = makePeptideSearch(1, true, true, true);
         int searchId_2 = searchDao.saveSearch(search_2);
-        searchList = (List<MsPeptideSearch>) searchDao.loadSearchesForRun(1);
+        searchList = (List<MsSearchDbImpl>) searchDao.loadSearchesForRun(1);
         assertEquals(2, searchList.size());
         assertEquals(2, seqDbDao.loadSearchDatabases(searchId_2).size());
         assertEquals(2, modDao.loadStaticModificationsForSearch(searchId_2).size());
         assertEquals(3, modDao.loadDynamicModificationsForSearch(searchId_2).size());
         
         // add results for the search
-        MsPeptideSearchResult r1 = makeSearchResult(searchId_2, 1, 3, "PEPTIDE1", true, true);
-        MsPeptideSearchResult r2 = makeSearchResult(searchId_2, 1, 3, "PEPTIDE1", true, true);
+        MsSearchResultDbImpl r1 = makeSearchResult(searchId_2, 1, 3, "PEPTIDE1", true, true);
+        MsSearchResultDbImpl r2 = makeSearchResult(searchId_2, 1, 3, "PEPTIDE1", true, true);
         int r1_id = resultDao.save(r1);
         int r2_id = resultDao.save(r2);
         assertEquals(2, resultDao.loadResultIdsForSearch(searchId_2).size());

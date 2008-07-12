@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTField;
+import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 
 
-public class Header implements ISQTSearch {
+public class Header implements SQTSearch {
 
     
     private static final Pattern multiDbPattern = Pattern.compile(".*[,:;\\s]+.*");
@@ -389,12 +390,12 @@ public class Header implements ISQTSearch {
         return dynaMods;
     }
 
-    public List<HeaderItem> getHeaders() {
+    public List<? extends SQTField> getHeaders() {
        return headerItems;
     }
 
-    public String getOriginalFileType() {
-        return "SQT";
+    public SearchFileFormat getOriginalFileType() {
+        return SearchFileFormat.SQT;
     }
 
     public List<Database> getSearchDatabases() {

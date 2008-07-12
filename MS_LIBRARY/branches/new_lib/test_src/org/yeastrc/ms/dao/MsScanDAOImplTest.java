@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.yeastrc.ms.domain.db.MsScan;
+import org.yeastrc.ms.domain.db.MsScanDbImpl;
 
 public class MsScanDAOImplTest extends BaseDAOTestCase {
 
@@ -28,7 +28,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         int[] scanIds = new int[10];
         for (int i = 0; i < 10; i++) {
             int scanNum = random.nextInt(100);
-            MsScan scan = makeMsScan(runId, scanNum);
+            MsScanDbImpl scan = makeMsScan(runId, scanNum);
             scanIds[i] = scanDao.save(scan);
         }
 
@@ -50,7 +50,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     public void testNullProperties() {
 
         // try to save a scan without a runId; Should fail since runID in msScan cannot be null
-        MsScan scan = new MsScan();
+        MsScanDbImpl scan = new MsScanDbImpl();
         try {
             scanDao.save(scan);
             fail("Should not be able to save a scan withour a runId");
@@ -60,7 +60,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         // set the run id and try to save again
         scan.setRunId(24);
         int scanId = scanDao.save(scan);
-        MsScan scan_db = scanDao.load(scanId);
+        MsScanDbImpl scan_db = scanDao.load(scanId);
         assertNotNull(scan_db);
         assertEquals(24, scan_db.getRunId());
 

@@ -10,8 +10,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.IMsSearchDatabase;
-import org.yeastrc.ms.domain.db.MsSequenceDatabase;
+import org.yeastrc.ms.domain.MsSearchDatabase;
+import org.yeastrc.ms.domain.db.MsSearchDatabaseDbImpl;
 
 /**
  * 
@@ -32,14 +32,14 @@ public class MsSequenceDatabaseDAOImplTest extends BaseDAOTestCase {
         int searchId_2 = 2;
         
         // try to select databases for the search ids; make sure no databases are found
-        List<MsSequenceDatabase> dbs_1 = seqDbDao.loadSearchDatabases(searchId_1);
+        List<MsSearchDatabaseDbImpl> dbs_1 = seqDbDao.loadSearchDatabases(searchId_1);
         assertEquals(0, dbs_1.size());
         
-        List<MsSequenceDatabase> dbs_2 = seqDbDao.loadSearchDatabases(searchId_2);
+        List<MsSearchDatabaseDbImpl> dbs_2 = seqDbDao.loadSearchDatabases(searchId_2);
         assertEquals(0, dbs_2.size());
         
         // create a sequence database and assign it to both the search ids
-        IMsSearchDatabase db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1", 100, 20);
+        MsSearchDatabase db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1", 100, 20);
         
         // assign this database to searchId_1; this will return the id from the msSequenceDatabaseDetails table
         int db1_id = seqDbDao.saveSearchDatabase(db1, searchId_1);
@@ -48,7 +48,7 @@ public class MsSequenceDatabaseDAOImplTest extends BaseDAOTestCase {
         assertEquals(db1_id, seqDbDao.saveSearchDatabase(db1, searchId_2));
         
         // create another dababase with some null values
-        IMsSearchDatabase db2 = makeSequenceDatabase("serverAddress_1", null, null, 20);
+        MsSearchDatabase db2 = makeSequenceDatabase("serverAddress_1", null, null, 20);
         
         // assign the database to searchId_1; we should get a different id since a new entry will be
         // created in msSequenceDatabaseDetails
@@ -56,12 +56,12 @@ public class MsSequenceDatabaseDAOImplTest extends BaseDAOTestCase {
         assertNotSame(db1_id, db2_id);
         
         // load the databases associated with searchId_1 and check the returned objects
-        List<MsSequenceDatabase> searchId_1_dbs = seqDbDao.loadSearchDatabases(searchId_1);
+        List<MsSearchDatabaseDbImpl> searchId_1_dbs = seqDbDao.loadSearchDatabases(searchId_1);
         assertEquals(2, searchId_1_dbs.size());
         
         // sort the results by db id
-        Collections.sort(searchId_1_dbs, new Comparator<MsSequenceDatabase> () {
-            public int compare(MsSequenceDatabase o1, MsSequenceDatabase o2) {
+        Collections.sort(searchId_1_dbs, new Comparator<MsSearchDatabaseDbImpl> () {
+            public int compare(MsSearchDatabaseDbImpl o1, MsSearchDatabaseDbImpl o2) {
                 return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
             }});
         
@@ -81,7 +81,7 @@ public class MsSequenceDatabaseDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchId_1_dbs.size());
         
         // we should still have one sequence db associated with searchId_2
-        List<MsSequenceDatabase> searchId_2_dbs = seqDbDao.loadSearchDatabases(searchId_2);
+        List<MsSearchDatabaseDbImpl> searchId_2_dbs = seqDbDao.loadSearchDatabases(searchId_2);
         assertEquals(1, searchId_2_dbs.size());
         
         // delete sequence database associations for searchId_2

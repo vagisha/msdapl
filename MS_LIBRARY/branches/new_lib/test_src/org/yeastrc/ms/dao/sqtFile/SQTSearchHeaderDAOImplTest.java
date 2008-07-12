@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
+import org.yeastrc.ms.domain.sqtFile.db.SQTHeaderDbImpl;
 
 /**
  * 
@@ -29,27 +29,27 @@ public class SQTSearchHeaderDAOImplTest extends SQTBaseDAOTestCase {
     public void testOperationsOnSqtSearchHeader() {
         
         // look for headers for a search that does not yet exist
-        List<SQTSearchHeader> headers_1 = sqtHeaderDao.loadSQTHeadersForSearch(1);
+        List<SQTHeaderDbImpl> headers_1 = sqtHeaderDao.loadSQTHeadersForSearch(1);
         assertEquals(0, headers_1.size());
         
         // insert some headers for a couple of search ids
-        SQTSearchHeader h1_1 = makeHeader(1, 1, false);
+        SQTHeaderDbImpl h1_1 = makeHeader(1, 1, false);
         sqtHeaderDao.saveSQTHeader(h1_1);
-        SQTSearchHeader h1_2 = makeHeader(1, 2, false);
+        SQTHeaderDbImpl h1_2 = makeHeader(1, 2, false);
         sqtHeaderDao.saveSQTHeader(h1_2);
         
-        SQTSearchHeader h2_1 = makeHeader(2, 1, true);
+        SQTHeaderDbImpl h2_1 = makeHeader(2, 1, true);
         sqtHeaderDao.saveSQTHeader(h2_1);
-        SQTSearchHeader h2_2 = makeHeader(2, 2, false);
+        SQTHeaderDbImpl h2_2 = makeHeader(2, 2, false);
         sqtHeaderDao.saveSQTHeader(h2_2);
-        SQTSearchHeader h2_3 = makeHeader(2, 3, false);
+        SQTHeaderDbImpl h2_3 = makeHeader(2, 3, false);
         sqtHeaderDao.saveSQTHeader(h2_3);
         
         // check the number of headers saved
         headers_1 = sqtHeaderDao.loadSQTHeadersForSearch(1);
         assertEquals(2, headers_1.size());
         
-        List<SQTSearchHeader> headers_2 = sqtHeaderDao.loadSQTHeadersForSearch(2);
+        List<SQTHeaderDbImpl> headers_2 = sqtHeaderDao.loadSQTHeadersForSearch(2);
         assertEquals(3, headers_2.size());
         
         
@@ -77,23 +77,23 @@ public class SQTSearchHeaderDAOImplTest extends SQTBaseDAOTestCase {
         
     }
     
-    private SQTSearchHeader makeHeader(int searchId, int itemId, boolean nullValue) {
+    private SQTHeaderDbImpl makeHeader(int searchId, int itemId, boolean nullValue) {
         String name = "header"+searchId+"_"+itemId;
         String value = nullValue? null : "value"+searchId+"_"+itemId;
-        SQTSearchHeader h = makeHeader(name, value);
+        SQTHeaderDbImpl h = makeHeader(name, value);
         h.setSearchId(searchId);
         return h;
     }
     
-    private void checkHeader(SQTSearchHeader header, int searchId, String name, String value) {
+    private void checkHeader(SQTHeaderDbImpl header, int searchId, String name, String value) {
         assertEquals(searchId, header.getSearchId());
         assertEquals(name, header.getName());
         assertEquals(value, header.getValue());
     }
     
     private static final class SQTSearchHeaderComparator implements
-    Comparator<SQTSearchHeader> {
-        public int compare(SQTSearchHeader o1, SQTSearchHeader o2) {
+    Comparator<SQTHeaderDbImpl> {
+        public int compare(SQTHeaderDbImpl o1, SQTHeaderDbImpl o2) {
             return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
         }
     }

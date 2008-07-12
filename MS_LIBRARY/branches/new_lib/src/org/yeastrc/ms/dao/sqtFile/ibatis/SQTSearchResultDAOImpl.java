@@ -8,12 +8,12 @@ package org.yeastrc.ms.dao.sqtFile.ibatis;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
+import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.domain.IMsSearchResult;
-import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
-import org.yeastrc.ms.domain.sqtFile.ISQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResult;
+import org.yeastrc.ms.domain.MsSearchResult;
+import org.yeastrc.ms.domain.MsSearchResultDb;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -21,27 +21,27 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * 
  */
 public class SQTSearchResultDAOImpl extends BaseSqlMapDAO 
-        implements MsPeptideSearchResultDAO<ISQTSearchResult, SQTSearchResult> {
+        implements MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> {
 
-    private MsPeptideSearchResultDAO<IMsSearchResult, MsPeptideSearchResult> resultDao;
+    private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
     
     public SQTSearchResultDAOImpl(SqlMapClient sqlMap,
-            MsPeptideSearchResultDAO<IMsSearchResult, MsPeptideSearchResult> resultDao) {
+            MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao) {
         super(sqlMap);
         this.resultDao = resultDao;
     }
     
-    public SQTSearchResult load(int resultId) {
-        return (SQTSearchResult) queryForObject("SqtResult.select", resultId);
+    public SQTSearchResultDb load(int resultId) {
+        return (SQTSearchResultDb) queryForObject("SqtResult.select", resultId);
     }
     
-    public int save(ISQTSearchResult sqtResult, int searchId, int scanId) {
+    public int save(SQTSearchResult sqtResult, int searchId, int scanId) {
         
         // first save the base result
         int resultId = resultDao.save(sqtResult, searchId, scanId);
         
         // now save the SQT specific information
-        SQTSearchResultDb resultDb = new SQTSearchResultDb(resultId, sqtResult);
+        SQTSearchResultSqlMapParam resultDb = new SQTSearchResultSqlMapParam(resultId, sqtResult);
         save("SqtResult.insert", resultDb);
         return resultId;
     }

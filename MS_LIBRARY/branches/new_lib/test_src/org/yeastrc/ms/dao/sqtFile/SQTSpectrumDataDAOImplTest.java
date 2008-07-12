@@ -1,6 +1,6 @@
 package org.yeastrc.ms.dao.sqtFile;
 
-import org.yeastrc.ms.domain.sqtFile.db.SQTSpectrumData;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchScanDbImpl;
 
 public class SQTSpectrumDataDAOImplTest extends SQTBaseDAOTestCase {
 
@@ -16,7 +16,7 @@ public class SQTSpectrumDataDAOImplTest extends SQTBaseDAOTestCase {
         
         assertNull(sqtSpectrumDao.load(1, 1, 1));
         
-        SQTSpectrumData data = new SQTSpectrumData();
+        SQTSearchScanDbImpl data = new SQTSearchScanDbImpl();
         data.setSearchId(0); // invalid search id
         data.setScanId(2);
         data.setCharge(3);
@@ -33,7 +33,7 @@ public class SQTSpectrumDataDAOImplTest extends SQTBaseDAOTestCase {
         
         assertNull(sqtSpectrumDao.load(1, 1, 1));
         
-        SQTSpectrumData data_db = sqtSpectrumDao.load(1024, 2, 3);
+        SQTSearchScanDbImpl data_db = sqtSpectrumDao.load(1024, 2, 3);
         assertNotNull(data_db);
         
         assertEquals(data.getSearchId(), data_db.getSearchId());

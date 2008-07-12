@@ -1,9 +1,9 @@
 package org.yeastrc.ms.domain.ms2File.db;
 
-import org.yeastrc.ms.domain.ms2File.IHeader;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
 
 
-public class BaseHeader implements IHeader {
+public class BaseHeader implements MS2Field {
 
     private String name;
     private String value;

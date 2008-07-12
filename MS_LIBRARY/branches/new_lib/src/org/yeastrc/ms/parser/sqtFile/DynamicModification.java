@@ -2,9 +2,9 @@ package org.yeastrc.ms.parser.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.IMsSearchDynamicMod;
+import org.yeastrc.ms.domain.MsSearchModification;
 
-public class DynamicModification implements IMsSearchDynamicMod {
+public class DynamicModification implements MsSearchModification {
 
     private char modificationChar;
     private BigDecimal modificationMass;
@@ -35,5 +35,9 @@ public class DynamicModification implements IMsSearchDynamicMod {
      */
     public char getModificationSymbol() {
         return modificationSymbol;
+    }
+
+    public ModificationType getModificationType() {
+        return MsSearchModification.ModificationType.DYNAMIC;
     }
 }

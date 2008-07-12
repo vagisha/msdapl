@@ -17,33 +17,33 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.IMsEnzyme;
-import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
-import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.db.MsPeptideSearchDynamicMod;
-import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
-import org.yeastrc.ms.domain.db.MsPeptideSearchStaticMod;
-import org.yeastrc.ms.domain.db.MsProteinMatch;
-import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.db.MsScan;
-import org.yeastrc.ms.domain.db.MsSearchResultDynamicMod;
-import org.yeastrc.ms.domain.db.MsSequenceDatabase;
+import org.yeastrc.ms.domain.MsEnzyme;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.db.MsDigestionEnzymeDb;
+import org.yeastrc.ms.domain.db.MsSearchDbImpl;
+import org.yeastrc.ms.domain.db.MsSearchDbImpl;
+import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.db.MsSearchStaticModification;
+import org.yeastrc.ms.domain.db.MsSearchResultProteinDbImpl;
+import org.yeastrc.ms.domain.db.MsRunDbImpl;
+import org.yeastrc.ms.domain.db.MsScanDbImpl;
+import org.yeastrc.ms.domain.db.MsSearchResultDynamicModDbImpl;
+import org.yeastrc.ms.domain.db.MsSearchDatabaseDbImpl;
 
 /**
  * 
  */
 public class BaseDAOTestCase extends TestCase {
 
-    protected MsScanDAO<MsScan> scanDao = DAOFactory.instance().getMsScanDAO();
+    protected MsScanDAO<MsScanDbImpl> scanDao = DAOFactory.instance().getMsScanDAO();
     protected MsRunDAO<MsRun> runDao = DAOFactory.instance().getMsRunDAO();
     
-    protected MsPeptideSearchDAO searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
-    protected MsPeptideSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
-    protected MsSequenceDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
-    protected MsPeptideSearchModDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-    protected MsProteinMatchDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
-    protected MsDigestionEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
+    protected MsSearchDAO searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
+    protected MsSearchResultDAO resultDao = DAOFactory.instance().getMsPeptideSearchResultDAO();
+    protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
+    protected MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
+    protected MsSearchResultProteinDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
+    protected MsEnzymeDAO enzymeDao = DAOFactory.instance().getEnzymeDAO();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -55,9 +55,9 @@ public class BaseDAOTestCase extends TestCase {
 
 
 
-    protected MsSequenceDatabase makeSequenceDatabase(String serverAddress, String serverPath,
+    protected MsSearchDatabaseDbImpl makeSequenceDatabase(String serverAddress, String serverPath,
             Integer seqLength, Integer proteinCount) {
-        MsSequenceDatabase db = new MsSequenceDatabase();
+        MsSearchDatabaseDbImpl db = new MsSearchDatabaseDbImpl();
         if (serverAddress != null)
             db.setServerAddress(serverAddress);
         if (serverPath != null)
@@ -69,10 +69,10 @@ public class BaseDAOTestCase extends TestCase {
         return db;
     }
 
-    protected MsPeptideSearchResult makeSearchResult(int searchId, int scanId, int charge,
+    protected MsSearchResultDbImpl makeSearchResult(int searchId, int scanId, int charge,
             String peptide, boolean addPrMatch, boolean addDynaMod) {
 
-        MsPeptideSearchResult result = makeSearchResult(searchId, scanId, charge, peptide);
+        MsSearchResultDbImpl result = makeSearchResult(searchId, scanId, charge, peptide);
 
         // add protein matches
         if (addPrMatch)     addProteinMatches(result);
@@ -83,8 +83,8 @@ public class BaseDAOTestCase extends TestCase {
         return result;
     }
 
-    protected MsPeptideSearchResult makeSearchResult(int searchId, int scanId, int charge, String peptide) {
-        MsPeptideSearchResult result = new MsPeptideSearchResult();
+    protected MsSearchResultDbImpl makeSearchResult(int searchId, int scanId, int charge, String peptide) {
+        MsSearchResultDbImpl result = new MsSearchResultDbImpl();
         result.setSearchId(searchId);
         result.setScanId(scanId);
         result.setCharge(charge);
@@ -93,27 +93,27 @@ public class BaseDAOTestCase extends TestCase {
         return result;
     }
 
-    protected void addProteinMatches(MsPeptideSearchResult result) {
-        MsProteinMatch match1 = new MsProteinMatch();
+    protected void addProteinMatches(MsSearchResultDbImpl result) {
+        MsSearchResultProteinDbImpl match1 = new MsSearchResultProteinDbImpl();
         match1.setAccession("Accession_"+result.getPeptide()+"_1");
         match1.setDescription("Description_"+result.getPeptide()+"_1");
 
         result.addProteinMatch(match1);
 
-        MsProteinMatch match2 = new MsProteinMatch();
+        MsSearchResultProteinDbImpl match2 = new MsSearchResultProteinDbImpl();
         match2.setAccession("Accession_"+result.getPeptide()+"_2");
 
         result.addProteinMatch(match2);
     }
 
-    protected void addResultDynamicModifications(MsPeptideSearchResult result, int searchId) {
+    protected void addResultDynamicModifications(MsSearchResultDbImpl result, int searchId) {
 
         List<MsPeptideSearchDynamicMod> dynaMods = modDao.loadDynamicModificationsForSearch(searchId);
 
-        List<MsSearchResultDynamicMod> resultDynaMods = new ArrayList<MsSearchResultDynamicMod>(dynaMods.size());
+        List<MsSearchResultDynamicModDbImpl> resultDynaMods = new ArrayList<MsSearchResultDynamicModDbImpl>(dynaMods.size());
         int pos = 1;
         for (MsPeptideSearchDynamicMod mod: dynaMods) {
-            MsSearchResultDynamicMod resMod = new MsSearchResultDynamicMod();
+            MsSearchResultDynamicModDbImpl resMod = new MsSearchResultDynamicModDbImpl();
             resMod.setModificationId(mod.getId());
             resMod.setModificationMass(mod.getModificationMass());
             resMod.setModifiedPosition(pos++);
@@ -125,8 +125,8 @@ public class BaseDAOTestCase extends TestCase {
         result.setDynamicModifications(resultDynaMods);
     }
 
-    protected MsPeptideSearchStaticMod makeStaticMod(Integer searchId, char modChar, String modMass) {
-        MsPeptideSearchStaticMod mod = new MsPeptideSearchStaticMod();
+    protected MsSearchStaticModification makeStaticMod(Integer searchId, char modChar, String modMass) {
+        MsSearchStaticModification mod = new MsSearchStaticModification();
         if (searchId != null)
             mod.setSearchId(searchId);
         mod.setModifiedResidue(modChar);
@@ -145,10 +145,10 @@ public class BaseDAOTestCase extends TestCase {
         return mod;
     }
 
-    protected MsPeptideSearch makePeptideSearch(int runId, boolean addSeqDb,
+    protected MsSearchDbImpl makePeptideSearch(int runId, boolean addSeqDb,
             boolean addStaticMods, boolean addDynaMods) {
 
-        MsPeptideSearch search = new MsPeptideSearch();
+        MsSearchDbImpl search = new MsSearchDbImpl();
         search.setRunId(runId);
         search.setOriginalFileType("SQT");
         search.setSearchEngineName("Sequest");
@@ -163,16 +163,16 @@ public class BaseDAOTestCase extends TestCase {
         search.setFragmentMassTolerance(new BigDecimal("0.0"));
 
         if (addSeqDb) {
-            MsSequenceDatabase db1 = makeSequenceDatabase("serverAddress", "path1", 100, 20);
-            MsSequenceDatabase db2 = makeSequenceDatabase("serverAddress", "path2", 200, 40);
+            MsSearchDatabaseDbImpl db1 = makeSequenceDatabase("serverAddress", "path1", 100, 20);
+            MsSearchDatabaseDbImpl db2 = makeSequenceDatabase("serverAddress", "path2", 200, 40);
             search.addSearchDatabase(db1);
             search.addSearchDatabase(db2);
         }
 
         if (addStaticMods) {
-            MsPeptideSearchStaticMod mod1 = makeStaticMod(null, 'C', "50.0");
-            MsPeptideSearchStaticMod mod2 = makeStaticMod(null, 'S', "80.0");
-            List<MsPeptideSearchStaticMod> staticMods = new ArrayList<MsPeptideSearchStaticMod>(2);
+            MsSearchStaticModification mod1 = makeStaticMod(null, 'C', "50.0");
+            MsSearchStaticModification mod2 = makeStaticMod(null, 'S', "80.0");
+            List<MsSearchStaticModification> staticMods = new ArrayList<MsSearchStaticModification>(2);
             staticMods.add(mod1);
             staticMods.add(mod2);
             search.setStaticModifications(staticMods);
@@ -235,19 +235,19 @@ public class BaseDAOTestCase extends TestCase {
         return cal.getTimeInMillis();
     }
 
-    protected MsDigestionEnzyme makeDigestionEnzyme(String name, int sense,
+    protected MsDigestionEnzymeDb makeDigestionEnzyme(String name, int sense,
             String cut, String nocut) {
-                MsDigestionEnzyme enzyme;
-                enzyme = new MsDigestionEnzyme();
+                MsDigestionEnzymeDb enzyme;
+                enzyme = new MsDigestionEnzymeDb();
                 enzyme.setName(name);
                 enzyme.setCut(cut);
-                enzyme.setSense((short)sense);
+                enzyme.setSenseByteVal((short)sense);
                 enzyme.setNocut(nocut);
                 return enzyme;
             }
 
-    protected MsScan makeMsScan(int runId, int scanNum) {
-        MsScan scan = new MsScan();
+    protected MsScanDbImpl makeMsScan(int runId, int scanNum) {
+        MsScanDbImpl scan = new MsScanDbImpl();
         scan.setRunId(runId);
         scan.setStartScanNum(scanNum);
         return scan;
@@ -258,7 +258,7 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     protected void checkRun(MsRun r1, MsRun r2) {
         assertEquals(r1.getMsExperimentId(), r2.getMsExperimentId());
-        assertEquals(r1.getFileFormat(), r2.getFileFormat());
+        assertEquals(r1.getFileFormatString(), r2.getFileFormatString());
         assertEquals(r1.getFileName(), r2.getFileName());
         assertEquals(r1.getSha1Sum(), r2.getSha1Sum());
         assertEquals(r1.getCreationDate(), r2.getCreationDate());
@@ -273,18 +273,18 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(r1.getComment(), r2.getComment());
     }
 
-    protected MsRun createRunWEnzymeInfo(int msExperimentId, List<MsDigestionEnzyme> enzymes) {
+    protected MsRun createRunWEnzymeInfo(int msExperimentId, List<MsDigestionEnzymeDb> enzymes) {
         
         MsRun run = createRun(msExperimentId);
-        for (IMsEnzyme e: enzymes)
+        for (MsEnzyme e: enzymes)
             run.addEnzyme(e);
         return run;
     }
 
     protected MsRun createRun(int msExperimentId) {
         MsRun run = new MsRun();
-        run.setMsExperimentId(msExperimentId);
-        run.setRunFileFormat(org.yeastrc.ms.domain.MS2.toString());
+        run.setExperimentId(msExperimentId);
+        run.setRunFileFormatString(org.yeastrc.ms.domain.MS2.toString());
         run.setFileName("my_file1.ms2");
         run.setAcquisitionMethod("Data dependent");
         run.setComment("Dummy run");
@@ -302,7 +302,7 @@ public class BaseDAOTestCase extends TestCase {
         Random random = new Random();
         for (int i = 0; i < scanCount; i++) {
             int scanNum = random.nextInt(100);
-            MsScan scan = new MsScan();
+            MsScanDbImpl scan = new MsScanDbImpl();
             scan.setRunId(runId);
             scan.setStartScanNum(scanNum);
             scanDao.save(scan);

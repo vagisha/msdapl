@@ -8,9 +8,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.db.MsExperiment;
-import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.db.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.db.MsExperimentDbImpl;
+import org.yeastrc.ms.domain.db.MsRunDbImpl;
+import org.yeastrc.ms.domain.db.MsRunDbImpl.RunFileFormat;
 
 public class MsExperimentUploader {
 
@@ -49,7 +49,7 @@ public class MsExperimentUploader {
     private int saveExperiment(String remoteServer, String remoteDirectory,
             String fileDirectory) {
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
-        MsExperiment experiment = new MsExperiment();
+        MsExperimentDbImpl experiment = new MsExperimentDbImpl();
         experiment.setDate(new Date(new java.util.Date().getTime()));
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);

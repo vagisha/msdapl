@@ -10,28 +10,28 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
-import org.yeastrc.ms.domain.IMsScan;
-import org.yeastrc.ms.domain.db.MsScan;
-import org.yeastrc.ms.domain.ms2File.IHeader;
-import org.yeastrc.ms.domain.ms2File.IMS2Scan;
-import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
+import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
+import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<IMS2Scan, MS2FileScan> {
+public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Scan, MS2ScanDb> {
 
-    private MsScanDAO<IMsScan, MsScan> msScanDao;
-    private MS2FileChargeIndependentAnalysisDAO iAnalDao;
-    private MS2FileScanChargeDAO chargeDao;
+    private MsScanDAO<MsScan, MsScanDb> msScanDao;
+    private MS2ChargeIndependentAnalysisDAO iAnalDao;
+    private MS2ScanChargeDAO chargeDao;
     
-    public MS2FileScanDAOImpl(SqlMapClient sqlMap, MsScanDAO<IMsScan, MsScan> msScanDAO,
-            MS2FileChargeIndependentAnalysisDAO iAnalDao, MS2FileScanChargeDAO chargeDao) {
+    public MS2FileScanDAOImpl(SqlMapClient sqlMap, MsScanDAO<MsScan, MsScanDb> msScanDAO,
+            MS2ChargeIndependentAnalysisDAO iAnalDao, MS2ScanChargeDAO chargeDao) {
         super(sqlMap);
         this.msScanDao = msScanDAO;
         this.iAnalDao = iAnalDao;
@@ -42,8 +42,8 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<IMS2S
      * This will return a MS2FileScan object. NO check is made to determine if 
      * the run this scan belongs to is of type MS2
      */
-    public MS2FileScan load(int scanId) {
-        return (MS2FileScan) queryForObject("MS2Scan.select", scanId);
+    public MS2ScanDb load(int scanId) {
+        return (MS2ScanDb) queryForObject("MS2Scan.select", scanId);
     }
     
     /**
@@ -58,18 +58,18 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<IMS2S
     /**
      * Saves the scan along with any MS2 file format specific data.
      */
-    public int save(IMS2Scan scan, int runId) {
+    public int save(MS2Scan scan, int runId, int precursorScanId) {
         
         // save the parent scan first
-        int scanId = msScanDao.save(scan, runId);
+        int scanId = msScanDao.save(scan, runId, precursorScanId);
         
         // save the charge independent analysis
-        for (IHeader iAnalysis: scan.getChargeIndependentAnalysisList()) {
+        for (MS2Field iAnalysis: scan.getChargeIndependentAnalysisList()) {
             iAnalDao.save(iAnalysis, scanId);
         }
         
         // save the charge dependent analysis
-        for (IMS2ScanCharge charge: scan.getScanChargeList()) {
+        for (MS2ScanCharge charge: scan.getScanChargeList()) {
             chargeDao.save(charge, scanId);
         }
         

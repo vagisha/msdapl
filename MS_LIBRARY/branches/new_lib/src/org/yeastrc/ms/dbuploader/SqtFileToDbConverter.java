@@ -6,14 +6,14 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.sqtFile.SQTPeptideSearchDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.db.MsPeptideSearchDynamicMod;
-import org.yeastrc.ms.domain.db.MsPeptideSearchStaticMod;
-import org.yeastrc.ms.domain.db.MsProteinMatch;
-import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSpectrumData;
+import org.yeastrc.ms.domain.db.MsSearchStaticModification;
+import org.yeastrc.ms.domain.db.MsSearchResultProteinDbImpl;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchDbImpl;
+import org.yeastrc.ms.domain.sqtFile.db.SQTHeaderDbImpl;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResultDbImpl;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchScanDbImpl;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.DynamicModification;
 import org.yeastrc.ms.parser.sqtFile.Header;
@@ -63,7 +63,7 @@ public class SqtFileToDbConverter {
 
     private int savePeptideResult(PeptideResult result, int searchId,
             int scanId, int charge) {
-        SQTSearchResult sqtResult = new SQTSearchResult();
+        SQTSearchResultDbImpl sqtResult = new SQTSearchResultDbImpl();
         sqtResult.setSearchId(searchId);
         sqtResult.setScanId(scanId);
         sqtResult.setCharge(charge);
@@ -85,7 +85,7 @@ public class SqtFileToDbConverter {
         // save matching protein information for this result
         List<DbLocus> loci = result.getMatchingLoci();
         for (DbLocus l: loci) {
-            MsProteinMatch match = new MsProteinMatch();
+            MsSearchResultProteinDbImpl match = new MsSearchResultProteinDbImpl();
             match.setAccession(l.getAccession());
             match.setDescription(l.getDescription());
             sqtResult.addProteinMatch(match);
@@ -110,7 +110,7 @@ public class SqtFileToDbConverter {
     }
     
     private void saveSpectrumData(ScanResult scan, int searchId, int scanId) {
-        SQTSpectrumData scanData = new SQTSpectrumData();
+        SQTSearchScanDbImpl scanData = new SQTSearchScanDbImpl();
         scanData.setSearchId(searchId);
         scanData.setCharge(scan.getCharge());
         scanData.setProcessTime(scan.getProcessingTime());
@@ -118,12 +118,12 @@ public class SqtFileToDbConverter {
         scanData.setServerName(scan.getServer());
         scanData.setTotalIntensity(scan.getTotalIntensity());
         scanData.setLowestSp(scan.getLowestSp());
-        SQTSpectrumDataDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
+        SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
         spectrumDataDao.save(scanData);
     }
 
     private int saveSQTSearch(Header header, String file, int runId) {
-        SQTPeptideSearch search = new SQTPeptideSearch();
+        SQTSearchDbImpl search = new SQTSearchDbImpl();
         search.setRunId(runId);
         search.setOriginalFileType("SQT");
         search.setSearchEngineName(header.getSqtGenerator());
@@ -135,7 +135,7 @@ public class SqtFileToDbConverter {
         
         // add headers
         for (HeaderItem item: header.getHeaderItems()) {
-            SQTSearchHeader h = new SQTSearchHeader();
+            SQTHeaderDbImpl h = new SQTHeaderDbImpl();
             h.setName(item.getName());
             h.setValue(item.getValue());
             search.addHeader(h);
@@ -153,7 +153,7 @@ public class SqtFileToDbConverter {
         
         // add static modifications
         for (StaticModification sMod: header.getStaticMods()) {
-            MsPeptideSearchStaticMod mod = new MsPeptideSearchStaticMod();
+            MsSearchStaticModification mod = new MsSearchStaticModification();
             mod.setModifiedResidue(sMod.getModifiedResidue());
             mod.setModificationMass(sMod.getModificationMass());
             search.addStaticModification(mod);

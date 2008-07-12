@@ -9,27 +9,27 @@ package org.yeastrc.ms.dao.ibatis;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.domain.IMsScan;
-import org.yeastrc.ms.domain.db.MsScan;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<IMsScan, MsScan> {
+public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, MsScanDb> {
 
     public MsScanDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
-    public int save(IMsScan scan, int runId) {
-        MsScanDb scanDb = new MsScanDb(runId, scan);
+    public int save(MsScan scan, int runId, int precursorScanId) {
+        MsScanSqlMapParam scanDb = new MsScanSqlMapParam(runId, precursorScanId, scan);
         return saveAndReturnId("MsScan.insert", scanDb);
     }
     
-    public MsScan load(int scanId) {
-        return (MsScan) queryForObject("MsScan.select", scanId);
+    public MsScanDb load(int scanId) {
+        return (MsScanDb) queryForObject("MsScan.select", scanId);
     }
     
     public List<Integer> loadScanIdsForRun(int runId) {

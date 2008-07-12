@@ -3,9 +3,9 @@ package org.yeastrc.ms.dao;
 import java.util.Arrays;
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsDigestionEnzymeDAO.EnzymeProperties;
-import org.yeastrc.ms.domain.IMsEnzyme;
-import org.yeastrc.ms.domain.db.MsDigestionEnzyme;
+import org.yeastrc.ms.dao.MsEnzymeDAO.EnzymeProperties;
+import org.yeastrc.ms.domain.MsEnzyme;
+import org.yeastrc.ms.domain.db.MsDigestionEnzymeDb;
 
 public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
 
@@ -19,7 +19,7 @@ public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testLoadEnzymeString() {
-        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin");
+        List<MsDigestionEnzymeDb> enzymes = enzymeDao.loadEnzymes("trypsin");
         assertNotNull(enzymes);
         assertEquals(1, enzymes.size());
         
@@ -29,9 +29,9 @@ public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
 
     public void testLoadEnzymeStringIntStringString() {
         // load an enzyme we know exists in the database
-        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", 1, "KR", "P");
+        List<MsDigestionEnzymeDb> enzymes = enzymeDao.loadEnzymes("trypsin", 1, "KR", "P");
         assertEquals(1, enzymes.size());
-        MsDigestionEnzyme enzyme = enzymes.get(0);
+        MsDigestionEnzymeDb enzyme = enzymes.get(0);
         assertNotNull(enzyme);
         assertEquals("trypsin".toUpperCase(), enzyme.getName().toUpperCase());
         assertEquals(1, enzyme.getSense());
@@ -45,9 +45,9 @@ public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
     
     public void testSaveEnzymeForRunCheckName() {
         // load an enzyme we know exists in the database
-        List<MsDigestionEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", 1, "KR", "P");
+        List<MsDigestionEnzymeDb> enzymes = enzymeDao.loadEnzymes("trypsin", 1, "KR", "P");
         assertEquals(1, enzymes.size());
-        MsDigestionEnzyme enzyme = enzymes.get(0);
+        MsDigestionEnzymeDb enzyme = enzymes.get(0);
         int enzyme_db_id = enzyme.getId();
         
         int runId = 20; 
@@ -78,7 +78,7 @@ public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
         // try to create another link for this enzyme to another runId. 
         // This time specify the parameters that will be used to look for 
         // a matching run in the database;
-        enzyme = new MsDigestionEnzyme();
+        enzyme = new MsDigestionEnzymeDb();
         enzyme.setName("Dummy");
         EnzymeProperties[] properties = new EnzymeProperties[]{EnzymeProperties.NAME};
         int enzymeId_3 = enzymeDao.saveEnzymeforRun(enzyme, 30, Arrays.asList(properties));
@@ -88,22 +88,22 @@ public class MsDigestionEnzymeDAOImplTest extends BaseDAOTestCase {
         
         // clean up 
         // remove entries from the msRunEnzyme table
-        enzymeDao.deleteEnzymesByRunId(runId);
-        enzymeDao.deleteEnzymesByRunId(30);
+        enzymeDao.deleteEnzymesForRun(runId);
+        enzymeDao.deleteEnzymesForRun(30);
         // remove the new entry we created in the msDigestionEnzyme table
         enzymeDao.deleteEnzymeById(enzymeId_2);
         
     }
     
     public void testSenseValue() {
-        MsDigestionEnzyme enzyme = new MsDigestionEnzyme();
+        MsDigestionEnzymeDb enzyme = new MsDigestionEnzymeDb();
         assertEquals(-1, enzyme.getSense());
         
         enzyme.setName("Dummy");
         
         int enzymeId = enzymeDao.saveEnzyme(enzyme);
         
-        IMsEnzyme enzyme_db = enzymeDao.loadEnzyme(enzymeId);
+        MsEnzyme enzyme_db = enzymeDao.loadEnzyme(enzymeId);
         assertEquals(-1, enzyme_db.getSense());
         
         // clean up

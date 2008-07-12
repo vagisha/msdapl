@@ -11,16 +11,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
-import org.yeastrc.ms.domain.ms2File.IHeader;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
+import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
+import org.yeastrc.ms.domain.sqtFile.SQTField;
+import org.yeastrc.ms.domain.sqtFile.SQTHeaderDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class SQTSearchHeaderDAOImpl extends BaseSqlMapDAO implements SQTSearchHeaderDAO {
+public class SQTSearchHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDAO {
 
     public SQTSearchHeaderDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
@@ -29,14 +29,14 @@ public class SQTSearchHeaderDAOImpl extends BaseSqlMapDAO implements SQTSearchHe
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO#loadSQTHeadersForSearch(int)
      */
-    public List<SQTSearchHeader> loadSQTHeadersForSearch(int searchId) {
+    public List<SQTHeaderDb> loadSQTHeadersForSearch(int searchId) {
         return queryForList("SqtHeader.selectHeadersForSearch", searchId);
     }
     
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO#saveSQTHeader(org.yeastrc.ms.dto.sqtFile.SQTSearchHeader)
      */
-    public void saveSQTHeader(IHeader header, int searchId) {
+    public void saveSQTHeader(SQTField header, int searchId) {
         Map<String, Object> map = new HashMap<String, Object>(3);
         map.put("searchId", searchId);
         map.put("name", header.getName());

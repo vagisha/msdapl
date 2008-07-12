@@ -10,18 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
-import org.yeastrc.ms.domain.IMsSearchModification;
-import org.yeastrc.ms.domain.db.MsPeptideSearchDynamicMod;
-import org.yeastrc.ms.domain.db.MsPeptideSearchStaticMod;
-import org.yeastrc.ms.domain.db.MsSearchResultDynamicMod;
+import org.yeastrc.ms.dao.MsSearchModificationDAO;
+import org.yeastrc.ms.domain.MsSearchModification;
+import org.yeastrc.ms.domain.MsSearchModificationDb;
+import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
+import org.yeastrc.ms.domain.db.MsSearchResultDynamicModDbImpl;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsPeptideSearchModDAO {
+public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsSearchModificationDAO {
 
     public MsPeptideSearchModDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
@@ -30,11 +30,11 @@ public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsPeptid
     //-------------------------------------------------------------------------------------------
     // Modifications associated with a search
     //-------------------------------------------------------------------------------------------
-    public List<MsPeptideSearchStaticMod> loadStaticModificationsForSearch(int searchId) {
+    public List<MsSearchModificationDb> loadStaticModificationsForSearch(int searchId) {
         return queryForList("MsSearchMod.selectStaticModsForSearch", searchId);
     }
     
-    public void saveStaticModification(IMsSearchModification mod, int searchId) {
+    public void saveStaticModification(MsSearchModification mod, int searchId) {
         MsPeptideSearchModDB modDb = new MsPeptideSearchModDB();
         modDb.mod = mod;
         modDb.searchId = searchId;
@@ -46,11 +46,11 @@ public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsPeptid
     }
     
     
-    public List<MsPeptideSearchDynamicMod> loadDynamicModificationsForSearch(int searchId) {
+    public List<MsSearchModificationDb> loadDynamicModificationsForSearch(int searchId) {
         return queryForList("MsSearchMod.selectDynaModsForSearch", searchId);
     }
     
-    public int saveDynamicModification(IMsSearchModification mod, int searchId) {
+    public int saveDynamicModification(MsSearchModification mod, int searchId) {
         MsPeptideSearchModDB modDb = new MsPeptideSearchModDB();
         modDb.mod = mod;
         modDb.searchId = searchId;
@@ -84,7 +84,7 @@ public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsPeptid
     //-------------------------------------------------------------------------------------------
     // Modifications (dynamic only) associated with a search result
     //-------------------------------------------------------------------------------------------
-    public List<MsSearchResultDynamicMod> loadDynamicModificationsForSearchResult(
+    public List<MsSearchResultDynamicModDb> loadDynamicModificationsForSearchResult(
             int resultId) {
         return queryForList("MsSearchMod.selectDynaModsForSearchResult", resultId);
     }
@@ -114,20 +114,5 @@ public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsPeptid
     // rather than when the map us used. With a Map iBatis has no way of detecting a name mismatch
     // since a Map is built at runtime rather than compile time. 
     //-------------------------------------------------------------------------------------------
-    public static final class MsPeptideSearchModDB {
-        private IMsSearchModification mod;
-        private int searchId;
-        /**
-         * @return the mod
-         */
-        public IMsSearchModification getMod() {
-            return mod;
-        }
-        /**
-         * @return the searchId
-         */
-        public int getSearchId() {
-            return searchId;
-        }
-    }
+   
 }

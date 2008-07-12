@@ -1,8 +1,8 @@
 package org.yeastrc.ms.parser.sqtFile;
 
-import org.yeastrc.ms.domain.ms2File.IHeader;
+import org.yeastrc.ms.domain.sqtFile.SQTField;
 
-public class HeaderItem implements IHeader {
+public class HeaderItem implements SQTField {
     
     private String name;
     private String value;

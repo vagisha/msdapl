@@ -8,16 +8,16 @@ package org.yeastrc.ms.dao.ibatis;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsPeptideSearchDAO;
-import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
-import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
-import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
-import org.yeastrc.ms.domain.IMsSearch;
-import org.yeastrc.ms.domain.IMsSearchDatabase;
-import org.yeastrc.ms.domain.IMsSearchModification;
-import org.yeastrc.ms.domain.IMsSearchResult;
-import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
+import org.yeastrc.ms.dao.MsSearchDAO;
+import org.yeastrc.ms.dao.MsSearchDatabaseDAO;
+import org.yeastrc.ms.dao.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.MsSearchResultDAO;
+import org.yeastrc.ms.domain.MsSearch;
+import org.yeastrc.ms.domain.MsSearchDatabase;
+import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsSearchModification;
+import org.yeastrc.ms.domain.MsSearchResult;
+import org.yeastrc.ms.domain.MsSearchResultDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -25,27 +25,27 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * 
  */
 public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO 
-        implements MsPeptideSearchDAO<IMsSearch, MsPeptideSearch> {
+        implements MsSearchDAO<MsSearch, MsSearchDb> {
 
-    private MsSequenceDatabaseDAO seqDbDao;
-    private MsPeptideSearchModDAO modDao;
-    private MsPeptideSearchResultDAO<IMsSearchResult, MsPeptideSearchResult> resultDao;
+    private MsSearchDatabaseDAO seqDbDao;
+    private MsSearchModificationDAO modDao;
+    private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
     
     public MsPeptideSearchDAOImpl(SqlMapClient sqlMap, 
-            MsPeptideSearchResultDAO<IMsSearchResult, MsPeptideSearchResult> resultDao,
-            MsSequenceDatabaseDAO seqDbDao,
-            MsPeptideSearchModDAO modDao) {
+            MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao,
+            MsSearchDatabaseDAO seqDbDao,
+            MsSearchModificationDAO modDao) {
         super(sqlMap);
         this.resultDao = resultDao;
         this.seqDbDao = seqDbDao;
         this.modDao = modDao;
     }
     
-    public MsPeptideSearch loadSearch(int searchId) {
-        return (MsPeptideSearch) queryForObject("MsSearch.select", searchId);
+    public MsSearchDb loadSearch(int searchId) {
+        return (MsSearchDb) queryForObject("MsSearch.select", searchId);
     }
     
-    public List<MsPeptideSearch> loadSearchesForRun(int runId) {
+    public List<MsSearchDb> loadSearchesForRun(int runId) {
         return queryForList("MsSearch.selectSearchesForRun", runId);
     }
     
@@ -53,22 +53,22 @@ public class MsPeptideSearchDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearch.selectSearchIdsForRun", runId);
     }
     
-    public int saveSearch(IMsSearch search, int runId) {
-        MsSearchDb searchDb = new MsSearchDb(runId, search);
+    public int saveSearch(MsSearch search, int runId) {
+        MsSearchSqlMapParam searchDb = new MsSearchSqlMapParam(runId, search);
         int searchId = saveAndReturnId("MsSearch.insert", searchDb);
         
         // save any database information associated with the search 
-        for (IMsSearchDatabase seqDb: search.getSearchDatabases()) {
+        for (MsSearchDatabase seqDb: search.getSearchDatabases()) {
             seqDbDao.saveSearchDatabase(seqDb, searchId);
         }
         
         // save any static modifications used for the search
-        for (IMsSearchModification staticMod: search.getStaticModifications()) {
+        for (MsSearchModification staticMod: search.getStaticModifications()) {
             modDao.saveStaticModification(staticMod, searchId);
         }
         
         // save any dynamic modifications used for the search
-        for (IMsSearchModification dynaMod: search.getDynamicModifications()) {
+        for (MsSearchModification dynaMod: search.getDynamicModifications()) {
             modDao.saveDynamicModification(dynaMod, searchId);
         }
         

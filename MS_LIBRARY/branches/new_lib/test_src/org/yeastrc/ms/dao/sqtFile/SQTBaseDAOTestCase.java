@@ -2,16 +2,16 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchHeader;
+import org.yeastrc.ms.domain.db.MsSearchDbImpl;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchDbImpl;
+import org.yeastrc.ms.domain.sqtFile.db.SQTHeaderDbImpl;
 
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 
-    protected SQTSearchHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
+    protected SQTHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
     protected SQTSearchResultDAO sqtResDao = DAOFactory.instance().getSqtResultDAO();
     protected SQTPeptideSearchDAO sqtSearchDao = DAOFactory.instance().getSqtSearchDAO();
-    protected SQTSpectrumDataDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
+    protected SQTSearchScanDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
     
     protected void setUp() throws Exception {
         super.setUp();
@@ -21,11 +21,11 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         super.tearDown();
     }
 
-    protected SQTPeptideSearch makeSQTPeptideSearch(int runId, boolean addSeqDb,
+    protected SQTSearchDbImpl makeSQTPeptideSearch(int runId, boolean addSeqDb,
             boolean addStaticMods, boolean addDynaMods,
             boolean addHeaders) {
-        MsPeptideSearch msSearch = super.makePeptideSearch(runId, addSeqDb, addStaticMods, addDynaMods);
-        SQTPeptideSearch sqtSearch = new SQTPeptideSearch(msSearch);
+        MsSearchDbImpl msSearch = super.makePeptideSearch(runId, addSeqDb, addStaticMods, addDynaMods);
+        SQTSearchDbImpl sqtSearch = new SQTSearchDbImpl(msSearch);
         sqtSearch.setOriginalFileType("SQT");
         sqtSearch.setSearchEngineName("Sequest");
         sqtSearch.setSearchEngineVersion("1.0");
@@ -39,8 +39,8 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
     }
 
     
-    protected SQTSearchHeader makeHeader(String name, String value) {
-        SQTSearchHeader h = new SQTSearchHeader();
+    protected SQTHeaderDbImpl makeHeader(String name, String value) {
+        SQTHeaderDbImpl h = new SQTHeaderDbImpl();
         h.setName(name);
         h.setValue(value);
         return h;

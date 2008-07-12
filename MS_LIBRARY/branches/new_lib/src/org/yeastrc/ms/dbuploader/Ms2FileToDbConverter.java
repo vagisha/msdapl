@@ -17,14 +17,14 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.ms2File.IMS2Run;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeDependentAnalysis;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileHeader;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.ms2File.MS2Run;
+import org.yeastrc.ms.domain.ms2File.db.MS2ChargeDependentAnalysisDbImpl;
+import org.yeastrc.ms.domain.ms2File.db.MS2ChargeIndependentAnalysisDbImpl;
+import org.yeastrc.ms.domain.ms2File.db.MS2HeaderDbImpl;
+import org.yeastrc.ms.domain.ms2File.db.MS2RunDbImpl;
+import org.yeastrc.ms.domain.ms2File.db.MS2ScanDbImpl;
+import org.yeastrc.ms.domain.ms2File.db.MS2ScanChargeDbImpl;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.ms2File.Scan;
@@ -80,7 +80,7 @@ public class Ms2FileToDbConverter {
     
     boolean fileIsInDb(String fileName, String sha1Sum) {
         
-        MsRunDAO<MS2FileRun> runDao = DAOFactory.instance().getMS2FileRunDAO();
+        MsRunDAO<MS2RunDbImpl> runDao = DAOFactory.instance().getMS2FileRunDAO();
         List <Integer> runsIds = runDao.runIdsFor(fileName, sha1Sum);
         // if a run with the same file name and SHA-1 hash code already exists in the 
         // database we will not upload this run
@@ -106,11 +106,11 @@ public class Ms2FileToDbConverter {
     
     private int saveMs2Header(Header header, int experimentId, String fileName, String sha1Sum) {
         
-        MS2FileRun run = new MS2FileRun();
+        MS2RunDbImpl run = new MS2RunDbImpl();
         run.setId(0); // new run; set id to 0
-        run.setMsExperimentId(experimentId);
+        run.setExperimentId(experimentId);
         run.setFileName(new File(fileName).getName());
-        run.setRunFileFormat(org.yeastrc.ms.domain.MS2.name());
+        run.setRunFileFormatString(org.yeastrc.ms.domain.MS2.name());
         run.setSha1Sum(sha1Sum);
         run.setCreationDate(header.getCreationDate());
         run.setConversionSW(header.getExtractor());
@@ -124,25 +124,25 @@ public class Ms2FileToDbConverter {
         
         
         // create a MS2FileRun; this is what we will save eventually
-        IMS2Run ms2Run = new MS2FileRun(run);
+        MS2Run ms2Run = new MS2RunDbImpl(run);
         
         // add all the headers from the MS2 file (some headers are already a part of the MsRun object created above)
         Iterator<Entry<String,String>> headerIterator = header.iterator();
         while(headerIterator.hasNext()) {
             Entry<String, String> headerEntry = headerIterator.next();
-            MS2FileHeader h = new MS2FileHeader();
+            MS2HeaderDbImpl h = new MS2HeaderDbImpl();
             h.setName(headerEntry.getKey());
             h.setValue(headerEntry.getValue());
         }
         
         // save the MS2FileRun
-        MsRunDAO<MS2FileRun> rundao = DAOFactory.instance().getMS2FileRunDAO();
+        MsRunDAO<MS2RunDbImpl> rundao = DAOFactory.instance().getMS2FileRunDAO();
         return rundao.saveRun(ms2Run, 0);
             
     }
     
     private void saveScan(Scan readScan, int runId) {
-        MS2FileScan scan = new MS2FileScan();
+        MS2ScanDbImpl scan = new MS2ScanDbImpl();
         scan.setRunId(runId);
         scan.setStartScanNum(readScan.getStartScan());
         scan.setEndScanNum(readScan.getEndScan());
@@ -154,7 +154,7 @@ public class Ms2FileToDbConverter {
         scan.setPeaks(readScan.getPeaks());
         
         // create a new MS2FileScan
-        MS2FileScan ms2Scan = new MS2FileScan(scan);
+        MS2ScanDbImpl ms2Scan = new MS2ScanDbImpl(scan);
         
         // add the scan charges
         for (ScanCharge scanCharge: readScan.getChargeStates()) {
@@ -164,20 +164,20 @@ public class Ms2FileToDbConverter {
         // add any charge independent analysis to this scan
         HashMap<String, String> analysisItems = readScan.getAnalysisItems();
         for (String label: analysisItems.keySet()) {
-            MS2FileChargeIndependentAnalysis analysis = new MS2FileChargeIndependentAnalysis();
+            MS2ChargeIndependentAnalysisDbImpl analysis = new MS2ChargeIndependentAnalysisDbImpl();
             analysis.setName(label);
             analysis.setValue(analysisItems.get(label));
             ms2Scan.addChargeIndependentAnalysis(analysis);
         }
         
         // save the scan
-        MsScanDAO<MS2FileScan> scanDAO = DAOFactory.instance().getMS2FileScanDAO();
+        MsScanDAO<MS2ScanDbImpl> scanDAO = DAOFactory.instance().getMS2FileScanDAO();
         int scanId = scanDAO.save(ms2Scan);
         
     }
     
-    private void addScanCharge(MS2FileScan ms2Scan, ScanCharge ms2ScanCharge) {
-        MS2FileScanCharge scanCharge = new MS2FileScanCharge();
+    private void addScanCharge(MS2ScanDbImpl ms2Scan, ScanCharge ms2ScanCharge) {
+        MS2ScanChargeDbImpl scanCharge = new MS2ScanChargeDbImpl();
         scanCharge.setCharge(ms2ScanCharge.getCharge());
         scanCharge.setMass(ms2ScanCharge.getMass());
         
@@ -185,7 +185,7 @@ public class Ms2FileToDbConverter {
         // add any charge dependent analysis associated with this charge state
         HashMap<String, String> analysisItems = ms2ScanCharge.getAnalysisItems();
         for (String label: analysisItems.keySet()) {
-            MS2FileChargeDependentAnalysis analysis = new MS2FileChargeDependentAnalysis();
+            MS2ChargeDependentAnalysisDbImpl analysis = new MS2ChargeDependentAnalysisDbImpl();
             analysis.setName(label);
             analysis.setValue(analysisItems.get(label));
             scanCharge.addChargeDependentAnalysis(analysis);

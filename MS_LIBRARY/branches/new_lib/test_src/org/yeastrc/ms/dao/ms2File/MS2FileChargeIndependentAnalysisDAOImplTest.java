@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.db.MS2FileChargeIndependentAnalysis;
+import org.yeastrc.ms.domain.ms2File.db.MS2ChargeIndependentAnalysisDbImpl;
 
 
 public class MS2FileChargeIndependentAnalysisDAOImplTest extends MS2BaseDAOtestCase {
@@ -23,10 +23,10 @@ public class MS2FileChargeIndependentAnalysisDAOImplTest extends MS2BaseDAOtestC
         assertEquals(0, iAnalDao.loadAnalysisForScan(1).size());
         
      // save something
-        MS2FileChargeIndependentAnalysis da11 = makeIAnalysis(1, "name_11", "value_11");
-        MS2FileChargeIndependentAnalysis da12 = makeIAnalysis(1, "name_12", "value_12");
-        MS2FileChargeIndependentAnalysis da21 = makeIAnalysis(2, "name_21", "value_21");
-        MS2FileChargeIndependentAnalysis da31 = makeIAnalysis(3, "name_31", "value_31");
+        MS2ChargeIndependentAnalysisDbImpl da11 = makeIAnalysis(1, "name_11", "value_11");
+        MS2ChargeIndependentAnalysisDbImpl da12 = makeIAnalysis(1, "name_12", "value_12");
+        MS2ChargeIndependentAnalysisDbImpl da21 = makeIAnalysis(2, "name_21", "value_21");
+        MS2ChargeIndependentAnalysisDbImpl da31 = makeIAnalysis(3, "name_31", "value_31");
         
         iAnalDao.save(da11);
         iAnalDao.save(da12);
@@ -35,11 +35,11 @@ public class MS2FileChargeIndependentAnalysisDAOImplTest extends MS2BaseDAOtestC
         
         // check saved entries
         assertEquals(2, iAnalDao.loadAnalysisForScan(1).size());
-        List<MS2FileChargeIndependentAnalysis> daList = iAnalDao.loadAnalysisForScan(1);
+        List<MS2ChargeIndependentAnalysisDbImpl> daList = iAnalDao.loadAnalysisForScan(1);
         // sort so that we get the entries in the order we inserted them
-        Collections.sort(daList, new Comparator<MS2FileChargeIndependentAnalysis>() {
-            public int compare(MS2FileChargeIndependentAnalysis o1,
-                    MS2FileChargeIndependentAnalysis o2) {
+        Collections.sort(daList, new Comparator<MS2ChargeIndependentAnalysisDbImpl>() {
+            public int compare(MS2ChargeIndependentAnalysisDbImpl o1,
+                    MS2ChargeIndependentAnalysisDbImpl o2) {
                 return new Integer(o1.getId()).compareTo(o2.getId());
             }});
         compare(da11, daList.get(0));

@@ -10,50 +10,50 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
+import org.yeastrc.ms.dao.MsEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.domain.IMsEnzyme;
-import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.IMsScan;
-import org.yeastrc.ms.domain.IMsRun.RunFileFormat;
-import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.db.MsScan;
+import org.yeastrc.ms.domain.MsEnzyme;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.MsRun.RunFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMsRun, MsRun> {
+public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRunDb> {
 
-    private MsScanDAO<IMsScan, MsScan> msScanDao;
-    private MsDigestionEnzymeDAO enzymeDao;
+    private MsScanDAO<MsScan, MsScanDb> msScanDao;
+    private MsEnzymeDAO enzymeDao;
     
-    public MsRunDAOImpl(SqlMapClient sqlMap, MsDigestionEnzymeDAO enzymeDao , 
-            MsScanDAO<IMsScan, MsScan> msScanDAO) {
+    public MsRunDAOImpl(SqlMapClient sqlMap, MsEnzymeDAO enzymeDao , 
+            MsScanDAO<MsScan, MsScanDb> msScanDAO) {
         super(sqlMap);
         this.enzymeDao = enzymeDao;
         this.msScanDao = msScanDAO;
     }
 
-    public int saveRun(IMsRun run, int msExperimentId) {
+    public int saveRun(MsRun run, int msExperimentId) {
         
-        MsRunDb runDb = new MsRunDb(msExperimentId, run);
+        MsRunSqlMapParam runDb = new MsRunSqlMapParam(msExperimentId, run);
         // save the run
         int runId = saveAndReturnId("MsRun.insert", runDb);
         
         // save the enzyme information
-        List<? extends IMsEnzyme> enzymes = run.getEnzymeList();
-        for (IMsEnzyme enzyme: enzymes) 
+        List<? extends MsEnzyme> enzymes = run.getEnzymeList();
+        for (MsEnzyme enzyme: enzymes) 
             enzymeDao.saveEnzymeforRun(enzyme, runId);
         
         return runId;
     }
 
-    public MsRun loadRun(int runId) {
-        return (MsRun) queryForObject("MsRun.select", runId);
+    public MsRunDb loadRun(int runId) {
+        return (MsRunDb) queryForObject("MsRun.select", runId);
     }
     
 
-    public List<MsRun> loadExperimentRuns(int msExperimentId) {
+    public List<MsRunDb> loadExperimentRuns(int msExperimentId) {
         return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
     }
     
@@ -73,7 +73,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMsRun, MsRu
     public void delete(int runId) {
         
         // delete enzyme information first
-        enzymeDao.deleteEnzymesByRunId(runId);
+        enzymeDao.deleteEnzymesForRun(runId);
         
         // delete scans
         msScanDao.deleteScansForRun(runId);
@@ -95,7 +95,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMsRun, MsRu
         
         if (runIds.size() > 0) {
             // delete enzyme associations
-            enzymeDao.deleteEnzymesByRunIds(runIds);
+            enzymeDao.deleteEnzymesForRuns(runIds);
         }
         
         for (Integer runId: runIds) {
@@ -110,7 +110,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<IMsRun, MsRu
 
     
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
-        IMsRun run = loadRun(runId);
+        MsRun run = loadRun(runId);
         
         if (run == null) {
             throw new Exception("No run found for runId: "+runId);

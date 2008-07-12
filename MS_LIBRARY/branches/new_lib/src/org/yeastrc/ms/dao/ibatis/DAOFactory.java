@@ -4,47 +4,48 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.MsDigestionEnzymeDAO;
+import org.yeastrc.ms.dao.MsEnzymeDAO;
 import org.yeastrc.ms.dao.MsExperimentDAO;
-import org.yeastrc.ms.dao.MsPeptideSearchDAO;
-import org.yeastrc.ms.dao.MsPeptideSearchModDAO;
-import org.yeastrc.ms.dao.MsPeptideSearchResultDAO;
-import org.yeastrc.ms.dao.MsProteinMatchDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.MsSequenceDatabaseDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileHeaderDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
+import org.yeastrc.ms.dao.MsSearchDAO;
+import org.yeastrc.ms.dao.MsSearchDatabaseDAO;
+import org.yeastrc.ms.dao.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.MsSearchResultDAO;
+import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.MS2HeaderDAO;
+import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileChargeDependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileChargeIndependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileHeaderDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileRunDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileScanChargeDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileScanDAOImpl;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSpectrumDataDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTPeptideSearchDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchHeaderDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSpectrumDataDAOImpl;
-import org.yeastrc.ms.domain.IMsRun;
-import org.yeastrc.ms.domain.IMsScan;
-import org.yeastrc.ms.domain.IMsSearch;
-import org.yeastrc.ms.domain.IMsSearchResult;
-import org.yeastrc.ms.domain.db.MsPeptideSearch;
-import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
-import org.yeastrc.ms.domain.db.MsRun;
-import org.yeastrc.ms.domain.db.MsScan;
-import org.yeastrc.ms.domain.ms2File.IMS2Run;
-import org.yeastrc.ms.domain.ms2File.IMS2Scan;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileRun;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileScan;
-import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
-import org.yeastrc.ms.domain.sqtFile.ISQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResult;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.MsSearch;
+import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsSearchResult;
+import org.yeastrc.ms.domain.MsSearchResultDb;
+import org.yeastrc.ms.domain.db.MsSearchDbImpl;
+import org.yeastrc.ms.domain.ms2File.MS2Run;
+import org.yeastrc.ms.domain.ms2File.MS2RunDb;
+import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
+import org.yeastrc.ms.domain.sqtFile.SQTSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -79,36 +80,36 @@ public class DAOFactory {
     
     // DAOs for run related objects
     private MsExperimentDAO expDAO;
-    private MsDigestionEnzymeDAO enzymeDAO;
-    private MsRunDAO<IMsRun, MsRun> runDAO;
-    private MsScanDAO<IMsScan, MsScan> scanDAO;
+    private MsEnzymeDAO enzymeDAO;
+    private MsRunDAO<MsRun, MsRunDb> runDAO;
+    private MsScanDAO<MsScan, MsScanDb> scanDAO;
     
     // related to MS2 files. 
-    private MsRunDAO<IMS2Run, MS2FileRun> ms2RunDAO;
-    private MsScanDAO<IMS2Scan, MS2FileScan> ms2ScanDAO;
-    private MS2FileScanChargeDAO ms2FileScanChargeDAO;
-    private MS2FileHeaderDAO ms2FileHeadersDAO;
-    private MS2FileChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
-    private MS2FileChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
+    private MsRunDAO<MS2Run, MS2RunDb> ms2RunDAO;
+    private MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDAO;
+    private MS2ScanChargeDAO ms2FileScanChargeDAO;
+    private MS2HeaderDAO ms2FileHeadersDAO;
+    private MS2ChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
+    private MS2ChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
     // DAOs for peptide search related objects
-    private MsPeptideSearchDAO<IMsSearch, MsPeptideSearch> searchDAO;
-    private MsPeptideSearchResultDAO <IMsSearchResult, MsPeptideSearchResult> searchResultDAO;
-    private MsProteinMatchDAO resultProteinDAO;
-    private MsPeptideSearchModDAO modDAO;
-    private MsSequenceDatabaseDAO seqDbDao;
+    private MsSearchDAO<MsSearch, MsSearchDb> searchDAO;
+    private MsSearchResultDAO <MsSearchResult, MsSearchResultDb> searchResultDAO;
+    private MsSearchResultProteinDAO resultProteinDAO;
+    private MsSearchModificationDAO modDAO;
+    private MsSearchDatabaseDAO seqDbDao;
     
     // DAOs for SQT file related objects
-    private MsPeptideSearchResultDAO <ISQTSearchResult, SQTSearchResult> sqtResultDAO;
-    private SQTSpectrumDataDAO sqtSpectrumDAO;
-    private SQTSearchHeaderDAO sqtHeaderDAO;
-    private MsPeptideSearchDAO<ISQTSearch, SQTPeptideSearch> sqtSearchDAO;
+    private MsSearchResultDAO <SQTSearchResult, SQTSearchResultDb> sqtResultDAO;
+    private SQTSearchScanDAO sqtSpectrumDAO;
+    private SQTHeaderDAO sqtHeaderDAO;
+    private MsSearchDAO<SQTSearch, SQTSearchDb> sqtSearchDAO;
     
     private DAOFactory() {
         
         // Run related
         expDAO = new MsExperimentDAOImpl(sqlMap);
-        enzymeDAO = new MsDigestionEnzymeDAOImpl(sqlMap);
+        enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
         scanDAO = new MsScanDAOImpl(sqlMap);
         runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO, scanDAO);
         
@@ -143,75 +144,75 @@ public class DAOFactory {
         return expDAO;
     }
     
-    public MsRunDAO<IMsRun, MsRun> getMsRunDAO() {
+    public MsRunDAO<MsRun, MsRunDb> getMsRunDAO() {
         return runDAO;
     }
     
-    public MsDigestionEnzymeDAO getEnzymeDAO() {
+    public MsEnzymeDAO getEnzymeDAO() {
         return enzymeDAO;
     }
     
-    public MsScanDAO<IMsScan, MsScan> getMsScanDAO() {
+    public MsScanDAO<MsScan, MsScanDb> getMsScanDAO() {
         return scanDAO;
     }
     
-    public MsRunDAO<IMS2Run, MS2FileRun> getMS2FileRunDAO() {
+    public MsRunDAO<MS2Run, MS2RunDb> getMS2FileRunDAO() {
         return ms2RunDAO;
     }
     
-    public MsScanDAO<IMS2Scan, MS2FileScan> getMS2FileScanDAO() {
+    public MsScanDAO<MS2Scan, MS2ScanDb> getMS2FileScanDAO() {
         return ms2ScanDAO;
     }
     
-    public MS2FileScanChargeDAO getMS2FileScanChargeDAO() {
+    public MS2ScanChargeDAO getMS2FileScanChargeDAO() {
         return ms2FileScanChargeDAO;
     }
     
-    public MS2FileHeaderDAO getMS2FileRunHeadersDAO() {
+    public MS2HeaderDAO getMS2FileRunHeadersDAO() {
         return ms2FileHeadersDAO;
     }
     
-    public MS2FileChargeDependentAnalysisDAO getMs2FileChargeDAnalysisDAO() {
+    public MS2ChargeDependentAnalysisDAO getMs2FileChargeDAnalysisDAO() {
         return ms2ChgDAnalysisDAO;
     }
     
-    public MS2FileChargeIndependentAnalysisDAO getMs2FileChargeIAnalysisDAO() {
+    public MS2ChargeIndependentAnalysisDAO getMs2FileChargeIAnalysisDAO() {
         return ms2ChgIAnalysisDAO;
     }
     
-    public MsPeptideSearchDAO<IMsSearch, MsPeptideSearch> getMsPeptideSearchDAO() {
+    public MsSearchDAO<MsSearch, MsSearchDb> getMsPeptideSearchDAO() {
         return searchDAO;
     }
     
-    public MsPeptideSearchResultDAO <IMsSearchResult, MsPeptideSearchResult> getMsPeptideSearchResultDAO() {
+    public MsSearchResultDAO <MsSearchResult, MsSearchResultDb> getMsPeptideSearchResultDAO() {
         return searchResultDAO;
     }
     
-    public MsProteinMatchDAO getMsProteinMatchDAO() {
+    public MsSearchResultProteinDAO getMsProteinMatchDAO() {
         return resultProteinDAO;
     }
     
-    public MsPeptideSearchModDAO getMsSearchModDAO() {
+    public MsSearchModificationDAO getMsSearchModDAO() {
         return modDAO;
     }
     
-    public MsSequenceDatabaseDAO getMsSequenceDatabaseDAO() {
+    public MsSearchDatabaseDAO getMsSequenceDatabaseDAO() {
         return seqDbDao;
     }
     
-    public SQTSearchHeaderDAO getSqtHeaderDAO() {
+    public SQTHeaderDAO getSqtHeaderDAO() {
         return sqtHeaderDAO;
     }
     
-    public MsPeptideSearchResultDAO<ISQTSearchResult, SQTSearchResult> getSqtResultDAO() {
+    public MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> getSqtResultDAO() {
         return sqtResultDAO;
     }
     
-    public MsPeptideSearchDAO<ISQTSearch, SQTPeptideSearch> getSqtSearchDAO() {
+    public MsSearchDAO<SQTSearch, SQTSearchDb> getSqtSearchDAO() {
         return sqtSearchDAO;
     }
     
-    public SQTSpectrumDataDAO getSqtSpectrumDAO() {
+    public SQTSearchScanDAO getSqtSpectrumDAO() {
         return sqtSpectrumDAO;
     }
 }

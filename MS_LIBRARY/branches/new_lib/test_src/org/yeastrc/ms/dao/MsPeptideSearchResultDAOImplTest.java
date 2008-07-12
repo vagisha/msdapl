@@ -1,7 +1,7 @@
 package org.yeastrc.ms.dao;
 
 
-import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
+import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
 
 public class MsPeptideSearchResultDAOImplTest extends BaseDAOTestCase {
 
@@ -50,7 +50,7 @@ public class MsPeptideSearchResultDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testOperationsOnMsSearchResult() {
-        MsPeptideSearchResult result = resultDao.load(searchId_1);
+        MsSearchResultDbImpl result = resultDao.load(searchId_1);
         assertNull(result);
         
         // insert a search result with NO extra information

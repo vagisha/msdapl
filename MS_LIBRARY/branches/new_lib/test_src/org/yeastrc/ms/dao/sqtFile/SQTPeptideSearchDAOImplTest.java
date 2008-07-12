@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.sqtFile.ISQTSearch;
-import org.yeastrc.ms.domain.sqtFile.db.SQTPeptideSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTSearch;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchDbImpl;
 
 
 public class SQTPeptideSearchDAOImplTest extends SQTBaseDAOTestCase {
@@ -23,27 +23,27 @@ public class SQTPeptideSearchDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sqtSearchDao.loadSearch(1));
         
         // save a search (don't add any SQT headers)
-        SQTPeptideSearch search_1 = makeSQTPeptideSearch(1, false, false, false, false);
+        SQTSearchDbImpl search_1 = makeSQTPeptideSearch(1, false, false, false, false);
         assertEquals(0, search_1.getHeaders().size());
         int searchId_1 = sqtSearchDao.saveSearch(search_1);
         
         // load the search using the general MsPeptideSearch DAO and make sure
         // the class of the returned object is SQTSearchResult
-        assertTrue(searchDao.loadSearch(searchId_1) instanceof ISQTSearch);
-        assertFalse(null instanceof ISQTSearch);
+        assertTrue(searchDao.loadSearch(searchId_1) instanceof SQTSearch);
+        assertFalse(null instanceof SQTSearch);
         
         // load using our specialized SQTSearchDAO
-        ISQTSearch search_1_db = sqtSearchDao.loadSearch(searchId_1);
+        SQTSearch search_1_db = sqtSearchDao.loadSearch(searchId_1);
         assertNotNull(search_1_db);
         assertEquals(0, search_1_db.getHeaders().size());
         
         // save another search (add SQT headers)
-        SQTPeptideSearch search_2 = makeSQTPeptideSearch(1, false, false, false, true);
+        SQTSearchDbImpl search_2 = makeSQTPeptideSearch(1, false, false, false, true);
         assertEquals(2, search_2.getHeaders().size());
         int searchId_2 = sqtSearchDao.saveSearch(search_2);
         
         // load the search with headers and check values
-        SQTPeptideSearch search_2_db = sqtSearchDao.loadSearch(searchId_2);
+        SQTSearchDbImpl search_2_db = sqtSearchDao.loadSearch(searchId_2);
         assertNotNull(search_2_db);
         assertEquals(2, search_2_db.getHeaders().size());
         assertEquals(search_2.getRunId(), search_2_db.getRunId());
@@ -58,10 +58,10 @@ public class SQTPeptideSearchDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(search_2.getFragmentMassTolerance().doubleValue(), search_2_db.getFragmentMassTolerance().doubleValue());
         
         // load both searches; make sure the right object types are returned
-        List<SQTPeptideSearch> searches = sqtSearchDao.loadSearchesForRun(1);
+        List<SQTSearchDbImpl> searches = sqtSearchDao.loadSearchesForRun(1);
         assertEquals(2, searches.size());
-        assertTrue(searches.get(0) instanceof ISQTSearch);
-        assertTrue(searches.get(1) instanceof ISQTSearch);
+        assertTrue(searches.get(0) instanceof SQTSearch);
+        assertTrue(searches.get(1) instanceof SQTSearch);
         
         // delete the searches
         sqtSearchDao.deleteSearch(searchId_1);

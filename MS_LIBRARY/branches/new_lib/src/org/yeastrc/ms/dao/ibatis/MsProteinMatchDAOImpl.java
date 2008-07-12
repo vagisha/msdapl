@@ -10,16 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.ms.dao.MsProteinMatchDAO;
-import org.yeastrc.ms.domain.IMsSearchResultProtein;
-import org.yeastrc.ms.domain.db.MsProteinMatch;
+import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
+import org.yeastrc.ms.domain.MsSearchResultProtein;
+import org.yeastrc.ms.domain.MsSearchResultProteinDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsProteinMatchDAO {
+public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsSearchResultProteinDAO {
 
 
     public MsProteinMatchDAOImpl(SqlMapClient sqlMap) {
@@ -29,14 +29,14 @@ public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsProteinMat
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsProteinMatchDAO#loadResultProteins(int)
      */
-    public List<MsProteinMatch> loadResultProteins(int resultId) {
+    public List<MsSearchResultProteinDb> loadResultProteins(int resultId) {
         return queryForList("MsResultProtein.selectResultProteins", resultId);
     }
     
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsProteinMatchDAO#save(org.yeastrc.ms.dto.MsProteinMatch)
      */
-    public void save(IMsSearchResultProtein proteinMatch, int resultId) {
+    public void save(MsSearchResultProtein proteinMatch, int resultId) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("match", proteinMatch);
         map.put("resultId", resultId);
@@ -56,7 +56,7 @@ public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsProteinMat
     public class MsProteinMatchDb {
         
         int resultId;
-        IMsSearchResultProtein resultProtein;
+        MsSearchResultProtein resultProtein;
         
         /**
          * @return the resultId
@@ -67,7 +67,7 @@ public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsProteinMat
         /**
          * @return the resultProtein
          */
-        public IMsSearchResultProtein getResultProtein() {
+        public MsSearchResultProtein getResultProtein() {
             return resultProtein;
         }
 

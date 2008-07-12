@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileChargeDependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2FileScanChargeDAO;
-import org.yeastrc.ms.domain.ms2File.IHeader;
-import org.yeastrc.ms.domain.ms2File.IMS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.db.MS2FileScanCharge;
+import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
+import org.yeastrc.ms.domain.ms2File.MS2ScanChargeDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileScanChargeDAO {
+public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2ScanChargeDAO {
 
-    private MS2FileChargeDependentAnalysisDAO dAnalysisDao;
+    private MS2ChargeDependentAnalysisDAO dAnalysisDao;
     
-    public MS2FileScanChargeDAOImpl(SqlMapClient sqlMap, MS2FileChargeDependentAnalysisDAO dAnalysisDao) {
+    public MS2FileScanChargeDAOImpl(SqlMapClient sqlMap, MS2ChargeDependentAnalysisDAO dAnalysisDao) {
         super(sqlMap);
         this.dAnalysisDao = dAnalysisDao;
     }
@@ -32,18 +32,18 @@ public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileSc
         return queryForList("MS2ScanCharge.selectIdsForScan", scanId);
     }
     
-    public List<MS2FileScanCharge> loadScanChargesForScan(int scanId) {
+    public List<MS2ScanChargeDb> loadScanChargesForScan(int scanId) {
         return queryForList("MS2ScanCharge.selectForScan", scanId);
     }
     
-    public List<MS2FileScanCharge> loadScanChargesForScan(int scanId, int charge) {
+    public List<MS2ScanChargeDb> loadScanChargesForScan(int scanId, int charge) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("scanId", scanId);
         map.put("charge", charge);
         return queryForList("MS2ScanCharge.selectForScanAndCharge", map);
     }
     
-    public int save(IMS2ScanCharge scanCharge, int scanId) {
+    public int save(MS2ScanCharge scanCharge, int scanId) {
         
         Map<String, Object> map = new HashMap<String, Object>(3);
         map.put("scanId", scanId);
@@ -52,7 +52,7 @@ public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2FileSc
         int id = saveAndReturnId("MS2ScanCharge.insert", map);
         
         // save any charge dependent anaysis with the scan charge object
-        for (IHeader dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
+        for (MS2Field dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
             dAnalysisDao.save(dAnalysis, id);
         }
         return id;

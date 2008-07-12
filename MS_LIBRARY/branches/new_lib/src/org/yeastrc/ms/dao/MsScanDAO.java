@@ -2,17 +2,17 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.IMsScan;
-import org.yeastrc.ms.domain.db.MsScan;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
 
-public interface MsScanDAO <I extends IMsScan, O extends MsScan> {
+public interface MsScanDAO <I extends MsScan, O extends MsScanDb> {
 
     /**
      * Saves the given scan in the database.
      * @param scan
      * @return
      */
-    public abstract int save(I scan, int runId);
+    public abstract int save(I scan, int runId, int precursorScanId);
 
     /**
      * Returns a scan with the given scan ID from the database.

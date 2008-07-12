@@ -2,9 +2,9 @@ package org.yeastrc.ms.dao.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.db.MsPeptideSearchResult;
-import org.yeastrc.ms.domain.sqtFile.ISQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResult;
+import org.yeastrc.ms.domain.db.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
+import org.yeastrc.ms.domain.sqtFile.db.SQTSearchResultDbImpl;
 
 public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 
@@ -19,11 +19,11 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public void testOperationsOnSqtSearchResult() {
         
         // try to get the result for a result id that does not exist in the table
-        ISQTSearchResult res = sqtResDao.load(1);
+        SQTSearchResult res = sqtResDao.load(1);
         assertNull(res);
         
         // insert one result in to the table
-        MsPeptideSearchResult parentResult = makeSearchResult(1, 100, 3, "PEPTIDE");
+        MsSearchResultDbImpl parentResult = makeSearchResult(1, 100, 3, "PEPTIDE");
         SQTSearchResult sqtResult = new SQTSearchResult(parentResult);
         
         // we have not yet set any of the SQT file specific values. Saving the 

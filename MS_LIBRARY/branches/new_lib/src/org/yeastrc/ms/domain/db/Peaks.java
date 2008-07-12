@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.IPeaks;
+import org.yeastrc.ms.domain.MsPeakData;
 import org.yeastrc.ms.util.NumberUtils;
 
 /**
  * Class encapsulating the peak data (m/z and intensity pairs) for a scan. 
  */
-public class Peaks implements IPeaks {
+public class Peaks implements MsPeakData {
 
     private List<Peak> peaks;
     
