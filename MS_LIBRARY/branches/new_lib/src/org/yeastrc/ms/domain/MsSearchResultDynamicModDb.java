@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain;
 /**
  * 
  */
-public interface MsSearchResultDynamicModDb extends MsSearchModification {
+public interface MsSearchResultDynamicModDb extends MsSearchResultModification {
 
     /**
      * @return database id of the result which has this modification
@@ -21,9 +21,6 @@ public interface MsSearchResultDynamicModDb extends MsSearchModification {
      */
     public abstract int getModificationId();
     
-    /**
-     * @return index (0 based) in the protein sequence at which this modification is present.
-     */
-    public abstract int getModifiedPosition();
+    
     
 }

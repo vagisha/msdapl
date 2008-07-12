@@ -6,24 +6,22 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchModificationDb;
 import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
-import org.yeastrc.ms.domain.db.MsSearchResultDynamicModDbImpl;
+import org.yeastrc.ms.domain.MsSearchResultModification;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsSearchModificationDAO {
+public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSearchModificationDAO {
 
-    public MsPeptideSearchModDAOImpl(SqlMapClient sqlMap) {
+    public MsSearchModificationDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
@@ -35,9 +33,7 @@ public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsSearch
     }
     
     public void saveStaticModification(MsSearchModification mod, int searchId) {
-        MsPeptideSearchModDB modDb = new MsPeptideSearchModDB();
-        modDb.mod = mod;
-        modDb.searchId = searchId;
+        MsSearchModSqlMapParam modDb = new MsSearchModSqlMapParam(searchId, mod);
         save("MsSearchMod.insertStaticMod", modDb);
     }
     
@@ -51,9 +47,7 @@ public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsSearch
     }
     
     public int saveDynamicModification(MsSearchModification mod, int searchId) {
-        MsPeptideSearchModDB modDb = new MsPeptideSearchModDB();
-        modDb.mod = mod;
-        modDb.searchId = searchId;
+        MsSearchModSqlMapParam modDb = new MsSearchModSqlMapParam(searchId, mod);
         return saveAndReturnId("MsSearchMod.insertDynaMod", modDb);
     }
     
@@ -89,30 +83,14 @@ public class MsPeptideSearchModDAOImpl extends BaseSqlMapDAO implements MsSearch
         return queryForList("MsSearchMod.selectDynaModsForSearchResult", resultId);
     }
 
-    public void saveDynamicModificationForSearchResult(int resultId,
-            int modificationId, int position) {
-        Map<String, Integer> map = new HashMap<String, Integer>(3);
-        map.put("resultId", resultId);
-        map.put("modId", modificationId);
-        map.put("position", position);
-        save("MsSearchMod.insertResultDynaMod", map);
+    public void saveDynamicModificationForSearchResult(MsSearchResultModification mod, int resultId,
+            int modificationId) {
+        MsSearchResultModSqlMapParam modDb = new MsSearchResultModSqlMapParam(resultId, modificationId, mod);
+        save("MsSearchMod.insertResultDynaMod", modDb);
     }
 
     public void deleteDynamicModificationsForResult(int resultId) {
         delete("MsSearchMod.deleteDynaModsForSearchResult", resultId);
     }
-    
-    //-------------------------------------------------------------------------------------------
-    // Class for inserting data into the database.  
-    // The save methods will be passed an object of type IMsSearchModification, along with 
-    // a searchId.  We have 3 options: 
-    // 1. Use inline parameters
-    // 2. Use a parameter map of type java.util.Map
-    // 3. Create a class that holds the IMsSearchModification and searchId and use this as the
-    // param class.  This 3rd options is used since using a bean in a parameter map gives us
-    // helps us catch a mismatch in the bean property and sql param map when the map is loaded,
-    // rather than when the map us used. With a Map iBatis has no way of detecting a name mismatch
-    // since a Map is built at runtime rather than compile time. 
-    //-------------------------------------------------------------------------------------------
    
 }

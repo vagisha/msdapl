@@ -19,10 +19,10 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MsProteinMatchDAOImpl extends BaseSqlMapDAO implements MsSearchResultProteinDAO {
+public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSearchResultProteinDAO {
 
 
-    public MsProteinMatchDAOImpl(SqlMapClient sqlMap) {
+    public MsSearchResultProteinDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 

@@ -5,6 +5,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchModificationDb;
 import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
+import org.yeastrc.ms.domain.MsSearchResultModification;
 
 public interface MsSearchModificationDAO {
 
@@ -37,7 +38,8 @@ public interface MsSearchModificationDAO {
     public abstract List<MsSearchResultDynamicModDb> loadDynamicModificationsForSearchResult(
             int resultId);
     
-    public abstract void saveDynamicModificationForSearchResult(int resultId, int modificationId, int position);
+    public abstract void saveDynamicModificationForSearchResult(MsSearchResultModification mod, 
+            int resultId, int modificationId);
 
     public void deleteDynamicModificationsForResult(int resultId);
 

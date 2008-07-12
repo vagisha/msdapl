@@ -5,32 +5,28 @@ import java.util.List;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearchModificationDb;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
+import org.yeastrc.ms.domain.MsSearchResultModification;
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
 import org.yeastrc.ms.domain.MsSearchModification.ModificationType;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MsPeptideSearchResultDAOImpl extends BaseSqlMapDAO 
+public class MsSearchResultDAOImpl extends BaseSqlMapDAO 
         implements MsSearchResultDAO<MsSearchResult, MsSearchResultDb> {
 
     private MsSearchResultProteinDAO matchDao;
     private MsSearchModificationDAO modDao;
     
-    public MsPeptideSearchResultDAOImpl(SqlMapClient sqlMap, MsSearchResultProteinDAO matchDao,
+    public MsSearchResultDAOImpl(SqlMapClient sqlMap, MsSearchResultProteinDAO matchDao,
             MsSearchModificationDAO modDao) {
         super(sqlMap);
         this.matchDao = matchDao;
         this.modDao =  modDao;
     }
 
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsPeptideSearchResultDAO#load(int)
-     */
     public MsSearchResultDb load(int id) {
         return (MsSearchResultDb) queryForObject("MsSearchResult.select", id);
     }
@@ -39,9 +35,6 @@ public class MsPeptideSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForSearch", searchId);
     }
     
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsPeptideSearchResultDAO#save(org.yeastrc.ms.dto.MsPeptideSearchResult)
-     */
     public int save(MsSearchResult searchResult, int searchId, int scanId) {
         
         MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(searchId, scanId, searchResult);
@@ -52,42 +45,23 @@ public class MsPeptideSearchResultDAOImpl extends BaseSqlMapDAO
             matchDao.save(protein, resultId);
         }
         
-        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicModificationsForSearch(searchId);
-        
         // save any dynamic modifications for this result
-        saveDynamicModsForResult(resultId, searchResult.getResultPeptide(), dynaMods);
+        saveDynamicModsForResult(searchId, resultId, searchResult.getResultPeptide());
         
         return resultId;
     }
 
-    // TODO make this more efficient
-    void saveDynamicModsForResult(int resultId, MsSearchResultPeptide peptide,
-            List<MsSearchModificationDb> dynaMods) {
+    void saveDynamicModsForResult(int searchId, int resultId, MsSearchResultPeptide peptide) {
         
-        for (MsSearchModification mod: peptide.getDynamicModifications()) {
-            // there may not be any modification at this position
-            // or it may not be a dynamic modification -- skip over
+        for (MsSearchResultModification mod: peptide.getDynamicModifications()) {
             if (mod == null || mod.getModificationType() == ModificationType.STATIC)
                 continue;
-            modDao.saveDynamicModificationForSearchResult(resultId, getModificationId(dynaMods, mod), i);
+            int modId = DynamicModLookupUtil.instance().getDynamicModificationId(searchId, 
+                    mod.getModifiedResidue(), mod.getModificationMass());
+            modDao.saveDynamicModificationForSearchResult(mod, resultId, modId);
         }
     }
     
-    
-    int getModificationId(List<MsSearchModificationDb> modList, MsSearchModification mod) {
-        
-        for (MsSearchModificationDb dmod: modList) {
-            if (dmod.getModificationMass().doubleValue() == mod.getModificationMass().doubleValue() &&
-                dmod.getModifiedResidue() == mod.getModifiedResidue())
-                return dmod.getId();
-        }
-        throw new RuntimeException("No dynamic modification found for modificaiton: "
-                +mod.getModifiedResidue()+"; "+mod.getModificationMass());
-    }
-    
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.MsPeptideSearchResultDAO#delete(int)
-     */
     public void delete(int resultId) {
         
         // delete any protein matches for this result

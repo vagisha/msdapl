@@ -37,7 +37,6 @@ import org.yeastrc.ms.domain.MsSearch;
 import org.yeastrc.ms.domain.MsSearchDb;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
-import org.yeastrc.ms.domain.db.MsSearchDbImpl;
 import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
@@ -123,10 +122,10 @@ public class DAOFactory {
         
         // Search related
         seqDbDao = new MsSequenceDatabaseDAOImpl(sqlMap);
-        modDAO = new MsPeptideSearchModDAOImpl(sqlMap);
-        resultProteinDAO = new MsProteinMatchDAOImpl(sqlMap);
-        searchResultDAO = new MsPeptideSearchResultDAOImpl(sqlMap, resultProteinDAO, modDAO);
-        searchDAO = new MsPeptideSearchDAOImpl(sqlMap, searchResultDAO, seqDbDao, modDAO);
+        modDAO = new MsSearchModificationDAOImpl(sqlMap);
+        resultProteinDAO = new MsSearchResultProteinDAOImpl(sqlMap);
+        searchResultDAO = new MsSearchResultDAOImpl(sqlMap, resultProteinDAO, modDAO);
+        searchDAO = new MsSearchDAOImpl(sqlMap, searchResultDAO, seqDbDao, modDAO);
         
 
         sqtResultDAO = new SQTSearchResultDAOImpl(sqlMap, searchResultDAO);

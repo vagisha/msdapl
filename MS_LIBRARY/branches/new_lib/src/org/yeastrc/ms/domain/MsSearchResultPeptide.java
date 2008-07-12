@@ -21,5 +21,5 @@ public interface MsSearchResultPeptide {
     
     public abstract int getSequenceLength();
     
-    public abstract List<? extends MsSearchModification> getDynamicModifications();
+    public abstract List<? extends MsSearchResultModification> getDynamicModifications();
 }
