@@ -18,7 +18,7 @@ import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2RunDb> {
+public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2RunDb> {
 
     private MsRunDAO<MsRun, MsRunDb> msRunDao;
     private MS2HeaderDAO ms2HeaderDao;
@@ -26,7 +26,7 @@ public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run,
     
     
     
-    public MS2FileRunDAOImpl(SqlMapClient sqlMap, MsRunDAO<MsRun, MsRunDb> msRunDao,
+    public MS2RunDAOImpl(SqlMapClient sqlMap, MsRunDAO<MsRun, MsRunDb> msRunDao,
             MS2HeaderDAO ms2HeaderDao, MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDao) {
         super(sqlMap);
         this.msRunDao = msRunDao;
@@ -44,7 +44,7 @@ public class MS2FileRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run,
     public int saveRun(MS2Run run, int msExperimentId) {
 
         // save the run
-        int runId = msRunDao.saveRun(run, 0);
+        int runId = msRunDao.saveRun(run, msExperimentId);
 
         MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
         for (MS2Field header: run.getHeaderList()) {

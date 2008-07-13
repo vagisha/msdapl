@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
-<sqlMap namespace="MsDigestionEnzyme"> 
+<sqlMap namespace="MsEnzyme"> 
 
-	<typeAlias alias="MsEnzyme" type="org.yeastrc.ms.dto.MsDigestionEnzyme"/>
+	<typeAlias alias="MsEnzymeDb" type="org.yeastrc.ms.domain.impl.MsEnzymeDbImpl"/>
+	<typeAlias alias="MsEnzyme" type="org.yeastrc.ms.domain.MsEnzyme"/>
+	<typeAlias alias="EnzymeSense" type="org.yeastrc.ms.domain.MsEnzyme$Sense"/>
+	<typeAlias alias="SenseHandler" type="org.yeastrc.ms.dao.ibatis.MsEnzymeDAOImpl$SenseTypeHandler"/>
 	
-	<resultMap class="MsEnzyme" id="msEnzymeResult">
+	
+	<resultMap class="MsEnzymeDb" id="msEnzymeResult">
 		<result property="id" column="id" />
 		<result property="name" column="name" />
-		<result property="sense" column="sense" nullValue="-1"/>
+		<result property="sense" column="sense" 
+				javaType="EnzymeSense"
+				jdbcType="SMALLINT"
+				typeHandler="SenseHandler"/>
 		<result property="cut" column="cut" />
 		<result property="nocut" column="nocut" />
 		<result property="description" column="description" />
@@ -16,8 +23,10 @@
 	
 	<parameterMap class="MsEnzyme" id="msEnzymeParam">
 		<parameter property="name" jdbcType="VARCHAR" />
-		<parameter property="sense" jdbcType="SMALLINT" nullValue="-1"/>
-		<parameter property="cut" jdbcType="VARCHAR"/>
+		<parameter property="sense" jdbcType="SMALLINT" 
+				   javaType="EnzymeSense"
+				   typeHandler="SenseHandler" />
+		<parameter property="cut" jdbcType="VARCHAR"/>	
 		<parameter property="nocut" jdbcType="VARCHAR"/>
 		<parameter property="description" jdbcType="TEXT"/>
 	</parameterMap>
@@ -85,7 +94,7 @@
     						nocut, 
     						description) 
     	VALUES (?,?,?,?,?)
-    	<selectKey resultClass="int" keyProperty="id">
+    	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>

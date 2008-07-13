@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
+import org.yeastrc.ms.domain.MsEnzyme;
+import org.yeastrc.ms.domain.MsEnzymeDb;
 import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.impl.MsDigestionEnzymeDb;
-import org.yeastrc.ms.domain.impl.MsRunDbImpl;
+import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsRun.RunFileFormat;
 
 public class MsRunDAOImplTest extends BaseDAOTestCase {
 
@@ -26,65 +28,17 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         runDao.deleteRunsForExperiment(msExperimentId_2);
     }
     
-    public void testOperationsOnMsRun() {
-        
-        // nothing in the database right now
-        List<Integer> runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
-        assertEquals(0, runIdList.size());
-        
-        MsRun run1 = createRun(msExperimentId_1);
-        int runId1 = runDao.saveRun(run1, 0);
-        
-        // lets make sure it got saved
-        runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
-        assertEquals(1, runIdList.size());
-        assertEquals(runId1, runIdList.get(0).intValue());
-        checkRun(run1, runDao.loadRun(runId1));
-        
-        
-        // create a run with a different experiment id and save it
-        MsRun run2 = createRun(msExperimentId_2);
-        int runId2 = runDao.saveRun(run2, 0);
-        
-        // make sure there is only one run with our original experiment id
-        runIdList = runDao.loadRunIdsForExperiment(msExperimentId_1);
-        assertEquals(1, runIdList.size());
-        
-        
-        // make sure there is only 1 run with the other experiment id
-        runIdList = runDao.loadRunIdsForExperiment(msExperimentId_2);
-        assertEquals(1, runIdList.size());
-        run2 = runDao.loadRun(runIdList.get(0));
-        checkRun(run2, runDao.loadRun(runId2));
+    public void testSaveAndLoad() {
+        MsRun run = createDefaultRun();
+        int runId = runDao.saveRun(run, msExperimentId_1);
+        MsRunDb runDb = runDao.loadRun(runId);
+        checkRun(run, runDb);
     }
-
-    public void testLoadRunsForExperiment() {
-        MsRun run = createRun(msExperimentId_1);
-        runDao.saveRun(run, 0);
-        List <MsRun> runs = runDao.loadExperimentRuns(msExperimentId_1);
-        assertEquals(1, runs.size());
-        checkRun(run, runs.get(0));
-    }
-   
-
-    public void testLoadRunsForFileNameAndSha1Sum() {
-        MsRun run = createRun(msExperimentId_1);
-        runDao.saveRun(run, 0);
-        run = createRun(msExperimentId_2);
-        runDao.saveRun(run, 0);
-        
-        List<Integer> runs = runDao.runIdsFor("my_file1.ms2", "sha1sum");
-        assertEquals(2, runs.size());
-    }
-    
     
     public void testDeleteRunsForExperiment() {
-        MsRun run = createRun(msExperimentId_1);
-        runDao.saveRun(run, 0);
-        run = createRun(msExperimentId_1);
-        runDao.saveRun(run, 0);
-        run = createRun(msExperimentId_2); // different experiment
-        runDao.saveRun(run, 0);
+        runDao.saveRun(createDefaultRun(), msExperimentId_1);
+        runDao.saveRun(createDefaultRun(), msExperimentId_1);
+        runDao.saveRun(createDefaultRun(), msExperimentId_2); // different experiment
         
         int origSize = runDao.loadRunIdsForExperiment(msExperimentId_1).size();
         assertTrue(origSize == 2);
@@ -97,63 +51,102 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, runDao.loadRunIdsForExperiment(msExperimentId_1).size());
     }
     
+    public void testSaveWithInvalidExpId() {
+        MsRun run1 = createDefaultRun();
+        try {
+            runDao.saveRun(run1, 0);// we should not be able to save a run with experimentId == 0
+            fail("Should not be able to save run with experimentId of 0");
+        }
+        catch(RuntimeException e) {}
+    }
+    
+    public void testSaveAndLoadRunFileFormats() {
+        MsRun run = createRunForFormat(RunFileFormat.MS2);
+        int runId = runDao.saveRun(run, msExperimentId_1);
+        MsRunDb runDb = runDao.loadRun(runId);
+        assertEquals(RunFileFormat.MS2, runDb.getRunFileFormat());
+        
+        run = createRunForFormat(RunFileFormat.UNKNOWN);
+        runId = runDao.saveRun(run, msExperimentId_1);
+        runDb = runDao.loadRun(runId);
+        assertEquals(RunFileFormat.UNKNOWN, runDb.getRunFileFormat());
+        
+        run = createRunForFormat(null);
+        runId = runDao.saveRun(run, msExperimentId_1);
+        runDb = runDao.loadRun(runId);
+        assertEquals(RunFileFormat.UNKNOWN, runDb.getRunFileFormat());
+    }
+    
+    public void testLoadRunsForExperiment() {
+        MsRun run = createDefaultRun();
+        runDao.saveRun(run, msExperimentId_1);
+        runDao.saveRun(createDefaultRun(), msExperimentId_2);
+        List <MsRunDb> runs = runDao.loadExperimentRuns(msExperimentId_1);
+        assertEquals(1, runs.size());
+        assertEquals(1, runDao.loadExperimentRuns(msExperimentId_2).size());
+        checkRun(run, runs.get(0));
+    }
+   
+
+    public void testLoadRunsForFileNameAndSha1Sum() {
+        MsRun run = createDefaultRun();
+        runDao.saveRun(run, msExperimentId_1);
+        run = createDefaultRun();
+        runDao.saveRun(run, msExperimentId_2);
+        
+        List<Integer> runs = runDao.runIdsFor(run.getFileName(), run.getSha1Sum());
+        assertEquals(2, runs.size());
+    }
+    
     public void testSaveAndLoadRunWithNoEnzymes() {
         // create a run and save it
-        MsRun run = createRun(msExperimentId_1);
-        int runId = runDao.saveRun(run, 0);
+        int runId = runDao.saveRun(createDefaultRun(), msExperimentId_1);
         
         // read back the run
-        MsRun dbRun = runDao.loadRun(runId);
+        MsRunDb dbRun = runDao.loadRun(runId);
         assertEquals(0, dbRun.getEnzymeList().size());
     }
     
     public void testSaveAndLoadRunWithEnzymeInfo() {
         
         // load some enzymes from the database
-        MsDigestionEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
-        MsDigestionEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
-        MsDigestionEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
+        MsEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
+        MsEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
+        MsEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
         
         assertNotNull(enzyme1);
         assertNotNull(enzyme2);
         assertNotNull(enzyme3);
         
-        
         // create a run with enzyme information
-        List <MsDigestionEnzymeDb> enzymeList1 = new ArrayList<MsDigestionEnzymeDb>(2);
+        List <MsEnzyme> enzymeList1 = new ArrayList<MsEnzyme>(2);
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
-        MsRun run1 = createRunWEnzymeInfo(msExperimentId_1, enzymeList1);
+        MsRun run1 = createRunWEnzymeInfo(enzymeList1);
         
         // save the run
-        int runId_1 = runDao.saveRun(run1, 0);
+        int runId_1 = runDao.saveRun(run1, msExperimentId_1);
         
         // now read back the run and make sure it has the enzyme information
-        MsRun runFromDb_1 = runDao.loadRun(runId_1);
-        List<MsDigestionEnzymeDb> enzymes = runFromDb_1.getEnzymeList();
+        MsRunDb runFromDb_1 = runDao.loadRun(runId_1);
+        List<MsEnzymeDb> enzymes = runFromDb_1.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());
         
-        
         // save another run for this experiment
-        List <MsDigestionEnzymeDb> enzymeList2 = new ArrayList<MsDigestionEnzymeDb>(2);
+        List <MsEnzyme> enzymeList2 = new ArrayList<MsEnzyme>(1);
         enzymeList2.add(enzyme3);
-        MsRun run2 = createRunWEnzymeInfo(msExperimentId_1, enzymeList2);
-        
+        MsRun run2 = createRunWEnzymeInfo(enzymeList2);
         
         // save the run
-        int runId_2 = runDao.saveRun(run2, 0);
+        int runId_2 = runDao.saveRun(run2, msExperimentId_1);
         
         // now read back the run and make sure it has the enzyme information
-        MsRun runFromDb_2 = runDao.loadRun(runId_2);
+        MsRunDb runFromDb_2 = runDao.loadRun(runId_2);
         enzymes = runFromDb_2.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(1, enzymes.size());
         checkEnzyme(enzyme3, enzymes.get(0));
-        
-        
-        List<MsRun> runsWenzymes = runDao.loadExperimentRuns(msExperimentId_1);
-        assertEquals(2, runsWenzymes.size());
         
     }
     
@@ -161,9 +154,9 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     public void testSaveAndDeleteRunsWithEnzymeInfoAndScans() {
         
         // load some enzymes from the database
-        MsDigestionEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
-        MsDigestionEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
-        MsDigestionEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
+        MsEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
+        MsEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
+        MsEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
         
         assertNotNull(enzyme1);
         assertNotNull(enzyme2);
@@ -171,30 +164,28 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         
         // create a run with enzyme information
-        List <MsDigestionEnzymeDb> enzymeList1 = new ArrayList<MsDigestionEnzymeDb>(2);
+        List <MsEnzyme> enzymeList1 = new ArrayList<MsEnzyme>(2);
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
-        MsRun run1 = createRunWEnzymeInfo(msExperimentId_1, enzymeList1);
+        MsRun run1 = createRunWEnzymeInfo(enzymeList1);
         
         // save the run
-        int runId_1 = runDao.saveRun(run1, 0);
+        int runId_1 = runDao.saveRun(run1, msExperimentId_1);
         
         // now read back the run and make sure it has the enzyme information
-        MsRun runFromDb_1 = runDao.loadRun(runId_1);
-        List<MsDigestionEnzymeDb> enzymes = runFromDb_1.getEnzymeList();
+        MsRunDb runFromDb_1 = runDao.loadRun(runId_1);
+        List<MsEnzymeDb> enzymes = runFromDb_1.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());
         
         
         // save another run for ANOTHER experiment
-        List <MsDigestionEnzymeDb> enzymeList2 = new ArrayList<MsDigestionEnzymeDb>(2);
+        List <MsEnzyme> enzymeList2 = new ArrayList<MsEnzyme>(1);
         enzymeList2.add(enzyme3);
-        MsRun run2 = createRunWEnzymeInfo(msExperimentId_2, enzymeList2);
-        
+        MsRun run2 = createRunWEnzymeInfo(enzymeList2);
         
         // save the run
-        int runId_2 = runDao.saveRun(run2, 0);
-        
+        int runId_2 = runDao.saveRun(run2, msExperimentId_2);
         
         // save some scans for the runs
         saveScansForRun(runId_1, 10);
@@ -238,11 +229,136 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     }
 
     
-    protected void checkEnzyme(MsDigestionEnzymeDb e1, MsDigestionEnzymeDb e2) {
-        assertEquals(e1.getName(), e2.getName());
-        assertEquals(e1.getSense(), e2.getSense());
-        assertEquals(e1.getCut(), e2.getCut());
-        assertEquals(e1.getNocut(), e2.getNocut());
-        assertEquals(e1.getDescription(), e2.getDescription());
+    
+    public static class MsRunTest implements MsRun {
+
+        
+        private String sha1Sum;
+        private RunFileFormat runFileFormat;
+        private String instrumentVendor;
+        private String instrumentSN;
+        private String instrumentModel;
+        private String fileName;
+        private List<? extends MsEnzyme> enzymeList = new ArrayList<MsEnzyme>();
+        private String dataType;
+        private String creationDate;
+        private String conversionSWVersion;
+        private String conversionSWOptions;
+        private String conversionSW;
+        private String comment;
+        private String aquisitionMethod;
+
+        public void setSha1Sum(String sha1Sum) {
+            this.sha1Sum = sha1Sum;
+        }
+
+        public void setRunFileFormat(RunFileFormat runFileFormat) {
+            this.runFileFormat = runFileFormat;
+        }
+
+        public void setInstrumentVendor(String instrumentVendor) {
+            this.instrumentVendor = instrumentVendor;
+        }
+
+        public void setInstrumentSN(String instrumentSN) {
+            this.instrumentSN = instrumentSN;
+        }
+
+        public void setInstrumentModel(String instrumentModel) {
+            this.instrumentModel = instrumentModel;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public void setEnzymeList(List<? extends MsEnzyme> enzymeList) {
+            this.enzymeList = enzymeList;
+        }
+
+        public void setDataType(String dataType) {
+            this.dataType = dataType;
+        }
+
+        public void setCreationDate(String creationDate) {
+            this.creationDate = creationDate;
+        }
+
+        public void setConversionSWVersion(String conversionSWVersion) {
+            this.conversionSWVersion = conversionSWVersion;
+        }
+
+        public void setConversionSWOptions(String conversionSWOptions) {
+            this.conversionSWOptions = conversionSWOptions;
+        }
+
+        public void setConversionSW(String conversionSW) {
+            this.conversionSW = conversionSW;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public void setAcquisitionMethod(String squisitionMethod) {
+            this.aquisitionMethod = squisitionMethod;
+        }
+
+        public String getAcquisitionMethod() {
+            return this.aquisitionMethod;
+        }
+
+        public String getComment() {
+            return this.comment;
+        }
+
+        public String getConversionSW() {
+            return this.conversionSW;
+        }
+
+        public String getConversionSWOptions() {
+            return this.conversionSWOptions;
+        }
+
+        public String getConversionSWVersion() {
+            return this.conversionSWVersion;
+        }
+
+        public String getCreationDate() {
+            return this.creationDate;
+        }
+
+        public String getDataType() {
+            return this.dataType;
+        }
+
+        public List<? extends MsEnzyme> getEnzymeList() {
+            return this.enzymeList;
+        }
+
+        public String getFileName() {
+            return this.fileName;
+        }
+
+        public String getInstrumentModel() {
+            return this.instrumentModel;
+        }
+
+        public String getInstrumentSN() {
+            return this.instrumentSN;
+        }
+
+        public String getInstrumentVendor() {
+            return this.instrumentVendor;
+        }
+
+        public RunFileFormat getRunFileFormat() {
+            return this.runFileFormat;
+        }
+
+        public String getSha1Sum() {
+            return this.sha1Sum;
+        }
+        
     }
 }

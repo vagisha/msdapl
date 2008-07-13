@@ -63,12 +63,8 @@ public class MsRunDbImpl implements MsRunDb {
         return fileFormat;
     }
 
-    public String getFileFormatString() {
-        return fileFormat.toString();
-    }
-
-    public void setRunFileFormatString(String fileFormatStr) {
-        this.fileFormat = RunFileFormat.getFileFormatForString(fileFormatStr);
+    public void setRunFileFormat(RunFileFormat format) {
+        this.fileFormat = format;
     }
     
 

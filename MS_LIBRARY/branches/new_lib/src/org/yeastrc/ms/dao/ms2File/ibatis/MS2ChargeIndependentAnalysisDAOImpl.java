@@ -20,10 +20,10 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MS2FileChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
+public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
         implements MS2ChargeIndependentAnalysisDAO {
 
-    public MS2FileChargeIndependentAnalysisDAOImpl(SqlMapClient sqlMap) {
+    public MS2ChargeIndependentAnalysisDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
@@ -32,15 +32,31 @@ public class MS2FileChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     public void save(MS2Field analysis, int scanId) {
-        Map<String, Object>map = new HashMap<String, Object>(3);
-        map.put("scanId", scanId);
-        map.put("name", analysis.getName());
-        map.put("value", analysis.getValue());
-        save("MS2ChgIAnalysis.insert", map);
+        MS2ChgIndepAnSqlMapParam analysisDb = new MS2ChgIndepAnSqlMapParam(scanId, analysis.getName(), analysis.getValue());
+        save("MS2ChgIAnalysis.insert", analysisDb);
     }
 
     public void deleteByScanId(int scanId) {
         delete("MS2ChgIAnalysis.deleteByScanId", scanId);
     }
 
+    public static final class MS2ChgIndepAnSqlMapParam {
+        private int scanId;
+        private String name;
+        private String value;
+        public MS2ChgIndepAnSqlMapParam(int scanId, String name, String value) {
+            this.scanId = scanId;
+            this.name = name;
+            this.value = value;
+        }
+        public int getScanId() {
+            return scanId;
+        }
+        public String getName() {
+            return name;
+        }
+        public String getValue() {
+            return value;
+        }
+    }
 }

@@ -43,16 +43,10 @@ public class MsEnzymeDbImpl implements MsEnzymeDb {
         return sense;
     }
     
-    public byte  getSenseByteVal() {
-        return sense.getByteVal();
+    public void setSense(Sense sense) {
+        this.sense = sense;
     }
     
-    /**
-     * @param sense the sense to set
-     */
-    public void setSenseByteVal(byte sense) {
-        this.sense = Sense.getSenseForByteVal(sense);
-    }
     /**
      * @return the cut
      */

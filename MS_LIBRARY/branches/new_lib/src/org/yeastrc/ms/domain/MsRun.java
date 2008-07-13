@@ -14,7 +14,7 @@ public interface MsRun {
         
         MS2, MZXML, MZDATA, MZML, UNKNOWN;
         
-        public static RunFileFormat getFileFormatForString(String extString) {
+        public static RunFileFormat instance(String extString) {
             if (extString.equalsIgnoreCase(RunFileFormat.MS2.name()))
                 return RunFileFormat.MS2;
             else if (extString.equals(RunFileFormat.MZXML.name()))

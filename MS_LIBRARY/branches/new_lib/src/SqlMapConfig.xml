@@ -29,28 +29,28 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsExperimentSqlMap.xml"/>
-
 	
 	<!-- Related to peptide searches -->
+	<!--
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchDatabaseSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchResultProteinSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchModificationSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchResultSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchSqlMap.xml" />
-
+	-->
 	
 	<!-- Related to MS2 files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2HeaderSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ChargeIndependentAnalysisSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ChargeDependentAnalysisSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ScanChargeSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ChargeIndependentAnalysisSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ScanSqlMap.xml"/>
 
-
 	<!-- Related to SQT files -->
+	<!--
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTHeaderSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchScanSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchResultSqlMap.xml"/>
-
+	-->
 
 </sqlMapConfig>	

@@ -3,10 +3,11 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsScan"> 
 
-	<typeAlias alias="MsScan" type="org.yeastrc.ms.dto.MsScan"/>
+	<typeAlias alias="MsScanDb" type="org.yeastrc.ms.domain.impl.MsScanDbImpl"/>
+	<typeAlias alias="MsScan" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanSqlMapParam"/>
 	
 	
-	<resultMap class="MsScan" id="msScanResult">
+	<resultMap class="MsScanDb" id="msScanResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" nullValue="0" />
 		<result property="startScanNum" column="startScanNumber" nullValue="-1"/>
@@ -17,7 +18,7 @@
 		<result property="precursorScanNum" column="prescanNumber" nullValue="-1"/>
 		<result property="retentionTime" column="retentionTime" />
 		<result property="fragmentationType" column="fragmentationType" />
-		<result property="peaksBinary" column="data" />
+		<result property="peakByteArray" column="data" />
 	</resultMap>
 	
 	
@@ -32,7 +33,7 @@
 		<parameter property="precursorScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
-		<parameter property="peaksBinary" jdbcType="BLOB" />
+		<parameter property="peakByteArray" jdbcType="LONGBLOB" />
 	</parameterMap>
 	
     <select id="selectScanIdsForRun" resultClass="Integer" parameterClass="Integer"> 
@@ -66,7 +67,7 @@
     						fragmentationType,
     						data) 
     	VALUES (?,?,?,?,?,?,?,?,?,COMPRESS(?))
-    	<selectKey resultClass="int" keyProperty="id">
+    	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>

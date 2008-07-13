@@ -17,12 +17,12 @@ import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2HeaderDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileChargeDependentAnalysisDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileChargeIndependentAnalysisDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileHeaderDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileRunDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileScanChargeDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2FileScanDAOImpl;
+import org.yeastrc.ms.dao.ms2File.ibatis.MS2ChargeDependentAnalysisDAOImpl;
+import org.yeastrc.ms.dao.ms2File.ibatis.MS2ChargeIndependentAnalysisDAOImpl;
+import org.yeastrc.ms.dao.ms2File.ibatis.MS2HeaderDAOImpl;
+import org.yeastrc.ms.dao.ms2File.ibatis.MS2RunDAOImpl;
+import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanChargeDAOImpl;
+import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTPeptideSearchDAOImpl;
@@ -112,12 +112,12 @@ public class DAOFactory {
         scanDAO = new MsScanDAOImpl(sqlMap);
         runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO, scanDAO);
         
-        ms2FileHeadersDAO = new MS2FileHeaderDAOImpl(sqlMap);
-        ms2ChgIAnalysisDAO = new MS2FileChargeIndependentAnalysisDAOImpl(sqlMap);
-        ms2ChgDAnalysisDAO = new MS2FileChargeDependentAnalysisDAOImpl(sqlMap);
-        ms2FileScanChargeDAO = new MS2FileScanChargeDAOImpl(sqlMap, ms2ChgDAnalysisDAO);
-        ms2ScanDAO = new MS2FileScanDAOImpl(sqlMap, scanDAO, ms2ChgIAnalysisDAO, ms2FileScanChargeDAO);
-        ms2RunDAO = new MS2FileRunDAOImpl(sqlMap, runDAO, ms2FileHeadersDAO, ms2ScanDAO);
+        ms2FileHeadersDAO = new MS2HeaderDAOImpl(sqlMap);
+        ms2ChgIAnalysisDAO = new MS2ChargeIndependentAnalysisDAOImpl(sqlMap);
+        ms2ChgDAnalysisDAO = new MS2ChargeDependentAnalysisDAOImpl(sqlMap);
+        ms2FileScanChargeDAO = new MS2ScanChargeDAOImpl(sqlMap, ms2ChgDAnalysisDAO);
+        ms2ScanDAO = new MS2ScanDAOImpl(sqlMap, scanDAO, ms2ChgIAnalysisDAO, ms2FileScanChargeDAO);
+        ms2RunDAO = new MS2RunDAOImpl(sqlMap, runDAO, ms2FileHeadersDAO, ms2ScanDAO);
         
         
         // Search related

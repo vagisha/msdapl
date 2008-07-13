@@ -6,26 +6,16 @@
  */
 package org.yeastrc.ms.domain;
 
-import java.math.BigDecimal;
+import java.util.Iterator;
 
 
-public interface MsScan {
 
-    public abstract int getStartScanNum();
+public interface MsScan extends MsScanBase {
 
-    public abstract int getEndScanNum();
-
-    public abstract int getMsLevel();
-
-    public abstract BigDecimal getPrecursorMz();
-    
-    public abstract int getPrecursorScanNum();
-    
-    public abstract BigDecimal getRetentionTime();
-    
-    public abstract String getFragmentationType();
-
-    public abstract MsPeakData getPeaks();
-    
+    /**
+     * String[0] = m/z; String[1] = RT
+     * @return
+     */
+    public Iterator<String[]> peakIterator();
 
 }

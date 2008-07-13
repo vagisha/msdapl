@@ -1,10 +1,13 @@
 package org.yeastrc.ms.dao;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
-import org.yeastrc.ms.domain.impl.MsScanDbImpl;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
 
 public class MsScanDAOImplTest extends BaseDAOTestCase {
 
@@ -17,66 +20,141 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         super.tearDown();
     }
 
-    public void testOperationsOnMsScan() {
-
-        // we don't have any scans in the database right now
-        int runId = 12;
-        assertEquals(0, scanDao.loadScanIdsForRun(runId).size());
-
-        // insert some scans
-        Random random = new Random();
-        int[] scanIds = new int[10];
-        for (int i = 0; i < 10; i++) {
-            int scanNum = random.nextInt(100);
-            MsScanDbImpl scan = makeMsScan(runId, scanNum);
-            scanIds[i] = scanDao.save(scan);
-        }
-
-        assertEquals(10, scanDao.loadScanIdsForRun(runId).size());
-
-        // make sure we get the correct scanIds
-        List<Integer> scanIdList = scanDao.loadScanIdsForRun(runId);
-        Collections.sort(scanIdList);
-        assertEquals(scanIds.length, scanIdList.size());
-        for(int i = 0; i < 10; i++)
-            assertEquals(scanIds[i], scanIdList.get(i).intValue());
-
+    public void testSaveLoadDelete() {
+        MsScan scan = makeMsScan(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        int scanId = scanDao.save(scan, 1, 1); // runId = 1; precursorScanId = 1;
+        MsScanDb scanDb = scanDao.load(scanId);
+        checkScan(scan, scanDb);
         // clean up
-        scanDao.deleteScansForRun(runId);
-        assertEquals(0, scanDao.loadScanIdsForRun(runId).size());
-
-    }
-
-    public void testNullProperties() {
-
-        // try to save a scan without a runId; Should fail since runID in msScan cannot be null
-        MsScanDbImpl scan = new MsScanDbImpl();
-        try {
-            scanDao.save(scan);
-            fail("Should not be able to save a scan withour a runId");
-        }
-        catch (RuntimeException e) {}
-
-        // set the run id and try to save again
-        scan.setRunId(24);
-        int scanId = scanDao.save(scan);
-        MsScanDbImpl scan_db = scanDao.load(scanId);
-        assertNotNull(scan_db);
-        assertEquals(24, scan_db.getRunId());
-
-        // make sure we have the expected values for all the properties we did NOT set
-        assertEquals(-1, scan_db.getStartScanNum());
-        assertEquals(-1, scan_db.getEndScanNum());
-        assertEquals(0, scan_db.getMsLevel());
-        assertNull(scan_db.getPrecursorMz());
-        assertEquals(0, scan_db.getPrecursorScanId());
-        assertNull(scan_db.getRetentionTime());
-        assertNull(scan.getFragmentationType());
-        assertEquals(0, scan.getPeaks().getPeaksCount());
-
-        // clean up
-        scanDao.deleteScansForRun(24);
+        scanDao.deleteScansForRun(1);
         assertNull(scanDao.load(scanId));
     }
 
+
+    public void testInvalidValues() {
+        MsScan scan = makeMsScan(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        try {
+            scanDao.save(scan, 0, 1); // runId = 0; precursorScanId  1;
+            fail("RunId cannot be 0");
+        }
+        catch(RuntimeException e){}
+    }
+
+    public void testSaveScanWithNoPrecursorScanId() {
+        MsScan scan = makeMsScan(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        int scanId = scanDao.save(scan, 1); // runID = 1
+        MsScanDb scanDb = scanDao.load(scanId);
+        checkScan(scan, scanDb);
+        // clean up
+        scanDao.deleteScansForRun(1);
+        assertNull(scanDao.load(scanId));
+    }
+
+    public void testLoadScanIdsForRun() {
+        int[] ids = new int[3];
+        ids[0] = scanDao.save((makeMsScan(2, 1)), 3); // runId = 3
+        ids[1] = scanDao.save((makeMsScan(3, 1)), 3);
+        ids[2] = scanDao.save((makeMsScan(4, 1)), 3);
+        
+        List<Integer> scanIdList = scanDao.loadScanIdsForRun(3);
+        Collections.sort(scanIdList);
+        assertEquals(3, scanIdList.size());
+        for (int i = 0; i < ids.length; i++) {
+            assertEquals(Integer.valueOf(ids[i]), scanIdList.get(i));
+        }
+        // clean up
+        scanDao.deleteScansForRun(3);
+        assertEquals(0, scanDao.loadScanIdsForRun(3).size());
+    }
+    
+    public void testSaveLoadPeakData() {
+        MsScan scan = makeMsScanWithPeakData(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        
+        int scanId = scanDao.save(scan, 1, 1); // runId = 1; precursorScanId = 1;
+        MsScanDb scanDb = scanDao.load(scanId);
+        checkScan(scan, scanDb);
+        // clean up
+        scanDao.deleteScansForRun(1);
+        assertNull(scanDao.load(scanId));
+    }
+
+    public static class MsScanTest implements MsScan {
+
+        private int startScanNum;
+        private BigDecimal retentionTime;
+        private int precursorScanNum;
+        private BigDecimal precursorMz;
+        private int msLevel;
+        private String fragmentationType;
+        private int endScanNum;
+        private List<String[]> peakList = new ArrayList<String[]>();
+
+        public int getEndScanNum() {
+            return this.endScanNum;
+        }
+
+        public String getFragmentationType() {
+            return this.fragmentationType;
+        }
+
+        public int getMsLevel() {
+            return this.msLevel;
+        }
+
+        public Iterator<String[]> peakIterator() {
+            return this.peakList.iterator();
+        }
+
+        public BigDecimal getPrecursorMz() {
+            return this.precursorMz;
+        }
+
+        public int getPrecursorScanNum() {
+            return this.precursorScanNum;
+        }
+
+        public BigDecimal getRetentionTime() {
+            return this.retentionTime;
+        }
+
+        public int getStartScanNum() {
+            return this.startScanNum;
+        }
+
+        public void setRetentionTime(BigDecimal retentionTime) {
+            this.retentionTime = retentionTime;
+        }
+
+        public void setPrecursorScanNum(int precursorScanNum) {
+            this.precursorScanNum = precursorScanNum;
+        }
+
+        public void setPrecursorMz(BigDecimal precursorMz) {
+            this.precursorMz = precursorMz;
+        }
+
+        public void setPeaks(List<String[]> peaks) {
+            this.peakList = peaks;
+        }
+
+        public int getPeakCount() {
+            return peakList.size();
+        }
+        
+        public void setMsLevel(int msLevel) {
+            this.msLevel = msLevel;
+        }
+
+        public void setFragmentationType(String fragmentationType) {
+            this.fragmentationType = fragmentationType;
+        }
+
+        public void setEndScanNum(int endScanNum) {
+            this.endScanNum = endScanNum;
+        }
+
+        public void setStartScanNum(int scanNum) {
+            this.startScanNum = scanNum;
+        }
+    }
 }

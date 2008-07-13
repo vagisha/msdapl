@@ -19,11 +19,11 @@ import org.yeastrc.ms.domain.ms2File.MS2ScanChargeDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2ScanChargeDAO {
+public class MS2ScanChargeDAOImpl extends BaseSqlMapDAO implements MS2ScanChargeDAO {
 
     private MS2ChargeDependentAnalysisDAO dAnalysisDao;
     
-    public MS2FileScanChargeDAOImpl(SqlMapClient sqlMap, MS2ChargeDependentAnalysisDAO dAnalysisDao) {
+    public MS2ScanChargeDAOImpl(SqlMapClient sqlMap, MS2ChargeDependentAnalysisDAO dAnalysisDao) {
         super(sqlMap);
         this.dAnalysisDao = dAnalysisDao;
     }
@@ -76,4 +76,7 @@ public class MS2FileScanChargeDAOImpl extends BaseSqlMapDAO implements MS2ScanCh
         delete("MS2ScanCharge.deleteByScanId_cascade", scanId);
     }
    
+    public static final class MS2ScanChargeSqlMapParam {
+        
+    }
 }

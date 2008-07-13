@@ -24,13 +24,13 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Scan, MS2ScanDb> {
+public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Scan, MS2ScanDb> {
 
     private MsScanDAO<MsScan, MsScanDb> msScanDao;
     private MS2ChargeIndependentAnalysisDAO iAnalDao;
     private MS2ScanChargeDAO chargeDao;
     
-    public MS2FileScanDAOImpl(SqlMapClient sqlMap, MsScanDAO<MsScan, MsScanDb> msScanDAO,
+    public MS2ScanDAOImpl(SqlMapClient sqlMap, MsScanDAO<MsScan, MsScanDb> msScanDAO,
             MS2ChargeIndependentAnalysisDAO iAnalDao, MS2ScanChargeDAO chargeDao) {
         super(sqlMap);
         this.msScanDao = msScanDAO;
@@ -74,6 +74,11 @@ public class MS2FileScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Sc
         }
         
         return scanId;
+    }
+    
+    
+    public int save(MS2Scan scan, int runId) {
+        return save(scan, runId, 0);
     }
     
     /**

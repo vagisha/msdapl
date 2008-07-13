@@ -3,9 +3,10 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2Header"> 
 
-	<typeAlias alias="Header" type="org.yeastrc.ms.dto.ms2File.MS2FileHeader"/>
+	<typeAlias alias="HeaderDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2HeaderDbImpl"/>
+	<typeAlias alias="Header" type="org.yeastrc.ms.dao.ms2File.ibatis.MS2HeaderDAOImpl$MS2HeaderSqlMapParam"/>
 	
-	<resultMap class="Header" id="headerResult">
+	<resultMap class="HeaderDb" id="headerResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" />
 		<result property="name" column="header" />
@@ -13,7 +14,7 @@
 	</resultMap>
 	
 	<parameterMap class="Header" id="headerParam">
-		<parameter property="runId" jdbcType="INTEGER" />
+		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>
 	</parameterMap>

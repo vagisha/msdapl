@@ -13,6 +13,15 @@ public interface MsScanDAO <I extends MsScan, O extends MsScanDb> {
      * @return
      */
     public abstract int save(I scan, int runId, int precursorScanId);
+    
+    /**
+     * Saves the given scan in the database.
+     * This method should be used when there is no precursorScanId for the scan
+     * e.g. a MS1 scan
+     * @param scan
+     * @return
+     */
+    public abstract int save(I scan, int runId);
 
     /**
      * Returns a scan with the given scan ID from the database.

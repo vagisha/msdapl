@@ -3,9 +3,9 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2Scan"> 
 
-	<typeAlias alias="MS2Scan" type="org.yeastrc.ms.dto.ms2File.MS2FileScan"/>
+	<typeAlias alias="MS2ScanDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2ScanDbImpl"/>
 	
-	<resultMap class="MS2Scan" id="MS2ScanResult" extends="MsScan.msScanResult">
+	<resultMap class="MS2ScanDb" id="MS2ScanResult" extends="MsScan.msScanResult">
 		<result property="scanChargeList" 
 				column="id" 
 				select="MS2ScanCharge.selectForScan"/>

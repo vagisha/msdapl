@@ -4,10 +4,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.impl.MS2ChargeIndependentAnalysisDbImpl;
+import org.yeastrc.ms.domain.ms2File.MS2ChargeIndependentAnalysisDb;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
 
 
-public class MS2FileChargeIndependentAnalysisDAOImplTest extends MS2BaseDAOtestCase {
+public class MS2ChargeIndependentAnalysisDAOImplTest extends MS2BaseDAOtestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -22,24 +23,24 @@ public class MS2FileChargeIndependentAnalysisDAOImplTest extends MS2BaseDAOtestC
         // nothing in the database right now
         assertEquals(0, iAnalDao.loadAnalysisForScan(1).size());
         
-     // save something
-        MS2ChargeIndependentAnalysisDbImpl da11 = makeIAnalysis(1, "name_11", "value_11");
-        MS2ChargeIndependentAnalysisDbImpl da12 = makeIAnalysis(1, "name_12", "value_12");
-        MS2ChargeIndependentAnalysisDbImpl da21 = makeIAnalysis(2, "name_21", "value_21");
-        MS2ChargeIndependentAnalysisDbImpl da31 = makeIAnalysis(3, "name_31", "value_31");
+        // save something
+        MS2Field da11 = makeAnalysis("name_11", "value_11");
+        MS2Field da12 = makeAnalysis("name_12", "value_12");
+        MS2Field da21 = makeAnalysis("name_21", "value_21");
+        MS2Field da31 = makeAnalysis("name_31", "value_31");
         
-        iAnalDao.save(da11);
-        iAnalDao.save(da12);
-        iAnalDao.save(da21);
-        iAnalDao.save(da31);
+        iAnalDao.save(da11, 1);
+        iAnalDao.save(da12, 1);
+        iAnalDao.save(da21, 2);
+        iAnalDao.save(da31, 3);
         
         // check saved entries
         assertEquals(2, iAnalDao.loadAnalysisForScan(1).size());
-        List<MS2ChargeIndependentAnalysisDbImpl> daList = iAnalDao.loadAnalysisForScan(1);
+        List<MS2ChargeIndependentAnalysisDb> daList = iAnalDao.loadAnalysisForScan(1);
         // sort so that we get the entries in the order we inserted them
-        Collections.sort(daList, new Comparator<MS2ChargeIndependentAnalysisDbImpl>() {
-            public int compare(MS2ChargeIndependentAnalysisDbImpl o1,
-                    MS2ChargeIndependentAnalysisDbImpl o2) {
+        Collections.sort(daList, new Comparator<MS2ChargeIndependentAnalysisDb>() {
+            public int compare(MS2ChargeIndependentAnalysisDb o1,
+                    MS2ChargeIndependentAnalysisDb o2) {
                 return new Integer(o1.getId()).compareTo(o2.getId());
             }});
         compare(da11, daList.get(0));

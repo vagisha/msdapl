@@ -3,9 +3,10 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2ScanCharge"> 
 
-	<typeAlias alias="ScanCharge" type="org.yeastrc.ms.dto.ms2File.MS2FileScanCharge"/>
+	<typeAlias alias="ScanChargeDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2ScanChargeDbImpl"/>
+	<typeAlias alias="ScanCharge" type="org.yeastrc.ms.dao.ibatis.MS2ScanChargeDAOImpl$MS2ScanChargeSqlMapParam"/>
 	
-	<resultMap class="ScanCharge" id="scanChargeResult">
+	<resultMap class="ScanChargeDb" id="scanChargeResult">
 		<result property="id" column="id" />
 		<result property="scanId" column="scanID" nullValue="0"/>
 		<result property="charge" column="charge" nullValue="0"/>
@@ -35,7 +36,7 @@
     
     <insert id="insert" parameterMap="scanChargeParam">
     	INSERT INTO MS2FileScanCharge (scanID, charge, mass) VALUES (?,?,?)
-    	<selectKey resultClass="int" keyProperty="id">
+    	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>

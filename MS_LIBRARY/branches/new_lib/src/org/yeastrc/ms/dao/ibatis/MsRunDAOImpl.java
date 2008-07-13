@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,9 @@ import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.domain.MsRun.RunFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.extensions.ParameterSetter;
+import com.ibatis.sqlmap.client.extensions.ResultGetter;
+import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRunDb> {
 
@@ -76,7 +80,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         enzymeDao.deleteEnzymesForRun(runId);
         
         // delete scans
-        msScanDao.deleteScansForRun(runId);
+//        msScanDao.deleteScansForRun(runId);
         
         // delete the run
         delete("MsRun.delete", runId);
@@ -118,4 +122,109 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         return run.getRunFileFormat();
     }
     
+    //---------------------------------------------------------------------------------------
+    /** 
+     * Type handler for converting between RunFileFormat and JDBC's VARCHAR types. 
+     */
+    public static class RunFileFormatTypeHandler implements TypeHandlerCallback {
+
+        public Object getResult(ResultGetter getter) throws SQLException {
+            String format = getter.getString();
+            if (getter.wasNull())
+                return RunFileFormat.UNKNOWN;
+            return RunFileFormat.instance(format);
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            if (parameter == null)
+                setter.setNull(java.sql.Types.VARCHAR);
+            else
+                setter.setString(((RunFileFormat)parameter).name());
+        }
+
+        public Object valueOf(String s) {
+            return RunFileFormat.instance(s);
+        }
+    }
+    //---------------------------------------------------------------------------------------
+    
+    //---------------------------------------------------------------------------------------
+    /**
+     * Convenience class for encapsulating a MsRun and associated experiment id
+     */
+    public static class MsRunSqlMapParam implements MsRun {
+
+        private int experimentId;
+        private MsRun run;
+        
+        public MsRunSqlMapParam(int experimentId, MsRun run) {
+            this.experimentId = experimentId;
+            this.run = run;
+        }
+        
+        /**
+         * @return the experimentId
+         */
+        public int getExperimentId() {
+            return experimentId;
+        }
+
+        public List<? extends MsEnzyme> getEnzymeList() {
+            return run.getEnzymeList();
+        }
+
+        public String getAcquisitionMethod() {
+            return run.getAcquisitionMethod();
+        }
+
+        public String getComment() {
+            return run.getComment();
+        }
+
+        public String getConversionSW() {
+            return run.getConversionSW();
+        }
+
+        public String getConversionSWOptions() {
+            return run.getConversionSWOptions();
+        }
+
+        public String getConversionSWVersion() {
+            return run.getConversionSWVersion();
+        }
+
+        public String getCreationDate() {
+            return run.getCreationDate();
+        }
+
+        public String getDataType() {
+            return run.getDataType();
+        }
+
+        public String getFileName() {
+            return run.getFileName();
+        }
+
+        public String getInstrumentModel() {
+            return run.getInstrumentModel();
+        }
+
+        public String getInstrumentSN() {
+            return run.getInstrumentSN();
+        }
+
+        public String getInstrumentVendor() {
+            return run.getInstrumentVendor();
+        }
+
+        public RunFileFormat getRunFileFormat() {
+            return run.getRunFileFormat();
+        }
+
+        public String getSha1Sum() {
+            return run.getSha1Sum();
+        }
+    }
+    //---------------------------------------------------------------------------------------
 }

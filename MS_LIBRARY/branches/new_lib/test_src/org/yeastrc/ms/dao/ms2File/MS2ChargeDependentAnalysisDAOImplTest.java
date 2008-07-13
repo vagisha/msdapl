@@ -4,10 +4,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.impl.MS2ChargeDependentAnalysisDbImpl;
+import org.yeastrc.ms.domain.ms2File.MS2ChargeDependentAnalysisDb;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
 
 
-public class MS2FileChargeDependentAnalysisDAOImplTest extends MS2BaseDAOtestCase {
+public class MS2ChargeDependentAnalysisDAOImplTest extends MS2BaseDAOtestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -23,23 +24,23 @@ public class MS2FileChargeDependentAnalysisDAOImplTest extends MS2BaseDAOtestCas
         assertEquals(0, dAnalDao.loadAnalysisForScanCharge(1).size());
         
         // save something
-        MS2ChargeDependentAnalysisDbImpl da11 = makeDAnalysis(1, "name_11", "value_11");
-        MS2ChargeDependentAnalysisDbImpl da12 = makeDAnalysis(1, "name_12", "value_12");
-        MS2ChargeDependentAnalysisDbImpl da21 = makeDAnalysis(2, "name_21", "value_21");
-        MS2ChargeDependentAnalysisDbImpl da31 = makeDAnalysis(3, "name_31", "value_31");
+        MS2Field da11 = makeAnalysis("name_11", "value_11");
+        MS2Field da12 = makeAnalysis("name_12", "value_12");
+        MS2Field da21 = makeAnalysis("name_21", "value_21");
+        MS2Field da31 = makeAnalysis("name_31", "value_31");
         
-        dAnalDao.save(da11);
-        dAnalDao.save(da12);
-        dAnalDao.save(da21);
-        dAnalDao.save(da31);
+        dAnalDao.save(da11, 1);
+        dAnalDao.save(da12, 1);
+        dAnalDao.save(da21, 2);
+        dAnalDao.save(da31, 3);
         
         // check saved entries
         assertEquals(2, dAnalDao.loadAnalysisForScanCharge(1).size());
-        List<MS2ChargeDependentAnalysisDbImpl> daList = dAnalDao.loadAnalysisForScanCharge(1);
+        List<MS2ChargeDependentAnalysisDb> daList = dAnalDao.loadAnalysisForScanCharge(1);
         // sort so that we get the entries in the order we inserted them
-        Collections.sort(daList, new Comparator<MS2ChargeDependentAnalysisDbImpl>() {
-            public int compare(MS2ChargeDependentAnalysisDbImpl o1,
-                    MS2ChargeDependentAnalysisDbImpl o2) {
+        Collections.sort(daList, new Comparator<MS2ChargeDependentAnalysisDb>() {
+            public int compare(MS2ChargeDependentAnalysisDb o1,
+                    MS2ChargeDependentAnalysisDb o2) {
                 return new Integer(o1.getId()).compareTo(o2.getId());
             }});
         compare(da11, daList.get(0));

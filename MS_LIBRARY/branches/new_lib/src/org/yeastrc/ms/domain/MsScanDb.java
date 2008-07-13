@@ -6,10 +6,12 @@
  */
 package org.yeastrc.ms.domain;
 
+import java.util.Iterator;
+
 /**
  * 
  */
-public interface MsScanDb extends MsScan {
+public interface MsScanDb extends MsScanBase {
 
     /**
      * @return database id of the run this scan belongs to
@@ -26,4 +28,11 @@ public interface MsScanDb extends MsScan {
      * Return value of this method for MS1 scans will always be 0.
      */
     public abstract int getPrecursorScanId();
+    
+    
+    /**
+     * double[0] = m/z; double[1] = RT
+     * @return
+     */
+    public Iterator<double[]> peakIterator();
 }

@@ -3,14 +3,19 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRun"> 
 
-	<typeAlias alias="MsRun" type="org.yeastrc.ms.dto.MsRun"/>
-	<typeAlias alias="MS2Run" type="org.yeastrc.ms.dto.ms2File.MS2FileRun"/>
+	<typeAlias alias="MsRunDb" type="org.yeastrc.ms.domain.impl.MsRunDbImpl"/>
+	<typeAlias alias="MS2RunDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2RunDbImpl"/>
+	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.MsRun$RunFileFormat"/>
+	<typeAlias alias="RunTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$RunFileFormatTypeHandler"/>
+	<typeAlias alias="MsRun" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$MsRunSqlMapParam" />
 	
-	<resultMap class="MsRun" id="msRunResult">
+	<resultMap class="MsRunDb" id="msRunResult">
 		<result property="id" column="id" />
-		<result property="msExperimentId" column="experimentID" nullValue="0"/>
+		<result property="experimentId" column="experimentID" nullValue="0"/>
 		<result property="fileName" column="filename" />
-		<result property="fileFormat" column="originalFileType" />
+		<result property="runFileFormat" column="originalFileType"
+				javaType="RunType" jdbcType="VARCHAR"
+				typeHandler="RunTypeHandler"/>
 		<result property="sha1Sum" column="sha1Sum" />
 		<result property="creationDate" column="creationTime" />
 		<result property="conversionSW" column="extractor" />
@@ -24,13 +29,15 @@
 		<result property="comment" column="comment" />
 		<result property="enzymeList" 
 				column="id" 
-				select="MsDigestionEnzyme.selectEnzymesForRun"/>
-		<discriminator javaType="String" column="originalFileType">
+				select="MsEnzyme.selectEnzymesForRun"/>
+		<discriminator javaType="RunType" jdbcType="VARCHAR" 
+						column="originalFileType" 
+						typeHandler="RunTypeHandler">
 			<subMap value="MS2" resultMap="ms2RunResult"/>
 		</discriminator>
 	</resultMap>
 	
-	<resultMap class="MS2Run" id="ms2RunResult" extends="MsRun.msRunResult">
+	<resultMap class="MS2RunDb" id="ms2RunResult" extends="MsRun.msRunResult">
 		<result property="headerList" 
 				column="id" 
 				select="MS2Header.selectHeadersForRun" />
@@ -38,7 +45,7 @@
 	
 	
 	<parameterMap class="MsRun" id="msRunParam">
-		<parameter property="msExperimentId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="experimentId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="fileName" jdbcType="VARCHAR"/>
 		<parameter property="sha1Sum" jdbcType="CHAR"/>
 		<parameter property="creationDate" jdbcType="VARCHAR"/>
@@ -50,7 +57,11 @@
 		<parameter property="instrumentSN" jdbcType="VARCHAR"/>
 		<parameter property="dataType" jdbcType="VARCHAR"/>
 		<parameter property="acquisitionMethod" jdbcType="VARCHAR" />
-		<parameter property="fileFormat" jdbcType="VARCHAR"/>
+		<parameter property="runFileFormat" 
+					jdbcType="VARCHAR" 
+					javaType="RunType" 
+					typeHandler="RunTypeHandler"
+		/>
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
@@ -88,7 +99,7 @@
     						originalFileType, 
     						comment) 
     	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    	<selectKey resultClass="int" keyProperty="id">
+    	<selectKey resultClass="int" >
       		select last_insert_id() as id
     	</selectKey>
     </insert>

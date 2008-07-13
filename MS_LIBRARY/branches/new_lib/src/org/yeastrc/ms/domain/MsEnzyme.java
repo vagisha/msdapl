@@ -10,17 +10,17 @@ public interface MsEnzyme {
 
     public static enum Sense {
         
-        CTERM((byte)0), NTERM((byte)1), UNKNOWN((byte)-1);
+        CTERM((short)0), NTERM((short)1), UNKNOWN((short)-1);
     
-        private byte byteVal;
-        private Sense(byte byteVal) {
-            this.byteVal = byteVal;
+        private short shortVal;
+        private Sense(short shortVal) {
+            this.shortVal = shortVal;
         }
-        public byte getByteVal() {
-            return byteVal;
+        public short getShortVal() {
+            return shortVal;
         }
-        public static Sense getSenseForByteVal(byte byteVal) {
-            switch (byteVal) {
+        public static Sense instance(short shortVal) {
+            switch (shortVal) {
                 case 0: return CTERM;
                 case 1: return NTERM;
                 default: return UNKNOWN;

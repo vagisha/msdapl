@@ -1,13 +1,18 @@
 package org.yeastrc.ms.dao.ms2File;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.yeastrc.ms.dao.MsScanDAOImplTest.MsScanTest;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
+import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 
 
-public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {
+public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
 
     private final int runId = 35;
 
@@ -33,8 +38,8 @@ public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {
         int[] scanIds = new int[10];
         for (int i = 0; i < 10; i++) {
             int scanNum = random.nextInt(100);
-            MS2Scan scan = makeMS2FileScan(runId, scanNum, false, false);
-            scanIds[i] = ms2ScanDao.save(scan);
+            MS2Scan scan = makeMS2Scan(scanNum, 0, false, false); // precursorScanNum = 0;
+            scanIds[i] = ms2ScanDao.save(scan, runId);
         }
         
         assertEquals(10, ms2ScanDao.loadScanIdsForRun(runId).size());
@@ -48,15 +53,15 @@ public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {
 
         // get the scan for the first scan id and make sure it does NOT have any 
         // charge dependent analysis or scan charges associated with it
-        MS2Scan scan = ms2ScanDao.load(scanIds[0]);
-        assertNotNull(scan);
-        assertEquals(0, scan.getChargeIndependentAnalysisList().size());
-        assertEquals(0, scan.getScanChargeList().size());
+        MS2ScanDb scanDb = ms2ScanDao.load(scanIds[0]);
+        assertNotNull(scanDb);
+        assertEquals(0, scanDb.getChargeIndependentAnalysisList().size());
+        assertEquals(0, scanDb.getScanChargeList().size());
         
         // save a scan WITH both charge independent analysis and scan charges
-        scan = makeMS2FileScan(runId, 25, true, true);
-        int scanId = ms2ScanDao.save(scan);
-        MS2Scan scan_db = ms2ScanDao.load(scanId);
+        MS2Scan scan = makeMS2Scan(420, 0, true, true);// scanNum = 420; precursorScanNum = 0s
+        int scanId = ms2ScanDao.save(scan, runId);
+        MS2ScanDb scan_db = ms2ScanDao.load(scanId);
         assertEquals(3, scan_db.getChargeIndependentAnalysisList().size());
         assertEquals(2, scan_db.getScanChargeList().size());
         
@@ -66,5 +71,27 @@ public class MS2FileScanDAOImplTest extends MS2BaseDAOtestCase {
         assertEquals(0, chargeDao.loadScanChargesForScan(scanId).size());
         assertEquals(0, iAnalDao.loadAnalysisForScan(scanId).size());
         
+    }
+    
+    public static final class MS2ScanTest extends MsScanTest implements MS2Scan {
+
+        private List<MS2Field> analysisList = new ArrayList<MS2Field>();
+        private List<MS2ScanCharge> scanChargeList = new ArrayList<MS2ScanCharge>();
+        
+        public List<? extends MS2Field> getChargeIndependentAnalysisList() {
+            return analysisList;
+        }
+
+        public List<? extends MS2ScanCharge> getScanChargeList() {
+            return scanChargeList;
+        }
+
+        public void addScanCharge(MS2ScanCharge scanCharge) {
+            scanChargeList.add(scanCharge);
+        }
+
+        public void addChargeIndependentAnalysis(MS2Field analysis) {
+            analysisList.add(analysis);
+        }
     }
 }

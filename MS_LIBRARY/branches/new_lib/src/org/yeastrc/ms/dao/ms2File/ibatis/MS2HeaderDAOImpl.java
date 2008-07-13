@@ -20,18 +20,15 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MS2FileHeaderDAOImpl extends BaseSqlMapDAO implements MS2HeaderDAO {
+public class MS2HeaderDAOImpl extends BaseSqlMapDAO implements MS2HeaderDAO {
 
-    public MS2FileHeaderDAOImpl(SqlMapClient sqlMap) {
+    public MS2HeaderDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
     public void save(MS2Field header, int runId) {
-        Map<String, Object> map = new HashMap<String, Object>(3);
-        map.put("runId", runId);
-        map.put("name", header.getName());
-        map.put("value", header.getValue());
-        save("MS2Header.insert", map);
+        MS2HeaderSqlMapParam headerDb = new MS2HeaderSqlMapParam(runId, header.getName(), header.getValue());
+        save("MS2Header.insert", headerDb);
     }
     
     public List<MS2HeaderDb> loadHeadersForRun(int runId) {
@@ -47,5 +44,25 @@ public class MS2FileHeaderDAOImpl extends BaseSqlMapDAO implements MS2HeaderDAO 
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>(1);
         map.put("runIdList", runIds);
         delete("MS2Header.deleteByRunIds", map);
+    }
+    
+    public static final class MS2HeaderSqlMapParam {
+        private int runId;
+        private String name;
+        private String value;
+        public MS2HeaderSqlMapParam(int runId, String name, String value) {
+            this.runId = runId;
+            this.name = name;
+            this.value = value;
+        }
+        public int getRunId() {
+            return runId;
+        }
+        public String getName() {
+            return name;
+        }
+        public String getValue() {
+            return value;
+        }
     }
 }

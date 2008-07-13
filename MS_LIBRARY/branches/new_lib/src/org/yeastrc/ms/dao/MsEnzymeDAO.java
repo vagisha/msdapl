@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsEnzymeDb;
+import org.yeastrc.ms.domain.MsEnzyme.Sense;
 
 public interface MsEnzymeDAO {
 
@@ -15,7 +16,7 @@ public interface MsEnzymeDAO {
     
     public List<MsEnzymeDb> loadEnzymes(String name);
     
-    public List<MsEnzymeDb> loadEnzymes(String name, int sense, String cut, String nocut);
+    public List<MsEnzymeDb> loadEnzymes(String name, Sense sense, String cut, String nocut);
     
     public List<MsEnzymeDb> loadEnzymesForRun(int runId);
     

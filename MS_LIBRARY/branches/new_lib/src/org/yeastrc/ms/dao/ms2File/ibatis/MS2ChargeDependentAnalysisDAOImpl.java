@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.ms2File.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
@@ -20,10 +18,10 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MS2FileChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
+public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
         implements MS2ChargeDependentAnalysisDAO {
 
-    public MS2FileChargeDependentAnalysisDAOImpl(SqlMapClient sqlMap) {
+    public MS2ChargeDependentAnalysisDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
@@ -32,15 +30,31 @@ public class MS2FileChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
     }
 
     public void save(MS2Field analysis, int scanChargeId) {
-        Map<String, Object>map = new HashMap<String, Object>(3);
-        map.put("scanId", scanChargeId);
-        map.put("name", analysis.getName());
-        map.put("value", analysis.getValue());
-        save("MS2ChgDAnalysis.insert", map);
+        MS2ChgDepAnSqlMapParam analysisDb = new MS2ChgDepAnSqlMapParam(scanChargeId, analysis.getName(), analysis.getValue());
+        save("MS2ChgDAnalysis.insert", analysisDb);
     }
 
     public void deleteByScanChargeId(int scanChargeId) {
         delete("MS2ChgDAnalysis.deleteByScanChargeId", scanChargeId);
     }
 
+    public static final class MS2ChgDepAnSqlMapParam {
+        private int scanChargeId;
+        private String name;
+        private String value;
+        public MS2ChgDepAnSqlMapParam(int scanChargeId, String name, String value) {
+            this.scanChargeId = scanChargeId;
+            this.name = name;
+            this.value = value;
+        }
+        public int getScanChargeId() {
+            return scanChargeId;
+        }
+        public String getName() {
+            return name;
+        }
+        public String getValue() {
+            return value;
+        }
+    }
 }
