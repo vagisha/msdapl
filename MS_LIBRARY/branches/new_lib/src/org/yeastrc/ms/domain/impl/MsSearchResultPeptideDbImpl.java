@@ -10,8 +10,8 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
 
     
     private char[] sequence;
-    private char preResidue;
-    private char postResidue;
+    private char preResidue = '\u0000';
+    private char postResidue = '\u0000';
     
     private List<? super MsSearchResultDynamicModDb> dynamicMods;
     
@@ -27,16 +27,6 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
     }
 
     @Override
-    public char getPostResidue() {
-        return postResidue;
-    }
-
-    @Override
-    public char getPreResidue() {
-        return preResidue;
-    }
-
-    @Override
     public int getSequenceLength() {
         return sequence.length;
     }
@@ -47,13 +37,37 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
     public void setPreResidue(char preResidue) {
         this.preResidue = preResidue;
     }
+    
+    public void setPreResidueString(String preResidue) {
+        if (preResidue == null || preResidue.length() == 0)
+            return;
+        this.preResidue = preResidue.charAt(0);
+    }
 
+    @Override
+    public char getPreResidue() {
+        return preResidue;
+    }
+    
     /**
      * @param postResidue the postResidue to set
      */
     public void setPostResidue(char postResidue) {
         this.postResidue = postResidue;
     }
+    
+    @Override
+    public char getPostResidue() {
+        return postResidue;
+    }
+
+    
+    public void setPostResidueString(String postResidue) {
+        if (postResidue == null || postResidue.length() == 0)
+            return;
+        this.postResidue = postResidue.charAt(0);
+    }
+    
 
     public void setPeptideSequence(String sequence) {
         this.sequence = sequence.toCharArray();

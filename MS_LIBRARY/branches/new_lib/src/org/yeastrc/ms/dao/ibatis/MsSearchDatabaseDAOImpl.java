@@ -19,9 +19,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class MsSequenceDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDatabaseDAO {
+public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDatabaseDAO {
 
-    public MsSequenceDatabaseDAOImpl(SqlMapClient sqlMap) {
+    public MsSearchDatabaseDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 

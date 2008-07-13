@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsSearchDAO;
@@ -18,8 +21,12 @@ import org.yeastrc.ms.domain.MsSearchDb;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
+import org.yeastrc.ms.domain.MsSearch.SearchFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.extensions.ParameterSetter;
+import com.ibatis.sqlmap.client.extensions.ResultGetter;
+import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 /**
  * 
@@ -91,4 +98,100 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         delete("MsSearch.delete", searchId);
     }
 
+    
+    //---------------------------------------------------------------------------------------
+    /** 
+     * Type handler for converting between SearchFileFormat and JDBC's VARCHAR types. 
+     */
+    public static class SearchFileFormatTypeHandler implements TypeHandlerCallback {
+
+        public Object getResult(ResultGetter getter) throws SQLException {
+            String format = getter.getString();
+            if (getter.wasNull())
+                return SearchFileFormat.UNKNOWN;
+            return SearchFileFormat.instance(format);
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            if (parameter == null)
+                setter.setNull(java.sql.Types.VARCHAR);
+            else
+                setter.setString(((SearchFileFormat)parameter).name());
+        }
+
+        public Object valueOf(String s) {
+            return SearchFileFormat.instance(s);
+        }
+    }
+    //---------------------------------------------------------------------------------------
+    
+    //---------------------------------------------------------------------------------------
+    
+    public class MsSearchSqlMapParam implements MsSearch {
+
+        private int runId;
+        private MsSearch search;
+        
+        public MsSearchSqlMapParam(int runId, MsSearch search) {
+            this.runId = runId;
+            this.search = search;
+        }
+
+        /**
+         * @return the runId
+         */
+        public int getRunId() {
+            return runId;
+        }
+        
+        public List<? extends MsSearchModification> getDynamicModifications() {
+            return search.getDynamicModifications();
+        }
+
+        public List<? extends MsSearchDatabase> getSearchDatabases() {
+            return search.getSearchDatabases();
+        }
+
+        public List<? extends MsSearchModification> getStaticModifications() {
+            return search.getStaticModifications();
+        }
+
+        public BigDecimal getFragmentMassTolerance() {
+            return search.getFragmentMassTolerance();
+        }
+
+        public String getFragmentMassType() {
+            return search.getFragmentMassType();
+        }
+
+        public SearchFileFormat getSearchFileFormat() {
+            return search.getSearchFileFormat();
+        }
+
+        public BigDecimal getPrecursorMassTolerance() {
+            return search.getPrecursorMassTolerance();
+        }
+
+        public String getPrecursorMassType() {
+            return search.getPrecursorMassType();
+        }
+
+        public Date getSearchDate() {
+            return search.getSearchDate();
+        }
+
+        public int getSearchDuration() {
+            return search.getSearchDuration();
+        }
+
+        public String getSearchEngineName() {
+            return search.getSearchEngineName();
+        }
+
+        public String getSearchEngineVersion() {
+            return search.getSearchEngineVersion();
+        }
+       
+    }
 }

@@ -37,10 +37,9 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
      * @see org.yeastrc.ms.dao.MsProteinMatchDAO#save(org.yeastrc.ms.dto.MsProteinMatch)
      */
     public void save(MsSearchResultProtein proteinMatch, int resultId) {
-        Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put("match", proteinMatch);
-        map.put("resultId", resultId);
-        save("MsResultProtein.insert", map);
+        save("MsResultProtein.insert", new MsResultProteinSqlMapParam(resultId, 
+                                                    proteinMatch.getAccession(),
+                                                    proteinMatch.getDescription()));
     }
     
     /* (non-Javadoc)
@@ -50,6 +49,26 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         delete("MsResultProtein.deleteForResultId", resultId);
     }
    
+    public static final class MsResultProteinSqlMapParam {
+        private int resultId;
+        private String accession;
+        private String description;
+        public MsResultProteinSqlMapParam(int resultId, String accession, String desription) {
+            this.resultId = resultId;
+            this.accession = accession;
+            this.description = desription;
+        }
+        public int getResultId() {
+            return resultId;
+        }
+        public String getAccession() {
+            return accession;
+        }
+        public String getDescription() {
+            return description;
+        }
+        
+    }
 }
 
 

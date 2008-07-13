@@ -69,14 +69,14 @@ public class MsSearchDbImpl implements MsSearchDb {
         this.runId = runId;
     }
     
-    public SearchFileFormat getOriginalFileType() {
+    public SearchFileFormat getSearchFileFormat() {
         return originalFileType;
     }
     /**
      * @param originalFileType the originalFileType to set
      */
-    public void setOriginalFileType(String originalFileType) {
-        this.originalFileType = SearchFileFormat.getFileFormatForString(originalFileType);
+    public void setSearchFileFormat(SearchFileFormat format) {
+        this.originalFileType = format;
     }
     
     public String getSearchEngineName() {

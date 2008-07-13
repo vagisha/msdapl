@@ -26,6 +26,11 @@ public class DynamicModLookupUtil {
         return instance;
     }
     
+    public static void reset() {
+        modMap.clear();
+        currentSearchId = 0;
+    }
+    
     private synchronized void buildLookup(int searchId) {
         
         if (currentSearchId == searchId)    return;

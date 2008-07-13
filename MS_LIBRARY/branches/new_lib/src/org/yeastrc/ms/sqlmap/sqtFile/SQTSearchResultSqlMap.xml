@@ -4,13 +4,14 @@
 <sqlMap namespace="SqtResult"> 
 
 
-	<typeAlias alias="SqtResult" type="org.yeastrc.ms.dto.sqtFile.SQTSearchResult"/>
+	<typeAlias alias="SqtResultDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchResultDbImpl"/>
+	<typeAlias alias="SqtResult" type="org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl$SQTSearchResultSqlMapParam"/>
 	
 	
-	<resultMap class="SqtResult" id="sqtResult" extends="MsSearchResult.msSearchResult">
-		<result property="resultId" column="resultID"/>
-		<result property="xCorrRank" column="XCorrRank"/>
-		<result property="spRank" column="spRank"/>
+	<resultMap class="SqtResultDb" id="sqtResult" extends="MsSearchResult.msSearchResult">
+		<result property="resultId" column="resultID" nullValue="0"/>
+		<result property="xCorrRank" column="XCorrRank" nullValue="0"/>
+		<result property="spRank" column="spRank" nullValue="0"/>
 		<result property="deltaCN" column="deltaCN"/>
 		<result property="xCorr" column="XCorr"/>
 		<result property="sp" column="sp"/>
@@ -18,7 +19,7 @@
 	
 	<!-- None of the columns in SQTSearchResult can be null but in case
 		 we try to save a SqtResult object with resultId or xCorrRank or spRank == 0
-		 we should use NULL in the INSERT statement. This will result in a RuntimeException
+		 we should use NULL in the INSERT statement. This will throw a RuntimeException
 	 -->
 	<parameterMap class="SqtResult" id="sqtResultParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>

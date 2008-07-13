@@ -10,7 +10,7 @@ public interface MsSearch {
 
         SQT, PEPXML, UNKNOWN;
 
-        public static SearchFileFormat getFileFormatForString(String extString) {
+        public static SearchFileFormat instance(String extString) {
             if (extString.equalsIgnoreCase(SearchFileFormat.SQT.name()))
                 return SearchFileFormat.SQT;
             else if (extString.equals(SearchFileFormat.PEPXML.name()))
@@ -22,7 +22,7 @@ public interface MsSearch {
     /**
      * @return the originalFileType
      */
-    public abstract SearchFileFormat getOriginalFileType();
+    public abstract SearchFileFormat getSearchFileFormat();
 
     /**
      * @return the searchEngineName

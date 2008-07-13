@@ -1,5 +1,7 @@
 package org.yeastrc.ms.dao.ibatis;
 
+import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
@@ -11,8 +13,12 @@ import org.yeastrc.ms.domain.MsSearchResultModification;
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
 import org.yeastrc.ms.domain.MsSearchModification.ModificationType;
+import org.yeastrc.ms.domain.MsSearchResult.ValidationStatus;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.extensions.ParameterSetter;
+import com.ibatis.sqlmap.client.extensions.ResultGetter;
+import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 public class MsSearchResultDAOImpl extends BaseSqlMapDAO 
         implements MsSearchResultDAO<MsSearchResult, MsSearchResultDb> {
@@ -79,4 +85,96 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
            delete(id);
     }
     
+    
+    /**
+     * Convenience class for encapsulating searchId, scanId and search result
+     */
+    public class MsSearchResultSqlMapParam implements MsSearchResult {
+
+        private int searchId;
+        private int scanId;
+        private MsSearchResult result;
+        
+        public MsSearchResultSqlMapParam(int searchId, int scanId, MsSearchResult result) {
+            this.searchId = searchId;
+            this.scanId = scanId;
+            this.result = result;
+        }
+        public int getSearchId() {
+            return searchId;
+        }
+        public int getScanId() {
+            return scanId;
+        }
+
+
+        public BigDecimal getCalculatedMass() {
+            return result.getCalculatedMass();
+        }
+
+        public int getCharge() {
+            return result.getCharge();
+        }
+
+        public int getNumIonsMatched() {
+            return result.getNumIonsMatched();
+        }
+
+        public int getNumIonsPredicted() {
+            return result.getNumIonsPredicted();
+        }
+
+        public List<? extends MsSearchResultProtein> getProteinMatchList() {
+            return result.getProteinMatchList();
+        }
+
+        public MsSearchResultPeptide getResultPeptide() {
+            return result.getResultPeptide();
+        }
+
+        public ValidationStatus getValidationStatus() {
+            return result.getValidationStatus();
+        }
+        public String getPeptideSequence() {
+            return result.getResultPeptide().getPeptideSequence();
+        }
+        public String getPreResidueString() {
+            return Character.toString(result.getResultPeptide().getPreResidue());
+        }
+        public String getPostResidueString() {
+            return Character.toString(result.getResultPeptide().getPostResidue());
+        }
+        public int getSequenceLength() {
+            return result.getResultPeptide().getSequenceLength();
+        }
+    }
+
+    /**
+     * Type handler for converting between ValidationType and SQL's CHAR type.
+     */
+    public static final class ValidationStatusTypeHandler implements TypeHandlerCallback {
+
+        public Object getResult(ResultGetter getter) throws SQLException {
+            String statusStr = getter.getString();
+            if (getter.wasNull() || statusStr.length() == 0)
+                return ValidationStatus.UNVALIDATED;
+            return ValidationStatus.instance(statusStr.charAt(0));
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            ValidationStatus status = (ValidationStatus) parameter;
+            if (status == null || status == ValidationStatus.UNVALIDATED)
+                setter.setNull(java.sql.Types.CHAR);
+            else
+                setter.setString(Character.toString(status.getStatusChar()));
+        }
+
+        public Object valueOf(String s) {
+            if (s == null || s.length() == 0)
+                return ValidationStatus.UNVALIDATED;
+            return ValidationStatus.instance(s.charAt(0));
+        }
+        
+    }
 }

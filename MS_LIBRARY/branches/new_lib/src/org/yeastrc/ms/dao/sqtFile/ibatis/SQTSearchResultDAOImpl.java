@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.sqtFile.ibatis;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsSearchResultDAO;
@@ -69,5 +70,38 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO
         return resultDao.loadResultIdsForSearch(searchId);
     }
 
-    
+    public class SQTSearchResultSqlMapParam {
+        
+        private int resultId;
+        private SQTSearchResult result;
+        
+        public SQTSearchResultSqlMapParam(int resultId, SQTSearchResult result) {
+            this.resultId = resultId;
+            this.result = result;
+        }
+
+        public int getResultId() {
+            return resultId;
+        }
+
+        public BigDecimal getDeltaCN() {
+            return result.getDeltaCN();
+        }
+
+        public BigDecimal getSp() {
+            return result.getSp();
+        }
+
+        public int getSpRank() {
+            return result.getSpRank();
+        }
+
+        public BigDecimal getxCorr() {
+            return result.getxCorr();
+        }
+
+        public int getxCorrRank() {
+            return result.getxCorrRank();
+        }
+    }
 }

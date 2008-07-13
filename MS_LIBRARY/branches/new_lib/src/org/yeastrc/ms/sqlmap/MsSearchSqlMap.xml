@@ -3,15 +3,19 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearch"> 
 
-	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dto.MsPeptideSearch"/>
+	<typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.impl.MsSearchDbImpl"/>
+	<typeAlias alias="SQTSearchDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl"/>
+	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.MsSearch$SearchFileFormat"/>
+	<typeAlias alias="SearchTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$SearchFileFormatTypeHandler"/>
+	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$MsSearchSqlMapParam" />
 	
-	<typeAlias alias="SqtSearch" type="org.yeastrc.ms.dto.sqtFile.SQTPeptideSearch"/>
-
 	
-	<resultMap class="MsSearch" id="msSearchResult">
+	<resultMap class="MsSearchDb" id="msSearchResult">
 		<result property="id" column="id" />
-		<result property="runId" column="runID" />
-		<result property="originalFileType" column="originalFileType" />
+		<result property="runId" column="runID" nullValue="0"/>
+		<result property="searchFileFormat" column="originalFileType"
+				javaType="SearchType" jdbcType="VARCHAR"
+				typeHandler="SearchTypeHandler"/>
 		<result property="searchEngineName" column="analysisProgramName" />
 		<result property="searchEngineVersion" column="analysisProgramVersion" />
 		<result property="searchDate" column="searchDate" />
@@ -29,29 +33,34 @@
 		<result property="dynamicModifications"
 				select="MsSearchMod.selectDynaModsForSearch"
 				column="id" />
-		<discriminator column="analysisProgramName" 
-						javaType="java.lang.String">
-			<subMap value="Sequest" resultMap="sqtSearchResult" />						
+		<discriminator javaType="SearchType" jdbcType="VARCHAR" 
+						column="originalFileType" 
+						typeHandler="SearchTypeHandler">
+			<subMap value="SQT" resultMap="sqtSearchResult" />						
 		</discriminator>
 	</resultMap>
 	
-	<resultMap class="SqtSearch" id="sqtSearchResult" extends="MsSearch.msSearchResult">
+	<resultMap class="SqtSearchDb" id="sqtSearchResult" extends="MsSearch.msSearchResult">
 		<result property="headers" 
 				select="SqtHeader.selectHeadersForSearch" 
 				column="id"/>
 	</resultMap> 
 	
-	<parameterMap class="java.util.Map" id="msSearchParam">
+	<parameterMap class="MsSearch" id="msSearchParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="search.originalFileType" jdbcType="VARCHAR" />
-		<parameter property="search.searchEngineName" jdbcType="VARCHAR" />
-		<parameter property="search.searchEngineVersion" jdbcType="VARCHAR"/>
-		<parameter property="search.searchDate" jdbcType="DATE" />
-		<parameter property="search.searchDuration" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="search.precursorMassType" jdbcType="VARCHAR" />
-		<parameter property="search.precursorMassTolerance" jdbcType="DECIMAL" />
-		<parameter property="search.fragmentMassType" jdbcType="VARCHAR" />
-		<parameter property="search.fragmentMassTolerance" jdbcType="DECIMAL" />
+		<parameter property="searchFileFormat" 
+					jdbcType="VARCHAR" 
+					javaType="SearchType" 
+					typeHandler="SearchTypeHandler"
+		/>
+		<parameter property="searchEngineName" jdbcType="VARCHAR" />
+		<parameter property="searchEngineVersion" jdbcType="VARCHAR"/>
+		<parameter property="searchDate" jdbcType="DATE" />
+		<parameter property="searchDuration" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="precursorMassType" jdbcType="VARCHAR" />
+		<parameter property="precursorMassTolerance" jdbcType="DECIMAL" />
+		<parameter property="fragmentMassType" jdbcType="VARCHAR" />
+		<parameter property="fragmentMassTolerance" jdbcType="DECIMAL" />
 	</parameterMap>
 	
     <select id="select" resultMap="msSearchResult" parameterClass="Integer">
@@ -80,7 +89,7 @@
     	fragmentMassMethod,
     	fragmentMassTolerance) 
     	VALUES (?,?,?,?,?,?,?,?,?,?)
-    	<selectKey resultClass="int" keyProperty="id">
+    	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>

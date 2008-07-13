@@ -125,7 +125,7 @@ public class SqtFileToDbConverter {
     private int saveSQTSearch(Header header, String file, int runId) {
         SQTSearchDbImpl search = new SQTSearchDbImpl();
         search.setRunId(runId);
-        search.setOriginalFileType("SQT");
+        search.setSearchFileFormat("SQT");
         search.setSearchEngineName(header.getSqtGenerator());
         search.setSearchEngineVersion(header.getSqtGeneratorVersion());
         search.setPrecursorMassType(header.getPrecursorMassType());

@@ -4,10 +4,11 @@
 <sqlMap namespace="MsDatabase"> 
 
 
-	<typeAlias alias="MsDatabase" type="org.yeastrc.ms.dto.MsSequenceDatabase"/>
+	<typeAlias alias="MsDatabaseDb" type="org.yeastrc.ms.domain.impl.MsSearchDatabaseDbImpl"/>
+	<typeAlias alias="MsDatabase" type="org.yeastrc.ms.domain.MsSearchDatabase"/>
 	
 	
-	<resultMap class="MsDatabase" id="msDatabaseResult">
+	<resultMap class="MsDatabaseDb" id="msDatabaseResult">
 		<result property="id" column="id"/>
 		<result property="serverAddress" column="serverAddress"/>
 		<result property="serverPath" column="serverPath"/>
@@ -20,8 +21,8 @@
 	<parameterMap class="MsDatabase" id="msDatabaseParam">
 		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverPath" jdbcType="VARCHAR"/>
-		<parameter property="sequenceLength" jdbcType="INTEGER" />
-		<parameter property="proteinCount" jdbcType="INTEGER" />
+		<parameter property="sequenceLength" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="proteinCount" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
 	
@@ -57,7 +58,7 @@
     	sequenceLength,
     	proteinCount)
     	VALUES (?,?,?,?)
-    	<selectKey keyProperty="id" resultClass="int">
+    	<selectKey resultClass="int">
     		select last_insert_id() as id
     	</selectKey>
     </insert>

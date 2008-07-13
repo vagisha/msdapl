@@ -4,13 +4,13 @@
 <sqlMap namespace="SqtSpectrum"> 
 
 
-	<typeAlias alias="SqtSpectrum" type="org.yeastrc.ms.dto.sqtFile.SQTSpectrumData"/>
+	<typeAlias alias="SqtSpectrumDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchScanDbImpl"/>
+	<typeAlias alias="SqtSpectrum" type="org.yeastrc.ms.dao.sqtFile.ibatic.SQTSearchScanDAOImpl$SQTSearchScanSqlMapParam"/>
 	
-	
-	<resultMap class="SqtSpectrum" id="sqtSpectrumResult" >
-		<result property="searchId" column="searchID"/>
-		<result property="scanId" column="scanID"/>
-		<result property="charge" column="charge"/>
+	<resultMap class="SqtSpectrumDb" id="sqtSpectrumResult" >
+		<result property="searchId" column="searchID" nullValue="0"/>
+		<result property="scanId" column="scanID" nullValue="0"/>
+		<result property="charge" column="charge" nullValue="0"/>
 		<result property="processTime" column="processTime" nullValue="0"/>
 		<result property="serverName" column="serverName"/>
 		<result property="totalIntensity" column="totalIntensity"/>

@@ -25,10 +25,10 @@ import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanChargeDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTPeptideSearchDAOImpl;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchHeaderDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.ibatis.SQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSpectrumDataDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchScanDAOImpl;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.domain.MsScan;
@@ -121,7 +121,7 @@ public class DAOFactory {
         
         
         // Search related
-        seqDbDao = new MsSequenceDatabaseDAOImpl(sqlMap);
+        seqDbDao = new MsSearchDatabaseDAOImpl(sqlMap);
         modDAO = new MsSearchModificationDAOImpl(sqlMap);
         resultProteinDAO = new MsSearchResultProteinDAOImpl(sqlMap);
         searchResultDAO = new MsSearchResultDAOImpl(sqlMap, resultProteinDAO, modDAO);
@@ -129,9 +129,9 @@ public class DAOFactory {
         
 
         sqtResultDAO = new SQTSearchResultDAOImpl(sqlMap, searchResultDAO);
-        sqtSpectrumDAO = new SQTSpectrumDataDAOImpl(sqlMap);
-        sqtHeaderDAO = new SQTSearchHeaderDAOImpl(sqlMap);
-        sqtSearchDAO = new SQTPeptideSearchDAOImpl(sqlMap, searchDAO, sqtHeaderDAO, sqtSpectrumDAO);
+        sqtSpectrumDAO = new SQTSearchScanDAOImpl(sqlMap);
+        sqtHeaderDAO = new SQTHeaderDAOImpl(sqlMap);
+        sqtSearchDAO = new SQTSearchDAOImpl(sqlMap, searchDAO, sqtHeaderDAO, sqtSpectrumDAO);
         
     }
     

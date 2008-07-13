@@ -394,7 +394,7 @@ public class Header implements SQTSearch {
        return headerItems;
     }
 
-    public SearchFileFormat getOriginalFileType() {
+    public SearchFileFormat getSearchFileFormat() {
         return SearchFileFormat.SQT;
     }
 

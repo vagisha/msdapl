@@ -3,31 +3,31 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearchMod"> 
 
-
-	<typeAlias alias="MsSearchStaticMod" type="org.yeastrc.ms.dto.MsPeptideSearchStaticMod"/>
-	<typeAlias alias="MsSearchDynaMod" type="org.yeastrc.ms.dto.MsPeptideSearchDynamicMod"/>
-	<typeAlias alias="MsSearchResultDynaMod" type="org.yeastrc.ms.dto.MsSearchResultDynamicMod"/>
-	<typeAlias alias="MsSearchModDb" type="org.yeastrc.ms.dto.MsPeptideSearchModDB" />
+	<typeAlias alias="MsSearchStaticModDb" type="org.yeastrc.ms.domain.impl.MsSearchStaticModification"/>
+	<typeAlias alias="MsSearchDynaModDb" type="org.yeastrc.ms.domain.impl.MsSearchDynamicModification"/>
+	<typeAlias alias="MsResultDynaModDb" type="org.yeastrc.ms.domain.impl.MsSearchResultDynamicModDbImpl"/>
+	<typeAlias alias="MsSearchMod" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$MsSearchModSqlMapParam " />
+	<typeAlias alias="MsResultMod" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$MsSearchResultModSqlMapParam " />
 	
 	
-	<resultMap class="MsSearchStaticMod" id="msStaticModResult">
+	<resultMap class="MsSearchStaticModDb" id="msStaticModResult">
 		<result property="id" column="id"/>
 		<result property="searchId" column="searchID"/>
-		<result property="modifiedResidueString" column="residue" javaType="java.lang.String"/>
+		<result property="modifiedResidueString" column="residue" javaType="java.lang.String" />
 		<result property="modificationMass" column="modifier"/>
 	</resultMap>
 	
 	<!-- if symbol is NULL we will return an empty String and the default value (\u0000)
 	     for modificationSymbol will be used 
 	-->
-	<resultMap class="MsSearchDynaMod" extends="msStaticModResult" id="msDynaModResult">
+	<resultMap class="MsSearchDynaModDb" extends="msStaticModResult" id="msDynaModResult">
 		<result property="modificationSymbolString" column="symbol" javaType="java.lang.String" nullValue=""/>
 	</resultMap>
 	
-	<resultMap class="MsSearchResultDynaMod" id="msResultDynaModResult">
+	<resultMap class="MsResultDynaModDb" id="msResultDynaModResult">
 		<result property="modificationId" column="modID"/>
 		<result property="resultId" column="resultID"/>
-		<result property="modifiedResidueString" column="residue" javaType="java.lang.String"/>
+		<result property="modifiedResidueString" column="residue" javaType="java.lang.String" />
 		<result property="modificationMass" column="modifier"/>
 		<result property="modificationSymbolString" column="symbol" javaType="java.lang.String" nullValue=""/>
 		<result property="modifiedPosition" column="position"/>
@@ -35,17 +35,23 @@
 		
 	</resultMap>
 	
-	<parameterMap class="MsSearchModDb" id="msStaticModParam">
+	<parameterMap class="MsSearchMod" id="msStaticModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="mod.modifiedResidueString" jdbcType="CHAR"/>
-		<parameter property="mod.modificationMass" jdbcType="DECIMAL"/>
+		<parameter property="modifiedResidueString" jdbcType="CHAR"/>
+		<parameter property="modificationMass" jdbcType="DECIMAL"/>
 	</parameterMap>
 	
-	<parameterMap class="MsSearchModDb" id="msDynaModParam">
+	<parameterMap class="MsSearchMod" id="msDynaModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="mod.modifiedResidueString" jdbcType="CHAR"/>
-		<parameter property="mod.modificationMass" jdbcType="DECIMAL"/>
-		<parameter property="mod.modificationSymbolString" jdbcType="CHAR"/>
+		<parameter property="modifiedResidueString" jdbcType="CHAR"/>
+		<parameter property="modificationMass" jdbcType="DECIMAL"/>
+		<parameter property="modificationSymbolString" jdbcType="CHAR"/>
+	</parameterMap>
+	
+	<parameterMap class="MsResultMod" id="msResultDynaModParam">
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="modificationId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="modifiedPosition" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
 	<!-- ================================================================================= -->
@@ -107,12 +113,12 @@
     </select>
     
     
-    <insert id="insertResultDynaMod" parameterClass="java.util.Map">
+    <insert id="insertResultDynaMod" parameterMap="msResultDynaModParam">
     	INSERT INTO msDynamicModResult (
-    	modID,
     	resultID,
+    	modID,
     	position)
-    	VALUES (#modId#, #resultId#, #position#)
+    	VALUES (?,?,?)
     </insert>
     
     <delete id="deleteDynaModsForModIds" parameterClass="String">

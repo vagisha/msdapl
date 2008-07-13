@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain;
 
+import java.util.List;
+
 /**
  * 
  */
@@ -25,4 +27,15 @@ public interface MsSearchResultDb extends MsSearchResult {
      * @return database id of the result.
      */
     public abstract int getId();
+    
+    /**
+     * @return the proteinMatchList
+     */
+    public abstract List<MsSearchResultProteinDb> getProteinMatchList();
+    
+    /**
+     * @return the peptideResult
+     */
+    public abstract MsSearchResultPeptideDb getResultPeptide();
+   
 }

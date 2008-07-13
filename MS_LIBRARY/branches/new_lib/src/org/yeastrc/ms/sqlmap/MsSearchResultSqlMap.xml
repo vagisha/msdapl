@@ -3,47 +3,51 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearchResult"> 
 
-	<typeAlias alias="MsSearchResult" type="org.yeastrc.ms.dto.MsPeptideSearchResult"/>
-	<typeAlias alias="MsSearchResultPeptide" type="org.yeastrc.ms.dto.MsSearchResultPeptide" />
+	<typeAlias alias="MsSearchResultPeptideDb" type="org.yeastrc.ms.domain.impl.MsSearchResultPeptideDbImpl" />
+	<typeAlias alias="MsSearchResultDb" type="org.yeastrc.ms.domain.impl.MsSearchResultDbImpl" />
+	<typeAlias alias="MsSearchResult" type="org.yeastrc.ms.dao.ibatis.MsSearchResultDAOImp$MsSearchResultSqlMapParam" />
+	<typeAlias alias="VStatus" type="org.yeastrc.ms.domain.MsSearchResult$ValidationStatus" />
+	<typeAlias alias="VStatusHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchResultDAOImpl$ValidationStatusTypeHandler" />
 	
-	<resultMap class="MsSearchResult" id="msSearchResult">
-		<result property="id" column="id" />
-		<result property="searchId" column="searchID" />
-		<result property="scanId" column="scanID" />
-		<result property="charge" column="charge" />
-		<result property="calculatedMass" column="calculatedMass" />
-		<result property="numIonsMatched" column="matchingIons" nullValue="0"/>
-		<result property="numIonsPredicted" column="predictedIons" nullValue="0"/>
-		<result property="validationStatusString" column="validationStatus" javaType="java.lang.String" nullValue=""/>
-		<result property="resultPeptide" resultMap="msSearchResultPeptideResult" />
-		<result property="proteinMatchList" 
-				select="MsResultProtein.selectResultProteins" 
-				column="id"/>
-	</resultMap>
 	
-	<resultMap class="MsSearchResultPeptide" id="msSearchResultPeptideResult">
+	<resultMap class="MsSearchResultPeptideDb" id="msSearchResultPeptideResult">
 		<result property="peptideSequence" column="peptide" />
 		<result property="preResidueString" column="preResidue" javaType="java.lang.String" nullValue=""/>
 		<result property="postResidueString" column="postResidue" javaType="java.lang.String" nullValue=""/>
-		<result property="staticModifications" 
-				select="MsSearchMod.selectStaticModsForSearch" 
-				column="searchID" />
 		<result property="dynamicModifications"
 				select="MsSearchMod.selectDynaModsForSearchResult"
 				column="id" />
 	</resultMap>
 	
-	<parameterMap class="java.util.Map" id="msSearchResultParam">
+	<resultMap class="MsSearchResultDb" id="msSearchResult">
+		<result property="id" column="id" />
+		<result property="searchId" column="searchID" nullValue="0"/>
+		<result property="scanId" column="scanID" nullValue="0"/>
+		<result property="charge" column="charge" nullValue="0"/>
+		<result property="calculatedMass" column="calculatedMass" />
+		<result property="numIonsMatched" column="matchingIons" nullValue="0"/>
+		<result property="numIonsPredicted" column="predictedIons" nullValue="0"/>
+		<result property="validationStatus" column="validationStatus" 
+				javaType="VStatus" jdbcType="CHAR" typeHandler="VStatusHandler"/>
+		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
+		<result property="proteinMatchList" 
+				select="MsResultProtein.selectResultProteins" 
+				column="id"/>
+	</resultMap>
+	
+	
+	
+	<parameterMap class="MsSearchResult" id="msSearchResultParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="result.scanId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="result.charge" jdbcType="TINYINT" nullValue="0"/>
-		<parameter property="result.peptide" jdbcType="VARCHAR"/>
-		<parameter property="result.calculatedMass" jdbcType="DECIMAL" />
-		<parameter property="result.numIonsMatched" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="result.numIonsPredicted" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="result.preResidueString" jdbcType="CHAR" nullValue=""/>
-		<parameter property="result.postResidueString" jdbcType="CHAR" nullValue=""/>
-		<parameter property="result.validationStatusString" jdbcType="CHAR" nullValue=""/>
+		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="charge" jdbcType="TINYINT" nullValue="0"/>
+		<parameter property="peptideSequence" jdbcType="VARCHAR"/>
+		<parameter property="calculatedMass" jdbcType="DECIMAL" />
+		<parameter property="numIonsMatched" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="numIonsPredicted" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="preResidueString" jdbcType="CHAR" nullValue=""/>
+		<parameter property="postResidueString" jdbcType="CHAR" nullValue=""/>
+		<parameter property="validationStatus" jdbcType="CHAR" javaType="VStatus" typeHandler="VStatusHandler"/>
 	</parameterMap>
 	
     <select id="select" resultMap="msSearchResult" parameterClass="Integer">
@@ -68,7 +72,7 @@
     	postResidue,
     	validationStatus) 
     	VALUES (?,?,?,?,?,?,?,?,?,?)
-    	<selectKey resultClass="int" keyProperty="id">
+    	<selectKey resultClass="int" >
       		select last_insert_id() as id
     	</selectKey>
     </insert>

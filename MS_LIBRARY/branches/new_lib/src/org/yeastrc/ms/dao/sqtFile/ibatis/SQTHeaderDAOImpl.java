@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.sqtFile.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
@@ -20,9 +18,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class SQTSearchHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDAO {
+public class SQTHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDAO {
 
-    public SQTSearchHeaderDAOImpl(SqlMapClient sqlMap) {
+    public SQTHeaderDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
     
@@ -37,11 +35,7 @@ public class SQTSearchHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDA
      * @see org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO#saveSQTHeader(org.yeastrc.ms.dto.sqtFile.SQTSearchHeader)
      */
     public void saveSQTHeader(SQTField header, int searchId) {
-        Map<String, Object> map = new HashMap<String, Object>(3);
-        map.put("searchId", searchId);
-        map.put("name", header.getName());
-        map.put("value", header.getValue());
-        save("SqtHeader.insertHeader", map);
+        save("SqtHeader.insertHeader", new SQTHeaderSqlMapParam(searchId, header.getName(), header.getValue()));
     }
     
     /* (non-Javadoc)
@@ -51,4 +45,23 @@ public class SQTSearchHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDA
         delete("SqtHeader.deleteHeadersForSearch", searchId);
     }
 
+    public static final class SQTHeaderSqlMapParam {
+        private int searchId;
+        private String name;
+        private String value;
+        public SQTHeaderSqlMapParam(int searchId, String name, String value) {
+            this.searchId = searchId;
+            this.name = name;
+            this.value = value;
+        }
+        public int getSearchId() {
+            return searchId;
+        }
+        public String getName() {
+            return name;
+        }
+        public String getValue() {
+            return value;
+        }
+    }
 }

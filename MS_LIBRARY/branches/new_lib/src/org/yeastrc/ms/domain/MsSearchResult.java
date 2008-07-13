@@ -12,7 +12,7 @@ public interface MsSearchResult {
         
         private ValidationStatus(char statusChar) { this.statusChar = statusChar; }
         
-        public static ValidationStatus getStatusForChar(char statusChar) {
+        public static ValidationStatus instance(char statusChar) {
             switch(statusChar) {
                 case 'V':   return VALID;
                 case 'N':   return NOT_VALID;

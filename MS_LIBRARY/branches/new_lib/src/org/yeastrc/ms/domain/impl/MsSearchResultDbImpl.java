@@ -144,21 +144,15 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
         this.validationStatus = validationStatus;
     }
 
-    public void setValidationStatusString(String status) {
-        if (status != null && status.length() > 0)
-            this.validationStatus = ValidationStatus.getStatusForChar(Character.valueOf(status.charAt(0)));
-    }
+//    public void setValidationStatusString(String status) {
+//        if (status != null && status.length() > 0)
+//            this.validationStatus = ValidationStatus.instance(Character.valueOf(status.charAt(0)));
+//    }
 
     public ValidationStatus getValidationStatus() {
         return validationStatus;
     }
 
-    public String getValidationStatusString() {
-        if (validationStatus == null)
-            return null;
-        return Character.toString(validationStatus.getStatusChar());
-    }
-   
     // ----------------------------------------------------------------------------------------
     // Peptide sequence information for this result
     // ----------------------------------------------------------------------------------------

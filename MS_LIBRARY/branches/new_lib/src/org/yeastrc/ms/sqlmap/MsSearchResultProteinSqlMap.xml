@@ -3,20 +3,20 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsResultProtein"> 
 
-	<typeAlias alias="MsResultProtein" type="org.yeastrc.ms.dto.MsProteinMatch"/>
-	<typeAlias alias="MsResultProteinDb" type="org.yeastrc.ms.dao.MsProteinMatchDAOImpl.MsProteinMatchDb" />
+	<typeAlias alias="MsResultProteinDb" type="org.yeastrc.ms.domain.impl.MsSearchResultProteinDbImpl"/>
+	<typeAlias alias="MsResultProtein" type="org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl$MsResultProteinSqlMapParam" />
 	
-	<resultMap class="MsResultProtein" id="msResultProteinResult">
+	<resultMap class="MsResultProteinDb" id="msResultProteinResult">
 		<result property="id" column="id"/>
-		<result property="resultId" column="resultID"/>
+		<result property="resultId" column="resultID" nullValue="0"/>
 		<result property="accession" column="accession"/>
 		<result property="description" column="description"/>
 	</resultMap>
 	
-	<parameterMap class="org.yeastrc.ms.dao.MsProteinMatchDAOImpl.MsProteinMatchDb" id="msResultProteinParam">
-		<parameter property="result" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="match.accession" jdbcType="VARCHAR"/>
-		<parameter property="match.description" jdbcType="VARCHAR"/>
+	<parameterMap class="MsResultProtein" id="msResultProteinParam">
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="accession" jdbcType="VARCHAR"/>
+		<parameter property="description" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
     <select id="selectResultProteins" resultMap="msResultProteinResult" parameterClass="Integer">

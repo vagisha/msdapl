@@ -23,14 +23,14 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class SQTPeptideSearchDAOImpl extends BaseSqlMapDAO 
+public class SQTSearchDAOImpl extends BaseSqlMapDAO 
     implements MsSearchDAO<SQTSearch, SQTSearchDb> {
 
     private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
     private SQTHeaderDAO headerDao;
     private SQTSearchScanDAO spectrumDao;
     
-    public SQTPeptideSearchDAOImpl(SqlMapClient sqlMap,
+    public SQTSearchDAOImpl(SqlMapClient sqlMap,
             MsSearchDAO<MsSearch, MsSearchDb> searchDao,
             SQTHeaderDAO headerDao,
             SQTSearchScanDAO spectrumDao) {
