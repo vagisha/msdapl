@@ -7,19 +7,23 @@
 package org.yeastrc.ms.parser.ms2File;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
 
 /**
  * 
  */
-public class ScanCharge {
+public class ScanCharge implements MS2ScanCharge {
 
     private int charge;
     private BigDecimal mass;
-    private HashMap<String, String> analysisItems;
+    private List<HeaderItem> analysisItems;
     
     public ScanCharge() {
-        analysisItems = new HashMap<String, String>();
+        analysisItems = new ArrayList<HeaderItem>();
     }
     
     /**
@@ -40,12 +44,6 @@ public class ScanCharge {
     public BigDecimal getMass() {
         return mass;
     }
-    /**
-     * @param mass the mass to set
-     */
-    public void setMass(BigDecimal mass) {
-        this.mass = mass;
-    }
    
     public void setMass(String mass) {
         this.mass = new BigDecimal(mass);
@@ -53,15 +51,7 @@ public class ScanCharge {
     
     public void addAnalysisItem(String label, String value) {
         if (label == null || value == null)   return;
-        analysisItems.put(label, value);
-    }
-    
-    public HashMap<String, String> getAnalysisItems() {
-        return analysisItems;
-    }
-    
-    public String getValueForAnalysisLabel(String label) {
-        return analysisItems.get(label);
+        analysisItems.add(new HeaderItem(label, value));
     }
     
     public String toString() {
@@ -71,14 +61,19 @@ public class ScanCharge {
         buf.append("\t");
         buf.append(mass);
         buf.append("\n");
-        for (String label: analysisItems.keySet()) {
+        for (HeaderItem item: analysisItems) {
             buf.append("D\t");
-            buf.append(label);
+            buf.append(item.getName());
             buf.append("\t");
-            buf.append(analysisItems.get(label));
+            buf.append(item.getValue());
             buf.append("\n");
         }
         buf.deleteCharAt(buf.length() - 1); // remove last new-line character
         return buf.toString();
+    }
+
+    @Override
+    public List<? extends MS2Field> getChargeDependentAnalysisList() {
+        return analysisItems;
     }
 }

@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.yeastrc.ms.domain.impl.Peaks;
-
 
 /**
  * 
@@ -191,19 +189,13 @@ public class Ms2FileReader {
     
     public void parsePeaks(Scan scan) throws Exception {
         
-        Peaks peaks = new Peaks();
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s");
             if (tokens.length < 2)
                 closeAndThrowException("missing charge and/or mass in line: "+currentLine);
             
-            // add peak if m/z and intensity values are valid
-            try {
-                peaks.addPeak(tokens[0], tokens[1]);
-            }
-            catch (Exception e) {
-                closeAndThrowException("Error adding peak data to scan: "+e.getMessage(), e);
-            }
+            // add peak m/z and intensity values
+            scan.addPeak(tokens[0], tokens[1]);
             
             try {
                 currentLine = reader.readLine();
@@ -212,7 +204,6 @@ public class Ms2FileReader {
                 closeAndThrowException(e);
             }
         }
-        scan.setPeaks(peaks);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
     }
     
     private boolean isScanLine(String line) {

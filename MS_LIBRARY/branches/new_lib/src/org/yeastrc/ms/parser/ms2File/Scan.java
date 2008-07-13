@@ -8,148 +8,120 @@ package org.yeastrc.ms.parser.ms2File;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsPeakData;
-import org.yeastrc.ms.domain.impl.Peaks;
-import org.yeastrc.ms.domain.impl.Peaks.Peak;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
 
 /**
  * 
  */
-public class Scan {
+public class Scan implements MS2Scan {
 
-    public static final String PRECURSOR_SCAN = "PrecursorScan";
+    public static final String PRECURSOR_SCAN = "PrecursorScan"; // precursor scan number
     public static final String ACTIVATION_TYPE = "ActivationType";
     public static final String RET_TIME = "RetTime";
     
     private int startScan = -1;
     private int endScan = -1;
+    private int precursorScanNum = -1;
     
     private BigDecimal precursorMz;
+    private BigDecimal retentionTime;
+    private String activationType;
     
-    private Peaks peaks;
+    private List<String[]> peakList;
     
     private List<ScanCharge> chargeStates;
     
-    private HashMap<String, String> analysisItems;
+    private List<HeaderItem> analysisItems;
+    
     
     public Scan() {
         chargeStates = new ArrayList<ScanCharge>();
-        analysisItems = new HashMap<String, String>();
-        peaks = new Peaks();
+        analysisItems = new ArrayList<HeaderItem>();
+        peakList = new ArrayList<String[]>();
     }
 
-    public void setPeaks(Peaks peaks) {
-        this.peaks = peaks;
-    }
-    
-    public MsPeakData getPeaks() {
-        return peaks;
-    }
-    
-    public Iterator<Peak> getPeaksIterator() {
-        return peaks.iterator();
+    @Override
+    public List<? extends MS2Field> getChargeIndependentAnalysisList() {
+        return this.analysisItems;
     }
     
     public void addAnalysisItem(String label, String value) {
         if (label == null || value == null)   return;
-        analysisItems.put(label, value);
-    }
-    
-    public HashMap<String, String> getAnalysisItems() {
-        return analysisItems;
-    }
-    
-    public String getValueForAnalysisLabel(String label) {
-        return analysisItems.get(label);
+        analysisItems.add(new HeaderItem(label, value));
+        if (label.equalsIgnoreCase(RET_TIME))
+            setRetentionTime(value);
+        else if (label.equalsIgnoreCase(PRECURSOR_SCAN))
+            setPrecursorScanNum(value);
+        else if (label.equalsIgnoreCase(ACTIVATION_TYPE))
+            setFragmentationType(value);
     }
     
     public BigDecimal getRetentionTime() {
-        String rtStr = getValueForAnalysisLabel(RET_TIME);
-        if (rtStr != null)
-            return new BigDecimal(rtStr);
-        else
-            return null;
+        return retentionTime;
+    }
+    private void setRetentionTime(String rt) {
+        this.retentionTime = new BigDecimal(rt);
     }
     
-    public String getActivationType() {
-        return getValueForAnalysisLabel(ACTIVATION_TYPE);
+    public int getPrecursorScanNum() {
+       return precursorScanNum;
+    }
+    private void setPrecursorScanNum(String num) {
+        this.precursorScanNum = Integer.parseInt(num);
     }
     
-    public int getPrecursorScanNumber() {
-        String scanNumStr = getValueForAnalysisLabel(PRECURSOR_SCAN);
-        if (scanNumStr == null)
-            return -1;
-        else
-            try { return Integer.parseInt(scanNumStr);}
-            catch (NumberFormatException e) {return -1;}
+    public List<? extends MS2ScanCharge> getScanChargeList() {
+        return this.chargeStates;
     }
-    
-    /**
-     * @return the chargeStates
-     */
-    public List<ScanCharge> getChargeStates() {
-        return chargeStates;
-    }
-
-
-    /**
-     * @param chargeState the chargeState to add
-     */
     public void addChargeState(ScanCharge chargeState) {
         chargeStates.add(chargeState);
     }
 
-
-    /**
-     * @return the startScan
-     */
-    public int getStartScan() {
+    public int getStartScanNum() {
         return startScan;
     }
-
-    /**
-     * @param startScan the startScan to set
-     */
     public void setStartScan(int startScan) {
         this.startScan = startScan;
     }
 
-    /**
-     * @return the endScan
-     */
-    public int getEndScan() {
-        return endScan;
+    public int getEndScanNum() {
+        return this.endScan;
     }
-
-    /**
-     * @param endScan the endScan to set
-     */
     public void setEndScan(int endScan) {
         this.endScan = endScan;
     }
 
-    /**
-     * @return the precursorMz
-     */
     public BigDecimal getPrecursorMz() {
         return precursorMz;
     }
-
-    /**
-     * @param precursorMz the precursorMz to set
-     */
-    public void setPrecursorMz(BigDecimal precursorMz) {
-        this.precursorMz = precursorMz;
-    }
-    
     public void setPrecursorMz(String precursorMz) {
         this.precursorMz = new BigDecimal(precursorMz);
     }
+ 
+
+    public Iterator<String[]> peakIterator() {
+        return peakList.iterator();
+    }
+    public void addPeak(String mz, String rt) {
+        peakList.add(new String[]{mz, rt});
+    }
     
+    public String getFragmentationType() {
+        return activationType;
+    }
+    private void setFragmentationType(String actType) {
+        this.activationType = actType;
+    }
+
+    public int getMsLevel() {
+        return 2;
+    }
+
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("S\t");
@@ -162,11 +134,11 @@ public class Scan {
         }
         buf.append("\n");
         // charge independent analysis
-        for (String label: analysisItems.keySet()) {
+        for (HeaderItem item: analysisItems) {
             buf.append("I\t");
-            buf.append(label);
+            buf.append(item.getName());
             buf.append("\t");
-            buf.append(analysisItems.get(label));
+            buf.append(item.getValue());
             buf.append("\n");
         }
         // charge states along with their charge dependent analysis
@@ -175,12 +147,10 @@ public class Scan {
             buf.append("\n");
         }
         // peak data
-        Iterator<Peak> iterator = getPeaksIterator();
-        while (iterator.hasNext()) {
-            Peak peak = iterator.next();
-            buf.append(peak.getMzString());
+        for (String[] peak: peakList){
+            buf.append(peak[0]);
             buf.append(" ");
-            buf.append(peak.getIntensityString());
+            buf.append(peak[1]);
             buf.append("\n");
         }
         buf.deleteCharAt(buf.length() - 1); // remove last new-line character
