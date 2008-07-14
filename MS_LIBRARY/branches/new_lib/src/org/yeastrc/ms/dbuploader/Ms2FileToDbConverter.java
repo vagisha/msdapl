@@ -35,55 +35,55 @@ public class Ms2FileToDbConverter {
      * @param filePath
      * @param experimentId
      * @return true if file was uploaded to the database; false otherwise
-     * @throws Ms2FileReaderException if an error occurs while parsing the file
+     * @throws Exception if an error occurs while parsing the file
      */
-    public boolean convertMs2File(String filePath, int experimentId) throws Exception {
+    public int convertMs2File(String filePath, int experimentId) throws Exception {
         
         String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
         
         String justFileName = new File(filePath).getName();
-        if (fileIsInDb(justFileName, sha1Sum)) {
+        int runId = getMatchingRunId(justFileName, sha1Sum);
+        if (runId != 0) {
             log.warn("Aborting upload of file: "+filePath+". This run already exists in the database");
-            return false;
+            return runId;
         }
         
         Ms2FileReader reader = new Ms2FileReader();
         reader.open(filePath);
         
-        convertMs2File(filePath, reader, experimentId, sha1Sum);
-        return true;
+        return convertMs2File(filePath, reader, experimentId, sha1Sum);
     }
 
-    public boolean convertMs2File(InputStream inStream, String fileName, int experimentId) throws Exception {
+    public int convertMs2File(InputStream inStream, String fileName, int experimentId) throws Exception {
         
         String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(inStream);
         
-        if (fileIsInDb(fileName, sha1Sum)) {
+        int runId = getMatchingRunId(fileName, sha1Sum);
+        if (runId != 0) {
             log.warn("Aborting upload of file: "+fileName+". This run already exists in the database");
-            return false;
+            return runId;
         }
         
         Ms2FileReader reader = new Ms2FileReader();
         reader.open(inStream);
         
-        convertMs2File(fileName, reader, experimentId, sha1Sum);
-        return true;  
+        return convertMs2File(fileName, reader, experimentId, sha1Sum);
     }
     
-    boolean fileIsInDb(String fileName, String sha1Sum) {
+    int getMatchingRunId(String fileName, String sha1Sum) {
         
         MsRunDAO<MS2Run, MS2RunDb> runDao = DAOFactory.instance().getMS2FileRunDAO();
-        List <Integer> runsIds = runDao.runIdsFor(fileName, sha1Sum);
+        List <Integer> runIds = runDao.runIdsFor(fileName, sha1Sum);
         // if a run with the same file name and SHA-1 hash code already exists in the 
         // database we will not upload this run
         
-        if (runsIds.size() > 0)
-            return true;
-        return false;
+        if (runIds.size() > 0)
+            return runIds.get(0);
+        return 0;
         
     }
 
-    private void convertMs2File(String file, Ms2FileReader reader, int experimentId, String sha1Sum)
+    private int convertMs2File(String file, Ms2FileReader reader, int experimentId, String sha1Sum)
             throws Exception {
         Header header = reader.getHeader();
         header.setFilePath(file);
@@ -98,6 +98,7 @@ public class Ms2FileToDbConverter {
             // save the scan
             scanDAO.save(scan, runId);
         }
+        return runId;
     }
   
     

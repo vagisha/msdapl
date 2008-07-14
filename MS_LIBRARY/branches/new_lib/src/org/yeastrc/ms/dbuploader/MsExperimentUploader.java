@@ -8,18 +8,20 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.ibatis.DAOFactory;
-import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.MsSearch.SearchFileFormat;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
 
 public class MsExperimentUploader {
 
     private static final Logger log = Logger.getLogger(MsExperimentUploader.class);
     
-    private MsRun.RunFileFormat runFormat;
+    private RunFileFormat runFormat;
+    private SearchFileFormat searchFormat;
     
-    public MsExperimentUploader(MsRun.RunFileFormat runFormat) {
+    public MsExperimentUploader(RunFileFormat runFormat, SearchFileFormat searchFormat) {
         this.runFormat = runFormat;
+        this.searchFormat = searchFormat;
     }
     
     /**
@@ -31,8 +33,12 @@ public class MsExperimentUploader {
     public boolean uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
         
         // right now we only know how to save runs in the .ms2 file format.
-        if (!runFormat.equals(RunFileFormat.MS2)) {
+        if (runFormat != RunFileFormat.MS2) {
             log.error("Don't know how to save runs in format: "+runFormat);
+            return false;
+        }
+        if (searchFormat != SearchFileFormat.SQT) {
+            log.error("Don't know how to save search in format: "+searchFormat);
             return false;
         }
         
@@ -41,7 +47,13 @@ public class MsExperimentUploader {
         try {expId = saveExperiment(remoteServer, remoteDirectory, fileDirectory);}
         catch(Exception e) {log.error("ERROR SAVING EXPERIMENT", e); return false;}
         
-        uploadMs2FilesToDb(expId, fileDirectory);
+        try {
+            uploadRunAndSearchFilesToDb(expId, fileDirectory);
+        }
+        catch (Exception e) {
+            log.error("ERROR UPLOADING EXPERIMENT (runs and/or search results). ABORTING...", e);
+            return false;
+        }
         
         return true;
     }
@@ -56,7 +68,7 @@ public class MsExperimentUploader {
         return expDao.save(experiment);
     }
     
-    private boolean uploadMs2FilesToDb(int experimentId, String fileDirectory) {
+    private boolean uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws Exception {
         
         File directory = new File (fileDirectory);
         if (!directory.exists()) {
@@ -64,7 +76,7 @@ public class MsExperimentUploader {
             return false;
         }
         
-        Set<String> filenames = getMs2FileNamesInDirectory(directory);
+        Set<String> filenames = getFileNamesInDirectory(directory);
         
         // If we didn't find anything, just leave
         if (filenames.size() == 0) {
@@ -73,29 +85,34 @@ public class MsExperimentUploader {
         }
         
         Ms2FileToDbConverter ms2Uploader = new Ms2FileToDbConverter();
+        SqtFileToDbConverter sqtUploader = new SqtFileToDbConverter();
         
         for (String filename: filenames) {
-            
             File file = new File (fileDirectory, filename + ".ms2");
-           // ms2Uploader.uploadMs2File(file.getAbsolutePath());
+            int runId = ms2Uploader.convertMs2File(file.getAbsolutePath(), experimentId);
+            file = new File(fileDirectory, filename+".sqt");
+            sqtUploader.convertSQTFile(file.getAbsolutePath(), runId);
         }
         return true;
     }
 
-    private Set<String> getMs2FileNamesInDirectory(File directory) {
+    private Set<String> getFileNamesInDirectory(File directory) {
         Set<String> filenames = new HashSet<String>();
         File[] files = directory.listFiles();
         String name = null;
         for (int i = 0; i < files.length; i++) {
-            
-            if (!files[i].getName().endsWith(".ms2"))
-                continue;
-            
-            name = files[i].getName();
-            name = name.replaceAll("\\.ms2", "");
-            
-            filenames.add(name);
+            String fileName = files[i].getName();
+            if (fileName.endsWith(".ms2") || fileName.endsWith(".sqt")) {
+                name = files[i].getName();
+                name = name.substring(0, name.indexOf('.'));
+                filenames.add(name);
+            }
         }
         return filenames;
+    }
+    
+    public static void main(String[] args) {
+        MsExperimentUploader uploader = new MsExperimentUploader(RunFileFormat.MS2, SearchFileFormat.SQT);
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC");
     }
 }

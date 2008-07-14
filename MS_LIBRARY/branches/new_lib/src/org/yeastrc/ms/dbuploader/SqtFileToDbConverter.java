@@ -21,7 +21,7 @@ import org.yeastrc.ms.parser.sqtFile.ScanResult;
 public class SqtFileToDbConverter {
 
 
-    private void convertSQTFile(String filePath, int runId) throws Exception {
+    public void convertSQTFile(String filePath, int runId) throws Exception {
 
         String justFileName = new File(filePath).getName();
         SQTFileReader reader = new SQTFileReader();
