@@ -131,7 +131,7 @@ public class DAOFactory {
         sqtResultDAO = new SQTSearchResultDAOImpl(sqlMap, searchResultDAO);
         sqtSpectrumDAO = new SQTSearchScanDAOImpl(sqlMap);
         sqtHeaderDAO = new SQTHeaderDAOImpl(sqlMap);
-        sqtSearchDAO = new SQTSearchDAOImpl(sqlMap, searchDAO, sqtHeaderDAO, sqtSpectrumDAO);
+        sqtSearchDAO = new SQTSearchDAOImpl(sqlMap, searchDAO, sqtHeaderDAO, sqtSpectrumDAO, sqtResultDAO);
         
     }
     

@@ -46,5 +46,13 @@ public interface MsScanDAO <I extends MsScan, O extends MsScanDb> {
      * @param runId
      */
     public abstract void deleteScansForRun(int runId);
+
+    /**
+     * Returns the database id for the scan with the given scan number and runId
+     * @param scanNum
+     * @param runId
+     * @return
+     */
+    public abstract int loadScanIdForScanNumRun(int scanNum, int runId);
     
 }

@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.List;
 
 
 public class SQTFileReader {
 
     private BufferedReader reader;
     private String currentLine;
-
+    private List<DynamicModification> searchDynamicMods;
 
     public void open(String filePath) throws Exception {
         try {
@@ -48,8 +49,14 @@ public class SQTFileReader {
                 header.addHeaderItem(tokens[1], tokens[2]);
             }
             else if (tokens.length >= 2){
-                // if the value for this header is missing, add the header with a empty String
-                header.addHeaderItem(tokens[1], "");
+                // maybe the header and value are separated by a space rather than a tab
+                String temp = tokens[1].trim(); // remove any trailing space first
+                int i = temp.indexOf(' '); // look for the first space character
+                if (i != -1)
+                    header.addHeaderItem(temp.substring(0, i), temp.substring(i+1));
+                else
+                    // if the value for this header is missing, add the header with a empty String
+                    header.addHeaderItem(tokens[1], "");
             }
             else {
                 // ignore if both label and value for this header item are missing
@@ -63,6 +70,7 @@ public class SQTFileReader {
                 closeAndThrowException(e);
             }
         }
+        this.searchDynamicMods = header.getDynamicModifications();
         return header;
     }
 
@@ -158,8 +166,8 @@ public class SQTFileReader {
         for (int i = 0; i < tokens.length; i++)
             tokens[i] = tokens[i].replaceAll("\\s+", "");
         
-        PeptideResult result = new PeptideResult();
-        result.setXcorrRank(Integer.parseInt(tokens[1]));
+        PeptideResult result = new PeptideResult(searchDynamicMods);
+        result.setxCorrRank(Integer.parseInt(tokens[1]));
         result.setSpRank(Integer.parseInt(tokens[2]));
         result.setMass(new BigDecimal(tokens[3]));
         result.setDeltaCN(new BigDecimal(tokens[4]));
@@ -167,7 +175,7 @@ public class SQTFileReader {
         result.setSp(new BigDecimal(tokens[6]));
         result.setNumMatchingIons(Integer.parseInt(tokens[7]));
         result.setNumPredictedIons(Integer.parseInt(tokens[8]));
-        result.setSequence(tokens[9]);
+        result.setResultSequence(tokens[9]);
         result.setValidationStatus(tokens[10].charAt(0));
         return result;
     }

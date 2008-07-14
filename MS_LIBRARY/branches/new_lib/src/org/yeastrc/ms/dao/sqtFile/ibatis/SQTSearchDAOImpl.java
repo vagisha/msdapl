@@ -9,6 +9,7 @@ package org.yeastrc.ms.dao.sqtFile.ibatis;
 import java.util.List;
 
 import org.yeastrc.ms.dao.MsSearchDAO;
+import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
@@ -17,6 +18,8 @@ import org.yeastrc.ms.domain.MsSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -29,15 +32,18 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
     private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
     private SQTHeaderDAO headerDao;
     private SQTSearchScanDAO spectrumDao;
+    private MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao;
     
     public SQTSearchDAOImpl(SqlMapClient sqlMap,
             MsSearchDAO<MsSearch, MsSearchDb> searchDao,
             SQTHeaderDAO headerDao,
-            SQTSearchScanDAO spectrumDao) {
+            SQTSearchScanDAO spectrumDao,
+            MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao) {
         super(sqlMap);
         this.searchDao = searchDao;
         this.headerDao = headerDao;
         this.spectrumDao = spectrumDao;
+        this.resultDao = resultDao;
     }
     
     public SQTSearchDb loadSearch(int searchId) {
@@ -81,6 +87,9 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
         
         // delete the spectrum data
         spectrumDao.deleteForSearch(searchId);
+        
+        // delete the results
+        resultDao.deleteResultsForSearch(searchId);
         
         // now delete the search
         searchDao.deleteSearch(searchId);

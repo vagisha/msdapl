@@ -4,10 +4,16 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.MsSearchModification;
+import org.yeastrc.ms.domain.MsSearchResultModification;
+import org.yeastrc.ms.domain.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.MsSearchResultProtein;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
+
 /**
  * Represents a 'M' line in the SQT file
  */
-public class PeptideResult {
+public class PeptideResult implements SQTSearchResult {
 
     private int xcorrRank;
     private int spRank;
@@ -19,28 +25,36 @@ public class PeptideResult {
     private int numPredictedIons;   // Fragment ions predicted for this sequence 
     private String sequence;
     private char validationStatus;  // Manual validation status:
-                                    // Y: Yes, this is a valid ID
-                                    // M: This ID may be valid
-                                    // N: No, this is an invalid ID
-                                    // U: This ID has not been validated 
-    
+    // Y: Yes, this is a valid ID
+    // M: This ID may be valid
+    // N: No, this is an invalid ID
+    // U: This ID has not been validated 
+
+    private int charge;
+
     private List<DbLocus> matchingLoci;
-    
-    public PeptideResult() {
+
+    private List<DynamicModification> seachDynaMods;
+
+    public PeptideResult(List<DynamicModification> searchDynamicMods) {
         matchingLoci = new ArrayList<DbLocus>();
+        if (searchDynamicMods != null)
+            this.seachDynaMods = searchDynamicMods;
+        else
+            seachDynaMods = new ArrayList<DynamicModification>(0);
     }
 
     /**
      * @return the xcorrRank
      */
-    public int getXcorrRank() {
+    public int getxCorrRank() {
         return xcorrRank;
     }
 
     /**
      * @param xcorrRank the xcorrRank to set
      */
-    public void setXcorrRank(int xcorrRank) {
+    public void setxCorrRank(int xcorrRank) {
         this.xcorrRank = xcorrRank;
     }
 
@@ -61,7 +75,7 @@ public class PeptideResult {
     /**
      * @return the mass
      */
-    public BigDecimal getMass() {
+    public BigDecimal getCalculatedMass() {
         return mass;
     }
 
@@ -89,7 +103,7 @@ public class PeptideResult {
     /**
      * @return the xcorr
      */
-    public BigDecimal getXcorr() {
+    public BigDecimal getxCorr() {
         return xcorr;
     }
 
@@ -117,7 +131,7 @@ public class PeptideResult {
     /**
      * @return the numMatchingIons
      */
-    public int getNumMatchingIons() {
+    public int getNumIonsMatched() {
         return numMatchingIons;
     }
 
@@ -131,7 +145,7 @@ public class PeptideResult {
     /**
      * @return the numPredictedIons
      */
-    public int getNumPredictedIons() {
+    public int getNumIonsPredicted() {
         return numPredictedIons;
     }
 
@@ -145,22 +159,22 @@ public class PeptideResult {
     /**
      * @return the sequence
      */
-    public String getSequence() {
+    public String getResultSequence() {
         return sequence;
     }
 
     /**
      * @param sequence the sequence to set
      */
-    public void setSequence(String sequence) {
+    public void setResultSequence(String sequence) {
         this.sequence = sequence;
     }
 
     /**
      * @return the validationStatus
      */
-    public char getValidationStatus() {
-        return validationStatus;
+    public ValidationStatus getValidationStatus() {
+        return ValidationStatus.instance(this.validationStatus);
     }
 
     /**
@@ -183,7 +197,7 @@ public class PeptideResult {
     public void setMatchingLoci(List<DbLocus> matchingLoci) {
         this.matchingLoci = matchingLoci;
     }
-    
+
     public void addMatchingLocus(String accession, String description) {
         DbLocus locus = new DbLocus(accession, description);
         addMatchingLocus(locus);
@@ -192,7 +206,7 @@ public class PeptideResult {
     public void addMatchingLocus(DbLocus locus) {
         matchingLoci.add(locus);
     }
-    
+
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("M\t");
@@ -215,9 +229,9 @@ public class PeptideResult {
         buf.append(sequence);
         buf.append("\t");
         buf.append(validationStatus);
-        
+
         buf.append("\n");
-        
+
         for (DbLocus locus: matchingLoci) {
             buf.append(locus.toString());
             buf.append("\n");
@@ -225,4 +239,21 @@ public class PeptideResult {
         buf.deleteCharAt(buf.length() -1); // delete last new line
         return buf.toString();
     }
+
+    public void setCharge(int charge) {
+        this.charge = charge;
+    }
+
+    public int getCharge() {
+        return charge;
+    }
+
+    public List<? extends MsSearchResultProtein> getProteinMatchList() {
+        return this.matchingLoci;
+    }
+
+    public MsSearchResultPeptide getResultPeptide() {
+        return MsSearchResultPeptideBuilder.instance().build(sequence, seachDynaMods);
+    }
+    
 }

@@ -55,6 +55,10 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Scan, 
         return msScanDao.loadScanIdsForRun(runId);
     }
     
+    public int loadScanIdForScanNumRun(int scanNum, int runId) {
+        return msScanDao.loadScanIdForScanNumRun(scanNum, runId);
+    }
+    
     /**
      * Saves the scan along with any MS2 file format specific data.
      */

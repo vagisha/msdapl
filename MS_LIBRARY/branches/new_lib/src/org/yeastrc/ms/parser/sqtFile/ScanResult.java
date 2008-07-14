@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
+
 /**
  * Represents a 'S' line in the SQT file
  */
-public class ScanResult {
+public class ScanResult implements SQTSearchScan {
 
     private int startScan;
     private int endScan;
@@ -200,5 +202,13 @@ public class ScanResult {
         buf.deleteCharAt(buf.length() -1);
         return buf.toString();        
         
+    }
+
+    public int getProcessTime() {
+        return getProcessingTime();
+    }
+
+    public String getServerName() {
+        return getServer();
     }
 }

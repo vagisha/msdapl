@@ -22,14 +22,14 @@ public class SQTFileReaderApp {
         try {
             reader.open(file);
             Header header = reader.getHeader();
-//            System.out.println(header.toString());
-            writer.write(header.toString());
-            writer.write("\n");
+            System.out.println(header.toString());
+//            writer.write(header.toString());
+//            writer.write("\n");
             while (reader.hasScans()) {
                 ScanResult scan = reader.getNextScan();
-//                System.out.println(scan.toString());
-                writer.write(scan.toString());
-                writer.write("\n");
+                System.out.println(scan.toString());
+//                writer.write(scan.toString());
+//                writer.write("\n");
             }
             
         }

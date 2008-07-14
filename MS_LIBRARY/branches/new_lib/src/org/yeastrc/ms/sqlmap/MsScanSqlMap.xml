@@ -52,11 +52,15 @@
     			retentionTime,
     			fragmentationType,
     			UNCOMPRESS(data) as data 
-    			FROM MsScan WHERE id= #id#
+    			FROM msScan WHERE id= #id#
+    </select>
+    
+    <select id="selectScanIdForScanNumRun" parameterClass="java.util.Map" resultClass="Integer">
+    	SELECT id from msScan where runId=#runId# AND startScanNumber=#scanNum#
     </select>
     
     <insert id="insert" parameterMap="msScanParam">
-    	INSERT INTO MsScan (runID, 
+    	INSERT INTO msScan (runID, 
     						startScanNumber, 
     						endScanNumber, 
     						level, 
@@ -73,11 +77,11 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM MsScan WHERE scanID=#scanId#		    
+		DELETE FROM msScan WHERE scanID=#scanId#		    
     </delete>
     
     <delete id="deleteByRunId" parameterClass="Integer">
-		DELETE FROM MsScan WHERE runID=#runId#		    
+		DELETE FROM msScan WHERE runID=#runId#		    
     </delete>
     
 </sqlMap>

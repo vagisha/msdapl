@@ -1,9 +1,11 @@
 package org.yeastrc.ms.parser.sqtFile;
 
+import org.yeastrc.ms.domain.MsSearchResultProtein;
+
 /**
  * Represents a L line in the SQT file. 
  */
-public class DbLocus {
+public class DbLocus implements MsSearchResultProtein {
 
     private String accession; // Locus in which this sequence is found
     private String description; // Description of this locus from database (optional) 

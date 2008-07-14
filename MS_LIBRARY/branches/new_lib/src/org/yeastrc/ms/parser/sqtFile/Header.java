@@ -409,6 +409,7 @@ public class Header implements SQTSearch {
     }
 
     private Date getStartDate() {
+        if (startTimeString == null)    return null;
         if (startDate == null) {
             try {
                 startDate = new Date(getTime(startTimeString));
@@ -421,6 +422,7 @@ public class Header implements SQTSearch {
     }
     
     private Date getEndDate() {
+        if (endTimeString == null)  return null;
         if (endDate == null) {
             try {
                 endDate = new Date(getTime(endTimeString));
@@ -435,7 +437,7 @@ public class Header implements SQTSearch {
     public int getSearchDuration() {
         
         // if we don't have the end time return 0
-        if (endTimeString == null) {
+        if (endTimeString == null || startTimeString == null) {
             searchDuration = 0;
         }
         // calculating for the first time

@@ -8,8 +8,10 @@ package org.yeastrc.ms.dao.ibatis;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.domain.MsScan;
@@ -45,6 +47,15 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         return queryForList("MsScan.selectScanIdsForRun", runId);
     }
 
+    public int loadScanIdForScanNumRun(int scanNum, int runId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("scanNum", scanNum);
+        map.put("runId", runId);
+        Integer id = (Integer)queryForObject("MsScan.selectScanIdForScanNumRun", map);
+        if (id != null) return id;
+        return 0;
+    }
+    
     public void delete(int scanId) {
         delete("MsScan.delete", scanId);
     }
