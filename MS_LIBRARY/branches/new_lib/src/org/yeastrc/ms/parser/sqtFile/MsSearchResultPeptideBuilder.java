@@ -32,6 +32,9 @@ public final class MsSearchResultPeptideBuilder {
     public MsSearchResultPeptide build(String resultSequence, List<? extends MsSearchModification> dynaMods) {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new IllegalArgumentException("sequence cannot be null or empty");
+        
+        resultSequence = removeAccession(resultSequence);
+        
         if (resultSequence.length() < 3)
             throw new IllegalArgumentException("sequence appears to be invalid: "+resultSequence);
         final char preResidue = getPreResidue(resultSequence);
@@ -60,22 +63,23 @@ public final class MsSearchResultPeptideBuilder {
     }
 
     char getPreResidue(String sequence) {
-        if (sequence.charAt(0) == '.')
-            return 0;
-        char firstChar = sequence.charAt(0);
-        if (sequence.charAt(1) != '.')
-            throw new IllegalArgumentException("No dot(.) found after pre residue: "+sequence);
-        return firstChar;
+        int dotIdx = sequence.indexOf('.');
+        if (dotIdx == 1)
+            return sequence.charAt(0);
+        else return 0;
+        // if dotIdx == -1 : no dot found e.g ABCD
+        // if dotIdx == 0  : no pre-residue before dot e.g .ABCD
+        // if dotIdx > 1   : this dot may be the one before the post-residue.  e.g ABCD.E
     }
     
     char getPostResidue(String sequence) {
-        int len = sequence.length();
-        if (sequence.charAt(len -1) == '.')
-            return 0;
-        char lastChar = sequence.charAt(len - 1);
-        if (sequence.charAt(len - 2) != '.')
-            throw new IllegalArgumentException("No dot(.) found before post residue: "+sequence);
-        return lastChar;
+        int dotIdx = sequence.lastIndexOf('.');
+        if (dotIdx == sequence.length() - 2)
+            return sequence.charAt(sequence.length() -1);
+        else return 0;
+        // if dotIdx == -1 : no dot found e.g ABCD
+        // if dotIdx == seqLen-1  : no post-residue after dot e.g ABCD.
+        // if dotIdx < seqLen-2   : this dot may be the one after the pre-residue.  e.g A.BCDE
     }
     
     List<MsSearchResultModification> getResultMods(String peptide, List<? extends MsSearchModification> dynaMods) {
@@ -123,14 +127,26 @@ public final class MsSearchResultPeptideBuilder {
         buf.append(mod.getModificationMass());
         return buf.toString();
     }
+    
+    // Handle this case: 34|emb|CAB44792.1|S.PELPATSLLQERW.A
+    // This method should return S.PELPATSLLQERW.A for the example above.
+    String removeAccession(String sequence) {
+        int idx = sequence.lastIndexOf('|');
+        if (idx == -1)  return sequence;
+        return sequence.substring(idx+1);
+    }
+    
     String removeDots(String sequence) {
         int f = sequence.indexOf('.');
-        if (f < 0) 
-            throw new IllegalArgumentException("Sequence does not have a .(dot): "+sequence);
-        int e = sequence.lastIndexOf('.');
-        if (f == e)
-            throw new IllegalArgumentException("First and last index of .(dot) cannot be the same: "+sequence);
-        return sequence.substring(f+1, e);
+        if (f == 0 || f == 1)                                           sequence = sequence.substring(f+1);
+        
+        int e = sequence.indexOf('.');
+        if (e == sequence.length() -1 || e == sequence.length() -2)     sequence = sequence.substring(0, e);
+        
+        if (e != -1 && e < sequence.length() - 2)
+            throw new IllegalArgumentException("Sequence does not have a .(dot) in the right position: "+sequence);
+       
+        return sequence;
     }
 
     String getOnlyPeptideSequence(String sequence) {

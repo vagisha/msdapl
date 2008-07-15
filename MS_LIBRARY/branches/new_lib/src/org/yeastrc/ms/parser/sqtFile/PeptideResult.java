@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearchResultModification;
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;

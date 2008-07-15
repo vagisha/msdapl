@@ -42,6 +42,7 @@ public class Ms2FileToDbConverter {
         String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
         
         String justFileName = new File(filePath).getName();
+        System.out.println("Reading file: "+justFileName);
         int runId = getMatchingRunId(justFileName, sha1Sum);
         if (runId != 0) {
             log.warn("Aborting upload of file: "+filePath+". This run already exists in the database");

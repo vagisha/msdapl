@@ -112,7 +112,10 @@ public class MsExperimentUploader {
     }
     
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader(RunFileFormat.MS2, SearchFileFormat.SQT);
         uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC");
+        long end = System.currentTimeMillis();
+        System.out.println("Time to upload experiment: "+((end - start)/(1000L))+"seconds.");
     }
 }
