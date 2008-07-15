@@ -24,6 +24,17 @@ public interface MsSearchResultDAO<I extends MsSearchResult, O extends MsSearchR
     public abstract int save(I searchResult, int searchId, int scanId);
 
     /**
+     * Saves the search result in the msPeptideSearchResult table. 
+     * Any data associated with the result (e.g. protein matches, dynamic modifications)
+     * are NOT saved.
+     * @param searchResult
+     * @param searchId
+     * @param scanId
+     * @return
+     */
+    public abstract int saveResultOnly(I searchResult, int searchId, int scanId);
+    
+    /**
      * Deletes this search result (msPeptideSearchResult table) along with any 
      * associated protein matches (msProteinMatch)
      * and dynamic modifications (msDynamicModResult).

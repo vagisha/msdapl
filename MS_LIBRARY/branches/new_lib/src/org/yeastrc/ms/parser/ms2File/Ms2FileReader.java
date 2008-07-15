@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.yeastrc.ms.parser.ParserException;
+
 
 /**
  * 
@@ -21,12 +23,12 @@ public class Ms2FileReader {
 
     private BufferedReader reader;
     private String currentLine;
-    
+    private int currentLineNum = 0;
 
-    public void open(String filePath) throws Exception {
+    public void open(String filePath) {
         try {
             reader = new BufferedReader(new FileReader(filePath));
-            currentLine = reader.readLine();
+            advanceLine();
         }
         catch (FileNotFoundException e) {
             closeAndThrowException("File does not exist: "+filePath, e);
@@ -37,17 +39,27 @@ public class Ms2FileReader {
     }
 
     
-    public void open(InputStream inStream) throws Exception {
+    public void open(InputStream inStream) {
         try {
             reader = new BufferedReader(new InputStreamReader(inStream));
-            currentLine = reader.readLine();
+            advanceLine();
         }
         catch (IOException e) {
             closeAndThrowException("Error reading file from input stream", e);
         }
     }
     
-    public Header getHeader() throws Exception {
+    private void advanceLine() throws IOException {
+        currentLineNum++;
+        currentLine = reader.readLine(); // advance first
+        // skip over blank lines
+        while(currentLine != null && currentLine.trim().length() == 0) {
+            currentLineNum++;
+            currentLine = reader.readLine();
+        }
+    }
+    
+    public Header getHeader() {
         
         Header header = new Header();
         while (isHeaderLine(currentLine)) {
@@ -66,7 +78,7 @@ public class Ms2FileReader {
             }
             
             try {
-                currentLine = reader.readLine();
+                advanceLine();
             }
             catch (IOException e) {
                 closeAndThrowException(e);
@@ -79,12 +91,12 @@ public class Ms2FileReader {
         return currentLine != null;
     }
     
-    public Scan getNextScan() throws Exception {
+    public Scan getNextScan() {
         
         Scan scan = parseScan();
         
         try {
-            currentLine = reader.readLine(); // go to the next line
+            advanceLine(); // go to the next line
             
             while(currentLine != null) {
                 // is this one of the charge states of the scan?
@@ -109,21 +121,21 @@ public class Ms2FileReader {
         return scan;
     }
 
-    private void parseIAnalysis(Scan scan) throws Exception   {
+    private void parseIAnalysis(Scan scan) {
         String[] tokens = currentLine.split("\\t");
         if (tokens.length < 3)
             closeAndThrowException("2 fields expected for line: "+currentLine);
         scan.addAnalysisItem(tokens[1], tokens[2]);
         // advance to next line
         try {
-            currentLine = reader.readLine();
+            advanceLine();
         }
         catch (IOException e) {
             closeAndThrowException(e);
         }
     }
     
-    private Scan parseScan() throws Exception {
+    private Scan parseScan() {
         
         // make sure we have a scan line
         if (!isScanLine(currentLine))
@@ -153,7 +165,7 @@ public class Ms2FileReader {
         return scan;
     }
     
-    private void parseScanCharge(Scan scan) throws Exception {
+    private void parseScanCharge(Scan scan) {
         String tokens[] = currentLine.split("\\s");
         if (tokens.length < 3)
             closeAndThrowException("2 fields expected for charge line: "+currentLine);
@@ -174,11 +186,13 @@ public class Ms2FileReader {
         
         // parse any charge dependent analysis associated with this charge state
         try {
-            while (isChargeDepAnalysisLine((currentLine = reader.readLine()))) {
+            advanceLine();
+            while (isChargeDepAnalysisLine((currentLine))) {
                 tokens = currentLine.split("\\t");
                 if (tokens.length < 3)
                     closeAndThrowException("2 fields expected for line: "+currentLine);
                 scanCharge.addAnalysisItem(tokens[1], tokens[2]);
+                advanceLine();
             }
         }
         catch (IOException e) {
@@ -187,7 +201,7 @@ public class Ms2FileReader {
         scan.addChargeState(scanCharge);
     }
     
-    public void parsePeaks(Scan scan) throws Exception {
+    public void parsePeaks(Scan scan) {
         
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s");
@@ -198,7 +212,7 @@ public class Ms2FileReader {
             scan.addPeak(tokens[0], tokens[1]);
             
             try {
-                currentLine = reader.readLine();
+                advanceLine();
             }
             catch (IOException e) {
                 closeAndThrowException(e);
@@ -244,23 +258,23 @@ public class Ms2FileReader {
     }
     
     
-    private void close() {
+    public void close() {
         if (reader != null) 
             try {reader.close();}
             catch (IOException e) {}
     }
     
-    private void closeAndThrowException(Exception e) throws Exception {
+    private void closeAndThrowException(Exception e) {
         closeAndThrowException("Error reading file.", e);
     }
     
-    private void closeAndThrowException(String message, Exception e) throws Exception {
+    private void closeAndThrowException(String message, Exception e) {
         close();
-        throw new Exception(message, e);
+        throw new ParserException(currentLineNum, message, e);
     }
     
-    private void closeAndThrowException(String message) throws Exception {
+    private void closeAndThrowException(String message) {
         close();
-        throw new Exception(message);
+        throw new ParserException(currentLineNum, message);
     }
 }

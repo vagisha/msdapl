@@ -5,7 +5,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.MsExperiment;
 import org.yeastrc.ms.domain.MsExperimentDb;
 

@@ -5,9 +5,9 @@ import java.sql.Date;
 import java.util.Arrays;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchDAOImplTest.SQTSearchTest;
 import org.yeastrc.ms.domain.MsSearchDatabase;
 import org.yeastrc.ms.domain.MsSearchModification;

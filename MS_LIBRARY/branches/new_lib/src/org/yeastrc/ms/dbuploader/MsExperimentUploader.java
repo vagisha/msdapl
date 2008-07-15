@@ -1,16 +1,17 @@
 package org.yeastrc.ms.dbuploader;
 
 import java.io.File;
-import java.sql.Date;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.MsExperimentDAO;
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.MsRun.RunFileFormat;
 import org.yeastrc.ms.domain.MsSearch.SearchFileFormat;
-import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
+import org.yeastrc.ms.parser.ms2File.MS2RunDataProviderImpl;
+import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl;
+import org.yeastrc.ms.service.MsDataUploadService;
 
 public class MsExperimentUploader {
 
@@ -30,70 +31,67 @@ public class MsExperimentUploader {
      * @param fileDirectory
      * @return true if experiment was uploaded to the database successfully, false otherwise
      */
-    public boolean uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
+    public void uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
         
         // right now we only know how to save runs in the .ms2 file format.
         if (runFormat != RunFileFormat.MS2) {
             log.error("Don't know how to save runs in format: "+runFormat);
-            return false;
+            return;
         }
         if (searchFormat != SearchFileFormat.SQT) {
             log.error("Don't know how to save search in format: "+searchFormat);
-            return false;
+            return;
         }
         
-        
-        int expId = 0;
-        try {expId = saveExperiment(remoteServer, remoteDirectory, fileDirectory);}
-        catch(Exception e) {log.error("ERROR SAVING EXPERIMENT", e); return false;}
-        
+        int experimentId = 0;
         try {
-            uploadRunAndSearchFilesToDb(expId, fileDirectory);
+           experimentId =  MsDataUploadService.uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
+           uploadRunAndSearchFilesToDb(experimentId, fileDirectory);
         }
-        catch (Exception e) {
-            log.error("ERROR UPLOADING EXPERIMENT (runs and/or search results). ABORTING...", e);
-            return false;
+        catch(RuntimeException e) {
+            triggerExperimentDelete(experimentId, e);
         }
-        
-        return true;
+        catch (NoSuchAlgorithmException e) {
+            triggerExperimentDelete(experimentId, e);
+        }
+        catch (IOException e) {
+            triggerExperimentDelete(experimentId, e);
+        }
     }
 
-    private int saveExperiment(String remoteServer, String remoteDirectory,
-            String fileDirectory) {
-        MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
-        MsExperimentDbImpl experiment = new MsExperimentDbImpl();
-        experiment.setDate(new Date(new java.util.Date().getTime()));
-        experiment.setServerAddress(remoteServer);
-        experiment.setServerDirectory(remoteDirectory);
-        return expDao.save(experiment);
+    private void triggerExperimentDelete(int experimentId, Throwable t) {
+        MsDataUploadService.deleteExperiment(experimentId, 
+                new RuntimeException("ERROR UPLOADING EXPERIMENT (runs and/or search results). ABORTING...",t));
     }
     
-    private boolean uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws Exception {
+    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws NoSuchAlgorithmException, IOException {
         
         File directory = new File (fileDirectory);
         if (!directory.exists()) {
-            log.error ("Invalid directory name.");
-            return false;
+            throw new IllegalArgumentException("Directory does not exist: "+fileDirectory);
         }
         
         Set<String> filenames = getFileNamesInDirectory(directory);
         
         // If we didn't find anything, just leave
         if (filenames.size() == 0) {
-            log.error("No files found to upload");
-            return false;
+            throw new RuntimeException("No files found to upload in directory: "+fileDirectory);
         }
         
-        Ms2FileToDbConverter ms2Uploader = new Ms2FileToDbConverter();
-        SqtFileToDbConverter sqtUploader = new SqtFileToDbConverter();
+        MS2RunDataProviderImpl ms2Provider = null;
+        SQTSearchDataProviderImpl sqtProvider = null;
         
         for (String filename: filenames) {
-            File file = new File (fileDirectory, filename + ".ms2");
-            int runId = ms2Uploader.convertMs2File(file.getAbsolutePath(), experimentId);
-            file = new File(fileDirectory, filename+".sqt");
-            sqtUploader.convertSQTFile(file.getAbsolutePath(), runId);
+            // upload the run first
+            ms2Provider = new MS2RunDataProviderImpl();
+            ms2Provider.setMS2Run(fileDirectory+File.separator+filename+".ms2");
+            int runId = MsDataUploadService.uploadMS2Run(ms2Provider,experimentId);
+            
+            // now upload the search result
+            sqtProvider = new SQTSearchDataProviderImpl();
+            sqtProvider.setSQTSearch(fileDirectory+File.separator+filename+".sqt");
+            MsDataUploadService.uploadSQTSearch(sqtProvider, runId);
         }
-        return true;
     }
 
     private Set<String> getFileNamesInDirectory(File directory) {

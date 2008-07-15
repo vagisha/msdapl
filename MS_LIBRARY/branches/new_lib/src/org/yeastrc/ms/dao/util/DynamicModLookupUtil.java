@@ -1,10 +1,11 @@
-package org.yeastrc.ms.dao.ibatis;
+package org.yeastrc.ms.dao.util;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.MsSearchModificationDb;
 
@@ -26,7 +27,7 @@ public class DynamicModLookupUtil {
         return instance;
     }
     
-    public static void reset() {
+    public void reset() {
         modMap.clear();
         currentSearchId = 0;
     }

@@ -43,7 +43,7 @@ public class Header implements MS2Run {
     
     private HashMap<String, String> headerItems;
     private List<MS2Field> headerList;
-    private String filePath;
+    private String fileName;
     private String sha1Sum;
     
     public Header() {
@@ -145,10 +145,10 @@ public class Header implements MS2Run {
     }
 
     public String getFileName() {
-        return new File(filePath).getName();
+        return fileName;
     }
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getInstrumentVendor() {

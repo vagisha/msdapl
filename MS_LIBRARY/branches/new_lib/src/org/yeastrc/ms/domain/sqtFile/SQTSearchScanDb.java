@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain.sqtFile;
 
+import java.util.List;
+
 /**
  * 
  */
@@ -21,4 +23,6 @@ public interface SQTSearchScanDb extends SQTSearchScan {
      */
     public abstract int getScanId();
    
+    
+    public abstract List<SQTSearchResultDb> getScanResults();
 }

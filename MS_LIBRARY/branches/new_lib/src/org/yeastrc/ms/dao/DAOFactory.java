@@ -1,18 +1,18 @@
-package org.yeastrc.ms.dao.ibatis;
+package org.yeastrc.ms.dao;
 
 import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.MsEnzymeDAO;
-import org.yeastrc.ms.dao.MsExperimentDAO;
-import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.MsSearchDAO;
-import org.yeastrc.ms.dao.MsSearchDatabaseDAO;
-import org.yeastrc.ms.dao.MsSearchModificationDAO;
-import org.yeastrc.ms.dao.MsSearchResultDAO;
-import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.ibatis.MsEnzymeDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsExperimentDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsRunDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsScanDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsSearchDatabaseDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsSearchResultDAOImpl;
+import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2HeaderDAO;

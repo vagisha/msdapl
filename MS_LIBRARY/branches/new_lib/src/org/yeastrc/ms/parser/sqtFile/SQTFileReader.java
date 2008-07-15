@@ -9,17 +9,20 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.yeastrc.ms.parser.ParserException;
+
 
 public class SQTFileReader {
 
     private BufferedReader reader;
     private String currentLine;
+    private int currentLineNum = 0;
     private List<DynamicModification> searchDynamicMods;
 
-    public void open(String filePath) throws Exception {
+    public void open(String filePath) {
         try {
             reader = new BufferedReader(new FileReader(filePath));
-            currentLine = reader.readLine();
+            advanceLine();
         }
         catch (FileNotFoundException e) {
             closeAndThrowException("File does not exist: "+filePath, e);
@@ -30,17 +33,17 @@ public class SQTFileReader {
     }
 
 
-    public void open(InputStream inStream) throws Exception {
+    public void open(InputStream inStream) {
         try {
             reader = new BufferedReader(new InputStreamReader(inStream));
-            currentLine = reader.readLine();
+            advanceLine();
         }
         catch (IOException e) {
             closeAndThrowException("Error reading file from input stream", e);
         }
     }
 
-    public Header getHeader() throws Exception {
+    public Header getHeader() {
         
         Header header = new Header();
         while (isHeaderLine(currentLine)) {
@@ -76,9 +79,11 @@ public class SQTFileReader {
 
 
     private void advanceLine() throws IOException {
+        currentLineNum++;
         currentLine = reader.readLine(); // advance first
         // skip over blank lines
         while(currentLine != null && currentLine.trim().length() == 0) {
+            currentLineNum++;
             currentLine = reader.readLine();
         }
     }
@@ -87,7 +92,7 @@ public class SQTFileReader {
         return currentLine != null;
     }
 
-    public ScanResult getNextScan() throws Exception {
+    public ScanResult getNextScan() {
 
         ScanResult scan = parseScanResult();
         PeptideResult result = null; // current result
@@ -102,7 +107,7 @@ public class SQTFileReader {
                     // if this is NOT the first time we are seeing a 'M' line add the previous result
                     if (result != null)
                         scan.addPeptideResult(result);
-                    result = parsePeptideResult();
+                    result = parsePeptideResult(scan.getStartScan(), scan.getCharge());
                 }
                 // is this one of the charge independent analysis for this scan?
                 else if (isLocusLine(currentLine)) {
@@ -157,7 +162,7 @@ public class SQTFileReader {
         return scan;
     }
 
-    private PeptideResult parsePeptideResult() {
+    private PeptideResult parsePeptideResult(int scanNumber, int charge) {
         
         String[] tokens = currentLine.split("\\t");
         if (tokens.length < 11)
@@ -177,10 +182,12 @@ public class SQTFileReader {
         result.setNumPredictedIons(Integer.parseInt(tokens[8]));
         result.setResultSequence(tokens[9]);
         result.setValidationStatus(tokens[10].charAt(0));
+        result.setCharge(charge);
+        result.setScanNumber(scanNumber);
         return result;
     }
     
-    private DbLocus parseLocus() throws Exception   {
+    private DbLocus parseLocus() {
         String[] tokens = currentLine.split("\\t");
         if (tokens.length < 2)
             closeAndThrowException("2 fields expected for line: "+currentLine);
@@ -212,7 +219,10 @@ public class SQTFileReader {
         return line.startsWith("L");
     }
 
-    private void close() {
+    /**
+     * This method should be called explicitly after the file has been read.
+     */
+    public void close() {
         if (reader != null) 
             try {reader.close();}
         catch (IOException e) {}
@@ -224,11 +234,11 @@ public class SQTFileReader {
 
     private void closeAndThrowException(String message, Exception e) {
         close();
-        throw new RuntimeException(message, e);
+        throw new ParserException(currentLineNum, message, e);
     }
 
     private void closeAndThrowException(String message) {
         close();
-        throw new RuntimeException(message);
+        throw new ParserException(currentLineNum, message);
     }
 }

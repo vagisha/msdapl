@@ -8,10 +8,12 @@ package org.yeastrc.ms.dao.sqtFile.ibatis;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 import org.yeastrc.ms.domain.sqtFile.impl.SQTSearchScanDbImpl;
 
@@ -81,6 +83,10 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
 
         public BigDecimal getTotalIntensity() {
             return scan.getTotalIntensity();
+        }
+
+        public List<SQTSearchResult> getScanResults() {
+            throw new UnsupportedOperationException("getScanResults is not supported by SQTSearchScanSqlMapParam");
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.yeastrc.ms.domain.sqtFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface SQTSearchScan {
 
@@ -28,5 +29,8 @@ public interface SQTSearchScan {
      * @return the lowestSp
      */
     public abstract BigDecimal getLowestSp();
+    
+    
+    public abstract List<? extends SQTSearchResult> getScanResults();
 
 }

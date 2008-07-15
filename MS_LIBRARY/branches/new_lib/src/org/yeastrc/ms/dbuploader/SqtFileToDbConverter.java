@@ -2,10 +2,10 @@ package org.yeastrc.ms.dbuploader;
 
 import java.io.File;
 
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;

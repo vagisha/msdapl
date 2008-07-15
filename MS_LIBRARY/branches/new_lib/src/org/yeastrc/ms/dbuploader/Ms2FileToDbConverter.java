@@ -11,9 +11,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
@@ -87,7 +87,7 @@ public class Ms2FileToDbConverter {
     private int convertMs2File(String file, Ms2FileReader reader, int experimentId, String sha1Sum)
             throws Exception {
         Header header = reader.getHeader();
-        header.setFilePath(file);
+        header.setFileName(file);
         header.setSha1Sum(sha1Sum);
         // insert a MS2Run into the database and get the run Id
         MsRunDAO<MS2Run, MS2RunDb> rundao = DAOFactory.instance().getMS2FileRunDAO();

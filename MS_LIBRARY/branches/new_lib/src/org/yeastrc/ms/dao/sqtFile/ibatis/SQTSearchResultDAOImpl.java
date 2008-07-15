@@ -47,6 +47,12 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO
         return resultId;
     }
     
+    @Override
+    public int saveResultOnly(SQTSearchResult searchResult, int searchId,
+            int scanId) {
+        return resultDao.save(searchResult, searchId, scanId);
+    }
+    
     /**
      * Deletes the search result and any SQT specific information associated with the result
      * @param resultId

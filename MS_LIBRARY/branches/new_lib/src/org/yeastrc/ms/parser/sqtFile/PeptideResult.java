@@ -29,10 +29,12 @@ public class PeptideResult implements SQTSearchResult {
     // U: This ID has not been validated 
 
     private int charge;
-
+    private int scanNumber;
+    
     private List<DbLocus> matchingLoci;
 
     private List<DynamicModification> seachDynaMods;
+    
 
     public PeptideResult(List<DynamicModification> searchDynamicMods) {
         matchingLoci = new ArrayList<DbLocus>();
@@ -254,4 +256,12 @@ public class PeptideResult implements SQTSearchResult {
         return MsSearchResultPeptideBuilder.instance().build(sequence, seachDynaMods);
     }
     
+    @Override
+    public int getScanNumber() {
+        return this.scanNumber;
+    }
+
+    public void setScanNumber(int scanNumber) {
+        this.scanNumber = scanNumber;
+    }
 }

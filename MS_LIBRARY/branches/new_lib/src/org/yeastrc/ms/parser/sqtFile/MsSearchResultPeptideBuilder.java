@@ -42,6 +42,11 @@ public final class MsSearchResultPeptideBuilder {
         final List<MsSearchResultModification> resultMods = getResultMods(resultSequence, dynaMods);
         final String justPeptide = getOnlyPeptideSequence(resultSequence);
         
+//        final char preResidue = 0;
+//      final char postResidue = 0;
+//      final List<MsSearchResultModification> resultMods = new ArrayList<MsSearchResultModification>(0);
+//      final String justPeptide = resultSequence;
+        
         return new MsSearchResultPeptide() {
 
             public List<? extends MsSearchResultModification> getDynamicModifications() {

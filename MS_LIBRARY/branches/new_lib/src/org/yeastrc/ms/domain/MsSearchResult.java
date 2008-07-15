@@ -26,6 +26,11 @@ public interface MsSearchResult {
     };
     
     /**
+     * @return the scan number for this result
+     */
+    public abstract int getScanNumber();
+    
+    /**
      * @return the charge
      */
     public abstract int getCharge();

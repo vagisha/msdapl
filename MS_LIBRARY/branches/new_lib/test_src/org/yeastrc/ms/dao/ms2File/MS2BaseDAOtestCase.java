@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Random;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.ibatis.DAOFactory;
 import org.yeastrc.ms.dao.ms2File.MS2RunDAOImplTest.MS2RunTest;
 import org.yeastrc.ms.dao.ms2File.MS2ScanDAOImplTest.MS2ScanTest;
 import org.yeastrc.ms.domain.MsRun.RunFileFormat;

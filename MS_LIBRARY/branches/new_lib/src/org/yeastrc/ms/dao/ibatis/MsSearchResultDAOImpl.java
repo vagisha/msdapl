@@ -7,6 +7,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
@@ -43,8 +44,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     
     public int save(MsSearchResult searchResult, int searchId, int scanId) {
         
-        MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(searchId, scanId, searchResult);
-        int resultId = saveAndReturnId("MsSearchResult.insert", resultDb);
+        int resultId = saveResultOnly(searchResult, searchId, scanId);
         
         // save any protein matches
         for(MsSearchResultProtein protein: searchResult.getProteinMatchList()) {
@@ -55,6 +55,12 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         saveDynamicModsForResult(searchId, resultId, searchResult.getResultPeptide());
         
         return resultId;
+    }
+    
+    public int saveResultOnly(MsSearchResult searchResult, int searchId, int scanId) {
+
+        MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(searchId, scanId, searchResult);
+        return saveAndReturnId("MsSearchResult.insert", resultDb);
     }
 
     void saveDynamicModsForResult(int searchId, int resultId, MsSearchResultPeptide peptide) {
@@ -146,6 +152,10 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         }
         public int getSequenceLength() {
             return result.getResultPeptide().getSequenceLength();
+        }
+        @Override
+        public int getScanNumber() {
+            throw new UnsupportedOperationException("getScanNumber is not supported by MsSearchResultSqlMapParam");
         }
     }
 
