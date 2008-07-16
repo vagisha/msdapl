@@ -117,6 +117,15 @@ CREATE TABLE msPeptideSearch (
 );
 ALTER TABLE msPeptideSearch ADD INDEX(runID);
 
+
+CREATE TABLE msSearchEnzyme (
+    searchID INT UNSIGNED NOT NULL,
+    enzymeID INT UNSIGNED NOT NULL
+);
+ALTER TABLE msSearchEnzyme ADD PRIMARY KEY (searchID, enzymeID);
+ALTER TABLE msSearchEnzyme ADD INDEX (enzymeID);
+
+
 CREATE TABLE msPeptideSearchResult (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     searchID INT UNSIGNED NOT NULL,
@@ -131,7 +140,7 @@ CREATE TABLE msPeptideSearchResult (
     validationStatus CHAR(1)
 );
 
-ALTER TABLE msPeptideSearchResult ADD UNIQUE INDEX(searchID, scanID, charge);
+ALTER TABLE msPeptideSearchResult ADD INDEX(searchID);
 ALTER TABLE msPeptideSearchResult ADD INDEX(scanID);
 ALTER TABLE msPeptideSearchResult ADD INDEX(charge);
 ALTER TABLE msPeptideSearchResult ADD INDEX(peptide);
@@ -218,3 +227,102 @@ ALTER TABLE SQTSearchResult ADD INDEX(spRank);
 ALTER TABLE SQTSearchResult ADD INDEX(deltaCN);
 ALTER TABLE SQTSearchResult ADD INDEX(XCorr);
 ALTER TABLE SQTSearchResult ADD INDEX(sp);
+
+
+# TRIGGERS TO ENSURE CASCADING DELETES
+
+DELIMITER |
+CREATE TRIGGER msPeptideSearchResult_bdelete BEFORE DELETE ON msPeptideSearchResult
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM msProteinMatch WHERE resultID = OLD.id;
+    DELETE FROM SQTSearchResult WHERE resultID = OLD.id;
+    DELETE FROM msDynamicModResult WHERE resultID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msPeptideSearchDynamicMod_bdelete BEFORE DELETE ON msPeptideSearchDynamicMod
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM msDynamicModResult WHERE modID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msSequenceDatabaseDetail_bdelete BEFORE DELETE ON msSequenceDatabaseDetail
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM msSearchDatabase WHERE databaseID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msPeptideSearch_bdelete BEFORE DELETE ON msPeptideSearch
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM msSearchDatabase WHERE searchID = OLD.id;
+    DELETE FROM msPeptideSearchStaticMod WHERE searchID = OLD.id;
+    DELETE FROM msPeptideSearchDynamicMod WHERE searchID = OLD.id;
+    DELETE FROM msPeptideSearchResult WHERE searchID = OLD.id;
+    DELETE FROM msSearchEnzyme WHERE searchID = OLD.id;
+    DELETE FROM SQTSpectrumData WHERE searchID = OLD.id;
+    DELETE FROM SQTSearchHeader WHERE searchID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msDigestionEnzyme_bdelete BEFORE DELETE ON msDigestionEnzyme
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM msSearchEnzyme WHERE enzymeID = OLD.id;
+    DELETE FROM msRunEnzyme WHERE enzymeID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER MS2FileScanCharge_bdelete BEFORE DELETE ON MS2FileScanCharge
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM MS2FileChargeDependentAnalysis WHERE scanChargeID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msScan_bdelete BEFORE DELETE ON msScan
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM MS2FileScanCharge WHERE scanID = OLD.id;
+    DELETE FROM msPeptideSearchResult WHERE scanID = OLD.id;
+    DELETE FROM SQTSpectrumData WHERE scanID = OLD.id;
+    DELETE FROM MS2FileChargeIndependentAnalysis WHERE scanID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msRun_bdelete BEFORE DELETE ON msRun
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM msScan WHERE runID = OLD.id;
+    DELETE FROM msPeptideSearch WHERE runID = OLD.id;
+    DELETE FROM msRunEnzyme WHERE runID = OLD.id;
+    DELETE FROM MS2FileHeader WHERE runID = OLD.id;
+  END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM msRun WHERE experimentID = OLD.id;
+  END;
+|
+DELIMITER ;
