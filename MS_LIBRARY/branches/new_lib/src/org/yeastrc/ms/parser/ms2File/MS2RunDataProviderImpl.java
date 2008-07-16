@@ -76,7 +76,7 @@ public class MS2RunDataProviderImpl implements MS2RunDataProvider {
 
         public boolean hasNext() {
             if (reader.hasScans()) return true;
-            reader.close();
+            reader.close(); // close the file
             return false;
         }
 

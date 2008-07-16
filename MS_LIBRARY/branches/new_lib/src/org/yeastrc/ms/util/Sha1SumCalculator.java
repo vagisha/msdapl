@@ -29,14 +29,18 @@ public class Sha1SumCalculator {
         digest = MessageDigest.getInstance("SHA-1");
         digest.reset();
         
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        bytesRead = inStr.read(buffer);
-        while (bytesRead > 0) {
-            digest.update(buffer, 0, bytesRead);
+        try {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
             bytesRead = inStr.read(buffer);
+            while (bytesRead > 0) {
+                digest.update(buffer, 0, bytesRead);
+                bytesRead = inStr.read(buffer);
+            }
         }
-        
+        finally {
+            if (inStr != null) inStr.close();
+        }
         byte[] digested = digest.digest();
         return hexStringFor(digested);
     }

@@ -7,6 +7,9 @@
 package org.yeastrc.ms.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,14 +33,9 @@ import org.yeastrc.ms2.utils.Decompresser;
 public class YatesCycleConverter {
 
     
-    // runID will become the experimentId in msData 
-    // cycleID will become the runID in msData
-    public void convertYatesCycle(int cycleId, int runId) {
-        
-    }
-    
-    
     public static void main(String[] args) throws ClassNotFoundException, SQLException, ZipException, IOException {
+        
+        YatesCycleConverter converter = new YatesCycleConverter();
         
         Connection connect = getConnection();
         Statement statement = null;
@@ -64,26 +62,33 @@ public class YatesCycleConverter {
         
         int lastRunId = 0;
         int numExp = 0;
-        int experimentID = 0;
+        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP";
+        MsExperimentUploader expUploader = new MsExperimentUploader();
         for (YatesCycle exp: experiments) {
             if (lastRunId != exp.runId) {
+                
+                // convert the experiment
+                if (numExp != 0)
+                    expUploader.uploadExperimentToDb("my_computer", dataDir, dataDir);
+                
+                // TODO delete the downloaded files
+                if (numExp != 0)
+                    break;
+                
                 lastRunId = exp.runId;
                 numExp++;
-                // upload experiment
             }
-            // get the MS2 file for this cycleID and upload it
-            //uploadMS2File(exp.cycleId, exp.cycleName+".ms2", experimentID);
+            // download the MS2 file for this experiment
+            converter.downloadMS2File(exp.cycleId, exp.cycleName+".ms2", dataDir);
             
-            // get the SQT file for this cycleID and upload it
-            uploadSQTFile(exp.cycleId, exp.cycleName+".sqt", experimentID);
-            break;
+            // download the SQT file for this experiment
+            converter.downloadSQTFile(exp.cycleId, exp.cycleName+".sqt", dataDir);
         }
-        
         
         System.out.println("Number of experiments found: "+numExp);
     }
     
-    public static void uploadMS2File(int cycleId, String fileName, int experimentId) throws ClassNotFoundException, SQLException, ZipException, IOException {
+    public void downloadMS2File(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
         Connection conn = getConnection();
         Statement statement = null;
         ResultSet rs = null;
@@ -91,23 +96,27 @@ public class YatesCycleConverter {
         String sql = "SELECT data from tblYatesCycleMS2Data WHERE cycleID="+cycleId;
         statement = conn.createStatement();
         rs = statement.executeQuery(sql);
+        BufferedReader reader = null;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(downloadDir+File.separator+fileName));
         if (rs.next()) {
             byte[] bytes = rs.getBytes("data");
             InputStream instr = Decompresser.getInstance().decompressString(bytes);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(instr));
+            reader = new BufferedReader(new InputStreamReader(instr));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                writer.write(line);
+                writer.write("\n");
             }
         }
-        
+        reader.close();
+        writer.close();
         rs.close();
         statement.close();
         conn.close();
-        
     }
     
-    public static void uploadSQTFile(int cycleId, String fileName, int runId) throws ClassNotFoundException, SQLException, ZipException, IOException {
+    
+    public void downloadSQTFile(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
         Connection conn = getConnection();
         Statement statement = null;
         ResultSet rs = null;
@@ -115,16 +124,20 @@ public class YatesCycleConverter {
         String sql = "SELECT data from tblYatesCycleSQTData WHERE cycleID="+cycleId;
         statement = conn.createStatement();
         rs = statement.executeQuery(sql);
+        BufferedReader reader = null;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(downloadDir+File.separator+fileName));
         if (rs.next()) {
             byte[] bytes = rs.getBytes("data");
             InputStream instr = Decompresser.getInstance().decompressString(bytes);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(instr));
+            reader = new BufferedReader(new InputStreamReader(instr));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                writer.write(line);
+                writer.write("\n");
             }
         }
-        
+        reader.close();
+        writer.close();
         rs.close();
         statement.close();
         conn.close();
