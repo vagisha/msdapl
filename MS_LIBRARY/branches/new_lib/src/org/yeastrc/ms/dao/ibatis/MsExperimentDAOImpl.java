@@ -15,7 +15,6 @@ import org.yeastrc.ms.domain.MsExperiment;
 import org.yeastrc.ms.domain.MsExperimentDb;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 

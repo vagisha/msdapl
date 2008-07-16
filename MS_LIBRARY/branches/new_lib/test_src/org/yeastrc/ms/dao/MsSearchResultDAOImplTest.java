@@ -12,6 +12,7 @@ import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
+import org.yeastrc.ms.domain.ValidationStatus;
 
 public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
 

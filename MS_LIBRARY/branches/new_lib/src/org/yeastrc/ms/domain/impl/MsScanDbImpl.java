@@ -35,10 +35,12 @@ public class MsScanDbImpl implements MsScanDb {
     private int precursorScanId = 0; // id (database) of the precursor scan.  0 if this is a MS1 scan
     private int precursorScanNum = -1; // scan number of the precursor scan
     
-    private List<double[]> peaks;
+   // private List<double[]> peaks;
+    
+    private String peakString;
     
     public MsScanDbImpl() {
-        peaks = new ArrayList<double[]>();
+        //peaks = new ArrayList<double[]>();
     }
 
     public int getId() {
@@ -122,33 +124,38 @@ public class MsScanDbImpl implements MsScanDb {
     }
 
 
-    public Iterator<double[]> peakIterator() {
-        return peaks.iterator();
-    }
+//    public Iterator<double[]> peakIterator() {
+//        return peaks.iterator();
+//    }
     
     public void setPeakByteArray(byte[] peaks) throws IOException, ClassNotFoundException {
-        String peakString = PeakUtils.decodePeakString(peaks);
-        parsePeaksAsString(peakString);
+        peakString = PeakUtils.decodePeakString(peaks);
+//        parsePeaksAsString(peakString);
+    }
+
+    @Override
+    public String peakDataString() {
+        return peakString;
     }
     
-    void parsePeaksAsString(String peaksString) {
-        if (peaksString == null || peaksString.length() == 0)
-            return;
-        String[] peaksStr = peaksString.split(";");
-        for (String peak: peaksStr) {
-            String [] peakVals = splitPeakVals(peak);
-            double[] peakData = new double[2];
-            peakData[0] = Double.parseDouble(peakVals[0]);
-            peakData[1] = Double.parseDouble(peakVals[1]);
-            peaks.add(peakData);
-        }
-    }
+//    void parsePeaksAsString(String peaksString) {
+//        if (peaksString == null || peaksString.length() == 0)
+//            return;
+//        String[] peaksStr = peaksString.split(";");
+//        for (String peak: peaksStr) {
+//            String [] peakVals = splitPeakVals(peak);
+//            double[] peakData = new double[2];
+//            peakData[0] = Double.parseDouble(peakVals[0]);
+//            peakData[1] = Double.parseDouble(peakVals[1]);
+//            peaks.add(peakData);
+//        }
+//    }
     
-    private String[] splitPeakVals(String peak) {
-        int i = peak.indexOf(":");
-        String[] vals = new String[2];
-        vals[0] = peak.substring(0, i);
-        vals[1] = peak.substring(i+1, peak.length());
-        return vals;
-    }
+//    private String[] splitPeakVals(String peak) {
+//        int i = peak.indexOf(":");
+//        String[] vals = new String[2];
+//        vals[0] = peak.substring(0, i);
+//        vals[1] = peak.substring(i+1, peak.length());
+//        return vals;
+//    }
 }

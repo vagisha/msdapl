@@ -4,20 +4,26 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
-public interface MsSearch {
+public interface MsSearch extends MsSearchBase {
 
-    public static enum SearchFileFormat {
+    /**
+     * @return the searchDatabases
+     */
+    public abstract List<MsSearchDatabase> getSearchDatabases();
 
-        SQT, PEPXML, UNKNOWN;
+    /**
+     * @return the staticModifications
+     */
+    public abstract List<MsSearchModification> getStaticModifications();
 
-        public static SearchFileFormat instance(String extString) {
-            if (extString.equalsIgnoreCase(SearchFileFormat.SQT.name()))
-                return SearchFileFormat.SQT;
-            else if (extString.equals(SearchFileFormat.PEPXML.name()))
-                return SearchFileFormat.PEPXML;
-            else return SearchFileFormat.UNKNOWN;
-        }
-    };
+    /**
+     * @return the dynamicModifications
+     */
+    public abstract List<MsSearchModification> getDynamicModifications();
+
+}
+
+interface MsSearchBase {
     
     /**
      * @return the originalFileType
@@ -63,20 +69,4 @@ public interface MsSearch {
      * @return the fragmentMassTolerance
      */
     public abstract BigDecimal getFragmentMassTolerance();
-
-    /**
-     * @return the searchDatabases
-     */
-    public abstract List<? extends MsSearchDatabase> getSearchDatabases();
-
-    /**
-     * @return the staticModifications
-     */
-    public abstract List<? extends MsSearchModification> getStaticModifications();
-
-    /**
-     * @return the dynamicModifications
-     */
-    public abstract List<? extends MsSearchModification> getDynamicModifications();
-
 }

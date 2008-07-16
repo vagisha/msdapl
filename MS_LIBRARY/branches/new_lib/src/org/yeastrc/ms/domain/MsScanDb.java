@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.domain;
 
-import java.util.Iterator;
 
 /**
  * 
@@ -29,10 +28,7 @@ public interface MsScanDb extends MsScanBase {
      */
     public abstract int getPrecursorScanId();
     
+
+    public abstract String peakDataString();
     
-    /**
-     * double[0] = m/z; double[1] = RT
-     * @return
-     */
-    public Iterator<double[]> peakIterator();
 }

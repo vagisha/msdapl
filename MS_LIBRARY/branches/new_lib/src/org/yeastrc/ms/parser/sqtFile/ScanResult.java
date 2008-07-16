@@ -42,6 +42,10 @@ public class ScanResult implements SQTSearchScan {
         this.startScan = startScan;
     }
 
+    public int getScanNumber() {
+        return startScan;
+    }
+    
     /**
      * @return the endScan
      */

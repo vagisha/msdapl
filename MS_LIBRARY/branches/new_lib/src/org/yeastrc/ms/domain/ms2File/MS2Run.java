@@ -15,6 +15,6 @@ public interface MS2Run extends MsRun {
     /**
      * @return the list of headers for the MS2 run.
      */
-    public abstract List<? extends MS2Field> getHeaderList();
+    public abstract List<MS2Field> getHeaderList();
 
 }

@@ -12,7 +12,7 @@ import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2RunDAOImplTest.MS2RunTest;
 import org.yeastrc.ms.dao.ms2File.MS2ScanDAOImplTest.MS2ScanTest;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2ChargeDependentAnalysisDb;
 import org.yeastrc.ms.domain.ms2File.MS2ChargeIndependentAnalysisDb;
 import org.yeastrc.ms.domain.ms2File.MS2Field;

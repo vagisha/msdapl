@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
+import org.yeastrc.ms.domain.ValidationStatus;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 
 /**
@@ -34,6 +35,7 @@ public class PeptideResult implements SQTSearchResult {
     private List<DbLocus> matchingLoci;
 
     private List<DynamicModification> seachDynaMods;
+    private MsSearchResultPeptide resultPeptide = null;
     
 
     public PeptideResult(List<DynamicModification> searchDynamicMods) {
@@ -253,7 +255,9 @@ public class PeptideResult implements SQTSearchResult {
     }
 
     public MsSearchResultPeptide getResultPeptide() {
-        return MsSearchResultPeptideBuilder.instance().build(sequence, seachDynaMods);
+        if (resultPeptide == null)
+            resultPeptide = MsSearchResultPeptideBuilder.instance().build(sequence, seachDynaMods);
+        return resultPeptide;
     }
     
     @Override

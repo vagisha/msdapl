@@ -33,6 +33,7 @@ public final class MsSearchResultPeptideBuilder {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new IllegalArgumentException("sequence cannot be null or empty");
         
+//        System.out.println("BUILDING");
         resultSequence = removeAccession(resultSequence);
         
         if (resultSequence.length() < 3)
@@ -46,7 +47,7 @@ public final class MsSearchResultPeptideBuilder {
 //      final char postResidue = 0;
 //      final List<MsSearchResultModification> resultMods = new ArrayList<MsSearchResultModification>(0);
 //      final String justPeptide = resultSequence;
-        
+//        System.out.println(resultSequence+", "+preResidue+", "+postResidue+", "+justPeptide); 
         return new MsSearchResultPeptide() {
 
             public List<? extends MsSearchResultModification> getDynamicModifications() {

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 
  */
-public interface MS2ScanChargeDb extends MS2ScanCharge {
+public interface MS2ScanChargeDb extends MS2ScanChargeBase  {
 
     /**
      * @return database id of the scan this belongs to

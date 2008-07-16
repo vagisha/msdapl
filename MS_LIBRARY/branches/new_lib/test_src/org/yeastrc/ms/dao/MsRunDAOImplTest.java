@@ -7,7 +7,7 @@ import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsEnzymeDb;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.RunFileFormat;
 
 public class MsRunDAOImplTest extends BaseDAOTestCase {
 

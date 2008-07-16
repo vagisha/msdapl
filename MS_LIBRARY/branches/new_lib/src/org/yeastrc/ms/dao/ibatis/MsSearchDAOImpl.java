@@ -21,7 +21,7 @@ import org.yeastrc.ms.domain.MsSearchDb;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
-import org.yeastrc.ms.domain.MsSearch.SearchFileFormat;
+import org.yeastrc.ms.domain.SearchFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;

@@ -5,6 +5,8 @@ import java.util.List;
 
 public interface SQTSearchScan {
 
+    
+    public abstract int getScanNumber();
     /**
      * @return the charge
      */

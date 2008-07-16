@@ -19,7 +19,7 @@ import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.RunFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;

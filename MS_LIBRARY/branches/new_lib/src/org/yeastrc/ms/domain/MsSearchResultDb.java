@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 
  */
-public interface MsSearchResultDb extends MsSearchResult {
+public interface MsSearchResultDb extends MsSearchResultBase {
 
     /**
      * @return database id of the search this result belongs to.

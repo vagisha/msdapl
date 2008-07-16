@@ -42,6 +42,40 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
                                                     proteinMatch.getDescription()));
     }
     
+    @Override
+    public void saveAll(List<MsResultProteinSqlMapParam> proteinMatchList) {
+        if (proteinMatchList.size() == 0)
+            return;
+        StringBuilder values = new StringBuilder();
+        for (MsResultProteinSqlMapParam match: proteinMatchList) {
+            values.append("(");
+            values.append(match.getResultId());
+            values.append(",");
+            if (match.getAccession() != null) {
+                values.append("\"");
+                values.append(match.getAccession());
+                values.append("\"");
+            }
+            else
+                values.append("NULL");
+            
+            values.append(",");
+            
+            if (match.getDescription() != null) {
+                values.append("\"");
+                values.append(match.getDescription());
+                values.append("\"");
+            }
+            else {
+                values.append("NULL");
+            }
+            values.append("),");
+        }
+        values.deleteCharAt(values.length() - 1);
+        
+        save("MsResultProtein.insertAll", values.toString());
+    }
+    
     /* (non-Javadoc)
      * @see org.yeastrc.ms.dao.MsProteinMatchDAO#delete(int)
      */

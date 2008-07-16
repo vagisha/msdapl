@@ -9,7 +9,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2HeaderDAO;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;

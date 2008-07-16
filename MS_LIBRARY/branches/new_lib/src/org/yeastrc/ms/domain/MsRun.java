@@ -8,24 +8,13 @@ package org.yeastrc.ms.domain;
 
 import java.util.List;
 
-public interface MsRun {
+public interface MsRun extends MsRunBase {
 
-    public static enum RunFileFormat {
-        
-        MS2, MZXML, MZDATA, MZML, UNKNOWN;
-        
-        public static RunFileFormat instance(String extString) {
-            if (extString.equalsIgnoreCase(RunFileFormat.MS2.name()))
-                return RunFileFormat.MS2;
-            else if (extString.equals(RunFileFormat.MZXML.name()))
-                return RunFileFormat.MZXML;
-            else if (extString.equalsIgnoreCase(RunFileFormat.MZDATA.name()))
-                return RunFileFormat.MZDATA;
-            else if (extString.equalsIgnoreCase(RunFileFormat.MZML.name()))
-                return RunFileFormat.MZML;
-            else return RunFileFormat.UNKNOWN;
-        }
-    };
+    public abstract List<MsEnzyme> getEnzymeList();
+
+}
+
+interface MsRunBase {
     
     public abstract RunFileFormat getRunFileFormat();
 
@@ -50,10 +39,8 @@ public interface MsRun {
     public abstract String getSha1Sum();
 
     // TODO: rename method.  getDataConversion(Processing)Method()??
+    // centroid, profile etc.
     public abstract String getDataType();
 
     public abstract String getAcquisitionMethod();
-
-    public abstract List<? extends MsEnzyme> getEnzymeList();
-
 }

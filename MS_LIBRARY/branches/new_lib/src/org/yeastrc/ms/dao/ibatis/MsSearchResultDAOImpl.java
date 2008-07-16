@@ -13,8 +13,8 @@ import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
+import org.yeastrc.ms.domain.ValidationStatus;
 import org.yeastrc.ms.domain.MsSearchModification.ModificationType;
-import org.yeastrc.ms.domain.MsSearchResult.ValidationStatus;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;

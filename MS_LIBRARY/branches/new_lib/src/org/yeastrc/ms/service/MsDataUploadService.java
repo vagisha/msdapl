@@ -15,10 +15,6 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.MsSearchDAO;
-import org.yeastrc.ms.dao.MsSearchResultDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
-import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
@@ -26,10 +22,7 @@ import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 
 /**
@@ -107,66 +100,43 @@ public class MsDataUploadService {
 
         log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
         
-        // RESET THE DYNAMIC MOD LOOKUP UTILITY
-        DynamicModLookupUtil.instance().reset();
-
-        MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();
-        int searchId = searchDao.saveSearch(provider.getSearchData(), runId);
+        SQTDataUploadService sqtService = new SQTDataUploadService();
+        
+        int searchId = sqtService.uploadSearch(provider.getSearchData(), runId);
         log.info("Uploaded top-level info for search with searchId: "+searchId);
 
         // upload the search results for each scan + charge combination
         Iterator<SQTSearchScan> searchScanIterator = provider.scanResultIterator();
-        int i = 0;
+        int numResults = 0;
+        int numProteins = 0;
         while (searchScanIterator.hasNext()) {
-            i+= saveScan(searchScanIterator.next(), searchId, runId);
+            SQTSearchScan scan = searchScanIterator.next();
+            int scanId = getScanId(runId, scan.getScanNumber());
+            
+            // save spectrum data
+            sqtService.uploadSearchScan(scan, searchId, scanId); 
+            
+            // save all the search results for this scan
+            for (SQTSearchResult result: scan.getScanResults()) {
+                sqtService.uploadSearchResult(result, searchId, scanId);
+                numResults++;
+                numProteins += result.getProteinMatchList().size();
+            }
         }
-        log.info("Uploaded "+i+" results for searchId: "+searchId);
+        sqtService.flush(); // save any cached data
+        
+        log.info("Uploaded "+numResults+" results, "+numProteins+" protein matches for searchId: "+searchId);
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
     }
 
-    private static int saveScan(SQTSearchScan scan, int searchId, int runId) {
-
-        // first get the database scan id for the given scan
-        List<? extends SQTSearchResult> resultList = scan.getScanResults();
-        if (resultList == null || resultList.size() == 0)
-            throw new IllegalArgumentException("No search results found for scan");
-        
-        int scanNumber = resultList.get(0).getScanNumber();
+    private static int getScanId(int runId, int scanNumber) {
         MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
         if (scanId == 0)
             throw new IllegalArgumentException("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
-
-        saveSpectrumData(scan, searchId, scanId);
-        // save all the results for the scan
-        for (SQTSearchResult result: resultList) {
-            savePeptideResult(result, searchId, scanId);
-        }
-        
-        // upload the protein match data and SQT related search data that was appended to temp files
-        
-        // delete temp files. 
-        
-        
-        return resultList.size();
+        return scanId;
     }
-
-    private static int savePeptideResult(SQTSearchResult result, int searchId, int scanId) {
-        
-        MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao = DAOFactory.instance().getSqtResultDAO();
-        return resultDao.saveResultOnly(result, searchId, scanId);
-        
-        // save the protein matches (append to existing temp file)
-        
-        // save the SQT related search result data (append to existing temp file)
-        
-    }
-
-    private static void saveSpectrumData(SQTSearchScan scan, int searchId, int scanId) {
-        SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        spectrumDataDao.save(scan, searchId, scanId);
-    }
-
+    
     public static void deleteExperiment(int experimentId) {
         MsExperimentDAO expDao = daoFactory.getMsExperimentDAO();
         log.info("DELETING EXPERIMENT: "+experimentId);

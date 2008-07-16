@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.yeastrc.ms.domain.MsEnzyme;
+import org.yeastrc.ms.domain.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Run;
 

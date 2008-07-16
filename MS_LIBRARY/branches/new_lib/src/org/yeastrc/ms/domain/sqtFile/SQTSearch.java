@@ -10,6 +10,6 @@ public interface SQTSearch extends MsSearch {
      * Returns a list of headers associated with this SQT file
      * @return
      */
-    public abstract List<? extends SQTField> getHeaders();
+    public abstract List<SQTField> getHeaders();
 
 }

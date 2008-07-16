@@ -13,7 +13,7 @@ import org.yeastrc.ms.domain.MsRunDb;
 /**
  * 
  */
-public interface MS2RunDb extends MS2Run, MsRunDb {
+public interface MS2RunDb extends MsRunDb {
 
     /**
      * @return the list of headers for the MS2 run.

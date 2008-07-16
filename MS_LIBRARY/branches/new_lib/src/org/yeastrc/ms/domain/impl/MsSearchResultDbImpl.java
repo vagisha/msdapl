@@ -13,6 +13,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.ValidationStatus;
 
 
 public class MsSearchResultDbImpl implements MsSearchResultDb {

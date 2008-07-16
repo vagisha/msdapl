@@ -32,6 +32,10 @@
     	VALUES (?,?,?)
     </insert>
     
+    <insert id="insertAll" parameterClass="String">
+    	INSERT INTO msProteinMatch (resultId, accession, description) VALUES $values$
+    </insert>
+    
     <delete id="deleteForResultId" parameterClass="Integer">
 		DELETE FROM msProteinMatch WHERE resultID=#id#
     </delete>

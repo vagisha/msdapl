@@ -13,7 +13,7 @@ import org.yeastrc.ms.domain.MsSearchDb;
 /**
  * 
  */
-public interface SQTSearchDb extends SQTSearch, MsSearchDb {
+public interface SQTSearchDb extends MsSearchDb {
 
     /**
      * Returns a list of headers associated with this SQT file

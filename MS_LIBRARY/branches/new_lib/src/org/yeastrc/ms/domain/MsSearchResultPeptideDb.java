@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 
  */
-public interface MsSearchResultPeptideDb extends MsSearchResultPeptide {
+public interface MsSearchResultPeptideDb extends MsSearchResultPeptideBase {
 
     /**
      * Returns a list of dynamic modifications, along with the index (0-based) at which 

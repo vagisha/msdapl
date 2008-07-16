@@ -11,7 +11,7 @@ import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchDAOImplTest.SQTSearchTest;
 import org.yeastrc.ms.domain.MsSearchDatabase;
 import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearch.SearchFileFormat;
+import org.yeastrc.ms.domain.SearchFileFormat;
 import org.yeastrc.ms.domain.sqtFile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;

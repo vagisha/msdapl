@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.yeastrc.ms.domain.SearchFileFormat;
 import org.yeastrc.ms.domain.sqtFile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 

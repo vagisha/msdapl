@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 
  */
-public interface MsRunDb extends MsRun {
+public interface MsRunDb extends MsRunBase {
 
     /**
      * @return database id of the experiment this run belongs to.

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.MsEnzymeDb;
 import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.RunFileFormat;
 
 
 public class MsRunDbImpl implements MsRunDb {
@@ -34,7 +35,7 @@ public class MsRunDbImpl implements MsRunDb {
 
     private String comment;
 
-    private List <? extends MsEnzymeDb> enzymeList;
+    private List <MsEnzymeDb> enzymeList;
 
     public MsRunDbImpl() {
         enzymeList = new ArrayList<MsEnzymeDb>();
@@ -165,10 +166,14 @@ public class MsRunDbImpl implements MsRunDb {
     }
 
     public List<MsEnzymeDb> getEnzymeList() {
-        return (List<MsEnzymeDb>) enzymeList; 
+        return enzymeList; 
     }
 
+    public void addEnzyme(MsEnzymeDb enzyme) {
+        enzymeList.add(enzyme);
+    }
+    
     public void  setEnzymeList(List<? extends MsEnzymeDb> enzymeList) {
-        this.enzymeList = enzymeList;
+        this.enzymeList = (List<MsEnzymeDb>) enzymeList;
     }
 }

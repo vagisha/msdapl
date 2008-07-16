@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
+import org.yeastrc.ms.domain.RunFileFormat;
 
 public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
 

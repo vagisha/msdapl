@@ -88,5 +88,10 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
         public List<SQTSearchResult> getScanResults() {
             throw new UnsupportedOperationException("getScanResults is not supported by SQTSearchScanSqlMapParam");
         }
+
+        @Override
+        public int getScanNumber() {
+            return scan.getScanNumber();
+        }
     }
 }

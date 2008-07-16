@@ -41,10 +41,10 @@ import org.yeastrc.ms.domain.MsSearchResultModification;
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
+import org.yeastrc.ms.domain.RunFileFormat;
+import org.yeastrc.ms.domain.SearchFileFormat;
+import org.yeastrc.ms.domain.ValidationStatus;
 import org.yeastrc.ms.domain.MsEnzyme.Sense;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
-import org.yeastrc.ms.domain.MsSearch.SearchFileFormat;
-import org.yeastrc.ms.domain.MsSearchResult.ValidationStatus;
 
 /**
  * 

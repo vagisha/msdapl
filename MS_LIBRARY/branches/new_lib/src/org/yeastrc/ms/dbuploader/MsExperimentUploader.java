@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.MsRun.RunFileFormat;
-import org.yeastrc.ms.domain.MsSearch.SearchFileFormat;
+import org.yeastrc.ms.domain.RunFileFormat;
+import org.yeastrc.ms.domain.SearchFileFormat;
 import org.yeastrc.ms.parser.ms2File.MS2RunDataProviderImpl;
 import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl;
 import org.yeastrc.ms.service.MsDataUploadService;
@@ -112,7 +112,7 @@ public class MsExperimentUploader {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader(RunFileFormat.MS2, SearchFileFormat.SQT);
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC");
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC/TEST");
         long end = System.currentTimeMillis();
         System.out.println("Time to upload experiment: "+((end - start)/(1000L))+"seconds.");
     }
