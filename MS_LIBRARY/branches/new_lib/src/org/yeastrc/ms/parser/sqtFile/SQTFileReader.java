@@ -53,7 +53,7 @@ public class SQTFileReader {
                 StringBuilder val = new StringBuilder();
                 // the value for the header may be a tab separated list; get the entire string
                 // e.g. H       Alg-MaxDiffMod  3H      Alg-DisplayTop  5
-                for (int i = 1; i < tokens.length; i++)
+                for (int i = 2; i < tokens.length; i++)
                     val.append(tokens[i]);
                 header.addHeaderItem(tokens[1], val.toString());
             }

@@ -51,8 +51,8 @@ public class MS2RunDataProviderImpl implements MS2RunDataProvider {
     @Override
     public MS2Run getRunData() {
         Header header = reader.getHeader();
-        if (!header.isHeaderValid())
-            throw new IllegalArgumentException("Invalid MS2 Header");
+//        if (!header.isHeaderValid())
+//            throw new IllegalArgumentException("Invalid MS2 Header");
         header.setFileName(fileName);
         header.setSha1Sum(sha1Sum);
         return header;

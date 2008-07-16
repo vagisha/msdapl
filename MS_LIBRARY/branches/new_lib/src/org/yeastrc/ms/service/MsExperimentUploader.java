@@ -34,7 +34,7 @@ public class MsExperimentUploader {
             return;
         }
         long end = System.currentTimeMillis();
-        log.info("EXPERIMENT UPLOADED IN: "+((end - start)/(1000L))+"seconds.");
+        log.info("---------------------- EXPERIMENT UPLOADED IN: "+((end - start)/(1000L))+"seconds ----------------------");
     }
 
     private void triggerExperimentDelete(int experimentId, Throwable t) {
@@ -93,6 +93,6 @@ public class MsExperimentUploader {
         MsExperimentUploader uploader = new MsExperimentUploader();
         uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC/TEST");
         long end = System.currentTimeMillis();
-        System.out.println("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
+        log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }
 }

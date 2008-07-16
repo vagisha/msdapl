@@ -48,7 +48,8 @@ public class MsDataUploadService {
     public static int uploadMS2Run(MS2RunDataProvider provider, int experimentId) {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
-
+        long startTime = System.currentTimeMillis();
+        
         MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
 
         // determine if this run is already in the database
@@ -80,7 +81,8 @@ public class MsDataUploadService {
             scanDao.save(scan, runId, precursorScanId);   
             i++;
         }
-        log.info("Uploaded "+i+" scans for runId: "+runId);
+        long endTime = System.currentTimeMillis();
+        log.info("Uploaded "+i+" scans for runId: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds");
         log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
         return runId;
     }
@@ -100,6 +102,7 @@ public class MsDataUploadService {
     public static void uploadSQTSearch(SQTSearchDataProvider provider, int runId) {
 
         log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
+        long startTime = System.currentTimeMillis();
         
         SQTDataUploadService sqtService = new SQTDataUploadService();
         
@@ -126,7 +129,9 @@ public class MsDataUploadService {
         }
         sqtService.flush(); // save any cached data
         
-        log.info("Uploaded SQT files with "+numResults+" results, "+numProteins+" protein matches. (searchId: "+searchId+")");
+        long endTime = System.currentTimeMillis();
+        log.info("Uploaded SQT files with "+numResults+" results, "+numProteins+" protein matches. (searchId: "+searchId+")"
+                + " in "+(endTime - startTime)/(1000L)+"seconds");
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
     }
 
