@@ -125,7 +125,7 @@ public class MsDataUploadService {
         }
         sqtService.flush(); // save any cached data
         
-        log.info("Uploaded "+numResults+" results, "+numProteins+" protein matches for searchId: "+searchId);
+        log.info("Uploaded SQT files with "+numResults+" results, "+numProteins+" protein matches. (searchId: "+searchId+")");
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
     }
 

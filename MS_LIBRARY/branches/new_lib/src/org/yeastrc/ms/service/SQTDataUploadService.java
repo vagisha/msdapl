@@ -67,14 +67,14 @@ class SQTDataUploadService {
         spectrumDataDao.save(scan, searchId, scanId);
     }
     
-    public void uploadSearchResult(SQTSearchResult result, int searchId, int scanId) {
+    public int uploadSearchResult(SQTSearchResult result, int searchId, int scanId) {
         
         try {
             result.getResultPeptide(); // parse the peptide sequence to get the pre, post residues, modifications etc.
         }
         catch(IllegalArgumentException e) {
-            log.error(("Peptide sequence appears to be invalid. Unlable to upload result... Skipping: "+e.getMessage()));
-            return;
+            log.error(("!!!Peptide sequence appears to be invalid. Unlable to upload result... Skipping: "+e.getMessage()));
+            return 0;
         }
         
         MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao = DAOFactory.instance().getSqtResultDAO();
@@ -99,6 +99,7 @@ class SQTDataUploadService {
         for (MsSearchResultProtein match: result.getProteinMatchList()) {
             proteinMatchList.add(new MsResultProteinSqlMapParam(resultId, match.getAccession(), match.getDescription()));
         }
+        return resultId;
     }
 
     private void uploadProteinMatchBuffer() {
