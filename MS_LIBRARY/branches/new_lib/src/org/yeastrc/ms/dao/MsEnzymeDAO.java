@@ -20,6 +20,9 @@ public interface MsEnzymeDAO {
     
     public List<MsEnzymeDb> loadEnzymesForRun(int runId);
     
+    public List<MsEnzymeDb> loadEnzymesForSearch(int searchId);
+    
+    public abstract void deleteEnzymeById(int enzymeId);
     
     /**
      * Saves the enzyme if it does not already exist in the database. 
@@ -41,7 +44,7 @@ public interface MsEnzymeDAO {
     
     /**
      * Saves an entry in msRunEnzyme linking the enzyme with the runId.
-     * If enzyme does not exist in the database it is saved
+     * If enzyme does not exist in the database (msDigestionEnzyme) it is saved
      * All enzyme properties are used to look for a matching enzyme in the database
      * If multiple matching enzymes are found the run is linked to the first enzyme
      * @param enzyme
@@ -52,7 +55,7 @@ public interface MsEnzymeDAO {
     
     /**
      * Saves an entry in msRunEnzyme linking the enzyme with the runId.
-     * If enzyme does not exist in the database it is saved
+     * If enzyme does not exist in the database (msDigestionEnzyme) it is saved
      * The given enzyme properties are used to look for a matching enzyme in the database
      * If multiple matching enzymes are found the run is linked to the first enzyme
      * @param enzyme
@@ -75,4 +78,43 @@ public interface MsEnzymeDAO {
      * @param runIds
      */
     public void deleteEnzymesForRuns(List<Integer> runIds);
+    
+    
+    
+    /**
+     * Saves an entry in msSearchEnzyme linking the enzyme with the searchId.
+     * If enzyme does not exist in the database (msDigestionEnzyme) it is saved
+     * All enzyme properties are used to look for a matching enzyme in the database
+     * If multiple matching enzymes are found the search is linked to the first enzyme
+     * @param enzyme
+     * @param searchId
+     * @return
+     */
+    public int saveEnzymeforSearch(MsEnzyme enzyme, int searchId);
+    
+    /**
+     * Saves an entry in msSearchEnzyme linking the enzyme with the searchId.
+     * If enzyme does not exist in the database (msDigestionEnzyme) it is saved
+     * The given enzyme properties are used to look for a matching enzyme in the database
+     * If multiple matching enzymes are found the search is linked to the first enzyme
+     * @param enzyme
+     * @param searchId
+     * @param properties
+     * @return
+     */
+    public int saveEnzymeforSearch(MsEnzyme enzyme, int searchId, List<EnzymeProperties> properties);
+    
+    
+    /**
+     * Deletes the enzyme to search association from the msSearchEnzyme table. The actual enzyme is NOT deleted.
+     * @param searchId
+     */
+    public void deleteEnzymesForSearch(int searchId);
+    
+    /**
+     * Deletes the enzyme to search association from the msSearchEnzyme table for all the given enzymes.
+     * The actual enzymes are NOT deleted.
+     * @param searchIds
+     */
+    public void deleteEnzymesForSearches(List<Integer> searchIds);
 }

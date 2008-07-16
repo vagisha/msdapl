@@ -125,7 +125,7 @@ public class DAOFactory {
         modDAO = new MsSearchModificationDAOImpl(sqlMap);
         resultProteinDAO = new MsSearchResultProteinDAOImpl(sqlMap);
         searchResultDAO = new MsSearchResultDAOImpl(sqlMap, resultProteinDAO, modDAO);
-        searchDAO = new MsSearchDAOImpl(sqlMap, searchResultDAO, seqDbDao, modDAO);
+        searchDAO = new MsSearchDAOImpl(sqlMap, searchResultDAO, seqDbDao, modDAO, enzymeDAO);
         
 
         sqtResultDAO = new SQTSearchResultDAOImpl(sqlMap, searchResultDAO);

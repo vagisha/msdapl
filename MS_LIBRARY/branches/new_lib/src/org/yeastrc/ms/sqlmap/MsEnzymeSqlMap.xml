@@ -36,7 +36,7 @@
     </select> 
     
     <select id="selectEnzymeByName" resultMap="msEnzymeResult" parameterClass="String"> 
-        SELECT * FROM msDigestionEnzyme WHERE name = #name#
+        SELECT * FROM msDigestionEnzyme WHERE UPPER(name) = UPPER(#name#)
     </select> 
     
     <select id="selectEnzymes" resultMap="msEnzymeResult" parameterClass="java.util.Map"> 
@@ -87,6 +87,14 @@
     	msRunEnzyme.runID = #id#
     </select>
     
+    <select id="selectEnzymesForSearch" resultMap="msEnzymeResult" parameterClass="Integer">
+    	SELECT e.id, e.name, e.sense, e.cut, e.nocut, e.description 
+    	FROM MsDigestionEnzyme as e, msSearchEnzyme
+    	WHERE e.id = msSearchEnzyme.enzymeID AND
+    	msSearchEnzyme.searchID = #id#
+    </select>
+    
+    
     <insert id="insert" parameterMap="msEnzymeParam">
     	INSERT INTO MsDigestionEnzyme (name, 
     						sense, 
@@ -105,12 +113,22 @@
     	VALUES (#runID#, #enzymeID#)
     </insert>
     
+    <insert id="insertSearchEnzyme" parameterClass="java.util.Map">
+    	INSERT INTO MsSearchEnzyme (searchID, 
+    						enzymeID) 
+    	VALUES (#searchID#, #enzymeID#)
+    </insert>
+    
     <delete id="deleteEnzymeById" parameterClass="Integer">
     	DELETE FROM msDigestionEnzyme WHERE id=#id#
     </delete>
     
     <delete id="deleteEnzymesByRunId" parameterClass="Integer">
     	DELETE FROM msRunEnzyme WHERE runID=#id#
+    </delete>
+    
+    <delete id="deleteEnzymesBySearchId" parameterClass="Integer">
+    	DELETE FROM msSearchEnzyme WHERE searchID=#id#
     </delete>
     
     <delete id="deleteEnzymesByRunIds" parameterClass="java.util.Map">
@@ -121,6 +139,17 @@
     			conjunction=","
     			>
     			#runIdList[]#
+    		</iterate>
+    </delete>
+    
+    <delete id="deleteEnzymesBySearchIds" parameterClass="java.util.Map">
+    	DELETE FROM msRunEnzyme 
+    		<iterate property="searchIdList"
+    			open="WHERE searchID IN("
+    			close=")"
+    			conjunction=","
+    			>
+    			#searchIdList[]#
     		</iterate>
     </delete>
     

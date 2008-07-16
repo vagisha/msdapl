@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsSearch;
 import org.yeastrc.ms.domain.MsSearchDatabase;
 import org.yeastrc.ms.domain.MsSearchDb;
@@ -29,8 +30,8 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchDao.loadSearchesForRun(runId_1).size()); // runId = 1
         assertEquals(0, searchDao.loadSearchIdsForRun(runId_1).size()); // runId = 1
         
-        // create and save a search with no seq. db information or modifications
-        MsSearch search_1 = makePeptideSearch(SearchFileFormat.SQT, false, false, false);
+        // create and save a search with no seq. db information or modifications or enzymes
+        MsSearch search_1 = makePeptideSearch(SearchFileFormat.SQT, false, false, false, false);
         assertEquals(167, search_1.getSearchDuration());
         assertEquals(0, search_1.getSearchDatabases().size());
         assertEquals(0, search_1.getStaticModifications().size());
@@ -43,8 +44,8 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         checkSearch(search_1, searchList.get(0));
         
         
-        // create and save a search with seq. db information and modifications
-        MsSearch search_2 = makePeptideSearch(SearchFileFormat.SQT, true, true, true);
+        // create and save a search with seq. db information and modifications AND enzymes
+        MsSearch search_2 = makePeptideSearch(SearchFileFormat.SQT, true, true, true, true);
         assertTrue(search_2.getSearchDatabases().size() > 0);
         assertTrue(search_2.getStaticModifications().size() > 0);
         assertTrue(search_2.getDynamicModifications().size() > 0);
@@ -57,6 +58,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(2, seqDbDao.loadSearchDatabases(searchId_2).size());
         assertEquals(2, modDao.loadStaticModificationsForSearch(searchId_2).size());
         assertEquals(3, modDao.loadDynamicModificationsForSearch(searchId_2).size());
+        assertEquals(2, enzymeDao.loadEnzymesForSearch(searchId_2).size());
         checkSearch(search_2, searchList.get(0));
         
         // add results for the search
@@ -89,14 +91,14 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testReturnedSearchType() {
-        MsSearch search = makePeptideSearch(SearchFileFormat.SQT, false, false, false);
+        MsSearch search = makePeptideSearch(SearchFileFormat.SQT, false, false, false, false);
         assertEquals(SearchFileFormat.SQT, search.getSearchFileFormat());
         int searchId_1 = searchDao.saveSearch(search, 21); // runId = 21
         MsSearchDb searchDb = searchDao.loadSearch(searchId_1);
         assertTrue(searchDb instanceof SQTSearchDb);
         assertEquals(SearchFileFormat.SQT, searchDb.getSearchFileFormat());
         
-        search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false);
+        search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false, false);
         assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
         int searchId_2 = searchDao.saveSearch(search, 21);
         searchDb = searchDao.loadSearch(searchId_2);
@@ -128,6 +130,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         private List<MsSearchModification> dynamicModifications = new ArrayList<MsSearchModification>();
         private List<MsSearchModification> staticModifications = new ArrayList<MsSearchModification>();
         private List<MsSearchDatabase> searchDatabases = new ArrayList<MsSearchDatabase>();
+        private List<MsEnzyme> enzymes = new ArrayList<MsEnzyme>();
         private BigDecimal fragmentMassTolerance;
         private String fragmentMassType;
         private SearchFileFormat searchFileFormat;
@@ -234,6 +237,15 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
 
         public void setPrecursorMassTolerance(BigDecimal precursorMassTolerance) {
             this.precursorMassTolerance = precursorMassTolerance;
+        }
+
+        @Override
+        public List<MsEnzyme> getEnzymeList() {
+            return enzymes;
+        }
+        
+        public void setEnzymeList(List<MsEnzyme> enzymeList) {
+            this.enzymes = enzymeList;
         }
         
     }

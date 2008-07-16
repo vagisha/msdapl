@@ -24,6 +24,9 @@
 		<result property="precursorMassTolerance" column="precursorMassTolerance"/>
 		<result property="fragmentMassType" column="fragmentMassMethod" />
 		<result property="fragmentMassTolerance" column="fragmentMassTolerance"/>
+		<result property="enzymeList" 
+				column="id" 
+				select="MsEnzyme.selectEnzymesForSearch"/>
 		<result property="searchDatabases" 
 				select="MsDatabase.selectSearchDatabases" 
 				column="id"/>

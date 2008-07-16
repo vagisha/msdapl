@@ -7,6 +7,7 @@
 package org.yeastrc.ms.dao.ibatis;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.MsEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.dao.MsEnzymeDAO.EnzymeProperties;
 import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
@@ -45,9 +47,10 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         int runId = saveAndReturnId("MsRun.insert", runDb);
         
         // save the enzyme information
-        List<? extends MsEnzyme> enzymes = run.getEnzymeList();
+        List<MsEnzyme> enzymes = run.getEnzymeList();
         for (MsEnzyme enzyme: enzymes) 
-            enzymeDao.saveEnzymeforRun(enzyme, runId);
+            // use the enzyme name attribute only to look for a matching enzyme.
+            enzymeDao.saveEnzymeforRun(enzyme, runId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
         
         return runId;
     }

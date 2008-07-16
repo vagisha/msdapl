@@ -259,7 +259,7 @@ public class BaseDAOTestCase extends TestCase {
     // SEARCH
     //-----------------------------------------------------------------------------------------------------
     protected MsSearch makePeptideSearch(SearchFileFormat format, boolean addSeqDb,
-            boolean addStaticMods, boolean addDynaMods) {
+            boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
 
         MsSearchTest search = new MsSearchTest();
         search.setSearchFileFormat(format);
@@ -293,6 +293,11 @@ public class BaseDAOTestCase extends TestCase {
             search.setDynamicModifications(Arrays.asList(new MsSearchModification[]{dmod1, dmod2, dmod3}));
         }
 
+        if (addEnzymes) {
+            MsEnzyme enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
+            MsEnzyme enzyme2 = makeDigestionEnzyme("Trypsin", null, null, null);
+            search.setEnzymeList(Arrays.asList(new MsEnzyme[]{enzyme1, enzyme2}));
+        }
         return search;
     }
 
@@ -343,6 +348,7 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getSearchDatabases().size(), output.getSearchDatabases().size());
         assertEquals(input.getStaticModifications().size(), output.getStaticModifications().size());
         assertEquals(input.getDynamicModifications().size(), output.getDynamicModifications().size());
+        assertEquals(input.getEnzymeList().size(), output.getEnzymeList().size());
         assertEquals(input.getFragmentMassTolerance().doubleValue(), output.getFragmentMassTolerance().doubleValue());
         assertEquals(input.getFragmentMassType(), output.getFragmentMassType());
         assertEquals(input.getPrecursorMassTolerance().doubleValue(), output.getPrecursorMassTolerance().doubleValue());

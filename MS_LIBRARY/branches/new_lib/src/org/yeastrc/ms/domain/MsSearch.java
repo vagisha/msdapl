@@ -20,7 +20,12 @@ public interface MsSearch extends MsSearchBase {
      * @return the dynamicModifications
      */
     public abstract List<MsSearchModification> getDynamicModifications();
-
+    
+    /**
+     * @return the enzymes used for this search
+     */
+    public abstract List<MsEnzyme> getEnzymeList();
+    
 }
 
 interface MsSearchBase {

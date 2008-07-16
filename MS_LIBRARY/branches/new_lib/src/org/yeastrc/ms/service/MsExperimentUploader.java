@@ -22,6 +22,7 @@ public class MsExperimentUploader {
      */
     public void uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
         
+        log.info("BEGIN EXPERIMENT UPLOAD: directory: "+fileDirectory);
         long start = System.currentTimeMillis();
         int experimentId = 0;
         try {
@@ -90,7 +91,7 @@ public class MsExperimentUploader {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC");
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC/TEST");
         long end = System.currentTimeMillis();
         System.out.println("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }

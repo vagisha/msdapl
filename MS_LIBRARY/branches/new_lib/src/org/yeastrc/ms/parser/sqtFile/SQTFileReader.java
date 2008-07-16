@@ -50,7 +50,12 @@ public class SQTFileReader {
         while (isHeaderLine(currentLine)) {
             String[] tokens = currentLine.split("\\t");
             if (tokens.length >= 3) {
-                header.addHeaderItem(tokens[1], tokens[2]);
+                StringBuilder val = new StringBuilder();
+                // the value for the header may be a tab separated list; get the entire string
+                // e.g. H       Alg-MaxDiffMod  3H      Alg-DisplayTop  5
+                for (int i = 1; i < tokens.length; i++)
+                    val.append(tokens[i]);
+                header.addHeaderItem(tokens[1], val.toString());
             }
             else if (tokens.length >= 2){
                 // maybe the header and value are separated by a space rather than a tab

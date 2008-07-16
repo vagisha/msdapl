@@ -37,4 +37,9 @@ public interface MsSearchDb extends MsSearchBase {
      * @return the dynamicModifications
      */
     public abstract List<MsSearchModificationDb> getDynamicModifications();
+    
+    /**
+     * @return the enzymes used for this search
+     */
+    public abstract List<MsEnzymeDb> getEnzymeList();
 }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsSearchDatabase;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.SearchFileFormat;
@@ -42,13 +43,14 @@ public class Header implements SQTSearch {
     private List<SQTField> headerItems;
     private List<MsSearchModification> staticMods;
     private List<MsSearchModification> dynaMods;
-    private String enzyme;
+    private List<MsEnzyme> enzymes;
     
     
     public Header() {
         headerItems = new ArrayList<SQTField>();
         staticMods = new ArrayList<MsSearchModification>();
         dynaMods = new ArrayList<MsSearchModification>();
+        enzymes = new ArrayList<MsEnzyme>();
     }
    
     public boolean isHeaderValid() {
@@ -103,7 +105,7 @@ public class Header implements SQTSearch {
         else if (isDynamicModification(name))
             addDynamicMods(value);
         else if (isEnzyme(name))
-            enzyme = value; // TODO: can there be multiple enzyme headers????
+            addEnzyme(value);
     }
 
     
@@ -258,6 +260,26 @@ public class Header implements SQTSearch {
     }
     
     
+    //-------------------------------------------------------------------------------------------------------
+    // Enzyme(s) used for the search
+    //-------------------------------------------------------------------------------------------------------
+    private void addEnzyme(String enzyme) {
+        if (enzyme.equalsIgnoreCase("No_Enzyme"))
+            return;
+        enzymes.add(new EnzymeNameHolder(enzyme));
+    }
+    
+    private static final class EnzymeNameHolder implements MsEnzyme {
+
+        private String name;
+        public EnzymeNameHolder(String name) { this.name = name;}
+        public String getCut() {return null;}
+        public String getDescription() {return null;}
+        public String getName() {return name;}
+        public String getNocut() {return null;}
+        public Sense getSense() {return Sense.UNKNOWN;}
+        
+    }
     //-------------------------------------------------------------------------------------------------------
     // These are the header names we know
     //-------------------------------------------------------------------------------------------------------
@@ -470,10 +492,9 @@ public class Header implements SQTSearch {
     public String getEndTime() {
         return endTimeString;
     }
-    /**
-     * @return the enzyme
-     */
-    public String getEnzyme() {
-        return enzyme;
+    
+    @Override
+    public List<MsEnzyme> getEnzymeList() {
+        return enzymes;
     }
 }

@@ -74,9 +74,10 @@ public class MsDataUploadService {
         int i = 0;
         while(scanIterator.hasNext()) {
             MS2Scan scan = scanIterator.next();
-            scanDao.save(scan, runId, 0);   // MS2 file scans may have a precursor scan number
-            // but the precursor scans are not in the database
-            // so we do not have a database id for the precursor scan.
+            // MS2 file scans may have a precursor scan number but the precursor scans are not in the database
+            // so we do not have a database id for the precursor scan. We still do the check, though
+            int precursorScanId = scanDao.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
+            scanDao.save(scan, runId, precursorScanId);   
             i++;
         }
         log.info("Uploaded "+i+" scans for runId: "+runId);

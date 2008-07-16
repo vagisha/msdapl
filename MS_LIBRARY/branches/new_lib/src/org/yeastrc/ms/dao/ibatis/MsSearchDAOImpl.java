@@ -9,12 +9,16 @@ package org.yeastrc.ms.dao.ibatis;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
+import org.yeastrc.ms.dao.MsEnzymeDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
+import org.yeastrc.ms.dao.MsEnzymeDAO.EnzymeProperties;
+import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsSearch;
 import org.yeastrc.ms.domain.MsSearchDatabase;
 import org.yeastrc.ms.domain.MsSearchDb;
@@ -37,15 +41,18 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     private MsSearchDatabaseDAO seqDbDao;
     private MsSearchModificationDAO modDao;
     private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
+    private MsEnzymeDAO enzymeDao;
     
     public MsSearchDAOImpl(SqlMapClient sqlMap, 
             MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao,
             MsSearchDatabaseDAO seqDbDao,
-            MsSearchModificationDAO modDao) {
+            MsSearchModificationDAO modDao,
+            MsEnzymeDAO enzymeDao) {
         super(sqlMap);
         this.resultDao = resultDao;
         this.seqDbDao = seqDbDao;
         this.modDao = modDao;
+        this.enzymeDao = enzymeDao;
     }
     
     public MsSearchDb loadSearch(int searchId) {
@@ -79,6 +86,13 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
             modDao.saveDynamicModification(dynaMod, searchId);
         }
         
+        // save any enzymes used for the search
+        List<MsEnzyme> enzymes = search.getEnzymeList();
+        for (MsEnzyme enzyme: enzymes) 
+            // use the enzyme name attribute only to look for a matching enzyme.
+            enzymeDao.saveEnzymeforSearch(enzyme, searchId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
+        
+        
         return searchId;
     }
     
@@ -93,6 +107,9 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         // delete any static and dynamic modifications used for this search
         modDao.deleteStaticModificationsForSearch(searchId);
         modDao.deleteDynamicModificationsForSearch(searchId);
+        
+        // delete any enzymes used for this search
+        enzymeDao.deleteEnzymesForSearch(searchId);
         
         // finally delete the search
         delete("MsSearch.delete", searchId);
@@ -195,6 +212,10 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         public String getSearchEngineVersion() {
             return search.getSearchEngineVersion();
         }
-       
+
+        @Override
+        public List<MsEnzyme> getEnzymeList() {
+            return search.getEnzymeList();
+        }
     }
 }
