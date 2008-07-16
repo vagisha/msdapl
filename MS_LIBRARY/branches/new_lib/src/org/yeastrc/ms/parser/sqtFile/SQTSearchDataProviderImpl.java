@@ -12,7 +12,6 @@ import java.util.Iterator;
 
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
-import org.yeastrc.ms.parser.ParserException;
 import org.yeastrc.ms.service.SQTSearchDataProvider;
 
 /**
