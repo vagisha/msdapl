@@ -51,7 +51,7 @@
 	<parameterMap class="MsResultMod" id="msResultDynaModParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modificationId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="modifiedPosition" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="modifiedPosition" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
 	<!-- ================================================================================= -->

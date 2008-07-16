@@ -142,10 +142,4 @@ public class MsDataUploadService {
         log.info("DELETING EXPERIMENT: "+experimentId);
         expDao.delete(experimentId);
     }
-
-    public static void deleteExperiment(int experimentId, Throwable t) {
-        MsExperimentDAO expDao = daoFactory.getMsExperimentDAO();
-        log.info("DELETING EXPERIMENT: "+experimentId, t);
-        expDao.delete(experimentId);
-    }
 }

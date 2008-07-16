@@ -4,7 +4,7 @@
  * Jul 14, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dbuploader;
+package org.yeastrc.ms.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;

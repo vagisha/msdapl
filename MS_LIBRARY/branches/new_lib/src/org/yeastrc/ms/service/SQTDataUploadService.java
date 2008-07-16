@@ -12,13 +12,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsSearchDAO;
+import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSqlMapParam;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
+import org.yeastrc.ms.domain.MsSearchResultModification;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
 import org.yeastrc.ms.domain.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.MsSearchModification.ModificationType;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
@@ -77,6 +80,18 @@ class SQTDataUploadService {
         MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao = DAOFactory.instance().getSqtResultDAO();
         int resultId = resultDao.saveResultOnly(result, searchId, scanId);
         
+        // upload dynamic mods for this result
+        MsSearchModificationDAO modDao = daoFactory.getMsSearchModDAO();
+        for (MsSearchResultModification mod: result.getResultPeptide().getDynamicModifications()) {
+            if (mod == null || mod.getModificationType() == ModificationType.STATIC)
+                continue;
+            int modId = DynamicModLookupUtil.instance().getDynamicModificationId(searchId, 
+                    mod.getModifiedResidue(), mod.getModificationMass());
+            modDao.saveDynamicModificationForSearchResult(mod, resultId, modId);
+        }
+        
+        
+        // upload the protein matches
         if (proteinMatchList.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();
         }

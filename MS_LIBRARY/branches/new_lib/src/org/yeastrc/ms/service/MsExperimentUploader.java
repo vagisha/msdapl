@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dbuploader;
+package org.yeastrc.ms.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,23 +7,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.RunFileFormat;
-import org.yeastrc.ms.domain.SearchFileFormat;
 import org.yeastrc.ms.parser.ms2File.MS2RunDataProviderImpl;
 import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl;
-import org.yeastrc.ms.service.MsDataUploadService;
 
 public class MsExperimentUploader {
 
     private static final Logger log = Logger.getLogger(MsExperimentUploader.class);
-    
-    private RunFileFormat runFormat;
-    private SearchFileFormat searchFormat;
-    
-    public MsExperimentUploader(RunFileFormat runFormat, SearchFileFormat searchFormat) {
-        this.runFormat = runFormat;
-        this.searchFormat = searchFormat;
-    }
     
     /**
      * @param remoteServer
@@ -33,35 +22,24 @@ public class MsExperimentUploader {
      */
     public void uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
         
-        // right now we only know how to save runs in the .ms2 file format.
-        if (runFormat != RunFileFormat.MS2) {
-            log.error("Don't know how to save runs in format: "+runFormat);
-            return;
-        }
-        if (searchFormat != SearchFileFormat.SQT) {
-            log.error("Don't know how to save search in format: "+searchFormat);
-            return;
-        }
-        
+        long start = System.currentTimeMillis();
         int experimentId = 0;
         try {
            experimentId =  MsDataUploadService.uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
            uploadRunAndSearchFilesToDb(experimentId, fileDirectory);
         }
-        catch(RuntimeException e) {
+        catch(Exception e) {
             triggerExperimentDelete(experimentId, e);
+            return;
         }
-        catch (NoSuchAlgorithmException e) {
-            triggerExperimentDelete(experimentId, e);
-        }
-        catch (IOException e) {
-            triggerExperimentDelete(experimentId, e);
-        }
+        long end = System.currentTimeMillis();
+        log.info("EXPERIMENT UPLOADED IN: "+((end - start)/(1000L))+"seconds.");
     }
 
     private void triggerExperimentDelete(int experimentId, Throwable t) {
-        MsDataUploadService.deleteExperiment(experimentId, 
-                new RuntimeException("ERROR UPLOADING EXPERIMENT (runs and/or search results). ABORTING...",t));
+        MsDataUploadService.deleteExperiment(experimentId);
+        log.error("", t);
+        log.error("ERROR UPLOADING EXPERIMENT "+experimentId+" (runs and/or search results). ABORTING...");
     }
     
     private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws NoSuchAlgorithmException, IOException {
@@ -73,7 +51,7 @@ public class MsExperimentUploader {
         
         Set<String> filenames = getFileNamesInDirectory(directory);
         
-        // If we didn't find anything, just leave
+        // If we didn't find anything throw an exception so that the experiment is deleted.
         if (filenames.size() == 0) {
             throw new RuntimeException("No files found to upload in directory: "+fileDirectory);
         }
@@ -111,9 +89,9 @@ public class MsExperimentUploader {
     
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        MsExperimentUploader uploader = new MsExperimentUploader(RunFileFormat.MS2, SearchFileFormat.SQT);
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC/TEST");
+        MsExperimentUploader uploader = new MsExperimentUploader();
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC");
         long end = System.currentTimeMillis();
-        System.out.println("Time to upload experiment: "+((end - start)/(1000L))+"seconds.");
+        System.out.println("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }
 }
