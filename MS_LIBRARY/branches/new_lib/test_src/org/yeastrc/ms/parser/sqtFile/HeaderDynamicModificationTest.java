@@ -3,6 +3,8 @@ package org.yeastrc.ms.parser.sqtFile;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.yeastrc.ms.domain.MsSearchModification;
+
 import junit.framework.TestCase;
 
 public class HeaderDynamicModificationTest extends TestCase {
@@ -120,11 +122,11 @@ public class HeaderDynamicModificationTest extends TestCase {
         String modString = buf.toString();
 
         header.addDynamicMods(modString);
-        List<DynamicModification> mods = header.getDynamicModifications();
+        List<MsSearchModification> mods = header.getDynamicModifications();
         assertEquals(3, mods.size());
 
         int i = 0; 
-        for (DynamicModification mod: mods) {
+        for (MsSearchModification mod: mods) {
             assertEquals(mod.getModifiedResidue(), modChars[i++]);
             assertEquals(mod.getModificationMass(), new BigDecimal("123.4"));
             assertEquals(mod.getModificationSymbol(), '*');

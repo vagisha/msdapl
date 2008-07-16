@@ -4,7 +4,7 @@
 <sqlMap namespace="MsResultProtein"> 
 
 	<typeAlias alias="MsResultProteinDb" type="org.yeastrc.ms.domain.impl.MsSearchResultProteinDbImpl"/>
-	<typeAlias alias="MsResultProtein" type="org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl$MsResultProteinSqlMapParam" />
+	<typeAlias alias="MsResultProtein" type="org.yeastrc.ms.domain.MsSearchResultProteinDb"/>
 	
 	<resultMap class="MsResultProteinDb" id="msResultProteinResult">
 		<result property="id" column="id"/>

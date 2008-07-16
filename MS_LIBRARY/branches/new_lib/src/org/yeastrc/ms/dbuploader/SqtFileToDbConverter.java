@@ -14,7 +14,6 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 import org.yeastrc.ms.parser.sqtFile.Header;
-import org.yeastrc.ms.parser.sqtFile.PeptideResult;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.ScanResult;
 
@@ -54,13 +53,12 @@ public class SqtFileToDbConverter {
         
         saveSpectrumData(scan, searchId, scanId);
         // save all the results for the scan
-        for (PeptideResult result: scan.getResultList()) {
-            result.setCharge(scan.getCharge());
+        for (SQTSearchResult result: scan.getScanResults()) {
             savePeptideResult(result, searchId, scanId);
         }
     }
 
-    private int savePeptideResult(PeptideResult result, int searchId, int scanId) {
+    private int savePeptideResult(SQTSearchResult result, int searchId, int scanId) {
         MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao = DAOFactory.instance().getSqtResultDAO();
         return resultDao.save(result, searchId, scanId);
     }

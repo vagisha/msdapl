@@ -3,21 +3,26 @@ package org.yeastrc.ms.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface MsSearchResult {
+public interface MsSearchResult extends MsSearchResultBase {
 
+    /**
+     * @return the scan number for this result
+     */
+    public abstract int getScanNumber();
+    
     /**
      * @return the proteinMatchList
      */
     public abstract List<MsSearchResultProtein> getProteinMatchList();
 
+    /**
+     * @return the peptideResult
+     */
+    public abstract MsSearchResultPeptide getResultPeptide();
+    
 }
 
 interface MsSearchResultBase {
-    
-    /**
-     * @return the scan number for this result
-     */
-    public abstract int getScanNumber();
     
     /**
      * @return the charge
@@ -44,8 +49,4 @@ interface MsSearchResultBase {
      */
     public abstract ValidationStatus getValidationStatus();
     
-    /**
-     * @return the peptideResult
-     */
-    public abstract MsSearchResultPeptide getResultPeptide();
 }

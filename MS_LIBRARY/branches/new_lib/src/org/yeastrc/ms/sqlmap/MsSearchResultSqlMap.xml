@@ -6,7 +6,7 @@
 	<typeAlias alias="MsSearchResultPeptideDb" type="org.yeastrc.ms.domain.impl.MsSearchResultPeptideDbImpl" />
 	<typeAlias alias="MsSearchResultDb" type="org.yeastrc.ms.domain.impl.MsSearchResultDbImpl" />
 	<typeAlias alias="MsSearchResult" type="org.yeastrc.ms.dao.ibatis.MsSearchResultDAOImp$MsSearchResultSqlMapParam" />
-	<typeAlias alias="VStatus" type="org.yeastrc.ms.domain.MsSearchResult$ValidationStatus" />
+	<typeAlias alias="VStatus" type="org.yeastrc.ms.domain.ValidationStatus" />
 	<typeAlias alias="VStatusHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchResultDAOImpl$ValidationStatusTypeHandler" />
 	
 	

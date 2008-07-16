@@ -78,11 +78,11 @@ public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
         private List<MS2Field> analysisList = new ArrayList<MS2Field>();
         private List<MS2ScanCharge> scanChargeList = new ArrayList<MS2ScanCharge>();
         
-        public List<? extends MS2Field> getChargeIndependentAnalysisList() {
+        public List<MS2Field> getChargeIndependentAnalysisList() {
             return analysisList;
         }
 
-        public List<? extends MS2ScanCharge> getScanChargeList() {
+        public List<MS2ScanCharge> getScanChargeList() {
             return scanChargeList;
         }
 

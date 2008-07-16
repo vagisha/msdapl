@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,7 +41,7 @@ public class Header implements MS2Run {
     public static final String ACQUISITION_METHOD = "AcquisitionMethod";
     public static final String DATA_TYPE = "DataType";
     
-    private HashMap<String, String> headerItems;
+    private Map<String, String> headerItems;
     private List<MS2Field> headerList;
     private String fileName;
     private String sha1Sum;
@@ -137,11 +136,11 @@ public class Header implements MS2Run {
         return buf.toString();
     }
 
-    public List<? extends MS2Field> getHeaderList() {
+    public List<MS2Field> getHeaderList() {
         return headerList;
     }
 
-    public List<? extends MsEnzyme> getEnzymeList() {
+    public List<MsEnzyme> getEnzymeList() {
         return new ArrayList<MsEnzyme>(0);
     }
 

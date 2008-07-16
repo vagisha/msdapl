@@ -5,7 +5,7 @@
 
 	<typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.impl.MsSearchDbImpl"/>
 	<typeAlias alias="SQTSearchDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl"/>
-	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.MsSearch$SearchFileFormat"/>
+	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.SearchFileFormat"/>
 	<typeAlias alias="SearchTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$SearchFileFormatTypeHandler"/>
 	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$MsSearchSqlMapParam" />
 	

@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.parser.ParserException;
 
 
@@ -17,7 +18,7 @@ public class SQTFileReader {
     private BufferedReader reader;
     private String currentLine;
     private int currentLineNum = 0;
-    private List<DynamicModification> searchDynamicMods;
+    private List<MsSearchModification> searchDynamicMods;
 
     public void open(String filePath) {
         try {

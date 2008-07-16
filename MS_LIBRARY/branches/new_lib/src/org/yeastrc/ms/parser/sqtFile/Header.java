@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.yeastrc.ms.domain.MsSearchDatabase;
+import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.SearchFileFormat;
 import org.yeastrc.ms.domain.sqtFile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
@@ -37,16 +39,16 @@ public class Header implements SQTSearch {
     
     private Database database;
     
-    private List<HeaderItem> headerItems;
-    private List<StaticModification> staticMods;
-    private List<DynamicModification> dynaMods;
+    private List<SQTField> headerItems;
+    private List<MsSearchModification> staticMods;
+    private List<MsSearchModification> dynaMods;
     private String enzyme;
     
     
     public Header() {
-        headerItems = new ArrayList<HeaderItem>();
-        staticMods = new ArrayList<StaticModification>();
-        dynaMods = new ArrayList<DynamicModification>();
+        headerItems = new ArrayList<SQTField>();
+        staticMods = new ArrayList<MsSearchModification>();
+        dynaMods = new ArrayList<MsSearchModification>();
     }
    
     public boolean isHeaderValid() {
@@ -318,7 +320,7 @@ public class Header implements SQTSearch {
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        for (HeaderItem h: headerItems) {
+        for (SQTField h: headerItems) {
             buf.append(h.toString());
             buf.append("\n");
         }
@@ -327,13 +329,6 @@ public class Header implements SQTSearch {
         return buf.toString();
     }
     
-
-    /**
-     * @return the headerItems
-     */
-    public List<HeaderItem> getHeaderItems() {
-        return headerItems;
-    }
 
     /**
      * @return the sqtGenerator
@@ -380,18 +375,18 @@ public class Header implements SQTSearch {
     /**
      * @return the staticMods
      */
-    public List<StaticModification> getStaticModifications() {
+    public List<MsSearchModification> getStaticModifications() {
         return staticMods;
     }
 
     /**
      * @return the dynaMods
      */
-    public List<DynamicModification> getDynamicModifications() {
+    public List<MsSearchModification> getDynamicModifications() {
         return dynaMods;
     }
 
-    public List<? extends SQTField> getHeaders() {
+    public List<SQTField> getHeaders() {
        return headerItems;
     }
 
@@ -399,8 +394,8 @@ public class Header implements SQTSearch {
         return SearchFileFormat.SQT;
     }
 
-    public List<Database> getSearchDatabases() {
-        List<Database> dbList = new ArrayList<Database>(1);
+    public List<MsSearchDatabase> getSearchDatabases() {
+        List<MsSearchDatabase> dbList = new ArrayList<MsSearchDatabase>(1);
         dbList.add(database);
         return dbList;
     }

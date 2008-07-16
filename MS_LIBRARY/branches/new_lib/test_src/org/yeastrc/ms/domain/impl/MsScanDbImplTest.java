@@ -2,14 +2,14 @@ package org.yeastrc.ms.domain.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import junit.framework.TestCase;
+
+import org.yeastrc.ms.util.PeakConverterDouble;
 import org.yeastrc.ms.util.PeakStringBuilder;
 import org.yeastrc.ms.util.PeakUtils;
-
-import junit.framework.TestCase;
 
 public class MsScanDbImplTest extends TestCase {
 
@@ -35,10 +35,9 @@ public class MsScanDbImplTest extends TestCase {
         }
         byte[] peakByteArray = PeakUtils.encodePeakString(builder.getPeaksAsString());
         scanDb.setPeakByteArray(peakByteArray);
-        Iterator<double[]> peaksDouble = scanDb.peakIterator();
+        List<double[]> peakList = new PeakConverterDouble().convert(scanDb.peakDataString());
         int i = 0;
-        while (peaksDouble.hasNext()) {
-            double[] peak = peaksDouble.next();
+        for (double[] peak: peakList) {
             String[] peakStr = peaks.get(i);
             assertEquals(peak[0], Double.parseDouble(peakStr[0]));
             assertEquals(peak[1], Double.parseDouble(peakStr[1]));

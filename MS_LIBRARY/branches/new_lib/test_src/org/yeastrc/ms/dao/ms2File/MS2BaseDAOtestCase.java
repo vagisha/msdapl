@@ -72,7 +72,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
             public int getCharge() {
                 return charge;
             }
-            public List<? extends MS2Field> getChargeDependentAnalysisList() {
+            public List<MS2Field> getChargeDependentAnalysisList() {
                 if (addChgDepAnalysis) {
                     MS2Field da1 = makeAnalysis("name_1", "value_1");
                     MS2Field da2 = makeAnalysis("name_2", "value_2");

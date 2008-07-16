@@ -128,6 +128,9 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     
     //---------------------------------------------------------------------------------------
     
+    /**
+     * Convenience class for encapsulating a MsRunSearch and associated runId
+     */
     public class MsSearchSqlMapParam implements MsSearch {
 
         private int runId;
@@ -145,15 +148,15 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
             return runId;
         }
         
-        public List<? extends MsSearchModification> getDynamicModifications() {
+        public List<MsSearchModification> getDynamicModifications() {
             return search.getDynamicModifications();
         }
 
-        public List<? extends MsSearchDatabase> getSearchDatabases() {
+        public List<MsSearchDatabase> getSearchDatabases() {
             return search.getSearchDatabases();
         }
 
-        public List<? extends MsSearchModification> getStaticModifications() {
+        public List<MsSearchModification> getStaticModifications() {
             return search.getStaticModifications();
         }
 

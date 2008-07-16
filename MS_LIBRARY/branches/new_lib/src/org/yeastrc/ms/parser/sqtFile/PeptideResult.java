@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
 import org.yeastrc.ms.domain.ValidationStatus;
@@ -32,18 +33,18 @@ public class PeptideResult implements SQTSearchResult {
     private int charge;
     private int scanNumber;
     
-    private List<DbLocus> matchingLoci;
+    private List<MsSearchResultProtein> matchingLoci;
 
-    private List<DynamicModification> seachDynaMods;
+    private List<MsSearchModification> seachDynaMods;
     private MsSearchResultPeptide resultPeptide = null;
     
 
-    public PeptideResult(List<DynamicModification> searchDynamicMods) {
-        matchingLoci = new ArrayList<DbLocus>();
+    public PeptideResult(List<MsSearchModification> searchDynamicMods) {
+        matchingLoci = new ArrayList<MsSearchResultProtein>();
         if (searchDynamicMods != null)
             this.seachDynaMods = searchDynamicMods;
         else
-            seachDynaMods = new ArrayList<DynamicModification>(0);
+            seachDynaMods = new ArrayList<MsSearchModification>(0);
     }
 
     /**
@@ -189,15 +190,8 @@ public class PeptideResult implements SQTSearchResult {
     /**
      * @return the matchingLoci
      */
-    public List<DbLocus> getMatchingLoci() {
+    public List<MsSearchResultProtein> getMatchingLoci() {
         return matchingLoci;
-    }
-
-    /**
-     * @param matchingLoci the matchingLoci to set
-     */
-    public void setMatchingLoci(List<DbLocus> matchingLoci) {
-        this.matchingLoci = matchingLoci;
     }
 
     public void addMatchingLocus(String accession, String description) {
@@ -234,7 +228,7 @@ public class PeptideResult implements SQTSearchResult {
 
         buf.append("\n");
 
-        for (DbLocus locus: matchingLoci) {
+        for (MsSearchResultProtein locus: matchingLoci) {
             buf.append(locus.toString());
             buf.append("\n");
         }
@@ -250,7 +244,7 @@ public class PeptideResult implements SQTSearchResult {
         return charge;
     }
 
-    public List<? extends MsSearchResultProtein> getProteinMatchList() {
+    public List<MsSearchResultProtein> getProteinMatchList() {
         return this.matchingLoci;
     }
 

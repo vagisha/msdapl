@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.MsSearchResult;
 
-public interface SQTSearchResult extends MsSearchResult {
+public interface SQTSearchResult extends MsSearchResult, SQTSearchResultBase {
 
+}
+
+interface SQTSearchResultBase {
     /**
      * @return the xCorrRank
      */
@@ -30,5 +33,4 @@ public interface SQTSearchResult extends MsSearchResult {
      * @return the sp
      */
     public abstract BigDecimal getSp();
-
 }

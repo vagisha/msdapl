@@ -5,6 +5,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.domain.MsSearchModification;
+
 public class HeaderStaticModificationTest extends TestCase {
 
     protected void setUp() throws Exception {
@@ -119,11 +121,11 @@ public class HeaderStaticModificationTest extends TestCase {
         String modString = buf.toString();
 
         header.addStaticMods(modString);
-        List<StaticModification> mods = header.getStaticModifications();
+        List<MsSearchModification> mods = header.getStaticModifications();
         assertEquals(3, mods.size());
 
         int i = 0; 
-        for (StaticModification mod: mods) {
+        for (MsSearchModification mod: mods) {
             assertEquals(mod.getModifiedResidue(), modChars[i++]);
             assertEquals(mod.getModificationMass(), new BigDecimal("123.4"));
         }

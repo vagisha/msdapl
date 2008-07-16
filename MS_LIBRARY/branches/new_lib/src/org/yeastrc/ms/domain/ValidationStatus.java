@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.domain;
 
-public enum ValidationStatus {VALID('V'), NOT_VALID('N'), MAYBE('M'), UNVALIDATED('U');
+public enum ValidationStatus {VALID('V'), NOT_VALID('N'), MAYBE('M'), UNVALIDATED('U'), UNKNOWN('K');
 
     private char statusChar;
     
@@ -18,7 +18,7 @@ public enum ValidationStatus {VALID('V'), NOT_VALID('N'), MAYBE('M'), UNVALIDATE
             case 'N':   return NOT_VALID;
             case 'M':   return MAYBE;
             case 'U':   return UNVALIDATED;
-            default:    return UNVALIDATED;
+            default:    return UNKNOWN;
         }
     }
     

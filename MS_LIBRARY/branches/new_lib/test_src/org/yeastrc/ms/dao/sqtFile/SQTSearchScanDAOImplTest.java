@@ -1,7 +1,10 @@
 package org.yeastrc.ms.dao.sqtFile;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScanDb;
 
@@ -86,6 +89,17 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
 
             public BigDecimal getTotalIntensity() {
                 return new BigDecimal("12345.12345");
+            }
+
+            @Override
+            public int getScanNumber() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
+
+            @Override
+            public List<SQTSearchResult> getScanResults() {
+                return new ArrayList<SQTSearchResult>(0);
             }};
             return scan;
     }

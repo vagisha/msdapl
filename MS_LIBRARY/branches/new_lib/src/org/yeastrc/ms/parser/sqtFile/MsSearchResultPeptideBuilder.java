@@ -34,14 +34,16 @@ public final class MsSearchResultPeptideBuilder {
             throw new IllegalArgumentException("sequence cannot be null or empty");
         
 //        System.out.println("BUILDING");
-        resultSequence = removeAccession(resultSequence);
+//        resultSequence = removeAccession(resultSequence);
         
-        if (resultSequence.length() < 3)
+        if (resultSequence.length() < 5)
             throw new IllegalArgumentException("sequence appears to be invalid: "+resultSequence);
+        resultSequence = resultSequence.toUpperCase();
         final char preResidue = getPreResidue(resultSequence);
         final char postResidue = getPostResidue(resultSequence);
-        final List<MsSearchResultModification> resultMods = getResultMods(resultSequence, dynaMods);
-        final String justPeptide = getOnlyPeptideSequence(resultSequence);
+        String dotless = removeDots(resultSequence);
+        final List<MsSearchResultModification> resultMods = getResultMods(dotless, dynaMods);
+        final String justPeptide = getOnlyPeptideSequence(dotless);
         
 //        final char preResidue = 0;
 //      final char postResidue = 0;
@@ -50,7 +52,7 @@ public final class MsSearchResultPeptideBuilder {
 //        System.out.println(resultSequence+", "+preResidue+", "+postResidue+", "+justPeptide); 
         return new MsSearchResultPeptide() {
 
-            public List<? extends MsSearchResultModification> getDynamicModifications() {
+            public List<MsSearchResultModification> getDynamicModifications() {
                 return resultMods;
             }
             public String getPeptideSequence() {
@@ -69,34 +71,23 @@ public final class MsSearchResultPeptideBuilder {
     }
 
     char getPreResidue(String sequence) {
-        int dotIdx = sequence.indexOf('.');
-        if (dotIdx == 1)
+        if (sequence.charAt(1) == '.')
             return sequence.charAt(0);
-        else return 0;
-        // if dotIdx == -1 : no dot found e.g ABCD
-        // if dotIdx == 0  : no pre-residue before dot e.g .ABCD
-        // if dotIdx > 1   : this dot may be the one before the post-residue.  e.g ABCD.E
+        throw new IllegalArgumentException("Invalid peptide sequence; cannot get PRE residue: "+sequence);
     }
     
     char getPostResidue(String sequence) {
-        int dotIdx = sequence.lastIndexOf('.');
-        if (dotIdx == sequence.length() - 2)
+        if (sequence.charAt(sequence.length() - 2) == '.')
             return sequence.charAt(sequence.length() -1);
-        else return 0;
-        // if dotIdx == -1 : no dot found e.g ABCD
-        // if dotIdx == seqLen-1  : no post-residue after dot e.g ABCD.
-        // if dotIdx < seqLen-2   : this dot may be the one after the pre-residue.  e.g A.BCDE
+        throw new IllegalArgumentException("Invalid peptide sequence; cannot get POST residue: "+sequence);
     }
     
     List<MsSearchResultModification> getResultMods(String peptide, List<? extends MsSearchModification> dynaMods) {
         
-        // remove any dots 
-        peptide = removeDots(peptide);
-        
         // create a map of the dynamic modifications for the search for easy access.
-        Map<Character, MsSearchModification> modMap = new HashMap<Character, MsSearchModification>(dynaMods.size());
+        Map<String, MsSearchModification> modMap = new HashMap<String, MsSearchModification>(dynaMods.size());
         for (MsSearchModification mod: dynaMods)
-            modMap.put(mod.getModifiedResidue(), mod);
+            modMap.put(mod.getModifiedResidue()+""+mod.getModificationSymbol(), mod);
         
         List<MsSearchResultModification> resultMods = new ArrayList<MsSearchResultModification>();
         char modChar = 0;
@@ -109,7 +100,7 @@ public final class MsSearchResultPeptideBuilder {
                 modCharIndex++;
                 continue;
             }
-            MsSearchModification matchingMod = modMap.get(modChar);
+            MsSearchModification matchingMod = modMap.get(modChar+""+x);
             if (matchingMod == null)
                 throw new IllegalArgumentException("No modification found for residue: "+modChar+"; sequence: "+peptide);
             if (x != matchingMod.getModificationSymbol())
@@ -136,39 +127,30 @@ public final class MsSearchResultPeptideBuilder {
     
     // Handle this case: 34|emb|CAB44792.1|S.PELPATSLLQERW.A
     // This method should return S.PELPATSLLQERW.A for the example above.
-    String removeAccession(String sequence) {
-        int idx = sequence.lastIndexOf('|');
-        if (idx == -1)  return sequence;
-        return sequence.substring(idx+1);
-    }
+//    String removeAccession(String sequence) {
+//        int idx = sequence.lastIndexOf('|');
+//        if (idx == -1)  return sequence;
+//        return sequence.substring(idx+1);
+//    }
     
     String removeDots(String sequence) {
-        int f = sequence.indexOf('.');
-        if (f == 0 || f == 1)                                           sequence = sequence.substring(f+1);
-        
-        int e = sequence.indexOf('.');
-        if (e == sequence.length() -1 || e == sequence.length() -2)     sequence = sequence.substring(0, e);
-        
-        if (e != -1 && e < sequence.length() - 2)
-            throw new IllegalArgumentException("Sequence does not have a .(dot) in the right position: "+sequence);
-       
-        return sequence;
+        if (sequence.charAt(1) != '.' || sequence.charAt(sequence.length() - 2) != '.')
+            throw new IllegalArgumentException("Sequence does not have .(dots) in the expected position: "+sequence);
+        return sequence.substring(2, sequence.length() - 2);
     }
 
     String getOnlyPeptideSequence(String sequence) {
-        String dotLess = removeDots(sequence);
-        dotLess = dotLess.toUpperCase();
-        char[] residueChars = new char[dotLess.length()];
+        char[] residueChars = new char[sequence.length()];
         int j = 0;
-        for (int i = 0; i < dotLess.length(); i++) {
-            char x = dotLess.charAt(i);
+        for (int i = 0; i < sequence.length(); i++) {
+            char x = sequence.charAt(i);
             if (isResidue(x))
                 residueChars[j++] = x;
         }
-        dotLess = String.valueOf(residueChars).trim();
-        if (dotLess.length() == 0)
+        sequence = String.valueOf(residueChars).trim();
+        if (sequence.length() == 0)
             throw new IllegalArgumentException("No residues found: "+sequence);
-        return dotLess;
+        return sequence;
     }
     
     private boolean isResidue(char residue) {

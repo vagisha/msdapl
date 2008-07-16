@@ -18,7 +18,6 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearchScanDb;
 public class SQTSearchScanDbImpl implements SQTSearchScanDb {
 
     private int scanId;
-    private int scanNumber;
     private int charge;
     private int searchId;
     private int processTime;
@@ -36,15 +35,6 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
      */
     public void setScanId(int scanId) {
         this.scanId = scanId;
-    }
-    
-    @Override
-    public int getScanNumber() {
-        return scanNumber;
-    }
-    
-    public void setScanNumber(int scanNumber) {
-        this.scanNumber = scanNumber;
     }
     
     /**

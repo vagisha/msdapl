@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
@@ -43,11 +41,11 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
     }
     
     @Override
-    public void saveAll(List<MsResultProteinSqlMapParam> proteinMatchList) {
+    public void saveAll(List<MsSearchResultProteinDb> proteinMatchList) {
         if (proteinMatchList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (MsResultProteinSqlMapParam match: proteinMatchList) {
+        for (MsSearchResultProteinDb match: proteinMatchList) {
             values.append("(");
             values.append(match.getResultId());
             values.append(",");
@@ -83,7 +81,7 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         delete("MsResultProtein.deleteForResultId", resultId);
     }
    
-    public static final class MsResultProteinSqlMapParam {
+    public static final class MsResultProteinSqlMapParam implements MsSearchResultProteinDb {
         private int resultId;
         private String accession;
         private String description;
@@ -100,6 +98,10 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         }
         public String getDescription() {
             return description;
+        }
+        @Override
+        public int getId() {
+            return 0;
         }
         
     }

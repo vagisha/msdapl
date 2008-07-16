@@ -5,7 +5,7 @@
 
 	<typeAlias alias="MsRunDb" type="org.yeastrc.ms.domain.impl.MsRunDbImpl"/>
 	<typeAlias alias="MS2RunDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2RunDbImpl"/>
-	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.MsRun$RunFileFormat"/>
+	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.RunFileFormat"/>
 	<typeAlias alias="RunTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$RunFileFormatTypeHandler"/>
 	<typeAlias alias="MsRun" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$MsRunSqlMapParam" />
 	

@@ -45,6 +45,7 @@ import org.yeastrc.ms.domain.RunFileFormat;
 import org.yeastrc.ms.domain.SearchFileFormat;
 import org.yeastrc.ms.domain.ValidationStatus;
 import org.yeastrc.ms.domain.MsEnzyme.Sense;
+import org.yeastrc.ms.util.PeakConverterDouble;
 
 /**
  * 
@@ -98,7 +99,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsSearchResult makeSearchResult(int searchId, int charge,String peptide, boolean addPrMatch, boolean addDynaMod) {
 
         //!!------------ RESET the dynamic mod lookup table --------------------------------
-        DynamicModLookupUtil.reset();
+        DynamicModLookupUtil.instance().reset();
         //!!------------ RESET the dynamic mod lookup table --------------------------------
         
         
@@ -157,7 +158,7 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getNumIonsMatched(), output.getNumIonsMatched());
         assertEquals(input.getNumIonsPredicted(), output.getNumIonsPredicted());
         assertNull(input.getValidationStatus());
-        assertEquals(ValidationStatus.UNVALIDATED, output.getValidationStatus());
+        assertEquals(ValidationStatus.UNKNOWN, output.getValidationStatus());
         assertEquals(input.getProteinMatchList().size(), output.getProteinMatchList().size());
         checkResultPeptide(input.getResultPeptide(), output.getResultPeptide());
     }
@@ -416,7 +417,8 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getRetentionTime().doubleValue(), output.getRetentionTime().doubleValue());
         assertEquals(input.getEndScanNum(), output.getEndScanNum());
         Iterator<String[]> ipiter = input.peakIterator();
-        Iterator<double[]> opiter = output.peakIterator();
+        List<double[]> peakList = new PeakConverterDouble().convert(output.peakDataString());
+        Iterator<double[]> opiter = peakList.iterator();
         while(ipiter.hasNext()) {
             String[] ipeak = ipiter.next();
             double[] opeak = opiter.next();

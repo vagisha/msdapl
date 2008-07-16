@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
@@ -128,11 +127,12 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
 
         private ValidationStatus validationStatus;
         private MsSearchResultPeptide resultPeptide;
-        private List<? extends MsSearchResultProtein> proteinMatchList = new ArrayList<MsSearchResultProtein>();
+        private List<MsSearchResultProtein> proteinMatchList = new ArrayList<MsSearchResultProtein>();
         private int numIonsPredicted;
         private int numIonsMatched;
         private int charge;
         private BigDecimal calculatedMass;
+        private int scanNumber;
 
         public BigDecimal getCalculatedMass() {
             return calculatedMass;
@@ -150,7 +150,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
             return numIonsPredicted;
         }
 
-        public List<? extends MsSearchResultProtein> getProteinMatchList() {
+        public List<MsSearchResultProtein> getProteinMatchList() {
             return proteinMatchList;
         }
 
@@ -170,8 +170,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
             this.resultPeptide = resultPeptide;
         }
 
-        public void setProteinMatchList(
-                List<? extends MsSearchResultProtein> proteinMatchList) {
+        public void setProteinMatchList(List<MsSearchResultProtein> proteinMatchList) {
             this.proteinMatchList = proteinMatchList;
         }
 
@@ -190,6 +189,15 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         public void setCalculatedMass(BigDecimal calculatedMass) {
             this.calculatedMass = calculatedMass;
         }
+
+        @Override
+        public int getScanNumber() {
+            return scanNumber;
+        }
+        
+        public void setScanNumber(int scanNum) {
+            this.scanNumber = scanNum;
+        }
     }
     
     public static class MsSearchResultPeptideTest implements MsSearchResultPeptide {
@@ -199,7 +207,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         private char postResidue;
         private List<MsSearchResultModification> dynamicModifications = new ArrayList<MsSearchResultModification>();;
         
-        public List<? extends MsSearchResultModification> getDynamicModifications() {
+        public List<MsSearchResultModification> getDynamicModifications() {
             return dynamicModifications;
         }
         public String getPeptideSequence() {

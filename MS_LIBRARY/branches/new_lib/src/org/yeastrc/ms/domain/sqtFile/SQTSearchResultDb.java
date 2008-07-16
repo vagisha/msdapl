@@ -11,7 +11,7 @@ import org.yeastrc.ms.domain.MsSearchResultDb;
 /**
  * 
  */
-public interface SQTSearchResultDb extends SQTSearchResult, MsSearchResultDb {
+public interface SQTSearchResultDb extends MsSearchResultDb, SQTSearchResultBase {
 
     
 }

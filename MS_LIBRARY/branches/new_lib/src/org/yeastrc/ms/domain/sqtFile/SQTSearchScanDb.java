@@ -6,12 +6,11 @@
  */
 package org.yeastrc.ms.domain.sqtFile;
 
-import java.util.List;
 
 /**
  * 
  */
-public interface SQTSearchScanDb extends SQTSearchScan {
+public interface SQTSearchScanDb extends SQTSearchScanBase {
 
     /**
      * @return the database id of the search to which this scan result belongs
@@ -24,5 +23,5 @@ public interface SQTSearchScanDb extends SQTSearchScan {
     public abstract int getScanId();
    
     
-    public abstract List<SQTSearchResultDb> getScanResults();
+//    public abstract List<SQTSearchResultDb> getScanResults();
 }

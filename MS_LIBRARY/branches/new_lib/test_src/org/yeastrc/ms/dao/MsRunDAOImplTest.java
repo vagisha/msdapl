@@ -238,7 +238,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         private String instrumentSN;
         private String instrumentModel;
         private String fileName;
-        private List<? extends MsEnzyme> enzymeList = new ArrayList<MsEnzyme>();
+        private List<MsEnzyme> enzymeList = new ArrayList<MsEnzyme>();
         private String dataType;
         private String creationDate;
         private String conversionSWVersion;
@@ -271,7 +271,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
             this.fileName = fileName;
         }
 
-        public void setEnzymeList(List<? extends MsEnzyme> enzymeList) {
+        public void setEnzymeList(List<MsEnzyme> enzymeList) {
             this.enzymeList = enzymeList;
         }
 
@@ -331,7 +331,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
             return this.dataType;
         }
 
-        public List<? extends MsEnzyme> getEnzymeList() {
+        public List<MsEnzyme> getEnzymeList() {
             return this.enzymeList;
         }
 

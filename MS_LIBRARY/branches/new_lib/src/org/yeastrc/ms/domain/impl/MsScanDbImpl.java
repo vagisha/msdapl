@@ -8,9 +8,6 @@ package org.yeastrc.ms.domain.impl;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.util.PeakUtils;
@@ -34,8 +31,6 @@ public class MsScanDbImpl implements MsScanDb {
     private BigDecimal precursorMz;  // 0 if this is a MS1 scan
     private int precursorScanId = 0; // id (database) of the precursor scan.  0 if this is a MS1 scan
     private int precursorScanNum = -1; // scan number of the precursor scan
-    
-   // private List<double[]> peaks;
     
     private String peakString;
     
@@ -124,38 +119,12 @@ public class MsScanDbImpl implements MsScanDb {
     }
 
 
-//    public Iterator<double[]> peakIterator() {
-//        return peaks.iterator();
-//    }
-    
     public void setPeakByteArray(byte[] peaks) throws IOException, ClassNotFoundException {
         peakString = PeakUtils.decodePeakString(peaks);
-//        parsePeaksAsString(peakString);
     }
 
     @Override
     public String peakDataString() {
         return peakString;
     }
-    
-//    void parsePeaksAsString(String peaksString) {
-//        if (peaksString == null || peaksString.length() == 0)
-//            return;
-//        String[] peaksStr = peaksString.split(";");
-//        for (String peak: peaksStr) {
-//            String [] peakVals = splitPeakVals(peak);
-//            double[] peakData = new double[2];
-//            peakData[0] = Double.parseDouble(peakVals[0]);
-//            peakData[1] = Double.parseDouble(peakVals[1]);
-//            peaks.add(peakData);
-//        }
-//    }
-    
-//    private String[] splitPeakVals(String peak) {
-//        int i = peak.indexOf(":");
-//        String[] vals = new String[2];
-//        vals[0] = peak.substring(0, i);
-//        vals[1] = peak.substring(i+1, peak.length());
-//        return vals;
-//    }
 }

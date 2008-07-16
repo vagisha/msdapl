@@ -20,10 +20,10 @@ public class ScanCharge implements MS2ScanCharge {
 
     private int charge;
     private BigDecimal mass;
-    private List<HeaderItem> analysisItems;
+    private List<MS2Field> analysisItems;
     
     public ScanCharge() {
-        analysisItems = new ArrayList<HeaderItem>();
+        analysisItems = new ArrayList<MS2Field>();
     }
     
     /**
@@ -61,7 +61,7 @@ public class ScanCharge implements MS2ScanCharge {
         buf.append("\t");
         buf.append(mass);
         buf.append("\n");
-        for (HeaderItem item: analysisItems) {
+        for (MS2Field item: analysisItems) {
             buf.append("D\t");
             buf.append(item.getName());
             buf.append("\t");
@@ -73,7 +73,7 @@ public class ScanCharge implements MS2ScanCharge {
     }
 
     @Override
-    public List<? extends MS2Field> getChargeDependentAnalysisList() {
+    public List<MS2Field> getChargeDependentAnalysisList() {
         return analysisItems;
     }
 }

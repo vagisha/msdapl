@@ -130,7 +130,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
             return result.getNumIonsPredicted();
         }
 
-        public List<? extends MsSearchResultProtein> getProteinMatchList() {
+        public List<MsSearchResultProtein> getProteinMatchList() {
             return result.getProteinMatchList();
         }
 
@@ -167,14 +167,14 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         public Object getResult(ResultGetter getter) throws SQLException {
             String statusStr = getter.getString();
             if (getter.wasNull() || statusStr.length() == 0)
-                return ValidationStatus.UNVALIDATED;
+                return ValidationStatus.UNKNOWN;
             return ValidationStatus.instance(statusStr.charAt(0));
         }
 
         public void setParameter(ParameterSetter setter, Object parameter)
                 throws SQLException {
             ValidationStatus status = (ValidationStatus) parameter;
-            if (status == null || status == ValidationStatus.UNVALIDATED)
+            if (status == null || status == ValidationStatus.UNKNOWN)
                 setter.setNull(java.sql.Types.CHAR);
             else
                 setter.setString(Character.toString(status.getStatusChar()));
@@ -182,7 +182,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
 
         public Object valueOf(String s) {
             if (s == null || s.length() == 0)
-                return ValidationStatus.UNVALIDATED;
+                return ValidationStatus.UNKNOWN;
             return ValidationStatus.instance(s.charAt(0));
         }
         

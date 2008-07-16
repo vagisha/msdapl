@@ -34,19 +34,19 @@ public class Scan implements MS2Scan {
     
     private List<String[]> peakList;
     
-    private List<ScanCharge> chargeStates;
+    private List<MS2ScanCharge> chargeStates;
     
-    private List<HeaderItem> analysisItems;
+    private List<MS2Field> analysisItems;
     
     
     public Scan() {
-        chargeStates = new ArrayList<ScanCharge>();
-        analysisItems = new ArrayList<HeaderItem>();
+        chargeStates = new ArrayList<MS2ScanCharge>();
+        analysisItems = new ArrayList<MS2Field>();
         peakList = new ArrayList<String[]>();
     }
 
     @Override
-    public List<? extends MS2Field> getChargeIndependentAnalysisList() {
+    public List<MS2Field> getChargeIndependentAnalysisList() {
         return this.analysisItems;
     }
     
@@ -75,7 +75,7 @@ public class Scan implements MS2Scan {
         this.precursorScanNum = Integer.parseInt(num);
     }
     
-    public List<? extends MS2ScanCharge> getScanChargeList() {
+    public List<MS2ScanCharge> getScanChargeList() {
         return this.chargeStates;
     }
     public void addChargeState(ScanCharge chargeState) {
@@ -134,7 +134,7 @@ public class Scan implements MS2Scan {
         }
         buf.append("\n");
         // charge independent analysis
-        for (HeaderItem item: analysisItems) {
+        for (MS2Field item: analysisItems) {
             buf.append("I\t");
             buf.append(item.getName());
             buf.append("\t");
@@ -142,7 +142,7 @@ public class Scan implements MS2Scan {
             buf.append("\n");
         }
         // charge states along with their charge dependent analysis
-        for (ScanCharge charge: chargeStates) {
+        for (MS2ScanCharge charge: chargeStates) {
             buf.append(charge.toString());
             buf.append("\n");
         }

@@ -22,10 +22,10 @@ public class ScanResult implements SQTSearchScan {
     private BigDecimal lowestSp; // Lowest Sp value for top 500 spectra
     private int numMatching; // Number of sequences matching this precursor ion
     
-    private List<PeptideResult> resultList;
+    private List<SQTSearchResult> resultList;
     
     public ScanResult() {
-        resultList = new ArrayList<PeptideResult>();
+        resultList = new ArrayList<SQTSearchResult>();
     }
 
     /**
@@ -158,20 +158,6 @@ public class ScanResult implements SQTSearchScan {
         this.numMatching = numMatching;
     }
 
-    /**
-     * @return the resultList
-     */
-    public List<PeptideResult> getResultList() {
-        return resultList;
-    }
-
-    /**
-     * @param resultList the resultList to set
-     */
-    public void setResultList(List<PeptideResult> resultList) {
-        this.resultList = resultList;
-    }
-    
     public void addPeptideResult(PeptideResult result) {
         resultList.add(result);
     }
@@ -199,7 +185,7 @@ public class ScanResult implements SQTSearchScan {
         
         buf.append("\n");
         
-        for (PeptideResult res: resultList) {
+        for (SQTSearchResult res: resultList) {
             buf.append(res.toString());
             buf.append("\n");
         }
@@ -217,7 +203,7 @@ public class ScanResult implements SQTSearchScan {
         return getServer();
     }
 
-    public List<? extends SQTSearchResult> getScanResults() {
-        return this.getResultList();
+    public List<SQTSearchResult> getScanResults() {
+        return this.resultList;
     }
 }

@@ -3,7 +3,6 @@ package org.yeastrc.ms.dbuploader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
@@ -19,6 +18,7 @@ import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 import org.yeastrc.ms.parser.ms2File.Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
 import org.yeastrc.ms.parser.ms2File.ScanCharge;
+import org.yeastrc.ms.util.PeakConverterDouble;
 
 public class DbToMs2FileConverter {
 
@@ -79,9 +79,9 @@ public class DbToMs2FileConverter {
        }
        
        // finally, the peak data!
-       Iterator<double[]> peakIterator = scan.peakIterator();
-       while(peakIterator.hasNext()) {
-           double[] peak = peakIterator.next();
+       PeakConverterDouble converter = new PeakConverterDouble();
+       List<double[]> peaks = converter.convert(scan.peakDataString());
+       for(double[] peak: peaks) {
            ms2scan.addPeak(String.valueOf(peak[0]), String.valueOf(peak[1]));
        }
        

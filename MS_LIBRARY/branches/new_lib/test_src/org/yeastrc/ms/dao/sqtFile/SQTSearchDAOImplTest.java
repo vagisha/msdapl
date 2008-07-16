@@ -79,7 +79,7 @@ public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {
 
         private List<SQTField> headers = new ArrayList<SQTField>();
 
-        public List<? extends SQTField> getHeaders() {
+        public List<SQTField> getHeaders() {
             return headers ;
         }
 

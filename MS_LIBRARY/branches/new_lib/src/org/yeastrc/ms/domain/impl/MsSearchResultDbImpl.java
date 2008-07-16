@@ -194,9 +194,4 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
     public List<MsSearchResultProteinDb> getProteinMatchList() {
         return (List<MsSearchResultProteinDb>) proteinMatchList;
     }
-
-    @Override
-    public int getScanNumber() {
-        throw new UnsupportedOperationException("getScanNumber is not supported by MsSearchResultDbImpl");
-    }
 }

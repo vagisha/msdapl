@@ -22,7 +22,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public void testOperationsOnSqtSearchResult() {
         
         // try to get the result for a result id that does not exist in the table
-        SQTSearchResult res = sqtResDao.load(1);
+        SQTSearchResultDb res = sqtResDao.load(1);
         assertNull(res);
         
         // insert one result in to the table

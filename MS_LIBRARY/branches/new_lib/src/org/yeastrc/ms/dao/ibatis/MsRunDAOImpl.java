@@ -80,7 +80,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         enzymeDao.deleteEnzymesForRun(runId);
         
         // delete scans
-//        msScanDao.deleteScansForRun(runId);
+        msScanDao.deleteScansForRun(runId);
         
         // delete the run
         delete("MsRun.delete", runId);
@@ -114,7 +114,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
 
     
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
-        MsRun run = loadRun(runId);
+        MsRunDb run = loadRun(runId);
         
         if (run == null) {
             throw new Exception("No run found for runId: "+runId);
@@ -170,7 +170,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
             return experimentId;
         }
 
-        public List<? extends MsEnzyme> getEnzymeList() {
+        public List<MsEnzyme> getEnzymeList() {
             return run.getEnzymeList();
         }
 

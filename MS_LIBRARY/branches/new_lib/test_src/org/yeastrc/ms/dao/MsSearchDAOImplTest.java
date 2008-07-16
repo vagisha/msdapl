@@ -88,28 +88,28 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         
     }
 
-//    public void testReturnedSearchType() {
-//        MsSearch search = makePeptideSearch(SearchFileFormat.SQT, false, false, false);
-//        assertEquals(SearchFileFormat.SQT, search.getSearchFileFormat());
-//        int searchId_1 = searchDao.saveSearch(search, 21); // runId = 21
-//        MsSearchDb searchDb = searchDao.loadSearch(searchId_1);
-//        assertTrue(searchDb instanceof SQTSearchDb);
-//        assertEquals(SearchFileFormat.SQT, searchDb.getSearchFileFormat());
-//        
-//        search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false);
-//        assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
-//        int searchId_2 = searchDao.saveSearch(search, 21);
-//        searchDb = searchDao.loadSearch(searchId_2);
-//        assertFalse(searchDb instanceof SQTSearchDb);
-//        assertEquals(SearchFileFormat.PEPXML, searchDb.getSearchFileFormat());
-//        
-//        searchDao.deleteSearch(searchId_1);
-//        searchDao.deleteSearch(searchId_2);
-//        
-//        testSearchDeleted(21, searchId_1, new int[0] );
-//        testSearchDeleted(21, searchId_2, new int[0] );
-//        
-//    }
+    public void testReturnedSearchType() {
+        MsSearch search = makePeptideSearch(SearchFileFormat.SQT, false, false, false);
+        assertEquals(SearchFileFormat.SQT, search.getSearchFileFormat());
+        int searchId_1 = searchDao.saveSearch(search, 21); // runId = 21
+        MsSearchDb searchDb = searchDao.loadSearch(searchId_1);
+        assertTrue(searchDb instanceof SQTSearchDb);
+        assertEquals(SearchFileFormat.SQT, searchDb.getSearchFileFormat());
+        
+        search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false);
+        assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
+        int searchId_2 = searchDao.saveSearch(search, 21);
+        searchDb = searchDao.loadSearch(searchId_2);
+        assertFalse(searchDb instanceof SQTSearchDb);
+        assertEquals(SearchFileFormat.PEPXML, searchDb.getSearchFileFormat());
+        
+        searchDao.deleteSearch(searchId_1);
+        searchDao.deleteSearch(searchId_2);
+        
+        testSearchDeleted(21, searchId_1, new int[0] );
+        testSearchDeleted(21, searchId_2, new int[0] );
+        
+    }
     
     private void testSearchDeleted(int runId, int searchId, int[] resultIds) {
         assertEquals(0, searchDao.loadSearchIdsForRun(runId).size());
@@ -138,7 +138,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         private String precursorMassType;
         private BigDecimal precursorMassTolerance;
 
-        public List<? extends MsSearchModification> getDynamicModifications() {
+        public List<MsSearchModification> getDynamicModifications() {
             return dynamicModifications;
         }
 
@@ -158,7 +158,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
             return precursorMassType;
         }
 
-        public List<? extends MsSearchDatabase> getSearchDatabases() {
+        public List<MsSearchDatabase> getSearchDatabases() {
             return searchDatabases;
         }
 
@@ -182,7 +182,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
             return searchFileFormat;
         }
 
-        public List<? extends MsSearchModification> getStaticModifications() {
+        public List<MsSearchModification> getStaticModifications() {
             return staticModifications;
         }
 

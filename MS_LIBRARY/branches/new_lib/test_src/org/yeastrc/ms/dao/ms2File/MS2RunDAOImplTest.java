@@ -69,7 +69,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
         List<MS2RunDb> runList = ms2RunDao.loadExperimentRuns(1);
         assertEquals(2, runList.size());
         
-        for (MS2Run r: runList) {
+        for (MS2RunDb r: runList) {
             assertEquals(3, r.getHeaderList().size());
         }
         
@@ -118,7 +118,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 
         private List<MS2Field> headers = new ArrayList<MS2Field>();
         
-        public List<? extends MS2Field> getHeaderList() {
+        public List<MS2Field> getHeaderList() {
             return headers;
         }
         public void addHeader(MS2Field header) {
