@@ -71,12 +71,5 @@ public class MS2ScanChargeDAOImpl extends BaseSqlMapDAO implements MS2ScanCharge
         // delete the scan charge entries for the scanId
         delete("MS2ScanCharge.deleteByScanId", scanId);
     }
-
-    public void deleteByScanIdCascade(int scanId) {
-        delete("MS2ScanCharge.deleteByScanId_cascade", scanId);
-    }
-   
-    public static final class MS2ScanChargeSqlMapParam {
-        
-    }
+  
 }

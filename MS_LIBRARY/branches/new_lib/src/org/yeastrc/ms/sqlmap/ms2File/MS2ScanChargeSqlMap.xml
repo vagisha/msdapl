@@ -46,12 +46,4 @@
     	DELETE FROM MS2FileScanCharge WHERE scanID=#id#
     </delete>
     
-    <delete id="deleteByScanId_cascade" parameterClass="Integer">
-    	DELETE s, a
-    	FROM MS2FileScanCharge as s
-    	LEFT JOIN MS2FileChargeDependentAnalysis as a
-    	ON (s.id = a.scanChargeID)
-    	WHERE scanID=#id#
-    </delete>
-    
 </sqlMap>

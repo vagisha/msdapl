@@ -17,10 +17,10 @@ public class DAOTestSuite {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for org.yeastrc.ms.dao");
         //$JUnit-BEGIN$
-        suite.addTestSuite(MsExperimentDAOImplTest.class);
-        suite.addTestSuite(MsEnzymeDAOImplTest.class);
-        suite.addTestSuite(MsRunDAOImplTest.class);
-        suite.addTestSuite(MsScanDAOImplTest.class);
+//        suite.addTestSuite(MsExperimentDAOImplTest.class);
+//        suite.addTestSuite(MsEnzymeDAOImplTest.class);
+//        suite.addTestSuite(MsRunDAOImplTest.class);
+//        suite.addTestSuite(MsScanDAOImplTest.class);
         
         // MS2 file data
         suite.addTestSuite(MS2ChargeDependentAnalysisDAOImplTest.class);
@@ -31,18 +31,18 @@ public class DAOTestSuite {
         
         
         // search 
-        suite.addTestSuite(MsSearchResultProteinDAOImplTest.class);
-        suite.addTestSuite(MsSearchModificationDAOImplTest.class);
-        suite.addTestSuite(MsSearchResultDAOImplTest.class);
-        suite.addTestSuite(MsSearchDAOImplTest.class);
-        suite.addTestSuite(MsSearchDatabaseDAOImplTest.class);
-        
-        
-        // SQT search
-        suite.addTestSuite(SQTHeaderDAOImplTest.class);
-        suite.addTestSuite(SQTSearchScanDAOImplTest.class);
-        suite.addTestSuite(SQTSearchResultDAOImplTest.class);
-        suite.addTestSuite(SQTSearchDAOImplTest.class);
+//        suite.addTestSuite(MsSearchResultProteinDAOImplTest.class);
+//        suite.addTestSuite(MsSearchModificationDAOImplTest.class);
+//        suite.addTestSuite(MsSearchResultDAOImplTest.class);
+//        suite.addTestSuite(MsSearchDAOImplTest.class);
+//        suite.addTestSuite(MsSearchDatabaseDAOImplTest.class);
+//        
+//        
+//        // SQT search
+//        suite.addTestSuite(SQTHeaderDAOImplTest.class);
+//        suite.addTestSuite(SQTSearchScanDAOImplTest.class);
+//        suite.addTestSuite(SQTSearchResultDAOImplTest.class);
+//        suite.addTestSuite(SQTSearchDAOImplTest.class);
         
         
         //$JUnit-END$

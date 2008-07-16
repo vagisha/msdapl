@@ -30,13 +30,4 @@ public interface MS2ScanChargeDAO {
      */
     public abstract void deleteByScanId(int scanId);
     
-    /**
-     * Deletes all entries associated with the given scanId. Related charge dependent
-     * analyses are deleted as well. 
-     * This method uses a single multi-delete query on the MS2FileScanCharge and
-     * MS2FileChargeDependentAnalysis tables.
-     * @param scanId
-     */
-    public abstract void deleteByScanIdCascade(int scanId);
-
 }
