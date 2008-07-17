@@ -59,12 +59,13 @@ public class SQTFileReader {
         while (isHeaderLine(currentLine)) {
             String[] tokens = currentLine.split("\\t");
             if (tokens.length >= 3) {
-                StringBuilder val = new StringBuilder();
                 // the value for the header may be a tab separated list; get the entire string
                 // e.g. H       Alg-MaxDiffMod  3H      Alg-DisplayTop  5
-                for (int i = 2; i < tokens.length; i++)
-                    val.append(tokens[i]);
-                header.addHeaderItem(tokens[1], val.toString());
+                if (tokens.length > 3) {
+                    int idx = currentLine.indexOf('\t',currentLine.indexOf('\t')+1);
+                    tokens[2] = currentLine.substring(idx+1, currentLine.length());
+                }
+                header.addHeaderItem(tokens[1], tokens[2]);
             }
             else if (tokens.length >= 2){
                 // maybe the header and value are separated by a space rather than a tab
@@ -109,40 +110,30 @@ public class SQTFileReader {
 
     public ScanResult getNextScan() {
 
-        ScanResult scan = parseScanResult();
-        PeptideResult result = null; // current result
+        ScanResult scan = parseScanResult(currentLine);
 
         try {
             advanceLine();
 
             while(currentLine != null) {
                 
-                // is this one of the charge states of the scan?
+                // is this one of the results for the scan ('M' line)
                 if (isResultLine(currentLine)) {
-                    // if this is NOT the first time we are seeing a 'M' line add the previous result
-                    if (result != null)
+                    PeptideResult result = parsePeptideResult(scan.getStartScan(), scan.getCharge());
+                    if (result != null) 
                         scan.addPeptideResult(result);
-                    result = parsePeptideResult(scan.getStartScan(), scan.getCharge());
+                    else {
+                        // there was an error parsing the 'M' line. We will ignore this peptide result
+                        // if there are any 'L' line after the offending 'M' line skip over them.
+                        advanceLine();
+                        while(isLocusLine(currentLine))
+                            advanceLine();
+                    }
                 }
-                // is this one of the charge independent analysis for this scan?
-                else if (isLocusLine(currentLine)) {
-                    
-                    DbLocus locus = parseLocus();
-                    // add this to the current result
-                    if (locus != null)  result.addMatchingLocus(locus);
-                }
-                // it is neither throw an exception
                 else {
-                   closeAndThrowException("Unexpected line (was expecting a 'M' or 'L' line): "+currentLine);
-                }
-                advanceLine();
-                if (currentLine == null || isScanLine(currentLine))
                     break;
+                }
             }
-            
-            // add the last peptide result
-            if (result != null)
-                scan.addPeptideResult(result);
         }
         catch (IOException e) {
             closeAndThrowException(e);
@@ -152,15 +143,15 @@ public class SQTFileReader {
     }
 
 
-    private ScanResult parseScanResult() {
+    private ScanResult parseScanResult(String line) {
 
         // make sure we have a scan line
-        if (!isScanLine(currentLine))
-            closeAndThrowException("Error parsing scan. Expected line starting with \"S\"\n"+currentLine);
+        if (!isScanLine(line))
+            closeAndThrowException("Error parsing scan. Expected line starting with \"S\"\n"+line);
 
-        String[] tokens = currentLine.split("\\t");
+        String[] tokens = line.split("\\t");
         if (tokens.length < 10)
-            closeAndThrowException("Expected 10 fields in scan line: "+currentLine);
+            closeAndThrowException("Expected 10 fields in scan line: "+line);
 
 
         ScanResult scan = new ScanResult();
@@ -177,16 +168,37 @@ public class SQTFileReader {
         return scan;
     }
 
-    private PeptideResult parsePeptideResult(int scanNumber, int charge) {
+    private PeptideResult parsePeptideResult(int scanNumber, int charge) throws IOException {
         PeptideResult result = null;
-        try {parsePeptideResult(currentLine, scanNumber, charge);
+        try {
+            result = parsePeptideResult(currentLine, scanNumber, charge);
+        }
+        catch (NumberFormatException e) {
+            log.warn("Ignoring 'M' line; Error parsing number(s). LINE#: "+currentLineNum+" -- "+currentLine);
+            warnings++;
+        }
+        if (result == null)     return null;
+        
+        advanceLine();
+        
+        while (currentLine != null) {
+            if (isLocusLine(currentLine)) {
+                DbLocus locus = parseLocus(currentLine);
+                if (locus != null)
+                    result.addMatchingLocus(locus);
+            }
+            else
+                break;
+            advanceLine();
+        }
+        return result;
     }
     
     private PeptideResult parsePeptideResult(String line, int scanNumber, int charge) {
         
         String[] tokens = line.split("\\t");
         if (tokens.length < 11) {
-            log.warn("Expected 11 fields in 'M' line: "+currentLine);
+            log.warn("Ignoring invalid 'M' line. Expected 11 fields in 'M' line. LINE#: "+currentLineNum+" -- "+line);
             warnings++;
             return null;
         }
@@ -213,8 +225,8 @@ public class SQTFileReader {
     private DbLocus parseLocus(String line) {
         String[] tokens = line.split("\\t");
         if (tokens.length < 2) {
-            // closeAndThrowException("2 fields expected for line: "+currentLine);
-            log.warn("Ignoring invalid 'L' line. 2 fields expected: "+currentLine);
+            // closeAndThrowException("2 fields expected for line: "+line);
+            log.warn("Ignoring invalid 'L' line. 2 fields expected. LINE#: "+currentLineNum+" -- "+line);
             warnings++;
             return null;
         }

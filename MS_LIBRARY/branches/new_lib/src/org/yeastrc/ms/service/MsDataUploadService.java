@@ -115,12 +115,16 @@ public class MsDataUploadService {
         int numProteins = 0;
         while (searchScanIterator.hasNext()) {
             SQTSearchScan scan = searchScanIterator.next();
+            
             int scanId = getScanId(runId, scan.getScanNumber());
             
             // save spectrum data
             sqtService.uploadSearchScan(scan, searchId, scanId); 
             
             // save all the search results for this scan
+            if (scan.getScanResults().size() == 0) {
+                log.warn("!!!No results found for scan (scanNumber: "+scan.getScanNumber()+", charge: "+scan.getCharge());
+            }
             for (SQTSearchResult result: scan.getScanResults()) {
                 sqtService.uploadSearchResult(result, searchId, scanId);
                 numResults++;

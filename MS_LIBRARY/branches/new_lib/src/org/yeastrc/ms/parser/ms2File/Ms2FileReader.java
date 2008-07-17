@@ -68,9 +68,11 @@ public class Ms2FileReader {
                 //header.addHeaderItem(tokens[1], tokens[2]);
                 StringBuilder val = new StringBuilder();
                 // the value for the header may be a tab separated list; get the entire string
-                for (int i = 2; i < tokens.length; i++)
-                    val.append(tokens[i]);
-                header.addHeaderItem(tokens[1], val.toString());
+                if (tokens.length > 3) {
+                    int idx = currentLine.indexOf('\t',currentLine.indexOf('\t')+1);
+                    tokens[2] = currentLine.substring(idx+1, currentLine.length());
+                }
+                header.addHeaderItem(tokens[1], tokens[2]);
             }
             else if (tokens.length >= 2){
                 // if the value for this header is missing, add the header
