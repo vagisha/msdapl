@@ -22,8 +22,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.zip.DataFormatException;
 import java.util.zip.ZipException;
 
+import org.apache.log4j.Logger;
+import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl;
+import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl.ScanResultIterator;
 import org.yeastrc.ms2.utils.Decompresser;
 
 
@@ -32,6 +37,7 @@ import org.yeastrc.ms2.utils.Decompresser;
  */
 public class YatesCycleConverter {
 
+    private static final Logger log = Logger.getLogger(YatesCycleConverter.class);
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, ZipException, IOException {
         
@@ -62,33 +68,40 @@ public class YatesCycleConverter {
         
         int lastRunId = 0;
         int numExp = 0;
-        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP";
+        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
         MsExperimentUploader expUploader = new MsExperimentUploader();
         for (YatesCycle exp: experiments) {
-            if (lastRunId != exp.runId) {
-                
-                // convert the experiment
-                if (numExp != 0)
-                    expUploader.uploadExperimentToDb("my_computer", dataDir, dataDir);
-                
-                // TODO delete the downloaded files
-                if (numExp != 0)
-                    break;
-                
-                lastRunId = exp.runId;
-                numExp++;
-            }
+//            if (lastRunId != exp.runId) {
+//                
+//                // convert the experiment
+//                if (numExp != 0)
+//                    expUploader.uploadExperimentToDb("my_computer", dataDir, dataDir);
+//                
+//                // TODO delete the downloaded files
+//                if (numExp != 0)
+//                    break;
+//                
+//                lastRunId = exp.runId;
+//                numExp++;
+//            }
             // download the MS2 file for this experiment
-            converter.downloadMS2File(exp.cycleId, exp.cycleName+".ms2", dataDir);
+//            converter.downloadMS2File(exp.cycleId, exp.cycleName+".ms2", dataDir);
             
             // download the SQT file for this experiment
-            converter.downloadSQTFile(exp.cycleId, exp.cycleName+".sqt", dataDir);
+            if (converter.downloadSQTFile(exp.cycleId, exp.cycleName+".sqt", dataDir)) {
+                converter.parseSQTFile(dataDir+File.separator+exp.cycleName+".sqt");
+                numExp++;
+                new File(dataDir+File.separator+exp.cycleName+".sqt").delete();
+            }
         }
+        
+        // upload the last experiment
+//        expUploader.uploadExperimentToDb("my_computer", dataDir, dataDir);
         
         System.out.println("Number of experiments found: "+numExp);
     }
     
-    public void downloadMS2File(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
+    public boolean downloadMS2File(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
         Connection conn = getConnection();
         Statement statement = null;
         ResultSet rs = null;
@@ -97,6 +110,7 @@ public class YatesCycleConverter {
         statement = conn.createStatement();
         rs = statement.executeQuery(sql);
         BufferedReader reader = null;
+        boolean downloaded = false;
         BufferedWriter writer = new BufferedWriter(new FileWriter(downloadDir+File.separator+fileName));
         if (rs.next()) {
             byte[] bytes = rs.getBytes("data");
@@ -107,24 +121,51 @@ public class YatesCycleConverter {
                 writer.write(line);
                 writer.write("\n");
             }
+            downloaded = true;
         }
         reader.close();
         writer.close();
         rs.close();
         statement.close();
         conn.close();
+        return downloaded;
     }
     
+    public void parseSQTFile(String filePath) {
+        SQTSearchDataProviderImpl provider = new SQTSearchDataProviderImpl();
+        try {
+            provider.setSQTSearch(filePath);
+            try {
+                provider.getSearchData();
+            }
+            catch (DataFormatException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        catch (ParserException e) {
+            e.printStackTrace();
+        }
+        ScanResultIterator scanIt = provider.scanResultIterator();
+        while(scanIt.hasNext()) {
+            try {
+                scanIt.next();
+            }
+            catch (DataFormatException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
     
-    public void downloadSQTFile(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
+    public boolean downloadSQTFile(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
         Connection conn = getConnection();
         Statement statement = null;
         ResultSet rs = null;
-        System.out.println("CycleID is: "+cycleId);
+        log.debug("CycleID is: "+cycleId+"; fileName: "+fileName);
         String sql = "SELECT data from tblYatesCycleSQTData WHERE cycleID="+cycleId;
         statement = conn.createStatement();
         rs = statement.executeQuery(sql);
         BufferedReader reader = null;
+        boolean downloaded = false;
         BufferedWriter writer = new BufferedWriter(new FileWriter(downloadDir+File.separator+fileName));
         if (rs.next()) {
             byte[] bytes = rs.getBytes("data");
@@ -135,12 +176,14 @@ public class YatesCycleConverter {
                 writer.write(line);
                 writer.write("\n");
             }
+            reader.close();
+            downloaded = true;
         }
-        reader.close();
         writer.close();
         rs.close();
         statement.close();
         conn.close();
+        return downloaded;
     }
     
     
@@ -161,4 +204,12 @@ public class YatesCycleConverter {
             this.cycleName = cycleName;
         }
     }
+    
+//    public static void main(String[] args) throws ZipException, ClassNotFoundException, SQLException, IOException {
+//        int cycleId = 9686;
+//        String fileName = "PARC_073105-smt3-wt-02.sqt";
+//        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test";
+//        YatesCycleConverter converter = new YatesCycleConverter();
+//        converter.downloadSQTFile(cycleId, fileName, downloadDir);
+//    }
 }

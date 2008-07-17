@@ -8,10 +8,11 @@ package org.yeastrc.ms.parser.sqtFile;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.util.zip.DataFormatException;
 
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
+import org.yeastrc.ms.parser.ParserException;
 import org.yeastrc.ms.service.SQTSearchDataProvider;
 
 /**
@@ -21,18 +22,18 @@ public class SQTSearchDataProviderImpl implements SQTSearchDataProvider {
 
     private String fileName;
     private SQTFileReader reader;
-    private Iterator<SQTSearchScan> iterator;
+    private ScanResultIterator iterator;
     
     public SQTSearchDataProviderImpl() {
         reader = new SQTFileReader();
     }
     
-    public void setSQTSearch(String filePath) {
+    public void setSQTSearch(String filePath) throws ParserException {
         fileName = new File(filePath).getName();
         reader.open(filePath);
     }
     
-    public void setSQT(String fileName, InputStream inputStream) {
+    public void setSQT(String fileName, InputStream inputStream) throws ParserException {
         this.fileName = fileName;
         reader.open(inputStream);
     }
@@ -41,14 +42,16 @@ public class SQTSearchDataProviderImpl implements SQTSearchDataProvider {
         return fileName;
     }
 
-    public SQTSearch getSearchData() {
-        Header header = reader.getHeader();
-        if (!header.isHeaderValid())
-            throw new RuntimeException("Invalid SQT Header");
-        return header;
+    public SQTSearch getSearchData() throws DataFormatException {
+        try {
+            return reader.getHeader();
+        }
+        catch(ParserException e) {
+            throw new DataFormatException(e.getMessage());
+        }
     }
     
-    public Iterator<SQTSearchScan> scanResultIterator() {
+    public ScanResultIterator scanResultIterator() {
         if (iterator == null)
             iterator = new ScanResultIterator();
         else
@@ -56,7 +59,7 @@ public class SQTSearchDataProviderImpl implements SQTSearchDataProvider {
         return iterator;
     }
    
-    private class ScanResultIterator implements Iterator<SQTSearchScan> {
+    public class ScanResultIterator {
 
         public boolean hasNext() {
             if (reader.hasScans()) return true;
@@ -64,13 +67,19 @@ public class SQTSearchDataProviderImpl implements SQTSearchDataProvider {
             return false;
         }
 
-        public SQTSearchScan next() {
-            return reader.getNextScan();
+        public SQTSearchScan next() throws DataFormatException {
+            try {
+                return reader.getNextScan();
+            }
+            catch (ParserException e) {
+               throw new DataFormatException(e.getMessage());
+            }
         }
+    }
 
-        public void remove() {
-            throw new UnsupportedOperationException("Remove operation is not permitted on ScanResultIterator");
-        }
+    @Override
+    public void close() {
+        if (reader != null) reader.close();
     }
 
 }

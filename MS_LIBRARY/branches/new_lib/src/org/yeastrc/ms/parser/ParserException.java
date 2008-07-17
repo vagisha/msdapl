@@ -9,7 +9,7 @@ package org.yeastrc.ms.parser;
 /**
  * 
  */
-public class ParserException extends RuntimeException {
+public class ParserException extends Exception {
 
     int lineNum;
     

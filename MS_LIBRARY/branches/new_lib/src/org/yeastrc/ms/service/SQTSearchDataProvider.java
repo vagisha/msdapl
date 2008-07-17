@@ -6,10 +6,10 @@
  */
 package org.yeastrc.ms.service;
 
-import java.util.Iterator;
+import java.util.zip.DataFormatException;
 
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
+import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl.ScanResultIterator;
 
 /**
  * 
@@ -18,8 +18,10 @@ public interface SQTSearchDataProvider {
 
     public abstract String getFileName();
     
-    public abstract SQTSearch getSearchData();
+    public abstract SQTSearch getSearchData() throws DataFormatException;
     
-    public Iterator<SQTSearchScan> scanResultIterator();
+    public ScanResultIterator scanResultIterator();
+    
+    public void close();
     
 }

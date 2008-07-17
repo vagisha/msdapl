@@ -53,7 +53,7 @@ public class Header implements SQTSearch {
         enzymes = new ArrayList<MsEnzyme>();
     }
    
-    public boolean isHeaderValid() {
+    public boolean isValid() {
         if (sqtGenerator == null)   return false;
         if (sqtGeneratorVersion == null)    return false;
         if (database == null)  return false;
@@ -77,6 +77,11 @@ public class Header implements SQTSearch {
             throw new NullPointerException("value for Header cannot be null.");
         
         headerItems.add(new HeaderItem(name, value));
+        
+        // if there is no value for this header ignore it; It will still get added to the 
+        // headerItems list. 
+        if (value == null || value.trim().length() == 0)
+            return;
         
         if (isSqtGenerator(name))
             sqtGenerator = value;

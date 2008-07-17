@@ -30,7 +30,7 @@ public class SqtFileToDbConverter {
 
     private void convertSQTFile(String file, SQTFileReader reader, int runId) throws Exception {
         Header header = reader.getHeader();
-        if (!header.isHeaderValid())
+        if (!header.isValid())
             throw new Exception("Invalid header section for SQT file");
             
         // insert a search into the database and get the search Id
