@@ -38,9 +38,11 @@ public class MsExperimentUploader {
     }
 
     private void triggerExperimentDelete(int experimentId, Throwable t) {
-        MsDataUploadService.deleteExperiment(experimentId);
         log.error("", t);
         log.error("ERROR UPLOADING EXPERIMENT "+experimentId+" (runs and/or search results). ABORTING...");
+        MsDataUploadService.deleteExperiment(experimentId);
+        log.error("DELETED EXPERIMENT "+experimentId);
+        
     }
     
     private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws NoSuchAlgorithmException, IOException {
