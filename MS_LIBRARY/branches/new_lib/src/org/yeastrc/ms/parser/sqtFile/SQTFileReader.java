@@ -174,7 +174,7 @@ public class SQTFileReader {
             result = parsePeptideResult(currentLine, scanNumber, charge);
         }
         catch (NumberFormatException e) {
-            log.warn("Ignoring 'M' line; Error parsing number(s). LINE#: "+currentLineNum+" -- "+currentLine);
+            log.warn("LINE# "+currentLineNum+" Ignoring 'M' line; Error parsing number(s): -- "+currentLine);
             warnings++;
         }
         if (result == null)     return null;
@@ -198,7 +198,7 @@ public class SQTFileReader {
         
         String[] tokens = line.split("\\t");
         if (tokens.length < 11) {
-            log.warn("Ignoring invalid 'M' line. Expected 11 fields in 'M' line. LINE#: "+currentLineNum+" -- "+line);
+            log.warn("LINE# "+currentLineNum+" Ignoring invalid 'M' line. 11 fields expected: -- "+line);
             warnings++;
             return null;
         }
@@ -226,7 +226,7 @@ public class SQTFileReader {
         String[] tokens = line.split("\\t");
         if (tokens.length < 2) {
             // closeAndThrowException("2 fields expected for line: "+line);
-            log.warn("Ignoring invalid 'L' line. 2 fields expected. LINE#: "+currentLineNum+" -- "+line);
+            log.warn("LINE# "+currentLineNum+" Ignoring invalid 'L' line. 2 fields expected:  -- "+line);
             warnings++;
             return null;
         }
