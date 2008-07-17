@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.parser.ParserException;
 
@@ -20,6 +21,14 @@ public class SQTFileReader {
     private int currentLineNum = 0;
     private List<MsSearchModification> searchDynamicMods;
 
+    private int warnings = 0;
+    
+    private static final Logger log = Logger.getLogger(SQTFileReader.class);
+    
+    public int getWarningCount() {
+        return warnings;
+    }
+    
     public void open(String filePath) {
         try {
             reader = new BufferedReader(new FileReader(filePath));
@@ -120,11 +129,11 @@ public class SQTFileReader {
                     
                     DbLocus locus = parseLocus();
                     // add this to the current result
-                    result.addMatchingLocus(locus);
+                    if (locus != null)  result.addMatchingLocus(locus);
                 }
                 // it is neither throw an exception
                 else {
-                   closeAndThrowException("Don't know how to parse line: "+currentLine);
+                   closeAndThrowException("Unexpected line (was expecting a 'M' or 'L' line): "+currentLine);
                 }
                 advanceLine();
                 if (currentLine == null || isScanLine(currentLine))
@@ -169,10 +178,18 @@ public class SQTFileReader {
     }
 
     private PeptideResult parsePeptideResult(int scanNumber, int charge) {
+        PeptideResult result = null;
+        try {parsePeptideResult(currentLine, scanNumber, charge);
+    }
+    
+    private PeptideResult parsePeptideResult(String line, int scanNumber, int charge) {
         
-        String[] tokens = currentLine.split("\\t");
-        if (tokens.length < 11)
-            closeAndThrowException("Expected 11 fields in scan line: "+currentLine);
+        String[] tokens = line.split("\\t");
+        if (tokens.length < 11) {
+            log.warn("Expected 11 fields in 'M' line: "+currentLine);
+            warnings++;
+            return null;
+        }
         
         for (int i = 0; i < tokens.length; i++)
             tokens[i] = tokens[i].replaceAll("\\s+", "");
@@ -193,10 +210,14 @@ public class SQTFileReader {
         return result;
     }
     
-    private DbLocus parseLocus() {
-        String[] tokens = currentLine.split("\\t");
-        if (tokens.length < 2)
-            closeAndThrowException("2 fields expected for line: "+currentLine);
+    private DbLocus parseLocus(String line) {
+        String[] tokens = line.split("\\t");
+        if (tokens.length < 2) {
+            // closeAndThrowException("2 fields expected for line: "+currentLine);
+            log.warn("Ignoring invalid 'L' line. 2 fields expected: "+currentLine);
+            warnings++;
+            return null;
+        }
 
         if (tokens.length > 2)
             return new DbLocus(tokens[1], tokens[2]);
