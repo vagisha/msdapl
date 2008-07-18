@@ -88,6 +88,7 @@ public class YatesCycleConverter {
 //            converter.downloadMS2File(exp.cycleId, exp.cycleName+".ms2", dataDir);
             
             // download the SQT file for this experiment
+            log.info("----------------RunID is: "+exp.runId);
             if (converter.downloadSQTFile(exp.cycleId, exp.cycleName+".sqt", dataDir)) {
                 converter.parseSQTFile(dataDir+File.separator+exp.cycleName+".sqt");
                 numExp++;
@@ -136,7 +137,7 @@ public class YatesCycleConverter {
         try {
             provider.setSQTSearch(filePath);
             try {
-                provider.getSearchData();
+                provider.getSearchHeader();
             }
             catch (DataFormatException e) {
                 log.error(e.getMessage(), e);

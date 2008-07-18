@@ -106,7 +106,7 @@ public class MsDataUploadService {
         
         SQTDataUploadService sqtService = new SQTDataUploadService();
         
-        int searchId = sqtService.uploadSearch(provider.getSearchData(), runId);
+        int searchId = sqtService.uploadSearch(provider.getSearchHeader(), runId);
         log.info("Uploaded top-level info for search with searchId: "+searchId);
 
         // upload the search results for each scan + charge combination

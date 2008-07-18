@@ -28,6 +28,10 @@ public class ScanResult implements SQTSearchScan {
         resultList = new ArrayList<SQTSearchResult>();
     }
 
+    public boolean isValid() {
+       return resultList.size() > 0; 
+    }
+    
     /**
      * @return the startScan
      */
