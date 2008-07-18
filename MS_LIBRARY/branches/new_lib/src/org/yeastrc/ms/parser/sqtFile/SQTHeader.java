@@ -17,7 +17,7 @@ import org.yeastrc.ms.domain.sqtFile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 
 
-public class Header implements SQTSearch {
+public class SQTHeader implements SQTSearch {
 
     
     private static final Pattern multiDbPattern = Pattern.compile(".*[,:;\\s]+.*");
@@ -46,7 +46,7 @@ public class Header implements SQTSearch {
     private List<MsEnzyme> enzymes;
     
     
-    public Header() {
+    public SQTHeader() {
         headerItems = new ArrayList<SQTField>();
         staticMods = new ArrayList<MsSearchModification>();
         dynaMods = new ArrayList<MsSearchModification>();

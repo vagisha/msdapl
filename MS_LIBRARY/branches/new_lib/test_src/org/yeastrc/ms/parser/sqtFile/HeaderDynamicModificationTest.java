@@ -19,7 +19,7 @@ public class HeaderDynamicModificationTest extends TestCase {
     
 
     public void testIsValidDynamicModificationSymbol() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         char modSymbol = 0;
         assertTrue(header.isValidDynamicModificationSymbol(modSymbol));
         modSymbol = 'A';
@@ -31,7 +31,7 @@ public class HeaderDynamicModificationTest extends TestCase {
     }
     
     public void testAddDynamicModsTestModCount() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String modString = "";
         try {
             header.addDynamicMods(modString);
@@ -57,7 +57,7 @@ public class HeaderDynamicModificationTest extends TestCase {
     }
 
     public void testAddDynamicModsTestValidModCharsAndSymbol() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String modString = "=123.4";
         try {
             header.addDynamicMods(modString);
@@ -85,7 +85,7 @@ public class HeaderDynamicModificationTest extends TestCase {
     }
 
     public void testAddDynamicModTestValidModMass() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String modString = "C@= ";
         try {
             header.addDynamicMods(modString);
@@ -113,7 +113,7 @@ public class HeaderDynamicModificationTest extends TestCase {
 
     public void testAddDynamicMods() {
 
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         char[] modChars = new char[]{'A', 'B', 'C'};
         StringBuilder buf = new StringBuilder();
         for (char c: modChars)

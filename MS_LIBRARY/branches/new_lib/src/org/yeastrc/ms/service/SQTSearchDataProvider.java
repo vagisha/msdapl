@@ -6,9 +6,6 @@
  */
 package org.yeastrc.ms.service;
 
-import java.io.IOException;
-import java.util.zip.DataFormatException;
-
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 
@@ -19,12 +16,13 @@ public interface SQTSearchDataProvider {
 
     public abstract String getFileName();
     
-    public abstract SQTSearch getSearchHeader() throws DataFormatException, IOException;
+    public abstract SQTSearch getSearchHeader() throws Exception;
     
     public abstract boolean hasNextSearchScan();
     
-    public abstract SQTSearchScan getNextSearchScan() throws DataFormatException, IOException;
+    public abstract SQTSearchScan getNextSearchScan() throws Exception;
     
     public void close();
-    
 }
+
+

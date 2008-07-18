@@ -13,7 +13,7 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
-import org.yeastrc.ms.parser.sqtFile.Header;
+import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.ScanResult;
 
@@ -29,7 +29,7 @@ public class SqtFileToDbConverter {
     }
 
     private void convertSQTFile(String file, SQTFileReader reader, int runId) throws Exception {
-        Header header = reader.getHeader();
+        SQTHeader header = reader.getHeader();
         if (!header.isValid())
             throw new Exception("Invalid header section for SQT file");
             
@@ -68,7 +68,7 @@ public class SqtFileToDbConverter {
         spectrumDataDao.save(scan, searchId, scanId);
     }
 
-    private int saveSQTSearch(Header header, int runId) {
+    private int saveSQTSearch(SQTHeader header, int runId) {
         // save and return id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = DAOFactory.instance().getSqtSearchDAO();
         return searchDao.saveSearch(header, runId);

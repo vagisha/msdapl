@@ -27,8 +27,7 @@ import java.util.zip.ZipException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.parser.ParserException;
-import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl;
-import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl.ScanResultIterator;
+import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms2.utils.Decompresser;
 
 
@@ -133,28 +132,27 @@ public class YatesCycleConverter {
     }
     
     public void parseSQTFile(String filePath) {
-        SQTSearchDataProviderImpl provider = new SQTSearchDataProviderImpl();
-        try {
-            provider.setSQTSearch(filePath);
-            try {
-                provider.getSearchHeader();
-            }
-            catch (DataFormatException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-        catch (ParserException e) {
-            e.printStackTrace();
-        }
-        ScanResultIterator scanIt = provider.scanResultIterator();
-        while(scanIt.hasNext()) {
-            try {
-                scanIt.next();
-            }
-            catch (DataFormatException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
+//        SQTFileReader provider = new SQTFileReader();
+//        try {
+//            provider.open(filePath);
+//            try {
+//                provider.getSearchHeader();
+//            }
+//            catch (DataFormatException e) {
+//                log.error(e.getMessage(), e);
+//            }
+//        }
+//        catch (ParserException e) {
+//            e.printStackTrace();
+//        }
+//        while(provider.hasNextSearchScan()) {
+//            try {
+//                provider.getNextSearchScan();
+//            }
+//            catch (DataFormatException e) {
+//                log.error(e.getMessage(), e);
+//            }
+//        }
     }
     
     public boolean downloadSQTFile(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {

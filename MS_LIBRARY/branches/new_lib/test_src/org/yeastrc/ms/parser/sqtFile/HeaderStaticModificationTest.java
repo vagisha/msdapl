@@ -19,7 +19,7 @@ public class HeaderStaticModificationTest extends TestCase {
 
 
     public void testIsValidStaticModCharString () {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String modCharString = "";
         assertFalse(header.isValidModCharString(modCharString));
         modCharString = "A";
@@ -37,7 +37,7 @@ public class HeaderStaticModificationTest extends TestCase {
     }
 
     public void testAddStaticModsTestModCount() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String modString = "";
         try {
             header.addStaticMods(modString);
@@ -63,7 +63,7 @@ public class HeaderStaticModificationTest extends TestCase {
     }
 
     public void testAddStaticModsTestValidModChars() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String modString = "=123.4";
         try {
             header.addStaticMods(modString);
@@ -84,7 +84,7 @@ public class HeaderStaticModificationTest extends TestCase {
     }
 
     public void testAddStaticModTestValidModMass() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String modString = "C= ";
         try {
             header.addStaticMods(modString);
@@ -112,7 +112,7 @@ public class HeaderStaticModificationTest extends TestCase {
 
     public void testAddStaticMods() {
 
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         char[] modChars = new char[]{'A', 'B', 'C'};
         StringBuilder buf = new StringBuilder();
         for (char c: modChars)

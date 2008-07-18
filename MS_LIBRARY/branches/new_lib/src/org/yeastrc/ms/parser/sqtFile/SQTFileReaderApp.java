@@ -21,12 +21,12 @@ public class SQTFileReaderApp {
         SQTFileReader reader = new SQTFileReader();
         try {
             reader.open(file);
-            Header header = reader.getHeader();
+            SQTHeader header = reader.getSearchHeader();
             System.out.println(header.toString());
             writer.write(header.toString());
             writer.write("\n");
-            while (reader.hasScans()) {
-                ScanResult scan = reader.getNextScan();
+            while (reader.hasNextSearchScan()) {
+                ScanResult scan = reader.getNextSearchScan();
                 System.out.println(scan.toString());
                 writer.write(scan.toString());
                 writer.write("\n");

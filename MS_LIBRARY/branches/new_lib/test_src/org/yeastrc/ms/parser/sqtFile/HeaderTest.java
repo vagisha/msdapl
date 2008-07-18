@@ -18,7 +18,7 @@ public class HeaderTest extends TestCase {
     }
 
     public void testMultipleDatabases() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         String filePath = "/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta";
         assertFalse(header.multipleDatabases(filePath));
 
@@ -40,7 +40,7 @@ public class HeaderTest extends TestCase {
 
     public void testGetTime() {
 
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         // Example of a valid time string: 01/29/2008, 03:34 AM
         try {
             header.getTime(" 01/29/2008, 03:34 AM ");
@@ -59,7 +59,7 @@ public class HeaderTest extends TestCase {
     
     
     public void testGetStartDate() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
         Date date = header.getSearchDate();
         Calendar myCal = GregorianCalendar.getInstance();
@@ -86,7 +86,7 @@ public class HeaderTest extends TestCase {
     }
     
     public void testGetStartDateInvalidDate() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         header.addHeaderItem("StartTime", "01/29/2008");
         try {
             header.getSearchDate();
@@ -96,21 +96,21 @@ public class HeaderTest extends TestCase {
     }
     
     public void testGetSearchDurationNoEndTime() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
         
         assertEquals(0, header.getSearchDuration());
     }
     
     public void testGetSearchDurationWithEndTime() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
         header.addHeaderItem("EndTime", "01/29/2008, 03:44 AM");
         assertEquals(10, header.getSearchDuration());
     }
     
     public void testGetSearchDurationInvalidEndDate() {
-        Header header = new Header();
+        SQTHeader header = new SQTHeader();
         header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
         header.addHeaderItem("EndTime", "01/29/2008, 03:44");
         try {
