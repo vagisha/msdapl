@@ -18,8 +18,8 @@ import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
-import org.yeastrc.ms.parser.ms2File.Header;
-import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
+import org.yeastrc.ms.parser.ms2File.MS2Header;
+import org.yeastrc.ms.parser.ms2File.MS2FileReader;
 import org.yeastrc.ms.parser.ms2File.Scan;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
@@ -49,7 +49,7 @@ public class Ms2FileToDbConverter {
             return runId;
         }
         
-        Ms2FileReader reader = new Ms2FileReader();
+        MS2FileReader reader = new MS2FileReader();
         reader.open(filePath);
         
         return convertMs2File(filePath, reader, experimentId, sha1Sum);
@@ -65,7 +65,7 @@ public class Ms2FileToDbConverter {
             return runId;
         }
         
-        Ms2FileReader reader = new Ms2FileReader();
+        MS2FileReader reader = new MS2FileReader();
         reader.open(inStream);
         
         return convertMs2File(fileName, reader, experimentId, sha1Sum);
@@ -84,9 +84,9 @@ public class Ms2FileToDbConverter {
         
     }
 
-    private int convertMs2File(String file, Ms2FileReader reader, int experimentId, String sha1Sum)
+    private int convertMs2File(String file, MS2FileReader reader, int experimentId, String sha1Sum)
             throws Exception {
-        Header header = reader.getHeader();
+        MS2Header header = reader.getHeader();
         header.setFileName(file);
         header.setSha1Sum(sha1Sum);
         // insert a MS2Run into the database and get the run Id

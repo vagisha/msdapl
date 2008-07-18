@@ -7,46 +7,63 @@
 package org.yeastrc.ms.parser.ms2File;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 
+import org.apache.log4j.Logger;
+import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.service.MS2RunDataProvider;
+import org.yeastrc.ms.util.Sha1SumCalculator;
 
 
 /**
  * 
  */
-public class Ms2FileReader {
+public class Ms2FileReader implements MS2RunDataProvider {
 
     private BufferedReader reader;
     private String currentLine;
+    private String fileName;
+    private String sha1Sum;
     private int currentLineNum = 0;
 
-    public void open(String filePath) {
-        try {
-            reader = new BufferedReader(new FileReader(filePath));
-            advanceLine();
-        }
-        catch (FileNotFoundException e) {
-            closeAndThrowException("File does not exist: "+filePath, e);
-        }
-        catch (IOException e) {
-            closeAndThrowException("Error reading file: "+filePath, e);
-        }
+    private int warnings = 0;
+
+    private static final Logger log = Logger.getLogger(Ms2FileReader.class);
+
+    public int getWarningCount() {
+        return warnings;
     }
 
-    
-    public void open(InputStream inStream) {
-        try {
-            reader = new BufferedReader(new InputStreamReader(inStream));
-            advanceLine();
-        }
-        catch (IOException e) {
-            closeAndThrowException("Error reading file from input stream", e);
-        }
+    public void open(String filePath) throws IOException, NoSuchAlgorithmException {
+        sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+        reader = new BufferedReader(new FileReader(filePath));
+        fileName = new File(filePath).getName();
+        advanceLine();
+    }
+
+    public void open(String fileName, InputStream inStream) throws IOException, NoSuchAlgorithmException {
+        this.fileName = fileName;
+        sha1Sum = Sha1SumCalculator.instance().sha1SumFor(inStream);
+        reader = new BufferedReader(new InputStreamReader(inStream));
+        advanceLine();
+    }
+
+    @Override
+    public String getFileName() {
+        return this.fileName;
+    }
+
+    @Override
+    public String getSha1Sum() {
+        return this.sha1Sum;
     }
     
     private void advanceLine() throws IOException {
@@ -58,10 +75,10 @@ public class Ms2FileReader {
             currentLine = reader.readLine();
         }
     }
-    
-    public Header getHeader() {
-        
-        Header header = new Header();
+
+    public MS2Header getRunHeader() throws IOException, ParserException {
+
+        MS2Header header = new MS2Header();
         while (isHeaderLine(currentLine)) {
             String[] tokens = currentLine.split("\\t");
             if (tokens.length >= 3) {
@@ -80,208 +97,222 @@ public class Ms2FileReader {
                 header.addHeaderItem(tokens[1], "");
             }
             else {
-             // ignore if both label and value for this header item are missing
-             //throw new Exception("Invalid header: "+currentLine);
+                // ignore if both label and value for this header item are missing
+                //throw new Exception("Invalid header: "+currentLine);
             }
-            
-            try {
-                advanceLine();
-            }
-            catch (IOException e) {
-                closeAndThrowException(e);
-            }
+
+            advanceLine();
         }
+//        if (!header.isValid()) {
+//            warnings++;
+//            ParserException e = new ParserException(currentLineNum-1, "Invalid header.  Required fields are missing", "");
+//            log.warn(e.getMessage());
+//            throw e;
+//        }
         return header;
     }
-    
-    public boolean hasScans() {
+
+    public boolean hasNextScan() {
         return currentLine != null;
     }
-    
-    public Scan getNextScan() {
-        
-        Scan scan = parseScan();
-        
+
+    public MS2Scan getNextScan() throws IOException, ParserException {
+
+        Scan scan;
         try {
-            advanceLine(); // go to the next line
-            
-            while(currentLine != null) {
-                // is this one of the charge states of the scan?
-                if (isChargeLine(currentLine)) {
-                    parseScanCharge(scan);
+            scan = parseScan();
+        }
+        catch (ParserException e) {
+            log.warn(e.getMessage());
+            skipScan();
+            throw e;
+        }
+
+        advanceLine(); // go to the next line
+
+        while(currentLine != null) {
+            // is this one of the charge states of the scan?
+            if (isChargeLine(currentLine)) {
+                try {
+                    ScanCharge sc = parseScanCharge();
+                    scan.addChargeState(sc);
                 }
-                // is this one of the charge independent analysis for this scan?
-                else if (isChargeIndAnalysisLine(currentLine)) {
-                    parseIAnalysis(scan);
-                }
-                // it is neither so must be peak data
-                else {
-                    parsePeaks(scan);
-                    break; // done parsing this scan!
+                catch (ParserException e) {
+                    log.warn(e.getMessage());
                 }
             }
+            // is this one of the charge independent analysis for this scan?
+            else if (isChargeIndAnalysisLine(currentLine)) {
+                try {
+                    MS2Field iAnalysis = parseIAnalysis(currentLine);
+                    scan.addAnalysisItem(iAnalysis.getName(), iAnalysis.getValue());
+                }
+                catch (ParserException e) {
+                    log.warn(e.getMessage());
+                }
+                advanceLine();
+            }
+            // it is neither so must be peak data
+            else {
+                try {
+                    parsePeaks(scan);
+                }
+                catch (ParserException e) {
+                    log.warn(e.getMessage());
+                    int i = currentLineNum;
+                    skipScan();
+                    throw new ParserException(i, "Invlid peak data found for scan. Skipping ...", "");
+                }
+                break; // done parsing this scan!
+            }
         }
-        catch (IOException e) {
-            closeAndThrowException(e);
+        if (!scan.isValid()) {
+            warnings++;
+            ParserException e = new ParserException(currentLineNum-1, "Invalid MS2 scan -- no peaks found", "");
+            log.warn(e.getMessage());
+            throw e;
         }
-        
         return scan;
     }
 
-    private void parseIAnalysis(Scan scan) {
-        String[] tokens = currentLine.split("\\t");
-        if (tokens.length < 3)
-            closeAndThrowException("2 fields expected for line: "+currentLine);
-        scan.addAnalysisItem(tokens[1], tokens[2]);
-        // advance to next line
-        try {
+    private void skipScan() throws IOException {
+        while (!isScanLine(currentLine))
             advanceLine();
-        }
-        catch (IOException e) {
-            closeAndThrowException(e);
-        }
     }
-    
-    private Scan parseScan() {
-        
+
+    private MS2Field parseIAnalysis(String line) throws ParserException {
+        String[] tokens = line.split("\\t");
+        if (tokens.length < 3)
+            throw new ParserException(currentLineNum, "Invalid 'I' line. Expected 2 fields.", line);
+        return new HeaderItem(tokens[1], tokens[2]);
+    }
+
+    private Scan parseScan() throws ParserException {
+
         // make sure we have a scan line
-        if (!isScanLine(currentLine))
-            closeAndThrowException("Error parsing scan. Expected line starting with \"S\"");
-        
+        if (!isScanLine(currentLine)) {
+            warnings++;
+            throw new ParserException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", currentLine);
+        }
+
         String[] tokens = currentLine.split("\\t");
-        if (tokens.length < 4)
-            closeAndThrowException("Expected 3 fields in scan line: "+currentLine);
-        
-        int firstScan = -1;
-        int lastScan = -1;
-        try {firstScan = Integer.parseInt(tokens[1]);}
-        catch(NumberFormatException e) {closeAndThrowException("Invalid first scan num in scan line: "+currentLine, e);}
-        try {lastScan = Integer.parseInt(tokens[2]);}
-        catch(NumberFormatException e) {closeAndThrowException("Invalid last scan num in scan line: "+currentLine, e);}
-        
+        if (tokens.length < 4) {
+            warnings++;
+            throw new ParserException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", currentLine);
+        }
+
         Scan scan = new Scan();
-        scan.setStartScan(firstScan);
-        scan.setEndScan(lastScan);
         try {
+            scan.setStartScan(Integer.parseInt(tokens[1]));
+            scan.setEndScan(Integer.parseInt(tokens[2]));
             scan.setPrecursorMz(tokens[3]);
         }
-        catch (NumberFormatException e) {
-            closeAndThrowException("Invalid precursor m/z in scan line: "+currentLine);
+        catch(NumberFormatException e) {
+            warnings++;
+            throw new ParserException(currentLineNum, "Invalid 'S' line. Error parsing number(s). "+e.getMessage(), currentLine);
         }
-        
         return scan;
     }
-    
-    private void parseScanCharge(Scan scan) {
+
+    private ScanCharge parseScanCharge() throws IOException, ParserException {
         String tokens[] = currentLine.split("\\s");
-        if (tokens.length < 3)
-            closeAndThrowException("2 fields expected for charge line: "+currentLine);
-        
+        if (tokens.length < 3) {
+            skipScanCharge();
+            warnings++;
+            throw new ParserException(currentLineNum, "Invalid 'Z' line. Expected 3 fields.", currentLine);
+        }
+
         // get the charge and mass
-        int charge = -1;
-        try {charge = Integer.parseInt(tokens[1]);}
-        catch(NumberFormatException e) {closeAndThrowException("Invalid charge in line: "+currentLine, e);}
-        
         ScanCharge scanCharge = new ScanCharge();
-        scanCharge.setCharge(charge);
         try {
-            scanCharge.setMass(tokens[2]);
+            scanCharge.setCharge(Integer.parseInt(tokens[1]));
+            scanCharge.setMass(new BigDecimal(tokens[2]));
         }
         catch(NumberFormatException e) {
-            closeAndThrowException("Invalid mass in line: "+currentLine, e);
+            skipScanCharge();
+            warnings++;
+            throw new ParserException(currentLineNum, "Invalid 'Z' line. Error parsing number(s). "+e.getMessage(), currentLine);
         }
-        
+
         // parse any charge dependent analysis associated with this charge state
-        try {
-            advanceLine();
-            while (isChargeDepAnalysisLine((currentLine))) {
-                tokens = currentLine.split("\\t");
-                if (tokens.length < 3)
-                    closeAndThrowException("2 fields expected for line: "+currentLine);
-                scanCharge.addAnalysisItem(tokens[1], tokens[2]);
-                advanceLine();
+        advanceLine();
+        while (isChargeDepAnalysisLine((currentLine))) {
+            tokens = currentLine.split("\\t");
+            if (tokens.length < 3) {
+                warnings++;
+                ParserException e = new ParserException(currentLineNum, "Invalid 'D' line. Expected 2 fields.", currentLine);
+                log.warn(e.getMessage());
             }
+            else {
+                scanCharge.addAnalysisItem(tokens[1], tokens[2]);
+            }
+            advanceLine();
         }
-        catch (IOException e) {
-            closeAndThrowException(e);
-        }
-        scan.addChargeState(scanCharge);
+        return scanCharge;
     }
-    
-    public void parsePeaks(Scan scan) {
-        
+
+    private void skipScanCharge() throws IOException {
+        advanceLine();
+        while(isChargeDepAnalysisLine(currentLine))
+            advanceLine();
+    }
+
+    public void parsePeaks(Scan scan) throws ParserException, IOException {
+
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s");
-            if (tokens.length < 2)
-                closeAndThrowException("missing charge and/or mass in line: "+currentLine);
-            
+            if (tokens.length < 2) {
+                warnings++;
+                throw new ParserException(currentLineNum, "missing charge and/or mass in line: ", currentLine);
+            }
+
             // add peak m/z and intensity values
             scan.addPeak(tokens[0], tokens[1]);
-            
-            try {
-                advanceLine();
-            }
-            catch (IOException e) {
-                closeAndThrowException(e);
-            }
+            advanceLine();
         }
     }
-    
+
     private boolean isScanLine(String line) {
         if (line == null)   return false;
         return line.startsWith("S");
     }
-    
+
     private boolean isHeaderLine(String line) {
         if (line == null)   return false;
         return line.startsWith("H");
     }
-    
+
     private boolean isChargeLine(String line) {
         if (line == null)   return false;
         return line.startsWith("Z");
     }
-    
+
     private boolean isChargeIndAnalysisLine(String line) {
         if (line == null)   return false;
         return line.startsWith("I");
     }
-    
+
     private boolean isChargeDepAnalysisLine(String line) {
         if (line == null)   return false;
         return line.startsWith("D");
     }
-    
+
     private boolean isPeakDataLine(String line) {
         if (line == null)
             return false;
         if (isScanLine(line) ||
-            isChargeLine(line) ||
-            isChargeDepAnalysisLine(line) ||
-            isChargeIndAnalysisLine(line) ||
-            isHeaderLine(line))
+                isChargeLine(line) ||
+                isChargeDepAnalysisLine(line) ||
+                isChargeIndAnalysisLine(line) ||
+                isHeaderLine(line))
             return false;
         return true;
     }
-    
-    
+
+
     public void close() {
         if (reader != null) 
             try {reader.close();}
-            catch (IOException e) {}
-    }
-    
-    private void closeAndThrowException(Exception e) {
-        closeAndThrowException("Error reading file.", e);
-    }
-    
-    private void closeAndThrowException(String message, Exception e) {
-        close();
-        throw new ParserException(currentLineNum, message, e);
-    }
-    
-    private void closeAndThrowException(String message) {
-        close();
-        throw new ParserException(currentLineNum, message);
+        catch (IOException e) {}
     }
 }

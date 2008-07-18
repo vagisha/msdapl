@@ -7,7 +7,6 @@
 package org.yeastrc.ms.service;
 
 import java.sql.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -24,6 +23,7 @@ import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
+import org.yeastrc.ms.parser.ParserException;
 
 /**
  * 
@@ -45,7 +45,7 @@ public class MsDataUploadService {
         return expDao.save(experiment);
     }
 
-    public static int uploadMS2Run(MS2RunDataProvider provider, int experimentId) {
+    public static int uploadMS2Run(MS2RunDataProvider provider, int experimentId) throws Exception  {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
         long startTime = System.currentTimeMillis();
@@ -66,23 +66,32 @@ public class MsDataUploadService {
         }
 
         // if run is NOT in the database get the top-level run information and upload it
-        runId = runDao.saveRun(provider.getRunData(), experimentId);
+        MS2Run header = provider.getRunHeader();
+        
+        runId = runDao.saveRun(header, experimentId);
         log.info("Uploaded top-level run information with runId: "+runId);
 
         // upload each of the scans
         MsScanDAO<MS2Scan, MS2ScanDb> scanDao = daoFactory.getMS2FileScanDAO();
-        Iterator<MS2Scan> scanIterator = provider.scanIterator();
-        int i = 0;
-        while(scanIterator.hasNext()) {
-            MS2Scan scan = scanIterator.next();
-            // MS2 file scans may have a precursor scan number but the precursor scans are not in the database
-            // so we do not have a database id for the precursor scan. We still do the check, though
-            int precursorScanId = scanDao.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
-            scanDao.save(scan, runId, precursorScanId);   
-            i++;
+        int all = 0;
+        int uploaded = 0;
+        while(provider.hasNextScan()) {
+            MS2Scan scan;
+            try {
+                scan = provider.getNextScan();
+                // MS2 file scans may have a precursor scan number but the precursor scans are not in the database
+                // so we do not have a database id for the precursor scan. We still do the check, though
+                int precursorScanId = scanDao.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
+                scanDao.save(scan, runId, precursorScanId);   
+                uploaded++;
+            }
+            catch (ParserException e) {
+                log.warn("Error processing scan. Scan will not be uploaded. "+e.getMessage(), e);
+            }
+            all++;
         }
         long endTime = System.currentTimeMillis();
-        log.info("Uploaded "+i+" scans for runId: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds");
+        log.info("Uploaded "+uploaded+" out of "+all+" scans for runId: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds");
         log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
         return runId;
     }
@@ -99,7 +108,7 @@ public class MsDataUploadService {
 
     }
 
-    public static void uploadSQTSearch(SQTSearchDataProvider provider, int runId) {
+    public static void uploadSQTSearch(SQTSearchDataProvider provider, int runId) throws Exception {
 
         log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
         long startTime = System.currentTimeMillis();
@@ -110,26 +119,30 @@ public class MsDataUploadService {
         log.info("Uploaded top-level info for search with searchId: "+searchId);
 
         // upload the search results for each scan + charge combination
-        Iterator<SQTSearchScan> searchScanIterator = provider.scanResultIterator();
         int numResults = 0;
         int numProteins = 0;
-        while (searchScanIterator.hasNext()) {
-            SQTSearchScan scan = searchScanIterator.next();
-            
-            int scanId = getScanId(runId, scan.getScanNumber());
-            
-            // save spectrum data
-            sqtService.uploadSearchScan(scan, searchId, scanId); 
-            
-            // save all the search results for this scan
-            if (scan.getScanResults().size() == 0) {
-                log.warn("!!!No results found for scan (scanNumber: "+scan.getScanNumber()+", charge: "+scan.getCharge());
+        while (provider.hasNextSearchScan()) {
+            SQTSearchScan scan = null;
+            try {
+                scan = provider.getNextSearchScan();
+                int scanId = getScanId(runId, scan.getScanNumber());
+                // save spectrum data
+                sqtService.uploadSearchScan(scan, searchId, scanId); 
+                
+                // save all the search results for this scan
+                if (scan.getScanResults().size() == 0) {
+                    log.warn("!!!No results found for scan (scanNumber: "+scan.getScanNumber()+", charge: "+scan.getCharge());
+                }
+                for (SQTSearchResult result: scan.getScanResults()) {
+                    sqtService.uploadSearchResult(result, searchId, scanId);
+                    numResults++;
+                    numProteins += result.getProteinMatchList().size();
+                }
             }
-            for (SQTSearchResult result: scan.getScanResults()) {
-                sqtService.uploadSearchResult(result, searchId, scanId);
-                numResults++;
-                numProteins += result.getProteinMatchList().size();
+            catch (ParserException e) {
+                log.warn("Error processing search result for scan. Results will not be uploaded. "+e.getMessage(), e);
             }
+            
         }
         sqtService.flush(); // save any cached data
         

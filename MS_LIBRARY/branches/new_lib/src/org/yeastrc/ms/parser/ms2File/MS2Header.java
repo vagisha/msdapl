@@ -22,7 +22,7 @@ import org.yeastrc.ms.domain.ms2File.MS2Run;
 /**
  * 
  */
-public class Header implements MS2Run {
+public class MS2Header implements MS2Run {
 
     // These are header items we know and care about
     public static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
@@ -46,7 +46,7 @@ public class Header implements MS2Run {
     private String fileName;
     private String sha1Sum;
     
-    public Header() {
+    public MS2Header() {
         headerItems = new HashMap<String, String>();
         headerList = new ArrayList<MS2Field>();
     }
@@ -65,7 +65,7 @@ public class Header implements MS2Run {
         return headerItems.size();
     }
     
-    public boolean isHeaderValid() {
+    public boolean isValid() {
         if (getHeaderValueForLabel(CREATION_DATE)        == null ||
             getHeaderValueForLabel(EXTRACTOR)            == null ||
             getHeaderValueForLabel(EXTRACTOR_VERSION)    == null ||

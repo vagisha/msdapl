@@ -155,7 +155,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
 
         if (!scan.isValid()) {
             warnings++;
-            ParserException e = new ParserException(currentLineNum-1, "Invalid scan -- no results found", "");
+            ParserException e = new ParserException(currentLineNum-1, "Invalid SQT scan -- no results found", "");
             log.warn(e.getMessage());
             throw e;
         }
@@ -195,7 +195,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
         }
         catch(NumberFormatException e) {
             warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'S' line. Error parsing number(s)", line);
+            throw new ParserException(currentLineNum, "Invalid 'S' line. Error parsing number(s): "+e.getMessage(), line);
         }
         scan.setServer(tokens[5]);
 
@@ -229,7 +229,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
             if (isLocusLine(currentLine)) {
                 DbLocus locus = null;
                 try {locus = parseLocus(currentLine);}
-                catch (ParserException e) { log.warn(e.getMessage(), e);}
+                catch (ParserException e) { log.warn(e.getMessage());}
                 if (locus != null)
                     result.addMatchingLocus(locus);
             }
@@ -278,7 +278,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
         }
         catch(NumberFormatException e) {
             warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'M' line. Error parsing number(s)", line);
+            throw new ParserException(currentLineNum, "Invalid 'M' line. Error parsing number(s): "+e.getMessage(), line);
         }
         
         result.setResultSequence(tokens[9]);

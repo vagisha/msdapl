@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanChargeDb;
 import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
-import org.yeastrc.ms.parser.ms2File.Header;
+import org.yeastrc.ms.parser.ms2File.MS2Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
 import org.yeastrc.ms.parser.ms2File.ScanCharge;
 import org.yeastrc.ms.util.PeakConverterDouble;
@@ -89,7 +89,7 @@ public class DbToMs2FileConverter {
     }
 
     private void printMs2Header(MS2RunDb run) throws IOException {
-        Header ms2Header = new Header();
+        MS2Header ms2Header = new MS2Header();
         for (MS2HeaderDb header: run.getHeaderList()) {
             ms2Header.addHeaderItem(header.getName(), header.getValue());
         }

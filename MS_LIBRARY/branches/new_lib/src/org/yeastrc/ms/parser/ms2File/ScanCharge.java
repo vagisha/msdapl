@@ -45,8 +45,8 @@ public class ScanCharge implements MS2ScanCharge {
         return mass;
     }
    
-    public void setMass(String mass) {
-        this.mass = new BigDecimal(mass);
+    public void setMass(BigDecimal mass) {
+        this.mass = mass;
     }
     
     public void addAnalysisItem(String label, String value) {

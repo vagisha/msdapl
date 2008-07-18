@@ -45,6 +45,10 @@ public class Scan implements MS2Scan {
         peakList = new ArrayList<String[]>();
     }
 
+    public boolean isValid() {
+        return peakList.size() > 0;
+    }
+    
     @Override
     public List<MS2Field> getChargeIndependentAnalysisList() {
         return this.analysisItems;

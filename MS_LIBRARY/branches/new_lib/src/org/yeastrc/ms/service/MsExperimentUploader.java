@@ -1,14 +1,12 @@
 package org.yeastrc.ms.service;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.parser.ms2File.MS2RunDataProviderImpl;
-import org.yeastrc.ms.parser.sqtFile.SQTSearchDataProviderImpl;
+import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
+import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 
 public class MsExperimentUploader {
 
@@ -45,7 +43,7 @@ public class MsExperimentUploader {
         
     }
     
-    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws NoSuchAlgorithmException, IOException {
+    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws Exception {
         
         File directory = new File (fileDirectory);
         if (!directory.exists()) {
@@ -59,18 +57,18 @@ public class MsExperimentUploader {
             throw new RuntimeException("No files found to upload in directory: "+fileDirectory);
         }
         
-        MS2RunDataProviderImpl ms2Provider = null;
-        SQTSearchDataProviderImpl sqtProvider = null;
+        Ms2FileReader ms2Provider = null;
+        SQTFileReader sqtProvider = null;
         
         for (String filename: filenames) {
             // upload the run first
-            ms2Provider = new MS2RunDataProviderImpl();
-            ms2Provider.setMS2Run(fileDirectory+File.separator+filename+".ms2");
+            ms2Provider = new Ms2FileReader();
+            ms2Provider.open(fileDirectory+File.separator+filename+".ms2");
             int runId = MsDataUploadService.uploadMS2Run(ms2Provider,experimentId);
             
             // now upload the search result
-            sqtProvider = new SQTSearchDataProviderImpl();
-            sqtProvider.setSQTSearch(fileDirectory+File.separator+filename+".sqt");
+            sqtProvider = new SQTFileReader();
+            sqtProvider.open(fileDirectory+File.separator+filename+".sqt");
             MsDataUploadService.uploadSQTSearch(sqtProvider, runId);
         }
     }
@@ -93,7 +91,7 @@ public class MsExperimentUploader {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC/TEST");
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC/");
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }

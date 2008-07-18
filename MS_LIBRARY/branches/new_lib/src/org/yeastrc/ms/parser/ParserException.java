@@ -14,7 +14,7 @@ public class ParserException extends Exception {
     private int lineNum;
     private String line;
     
-    public ParserException(int lineNum, String line, String message) {
+    public ParserException(int lineNum, String message, String line) {
         super(message);
         this.lineNum = lineNum;
         this.line = line;
@@ -35,6 +35,6 @@ public class ParserException extends Exception {
     }
     
     public String getMessage() {
-        return "!!!LINE# "+lineNum+" "+super.getMessage()+"\n\t"+line;
+        return "!!!LINE# "+lineNum+":  "+super.getMessage()+"\n\t"+line;
     }
 }

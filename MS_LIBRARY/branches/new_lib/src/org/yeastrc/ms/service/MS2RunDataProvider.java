@@ -6,8 +6,6 @@
  */
 package org.yeastrc.ms.service;
 
-import java.util.Iterator;
-
 import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 
@@ -20,7 +18,11 @@ public interface MS2RunDataProvider  {
     
     public abstract String getSha1Sum();
     
-    public abstract MS2Run getRunData();
+    public abstract MS2Run getRunHeader() throws Exception;
     
-    public abstract Iterator<MS2Scan> scanIterator();
+    public abstract boolean hasNextScan();
+    
+    public abstract MS2Scan getNextScan() throws Exception;
+    
+    public void close();
 }

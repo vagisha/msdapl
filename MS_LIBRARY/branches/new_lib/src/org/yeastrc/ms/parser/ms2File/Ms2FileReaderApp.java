@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
+import org.yeastrc.ms.domain.ms2File.MS2Scan;
+
 
 /**
  * 
@@ -20,10 +22,10 @@ public class Ms2FileReaderApp {
         Ms2FileReader reader = new Ms2FileReader();
         try {
             reader.open(file);
-            Header header = reader.getHeader();
+            MS2Header header = reader.getRunHeader();
             System.out.println(header.toString());
-            while (reader.hasScans()) {
-                Scan scan = reader.getNextScan();
+            while (reader.hasNextScan()) {
+                MS2Scan scan = reader.getNextScan();
                 System.out.println(scan.toString());
             }
             
