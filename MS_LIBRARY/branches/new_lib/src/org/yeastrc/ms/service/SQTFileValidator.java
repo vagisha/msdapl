@@ -30,7 +30,7 @@ public class SQTFileValidator {
 
     private static final Logger log = Logger.getLogger(SQTFileValidator.class);
 
-    private boolean headerValid = true;
+    private boolean headerValid = false;
     private int numValidScans = 0;
     private int numScans = 0;
     private int numWarnings = 0;
@@ -53,12 +53,10 @@ public class SQTFileValidator {
         // read the header
         try {
             dataProvider.getSearchHeader();
+            headerValid = true;
         }
-        catch (ParserException e) {
-            headerValid = false;
-        }
+        catch (ParserException e) {dataProvider.close(); numWarnings = dataProvider.getWarningCount(); return;}
         catch (IOException e) {
-            headerValid = false;
             log.error(e.getMessage(), e);
             dataProvider.close();
             return;
@@ -69,8 +67,8 @@ public class SQTFileValidator {
             numScans++;
             try {
                 SQTSearchScan scan = dataProvider.getNextSearchScan();
-                for (SQTSearchResult result: scan.getScanResults())
-                    result.getResultPeptide(); // this will validate the peptide sequence
+//                for (SQTSearchResult result: scan.getScanResults())
+//                    result.getResultPeptide(); // this will validate the peptide sequence
                 numValidScans++;
             }
             catch (ParserException e) {}
@@ -94,34 +92,35 @@ public class SQTFileValidator {
     }
 
     public static void main(String[] args) {
-        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/";
+        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
         Map<Integer, String> cycleIds = getCycleIdList();
         int found = 0;
         int valid = 0;
         try {
             for (Integer cycleId: cycleIds.keySet()) {
-                if (found > 10)
-                    break;
+                //if (found > 208)
+                 //   break;
                 String fileName = cycleIds.get(cycleId);
                 if (fileName == null || fileName.trim().length() == 0)
                     continue;
+                fileName = fileName+".sqt";
                 YatesCycleDownloader downloader = new YatesCycleDownloader();
                 if (downloader.downloadFile(cycleId, downloadDir, fileName, DATA_TYPE.SQT)) {
                     found++;
                     SQTFileValidator validator = new SQTFileValidator();
                     if (validator.validate(downloadDir+File.separator+fileName)){
                         valid++;
-                        new File(downloadDir+File.separator+fileName).delete();
                     }
                     else {
                         log.error("!!!!!!!!!!INVALID FILE: "+fileName);
                     }
+                    new File(downloadDir+File.separator+fileName).delete();
                 }
             }
         }
-        catch(Exception e) {}
+        catch(Exception e) {e.printStackTrace();}
         finally {
-            log.info("Num files found: "+found+"; Valid files: "+valid);
+            log.info("Num files found: "+(found-1)+"; Valid files: "+valid);
         }
 //      String filePath = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test/21251_PARC_meth_async_05_itms.sqt";
 //      SQTFileValidator validator = new SQTFileValidator();
@@ -136,7 +135,7 @@ public class SQTFileValidator {
         try {
             conn = getConnection();
             s = conn.createStatement();
-            rs = s.executeQuery("SELECT cycleID, cycleFileName FROM tblYatesCycles ORDER BY runID, cycleID");
+            rs = s.executeQuery("SELECT cycleID, cycleFileName FROM tblYatesCycles ORDER BY runID DESC limit 500");
             while (rs.next()) {
                 cycleIdList.put(rs.getInt("cycleID"), rs.getString("cycleFileName"));
             }
@@ -154,6 +153,7 @@ public class SQTFileValidator {
                 rs.close();
             }
             catch (SQLException e) {
+                e.printStackTrace();
             }
         }
         return cycleIdList;

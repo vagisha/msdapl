@@ -100,7 +100,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
         if (!header.isValid()) {
             warnings++;
             ParserException e = new ParserException(currentLineNum-1, "Invalid header.  Required fields are missing", "");
-            log.warn(e.getMessage(), e);
+            log.warn(e.getMessage());
             throw e;
         }
         return header;
@@ -128,7 +128,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
             // there was an error parsing the 'S' line. We will ignore this scan
             // if there are any 'M' or 'L' lines after the offending 'S' line skip over them.
             skipScan();
-            log.warn(e.getMessage(), e);
+            log.warn(e.getMessage());
             throw e;
         }
 
@@ -143,7 +143,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
                     result = parsePeptideResult(scan.getStartScan(), scan.getCharge());
                 }
                 catch (ParserException e) {
-                    log.warn(e.getMessage(), e);
+                    log.warn(e.getMessage());
                 }
                 if (result != null) 
                     scan.addPeptideResult(result);
@@ -155,7 +155,9 @@ public class SQTFileReader implements SQTSearchDataProvider {
 
         if (!scan.isValid()) {
             warnings++;
-            throw new ParserException(currentLineNum-1, "Invalid scan -- no results found", "");
+            ParserException e = new ParserException(currentLineNum-1, "Invalid scan -- no results found", "");
+            log.warn(e.getMessage());
+            throw e;
         }
         return scan;
     }
@@ -283,6 +285,14 @@ public class SQTFileReader implements SQTSearchDataProvider {
         result.setValidationStatus(tokens[10].charAt(0));
         result.setCharge(charge);
         result.setScanNumber(scanNumber);
+        
+        try {
+            result.getResultPeptide();
+        }
+        catch(IllegalArgumentException e) {
+            warnings++;
+            throw new ParserException(currentLineNum, "Invalid peptide sequence in 'M' line: "+e.getMessage(), line);
+        }
         return result;
     }
 
