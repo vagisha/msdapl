@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
@@ -21,8 +22,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * 
  */
-public class SQTSearchResultDAOImpl extends BaseSqlMapDAO 
-        implements MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> {
+public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchResultDAO {
 
     private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
     
@@ -57,6 +57,37 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO
         save("SqtResult.insert", resultDb);
         
         return resultId;
+    }
+    
+    @Override
+    public void saveSqtResultOnly(SQTSearchResult searchResult, int resultId) {
+        // now save the SQT specific information
+        SQTSearchResultSqlMapParam resultDb = new SQTSearchResultSqlMapParam(resultId, searchResult);
+        save("SqtResult.insert", resultDb);
+    }
+    
+    
+    public void saveAllSqtResultOnly(List<SQTSearchResultDb> resultList) {
+        if (resultList.size() == 0)
+            return;
+        StringBuilder values = new StringBuilder();
+        for (SQTSearchResultDb result: resultList) {
+            values.append("(");
+            values.append(result.getId());
+            values.append(",");
+            values.append(result.getxCorrRank());
+            values.append(",");
+            values.append(result.getSpRank());
+            values.append(",");
+            values.append(result.getDeltaCN());
+            values.append(",");
+            values.append(result.getxCorr());
+            values.append(",");values.append(result.getSp());
+            values.append("),");
+        }
+        values.deleteCharAt(values.length() - 1);
+        
+        save("SqtResult.insertAll", values.toString());
     }
     
     /**
@@ -116,4 +147,5 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO
             return result.getxCorrRank();
         }
     }
+   
 }

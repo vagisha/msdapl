@@ -45,6 +45,9 @@
     	VALUES (?,?,?,?,?,?)
     </insert>
     
+    <insert id="insertAll" parameterClass="String">
+    	INSERT INTO SQTSearchResult (resultId, XCorrRank, spRank, deltaCN, XCorr, sp) VALUES $values$
+    </insert>
     
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM SQTSearchResult WHERE resultID=#id#

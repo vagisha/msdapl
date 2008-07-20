@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +17,16 @@ import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSqlMapParam;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
+import org.yeastrc.ms.domain.MsSearchResult;
+import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
+import org.yeastrc.ms.domain.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
 import org.yeastrc.ms.domain.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.ValidationStatus;
 import org.yeastrc.ms.domain.MsSearchModification.ModificationType;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
@@ -43,10 +49,12 @@ class SQTDataUploadService {
     
     // these are the things we will cache and do bulk-inserts
     List<MsSearchResultProteinDb> proteinMatchList; // protein matches
+    List<SQTSearchResultDb> sqtResultList; 
     
     
     public SQTDataUploadService() {
         proteinMatchList = new ArrayList<MsSearchResultProteinDb>();
+        sqtResultList = new ArrayList<SQTSearchResultDb>();
     }
     
     public int uploadSearch(SQTSearch search, int runId) {
@@ -56,6 +64,7 @@ class SQTDataUploadService {
         
         // clean up any cached data
         proteinMatchList.clear();
+        sqtResultList.clear();
         
         // save the search and return the database id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();
@@ -77,7 +86,7 @@ class SQTDataUploadService {
             return 0;
         }
         
-        MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao = DAOFactory.instance().getSqtResultDAO();
+        MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
         int resultId = resultDao.saveResultOnly(result, searchId, scanId);
         
         // upload dynamic mods for this result
@@ -90,16 +99,23 @@ class SQTDataUploadService {
             modDao.saveDynamicModificationForSearchResult(mod, resultId, modId);
         }
         
-        
         // upload the protein matches
+        uploadProteinMatches(result, resultId);
+        // upload the SQT file specific information for this result.
+        uploadSQTResult(result, resultId);
+        
+        return resultId;
+    }
+
+    private void uploadProteinMatches(SQTSearchResult result, int resultId) {
+        // upload the protein matches if the cache has enough entries
         if (proteinMatchList.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();
         }
-        
+        // add the protein matches for this result to the cache
         for (MsSearchResultProtein match: result.getProteinMatchList()) {
             proteinMatchList.add(new MsResultProteinSqlMapParam(resultId, match.getAccession(), match.getDescription()));
         }
-        return resultId;
     }
 
     private void uploadProteinMatchBuffer() {
@@ -108,9 +124,114 @@ class SQTDataUploadService {
         proteinMatchList.clear();
     }
     
+    private void uploadSQTResult(SQTSearchResult result, int resultId) {
+        // upoad the SQT file specific result information if the cache has enough entries
+        if (sqtResultList.size() >= BUF_SIZE) {
+            uploadSqtResultBuffer();
+        }
+        // add the SQT file specific information for this result to the cache
+        SQTSearchResultLite sqtResultOnly = new SQTSearchResultLite();
+        sqtResultOnly.resultId = resultId;
+        sqtResultOnly.xcorrRank = result.getxCorrRank();
+        sqtResultOnly.spRank = result.getSpRank();
+        sqtResultOnly.deltaCN = result.getDeltaCN();
+        sqtResultOnly.xcorr = result.getxCorr();
+        sqtResultOnly.sp = result.getSp();
+        sqtResultList.add(sqtResultOnly);
+    }
+    
+    private void uploadSqtResultBuffer() {
+        SQTSearchResultDAO sqtResultDao = daoFactory.getSqtResultDAO();
+        sqtResultDao.saveAllSqtResultOnly(sqtResultList);
+        sqtResultList.clear();
+    }
+    
     public void flush() {
         if (proteinMatchList.size() > 0) {
             uploadProteinMatchBuffer();
+        }
+        if (sqtResultList.size() > 0) {
+            uploadSqtResultBuffer();
+        }
+    }
+    
+    private static final class SQTSearchResultLite implements SQTSearchResultDb{
+
+        int resultId;
+        int xcorrRank;
+        int spRank;
+        BigDecimal deltaCN;
+        BigDecimal xcorr;
+        BigDecimal sp;
+        
+        public int getId() {
+            return resultId;
+        }
+
+        @Override
+        public BigDecimal getDeltaCN() {
+            return deltaCN;
+        }
+
+        @Override
+        public BigDecimal getSp() {
+            return sp;
+        }
+
+        @Override
+        public int getSpRank() {
+            return spRank;
+        }
+
+        @Override
+        public BigDecimal getxCorr() {
+            return xcorr;
+        }
+
+        @Override
+        public int getxCorrRank() {
+            return xcorrRank;
+        }
+        
+        @Override
+        public int getSearchId() {
+            return 0;
+        }
+        
+        public List<MsSearchResultProteinDb> getProteinMatchList() {
+            return null;
+        }
+
+        public MsSearchResultPeptideDb getResultPeptide() {
+            return null;
+        }
+
+        public int getScanId() {
+            return 0;
+        }
+
+        public BigDecimal getCalculatedMass() {
+            return null;
+        }
+
+        @Override
+        public int getCharge() {
+            return 0;
+        }
+
+        @Override
+        public int getNumIonsMatched() {
+            return 0;
+        }
+
+        @Override
+        public int getNumIonsPredicted() {
+            return 0;
+        }
+
+        @Override
+        public ValidationStatus getValidationStatus() {
+            return null;
         }
     }
 }

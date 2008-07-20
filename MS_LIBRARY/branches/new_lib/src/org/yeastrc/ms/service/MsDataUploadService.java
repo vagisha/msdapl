@@ -86,10 +86,17 @@ public class MsDataUploadService {
                 uploaded++;
             }
             catch (ParserException e) {
-                log.warn("Error processing scan. Scan will not be uploaded. "+e.getMessage(), e);
+                log.error("Error processing scan. Scan will not be uploaded. "+e.getMessage(), e);
             }
             all++;
         }
+        
+        // if no scans were uploaded for this run throw an exception
+        if (uploaded == 0) {
+            log.error("END MS2 FILE UPLOAD: !!!No scans were uploaded for file: "+provider.getFileName()+"("+runId+")");
+            throw new Exception("No scans were uploadef for runID: "+runId);
+        }
+        
         long endTime = System.currentTimeMillis();
         log.info("Uploaded "+uploaded+" out of "+all+" scans for runId: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds");
         log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);

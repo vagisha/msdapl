@@ -24,9 +24,10 @@ import org.yeastrc.ms.dao.ms2File.ibatis.MS2RunDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanChargeDAOImpl;
 import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
+import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTHeaderDAOImpl;
+import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchScanDAOImpl;
 import org.yeastrc.ms.domain.MsRun;
@@ -43,8 +44,6 @@ import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -99,7 +98,7 @@ public class DAOFactory {
     private MsSearchDatabaseDAO seqDbDao;
     
     // DAOs for SQT file related objects
-    private MsSearchResultDAO <SQTSearchResult, SQTSearchResultDb> sqtResultDAO;
+    private SQTSearchResultDAO sqtResultDAO;
     private SQTSearchScanDAO sqtSpectrumDAO;
     private SQTHeaderDAO sqtHeaderDAO;
     private MsSearchDAO<SQTSearch, SQTSearchDb> sqtSearchDAO;
@@ -183,7 +182,7 @@ public class DAOFactory {
         return searchDAO;
     }
     
-    public MsSearchResultDAO <MsSearchResult, MsSearchResultDb> getMsPeptideSearchResultDAO() {
+    public MsSearchResultDAO <MsSearchResult, MsSearchResultDb> getMsSearchResultDAO() {
         return searchResultDAO;
     }
     
@@ -203,7 +202,7 @@ public class DAOFactory {
         return sqtHeaderDAO;
     }
     
-    public MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> getSqtResultDAO() {
+    public SQTSearchResultDAO getSqtResultDAO() {
         return sqtResultDAO;
     }
     
