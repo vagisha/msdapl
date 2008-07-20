@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
@@ -37,6 +39,8 @@ public class Ms2FileReader implements MS2RunDataProvider {
     private int warnings = 0;
 
     private static final Logger log = Logger.getLogger(Ms2FileReader.class);
+    
+    private static final Pattern headerPattern = Pattern.compile("^H\\s+([\\S]+)\\s*(.*)");
 
     public int getWarningCount() {
         return warnings;
@@ -80,27 +84,15 @@ public class Ms2FileReader implements MS2RunDataProvider {
 
         MS2Header header = new MS2Header();
         while (isHeaderLine(currentLine)) {
-            String[] tokens = currentLine.split("\\t");
-            if (tokens.length >= 3) {
-                //header.addHeaderItem(tokens[1], tokens[2]);
-                StringBuilder val = new StringBuilder();
-                // the value for the header may be a tab separated list; get the entire string
-                if (tokens.length > 3) {
-                    int idx = currentLine.indexOf('\t',currentLine.indexOf('\t')+1);
-                    tokens[2] = currentLine.substring(idx+1, currentLine.length());
-                }
-                header.addHeaderItem(tokens[1], tokens[2]);
-            }
-            else if (tokens.length >= 2){
-                // if the value for this header is missing, add the header
-                // with an empty string as the value
-                header.addHeaderItem(tokens[1], "");
+            String[] nameAndVal = parseHeader(currentLine);
+            if (nameAndVal.length == 2) {
+                header.addHeaderItem(nameAndVal[0], nameAndVal[1]);
             }
             else {
                 // ignore if both label and value for this header item are missing
                 //throw new Exception("Invalid header: "+currentLine);
+                log.warn("!!!LINE# "+currentLineNum+" Invalid 'H' line; ignoring...: -- "+currentLine);
             }
-
             advanceLine();
         }
 //        if (!header.isValid()) {
@@ -110,6 +102,14 @@ public class Ms2FileReader implements MS2RunDataProvider {
 //            throw e;
 //        }
         return header;
+    }
+
+    String[] parseHeader(String line) {
+        Matcher match = headerPattern.matcher(line);
+        if (match.matches())
+            return new String[]{match.group(1), match.group(2)};
+        else
+            return new String[0];
     }
 
     public boolean hasNextScan() {

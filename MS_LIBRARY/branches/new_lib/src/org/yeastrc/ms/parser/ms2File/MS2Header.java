@@ -7,12 +7,7 @@
 package org.yeastrc.ms.parser.ms2File;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.RunFileFormat;
@@ -24,131 +19,122 @@ import org.yeastrc.ms.domain.ms2File.MS2Run;
  */
 public class MS2Header implements MS2Run {
 
-    // These are header items we know and care about
-    public static final String DANALYZER_OPTIONS = "DAnalyzerOptions";
-    public static final String DANALYZER_VERSION = "DAnalyzerVersion";
-    public static final String DANALYZER = "DAnalyzer";
-    public static final String IANALYZER_OPTIONS = "IAnalyzerOptions";
-    public static final String IANALYZER_VERSION = "IAnalyzerVersion";
-    public static final String IANALYZER = "IAnalyzer";
-    public static final String INSTRUMENT_SN = "InstrumentSN";
-    public static final String INSTRUMENT_TYPE = "InstrumentType";
-    public static final String EXTRACTOR_OPTIONS = "ExtractorOptions";
-    public static final String EXTRACTOR_VERSION = "ExtractorVersion";
-    public static final String EXTRACTOR = "Extractor";
-    public static final String CREATION_DATE = "CreationDate";
-    public static final String COMMENTS = "Comments";
-    public static final String ACQUISITION_METHOD = "AcquisitionMethod";
-    public static final String DATA_TYPE = "DataType";
-    
-    private Map<String, String> headerItems;
     private List<MS2Field> headerList;
     private String fileName;
     private String sha1Sum;
+    private String creationDate;
+    private String extractor;
+    private String extractorVersion;
+    private String extractorOptions;
+    private String instrumentModel;
+    private String instrumentSN;
+    private String acquisionMethod;
+    private String dataType;
+    private StringBuilder comment;
     
     public MS2Header() {
-        headerItems = new HashMap<String, String>();
         headerList = new ArrayList<MS2Field>();
+        comment = new StringBuilder();
     }
     
     public void addHeaderItem(String label, String value) {
         if (label == null || value == null)   return;
-        headerItems.put(label, value);
         headerList.add(new HeaderItem(label, value));
-    }
-    
-    public Iterator<Entry<String,String>> iterator() {
-        return headerItems.entrySet().iterator();
+        if (isCreationDate(label))
+            creationDate = value;
+        if (isExtractor(label))
+            extractor = value;
+        if (isExtractorVersion(label)) 
+            extractorVersion = value;
+        if (isExtractorOptions(label))
+            extractorOptions = value;
+        if (isInstrumentModel(label))
+            instrumentModel = value;
+        if (isInstrumentSN(label))
+            instrumentSN = value;
+        if (isAcquisitionMethod(label))
+            acquisionMethod = value;
+        if (isDataType(label))
+            dataType = value;
+        if (isComment(label)) {
+            comment.append(value+";");
+        }
     }
     
     public int headerCount() {
-        return headerItems.size();
+        return headerList.size();
     }
     
     public boolean isValid() {
-        if (getHeaderValueForLabel(CREATION_DATE)        == null ||
-            getHeaderValueForLabel(EXTRACTOR)            == null ||
-            getHeaderValueForLabel(EXTRACTOR_VERSION)    == null ||
-            getHeaderValueForLabel(EXTRACTOR_OPTIONS)    == null)
+        if (creationDate        == null ||
+            extractor           == null ||
+            extractorVersion    == null ||
+            extractorOptions    == null ||
+            sha1Sum             == null ||
+            fileName            == null)
             return false;
         return true;
     }
     
-    public String getHeaderValueForLabel(String label) {
-        return headerItems.get(label);
+    public void setSha1Sum(String sha1Sum) {
+        this.sha1Sum = sha1Sum;
     }
     
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+    
+    public String getSha1Sum() {
+        return this.sha1Sum;
+    }
+    
+    public String getFileName() {
+        return fileName;
+    }
+   
     public String getCreationDate() {
-        return getHeaderValueForLabel(CREATION_DATE);
+        return creationDate;
     }
     
     public String getInstrumentModel() {
-        return getHeaderValueForLabel(INSTRUMENT_TYPE);
+        return instrumentModel;
     }
     
     public String getInstrumentSN() {
-        return getHeaderValueForLabel(INSTRUMENT_SN);
+        return instrumentSN;
     }
     
     public String getConversionSW() {
-        return getHeaderValueForLabel(EXTRACTOR);
+        return extractor;
     }
     
     public String getConversionSWVersion() {
-        return getHeaderValueForLabel(EXTRACTOR_VERSION);
+        return extractorVersion;
     }
     
     public String getConversionSWOptions() {
-        return getHeaderValueForLabel(EXTRACTOR_OPTIONS);
+        return extractorOptions;
     }
     
     public String getAcquisitionMethod() {
-        return getHeaderValueForLabel(ACQUISITION_METHOD);
+        return acquisionMethod;
     }
     
     public String getDataType() {
-        return getHeaderValueForLabel(DATA_TYPE);
+        return dataType;
     }
     
     public String getComment() {
-        String comments = getHeaderValueForLabel(COMMENTS);
-        if (comments == null)
-            // older versions may have Comment instead of Comments
-            comments = getHeaderValueForLabel("Comment");
-        return comments;
+        return comment.deleteCharAt(comment.length() -1).toString(); // delete last semi-colon
     }
     
-    
-    public String toString() {
-        Map<String, String> sortedItems = new TreeMap<String, String>(headerItems);
-        
-        StringBuilder buf = new StringBuilder();
-        for (String headerItem: sortedItems.keySet()) {
-            if (headerItem == null)
-                continue;
-            buf.append("H\t");
-            buf.append(headerItem);
-            buf.append("\t");
-            buf.append(headerItems.get(headerItem));
-            buf.append("\n");
-        }
-        buf.deleteCharAt(buf.length() - 1); // remove the last new line character.
-        return buf.toString();
-    }
-
     public List<MS2Field> getHeaderList() {
         return headerList;
     }
 
+    // MS2 files don't have any enzyme information
     public List<MsEnzyme> getEnzymeList() {
         return new ArrayList<MsEnzyme>(0);
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public String getInstrumentVendor() {
@@ -159,11 +145,56 @@ public class MS2Header implements MS2Run {
         return RunFileFormat.MS2;
     }
 
-    public String getSha1Sum() {
-        return this.sha1Sum;
+    public String toString() {
+        
+        StringBuilder buf = new StringBuilder();
+        for (MS2Field headerItem: headerList) {
+            if (headerItem == null)
+                continue;
+            buf.append("H\t");
+            buf.append(headerItem.getName());
+            buf.append("\t");
+            buf.append(headerItem.getValue());
+            buf.append("\n");
+        }
+        buf.deleteCharAt(buf.length() - 1); // remove the last new line character.
+        return buf.toString();
     }
     
-    public void setSha1Sum(String sha1Sum) {
-        this.sha1Sum = sha1Sum;
+    private boolean isCreationDate(String value) {
+        return value.equalsIgnoreCase("CreationDate");
     }
+    
+    private boolean isExtractor(String value) {
+        return value.equalsIgnoreCase("Extractor");
+    }
+    
+    private boolean isExtractorVersion(String value) {
+        return value.equalsIgnoreCase("ExtractorVersion");
+    }
+    
+    private boolean isExtractorOptions(String value) {
+        return value.equalsIgnoreCase("ExtractorOptions");
+    }
+    
+    private boolean isInstrumentModel(String value) {
+        return value.equalsIgnoreCase("InstrumentType");
+    }
+    
+    private boolean isInstrumentSN(String value) {
+        return value.equalsIgnoreCase("InstrumentSN");
+    }
+    
+    private boolean isAcquisitionMethod(String value) {
+        return value.equalsIgnoreCase("AcquisitionMethod");
+    }
+    
+    private boolean isDataType(String value) {
+        return value.equalsIgnoreCase("DataType");
+    }
+    
+    private boolean isComment(String value) {
+        return value.startsWith("Comment");
+    }
+    
 }

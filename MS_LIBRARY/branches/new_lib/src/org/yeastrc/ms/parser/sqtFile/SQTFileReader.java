@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.MsSearchModification;
@@ -27,6 +29,8 @@ public class SQTFileReader implements SQTSearchDataProvider {
 
     private static final Logger log = Logger.getLogger(SQTFileReader.class);
 
+    private static final Pattern headerPattern = Pattern.compile("^H\\s+([\\S]+)\\s*(.*)");
+    
     public int getWarningCount() {
         return warnings;
     }
@@ -54,7 +58,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
         currentLine = reader.readLine(); // advance first
         // skip over blank lines and line that don't start with a H, S, M or L
         while(currentLine != null && !isValidLine(currentLine)) {
-            log.warn("!!!LINE# "+currentLineNum+" Lines should begin with H, S, M, or L. Invalid line: -- "+currentLine);
+//            log.warn("!!!LINE# "+currentLineNum+" Lines should begin with H, S, M, or L. Invalid line: -- "+currentLine);
             currentLineNum++;
             currentLine = reader.readLine();
         }
@@ -72,28 +76,14 @@ public class SQTFileReader implements SQTSearchDataProvider {
 
         SQTHeader header = new SQTHeader();
         while (isHeaderLine(currentLine)) {
-            String[] tokens = currentLine.split("\\t");
-            if (tokens.length >= 3) {
-                // the value for the header may be a tab separated list; get the entire string
-                // e.g. H       Alg-MaxDiffMod  3H      Alg-DisplayTop  5
-                if (tokens.length > 3) {
-                    int idx = currentLine.indexOf('\t',currentLine.indexOf('\t')+1);
-                    tokens[2] = currentLine.substring(idx+1, currentLine.length());
-                }
-                header.addHeaderItem(tokens[1], tokens[2]);
+            String[] nameAndVal = parseHeader(currentLine.trim());
+            if (nameAndVal.length == 2) {
+                header.addHeaderItem(nameAndVal[1], nameAndVal[2]);
             }
-            else if (tokens.length >= 2){
-                // maybe the header and value are separated by a space rather than a tab
-                String temp = tokens[1].trim(); // remove any trailing space first
-                int i = temp.indexOf(' '); // look for the first space character
-                if (i != -1)
-                    header.addHeaderItem(temp.substring(0, i), temp.substring(i+1));
-                else
-                    // if the value for this header is missing, add the header with a empty String
-                    header.addHeaderItem(tokens[1], "");
+            else {
+                // ignore if both label and value for this header item are missing
+                log.warn("!!!LINE# "+currentLineNum+" Invalid 'H' line; ignoring...: -- "+currentLine);
             }
-            // ignore if both label and value for this header item are missing
-
             advanceLine();
         }
         this.searchDynamicMods = header.getDynamicModifications();
@@ -107,6 +97,14 @@ public class SQTFileReader implements SQTSearchDataProvider {
     }
 
 
+    String[] parseHeader(String line) {
+        Matcher match = headerPattern.matcher(line);
+        if (match.matches())
+            return new String[]{match.group(1), match.group(2)};
+        else
+            return new String[0];
+    }
+    
     public boolean hasNextSearchScan()  {
         return currentLine != null;
     }
