@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
@@ -54,7 +55,11 @@ public class Scan implements MS2Scan {
         return this.analysisItems;
     }
     
-    public void addAnalysisItem(String label, String value) {
+    /**
+     * @throws DataFormatException is thrown if we are parsing the "ActivationType" header
+     *         and the value is more than 3 characters.
+     */
+    public void addAnalysisItem(String label, String value) throws DataFormatException {
         if (label == null || value == null)   return;
         analysisItems.add(new HeaderItem(label, value));
         if (label.equalsIgnoreCase(RET_TIME))
@@ -118,8 +123,16 @@ public class Scan implements MS2Scan {
     public String getFragmentationType() {
         return activationType;
     }
-    private void setFragmentationType(String actType) {
+    /**
+     * @throws DataFormatException is thrown if actType is more than 3 characters.
+     * 
+     * The database (msScan table) currently supports a 3 character value for 
+     * fragmentationType.
+     */
+    private void setFragmentationType(String actType) throws DataFormatException {
         this.activationType = actType;
+        if (actType.length() > 3)
+            throw new DataFormatException("Invalid fragmentation type (> 3 characters): "+actType);
     }
 
     public int getMsLevel() {

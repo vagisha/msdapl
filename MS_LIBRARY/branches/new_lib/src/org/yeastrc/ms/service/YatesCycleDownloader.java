@@ -22,8 +22,8 @@ public class YatesCycleDownloader {
     private static final Logger  log = Logger.getLogger(YatesCycleDownloader.class);
     public static enum DATA_TYPE {MS2, SQT;};
     
-    public boolean downloadMS2Cycle(int cycleId, String outdir, String outFile) throws ClassNotFoundException, SQLException {
-        return downloadFile(cycleId, outdir, outFile, DATA_TYPE.SQT);
+    public boolean downloadMS2File(int cycleId, String outdir, String outFile) throws ClassNotFoundException, SQLException {
+        return downloadFile(cycleId, outdir, outFile, DATA_TYPE.MS2);
     }
     
     public boolean downloadSQTFile(int cycleId, String outdir, String outFile) throws ClassNotFoundException, SQLException {
@@ -91,11 +91,18 @@ public class YatesCycleDownloader {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test";
-        int cycleId = 21251;
-        String fileName = cycleId+"_"+"PARC_meth_async_05_itms";
+
+//        int cycleId = 10936;
+//        String fileName = cycleId+"_"+"PARC_ep2_03_itms"; // Prolucid file
+        
+        int cycleId = 21270;
+        String fileName = cycleId+"_"+"PARC_asyclp1cs_03_itms";
+//      int cycleId = 21251;
+//        String fileName = cycleId+"_"+"PARC_meth_async_05_itms";
+
         
         YatesCycleDownloader downloader = new YatesCycleDownloader();
-//        downloader.downloadMS2Cycle(cycleId, downloadDir, fileName+".ms2");
-        downloader.downloadMS2Cycle(cycleId, downloadDir, fileName+".sqt");
+//        downloader.downloadMS2File(cycleId, downloadDir, fileName+".ms2");
+        downloader.downloadSQTFile(cycleId, downloadDir, fileName+".sqt");
     }
 }

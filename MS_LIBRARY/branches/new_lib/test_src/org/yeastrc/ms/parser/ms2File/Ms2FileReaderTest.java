@@ -39,5 +39,11 @@ public class Ms2FileReaderTest extends TestCase {
         assertEquals(2, parsed.length);
         assertEquals("FilteringProgram", parsed[0]);
         assertEquals("", parsed[1]);
+        
+        header = "H       Precursor/Fragment Ion Isotopes AVG/MONO";
+        parsed = reader.parseHeader(header);
+        assertEquals(2, parsed.length);
+        assertEquals("Precursor/Fragment", parsed[0]);
+        assertEquals("Ion Isotopes AVG/MONO", parsed[1]);
     }
 }

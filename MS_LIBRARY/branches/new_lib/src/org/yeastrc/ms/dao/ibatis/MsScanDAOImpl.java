@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,7 +16,6 @@ import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.util.PeakStringBuilder;
-import org.yeastrc.ms.util.PeakUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -32,7 +30,10 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
 
     public int save(MsScan scan, int runId, int precursorScanId) {
         MsScanSqlMapParam scanDb = new MsScanSqlMapParam(runId, precursorScanId, scan);
-        return saveAndReturnId("MsScan.insert", scanDb);
+        int scanId = saveAndReturnId("MsScan.insert", scanDb);
+        // save the peak data
+        save("MsScan.insertPeakData", new MsScanDataSqlMapParam(scanId, scan));
+        return scanId;
     }
 
     public int save(MsScan scan, int runId) {
@@ -58,17 +59,21 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
     
     public void delete(int scanId) {
         delete("MsScan.delete", scanId);
+        delete("MsScan.deletePeakData", scanId);
     }
 
     public void deleteScansForRun(int runId) {
-        delete("MsScan.deleteByRunId", runId);
+        List<Integer> scanIds = loadScanIdsForRun(runId);
+        for (Integer scanId: scanIds) {
+            delete(scanId);
+        }
     }
 
     /**
      * Convenience class for encapsulating a MsScan along with the associated runId 
      * and precursorScanId (if any)
      */
-    public class MsScanSqlMapParam implements MsScan {
+    public static class MsScanSqlMapParam implements MsScan {
 
         private int runId;
         private int precursorScanId;
@@ -85,17 +90,6 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
          */
         public int getRunId() {
             return runId;
-        }
-
-        public byte[] getPeakByteArray() throws IOException {
-            Iterator<String[]> peakIterator = scan.peakIterator();
-            String[] peak = null;
-            PeakStringBuilder builder = new PeakStringBuilder();
-            while(peakIterator.hasNext()) {
-                peak = peakIterator.next();
-                builder.addPeak(peak[0], peak[1]);
-            }
-            return PeakUtils.encodePeakString(builder.getPeaksAsString());
         }
         
         public int getPrecursorScanId() {
@@ -132,6 +126,34 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
 
         public Iterator<String[]> peakIterator() {
             return scan.peakIterator();
+        }
+    }
+    
+    /**
+     * Convenience class for encapsulating data for a row in the msScanData table.
+     */
+    public static class MsScanDataSqlMapParam {
+        private int scanId;
+        private String peakData;
+        public MsScanDataSqlMapParam(int scanId, MsScan scan) {
+            this.scanId = scanId;
+            this.peakData = getPeakString(scan);
+        }
+        public int getScanId() {
+            return scanId;
+        }
+        public String getPeakData() {
+            return peakData;
+        }
+        private String getPeakString(MsScan scan) {
+            Iterator<String[]> peakIterator = scan.peakIterator();
+            String[] peak = null;
+            PeakStringBuilder builder = new PeakStringBuilder();
+            while(peakIterator.hasNext()) {
+                peak = peakIterator.next();
+                builder.addPeak(peak[0], peak[1]);
+            }
+            return builder.getPeaksAsString();
         }
     }
 }

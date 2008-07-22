@@ -125,6 +125,7 @@ public class MS2Header implements MS2Run {
     }
     
     public String getComment() {
+        if (comment == null || comment.length() == 0)    return null;
         return comment.deleteCharAt(comment.length() -1).toString(); // delete last semi-colon
     }
     

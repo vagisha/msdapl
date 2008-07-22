@@ -33,8 +33,7 @@ public class MsScanDbImplTest extends TestCase {
             peaks.add(peak);
             builder.addPeak(peak[0], peak[1]);
         }
-        byte[] peakByteArray = PeakUtils.encodePeakString(builder.getPeaksAsString());
-        scanDb.setPeakByteArray(peakByteArray);
+        scanDb.setPeakData(builder.getPeaksAsString());
         List<double[]> peakList = new PeakConverterDouble().convert(scanDb.peakDataString());
         int i = 0;
         for (double[] peak: peakList) {

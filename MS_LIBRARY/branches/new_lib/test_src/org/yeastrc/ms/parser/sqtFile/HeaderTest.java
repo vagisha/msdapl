@@ -7,6 +7,8 @@ import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.parser.ParserException;
+
 public class HeaderTest extends TestCase {
 
     protected void setUp() throws Exception {
@@ -119,6 +121,15 @@ public class HeaderTest extends TestCase {
         }
         catch(RuntimeException e){}
         
+    }
+    
+    public void testParseHeader() {
+        SQTFileReader reader = new SQTFileReader();
+        String header = "H       Precursor/Fragment Ion Isotopes AVG/MONO";
+        String[] parsed = reader.parseHeader(header);
+        assertEquals(2, parsed.length);
+        assertEquals("Precursor/Fragment", parsed[0]);
+        assertEquals("Ion Isotopes AVG/MONO", parsed[1]);
     }
 
 }

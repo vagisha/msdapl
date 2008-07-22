@@ -45,22 +45,29 @@ public class MsExperimentUploader {
     
     private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws Exception {
         
-        File directory = new File (fileDirectory);
-        if (!directory.exists()) {
-            throw new IllegalArgumentException("Directory does not exist: "+fileDirectory);
-        }
-        
-        Set<String> filenames = getFileNamesInDirectory(directory);
+        Set<String> filenames = getFileNamePrefixes(fileDirectory);
         
         // If we didn't find anything throw an exception so that the experiment is deleted.
         if (filenames.size() == 0) {
-            throw new RuntimeException("No files found to upload in directory: "+fileDirectory);
+            throw new IllegalArgumentException("No files found to upload in directory: "+fileDirectory);
+        }
+        
+        // Make sure matching .ms2 and sqt file pairs are found
+        if (!requiredFilesExist(fileDirectory, filenames)) {
+            throw new IllegalArgumentException("Missing required files in directory: "+fileDirectory);
         }
         
         Ms2FileReader ms2Provider = null;
         SQTFileReader sqtProvider = null;
         
         for (String filename: filenames) {
+            
+            // We are only uploading SEQUEST .sqt files. We don't know how to upload other formats: 
+            // e.g. Percolator, ProLuCID, PepProbe etc.
+            if (!SQTFileReader.isSequestSQT(fileDirectory+File.separator+filename+".sqt")) {
+                throw new IllegalArgumentException("Don't know how to convert non-SEQUEST .sqt files");
+            }
+            
             // upload the run first
             ms2Provider = new Ms2FileReader();
             ms2Provider.open(fileDirectory+File.separator+filename+".ms2");
@@ -73,7 +80,31 @@ public class MsExperimentUploader {
         }
     }
 
+
+    private boolean requiredFilesExist(String fileDirectory, Set<String> filenames) {
+        for (String filePrefix: filenames) {
+            if (!(new File(fileDirectory+File.separator+filePrefix+".ms2").exists())) {
+                log.error("Required file: "+filePrefix+".ms2 not found");
+                return false;
+            }
+            if (!(new File(fileDirectory+File.separator+filePrefix+".sqt").exists())) {
+                log.error("Required file: "+filePrefix+".sqt not found");
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private Set<String> getFileNamePrefixes(String fileDirectory) {
+        File directory = new File (fileDirectory);
+        if (!directory.exists()) {
+            throw new IllegalArgumentException("Directory does not exist: "+fileDirectory);
+        }
+        return getFileNamesInDirectory(directory);
+    }
+    
     private Set<String> getFileNamesInDirectory(File directory) {
+        
         Set<String> filenames = new HashSet<String>();
         File[] files = directory.listFiles();
         String name = null;
@@ -91,7 +122,8 @@ public class MsExperimentUploader {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "./resources/PARC/");
+//        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }

@@ -30,11 +30,32 @@ public class SQTFileReader implements SQTSearchDataProvider {
     private static final Logger log = Logger.getLogger(SQTFileReader.class);
 
     private static final Pattern headerPattern = Pattern.compile("^H\\s+([\\S]+)\\s*(.*)");
+    private static final Pattern locusPattern = Pattern.compile("^L\\s+([\\S]+)\\s*(.*)");
+    private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
     
     public int getWarningCount() {
         return warnings;
     }
 
+    public static boolean isSequestSQT(String filePath) throws IOException {
+        BufferedReader reader = null;
+            reader = new BufferedReader(new FileReader(filePath));
+            String line = reader.readLine();
+            Matcher match = null;
+            while(line != null && isHeaderLine(line)) {
+                if (line.contains("Percolator"))    return false;
+                match = sqtGenPattern.matcher(line.trim());
+                if (match.matches()) {
+                    String genProg = match.group(1);
+                    if (genProg != null && genProg.equalsIgnoreCase("SEQUEST"))
+                        return true;
+                    else
+                        return false;
+                }
+            }
+        return false;
+    }
+    
     public void open(String filePath) throws IOException{
         reader = new BufferedReader(new FileReader(filePath));
         fileName = new File(filePath).getName();
@@ -76,7 +97,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
 
         SQTHeader header = new SQTHeader();
         while (isHeaderLine(currentLine)) {
-            String[] nameAndVal = parseHeader(currentLine.trim());
+            String[] nameAndVal = parseHeader(currentLine);
             if (nameAndVal.length == 2) {
                 header.addHeaderItem(nameAndVal[0], nameAndVal[1]);
             }
@@ -98,7 +119,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
 
 
     String[] parseHeader(String line) {
-        Matcher match = headerPattern.matcher(line);
+        Matcher match = headerPattern.matcher(line.trim());
         if (match.matches())
             return new String[]{match.group(1), match.group(2)};
         else
@@ -250,18 +271,20 @@ public class SQTFileReader implements SQTSearchDataProvider {
      * @param scanNumber
      * @param charge
      * @return
-     * @throws ParserException
+     * @throws ParserException if the line did not contain the expected number of fields OR
+     *                         there was an error parsing numbers in the line OR
+     *                         there was an error parsing the peptide sequence in this 'M' line.
      */
-    private PeptideResult parsePeptideResult(String line, int scanNumber, int charge) throws ParserException {
+    PeptideResult parsePeptideResult(String line, int scanNumber, int charge) throws ParserException {
 
-        String[] tokens = line.split("\\t");
-        if (tokens.length < 11) {
+        String[] tokens = line.split("\\s+");
+        if (tokens.length < 11 || tokens.length > 11) {
             warnings++;
             throw new ParserException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-        for (int i = 0; i < tokens.length; i++)
-            tokens[i] = tokens[i].replaceAll("\\s+", "");
+//        for (int i = 0; i < tokens.length; i++)
+//            tokens[i] = tokens[i].replaceAll("\\s+", "");
 
         PeptideResult result = new PeptideResult(searchDynamicMods);
         try {
@@ -284,6 +307,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
         result.setCharge(charge);
         result.setScanNumber(scanNumber);
         
+        // parse the peptide sequence
         try {
             result.getResultPeptide();
         }
@@ -300,36 +324,35 @@ public class SQTFileReader implements SQTSearchDataProvider {
      * @return
      * @throws ParserException
      */
-    private DbLocus parseLocus(String line) throws ParserException {
-        String[] tokens = line.split("\\t");
-        if (tokens.length < 2) {
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'L' line. Expected 2 fields", line);
+    DbLocus parseLocus(String line) throws ParserException {
+        
+        Matcher match = locusPattern.matcher(line.trim());
+        if (match.matches()) {
+            return new DbLocus(match.group(1), match.group(2));
         }
-
-        if (tokens.length > 2)
-            return new DbLocus(tokens[1], tokens[2]);
-        else
-            return new DbLocus(tokens[1], null);
+        else {
+            warnings++;
+            throw new ParserException(currentLineNum, "Invalid 'L' line. Expected >= 2 fields", line);
+        }
     }
 
 
-    private boolean isScanLine(String line) {
+    private static boolean isScanLine(String line) {
         if (line == null)   return false;
         return line.startsWith("S");
     }
 
-    private boolean isHeaderLine(String line) {
+    private static boolean isHeaderLine(String line) {
         if (line == null)   return false;
         return line.startsWith("H");
     }
 
-    private boolean isResultLine(String line) {
+    private static boolean isResultLine(String line) {
         if (line == null)   return false;
         return line.startsWith("M");
     }
 
-    private boolean isLocusLine(String line) {
+    private static boolean isLocusLine(String line) {
         if (line == null)   return false;
         return line.startsWith("L");
     }

@@ -119,8 +119,8 @@ public class MsScanDbImpl implements MsScanDb {
     }
 
 
-    public void setPeakByteArray(byte[] peaks) throws IOException, ClassNotFoundException {
-        peakString = PeakUtils.decodePeakString(peaks);
+    public void setPeakData(String peaks) {
+        peakString = peaks;
     }
 
     @Override

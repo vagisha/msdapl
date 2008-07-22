@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
@@ -129,7 +130,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
         }
 
         advanceLine(); // go to the next line
-
+        
         while(currentLine != null) {
             // is this one of the charge states of the scan?
             if (isChargeLine(currentLine)) {
@@ -150,6 +151,9 @@ public class Ms2FileReader implements MS2RunDataProvider {
                 catch (ParserException e) {
                     log.warn(e.getMessage());
                 }
+                catch (DataFormatException e) {
+                    log.warn(e.getMessage());
+                }
                 advanceLine();
             }
             // it is neither so must be peak data
@@ -158,6 +162,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
                     parsePeaks(scan);
                 }
                 catch (ParserException e) {
+                    warnings++;
                     log.warn(e.getMessage());
                     int i = currentLineNum;
                     skipScan();
@@ -172,6 +177,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
             log.warn(e.getMessage());
             throw e;
         }
+        
         return scan;
     }
 
@@ -183,7 +189,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
     private MS2Field parseIAnalysis(String line) throws ParserException {
         String[] tokens = line.split("\\t");
         if (tokens.length < 3)
-            throw new ParserException(currentLineNum, "Invalid 'I' line. Expected 2 fields.", line);
+            throw new ParserException(currentLineNum, "Invalid 'I' line. Expected 3 fields.", line);
         return new HeaderItem(tokens[1], tokens[2]);
     }
 

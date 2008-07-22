@@ -5,6 +5,7 @@
 
 	<typeAlias alias="MsScanDb" type="org.yeastrc.ms.domain.impl.MsScanDbImpl"/>
 	<typeAlias alias="MsScan" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanSqlMapParam"/>
+	<typeAlias alias="MsScanData" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
 	
 	
 	<resultMap class="MsScanDb" id="msScanResult">
@@ -18,7 +19,7 @@
 		<result property="precursorScanNum" column="prescanNumber" nullValue="-1"/>
 		<result property="retentionTime" column="retentionTime" />
 		<result property="fragmentationType" column="fragmentationType" />
-		<result property="peakByteArray" column="data" />
+		<result property="peakData" column="data" />
 	</resultMap>
 	
 	
@@ -33,7 +34,11 @@
 		<parameter property="precursorScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
-		<parameter property="peakByteArray" jdbcType="LONGBLOB" />
+	</parameterMap>
+	
+	<parameterMap class="MsScanData" id="msScanDataParam">
+		<parameter property="scanId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="peakData" jdbcType="LONGBLOB" />
 	</parameterMap>
 	
     <select id="selectScanIdsForRun" resultClass="Integer" parameterClass="Integer"> 
@@ -52,7 +57,9 @@
     			retentionTime,
     			fragmentationType,
     			UNCOMPRESS(data) as data 
-    			FROM msScan WHERE id= #id#
+    			FROM msScan, msScanData
+    			WHERE msScan.id = msScanData.scanID
+    			AND id= #id#
     </select>
     
     <select id="selectScanIdForScanNumRun" parameterClass="java.util.Map" resultClass="Integer">
@@ -68,20 +75,24 @@
     						preScanID, 
     						prescanNumber,
     						retentionTime, 
-    						fragmentationType,
-    						data) 
-    	VALUES (?,?,?,?,?,?,?,?,?,COMPRESS(?))
+    						fragmentationType) 
+    	VALUES (?,?,?,?,?,?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>
     
+    <insert id="insertPeakData" parameterMap="msScanDataParam">
+    	INSERT INTO msScanData (scanID,data) 
+    	VALUES (?,COMPRESS(?))
+    </insert>
+    
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM msScan WHERE scanID=#scanId#		    
+		DELETE FROM msScan WHERE id=#scanId#		    
     </delete>
     
-    <delete id="deleteByRunId" parameterClass="Integer">
-		DELETE FROM msScan WHERE runID=#runId#		    
+    <delete id="deletePeakData" parameterClass="Integer">
+		DELETE FROM msScanData WHERE scanID=#scanId#		    
     </delete>
     
 </sqlMap>

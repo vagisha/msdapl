@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
@@ -75,7 +76,12 @@ public class DbToMs2FileConverter {
        
        // add charge independent analysis
        for (MS2Field item: scan.getChargeIndependentAnalysisList()) {
-           ms2scan.addAnalysisItem(item.getName(), item.getValue());
+           try {
+            ms2scan.addAnalysisItem(item.getName(), item.getValue());
+        }
+        catch (DataFormatException e) {
+            e.printStackTrace();
+        }
        }
        
        // finally, the peak data!

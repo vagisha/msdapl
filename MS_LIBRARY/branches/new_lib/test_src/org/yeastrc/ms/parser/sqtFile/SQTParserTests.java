@@ -10,9 +10,9 @@ public class SQTParserTests {
                 "Test for org.yeastrc.ms.parser.sqtFile");
         //$JUnit-BEGIN$
         suite.addTestSuite(HeaderTest.class);
+        suite.addTestSuite(SQTParserTest.class);
         suite.addTestSuite(MsSearchResultPeptideBuilderTest.class);
         suite.addTestSuite(HeaderStaticModificationTest.class);
-        suite.addTest(SQTParserTest.suite());
         suite.addTestSuite(HeaderDynamicModificationTest.class);
         //$JUnit-END$
         return suite;
