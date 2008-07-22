@@ -42,11 +42,18 @@ CREATE TABLE msScan (
     preScanID INT UNSIGNED,
     prescanNumber INT UNSIGNED,
     retentionTime DECIMAL(10,5),
-    fragmentationType VARCHAR(20),
-    data LONGBLOB NOT NULL
+    fragmentationType CHAR(3),
 );
 ALTER TABLE msScan ADD INDEX(runID);
 ALTER TABLE msScan ADD INDEX(startScanNumber);
+
+CREATE TABLE msScanData (
+    scanID INT UNSIGNED NOT NULL PRIMARY KEY,
+    data LONGBLOB NOT NULL
+)
+PARTITION BY KEY()
+PARTITIONS 100;
+ALTER TABLE msScanData ADD INDEX(scanID);
 
 CREATE TABLE MS2FileScanCharge (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -302,6 +309,7 @@ CREATE TRIGGER msScan_bdelete BEFORE DELETE ON msScan
     DELETE FROM msPeptideSearchResult WHERE scanID = OLD.id;
     DELETE FROM SQTSpectrumData WHERE scanID = OLD.id;
     DELETE FROM MS2FileChargeIndependentAnalysis WHERE scanID = OLD.id;
+    DELETE FROM msScanData WHERE scanID = OLD.id;
   END;
 |
 DELIMITER ;
