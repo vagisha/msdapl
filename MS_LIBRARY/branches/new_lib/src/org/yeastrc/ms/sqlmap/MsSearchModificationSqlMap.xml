@@ -121,6 +121,10 @@
     	VALUES (?,?,?)
     </insert>
     
+    <insert id="insertAllResultDynaMod" parameterClass="String">
+    	INSERT INTO msDynamicModResult (resultID, modID, position) VALUES $values$
+    </insert>
+    
     <delete id="deleteDynaModsForModIds" parameterClass="String">
 		DELETE FROM msDynamicModResult WHERE modID IN $idString$
     </delete>

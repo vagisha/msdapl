@@ -13,8 +13,8 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
-import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
+import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.ScanResult;
 
 public class SqtFileToDbConverter {
@@ -29,15 +29,15 @@ public class SqtFileToDbConverter {
     }
 
     private void convertSQTFile(String file, SQTFileReader reader, int runId) throws Exception {
-        SQTHeader header = reader.getHeader();
+        SQTHeader header = reader.getSearchHeader();
         if (!header.isValid())
             throw new Exception("Invalid header section for SQT file");
             
         // insert a search into the database and get the search Id
         int searchId = saveSQTSearch(header, runId);
 
-        while (reader.hasScans()) {
-            ScanResult scan = reader.getNextScan();
+        while (reader.hasNextSearchScan()) {
+            ScanResult scan = reader.getNextSearchScan();
             saveScan(scan, searchId, runId);
         }
     }

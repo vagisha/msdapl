@@ -78,7 +78,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
         while (isHeaderLine(currentLine)) {
             String[] nameAndVal = parseHeader(currentLine.trim());
             if (nameAndVal.length == 2) {
-                header.addHeaderItem(nameAndVal[1], nameAndVal[2]);
+                header.addHeaderItem(nameAndVal[0], nameAndVal[1]);
             }
             else {
                 // ignore if both label and value for this header item are missing

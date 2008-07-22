@@ -7,7 +7,6 @@
 package org.yeastrc.ms.dbuploader;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -19,8 +18,7 @@ import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 import org.yeastrc.ms.parser.ms2File.MS2Header;
-import org.yeastrc.ms.parser.ms2File.MS2FileReader;
-import org.yeastrc.ms.parser.ms2File.Scan;
+import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 
@@ -49,26 +47,10 @@ public class Ms2FileToDbConverter {
             return runId;
         }
         
-        MS2FileReader reader = new MS2FileReader();
+        Ms2FileReader reader = new Ms2FileReader();
         reader.open(filePath);
         
         return convertMs2File(filePath, reader, experimentId, sha1Sum);
-    }
-
-    public int convertMs2File(InputStream inStream, String fileName, int experimentId) throws Exception {
-        
-        String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(inStream);
-        
-        int runId = getMatchingRunId(fileName, sha1Sum);
-        if (runId != 0) {
-            log.warn("Aborting upload of file: "+fileName+". This run already exists in the database");
-            return runId;
-        }
-        
-        MS2FileReader reader = new MS2FileReader();
-        reader.open(inStream);
-        
-        return convertMs2File(fileName, reader, experimentId, sha1Sum);
     }
     
     int getMatchingRunId(String fileName, String sha1Sum) {
@@ -84,9 +66,9 @@ public class Ms2FileToDbConverter {
         
     }
 
-    private int convertMs2File(String file, MS2FileReader reader, int experimentId, String sha1Sum)
+    private int convertMs2File(String file, Ms2FileReader reader, int experimentId, String sha1Sum)
             throws Exception {
-        MS2Header header = reader.getHeader();
+        MS2Header header = reader.getRunHeader();
         header.setFileName(file);
         header.setSha1Sum(sha1Sum);
         // insert a MS2Run into the database and get the run Id
@@ -94,8 +76,8 @@ public class Ms2FileToDbConverter {
         int runId = rundao.saveRun(header, experimentId);
         
         MsScanDAO<MS2Scan, MS2ScanDb> scanDAO = DAOFactory.instance().getMS2FileScanDAO();
-        while (reader.hasScans()) {
-            Scan scan = reader.getNextScan();
+        while (reader.hasNextScan()) {
+            MS2Scan scan = reader.getNextScan();
             // save the scan
             scanDAO.save(scan, runId);
         }

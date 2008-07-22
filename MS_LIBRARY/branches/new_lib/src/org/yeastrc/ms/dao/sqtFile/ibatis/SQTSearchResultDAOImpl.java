@@ -16,6 +16,7 @@ import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -67,13 +68,13 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
     }
     
     
-    public void saveAllSqtResultOnly(List<SQTSearchResultDb> resultList) {
+    public void saveAllSqtResultScores(List<SQTSearchResultScoresDb> resultList) {
         if (resultList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (SQTSearchResultDb result: resultList) {
+        for (SQTSearchResultScoresDb result: resultList) {
             values.append("(");
-            values.append(result.getId());
+            values.append(result.getResultId());
             values.append(",");
             values.append(result.getxCorrRank());
             values.append(",");

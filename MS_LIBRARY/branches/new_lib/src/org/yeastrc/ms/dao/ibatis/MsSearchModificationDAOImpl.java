@@ -14,6 +14,7 @@ import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchModificationDb;
 import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -86,8 +87,25 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
 
     public void saveDynamicModificationForSearchResult(MsSearchResultModification mod, int resultId,
             int modificationId) {
-        MsSearchResultModSqlMapParam modDb = new MsSearchResultModSqlMapParam(resultId, modificationId, mod);
+        MsSearchResultModSqlMapParam modDb = new MsSearchResultModSqlMapParam(resultId, modificationId, mod.getModifiedPosition());
         save("MsSearchMod.insertResultDynaMod", modDb);
+    }
+    
+    public void saveAllDynamicModificationForSearchResult(List<MsSearchResultModSqlMapParam> modList) {
+        if (modList.size() == 0)
+            return;
+        StringBuilder values = new StringBuilder();
+        for (MsSearchResultModSqlMapParam mod: modList) {
+            values.append("(");
+            values.append(mod.getResultId());
+            values.append(",");
+            values.append(mod.getModificationId());
+            values.append(",");
+            values.append(mod.getModifiedPosition());
+            values.append("),");
+        }
+        values.deleteCharAt(values.length() - 1);
+        save("MsSearchMod.insertAllResultDynaMod", values.toString());
     }
 
     public void deleteDynamicModificationsForResult(int resultId) {
@@ -110,7 +128,7 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     // a name mismatch since a Map is built at runtime rather than compile time. 
     // Usnig a bean is also supposed to have better performance.
     //-------------------------------------------------------------------------------------------
-    public class MsSearchModSqlMapParam {
+    public static class MsSearchModSqlMapParam {
 
         private int searchId;
         private char modResidue;
@@ -141,16 +159,16 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         }
     }
     
-    public class MsSearchResultModSqlMapParam {
+    public static class MsSearchResultModSqlMapParam {
 
         private int resultId;
         private int modId;
         private int modPosition;
 
-        public MsSearchResultModSqlMapParam(int resultId, int modId, MsSearchResultModification mod) {
+        public MsSearchResultModSqlMapParam(int resultId, int modId, int modPosition) {
             this.resultId = resultId;
             this.modId = modId;
-            this.modPosition = mod.getModifiedPosition();
+            this.modPosition = modPosition;
         }
 
         public int getResultId() {

@@ -16,6 +16,7 @@ import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl.MsSearchResultModSqlMapParam;
 import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSqlMapParam;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
@@ -23,15 +24,13 @@ import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
-import org.yeastrc.ms.domain.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.MsSearchResultProtein;
 import org.yeastrc.ms.domain.MsSearchResultProteinDb;
-import org.yeastrc.ms.domain.ValidationStatus;
 import org.yeastrc.ms.domain.MsSearchModification.ModificationType;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
+import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 
 /**
@@ -49,12 +48,14 @@ class SQTDataUploadService {
     
     // these are the things we will cache and do bulk-inserts
     List<MsSearchResultProteinDb> proteinMatchList; // protein matches
-    List<SQTSearchResultDb> sqtResultList; 
+    List<SQTSearchResultScoresDb> sqtResultScoresList; // sequest scores
+    List<MsSearchResultModSqlMapParam> resultModList; // dynamic modifications
     
     
     public SQTDataUploadService() {
         proteinMatchList = new ArrayList<MsSearchResultProteinDb>();
-        sqtResultList = new ArrayList<SQTSearchResultDb>();
+        sqtResultScoresList = new ArrayList<SQTSearchResultScoresDb>();
+        resultModList = new ArrayList<MsSearchResultModSqlMapParam>();
     }
     
     public int uploadSearch(SQTSearch search, int runId) {
@@ -64,7 +65,8 @@ class SQTDataUploadService {
         
         // clean up any cached data
         proteinMatchList.clear();
-        sqtResultList.clear();
+        sqtResultScoresList.clear();
+        resultModList.clear();
         
         // save the search and return the database id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();
@@ -90,17 +92,11 @@ class SQTDataUploadService {
         int resultId = resultDao.saveResultOnly(result, searchId, scanId);
         
         // upload dynamic mods for this result
-        MsSearchModificationDAO modDao = daoFactory.getMsSearchModDAO();
-        for (MsSearchResultModification mod: result.getResultPeptide().getDynamicModifications()) {
-            if (mod == null || mod.getModificationType() == ModificationType.STATIC)
-                continue;
-            int modId = DynamicModLookupUtil.instance().getDynamicModificationId(searchId, 
-                    mod.getModifiedResidue(), mod.getModificationMass());
-            modDao.saveDynamicModificationForSearchResult(mod, resultId, modId);
-        }
+        uploadResultMods(result, resultId, searchId);
         
         // upload the protein matches
         uploadProteinMatches(result, resultId);
+        
         // upload the SQT file specific information for this result.
         uploadSQTResult(result, resultId);
         
@@ -124,38 +120,62 @@ class SQTDataUploadService {
         proteinMatchList.clear();
     }
     
+    private void uploadResultMods(SQTSearchResult result, int resultId, int searchId) {
+        // upload the result dynamic modifications if the cache has enough entries
+        if (resultModList.size() >= BUF_SIZE) {
+            uploadProteinMatchBuffer();
+        }
+        // add the dynamic modifications for this result to the cache
+        for (MsSearchResultModification mod: result.getResultPeptide().getDynamicModifications()) {
+            if (mod == null || mod.getModificationType() == ModificationType.STATIC)
+                continue;
+            int modId = DynamicModLookupUtil.instance().getDynamicModificationId(searchId, 
+                    mod.getModifiedResidue(), mod.getModificationMass());
+            resultModList.add(new MsSearchResultModSqlMapParam(resultId, modId, mod.getModifiedPosition()));
+        }
+    }
+
+    private void uploadResultModBuffer() {
+        MsSearchModificationDAO modDao = daoFactory.getMsSearchModDAO();
+        modDao.saveAllDynamicModificationForSearchResult(resultModList);
+        resultModList.clear();
+    }
+    
     private void uploadSQTResult(SQTSearchResult result, int resultId) {
-        // upoad the SQT file specific result information if the cache has enough entries
-        if (sqtResultList.size() >= BUF_SIZE) {
+        // upload the SQT file specific result information if the cache has enough entries
+        if (sqtResultScoresList.size() >= BUF_SIZE) {
             uploadSqtResultBuffer();
         }
         // add the SQT file specific information for this result to the cache
-        SQTSearchResultLite sqtResultOnly = new SQTSearchResultLite();
+        SQTSearchResultScores sqtResultOnly = new SQTSearchResultScores();
         sqtResultOnly.resultId = resultId;
         sqtResultOnly.xcorrRank = result.getxCorrRank();
         sqtResultOnly.spRank = result.getSpRank();
         sqtResultOnly.deltaCN = result.getDeltaCN();
         sqtResultOnly.xcorr = result.getxCorr();
         sqtResultOnly.sp = result.getSp();
-        sqtResultList.add(sqtResultOnly);
+        sqtResultScoresList.add(sqtResultOnly);
     }
     
     private void uploadSqtResultBuffer() {
         SQTSearchResultDAO sqtResultDao = daoFactory.getSqtResultDAO();
-        sqtResultDao.saveAllSqtResultOnly(sqtResultList);
-        sqtResultList.clear();
+        sqtResultDao.saveAllSqtResultScores(sqtResultScoresList);
+        sqtResultScoresList.clear();
     }
     
     public void flush() {
         if (proteinMatchList.size() > 0) {
             uploadProteinMatchBuffer();
         }
-        if (sqtResultList.size() > 0) {
+        if (sqtResultScoresList.size() > 0) {
             uploadSqtResultBuffer();
+        }
+        if (resultModList.size() > 0) {
+            uploadResultModBuffer();
         }
     }
     
-    private static final class SQTSearchResultLite implements SQTSearchResultDb{
+    private static final class SQTSearchResultScores implements SQTSearchResultScoresDb{
 
         int resultId;
         int xcorrRank;
@@ -164,7 +184,7 @@ class SQTDataUploadService {
         BigDecimal xcorr;
         BigDecimal sp;
         
-        public int getId() {
+        public int getResultId() {
             return resultId;
         }
 
@@ -191,47 +211,6 @@ class SQTDataUploadService {
         @Override
         public int getxCorrRank() {
             return xcorrRank;
-        }
-        
-        @Override
-        public int getSearchId() {
-            return 0;
-        }
-        
-        public List<MsSearchResultProteinDb> getProteinMatchList() {
-            return null;
-        }
-
-        public MsSearchResultPeptideDb getResultPeptide() {
-            return null;
-        }
-
-        public int getScanId() {
-            return 0;
-        }
-
-        public BigDecimal getCalculatedMass() {
-            return null;
-        }
-
-        @Override
-        public int getCharge() {
-            return 0;
-        }
-
-        @Override
-        public int getNumIonsMatched() {
-            return 0;
-        }
-
-        @Override
-        public int getNumIonsPredicted() {
-            return 0;
-        }
-
-        @Override
-        public ValidationStatus getValidationStatus() {
-            return null;
         }
     }
 }

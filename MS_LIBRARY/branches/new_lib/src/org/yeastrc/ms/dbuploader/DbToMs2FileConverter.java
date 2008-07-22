@@ -66,7 +66,7 @@ public class DbToMs2FileConverter {
        for (MS2ScanChargeDb scanCharge: scan.getScanChargeList()) {
            ScanCharge sc = new ScanCharge();
            sc.setCharge(scanCharge.getCharge());
-           sc.setMass(scanCharge.getMass().toString());
+           sc.setMass(scanCharge.getMass());
            for (MS2Field dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
                sc.addAnalysisItem(dAnalysis.getName(), dAnalysis.getValue());
            }

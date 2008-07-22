@@ -2,6 +2,7 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl.MsSearchResultModSqlMapParam;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchModificationDb;
 import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
@@ -41,6 +42,8 @@ public interface MsSearchModificationDAO {
     public abstract void saveDynamicModificationForSearchResult(MsSearchResultModification mod, 
             int resultId, int modificationId);
 
+    public abstract void saveAllDynamicModificationForSearchResult(List<MsSearchResultModSqlMapParam> modList);
+    
     public void deleteDynamicModificationsForResult(int resultId);
 
 }
