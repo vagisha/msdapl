@@ -42,7 +42,7 @@ CREATE TABLE msScan (
     preScanID INT UNSIGNED,
     prescanNumber INT UNSIGNED,
     retentionTime DECIMAL(10,5),
-    fragmentationType CHAR(3),
+    fragmentationType CHAR(3)
 );
 ALTER TABLE msScan ADD INDEX(runID);
 ALTER TABLE msScan ADD INDEX(startScanNumber);
