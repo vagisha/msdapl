@@ -160,16 +160,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
             }
             // it is neither so must be peak data
             else {
-                try {
-                    parsePeaks(scan);
-                }
-                catch (ParserException e) {
-                    warnings++;
-                    log.warn(e.getMessage());
-                    int i = currentLineNum;
-                    skipScan();
-                    throw new ParserException(i, "Invlid peak data found for scan. Skipping ...", "");
-                }
+                parsePeaks(scan);
                 break; // done parsing this scan!
             }
         }
@@ -184,7 +175,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
     }
 
     private void skipScan() throws IOException {
-        while (!isScanLine(currentLine))
+        while (currentLine != null && !isScanLine(currentLine))
             advanceLine();
     }
 
@@ -265,17 +256,19 @@ public class Ms2FileReader implements MS2RunDataProvider {
             advanceLine();
     }
 
-    public void parsePeaks(Scan scan) throws ParserException, IOException {
+    public void parsePeaks(Scan scan) throws IOException {
 
         while (isPeakDataLine(currentLine)) {
-            String[] tokens = currentLine.split("\\s");
-            if (tokens.length < 2) {
-                warnings++;
-                throw new ParserException(currentLineNum, "missing charge and/or mass in line: ", currentLine);
+            String[] tokens = currentLine.split("\\s+");
+            if (tokens.length >= 2) {
+                // add peak m/z and intensity values
+                scan.addPeak(tokens[0], tokens[1]); 
             }
-
-            // add peak m/z and intensity values
-            scan.addPeak(tokens[0], tokens[1]);
+            else if (tokens.length == 1) {
+                warnings++;
+                log.warn( new ParserException(currentLineNum, "missing peak intensity in line. Setting peak intensity to 0.", currentLine).getMessage());
+                scan.addPeak(tokens[0], "0");
+            }
             advanceLine();
         }
     }

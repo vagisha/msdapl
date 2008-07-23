@@ -6,29 +6,19 @@
  */
 package org.yeastrc.ms.service;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
-import java.util.zip.DataFormatException;
 import java.util.zip.ZipException;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.parser.ParserException;
-import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms2.utils.Decompresser;
 
 
 /**
@@ -40,149 +30,71 @@ public class YatesCycleConverter {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, ZipException, IOException {
         
-        YatesCycleConverter converter = new YatesCycleConverter();
+        Connection connect = getConnection();
+        Statement statement = null;
+        ResultSet rs = null;
+        
+        // get a list of runIds from tblYatesCycles
+        String sql = "SELECT distinct runID FROM tblYatesCycles ORDER BY runID DESC limit 10";
+        statement = connect.createStatement();
+        rs = statement.executeQuery(sql);
+        
+        List<Integer> yatesRunIds = new ArrayList<Integer>();
+        while(rs.next()) {
+            yatesRunIds.add(rs.getInt("runID"));
+        }
+
+        rs.close();
+        statement.close();
+        connect.close();
+        
+       
+        log.info("STARTED UPLOAD: "+new Date());
+        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/UploadTest";
+        for (Integer runId: yatesRunIds) {
+            List<YatesCycle> cycles = getCyclesForRun(runId);
+            // download the files first
+            for (YatesCycle cycle: cycles) {
+                YatesCycleDownloader downloader = new YatesCycleDownloader();
+                downloader.downloadMS2File(cycle.cycleId, dataDir, cycle.cycleName+".ms2");
+                downloader.downloadSQTFile(cycle.cycleId, dataDir, cycle.cycleName+".sqt");
+            }
+            
+            // upload data to msData database
+            MsExperimentUploader uploader = new MsExperimentUploader();
+            int experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dataDir);
+            
+            // delete the files
+            for (YatesCycle cycle: cycles) {
+                new File(dataDir+File.separator+cycle.cycleName+".ms2").delete();
+                new File(dataDir+File.separator+cycle.cycleName+".sqt").delete();
+            }
+            log.info("------UPLOADED EXPERIMENT: "+experimentId+" for yates run: "+runId);
+        }
+        log.info("FINISHED UPLOAD: "+new Date());
+    }
+
+    public static List<YatesCycle> getCyclesForRun(int runId) throws ClassNotFoundException, SQLException {
         
         Connection connect = getConnection();
         Statement statement = null;
         ResultSet rs = null;
         
         // get a list of runIds from tblYatesCycles
-        String sql = "SELECT runID, cycleID, cycleFileName FROM tblYatesCycles ORDER BY runID";
+        String sql = "SELECT runID, cycleID, cycleFileName FROM tblYatesCycles where runID="+runId;
         statement = connect.createStatement();
         rs = statement.executeQuery(sql);
         
-        List<YatesCycle> experiments = new ArrayList<YatesCycle>();
+        List<YatesCycle> cycles = new ArrayList<YatesCycle>();
         while(rs.next()) {
-            experiments.add(new YatesCycle(rs.getInt("runID"), rs.getInt("cycleID"), rs.getString("cycleFileName")));
+            cycles.add(new YatesCycle(rs.getInt("runID"), rs.getInt("cycleID"), rs.getString("cycleFileName")));
         }
-        Collections.sort(experiments, new Comparator<YatesCycle>() {
-            public int compare(YatesCycle o1, YatesCycle o2) {
-                return Integer.valueOf(o2.runId).compareTo(Integer.valueOf(o1.runId));
-            }});
         
         rs.close();
         statement.close();
         connect.close();
+        return cycles;
         
-        
-        int lastRunId = 0;
-        int numExp = 0;
-        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
-        MsExperimentUploader expUploader = new MsExperimentUploader();
-        for (YatesCycle exp: experiments) {
-//            if (lastRunId != exp.runId) {
-//                
-//                // convert the experiment
-//                if (numExp != 0)
-//                    expUploader.uploadExperimentToDb("my_computer", dataDir, dataDir);
-//                
-//                // TODO delete the downloaded files
-//                if (numExp != 0)
-//                    break;
-//                
-//                lastRunId = exp.runId;
-//                numExp++;
-//            }
-            // download the MS2 file for this experiment
-//            converter.downloadMS2File(exp.cycleId, exp.cycleName+".ms2", dataDir);
-            
-            // download the SQT file for this experiment
-            log.info("----------------RunID is: "+exp.runId);
-            if (converter.downloadSQTFile(exp.cycleId, exp.cycleName+".sqt", dataDir)) {
-                converter.parseSQTFile(dataDir+File.separator+exp.cycleName+".sqt");
-                numExp++;
-                new File(dataDir+File.separator+exp.cycleName+".sqt").delete();
-            }
-        }
-        
-        // upload the last experiment
-//        expUploader.uploadExperimentToDb("my_computer", dataDir, dataDir);
-        
-        System.out.println("Number of experiments found: "+numExp);
-    }
-    
-    public boolean downloadMS2File(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
-        Connection conn = getConnection();
-        Statement statement = null;
-        ResultSet rs = null;
-        System.out.println("CycleID is: "+cycleId);
-        String sql = "SELECT data from tblYatesCycleMS2Data WHERE cycleID="+cycleId;
-        statement = conn.createStatement();
-        rs = statement.executeQuery(sql);
-        BufferedReader reader = null;
-        boolean downloaded = false;
-        BufferedWriter writer = new BufferedWriter(new FileWriter(downloadDir+File.separator+fileName));
-        if (rs.next()) {
-            byte[] bytes = rs.getBytes("data");
-            InputStream instr = Decompresser.getInstance().decompressString(bytes);
-            reader = new BufferedReader(new InputStreamReader(instr));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                writer.write(line);
-                writer.write("\n");
-            }
-            downloaded = true;
-        }
-        reader.close();
-        writer.close();
-        rs.close();
-        statement.close();
-        conn.close();
-        return downloaded;
-    }
-    
-    public void parseSQTFile(String filePath) {
-//        SQTFileReader provider = new SQTFileReader();
-//        try {
-//            provider.open(filePath);
-//            try {
-//                provider.getSearchHeader();
-//            }
-//            catch (DataFormatException e) {
-//                log.error(e.getMessage(), e);
-//            }
-//        }
-//        catch (ParserException e) {
-//            e.printStackTrace();
-//        }
-//        while(provider.hasNextSearchScan()) {
-//            try {
-//                provider.getNextSearchScan();
-//            }
-//            catch (DataFormatException e) {
-//                log.error(e.getMessage(), e);
-//            }
-//        }
-    }
-    
-    public boolean downloadSQTFile(int cycleId, String fileName, String downloadDir) throws ClassNotFoundException, SQLException, ZipException, IOException {
-        Connection conn = getConnection();
-        Statement statement = null;
-        ResultSet rs = null;
-        log.debug("CycleID is: "+cycleId+"; fileName: "+fileName);
-        String sql = "SELECT data from tblYatesCycleSQTData WHERE cycleID="+cycleId;
-        statement = conn.createStatement();
-        rs = statement.executeQuery(sql);
-        BufferedReader reader = null;
-        boolean downloaded = false;
-        BufferedWriter writer = new BufferedWriter(new FileWriter(downloadDir+File.separator+fileName));
-        if (rs.next()) {
-            byte[] bytes = rs.getBytes("data");
-            InputStream instr = Decompresser.getInstance().decompressString(bytes);
-            reader = new BufferedReader(new InputStreamReader(instr));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                writer.write(line);
-                writer.write("\n");
-            }
-            reader.close();
-            downloaded = true;
-        }
-        writer.close();
-        rs.close();
-        statement.close();
-        conn.close();
-        return downloaded;
     }
     
     
@@ -204,7 +116,7 @@ public class YatesCycleConverter {
         }
     }
     
-//    public static void main(String[] args) throws ZipException, ClassNotFoundException, SQLException, IOException {
+//    public static void main(String[] args) {
 //        int cycleId = 9686;
 //        String fileName = "PARC_073105-smt3-wt-02.sqt";
 //        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test";

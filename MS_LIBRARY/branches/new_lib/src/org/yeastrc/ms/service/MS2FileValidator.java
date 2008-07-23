@@ -1,13 +1,13 @@
 /**
- * SQTFileValidator.java
+ * MS2FileValidator.java
  * @author Vagisha Sharma
- * Jul 17, 2008
+ * Jul 23, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.service;
 
-import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -17,17 +17,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
+import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.parser.ParserException;
-import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms.service.YatesCycleDownloader.DATA_TYPE;
+import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 
 /**
  * 
  */
-public class SQTFileValidator {
+public class MS2FileValidator {
 
-    private static final Logger log = Logger.getLogger(SQTFileValidator.class);
+    private static final Logger log = Logger.getLogger(MS2FileValidator.class);
 
     private boolean headerValid = false;
     private int numValidScans = 0;
@@ -37,7 +36,7 @@ public class SQTFileValidator {
     private void validateFile(String filePath) {
 
 
-        SQTFileReader dataProvider = new SQTFileReader();
+        Ms2FileReader dataProvider = new Ms2FileReader();
 
         // open the file
         try {
@@ -48,10 +47,13 @@ public class SQTFileValidator {
             dataProvider.close();
             return;
         }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
 
         // read the header
         try {
-            dataProvider.getSearchHeader();
+            dataProvider.getRunHeader();
             headerValid = true;
         }
         catch (ParserException e) {dataProvider.close(); numWarnings = dataProvider.getWarningCount(); return;}
@@ -62,15 +64,15 @@ public class SQTFileValidator {
         }
 
         // read the scans
-        while (dataProvider.hasNextSearchScan()) {
+        while (dataProvider.hasNextScan()) {
             numScans++;
             try {
-                SQTSearchScan scan = dataProvider.getNextSearchScan();
-//                for (SQTSearchResult result: scan.getScanResults())
-//                    result.getResultPeptide(); // this will validate the peptide sequence
+                MS2Scan scan = dataProvider.getNextScan();
                 numValidScans++;
             }
-            catch (ParserException e) {}
+            catch (ParserException e) {
+                log.error(e.getMessage(), e);
+            }
             catch (IOException e) {
                 log.error(e.getMessage(), e);
                 dataProvider.close();
@@ -85,45 +87,45 @@ public class SQTFileValidator {
         validateFile(filePath);
         log.info("Ran validator on: "+filePath);
         log.info("# warnings: "+numWarnings);
-        log.info("Valid SQT Header: "+headerValid);
+        log.info("Valid MS2 Header: "+headerValid);
         log.info("# scans in file: "+numScans+"; # valid scans: "+numValidScans);
         return (headerValid && numValidScans > 0 && numWarnings == 0);
     }
 
     public static void main(String[] args) {
-        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
-        Map<Integer, String> cycleIds = getCycleIdList();
-        int found = 0;
-        int valid = 0;
-        try {
-            for (Integer cycleId: cycleIds.keySet()) {
-                //if (found > 208)
-                 //   break;
-                String fileName = cycleIds.get(cycleId);
-                if (fileName == null || fileName.trim().length() == 0)
-                    continue;
-                fileName = fileName+".sqt";
-                YatesCycleDownloader downloader = new YatesCycleDownloader();
-                if (downloader.downloadFile(cycleId, downloadDir, fileName, DATA_TYPE.SQT)) {
-                    found++;
-                    SQTFileValidator validator = new SQTFileValidator();
-                    if (validator.validate(downloadDir+File.separator+fileName)){
-                        valid++;
-                    }
-                    else {
-                        log.error("!!!!!!!!!!INVALID FILE: "+fileName);
-                    }
-                    new File(downloadDir+File.separator+fileName).delete();
-                }
-            }
-        }
-        catch(Exception e) {e.printStackTrace();}
-        finally {
-            log.info("Num files found: "+(found-1)+"; Valid files: "+valid);
-        }
-//      String filePath = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test/21251_PARC_meth_async_05_itms.sqt";
-//      SQTFileValidator validator = new SQTFileValidator();
-//      validator.validate(filePath);
+//        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
+//        Map<Integer, String> cycleIds = getCycleIdList();
+//        int found = 0;
+//        int valid = 0;
+//        try {
+//            for (Integer cycleId: cycleIds.keySet()) {
+//                //if (found > 208)
+//                 //   break;
+//                String fileName = cycleIds.get(cycleId);
+//                if (fileName == null || fileName.trim().length() == 0)
+//                    continue;
+//                fileName = fileName+".ms2";
+//                YatesCycleDownloader downloader = new YatesCycleDownloader();
+//                if (downloader.downloadFile(cycleId, downloadDir, fileName, DATA_TYPE.MS2)) {
+//                    found++;
+//                    SQTFileValidator validator = new SQTFileValidator();
+//                    if (validator.validate(downloadDir+File.separator+fileName)){
+//                        valid++;
+//                    }
+//                    else {
+//                        log.error("!!!!!!!!!!INVALID FILE: "+fileName);
+//                    }
+//                    new File(downloadDir+File.separator+fileName).delete();
+//                }
+//            }
+//        }
+//        catch(Exception e) {e.printStackTrace();}
+//        finally {
+//            log.info("Num files found: "+(found-1)+"; Valid files: "+valid);
+//        }
+      String filePath = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/UploadTest/PARC_orbplusphos-05.ms2";
+      MS2FileValidator validator = new MS2FileValidator();
+      validator.validate(filePath);
     }
 
     public static Map<Integer, String> getCycleIdList() {
