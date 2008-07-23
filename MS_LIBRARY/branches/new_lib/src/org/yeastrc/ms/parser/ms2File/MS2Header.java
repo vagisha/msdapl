@@ -37,26 +37,35 @@ public class MS2Header implements MS2Run {
         comment = new StringBuilder();
     }
     
-    public void addHeaderItem(String label, String value) {
-        if (label == null || value == null)   return;
-        headerList.add(new HeaderItem(label, value));
-        if (isCreationDate(label))
+    public void addHeaderItem(String name, String value) {
+        
+        if (name == null)
+            throw new NullPointerException("name for Header cannot be null.");
+        
+        headerList.add(new HeaderItem(name, value));
+        
+        // if there is no value for this header ignore it; It will still get added to the 
+        // headerItems list. 
+        if (value == null || value.trim().length() == 0)
+            return;
+        
+        if (isCreationDate(name))
             creationDate = value;
-        if (isExtractor(label))
+        if (isExtractor(name))
             extractor = value;
-        if (isExtractorVersion(label)) 
+        if (isExtractorVersion(name)) 
             extractorVersion = value;
-        if (isExtractorOptions(label))
+        if (isExtractorOptions(name))
             extractorOptions = value;
-        if (isInstrumentModel(label))
+        if (isInstrumentModel(name))
             instrumentModel = value;
-        if (isInstrumentSN(label))
+        if (isInstrumentSN(name))
             instrumentSN = value;
-        if (isAcquisitionMethod(label))
+        if (isAcquisitionMethod(name))
             acquisionMethod = value;
-        if (isDataType(label))
+        if (isDataType(name))
             dataType = value;
-        if (isComment(label)) {
+        if (isComment(name)) {
             comment.append(value+";");
         }
     }

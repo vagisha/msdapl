@@ -102,6 +102,8 @@ public class Ms2FileReader implements MS2RunDataProvider {
 //            log.warn(e.getMessage());
 //            throw e;
 //        }
+        header.setFileName(fileName);
+        header.setSha1Sum(sha1Sum);
         return header;
     }
 
