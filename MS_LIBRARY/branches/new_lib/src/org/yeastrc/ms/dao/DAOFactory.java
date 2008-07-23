@@ -178,7 +178,7 @@ public class DAOFactory {
         return ms2ChgIAnalysisDAO;
     }
     
-    public MsSearchDAO<MsSearch, MsSearchDb> getMsPeptideSearchDAO() {
+    public MsSearchDAO<MsSearch, MsSearchDb> getMsSearchDAO() {
         return searchDAO;
     }
     

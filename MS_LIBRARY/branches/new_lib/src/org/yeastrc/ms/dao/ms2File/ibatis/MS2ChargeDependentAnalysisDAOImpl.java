@@ -34,6 +34,25 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
         save("MS2ChgDAnalysis.insert", analysisDb);
     }
 
+    @Override
+    public void saveAll(List<MS2ChargeDependentAnalysisDb> analysisList) {
+        if (analysisList.size() == 0)
+            return;
+        StringBuilder values = new StringBuilder();
+        for (MS2ChargeDependentAnalysisDb analysis: analysisList) {
+            values.append("(");
+            values.append(analysis.getScanChargeId());
+            values.append(",");
+            values.append("\""+analysis.getName()+"\"");
+            values.append(",");
+            values.append(analysis.getValue());
+            values.append("),");
+        }
+        values.deleteCharAt(values.length() - 1);
+        
+        save("MS2ChgDAnalysis.insertAll", values.toString());
+    }
+    
     public void deleteByScanChargeId(int scanChargeId) {
         delete("MS2ChgDAnalysis.deleteByScanChargeId", scanChargeId);
     }

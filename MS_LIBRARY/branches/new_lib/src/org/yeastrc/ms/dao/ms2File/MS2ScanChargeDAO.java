@@ -22,6 +22,7 @@ public interface MS2ScanChargeDAO {
      */
     public abstract int save(MS2ScanCharge scanCharge, int scanId);
 
+    public abstract int saveScanChargeOnly(MS2ScanCharge scanCharge, int scanId);
     
     /**
      * Deletes all entries associated with the given scanId. Related charge dependent

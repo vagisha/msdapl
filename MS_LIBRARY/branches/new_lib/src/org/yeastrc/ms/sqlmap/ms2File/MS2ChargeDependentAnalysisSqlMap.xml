@@ -28,6 +28,10 @@
     	VALUES (?,?,?)
     </insert>
     
+    <insert id="insertAll" parameterClass="String">
+    	INSERT INTO MS2FileChargeDependentAnalysis (scanChargeID, header, value) VALUES $values$
+    </insert>
+    
     <delete id="deleteByScanChargeId" parameterClass="Integer" >
     	DELETE FROM MS2FileChargeDependentAnalysis WHERE scanChargeID = #id#
     </delete>

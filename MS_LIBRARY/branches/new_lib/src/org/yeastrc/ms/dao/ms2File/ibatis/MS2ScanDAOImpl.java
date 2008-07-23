@@ -72,7 +72,7 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Scan, 
             iAnalDao.save(iAnalysis, scanId);
         }
         
-        // save the charge dependent analysis
+        // save the charge state
         for (MS2ScanCharge charge: scan.getScanChargeList()) {
             chargeDao.save(charge, scanId);
         }

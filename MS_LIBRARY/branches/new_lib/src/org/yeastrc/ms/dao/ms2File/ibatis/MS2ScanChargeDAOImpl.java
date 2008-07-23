@@ -45,16 +45,21 @@ public class MS2ScanChargeDAOImpl extends BaseSqlMapDAO implements MS2ScanCharge
     
     public int save(MS2ScanCharge scanCharge, int scanId) {
         
-        Map<String, Object> map = new HashMap<String, Object>(3);
-        map.put("scanId", scanId);
-        map.put("charge", scanCharge.getCharge());
-        map.put("mass", scanCharge.getMass());
-        int id = saveAndReturnId("MS2ScanCharge.insert", map);
+        int id = saveScanChargeOnly(scanCharge, scanId);
         
         // save any charge dependent anaysis with the scan charge object
         for (MS2Field dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
             dAnalysisDao.save(dAnalysis, id);
         }
+        return id;
+    }
+
+    public int saveScanChargeOnly(MS2ScanCharge scanCharge, int scanId) {
+        Map<String, Object> map = new HashMap<String, Object>(3);
+        map.put("scanId", scanId);
+        map.put("charge", scanCharge.getCharge());
+        map.put("mass", scanCharge.getMass());
+        int id = saveAndReturnId("MS2ScanCharge.insert", map);
         return id;
     }
     

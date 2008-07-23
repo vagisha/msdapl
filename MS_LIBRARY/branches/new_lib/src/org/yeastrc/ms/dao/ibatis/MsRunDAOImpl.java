@@ -59,7 +59,14 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         return (MsRunDb) queryForObject("MsRun.select", runId);
     }
     
-
+    @Override
+    public int loadExperimentIdForRun(int runId) {
+        Integer id = (Integer)queryForObject("MsRun.selectExperimentIdForRun", runId);
+        if (id != null)
+            return id;
+        return 0;
+    }
+    
     public List<MsRunDb> loadExperimentRuns(int msExperimentId) {
         return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
     }

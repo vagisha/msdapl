@@ -17,6 +17,8 @@ import org.yeastrc.ms.domain.ms2File.MS2Field;
 public interface MS2ChargeDependentAnalysisDAO {
 
     public abstract void save(MS2Field analysis, int scanChargeId);
+    
+    public abstract void saveAll(List<MS2ChargeDependentAnalysisDb> analysisList);
 
     public abstract List<MS2ChargeDependentAnalysisDb> loadAnalysisForScanCharge(int scanChargeId);
     

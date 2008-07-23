@@ -55,7 +55,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
     protected MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
 
-    protected MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsPeptideSearchDAO();
+    protected MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
     protected MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = 
         DAOFactory.instance().getMsSearchResultDAO();
     protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();

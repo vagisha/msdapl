@@ -36,7 +36,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
     protected SQTSearch makeSQTSearch(boolean addSeqDb,boolean addStaticMods, boolean addDynaMods,boolean addHeaders) {
 
         SQTSearchTest search = new SQTSearchTest();
-        search.setSearchFileFormat(SearchFileFormat.SQT);
+        search.setSearchFileFormat(SearchFileFormat.SQT_SEQ);
         search.setSearchEngineName("Sequest");
         search.setSearchEngineVersion("1.0");
         long startTime = getTime("01/29/2008, 03:34 AM", false);

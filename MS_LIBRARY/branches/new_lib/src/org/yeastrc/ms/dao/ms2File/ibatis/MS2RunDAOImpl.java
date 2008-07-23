@@ -60,6 +60,10 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
         return (MS2RunDb) queryForObject("MsRun.select", runId);
     }
 
+    @Override
+    public int loadExperimentIdForRun(int runId) {
+        return msRunDao.loadExperimentIdForRun(runId);
+    }
 
     public List<MS2RunDb> loadExperimentRuns(int msExperimentId) {
         return queryForList("MsRun.selectRunsForExperiment", msExperimentId);

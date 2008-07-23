@@ -28,6 +28,9 @@
     	VALUES (?,?,?)
     </insert>
     
+    <insert id="insertAll" parameterClass="String">
+    	INSERT INTO MS2FileChargeIndependentAnalysis (scanID, header, value) VALUES $values$
+    </insert>
     
      <delete id="deleteByScanId" parameterClass="Integer">
 		DELETE FROM MS2FileChargeIndependentAnalysis WHERE scanId=#scanId#		    

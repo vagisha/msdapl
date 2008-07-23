@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
@@ -21,6 +22,10 @@ import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSql
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.MsSearch;
+import org.yeastrc.ms.domain.MsSearchDb;
 import org.yeastrc.ms.domain.MsSearchResult;
 import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
@@ -32,6 +37,7 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
+import org.yeastrc.ms.parser.ParserException;
 
 /**
  * 
@@ -58,7 +64,60 @@ class SQTDataUploadService {
         resultModList = new ArrayList<MsSearchResultModSqlMapParam>();
     }
     
-    public int uploadSearch(SQTSearch search, int runId) {
+    public int uploadSQTSearch(SQTSearchDataProvider provider, int runId) throws Exception {
+
+        log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
+        long startTime = System.currentTimeMillis();
+        
+        int searchId = uploadSearch(provider.getSearchHeader(), runId);
+        log.info("Uploaded top-level info for search with searchId: "+searchId);
+
+        // upload the search results for each scan + charge combination
+        int numResults = 0;
+        int numProteins = 0;
+        while (provider.hasNextSearchScan()) {
+            SQTSearchScan scan = null;
+            try {
+                scan = provider.getNextSearchScan();
+                int scanId = getScanId(runId, scan.getScanNumber());
+                // save spectrum data
+                uploadSearchScan(scan, searchId, scanId); 
+                
+                // save all the search results for this scan
+                if (scan.getScanResults().size() == 0) {
+                    log.warn("!!!No results found for scan (scanNumber: "+scan.getScanNumber()+", charge: "+scan.getCharge());
+                }
+                for (SQTSearchResult result: scan.getScanResults()) {
+                    uploadSearchResult(result, searchId, scanId);
+                    numResults++;
+                    numProteins += result.getProteinMatchList().size();
+                }
+            }
+            catch (ParserException e) {
+                log.warn("Error processing search result for scan. Results will not be uploaded. "+e.getMessage(), e);
+            }
+            
+        }
+        flush(); // save any cached data
+        
+        long endTime = System.currentTimeMillis();
+        log.info("Uploaded SQT files with "+numResults+" results, "+numProteins+" protein matches. (searchId: "+searchId+")"
+                + " in "+(endTime - startTime)/(1000L)+"seconds");
+        log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
+        
+        return searchId;
+    }
+    
+    private static int getScanId(int runId, int scanNumber) {
+        MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
+        int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
+        if (scanId == 0)
+            throw new IllegalArgumentException("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
+        return scanId;
+    }
+    
+    
+    private int uploadSearch(SQTSearch search, int runId) {
         
         // RESET THE DYNAMIC MOD LOOKUP UTILITY
         dynaModLookup.reset();
@@ -73,12 +132,12 @@ class SQTDataUploadService {
         return searchDao.saveSearch(search, runId);
     }
     
-    public void uploadSearchScan(SQTSearchScan scan, int searchId, int scanId) {
+    private void uploadSearchScan(SQTSearchScan scan, int searchId, int scanId) {
         SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
         spectrumDataDao.save(scan, searchId, scanId);
     }
     
-    public int uploadSearchResult(SQTSearchResult result, int searchId, int scanId) {
+    private int uploadSearchResult(SQTSearchResult result, int searchId, int scanId) {
         
         try {
             result.getResultPeptide(); // parse the peptide sequence to get the pre, post residues, modifications etc.
@@ -163,7 +222,7 @@ class SQTDataUploadService {
         sqtResultScoresList.clear();
     }
     
-    public void flush() {
+    private void flush() {
         if (proteinMatchList.size() > 0) {
             uploadProteinMatchBuffer();
         }
@@ -173,6 +232,11 @@ class SQTDataUploadService {
         if (resultModList.size() > 0) {
             uploadResultModBuffer();
         }
+    }
+    
+    public static void deleteSearch(int searchId) {
+        MsSearchDAO<MsSearch, MsSearchDb> searchDao = daoFactory.getMsSearchDAO();
+        searchDao.deleteSearch(searchId);
     }
     
     private static final class SQTSearchResultScores implements SQTSearchResultScoresDb{

@@ -83,6 +83,10 @@
         SELECT * FROM msRun WHERE id=#id#
     </select> 
     
+    <select id="selectExperimentIdForRun" resultClass="Integer" parameterClass="Integer"> 
+        SELECT experimentID FROM msRun WHERE id=#id#
+    </select> 
+    
     <insert id="insert" parameterMap="msRunParam">
     	INSERT INTO MsRun (experimentID, 
     						filename, 

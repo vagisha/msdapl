@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.ms2File.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
@@ -36,6 +34,25 @@ public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
         save("MS2ChgIAnalysis.insert", analysisDb);
     }
 
+    @Override
+    public void saveAll(List<MS2ChargeIndependentAnalysisDb> analysisList) {
+        if (analysisList.size() == 0)
+            return;
+        StringBuilder values = new StringBuilder();
+        for (MS2ChargeIndependentAnalysisDb analysis: analysisList) {
+            values.append("(");
+            values.append(analysis.getScanId());
+            values.append(",");
+            values.append("\""+analysis.getName()+"\"");
+            values.append(",");
+            values.append(analysis.getValue());
+            values.append("),");
+        }
+        values.deleteCharAt(values.length() - 1);
+        
+        save("MS2ChgIAnalysis.insertAll", values.toString());
+    }
+    
     public void deleteByScanId(int scanId) {
         delete("MS2ChgIAnalysis.deleteByScanId", scanId);
     }

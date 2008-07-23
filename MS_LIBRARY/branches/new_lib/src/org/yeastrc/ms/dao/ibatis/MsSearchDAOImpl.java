@@ -98,18 +98,19 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     
     public void deleteSearch(int searchId) {
         
-        // delete all results for this search
-        resultDao.deleteResultsForSearch(searchId);
-        
-        // delete any sequence database(s) associated with this search
-        seqDbDao.deleteSearchDatabases(searchId);
-        
-        // delete any static and dynamic modifications used for this search
-        modDao.deleteStaticModificationsForSearch(searchId);
-        modDao.deleteDynamicModificationsForSearch(searchId);
-        
-        // delete any enzymes used for this search
-        enzymeDao.deleteEnzymesForSearch(searchId);
+        // NOTE: all of this is now done by the MySQL trigger
+//        // delete all results for this search
+//        resultDao.deleteResultsForSearch(searchId);
+//        
+//        // delete any sequence database(s) associated with this search
+//        seqDbDao.deleteSearchDatabases(searchId);
+//        
+//        // delete any static and dynamic modifications used for this search
+//        modDao.deleteStaticModificationsForSearch(searchId);
+//        modDao.deleteDynamicModificationsForSearch(searchId);
+//        
+//        // delete any enzymes used for this search
+//        enzymeDao.deleteEnzymesForSearch(searchId);
         
         // finally delete the search
         delete("MsSearch.delete", searchId);

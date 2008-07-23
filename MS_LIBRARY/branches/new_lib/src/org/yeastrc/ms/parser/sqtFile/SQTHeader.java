@@ -66,15 +66,12 @@ public class SQTHeader implements SQTSearch {
     /**
      * @param name
      * @param value
-     * @throws ParseException 
-     * @throws NullPointerException if either name or value is null.
+     * @throws NullPointerException if header name is null.
      */
     public void addHeaderItem(String name, String value) {
         
         if (name == null)
             throw new NullPointerException("name for Header cannot be null.");
-        if (value == null)
-            throw new NullPointerException("value for Header cannot be null.");
         
         headerItems.add(new HeaderItem(name, value));
         
@@ -122,10 +119,10 @@ public class SQTHeader implements SQTSearch {
             database = new Database();
         // we should have at least one database
         if (filePath.trim().length() == 0)
-            throw new RuntimeException("No database path found in header: "+filePath);
+            throw new IllegalArgumentException("No database path found in header: "+filePath);
         // check is there are multiple databases (look for commas, semicolons, colons and spaces)
         if (multipleDatabases(filePath))
-            throw new RuntimeException("Multiple databases found in header: "+filePath+"; Don't know how to handle this yet.");
+            throw new IllegalArgumentException("Multiple databases found in header: "+filePath+"; Don't know how to handle this yet.");
         database.setServerPath(filePath);
     }
     
@@ -417,8 +414,9 @@ public class SQTHeader implements SQTSearch {
        return headerItems;
     }
 
+    // TODO subclasses should override this method.
     public SearchFileFormat getSearchFileFormat() {
-        return SearchFileFormat.SQT;
+        return SearchFileFormat.SQT_SEQ;
     }
 
     public List<MsSearchDatabase> getSearchDatabases() {

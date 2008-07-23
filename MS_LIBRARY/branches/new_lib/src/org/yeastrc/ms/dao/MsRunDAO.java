@@ -25,6 +25,12 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
      */
     public abstract O loadRun(int runId);
     
+    /**
+     * Returns the experiment Id for the given run.
+     * @param runId
+     * @return
+     */
+    public abstract int loadExperimentIdForRun(int runId);
     
     /**
      * Returns the list of runs for the given experiment ID.
