@@ -43,9 +43,15 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
             values.append("(");
             values.append(analysis.getScanChargeId());
             values.append(",");
-            values.append("\""+analysis.getName()+"\"");
+            String name = analysis.getName();
+            if (name != null)   values.append("\"");
+            values.append(name);
+            if (name != null)   values.append("\"");
             values.append(",");
-            values.append(analysis.getValue());
+            String val = analysis.getValue();
+            if (val != null)   values.append("\"");
+            values.append(val);
+            if (val != null)   values.append("\"");
             values.append("),");
         }
         values.deleteCharAt(values.length() - 1);
