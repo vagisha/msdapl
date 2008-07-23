@@ -7,10 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
@@ -20,16 +17,7 @@ import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 public class MsExperimentUploader {
 
     private static final Logger log = Logger.getLogger(MsExperimentUploader.class);
-//    static {
-//        log.setAdditivity(false);
-//        log.setLevel(Level.INFO);
-//        FileAppender appender = new FileAppender();
-//        appender.setName("uploadlog");
-//        PatternLayout layout = new PatternLayout();
-//        layout.setConversionPattern("%5p [%t] - %m%n");
-//        appender.setLayout(layout);
-//        log.addAppender(appender);
-//    }
+
 
     private int experimentId = 0;
     private List<Integer> searchIdList = new ArrayList<Integer>();

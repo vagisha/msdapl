@@ -31,7 +31,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchDao.loadSearchIdsForRun(runId_1).size()); // runId = 1
         
         // create and save a search with no seq. db information or modifications or enzymes
-        MsSearch search_1 = makePeptideSearch(SearchFileFormat.SQT, false, false, false, false);
+        MsSearch search_1 = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
         assertEquals(167, search_1.getSearchDuration());
         assertEquals(0, search_1.getSearchDatabases().size());
         assertEquals(0, search_1.getStaticModifications().size());
@@ -45,7 +45,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         
         
         // create and save a search with seq. db information and modifications AND enzymes
-        MsSearch search_2 = makePeptideSearch(SearchFileFormat.SQT, true, true, true, true);
+        MsSearch search_2 = makePeptideSearch(SearchFileFormat.SQT_SEQ, true, true, true, true);
         assertTrue(search_2.getSearchDatabases().size() > 0);
         assertTrue(search_2.getStaticModifications().size() > 0);
         assertTrue(search_2.getDynamicModifications().size() > 0);
@@ -91,12 +91,12 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testReturnedSearchType() {
-        MsSearch search = makePeptideSearch(SearchFileFormat.SQT, false, false, false, false);
-        assertEquals(SearchFileFormat.SQT, search.getSearchFileFormat());
+        MsSearch search = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
+        assertEquals(SearchFileFormat.SQT_SEQ, search.getSearchFileFormat());
         int searchId_1 = searchDao.saveSearch(search, 21); // runId = 21
         MsSearchDb searchDb = searchDao.loadSearch(searchId_1);
         assertTrue(searchDb instanceof SQTSearchDb);
-        assertEquals(SearchFileFormat.SQT, searchDb.getSearchFileFormat());
+        assertEquals(SearchFileFormat.SQT_SEQ, searchDb.getSearchFileFormat());
         
         search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false, false);
         assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
