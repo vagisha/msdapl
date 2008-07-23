@@ -1,10 +1,4 @@
-/**
- * YatesCycleConverter.java
- * @author Vagisha Sharma
- * Jul 14, 2008
- * @version 1.0
- */
-package org.yeastrc.ms.service;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +13,8 @@ import java.util.List;
 import java.util.zip.ZipException;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.service.MsExperimentUploader;
+import org.yeastrc.ms.service.YatesCycleDownloader;
 
 
 /**
@@ -52,6 +48,7 @@ public class YatesCycleConverter {
         log.info("STARTED UPLOAD: "+new Date());
         String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/UploadTest";
         for (Integer runId: yatesRunIds) {
+            log.info("------UPLOADING YATES runID: "+runId);
             List<YatesCycle> cycles = getCyclesForRun(runId);
             // download the files first
             for (YatesCycle cycle: cycles) {
