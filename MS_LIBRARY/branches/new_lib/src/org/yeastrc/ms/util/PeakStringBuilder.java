@@ -45,6 +45,8 @@ public class PeakStringBuilder {
     public static String trimTrailingZeros(String number) {
 
         if (number.lastIndexOf('0') == -1)   return number;
+        if (number.lastIndexOf('.') == -1)   return number;
+        
 
         int e = number.length() - 1;
         while(number.charAt(e) == '0') {

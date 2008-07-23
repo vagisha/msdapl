@@ -38,6 +38,19 @@ public class PeakStringBuilderTest extends TestCase {
         String number = "";
         assertEquals(number, PeakStringBuilder.trimTrailingZeros(number));
         
+        number = "0";
+        assertEquals(number, PeakStringBuilder.trimTrailingZeros(number));
+        
+        number = "0.";
+        assertEquals("0", PeakStringBuilder.trimTrailingZeros(number));
+        
+        number = ".0";
+        assertEquals("", PeakStringBuilder.trimTrailingZeros(number));
+        
+        number = "0.0";
+        assertEquals("0", PeakStringBuilder.trimTrailingZeros(number));
+        
+        
         number = "1";
         assertEquals(number, PeakStringBuilder.trimTrailingZeros(number));
         
@@ -57,4 +70,18 @@ public class PeakStringBuilderTest extends TestCase {
         assertEquals("1", PeakStringBuilder.trimTrailingZeros(number));
     }
 
+    public void testParseDouble() {
+        String number = "0.";
+        Double.parseDouble(number);
+        number = ".0";
+        Double.parseDouble(number);
+        number = ".";
+        try {Double.parseDouble(number);fail("Invalid number");}
+        catch(NumberFormatException e){}
+        number = "";
+        try {Double.parseDouble(number);fail("Invalid number");}
+        catch(NumberFormatException e){}
+        number = "0";
+        Double.parseDouble(number);
+    }
 }
