@@ -219,7 +219,7 @@ CREATE TABLE msDynamicModResult (
     resultID INT UNSIGNED NOT NULL,
     position SMALLINT UNSIGNED NOT NULL
 );
-ALTER TABLE msDynamicModResult ADD PRIMARY KEY(modID, resultID, position);
+ALTER TABLE msDynamicModResult ADD PRIMARY KEY(modID, resultID, position);ALTER TABLE msDynamicModResult ADD INDEX(resultID);
 
 CREATE TABLE SQTSearchResult (
     resultID INT UNSIGNED NOT NULL PRIMARY KEY,
