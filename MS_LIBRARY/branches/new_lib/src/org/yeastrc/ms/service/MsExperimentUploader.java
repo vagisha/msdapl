@@ -32,14 +32,29 @@ public class MsExperimentUploader {
 
         log.info("BEGIN EXPERIMENT UPLOAD: directory: "+fileDirectory);
         long start = System.currentTimeMillis();
+        
+        // get the file names
+        Set<String> filenames = getFileNamePrefixes(fileDirectory);
+        
+        // If we didn't find anything print warning and return.
+        if (filenames.size() == 0) {
+            log.error("ERROR UPLOADING EXPERIMENT -- No files found to upload in directory: "+fileDirectory);
+            return 0;
+        }
+        // make sure .ms2 files are present
+        if (!requiredFilesExist(fileDirectory, filenames)) {
+            log.error("ERROR UPLOADING EXPERIMENT -- Missing required ms2 files in directory: "+fileDirectory);
+            return 0;
+        }
+        
         try {
             experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
-            uploadRunAndSearchFilesToDb(experimentId, fileDirectory);
+            uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames);
         }
         catch(Exception e) {
             log.error("ERROR UPLOADING EXPERIMENT "+experimentId+" (runs and/or search results). ABORTING...", e);
-            deleteSearchCascade(searchIdList);
-            deleteExperimentCascade(experimentId);
+            deleteSearch(searchIdList);
+            deleteExperiment(experimentId);
             return 0;
         }
         long end = System.currentTimeMillis();
@@ -56,39 +71,32 @@ public class MsExperimentUploader {
         return expDao.save(experiment);
     }
 
-    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory) throws Exception {
-
-        Set<String> filenames = getFileNamePrefixes(fileDirectory);
-
-        // If we didn't find anything throw an exception so that the experiment is deleted.
-        if (filenames.size() == 0) {
-            throw new IllegalArgumentException("No files found to upload in directory: "+fileDirectory);
-        }
-
-        // Make sure matching .ms2 and sqt file pairs are found
-        if (!requiredFilesExist(fileDirectory, filenames)) {
-            throw new IllegalArgumentException("Missing required files in directory: "+fileDirectory);
-        }
-
+    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames) throws Exception {
         
         int runExpId = -1;
         for (String filename: filenames) {
-
-            // We are only uploading SEQUEST .sqt files. We don't know how to upload other formats: 
-            // e.g. Percolator, ProLuCID, PepProbe etc.
-            if (!SQTFileReader.isSequestSQT(fileDirectory+File.separator+filename+".sqt")) {
-                throw new IllegalArgumentException("Don't know how to convert non-SEQUEST .sqt files");
-            }
 
             // upload the run first
             int runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2",experimentId);
             // get the experimentId for this run
             int tempId = MS2DataUploadService.getExperimentIdForRun(runId);
-            if (runExpId == -1) runExpId = tempId;
+            if (runExpId == -1) runExpId = tempId; // in the first iteration
             if (runExpId != tempId) {
                 throw new Exception("Runs in an experiment upload cannot have different experimentIds!");
             }
 
+            // if the sqt file does not exist go on to the next run
+            String sqtFile = fileDirectory+File.separator+filename+".sqt";
+            if (!(new File(sqtFile).exists()))
+                continue;
+            
+            // We are only uploading SEQUEST .sqt files. We don't know how to upload other formats: 
+            // e.g. Percolator, ProLuCID, PepProbe etc.
+            if (!SQTFileReader.isSequestSQT(sqtFile)) {
+                log.error("Non-SEQUEST sqt file not supported: "+sqtFile);
+                throw new Exception("Non-SEQUEST sqt file not supported: "+sqtFile);
+            }
+            
             // now upload the search result 
             uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId);
         }
@@ -107,7 +115,7 @@ public class MsExperimentUploader {
         return uploadService.uploadMS2Run(ms2Provider,experimentId);
     }
     
-    private void uploadSQTSearch(String filePath, int runId) throws Exception {
+    private int uploadSQTSearch(String filePath, int runId) throws Exception {
         SQTFileReader sqtProvider = new SQTFileReader();
         SQTDataUploadService uploadService = new SQTDataUploadService();
         sqtProvider.open(filePath);
@@ -123,16 +131,19 @@ public class MsExperimentUploader {
             if (searchId != 0)
                 searchIdList.add(searchId);
         }
+        return searchId;
     }
     
+    /**
+     * Check for .ms2 files. 
+     * @param fileDirectory
+     * @param filenames
+     * @return
+     */
     private boolean requiredFilesExist(String fileDirectory, Set<String> filenames) {
         for (String filePrefix: filenames) {
             if (!(new File(fileDirectory+File.separator+filePrefix+".ms2").exists())) {
                 log.error("Required file: "+filePrefix+".ms2 not found");
-                return false;
-            }
-            if (!(new File(fileDirectory+File.separator+filePrefix+".sqt").exists())) {
-                log.error("Required file: "+filePrefix+".sqt not found");
                 return false;
             }
         }
@@ -165,17 +176,12 @@ public class MsExperimentUploader {
     
     private void deleteExperiment(int experimentId) {
         MS2DataUploadService.deleteExperiment(experimentId);
-        log.error("DELETED EMPTY EXPERIMENT "+experimentId);
-    }
-    
-    private void deleteExperimentCascade(int experimentId) {
-        MS2DataUploadService.deleteExperimentCascade(experimentId);
         log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
     }
     
-    private void deleteSearchCascade(List<Integer> searchIdList) {
+    private void deleteSearch(List<Integer> searchIdList) {
         for (Integer searchId: searchIdList) {
-            SQTDataUploadService.deleteSearchCascade(searchId);
+            SQTDataUploadService.deleteSearch(searchId);
             log.error("DELETED searchID: "+searchId);
         }
         
@@ -184,9 +190,9 @@ public class MsExperimentUploader {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
-//        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/silmaril/WORK/UW/MS_LIBRARY/YATES_CYCLE_DUMP/1542/temp");
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/silmaril/WORK/UW/MS_LIBRARY/new_lib/resources/PARC");
+//        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }

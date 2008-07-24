@@ -24,10 +24,7 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
     public abstract int saveSearch(I search, int runId);
 
     /**
-     * Deletes the search. Also deletes: 
-     * 1. All results associated with this search
-     * 2. Any sequence database associations with this search
-     * 3. All static and dynamic modifications for the search
+     * Deletes the search ONLY
      * @param searchId
      */
     public abstract void deleteSearch(int searchId);

@@ -242,9 +242,9 @@ class SQTDataUploadService {
         }
     }
     
-    public static void deleteSearchCascade(int searchId) {
-        MsDeletionDAO delDao = daoFactory.getDeletionDAO();
-        delDao.deleteSearch(searchId);
+    public static void deleteSearch(int searchId) {
+        MsSearchDAO<MsSearch, MsSearchDb> searchDao = daoFactory.getMsSearchDAO();
+        searchDao.deleteSearch(searchId);
     }
     
     private static final class SQTSearchResultScores implements SQTSearchResultScoresDb{
