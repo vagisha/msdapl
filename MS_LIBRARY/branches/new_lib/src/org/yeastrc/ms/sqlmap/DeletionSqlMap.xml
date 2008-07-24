@@ -60,7 +60,7 @@
     
     <!-- DELETE from msRun -->
     <delete id="deleteRun" parameterClass="Integer">
-    	DELETE FROM msRun WHERE experimentID=#experimentId#)
+    	DELETE FROM msRun WHERE experimentID=#experimentId#
     </delete>
     
     <!-- ==================== Run related ==================== -->
