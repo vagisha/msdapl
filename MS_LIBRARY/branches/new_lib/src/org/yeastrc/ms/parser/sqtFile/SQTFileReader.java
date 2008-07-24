@@ -176,7 +176,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
             warnings++;
             ParserException e = new ParserException(currentLineNum-1, "Invalid SQT scan -- no results found", "");
             log.warn(e.getMessage());
-            throw e;
+//            throw e;
         }
         return scan;
     }

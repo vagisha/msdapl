@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsDeletionDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
@@ -84,14 +83,18 @@ class SQTDataUploadService {
             SQTSearchScan scan = null;
             try {
                 scan = provider.getNextSearchScan();
+                
+                // if the scan does not have any results don't upload it.
+                if (scan.getScanResults().size() == 0) {
+                    log.warn("!!!Scan will NOT be uploaded. No results found for scan (scanNumber: "+scan.getScanNumber()+", charge: "+scan.getCharge());
+                    continue;
+                }
+                
                 int scanId = getScanId(runId, scan.getScanNumber());
                 // save spectrum data
                 uploadSearchScan(scan, searchId, scanId); 
                 
                 // save all the search results for this scan
-                if (scan.getScanResults().size() == 0) {
-                    log.warn("!!!No results found for scan (scanNumber: "+scan.getScanNumber()+", charge: "+scan.getCharge());
-                }
                 for (SQTSearchResult result: scan.getScanResults()) {
                     uploadSearchResult(result, searchId, scanId);
                     numResults++;
