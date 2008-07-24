@@ -51,5 +51,8 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTHeaderSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchScanSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchResultSqlMap.xml"/>
+	
+	<!-- Related to deletion -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/DeletionSqlMap.xml"/>
 
 </sqlMapConfig>	

@@ -38,9 +38,8 @@ public class MsExperimentUploader {
         }
         catch(Exception e) {
             log.error("ERROR UPLOADING EXPERIMENT "+experimentId+" (runs and/or search results). ABORTING...", e);
-            triggerSearchDelete(searchIdList);
-            triggerExperimentDelete(experimentId);
-            log.error("DELETED search results (and runs)");
+            deleteSearchCascade(searchIdList);
+            deleteExperimentCascade(experimentId);
             return 0;
         }
         long end = System.currentTimeMillis();
@@ -90,15 +89,14 @@ public class MsExperimentUploader {
                 throw new Exception("Runs in an experiment upload cannot have different experimentIds!");
             }
 
-            // now upload the search result and remember the searchId in case we have to abort upload
-            int searchId = uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId);
-            searchIdList.add(searchId);
+            // now upload the search result 
+            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId);
         }
         
         // if the runs in this experiment upload were already uploaded as part of another
         // experiment upload, delete the entry we created earlier in the msExperiment table
         if (runExpId != experimentId) {
-            triggerExperimentDelete(experimentId);
+            deleteExperiment(experimentId);
         }
     }
 
@@ -109,11 +107,22 @@ public class MsExperimentUploader {
         return uploadService.uploadMS2Run(ms2Provider,experimentId);
     }
     
-    private int uploadSQTSearch(String filePath, int runId) throws Exception {
+    private void uploadSQTSearch(String filePath, int runId) throws Exception {
         SQTFileReader sqtProvider = new SQTFileReader();
         SQTDataUploadService uploadService = new SQTDataUploadService();
         sqtProvider.open(filePath);
-        return uploadService.uploadSQTSearch(sqtProvider, runId);
+        int searchId = 0;
+        try { 
+            searchId = uploadService.uploadSQTSearch(sqtProvider, runId);
+        }
+        catch(Exception e){
+            searchId = uploadService.getUploadedSearchId(); 
+            throw e; // throw the exception again
+        }
+        finally {
+            if (searchId != 0)
+                searchIdList.add(searchId);
+        }
     }
     
     private boolean requiredFilesExist(String fileDirectory, Set<String> filenames) {
@@ -154,24 +163,30 @@ public class MsExperimentUploader {
         return filenames;
     }
     
-    private void triggerExperimentDelete(int experimentId) {
+    private void deleteExperiment(int experimentId) {
         MS2DataUploadService.deleteExperiment(experimentId);
-        log.error("DELETED EXPERIMENT "+experimentId);
+        log.error("DELETED EMPTY EXPERIMENT "+experimentId);
     }
     
-    private void triggerSearchDelete(List<Integer> searchIdList) {
+    private void deleteExperimentCascade(int experimentId) {
+        MS2DataUploadService.deleteExperimentCascade(experimentId);
+        log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
+    }
+    
+    private void deleteSearchCascade(List<Integer> searchIdList) {
         for (Integer searchId: searchIdList) {
-            SQTDataUploadService.deleteSearch(searchId);
+            SQTDataUploadService.deleteSearchCascade(searchId);
             log.error("DELETED searchID: "+searchId);
         }
+        
     }
     
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/silmaril/WORK/UW/MS_LIBRARY/YATES_CYCLE_DUMP/1542/temp");
+//        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/silmaril/WORK/UW/MS_LIBRARY/YATES_CYCLE_DUMP/1542/temp");
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
-        //uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
+        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/silmaril/WORK/UW/MS_LIBRARY/new_lib/resources/PARC");
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }

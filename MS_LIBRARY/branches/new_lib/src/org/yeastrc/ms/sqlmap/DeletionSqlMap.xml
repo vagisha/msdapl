@@ -51,6 +51,13 @@
     	(SELECT id FROM msRun WHERE experimentID=#experimentId#)
     </delete>
     
+    <!-- DELETE from MS2FileHeader -->
+    <delete id="deleteMS2Header" parameterClass="Integer">
+    	DELETE FROM MS2FileHeader
+    	WHERE runID IN 
+    	(SELECT id FROM msRun WHERE experimentID=#experimentId#)
+    </delete>
+    
     <!-- DELETE from msRun -->
     <delete id="deleteRun" parameterClass="Integer">
     	DELETE FROM msRun WHERE experimentID=#experimentId#)

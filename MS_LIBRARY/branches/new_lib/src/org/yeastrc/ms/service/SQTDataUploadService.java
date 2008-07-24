@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.MsDeletionDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
@@ -52,6 +53,8 @@ class SQTDataUploadService {
     
     public static final int BUF_SIZE = 1000;
     
+    private int uploadedSearchId = 0;
+    
     // these are the things we will cache and do bulk-inserts
     List<MsSearchResultProteinDb> proteinMatchList; // protein matches
     List<SQTSearchResultScoresDb> sqtResultScoresList; // sequest scores
@@ -70,6 +73,8 @@ class SQTDataUploadService {
         long startTime = System.currentTimeMillis();
         
         int searchId = uploadSearch(provider.getSearchHeader(), runId);
+        uploadedSearchId = searchId;
+        
         log.info("Uploaded top-level info for search with searchId: "+searchId);
 
         // upload the search results for each scan + charge combination
@@ -108,6 +113,9 @@ class SQTDataUploadService {
         return searchId;
     }
     
+    public int getUploadedSearchId() {
+        return uploadedSearchId;
+    }
     private static int getScanId(int runId, int scanNumber) {
         MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
@@ -234,9 +242,9 @@ class SQTDataUploadService {
         }
     }
     
-    public static void deleteSearch(int searchId) {
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = daoFactory.getMsSearchDAO();
-        searchDao.deleteSearch(searchId);
+    public static void deleteSearchCascade(int searchId) {
+        MsDeletionDAO delDao = daoFactory.getDeletionDAO();
+        delDao.deleteSearch(searchId);
     }
     
     private static final class SQTSearchResultScores implements SQTSearchResultScoresDb{

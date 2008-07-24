@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.ibatis.MsDeletionDAOImpl;
 import org.yeastrc.ms.dao.ibatis.MsEnzymeDAOImpl;
 import org.yeastrc.ms.dao.ibatis.MsExperimentDAOImpl;
 import org.yeastrc.ms.dao.ibatis.MsRunDAOImpl;
@@ -103,6 +104,9 @@ public class DAOFactory {
     private SQTHeaderDAO sqtHeaderDAO;
     private MsSearchDAO<SQTSearch, SQTSearchDb> sqtSearchDAO;
     
+    // DAO for deleting experiments or searches
+    private MsDeletionDAO deletionDAO;
+    
     private DAOFactory() {
         
         // Run related
@@ -132,6 +136,7 @@ public class DAOFactory {
         sqtHeaderDAO = new SQTHeaderDAOImpl(sqlMap);
         sqtSearchDAO = new SQTSearchDAOImpl(sqlMap, searchDAO, sqtHeaderDAO, sqtSpectrumDAO, sqtResultDAO);
         
+        deletionDAO = new MsDeletionDAOImpl(sqlMap);
     }
     
     public static DAOFactory instance() {
@@ -212,5 +217,9 @@ public class DAOFactory {
     
     public SQTSearchScanDAO getSqtSpectrumDAO() {
         return sqtSpectrumDAO;
+    }
+    
+    public MsDeletionDAO getDeletionDAO() {
+        return deletionDAO;
     }
 }

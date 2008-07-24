@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.MsDeletionDAO;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
@@ -192,6 +193,11 @@ public class MS2DataUploadService {
     public static void deleteExperiment(int experimentId) {
         MsExperimentDAO expDao = daoFactory.getMsExperimentDAO();
         expDao.delete(experimentId);
+    }
+    
+    public static void deleteExperimentCascade(int experimentId) {
+        MsDeletionDAO delDao = daoFactory.getDeletionDAO();
+        delDao.deleteExperiment(experimentId);
     }
     
     public static int getExperimentIdForRun(int runId) {
