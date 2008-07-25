@@ -187,7 +187,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
             advanceLine();
     }
 
-    private ScanResult parseScan(String line) throws ParserException {
+    ScanResult parseScan(String line) throws ParserException {
 
         // make sure we have a scan line
         if (!isScanLine(line)) {
@@ -195,7 +195,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
             throw new ParserException(currentLineNum, "Error parsing scan. Expected line starting with 'S'. Found -- ", line);
         }
 
-        String[] tokens = line.split("\\t");
+        String[] tokens = line.split("\\s+");
         if (tokens.length < 10) {
             warnings++;
             throw new ParserException(currentLineNum, "Invalid 'S' line. Expected 10 fields", line);

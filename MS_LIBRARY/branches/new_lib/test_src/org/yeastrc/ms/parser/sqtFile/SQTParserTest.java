@@ -14,6 +14,20 @@ public class SQTParserTest extends TestCase {
         super.tearDown();
     }
     
+    public void testParseScan() {
+        String line = "S  00016\t00016\t1\t0 \t shamu046\t 742.52000\t 0.0\t0.0 \t0";
+        SQTFileReader reader = new SQTFileReader();
+        try {
+            reader.parseScan(line);
+        }
+        catch (ParserException e) {
+            fail("Valid scan line");
+            e.printStackTrace();
+        }
+        
+    }
+    
+    
     public void testParseLocus() {
         SQTFileReader reader = new SQTFileReader();
         
