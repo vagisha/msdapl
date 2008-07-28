@@ -119,7 +119,7 @@ public class MS2DataUploadService {
         // if no scans were uploaded for this run throw an exception
         if (uploaded == 0) {
             log.error("END MS2 FILE UPLOAD: !!!No scans were uploaded for file: "+provider.getFileName()+"("+runId+")");
-            throw new Exception("No scans were uploadef for runID: "+runId);
+            throw new Exception("No scans were uploaded for runID: "+runId);
         }
         
         flush(); // save any cached data

@@ -20,6 +20,12 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 public class SQTHeader implements SQTSearch {
 
     
+    public static final String SEQUEST = "SEQUEST";
+    public static final String SEQUEST_NORM = "EE-normalized SEQUEST";
+    public static final String PERCOLATOR = "Percolator";
+    public static final String PROLUCID = "ProLuCID";
+    public static final String PEPPROBE = "PEP_PROBE";
+    
     private static final Pattern multiDbPattern = Pattern.compile(".*[,:;\\s]+.*");
     private static final Pattern staticModPattern = Pattern.compile("[A-Z]+");
     
@@ -414,9 +420,19 @@ public class SQTHeader implements SQTSearch {
        return headerItems;
     }
 
-    // TODO subclasses should override this method.
     public SearchFileFormat getSearchFileFormat() {
-        return SearchFileFormat.SQT_SEQ;
+        if (sqtGenerator.equalsIgnoreCase(SEQUEST))
+            return SearchFileFormat.SQT_SEQ;
+        else if (sqtGenerator.equalsIgnoreCase(SEQUEST_NORM))
+            return SearchFileFormat.SQT_NSEQ;
+        else if (sqtGenerator.equalsIgnoreCase(PERCOLATOR))
+            return SearchFileFormat.SQT_PERC;
+        else if (sqtGenerator.equalsIgnoreCase(PROLUCID))
+            return SearchFileFormat.SQT_PLUCID;
+        else if (sqtGenerator.equalsIgnoreCase(PEPPROBE))
+            return SearchFileFormat.SQT_PPROBE;
+        else
+            return SearchFileFormat.UNKNOWN;
     }
 
     public List<MsSearchDatabase> getSearchDatabases() {

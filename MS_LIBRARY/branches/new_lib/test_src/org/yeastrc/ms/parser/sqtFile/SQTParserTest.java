@@ -55,7 +55,7 @@ public class SQTParserTest extends TestCase {
             e.printStackTrace();
         }
 
-        locus = "L locus description for locus ";
+        locus = "L locus description for locus";
         try {
             DbLocus loc = reader.parseLocus(locus);
             assertEquals("locus", loc.getAccession());
@@ -92,16 +92,22 @@ public class SQTParserTest extends TestCase {
     public void testIsSequestSQT () throws IOException {
         Reader reader = new StringReader(percolatorHeader());
         assertFalse(SQTFileReader.isSequestSQT(reader));
-        
+
         reader = new StringReader(prolucidHeader1());
         assertFalse(SQTFileReader.isSequestSQT(reader));
-        
+
         reader = new StringReader(prolucidHeader2());
         assertFalse(SQTFileReader.isSequestSQT(reader));
-        
-        reader = new StringReader(unrecognizableHeader());
+
+        reader = new StringReader(unrecognizedHeader());
         assertFalse(SQTFileReader.isSequestSQT(reader));
+
+        reader = new StringReader(sequestHeader());
+        assertTrue(SQTFileReader.isSequestSQT(reader));
         
+        reader = new StringReader(normSequestHeader());
+        assertTrue(SQTFileReader.isSequestSQT(reader));
+
     }
 
     private String percolatorHeader() {
@@ -149,7 +155,7 @@ public class SQTParserTest extends TestCase {
         buf.append("L       F28B3.8\n");
         return buf.toString();
     }
-    
+
     private String prolucidHeader2() {
         StringBuilder buf = new StringBuilder();
         buf.append("H       SQTGeneratorVersion     0.1\n");
@@ -162,8 +168,8 @@ public class SQTParserTest extends TestCase {
         buf.append("L       F28B3.8\n");
         return buf.toString();
     }
-    
-    private String unrecognizableHeader() {
+
+    private String unrecognizedHeader() {
         StringBuilder buf = new StringBuilder();
         buf.append("H       SQTGeneratorVersion     0.1\n");
         buf.append("H       Database        /bluefish/people-a/alisark/dbase/worm/WormBase_C-elegans_na_12-17-2006_con_reversed.fasta\n");
@@ -172,6 +178,66 @@ public class SQTParserTest extends TestCase {
         buf.append("S       16970   16970   2       16530   bluefish0249    1602.8047       9823.00 0.1210  1205782\n");
         buf.append("M       1       12      1602.8049       0.0000  2.9482  3.988   22      48      M.(42.01056)AEQAAEQMLTVLEK.T    U\n");
         buf.append("L       F28B3.8\n");
+        return buf.toString();
+    }
+
+    private String sequestHeader() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("H       SQTGenerator SEQUEST\n");
+        buf.append("H       SQTGeneratorVersion     3.0\n");
+        buf.append("H       Comment SEQUEST was written by J Eng and JR Yates, III\n");
+        buf.append("H       Comment SEQUEST ref. J. Am. Soc. Mass Spectrom., 1994, v. 4, p. 976\n");
+        buf.append("H       Comment SEQUEST ref. Eng,J.K.; McCormack A.L.; Yates J.R.\n");
+        buf.append("H       Comment SEQUEST is licensed to Finnigan Corp.\n");
+        buf.append("H       Comment Paralellization Program is run_ms2\n");
+        buf.append("H       Comment run_ms2 was written by Rovshan Sadygov\n");
+        buf.append("H       StartTime 05/05/2008, 11:26 PM\n");
+        buf.append("H       EndTime 05/05/2008, 11:34 PM\n");
+        buf.append("H       Database        /garibaldi/people-b/applications/yates/dbase/EBI-IPI_Arabidopsis_3.11_12-06-2005_reversed.fasta\n");
+        buf.append("H       DBSeqLength     28288090\n");
+        buf.append("H       DBLocusCount    68280\n");
+        buf.append("H       PrecursorMasses AVG\n");
+        buf.append("H       FragmentMasses  MONO\n");
+        buf.append("H       Alg-PreMassTol  ^E\n");
+        buf.append("H       Alg-FragMassTol 0.0\n");
+        buf.append("H       Alg-XCorrMode   0\n");
+        buf.append("H       StaticMod       C=160.160\n");
+        buf.append("H       Alg-DisplayTop  5\n");
+        buf.append("H       Alg-IonSeries   0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0\n");
+        buf.append("H       EnzymeSpec      No_Enzyme\n");
+        buf.append("S       00006   00006   1       1       node0001        775.86000       3093.3  30.1    885786n");
+        buf.append("M         1      59      774.86642      0.0000   0.6990   2.932   3     10        Q.AMYNEF.S    Un");
+        return buf.toString();
+    }
+
+    private String normSequestHeader() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("H       SQTGenerator    EE-normalized SEQUEST\n");
+        buf.append("H       Comment SEQUEST was written by J Eng and JR Yates, III\n");
+        buf.append("H       Comment SEQUEST ref. J. Am. Soc. Mass Spectrom., 1994, v. 4, p. 976\n");
+        buf.append("H       Comment SEQUEST ref. Eng,J.K.; McCormack A.L.; Yates J.R.\n");
+        buf.append("H       Comment SEQUEST is licensed to Finnigan Corp.\n");
+        buf.append("H       Comment Normalized SEQUEST ref. MacCoss,M.J.; Wu C.C; Yates J.R.\n");
+        buf.append("H       Comment Normalized SEQUEST ref. Anal. Chem. 2002, v. 74, p. 5593\n");
+        buf.append("H       Comment Paralellization Program is run_ms2\n");
+        buf.append("H       Comment run_ms2 was written by Rovshan Sadygov\n");
+        buf.append("H       StartTime 03/26/2005, 01:51 PM\n");
+        buf.append("H       EndTime 03/26/2005, 05:41 PM\n");
+        buf.append("H       Database        /home/maccoss/dbase/SGD/SGD-orf-040204-rand.fasta\n");
+        buf.append("H       DBSeqLength     6076840\n");
+        buf.append("H       DBLocusCount    13468\n");
+        buf.append("H       PrecursorMasses AVG\n");
+        buf.append("H       FragmentMasses  MONO\n");
+        buf.append("H       Alg-PreMassTol  3.000\n");
+        buf.append("H       Alg-FragMassTol 0.0\n");
+        buf.append("H       Alg-XCorrMode   1\n");
+        buf.append("H       StaticMod       C=160.139\n");
+        buf.append("H       Alg-DisplayTop  5\n");
+        buf.append("H       Alg-IonSeries   0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0\n");
+        buf.append("H       EnzymeSpec      No_Enzyme\n");
+        buf.append("S       00002   00002   1       1       node010 422.02  1281.0  2.2     319348\n");
+        buf.append("M         1       3      423.533        0.0000   0.2379   66.7    2      6          L.PLPP.S    U\n");
+        buf.append("L       YAR068W\n");
         return buf.toString();
     }
 }

@@ -53,14 +53,18 @@ public class SQTFileReader implements SQTSearchDataProvider {
             if (line != null)   line = line.trim();
             while(line != null && isHeaderLine(line)) {
                 if (line.contains("Percolator"))    {
+                    log.warn("Percolator sqt.");
                     return false;
                 }
                 match = sqtGenPattern.matcher(line);
                 if (match.matches()) {
                     String genProg = match.group(1);
-                    if (genProg != null && genProg.equalsIgnoreCase("SEQUEST"))
+                    if (genProg != null && 
+                            (genProg.equalsIgnoreCase(SQTHeader.SEQUEST) ||
+                             genProg.equalsIgnoreCase(SQTHeader.SEQUEST_NORM)))
                         return true;
                     else {
+                        log.warn("Non-Sequest sqt. Generating program is: "+genProg);
                         return false;
                     }
                 }
@@ -74,7 +78,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
                 catch (IOException e) {}
             }
         }
-        
+        log.warn("No sqt generating program found");
         return false;
     }
     
