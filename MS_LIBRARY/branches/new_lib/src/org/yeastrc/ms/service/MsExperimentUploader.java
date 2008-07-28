@@ -14,6 +14,7 @@ import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
+import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 public class MsExperimentUploader {
@@ -37,17 +38,20 @@ public class MsExperimentUploader {
         // get the file names
         Set<String> filenames = getFileNamePrefixes(fileDirectory);
         
-        // If we didn't find anything print warning and return.
+        // ----- BEFORE BEGINNING UPLOAD MAKE THE FOLLOWING CHECKS -----
+        // (1). If we didn't find anything print warning and return.
         if (filenames.size() == 0) {
             log.error("ERROR UPLOADING EXPERIMENT -- No files found to upload in directory: "+fileDirectory+"\n\n");
             return 0;
         }
-        // make sure .ms2 files are present
+        
+        // (2). make sure .ms2 files are present
         if (!requiredFilesExist(fileDirectory, filenames)) {
             log.error("ERROR UPLOADING EXPERIMENT -- Missing required ms2 files in directory: "+fileDirectory+"\n\n");
             return 0;
         }
-        // make sure there are no non-SEQUEST .sqt files in the directory. We don't handle ProLuCID, Percolator etc. for now
+        
+        // (3). make sure there are no non-SEQUEST .sqt files in the directory. We don't handle ProLuCID, Percolator etc. for now
         String file = null;
         try {
             if((file = foundNonSequestFiles(fileDirectory, filenames)) != null) {
@@ -59,6 +63,19 @@ public class MsExperimentUploader {
             log.error("ERROR UPLOADING EXPERIMENT -- exception reading .sqt file\n\n", e);
         }
         
+        // (4). make sure all SQT headers are valid
+        try {
+            if (foundInvalidSQTHeader(fileDirectory, filenames)) {
+                log.error("ERROR UPLOADING EXPERIMENT -- Invalid SQT header found\n\n"); 
+                return 0;
+            }
+        }
+        catch (IOException e) {
+            log.error("ERROR UPLOADING EXPERIMENT -- exception reading .sqt file\n\n", e);
+        }
+        
+        
+        // ----- NOW WE CAN BEGIN UPLOAD -----
         int experimentId = 0;
         int runExperimentId = 0;
         try {
@@ -88,7 +105,6 @@ public class MsExperimentUploader {
                     +((end - start)/(1000L))+"seconds\n\tONLY SQT FILES WERE UPLOADED.\n\tTime: "+(new Date()).toString()+"\n\n");
         return experimentId;
     }
-
 
     private int uploadExperiment(String remoteServer, String remoteDirectory, String fileDirectory) {
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
@@ -197,6 +213,25 @@ public class MsExperimentUploader {
             }
         }
         return null;
+    }
+    
+    private boolean foundInvalidSQTHeader(String fileDirectory, Set<String> filenames) throws IOException {
+        for (String filePrefix: filenames) {
+            String sqtFile = fileDirectory+File.separator+filePrefix+".sqt";
+            SQTFileReader sqtProvider = new SQTFileReader();
+            try { 
+                sqtProvider.open(sqtFile);
+                SQTHeader header = sqtProvider.getSearchHeader();
+                if (!header.isValid()) {
+                    log.warn("Invalid SQTHeader in file: "+sqtFile);
+                    return true;
+                }
+            }
+            finally {
+                sqtProvider.close(); // close file
+            }
+        }
+        return false;
     }
     
     private Set<String> getFileNamePrefixes(String fileDirectory) {

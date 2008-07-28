@@ -259,11 +259,13 @@ public class Ms2FileReader implements MS2RunDataProvider {
                 if (!isValidDouble(tokens[0])) {
                     warnings++;
                     log.warn( new ParserException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
+                    advanceLine();
                     continue;
                 }
                 if (!isValidDouble(tokens[1])) {
                     warnings++;
                     log.warn( new ParserException(currentLineNum, "Invalid intensity value. Ignoring peak...", currentLine).getMessage());
+                    advanceLine();
                     continue;
                 }
                 scan.addPeak(tokens[0], tokens[1]); 
@@ -275,6 +277,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
                 if (!isValidDouble(tokens[0])) {
                     warnings++;
                     log.warn( new ParserException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
+                    advanceLine();
                     continue;
                 }
                 scan.addPeak(tokens[0], "0");

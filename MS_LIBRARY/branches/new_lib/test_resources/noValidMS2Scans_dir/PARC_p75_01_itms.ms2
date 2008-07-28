@@ -1,0 +1,97 @@
+H	FilteringProgram	Parc	
+H	CreationDate	12/20/2007 2:29:19 PM
+H	Extractor	RAWXtract
+H	ExtractorVersion	1.8
+H	Comments	RawXtract written by John Venable, 2003
+H	ExtractorOptions	MS2
+H	AcquisitionMethod	Data-Dependent
+H	InstrumentType	ITMS
+H	ScanType	MS2
+H	DataType	Centroid
+H	IsolationWindow	
+H	FirstScan	1
+H	LastScan	17903
+ S	000002	000002	475.42000
+I	RetTime	0.01
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	1
+Z	1	475.42aaaaaaaaaaaaaaa
+D	PARC	0.106982
+S	000009	000009	1372.55000
+I	RetTime	0.03
+I	ActivationType  
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	7
+Z	1	1372.55
+D	PARC	-1.602722
+895.5a 86.2b
+S	000010	000010	717.62000
+I	RetTime	0.04
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	7
+Z	1	717.62
+D	PARC	0.133447
+S	000011	000011	576.27000
+I	RetTime	0.04
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	7
+Z	1	576.27
+D	PARC	
+S	000012	000012	1394.58000
+I	RetTime	0.04
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	7
+Z	1	1394.58
+D	PARC	4.082397
+S	000014	000014	1712.65000
+I	RetTime	0.05
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	13
+Z	1	1712.65
+D	PARC	0.102705
+S	000016	000016	1410.57000
+I	RetTime	0.06
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	13
+Z	1	1410.57
+D	PARC	0.723101
+S	000017	000017	709.12000
+I	RetTime	0.06
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	13
+Z	2	1417.23218
+Z	3	2125.34435
+D	PARC	-0.432856
+S	000020	000020	807.67000
+I	RetTime	0.08
+I	ActivationType	CID
+S	000022	000022	1396.69000
+I	RetTime	0.08
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	19
+Z	1	1396.69
+D	PARC	4.681008
+S	000023	000023	866.46000
+I	RetTime	0.09
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	19
+Z	1	866.46
+D	PARC	0.757822
+S	000026	000026	817.33000
+I	RetTime	0.10
+I	ActivationType	CID
+I	PrecursorFile	p75_01_itms.ms1
+I	PrecursorScan	25
+Z	1	817.33
+D	PARC	-2.005286
+236.2	xyz
+

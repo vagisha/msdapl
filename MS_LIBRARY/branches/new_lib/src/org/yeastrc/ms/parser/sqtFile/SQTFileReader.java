@@ -123,7 +123,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
                 line.charAt(0) == 'H');
     }
 
-    public SQTHeader getSearchHeader()  throws IOException, ParserException {
+    public SQTHeader getSearchHeader()  throws IOException {
 
         SQTHeader header = new SQTHeader();
         while (isHeaderLine(currentLine)) {
@@ -138,12 +138,6 @@ public class SQTFileReader implements SQTSearchDataProvider {
             advanceLine();
         }
         this.searchDynamicMods = header.getDynamicModifications();
-        if (!header.isValid()) {
-            warnings++;
-            ParserException e = new ParserException(currentLineNum-1, "Invalid header.  Required fields are missing", "");
-            log.warn(e.getMessage());
-            throw e;
-        }
         return header;
     }
 
