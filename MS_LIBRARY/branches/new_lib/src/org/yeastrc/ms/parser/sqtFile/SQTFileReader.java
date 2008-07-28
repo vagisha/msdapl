@@ -283,9 +283,6 @@ public class SQTFileReader implements SQTSearchDataProvider {
             throw new ParserException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-//        for (int i = 0; i < tokens.length; i++)
-//            tokens[i] = tokens[i].replaceAll("\\s+", "");
-
         PeptideResult result = new PeptideResult(searchDynamicMods);
         try {
             result.setxCorrRank(Integer.parseInt(tokens[1]));

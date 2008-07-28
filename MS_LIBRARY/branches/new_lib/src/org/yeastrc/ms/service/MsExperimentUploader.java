@@ -1,8 +1,9 @@
 package org.yeastrc.ms.service;
 
 import java.io.File;
-import java.sql.Date;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,6 @@ public class MsExperimentUploader {
     private static final Logger log = Logger.getLogger(MsExperimentUploader.class);
 
 
-    private int experimentId = 0;
     private List<Integer> searchIdList = new ArrayList<Integer>();
     
     /**
@@ -30,7 +30,7 @@ public class MsExperimentUploader {
      */
     public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
 
-        log.info("BEGIN EXPERIMENT UPLOAD: directory: "+fileDirectory);
+        log.info("BEGIN EXPERIMENT UPLOAD\n\tDirectory: "+fileDirectory+"\n\tTime: "+(new Date().toString()));
         long start = System.currentTimeMillis();
         
         // get the file names
@@ -38,50 +38,84 @@ public class MsExperimentUploader {
         
         // If we didn't find anything print warning and return.
         if (filenames.size() == 0) {
-            log.error("ERROR UPLOADING EXPERIMENT -- No files found to upload in directory: "+fileDirectory);
+            log.error("ERROR UPLOADING EXPERIMENT -- No files found to upload in directory: "+fileDirectory+"\n\n");
             return 0;
         }
         // make sure .ms2 files are present
         if (!requiredFilesExist(fileDirectory, filenames)) {
-            log.error("ERROR UPLOADING EXPERIMENT -- Missing required ms2 files in directory: "+fileDirectory);
+            log.error("ERROR UPLOADING EXPERIMENT -- Missing required ms2 files in directory: "+fileDirectory+"\n\n");
             return 0;
         }
+        // make sure there are no non-SEQUEST .sqt files in the directory. We don't handle ProLuCID, Percolator etc. for now
+        String file = null;
+        try {
+            if((file = foundNonSequestFiles(fileDirectory, filenames)) != null) {
+                log.error("ERROR UPLOADING EXPERIMENT -- Non-SEQUEST sqt file not supported: "+file+"\n\n"); 
+                return 0;
+            }
+        }
+        catch (IOException e) {
+            log.error("ERROR UPLOADING EXPERIMENT -- exception reading .sqt file\n\n", e);
+        }
         
+        int experimentId = 0;
+        int runExperimentId = 0;
         try {
             experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
-            uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames);
+            runExperimentId = uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames);
         }
         catch(Exception e) {
-            log.error("ERROR UPLOADING EXPERIMENT "+experimentId+" (runs and/or search results). ABORTING...", e);
+            log.error("ERROR UPLOADING EXPERIMENT "+experimentId+". ABORTING...\n\n", e);
             deleteSearch(searchIdList);
             deleteExperiment(experimentId);
             return 0;
         }
+        
+        // If the runs in this upload were already uploaded as part of another
+        // experiment, delete the entry we created earlier in the msExperiment table
+        if (experimentId != runExperimentId) {
+            deleteExperiment(experimentId);
+            experimentId = 0;
+        }
+        
         long end = System.currentTimeMillis();
-        log.info("---------------------- EXPERIMENT UPLOADED IN: "+((end - start)/(1000L))+"seconds ----------------------");
+        if (experimentId != 0)
+            log.info("EXPERIMENT (id: "+experimentId+") UPLOADED IN: "
+                    +((end - start)/(1000L))+"seconds\n\tTime: "+(new Date()).toString()+"\n\n");
+        else
+            log.info("EXPERIMENT UPLOADED IN: "
+                    +((end - start)/(1000L))+"seconds\n\tONLY SQT FILES WERE UPLOADED.\n\tTime: "+(new Date()).toString()+"\n\n");
         return experimentId;
     }
+
 
     private int uploadExperiment(String remoteServer, String remoteDirectory, String fileDirectory) {
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
         MsExperimentDbImpl experiment = new MsExperimentDbImpl();
-        experiment.setDate(new Date(new java.util.Date().getTime()));
+        experiment.setDate(new java.sql.Date(new Date().getTime()));
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);
         return expDao.save(experiment);
     }
 
-    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames) throws Exception {
+    private int uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames) throws Exception {
         
-        int runExpId = -1;
+        boolean firstIter = true;
         for (String filename: filenames) {
 
-            // upload the run first
+            // Upload the run first.
             int runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2",experimentId);
-            // get the experimentId for this run
+            
+            // Get the experimentId for this run.  If this run is already in the database
+            // it will have a experiment id different from the one given to us as arguments
+            // to this method.
             int tempId = MS2DataUploadService.getExperimentIdForRun(runId);
-            if (runExpId == -1) runExpId = tempId; // in the first iteration
-            if (runExpId != tempId) {
+            if (firstIter) {
+                experimentId = tempId;
+                firstIter = false;
+            }
+            // Make sure all runs in this experiment have the same experimentID!
+            else if (tempId != experimentId) {
                 throw new Exception("Runs in an experiment upload cannot have different experimentIds!");
             }
 
@@ -90,22 +124,11 @@ public class MsExperimentUploader {
             if (!(new File(sqtFile).exists()))
                 continue;
             
-            // We are only uploading SEQUEST .sqt files. We don't know how to upload other formats: 
-            // e.g. Percolator, ProLuCID, PepProbe etc.
-            if (!SQTFileReader.isSequestSQT(sqtFile)) {
-                log.error("Non-SEQUEST sqt file not supported: "+sqtFile);
-                throw new Exception("Non-SEQUEST sqt file not supported: "+sqtFile);
-            }
-            
             // now upload the search result 
             uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId);
         }
         
-        // if the runs in this experiment upload were already uploaded as part of another
-        // experiment upload, delete the entry we created earlier in the msExperiment table
-        if (runExpId != experimentId) {
-            deleteExperiment(experimentId);
-        }
+        return experimentId;
     }
 
     private int uploadMS2Run(String filePath, int experimentId) throws Exception {
@@ -150,6 +173,23 @@ public class MsExperimentUploader {
         return true;
     }
 
+    /**
+     * Check for non-SEQUEST .sqt files.
+     * @param fileDirectory
+     * @param filenames
+     * @return
+     * @throws IOException 
+     */
+    private String foundNonSequestFiles(String fileDirectory, Set<String> filenames) throws IOException {
+        for (String filePrefix: filenames) {
+            String sqtFile = fileDirectory+File.separator+filePrefix+".sqt";
+            if (!SQTFileReader.isSequestSQT(sqtFile)) {
+                return sqtFile;
+            }
+        }
+        return null;
+    }
+    
     private Set<String> getFileNamePrefixes(String fileDirectory) {
         File directory = new File (fileDirectory);
         if (!directory.exists()) {

@@ -71,7 +71,7 @@ public class YatesCycleConverter {
                 if (files.length > 0)
                     throw new IllegalStateException("Files for previous experiment were not all deleted. Cannot continue...");
             }
-            log.info("------UPLOADED EXPERIMENT: "+experimentId+" for yates run: "+runId);
+            log.info("------UPLOADED EXPERIMENT: "+experimentId+" for yates run: "+runId+"\n\n");
         }
         log.info("FINISHED UPLOAD: "+new Date());
     }

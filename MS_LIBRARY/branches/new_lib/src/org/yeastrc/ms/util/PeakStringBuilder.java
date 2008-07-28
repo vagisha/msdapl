@@ -20,16 +20,6 @@ public class PeakStringBuilder {
 
     public void addPeak(String mz, String rt) {
 
-        try {Double.parseDouble(mz);}
-        catch(NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid m/z value: "+mz, e);
-        }
-
-        try {Double.parseDouble(rt);}
-        catch(NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid retention time value: "+rt, e);
-        }
-        
         peakBuffer.append(trimTrailingZeros(mz));
         peakBuffer.append(":");
         peakBuffer.append(trimTrailingZeros(rt));

@@ -180,7 +180,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
     }
 
     private MS2Field parseIAnalysis(String line) throws ParserException {
-        String[] tokens = line.split("\\t");
+        String[] tokens = line.split("\\s+");
         if (tokens.length < 3)
             throw new ParserException(currentLineNum, "Invalid 'I' line. Expected 3 fields.", line);
         return new HeaderItem(tokens[1], tokens[2]);
@@ -194,7 +194,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
             throw new ParserException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", currentLine);
         }
 
-        String[] tokens = currentLine.split("\\t");
+        String[] tokens = currentLine.split("\\s+");
         if (tokens.length < 4) {
             warnings++;
             throw new ParserException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", currentLine);
@@ -214,7 +214,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
     }
 
     private ScanCharge parseScanCharge() throws IOException, ParserException {
-        String tokens[] = currentLine.split("\\s");
+        String tokens[] = currentLine.split("\\s+");
         if (tokens.length < 3) {
             skipScanCharge();
             warnings++;
@@ -236,7 +236,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
         // parse any charge dependent analysis associated with this charge state
         advanceLine();
         while (isChargeDepAnalysisLine((currentLine))) {
-            tokens = currentLine.split("\\t");
+            tokens = currentLine.split("\\s+");
             if (tokens.length < 3) {
                 warnings++;
                 ParserException e = new ParserException(currentLineNum, "Invalid 'D' line. Expected 2 fields.", currentLine);
@@ -262,17 +262,41 @@ public class Ms2FileReader implements MS2RunDataProvider {
             String[] tokens = currentLine.split("\\s+");
             if (tokens.length >= 2) {
                 // add peak m/z and intensity values
+                if (!isValidDouble(tokens[0])) {
+                    warnings++;
+                    log.warn( new ParserException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
+                    continue;
+                }
+                if (!isValidDouble(tokens[1])) {
+                    warnings++;
+                    log.warn( new ParserException(currentLineNum, "Invalid intensity value. Ignoring peak...", currentLine).getMessage());
+                    continue;
+                }
                 scan.addPeak(tokens[0], tokens[1]); 
             }
             else if (tokens.length == 1) {
                 warnings++;
-                log.warn( new ParserException(currentLineNum, "missing peak intensity in line. Setting peak intensity to 0.", currentLine).getMessage());
+                log.warn( new ParserException(currentLineNum, 
+                        "missing peak intensity in line. Setting peak intensity to 0.", currentLine).getMessage());
+                if (!isValidDouble(tokens[0])) {
+                    warnings++;
+                    log.warn( new ParserException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
+                    continue;
+                }
                 scan.addPeak(tokens[0], "0");
             }
             advanceLine();
         }
     }
 
+    private boolean isValidDouble(String doubleStr) {
+        try {Double.parseDouble(doubleStr);}
+        catch(NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+    
     private boolean isScanLine(String line) {
         if (line == null)   return false;
         return line.startsWith("S");

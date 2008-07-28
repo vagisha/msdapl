@@ -15,7 +15,8 @@ public class SQTParserTest extends TestCase {
     }
     
     public void testParseScan() {
-        String line = "S  00016\t00016\t1\t0 \t shamu046\t 742.52000\t 0.0\t0.0 \t0";
+//        String line = "S  00016\t00016\t1\t0 \t shamu046\t 742.52000\t 0.0\t0.0 \t0";
+        String line = "S       01718   01718   1       0       node0269        993.88000        0.0    0.0     0";
         SQTFileReader reader = new SQTFileReader();
         try {
             reader.parseScan(line);
