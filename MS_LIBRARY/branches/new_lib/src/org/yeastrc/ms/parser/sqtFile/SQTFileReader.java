@@ -2,10 +2,13 @@ package org.yeastrc.ms.parser.sqtFile;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -37,24 +40,42 @@ public class SQTFileReader implements SQTSearchDataProvider {
         return warnings;
     }
 
-    public static boolean isSequestSQT(String filePath) throws IOException {
-        BufferedReader reader = null;
-            reader = new BufferedReader(new FileReader(filePath));
-            String line = reader.readLine();
-            Matcher match = null;
+    public static boolean isSequestSQT(String filePath) throws FileNotFoundException, IOException {
+        return isSequestSQT(new FileReader(filePath));
+    }
+    
+    static boolean isSequestSQT(Reader reader) throws IOException {
+        Matcher match = null;
+        BufferedReader bReader = null;
+        bReader = new BufferedReader(reader);
+        String line;
+        try {
+            line = bReader.readLine();
             while(line != null && isHeaderLine(line)) {
-                if (line.contains("Percolator"))    return false;
+                if (line.contains("Percolator"))    {
+                    return false;
+                }
                 match = sqtGenPattern.matcher(line.trim());
                 if (match.matches()) {
                     String genProg = match.group(1);
                     if (genProg != null && genProg.equalsIgnoreCase("SEQUEST"))
                         return true;
-                    else
+                    else {
                         return false;
+                    }
                 }
+                line = bReader.readLine();
             }
+        }
+        finally {
+            if (bReader != null) {
+                try {bReader.close();}
+                catch (IOException e) {}
+            }
+        }
         return false;
     }
+    
     
     public void open(String filePath) throws IOException{
         reader = new BufferedReader(new FileReader(filePath));

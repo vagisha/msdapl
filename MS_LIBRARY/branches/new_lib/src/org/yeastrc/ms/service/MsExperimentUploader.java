@@ -183,6 +183,7 @@ public class MsExperimentUploader {
     private String foundNonSequestFiles(String fileDirectory, Set<String> filenames) throws IOException {
         for (String filePrefix: filenames) {
             String sqtFile = fileDirectory+File.separator+filePrefix+".sqt";
+            if (!(new File(sqtFile).exists()))  continue;
             if (!SQTFileReader.isSequestSQT(sqtFile)) {
                 return sqtFile;
             }
