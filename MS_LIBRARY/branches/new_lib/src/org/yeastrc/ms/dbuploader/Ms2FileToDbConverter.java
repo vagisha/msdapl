@@ -48,7 +48,7 @@ public class Ms2FileToDbConverter {
         }
         
         Ms2FileReader reader = new Ms2FileReader();
-        reader.open(filePath);
+        reader.open(filePath, sha1Sum);
         
         return convertMs2File(filePath, reader, experimentId, sha1Sum);
     }

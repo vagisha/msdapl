@@ -14,6 +14,7 @@ import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
+import org.yeastrc.ms.util.Sha1SumCalculator;
 
 public class MsExperimentUploader {
 
@@ -134,16 +135,22 @@ public class MsExperimentUploader {
     private int uploadMS2Run(String filePath, int experimentId) throws Exception {
         Ms2FileReader ms2Provider = new Ms2FileReader();
         MS2DataUploadService uploadService = new MS2DataUploadService();
-        ms2Provider.open(filePath);
-        return uploadService.uploadMS2Run(ms2Provider,experimentId);
+        String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+        try {
+            ms2Provider.open(filePath, sha1Sum);
+            return uploadService.uploadMS2Run(ms2Provider,experimentId, sha1Sum);
+        }
+        finally {
+            ms2Provider.close();
+        }
     }
     
     private int uploadSQTSearch(String filePath, int runId) throws Exception {
         SQTFileReader sqtProvider = new SQTFileReader();
         SQTDataUploadService uploadService = new SQTDataUploadService();
-        sqtProvider.open(filePath);
         int searchId = 0;
         try { 
+            sqtProvider.open(filePath);
             searchId = uploadService.uploadSQTSearch(sqtProvider, runId);
         }
         catch(Exception e){
@@ -153,6 +160,7 @@ public class MsExperimentUploader {
         finally {
             if (searchId != 0)
                 searchIdList.add(searchId);
+            sqtProvider.close(); // close open file
         }
         return searchId;
     }

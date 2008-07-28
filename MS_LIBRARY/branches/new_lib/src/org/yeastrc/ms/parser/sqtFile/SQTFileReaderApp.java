@@ -36,7 +36,9 @@ public class SQTFileReaderApp {
         catch (Exception e) {
             e.printStackTrace();
         }
-        
+        finally {
+            reader.close();
+        }
         writer.close();
     }
 

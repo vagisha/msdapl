@@ -6,7 +6,10 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
+import java.io.File;
+
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.util.Sha1SumCalculator;
 
 
 /**
@@ -21,7 +24,8 @@ public class Ms2FileReaderApp {
         String file = "./resources/sample.ms2";
         Ms2FileReader reader = new Ms2FileReader();
         try {
-            reader.open(file);
+            String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(file));
+            reader.open(file, sha1Sum);
             MS2Header header = reader.getRunHeader();
             System.out.println(header.toString());
             while (reader.hasNextScan()) {
@@ -32,6 +36,9 @@ public class Ms2FileReaderApp {
         }
         catch (Exception e) {
             e.printStackTrace();
+        }
+        finally {
+            reader.close();
         }
     }
 

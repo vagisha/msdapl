@@ -39,7 +39,10 @@ public class Sha1SumCalculator {
             }
         }
         finally {
-            if (inStr != null) inStr.close();
+            if (inStr != null) {
+                try {inStr.close();}
+                catch (IOException e) {}
+            }
         }
         byte[] digested = digest.digest();
         return hexStringFor(digested);

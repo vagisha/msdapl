@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
@@ -23,7 +22,6 @@ import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.parser.ParserException;
 import org.yeastrc.ms.service.MS2RunDataProvider;
-import org.yeastrc.ms.util.Sha1SumCalculator;
 
 
 /**
@@ -36,7 +34,6 @@ public class Ms2FileReader implements MS2RunDataProvider {
     private String fileName;
     private String sha1Sum;
     private int currentLineNum = 0;
-
     private int warnings = 0;
 
     private static final Logger log = Logger.getLogger(Ms2FileReader.class);
@@ -47,16 +44,16 @@ public class Ms2FileReader implements MS2RunDataProvider {
         return warnings;
     }
 
-    public void open(String filePath) throws IOException, NoSuchAlgorithmException {
-        sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+    public void open(String filePath, String sha1Sum) throws IOException {
         reader = new BufferedReader(new FileReader(filePath));
         fileName = new File(filePath).getName();
+        this.sha1Sum = sha1Sum;
         advanceLine();
     }
 
-    public void open(String fileName, InputStream inStream) throws IOException, NoSuchAlgorithmException {
+    public void open(String fileName, InputStream inStream, String sha1Sum) throws IOException {
         this.fileName = fileName;
-        sha1Sum = Sha1SumCalculator.instance().sha1SumFor(inStream);
+        this.sha1Sum = sha1Sum;
         reader = new BufferedReader(new InputStreamReader(inStream));
         advanceLine();
     }
@@ -66,11 +63,6 @@ public class Ms2FileReader implements MS2RunDataProvider {
         return this.fileName;
     }
 
-    @Override
-    public String getSha1Sum() {
-        return this.sha1Sum;
-    }
-    
     private void advanceLine() throws IOException {
         currentLineNum++;
         currentLine = reader.readLine(); // advance first
@@ -81,7 +73,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
         }
     }
 
-    public MS2Header getRunHeader() throws IOException, ParserException {
+    public MS2Header getRunHeader() throws IOException {
 
         MS2Header header = new MS2Header();
         while (isHeaderLine(currentLine)) {

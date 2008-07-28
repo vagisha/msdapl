@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -20,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.parser.ParserException;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
+import org.yeastrc.ms.util.Sha1SumCalculator;
 
 /**
  * 
@@ -40,7 +42,8 @@ public class MS2FileValidator {
 
         // open the file
         try {
-            dataProvider.open(filePath);
+            String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+            dataProvider.open(filePath, sha1Sum);
         }
         catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -56,7 +59,7 @@ public class MS2FileValidator {
             dataProvider.getRunHeader();
             headerValid = true;
         }
-        catch (ParserException e) {dataProvider.close(); numWarnings = dataProvider.getWarningCount(); return;}
+//        catch (ParserException e) {dataProvider.close(); numWarnings = dataProvider.getWarningCount(); return;}
         catch (IOException e) {
             log.error(e.getMessage(), e);
             dataProvider.close();

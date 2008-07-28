@@ -66,6 +66,13 @@ class SQTDataUploadService {
         resultModList = new ArrayList<MsSearchResultModSqlMapParam>();
     }
     
+    /**
+     * provider should be closed after this method returns. 
+     * @param provider
+     * @param runId
+     * @return
+     * @throws Exception
+     */
     public int uploadSQTSearch(SQTSearchDataProvider provider, int runId) throws Exception {
 
         log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);

@@ -50,7 +50,15 @@ public class MS2DataUploadService {
         iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisDb>();
     }
 
-    public int uploadMS2Run(MS2RunDataProvider provider, int experimentId) throws Exception  {
+    /**
+     * provider should be closed after this method returns
+     * @param provider
+     * @param experimentId
+     * @param sha1Sum
+     * @return
+     * @throws Exception
+     */
+    public int uploadMS2Run(MS2RunDataProvider provider, int experimentId, String sha1Sum) throws Exception  {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
         long startTime = System.currentTimeMillis();
@@ -60,11 +68,11 @@ public class MS2DataUploadService {
         // determine if this run is already in the database
         // if a run with the same file name and SHA-1 hash code already exists in the 
         // database we will not upload it
-        int runId = getMatchingRunId(provider.getFileName(), provider.getSha1Sum());
+        int runId = getMatchingRunId(provider.getFileName(), sha1Sum);
 
         // if run is already in the database return the runId of the existing run
         if (runId > 0)  {
-            log.info("Run with name: "+provider.getFileName()+" and sha1Sum: "+provider.getSha1Sum()+
+            log.info("Run with name: "+provider.getFileName()+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
             log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
             return runId;

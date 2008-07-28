@@ -95,11 +95,10 @@ public class YatesCycleDownloader {
 //        int cycleId = 10936;
 //        String fileName = cycleId+"_"+"PARC_ep2_03_itms"; // Prolucid file
         
-        int cycleId = 21270;
-        String fileName = cycleId+"_"+"PARC_asyclp1cs_03_itms";
-//      int cycleId = 21251;
-//        String fileName = cycleId+"_"+"PARC_meth_async_05_itms";
-
+        int runId = 2985;
+        int cycleId = 20389;
+        // 20389 |  2985
+        String fileName = runId+"_"+cycleId;
         
         YatesCycleDownloader downloader = new YatesCycleDownloader();
 //        downloader.downloadMS2File(cycleId, downloadDir, fileName+".ms2");

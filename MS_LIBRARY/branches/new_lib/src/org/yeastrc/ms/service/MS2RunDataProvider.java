@@ -16,8 +16,6 @@ public interface MS2RunDataProvider  {
 
     public abstract String getFileName();
     
-    public abstract String getSha1Sum();
-    
     public abstract MS2Run getRunHeader() throws Exception;
     
     public abstract boolean hasNextScan();
