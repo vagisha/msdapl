@@ -31,7 +31,8 @@ public class YatesCycleConverter {
         ResultSet rs = null;
         
         // get a list of runIds from tblYatesCycles
-        String sql = "SELECT distinct runID FROM tblYatesCycles ORDER BY runID DESC limit 10";
+//        String sql = "SELECT distinct runID FROM tblYatesCycles ORDER BY runID DESC limit 10";
+        String sql = "SELECT distinct runID FROM tblYatesCycles WHERE runID < 2986 ORDER BY runID DESC limit 50";
         statement = connect.createStatement();
         rs = statement.executeQuery(sql);
         
@@ -66,11 +67,11 @@ public class YatesCycleConverter {
                 log.info("Deleting yates cycle files......");
                 new File(dataDir+File.separator+cycle.cycleName+".ms2").delete();
                 new File(dataDir+File.separator+cycle.cycleName+".sqt").delete();
-                // make sure not ms2 or sqt files are left in the directory;
-                String[] files = new File(dataDir).list();
-                if (files.length > 0)
-                    throw new IllegalStateException("Files for previous experiment were not all deleted. Cannot continue...");
             }
+            // make sure not ms2 or sqt files are left in the directory;
+            String[] files = new File(dataDir).list();
+            if (files.length > 0)
+                throw new IllegalStateException("Files for previous experiment were not all deleted. Cannot continue...");
             log.info("------UPLOADED EXPERIMENT: "+experimentId+" for yates run: "+runId+"\n\n");
         }
         log.info("FINISHED UPLOAD: "+new Date());
