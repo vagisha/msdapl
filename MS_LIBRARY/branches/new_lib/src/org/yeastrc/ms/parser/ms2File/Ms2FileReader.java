@@ -71,6 +71,8 @@ public class Ms2FileReader implements MS2RunDataProvider {
             currentLineNum++;
             currentLine = reader.readLine();
         }
+        if (currentLine != null)
+            currentLine = currentLine.trim();
     }
 
     public MS2Header getRunHeader() throws IOException {

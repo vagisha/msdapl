@@ -42,7 +42,7 @@ import org.yeastrc.ms.parser.ParserException;
 /**
  * 
  */
-class SQTDataUploadService {
+public class SQTDataUploadService {
 
     private static final Logger log = Logger.getLogger(SQTDataUploadService.class);
     

@@ -50,11 +50,12 @@ public class SQTFileReader implements SQTSearchDataProvider {
         String line;
         try {
             line = bReader.readLine();
+            if (line != null)   line = line.trim();
             while(line != null && isHeaderLine(line)) {
                 if (line.contains("Percolator"))    {
                     return false;
                 }
-                match = sqtGenPattern.matcher(line.trim());
+                match = sqtGenPattern.matcher(line);
                 if (match.matches()) {
                     String genProg = match.group(1);
                     if (genProg != null && genProg.equalsIgnoreCase("SEQUEST"))
@@ -64,6 +65,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
                     }
                 }
                 line = bReader.readLine();
+                if (line != null)   line = line.trim();
             }
         }
         finally {
@@ -72,6 +74,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
                 catch (IOException e) {}
             }
         }
+        
         return false;
     }
     
@@ -103,6 +106,9 @@ public class SQTFileReader implements SQTSearchDataProvider {
             currentLineNum++;
             currentLine = reader.readLine();
         }
+        // remove any leading or trailing white spaces
+        if (currentLine != null)
+            currentLine = currentLine.trim();
     }
 
     private boolean isValidLine(String line) {
@@ -139,7 +145,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
 
 
     String[] parseHeader(String line) {
-        Matcher match = headerPattern.matcher(line.trim());
+        Matcher match = headerPattern.matcher(line);
         if (match.matches())
             return new String[]{match.group(1), match.group(2)};
         else
@@ -343,7 +349,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
      */
     DbLocus parseLocus(String line) throws ParserException {
         
-        Matcher match = locusPattern.matcher(line.trim());
+        Matcher match = locusPattern.matcher(line);
         if (match.matches()) {
             return new DbLocus(match.group(1), match.group(2));
         }
