@@ -1,8 +1,10 @@
-package org.yeastrc.ms.dbuploader;
+package org.yeastrc.ms.service;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
@@ -25,10 +27,10 @@ public class DbToMs2FileConverter {
 
     private BufferedWriter outFile = null;
     
-    public void convertToMs2(int dbRunId, String output) throws IOException {
+    public void convertToMs2(int dbRunId, String outputFile) throws IOException {
         
         try {
-            outFile = new BufferedWriter(new FileWriter(output));
+            outFile = new BufferedWriter(new FileWriter(outputFile));
 
             MsRunDAO<MS2Run, MS2RunDb> runDao = DAOFactory.instance().getMS2FileRunDAO();
             MS2RunDb run = runDao.loadRun(dbRunId);
@@ -96,7 +98,13 @@ public class DbToMs2FileConverter {
 
     private void printMs2Header(MS2RunDb run) throws IOException {
         MS2Header ms2Header = new MS2Header();
-        for (MS2HeaderDb header: run.getHeaderList()) {
+        List<MS2HeaderDb> headerList = run.getHeaderList();
+        Collections.sort(headerList, new Comparator<MS2HeaderDb>() {
+            public int compare(MS2HeaderDb o1, MS2HeaderDb o2) {
+                return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
+            }});
+        
+        for (MS2HeaderDb header: headerList) {
             ms2Header.addHeaderItem(header.getName(), header.getValue());
         }
         outFile.write(ms2Header.toString());

@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 import org.yeastrc.ms.parser.ParserException;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
+import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.service.YatesCycleDownloader.DATA_TYPE;
 
 /**
@@ -50,17 +51,22 @@ public class SQTFileValidator {
         }
 
         // read the header
+        SQTHeader header = null;
         try {
-            dataProvider.getSearchHeader();
+            header = dataProvider.getSearchHeader();
             headerValid = true;
         }
-        catch (ParserException e) {dataProvider.close(); numWarnings = dataProvider.getWarningCount(); return;}
         catch (IOException e) {
             log.error(e.getMessage(), e);
             dataProvider.close();
             return;
         }
-
+        if (!header.isValid()) {
+            log.error("Invalid SQT Header");
+            dataProvider.close();
+            return;
+        }
+        
         // read the scans
         while (dataProvider.hasNextSearchScan()) {
             numScans++;

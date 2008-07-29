@@ -27,7 +27,9 @@
     			retentionTime,
     			fragmentationType,
     			UNCOMPRESS(data) as data 
-    			FROM MsScan WHERE id= #id#
+    			FROM msScan, msScanData
+    			WHERE msScan.id = msScanData.scanID
+    			AND id= #id#
     </select>
     
 </sqlMap>

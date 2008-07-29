@@ -59,7 +59,7 @@ public class ScanCharge implements MS2ScanCharge {
         buf.append("Z\t");
         buf.append(charge);
         buf.append("\t");
-        buf.append(mass);
+        buf.append(mass.stripTrailingZeros());
         buf.append("\n");
         for (MS2Field item: analysisItems) {
             buf.append("D\t");

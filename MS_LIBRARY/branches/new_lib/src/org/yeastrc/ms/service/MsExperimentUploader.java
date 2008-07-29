@@ -220,6 +220,7 @@ public class MsExperimentUploader {
             String sqtFile = fileDirectory+File.separator+filePrefix+".sqt";
             SQTFileReader sqtProvider = new SQTFileReader();
             try { 
+                if (!(new File(sqtFile).exists()))  continue;
                 sqtProvider.open(sqtFile);
                 SQTHeader header = sqtProvider.getSearchHeader();
                 if (!header.isValid()) {
