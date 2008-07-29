@@ -90,18 +90,19 @@ public class YatesCycleDownloader {
     }
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test";
-
+//        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test";
+          String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/validData_dir";
 //        int cycleId = 10936;
 //        String fileName = cycleId+"_"+"PARC_ep2_03_itms"; // Prolucid file
         
-        int runId = 2985;
-        int cycleId = 20389;
+        
+        int runId =  771;
+        int cycleId = 5489;
         // 20389 |  2985
         String fileName = runId+"_"+cycleId;
         
         YatesCycleDownloader downloader = new YatesCycleDownloader();
-//        downloader.downloadMS2File(cycleId, downloadDir, fileName+".ms2");
+        downloader.downloadMS2File(cycleId, downloadDir, fileName+".ms2");
         downloader.downloadSQTFile(cycleId, downloadDir, fileName+".sqt");
     }
 }

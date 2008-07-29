@@ -32,7 +32,7 @@ public class YatesCycleConverter {
         
         // get a list of runIds from tblYatesCycles
 //        String sql = "SELECT distinct runID FROM tblYatesCycles ORDER BY runID DESC limit 10";
-        String sql = "SELECT distinct runID FROM tblYatesCycles WHERE runID < 2986 ORDER BY runID DESC limit 50";
+        String sql = "SELECT distinct runID FROM tblYatesCycles WHERE runID < 2978 ORDER BY runID DESC limit 50";
         statement = connect.createStatement();
         rs = statement.executeQuery(sql);
         
