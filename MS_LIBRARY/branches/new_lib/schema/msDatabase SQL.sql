@@ -113,7 +113,7 @@ CREATE TABLE msPeptideSearch (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     runID INT UNSIGNED NOT NULL,
     originalFileType VARCHAR(10) NOT NULL,
-    analysisProgramName VARCHAR(20),
+    analysisProgramName VARCHAR(25),
     analysisProgramVersion VARCHAR(10),
     searchDate DATE,
     searchDuration INT UNSIGNED,
@@ -168,7 +168,7 @@ CREATE TABLE SQTSpectrumData (
     processTime INT UNSIGNED,
     serverName VARCHAR(50),
     totalIntensity DECIMAL(10,5),
-    lowestSp DECIMAL(10,5)
+    lowestSp DECIMAL(10,5),        sequenceMatches INT UNSIGNED
 );
 ALTER TABLE SQTSpectrumData ADD PRIMARY KEY(scanID, searchID, charge);
 ALTER TABLE SQTSpectrumData ADD INDEX (searchID);

@@ -168,7 +168,7 @@ CREATE TABLE SQTSpectrumData (
     processTime INT UNSIGNED,
     serverName VARCHAR(50),
     totalIntensity DECIMAL(10,5),
-    lowestSp DECIMAL(10,5)
+    lowestSp DECIMAL(10,5),        sequenceMatches INT UNSIGNED
 );
 ALTER TABLE SQTSpectrumData ADD PRIMARY KEY(scanID, searchID, charge);
 ALTER TABLE SQTSpectrumData ADD INDEX (searchID);
