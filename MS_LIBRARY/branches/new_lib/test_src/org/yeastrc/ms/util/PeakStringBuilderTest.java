@@ -68,6 +68,9 @@ public class PeakStringBuilderTest extends TestCase {
         
         number = "1.000000";
         assertEquals("1", PeakStringBuilder.trimTrailingZeros(number));
+        
+        number = "10";
+        assertEquals("10", PeakStringBuilder.trimTrailingZeros(number));
     }
 
     public void testParseDouble() {

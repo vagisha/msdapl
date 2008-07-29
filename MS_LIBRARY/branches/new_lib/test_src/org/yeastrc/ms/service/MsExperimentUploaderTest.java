@@ -88,19 +88,19 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertEquals(0, expId);
     }
     
-//    public void testUploadExperimentNoValidMS2Scans() {
-//        resetDatabase();
-//        String dir = "test_resources/noValidMS2Scans_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
-//    
-//    public void testUploadExperimentNoScanIdFound() {
-//        resetDatabase();
-//        String dir = "test_resources/noScanIdFound_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
+    public void testUploadExperimentNoValidMS2Scans() {
+        resetDatabase();
+        String dir = "test_resources/noValidMS2Scans_dir";
+        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+        assertEquals(0, expId);
+    }
+    
+    public void testUploadExperimentNoScanIdFound() {
+        resetDatabase();
+        String dir = "test_resources/noScanIdFound_dir";
+        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+        assertEquals(0, expId);
+    }
     
     public void testUploadValidData() {
         resetDatabase();
@@ -140,15 +140,15 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         new File(outputTest).delete();
         DbToSqtFileConverter sqtConverter = new DbToSqtFileConverter();
         // compare the first sqt file uploaded
-//        try {
-//            sqtConverter.convertToSqt(1, outputTest);
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        assertTrue(filesIdentical(outputTest, dir+File.separator+"771_5489.sqt"));
-//        // remove the output file
-//        assertTrue(new File(outputTest).delete());
+        try {
+            sqtConverter.convertToSqt(1, outputTest);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(filesIdentical(outputTest, dir+File.separator+"771_5489.sqt"));
+        // remove the output file
+        assertTrue(new File(outputTest).delete());
         // compare the second sqt file uploaded
         try {
             sqtConverter.convertToSqt(2, outputTest);
