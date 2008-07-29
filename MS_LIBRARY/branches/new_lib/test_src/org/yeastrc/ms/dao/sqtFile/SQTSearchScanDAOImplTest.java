@@ -100,6 +100,11 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
             @Override
             public List<SQTSearchResult> getScanResults() {
                 return new ArrayList<SQTSearchResult>(0);
+            }
+
+            @Override
+            public int getSequenceMatches() {
+                return 0;
             }};
             return scan;
     }
