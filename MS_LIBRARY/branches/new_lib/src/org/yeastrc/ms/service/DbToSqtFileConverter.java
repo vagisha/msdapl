@@ -163,7 +163,7 @@ public class DbToSqtFileConverter {
         scanResult.setLowestSp(resultScan.getLowestSp());
         scanResult.setObservedMass(msScan.getPrecursorMz());
         scanResult.setProcessingTime(resultScan.getProcessTime());
-        scanResult.setNumMatching(0);
+        scanResult.setSequenceMatches(resultScan.getSequenceMatches());
         scanResult.setServer(resultScan.getServerName());
         scanResult.setTotalIntensity(resultScan.getTotalIntensity());
         return scanResult;

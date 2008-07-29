@@ -24,6 +24,8 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
     private String serverName;
     private BigDecimal totalIntensity;
     private BigDecimal lowestSp;
+    private int sequenceMatches;
+    
     /**
      * @return the scanId
      */
@@ -116,5 +118,13 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
     public List<SQTSearchResultDb> getScanResults() {
         throw new UnsupportedOperationException("getScanResults is not supported by SQTSearchScanDbImpl");
     }
-   
+    
+    @Override
+    public int getSequenceMatches() {
+        return sequenceMatches;
+    }
+    
+    public void setSequenceMatches(int sequenceMatches) {
+        this.sequenceMatches = sequenceMatches;
+    }
 }

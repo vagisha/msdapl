@@ -36,4 +36,10 @@ interface SQTSearchScanBase {
      * @return the lowestSp
      */
     public abstract BigDecimal getLowestSp();
+    
+    /**
+     * Returns the number of sequence matching the precursor ion.
+     * @return
+     */
+    public abstract int getSequenceMatches();
 }

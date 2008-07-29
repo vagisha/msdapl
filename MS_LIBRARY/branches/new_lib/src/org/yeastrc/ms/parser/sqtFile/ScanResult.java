@@ -151,14 +151,14 @@ public class ScanResult implements SQTSearchScan {
     /**
      * @return the numMatching
      */
-    public int getNumMatching() {
+    public int getSequenceMatches() {
         return numMatching;
     }
 
     /**
      * @param numMatching the numMatching to set
      */
-    public void setNumMatching(int numMatching) {
+    public void setSequenceMatches(int numMatching) {
         this.numMatching = numMatching;
     }
 

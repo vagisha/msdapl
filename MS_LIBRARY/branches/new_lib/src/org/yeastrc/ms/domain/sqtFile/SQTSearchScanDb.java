@@ -22,6 +22,4 @@ public interface SQTSearchScanDb extends SQTSearchScanBase {
      */
     public abstract int getScanId();
    
-    
-//    public abstract List<SQTSearchResultDb> getScanResults();
 }

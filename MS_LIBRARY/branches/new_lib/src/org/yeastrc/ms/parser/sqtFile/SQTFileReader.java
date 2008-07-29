@@ -234,7 +234,7 @@ public class SQTFileReader implements SQTSearchDataProvider {
             scan.setObservedMass(new BigDecimal(tokens[6]));
             scan.setTotalIntensity(new BigDecimal(tokens[7]));
             scan.setLowestSp(new BigDecimal(tokens[8]));
-            scan.setNumMatching(Integer.parseInt(tokens[9]));
+            scan.setSequenceMatches(Integer.parseInt(tokens[9]));
         }
         catch(NumberFormatException e) {
             warnings++;
