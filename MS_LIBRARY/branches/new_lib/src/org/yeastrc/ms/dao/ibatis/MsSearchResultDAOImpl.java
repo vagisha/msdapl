@@ -2,7 +2,9 @@ package org.yeastrc.ms.dao.ibatis;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
@@ -40,6 +42,14 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     
     public List<Integer> loadResultIdsForSearch(int searchId) {
         return queryForList("MsSearchResult.selectResultIdsForSearch", searchId);
+    }
+    
+    public List<Integer> loadResultIdsForSearchScanCharge(int searchId, int scanId, int charge) {
+        Map<String, Integer> map = new HashMap<String, Integer>(3);
+        map.put("searchId", searchId);
+        map.put("scanId", scanId);
+        map.put("charge", charge);
+        return queryForList("MsSearchResult.selectResultIdsForSearchScanCharge", map);
     }
     
     public int save(MsSearchResult searchResult, int searchId, int scanId) {

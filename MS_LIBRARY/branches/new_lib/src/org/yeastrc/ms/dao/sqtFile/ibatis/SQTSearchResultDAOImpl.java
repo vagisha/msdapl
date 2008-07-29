@@ -114,6 +114,11 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
         return resultDao.loadResultIdsForSearch(searchId);
     }
 
+    @Override
+    public List<Integer> loadResultIdsForSearchScanCharge(int searchId, int scanId, int charge) {
+        return resultDao.loadResultIdsForSearchScanCharge(searchId, scanId, charge);
+    }
+    
     public class SQTSearchResultSqlMapParam {
         
         private int resultId;

@@ -39,7 +39,8 @@
 		<discriminator javaType="SearchType" jdbcType="VARCHAR" 
 						column="originalFileType" 
 						typeHandler="SearchTypeHandler">
-			<subMap value="SQT" resultMap="sqtSearchResult" />						
+			<subMap value="SQT_NSEQ" resultMap="sqtSearchResult" />	
+			<subMap value="SQT_SEQ" resultMap="sqtSearchResult" />						
 		</discriminator>
 	</resultMap>
 	

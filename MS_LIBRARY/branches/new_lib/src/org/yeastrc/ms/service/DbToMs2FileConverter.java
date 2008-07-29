@@ -21,7 +21,7 @@ import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 import org.yeastrc.ms.parser.ms2File.MS2Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
 import org.yeastrc.ms.parser.ms2File.ScanCharge;
-import org.yeastrc.ms.util.PeakConverterDouble;
+import org.yeastrc.ms.util.PeakConverterString;
 
 public class DbToMs2FileConverter {
 
@@ -87,9 +87,9 @@ public class DbToMs2FileConverter {
        }
        
        // finally, the peak data!
-       PeakConverterDouble converter = new PeakConverterDouble();
-       List<double[]> peaks = converter.convert(scan.peakDataString());
-       for(double[] peak: peaks) {
+       PeakConverterString converter = new PeakConverterString();
+       List<String[]> peaks = converter.convert(scan.peakDataString());
+       for(String[] peak: peaks) {
            ms2scan.addPeak(String.valueOf(peak[0]), String.valueOf(peak[1]));
        }
        

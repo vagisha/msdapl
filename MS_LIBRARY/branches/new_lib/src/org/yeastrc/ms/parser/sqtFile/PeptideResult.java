@@ -212,11 +212,11 @@ public class PeptideResult implements SQTSearchResult {
         buf.append("\t");
         buf.append(mass);
         buf.append("\t");
-        buf.append(deltaCN);
+        buf.append(deltaCN.stripTrailingZeros());
         buf.append("\t");
-        buf.append(xcorr);
+        buf.append(xcorr.stripTrailingZeros());
         buf.append("\t");
-        buf.append(sp);
+        buf.append(sp.stripTrailingZeros());
         buf.append("\t");
         buf.append(numMatchingIons);
         buf.append("\t");

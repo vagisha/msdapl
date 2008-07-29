@@ -169,9 +169,9 @@ public class ScanResult implements SQTSearchScan {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("S\t");
-        buf.append(startScan);
+        buf.append(String.format("%05d", startScan));
         buf.append("\t");
-        buf.append(endScan);
+        buf.append(String.format("%05d", endScan));
         buf.append("\t");
         buf.append(charge);
         buf.append("\t");
@@ -181,9 +181,9 @@ public class ScanResult implements SQTSearchScan {
         buf.append("\t");
         buf.append(observedMass);
         buf.append("\t");
-        buf.append(totalIntensity);
+        buf.append(totalIntensity.stripTrailingZeros());
         buf.append("\t");
-        buf.append(lowestSp);
+        buf.append(lowestSp.stripTrailingZeros());
         buf.append("\t");
         buf.append(numMatching);
         

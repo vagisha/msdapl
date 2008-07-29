@@ -58,6 +58,12 @@
     	SELECT id FROM msPeptideSearchResult WHERE searchID = #id#
     </select>
     
+    <select id="selectResultIdsForSearchScanCharge" resultClass="Integer" parameterClass="Map">
+    	SELECT id FROM msPeptideSearchResult 
+    	WHERE searchID = #searchId# 
+    	AND scanID = #scanId#
+    	AND charge = #charge#
+    </select>
     
     <insert id="insert" parameterMap="msSearchResultParam">
     	INSERT INTO msPeptideSearchResult (

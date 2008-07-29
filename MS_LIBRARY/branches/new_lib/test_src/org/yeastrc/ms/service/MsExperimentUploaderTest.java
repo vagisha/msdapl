@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 
@@ -23,16 +24,16 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     
     public void resetDatabase() {
         System.out.println("Resetting database");
-        String script = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/src/resetDatabase.sh";
+        String script = "src/resetDatabase.sh";
         try {
             Process proc = runtime.exec("sh "+script);
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-//            String line = reader.readLine();
-//            while(line != null) {
-//                System.out.println(line);
-//                line = reader.readLine();
-//            }
-//            reader.close();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+            String line = reader.readLine();
+            while(line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            reader.close();
             proc.waitFor();
         }
         catch (IOException e) {
@@ -52,66 +53,79 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     }
 
     public void testUploadExperimentToDbEmptyDirectory() {
-        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/empty_dir";
+        String dir = "test_resources/empty_dir";
         int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
         assertEquals(0, expId);
     }
 
     public void testUploadExperimentToDbMissingMS2Files() {
-        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/missingMS2_dir";
+        String dir = "test_resources/missingMS2_dir";
         int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
         assertEquals(0, expId);
     }
     
     public void testUploadExperimentToDbPercolatorSQTFiles() {
-        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/percolatorSQT_dir";
+        String dir = "test_resources/percolatorSQT_dir";
         int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
         assertEquals(0, expId);
     }
     
     public void testUploadExperimentToDbProlucidSQTFiles() {
-        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/prolucidSQT_dir";
+        String dir = "test_resources/prolucidSQT_dir";
         int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
         assertEquals(0, expId);
     }
     
     public void testUploadExperimentToDbPepProbeSQTFiles() {
-        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/pepprobeSQT_dir";
+        String dir = "test_resources/pepprobeSQT_dir";
         int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
         assertEquals(0, expId);
     }
     
     public void testUploadExperimentInvalidSQTHeader() {
-        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/invalidSQTHeader_dir";
+        String dir = "test_resources/invalidSQTHeader_dir";
         int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
         assertEquals(0, expId);
     }
     
 //    public void testUploadExperimentNoValidMS2Scans() {
 //        resetDatabase();
-//        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/noValidMS2Scans_dir";
+//        String dir = "test_resources/noValidMS2Scans_dir";
 //        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
 //        assertEquals(0, expId);
 //    }
 //    
 //    public void testUploadExperimentNoScanIdFound() {
 //        resetDatabase();
-//        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/noScanIdFound_dir";
+//        String dir = "test_resources/noScanIdFound_dir";
 //        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
 //        assertEquals(0, expId);
 //    }
     
     public void testUploadValidData() {
         resetDatabase();
-        String dir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/validData_dir";
+        String dir = "test_resources/validData_dir";
         int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
         assertEquals(1, expId);
         
-        // read from database and make sure files are identical
-        String outputTest = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/validData_dir/fromDb.ms2";
+        // read from database and make sure files are identical (MS2 files)
+        String outputTest = "test_resources/validData_dir/fromDb.ms2";
+        // remove the output if it already exists
+        new File(outputTest).delete();
         DbToMs2FileConverter ms2Converter = new DbToMs2FileConverter();
+        // compare the first ms2 file uploaded
         try {
             ms2Converter.convertToMs2(1, outputTest);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(filesIdentical(outputTest, dir+File.separator+"771_5489.ms2"));
+        // remove the output file
+        assertTrue(new File(outputTest).delete());
+        // compare the second ms2 file uploaded
+        try {
+            ms2Converter.convertToMs2(2, outputTest);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -119,6 +133,33 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertTrue(filesIdentical(outputTest, dir+File.separator+"PARC_p75_01_itms.ms2"));
         // remove the output file
         assertTrue(new File(outputTest).delete());
+        
+        // read from database and make sure files are identical (SQT files)
+        outputTest = "test_resources/validData_dir/fromDb.sqt";
+        // remove the output if it already exists
+        new File(outputTest).delete();
+        DbToSqtFileConverter sqtConverter = new DbToSqtFileConverter();
+        // compare the first sqt file uploaded
+//        try {
+//            sqtConverter.convertToSqt(1, outputTest);
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        assertTrue(filesIdentical(outputTest, dir+File.separator+"771_5489.sqt"));
+//        // remove the output file
+//        assertTrue(new File(outputTest).delete());
+        // compare the second sqt file uploaded
+        try {
+            sqtConverter.convertToSqt(2, outputTest);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(filesIdentical(outputTest, dir+File.separator+"PARC_p75_01_itms.sqt"));
+        // remove the output file
+        assertTrue(new File(outputTest).delete());
+        
         
         // upload the same experiment.  This time the MS2 file should not be uploaded
         // so the returned experimentID should be 0;
