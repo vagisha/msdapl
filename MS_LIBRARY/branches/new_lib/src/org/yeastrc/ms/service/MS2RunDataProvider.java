@@ -22,5 +22,5 @@ public interface MS2RunDataProvider  {
     
     public abstract MS2Scan getNextScan() throws Exception;
     
-    public void close();
+    public abstract void close();
 }

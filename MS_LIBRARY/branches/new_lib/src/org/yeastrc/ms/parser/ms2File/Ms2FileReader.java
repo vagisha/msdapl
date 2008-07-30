@@ -6,20 +6,15 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.DataFormatException;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.parser.AbstractReader;
 import org.yeastrc.ms.parser.ParserException;
 import org.yeastrc.ms.service.MS2RunDataProvider;
 
@@ -27,52 +22,26 @@ import org.yeastrc.ms.service.MS2RunDataProvider;
 /**
  * 
  */
-public class Ms2FileReader implements MS2RunDataProvider {
+public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider {
 
-    private BufferedReader reader;
-    private String currentLine;
-    private String fileName;
     private String sha1Sum;
-    private int currentLineNum = 0;
-    private int warnings = 0;
 
     private static final Logger log = Logger.getLogger(Ms2FileReader.class);
-    
-    private static final Pattern headerPattern = Pattern.compile("^H\\s+([\\S]+)\\s*(.*)");
 
-    public int getWarningCount() {
-        return warnings;
-    }
+    private static final Pattern headerPattern = Pattern.compile("^H\\s+([\\S]+)\\s*(.*)");
+    private static final Pattern dAnalysisPattern = Pattern.compile("^D\\s+([\\S]+)\\s*(.*)");
+    private static final Pattern iAnalysisPattern = Pattern.compile("^I\\s+([\\S]+)\\s*(.*)");
+    private static final Pattern chargeStatePattern = Pattern.compile("^Z\\s+(\\d+)\\s+(\\d+\\.?\\d*)\\s*$");
+
 
     public void open(String filePath, String sha1Sum) throws IOException {
-        reader = new BufferedReader(new FileReader(filePath));
-        fileName = new File(filePath).getName();
         this.sha1Sum = sha1Sum;
-        advanceLine();
+        super.open(filePath);
     }
 
     public void open(String fileName, InputStream inStream, String sha1Sum) throws IOException {
-        this.fileName = fileName;
         this.sha1Sum = sha1Sum;
-        reader = new BufferedReader(new InputStreamReader(inStream));
-        advanceLine();
-    }
-
-    @Override
-    public String getFileName() {
-        return this.fileName;
-    }
-
-    private void advanceLine() throws IOException {
-        currentLineNum++;
-        currentLine = reader.readLine(); // advance first
-        // skip over blank lines
-        while(currentLine != null && currentLine.trim().length() == 0) {
-            currentLineNum++;
-            currentLine = reader.readLine();
-        }
-        if (currentLine != null)
-            currentLine = currentLine.trim();
+        super.open(fileName, inStream);
     }
 
     public MS2Header getRunHeader() throws IOException {
@@ -83,30 +52,28 @@ public class Ms2FileReader implements MS2RunDataProvider {
             if (nameAndVal.length == 2) {
                 header.addHeaderItem(nameAndVal[0], nameAndVal[1]);
             }
+            else if (nameAndVal.length == 1) {
+                warnings++;
+                log.warn("!!!LINE# "+currentLineNum+" Missing value in 'H' line.\n\t"+currentLine);
+                header.addHeaderItem(nameAndVal[0], null);
+            }
             else {
                 // ignore if both label and value for this header item are missing
                 //throw new Exception("Invalid header: "+currentLine);
-                log.warn("!!!LINE# "+currentLineNum+" Invalid 'H' line; ignoring...: -- "+currentLine);
+                warnings++;
+                log.warn("!!!LINE# "+currentLineNum+" Invalid 'H' line; Ignoring...: -- "+currentLine);
             }
             advanceLine();
         }
-//        if (!header.isValid()) {
-//            warnings++;
-//            ParserException e = new ParserException(currentLineNum-1, "Invalid header.  Required fields are missing", "");
-//            log.warn(e.getMessage());
-//            throw e;
-//        }
+//      if (!header.isValid()) {
+//      warnings++;
+//      ParserException e = new ParserException(currentLineNum-1, "Invalid header.  Required fields are missing", "");
+//      log.warn(e.getMessage());
+//      throw e;
+//      }
         header.setFileName(fileName);
         header.setSha1Sum(sha1Sum);
         return header;
-    }
-
-    String[] parseHeader(String line) {
-        Matcher match = headerPattern.matcher(line);
-        if (match.matches())
-            return new String[]{match.group(1), match.group(2)};
-        else
-            return new String[0];
     }
 
     public boolean hasNextScan() {
@@ -117,7 +84,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
 
         Scan scan;
         try {
-            scan = parseScan();
+            scan = parseScan(currentLine);
         }
         catch (ParserException e) {
             log.warn(e.getMessage());
@@ -126,7 +93,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
         }
 
         advanceLine(); // go to the next line
-        
+
         while(currentLine != null) {
             // is this one of the charge states of the scan?
             if (isChargeLine(currentLine)) {
@@ -135,21 +102,13 @@ public class Ms2FileReader implements MS2RunDataProvider {
                     scan.addChargeState(sc);
                 }
                 catch (ParserException e) {
+                    skipScanCharge();
                     log.warn(e.getMessage());
                 }
             }
             // is this one of the charge independent analysis for this scan?
             else if (isChargeIndAnalysisLine(currentLine)) {
-                try {
-                    MS2Field iAnalysis = parseIAnalysis(currentLine);
-                    scan.addAnalysisItem(iAnalysis.getName(), iAnalysis.getValue());
-                }
-                catch (ParserException e) {
-                    log.warn(e.getMessage());
-                }
-                catch (DataFormatException e) {
-                    log.warn(e.getMessage());
-                }
+                parseChargeIndependentAnalysis(currentLine, scan);
                 advanceLine();
             }
             // it is neither so must be peak data
@@ -160,38 +119,27 @@ public class Ms2FileReader implements MS2RunDataProvider {
         }
         if (!scan.isValid()) {
             warnings++;
-            ParserException e = new ParserException(currentLineNum-1, "Invalid MS2 scan -- no peaks found", "");
+            ParserException e = new ParserException(currentLineNum-1, "Invalid MS2 scan -- no valid peaks and/or charge states found", "");
             log.warn(e.getMessage());
             throw e;
         }
-        
+
         return scan;
     }
+   
 
-    private void skipScan() throws IOException {
-        while (currentLine != null && !isScanLine(currentLine))
-            advanceLine();
-    }
-
-    private MS2Field parseIAnalysis(String line) throws ParserException {
-        String[] tokens = line.split("\\s+");
-        if (tokens.length < 3)
-            throw new ParserException(currentLineNum, "Invalid 'I' line. Expected 3 fields.", line);
-        return new HeaderItem(tokens[1], tokens[2]);
-    }
-
-    private Scan parseScan() throws ParserException {
+    private Scan parseScan(String line) throws ParserException {
 
         // make sure we have a scan line
-        if (!isScanLine(currentLine)) {
+        if (!isScanLine(line)) {
             warnings++;
-            throw new ParserException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", currentLine);
+            throw new ParserException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", line);
         }
 
-        String[] tokens = currentLine.split("\\s+");
+        String[] tokens = line.split("\\s+");
         if (tokens.length < 4) {
             warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", currentLine);
+            throw new ParserException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", line);
         }
 
         Scan scan = new Scan();
@@ -202,48 +150,80 @@ public class Ms2FileReader implements MS2RunDataProvider {
         }
         catch(NumberFormatException e) {
             warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'S' line. Error parsing number(s). "+e.getMessage(), currentLine);
+            throw new ParserException(currentLineNum, "Invalid 'S' line. Error parsing number(s). "+e.getMessage(), line);
         }
         return scan;
     }
 
     private ScanCharge parseScanCharge() throws IOException, ParserException {
-        String tokens[] = currentLine.split("\\s+");
-        if (tokens.length < 3) {
-            skipScanCharge();
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'Z' line. Expected 3 fields.", currentLine);
-        }
-
-        // get the charge and mass
-        ScanCharge scanCharge = new ScanCharge();
-        try {
-            scanCharge.setCharge(Integer.parseInt(tokens[1]));
-            scanCharge.setMass(new BigDecimal(tokens[2]));
-        }
-        catch(NumberFormatException e) {
-            skipScanCharge();
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'Z' line. Error parsing number(s). "+e.getMessage(), currentLine);
-        }
+        
+        ScanCharge scanCharge = parseScanCharge(currentLine);
 
         // parse any charge dependent analysis associated with this charge state
         advanceLine();
         while (isChargeDepAnalysisLine((currentLine))) {
-            tokens = currentLine.split("\\s+");
-            if (tokens.length < 3) {
-                warnings++;
-                ParserException e = new ParserException(currentLineNum, "Invalid 'D' line. Expected 2 fields.", currentLine);
-                log.warn(e.getMessage());
-            }
-            else {
-                scanCharge.addAnalysisItem(tokens[1], tokens[2]);
-            }
+            parseChargeDependentAnalysis(currentLine, scanCharge);
             advanceLine();
         }
         return scanCharge;
     }
 
+    ScanCharge parseScanCharge(String line) throws ParserException {
+        
+        Matcher match = chargeStatePattern.matcher(line);
+        if (match.matches()) {
+            ScanCharge scanCharge = new ScanCharge();
+            scanCharge.setCharge(Integer.parseInt(match.group(1)));
+            scanCharge.setMass(new BigDecimal(match.group(2)));
+            return scanCharge;
+        }
+        else {
+            warnings++;
+            throw new ParserException(currentLineNum, "Invalid 'Z' line. Ignoring...", line);
+        }
+    }
+
+    void parseChargeDependentAnalysis(String line, ScanCharge scanCharge) {
+        String[] nameAndVal = parseChargeDependentAnalysis(line);
+        if (nameAndVal.length == 2) {
+            scanCharge.addAnalysisItem(nameAndVal[0], nameAndVal[1]);
+        }
+        else if (nameAndVal.length == 2) {
+            scanCharge.addAnalysisItem(nameAndVal[0], null);
+            warnings++;
+            log.warn("!!!LINE# "+currentLineNum+" Missing value in 'D' line.\n\t"+currentLine);
+        }
+        else {
+            // ignore if both label and value for this analysis item are missing
+            warnings++;
+            ParserException e = new ParserException(currentLineNum, "Invalid 'D' line. Expected 2 fields. Ignoring...", line);
+            log.warn(e.getMessage());
+        }
+    }
+
+    void parseChargeIndependentAnalysis(String line, Scan scan) {
+        String[] nameAndVal = parseChargeIndependentAnalysis(line);
+        if (nameAndVal.length == 2) {
+            scan.addAnalysisItem(nameAndVal[0], nameAndVal[1]);
+        }
+        else if (nameAndVal.length == 1) {
+            scan.addAnalysisItem(nameAndVal[0], null);
+            warnings++;
+            log.warn("!!!LINE# "+currentLineNum+" Missing value in 'I' line\n\t"+currentLine);
+        }
+        else {
+            // ignore if both label and value for this analysis item are missing
+            warnings++;
+            ParserException e = new ParserException(currentLineNum, "Invalid 'I' line. Expected 2 fields. Ignoring...", line);
+            log.warn(e.getMessage());
+        }
+    }
+    
+    private void skipScan() throws IOException {
+        while (currentLine != null && !isScanLine(currentLine))
+            advanceLine();
+    }
+    
     private void skipScanCharge() throws IOException {
         advanceLine();
         while(isChargeDepAnalysisLine(currentLine))
@@ -286,6 +266,18 @@ public class Ms2FileReader implements MS2RunDataProvider {
         }
     }
 
+    String[] parseHeader(String line) {
+        return parseNameValueLine(line, headerPattern);
+    }
+
+    String[] parseChargeIndependentAnalysis(String line) {
+        return parseNameValueLine(line, iAnalysisPattern);
+    }
+
+    String[] parseChargeDependentAnalysis(String line) {
+        return parseNameValueLine(line, dAnalysisPattern);
+    }
+
     private boolean isValidDouble(String doubleStr) {
         try {Double.parseDouble(doubleStr);}
         catch(NumberFormatException e) {
@@ -293,7 +285,7 @@ public class Ms2FileReader implements MS2RunDataProvider {
         }
         return true;
     }
-    
+
     private boolean isScanLine(String line) {
         if (line == null)   return false;
         return line.startsWith("S");
@@ -331,10 +323,8 @@ public class Ms2FileReader implements MS2RunDataProvider {
         return true;
     }
 
-
-    public void close() {
-        if (reader != null) 
-            try {reader.close();}
-        catch (IOException e) {}
+    protected boolean isValidLine(String line) {
+        if (line.trim().length() == 0)  return false;
+        return true;
     }
 }

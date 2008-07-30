@@ -1,12 +1,9 @@
 package org.yeastrc.ms.parser.sqtFile;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,19 +12,14 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.MsSearchModification;
+import org.yeastrc.ms.parser.AbstractReader;
 import org.yeastrc.ms.parser.ParserException;
 import org.yeastrc.ms.service.SQTSearchDataProvider;
 
 
-public class SQTFileReader implements SQTSearchDataProvider {
+public class SQTFileReader extends AbstractReader implements SQTSearchDataProvider {
 
-    private BufferedReader reader;
-    private String currentLine;
-    private int currentLineNum = 0;
-    private String fileName;
     private List<MsSearchModification> searchDynamicMods;
-
-    private int warnings = 0;
 
     private static final Logger log = Logger.getLogger(SQTFileReader.class);
 
@@ -35,10 +27,6 @@ public class SQTFileReader implements SQTSearchDataProvider {
     private static final Pattern locusPattern = Pattern.compile("^L\\s+([\\S]+)\\s*(.*)");
     private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
     
-    public int getWarningCount() {
-        return warnings;
-    }
-
     public static boolean isSequestSQT(String filePath) throws FileNotFoundException, IOException {
         return isSequestSQT(new FileReader(filePath));
     }
@@ -82,47 +70,6 @@ public class SQTFileReader implements SQTSearchDataProvider {
         return false;
     }
     
-    
-    public void open(String filePath) throws IOException{
-        reader = new BufferedReader(new FileReader(filePath));
-        fileName = new File(filePath).getName();
-        advanceLine();
-    }
-
-
-    public void open(String fileName, InputStream inStream) throws IOException {
-        this.fileName = fileName;
-        reader = new BufferedReader(new InputStreamReader(inStream));
-        advanceLine();
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-    
-    private void advanceLine() throws IOException {
-
-        currentLineNum++;
-        currentLine = reader.readLine(); // advance first
-        // skip over blank lines and line that don't start with a H, S, M or L
-        while(currentLine != null && !isValidLine(currentLine)) {
-//            log.warn("!!!LINE# "+currentLineNum+" Lines should begin with H, S, M, or L. Invalid line: -- "+currentLine);
-            currentLineNum++;
-            currentLine = reader.readLine();
-        }
-        // remove any leading or trailing white spaces
-        if (currentLine != null)
-            currentLine = currentLine.trim();
-    }
-
-    private boolean isValidLine(String line) {
-        if (line.trim().length() == 0)  return false;
-        return( line.charAt(0) == 'L'   || 
-                line.charAt(0) == 'M'   || 
-                line.charAt(0) == 'S'   ||
-                line.charAt(0) == 'H');
-    }
-
     public SQTHeader getSearchHeader()  throws IOException {
 
         SQTHeader header = new SQTHeader();
@@ -378,14 +325,11 @@ public class SQTFileReader implements SQTSearchDataProvider {
         return line.startsWith("L");
     }
 
-    /**
-     * This method should be called explicitly after the file has been read.
-     */
-    public void close() {
-        currentLine = null;
-        if (reader != null) 
-            try {reader.close();}
-        catch (IOException e) {}
+    protected boolean isValidLine(String line) {
+        if (line.trim().length() == 0)  return false;
+        return( line.charAt(0) == 'L'   || 
+                line.charAt(0) == 'M'   || 
+                line.charAt(0) == 'S'   ||
+                line.charAt(0) == 'H');
     }
-    
 }

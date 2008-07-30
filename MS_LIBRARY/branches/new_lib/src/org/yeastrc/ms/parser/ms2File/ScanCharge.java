@@ -21,11 +21,11 @@ public class ScanCharge implements MS2ScanCharge {
     private int charge;
     private BigDecimal mass;
     private List<MS2Field> analysisItems;
-    
+
     public ScanCharge() {
         analysisItems = new ArrayList<MS2Field>();
     }
-    
+
     /**
      * @return the charge
      */
@@ -44,16 +44,16 @@ public class ScanCharge implements MS2ScanCharge {
     public BigDecimal getMass() {
         return mass;
     }
-   
+
     public void setMass(BigDecimal mass) {
         this.mass = mass;
     }
-    
+
     public void addAnalysisItem(String label, String value) {
-        if (label == null || value == null)   return;
+        if (label == null)   return;
         analysisItems.add(new HeaderItem(label, value));
     }
-    
+
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("Z\t");
@@ -64,8 +64,10 @@ public class ScanCharge implements MS2ScanCharge {
         for (MS2Field item: analysisItems) {
             buf.append("D\t");
             buf.append(item.getName());
-            buf.append("\t");
-            buf.append(item.getValue());
+            if (item.getValue() != null) {
+                buf.append("\t");
+                buf.append(item.getValue());
+            }
             buf.append("\n");
         }
         buf.deleteCharAt(buf.length() - 1); // remove last new-line character

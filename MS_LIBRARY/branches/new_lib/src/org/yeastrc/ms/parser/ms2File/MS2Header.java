@@ -163,8 +163,10 @@ public class MS2Header implements MS2Run {
                 continue;
             buf.append("H\t");
             buf.append(headerItem.getName());
-            buf.append("\t");
-            buf.append(headerItem.getValue());
+            if (headerItem.getValue() != null) {
+                buf.append("\t");
+                buf.append(headerItem.getValue());
+            }
             buf.append("\n");
         }
         buf.deleteCharAt(buf.length() - 1); // remove the last new line character.

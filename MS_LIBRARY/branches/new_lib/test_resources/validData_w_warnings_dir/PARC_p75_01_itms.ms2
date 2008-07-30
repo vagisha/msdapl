@@ -12,10 +12,12 @@ H	IsolationWindow
 H	FirstScan	1
 H	LastScan	17903
 S	000002	000002	475.42000
+I
 I	RetTime
 I	ActivationType	CID
 I	PrecursorFile	p75_01_itms.ms1
 I	PrecursorScan
+I
 Z	1	475.42
 D	PARC	0.106982
 166.2 1785.6
@@ -37,8 +39,10 @@ I	RetTime	0.03
 I	ActivationType	CID
 I	PrecursorFile	p75_01_itms.ms1
 I	PrecursorScan	7
+Z	2	123.45
+D       PARC	-1.2345 Hello World
 Z	1	1372.55laksdjflkasf;a
-D	PARC	-1.602722
+D	PARC	-1.602722 Hello World
 397.4 78.6
 399.2 57.0
 401.1 23.4
@@ -52,8 +56,8 @@ I	RetTime	0.04
 I	ActivationType	CID
 I	PrecursorFile	p75_01_itms.ms1
 I	PrecursorScan	7
-Z	1	717.62
-D	PARC	0.133447 Hello World
+Z	1	717.62invalid
+D	PARC	0.133447
 207.4 37.8
 222.1 39.2
 235.2 45.8

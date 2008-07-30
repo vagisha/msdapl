@@ -174,7 +174,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertEquals(1, expId);
         
         // read from database and make sure files are identical (MS2 files)
-        String outputTest = "test_resources/validData_dir/fromDb.ms2";
+        String outputTest = "test_resources/validData_w_warnings_dir/fromDb.ms2";
         // remove the output if it already exists
         new File(outputTest).delete();
         DbToMs2FileConverter ms2Converter = new DbToMs2FileConverter();
@@ -185,9 +185,9 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         catch (IOException e) {
             e.printStackTrace();
         }
-//        assertTrue(filesIdentical(outputTest, dir+File.separator+"PARC_p75_01_itms.ms2"));
+        assertTrue(filesIdentical(outputTest, dir+File.separator+"PARC_p75_01_itms.ms2.valid"));
         // remove the output file
-//        assertTrue(new File(outputTest).delete());
+        assertTrue(new File(outputTest).delete());
     }
     
     private boolean filesIdentical(String output, String input) {

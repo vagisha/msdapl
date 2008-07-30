@@ -7,6 +7,7 @@ import java.io.StringReader;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.ms2File.ScanCharge;
 
 public class SQTParserTest extends TestCase {
 

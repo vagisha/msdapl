@@ -22,7 +22,7 @@ public interface SQTSearchDataProvider {
     
     public abstract SQTSearchScan getNextSearchScan() throws Exception;
     
-    public void close();
+    public abstract void close();
 }
 
 

@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.zip.DataFormatException;
 
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
@@ -24,22 +23,22 @@ public class Scan implements MS2Scan {
     public static final String PRECURSOR_SCAN = "PrecursorScan"; // precursor scan number
     public static final String ACTIVATION_TYPE = "ActivationType";
     public static final String RET_TIME = "RetTime";
-    
+
     private int startScan = -1;
     private int endScan = -1;
     private int precursorScanNum = -1;
-    
+
     private BigDecimal precursorMz;
     private BigDecimal retentionTime;
     private String activationType;
-    
+
     private List<String[]> peakList;
-    
+
     private List<MS2ScanCharge> chargeStates;
-    
+
     private List<MS2Field> analysisItems;
-    
-    
+
+
     public Scan() {
         chargeStates = new ArrayList<MS2ScanCharge>();
         analysisItems = new ArrayList<MS2Field>();
@@ -47,20 +46,16 @@ public class Scan implements MS2Scan {
     }
 
     public boolean isValid() {
-        return peakList.size() > 0;
+        return peakList.size() > 0 && chargeStates.size() > 0;
     }
-    
+
     @Override
     public List<MS2Field> getChargeIndependentAnalysisList() {
         return this.analysisItems;
     }
-    
-    /**
-     * @throws DataFormatException is thrown if we are parsing the "ActivationType" header
-     *         and the value is more than 3 characters.
-     */
-    public void addAnalysisItem(String label, String value) throws DataFormatException {
-        if (label == null || value == null)   return;
+
+    public void addAnalysisItem(String label, String value) {
+        if (label == null)   return;
         analysisItems.add(new HeaderItem(label, value));
         if (label.equalsIgnoreCase(RET_TIME))
             setRetentionTime(value);
@@ -69,21 +64,33 @@ public class Scan implements MS2Scan {
         else if (label.equalsIgnoreCase(ACTIVATION_TYPE))
             setFragmentationType(value);
     }
-    
+
     public BigDecimal getRetentionTime() {
         return retentionTime;
     }
     private void setRetentionTime(String rt) {
-        this.retentionTime = new BigDecimal(rt);
+        if (rt == null) return;
+        try {
+            this.retentionTime = new BigDecimal(rt);
+        }
+        catch(NumberFormatException e) {
+            this.retentionTime = null;
+        }
     }
-    
+
     public int getPrecursorScanNum() {
-       return precursorScanNum;
+        return precursorScanNum;
     }
     private void setPrecursorScanNum(String num) {
-        this.precursorScanNum = Integer.parseInt(num);
+        if (num == null)    return;
+        try {
+            this.precursorScanNum = Integer.parseInt(num);
+        }
+        catch(NumberFormatException e) {
+            this.precursorScanNum = -1;
+        }
     }
-    
+
     public List<MS2ScanCharge> getScanChargeList() {
         return this.chargeStates;
     }
@@ -111,7 +118,7 @@ public class Scan implements MS2Scan {
     public void setPrecursorMz(String precursorMz) {
         this.precursorMz = new BigDecimal(precursorMz);
     }
- 
+
 
     public Iterator<String[]> peakIterator() {
         return peakList.iterator();
@@ -119,20 +126,17 @@ public class Scan implements MS2Scan {
     public void addPeak(String mz, String rt) {
         peakList.add(new String[]{mz, rt});
     }
-    
+
     public String getFragmentationType() {
         return activationType;
     }
+
     /**
-     * @throws DataFormatException is thrown if actType is more than 3 characters.
-     * 
      * The database (msScan table) currently supports a 3 character value for 
-     * fragmentationType.
+     * fragmentationType. We should get a SQL exception if actType is more than 3 characters long.
      */
-    private void setFragmentationType(String actType) throws DataFormatException {
+    private void setFragmentationType(String actType) {
         this.activationType = actType;
-        if (actType.length() > 3)
-            throw new DataFormatException("Invalid fragmentation type (> 3 characters): "+actType);
     }
 
     public int getMsLevel() {
@@ -154,8 +158,10 @@ public class Scan implements MS2Scan {
         for (MS2Field item: analysisItems) {
             buf.append("I\t");
             buf.append(item.getName());
-            buf.append("\t");
-            buf.append(item.getValue());
+            if (item.getValue() != null) {
+                buf.append("\t");
+                buf.append(item.getValue());
+            }
             buf.append("\n");
         }
         // charge states along with their charge dependent analysis
