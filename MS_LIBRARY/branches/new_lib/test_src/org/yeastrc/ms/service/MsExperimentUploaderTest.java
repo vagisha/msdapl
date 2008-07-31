@@ -162,9 +162,10 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         
         
         // upload the same experiment.  This time the MS2 file should not be uploaded
-        // so the returned experimentID should be 0;
+        // so the returned experimentID should be the same as before. No new experiment
+        // should have been created.
         expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-        assertEquals(0, expId);
+        assertEquals(1, expId);
     }
 
     public void testUploadValidDataWWarnings() {

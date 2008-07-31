@@ -73,12 +73,12 @@ public class SQTDataUploadService {
      * @return
      * @throws Exception
      */
-    public int uploadSQTSearch(SQTSearchDataProvider provider, int runId) throws Exception {
+    public int uploadSQTSearch(SQTSearchDataProvider provider, int runId, int searchGroupId) throws Exception {
 
-        log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
+        log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+"; SearchGroupID: "+searchGroupId);
         long startTime = System.currentTimeMillis();
         
-        int searchId = uploadSearch(provider.getSearchHeader(), runId);
+        int searchId = uploadSearch(provider.getSearchHeader(), runId, searchGroupId);
         uploadedSearchId = searchId;
         
         log.info("Uploaded top-level info for search with searchId: "+searchId);
@@ -116,7 +116,7 @@ public class SQTDataUploadService {
         flush(); // save any cached data
         
         long endTime = System.currentTimeMillis();
-        log.info("Uploaded SQT files with "+numResults+" results, "+numProteins+" protein matches. (searchId: "+searchId+")"
+        log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+" results, "+numProteins+" protein matches. (searchId: "+searchId+")"
                 + " in "+(endTime - startTime)/(1000L)+"seconds");
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
         
@@ -135,7 +135,7 @@ public class SQTDataUploadService {
     }
     
     
-    private int uploadSearch(SQTSearch search, int runId) {
+    private int uploadSearch(SQTSearch search, int runId, int searchGroupId) {
         
         // RESET THE DYNAMIC MOD LOOKUP UTILITY
         dynaModLookup.reset();
@@ -147,7 +147,7 @@ public class SQTDataUploadService {
         
         // save the search and return the database id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();
-        return searchDao.saveSearch(search, runId);
+        return searchDao.saveSearch(search, runId, searchGroupId);
     }
     
     private void uploadSearchScan(SQTSearchScan scan, int searchId, int scanId) {

@@ -14,6 +14,11 @@ import java.util.List;
 public interface MsSearchDb extends MsSearchBase {
 
     /**
+     * @return database id of the search group this search belongs to
+     */
+    public abstract int getSearchGroupId();
+    
+    /**
      * @return database id of the run on which this search was done.
      */
     public abstract int getRunId();

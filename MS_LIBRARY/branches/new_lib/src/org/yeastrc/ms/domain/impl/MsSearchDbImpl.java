@@ -20,6 +20,7 @@ import org.yeastrc.ms.domain.SearchFileFormat;
 public class MsSearchDbImpl implements MsSearchDb {
 
     private int id; // unique id (database) for this search result
+    private int searchGroupId; // id of the search group this search belongs to
     private int runId; // MS run on which the search was performed
     
     private SearchFileFormat originalFileType;
@@ -71,6 +72,20 @@ public class MsSearchDbImpl implements MsSearchDb {
      */
     public void setRunId(int runId) {
         this.runId = runId;
+    }
+    
+    /**
+     * @return the searchGroupId
+     */
+    public int getSearchGroupId() {
+        return searchGroupId;
+    }
+    
+    /**
+     * @param searchGroupId the searchGroupId to set
+     */
+    public void setSearchGroupId(int searchGroupId) {
+        this.searchGroupId = searchGroupId;
     }
     
     public SearchFileFormat getSearchFileFormat() {

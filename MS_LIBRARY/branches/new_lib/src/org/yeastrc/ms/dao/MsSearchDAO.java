@@ -13,15 +13,19 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
 
     public abstract List<Integer> loadSearchIdsForRun(int runId);
 
+    public abstract int getMaxSearchGroupId();
+    
     /**
      * Saves the search in the database. Also saves:
      * 1. any associated sequence database information used for the search
      * 2. any static modifications used for the search
      * 3. any dynamic modifications used for the search 
      * @param search
+     * @param runId
+     * @param searchGroupId
      * @return database id of the search
      */
-    public abstract int saveSearch(I search, int runId);
+    public abstract int saveSearch(I search, int runId, int searchGroupId);
 
     /**
      * Deletes the search ONLY

@@ -94,10 +94,12 @@ public class MsExperimentUploader {
         
         // ----- NOW WE CAN BEGIN UPLOAD -----
         int experimentId = 0;
+        int searchGroupId = 0;
         
         try {
             experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
-            runExperimentId = uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames);
+            searchGroupId = getSearchGroupId()+1; // one more than the last search group id.
+            runExperimentId = uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames, searchGroupId);
         }
         catch(Exception e) {
             log.error("ERROR UPLOADING EXPERIMENT "+experimentId+". ABORTING...\n\n", e);
@@ -119,7 +121,7 @@ public class MsExperimentUploader {
                     +((end - start)/(1000L))+"seconds\n\tTime: "+(new Date()).toString()+"\n\n");
         else
             log.info("EXPERIMENT UPLOADED IN: "
-                    +((end - start)/(1000L))+"seconds\n\tONLY SQT FILES WERE UPLOADED.\n\tTime: "+(new Date()).toString()+"\n\n");
+                    +((end - start)/(1000L))+"seconds\n\tONLY SQT FILES WERE UPLOADED for existing experimentID: "+runExperimentId+"\n\tTime: "+(new Date()).toString()+"\n\n");
         return runExperimentId;
     }
 
@@ -132,6 +134,10 @@ public class MsExperimentUploader {
         return expDao.save(experiment);
     }
 
+    private int getSearchGroupId() {
+        return DAOFactory.instance().getMsSearchDAO().getMaxSearchGroupId();
+    }
+    
     /**
      * If the runs were already in the database, the runs are not uploaded again, and the 
      * existing experimentId for the runs is returned. 
@@ -141,7 +147,7 @@ public class MsExperimentUploader {
      * @return
      * @throws Exception
      */
-    private int uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames) throws Exception {
+    private int uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames, int searchGroupId) throws Exception {
         
         boolean firstIter = true;
         for (String filename: filenames) {
@@ -168,7 +174,7 @@ public class MsExperimentUploader {
                 continue;
             
             // now upload the search result 
-            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId);
+            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId, searchGroupId);
         }
         
         return experimentId;
@@ -187,13 +193,13 @@ public class MsExperimentUploader {
         }
     }
     
-    private int uploadSQTSearch(String filePath, int runId) throws Exception {
+    private int uploadSQTSearch(String filePath, int runId, int searchGroupId) throws Exception {
         SQTFileReader sqtProvider = new SQTFileReader();
         SQTDataUploadService uploadService = new SQTDataUploadService();
         int searchId = 0;
         try { 
             sqtProvider.open(filePath);
-            searchId = uploadService.uploadSQTSearch(sqtProvider, runId);
+            searchId = uploadService.uploadSQTSearch(sqtProvider, runId, searchGroupId);
         }
         catch(Exception e){
             searchId = uploadService.getUploadedSearchId(); 
@@ -333,7 +339,8 @@ public class MsExperimentUploader {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
-        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
+//        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
+        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156");
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
         long end = System.currentTimeMillis();

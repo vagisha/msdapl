@@ -20,21 +20,21 @@ import org.yeastrc.ms.parser.sqtFile.ScanResult;
 public class SqtFileToDbConverter {
 
 
-    public void convertSQTFile(String filePath, int runId) throws Exception {
+    public void convertSQTFile(String filePath, int runId, int searchGroupId) throws Exception {
 
         String justFileName = new File(filePath).getName();
         SQTFileReader reader = new SQTFileReader();
         reader.open(filePath);
-        convertSQTFile(justFileName, reader, runId);
+        convertSQTFile(justFileName, reader, runId, searchGroupId);
     }
 
-    private void convertSQTFile(String file, SQTFileReader reader, int runId) throws Exception {
+    private void convertSQTFile(String file, SQTFileReader reader, int runId, int searchGroupId) throws Exception {
         SQTHeader header = reader.getSearchHeader();
         if (!header.isValid())
             throw new Exception("Invalid header section for SQT file");
             
         // insert a search into the database and get the search Id
-        int searchId = saveSQTSearch(header, runId);
+        int searchId = saveSQTSearch(header, runId, searchGroupId);
 
         while (reader.hasNextSearchScan()) {
             ScanResult scan = reader.getNextSearchScan();
@@ -68,10 +68,10 @@ public class SqtFileToDbConverter {
         spectrumDataDao.save(scan, searchId, scanId);
     }
 
-    private int saveSQTSearch(SQTHeader header, int runId) {
+    private int saveSQTSearch(SQTHeader header, int runId, int searchGroupId) {
         // save and return id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = DAOFactory.instance().getSqtSearchDAO();
-        return searchDao.saveSearch(header, runId);
+        return searchDao.saveSearch(header, runId, searchGroupId);
     }
 
     /**

@@ -28,7 +28,7 @@ public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {
         // save a search (don't add any SQT headers)
         SQTSearch search_1 = makeSQTSearch(false, false, false, false);
         assertEquals(0, search_1.getHeaders().size());
-        int searchId_1 = sqtSearchDao.saveSearch(search_1, 1); // runId = 1
+        int searchId_1 = sqtSearchDao.saveSearch(search_1, 1, 1); // runId = 1; // searchGroupId = 1
         
         // load the search using the general MsPeptideSearch DAO and make sure
         // the class of the returned object is SQTSearchResult
@@ -44,7 +44,7 @@ public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {
         // save another search (add SQT headers)
         SQTSearch search_2 = makeSQTSearch(false, false, false, true);
         assertEquals(2, search_2.getHeaders().size());
-        int searchId_2 = sqtSearchDao.saveSearch(search_2, 1); // runId = 1
+        int searchId_2 = sqtSearchDao.saveSearch(search_2, 1, 1); // runId = 1; // searchGroupId = 1
         
         // load the search with headers and check values
         SQTSearchDb search_2_db = sqtSearchDao.loadSearch(searchId_2);

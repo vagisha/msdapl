@@ -12,6 +12,7 @@
 	
 	<resultMap class="MsSearchDb" id="msSearchResult">
 		<result property="id" column="id" />
+		<result property="searchGroupId" column="searchGroupID" nullValue="0"/>
 		<result property="runId" column="runID" nullValue="0"/>
 		<result property="searchFileFormat" column="originalFileType"
 				javaType="SearchType" jdbcType="VARCHAR"
@@ -51,6 +52,7 @@
 	</resultMap> 
 	
 	<parameterMap class="MsSearch" id="msSearchParam">
+		<parameter property="searchGroupId" jdbcType="INTEGER"/>
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="searchFileFormat" 
 					jdbcType="VARCHAR" 
@@ -75,13 +77,17 @@
     	SELECT * FROM msPeptideSearch WHERE runID = #id#
     </select>
     
-     <select id="selectSearchIdsForRun" resultClass="Integer" parameterClass="Integer">
+    <select id="selectSearchIdsForRun" resultClass="Integer" parameterClass="Integer">
     	SELECT id FROM msPeptideSearch WHERE runID = #id#
     </select>
     
+    <select id="selectMaxSearchGroupId" resultClass="Integer" >
+    	SELECT max(searchGroupID) FROM msPeptideSearch
+    </select>
     
     <insert id="insert" parameterMap="msSearchParam">
     	INSERT INTO msPeptideSearch (
+    	searchGroupID,
     	runID,
     	originalFileType,
     	analysisProgramName,
@@ -92,7 +98,7 @@
     	precursorMassTolerance,
     	fragmentMassMethod,
     	fragmentMassTolerance) 
-    	VALUES (?,?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
