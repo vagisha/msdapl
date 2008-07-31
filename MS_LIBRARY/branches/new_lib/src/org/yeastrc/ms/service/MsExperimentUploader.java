@@ -39,11 +39,15 @@ public class MsExperimentUploader {
      * @param remoteServer
      * @param remoteDirectory
      * @param fileDirectory
-     * @return true if experiment was uploaded to the database successfully, false otherwise
+     * @return database id for experiment if it was uploaded successfully, 0 otherwise
      */
     public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
 
-        log.info("BEGIN EXPERIMENT UPLOAD\n\tDirectory: "+fileDirectory+"\n\tTime: "+(new Date().toString()));
+        log.info("BEGIN EXPERIMENT UPLOAD"+
+                "\n\tRemote server: "+remoteServer+
+                "\n\tRemote directory: "+remoteDirectory+
+                "\n\tDirectory: "+fileDirectory+
+                "\n\tTime: "+(new Date().toString()));
         long start = System.currentTimeMillis();
         
         // get the file names
@@ -72,6 +76,7 @@ public class MsExperimentUploader {
         }
         catch (IOException e) {
             log.error("ERROR UPLOADING EXPERIMENT -- exception reading .sqt file\n\n", e);
+            return 0;
         }
         
         // (4). make sure all SQT headers are valid
@@ -83,6 +88,7 @@ public class MsExperimentUploader {
         }
         catch (IOException e) {
             log.error("ERROR UPLOADING EXPERIMENT -- exception reading .sqt file\n\n", e);
+            return 0;
         }
         
         
@@ -300,7 +306,7 @@ public class MsExperimentUploader {
             log.error("!!!INVALID FILENAME FROM DTASELECT RESULT: "+runFileScanString);
             return 0;
         }
-        String filename = match.group(1);
+        String filename = match.group(1)+".ms2";
         int scanNum = 0;
         try {
             scanNum = Integer.parseInt(match.group(2));
