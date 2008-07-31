@@ -5,8 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.MsSearchDAO;
+import org.yeastrc.ms.domain.MsSearch;
+import org.yeastrc.ms.domain.MsSearchDb;
 
 public class MsExperimentUploaderTest extends BaseDAOTestCase {
 
@@ -189,6 +195,39 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertTrue(filesIdentical(outputTest, dir+File.separator+"PARC_p75_01_itms.ms2.valid"));
         // remove the output file
         assertTrue(new File(outputTest).delete());
+    }
+    
+    public void testUploadTwoSearchGroups() {
+        resetDatabase();
+        String dir = "test_resources/validData_dir";
+        
+        int expId1 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+        int searchGroupId1 = uploader.getSearchGroupId();
+        List<Integer> searchIdList1 = uploader.getSearchIdList();
+        Collections.sort(searchIdList1);
+        assertEquals(2, searchIdList1.size());
+        
+        int expId2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+        int searchGroupId2 = uploader.getSearchGroupId();
+        List<Integer> searchIdList2 = uploader.getSearchIdList();
+        Collections.sort(searchIdList2);
+        assertEquals(2, searchIdList2.size());
+        
+        assertEquals(expId1, expId2);
+        assertEquals(1, searchGroupId1);
+        assertEquals(searchGroupId1+1, searchGroupId2);
+        
+        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+        for (Integer searchId: searchIdList1) {
+            MsSearchDb search = searchDao.loadSearch(searchId);
+            assertEquals(search.getSearchGroupId(), searchGroupId1);
+        }
+        
+        for (Integer searchId: searchIdList2) {
+            MsSearchDb search = searchDao.loadSearch(searchId);
+            assertEquals(search.getSearchGroupId(), searchGroupId2);
+        }
+        
     }
     
     private boolean filesIdentical(String output, String input) {

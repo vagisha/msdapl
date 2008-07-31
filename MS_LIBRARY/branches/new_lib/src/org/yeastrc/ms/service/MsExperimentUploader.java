@@ -3,6 +3,7 @@ package org.yeastrc.ms.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,7 @@ public class MsExperimentUploader {
 
     private List<Integer> searchIdList = new ArrayList<Integer>();
     private int runExperimentId;
+    private int searchGroupId;
     
     private static final Pattern fileNamePattern = Pattern.compile("(\\S+)\\.(\\d+)\\.(\\d+)\\.(\\d{1})");
     
@@ -43,6 +45,10 @@ public class MsExperimentUploader {
      */
     public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
 
+        searchIdList.clear();
+        runExperimentId = 0;
+        searchGroupId = 0;
+        
         log.info("BEGIN EXPERIMENT UPLOAD"+
                 "\n\tRemote server: "+remoteServer+
                 "\n\tRemote directory: "+remoteDirectory+
@@ -94,11 +100,10 @@ public class MsExperimentUploader {
         
         // ----- NOW WE CAN BEGIN UPLOAD -----
         int experimentId = 0;
-        int searchGroupId = 0;
         
         try {
             experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
-            searchGroupId = getSearchGroupId()+1; // one more than the last search group id.
+            searchGroupId = getMySearchGroupId();
             runExperimentId = uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames, searchGroupId);
         }
         catch(Exception e) {
@@ -134,8 +139,19 @@ public class MsExperimentUploader {
         return expDao.save(experiment);
     }
 
-    private int getSearchGroupId() {
-        return DAOFactory.instance().getMsSearchDAO().getMaxSearchGroupId();
+    private int getMySearchGroupId() {
+        return DAOFactory.instance().getMsSearchDAO().getMaxSearchGroupId() + 1; // one more than the last search group id.
+    }
+    
+    public int getSearchGroupId() {
+        return searchGroupId;
+    }
+    
+    public List<Integer> getSearchIdList() {
+        List<Integer> copyList = new ArrayList<Integer>(searchIdList.size());
+        for (Integer id: searchIdList)
+            copyList.add(id);
+        return copyList;
     }
     
     /**
