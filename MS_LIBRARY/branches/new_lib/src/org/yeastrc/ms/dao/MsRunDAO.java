@@ -48,6 +48,14 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
      */
     public abstract List<Integer> loadRunIdsForExperiment(int msExperimentId);
     
+    /**
+     * Returns the runId for the given experiment and file name. Returns
+     * 0 if no matching run was found
+     * @param experimentId
+     * @param fileName
+     * @return
+     */
+    public abstract int loadRunIdForExperimentAndFileName(int experimentId, String fileName);
     
     /**
      * Returns a list of run IDs for runs in the database with the given file name

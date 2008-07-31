@@ -7,10 +7,18 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsExperimentDAO;
+import org.yeastrc.ms.dao.MsRunDAO;
+import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.domain.MsRun;
+import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsScan;
+import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
@@ -23,6 +31,9 @@ public class MsExperimentUploader {
 
 
     private List<Integer> searchIdList = new ArrayList<Integer>();
+    private int runExperimentId;
+    
+    private static final Pattern fileNamePattern = Pattern.compile("(\\S+)\\.(\\d+)\\.(\\d+)\\.(\\d{1})");
     
     /**
      * @param remoteServer
@@ -77,7 +88,7 @@ public class MsExperimentUploader {
         
         // ----- NOW WE CAN BEGIN UPLOAD -----
         int experimentId = 0;
-        int runExperimentId = 0;
+        
         try {
             experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
             runExperimentId = uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames);
@@ -103,7 +114,7 @@ public class MsExperimentUploader {
         else
             log.info("EXPERIMENT UPLOADED IN: "
                     +((end - start)/(1000L))+"seconds\n\tONLY SQT FILES WERE UPLOADED.\n\tTime: "+(new Date()).toString()+"\n\n");
-        return experimentId;
+        return runExperimentId;
     }
 
     private int uploadExperiment(String remoteServer, String remoteDirectory, String fileDirectory) {
@@ -115,6 +126,15 @@ public class MsExperimentUploader {
         return expDao.save(experiment);
     }
 
+    /**
+     * If the runs were already in the database, the runs are not uploaded again, and the 
+     * existing experimentId for the runs is returned. 
+     * @param experimentId
+     * @param fileDirectory
+     * @param filenames
+     * @return
+     * @throws Exception
+     */
     private int uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames) throws Exception {
         
         boolean firstIter = true;
@@ -270,6 +290,38 @@ public class MsExperimentUploader {
             log.error("DELETED searchID: "+searchId);
         }
         
+    }
+    
+    public static int getScanIdFor(int experimentId, String runFileScanString) {
+     // parse the filename to get the scan number and filename
+        // e.g. NE063005ph8s02.17247.17247.2
+        Matcher match = fileNamePattern.matcher(runFileScanString);
+        if (!match.matches()) {
+            log.error("!!!INVALID FILENAME FROM DTASELECT RESULT: "+runFileScanString);
+            return 0;
+        }
+        String filename = match.group(1);
+        int scanNum = 0;
+        try {
+            scanNum = Integer.parseInt(match.group(2));
+        }
+        catch(NumberFormatException e) {
+            log.error("!!!ERROR PARSING SCAN NUMBER FROM DTASELECT RESULT: "+match.group(2)+"; "+runFileScanString);
+            return 0;
+        }
+        return getScanIdFor(experimentId, filename, scanNum);
+    }
+        
+    public static int getScanIdFor(int experimentId, String runFileName, int scanNumber) {
+        
+        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
+        int runId = runDao.loadRunIdForExperimentAndFileName(experimentId, runFileName);
+        if (runId == 0) {
+            log.error("!!!NO RUN FOUND FOR EXPERIMENT: "+experimentId+"; fileName: "+runFileName);
+            return 0;
+        }
+        MsScanDAO<MsScan, MsScanDb>scanDao = DAOFactory.instance().getMsScanDAO();
+        return scanDao.loadScanIdForScanNumRun(scanNumber, runId);
     }
     
     public static void main(String[] args) {

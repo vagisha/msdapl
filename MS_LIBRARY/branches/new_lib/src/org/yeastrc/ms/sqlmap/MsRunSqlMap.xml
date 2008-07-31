@@ -87,6 +87,10 @@
         SELECT experimentID FROM msRun WHERE id=#id#
     </select> 
     
+    <select id="selectRunIdForExperimentAndFileName" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT id FROM msRun WHERE experimentID=#experimentId# AND filename=#fileName#
+    </select> 
+    
     <insert id="insert" parameterMap="msRunParam">
     	INSERT INTO MsRun (experimentID, 
     						filename, 

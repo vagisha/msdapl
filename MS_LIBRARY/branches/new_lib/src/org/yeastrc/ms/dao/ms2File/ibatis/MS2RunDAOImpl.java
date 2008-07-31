@@ -1,6 +1,8 @@
 package org.yeastrc.ms.dao.ms2File.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
@@ -73,6 +75,11 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
         return msRunDao.loadRunIdsForExperiment(msExperimentId);
     }
 
+    @Override
+    public int loadRunIdForExperimentAndFileName(int experimentId, String fileName) {
+      return msRunDao.loadRunIdForExperimentAndFileName(experimentId, fileName);
+    }
+    
     public List<Integer> runIdsFor(String fileName, String sha1Sum) {
 
         return msRunDao.runIdsFor(fileName, sha1Sum);
