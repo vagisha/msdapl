@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.MsEnzymeDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
@@ -73,6 +75,17 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     
     public List<Integer> loadSearchIdsForRun(int runId) {
         return queryForList("MsSearch.selectSearchIdsForRun", runId);
+    }
+    
+    @Override
+    public int loadSearchIdForRunAndGroup(int runId, int searchGroupId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("runId", runId);
+        map.put("searchGrouId", searchGroupId);
+        Integer searchId = (Integer)queryForObject("MsSearch.selectSearchIdForRunAndGroup", map);
+        if (searchId != null)
+            return searchId;
+        return 0;
     }
     
     public int saveSearch(MsSearch search, int runId, int searchGroupId) {

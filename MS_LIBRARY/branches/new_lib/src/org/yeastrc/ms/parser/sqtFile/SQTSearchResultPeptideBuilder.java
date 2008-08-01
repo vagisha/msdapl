@@ -106,13 +106,13 @@ public final class SQTSearchResultPeptideBuilder {
         return resultMods;
     }
 
-    String removeDots(String sequence) throws SQTParseException {
+    static String removeDots(String sequence) throws SQTParseException {
         if (sequence.charAt(1) != '.' || sequence.charAt(sequence.length() - 2) != '.')
             throw new SQTParseException("Sequence does not have .(dots) in the expected position: "+sequence);
         return sequence.substring(2, sequence.length() - 2);
     }
 
-    String getOnlyPeptideSequence(String sequence) throws SQTParseException {
+    static String getOnlyPeptideSequence(String sequence) throws SQTParseException {
         char[] residueChars = new char[sequence.length()];
         int j = 0;
         for (int i = 0; i < sequence.length(); i++) {
@@ -126,8 +126,13 @@ public final class SQTSearchResultPeptideBuilder {
         return sequence;
     }
     
-    private boolean isResidue(char residue) {
+    static private boolean isResidue(char residue) {
         return residue >= 'A' && residue <= 'Z';
+    }
+    
+    public static String getOnlyPeptide(String peptideAndExtras) throws SQTParseException {
+        String dotless = removeDots(peptideAndExtras);
+        return getOnlyPeptideSequence(dotless);
     }
     
     private static class ResultMod implements MsSearchResultModification {

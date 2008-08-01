@@ -13,6 +13,8 @@ public interface MsSearchResultDAO<I extends MsSearchResult, O extends MsSearchR
     
     public abstract List<Integer> loadResultIdsForSearchScanCharge(int searchId, int scanId, int charge);
     
+    public abstract int loadResultIdForSearchScanChargePeptide(int searchId, int scanId, int charge, String peptide);
+    
     /**
      * Saves the search result in the msPeptideSearchResult table. 
      * Any associated protein matches for this result are also saved in the 

@@ -81,6 +81,10 @@
     	SELECT id FROM msPeptideSearch WHERE runID = #id#
     </select>
     
+    <select id="selectSearchIdForRunAndGroup" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msPeptideSearch WHERE runID = #runId# AND searchGroupID=#searchGroupId# LIMIT 1
+    </select>
+    
     <select id="selectMaxSearchGroupId" resultClass="Integer" >
     	SELECT max(searchGroupID) FROM msPeptideSearch
     </select>

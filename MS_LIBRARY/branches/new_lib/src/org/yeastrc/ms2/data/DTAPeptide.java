@@ -16,7 +16,7 @@ public class DTAPeptide {
 	// Instance variables
 	private int id;
 	private int resultID;
-	private int scanId;
+	private int searchResultId;
 	private boolean unique;
 	private String filename;
 	private double XCorr;
@@ -110,16 +110,16 @@ public class DTAPeptide {
 		this.id = id;
 	}
 	/**
-     * @return Returns the scanID.
+     * @return Returns the searchResultID.
      */
-    public int getScanId() {
-        return scanId;
+    public int getSearchResultId() {
+        return searchResultId;
     }
     /**
-     * @param id The id to set.
+     * @param searchResultId The searchResultId to set.
      */
-    public void setScanId(int scanId) {
-        this.scanId = scanId;
+    public void setScanId(int searchResultId) {
+        this.searchResultId = searchResultId;
     }
     
 	/**

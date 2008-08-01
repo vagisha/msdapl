@@ -60,6 +60,11 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
         return searchDao.loadSearchIdsForRun(runId);
     }
     
+    @Override
+    public int loadSearchIdForRunAndGroup(int runId, int searchGroupId) {
+        return searchDao.loadSearchIdForRunAndGroup(runId, searchGroupId);
+    }
+    
     public List<SQTSearchDb> loadSearchesForRun(int runId) {
         return queryForList("MsSearch.selectSearchesForRun", runId);
     }
@@ -99,5 +104,5 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
         // now delete the search
         searchDao.deleteSearch(searchId);
     }
-  
+
 }

@@ -15,14 +15,22 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.dao.MsSearchDAO;
+import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.MsSearch;
+import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsSearchResult;
+import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
+import org.yeastrc.ms.parser.sqtFile.SQTParseException;
+import org.yeastrc.ms.parser.sqtFile.SQTSearchResultPeptideBuilder;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
@@ -356,8 +364,8 @@ public class MsExperimentUploader {
         }
     }
     
-    public static int getScanIdFor(int experimentId, String runFileScanString) {
-     // parse the filename to get the scan number and filename
+    public static int getSearchResultIdFor(int experimentId, int searchGroupId, String runFileScanString, String peptideAndExtras) {
+        // parse the filename to get the filename, scannumber and charge
         // e.g. NE063005ph8s02.17247.17247.2
         Matcher match = fileNamePattern.matcher(runFileScanString);
         if (!match.matches()) {
@@ -365,18 +373,21 @@ public class MsExperimentUploader {
             return 0;
         }
         String filename = match.group(1)+".ms2";
-        int scanNum = 0;
+        int scanNum = Integer.parseInt(match.group(2));
+        int charge = Integer.parseInt(match.group(4));
+        
+        String peptide;
         try {
-            scanNum = Integer.parseInt(match.group(2));
+            peptide = SQTSearchResultPeptideBuilder.getOnlyPeptide(peptideAndExtras);
         }
-        catch(NumberFormatException e) {
-            log.error("!!!ERROR PARSING SCAN NUMBER FROM DTASELECT RESULT: "+match.group(2)+"; "+runFileScanString);
-            return 0;
+        catch (SQTParseException e) {
+           log.error("!!!ERROR parsing peptide from DTASelect: "+peptideAndExtras+"\n"+e.getMessage());
+           return 0;
         }
-        return getScanIdFor(experimentId, filename, scanNum);
+        return getSearchResultIdFor(experimentId, filename, searchGroupId, scanNum, charge, peptide);
     }
         
-    public static int getScanIdFor(int experimentId, String runFileName, int scanNumber) {
+    public static int getSearchResultIdFor(int experimentId, String runFileName, int searchGroupId, int scanNumber, int charge, String peptide) {
         
         MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
         int runId = runDao.loadRunIdForExperimentAndFileName(experimentId, runFileName);
@@ -385,7 +396,21 @@ public class MsExperimentUploader {
             return 0;
         }
         MsScanDAO<MsScan, MsScanDb>scanDao = DAOFactory.instance().getMsScanDAO();
-        return scanDao.loadScanIdForScanNumRun(scanNumber, runId);
+        int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
+        if (scanId == 0) {
+            log.error("!!!NO SCAN FOUND FOR SCAN NUMBER: "+scanNumber+"; runId: "+runId+"; fileName: "+runFileName);
+            return 0;
+        }
+        
+        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+        int searchId = searchDao.loadSearchIdForRunAndGroup(runId, searchGroupId);
+        if (scanId == 0) {
+            log.error("!!!NO SEARCH FOUND FOR RUNID: "+runId+"; searchGroupId: "+searchGroupId+"; fileName: "+runFileName);
+            return 0;
+        }
+        
+        MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
+        return resultDao.loadResultIdForSearchScanChargePeptide(searchId, scanId, charge, peptide);
     }
     
     public static void main(String[] args) throws UploadException {

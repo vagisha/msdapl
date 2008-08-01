@@ -7,7 +7,9 @@
 package org.yeastrc.ms.dao.sqtFile.ibatis;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -117,6 +119,10 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
     @Override
     public List<Integer> loadResultIdsForSearchScanCharge(int searchId, int scanId, int charge) {
         return resultDao.loadResultIdsForSearchScanCharge(searchId, scanId, charge);
+    }
+    
+    public int loadResultIdForSearchScanChargePeptide(int searchId, int scanId, int charge, String peptide) {
+        return resultDao.loadResultIdForSearchScanChargePeptide(searchId, scanId, charge, peptide);
     }
     
     public class SQTSearchResultSqlMapParam {
