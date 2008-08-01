@@ -7,7 +7,7 @@ import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 
 public class HeaderTest extends TestCase {
 

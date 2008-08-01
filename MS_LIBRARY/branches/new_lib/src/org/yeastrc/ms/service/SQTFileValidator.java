@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.service.YatesCycleDownloader.DATA_TYPE;
@@ -76,7 +76,7 @@ public class SQTFileValidator {
 //                    result.getResultPeptide(); // this will validate the peptide sequence
                 numValidScans++;
             }
-            catch (ParserException e) {}
+            catch (DataProviderException e) {}
             catch (IOException e) {
                 log.error(e.getMessage(), e);
                 dataProvider.close();

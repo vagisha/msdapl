@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.parser.AbstractReader;
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.MS2RunDataProvider;
 
 
@@ -80,13 +80,13 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return currentLine != null;
     }
 
-    public MS2Scan getNextScan() throws IOException, ParserException {
+    public MS2Scan getNextScan() throws IOException, DataProviderException {
 
         Scan scan;
         try {
             scan = parseScan(currentLine);
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             log.warn(e.getMessage());
             skipScan();
             throw e;
@@ -101,7 +101,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                     ScanCharge sc = parseScanCharge();
                     scan.addChargeState(sc);
                 }
-                catch (ParserException e) {
+                catch (DataProviderException e) {
                     skipScanCharge();
                     log.warn(e.getMessage());
                 }
@@ -119,7 +119,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
         if (!scan.isValid()) {
             warnings++;
-            ParserException e = new ParserException(currentLineNum-1, "Invalid MS2 scan -- no valid peaks and/or charge states found", "");
+            DataProviderException e = new DataProviderException(currentLineNum-1, "Invalid MS2 scan -- no valid peaks and/or charge states found", "");
             log.warn(e.getMessage());
             throw e;
         }
@@ -128,18 +128,18 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
     }
    
 
-    private Scan parseScan(String line) throws ParserException {
+    private Scan parseScan(String line) throws DataProviderException {
 
         // make sure we have a scan line
         if (!isScanLine(line)) {
             warnings++;
-            throw new ParserException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", line);
+            throw new DataProviderException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", line);
         }
 
         String[] tokens = line.split("\\s+");
         if (tokens.length < 4) {
             warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", line);
+            throw new DataProviderException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", line);
         }
 
         Scan scan = new Scan();
@@ -150,12 +150,12 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
         catch(NumberFormatException e) {
             warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'S' line. Error parsing number(s). "+e.getMessage(), line);
+            throw new DataProviderException(currentLineNum, "Invalid 'S' line. Error parsing number(s). "+e.getMessage(), line);
         }
         return scan;
     }
 
-    private ScanCharge parseScanCharge() throws IOException, ParserException {
+    private ScanCharge parseScanCharge() throws IOException, DataProviderException {
         
         ScanCharge scanCharge = parseScanCharge(currentLine);
 
@@ -168,7 +168,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return scanCharge;
     }
 
-    ScanCharge parseScanCharge(String line) throws ParserException {
+    ScanCharge parseScanCharge(String line) throws DataProviderException {
         
         Matcher match = chargeStatePattern.matcher(line);
         if (match.matches()) {
@@ -179,7 +179,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
         else {
             warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'Z' line. Ignoring...", line);
+            throw new DataProviderException(currentLineNum, "Invalid 'Z' line. Ignoring...", line);
         }
     }
 
@@ -196,7 +196,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         else {
             // ignore if both label and value for this analysis item are missing
             warnings++;
-            ParserException e = new ParserException(currentLineNum, "Invalid 'D' line. Expected 2 fields. Ignoring...", line);
+            DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'D' line. Expected 2 fields. Ignoring...", line);
             log.warn(e.getMessage());
         }
     }
@@ -214,7 +214,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         else {
             // ignore if both label and value for this analysis item are missing
             warnings++;
-            ParserException e = new ParserException(currentLineNum, "Invalid 'I' line. Expected 2 fields. Ignoring...", line);
+            DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'I' line. Expected 2 fields. Ignoring...", line);
             log.warn(e.getMessage());
         }
     }
@@ -238,13 +238,13 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                 // add peak m/z and intensity values
                 if (!isValidDouble(tokens[0])) {
                     warnings++;
-                    log.warn( new ParserException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
+                    log.warn( new DataProviderException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
                     advanceLine();
                     continue;
                 }
                 if (!isValidDouble(tokens[1])) {
                     warnings++;
-                    log.warn( new ParserException(currentLineNum, "Invalid intensity value. Ignoring peak...", currentLine).getMessage());
+                    log.warn( new DataProviderException(currentLineNum, "Invalid intensity value. Ignoring peak...", currentLine).getMessage());
                     advanceLine();
                     continue;
                 }
@@ -252,11 +252,11 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             }
             else if (tokens.length == 1) {
                 warnings++;
-                log.warn( new ParserException(currentLineNum, 
+                log.warn( new DataProviderException(currentLineNum, 
                         "missing peak intensity in line. Setting peak intensity to 0.", currentLine).getMessage());
                 if (!isValidDouble(tokens[0])) {
                     warnings++;
-                    log.warn( new ParserException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
+                    log.warn( new DataProviderException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
                     advanceLine();
                     continue;
                 }

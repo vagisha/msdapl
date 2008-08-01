@@ -37,7 +37,7 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 
 /**
  * 
@@ -78,7 +78,11 @@ public class SQTDataUploadService {
         log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+"; SearchGroupID: "+searchGroupId);
         long startTime = System.currentTimeMillis();
         
-        int searchId = uploadSearch(provider.getSearchHeader(), runId, searchGroupId);
+        // reset all caches etc.
+        reset();
+
+        
+        int searchId = uploadSearchHeader(provider.getSearchHeader(), runId, searchGroupId);
         uploadedSearchId = searchId;
         
         log.info("Uploaded top-level info for search with searchId: "+searchId);
@@ -108,7 +112,7 @@ public class SQTDataUploadService {
                     numProteins += result.getProteinMatchList().size();
                 }
             }
-            catch (ParserException e) {
+            catch (DataProviderException e) {
                 log.warn("Error processing search result for scan. Results will not be uploaded. "+e.getMessage(), e);
             }
             
@@ -134,9 +138,7 @@ public class SQTDataUploadService {
         return scanId;
     }
     
-    
-    private int uploadSearch(SQTSearch search, int runId, int searchGroupId) {
-        
+    private void reset() {
         // RESET THE DYNAMIC MOD LOOKUP UTILITY
         dynaModLookup.reset();
         
@@ -144,6 +146,11 @@ public class SQTDataUploadService {
         proteinMatchList.clear();
         sqtResultScoresList.clear();
         resultModList.clear();
+        
+        uploadedSearchId = 0;
+    }
+    
+    private int uploadSearchHeader(SQTSearch search, int runId, int searchGroupId) {
         
         // save the search and return the database id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();

@@ -2,7 +2,7 @@ package org.yeastrc.ms.parser.ms2File;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 
 public class Ms2FileReaderTest extends TestCase {
 
@@ -56,7 +56,7 @@ public class Ms2FileReaderTest extends TestCase {
             assertEquals(1, scanCharge.getCharge());
             assertEquals(1394.58, scanCharge.getMass().doubleValue());
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Valid 'Z' line");
             e.printStackTrace();
         }
@@ -67,7 +67,7 @@ public class Ms2FileReaderTest extends TestCase {
             assertEquals(1, scanCharge.getCharge());
             assertEquals(1394.0, scanCharge.getMass().doubleValue());
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Valid 'Z' line");
             e.printStackTrace();
         }
@@ -78,7 +78,7 @@ public class Ms2FileReaderTest extends TestCase {
             assertEquals(1, scanCharge.getCharge());
             assertEquals(1394.0, scanCharge.getMass().doubleValue());
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Valid 'Z' line");
             e.printStackTrace();
         }
@@ -91,48 +91,48 @@ public class Ms2FileReaderTest extends TestCase {
             reader.parseScanCharge(line);
             fail("Invalid 'Z' line");
         }
-        catch (ParserException e) {}
+        catch (DataProviderException e) {}
         
         line = "  Z       1.0       1394.";
         try {
             reader.parseScanCharge(line);
             fail("Invalid 'Z' line");
         }
-        catch (ParserException e) {}
+        catch (DataProviderException e) {}
         
         line = "Z       1.0       1394.";
         try {
             reader.parseScanCharge(line);
             fail("Invalid 'Z' line");
         }
-        catch (ParserException e) {}
+        catch (DataProviderException e) {}
         
         line = "Z       1   ";
         try {
             reader.parseScanCharge(line);
             fail("Invalid 'Z' line");
         }
-        catch (ParserException e) {}
+        catch (DataProviderException e) {}
         
         line = "Z       1$%      1394";
         try {
             reader.parseScanCharge(line);
             fail("Invalid 'Z' line");
         }
-        catch (ParserException e) {}
+        catch (DataProviderException e) {}
         
         line = "Z       1       1394abcd";
         try {
             reader.parseScanCharge(line);
             fail("Invalid 'Z' line");
         }
-        catch (ParserException e) {}
+        catch (DataProviderException e) {}
         
         line = "Z       1      1394 abcde";
         try {
             reader.parseScanCharge(line);
             fail("Invalid 'Z' line");
         }
-        catch (ParserException e) {}
+        catch (DataProviderException e) {}
     }
 }

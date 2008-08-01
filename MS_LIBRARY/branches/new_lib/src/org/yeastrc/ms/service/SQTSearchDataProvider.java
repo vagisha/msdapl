@@ -8,6 +8,7 @@ package org.yeastrc.ms.service;
 
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
+import org.yeastrc.ms.parser.DataProviderException;
 
 /**
  * 
@@ -16,11 +17,11 @@ public interface SQTSearchDataProvider {
 
     public abstract String getFileName();
     
-    public abstract SQTSearch getSearchHeader() throws Exception;
+    public abstract SQTSearch getSearchHeader() throws DataProviderException;
     
     public abstract boolean hasNextSearchScan();
     
-    public abstract SQTSearchScan getNextSearchScan() throws Exception;
+    public abstract SQTSearchScan getNextSearchScan() throws DataProviderException;
     
     public abstract void close();
 }

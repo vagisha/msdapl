@@ -29,7 +29,7 @@ import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 
 /**
  * 
@@ -109,7 +109,7 @@ public class MS2DataUploadService {
                 
                 uploaded++;
             }
-            catch (ParserException e) {
+            catch (DataProviderException e) {
                 log.error("Error processing scan. Scan will not be uploaded. "+e.getMessage(), e);
             }
             all++;

@@ -91,7 +91,7 @@ public class YatesCycleDownloader {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
 //        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test";
-          String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/validData_dir";
+          String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/new_lib/test_resources/validData_dir/temp";
 //        int cycleId = 10936;
 //        String fileName = cycleId+"_"+"PARC_ep2_03_itms"; // Prolucid file
         

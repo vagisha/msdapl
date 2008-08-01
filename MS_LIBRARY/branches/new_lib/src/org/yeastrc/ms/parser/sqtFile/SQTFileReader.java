@@ -13,8 +13,10 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.parser.AbstractReader;
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.SQTSearchDataProvider;
+
+import sun.tools.jstat.ParserException;
 
 
 public class SQTFileReader extends AbstractReader implements SQTSearchDataProvider {
@@ -70,31 +72,39 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         return false;
     }
     
-    public SQTHeader getSearchHeader()  throws IOException {
+    public SQTHeader getSearchHeader()  throws DataProviderException {
 
         SQTHeader header = new SQTHeader();
         while (isHeaderLine(currentLine)) {
             String[] nameAndVal = parseHeader(currentLine);
+            addHeaderItem(header, nameAndVal);
             if (nameAndVal.length == 2) {
                 header.addHeaderItem(nameAndVal[0], nameAndVal[1]);
             }
-            else {
-                // ignore if both label and value for this header item are missing
-                log.warn("!!!LINE# "+currentLineNum+" Invalid 'H' line; ignoring...: -- "+currentLine);
-            }
             advanceLine();
         }
+        
+        if (!header.isValid())
+            throw new DataProviderException("Invalid SQT Header");
+        
         this.searchDynamicMods = header.getDynamicModifications();
         return header;
     }
 
-
+    private void addHeaderItem(SQTHeader header, String[] nameAndVal) throws DataProviderException {
+        
+        if (nameAndVal.length == 0)
+            throw new DataProviderException(currentLineNum, "Invalid Header line.", currentLine);
+        
+        String name = nameAndVal[0];
+        String val = nameAndVal.length > 1 ? nameAndVal[1] : null;
+        
+        try { header.addHeaderItem(name, val);}
+        catch(RuntimeException e) {throw new DataProviderException(currentLineNum, e.getMessage(), currentLine, e);}
+    }
+    
     String[] parseHeader(String line) {
-        Matcher match = headerPattern.matcher(line);
-        if (match.matches())
-            return new String[]{match.group(1), match.group(2)};
-        else
-            return new String[0];
+        return parseNameValueLine(line, headerPattern);
     }
     
     public boolean hasNextSearchScan()  {

@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
@@ -73,7 +73,7 @@ public class MS2FileValidator {
                 MS2Scan scan = dataProvider.getNextScan();
                 numValidScans++;
             }
-            catch (ParserException e) {
+            catch (DataProviderException e) {
                 log.error(e.getMessage(), e);
             }
             catch (IOException e) {

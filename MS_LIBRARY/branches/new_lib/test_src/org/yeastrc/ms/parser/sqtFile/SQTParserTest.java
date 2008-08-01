@@ -6,7 +6,7 @@ import java.io.StringReader;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.parser.ParserException;
+import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.ms2File.ScanCharge;
 
 public class SQTParserTest extends TestCase {
@@ -26,7 +26,7 @@ public class SQTParserTest extends TestCase {
         try {
             reader.parseScan(line);
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Valid scan line");
             e.printStackTrace();
         }
@@ -39,11 +39,11 @@ public class SQTParserTest extends TestCase {
 
         String locus = "H\tName\tValue";
         try {reader.parseLocus(locus); fail("Not a 'L' line");}
-        catch(ParserException e){}
+        catch(DataProviderException e){}
 
         locus = "L";
         try {reader.parseLocus(locus); fail("Invalid 'L' line");}
-        catch(ParserException e){}
+        catch(DataProviderException e){}
 
         locus = "L locus ";
         try {
@@ -51,7 +51,7 @@ public class SQTParserTest extends TestCase {
             assertEquals("locus", loc.getAccession());
             assertEquals("", loc.getDescription());
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Exception parsing valid locus line");
             e.printStackTrace();
         }
@@ -62,7 +62,7 @@ public class SQTParserTest extends TestCase {
             assertEquals("locus", loc.getAccession());
             assertEquals("description for locus", loc.getDescription());
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Exception parsing valid locus line");
             e.printStackTrace();
         }
@@ -73,7 +73,7 @@ public class SQTParserTest extends TestCase {
             assertEquals("Placeholder", loc.getAccession());
             assertEquals("satisfying DTASelect", loc.getDescription());
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Exception parsing valid locus line");
             e.printStackTrace();
         }
@@ -84,7 +84,7 @@ public class SQTParserTest extends TestCase {
             assertEquals("ORFP:YKL160W", loc.getAccession());
             assertEquals("", loc.getDescription());
         }
-        catch (ParserException e) {
+        catch (DataProviderException e) {
             fail("Exception parsing valid locus line");
             e.printStackTrace();
         }

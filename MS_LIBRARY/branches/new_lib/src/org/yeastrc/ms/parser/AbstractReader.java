@@ -2,6 +2,7 @@ package org.yeastrc.ms.parser;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,13 +30,18 @@ public abstract class AbstractReader {
         return fileName;
     }
     
-    public void open(String filePath) throws IOException{
-        reader = new BufferedReader(new FileReader(filePath));
+    public void open(String filePath) throws DataProviderException{
+        try {
+            reader = new BufferedReader(new FileReader(filePath));
+        }
+        catch (FileNotFoundException e) {
+            throw new DataProviderException("File not found: "+filePath, e);
+        }
         fileName = new File(filePath).getName();
         advanceLine();
     }
 
-    public void open(String fileName, InputStream inStream) throws IOException {
+    public void open(String fileName, InputStream inStream) throws DataProviderException {
         this.fileName = fileName;
         reader = new BufferedReader(new InputStreamReader(inStream));
         advanceLine();
@@ -51,18 +57,24 @@ public abstract class AbstractReader {
         catch (IOException e) {}
     }
 
-    protected void advanceLine() throws IOException {
+    protected void advanceLine() throws DataProviderException {
         currentLineNum++;
-        currentLine = reader.readLine(); // advance first
-        // skip over blank lines and line that don't start with valid character
-        while(currentLine != null && !isValidLine(currentLine)) {
-            // log.warn("!!!LINE# "+currentLineNum+" Invalid line; skipping ... \n"+currentLine);
-            currentLineNum++;
-            currentLine = reader.readLine();
+        try {
+            currentLine = reader.readLine(); // advance first
+            // skip over blank lines and line that don't start with valid character
+            while(currentLine != null && !isValidLine(currentLine)) {
+                // log.warn("!!!LINE# "+currentLineNum+" Invalid line; skipping ... \n"+currentLine);
+                currentLineNum++;
+                currentLine = reader.readLine();
+            }
+            // remove any leading or trailing white spaces
+            if (currentLine != null)
+                currentLine = currentLine.trim();
         }
-        // remove any leading or trailing white spaces
-        if (currentLine != null)
-            currentLine = currentLine.trim();
+        catch (IOException e) {
+            throw new DataProviderException(currentLineNum, "Error reading file", currentLine, e);
+        } 
+        
     }
 
     protected final String[] parseNameValueLine(String line, Pattern pattern) {

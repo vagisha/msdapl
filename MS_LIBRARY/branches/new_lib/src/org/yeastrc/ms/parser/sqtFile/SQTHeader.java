@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
 
 import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsSearchDatabase;
@@ -54,30 +55,31 @@ public class SQTHeader implements SQTSearch {
     
     public SQTHeader() {
         headerItems = new ArrayList<SQTField>();
-        staticMods = new ArrayList<MsSearchModification>();
-        dynaMods = new ArrayList<MsSearchModification>();
         enzymes = new ArrayList<MsEnzyme>();
     }
    
     public boolean isValid() {
-        if (sqtGenerator == null)   return false;
+        if (sqtGenerator == null)           return false;
         if (sqtGeneratorVersion == null)    return false;
-        if (database == null)  return false;
-        if (fragmentMassType == null)   return false;
-        if (precursorMassType == null)  return false;
-        if (startTimeString == null)  return false;
+        if (database == null)               return false;
+        if (fragmentMassType == null)       return false;
+        if (precursorMassType == null)      return false;
+        if (startTimeString == null)        return false;
+        if (staticMods == null)             return false;
+        if (dynaMods == null)               return false;
+        
         return true;
     }
     
     /**
      * @param name
      * @param value
-     * @throws NullPointerException if header name is null.
+     * @throws DataFormatException if header name is null or if the header value is invalid
      */
-    public void addHeaderItem(String name, String value) {
+    public void addHeaderItem(String name, String value) throws DataFormatException {
         
         if (name == null)
-            throw new NullPointerException("name for Header cannot be null.");
+            throw new DataFormatException("name for Header cannot be null.");
         
         headerItems.add(new HeaderItem(name, value));
         
@@ -120,15 +122,18 @@ public class SQTHeader implements SQTSearch {
     //-------------------------------------------------------------------------------------------------------
     // Search database
     //-------------------------------------------------------------------------------------------------------
-    private void setDatabasePath(String filePath) {
+    /**
+     * @throws DataFormatException
+     */
+    private void setDatabasePath(String filePath) throws DataFormatException {
         if (database == null)
             database = new Database();
         // we should have at least one database
         if (filePath.trim().length() == 0)
-            throw new IllegalArgumentException("No database path found in header: "+filePath);
+            throw new DataFormatException("No database path found in header");
         // check is there are multiple databases (look for commas, semicolons, colons and spaces)
         if (multipleDatabases(filePath))
-            throw new IllegalArgumentException("Multiple databases found in header: "+filePath+"; Don't know how to handle this yet.");
+            throw new DataFormatException("Multiple databases found in header");
         database.setServerPath(filePath);
     }
     
@@ -159,10 +164,11 @@ public class SQTHeader implements SQTSearch {
      * Multiple static modifications should be present on separate StaticMod lines in a SQT file
      * @param value
      * @return
-     * @throws IllegalArgumentException if an error occurs while parsing the static modification
-     * @throws NumberFormatException if the modification mass is not a valid number.
+     * @throws DataFormatException if an error occurs while parsing the static modification
      */
-    void addStaticMods(String value) {
+    void addStaticMods(String value) throws DataFormatException {
+        
+        if (staticMods == null) staticMods = new ArrayList<MsSearchModification>();
         
         // if there were no modifications we will get a empty string
         value = value.trim();
@@ -172,22 +178,29 @@ public class SQTHeader implements SQTSearch {
         String[] tokens = value.split("=");
         // The split should create exactly two tokens
         if (tokens.length < 2)
-            throw new IllegalArgumentException("Invalid static modification string: "+value);
+            throw new DataFormatException("Invalid static modification string: "+value);
         if (tokens.length > 2)
-            throw new IllegalArgumentException("Invalid static modification string (appears to have > 1 static modification): "+value);
+            throw new DataFormatException("Invalid static modification string (appears to have > 1 static modification): "+value);
         
         // convert modification chars to upper case 
         String modChars = tokens[0].trim().toUpperCase();
         if (modChars.length() < 1)
-            throw new IllegalArgumentException("No residues found for static modification: "+value);
+            throw new DataFormatException("No residues found for static modification: "+value);
         if (!isValidModCharString(modChars))
-            throw new IllegalArgumentException("Invalid residues found found for static modification"+value);
+            throw new DataFormatException("Invalid residues found found for static modification"+value);
         
         
         String modMass = tokens[1].trim();
         if (modMass.length() < 1)
-            throw new IllegalArgumentException("No mass found for static modification: "+value);
-        BigDecimal mass = new BigDecimal(modMass);
+            throw new DataFormatException("No mass found for static modification: "+value);
+        
+        BigDecimal mass = null;
+        try {
+            mass = new BigDecimal(modMass);
+        }
+        catch(NumberFormatException e) {
+            throw new DataFormatException("Error parsing modification mass: "+value);
+        }
         
         // this modification may be for multiple residues; 
         // add one StaticModification for each residue character
@@ -208,10 +221,11 @@ public class SQTHeader implements SQTSearch {
      * Multiple dynamic modifications should be present on separate DiffMod lines in a SQT file
      * @param value
      * @return
-     * @throws IllegalArgumentException if an error occurs while parsing the dynamic modification
-     * @throws NumberFormatException if the modification mass is not a valid number.
+     * @throws DataFormatException if an error occurs while parsing the dynamic modification
      */
-    void addDynamicMods(String value) {
+    void addDynamicMods(String value) throws DataFormatException {
+        
+        if (dynaMods == null)   dynaMods = new ArrayList<MsSearchModification>();
         
         // if there were no modifications we will get a empty string
         value = value.trim();
@@ -222,31 +236,37 @@ public class SQTHeader implements SQTSearch {
         String[] tokens = value.split("=");
         // The split should create exactly two tokens
         if (tokens.length < 2)
-            throw new IllegalArgumentException("Invalid dynamic modification string: "+value);
+            throw new DataFormatException("Invalid dynamic modification string: "+value);
         if (tokens.length > 2)
-            throw new IllegalArgumentException("Invalid dynamic modification string (appears to have > 1 dynamic modification): "+value);
+            throw new DataFormatException("Invalid dynamic modification string (appears to have > 1 dynamic modification): "+value);
         
         String modChars = tokens[0].trim();
         // get the modification symbol (this character should follow the modification residue characters)
         if (modChars.length() < 2)
-            throw new IllegalArgumentException("No modification symbol found: "+value);
+            throw new DataFormatException("No modification symbol found: "+value);
         char modSymbol = modChars.charAt(modChars.length() - 1);
         if (!isValidDynamicModificationSymbol(modSymbol))
-            throw new IllegalArgumentException("Invalid modification symbol: "+value);
+            throw new DataFormatException("Invalid modification symbol: "+value);
         
         // remove the modification symbol and convert modification chars to upper case 
         modChars = modChars.substring(0, modChars.length()-1).toUpperCase();
         if (modChars.length() < 1)
-            throw new IllegalArgumentException("No residues found for dynamic modification: "+value);
+            throw new DataFormatException("No residues found for dynamic modification: "+value);
         if (!isValidModCharString(modChars))
-            throw new IllegalArgumentException("Invalid residues found found for dynamic modification"+value);
+            throw new DataFormatException("Invalid residues found found for dynamic modification"+value);
         
         
         String modMass = tokens[1].trim();
         modMass = removeSign(modMass); // removes a + sign
         if (modMass.length() < 1)
-            throw new IllegalArgumentException("No mass found for dynamic modification: "+value);
-        BigDecimal mass = new BigDecimal(modMass);
+            throw new DataFormatException("No mass found for dynamic modification: "+value);
+        
+        
+        BigDecimal mass = null;
+        try { mass = new BigDecimal(modMass);}
+        catch(NumberFormatException e) {
+            throw new DataFormatException("Error parsing modification mass: "+value);
+        }
         
         // this modification may be for multiple residues; 
         // add one StaticModification for each residue character
