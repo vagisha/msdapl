@@ -517,6 +517,8 @@ public class SQTHeader implements SQTSearch {
      * @return the staticMods
      */
     public List<MsSearchModification> getStaticModifications() {
+        if (staticMods == null)
+            return new ArrayList<MsSearchModification>(0);
         return staticMods;
     }
 
@@ -524,6 +526,8 @@ public class SQTHeader implements SQTSearch {
      * @return the dynaMods
      */
     public List<MsSearchModification> getDynamicModifications() {
+        if (dynaMods == null)
+            return new ArrayList<MsSearchModification>(0);
         return dynaMods;
     }
 
