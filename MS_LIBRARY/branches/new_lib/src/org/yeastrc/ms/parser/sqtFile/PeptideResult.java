@@ -249,9 +249,20 @@ public class PeptideResult implements SQTSearchResult {
     }
 
     public MsSearchResultPeptide getResultPeptide() {
-        if (resultPeptide == null)
-            resultPeptide = MsSearchResultPeptideBuilder.instance().build(sequence, seachDynaMods);
+        if (resultPeptide != null)
+            return resultPeptide;
+        try {
+            buildPeptideResult();
+        }
+        catch (SQTParseException e) {
+            throw new RuntimeException("Error building SQT peptide result", e);
+        }
         return resultPeptide;
+    }
+    
+    public void buildPeptideResult() throws SQTParseException {
+        if (resultPeptide == null)
+            resultPeptide = SQTSearchResultPeptideBuilder.instance().build(sequence, seachDynaMods);
     }
     
     @Override

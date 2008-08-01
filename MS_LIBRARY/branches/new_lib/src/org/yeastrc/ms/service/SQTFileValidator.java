@@ -7,7 +7,6 @@
 package org.yeastrc.ms.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -31,9 +30,7 @@ public class SQTFileValidator {
     private static final Logger log = Logger.getLogger(SQTFileValidator.class);
 
     private boolean headerValid = false;
-    private int numValidScans = 0;
-    private int numScans = 0;
-    private int numWarnings = 0;
+    private boolean scansValid = false;
 
     private void validateFile(String filePath) {
 
@@ -44,7 +41,7 @@ public class SQTFileValidator {
         try {
             dataProvider.open(filePath);
         }
-        catch (IOException e) {
+        catch (DataProviderException e) {
             log.error(e.getMessage(), e);
             dataProvider.close();
             return;
@@ -56,7 +53,7 @@ public class SQTFileValidator {
             header = dataProvider.getSearchHeader();
             headerValid = true;
         }
-        catch (IOException e) {
+        catch (DataProviderException e) {
             log.error(e.getMessage(), e);
             dataProvider.close();
             return;
@@ -69,31 +66,35 @@ public class SQTFileValidator {
         
         // read the scans
         while (dataProvider.hasNextSearchScan()) {
-            numScans++;
             try {
                 SQTSearchScan scan = dataProvider.getNextSearchScan();
-//                for (SQTSearchResult result: scan.getScanResults())
-//                    result.getResultPeptide(); // this will validate the peptide sequence
-                numValidScans++;
             }
-            catch (DataProviderException e) {}
-            catch (IOException e) {
+            catch (DataProviderException e) {
                 log.error(e.getMessage(), e);
                 dataProvider.close();
                 return;
             }
         }
-        numWarnings = dataProvider.getWarningCount();
         dataProvider.close();
+        scansValid = true;
     }
 
     public boolean validate(String filePath) {
         validateFile(filePath);
-        log.info("Ran validator on: "+filePath);
-        log.info("# warnings: "+numWarnings);
-        log.info("Valid SQT Header: "+headerValid);
-        log.info("# scans in file: "+numScans+"; # valid scans: "+numValidScans);
-        return (headerValid && numValidScans > 0 && numWarnings == 0);
+        StringBuilder buf = new StringBuilder();
+        buf.append("Ran validator on: "+filePath);
+        if (headerValid) {
+            buf.append("Header: valid");
+            if (scansValid)
+                buf.append("Scans: valid");
+            else
+                buf.append("Scans: invalid");
+        }
+        else {
+            buf.append("Header: invalid");
+        }
+        log.info(buf.toString());
+        return (headerValid && scansValid);
     }
 
     public static void main(String[] args) {

@@ -20,9 +20,10 @@ import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
+import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms.parser.sqtFile.SQTHeader;
+import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 public class MsExperimentUploader {
@@ -33,6 +34,8 @@ public class MsExperimentUploader {
     private List<Integer> searchIdList = new ArrayList<Integer>();
     private int runExperimentId;
     private int searchGroupId;
+    
+    private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
     private static final Pattern fileNamePattern = Pattern.compile("(\\S+)\\.(\\d+)\\.(\\d+)\\.(\\d{1})");
     
@@ -45,6 +48,7 @@ public class MsExperimentUploader {
     public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
 
         searchIdList.clear();
+        uploadExceptionList.clear();
         runExperimentId = 0;
         searchGroupId = 0;
         
@@ -61,38 +65,21 @@ public class MsExperimentUploader {
         // ----- BEFORE BEGINNING UPLOAD MAKE THE FOLLOWING CHECKS -----
         // (1). If we didn't find anything print warning and return.
         if (filenames.size() == 0) {
-            log.error("ERROR UPLOADING EXPERIMENT -- No files found to upload in directory: "+fileDirectory+"\n\n");
+            UploadException ex = new UploadException(ERROR_CODE.EMPTY_DIRECTORY);
+            ex.setDirectory(fileDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
             return 0;
         }
         
         // (2). make sure .ms2 files are present
-        if (!requiredFilesExist(fileDirectory, filenames)) {
-            log.error("ERROR UPLOADING EXPERIMENT -- Missing required ms2 files in directory: "+fileDirectory+"\n\n");
-            return 0;
-        }
-        
-        // (3). make sure there are no non-SEQUEST .sqt files in the directory. We don't handle ProLuCID, Percolator etc. for now
-        String file = null;
-        try {
-            if((file = foundNonSequestFiles(fileDirectory, filenames)) != null) {
-                log.error("ERROR UPLOADING EXPERIMENT -- Non-SEQUEST sqt file not supported: "+file+"\n\n"); 
-                return 0;
-            }
-        }
-        catch (IOException e) {
-            log.error("ERROR UPLOADING EXPERIMENT -- exception reading .sqt file\n\n", e);
-            return 0;
-        }
-        
-        // (4). make sure all SQT headers are valid
-        try {
-            if (foundInvalidSQTHeader(fileDirectory, filenames)) {
-                log.error("ERROR UPLOADING EXPERIMENT -- Invalid SQT header found\n\n"); 
-                return 0;
-            }
-        }
-        catch (IOException e) {
-            log.error("ERROR UPLOADING EXPERIMENT -- exception reading .sqt file\n\n", e);
+        String missingFile = missingMs2File(fileDirectory, filenames);
+        if (missingFile != null) {
+            UploadException ex = new UploadException(ERROR_CODE.MISSING_MS2);
+            ex.setErrorMessage("Missing file: "+missingFile);
+            ex.setDirectory(fileDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
             return 0;
         }
         
@@ -100,17 +87,18 @@ public class MsExperimentUploader {
         // ----- NOW WE CAN BEGIN UPLOAD -----
         int experimentId = 0;
         
+        experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
+        searchGroupId = getMySearchGroupId();
         try {
-            experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
-            searchGroupId = getMySearchGroupId();
             runExperimentId = uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames, searchGroupId);
         }
-        catch(Exception e) {
-            log.error("ERROR UPLOADING EXPERIMENT "+experimentId+". ABORTING...\n\n", e);
-            deleteSearch(searchIdList);
+        catch (UploadException e) {
+            uploadExceptionList.add(e);
+            log.error(e.getMessage(), e);
+            deleteSearches(searchIdList);
             deleteExperiment(experimentId);
-            return 0;
         }
+
         
         // If the runs in this upload were already uploaded as part of another
         // experiment, delete the entry we created earlier in the msExperiment table
@@ -160,9 +148,9 @@ public class MsExperimentUploader {
      * @param fileDirectory
      * @param filenames
      * @return
-     * @throws Exception
+     * @throws UploadException 
      */
-    private int uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames, int searchGroupId) throws Exception {
+    private int uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames, int searchGroupId) throws UploadException {
         
         boolean firstIter = true;
         for (String filename: filenames) {
@@ -180,7 +168,10 @@ public class MsExperimentUploader {
             }
             // Make sure all runs in this experiment have the same experimentID!
             else if (tempId != experimentId) {
-                throw new Exception("Runs in an experiment upload cannot have different experimentIds!");
+                UploadException ex = new UploadException(ERROR_CODE.MULTIPLE_EXPIDS);
+                ex.setDirectory(fileDirectory);
+                ex.setErrorMessage("Runs in an experiment upload cannot have different experimentIds! Found ids: "+experimentId+", "+tempId);
+                throw ex;
             }
 
             // if the sqt file does not exist go on to the next run
@@ -195,20 +186,62 @@ public class MsExperimentUploader {
         return experimentId;
     }
 
-    private int uploadMS2Run(String filePath, int experimentId) throws Exception {
+    private int uploadMS2Run(String filePath, int experimentId) throws UploadException {
         Ms2FileReader ms2Provider = new Ms2FileReader();
         MS2DataUploadService uploadService = new MS2DataUploadService();
-        String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+        String sha1Sum;
+        try {
+            sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+        }
+        catch (Exception e) {
+            UploadException ex = new UploadException(ERROR_CODE.SHA1SUM_CALC_ERROR, e);
+            ex.setFile(filePath);
+            ex.setErrorMessage(e.getMessage());
+            log.error(ex.getMessage(), ex);
+            uploadExceptionList.add(ex);
+            throw ex;
+        }
+        
         try {
             ms2Provider.open(filePath, sha1Sum);
             return uploadService.uploadMS2Run(ms2Provider,experimentId, sha1Sum);
+        }
+        catch (DataProviderException e) {
+            UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_MS2, e);
+            ex.setFile(filePath);
+            ex.setErrorMessage(e.getMessage());
+            log.error(ex.getMessage(), ex);
+            uploadExceptionList.add(ex);
+            throw ex;
+        }
+        catch (RuntimeException e) { // most likely due to SQL exception
+            UploadException ex = new UploadException(ERROR_CODE.UNKNOWN_MS2_ERROR, e);
+            ex.setFile(filePath);
+            ex.setErrorMessage(e.getMessage());
+            log.error(ex.getMessage(), ex);
+            uploadExceptionList.add(ex);
+            throw ex;
         }
         finally {
             ms2Provider.close();
         }
     }
     
-    private int uploadSQTSearch(String filePath, int runId, int searchGroupId) throws Exception {
+    private int uploadSQTSearch(String filePath, int runId, int searchGroupId) {
+        
+        // is this a supported SQT file
+        try {
+            if (!SQTFileReader.isSequestSQT(filePath)) {
+                createAndLogUploadException(ERROR_CODE.UNSUPPORTED_SQT, null, filePath, null, null);
+                return 0;
+            }
+        }
+        catch (IOException e1) {
+            createAndLogUploadException(ERROR_CODE.READ_ERROR_SQT, e1, filePath, null, e1.getMessage());
+            return 0;
+        }
+        
+        // upload the file
         SQTFileReader sqtProvider = new SQTFileReader();
         SQTDataUploadService uploadService = new SQTDataUploadService();
         int searchId = 0;
@@ -216,10 +249,33 @@ public class MsExperimentUploader {
             sqtProvider.open(filePath);
             searchId = uploadService.uploadSQTSearch(sqtProvider, runId, searchGroupId);
         }
-        catch(Exception e){
-            searchId = uploadService.getUploadedSearchId(); 
-            throw e; // throw the exception again
+        catch (DataProviderException e) {
+            createAndLogUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, e.getMessage());
+            UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_SQT, e);
+            if (searchId != 0) {
+                SQTDataUploadService.deleteSearch(searchId);
+                searchId = 0;
+            }
         }
+        catch (UploadException e) {
+            e.setFile(filePath);
+            log.error(e.getMessage(), e);
+            uploadExceptionList.add(e);
+            searchId = uploadService.getUploadedSearchId();
+            if (searchId != 0) {
+                SQTDataUploadService.deleteSearch(searchId);
+                searchId = 0;
+            }
+        }
+        catch (RuntimeException e) { // most likely due to SQL exception
+            createAndLogUploadException(ERROR_CODE.UNKNOWN_SQT_ERROR, e, filePath, null, e.getMessage());
+            searchId = uploadService.getUploadedSearchId();
+            if (searchId != 0) {
+                SQTDataUploadService.deleteSearch(searchId);
+                searchId = 0;
+            }
+        }
+        
         finally {
             if (searchId != 0)
                 searchIdList.add(searchId);
@@ -228,59 +284,36 @@ public class MsExperimentUploader {
         return searchId;
     }
     
+    private UploadException createAndLogUploadException(ERROR_CODE errCode, Exception sourceException, String file, String directory, String message) {
+        UploadException ex = null;
+        if (sourceException == null)
+            ex = new UploadException(errCode);
+        else
+            ex = new UploadException(errCode, sourceException);
+        ex.setFile(file);
+        ex.setDirectory(directory);
+        ex.setErrorMessage(message);
+        uploadExceptionList.add(ex);
+        log.error(ex.getMessage(), ex);
+        return ex;
+    }
+    
     /**
      * Check for .ms2 files. 
      * @param fileDirectory
      * @param filenames
      * @return
      */
-    private boolean requiredFilesExist(String fileDirectory, Set<String> filenames) {
+    private String missingMs2File(String fileDirectory, Set<String> filenames) {
         for (String filePrefix: filenames) {
             if (!(new File(fileDirectory+File.separator+filePrefix+".ms2").exists())) {
                 log.error("Required file: "+filePrefix+".ms2 not found");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Check for non-SEQUEST .sqt files.
-     * @param fileDirectory
-     * @param filenames
-     * @return
-     * @throws IOException 
-     */
-    private String foundNonSequestFiles(String fileDirectory, Set<String> filenames) throws IOException {
-        for (String filePrefix: filenames) {
-            String sqtFile = fileDirectory+File.separator+filePrefix+".sqt";
-            if (!(new File(sqtFile).exists()))  continue;
-            if (!SQTFileReader.isSequestSQT(sqtFile)) {
-                return sqtFile;
+                return filePrefix+".ms2";
             }
         }
         return null;
     }
-    
-    private boolean foundInvalidSQTHeader(String fileDirectory, Set<String> filenames) throws IOException {
-        for (String filePrefix: filenames) {
-            String sqtFile = fileDirectory+File.separator+filePrefix+".sqt";
-            SQTFileReader sqtProvider = new SQTFileReader();
-            try { 
-                if (!(new File(sqtFile).exists()))  continue;
-                sqtProvider.open(sqtFile);
-                SQTHeader header = sqtProvider.getSearchHeader();
-                if (!header.isValid()) {
-                    log.warn("Invalid SQTHeader in file: "+sqtFile);
-                    return true;
-                }
-            }
-            finally {
-                sqtProvider.close(); // close file
-            }
-        }
-        return false;
-    }
+
     
     private Set<String> getFileNamePrefixes(String fileDirectory) {
         File directory = new File (fileDirectory);
@@ -311,7 +344,7 @@ public class MsExperimentUploader {
         log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
     }
     
-    private void deleteSearch(List<Integer> searchIdList) {
+    private void deleteSearches(List<Integer> searchIdList) {
         for (Integer searchId: searchIdList) {
             SQTDataUploadService.deleteSearch(searchId);
             log.error("DELETED searchID: "+searchId);

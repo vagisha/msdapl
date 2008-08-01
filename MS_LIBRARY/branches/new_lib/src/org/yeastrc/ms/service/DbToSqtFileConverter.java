@@ -35,6 +35,7 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScanDb;
 import org.yeastrc.ms.parser.sqtFile.PeptideResult;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
+import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.ScanResult;
 
 /**
@@ -183,7 +184,12 @@ public class DbToSqtFileConverter {
             }});
 
         for (SQTHeaderDb header: headerList) {
-            sqtHeader.addHeaderItem(header.getName(), header.getValue());
+            try {
+                sqtHeader.addHeaderItem(header.getName(), header.getValue());
+            }
+            catch (SQTParseException e) {
+                e.printStackTrace();
+            }
         }
         outFile.write(sqtHeader.toString());
     }

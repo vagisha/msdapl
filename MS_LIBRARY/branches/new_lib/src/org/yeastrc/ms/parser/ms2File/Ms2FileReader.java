@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
@@ -34,17 +33,17 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
     private static final Pattern chargeStatePattern = Pattern.compile("^Z\\s+(\\d+)\\s+(\\d+\\.?\\d*)\\s*$");
 
 
-    public void open(String filePath, String sha1Sum) throws IOException {
+    public void open(String filePath, String sha1Sum) throws DataProviderException {
         this.sha1Sum = sha1Sum;
         super.open(filePath);
     }
 
-    public void open(String fileName, InputStream inStream, String sha1Sum) throws IOException {
+    public void open(String fileName, InputStream inStream, String sha1Sum) throws DataProviderException {
         this.sha1Sum = sha1Sum;
         super.open(fileName, inStream);
     }
 
-    public MS2Header getRunHeader() throws IOException {
+    public MS2Header getRunHeader() throws DataProviderException {
 
         MS2Header header = new MS2Header();
         while (isHeaderLine(currentLine)) {
@@ -53,24 +52,18 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                 header.addHeaderItem(nameAndVal[0], nameAndVal[1]);
             }
             else if (nameAndVal.length == 1) {
-                warnings++;
-                log.warn("!!!LINE# "+currentLineNum+" Missing value in 'H' line.\n\t"+currentLine);
+                DataProviderException e = new DataProviderException(currentLineNum, "Missing value in 'H' line.Setting value to null.", currentLine);
+                log.warn(e.getMessage());
                 header.addHeaderItem(nameAndVal[0], null);
             }
             else {
                 // ignore if both label and value for this header item are missing
-                //throw new Exception("Invalid header: "+currentLine);
-                warnings++;
-                log.warn("!!!LINE# "+currentLineNum+" Invalid 'H' line; Ignoring...: -- "+currentLine);
+                DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'H' line; Ignoring.", currentLine);
+                log.warn(e.getMessage());
             }
             advanceLine();
         }
-//      if (!header.isValid()) {
-//      warnings++;
-//      ParserException e = new ParserException(currentLineNum-1, "Invalid header.  Required fields are missing", "");
-//      log.warn(e.getMessage());
-//      throw e;
-//      }
+        
         header.setFileName(fileName);
         header.setSha1Sum(sha1Sum);
         return header;
@@ -80,31 +73,17 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return currentLine != null;
     }
 
-    public MS2Scan getNextScan() throws IOException, DataProviderException {
+    public MS2Scan getNextScan() throws DataProviderException {
 
-        Scan scan;
-        try {
-            scan = parseScan(currentLine);
-        }
-        catch (DataProviderException e) {
-            log.warn(e.getMessage());
-            skipScan();
-            throw e;
-        }
+        Scan scan = parseScan(currentLine);
 
         advanceLine(); // go to the next line
 
         while(currentLine != null) {
             // is this one of the charge states of the scan?
             if (isChargeLine(currentLine)) {
-                try {
-                    ScanCharge sc = parseScanCharge();
-                    scan.addChargeState(sc);
-                }
-                catch (DataProviderException e) {
-                    skipScanCharge();
-                    log.warn(e.getMessage());
-                }
+                ScanCharge sc = parseScanCharge();
+                scan.addChargeState(sc);
             }
             // is this one of the charge independent analysis for this scan?
             else if (isChargeIndAnalysisLine(currentLine)) {
@@ -118,10 +97,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             }
         }
         if (!scan.isValid()) {
-            warnings++;
-            DataProviderException e = new DataProviderException(currentLineNum-1, "Invalid MS2 scan -- no valid peaks and/or charge states found", "");
-            log.warn(e.getMessage());
-            throw e;
+            throw new DataProviderException(currentLineNum-1, "Invalid MS2 scan -- no valid peaks and/or charge states found", "");
         }
 
         return scan;
@@ -132,13 +108,11 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
 
         // make sure we have a scan line
         if (!isScanLine(line)) {
-            warnings++;
             throw new DataProviderException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", line);
         }
 
         String[] tokens = line.split("\\s+");
-        if (tokens.length < 4) {
-            warnings++;
+        if (tokens.length != 4) {
             throw new DataProviderException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", line);
         }
 
@@ -149,13 +123,12 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             scan.setPrecursorMz(tokens[3]);
         }
         catch(NumberFormatException e) {
-            warnings++;
             throw new DataProviderException(currentLineNum, "Invalid 'S' line. Error parsing number(s). "+e.getMessage(), line);
         }
         return scan;
     }
 
-    private ScanCharge parseScanCharge() throws IOException, DataProviderException {
+    private ScanCharge parseScanCharge() throws DataProviderException {
         
         ScanCharge scanCharge = parseScanCharge(currentLine);
 
@@ -178,8 +151,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             return scanCharge;
         }
         else {
-            warnings++;
-            throw new DataProviderException(currentLineNum, "Invalid 'Z' line. Ignoring...", line);
+            throw new DataProviderException(currentLineNum, "Invalid 'Z' line.", line);
         }
     }
 
@@ -190,13 +162,12 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
         else if (nameAndVal.length == 2) {
             scanCharge.addAnalysisItem(nameAndVal[0], null);
-            warnings++;
-            log.warn("!!!LINE# "+currentLineNum+" Missing value in 'D' line.\n\t"+currentLine);
+            DataProviderException e = new DataProviderException(currentLineNum, "Missing value in 'D' line. Setting value to null.", line);
+            log.warn(e.getMessage());
         }
         else {
             // ignore if both label and value for this analysis item are missing
-            warnings++;
-            DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'D' line. Expected 2 fields. Ignoring...", line);
+            DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'D' line. Expected 2 fields. Ignoring.", line);
             log.warn(e.getMessage());
         }
     }
@@ -208,60 +179,81 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
         else if (nameAndVal.length == 1) {
             scan.addAnalysisItem(nameAndVal[0], null);
-            warnings++;
-            log.warn("!!!LINE# "+currentLineNum+" Missing value in 'I' line\n\t"+currentLine);
+            DataProviderException e = new DataProviderException(currentLineNum, "Missing value in 'I' line. Setting value to null.", line);
+            log.warn(e.getMessage());
         }
         else {
             // ignore if both label and value for this analysis item are missing
-            warnings++;
-            DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'I' line. Expected 2 fields. Ignoring...", line);
+            DataProviderException e = new DataProviderException(currentLineNum, "Invalid 'I' line. Expected 2 fields. Ignoring.", line);
             log.warn(e.getMessage());
         }
     }
     
-    private void skipScan() throws IOException {
-        while (currentLine != null && !isScanLine(currentLine))
-            advanceLine();
-    }
-    
-    private void skipScanCharge() throws IOException {
-        advanceLine();
-        while(isChargeDepAnalysisLine(currentLine))
-            advanceLine();
-    }
+//    private void skipScan() throws DataProviderException {
+//        while (currentLine != null && !isScanLine(currentLine))
+//            advanceLine();
+//    }
+//    
+//    private void skipScanCharge() throws DataProviderException {
+//        advanceLine();
+//        while(isChargeDepAnalysisLine(currentLine))
+//            advanceLine();
+//    }
 
-    public void parsePeaks(Scan scan) throws IOException {
+    public void parsePeaks(Scan scan) throws DataProviderException {
 
+        int numErrors = 0;
+        int maxErrAllowed = 3;
+        
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s+");
-            if (tokens.length >= 2) {
-                // add peak m/z and intensity values
-                if (!isValidDouble(tokens[0])) {
-                    warnings++;
-                    log.warn( new DataProviderException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
-                    advanceLine();
-                    continue;
-                }
-                if (!isValidDouble(tokens[1])) {
-                    warnings++;
-                    log.warn( new DataProviderException(currentLineNum, "Invalid intensity value. Ignoring peak...", currentLine).getMessage());
-                    advanceLine();
-                    continue;
-                }
-                scan.addPeak(tokens[0], tokens[1]); 
-            }
-            else if (tokens.length == 1) {
-                warnings++;
+            
+            if (tokens.length == 0) {
                 log.warn( new DataProviderException(currentLineNum, 
-                        "missing peak intensity in line. Setting peak intensity to 0.", currentLine).getMessage());
-                if (!isValidDouble(tokens[0])) {
-                    warnings++;
-                    log.warn( new DataProviderException(currentLineNum, "Invalid m/z value. Ignoring peak...", currentLine).getMessage());
-                    advanceLine();
-                    continue;
-                }
-                scan.addPeak(tokens[0], "0");
+                        "missing peak m/z and intensity in line. Ignoring peak.", currentLine).getMessage());
+                numErrors++;
+                if (numErrors > maxErrAllowed)
+                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                
+                advanceLine();
+                continue; // go on to the next peak
             }
+            
+            if (tokens.length == 1) {
+                log.warn( new DataProviderException(currentLineNum, 
+                        "missing peak intensity in line. Ignoring peak.", currentLine).getMessage());
+                numErrors++;
+                if (numErrors > maxErrAllowed)
+                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                
+                advanceLine();
+                continue; // go on to the next peak
+            }
+            
+            
+            if (!isValidDouble(tokens[0])) {
+                log.warn( new DataProviderException(currentLineNum, "Invalid m/z value. Ignoring peak.", currentLine).getMessage());
+                
+                numErrors++;
+                if (numErrors > maxErrAllowed)
+                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                
+                advanceLine();
+                continue; // go on to the next peak
+            }
+            
+            if (!isValidDouble(tokens[1])) {
+                log.warn( new DataProviderException(currentLineNum, "Invalid intensity value. Ignoring peak.", currentLine).getMessage());
+                
+                numErrors++;
+                if (numErrors > maxErrAllowed)
+                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                
+                advanceLine();
+                continue; // go on to the next peak
+            }
+            
+            scan.addPeak(tokens[0], tokens[1]); 
             advanceLine();
         }
     }

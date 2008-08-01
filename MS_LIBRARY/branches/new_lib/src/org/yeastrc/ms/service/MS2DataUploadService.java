@@ -30,6 +30,7 @@ import org.yeastrc.ms.domain.ms2File.MS2RunDb;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 /**
  * 
@@ -56,12 +57,15 @@ public class MS2DataUploadService {
      * @param experimentId
      * @param sha1Sum
      * @return
-     * @throws Exception
+     * @throws UploadException 
      */
-    public int uploadMS2Run(MS2RunDataProvider provider, int experimentId, String sha1Sum) throws Exception  {
+    public int uploadMS2Run(MS2RunDataProvider provider, int experimentId, String sha1Sum) throws UploadException {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
         long startTime = System.currentTimeMillis();
+        
+        // reset all caches etc.
+        reset();
         
         MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
 
@@ -79,7 +83,15 @@ public class MS2DataUploadService {
         }
 
         // if run is NOT in the database get the top-level run information and upload it
-        MS2Run header = provider.getRunHeader();
+        MS2Run header;
+        try {
+            header = provider.getRunHeader();
+        }
+        catch (DataProviderException e) { // this should only happen if there was an IOException while reading the file
+            UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_MS2);
+            ex.setErrorMessage(e.getMessage());
+            throw ex;
+        }
         
         runId = runDao.saveRun(header, experimentId);
         log.info("Uploaded top-level run information with runId: "+runId);
@@ -92,26 +104,28 @@ public class MS2DataUploadService {
             MS2Scan scan;
             try {
                 scan = provider.getNextScan();
-                // MS2 file scans may have a precursor scan number but the precursor scans are not in the database
-                // so we do not have a database id for the precursor scan. We still do the check, though
-                int precursorScanId = scanDao.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
-                int scanId = scanDao.save(scan, runId, precursorScanId); 
-                
-                // save charge independent analysis
-                saveChargeIndependentAnalysis(scan, scanId);
-                
-                // save the scan charge states for this scan
-                MS2ScanChargeDAO chargeDao = daoFactory.getMS2FileScanChargeDAO();
-                for (MS2ScanCharge scanCharge: scan.getScanChargeList()) {
-                    int scanChargeId = chargeDao.saveScanChargeOnly(scanCharge, scanId);
-                    saveChargeDependentAnalysis(scanCharge, scanChargeId);
-                }
-                
-                uploaded++;
             }
             catch (DataProviderException e) {
-                log.error("Error processing scan. Scan will not be uploaded. "+e.getMessage(), e);
+                UploadException ex = new UploadException(ERROR_CODE.INVALID_MS2_SCAN);
+                ex.setErrorMessage(e.getMessage());
+                throw ex;
             }
+            // MS2 file scans may have a precursor scan number but the precursor scans are not in the database
+            // so we do not have a database id for the precursor scan. We still do the check, though
+            int precursorScanId = scanDao.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
+            int scanId = scanDao.save(scan, runId, precursorScanId); 
+
+            // save charge independent analysis
+            saveChargeIndependentAnalysis(scan, scanId);
+
+            // save the scan charge states for this scan
+            MS2ScanChargeDAO chargeDao = daoFactory.getMS2FileScanChargeDAO();
+            for (MS2ScanCharge scanCharge: scan.getScanChargeList()) {
+                int scanChargeId = chargeDao.saveScanChargeOnly(scanCharge, scanId);
+                saveChargeDependentAnalysis(scanCharge, scanChargeId);
+            }
+
+            uploaded++;
             all++;
         }
         
@@ -119,7 +133,8 @@ public class MS2DataUploadService {
         // if no scans were uploaded for this run throw an exception
         if (uploaded == 0) {
             log.error("END MS2 FILE UPLOAD: !!!No scans were uploaded for file: "+provider.getFileName()+"("+runId+")");
-            throw new Exception("No scans were uploaded for runID: "+runId);
+            UploadException ex = new UploadException(ERROR_CODE.INVALID_MS2_SCAN);
+            ex.setErrorMessage("No scans were uploaded for runID: "+runId);
         }
         
         flush(); // save any cached data
@@ -130,6 +145,12 @@ public class MS2DataUploadService {
         return runId;
     }
 
+    private void reset() {
+        // clean up any cached data
+        dAnalysisList.clear();
+        iAnalysisList.clear();
+    }
+    
     private void saveChargeDependentAnalysis(MS2ScanCharge scanCharge, final int scanChargeId) {
         if (dAnalysisList.size() > BUF_SIZE) {
             saveChargeDependentAnalysis();

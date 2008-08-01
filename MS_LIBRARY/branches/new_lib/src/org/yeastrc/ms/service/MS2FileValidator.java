@@ -31,9 +31,7 @@ public class MS2FileValidator {
     private static final Logger log = Logger.getLogger(MS2FileValidator.class);
 
     private boolean headerValid = false;
-    private int numValidScans = 0;
-    private int numScans = 0;
-    private int numWarnings = 0;
+    private boolean scansValid = false;
 
     private void validateFile(String filePath) {
 
@@ -45,13 +43,20 @@ public class MS2FileValidator {
             String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
             dataProvider.open(filePath, sha1Sum);
         }
+        catch (DataProviderException e) {
+            log.error(e.getMessage(), e);
+            dataProvider.close();
+            return;
+        }
         catch (IOException e) {
             log.error(e.getMessage(), e);
             dataProvider.close();
             return;
         }
         catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+            dataProvider.close();
+            return;
         }
 
         // read the header
@@ -59,8 +64,7 @@ public class MS2FileValidator {
             dataProvider.getRunHeader();
             headerValid = true;
         }
-//        catch (ParserException e) {dataProvider.close(); numWarnings = dataProvider.getWarningCount(); return;}
-        catch (IOException e) {
+        catch (DataProviderException e) {
             log.error(e.getMessage(), e);
             dataProvider.close();
             return;
@@ -68,31 +72,34 @@ public class MS2FileValidator {
 
         // read the scans
         while (dataProvider.hasNextScan()) {
-            numScans++;
             try {
                 MS2Scan scan = dataProvider.getNextScan();
-                numValidScans++;
             }
             catch (DataProviderException e) {
-                log.error(e.getMessage(), e);
-            }
-            catch (IOException e) {
                 log.error(e.getMessage(), e);
                 dataProvider.close();
                 return;
             }
         }
-        numWarnings = dataProvider.getWarningCount();
         dataProvider.close();
     }
 
     public boolean validate(String filePath) {
         validateFile(filePath);
-        log.info("Ran validator on: "+filePath);
-        log.info("# warnings: "+numWarnings);
-        log.info("Valid MS2 Header: "+headerValid);
-        log.info("# scans in file: "+numScans+"; # valid scans: "+numValidScans);
-        return (headerValid && numValidScans > 0 && numWarnings == 0);
+        StringBuilder buf = new StringBuilder();
+        buf.append("Ran validator on: "+filePath);
+        if (headerValid) {
+            buf.append("Header: valid");
+            if (scansValid)
+                buf.append("Scans: valid");
+            else
+                buf.append("Scans: invalid");
+        }
+        else {
+            buf.append("Header: invalid");
+        }
+        log.info(buf.toString());
+        return (headerValid && scansValid);
     }
 
     public static void main(String[] args) {

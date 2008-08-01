@@ -38,6 +38,7 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 /**
  * 
@@ -71,9 +72,10 @@ public class SQTDataUploadService {
      * @param provider
      * @param runId
      * @return
-     * @throws Exception
+     * @throws UploadException 
      */
-    public int uploadSQTSearch(SQTSearchDataProvider provider, int runId, int searchGroupId) throws Exception {
+    public int uploadSQTSearch(SQTSearchDataProvider provider, int runId, int searchGroupId) 
+    throws UploadException {
 
         log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+"; SearchGroupID: "+searchGroupId);
         long startTime = System.currentTimeMillis();
@@ -81,11 +83,16 @@ public class SQTDataUploadService {
         // reset all caches etc.
         reset();
 
+        try {
+            uploadedSearchId = uploadSearchHeader(provider, runId, searchGroupId);
+        }
+        catch(DataProviderException e) {
+            UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER);
+            ex.setErrorMessage(e.getMessage());
+            throw ex;
+        }
         
-        int searchId = uploadSearchHeader(provider.getSearchHeader(), runId, searchGroupId);
-        uploadedSearchId = searchId;
-        
-        log.info("Uploaded top-level info for search with searchId: "+searchId);
+        log.info("Uploaded top-level info for search with searchId: "+uploadedSearchId);
 
         // upload the search results for each scan + charge combination
         int numResults = 0;
@@ -94,48 +101,37 @@ public class SQTDataUploadService {
             SQTSearchScan scan = null;
             try {
                 scan = provider.getNextSearchScan();
-                
-                // if the scan does not have any results don't upload it.
-                if (scan.getScanResults().size() == 0) {
-                    log.warn("!!!Scan will NOT be uploaded. No results found for scan (scanNumber: "+scan.getScanNumber()+", charge: "+scan.getCharge());
-                    continue;
-                }
-                
-                int scanId = getScanId(runId, scan.getScanNumber());
-                // save spectrum data
-                uploadSearchScan(scan, searchId, scanId); 
-                
-                // save all the search results for this scan
-                for (SQTSearchResult result: scan.getScanResults()) {
-                    uploadSearchResult(result, searchId, scanId);
-                    numResults++;
-                    numProteins += result.getProteinMatchList().size();
-                }
             }
             catch (DataProviderException e) {
-                log.warn("Error processing search result for scan. Results will not be uploaded. "+e.getMessage(), e);
+                UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_SCAN);
+                ex.setErrorMessage(e.getMessage());
+                throw ex;
+            }
+            int scanId = getScanId(runId, scan.getScanNumber());
+            // save spectrum data
+            uploadSearchScan(scan, uploadedSearchId, scanId); 
+
+            // save all the search results for this scan
+            for (SQTSearchResult result: scan.getScanResults()) {
+                uploadSearchResult(result, uploadedSearchId, scanId);
+                numResults++;
+                numProteins += result.getProteinMatchList().size();
             }
             
         }
         flush(); // save any cached data
         
         long endTime = System.currentTimeMillis();
-        log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+" results, "+numProteins+" protein matches. (searchId: "+searchId+")"
+        log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
+                " results, "+numProteins+" protein matches. (searchId: "+uploadedSearchId+")"
                 + " in "+(endTime - startTime)/(1000L)+"seconds");
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId);
         
-        return searchId;
+        return uploadedSearchId;
     }
     
     public int getUploadedSearchId() {
         return uploadedSearchId;
-    }
-    private static int getScanId(int runId, int scanNumber) {
-        MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
-        int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
-        if (scanId == 0)
-            throw new IllegalArgumentException("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
-        return scanId;
     }
     
     private void reset() {
@@ -150,8 +146,9 @@ public class SQTDataUploadService {
         uploadedSearchId = 0;
     }
     
-    private int uploadSearchHeader(SQTSearch search, int runId, int searchGroupId) {
+    private int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int searchGroupId) throws DataProviderException {
         
+        SQTSearch search = provider.getSearchHeader();
         // save the search and return the database id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();
         return searchDao.saveSearch(search, runId, searchGroupId);
@@ -163,14 +160,6 @@ public class SQTDataUploadService {
     }
     
     private int uploadSearchResult(SQTSearchResult result, int searchId, int scanId) {
-        
-        try {
-            result.getResultPeptide(); // parse the peptide sequence to get the pre, post residues, modifications etc.
-        }
-        catch(IllegalArgumentException e) {
-            log.error(("!!!Peptide sequence appears to be invalid. Unlable to upload result... Skipping: "+e.getMessage()));
-            return 0;
-        }
         
         MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
         int resultId = resultDao.saveResultOnly(result, searchId, scanId);
@@ -257,6 +246,17 @@ public class SQTDataUploadService {
         if (resultModList.size() > 0) {
             uploadResultModBuffer();
         }
+    }
+    
+    private static int getScanId(int runId, int scanNumber) throws UploadException {
+        MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
+        int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
+        if (scanId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN);
+            ex.setErrorMessage("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
+            throw ex;
+        }
+        return scanId;
     }
     
     public static void deleteSearch(int searchId) {

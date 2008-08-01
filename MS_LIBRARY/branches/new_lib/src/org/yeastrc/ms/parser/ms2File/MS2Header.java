@@ -40,7 +40,8 @@ public class MS2Header implements MS2Run {
     public void addHeaderItem(String name, String value) {
         
         if (name == null)
-            throw new NullPointerException("name for Header cannot be null.");
+//            throw new NullPointerException("name for Header cannot be null.");
+            return;
         
         headerList.add(new HeaderItem(name, value));
         

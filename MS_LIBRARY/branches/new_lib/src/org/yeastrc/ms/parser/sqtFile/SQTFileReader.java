@@ -16,8 +16,6 @@ import org.yeastrc.ms.parser.AbstractReader;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.SQTSearchDataProvider;
 
-import sun.tools.jstat.ParserException;
-
 
 public class SQTFileReader extends AbstractReader implements SQTSearchDataProvider {
 
@@ -78,14 +76,12 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         while (isHeaderLine(currentLine)) {
             String[] nameAndVal = parseHeader(currentLine);
             addHeaderItem(header, nameAndVal);
-            if (nameAndVal.length == 2) {
-                header.addHeaderItem(nameAndVal[0], nameAndVal[1]);
-            }
             advanceLine();
         }
         
         if (!header.isValid())
-            throw new DataProviderException("Invalid SQT Header");
+            throw new DataProviderException("Invalid SQT Header. One or more required headers is missing. "+
+                    "Required headers:\n"+SQTHeader.requiredHeaders());
         
         this.searchDynamicMods = header.getDynamicModifications();
         return header;
@@ -99,8 +95,16 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         String name = nameAndVal[0];
         String val = nameAndVal.length > 1 ? nameAndVal[1] : null;
         
-        try { header.addHeaderItem(name, val);}
-        catch(RuntimeException e) {throw new DataProviderException(currentLineNum, e.getMessage(), currentLine, e);}
+        try { 
+            header.addHeaderItem(name, val);
+        }
+        catch(SQTParseException e) {
+            DataProviderException ex = new DataProviderException(currentLineNum, e.getMessage(), currentLine, e);
+            if (e.isFatal())
+                throw ex;
+            else
+                log.warn(ex.getMessage());
+        }
     }
     
     String[] parseHeader(String line) {
@@ -113,38 +117,18 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
 
     /**
      * Returns the next scan in the file. 
-     * Returns null if the scan line (beginning with 'S') was invalid
      * @return
-     * @throws IOException 
-     * @throws ParserException 
+     * @throws DataProviderException if the scan or any of its associated results were invalid
      */
-    public ScanResult getNextSearchScan() throws IOException, ParserException {
+    public ScanResult getNextSearchScan() throws DataProviderException {
 
-        ScanResult scan = null;
-        try {
-            scan = parseScan(currentLine);
-        }
-        catch(ParserException e) {
-            // there was an error parsing the 'S' line. We will ignore this scan
-            // if there are any 'M' or 'L' lines after the offending 'S' line skip over them.
-            skipScan();
-            log.warn(e.getMessage());
-            throw e;
-        }
-
+        ScanResult scan = parseScan(currentLine);
         advanceLine();
 
         while(currentLine != null) {
-
             // is this one of the results for the scan ('M' line)
             if (isResultLine(currentLine)) {
-                PeptideResult result = null;
-                try {
-                    result = parsePeptideResult(scan.getStartScan(), scan.getCharge());
-                }
-                catch (ParserException e) {
-                    log.warn(e.getMessage());
-                }
+                PeptideResult result = parsePeptideResult(scan.getStartScan(), scan.getCharge());
                 if (result != null) 
                     scan.addPeptideResult(result);
             }
@@ -152,34 +136,26 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
                 break;
             }
         }
-
-        if (!scan.isValid()) {
-            warnings++;
-            ParserException e = new ParserException(currentLineNum-1, "Invalid SQT scan -- no results found", "");
-            log.warn(e.getMessage());
-//            throw e;
-        }
+        
         return scan;
     }
 
-    private void skipScan() throws IOException {
-        advanceLine();
-        while(isResultLine(currentLine) || isLocusLine(currentLine))
-            advanceLine();
-    }
+//    private void skipScan() throws DataProviderException {
+//        advanceLine();
+//        while(isResultLine(currentLine) || isLocusLine(currentLine))
+//            advanceLine();
+//    }
 
-    ScanResult parseScan(String line) throws ParserException {
+    ScanResult parseScan(String line) throws DataProviderException {
 
         // make sure we have a scan line
         if (!isScanLine(line)) {
-            warnings++;
-            throw new ParserException(currentLineNum, "Error parsing scan. Expected line starting with 'S'. Found -- ", line);
+            throw new DataProviderException(currentLineNum, "Error parsing scan. Expected line starting with 'S'.", line);
         }
 
         String[] tokens = line.split("\\s+");
-        if (tokens.length < 10) {
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'S' line. Expected 10 fields", line);
+        if (tokens.length != 10) {
+            throw new DataProviderException(currentLineNum, "Invalid 'S' line. Expected 10 fields", line);
         }
 
         ScanResult scan = new ScanResult();
@@ -194,8 +170,7 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
             scan.setSequenceMatches(Integer.parseInt(tokens[9]));
         }
         catch(NumberFormatException e) {
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'S' line. Error parsing number(s): "+e.getMessage(), line);
+            throw new DataProviderException(currentLineNum, "Invalid 'S' line. Error parsing number(s): "+e.getMessage(), line);
         }
         scan.setServer(tokens[5]);
 
@@ -207,29 +182,18 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
      * @param scanNumber
      * @param charge
      * @return
-     * @throws IOException
-     * @throws ParserException 
+     * @throws DataProviderException 
      */
-    private PeptideResult parsePeptideResult(int scanNumber, int charge) throws IOException, ParserException {
+    private PeptideResult parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
 
-        PeptideResult result = null;
-
-        try {
-            result = parsePeptideResult(currentLine, scanNumber, charge);
-        }
-        catch (ParserException e) {
-            // there was an error parsing the 'M' line. We will ignore this peptide result
-            // if there are any 'L' line after the offending 'M' line skip over them.
-            skipPeptideResult();
-            throw e;
-        }
+        PeptideResult result = parsePeptideResult(currentLine, scanNumber, charge);
 
         advanceLine();
+        
         while (currentLine != null) {
             if (isLocusLine(currentLine)) {
                 DbLocus locus = null;
-                try {locus = parseLocus(currentLine);}
-                catch (ParserException e) { log.warn(e.getMessage());}
+                locus = parseLocus(currentLine);
                 if (locus != null)
                     result.addMatchingLocus(locus);
             }
@@ -240,11 +204,11 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         return result;
     }
 
-    private void skipPeptideResult() throws IOException {
-        advanceLine();
-        while(isLocusLine(currentLine))
-            advanceLine();
-    }
+//    private void skipPeptideResult() throws DataProviderException {
+//        advanceLine();
+//        while(isLocusLine(currentLine))
+//            advanceLine();
+//    }
 
     /**
      * Parses a 'M' line in the sqt file.
@@ -252,16 +216,15 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
      * @param scanNumber
      * @param charge
      * @return
-     * @throws ParserException if the line did not contain the expected number of fields OR
+     * @throws DataProviderException if the line did not contain the expected number of fields OR
      *                         there was an error parsing numbers in the line OR
      *                         there was an error parsing the peptide sequence in this 'M' line.
      */
-    PeptideResult parsePeptideResult(String line, int scanNumber, int charge) throws ParserException {
+    PeptideResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
 
         String[] tokens = line.split("\\s+");
-        if (tokens.length < 11 || tokens.length > 11) {
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
+        if (tokens.length != 11) {
+            throw new DataProviderException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
         PeptideResult result = new PeptideResult(searchDynamicMods);
@@ -276,8 +239,7 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
             result.setNumPredictedIons(Integer.parseInt(tokens[8]));
         }
         catch(NumberFormatException e) {
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'M' line. Error parsing number(s): "+e.getMessage(), line);
+            throw new DataProviderException(currentLineNum, "Invalid 'M' line. Error parsing number(s): "+e.getMessage(), line);
         }
         
         result.setResultSequence(tokens[9]);
@@ -287,11 +249,10 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         
         // parse the peptide sequence
         try {
-            result.getResultPeptide();
+            result.buildPeptideResult();
         }
-        catch(IllegalArgumentException e) {
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid peptide sequence in 'M' line: "+e.getMessage(), line);
+        catch(SQTParseException e) {
+            throw new DataProviderException(currentLineNum, "Invalid peptide sequence in 'M' line:\n"+e.getMessage(), line);
         }
         return result;
     }
@@ -300,17 +261,16 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
      * Parses a 'L' line in the sqt file
      * @param line
      * @return
-     * @throws ParserException
+     * @throws DataProviderException
      */
-    DbLocus parseLocus(String line) throws ParserException {
+    DbLocus parseLocus(String line) throws DataProviderException {
         
         Matcher match = locusPattern.matcher(line);
         if (match.matches()) {
             return new DbLocus(match.group(1), match.group(2));
         }
         else {
-            warnings++;
-            throw new ParserException(currentLineNum, "Invalid 'L' line. Expected >= 2 fields", line);
+            throw new DataProviderException(currentLineNum, "Invalid 'L' line. Expected 2 fields", line);
         }
     }
 

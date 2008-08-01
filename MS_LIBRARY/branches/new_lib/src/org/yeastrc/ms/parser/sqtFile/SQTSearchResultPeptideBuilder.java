@@ -19,25 +19,25 @@ import org.yeastrc.ms.domain.MsSearchResultPeptide;
 /**
  * 
  */
-public final class MsSearchResultPeptideBuilder {
+public final class SQTSearchResultPeptideBuilder {
 
-    public static final MsSearchResultPeptideBuilder instance = new MsSearchResultPeptideBuilder();
+    public static final SQTSearchResultPeptideBuilder instance = new SQTSearchResultPeptideBuilder();
 
-    private MsSearchResultPeptideBuilder() {}
+    private SQTSearchResultPeptideBuilder() {}
 
-    public static MsSearchResultPeptideBuilder instance() {
+    public static SQTSearchResultPeptideBuilder instance() {
         return instance;
     }
 
-    public MsSearchResultPeptide build(String resultSequence, List<? extends MsSearchModification> dynaMods) {
+    public MsSearchResultPeptide build(String resultSequence, List<? extends MsSearchModification> dynaMods) 
+    throws SQTParseException {
         if (resultSequence == null || resultSequence.length() == 0)
-            throw new IllegalArgumentException("sequence cannot be null or empty");
+            throw new SQTParseException("sequence cannot be null or empty");
         
 //        System.out.println("BUILDING");
-//        resultSequence = removeAccession(resultSequence);
         
         if (resultSequence.length() < 5)
-            throw new IllegalArgumentException("sequence appears to be invalid: "+resultSequence);
+            throw new SQTParseException("sequence appears to be invalid: "+resultSequence);
         resultSequence = resultSequence.toUpperCase();
         final char preResidue = getPreResidue(resultSequence);
         final char postResidue = getPostResidue(resultSequence);
@@ -45,11 +45,6 @@ public final class MsSearchResultPeptideBuilder {
         final List<MsSearchResultModification> resultMods = getResultMods(dotless, dynaMods);
         final String justPeptide = getOnlyPeptideSequence(dotless);
         
-//        final char preResidue = 0;
-//      final char postResidue = 0;
-//      final List<MsSearchResultModification> resultMods = new ArrayList<MsSearchResultModification>(0);
-//      final String justPeptide = resultSequence;
-//        System.out.println(resultSequence+", "+preResidue+", "+postResidue+", "+justPeptide); 
         return new MsSearchResultPeptide() {
 
             public List<MsSearchResultModification> getDynamicModifications() {
@@ -70,19 +65,19 @@ public final class MsSearchResultPeptideBuilder {
             }};
     }
 
-    char getPreResidue(String sequence) {
+    char getPreResidue(String sequence) throws SQTParseException {
         if (sequence.charAt(1) == '.')
             return sequence.charAt(0);
-        throw new IllegalArgumentException("Invalid peptide sequence; cannot get PRE residue: "+sequence);
+        throw new SQTParseException("Invalid peptide sequence; cannot get PRE residue: "+sequence);
     }
     
-    char getPostResidue(String sequence) {
+    char getPostResidue(String sequence) throws SQTParseException {
         if (sequence.charAt(sequence.length() - 2) == '.')
             return sequence.charAt(sequence.length() -1);
-        throw new IllegalArgumentException("Invalid peptide sequence; cannot get POST residue: "+sequence);
+        throw new SQTParseException("Invalid peptide sequence; cannot get POST residue: "+sequence);
     }
     
-    List<MsSearchResultModification> getResultMods(String peptide, List<? extends MsSearchModification> dynaMods) {
+    List<MsSearchResultModification> getResultMods(String peptide, List<? extends MsSearchModification> dynaMods) throws SQTParseException {
         
         // create a map of the dynamic modifications for the search for easy access.
         Map<String, MsSearchModification> modMap = new HashMap<String, MsSearchModification>(dynaMods.size());
@@ -102,11 +97,7 @@ public final class MsSearchResultPeptideBuilder {
             }
             MsSearchModification matchingMod = modMap.get(modChar+""+x);
             if (matchingMod == null)
-                throw new IllegalArgumentException("No modification found for residue: "+modChar+"; sequence: "+peptide);
-            if (x != matchingMod.getModificationSymbol())
-                throw new IllegalArgumentException("Modification symbol does not match. "+
-                        "Search modification is: "+makeString(matchingMod)+
-                        "; Result modification: "+modChar+", "+x);
+                throw new SQTParseException("No matching modification found: "+modChar+x+"; sequence: "+peptide);
             
             // found a match!!
             resultMods.add(new ResultMod(modChar, x, matchingMod.getModificationMass(), modCharIndex));
@@ -115,31 +106,13 @@ public final class MsSearchResultPeptideBuilder {
         return resultMods;
     }
 
-    private String makeString(MsSearchModification mod) {
-        StringBuilder buf = new StringBuilder();
-        buf.append(mod.getModifiedResidue());
-        buf.append(", ");
-        buf.append(mod.getModificationSymbol());
-        buf.append(", ");
-        buf.append(mod.getModificationMass());
-        return buf.toString();
-    }
-    
-    // Handle this case: 34|emb|CAB44792.1|S.PELPATSLLQERW.A
-    // This method should return S.PELPATSLLQERW.A for the example above.
-//    String removeAccession(String sequence) {
-//        int idx = sequence.lastIndexOf('|');
-//        if (idx == -1)  return sequence;
-//        return sequence.substring(idx+1);
-//    }
-    
-    String removeDots(String sequence) {
+    String removeDots(String sequence) throws SQTParseException {
         if (sequence.charAt(1) != '.' || sequence.charAt(sequence.length() - 2) != '.')
-            throw new IllegalArgumentException("Sequence does not have .(dots) in the expected position: "+sequence);
+            throw new SQTParseException("Sequence does not have .(dots) in the expected position: "+sequence);
         return sequence.substring(2, sequence.length() - 2);
     }
 
-    String getOnlyPeptideSequence(String sequence) {
+    String getOnlyPeptideSequence(String sequence) throws SQTParseException {
         char[] residueChars = new char[sequence.length()];
         int j = 0;
         for (int i = 0; i < sequence.length(); i++) {
@@ -149,7 +122,7 @@ public final class MsSearchResultPeptideBuilder {
         }
         sequence = String.valueOf(residueChars).trim();
         if (sequence.length() == 0)
-            throw new IllegalArgumentException("No residues found: "+sequence);
+            throw new SQTParseException("No residues found: "+sequence);
         return sequence;
     }
     

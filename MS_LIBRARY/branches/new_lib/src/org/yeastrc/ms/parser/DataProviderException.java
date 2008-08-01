@@ -55,7 +55,7 @@ public class DataProviderException extends Exception {
     
     public String getMessage() {
         StringBuilder buf = new StringBuilder();
-        buf.append("!!!"+message);
+        buf.append(message);
         if (lineNum != -1)
             buf.append("\n\tLINE NUMBER: "+lineNum);
         if (line != null)

@@ -17,16 +17,21 @@ public class UploadException extends Exception {
     private static int ERROR = 1;
     
     public static enum ERROR_CODE {
-        EMPTY_DIRECTORY     ("No files found to upload.", ERROR),
-        MISSING_MS2         ("Missing required ms2 files.", ERROR),
-        READ_ERROR_MS2      ("Error reading MS2 file", ERROR),
-        UNKNOWN_ERROR       ("", ERROR),
+        EMPTY_DIRECTORY         ("No files found to upload.", ERROR),
+        MISSING_MS2             ("Missing required ms2 files.", ERROR),
+        READ_ERROR_MS2          ("Error reading MS2 file", ERROR),
+        INVALID_MS2_SCAN        ("Invalid SQT scan", ERROR),
+        SHA1SUM_CALC_ERROR      ("Error calculating sha1sum", ERROR),
+        MULTIPLE_EXPIDS         ("Runs belong to different experiments", ERROR),
         
-        UNSUPPORTED_SQT     ("Non-SEQUEST sqt files are not supported", WARN),
-        INVALID_SQT_HEADER  ("Invalid SQT header", WARN),
-        READ_ERROR_SQT      ("Error reading MS2 file", WARN),
+        UNKNOWN_MS2_ERROR       ("", ERROR),
         
-        
+        UNSUPPORTED_SQT         ("Non-SEQUEST sqt files are not supported", WARN),
+        INVALID_SQT_HEADER      ("Invalid SQT header", WARN),
+        INVALID_SQT_SCAN        ("Invalid SQT scan", WARN),
+        NO_SCANID_FOR_SQT_SCAN  ("No database scanID found for SQT scan", WARN),
+        READ_ERROR_SQT          ("Error reading SQT file", ERROR),
+        UNKNOWN_SQT_ERROR       ("", WARN),
         ;
       
         private String message = "";
@@ -47,10 +52,14 @@ public class UploadException extends Exception {
     private final ERROR_CODE errCode;
     private String directory; 
     private String file;
-    private int lineNum = -1;
     private String errorMessage;
     
     public UploadException(ERROR_CODE error) {
+        this.errCode = error;
+    }
+    
+    public UploadException(ERROR_CODE error, Exception e) {
+        super(e);
         this.errCode = error;
     }
     
@@ -61,19 +70,18 @@ public class UploadException extends Exception {
     public String getMessage() {
         StringBuilder buf = new StringBuilder();
         if (errCode.isError()) 
-            buf.append("ERROR: upload failed\n");
+            buf.append("ERROR: ");
         else
-            buf.append("WARNING: uploaded with warnings\n");
+            buf.append("WARNING: ");
         buf.append(errCode.getMessage());
         buf.append("\n");
-        if (directory != null)
-            buf.append("\tDirectory: "+directory+"\n");
-        if (file != null)
-            buf.append("\tFile: "+file+"\n");
-        if (lineNum != -1)
-            buf.append("\tLineNum: "+file+"\n");
         if (errorMessage != null)
             buf.append("\t"+errorMessage);
+        if (file != null)
+            buf.append("\tFile: "+file+"\n");
+        if (directory != null)
+            buf.append("\tDirectory: "+directory+"\n");
+        
         return buf.toString();
     }
 
@@ -83,10 +91,6 @@ public class UploadException extends Exception {
     
     public void setFile(String file) {
         this.file = file;
-    }
-
-    public void setLineNum(int lineNum) {
-        this.lineNum = lineNum;
     }
 
     public void setErrorMessage(String errorMessage) {

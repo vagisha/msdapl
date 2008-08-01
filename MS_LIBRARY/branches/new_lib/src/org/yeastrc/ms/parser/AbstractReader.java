@@ -13,17 +13,12 @@ import java.util.regex.Pattern;
 public abstract class AbstractReader {
 
     protected int currentLineNum = 0;
-    protected int warnings = 0;
     protected String currentLine;
     protected BufferedReader reader;
     protected String fileName;
 
     public AbstractReader() {
         super();
-    }
-
-    public int getWarningCount() {
-        return warnings;
     }
 
     public String getFileName() {
