@@ -44,8 +44,9 @@ public class MsExperimentUploader {
      * @param remoteDirectory
      * @param fileDirectory
      * @return database id for experiment if it was uploaded successfully, 0 otherwise
+     * @throws UploadException 
      */
-    public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) {
+    public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) throws UploadException {
 
         searchIdList.clear();
         uploadExceptionList.clear();
@@ -95,8 +96,10 @@ public class MsExperimentUploader {
         catch (UploadException e) {
             uploadExceptionList.add(e);
             log.error(e.getMessage(), e);
-            deleteSearches(searchIdList);
-            deleteExperiment(experimentId);
+            log.error("ABORTING EXPERIMENT UPLOAD!!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            deleteSearches(searchIdList); // deleted all the uploaded searches
+            deleteExperiment(experimentId); // delete the experiment
+            throw e;
         }
 
         
@@ -141,6 +144,18 @@ public class MsExperimentUploader {
         return copyList;
     }
     
+    public List<UploadException> getUploadExceptionList() {
+        return this.uploadExceptionList;
+    }
+    
+    public String getUploadWarnings() {
+        StringBuilder buf = new StringBuilder();
+        for (UploadException e: uploadExceptionList) {
+            buf.append(e.getMessage()+"\n");
+        }
+        return buf.toString();
+    }
+    
     /**
      * If the runs were already in the database, the runs are not uploaded again, and the 
      * existing experimentId for the runs is returned. 
@@ -159,7 +174,7 @@ public class MsExperimentUploader {
             int runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2",experimentId);
             
             // Get the experimentId for this run.  If this run is already in the database
-            // it will have a experiment id different from the one given to us as arguments
+            // it will have an experiment id different from the one given to us as arguments
             // to this method.
             int tempId = MS2DataUploadService.getExperimentIdForRun(runId);
             if (firstIter) {
@@ -186,6 +201,8 @@ public class MsExperimentUploader {
         return experimentId;
     }
 
+    // Any exceptions that happens during sha1sum calculation, parsing or upload
+    // will be punted up to the calling function. 
     private int uploadMS2Run(String filePath, int experimentId) throws UploadException {
         Ms2FileReader ms2Provider = new Ms2FileReader();
         MS2DataUploadService uploadService = new MS2DataUploadService();
@@ -194,11 +211,7 @@ public class MsExperimentUploader {
             sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
         }
         catch (Exception e) {
-            UploadException ex = new UploadException(ERROR_CODE.SHA1SUM_CALC_ERROR, e);
-            ex.setFile(filePath);
-            ex.setErrorMessage(e.getMessage());
-            log.error(ex.getMessage(), ex);
-            uploadExceptionList.add(ex);
+            UploadException ex = logAndAddUploadException(ERROR_CODE.SHA1SUM_CALC_ERROR, e, filePath, null, e.getMessage());
             throw ex;
         }
         
@@ -207,19 +220,11 @@ public class MsExperimentUploader {
             return uploadService.uploadMS2Run(ms2Provider,experimentId, sha1Sum);
         }
         catch (DataProviderException e) {
-            UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_MS2, e);
-            ex.setFile(filePath);
-            ex.setErrorMessage(e.getMessage());
-            log.error(ex.getMessage(), ex);
-            uploadExceptionList.add(ex);
+            UploadException ex = logAndAddUploadException(ERROR_CODE.READ_ERROR_MS2, e, filePath, null, e.getMessage());
             throw ex;
         }
         catch (RuntimeException e) { // most likely due to SQL exception
-            UploadException ex = new UploadException(ERROR_CODE.UNKNOWN_MS2_ERROR, e);
-            ex.setFile(filePath);
-            ex.setErrorMessage(e.getMessage());
-            log.error(ex.getMessage(), ex);
-            uploadExceptionList.add(ex);
+            UploadException ex = logAndAddUploadException(ERROR_CODE.RUNTIME_MS2_ERROR, e, filePath, null, e.getMessage());
             throw ex;
         }
         finally {
@@ -227,17 +232,19 @@ public class MsExperimentUploader {
         }
     }
     
+    // Consume any exceptions during parsing and upload. If exceptions occur, this search will be deleted
+    // but the experiment upload will continue.
     private int uploadSQTSearch(String filePath, int runId, int searchGroupId) {
         
         // is this a supported SQT file
         try {
             if (!SQTFileReader.isSequestSQT(filePath)) {
-                createAndLogUploadException(ERROR_CODE.UNSUPPORTED_SQT, null, filePath, null, null);
+                logAndAddUploadException(ERROR_CODE.UNSUPPORTED_SQT, null, filePath, null, null);
                 return 0;
             }
         }
         catch (IOException e1) {
-            createAndLogUploadException(ERROR_CODE.READ_ERROR_SQT, e1, filePath, null, e1.getMessage());
+            logAndAddUploadException(ERROR_CODE.READ_ERROR_SQT, e1, filePath, null, e1.getMessage());
             return 0;
         }
         
@@ -250,30 +257,21 @@ public class MsExperimentUploader {
             searchId = uploadService.uploadSQTSearch(sqtProvider, runId, searchGroupId);
         }
         catch (DataProviderException e) {
-            createAndLogUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, e.getMessage());
-            UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_SQT, e);
-            if (searchId != 0) {
-                SQTDataUploadService.deleteSearch(searchId);
-                searchId = 0;
-            }
+            logAndAddUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, e.getMessage());
+            deleteLastUploadedSearch(uploadService);
+            return 0;
         }
         catch (UploadException e) {
             e.setFile(filePath);
             log.error(e.getMessage(), e);
             uploadExceptionList.add(e);
-            searchId = uploadService.getUploadedSearchId();
-            if (searchId != 0) {
-                SQTDataUploadService.deleteSearch(searchId);
-                searchId = 0;
-            }
+            deleteLastUploadedSearch(uploadService);
+            return 0;
         }
         catch (RuntimeException e) { // most likely due to SQL exception
-            createAndLogUploadException(ERROR_CODE.UNKNOWN_SQT_ERROR, e, filePath, null, e.getMessage());
-            searchId = uploadService.getUploadedSearchId();
-            if (searchId != 0) {
-                SQTDataUploadService.deleteSearch(searchId);
-                searchId = 0;
-            }
+            logAndAddUploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e, filePath, null, e.getMessage());
+            deleteLastUploadedSearch(uploadService);
+            return 0;
         }
         
         finally {
@@ -283,8 +281,15 @@ public class MsExperimentUploader {
         }
         return searchId;
     }
+
+    private void deleteLastUploadedSearch(SQTDataUploadService uploadService) {
+        int searchId = uploadService.getUploadedSearchId();
+        if (searchId != 0) {
+            SQTDataUploadService.deleteSearch(searchId);
+        }
+    }
     
-    private UploadException createAndLogUploadException(ERROR_CODE errCode, Exception sourceException, String file, String directory, String message) {
+    private UploadException logAndAddUploadException(ERROR_CODE errCode, Exception sourceException, String file, String directory, String message) {
         UploadException ex = null;
         if (sourceException == null)
             ex = new UploadException(errCode);
@@ -349,7 +354,6 @@ public class MsExperimentUploader {
             SQTDataUploadService.deleteSearch(searchId);
             log.error("DELETED searchID: "+searchId);
         }
-        
     }
     
     public static int getScanIdFor(int experimentId, String runFileScanString) {
@@ -384,7 +388,7 @@ public class MsExperimentUploader {
         return scanDao.loadScanIdForScanNumRun(scanNumber, runId);
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UploadException {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");

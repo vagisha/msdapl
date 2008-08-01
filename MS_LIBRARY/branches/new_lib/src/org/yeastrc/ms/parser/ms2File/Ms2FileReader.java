@@ -203,7 +203,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
     public void parsePeaks(Scan scan) throws DataProviderException {
 
         int numErrors = 0;
-        int maxErrAllowed = 3;
+        int maxErrAllowed = 0;
         
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s+");
@@ -213,7 +213,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                         "missing peak m/z and intensity in line. Ignoring peak.", currentLine).getMessage());
                 numErrors++;
                 if (numErrors > maxErrAllowed)
-                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
                 
                 advanceLine();
                 continue; // go on to the next peak
@@ -224,7 +224,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                         "missing peak intensity in line. Ignoring peak.", currentLine).getMessage());
                 numErrors++;
                 if (numErrors > maxErrAllowed)
-                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
                 
                 advanceLine();
                 continue; // go on to the next peak
@@ -236,7 +236,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                 
                 numErrors++;
                 if (numErrors > maxErrAllowed)
-                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
                 
                 advanceLine();
                 continue; // go on to the next peak
@@ -247,7 +247,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                 
                 numErrors++;
                 if (numErrors > maxErrAllowed)
-                    throw new DataProviderException("More than 5 invalid peak data lines found for scan: "+scan.getStartScanNum());
+                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
                 
                 advanceLine();
                 continue; // go on to the next peak

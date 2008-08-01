@@ -24,14 +24,15 @@ public class UploadException extends Exception {
         SHA1SUM_CALC_ERROR      ("Error calculating sha1sum", ERROR),
         MULTIPLE_EXPIDS         ("Runs belong to different experiments", ERROR),
         
-        UNKNOWN_MS2_ERROR       ("", ERROR),
+        RUNTIME_MS2_ERROR       ("", ERROR),
         
         UNSUPPORTED_SQT         ("Non-SEQUEST sqt files are not supported", WARN),
         INVALID_SQT_HEADER      ("Invalid SQT header", WARN),
         INVALID_SQT_SCAN        ("Invalid SQT scan", WARN),
         NO_SCANID_FOR_SQT_SCAN  ("No database scanID found for SQT scan", WARN),
         READ_ERROR_SQT          ("Error reading SQT file", ERROR),
-        UNKNOWN_SQT_ERROR       ("", WARN),
+        
+        RUNTIME_SQT_ERROR       ("", WARN)
         ;
       
         private String message = "";

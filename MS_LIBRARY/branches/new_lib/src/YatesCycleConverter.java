@@ -14,6 +14,7 @@ import java.util.zip.ZipException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.service.MsExperimentUploader;
+import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.YatesCycleDownloader;
 
 
@@ -24,7 +25,7 @@ public class YatesCycleConverter {
 
     private static final Logger log = Logger.getLogger(YatesCycleConverter.class);
     
-    public static void main(String[] args) throws ClassNotFoundException, SQLException, ZipException, IOException {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, ZipException, IOException, UploadException {
         
         Connection connect = getConnection();
         Statement statement = null;
