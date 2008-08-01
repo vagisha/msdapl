@@ -73,8 +73,8 @@ public class SQTHeader implements SQTSearch {
         if (fragmentMassType == null)       return false;
         if (precursorMassType == null)      return false;
 //        if (startTimeString == null)        return false;
-        if (staticMods == null)             return false;
-        if (dynaMods == null)               return false;
+//        if (staticMods == null)             return false;
+//        if (dynaMods == null)               return false;
         
         return true;
     }
