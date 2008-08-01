@@ -118,7 +118,7 @@ public class DTAPeptide {
     /**
      * @param searchResultId The searchResultId to set.
      */
-    public void setScanId(int searchResultId) {
+    public void setSearchResultId(int searchResultId) {
         this.searchResultId = searchResultId;
     }
     
