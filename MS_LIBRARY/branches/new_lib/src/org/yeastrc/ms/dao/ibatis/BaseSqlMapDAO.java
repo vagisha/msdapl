@@ -34,8 +34,8 @@ public class BaseSqlMapDAO {
             return sqlMap.queryForObject(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Failed to execute select statement", e);
-            throw new RuntimeException("Failed to execute select statement", e);
+            log.error("Failed to execute select statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
         }
     }
     
@@ -50,8 +50,8 @@ public class BaseSqlMapDAO {
             return sqlMap.queryForList(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Failed to execute select list statement", e);
-            throw new RuntimeException("Failed to execute select list statement", e);
+            log.error("Failed to execute select list statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute select list statement: "+statementName, e);
         }
     }
     
@@ -65,8 +65,8 @@ public class BaseSqlMapDAO {
             return sqlMap.queryForList(statementName);
         }
         catch (SQLException e) {
-            log.error("Failed to execute select list statement", e);
-            throw new RuntimeException("Failed to execute select list statement", e);
+            log.error("Failed to execute select list statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute select list statement: "+statementName, e);
         }
     }
     
@@ -81,8 +81,8 @@ public class BaseSqlMapDAO {
             return (Integer) sqlMap.insert(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Failed to execute save statement", e);
-            throw new RuntimeException("Failed to execute save statement", e);
+            log.error("Failed to execute save statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute save statement: "+statementName, e);
         }
     }
     
@@ -96,8 +96,8 @@ public class BaseSqlMapDAO {
             sqlMap.insert(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Failed to execute save statement", e);
-            throw new RuntimeException("Failed to execute save statement", e);
+            log.error("Failed to execute save statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute save statement: "+statementName, e);
         }
     }
     
@@ -111,8 +111,8 @@ public class BaseSqlMapDAO {
             sqlMap.delete(statementName, parameterObject);
         }
         catch (SQLException e) {
-            log.error("Failed to execute delete statement", e);
-            throw new RuntimeException("Failed to execute delete statement", e);
+            log.error("Failed to execute delete statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute delete statement: "+statementName, e);
         }
     }
     
@@ -125,8 +125,8 @@ public class BaseSqlMapDAO {
             sqlMap.delete(statementName);
         }
         catch (SQLException e) {
-            log.error("Failed to execute deleteAll statement", e);
-            throw new RuntimeException("Failed to execute deleteAll statement", e);
+            log.error("Failed to execute deleteAll statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute deleteAll statement: "+statementName, e);
         }
     }
 }
