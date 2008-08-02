@@ -404,7 +404,7 @@ public class MsExperimentUploader {
         
         MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
         int searchId = searchDao.loadSearchIdForRunAndGroup(runId, searchGroupId);
-        if (scanId == 0) {
+        if (searchId == 0) {
             log.error("!!!NO SEARCH FOUND FOR RUNID: "+runId+"; searchGroupId: "+searchGroupId+"; fileName: "+runFileName);
             return 0;
         }

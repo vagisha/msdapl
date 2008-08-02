@@ -81,7 +81,7 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     public int loadSearchIdForRunAndGroup(int runId, int searchGroupId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("runId", runId);
-        map.put("searchGrouId", searchGroupId);
+        map.put("searchGroupId", searchGroupId);
         Integer searchId = (Integer)queryForObject("MsSearch.selectSearchIdForRunAndGroup", map);
         if (searchId != null)
             return searchId;
