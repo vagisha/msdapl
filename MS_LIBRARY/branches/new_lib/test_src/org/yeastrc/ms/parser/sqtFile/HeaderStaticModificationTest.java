@@ -42,7 +42,7 @@ public class HeaderStaticModificationTest extends TestCase {
         try {
             header.addStaticMods(modString);
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             fail("Empty modification string is be valid"+e.getMessage());
         }
 
@@ -51,7 +51,7 @@ public class HeaderStaticModificationTest extends TestCase {
             header.addStaticMods(modString);
             fail("Multiple static modifications modifications");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("Invalid static modification string (appears to have > 1 static modification): "+modString, e.getMessage());
         }
 
@@ -59,7 +59,7 @@ public class HeaderStaticModificationTest extends TestCase {
         try {
             header.addStaticMods(modString);
         }
-        catch(IllegalArgumentException e){fail("Valid static modification string");}
+        catch(SQTParseException e){fail("Valid static modification string");}
     }
 
     public void testAddStaticModsTestValidModChars() {
@@ -69,7 +69,7 @@ public class HeaderStaticModificationTest extends TestCase {
             header.addStaticMods(modString);
             fail("Missing static modification residues");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("No residues found for static modification: "+modString, e.getMessage());
         }
 
@@ -78,7 +78,7 @@ public class HeaderStaticModificationTest extends TestCase {
             header.addStaticMods(modString);
             fail("Invalid static modification residue");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("Invalid residues found found for static modification"+modString, e.getMessage());
         }
     }
@@ -90,7 +90,7 @@ public class HeaderStaticModificationTest extends TestCase {
             header.addStaticMods(modString);
             fail("Missing static modification mass");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("Invalid static modification string: "+modString.trim(), e.getMessage());
         }
 
@@ -99,7 +99,9 @@ public class HeaderStaticModificationTest extends TestCase {
             header.addStaticMods(modString);
             fail("Invalid static modification mass");
         }
-        catch(NumberFormatException e) {}
+        catch(SQTParseException e) {
+            assertEquals("Error parsing modification mass: "+modString, e.getMessage());
+        }
 
     }
 
@@ -120,7 +122,13 @@ public class HeaderStaticModificationTest extends TestCase {
         buf.append("=123.4");
         String modString = buf.toString();
 
-        header.addStaticMods(modString);
+        try {
+            header.addStaticMods(modString);
+        }
+        catch (SQTParseException e) {
+            fail("Valid static mod string");
+        }
+        
         List<MsSearchModification> mods = header.getStaticModifications();
         assertEquals(3, mods.size());
 

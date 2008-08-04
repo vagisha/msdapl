@@ -36,7 +36,7 @@ public class HeaderDynamicModificationTest extends TestCase {
         try {
             header.addDynamicMods(modString);
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             fail("Empty modification string is be valid"+e.getMessage());
         }
 
@@ -45,7 +45,7 @@ public class HeaderDynamicModificationTest extends TestCase {
             header.addDynamicMods(modString);
             fail("Multiple dynamic modifications modifications");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("Invalid dynamic modification string (appears to have > 1 dynamic modification): "+modString, e.getMessage());
         }
 
@@ -53,7 +53,7 @@ public class HeaderDynamicModificationTest extends TestCase {
         try {
             header.addDynamicMods(modString);
         }
-        catch(IllegalArgumentException e){fail("Valid dynamic modification string: "+e.getMessage()); e.getMessage();}
+        catch(SQTParseException e){fail("Valid dynamic modification string: "+e.getMessage()); e.getMessage();}
     }
 
     public void testAddDynamicModsTestValidModCharsAndSymbol() {
@@ -63,7 +63,7 @@ public class HeaderDynamicModificationTest extends TestCase {
             header.addDynamicMods(modString);
             fail("Missing modification symbol");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("No modification symbol found: "+modString, e.getMessage());
         }
         modString = "%=123.4";
@@ -71,7 +71,7 @@ public class HeaderDynamicModificationTest extends TestCase {
             header.addDynamicMods(modString);
             fail("Missing dynamic modification residues");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("No modification symbol found: "+modString, e.getMessage());
         }
         modString = "Cc=123.4";
@@ -79,7 +79,7 @@ public class HeaderDynamicModificationTest extends TestCase {
             header.addDynamicMods(modString);
             fail("Invalid modification symbol");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("Invalid modification symbol: "+modString, e.getMessage());
         }
     }
@@ -91,7 +91,7 @@ public class HeaderDynamicModificationTest extends TestCase {
             header.addDynamicMods(modString);
             fail("Missing dynamic modification mass");
         }
-        catch(IllegalArgumentException e){
+        catch(SQTParseException e){
             assertEquals("Invalid dynamic modification string: "+modString.trim(), e.getMessage());
         }
 
@@ -100,7 +100,9 @@ public class HeaderDynamicModificationTest extends TestCase {
             header.addDynamicMods(modString);
             fail("Invalid dynamic modification mass");
         }
-        catch(NumberFormatException e) {}
+        catch(SQTParseException e) {
+            assertEquals("Error parsing modification mass: "+modString, e.getMessage());
+        }
 
     }
 
@@ -121,7 +123,12 @@ public class HeaderDynamicModificationTest extends TestCase {
         buf.append("*=123.4");
         String modString = buf.toString();
 
-        header.addDynamicMods(modString);
+        try {
+            header.addDynamicMods(modString);
+        }
+        catch (SQTParseException e) {
+            fail("Valid dynamic modification string");
+        }
         List<MsSearchModification> mods = header.getDynamicModifications();
         assertEquals(3, mods.size());
 

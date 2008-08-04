@@ -7,8 +7,6 @@ import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.parser.DataProviderException;
-
 public class HeaderTest extends TestCase {
 
     protected void setUp() throws Exception {
@@ -62,7 +60,13 @@ public class HeaderTest extends TestCase {
     
     public void testGetStartDate() {
         SQTHeader header = new SQTHeader();
-        header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
+        try {
+            header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
+        }
+        catch (SQTParseException e) {
+            fail("Header is valid");
+            e.printStackTrace();
+        }
         Date date = header.getSearchDate();
         Calendar myCal = GregorianCalendar.getInstance();
         myCal.setTime(date);
@@ -89,37 +93,61 @@ public class HeaderTest extends TestCase {
     
     public void testGetStartDateInvalidDate() {
         SQTHeader header = new SQTHeader();
-        header.addHeaderItem("StartTime", "01/29/2008");
         try {
-            header.getSearchDate();
-            fail("Invalid start date");
+            header.addHeaderItem("StartTime", "01/29/2008");
+            fail("Valid header and start time");
         }
-        catch(RuntimeException e){}
+        catch (SQTParseException e) {
+            assertTrue(e.getMessage().startsWith("Error parsing start time: 01/29/2008"));
+        }
     }
     
     public void testGetSearchDurationNoEndTime() {
         SQTHeader header = new SQTHeader();
-        header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
+        try {
+            header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
+        }
+        catch (SQTParseException e) {
+            fail("Valid start time in header");
+        }
         
         assertEquals(0, header.getSearchDuration());
     }
     
     public void testGetSearchDurationWithEndTime() {
         SQTHeader header = new SQTHeader();
-        header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
-        header.addHeaderItem("EndTime", "01/29/2008, 03:44 AM");
+        try {
+            header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
+        }
+        catch (SQTParseException e) {
+            fail("Valid start time in header");
+        }
+        try {
+            header.addHeaderItem("EndTime", "01/29/2008, 03:44 AM");
+        }
+        catch (SQTParseException e) {
+            fail("Valid end time in header");
+        }
         assertEquals(10, header.getSearchDuration());
     }
     
     public void testGetSearchDurationInvalidEndDate() {
         SQTHeader header = new SQTHeader();
-        header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
-        header.addHeaderItem("EndTime", "01/29/2008, 03:44");
         try {
-            header.getSearchDuration();
-            fail("Invalid end date");
+            header.addHeaderItem("StartTime", "01/29/2008, 03:34 AM");
         }
-        catch(RuntimeException e){}
+        catch (SQTParseException e) {
+            fail("Valid start time in header");
+        }
+        try {
+            header.addHeaderItem("EndTime", "01/29/2008, 03:44");
+            fail("Valid end time in header");
+        }
+        catch (SQTParseException e) {
+            assertTrue(e.getMessage().startsWith("Error parsing end time: 01/29/2008, 03:44"));
+        }
+        
+        assertEquals(0, header.getSearchDuration());
         
     }
     
