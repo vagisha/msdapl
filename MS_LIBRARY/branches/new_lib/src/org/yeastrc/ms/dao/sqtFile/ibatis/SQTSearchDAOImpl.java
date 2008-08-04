@@ -46,11 +46,6 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
         this.resultDao = resultDao;
     }
     
-    @Override
-    public int getMaxSearchGroupId() {
-        return searchDao.getMaxSearchGroupId();
-    }
-    
     public SQTSearchDb loadSearch(int searchId) {
         return (SQTSearchDb) queryForObject("MsSearch.select", searchId);
     }
@@ -61,8 +56,8 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
     }
     
     @Override
-    public int loadSearchIdForRunAndGroup(int runId, int searchGroupId) {
-        return searchDao.loadSearchIdForRunAndGroup(runId, searchGroupId);
+    public int loadSearchIdForRunAndExperiment(int runId, int searchGroupId) {
+        return searchDao.loadSearchIdForRunAndExperiment(runId, searchGroupId);
     }
     
     public List<SQTSearchDb> loadSearchesForRun(int runId) {

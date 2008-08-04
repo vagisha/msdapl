@@ -35,13 +35,13 @@ public class MsLibTests {
         suite.addTest(SQTParserTests.suite());
         suite.addTestSuite(Ms2FileReaderTest.class);
         
-        // upload classes
-        suite.addTestSuite(MsExperimentUploaderTest.class);
-        
         // utility classes
         suite.addTestSuite(PeakStringBuilderTest.class);
         suite.addTestSuite(PeakUtilsTest.class);
         suite.addTestSuite(Sha1SumCalculatorTest.class);
+        
+        // upload classes
+        suite.addTestSuite(MsExperimentUploaderTest.class);
         
         //$JUnit-END$
         return suite;

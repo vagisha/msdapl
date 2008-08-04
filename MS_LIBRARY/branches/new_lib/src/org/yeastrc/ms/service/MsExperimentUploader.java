@@ -16,21 +16,16 @@ import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
-import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.domain.MsSearch;
 import org.yeastrc.ms.domain.MsSearchDb;
-import org.yeastrc.ms.domain.MsSearchResult;
-import org.yeastrc.ms.domain.MsSearchResultDb;
 import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms.parser.sqtFile.SQTParseException;
-import org.yeastrc.ms.parser.sqtFile.SQTSearchResultPeptideBuilder;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
@@ -39,9 +34,11 @@ public class MsExperimentUploader {
     private static final Logger log = Logger.getLogger(MsExperimentUploader.class);
 
 
-    private List<Integer> searchIdList = new ArrayList<Integer>();
     private int runExperimentId;
-    private int searchGroupId;
+    private int numRunsToUpload = 0;
+    private int numRunsUploaded = 0;
+    private int numSearchesToUpload = 0;
+    private int numSearchesUploaded = 0;
     
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
@@ -56,10 +53,7 @@ public class MsExperimentUploader {
      */
     public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) throws UploadException {
 
-        searchIdList.clear();
-        uploadExceptionList.clear();
-        runExperimentId = 0;
-        searchGroupId = 0;
+        resetUploader();
         
         log.info("BEGIN EXPERIMENT UPLOAD"+
                 "\n\tRemote server: "+remoteServer+
@@ -72,7 +66,7 @@ public class MsExperimentUploader {
         Set<String> filenames = getFileNamePrefixes(fileDirectory);
         
         // ----- BEFORE BEGINNING UPLOAD MAKE THE FOLLOWING CHECKS -----
-        // (1). If we didn't find anything print warning and return.
+        // (1). If we didn't find any files print warning and return.
         if (filenames.size() == 0) {
             UploadException ex = new UploadException(ERROR_CODE.EMPTY_DIRECTORY);
             ex.setDirectory(fileDirectory);
@@ -93,63 +87,52 @@ public class MsExperimentUploader {
         }
         
         
-        // ----- NOW WE CAN BEGIN UPLOAD -----
-        int experimentId = 0;
+        // ----- NOW WE CAN BEGIN THE UPLOAD -----
+        // make a new entry in the msExperment table first
+        runExperimentId =  uploadExperiment(remoteServer, remoteDirectory);
         
-        experimentId =  uploadExperiment(remoteServer, remoteDirectory, fileDirectory);
-        searchGroupId = getMySearchGroupId();
         try {
-            runExperimentId = uploadRunAndSearchFilesToDb(experimentId, fileDirectory, filenames, searchGroupId);
+            uploadRunAndSearchFilesToDb(runExperimentId, fileDirectory, filenames);
         }
         catch (UploadException e) {
             uploadExceptionList.add(e);
             log.error(e.getMessage(), e);
             log.error("ABORTING EXPERIMENT UPLOAD!!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-            deleteSearches(searchIdList); // deleted all the uploaded searches
-            deleteExperiment(experimentId); // delete the experiment
+            deleteExperiment(runExperimentId); // delete the experiment
+            numRunsUploaded = 0;
+            numSearchesUploaded = 0;
             throw e;
-        }
-
-        
-        // If the runs in this upload were already uploaded as part of another
-        // experiment, delete the entry we created earlier in the msExperiment table
-        if (experimentId != runExperimentId) {
-            deleteExperiment(experimentId);
-            experimentId = 0;
         }
         
         long end = System.currentTimeMillis();
-        if (experimentId != 0)
-            log.info("EXPERIMENT (id: "+experimentId+") UPLOADED IN: "
-                    +((end - start)/(1000L))+"seconds\n\tTime: "+(new Date()).toString()+"\n\n");
-        else
-            log.info("EXPERIMENT UPLOADED IN: "
-                    +((end - start)/(1000L))+"seconds\n\tONLY SQT FILES WERE UPLOADED for existing experimentID: "+runExperimentId+"\n\tTime: "+(new Date()).toString()+"\n\n");
+        log.info("END EXPERIMENT (id: "+runExperimentId+") UPLOAD: "+((end - start)/(1000L))+"seconds"+
+                "\n\tTime: "+(new Date().toString())+
+                "\n\t#Runs in Directory: "+numRunsToUpload+"; #Uploaded: "+numRunsUploaded+
+                "\n\t#Searches in Directory: "+numSearchesToUpload+"; #Uploaded: "+numSearchesUploaded+
+                "\n\tRemote server: "+remoteServer+
+                "\n\tRemote directory: "+remoteDirectory+
+                "\n\tDirectory: "+fileDirectory+
+                "\n\n");
+        
         return runExperimentId;
     }
 
-    private int uploadExperiment(String remoteServer, String remoteDirectory, String fileDirectory) {
+    private void resetUploader() {
+        uploadExceptionList.clear();
+        runExperimentId = 0;
+        numRunsToUpload = 0;
+        numRunsUploaded = 0;
+        numSearchesToUpload = 0;
+        numSearchesUploaded = 0;
+    }
+
+    private int uploadExperiment(String remoteServer, String remoteDirectory) {
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
         MsExperimentDbImpl experiment = new MsExperimentDbImpl();
         experiment.setDate(new java.sql.Date(new Date().getTime()));
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);
         return expDao.save(experiment);
-    }
-
-    private int getMySearchGroupId() {
-        return DAOFactory.instance().getMsSearchDAO().getMaxSearchGroupId() + 1; // one more than the last search group id.
-    }
-    
-    public int getSearchGroupId() {
-        return searchGroupId;
-    }
-    
-    public List<Integer> getSearchIdList() {
-        List<Integer> copyList = new ArrayList<Integer>(searchIdList.size());
-        for (Integer id: searchIdList)
-            copyList.add(id);
-        return copyList;
     }
     
     public List<UploadException> getUploadExceptionList() {
@@ -165,48 +148,29 @@ public class MsExperimentUploader {
     }
     
     /**
-     * If the runs were already in the database, the runs are not uploaded again, and the 
-     * existing experimentId for the runs is returned. 
+     * If the runs were already in the database, the runs are not uploaded again, but a new entry is 
+     * created in msExperimentRun linking the run with the new experiment.
      * @param experimentId
      * @param fileDirectory
      * @param filenames
      * @return
      * @throws UploadException 
      */
-    private int uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames, int searchGroupId) throws UploadException {
+    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames) throws UploadException {
         
-        boolean firstIter = true;
         for (String filename: filenames) {
 
             // Upload the run first.
             int runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2",experimentId);
             
-            // Get the experimentId for this run.  If this run is already in the database
-            // it will have an experiment id different from the one given to us as arguments
-            // to this method.
-            int tempId = MS2DataUploadService.getExperimentIdForRun(runId);
-            if (firstIter) {
-                experimentId = tempId;
-                firstIter = false;
-            }
-            // Make sure all runs in this experiment have the same experimentID!
-            else if (tempId != experimentId) {
-                UploadException ex = new UploadException(ERROR_CODE.MULTIPLE_EXPIDS);
-                ex.setDirectory(fileDirectory);
-                ex.setErrorMessage("Runs in an experiment upload cannot have different experimentIds! Found ids: "+experimentId+", "+tempId);
-                throw ex;
-            }
-
             // if the sqt file does not exist go on to the next run
             String sqtFile = fileDirectory+File.separator+filename+".sqt";
             if (!(new File(sqtFile).exists()))
                 continue;
             
             // now upload the search result 
-            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId, searchGroupId);
+            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId, experimentId);
         }
-        
-        return experimentId;
     }
 
     // Any exceptions that happens during sha1sum calculation, parsing or upload
@@ -242,7 +206,7 @@ public class MsExperimentUploader {
     
     // Consume any exceptions during parsing and upload. If exceptions occur, this search will be deleted
     // but the experiment upload will continue.
-    private int uploadSQTSearch(String filePath, int runId, int searchGroupId) {
+    private int uploadSQTSearch(String filePath, int runId, int experimentId) {
         
         // is this a supported SQT file
         try {
@@ -262,7 +226,7 @@ public class MsExperimentUploader {
         int searchId = 0;
         try { 
             sqtProvider.open(filePath);
-            searchId = uploadService.uploadSQTSearch(sqtProvider, runId, searchGroupId);
+            searchId = uploadService.uploadSQTSearch(sqtProvider, runId, experimentId);
         }
         catch (DataProviderException e) {
             logAndAddUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, e.getMessage());
@@ -283,8 +247,6 @@ public class MsExperimentUploader {
         }
         
         finally {
-            if (searchId != 0)
-                searchIdList.add(searchId);
             sqtProvider.close(); // close open file
         }
         return searchId;
@@ -357,60 +319,39 @@ public class MsExperimentUploader {
         log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
     }
     
-    private void deleteSearches(List<Integer> searchIdList) {
-        for (Integer searchId: searchIdList) {
-            SQTDataUploadService.deleteSearch(searchId);
-            log.error("DELETED searchID: "+searchId);
-        }
-    }
-    
-    public static int getSearchResultIdFor(int experimentId, int searchGroupId, String runFileScanString, String peptideAndExtras) {
-        // parse the filename to get the filename, scannumber and charge
+    public static int[] getScanAndSearchIdFor(int experimentId, int searchGroupId, String runFileScanString) {
+        // parse the filename to get the filename, scan number and charge
         // e.g. NE063005ph8s02.17247.17247.2
         Matcher match = fileNamePattern.matcher(runFileScanString);
         if (!match.matches()) {
             log.error("!!!INVALID FILENAME FROM DTASELECT RESULT: "+runFileScanString);
-            return 0;
+            return new int[0];
         }
-        String filename = match.group(1)+".ms2";
+        String runFileName = match.group(1)+".ms2";
         int scanNum = Integer.parseInt(match.group(2));
-        int charge = Integer.parseInt(match.group(4));
-        
-        String peptide;
-        try {
-            peptide = SQTSearchResultPeptideBuilder.getOnlyPeptide(peptideAndExtras);
-        }
-        catch (SQTParseException e) {
-           log.error("!!!ERROR parsing peptide from DTASelect: "+peptideAndExtras+"\n"+e.getMessage());
-           return 0;
-        }
-        return getSearchResultIdFor(experimentId, filename, searchGroupId, scanNum, charge, peptide);
-    }
-        
-    public static int getSearchResultIdFor(int experimentId, String runFileName, int searchGroupId, int scanNumber, int charge, String peptide) {
         
         MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
         int runId = runDao.loadRunIdForExperimentAndFileName(experimentId, runFileName);
         if (runId == 0) {
             log.error("!!!NO RUN FOUND FOR EXPERIMENT: "+experimentId+"; fileName: "+runFileName);
-            return 0;
+            return new int[0];
         }
+        
         MsScanDAO<MsScan, MsScanDb>scanDao = DAOFactory.instance().getMsScanDAO();
-        int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
+        int scanId = scanDao.loadScanIdForScanNumRun(scanNum, runId);
         if (scanId == 0) {
-            log.error("!!!NO SCAN FOUND FOR SCAN NUMBER: "+scanNumber+"; runId: "+runId+"; fileName: "+runFileName);
-            return 0;
+            log.error("!!!NO SCAN FOUND FOR SCAN NUMBER: "+scanNum+"; runId: "+runId+"; fileName: "+runFileName);
+            return new int[0];
         }
         
         MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-        int searchId = searchDao.loadSearchIdForRunAndGroup(runId, searchGroupId);
+        int searchId = searchDao.loadSearchIdForRunAndExperiment(runId, searchGroupId);
         if (searchId == 0) {
             log.error("!!!NO SEARCH FOUND FOR RUNID: "+runId+"; searchGroupId: "+searchGroupId+"; fileName: "+runFileName);
-            return 0;
+            return new int[0];
         }
         
-        MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
-        return resultDao.loadResultIdForSearchScanChargePeptide(searchId, scanId, charge, peptide);
+        return new int[]{scanId, searchId};
     }
     
     public static void main(String[] args) throws UploadException {

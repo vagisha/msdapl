@@ -11,8 +11,13 @@ public interface MsExperimentDAO {
 
     public abstract List<Integer> selectAllExperimentIds();
     
+    public abstract List<Integer> selectExperimentIdsForRun(int runId);
+    
+    public abstract List<Integer> selectRunIdsForExperiment(int experimentId);
+    
     public abstract int save(MsExperiment experiment);
+    
+    public abstract void saveRunExperiment(int experimentId, int runId);
 
     public abstract void delete(int msExperimentId);
-
 }

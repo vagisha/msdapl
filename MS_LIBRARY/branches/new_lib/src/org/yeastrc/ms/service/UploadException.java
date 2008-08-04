@@ -22,7 +22,6 @@ public class UploadException extends Exception {
         READ_ERROR_MS2          ("Error reading MS2 file", ERROR),
         INVALID_MS2_SCAN        ("Invalid SQT scan", ERROR),
         SHA1SUM_CALC_ERROR      ("Error calculating sha1sum", ERROR),
-        MULTIPLE_EXPIDS         ("Runs belong to different experiments", ERROR),
         
         RUNTIME_MS2_ERROR       ("", ERROR),
         

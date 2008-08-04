@@ -12,7 +12,7 @@
 	
 	<resultMap class="MsSearchDb" id="msSearchResult">
 		<result property="id" column="id" />
-		<result property="searchGroupId" column="searchGroupID" nullValue="0"/>
+		<result property="experimentId" column="experimentID" nullValue="0"/>
 		<result property="runId" column="runID" nullValue="0"/>
 		<result property="searchFileFormat" column="originalFileType"
 				javaType="SearchType" jdbcType="VARCHAR"
@@ -52,7 +52,7 @@
 	</resultMap> 
 	
 	<parameterMap class="MsSearch" id="msSearchParam">
-		<parameter property="searchGroupId" jdbcType="INTEGER"/>
+		<parameter property="experimentId" jdbcType="INTEGER"/>
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="searchFileFormat" 
 					jdbcType="VARCHAR" 
@@ -81,17 +81,13 @@
     	SELECT id FROM msPeptideSearch WHERE runID = #id#
     </select>
     
-    <select id="selectSearchIdForRunAndGroup" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msPeptideSearch WHERE runID = #runId# AND searchGroupID=#searchGroupId# LIMIT 1
-    </select>
-    
-    <select id="selectMaxSearchGroupId" resultClass="Integer" >
-    	SELECT max(searchGroupID) FROM msPeptideSearch
+    <select id="selectSearchIdForRunAndExperiment" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msPeptideSearch WHERE runID = #runId# AND experimentID=#experimentId# LIMIT 1
     </select>
     
     <insert id="insert" parameterMap="msSearchParam">
     	INSERT INTO msPeptideSearch (
-    	searchGroupID,
+    	experimentID,
     	runID,
     	originalFileType,
     	analysisProgramName,

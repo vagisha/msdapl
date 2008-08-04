@@ -14,9 +14,9 @@ import java.util.List;
 public interface MsSearchDb extends MsSearchBase {
 
     /**
-     * @return database id of the search group this search belongs to
+     * @return database id of the experiment this search belongs to
      */
-    public abstract int getSearchGroupId();
+    public abstract int getExperimentId();
     
     /**
      * @return database id of the run on which this search was done.

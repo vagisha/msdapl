@@ -23,6 +23,7 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
     private int processTime;
     private String serverName;
     private BigDecimal totalIntensity;
+    private BigDecimal observedMass;
     private BigDecimal lowestSp;
     private int sequenceMatches;
     
@@ -99,6 +100,16 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
     public void setTotalIntensity(BigDecimal totalIntensity) {
         this.totalIntensity = totalIntensity;
     }
+    
+    @Override
+    public BigDecimal getObservedMass() {
+        return observedMass;
+    }
+    
+    public void setObservedMass(BigDecimal mass) {
+        this.observedMass = mass;
+    }
+    
     /**
      * @return the lowestSp
      */

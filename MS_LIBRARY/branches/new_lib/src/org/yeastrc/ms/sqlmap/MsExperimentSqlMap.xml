@@ -27,11 +27,23 @@
     	SELECT * FROM msExperiment WHERE id= #id#
     </select>
     
+    <select id="selectExperimentIdsForRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT experimentID FROM msRunExperiment WHERE runID= #runId#
+    </select>
+    
+    <select id="selectRunIdsForExperiment" resultClass="Integer" parameterClass="Integer">
+    	SELECT runID FROM msRunExperiment WHERE experimentID= #experimentId#
+    </select>
+    
     <insert id="insert" parameterMap="msExperimentParam">
     	INSERT INTO msExperiment (expDate, serverAddress, serverDirectory) VALUES (?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
+    </insert>
+    
+    <insert id="insertRunExperiment" parameterClass="java.util.Map">
+    	INSERT INTO msRunExperiment (experimentID, runID) VALUES (#experimentId#, #runId#)
     </insert>
     
     <delete id="delete" parameterClass="Integer">

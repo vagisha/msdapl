@@ -98,5 +98,10 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
         public int getSequenceMatches() {
             return scan.getSequenceMatches();
         }
+
+        @Override
+        public BigDecimal getObservedMass() {
+            return scan.getObservedMass();
+        }
     }
 }

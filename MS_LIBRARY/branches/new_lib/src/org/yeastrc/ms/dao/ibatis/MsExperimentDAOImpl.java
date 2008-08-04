@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.domain.MsExperiment;
@@ -27,8 +29,26 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         return (MsExperimentDb)queryForObject("MsExperiment.select", msExperimentId);
     }
     
+    @Override
+    public List<Integer> selectExperimentIdsForRun(int runId) {
+        return queryForList("MsExperiment.selectExperimentIdsForRun");
+    }
+
+    @Override
+    public List<Integer> selectRunIdsForExperiment(int experimentId) {
+        return queryForList("MsExperiment.selectRunIdsForExperiment");
+    }
+    
     public int save(MsExperiment experiment) {
         return saveAndReturnId("MsExperiment.insert", experiment);
+    }
+    
+    @Override
+    public void saveRunExperiment(int experimentId, int runId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("experimentId", experimentId);
+        map.put("runId", runId);
+        save("MsExperiment.insertRunExperiment", map);
     }
     
     public List<Integer> selectAllExperimentIds() {

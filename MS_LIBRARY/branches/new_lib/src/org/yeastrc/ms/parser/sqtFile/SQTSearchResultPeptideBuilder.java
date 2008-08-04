@@ -85,22 +85,22 @@ public final class SQTSearchResultPeptideBuilder {
             modMap.put(mod.getModifiedResidue()+""+mod.getModificationSymbol(), mod);
         
         List<MsSearchResultModification> resultMods = new ArrayList<MsSearchResultModification>();
-        char modChar = 0;
+        char modifiedChar = 0;
         int modCharIndex = -1;
         for (int i = 0; i < peptide.length(); i++) {
             char x = peptide.charAt(i);
             // if this is a valid residue skip over it
             if (isResidue(x))   {
-                modChar = x;
+                modifiedChar = x;
                 modCharIndex++;
                 continue;
             }
-            MsSearchModification matchingMod = modMap.get(modChar+""+x);
+            MsSearchModification matchingMod = modMap.get(modifiedChar+""+x);
             if (matchingMod == null)
-                throw new SQTParseException("No matching modification found: "+modChar+x+"; sequence: "+peptide);
+                throw new SQTParseException("No matching modification found: "+modifiedChar+x+"; sequence: "+peptide);
             
             // found a match!!
-            resultMods.add(new ResultMod(modChar, x, matchingMod.getModificationMass(), modCharIndex));
+            resultMods.add(new ResultMod(modifiedChar, x, matchingMod.getModificationMass(), modCharIndex));
         }
         
         return resultMods;

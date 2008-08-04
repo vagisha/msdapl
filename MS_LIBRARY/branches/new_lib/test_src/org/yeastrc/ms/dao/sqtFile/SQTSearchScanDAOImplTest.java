@@ -66,6 +66,8 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(input.getProcessTime(), output.getProcessTime());
         assertEquals(input.getServerName(), output.getServerName());
         assertEquals(input.getTotalIntensity().doubleValue(), output.getTotalIntensity().doubleValue());
+        assertEquals(input.getSequenceMatches(), output.getSequenceMatches());
+        assertEquals(input.getObservedMass(), output.getObservedMass());
     }
     
     private SQTSearchScan makeSearchScan(final int charge, final int processTime) {
@@ -105,6 +107,11 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
             @Override
             public int getSequenceMatches() {
                 return 0;
+            }
+
+            @Override
+            public BigDecimal getObservedMass() {
+                return new BigDecimal("1124.08");
             }};
             return scan;
     }

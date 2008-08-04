@@ -18,8 +18,6 @@ import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.domain.ms2File.MS2ChargeDependentAnalysisDb;
@@ -76,6 +74,8 @@ public class MS2DataUploadService {
 
         // if run is already in the database return the runId of the existing run
         if (runId > 0)  {
+            // first save an entry in the msExperimentRun table
+            saveExperimentRun(experimentId, runId);
             log.info("Run with name: "+provider.getFileName()+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
             log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
@@ -96,6 +96,9 @@ public class MS2DataUploadService {
         runId = runDao.saveRun(header, experimentId);
         log.info("Uploaded top-level run information with runId: "+runId);
 
+        // Save an entry in the msExperimentRun table
+        saveExperimentRun(experimentId, runId);
+        
         // upload each of the scans
         MsScanDAO<MsScan, MsScanDb> scanDao = daoFactory.getMsScanDAO();
         int all = 0;
@@ -149,6 +152,11 @@ public class MS2DataUploadService {
         // clean up any cached data
         dAnalysisList.clear();
         iAnalysisList.clear();
+    }
+    
+    private void saveExperimentRun(int experimentId, int runId) {
+       MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
+       expDao.saveRunExperiment(experimentId, runId);
     }
     
     private void saveChargeDependentAnalysis(MS2ScanCharge scanCharge, final int scanChargeId) {
@@ -227,10 +235,5 @@ public class MS2DataUploadService {
     public static void deleteExperimentCascade(int experimentId) {
         MsDeletionDAO delDao = daoFactory.getDeletionDAO();
         delDao.deleteExperiment(experimentId);
-    }
-    
-    public static int getExperimentIdForRun(int runId) {
-        MsRunDAO<MsRun, MsRunDb> runDao = daoFactory.getMsRunDAO();
-        return runDao.loadExperimentIdForRun(runId);
     }
 }

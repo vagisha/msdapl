@@ -11,7 +11,6 @@
 	
 	<resultMap class="MsRunDb" id="msRunResult">
 		<result property="id" column="id" />
-		<result property="experimentId" column="experimentID" nullValue="0"/>
 		<result property="fileName" column="filename" />
 		<result property="runFileFormat" column="originalFileType"
 				javaType="RunType" jdbcType="VARCHAR"
@@ -45,7 +44,6 @@
 	
 	
 	<parameterMap class="MsRun" id="msRunParam">
-		<parameter property="experimentId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="fileName" jdbcType="VARCHAR"/>
 		<parameter property="sha1Sum" jdbcType="CHAR"/>
 		<parameter property="creationDate" jdbcType="VARCHAR"/>
@@ -64,36 +62,25 @@
 		/>
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>
-	
-    
-    <select id="selectRunIdsForExperiment" resultClass="Integer"> 
-        SELECT id FROM msRun WHERE experimentID = #id#
-    </select> 
     
     <select id="selectRunIdsForFileNameAndSha1Sum" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT id FROM msRun WHERE filename = #fileName# AND sha1Sum = #sha1Sum#
     </select> 
     
-    <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer">
-    	SELECT * FROM msRun WHERE experimentID=#id#;
-    </select>
-    
-    
     <select id="select" resultMap="msRunResult" parameterClass="Integer"> 
         SELECT * FROM msRun WHERE id=#id#
     </select> 
     
-    <select id="selectExperimentIdForRun" resultClass="Integer" parameterClass="Integer"> 
-        SELECT experimentID FROM msRun WHERE id=#id#
-    </select> 
-    
     <select id="selectRunIdForExperimentAndFileName" resultClass="Integer" parameterClass="java.util.Map"> 
-        SELECT id FROM msRun WHERE experimentID=#experimentId# AND filename=#fileName#
+        SELECT run.id 
+        FROM msRun as run, msExperimentRun as expRun
+        WHERE run.id = expRun.runID
+        AND expRun.experimentID=#experimentId# 
+        AND run.filename=#fileName#
     </select> 
     
     <insert id="insert" parameterMap="msRunParam">
-    	INSERT INTO MsRun (experimentID, 
-    						filename, 
+    	INSERT INTO MsRun ( filename, 
     						sha1Sum,
     						creationTime, 
     						extractor, 
@@ -106,7 +93,7 @@
     						acquisitionMethod,
     						originalFileType, 
     						comment) 
-    	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     	<selectKey resultClass="int" >
       		select last_insert_id() as id
     	</selectKey>
@@ -114,10 +101,6 @@
     
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM MsRun WHERE id=#id#		    
-    </delete>
-    
-    <delete id="deleteByExperimentId" parameterClass="Integer">
-		DELETE FROM MsRun WHERE experimentID=#id#		    
     </delete>
     
 </sqlMap>

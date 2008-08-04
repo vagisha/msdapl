@@ -13,10 +13,7 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
 
     public abstract List<Integer> loadSearchIdsForRun(int runId);
     
-    public abstract int loadSearchIdForRunAndGroup(int runId, int searchGroupId);
-    
-
-    public abstract int getMaxSearchGroupId();
+    public abstract int loadSearchIdForRunAndExperiment(int runId, int experimentId);
     
     /**
      * Saves the search in the database. Also saves:
@@ -25,10 +22,10 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
      * 3. any dynamic modifications used for the search 
      * @param search
      * @param runId
-     * @param searchGroupId
+     * @param experimentId
      * @return database id of the search
      */
-    public abstract int saveSearch(I search, int runId, int searchGroupId);
+    public abstract int saveSearch(I search, int runId, int experimentId);
 
     /**
      * Deletes the search ONLY

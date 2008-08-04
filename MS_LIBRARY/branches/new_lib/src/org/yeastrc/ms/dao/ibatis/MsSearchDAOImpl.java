@@ -57,14 +57,6 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         this.enzymeDao = enzymeDao;
     }
     
-    @Override
-    public int getMaxSearchGroupId() {
-        Integer groupId = (Integer)queryForObject("MsSearch.selectMaxSearchGroupId", null);
-        if (groupId != null)
-            return groupId;
-        return 0;
-    }
-    
     public MsSearchDb loadSearch(int searchId) {
         return (MsSearchDb) queryForObject("MsSearch.select", searchId);
     }
@@ -78,18 +70,18 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     }
     
     @Override
-    public int loadSearchIdForRunAndGroup(int runId, int searchGroupId) {
+    public int loadSearchIdForRunAndExperiment(int runId, int experimentId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("runId", runId);
-        map.put("searchGroupId", searchGroupId);
-        Integer searchId = (Integer)queryForObject("MsSearch.selectSearchIdForRunAndGroup", map);
+        map.put("experimentId", experimentId);
+        Integer searchId = (Integer)queryForObject("MsSearch.selectSearchIdForRunAndExperiment", map);
         if (searchId != null)
             return searchId;
         return 0;
     }
     
-    public int saveSearch(MsSearch search, int runId, int searchGroupId) {
-        MsSearchSqlMapParam searchDb = new MsSearchSqlMapParam(runId, search, searchGroupId);
+    public int saveSearch(MsSearch search, int runId, int experimentId) {
+        MsSearchSqlMapParam searchDb = new MsSearchSqlMapParam(runId, search, experimentId);
         int searchId = saveAndReturnId("MsSearch.insert", searchDb);
         
         // save any database information associated with the search 
@@ -173,12 +165,12 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     public class MsSearchSqlMapParam implements MsSearch {
 
         private int runId;
-        private int searchGroupId;
+        private int experimentId;
         private MsSearch search;
         
-        public MsSearchSqlMapParam(int runId, MsSearch search, int searchGroupId) {
+        public MsSearchSqlMapParam(int runId, MsSearch search, int experimentId) {
             this.runId = runId;
-            this.searchGroupId = searchGroupId;
+            this.experimentId = experimentId;
             this.search = search;
         }
 
@@ -189,8 +181,8 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
             return runId;
         }
         
-        public int getSearchGroupId() {
-            return searchGroupId;
+        public int getExperimentId() {
+            return experimentId;
         }
         
         public List<MsSearchModification> getDynamicModifications() {

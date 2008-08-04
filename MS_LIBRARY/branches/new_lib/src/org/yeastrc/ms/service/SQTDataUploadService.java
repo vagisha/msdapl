@@ -71,20 +71,21 @@ public class SQTDataUploadService {
      * provider should be closed after this method returns. 
      * @param provider
      * @param runId
+     * @param experimentId
      * @return
      * @throws UploadException 
      */
-    public int uploadSQTSearch(SQTSearchDataProvider provider, int runId, int searchGroupId) 
+    public int uploadSQTSearch(SQTSearchDataProvider provider, int runId, int experimentId) 
     throws UploadException {
 
-        log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+"; SearchGroupID: "+searchGroupId);
+        log.info("BEGIN SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+"; EXPERIMENT_ID: "+experimentId);
         long startTime = System.currentTimeMillis();
         
         // reset all caches etc.
         reset();
 
         try {
-            uploadedSearchId = uploadSearchHeader(provider, runId, searchGroupId);
+            uploadedSearchId = uploadSearchHeader(provider, runId, experimentId);
         }
         catch(DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER);
@@ -146,12 +147,12 @@ public class SQTDataUploadService {
         uploadedSearchId = 0;
     }
     
-    private int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int searchGroupId) throws DataProviderException {
+    private int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int experimentId) throws DataProviderException {
         
         SQTSearch search = provider.getSearchHeader();
         // save the search and return the database id
         MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();
-        return searchDao.saveSearch(search, runId, searchGroupId);
+        return searchDao.saveSearch(search, runId, experimentId);
     }
     
     private void uploadSearchScan(SQTSearchScan scan, int searchId, int scanId) {
@@ -260,7 +261,7 @@ public class SQTDataUploadService {
     }
     
     public static void deleteSearch(int searchId) {
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = daoFactory.getMsSearchDAO();
+        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
         searchDao.deleteSearch(searchId);
     }
     

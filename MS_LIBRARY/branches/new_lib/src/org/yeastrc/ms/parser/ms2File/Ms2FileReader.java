@@ -189,68 +189,26 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
     }
     
-//    private void skipScan() throws DataProviderException {
-//        while (currentLine != null && !isScanLine(currentLine))
-//            advanceLine();
-//    }
-//    
-//    private void skipScanCharge() throws DataProviderException {
-//        advanceLine();
-//        while(isChargeDepAnalysisLine(currentLine))
-//            advanceLine();
-//    }
-
     public void parsePeaks(Scan scan) throws DataProviderException {
 
-        int numErrors = 0;
-        int maxErrAllowed = 0;
-        
         while (isPeakDataLine(currentLine)) {
             String[] tokens = currentLine.split("\\s+");
             
             if (tokens.length == 0) {
-                log.warn( new DataProviderException(currentLineNum, 
-                        "missing peak m/z and intensity in line. Ignoring peak.", currentLine).getMessage());
-                numErrors++;
-                if (numErrors > maxErrAllowed)
-                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
-                
-                advanceLine();
-                continue; // go on to the next peak
+                throw new DataProviderException(currentLineNum, "Missing peak m/z and intensity for scan: "+scan.getStartScanNum(), currentLine);
             }
             
             if (tokens.length == 1) {
-                log.warn( new DataProviderException(currentLineNum, 
-                        "missing peak intensity in line. Ignoring peak.", currentLine).getMessage());
-                numErrors++;
-                if (numErrors > maxErrAllowed)
-                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
-                
-                advanceLine();
-                continue; // go on to the next peak
+                throw new DataProviderException(currentLineNum, "Missing peak intensity for scan: "+scan.getStartScanNum(), currentLine);
             }
             
             
             if (!isValidDouble(tokens[0])) {
-                log.warn( new DataProviderException(currentLineNum, "Invalid m/z value. Ignoring peak.", currentLine).getMessage());
-                
-                numErrors++;
-                if (numErrors > maxErrAllowed)
-                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
-                
-                advanceLine();
-                continue; // go on to the next peak
+                throw new DataProviderException(currentLineNum, "Invalid m/z value found for peak in scan: "+scan.getStartScanNum(), currentLine);
             }
             
             if (!isValidDouble(tokens[1])) {
-                log.warn( new DataProviderException(currentLineNum, "Invalid intensity value. Ignoring peak.", currentLine).getMessage());
-                
-                numErrors++;
-                if (numErrors > maxErrAllowed)
-                    throw new DataProviderException(currentLineNum, numErrors+" invalid peak data lines found for scan: "+scan.getStartScanNum(), currentLine);
-                
-                advanceLine();
-                continue; // go on to the next peak
+                throw new DataProviderException(currentLineNum, "Invalid intensity value found for peak in scan: "+scan.getStartScanNum(), currentLine);
             }
             
             scan.addPeak(tokens[0], tokens[1]); 
