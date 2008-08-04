@@ -20,6 +20,8 @@ import org.yeastrc.ms.service.SQTSearchDataProvider;
 public class SQTFileReader extends AbstractReader implements SQTSearchDataProvider {
 
     private List<MsSearchModification> searchDynamicMods;
+    
+    private String serverAddress;
 
     private static final Logger log = Logger.getLogger(SQTFileReader.class);
 
@@ -70,9 +72,16 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         return false;
     }
     
+    public SQTFileReader(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+    
     public SQTHeader getSearchHeader()  throws DataProviderException {
 
         SQTHeader header = new SQTHeader();
+        // if any search databases are found; set the server path
+        header.setServerAddress(serverAddress);
+        
         while (isHeaderLine(currentLine)) {
             String[] nameAndVal = parseHeader(currentLine);
             addHeaderItem(header, nameAndVal);

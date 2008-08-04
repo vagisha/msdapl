@@ -48,9 +48,13 @@ public class DTAPeptideSaver {
 			if (peptide.getResultID() == 0) { throw new Exception("No resultID set in ResultPeptide on save()."); }
 			else { rs.updateInt("resultID", peptide.getResultID() ); }
 			
-			if (peptide.getSearchResultId() != 0) { 
-			    rs.updateInt("searchResultID", peptide.getSearchResultId()); 
+			if (peptide.getSearchID() != 0) { 
+			    rs.updateInt("searchID", peptide.getSearchID()); 
 			}
+			
+			if (peptide.getScanID() != 0) { 
+                rs.updateInt("scanID", peptide.getScanID()); 
+            }
 
 			if (peptide.isUnique()) { rs.updateString("pepUnique", "T"); }
 			else { rs.updateString("pepUnique", "F"); }

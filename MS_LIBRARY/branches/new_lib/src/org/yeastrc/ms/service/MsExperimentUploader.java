@@ -100,7 +100,7 @@ public class MsExperimentUploader {
         runExperimentId =  uploadExperiment(remoteServer, remoteDirectory);
         
         try {
-            uploadRunAndSearchFilesToDb(runExperimentId, fileDirectory, filenames);
+            uploadRunAndSearchFilesToDb(runExperimentId, fileDirectory, filenames, remoteServer);
         }
         catch (UploadException e) {
             uploadExceptionList.add(e);
@@ -164,7 +164,7 @@ public class MsExperimentUploader {
      * @return
      * @throws UploadException 
      */
-    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames) throws UploadException {
+    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames, String serverAddress) throws UploadException {
         
         for (String filename: filenames) {
 
@@ -177,13 +177,14 @@ public class MsExperimentUploader {
                 continue;
             
             // now upload the search result 
-            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId, experimentId);
+            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId, experimentId, serverAddress);
         }
     }
 
     // Any exceptions that happens during sha1sum calculation, parsing or upload
     // will be punted up to the calling function. 
     private int uploadMS2Run(String filePath, int experimentId) throws UploadException {
+        numRunsToUpload++;
         Ms2FileReader ms2Provider = new Ms2FileReader();
         MS2DataUploadService uploadService = new MS2DataUploadService();
         String sha1Sum;
@@ -197,7 +198,9 @@ public class MsExperimentUploader {
         
         try {
             ms2Provider.open(filePath, sha1Sum);
-            return uploadService.uploadMS2Run(ms2Provider,experimentId, sha1Sum);
+            int runId = uploadService.uploadMS2Run(ms2Provider,experimentId, sha1Sum);
+            numRunsUploaded++;
+            return runId;
         }
         catch (DataProviderException e) {
             UploadException ex = logAndAddUploadException(ERROR_CODE.READ_ERROR_MS2, e, filePath, null, e.getMessage());
@@ -214,7 +217,9 @@ public class MsExperimentUploader {
     
     // Consume any exceptions during parsing and upload. If exceptions occur, this search will be deleted
     // but the experiment upload will continue.
-    private int uploadSQTSearch(String filePath, int runId, int experimentId) {
+    private int uploadSQTSearch(String filePath, int runId, int experimentId, String serverAddress) {
+        
+        numSearchesToUpload++;
         
         // is this a supported SQT file
         try {
@@ -229,12 +234,13 @@ public class MsExperimentUploader {
         }
         
         // upload the file
-        SQTFileReader sqtProvider = new SQTFileReader();
+        SQTFileReader sqtProvider = new SQTFileReader(serverAddress);
         SQTDataUploadService uploadService = new SQTDataUploadService();
         int searchId = 0;
         try { 
             sqtProvider.open(filePath);
             searchId = uploadService.uploadSQTSearch(sqtProvider, runId, experimentId);
+            numSearchesUploaded++;
         }
         catch (DataProviderException e) {
             logAndAddUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, e.getMessage());

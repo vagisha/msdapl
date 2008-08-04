@@ -7,7 +7,6 @@ import java.io.StringReader;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.ms2File.ScanCharge;
 
 public class SQTParserTest extends TestCase {
 
@@ -22,7 +21,7 @@ public class SQTParserTest extends TestCase {
     public void testParseScan() {
 //      String line = "S  00016\t00016\t1\t0 \t shamu046\t 742.52000\t 0.0\t0.0 \t0";
         String line = "S       01718   01718   1       0       node0269        993.88000        0.0    0.0     0";
-        SQTFileReader reader = new SQTFileReader();
+        SQTFileReader reader = new SQTFileReader(null);
         try {
             reader.parseScan(line);
         }
@@ -35,7 +34,7 @@ public class SQTParserTest extends TestCase {
 
 
     public void testParseLocus() {
-        SQTFileReader reader = new SQTFileReader();
+        SQTFileReader reader = new SQTFileReader(null);
 
         String locus = "H\tName\tValue";
         try {reader.parseLocus(locus); fail("Not a 'L' line");}

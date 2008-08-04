@@ -152,7 +152,7 @@ public class HeaderTest extends TestCase {
     }
     
     public void testParseHeader() {
-        SQTFileReader reader = new SQTFileReader();
+        SQTFileReader reader = new SQTFileReader(null);
         String header = "H       Precursor/Fragment Ion Isotopes AVG/MONO";
         String[] parsed = reader.parseHeader(header);
         assertEquals(2, parsed.length);

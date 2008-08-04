@@ -54,6 +54,7 @@ public class SQTHeader implements SQTSearch {
     private int searchDuration = -1;
     
     private Database database;
+    private String serverAddress;
     
     private List<SQTField> headerItems;
     private List<MsSearchModification> staticMods;
@@ -180,6 +181,11 @@ public class SQTHeader implements SQTSearch {
         if (multipleDatabases(filePath))
             throw new SQTParseException("Multiple databases found in header");
         database.setServerPath(filePath);
+        database.setServerAddress(this.serverAddress);
+    }
+    
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
     }
     
     boolean multipleDatabases(String filePath) {

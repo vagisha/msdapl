@@ -35,7 +35,7 @@ public class SQTFileValidator {
     private void validateFile(String filePath) {
 
 
-        SQTFileReader dataProvider = new SQTFileReader();
+        SQTFileReader dataProvider = new SQTFileReader("remoteServer");
 
         // open the file
         try {
