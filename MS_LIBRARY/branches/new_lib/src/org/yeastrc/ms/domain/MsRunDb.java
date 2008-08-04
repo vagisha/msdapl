@@ -14,11 +14,6 @@ import java.util.List;
 public interface MsRunDb extends MsRunBase {
 
     /**
-     * @return database id of the experiment this run belongs to.
-     */
-    public abstract int getExperimentId();
-    
-    /**
      * @return database id of the run
      */
     public abstract int getId();

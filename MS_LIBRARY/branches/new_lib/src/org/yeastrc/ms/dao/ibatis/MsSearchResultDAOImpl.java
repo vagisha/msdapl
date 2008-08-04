@@ -52,18 +52,6 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForSearchScanCharge", map);
     }
     
-    public int loadResultIdForSearchScanChargePeptide(int searchId, int scanId, int charge, String peptide) {
-        Map<String, Object> map = new HashMap<String, Object>(4);
-        map.put("searchId", searchId);
-        map.put("scanId", scanId);
-        map.put("charge", charge);
-        map.put("peptide", peptide);
-        Integer resultId = (Integer)queryForObject("MsSearchResult.selectResultIdsForSearchScanCharge", map);
-        if (resultId == null)
-            return 0;
-        return resultId;
-    }
-    
     public int save(MsSearchResult searchResult, int searchId, int scanId) {
         
         int resultId = saveResultOnly(searchResult, searchId, scanId);

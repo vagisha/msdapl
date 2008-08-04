@@ -127,10 +127,10 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
     //---------------------------------------------------------------------------------------
     // MS2 Run
     //---------------------------------------------------------------------------------------
-    protected MS2RunTest makeMS2Run() {
+    protected MS2RunTest makeMS2Run(String fileName) {
         MS2RunTest run = new MS2RunTest();
         run.setRunFileFormat(RunFileFormat.MS2);
-        run.setFileName("my_file1.ms2");
+        run.setFileName(fileName);
         run.setAcquisitionMethod("Data dependent");
         run.setComment("Dummy run");
         run.setConversionSW("ms2Convert");

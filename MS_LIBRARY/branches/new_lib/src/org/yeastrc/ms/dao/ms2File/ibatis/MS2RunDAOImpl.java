@@ -1,8 +1,6 @@
 package org.yeastrc.ms.dao.ms2File.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
@@ -43,10 +41,10 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
     /**
      * Saves the run along with MS2 file specific information
      */
-    public int saveRun(MS2Run run, int msExperimentId) {
+    public int saveRun(MS2Run run, int experimentId) {
 
         // save the run
-        int runId = msRunDao.saveRun(run, msExperimentId);
+        int runId = msRunDao.saveRun(run, experimentId);
 
         MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
         for (MS2Field header: run.getHeaderList()) {
@@ -62,17 +60,8 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
         return (MS2RunDb) queryForObject("MsRun.select", runId);
     }
 
-    @Override
-    public int loadExperimentIdForRun(int runId) {
-        return msRunDao.loadExperimentIdForRun(runId);
-    }
-
     public List<MS2RunDb> loadExperimentRuns(int msExperimentId) {
         return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
-    }
-
-    public List<Integer> loadRunIdsForExperiment(int msExperimentId) {
-        return msRunDao.loadRunIdsForExperiment(msExperimentId);
     }
 
     @Override
@@ -85,33 +74,7 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
         return msRunDao.runIdsFor(fileName, sha1Sum);
     }
 
-
-    /**
-     * This will delete all the runs associated with the given experimentId, along with
-     * any enzyme entries (msRunEnzyme table) associated with the runs, as well as the scans
-     * MS2 file-format specific information is deleted too.
-     * 
-     * @param msExperimentId
-     * @return List of run IDs that were deleted
-     */
-    public List<Integer> deleteRunsForExperiment(int msExperimentId) {
-
-        List<Integer> runIds = loadRunIdsForExperiment(msExperimentId);
-        for (Integer runId: runIds)
-            delete(runId);
-        
-        return runIds;
-    }
-
     public void delete(int runId) {
-
-        // delete any headers
-        ms2HeaderDao.deleteHeadersForRunId(runId);
-
-        // delete any scans
-        ms2ScanDao.deleteScansForRun(runId);
-
         msRunDao.delete(runId);
-
     }
 }

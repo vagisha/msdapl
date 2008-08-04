@@ -121,10 +121,6 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
         return resultDao.loadResultIdsForSearchScanCharge(searchId, scanId, charge);
     }
     
-    public int loadResultIdForSearchScanChargePeptide(int searchId, int scanId, int charge, String peptide) {
-        return resultDao.loadResultIdForSearchScanChargePeptide(searchId, scanId, charge, peptide);
-    }
-    
     public class SQTSearchResultSqlMapParam {
         
         private int resultId;

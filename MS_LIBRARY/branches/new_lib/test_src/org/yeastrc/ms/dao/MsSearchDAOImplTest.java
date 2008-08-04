@@ -31,14 +31,13 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchDao.loadSearchIdsForRun(runId_1).size()); // runId = 1
         
         // create and save a search with no seq. db information or modifications or enzymes
-        int searchGroupId = searchDao.getMaxSearchGroupId();
         MsSearch search_1 = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
         assertEquals(167, search_1.getSearchDuration());
         assertEquals(0, search_1.getSearchDatabases().size());
         assertEquals(0, search_1.getStaticModifications().size());
         assertEquals(0, search_1.getDynamicModifications().size());
         
-        int searchId_1 = searchDao.saveSearch(search_1, runId_1, searchGroupId); // runId = 21
+        int searchId_1 = searchDao.saveSearch(search_1, runId_1, 32); // runId = 21; experimentId = 32
         List<MsSearchDb> searchList = (List<MsSearchDb>) searchDao.loadSearchesForRun(runId_1);
         assertEquals(1, searchList.size());
         assertEquals(0, resultDao.loadResultIdsForSearch(searchId_1).size());
@@ -53,7 +52,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         
         
         int runId_2 = 23;
-        int searchId_2 = searchDao.saveSearch(search_2, runId_2, searchGroupId); // runId = 23
+        int searchId_2 = searchDao.saveSearch(search_2, runId_2, 32); // runId = 23; experimentId = 32
         searchList = searchDao.loadSearchesForRun(runId_2);
         assertEquals(1, searchList.size());
         assertEquals(2, seqDbDao.loadSearchDatabases(searchId_2).size());

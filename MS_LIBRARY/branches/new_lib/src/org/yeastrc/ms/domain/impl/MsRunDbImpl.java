@@ -12,8 +12,6 @@ public class MsRunDbImpl implements MsRunDb {
 
     private int id; // unique id (database) for this run
 
-    private int experimentId; // id (database) of the experiment this run belongs to
-
     // File for this run
     private String fileName; 
     private RunFileFormat fileFormat = RunFileFormat.UNKNOWN;
@@ -47,14 +45,6 @@ public class MsRunDbImpl implements MsRunDb {
 
     public void setId(int id) {
         this.id = id;
-    }
-    
-    public int getExperimentId() {
-        return experimentId;
-    }
-    
-    public void setExperimentId(int msExperimentId) {
-        this.experimentId = msExperimentId;
     }
     
     //---------------------------------------------------------------------------------------

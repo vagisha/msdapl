@@ -11,11 +11,11 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
     /**
      * Saves the given run in the database and returns the database id for the run.
      * Any enzyme information is saved
+     * An entry is creatd in msExperimentRun linking this run to the experiment.
      * @param run
-     * @param msExperimentId 
      * @return
      */
-    public abstract int saveRun(I run, int msExperimentId);
+    public abstract int saveRun(I run, int experimentId);
     
     
     /**
@@ -26,27 +26,12 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
     public abstract O loadRun(int runId);
     
     /**
-     * Returns the experiment Id for the given run.
-     * @param runId
-     * @return
-     */
-    public abstract int loadExperimentIdForRun(int runId);
-    
-    /**
      * Returns the list of runs for the given experiment ID.
      * The returned runs have associated enzyme related information
      * @param msExperimentId
      * @return
      */
     public abstract List<O> loadExperimentRuns(int msExperimentId);
-    
-    
-    /**
-     * Returns the list of run IDs for the given experiment ID.
-     * @param msExperimentId
-     * @return
-     */
-    public abstract List<Integer> loadRunIdsForExperiment(int msExperimentId);
     
     /**
      * Returns the runId for the given experiment and file name. Returns
@@ -72,15 +57,6 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
      * @param runId
      */
     public abstract void delete(int runId);
-    
-    /**
-     * This will delete all the runs associated with this experiment, along with
-     * any enzyme entries (msRunEnzyme table) associated with the runs as well as
-     * the scans.
-     * @param msExperimentId
-     * @return List of run IDs that were deleted
-     */
-    public abstract List<Integer> deleteRunsForExperiment(int msExperimentId);
     
     
     /**

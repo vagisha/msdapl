@@ -28,11 +28,11 @@
     </select>
     
     <select id="selectExperimentIdsForRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT experimentID FROM msRunExperiment WHERE runID= #runId#
+    	SELECT experimentID FROM msExperimentRun WHERE runID= #runId#
     </select>
     
     <select id="selectRunIdsForExperiment" resultClass="Integer" parameterClass="Integer">
-    	SELECT runID FROM msRunExperiment WHERE experimentID= #experimentId#
+    	SELECT runID FROM msExperimentRun WHERE experimentID=#experimentId#
     </select>
     
     <insert id="insert" parameterMap="msExperimentParam">
@@ -43,11 +43,15 @@
     </insert>
     
     <insert id="insertRunExperiment" parameterClass="java.util.Map">
-    	INSERT INTO msRunExperiment (experimentID, runID) VALUES (#experimentId#, #runId#)
+    	INSERT INTO msExperimentRun (experimentID, runID) VALUES (#experimentId#, #runId#)
     </insert>
     
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM msExperiment WHERE id=#id#		    
+    </delete>
+    
+     <delete id="deleteExperimentRuns" parameterClass="Integer">
+		DELETE FROM msExperimentRun WHERE id=#id#		    
     </delete>
     
 </sqlMap>

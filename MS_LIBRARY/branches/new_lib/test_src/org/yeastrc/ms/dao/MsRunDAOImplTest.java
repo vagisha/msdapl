@@ -16,15 +16,12 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     protected void setUp() throws Exception {
         super.setUp();
-        runDao = DAOFactory.instance().getMsRunDAO();
-        enzymeDao = DAOFactory.instance().getEnzymeDAO();
-        scanDao = DAOFactory.instance().getMsScanDAO();
     }
     
     protected void tearDown() throws Exception {
         super.tearDown();
-        runDao.deleteRunsForExperiment(msExperimentId_1);
-        runDao.deleteRunsForExperiment(msExperimentId_2);
+        deleteRunsForExperiment(msExperimentId_1);
+        deleteRunsForExperiment(msExperimentId_2);
     }
     
     public void testSaveAndLoad() {
@@ -39,15 +36,15 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         runDao.saveRun(createDefaultRun(), msExperimentId_1);
         runDao.saveRun(createDefaultRun(), msExperimentId_2); // different experiment
         
-        int origSize = runDao.loadRunIdsForExperiment(msExperimentId_1).size();
+        int origSize = expDao.loadRunIdsForExperiment(msExperimentId_1).size();
         assertTrue(origSize == 2);
         
         // delete experiment 2 runs
-        runDao.deleteRunsForExperiment(msExperimentId_2); 
-        assertEquals(origSize, runDao.loadRunIdsForExperiment(msExperimentId_1).size());
+        deleteRunsForExperiment(msExperimentId_2); 
+        assertEquals(origSize, expDao.loadRunIdsForExperiment(msExperimentId_1).size());
         
-        runDao.deleteRunsForExperiment(msExperimentId_1); 
-        assertEquals(0, runDao.loadRunIdsForExperiment(msExperimentId_1).size());
+        deleteRunsForExperiment(msExperimentId_1); 
+        assertEquals(0, expDao.loadRunIdsForExperiment(msExperimentId_1).size());
     }
     
     public void testSaveWithInvalidExpId() {
@@ -201,7 +198,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(5, scanDao.loadScanIdsForRun(runId_2).size());
         
         // now delete the runs for experiment 1
-        runDao.deleteRunsForExperiment(msExperimentId_1);
+        deleteRunsForExperiment(msExperimentId_1);
         
         // make sure the run is deleted ...
         assertEquals(0, runDao.loadExperimentRuns(msExperimentId_1).size());
@@ -216,7 +213,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(5, scanDao.loadScanIdsForRun(runId_2).size());
         
         // now delete the runs for experiment 1
-        runDao.deleteRunsForExperiment(msExperimentId_2);
+        deleteRunsForExperiment(msExperimentId_2);
         
         // make sure the run is deleted ...
         assertEquals(0, runDao.loadExperimentRuns(msExperimentId_2).size());

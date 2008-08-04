@@ -58,14 +58,6 @@
     	SELECT id FROM msPeptideSearchResult WHERE searchID = #id#
     </select>
     
-    <select id="selectResultIdForSearchScanChargePeptide" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msPeptideSearchResult
-    	WHERE searchID = #searchId#
-    	AND scanID = #scanId#
-    	AND charge = #charge#
-    	AND peptide = #peptide#
-    </select>
-    
     <select id="selectResultIdsForSearchScanCharge" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msPeptideSearchResult 
     	WHERE searchID = #searchId# 

@@ -65,6 +65,11 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearch.selectSearchesForRun", runId);
     }
     
+    @Override
+    public List<Integer> loadSearchIdsForExperiment(int experimentId) {
+        return queryForList("MsSearch.selectSearchIdsForExperiment", experimentId);
+    }
+    
     public List<Integer> loadSearchIdsForRun(int runId) {
         return queryForList("MsSearch.selectSearchIdsForRun", runId);
     }
@@ -110,22 +115,6 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     }
     
     public void deleteSearch(int searchId) {
-        
-        // NOTE: all of this is now done by the MySQL trigger
-//        // delete all results for this search
-//        resultDao.deleteResultsForSearch(searchId);
-//        
-//        // delete any sequence database(s) associated with this search
-//        seqDbDao.deleteSearchDatabases(searchId);
-//        
-//        // delete any static and dynamic modifications used for this search
-//        modDao.deleteStaticModificationsForSearch(searchId);
-//        modDao.deleteDynamicModificationsForSearch(searchId);
-//        
-//        // delete any enzymes used for this search
-//        enzymeDao.deleteEnzymesForSearch(searchId);
-        
-        // finally delete the search
         delete("MsSearch.delete", searchId);
     }
 
@@ -238,4 +227,5 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
             return search.getEnzymeList();
         }
     }
+
 }

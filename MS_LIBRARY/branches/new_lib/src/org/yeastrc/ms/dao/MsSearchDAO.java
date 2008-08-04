@@ -11,6 +11,8 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
     
     public abstract List<O> loadSearchesForRun(int runId);
 
+    public abstract List<Integer> loadSearchIdsForExperiment(int experimentId);
+    
     public abstract List<Integer> loadSearchIdsForRun(int runId);
     
     public abstract int loadSearchIdForRunAndExperiment(int runId, int experimentId);

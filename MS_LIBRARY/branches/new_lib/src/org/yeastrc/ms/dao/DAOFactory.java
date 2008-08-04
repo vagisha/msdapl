@@ -113,7 +113,7 @@ public class DAOFactory {
         expDAO = new MsExperimentDAOImpl(sqlMap);
         enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
         scanDAO = new MsScanDAOImpl(sqlMap);
-        runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO, scanDAO);
+        runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO, scanDAO, expDAO);
         
         ms2FileHeadersDAO = new MS2HeaderDAOImpl(sqlMap);
         ms2ChgIAnalysisDAO = new MS2ChargeIndependentAnalysisDAOImpl(sqlMap);

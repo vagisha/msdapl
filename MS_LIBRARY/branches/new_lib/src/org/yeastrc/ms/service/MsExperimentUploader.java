@@ -62,17 +62,26 @@ public class MsExperimentUploader {
                 "\n\tTime: "+(new Date().toString()));
         long start = System.currentTimeMillis();
         
+        // ----- BEFORE BEGINNING UPLOAD MAKE THE FOLLOWING CHECKS -----
+        // (1). Make sure upload directory exists
+        if (!(new File(fileDirectory).exists())) {
+            UploadException ex = new UploadException(ERROR_CODE.DIRECTORY_NOT_FOUND);
+            ex.setDirectory(fileDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
+        
         // get the file names
         Set<String> filenames = getFileNamePrefixes(fileDirectory);
         
-        // ----- BEFORE BEGINNING UPLOAD MAKE THE FOLLOWING CHECKS -----
-        // (1). If we didn't find any files print warning and return.
+        // (2). If we didn't find any files print warning and return.
         if (filenames.size() == 0) {
             UploadException ex = new UploadException(ERROR_CODE.EMPTY_DIRECTORY);
             ex.setDirectory(fileDirectory);
             uploadExceptionList.add(ex);
             log.error(ex.getMessage(), ex);
-            return 0;
+            throw ex;
         }
         
         // (2). make sure .ms2 files are present
@@ -83,9 +92,8 @@ public class MsExperimentUploader {
             ex.setDirectory(fileDirectory);
             uploadExceptionList.add(ex);
             log.error(ex.getMessage(), ex);
-            return 0;
+            throw ex;
         }
-        
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
         // make a new entry in the msExperment table first
@@ -245,7 +253,6 @@ public class MsExperimentUploader {
             deleteLastUploadedSearch(uploadService);
             return 0;
         }
-        
         finally {
             sqtProvider.close(); // close open file
         }
@@ -315,11 +322,25 @@ public class MsExperimentUploader {
     }
     
     private void deleteExperiment(int experimentId) {
-        MS2DataUploadService.deleteExperiment(experimentId);
+        
+        // delete the searches for the given experimentId
+        List<Integer> searchIds = SQTDataUploadService.getSearchIdsForExperiment(experimentId);
+        for (Integer searchId: searchIds) 
+            SQTDataUploadService.deleteSearch(searchId);
+        
+        MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
+        // delete the runs for the given experimentId (ONLY if they do NOT belong to another experiment)
+        List<Integer> runIds = expDao.loadRunIdsUniqueToExperiment(experimentId);
+        for (Integer runId: runIds)
+            MS2DataUploadService.deleteRun(runId);
+        
+        // delete the experiment. This will also delete entries from the msExperimentRun table.
+        expDao.delete(experimentId);
+        
         log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
     }
     
-    public static int[] getScanAndSearchIdFor(int experimentId, int searchGroupId, String runFileScanString) {
+    public static int[] getScanAndSearchIdFor(int experimentId, String runFileScanString) {
         // parse the filename to get the filename, scan number and charge
         // e.g. NE063005ph8s02.17247.17247.2
         Matcher match = fileNamePattern.matcher(runFileScanString);
@@ -345,9 +366,9 @@ public class MsExperimentUploader {
         }
         
         MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-        int searchId = searchDao.loadSearchIdForRunAndExperiment(runId, searchGroupId);
+        int searchId = searchDao.loadSearchIdForRunAndExperiment(runId, experimentId);
         if (searchId == 0) {
-            log.error("!!!NO SEARCH FOUND FOR RUNID: "+runId+"; searchGroupId: "+searchGroupId+"; fileName: "+runFileName);
+            log.error("!!!NO SEARCH FOUND FOR RUNID: "+runId+"; experimentId: "+experimentId+"; fileName: "+runFileName);
             return new int[0];
         }
         

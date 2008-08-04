@@ -81,8 +81,12 @@
     	SELECT id FROM msPeptideSearch WHERE runID = #id#
     </select>
     
+    <select id="selectSearchIdsForExperiment" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msPeptideSearch WHERE experimentID = #id#
+    </select>
+    
     <select id="selectSearchIdForRunAndExperiment" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msPeptideSearch WHERE runID = #runId# AND experimentID=#experimentId# LIMIT 1
+    	SELECT id FROM msPeptideSearch WHERE runID = #runId# AND experimentID=#experimentId#
     </select>
     
     <insert id="insert" parameterMap="msSearchParam">

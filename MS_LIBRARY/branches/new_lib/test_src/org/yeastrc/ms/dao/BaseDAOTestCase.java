@@ -54,6 +54,7 @@ public class BaseDAOTestCase extends TestCase {
 
     protected MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
     protected MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
+    protected MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
 
     protected MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
     protected MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = 
@@ -478,6 +479,12 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(inputRun.getSha1Sum(), outputRun.getSha1Sum());
         assertEquals(inputRun.getRunFileFormat(), outputRun.getRunFileFormat());
         assertEquals(inputRun.getEnzymeList().size(), outputRun.getEnzymeList().size());
+    }
+
+    protected void deleteRunsForExperiment(int experimentId) {
+        List<Integer> uniqueRuns = expDao.loadRunIdsUniqueToExperiment(experimentId);
+        for (Integer runId: uniqueRuns)
+            runDao.delete(runId);
     }
 
 }

@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,13 +31,24 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     }
     
     @Override
-    public List<Integer> selectExperimentIdsForRun(int runId) {
-        return queryForList("MsExperiment.selectExperimentIdsForRun");
+    public List<Integer> loadExperimentIdsForRun(int runId) {
+        return queryForList("MsExperiment.selectExperimentIdsForRun", runId);
     }
 
     @Override
-    public List<Integer> selectRunIdsForExperiment(int experimentId) {
-        return queryForList("MsExperiment.selectRunIdsForExperiment");
+    public List<Integer> loadRunIdsForExperiment(int experimentId) {
+        return queryForList("MsExperiment.selectRunIdsForExperiment", experimentId);
+    }
+    
+    @Override
+    public List<Integer> loadRunIdsUniqueToExperiment(int experimentId) {
+        List<Integer> runIdsForExp = loadRunIdsForExperiment(experimentId);
+        List<Integer> uniqueRunIds = new ArrayList<Integer>();
+        for (Integer runId: runIdsForExp) {
+            if (loadExperimentIdsForRun(runId).size() == 1)
+                uniqueRunIds.add(runId);
+        }
+        return uniqueRunIds;
     }
     
     public int save(MsExperiment experiment) {
@@ -56,10 +68,12 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     }
     
     /**
-     * Deletes the experiment ONLY
+     * Deletes the experiment and matching entries in msExperimentRun table
      */
     public void delete(int msExperimentId) {
         // delete the experiment
         delete("MsExperiment.delete", msExperimentId);
+        // delete matching entries in msExperimentRun table
+        delete("MsExperiment.deleteExperimentRuns", msExperimentId);
     }
 }

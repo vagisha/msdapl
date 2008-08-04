@@ -3,11 +3,12 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRun"> 
 
+	<typeAlias alias="MsRun" type="org.yeastrc.ms.domain.MsRun" />
 	<typeAlias alias="MsRunDb" type="org.yeastrc.ms.domain.impl.MsRunDbImpl"/>
 	<typeAlias alias="MS2RunDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2RunDbImpl"/>
 	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.RunFileFormat"/>
 	<typeAlias alias="RunTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$RunFileFormatTypeHandler"/>
-	<typeAlias alias="MsRun" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$MsRunSqlMapParam" />
+	
 	
 	<resultMap class="MsRunDb" id="msRunResult">
 		<result property="id" column="id" />
@@ -69,6 +70,12 @@
     
     <select id="select" resultMap="msRunResult" parameterClass="Integer"> 
         SELECT * FROM msRun WHERE id=#id#
+    </select> 
+    
+    <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer"> 
+        SELECT * FROM msRun as run, msExperimentRun as expRun
+        WHERE run.id = expRun.runID
+        AND expRun.experimentId=#id#
     </select> 
     
     <select id="selectRunIdForExperimentAndFileName" resultClass="Integer" parameterClass="java.util.Map"> 

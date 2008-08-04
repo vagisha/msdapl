@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsEnzymeDAO;
+import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.MsEnzymeDAO.EnzymeProperties;
@@ -30,21 +31,22 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRunDb> {
 
+    private MsExperimentDAO expDao;
     private MsScanDAO<MsScan, MsScanDb> msScanDao;
     private MsEnzymeDAO enzymeDao;
     
     public MsRunDAOImpl(SqlMapClient sqlMap, MsEnzymeDAO enzymeDao , 
-            MsScanDAO<MsScan, MsScanDb> msScanDAO) {
+            MsScanDAO<MsScan, MsScanDb> msScanDAO, MsExperimentDAO expDao) {
         super(sqlMap);
         this.enzymeDao = enzymeDao;
         this.msScanDao = msScanDAO;
+        this.expDao = expDao;
     }
 
-    public int saveRun(MsRun run, int msExperimentId) {
+    public int saveRun(MsRun run, int experimentId) {
         
-        MsRunSqlMapParam runDb = new MsRunSqlMapParam(msExperimentId, run);
-        // save the run
-        int runId = saveAndReturnId("MsRun.insert", runDb);
+        int runId = saveAndReturnId("MsRun.insert", run);
+        expDao.saveRunExperiment(experimentId, runId);
         
         // save the enzyme information
         List<MsEnzyme> enzymes = run.getEnzymeList();
@@ -59,20 +61,8 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         return (MsRunDb) queryForObject("MsRun.select", runId);
     }
     
-    @Override
-    public int loadExperimentIdForRun(int runId) {
-        Integer id = (Integer)queryForObject("MsRun.selectExperimentIdForRun", runId);
-        if (id != null)
-            return id;
-        return 0;
-    }
-    
     public List<MsRunDb> loadExperimentRuns(int msExperimentId) {
         return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
-    }
-    
-    public List<Integer> loadRunIdsForExperiment(int msExperimentId) {
-        return queryForList("MsRun.selectRunIdsForExperiment", msExperimentId);
     }
     
     @Override
@@ -95,45 +85,14 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
     }
     
     
+    /**
+     * Delete only the top level run; everything else is deleted via SQL triggers.
+     */
     public void delete(int runId) {
-        
-        // delete enzyme information first
-        enzymeDao.deleteEnzymesForRun(runId);
-        
-        // delete scans
-        msScanDao.deleteScansForRun(runId);
-        
         // delete the run
         delete("MsRun.delete", runId);
     }
    
-    
-    /**
-     * This will delete all the runs associated with the given experimentId, along with
-     * any enzyme entries (msRunEnzyme table) associated with the runs, as well as the scans
-     * 
-     * @param msExperimentId
-     * @return List of run IDs that were deleted
-     */
-    public List<Integer> deleteRunsForExperiment(int msExperimentId) {
-        List<Integer> runIds = loadRunIdsForExperiment(msExperimentId);
-        
-        if (runIds.size() > 0) {
-            // delete enzyme associations
-            enzymeDao.deleteEnzymesForRuns(runIds);
-        }
-        
-        for (Integer runId: runIds) {
-            // delete scans for this run
-            msScanDao.deleteScansForRun(runId);
-        }
-        
-        // finally, delete the runs
-        delete("MsRun.deleteByExperimentId", msExperimentId);
-        return runIds;
-    }
-
-    
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
         MsRunDb run = loadRun(runId);
         
@@ -168,85 +127,4 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
             return RunFileFormat.instance(s);
         }
     }
-    //---------------------------------------------------------------------------------------
-    
-    //---------------------------------------------------------------------------------------
-    /**
-     * Convenience class for encapsulating a MsRun and associated experiment id
-     */
-    public static class MsRunSqlMapParam implements MsRun {
-
-        private int experimentId;
-        private MsRun run;
-        
-        public MsRunSqlMapParam(int experimentId, MsRun run) {
-            this.experimentId = experimentId;
-            this.run = run;
-        }
-        
-        /**
-         * @return the experimentId
-         */
-        public int getExperimentId() {
-            return experimentId;
-        }
-
-        public List<MsEnzyme> getEnzymeList() {
-            return run.getEnzymeList();
-        }
-
-        public String getAcquisitionMethod() {
-            return run.getAcquisitionMethod();
-        }
-
-        public String getComment() {
-            return run.getComment();
-        }
-
-        public String getConversionSW() {
-            return run.getConversionSW();
-        }
-
-        public String getConversionSWOptions() {
-            return run.getConversionSWOptions();
-        }
-
-        public String getConversionSWVersion() {
-            return run.getConversionSWVersion();
-        }
-
-        public String getCreationDate() {
-            return run.getCreationDate();
-        }
-
-        public String getDataType() {
-            return run.getDataType();
-        }
-
-        public String getFileName() {
-            return run.getFileName();
-        }
-
-        public String getInstrumentModel() {
-            return run.getInstrumentModel();
-        }
-
-        public String getInstrumentSN() {
-            return run.getInstrumentSN();
-        }
-
-        public String getInstrumentVendor() {
-            return run.getInstrumentVendor();
-        }
-
-        public RunFileFormat getRunFileFormat() {
-            return run.getRunFileFormat();
-        }
-
-        public String getSha1Sum() {
-            return run.getSha1Sum();
-        }
-    }
-    //---------------------------------------------------------------------------------------
-
 }

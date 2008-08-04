@@ -51,6 +51,11 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
     }
     
     @Override
+    public List<Integer> loadSearchIdsForExperiment(int experimentId) {
+        return searchDao.loadSearchIdsForExperiment(experimentId);
+    }
+    
+    @Override
     public List<Integer> loadSearchIdsForRun(int runId) {
         return searchDao.loadSearchIdsForRun(runId);
     }

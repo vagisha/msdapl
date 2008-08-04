@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsDeletionDAO;
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
@@ -96,9 +95,6 @@ public class MS2DataUploadService {
         runId = runDao.saveRun(header, experimentId);
         log.info("Uploaded top-level run information with runId: "+runId);
 
-        // Save an entry in the msExperimentRun table
-        saveExperimentRun(experimentId, runId);
-        
         // upload each of the scans
         MsScanDAO<MsScan, MsScanDb> scanDao = daoFactory.getMsScanDAO();
         int all = 0;
@@ -226,14 +222,9 @@ public class MS2DataUploadService {
             return runIds.get(0);
         return 0;
     }
-
-    public static void deleteExperiment(int experimentId) {
-        MsExperimentDAO expDao = daoFactory.getMsExperimentDAO();
-        expDao.delete(experimentId);
-    }
     
-    public static void deleteExperimentCascade(int experimentId) {
-        MsDeletionDAO delDao = daoFactory.getDeletionDAO();
-        delDao.deleteExperiment(experimentId);
+    public static void deleteRun(Integer runId) {
+        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+        runDao.delete(runId);
     }
 }
