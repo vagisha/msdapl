@@ -262,7 +262,7 @@ public class SQTDataUploadService {
     
     public static List<Integer> getSearchIdsForExperiment(int experimentId) {
         MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-        return searchDao.loadSearchIdsForRun(experimentId);
+        return searchDao.loadSearchIdsForExperiment(experimentId);
     }
     
     public static void deleteSearch(int searchId) {
