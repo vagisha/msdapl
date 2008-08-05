@@ -51,7 +51,7 @@
     </delete>
     
      <delete id="deleteExperimentRuns" parameterClass="Integer">
-		DELETE FROM msExperimentRun WHERE id=#id#		    
+		DELETE FROM msExperimentRun WHERE experimentID=#id#		    
     </delete>
     
 </sqlMap>

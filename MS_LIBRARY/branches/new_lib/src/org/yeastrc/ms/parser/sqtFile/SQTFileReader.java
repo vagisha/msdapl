@@ -149,12 +149,6 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         return scan;
     }
 
-//    private void skipScan() throws DataProviderException {
-//        advanceLine();
-//        while(isResultLine(currentLine) || isLocusLine(currentLine))
-//            advanceLine();
-//    }
-
     ScanResult parseScan(String line) throws DataProviderException {
 
         // make sure we have a scan line

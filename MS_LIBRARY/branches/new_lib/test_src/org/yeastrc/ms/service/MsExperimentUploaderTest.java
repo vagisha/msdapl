@@ -210,10 +210,31 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         }
     }
 
+    public void testUploadInvalidMS2() {
+        resetDatabase();
+        String dir = "test_resources/invalid_ms2_S_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            fail("2.ms2 is invalid");
+        }
+        catch (UploadException e1) {
+            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
+//            String msg = "LINE NUMBER: 37\n\tLINE: Z 1   1372.55laksdjflkasf;a";
+            assertTrue(e1.getMessage().contains(msg));
+        }
+        assertTrue(DAOFactory.instance().getMsExperimentDAO().selectAllExperimentIds().size() == 0);
+    }
+    
 //    public void testUploadValidDataWWarnings() {
 //        resetDatabase();
 //        String dir = "test_resources/validData_w_warnings_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+//        int expId = 0;
+//        try {
+//            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+//        }
+//        catch (UploadException e1) {
+//            e1.printStackTrace();
+//        }
 //        assertEquals(1, expId);
 //        
 //        // read from database and make sure files are identical (MS2 files)

@@ -210,6 +210,10 @@ public class MsExperimentUploader {
             UploadException ex = logAndAddUploadException(ERROR_CODE.RUNTIME_MS2_ERROR, e, filePath, null, e.getMessage());
             throw ex;
         }
+        catch(UploadException e) {
+            e.setFile(filePath);
+            throw e;
+        }
         finally {
             ms2Provider.close();
         }

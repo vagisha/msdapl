@@ -21,7 +21,7 @@ public class UploadException extends Exception {
         EMPTY_DIRECTORY         ("No files found to upload.", ERROR),
         MISSING_MS2             ("Missing required ms2 files.", ERROR),
         READ_ERROR_MS2          ("Error reading MS2 file", ERROR),
-        INVALID_MS2_SCAN        ("Invalid SQT scan", ERROR),
+        INVALID_MS2_SCAN        ("Invalid MS2 scan", ERROR),
         SHA1SUM_CALC_ERROR      ("Error calculating sha1sum", ERROR),
         
         RUNTIME_MS2_ERROR       ("", ERROR),
@@ -79,9 +79,9 @@ public class UploadException extends Exception {
         if (errorMessage != null)
             buf.append("\t"+errorMessage);
         if (file != null)
-            buf.append("\tFile: "+file+"\n");
+            buf.append("\n\tFile: "+file+"\n");
         if (directory != null)
-            buf.append("\tDirectory: "+directory+"\n");
+            buf.append("\n\tDirectory: "+directory+"\n");
         
         return buf.toString();
     }
