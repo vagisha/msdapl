@@ -9,16 +9,8 @@ package org.yeastrc.ms.service;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.util.Sha1SumCalculator;
@@ -30,149 +22,69 @@ public class MS2FileValidator {
 
     private static final Logger log = Logger.getLogger(MS2FileValidator.class);
 
-    private boolean headerValid = false;
-    private boolean scansValid = false;
+    public static final int VALIDATION_ERR_SHA1SUM = 1;
+    public static final int VALIDATION_ERR_READ = 2;
+    public static final int VALIDATION_ERR_HEADER = 3;
+    public static final int VALIDATION_ERR_SCAN = 4;
+    public static final int VALID = 0;
 
-    private void validateFile(String filePath) {
+    public int validateFile(String filePath) {
 
-
+        log.info("VALIDATING file: "+filePath);
+        
         Ms2FileReader dataProvider = new Ms2FileReader();
 
+        String sha1sum = getSha1Sum(filePath);
+        if (sha1sum == null) {
+            log.error("ERROR calculating sha1sum for file: "+filePath+". EXITING...");
+            return VALIDATION_ERR_SHA1SUM;
+        }
         // open the file
         try {
-            String sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
-            dataProvider.open(filePath, sha1Sum);
+            dataProvider.open(filePath, sha1sum);
         }
         catch (DataProviderException e) {
-            log.error(e.getMessage(), e);
+            log.error("ERROR reading file: "+filePath+". EXITING...", e);
             dataProvider.close();
-            return;
-        }
-        catch (IOException e) {
-            log.error(e.getMessage(), e);
-            dataProvider.close();
-            return;
-        }
-        catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage(), e);
-            dataProvider.close();
-            return;
+            return VALIDATION_ERR_READ;
         }
 
         // read the header
         try {
             dataProvider.getRunHeader();
-            headerValid = true;
         }
         catch (DataProviderException e) {
-            log.error(e.getMessage(), e);
+            log.error("ERROR reading file: "+filePath+". EXITING...", e);
             dataProvider.close();
-            return;
+            return VALIDATION_ERR_HEADER;
         }
 
         // read the scans
         while (dataProvider.hasNextScan()) {
             try {
-                MS2Scan scan = dataProvider.getNextScan();
+                dataProvider.getNextScan();
             }
             catch (DataProviderException e) {
-                log.error(e.getMessage(), e);
+                log.error("ERROR reading file: "+filePath+". EXITING...", e);
                 dataProvider.close();
-                return;
+                return VALIDATION_ERR_SCAN;
             }
         }
         dataProvider.close();
+        return VALID;
     }
 
-    public boolean validate(String filePath) {
-        validateFile(filePath);
-        StringBuilder buf = new StringBuilder();
-        buf.append("Ran validator on: "+filePath);
-        if (headerValid) {
-            buf.append("Header: valid");
-            if (scansValid)
-                buf.append("Scans: valid");
-            else
-                buf.append("Scans: invalid");
-        }
-        else {
-            buf.append("Header: invalid");
-        }
-        log.info(buf.toString());
-        return (headerValid && scansValid);
-    }
-
-    public static void main(String[] args) {
-//        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
-//        Map<Integer, String> cycleIds = getCycleIdList();
-//        int found = 0;
-//        int valid = 0;
-//        try {
-//            for (Integer cycleId: cycleIds.keySet()) {
-//                //if (found > 208)
-//                 //   break;
-//                String fileName = cycleIds.get(cycleId);
-//                if (fileName == null || fileName.trim().length() == 0)
-//                    continue;
-//                fileName = fileName+".ms2";
-//                YatesCycleDownloader downloader = new YatesCycleDownloader();
-//                if (downloader.downloadFile(cycleId, downloadDir, fileName, DATA_TYPE.MS2)) {
-//                    found++;
-//                    SQTFileValidator validator = new SQTFileValidator();
-//                    if (validator.validate(downloadDir+File.separator+fileName)){
-//                        valid++;
-//                    }
-//                    else {
-//                        log.error("!!!!!!!!!!INVALID FILE: "+fileName);
-//                    }
-//                    new File(downloadDir+File.separator+fileName).delete();
-//                }
-//            }
-//        }
-//        catch(Exception e) {e.printStackTrace();}
-//        finally {
-//            log.info("Num files found: "+(found-1)+"; Valid files: "+valid);
-//        }
-      String filePath = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/UploadTest/PARC_orbplusphos-05.ms2";
-      MS2FileValidator validator = new MS2FileValidator();
-      validator.validate(filePath);
-    }
-
-    public static Map<Integer, String> getCycleIdList() {
-        Connection conn = null;
-        Statement s = null;
-        ResultSet rs = null;
-        Map<Integer, String> cycleIdList = new HashMap<Integer, String>();
+    private String getSha1Sum(String filePath) {
         try {
-            conn = getConnection();
-            s = conn.createStatement();
-            rs = s.executeQuery("SELECT cycleID, cycleFileName FROM tblYatesCycles ORDER BY runID DESC limit 500");
-            while (rs.next()) {
-                cycleIdList.put(rs.getInt("cycleID"), rs.getString("cycleFileName"));
-            }
+            return Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
         }
-        catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        catch (IOException e) {
+            log.error(e.getMessage(), e);
+            return null;
         }
-        catch (SQLException e) {
-            e.printStackTrace();
+        catch (NoSuchAlgorithmException e) {
+            log.error(e.getMessage(), e);
+            return null;
         }
-        finally {
-            try {
-                conn.close();
-                s.close();
-                rs.close();
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return cycleIdList;
-    }
-
-    public static Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName( "com.mysql.jdbc.Driver" );
-        String URL = "jdbc:mysql://localhost/yrc";
-        return DriverManager.getConnection( URL, "root", "");
     }
 }

@@ -20,7 +20,6 @@ import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
-import org.yeastrc.ms.service.YatesCycleDownloader.DATA_TYPE;
 
 /**
  * 
