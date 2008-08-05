@@ -14,7 +14,6 @@ ALTER TABLE msExperiment ADD INDEX(expDate);
 
 CREATE TABLE msRun (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    experimentID INT UNSIGNED NOT NULL,
     filename VARCHAR(255),
     sha1Sum CHAR(40),
     creationTime VARCHAR(255),
@@ -29,9 +28,8 @@ CREATE TABLE msRun (
     originalFileType VARCHAR(10),
     comment TEXT
 );
-ALTER TABLE msRun ADD INDEX(experimentID);
 ALTER TABLE msRun ADD INDEX(filename);
-
+CREATE TABLE msExperimentRun (	runID INT UNSIGNED NOT NULL,		experimentID INT UNSIGNED NOT NULL);
 CREATE TABLE msScan (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     runID INT UNSIGNED NOT NULL,
@@ -110,7 +108,7 @@ ALTER TABLE msRunEnzyme ADD INDEX (enzymeID);
 # PEPTIDE ANALYSIS SIDE
 
 CREATE TABLE msPeptideSearch (
-    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,        searchGroupID  INT UNSIGNED NOT NULL,
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,        experimentID  INT UNSIGNED NOT NULL,
     runID INT UNSIGNED NOT NULL,
     originalFileType VARCHAR(10) NOT NULL,
     analysisProgramName VARCHAR(25),
@@ -122,7 +120,7 @@ CREATE TABLE msPeptideSearch (
     fragmentMassMethod VARCHAR(20),
     fragmentMassTolerance DECIMAL(10,5)
 );
-ALTER TABLE msPeptideSearch ADD INDEX(runID);
+ALTER TABLE msPeptideSearch ADD INDEX(runID);ALTER TABLE msPeptideSearch ADD INDEX(experimentID);
 
 
 CREATE TABLE msSearchEnzyme (
@@ -167,7 +165,7 @@ CREATE TABLE SQTSpectrumData (
     charge TINYINT UNSIGNED,
     processTime INT UNSIGNED,
     serverName VARCHAR(50),
-    totalIntensity DECIMAL(10,5),
+    totalIntensity DECIMAL(10,5),        observedMass DECIMAL(10,5),
     lowestSp DECIMAL(10,5),        sequenceMatches INT UNSIGNED
 );
 ALTER TABLE SQTSpectrumData ADD PRIMARY KEY(scanID, searchID, charge);
@@ -326,11 +324,11 @@ CREATE TRIGGER msRun_bdelete BEFORE DELETE ON msRun
 |
 DELIMITER ;
 
-DELIMITER |
-CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
-  FOR EACH ROW
-  BEGIN
-    DELETE FROM msRun WHERE experimentID = OLD.id;
-  END;
-|
-DELIMITER ;
+#DELIMITER |
+#CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
+ # FOR EACH ROW
+ # BEGIN
+ #   DELETE FROM msRun WHERE experimentID = OLD.id;
+#  END;
+#|
+#DELIMITER ;
