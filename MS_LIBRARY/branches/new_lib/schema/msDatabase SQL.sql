@@ -12,9 +12,15 @@ CREATE TABLE msExperiment (
 );
 ALTER TABLE msExperiment ADD INDEX(expDate);
 
+CREATE TABLE msExperimentRun (
+    runID INT UNSIGNED NOT NULL,
+    experimentID INT UNSIGNED NOT NULL
+);
+ALTER TABLE msExperimentRun ADD PRIMARY KEY (runID, experimentID );
+ALTER TABLE msExperimentRun ADD INDEX (experimentID );
+
 CREATE TABLE msRun (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    experimentID INT UNSIGNED NOT NULL,
     filename VARCHAR(255),
     sha1Sum CHAR(40),
     creationTime VARCHAR(255),
@@ -29,7 +35,6 @@ CREATE TABLE msRun (
     originalFileType VARCHAR(10),
     comment TEXT
 );
-ALTER TABLE msRun ADD INDEX(experimentID);
 ALTER TABLE msRun ADD INDEX(filename);
 
 CREATE TABLE msScan (
@@ -42,7 +47,7 @@ CREATE TABLE msScan (
     preScanID INT UNSIGNED,
     prescanNumber INT UNSIGNED,
     retentionTime DECIMAL(10,5),
-    fragmentationType CHAR(3)
+    fragmentationType CHAR(3),
 );
 ALTER TABLE msScan ADD INDEX(runID);
 ALTER TABLE msScan ADD INDEX(startScanNumber);
@@ -110,10 +115,11 @@ ALTER TABLE msRunEnzyme ADD INDEX (enzymeID);
 # PEPTIDE ANALYSIS SIDE
 
 CREATE TABLE msPeptideSearch (
-    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,    	searchGroupID INT UNSIGNED NOT NULL,
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     runID INT UNSIGNED NOT NULL,
+    experimentID INT UNSIGNED NOT NULL,
     originalFileType VARCHAR(10) NOT NULL,
-    analysisProgramName VARCHAR(25),
+    analysisProgramName VARCHAR(255),
     analysisProgramVersion VARCHAR(10),
     searchDate DATE,
     searchDuration INT UNSIGNED,
@@ -123,7 +129,7 @@ CREATE TABLE msPeptideSearch (
     fragmentMassTolerance DECIMAL(10,5)
 );
 ALTER TABLE msPeptideSearch ADD INDEX(runID);
-
+ALTER TABLE msPeptideSearch ADD INDEX(experimentID);
 
 CREATE TABLE msSearchEnzyme (
     searchID INT UNSIGNED NOT NULL,
@@ -168,7 +174,9 @@ CREATE TABLE SQTSpectrumData (
     processTime INT UNSIGNED,
     serverName VARCHAR(50),
     totalIntensity DECIMAL(10,5),
-    lowestSp DECIMAL(10,5),        sequenceMatches INT UNSIGNED
+    observedMass DECIMAL(10,5 ),
+    lowestSp DECIMAL(10,5),
+    sequenceMatches INT UNSIGNED
 );
 ALTER TABLE SQTSpectrumData ADD PRIMARY KEY(scanID, searchID, charge);
 ALTER TABLE SQTSpectrumData ADD INDEX (searchID);
@@ -219,7 +227,8 @@ CREATE TABLE msDynamicModResult (
     resultID INT UNSIGNED NOT NULL,
     position SMALLINT UNSIGNED NOT NULL
 );
-ALTER TABLE msDynamicModResult ADD PRIMARY KEY(modID, resultID, position);ALTER TABLE msDynamicModResult ADD INDEX(resultID);
+ALTER TABLE msDynamicModResult ADD PRIMARY KEY(modID, resultID, position);
+ALTER TABLE msDynamicModResult ADD INDEX(resultID);
 
 CREATE TABLE SQTSearchResult (
     resultID INT UNSIGNED NOT NULL PRIMARY KEY,
@@ -322,6 +331,7 @@ CREATE TRIGGER msRun_bdelete BEFORE DELETE ON msRun
     DELETE FROM msPeptideSearch WHERE runID = OLD.id;
     DELETE FROM msRunEnzyme WHERE runID = OLD.id;
     DELETE FROM MS2FileHeader WHERE runID = OLD.id;
+    DELETE FROM msExperimentRun WHERE runID = OLD.id;
   END;
 |
 DELIMITER ;
@@ -330,7 +340,8 @@ DELIMITER |
 CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
   FOR EACH ROW
   BEGIN
-    DELETE FROM msRun WHERE experimentID = OLD.id;
+    DELETE FROM msRun WHERE id IN ( SELECT runID FROM msExperimentRun WHERE experimentID = OLD.id ) AND id NOT IN ( SELECT runID FROM msExperimentRun WHERE experimentID <> OLD.id );
+    DELETE FROM msExperimentRun WHERE experimentID = OLD.id;
   END;
 |
 DELIMITER ;
