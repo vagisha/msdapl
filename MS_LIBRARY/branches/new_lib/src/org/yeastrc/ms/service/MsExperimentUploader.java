@@ -248,7 +248,7 @@ public class MsExperimentUploader {
         }
         catch (DataProviderException e) {
             logAndAddUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, 
-                    e.getMessage()+"  SQT FILE WILL NOT BE UPLOADED!!");
+                    e.getMessage()+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
             deleteLastUploadedSearch(uploadService);
             return 0;
         }
@@ -257,13 +257,13 @@ public class MsExperimentUploader {
             log.error(e.getMessage(), e);
             uploadExceptionList.add(e);
             String msg = e.getErrorMessage() == null ? "" : e.getErrorMessage();
-            e.setErrorMessage(msg+"  SQT FILE WILL NOT BE UPLOADED!!");
+            e.setErrorMessage(msg+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
             deleteLastUploadedSearch(uploadService);
             return 0;
         }
         catch (RuntimeException e) { // most likely due to SQL exception
             logAndAddUploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e, filePath, null, 
-                    e.getMessage()+" SQT FILE WILL NOT BE UPLOADED!!");
+                    e.getMessage()+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
             deleteLastUploadedSearch(uploadService);
             return 0;
         }

@@ -173,7 +173,7 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
             scan.setSequenceMatches(Integer.parseInt(tokens[9]));
         }
         catch(NumberFormatException e) {
-            throw new DataProviderException(currentLineNum, "Invalid 'S' line. Error parsing number(s): "+e.getMessage(), line);
+            throw new DataProviderException(currentLineNum, "Invalid 'S' line. Error parsing number(s). "+e.getMessage(), line);
         }
         scan.setServer(tokens[5]);
 
@@ -242,7 +242,7 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
             result.setNumPredictedIons(Integer.parseInt(tokens[8]));
         }
         catch(NumberFormatException e) {
-            throw new DataProviderException(currentLineNum, "Invalid 'M' line. Error parsing number(s): "+e.getMessage(), line);
+            throw new DataProviderException(currentLineNum, "Invalid 'M' line. Error parsing number(s). "+e.getMessage(), line);
         }
         
         result.setResultSequence(tokens[9]);
@@ -255,7 +255,7 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
             result.buildPeptideResult();
         }
         catch(SQTParseException e) {
-            throw new DataProviderException(currentLineNum, "Invalid peptide sequence in 'M' line:\n"+e.getMessage(), line);
+            throw new DataProviderException(currentLineNum, "Invalid peptide sequence in 'M'. "+e.getMessage(), line);
         }
         return result;
     }
