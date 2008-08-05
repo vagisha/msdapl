@@ -309,9 +309,6 @@ public class MsExperimentUploader {
     
     private Set<String> getFileNamePrefixes(String fileDirectory) {
         File directory = new File (fileDirectory);
-        if (!directory.exists()) {
-            throw new IllegalArgumentException("Directory does not exist: "+fileDirectory);
-        }
         return getFileNamesInDirectory(directory);
     }
 

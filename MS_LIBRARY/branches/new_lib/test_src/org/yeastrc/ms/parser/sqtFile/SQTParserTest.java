@@ -48,7 +48,7 @@ public class SQTParserTest extends TestCase {
         try {
             DbLocus loc = reader.parseLocus(locus);
             assertEquals("locus", loc.getAccession());
-            assertEquals("", loc.getDescription());
+            assertNull(loc.getDescription());
         }
         catch (DataProviderException e) {
             fail("Exception parsing valid locus line");
@@ -81,7 +81,7 @@ public class SQTParserTest extends TestCase {
         try {
             DbLocus loc = reader.parseLocus(locus);
             assertEquals("ORFP:YKL160W", loc.getAccession());
-            assertEquals("", loc.getDescription());
+            assertNull(loc.getDescription());
         }
         catch (DataProviderException e) {
             fail("Exception parsing valid locus line");

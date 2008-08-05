@@ -10,9 +10,6 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsSearchDAO;
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 public class MsExperimentUploaderTest extends BaseDAOTestCase {
@@ -85,43 +82,6 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertEquals(0, expId);
     }
     
-//    public void testUploadExperimentToDbPercolatorSQTFiles() {
-//        String dir = "test_resources/percolatorSQT_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
-//    
-//    public void testUploadExperimentToDbProlucidSQTFiles() {
-//        String dir = "test_resources/prolucidSQT_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
-//    
-//    public void testUploadExperimentToDbPepProbeSQTFiles() {
-//        String dir = "test_resources/pepprobeSQT_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
-//    
-//    public void testUploadExperimentInvalidSQTHeader() {
-//        String dir = "test_resources/invalidSQTHeader_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
-    
-//    public void testUploadExperimentNoValidMS2Scans() {
-//        resetDatabase();
-//        String dir = "test_resources/noValidMS2Scans_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
-//    
-//    public void testUploadExperimentNoScanIdFound() {
-//        resetDatabase();
-//        String dir = "test_resources/noScanIdFound_dir";
-//        int expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        assertEquals(0, expId);
-//    }
     
     public void testUploadValidData() {
         resetDatabase();
@@ -210,7 +170,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         }
     }
 
-    public void testUploadInvalidMS2() {
+    public void testUploadInvalidMS2_S() {
         resetDatabase();
         String dir = "test_resources/invalid_ms2_S_dir";
         try {
@@ -219,11 +179,115 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         }
         catch (UploadException e1) {
             assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
-//            String msg = "LINE NUMBER: 37\n\tLINE: Z 1   1372.55laksdjflkasf;a";
+            String msg = "Invalid 'Z' line.\n\tLINE NUMBER: 37\n\tLINE: Z\t1\t1372.55laksdjflkasf;a";
+            System.out.println(e1.getMessage());
             assertTrue(e1.getMessage().contains(msg));
         }
         assertTrue(DAOFactory.instance().getMsExperimentDAO().selectAllExperimentIds().size() == 0);
+        assertNull(DAOFactory.instance().getMsRunDAO().loadRun(1));
+        assertNull(DAOFactory.instance().getMsSearchDAO().loadSearch(1));
     }
+    
+    public void testUploadInvalidMS2_peak() {
+        resetDatabase();
+        String dir = "test_resources/invalid_ms2_peak_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            fail("1.ms2 is invalid");
+        }
+        catch (UploadException e1) {
+            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
+            String msg = "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: 11"+
+            "\n\tLINE NUMBER: 61\n\tLINE: S\t000012\t000012\t1394.58000";
+            System.out.println(e1.getMessage());
+            assertTrue(e1.getMessage().contains(msg));
+        }
+        assertTrue(DAOFactory.instance().getMsExperimentDAO().selectAllExperimentIds().size() == 0);
+        assertNull(DAOFactory.instance().getMsRunDAO().loadRun(1));
+        assertNull(DAOFactory.instance().getMsSearchDAO().loadSearch(1));
+    }
+    
+    public void testUploadInvalidMS2_Z() {
+        resetDatabase();
+        String dir = "test_resources/invalid_ms2_Z_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            fail("1.ms2 is invalid");
+        }
+        catch (UploadException e1) {
+            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
+            String msg = "Invalid 'Z' line.\n\tLINE NUMBER: 60\n\tLINE: Z\t1\t1394.58 invalid Z line";
+            System.out.println(e1.getMessage());
+            assertTrue(e1.getMessage().contains(msg));
+        }
+        assertTrue(DAOFactory.instance().getMsExperimentDAO().selectAllExperimentIds().size() == 0);
+        assertNull(DAOFactory.instance().getMsRunDAO().loadRun(1));
+        assertNull(DAOFactory.instance().getMsSearchDAO().loadSearch(1));
+    }
+    
+    public void testUploadInvalidSQTFiles() {
+      resetDatabase();
+      String dir = "test_resources/invalid_sqt_dir";
+      try {
+          uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+      }
+      catch (UploadException e1) {
+         fail("Valid ms2 files in directory");
+      }
+      List<UploadException> exceptionList = uploader.getUploadExceptionList();
+      String warnings = "WARNING: Non-SEQUEST sqt files are not supported"+
+                          "\n\tFile: test_resources/invalid_sqt_dir/percolator.sqt"+
+                          "\n\nWARNING: Non-SEQUEST sqt files are not supported"+
+                          "\n\tFile: test_resources/invalid_sqt_dir/pepprobe.sqt"+
+                          "\n\nWARNING: Non-SEQUEST sqt files are not supported"+
+                          "\n\tFile: test_resources/invalid_sqt_dir/prolucid.sqt";
+      
+      assertEquals(warnings, uploader.getUploadWarnings().trim());
+      
+      assertEquals(3, exceptionList.size());
+      assertEquals(3, DAOFactory.instance().getMsRunDAO().loadExperimentRuns(1).size());
+      assertEquals(0, DAOFactory.instance().getMsSearchDAO().loadSearchIdsForExperiment(1).size());
+      
+    }
+    
+    public void testUploadExperimentInvalidSQTHeader() {
+        resetDatabase();
+        String dir = "test_resources/invalidSQTHeader_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+        }
+        catch (UploadException e) {
+            fail("Valid ms2 file in directory");
+        }
+        
+        List<UploadException> exceptions = uploader.getUploadExceptionList();
+        assertEquals(1, exceptions.size());
+        
+        assertEquals(1, exceptions.size());
+        assertEquals(1, DAOFactory.instance().getMsRunDAO().loadExperimentRuns(1).size());
+        assertEquals(0, DAOFactory.instance().getMsSearchDAO().loadSearchIdsForExperiment(1).size());
+    }
+    
+    public void testUploadExperimntNoScanIdFound() {
+        resetDatabase();
+        String dir = "test_resources/noScanIdFound_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+        }
+        catch (UploadException e) {
+            fail("Valid ms2 file in directory");
+        }
+        
+        List<UploadException> exceptions = uploader.getUploadExceptionList();
+        assertEquals(1, exceptions.size());
+        System.out.println(uploader.getUploadWarnings());
+        assertEquals(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN, exceptions.get(0).getErrorCode());
+        
+        assertEquals(1, exceptions.size());
+        assertEquals(1, DAOFactory.instance().getMsRunDAO().loadExperimentRuns(1).size());
+        assertEquals(0, DAOFactory.instance().getMsSearchDAO().loadSearchIdsForExperiment(1).size());
+    }
+
     
 //    public void testUploadValidDataWWarnings() {
 //        resetDatabase();
@@ -254,46 +318,6 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
 //        assertTrue(new File(outputTest).delete());
 //    }
     
-//    public void testUploadTwoSearchGroups() {
-//        resetDatabase();
-//        String dir = "test_resources/validData_dir";
-//        
-//        int expId1 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        int searchGroupId1 = uploader.getSearchGroupId();
-//        List<Integer> searchIdList1 = uploader.getSearchIdList();
-//        Collections.sort(searchIdList1);
-//        assertEquals(2, searchIdList1.size());
-//        
-//        int expId2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        int searchGroupId2 = uploader.getSearchGroupId();
-//        List<Integer> searchIdList2 = uploader.getSearchIdList();
-//        Collections.sort(searchIdList2);
-//        assertEquals(2, searchIdList2.size());
-//        
-//        assertEquals(expId1, expId2);
-//        assertEquals(1, searchGroupId1);
-//        assertEquals(searchGroupId1+1, searchGroupId2);
-//        
-//        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-//        for (Integer searchId: searchIdList1) {
-//            MsSearchDb search = searchDao.loadSearch(searchId);
-//            assertEquals(search.getSearchGroupId(), searchGroupId1);
-//        }
-//        
-//        for (Integer searchId: searchIdList2) {
-//            MsSearchDb search = searchDao.loadSearch(searchId);
-//            assertEquals(search.getSearchGroupId(), searchGroupId2);
-//        }
-//        
-//    }
-    
-//    public void testGetScanSearchIdFor() {
-//        String peptide = "R.WAESGSGTSPESGDEEVSGAGS*SPVSGGVNLFANDGSFLELFKR.K";
-//        String filename = "NE063005ph8s13.18352.18352.3";
-//        int experimentId = 1;
-//        int[] scanAndSearch = MsExperimentUploader.getScanAndSearchIdFor(experimentId, filename);
-//        assertEquals(2, scanAndSearch.length);
-//    }
     
     private boolean filesIdentical(String output, String input) {
         BufferedReader orig = null;

@@ -97,7 +97,9 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             }
         }
         if (!scan.isValid()) {
-            throw new DataProviderException(currentLineNum-1, "Invalid MS2 scan -- no valid peaks and/or charge states found", "");
+            throw new DataProviderException(currentLineNum-1, 
+                    "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: "+scan.getStartScanNum(), 
+                    currentLine);
         }
 
         return scan;

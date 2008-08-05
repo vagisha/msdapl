@@ -75,13 +75,13 @@ public class UploadException extends Exception {
         else
             buf.append("WARNING: ");
         buf.append(errCode.getMessage());
-        buf.append("\n");
         if (errorMessage != null)
-            buf.append("\t"+errorMessage);
+            buf.append("\n\t"+errorMessage);
         if (file != null)
-            buf.append("\n\tFile: "+file+"\n");
+            buf.append("\n\tFile: "+file);
         if (directory != null)
-            buf.append("\n\tDirectory: "+directory+"\n");
+            buf.append("\n\tDirectory: "+directory);
+        buf.append("\n");
         
         return buf.toString();
     }

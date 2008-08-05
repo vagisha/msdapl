@@ -268,10 +268,14 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
      */
     DbLocus parseLocus(String line) throws DataProviderException {
         
-        Matcher match = locusPattern.matcher(line);
-        if (match.matches()) {
-            return new DbLocus(match.group(1), match.group(2));
+        String[] nameAndVal = super.parseNameValueLine(line, locusPattern);
+        if (nameAndVal.length == 2) {
+            return new DbLocus(nameAndVal[0], nameAndVal[1]);
         }
+        else if (nameAndVal.length == 1) {
+            return new DbLocus(nameAndVal[0], null);
+        }
+        
         else {
             throw new DataProviderException(currentLineNum, "Invalid 'L' line. Expected 2 fields", line);
         }
