@@ -247,7 +247,8 @@ public class MsExperimentUploader {
             numSearchesUploaded++;
         }
         catch (DataProviderException e) {
-            logAndAddUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, e.getMessage());
+            logAndAddUploadException(ERROR_CODE.READ_ERROR_SQT, e, filePath, null, 
+                    e.getMessage()+"  SQT FILE WILL NOT BE UPLOADED!!");
             deleteLastUploadedSearch(uploadService);
             return 0;
         }
@@ -255,11 +256,14 @@ public class MsExperimentUploader {
             e.setFile(filePath);
             log.error(e.getMessage(), e);
             uploadExceptionList.add(e);
+            String msg = e.getErrorMessage() == null ? "" : e.getErrorMessage();
+            e.setErrorMessage(msg+"  SQT FILE WILL NOT BE UPLOADED!!");
             deleteLastUploadedSearch(uploadService);
             return 0;
         }
         catch (RuntimeException e) { // most likely due to SQL exception
-            logAndAddUploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e, filePath, null, e.getMessage());
+            logAndAddUploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e, filePath, null, 
+                    e.getMessage()+" SQT FILE WILL NOT BE UPLOADED!!");
             deleteLastUploadedSearch(uploadService);
             return 0;
         }
@@ -272,6 +276,7 @@ public class MsExperimentUploader {
     private void deleteLastUploadedSearch(SQTDataUploadService uploadService) {
         int searchId = uploadService.getUploadedSearchId();
         if (searchId != 0) {
+            log.error("DELETING SQT searchId: "+searchId);
             SQTDataUploadService.deleteSearch(searchId);
         }
     }
