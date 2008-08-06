@@ -68,12 +68,10 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     }
     
     /**
-     * Deletes the experiment and matching entries in msExperimentRun table
+     * Deletes the experiment
      */
     public void delete(int msExperimentId) {
         // delete the experiment
         delete("MsExperiment.delete", msExperimentId);
-        // delete matching entries in msExperimentRun table
-        delete("MsExperiment.deleteExperimentRuns", msExperimentId);
     }
 }

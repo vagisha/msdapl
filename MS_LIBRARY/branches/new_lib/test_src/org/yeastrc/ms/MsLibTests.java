@@ -68,4 +68,26 @@ public class MsLibTests {
             e.printStackTrace();
         }
     }
+    
+    public static void addEnzymes() {
+        System.out.println("Adding enzymes");
+        String script = "src/addEnzymes.sh";
+        try {
+            Process proc = Runtime.getRuntime().exec("sh "+script);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+            String line = reader.readLine();
+            while(line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            reader.close();
+            proc.waitFor();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

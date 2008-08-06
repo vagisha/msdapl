@@ -333,20 +333,11 @@ public class MsExperimentUploader {
         return filenames;
     }
     
-    private void deleteExperiment(int experimentId) {
-        
-        // delete the searches for the given experimentId
-        List<Integer> searchIds = SQTDataUploadService.getSearchIdsForExperiment(experimentId);
-        for (Integer searchId: searchIds) 
-            SQTDataUploadService.deleteSearch(searchId);
+    void deleteExperiment(int experimentId) {
         
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
-        // delete the runs for the given experimentId (ONLY if they do NOT belong to another experiment)
-        List<Integer> runIds = expDao.loadRunIdsUniqueToExperiment(experimentId);
-        for (Integer runId: runIds)
-            MS2DataUploadService.deleteRun(runId);
         
-        // delete the experiment. This will also delete entries from the msExperimentRun table.
+        // delete the experiment. This will also delete all related runs (unique to this eperiment) and searches.
         expDao.delete(experimentId);
         
         log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);

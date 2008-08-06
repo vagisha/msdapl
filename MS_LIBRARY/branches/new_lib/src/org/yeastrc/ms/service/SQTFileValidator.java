@@ -96,41 +96,41 @@ public class SQTFileValidator {
         return (headerValid && scansValid);
     }
 
-    public static void main(String[] args) {
-        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
-        Map<Integer, String> cycleIds = getCycleIdList();
-        int found = 0;
-        int valid = 0;
-        try {
-            for (Integer cycleId: cycleIds.keySet()) {
-                //if (found > 208)
-                 //   break;
-                String fileName = cycleIds.get(cycleId);
-                if (fileName == null || fileName.trim().length() == 0)
-                    continue;
-                fileName = fileName+".sqt";
-                YatesCycleDownloader downloader = new YatesCycleDownloader();
-                if (downloader.downloadFile(cycleId, downloadDir, fileName, DATA_TYPE.SQT)) {
-                    found++;
-                    SQTFileValidator validator = new SQTFileValidator();
-                    if (validator.validate(downloadDir+File.separator+fileName)){
-                        valid++;
-                    }
-                    else {
-                        log.error("!!!!!!!!!!INVALID FILE: "+fileName);
-                    }
-                    new File(downloadDir+File.separator+fileName).delete();
-                }
-            }
-        }
-        catch(Exception e) {e.printStackTrace();}
-        finally {
-            log.info("Num files found: "+(found-1)+"; Valid files: "+valid);
-        }
-//      String filePath = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test/21251_PARC_meth_async_05_itms.sqt";
-//      SQTFileValidator validator = new SQTFileValidator();
-//      validator.validate(filePath);
-    }
+//    public static void main(String[] args) {
+//        String downloadDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/SQTParserTest";
+//        Map<Integer, String> cycleIds = getCycleIdList();
+//        int found = 0;
+//        int valid = 0;
+//        try {
+//            for (Integer cycleId: cycleIds.keySet()) {
+//                //if (found > 208)
+//                 //   break;
+//                String fileName = cycleIds.get(cycleId);
+//                if (fileName == null || fileName.trim().length() == 0)
+//                    continue;
+//                fileName = fileName+".sqt";
+//                YatesCycleDownloader downloader = new YatesCycleDownloader();
+//                if (downloader.downloadFile(cycleId, downloadDir, fileName, DATA_TYPE.SQT)) {
+//                    found++;
+//                    SQTFileValidator validator = new SQTFileValidator();
+//                    if (validator.validate(downloadDir+File.separator+fileName)){
+//                        valid++;
+//                    }
+//                    else {
+//                        log.error("!!!!!!!!!!INVALID FILE: "+fileName);
+//                    }
+//                    new File(downloadDir+File.separator+fileName).delete();
+//                }
+//            }
+//        }
+//        catch(Exception e) {e.printStackTrace();}
+//        finally {
+//            log.info("Num files found: "+(found-1)+"; Valid files: "+valid);
+//        }
+////      String filePath = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/test/21251_PARC_meth_async_05_itms.sqt";
+////      SQTFileValidator validator = new SQTFileValidator();
+////      validator.validate(filePath);
+//    }
 
     public static Map<Integer, String> getCycleIdList() {
         Connection conn = null;

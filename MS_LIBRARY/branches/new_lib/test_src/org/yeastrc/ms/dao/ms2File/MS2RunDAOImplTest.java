@@ -16,6 +16,8 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
+        MsLibTests.resetDatabase();
+        MsLibTests.addEnzymes();
     }
 
     protected void tearDown() throws Exception {
@@ -24,7 +26,6 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 
 
     public void testSaveLoadAndDelete() {
-        MsLibTests.resetDatabase();
         MS2Run run = makeMS2Run("MyFile1", true, true); // run with enzyme info and headers
         
         assertTrue(run.getHeaderList().size() == 3);
@@ -66,7 +67,6 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
     }
     
     public void testLoadExperimentRuns() {
-        MsLibTests.resetDatabase();
         // do we get a list of type List<MS2FileRun>?
         MS2Run run = makeMS2Run("File1", true, true); // run with enzyme info and headers
         ms2RunDao.saveRun(run, 1);
@@ -89,7 +89,6 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
     
     
     public void testGetRunsUniqueToExperiment() {
-        MsLibTests.resetDatabase();
         MS2Run run1 = makeMS2Run("File1", true, true); // run with enzyme info and headers
         MS2Run run2 = makeMS2Run("File2", true, true); // run with enzyme info and headers
         MS2Run run3 = makeMS2Run("File3", true, true); // run with enzyme info and headers
