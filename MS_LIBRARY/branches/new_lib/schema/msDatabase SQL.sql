@@ -47,7 +47,7 @@ CREATE TABLE msScan (
     preScanID INT UNSIGNED,
     prescanNumber INT UNSIGNED,
     retentionTime DECIMAL(10,5),
-    fragmentationType CHAR(3),
+    fragmentationType CHAR(3)
 );
 ALTER TABLE msScan ADD INDEX(runID);
 ALTER TABLE msScan ADD INDEX(startScanNumber);
@@ -340,7 +340,7 @@ DELIMITER |
 CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
   FOR EACH ROW
   BEGIN
-    DELETE FROM msRun WHERE id IN ( SELECT runID FROM msExperimentRun WHERE experimentID = OLD.id ) AND id NOT IN ( SELECT runID FROM msExperimentRun WHERE experimentID <> OLD.id );
+    DELETE FROM msRun WHERE id IN ( SELECT runID FROM msExperimentRun WHERE experimentID = OLD.id ) AND id NOT IN ( SELECT runID FROM msExperimentRun WHERE experimentID <> OLD.id );	DELETE FROM msPeptideSearch WHERE experimentID = OLD.id;	
     DELETE FROM msExperimentRun WHERE experimentID = OLD.id;
   END;
 |
