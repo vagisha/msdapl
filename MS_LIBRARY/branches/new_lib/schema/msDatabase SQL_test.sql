@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS msData_test;
+DROP DATABASE IF EXISTS msData_test2;
 
-CREATE DATABASE msData_test;
+CREATE DATABASE msData_test2;
 
-USE msData_test;
+USE msData_test2;
 
 
 
@@ -67,6 +67,8 @@ CREATE TABLE msRun (
     acquisitionMethod VARCHAR(255),
 
     originalFileType VARCHAR(10),
+
+    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     comment TEXT
 
@@ -254,7 +256,9 @@ CREATE TABLE msPeptideSearch (
 
     fragmentMassMethod VARCHAR(20),
 
-    fragmentMassTolerance DECIMAL(10,5)
+    fragmentMassTolerance DECIMAL(10,5),
+
+    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 );
 
@@ -682,11 +686,9 @@ CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
 
   BEGIN
 
-    DELETE FROM msRun WHERE id IN ( SELECT runID FROM msExperimentRun WHERE experimentID = OLD.id ) AND id NOT IN ( SELECT runID FROM msExperimentRun WHERE experimentID <> OLD.id );
-
-	DELETE FROM msPeptideSearch WHERE experimentID = OLD.id;
-	
     DELETE FROM msExperimentRun WHERE experimentID = OLD.id;
+
+    DELETE FROM msPeptideSearch WHERE experimentID = OLD.id;
 
   END;
 

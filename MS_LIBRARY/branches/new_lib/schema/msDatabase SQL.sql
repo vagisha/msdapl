@@ -33,6 +33,7 @@ CREATE TABLE msRun (
     dataType VARCHAR(255),
     acquisitionMethod VARCHAR(255),
     originalFileType VARCHAR(10),
+    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     comment TEXT
 );
 ALTER TABLE msRun ADD INDEX(filename);
@@ -126,7 +127,8 @@ CREATE TABLE msPeptideSearch (
     precursorMassMethod VARCHAR(20),
     precursorMassTolerance DECIMAL(10,5),
     fragmentMassMethod VARCHAR(20),
-    fragmentMassTolerance DECIMAL(10,5)
+    fragmentMassTolerance DECIMAL(10,5),
+    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ALTER TABLE msPeptideSearch ADD INDEX(runID);
 ALTER TABLE msPeptideSearch ADD INDEX(experimentID);
@@ -340,8 +342,8 @@ DELIMITER |
 CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
   FOR EACH ROW
   BEGIN
-    DELETE FROM msRun WHERE id IN ( SELECT runID FROM msExperimentRun WHERE experimentID = OLD.id ) AND id NOT IN ( SELECT runID FROM msExperimentRun WHERE experimentID <> OLD.id );	DELETE FROM msPeptideSearch WHERE experimentID = OLD.id;	
     DELETE FROM msExperimentRun WHERE experimentID = OLD.id;
+    DELETE FROM msPeptideSearch WHERE experimentID = OLD.id;
   END;
 |
 DELIMITER ;
