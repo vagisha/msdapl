@@ -273,7 +273,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
             expID2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", exp2Dir, false);
         }
         catch (UploadException e) {
-            fail("Valid files in both directories");
+            fail("Valid files in both directories. Error is: "+e.getMessage());
         }
         
         assertEquals(1, expID1);
