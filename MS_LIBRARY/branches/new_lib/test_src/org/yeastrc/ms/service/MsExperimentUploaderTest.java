@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.yeastrc.ms.MsLibTests;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
@@ -31,7 +31,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     
     public void testUploadExperimentToDbInvalidDirectory() {
         String dir = "dummy/directory";
-        try {uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false); fail("Directory "+dir+" does not exist");}
+        try {uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false); fail("Directory "+dir+" does not exist");}
         catch(UploadException e) {
             assertEquals(ERROR_CODE.DIRECTORY_NOT_FOUND, e.getErrorCode());
         }
@@ -41,7 +41,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/empty_dir";
         int expId = 0;
         try {
-            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
             fail("Upload directory is empty");
         }
         catch (UploadException e) {
@@ -54,7 +54,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/missingMS2_dir";
         int expId = 0;
         try {
-            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
             fail("Upload directory has missing ms2 files");
         }
         catch (UploadException e) {
@@ -68,7 +68,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/validData_dir";
         int expId = 0;
         try {
-            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
         }
         catch (UploadException e1) {
             fail("Data is valid. Error message: "+e1.getMessage());
@@ -134,7 +134,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         List<Integer> runIds = expDao.loadRunIdsForExperiment(expId);
         int expId2 = 0;
         try {
-            expId2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            expId2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
         }
         catch (UploadException e) {
             fail("Data is valid. Error message: "+e.getMessage());
@@ -153,7 +153,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidMS2_S() {
         String dir = "test_resources/invalid_ms2_S_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
             fail("2.ms2 is invalid");
         }
         catch (UploadException e1) {
@@ -170,7 +170,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidMS2_peak() {
         String dir = "test_resources/invalid_ms2_peak_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
             fail("1.ms2 is invalid");
         }
         catch (UploadException e1) {
@@ -188,7 +188,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidMS2_Z() {
         String dir = "test_resources/invalid_ms2_Z_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
             fail("1.ms2 is invalid");
         }
         catch (UploadException e1) {
@@ -205,7 +205,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidSQTFiles() {
       String dir = "test_resources/invalid_sqt_dir";
       try {
-          uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+          uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
       }
       catch (UploadException e1) {
          fail("Valid ms2 files in directory");
@@ -229,7 +229,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     public void testUploadExperimentInvalidSQTHeader() {
         String dir = "test_resources/invalidSQTHeader_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
         }
         catch (UploadException e) {
             fail("Valid ms2 file in directory");
@@ -246,7 +246,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     public void testUploadExperimntNoScanIdFound() {
         String dir = "test_resources/noScanIdFound_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
         }
         catch (UploadException e) {
             fail("Valid ms2 file in directory");
@@ -269,8 +269,8 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         int expID1 = 0;
         int expID2 = 0;
         try {
-            expID1 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", exp1Dir, false);
-            expID2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", exp2Dir, false);
+            expID1 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", exp1Dir, new Date(), false);
+            expID2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", exp2Dir, new Date(), false);
         }
         catch (UploadException e) {
             fail("Valid files in both directories. Error is: "+e.getMessage());
@@ -311,7 +311,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     public void testCheckNonSqtFilesFirst() {
         String dir = "test_resources/invalid_sqt_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, true);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), true);
             fail("We care checking for non-sequest SQT's first. We have those in the directory");
         }
         catch (UploadException e) {

@@ -52,7 +52,7 @@ public class MsExperimentUploader {
      * @return database id for experiment if it was uploaded successfully, 0 otherwise
      * @throws UploadException 
      */
-    public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory, 
+    public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory, Date expDate,
             boolean doNonSeqCheckFirst) throws UploadException {
 
         resetUploader();
@@ -111,7 +111,7 @@ public class MsExperimentUploader {
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
         // make a new entry in the msExperment table first
-        runExperimentId =  uploadExperiment(remoteServer, remoteDirectory);
+        runExperimentId =  uploadExperiment(remoteServer, remoteDirectory, expDate);
         
         try {
             uploadRunAndSearchFilesToDb(runExperimentId, fileDirectory, filenames, remoteServer);
@@ -166,10 +166,10 @@ public class MsExperimentUploader {
         numSearchesUploaded = 0;
     }
 
-    private int uploadExperiment(String remoteServer, String remoteDirectory) {
+    private int uploadExperiment(String remoteServer, String remoteDirectory, Date expDate) {
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
         MsExperimentDbImpl experiment = new MsExperimentDbImpl();
-        experiment.setDate(new java.sql.Date(new Date().getTime()));
+        experiment.setDate(new java.sql.Date(expDate.getTime()));
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);
         return expDao.save(experiment);
@@ -368,10 +368,15 @@ public class MsExperimentUploader {
     void deleteExperiment(int experimentId) {
         
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
+        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
         
-        // delete the experiment. This will also delete all related runs (unique to this experiment) and searches.
+        List<Integer> uniqueRunIds = expDao.loadRunIdsUniqueToExperiment(experimentId);
+        for (Integer runId: uniqueRunIds) {
+            runDao.delete(runId);
+        }
+        
+        // delete the experiment. This will also delete all related searches and entries from msExperimentRun table
         expDao.delete(experimentId);
-        
         log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
     }
     
@@ -414,7 +419,7 @@ public class MsExperimentUploader {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", false);
+        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", new Date(), false);
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
         long end = System.currentTimeMillis();

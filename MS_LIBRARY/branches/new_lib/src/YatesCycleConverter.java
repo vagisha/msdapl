@@ -40,7 +40,7 @@ public class YatesCycleConverter {
             
             // upload data to msData database
             MsExperimentUploader uploader = new MsExperimentUploader();
-            int experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dataDir, true);
+            int experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dataDir, new Date(), true);
             
             // delete the files
             for (YatesTablesUtils.YatesCycle cycle: cycles) {
