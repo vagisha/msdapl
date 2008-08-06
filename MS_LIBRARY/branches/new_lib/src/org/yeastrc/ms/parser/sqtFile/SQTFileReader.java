@@ -90,7 +90,7 @@ public class SQTFileReader extends AbstractReader implements SQTSearchDataProvid
         
         if (!header.isValid())
             throw new DataProviderException("Invalid SQT Header. One or more required headers is missing. "+
-                    "Required headers:\n"+SQTHeader.requiredHeaders());
+                    "Required headers:\n\t"+SQTHeader.requiredHeaders());
         
         this.searchDynamicMods = header.getDynamicModifications();
         return header;

@@ -91,10 +91,10 @@ public class SQTHeader implements SQTSearch {
        buf.append(FRAGMENT_MASS_TYPE);
        buf.append(", ");
        buf.append(PRECURSOR_MASS_TYPE);
-       buf.append(", ");
-       buf.append(STATIC_MOD);
-       buf.append(", ");
-       buf.append(DYNAMIC_MOD);
+//       buf.append(", ");
+//       buf.append(STATIC_MOD);
+//       buf.append(", ");
+//       buf.append(DYNAMIC_MOD);
        return buf.toString();
     }
     

@@ -368,7 +368,7 @@ public class MsExperimentUploader {
         
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
         
-        // delete the experiment. This will also delete all related runs (unique to this eperiment) and searches.
+        // delete the experiment. This will also delete all related runs (unique to this experiment) and searches.
         expDao.delete(experimentId);
         
         log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
