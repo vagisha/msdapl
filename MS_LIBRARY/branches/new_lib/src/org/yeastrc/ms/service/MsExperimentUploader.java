@@ -1,6 +1,7 @@
 package org.yeastrc.ms.service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,7 +52,8 @@ public class MsExperimentUploader {
      * @return database id for experiment if it was uploaded successfully, 0 otherwise
      * @throws UploadException 
      */
-    public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory) throws UploadException {
+    public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory, 
+            boolean doNonSeqCheckFirst) throws UploadException {
 
         resetUploader();
         
@@ -95,6 +97,18 @@ public class MsExperimentUploader {
             throw ex;
         }
         
+        // ----------- THIS IS TEMPORARY TILL WE ARE ABBLE TO PARSE OTHER TYPES OF SQT ------------ //
+        if (doNonSeqCheckFirst) {
+            String nonSequestFile = null;
+            if ((nonSequestFile = directoryHasNonSequestSQT(fileDirectory, filenames)) != null) {
+                UploadException ex = new UploadException(ERROR_CODE.UNSUPPORTED_SQT);
+                ex.setFile(nonSequestFile);
+                throw ex;
+            }
+        }
+        // ----------- THIS IS TEMPORARY TILL WE ARE ABBLE TO PARSE OTHER TYPES OF SQT ------------ // 
+        
+        
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
         // make a new entry in the msExperment table first
         runExperimentId =  uploadExperiment(remoteServer, remoteDirectory);
@@ -123,6 +137,23 @@ public class MsExperimentUploader {
                 "\n\n");
         
         return runExperimentId;
+    }
+
+    private String directoryHasNonSequestSQT(String fileDirectory, Set<String> filenames) {
+        String sqtFile = null;
+        for (String file: filenames) {
+            sqtFile = fileDirectory+File.separator+file+".sqt";
+            // first make sure the file exists
+            if (!(new File(sqtFile).exists()))
+                continue;
+            try {
+                if (!SQTFileReader.isSequestSQT(sqtFile))
+                    return file;
+            }
+            catch (FileNotFoundException e) {}
+            catch (IOException e) {}
+        }
+        return null;
     }
 
     private void resetUploader() {
@@ -382,7 +413,7 @@ public class MsExperimentUploader {
         long start = System.currentTimeMillis();
         MsExperimentUploader uploader = new MsExperimentUploader();
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156");
+        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", false);
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
         long end = System.currentTimeMillis();

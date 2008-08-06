@@ -4,53 +4,34 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.yeastrc.ms.MsLibTests;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.domain.MsRunDb;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 public class MsExperimentUploaderTest extends BaseDAOTestCase {
 
     private MsExperimentUploader uploader = null;
-    private static final Runtime runtime = Runtime.getRuntime();
     
     protected void setUp() throws Exception {
         super.setUp();
         uploader = new MsExperimentUploader();
+        MsLibTests.resetDatabase();
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
     }
     
-    public void resetDatabase() {
-        System.out.println("Resetting database");
-        String script = "src/resetDatabase.sh";
-        try {
-            Process proc = runtime.exec("sh "+script);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-            String line = reader.readLine();
-            while(line != null) {
-                System.out.println(line);
-                line = reader.readLine();
-            }
-            reader.close();
-            proc.waitFor();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-    
     public void testUploadExperimentToDbInvalidDirectory() {
         String dir = "dummy/directory";
-        try {uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir); fail("Directory "+dir+" does not exist");}
+        try {uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false); fail("Directory "+dir+" does not exist");}
         catch(UploadException e) {
             assertEquals(ERROR_CODE.DIRECTORY_NOT_FOUND, e.getErrorCode());
         }
@@ -60,7 +41,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/empty_dir";
         int expId = 0;
         try {
-            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
             fail("Upload directory is empty");
         }
         catch (UploadException e) {
@@ -73,7 +54,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/missingMS2_dir";
         int expId = 0;
         try {
-            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
             fail("Upload directory has missing ms2 files");
         }
         catch (UploadException e) {
@@ -84,11 +65,10 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     
     
     public void testUploadValidData() {
-        resetDatabase();
         String dir = "test_resources/validData_dir";
         int expId = 0;
         try {
-            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
         }
         catch (UploadException e1) {
             fail("Data is valid. Error message: "+e1.getMessage());
@@ -154,7 +134,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         List<Integer> runIds = expDao.loadRunIdsForExperiment(expId);
         int expId2 = 0;
         try {
-            expId2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            expId2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
         }
         catch (UploadException e) {
             fail("Data is valid. Error message: "+e.getMessage());
@@ -171,10 +151,9 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
     }
 
     public void testUploadInvalidMS2_S() {
-        resetDatabase();
         String dir = "test_resources/invalid_ms2_S_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
             fail("2.ms2 is invalid");
         }
         catch (UploadException e1) {
@@ -183,16 +162,15 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
             System.out.println(e1.getMessage());
             assertTrue(e1.getMessage().contains(msg));
         }
-        assertTrue(DAOFactory.instance().getMsExperimentDAO().selectAllExperimentIds().size() == 0);
-        assertNull(DAOFactory.instance().getMsRunDAO().loadRun(1));
-        assertNull(DAOFactory.instance().getMsSearchDAO().loadSearch(1));
+        assertEquals(0, expDao.selectAllExperimentIds().size());
+        assertNull(runDao.loadRun(1));
+        assertNull(searchDao.loadSearch(1));
     }
     
     public void testUploadInvalidMS2_peak() {
-        resetDatabase();
         String dir = "test_resources/invalid_ms2_peak_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
             fail("1.ms2 is invalid");
         }
         catch (UploadException e1) {
@@ -202,16 +180,15 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
             System.out.println(e1.getMessage());
             assertTrue(e1.getMessage().contains(msg));
         }
-        assertTrue(DAOFactory.instance().getMsExperimentDAO().selectAllExperimentIds().size() == 0);
-        assertNull(DAOFactory.instance().getMsRunDAO().loadRun(1));
-        assertNull(DAOFactory.instance().getMsSearchDAO().loadSearch(1));
+        assertEquals(0, expDao.selectAllExperimentIds().size());
+        assertNull(runDao.loadRun(1));
+        assertNull(searchDao.loadSearch(1));
     }
     
     public void testUploadInvalidMS2_Z() {
-        resetDatabase();
         String dir = "test_resources/invalid_ms2_Z_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
             fail("1.ms2 is invalid");
         }
         catch (UploadException e1) {
@@ -220,16 +197,15 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
             System.out.println(e1.getMessage());
             assertTrue(e1.getMessage().contains(msg));
         }
-        assertTrue(DAOFactory.instance().getMsExperimentDAO().selectAllExperimentIds().size() == 0);
-        assertNull(DAOFactory.instance().getMsRunDAO().loadRun(1));
-        assertNull(DAOFactory.instance().getMsSearchDAO().loadSearch(1));
+        assertEquals(0, expDao.selectAllExperimentIds().size());
+        assertNull(runDao.loadRun(1));
+        assertNull(searchDao.loadSearch(1));
     }
     
     public void testUploadInvalidSQTFiles() {
-      resetDatabase();
       String dir = "test_resources/invalid_sqt_dir";
       try {
-          uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+          uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
       }
       catch (UploadException e1) {
          fail("Valid ms2 files in directory");
@@ -245,16 +221,15 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
       assertEquals(warnings, uploader.getUploadWarnings().trim());
       
       assertEquals(3, exceptionList.size());
-      assertEquals(3, DAOFactory.instance().getMsRunDAO().loadExperimentRuns(1).size());
-      assertEquals(0, DAOFactory.instance().getMsSearchDAO().loadSearchIdsForExperiment(1).size());
+      assertEquals(3, runDao.loadExperimentRuns(1).size());
+      assertEquals(0, searchDao.loadSearchIdsForExperiment(1).size());
       
     }
     
     public void testUploadExperimentInvalidSQTHeader() {
-        resetDatabase();
         String dir = "test_resources/invalidSQTHeader_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
         }
         catch (UploadException e) {
             fail("Valid ms2 file in directory");
@@ -264,15 +239,14 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertEquals(1, exceptions.size());
         
         assertEquals(1, exceptions.size());
-        assertEquals(1, DAOFactory.instance().getMsRunDAO().loadExperimentRuns(1).size());
-        assertEquals(0, DAOFactory.instance().getMsSearchDAO().loadSearchIdsForExperiment(1).size());
+        assertEquals(1, runDao.loadExperimentRuns(1).size());
+        assertEquals(0, searchDao.loadSearchIdsForExperiment(1).size());
     }
     
     public void testUploadExperimntNoScanIdFound() {
-        resetDatabase();
         String dir = "test_resources/noScanIdFound_dir";
         try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, false);
         }
         catch (UploadException e) {
             fail("Valid ms2 file in directory");
@@ -284,40 +258,68 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertEquals(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN, exceptions.get(0).getErrorCode());
         
         assertEquals(1, exceptions.size());
-        assertEquals(1, DAOFactory.instance().getMsRunDAO().loadExperimentRuns(1).size());
-        assertEquals(0, DAOFactory.instance().getMsSearchDAO().loadSearchIdsForExperiment(1).size());
+        assertEquals(1, runDao.loadExperimentRuns(1).size());
+        assertEquals(0, searchDao.loadSearchIdsForExperiment(1).size());
     }
 
+    public void testDeleteExperiment() {
+        String exp1Dir = "test_resources/deleteExperiment_dir/one"; //has ONE ms2, sqt pair
+        String exp2Dir = "test_resources/deleteExperiment_dir/two"; //has TWO ms2, sqt pair (one of them is the same as above)
+        
+        int expID1 = 0;
+        int expID2 = 0;
+        try {
+            expID1 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", exp1Dir, false);
+            expID2 = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", exp2Dir, false);
+        }
+        catch (UploadException e) {
+            fail("Valid files in both directories");
+        }
+        
+        assertEquals(1, expID1);
+        assertEquals(2, expID2);
+        
+        // make sure everything got uploaded
+        assertEquals(1, searchDao.loadSearchIdsForExperiment(expID1).size());
+        List<MsRunDb> runs1 = runDao.loadExperimentRuns(expID1);
+        assertEquals(1, runs1.size());
+        
+        assertEquals(2, searchDao.loadSearchIdsForExperiment(expID2).size());
+        List<MsRunDb> runs2 = runDao.loadExperimentRuns(expID2);
+        assertEquals(2, runs2.size());
+        
+        Set<Integer> distinctRunIds = new HashSet<Integer>();
+        for (MsRunDb run: runs1)
+            distinctRunIds.add(run.getId());
+        for (MsRunDb run: runs2)
+            distinctRunIds.add(run.getId());
+        assertEquals(2, distinctRunIds.size());
+        
+        // delete the second experiment
+        uploader.deleteExperiment(expID2);
+        
+        // make sure run common to both experiments is still there
+        List<MsRunDb> runs = runDao.loadExperimentRuns(expID1);
+        assertEquals(1, runs.size());
+        assertEquals("771_5489.ms2", runs.get(0).getFileName());
+        
+        // make sure runs for deleted experiment are gone
+        assertEquals(0, runDao.loadExperimentRuns(expID2).size());
+        assertEquals(0, searchDao.loadSearchIdsForExperiment(expID2).size());
+    }
     
-//    public void testUploadValidDataWWarnings() {
-//        resetDatabase();
-//        String dir = "test_resources/validData_w_warnings_dir";
-//        int expId = 0;
-//        try {
-//            expId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir);
-//        }
-//        catch (UploadException e1) {
-//            e1.printStackTrace();
-//        }
-//        assertEquals(1, expId);
-//        
-//        // read from database and make sure files are identical (MS2 files)
-//        String outputTest = "test_resources/validData_w_warnings_dir/fromDb.ms2";
-//        // remove the output if it already exists
-//        new File(outputTest).delete();
-//        DbToMs2FileConverter ms2Converter = new DbToMs2FileConverter();
-//        // compare the first ms2 file uploaded
-//        try {
-//            ms2Converter.convertToMs2(1, outputTest);
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        assertTrue(filesIdentical(outputTest, dir+File.separator+"PARC_p75_01_itms.ms2.valid"));
-//        // remove the output file
-//        assertTrue(new File(outputTest).delete());
-//    }
-    
+    public void testCheckNonSqtFilesFirst() {
+        String dir = "test_resources/invalid_sqt_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, true);
+            fail("We care checking for non-sequest SQT's first. We have those in the directory");
+        }
+        catch (UploadException e) {
+            assertEquals(ERROR_CODE.UNSUPPORTED_SQT, e.getErrorCode());
+        }
+        // make sure nothing got uploaded
+        assertEquals(0, expDao.selectAllExperimentIds().size());
+    }
     
     private boolean filesIdentical(String output, String input) {
         BufferedReader orig = null;
