@@ -97,7 +97,7 @@ public class MsExperimentUploader {
             throw ex;
         }
         
-        // ----------- THIS IS TEMPORARY TILL WE ARE ABBLE TO PARSE OTHER TYPES OF SQT ------------ //
+        // ----------- THIS IS TEMPORARY TILL WE ARE ABLE TO PARSE OTHER TYPES OF SQT ------------ //
         if (doNonSeqCheckFirst) {
             String nonSequestFile = null;
             if ((nonSequestFile = directoryHasNonSequestSQT(fileDirectory, filenames)) != null) {
@@ -123,6 +123,7 @@ public class MsExperimentUploader {
             deleteExperiment(runExperimentId); // delete the experiment
             numRunsUploaded = 0;
             numSearchesUploaded = 0;
+            e.appendErrorMessage("!!!MS2 and SQT files will not be uploaded!!!");
             throw e;
         }
         

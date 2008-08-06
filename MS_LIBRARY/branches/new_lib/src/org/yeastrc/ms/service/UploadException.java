@@ -98,6 +98,14 @@ public class UploadException extends Exception {
         this.errorMessage = errorMessage;
     }
     
+    public void appendErrorMessage(String toAppend) {
+        if (errorMessage == null || errorMessage.length() == 0) {
+            errorMessage = toAppend;
+        }
+        else {
+            errorMessage = errorMessage+"\n\t"+toAppend;
+        }
+    }
     public String getErrorMessage() {
         return errorMessage;
     }
