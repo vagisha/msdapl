@@ -322,7 +322,6 @@ public class SQTHeader implements SQTSearch {
         
         
         String modMass = tokens[1].trim();
-        modMass = removeSign(modMass); // removes a + sign
         if (modMass.length() < 1)
             throw new SQTParseException("No mass found for dynamic modification: "+value);
         
@@ -344,14 +343,6 @@ public class SQTHeader implements SQTSearch {
         modSymbol = Character.toUpperCase(modSymbol);  
         return (modSymbol < 'A' || modSymbol > 'Z');
     }
-    
-    private String removeSign(String massStr) {
-        if (massStr.length() == 0)  return massStr;
-        if (massStr.charAt(0) == '+' || massStr.charAt(0) == '-')
-            return massStr.substring(1);
-        return massStr;
-    }
-    
     
     //-------------------------------------------------------------------------------------------------------
     // Enzyme(s) used for the search

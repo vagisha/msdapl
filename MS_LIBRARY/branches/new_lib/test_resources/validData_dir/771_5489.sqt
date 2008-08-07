@@ -19,7 +19,7 @@ H	Alg-PreMassTol	3.000
 H	Alg-FragMassTol	0.0
 H	Alg-XCorrMode	1
 H	StaticMod	C=160.139
-H       DiffMod GVD#=+99.9
+H       DiffMod GVD#=-99.9
 H	Alg-DisplayTop	5
 H	Alg-IonSeries	0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0
 H	EnzymeSpec	No_Enzyme
