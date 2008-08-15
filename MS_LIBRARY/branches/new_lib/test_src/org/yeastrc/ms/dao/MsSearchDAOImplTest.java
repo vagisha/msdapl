@@ -5,8 +5,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsRunSearch;
+import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
@@ -31,21 +31,21 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchDao.loadSearchIdsForRun(runId_1).size()); // runId = 1
         
         // create and save a search with no seq. db information or modifications or enzymes
-        MsSearch search_1 = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
+        MsRunSearch search_1 = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
         assertEquals(167, search_1.getSearchDuration());
         assertEquals(0, search_1.getSearchDatabases().size());
         assertEquals(0, search_1.getStaticModifications().size());
         assertEquals(0, search_1.getDynamicModifications().size());
         
         int searchId_1 = searchDao.saveSearch(search_1, runId_1, 32); // runId = 21; experimentId = 32
-        List<MsSearchDb> searchList = (List<MsSearchDb>) searchDao.loadSearchesForRun(runId_1);
+        List<MsRunSearchDb> searchList = (List<MsRunSearchDb>) searchDao.loadSearchesForRun(runId_1);
         assertEquals(1, searchList.size());
         assertEquals(0, resultDao.loadResultIdsForSearch(searchId_1).size());
         checkSearch(search_1, searchList.get(0));
         
         
         // create and save a search with seq. db information and modifications AND enzymes
-        MsSearch search_2 = makePeptideSearch(SearchFileFormat.SQT_SEQ, true, true, true, true);
+        MsRunSearch search_2 = makePeptideSearch(SearchFileFormat.SQT_SEQ, true, true, true, true);
         assertTrue(search_2.getSearchDatabases().size() > 0);
         assertTrue(search_2.getStaticModifications().size() > 0);
         assertTrue(search_2.getDynamicModifications().size() > 0);
@@ -91,10 +91,10 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testReturnedSearchType() {
-        MsSearch search = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
+        MsRunSearch search = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
         assertEquals(SearchFileFormat.SQT_SEQ, search.getSearchFileFormat());
         int searchId_1 = searchDao.saveSearch(search, 21, 0); // runId = 21
-        MsSearchDb searchDb = searchDao.loadSearch(searchId_1);
+        MsRunSearchDb searchDb = searchDao.loadSearch(searchId_1);
         assertTrue(searchDb instanceof SQTSearchDb);
         assertEquals(SearchFileFormat.SQT_SEQ, searchDb.getSearchFileFormat());
         
@@ -125,7 +125,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         }
     }
     
-    public static class MsSearchTest implements MsSearch {
+    public static class MsSearchTest implements MsRunSearch {
 
         private List<MsSearchModification> dynamicModifications = new ArrayList<MsSearchModification>();
         private List<MsSearchModification> staticModifications = new ArrayList<MsSearchModification>();

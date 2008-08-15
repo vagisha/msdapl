@@ -1,6 +1,5 @@
 package org.yeastrc.ms.domain;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -9,7 +8,7 @@ import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 
-public interface MsSearch extends MsSearchBase {
+public interface MsRunSearch extends MsRunSearchBase {
 
     /**
      * @return the searchDatabases
@@ -33,22 +32,12 @@ public interface MsSearch extends MsSearchBase {
     
 }
 
-interface MsSearchBase {
+interface MsRunSearchBase {
     
     /**
      * @return the originalFileType
      */
     public abstract SearchFileFormat getSearchFileFormat();
-
-    /**
-     * @return the searchEngineName
-     */
-    public abstract String getSearchEngineName();
-
-    /**
-     * @return the searchEngineVersion
-     */
-    public abstract String getSearchEngineVersion();
 
     /**
      * @return the searchDate
@@ -60,23 +49,4 @@ interface MsSearchBase {
      */
     public abstract int getSearchDuration();
 
-    /**
-     * @return the precursorMassType
-     */
-    public abstract String getPrecursorMassType();
-
-    /**
-     * @return the precursorMassTolerance
-     */
-    public abstract BigDecimal getPrecursorMassTolerance();
-
-    /**
-     * @return the fragmentMassType
-     */
-    public abstract String getFragmentMassType();
-
-    /**
-     * @return the fragmentMassTolerance
-     */
-    public abstract BigDecimal getFragmentMassTolerance();
 }

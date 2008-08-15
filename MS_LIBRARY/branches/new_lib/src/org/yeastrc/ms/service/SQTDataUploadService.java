@@ -22,8 +22,8 @@ import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSql
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsRunSearch;
+import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
@@ -261,12 +261,12 @@ public class SQTDataUploadService {
     }
     
     public static List<Integer> getSearchIdsForExperiment(int experimentId) {
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
         return searchDao.loadSearchIdsForExperiment(experimentId);
     }
     
     public static void deleteSearch(int searchId) {
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
         searchDao.deleteSearch(searchId);
     }
     

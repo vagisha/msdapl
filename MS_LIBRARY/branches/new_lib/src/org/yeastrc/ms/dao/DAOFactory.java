@@ -31,8 +31,8 @@ import org.yeastrc.ms.dao.sqtFile.ibatis.SQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchScanDAOImpl;
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsRunSearch;
+import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -92,7 +92,7 @@ public class DAOFactory {
     private MS2ChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
     // DAOs for peptide search related objects
-    private MsSearchDAO<MsSearch, MsSearchDb> searchDAO;
+    private MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDAO;
     private MsSearchResultDAO <MsSearchResult, MsSearchResultDb> searchResultDAO;
     private MsSearchResultProteinDAO resultProteinDAO;
     private MsSearchModificationDAO modDAO;
@@ -183,7 +183,7 @@ public class DAOFactory {
         return ms2ChgIAnalysisDAO;
     }
     
-    public MsSearchDAO<MsSearch, MsSearchDb> getMsSearchDAO() {
+    public MsSearchDAO<MsRunSearch, MsRunSearchDb> getMsSearchDAO() {
         return searchDAO;
     }
     

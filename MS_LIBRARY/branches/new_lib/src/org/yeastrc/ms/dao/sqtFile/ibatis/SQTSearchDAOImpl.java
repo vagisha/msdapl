@@ -13,8 +13,8 @@ import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsRunSearch;
+import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
@@ -29,13 +29,13 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class SQTSearchDAOImpl extends BaseSqlMapDAO 
     implements MsSearchDAO<SQTSearch, SQTSearchDb> {
 
-    private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
+    private MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao;
     private SQTHeaderDAO headerDao;
     private SQTSearchScanDAO spectrumDao;
     private MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao;
     
     public SQTSearchDAOImpl(SqlMapClient sqlMap,
-            MsSearchDAO<MsSearch, MsSearchDb> searchDao,
+            MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao,
             SQTHeaderDAO headerDao,
             SQTSearchScanDAO spectrumDao,
             MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao) {

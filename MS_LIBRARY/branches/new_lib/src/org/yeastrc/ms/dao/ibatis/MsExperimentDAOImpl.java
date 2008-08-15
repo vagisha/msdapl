@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.domain.MsExperiment;
-import org.yeastrc.ms.domain.MsExperimentDb;
+import org.yeastrc.ms.domain.MsSearchDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -26,8 +26,8 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         super(sqlMap);
     }
 
-    public MsExperimentDb load(int msExperimentId) {
-        return (MsExperimentDb)queryForObject("MsExperiment.select", msExperimentId);
+    public MsSearchDb load(int msExperimentId) {
+        return (MsSearchDb)queryForObject("MsExperiment.select", msExperimentId);
     }
     
     public int save(MsExperiment experiment) {

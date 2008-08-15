@@ -17,9 +17,9 @@ import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.MsSearchDAO;
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
-import org.yeastrc.ms.domain.impl.MsExperimentDbImpl;
+import org.yeastrc.ms.domain.MsRunSearch;
+import org.yeastrc.ms.domain.MsRunSearchDb;
+import org.yeastrc.ms.domain.impl.MsSearchDbImpl;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -165,7 +165,7 @@ public class MsExperimentUploader {
 
     private int uploadExperiment(String remoteServer, String remoteDirectory, Date expDate) {
         MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
-        MsExperimentDbImpl experiment = new MsExperimentDbImpl();
+        MsSearchDbImpl experiment = new MsSearchDbImpl();
         experiment.setDate(new java.sql.Date(expDate.getTime()));
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);

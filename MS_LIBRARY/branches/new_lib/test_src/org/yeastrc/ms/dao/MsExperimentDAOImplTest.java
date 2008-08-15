@@ -6,7 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.MsExperiment;
-import org.yeastrc.ms.domain.MsExperimentDb;
+import org.yeastrc.ms.domain.MsSearchDb;
 
 public class MsExperimentDAOImplTest extends TestCase {
 
@@ -21,7 +21,7 @@ public class MsExperimentDAOImplTest extends TestCase {
         MsExperiment experiment = createMsExperiment();
         int expId = expDao.save(experiment);
         
-        MsExperimentDb experimentDb = expDao.load(0); // there should be experiments with id 0
+        MsSearchDb experimentDb = expDao.load(0); // there should be experiments with id 0
         assertNull(experimentDb);
         
         List<Integer> expIds = expDao.selectAllExperimentIds();
@@ -31,7 +31,7 @@ public class MsExperimentDAOImplTest extends TestCase {
         assertNotNull(experimentDb);
         
         // make sure the original experiment and the one saved in the database are same.
-        assertEquals(experiment.getDate().toString(), experimentDb.getDate().toString());
+        assertEquals(experiment.getSearchDate().toString(), experimentDb.getSearchDate().toString());
         assertEquals(experiment.getServerAddress(), experimentDb.getServerAddress());
         assertEquals(experiment.getServerDirectory(), experiment.getServerDirectory());
         

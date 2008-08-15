@@ -15,18 +15,18 @@ import org.yeastrc.ms.domain.search.MsSearchModificationDb;
 /**
  * 
  */
-public interface MsSearchDb extends MsSearchBase {
+public interface MsRunSearchDb extends MsRunSearchBase {
 
-    /**
-     * @return database id of the experiment this search belongs to
-     */
-    public abstract int getExperimentId();
-    
     /**
      * @return database id of the run on which this search was done.
      */
     public abstract int getRunId();
 
+    /**
+     * @return database id of the search group
+     */
+    public abstract int getSearchId();
+    
     /**
      * @return database id of this search
      */

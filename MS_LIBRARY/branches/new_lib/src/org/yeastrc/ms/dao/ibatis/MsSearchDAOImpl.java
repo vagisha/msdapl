@@ -20,8 +20,8 @@ import org.yeastrc.ms.dao.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.MsEnzymeDAO.EnzymeProperties;
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsRunSearch;
+import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
@@ -38,7 +38,7 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
  * 
  */
 public class MsSearchDAOImpl extends BaseSqlMapDAO 
-        implements MsSearchDAO<MsSearch, MsSearchDb> {
+        implements MsSearchDAO<MsRunSearch, MsRunSearchDb> {
 
     private MsSearchDatabaseDAO seqDbDao;
     private MsSearchModificationDAO modDao;
@@ -57,11 +57,11 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         this.enzymeDao = enzymeDao;
     }
     
-    public MsSearchDb loadSearch(int searchId) {
-        return (MsSearchDb) queryForObject("MsSearch.select", searchId);
+    public MsRunSearchDb loadSearch(int searchId) {
+        return (MsRunSearchDb) queryForObject("MsSearch.select", searchId);
     }
     
-    public List<MsSearchDb> loadSearchesForRun(int runId) {
+    public List<MsRunSearchDb> loadSearchesForRun(int runId) {
         return queryForList("MsSearch.selectSearchesForRun", runId);
     }
     
@@ -85,7 +85,7 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         return 0;
     }
     
-    public int saveSearch(MsSearch search, int runId, int experimentId) {
+    public int saveSearch(MsRunSearch search, int runId, int experimentId) {
         MsSearchSqlMapParam searchDb = new MsSearchSqlMapParam(runId, search, experimentId);
         int searchId = saveAndReturnId("MsSearch.insert", searchDb);
         
@@ -151,13 +151,13 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
     /**
      * Convenience class for encapsulating a MsRunSearch and associated runId
      */
-    public class MsSearchSqlMapParam implements MsSearch {
+    public class MsSearchSqlMapParam implements MsRunSearch {
 
         private int runId;
         private int experimentId;
-        private MsSearch search;
+        private MsRunSearch search;
         
-        public MsSearchSqlMapParam(int runId, MsSearch search, int experimentId) {
+        public MsSearchSqlMapParam(int runId, MsRunSearch search, int experimentId) {
             this.runId = runId;
             this.experimentId = experimentId;
             this.search = search;
@@ -215,11 +215,11 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
         }
 
         public String getSearchEngineName() {
-            return search.getSearchEngineName();
+            return search.getAnalysisProgramName();
         }
 
         public String getSearchEngineVersion() {
-            return search.getSearchEngineVersion();
+            return search.getAnalysisProgramVersion();
         }
 
         @Override

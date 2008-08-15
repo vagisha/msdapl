@@ -24,8 +24,8 @@ import org.yeastrc.ms.dao.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDb;
+import org.yeastrc.ms.domain.MsRunSearch;
+import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
@@ -57,7 +57,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
     protected MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
 
-    protected MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+    protected MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
     protected MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = 
         DAOFactory.instance().getMsSearchResultDAO();
     protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
@@ -260,7 +260,7 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearch makePeptideSearch(SearchFileFormat format, boolean addSeqDb,
+    protected MsRunSearch makePeptideSearch(SearchFileFormat format, boolean addSeqDb,
             boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
 
         MsSearchTest search = new MsSearchTest();
@@ -346,7 +346,7 @@ public class BaseDAOTestCase extends TestCase {
         return cal.getTimeInMillis();
     }
     
-    protected void checkSearch(MsSearch input, MsSearchDb output) {
+    protected void checkSearch(MsRunSearch input, MsRunSearchDb output) {
         assertEquals(input.getSearchDatabases().size(), output.getSearchDatabases().size());
         assertEquals(input.getStaticModifications().size(), output.getStaticModifications().size());
         assertEquals(input.getDynamicModifications().size(), output.getDynamicModifications().size());
@@ -357,8 +357,8 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getPrecursorMassType(), output.getPrecursorMassType());
         assertEquals(input.getSearchDate().toString(), output.getSearchDate().toString());
         assertEquals(input.getSearchDuration(), output.getSearchDuration());
-        assertEquals(input.getSearchEngineName(), output.getSearchEngineName());
-        assertEquals(input.getSearchEngineVersion(), output.getSearchEngineVersion());
+        assertEquals(input.getAnalysisProgramName(), output.getAnalysisProgramName());
+        assertEquals(input.getAnalysisProgramVersion(), output.getAnalysisProgramVersion());
         assertEquals(input.getSearchFileFormat(), output.getSearchFileFormat());
     }
 
