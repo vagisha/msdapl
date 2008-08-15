@@ -10,8 +10,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.sqtFile.SQTField;
-import org.yeastrc.ms.domain.sqtFile.SQTHeaderDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTField;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 
 /**
  * 

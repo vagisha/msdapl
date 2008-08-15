@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
-import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2Field;
 
 /**
  * 

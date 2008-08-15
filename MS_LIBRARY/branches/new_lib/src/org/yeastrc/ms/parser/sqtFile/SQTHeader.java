@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yeastrc.ms.domain.MsEnzyme;
-import org.yeastrc.ms.domain.MsSearchDatabase;
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.SearchFileFormat;
-import org.yeastrc.ms.domain.sqtFile.SQTField;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 
 

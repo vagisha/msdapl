@@ -10,8 +10,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsSearchDatabase;
-import org.yeastrc.ms.domain.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 
 /**
  * 

@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.DataConversionType;
-import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.parser.AbstractReader;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.MS2RunDataProvider;

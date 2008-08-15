@@ -2,11 +2,11 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsRunDb;
-import org.yeastrc.ms.domain.MsRunLocation;
-import org.yeastrc.ms.domain.MsRunLocationDb;
-import org.yeastrc.ms.domain.RunFileFormat;
+import org.yeastrc.ms.domain.run.MsRun;
+import org.yeastrc.ms.domain.run.MsRunDb;
+import org.yeastrc.ms.domain.run.MsRunLocation;
+import org.yeastrc.ms.domain.run.MsRunLocationDb;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 
 public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
 

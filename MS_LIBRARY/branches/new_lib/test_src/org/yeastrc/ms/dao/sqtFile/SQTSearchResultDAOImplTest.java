@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultTest;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 
 public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 

@@ -1,0 +1,108 @@
+/**
+ * Ms2FileScanCharge.java
+ * @author Vagisha Sharma
+ * Jun 16, 2008
+ * @version 1.0
+ */
+package org.yeastrc.ms.domain.run.ms2file.impl;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb;
+
+
+/**
+ * Represents a "Z" line (and any following "D" lines) from a MS2 file.  Describes the charge for a scan.
+ * A scan can have multiple predicted charges
+ */
+public class MS2ScanChargeDbImpl implements MS2ScanChargeDb {
+
+    
+    private int id;         // unique id (database)
+    private int scanId;     // the id (database) of the scan to which this charge corresponds
+    private int charge;     // the charge state
+    private BigDecimal mass;     // predicted [M+H]+ (mass)
+    
+    private List<? super MS2ChargeDependentAnalysisDb> chargeDepAnalysis;
+ 
+    public MS2ScanChargeDbImpl() {
+        chargeDepAnalysis = new ArrayList<MS2ChargeDependentAnalysisDb>();
+    }
+    
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+    /**
+     * @return the scanId
+     */
+    public int getScanId() {
+        return scanId;
+    }
+    /**
+     * @param scanId the scanId to set
+     */
+    public void setScanId(int scanId) {
+        this.scanId = scanId;
+    }
+    /**
+     * @return the charge
+     */
+    public int getCharge() {
+        return charge;
+    }
+    /**
+     * @param charge the charge to set
+     */
+    public void setCharge(int charge) {
+        this.charge = charge;
+    }
+    /**
+     * @return the mass
+     */
+    public BigDecimal getMass() {
+        return mass;
+    }
+    /**
+     * @param mass the mass to set
+     */
+    public void setMass(BigDecimal mass) {
+        this.mass = mass;
+    }
+
+    /**
+     * @return the chargeDepAnalysis
+     */
+    public List<MS2ChargeDependentAnalysisDb> getChargeDependentAnalysisList() {
+        return (List<MS2ChargeDependentAnalysisDb>) chargeDepAnalysis;
+    }
+
+    public void addChargeDependentAnalysis(MS2ChargeDependentAnalysisDb analysis) {
+        chargeDepAnalysis.add(analysis);
+    }
+    
+    /**
+     * @param chargeDepAnalysis the chargeDepAnalysis to set
+     */
+    public void setChargeDependentAnalysis(List<? super MS2ChargeDependentAnalysisDb> chargeDepAnalysis) {
+        this.chargeDepAnalysis = chargeDepAnalysis;
+    }
+    
+    /**
+     * @return the number of charge dependent analyses for this predicted charge for a scan.
+     */
+    public int getChargeDependentAnalysisCount() {
+        return chargeDepAnalysis.size();
+    }
+}

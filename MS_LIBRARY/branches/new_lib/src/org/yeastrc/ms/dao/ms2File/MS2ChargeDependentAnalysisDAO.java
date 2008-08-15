@@ -8,8 +8,8 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.MS2ChargeDependentAnalysisDb;
-import org.yeastrc.ms.domain.ms2File.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2Field;
 
 /**
  * 

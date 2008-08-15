@@ -8,6 +8,10 @@ package org.yeastrc.ms.domain;
 
 import java.util.List;
 
+import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchModificationDb;
+
 /**
  * 
  */

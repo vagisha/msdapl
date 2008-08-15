@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.MsScanDAOImpl.DataConversionTypeHandler;
-import org.yeastrc.ms.domain.DataConversionType;
-import org.yeastrc.ms.domain.MsScan;
-import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.MsScanDb;
 
 public class MsScanDAOImplTest extends BaseDAOTestCase {
 

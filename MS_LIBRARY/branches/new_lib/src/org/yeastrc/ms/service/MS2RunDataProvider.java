@@ -6,8 +6,8 @@
  */
 package org.yeastrc.ms.service;
 
-import org.yeastrc.ms.domain.ms2File.MS2Run;
-import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2Run;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.parser.DataProviderException;
 
 /**

@@ -1,7 +1,7 @@
 package org.yeastrc.ms.dao.sqtFile;
 
-import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchScanDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 
 public interface SQTSearchScanDAO {
 

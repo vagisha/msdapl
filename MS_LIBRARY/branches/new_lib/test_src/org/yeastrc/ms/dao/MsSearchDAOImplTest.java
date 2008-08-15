@@ -5,13 +5,13 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsSearch;
-import org.yeastrc.ms.domain.MsSearchDatabase;
 import org.yeastrc.ms.domain.MsSearchDb;
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearchResult;
-import org.yeastrc.ms.domain.SearchFileFormat;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 
 public class MsSearchDAOImplTest extends BaseDAOTestCase {

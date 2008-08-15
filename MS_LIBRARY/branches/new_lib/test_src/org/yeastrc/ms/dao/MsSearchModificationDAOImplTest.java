@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearchModificationDb;
-import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
-import org.yeastrc.ms.domain.MsSearchResultModification;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchModificationDb;
+import org.yeastrc.ms.domain.search.MsSearchResultDynamicModDb;
+import org.yeastrc.ms.domain.search.MsSearchResultModification;
 
 public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 

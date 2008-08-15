@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.MS2ScanChargeDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb;
 
 public class MS2ScanChargeDAOImplTest extends MS2BaseDAOtestCase {
 

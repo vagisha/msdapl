@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsSearchResultProtein;
-import org.yeastrc.ms.domain.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 
 public interface MsSearchResultProteinDAO {
 

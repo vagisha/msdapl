@@ -3,7 +3,7 @@ package org.yeastrc.ms.parser.sqtFile;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchModification;
 
 import junit.framework.TestCase;
 

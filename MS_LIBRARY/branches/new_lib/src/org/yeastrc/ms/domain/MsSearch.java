@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+
 public interface MsSearch extends MsSearchBase {
 
     /**

@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.parser.AbstractReader;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.SQTSearchDataProvider;

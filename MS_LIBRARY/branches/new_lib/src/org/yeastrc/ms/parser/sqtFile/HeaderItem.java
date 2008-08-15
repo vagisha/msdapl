@@ -1,6 +1,6 @@
 package org.yeastrc.ms.parser.sqtFile;
 
-import org.yeastrc.ms.domain.sqtFile.SQTField;
+import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 
 public class HeaderItem implements SQTField {
     

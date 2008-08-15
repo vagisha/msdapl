@@ -1,6 +1,6 @@
 package org.yeastrc.ms.parser.sqtFile;
 
-import org.yeastrc.ms.domain.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 
 public class Database implements MsSearchDatabase {
     

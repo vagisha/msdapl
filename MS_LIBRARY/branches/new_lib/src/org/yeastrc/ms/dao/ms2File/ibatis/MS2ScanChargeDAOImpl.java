@@ -13,9 +13,9 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
-import org.yeastrc.ms.domain.ms2File.MS2Field;
-import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.MS2ScanChargeDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

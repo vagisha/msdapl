@@ -11,11 +11,12 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsEnzymeDb;
-import org.yeastrc.ms.domain.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.MsSearchDb;
-import org.yeastrc.ms.domain.MsSearchModificationDb;
-import org.yeastrc.ms.domain.SearchFileFormat;
+import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchModificationDb;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseDbImpl;
 
 public class MsSearchDbImpl implements MsSearchDb {
 

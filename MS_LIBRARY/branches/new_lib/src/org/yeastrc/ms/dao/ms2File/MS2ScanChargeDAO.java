@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao.ms2File;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.MS2ScanChargeDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb;
 
 public interface MS2ScanChargeDAO {
 

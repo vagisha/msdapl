@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchScanDb;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 
 public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
 

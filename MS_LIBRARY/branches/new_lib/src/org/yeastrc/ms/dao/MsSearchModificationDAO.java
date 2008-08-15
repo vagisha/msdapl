@@ -3,10 +3,10 @@ package org.yeastrc.ms.dao;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl.MsSearchResultModSqlMapParam;
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearchModificationDb;
-import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
-import org.yeastrc.ms.domain.MsSearchResultModification;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchModificationDb;
+import org.yeastrc.ms.domain.search.MsSearchResultDynamicModDb;
+import org.yeastrc.ms.domain.search.MsSearchResultModification;
 
 public interface MsSearchModificationDAO {
 

@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsEnzymeDAO;
-import org.yeastrc.ms.domain.MsEnzyme;
-import org.yeastrc.ms.domain.MsEnzymeDb;
-import org.yeastrc.ms.domain.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;

@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Random;
 
 import org.yeastrc.ms.dao.MsScanDAOImplTest.MsScanTest;
-import org.yeastrc.ms.domain.DataConversionType;
-import org.yeastrc.ms.domain.ms2File.MS2Field;
-import org.yeastrc.ms.domain.ms2File.MS2Scan;
-import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
+import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 
 
 public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {

@@ -15,11 +15,11 @@ import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.MsSearch;
 import org.yeastrc.ms.domain.MsSearchDb;
-import org.yeastrc.ms.domain.sqtFile.SQTField;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

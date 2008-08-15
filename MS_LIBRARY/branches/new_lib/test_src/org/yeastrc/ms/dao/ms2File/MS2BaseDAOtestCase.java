@@ -12,16 +12,16 @@ import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2RunDAOImplTest.MS2RunTest;
 import org.yeastrc.ms.dao.ms2File.MS2ScanDAOImplTest.MS2ScanTest;
-import org.yeastrc.ms.domain.DataConversionType;
-import org.yeastrc.ms.domain.RunFileFormat;
-import org.yeastrc.ms.domain.ms2File.MS2ChargeDependentAnalysisDb;
-import org.yeastrc.ms.domain.ms2File.MS2ChargeIndependentAnalysisDb;
-import org.yeastrc.ms.domain.ms2File.MS2Field;
-import org.yeastrc.ms.domain.ms2File.MS2Run;
-import org.yeastrc.ms.domain.ms2File.MS2RunDb;
-import org.yeastrc.ms.domain.ms2File.MS2Scan;
-import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
-import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
+import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.RunFileFormat;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2Run;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 
 public class MS2BaseDAOtestCase extends BaseDAOTestCase {
 

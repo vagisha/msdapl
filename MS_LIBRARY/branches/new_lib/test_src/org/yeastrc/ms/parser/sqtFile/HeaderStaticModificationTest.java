@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchModification;
 
 public class HeaderStaticModificationTest extends TestCase {
 

@@ -5,13 +5,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearchResult;
-import org.yeastrc.ms.domain.MsSearchResultDb;
-import org.yeastrc.ms.domain.MsSearchResultModification;
-import org.yeastrc.ms.domain.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.MsSearchResultProtein;
-import org.yeastrc.ms.domain.ValidationStatus;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResultModification;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.ValidationStatus;
 
 public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
 

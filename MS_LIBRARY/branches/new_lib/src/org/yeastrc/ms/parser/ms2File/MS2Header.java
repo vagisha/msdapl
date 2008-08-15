@@ -9,11 +9,11 @@ package org.yeastrc.ms.parser.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.DataConversionType;
-import org.yeastrc.ms.domain.MsEnzyme;
-import org.yeastrc.ms.domain.RunFileFormat;
-import org.yeastrc.ms.domain.ms2File.MS2Field;
-import org.yeastrc.ms.domain.ms2File.MS2Run;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.RunFileFormat;
+import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 
 /**
  * 

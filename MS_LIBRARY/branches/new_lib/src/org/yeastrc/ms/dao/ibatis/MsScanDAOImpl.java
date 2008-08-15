@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.domain.DataConversionType;
-import org.yeastrc.ms.domain.MsScan;
-import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

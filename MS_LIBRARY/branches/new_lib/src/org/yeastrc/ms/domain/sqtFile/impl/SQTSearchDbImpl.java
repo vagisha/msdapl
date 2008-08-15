@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.impl.MsSearchDbImpl;
-import org.yeastrc.ms.domain.sqtFile.SQTHeaderDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
 
 public class SQTSearchDbImpl extends MsSearchDbImpl implements SQTSearchDb {

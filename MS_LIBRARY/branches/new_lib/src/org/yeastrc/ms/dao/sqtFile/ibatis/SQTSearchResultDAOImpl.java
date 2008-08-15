@@ -14,11 +14,11 @@ import java.util.Map;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
-import org.yeastrc.ms.domain.MsSearchResult;
-import org.yeastrc.ms.domain.MsSearchResultDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResultScoresDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

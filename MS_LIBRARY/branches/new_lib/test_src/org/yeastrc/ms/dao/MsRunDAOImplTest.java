@@ -3,12 +3,12 @@ package org.yeastrc.ms.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsEnzyme;
-import org.yeastrc.ms.domain.MsEnzymeDb;
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsRunDb;
-import org.yeastrc.ms.domain.MsRunLocationDb;
-import org.yeastrc.ms.domain.RunFileFormat;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.run.MsRun;
+import org.yeastrc.ms.domain.run.MsRunDb;
+import org.yeastrc.ms.domain.run.MsRunLocationDb;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 
 public class MsRunDAOImplTest extends BaseDAOTestCase {
 

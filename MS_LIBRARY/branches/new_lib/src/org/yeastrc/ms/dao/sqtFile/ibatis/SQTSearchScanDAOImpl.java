@@ -13,9 +13,9 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchScan;
-import org.yeastrc.ms.domain.sqtFile.impl.SQTSearchScanDbImpl;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanDbImpl;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

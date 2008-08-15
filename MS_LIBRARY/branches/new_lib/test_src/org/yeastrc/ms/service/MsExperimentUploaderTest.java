@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.MsLibTests;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 public class MsExperimentUploaderTest extends BaseDAOTestCase {

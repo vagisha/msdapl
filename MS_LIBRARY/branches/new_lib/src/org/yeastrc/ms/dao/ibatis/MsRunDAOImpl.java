@@ -16,11 +16,11 @@ import java.util.Map;
 import org.yeastrc.ms.dao.MsEnzymeDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsEnzymeDAO.EnzymeProperties;
-import org.yeastrc.ms.domain.MsEnzyme;
-import org.yeastrc.ms.domain.MsRun;
-import org.yeastrc.ms.domain.MsRunDb;
-import org.yeastrc.ms.domain.MsRunLocationDb;
-import org.yeastrc.ms.domain.RunFileFormat;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.run.MsRun;
+import org.yeastrc.ms.domain.run.MsRunDb;
+import org.yeastrc.ms.domain.run.MsRunLocationDb;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;

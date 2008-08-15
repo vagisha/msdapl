@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsScan;
-import org.yeastrc.ms.domain.MsScanDb;
+import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.MsScanDb;
 
 public interface MsScanDAO <I extends MsScan, O extends MsScanDb> {
 

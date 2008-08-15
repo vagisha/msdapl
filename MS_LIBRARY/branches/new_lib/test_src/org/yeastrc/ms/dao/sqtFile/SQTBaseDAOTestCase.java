@@ -9,14 +9,14 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsSearchDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchDAOImplTest.SQTSearchTest;
-import org.yeastrc.ms.domain.MsSearchDatabase;
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.SearchFileFormat;
-import org.yeastrc.ms.domain.sqtFile.SQTField;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.sqtFile.SQTSearch;
 import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultDb;
 
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 

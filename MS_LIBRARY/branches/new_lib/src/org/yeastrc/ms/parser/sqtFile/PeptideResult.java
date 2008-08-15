@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsSearchModification;
-import org.yeastrc.ms.domain.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.MsSearchResultProtein;
-import org.yeastrc.ms.domain.ValidationStatus;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
 
 /**
  * Represents a 'M' line in the SQT file

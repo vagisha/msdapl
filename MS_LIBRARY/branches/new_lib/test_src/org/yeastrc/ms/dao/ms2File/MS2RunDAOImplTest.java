@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.yeastrc.ms.MsLibTests;
 import org.yeastrc.ms.dao.MsRunDAOImplTest.MsRunTest;
-import org.yeastrc.ms.domain.MsEnzyme;
-import org.yeastrc.ms.domain.MsEnzymeDb;
-import org.yeastrc.ms.domain.ms2File.MS2Field;
-import org.yeastrc.ms.domain.ms2File.MS2Run;
-import org.yeastrc.ms.domain.ms2File.MS2RunDb;
-import org.yeastrc.ms.domain.ms2File.impl.MS2HeaderDbImpl;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2Run;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2HeaderDbImpl;
 
 public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 

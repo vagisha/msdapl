@@ -7,6 +7,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.domain.run.impl.MsScanDbImpl;
 import org.yeastrc.ms.util.PeakConverterDouble;
 import org.yeastrc.ms.util.PeakStringBuilder;
 import org.yeastrc.ms.util.PeakUtils;

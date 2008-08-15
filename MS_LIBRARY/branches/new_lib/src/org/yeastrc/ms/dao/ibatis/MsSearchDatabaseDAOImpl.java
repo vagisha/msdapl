@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.MsSearchDatabaseDAO;
-import org.yeastrc.ms.domain.MsSearchDatabase;
-import org.yeastrc.ms.domain.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

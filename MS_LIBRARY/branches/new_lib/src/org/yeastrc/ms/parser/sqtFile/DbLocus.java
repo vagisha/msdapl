@@ -1,6 +1,6 @@
 package org.yeastrc.ms.parser.sqtFile;
 
-import org.yeastrc.ms.domain.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 
 /**
  * Represents a L line in the SQT file. 

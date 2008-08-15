@@ -8,7 +8,7 @@ package org.yeastrc.ms.parser.ms2File;
 
 import java.io.File;
 
-import org.yeastrc.ms.domain.ms2File.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 
