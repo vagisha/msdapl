@@ -15,14 +15,14 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
-import org.yeastrc.ms.domain.sqtFile.SQTSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 
     protected SQTHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
     protected MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> sqtResDao = DAOFactory.instance().getSqtResultDAO();
-    protected MsSearchDAO<SQTSearch, SQTSearchDb> sqtSearchDao = DAOFactory.instance().getSqtSearchDAO();
+    protected MsSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtSearchDao = DAOFactory.instance().getSqtSearchDAO();
     protected SQTSearchScanDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
 
     protected void setUp() throws Exception {
@@ -33,7 +33,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         super.tearDown();
     }
 
-    protected SQTSearch makeSQTSearch(boolean addSeqDb,boolean addStaticMods, boolean addDynaMods,boolean addHeaders) {
+    protected SQTRunSearch makeSQTSearch(boolean addSeqDb,boolean addStaticMods, boolean addDynaMods,boolean addHeaders) {
 
         SQTSearchTest search = new SQTSearchTest();
         search.setSearchFileFormat(SearchFileFormat.SQT_SEQ);

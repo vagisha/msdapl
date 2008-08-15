@@ -2,8 +2,8 @@ package org.yeastrc.ms.dao;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsRunSearch;
-import org.yeastrc.ms.domain.MsRunSearchDb;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsRunSearchDb;
 
 public interface MsSearchDAO <I extends MsRunSearch, O extends MsRunSearchDb>{
 

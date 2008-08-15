@@ -4,13 +4,11 @@
  * Jul 11, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain;
+package org.yeastrc.ms.domain.search;
 
 import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
-import org.yeastrc.ms.domain.search.MsSearchModificationDb;
 
 /**
  * 

@@ -22,10 +22,10 @@ import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSql
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.MsRunSearch;
-import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultModification;
@@ -35,8 +35,8 @@ import org.yeastrc.ms.domain.search.MsSearchModification.ModificationType;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultScoresDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
-import org.yeastrc.ms.domain.sqtFile.SQTSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
@@ -149,9 +149,9 @@ public class SQTDataUploadService {
     
     private int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int experimentId) throws DataProviderException {
         
-        SQTSearch search = provider.getSearchHeader();
+        SQTRunSearch search = provider.getSearchHeader();
         // save the search and return the database id
-        MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = daoFactory.getSqtSearchDAO();
+        MsSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = daoFactory.getSqtSearchDAO();
         return searchDao.saveSearch(search, runId, experimentId);
     }
     

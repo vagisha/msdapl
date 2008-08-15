@@ -31,8 +31,6 @@ import org.yeastrc.ms.dao.sqtFile.ibatis.SQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl;
 import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchScanDAOImpl;
-import org.yeastrc.ms.domain.MsRunSearch;
-import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -41,10 +39,12 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -102,7 +102,7 @@ public class DAOFactory {
     private SQTSearchResultDAO sqtResultDAO;
     private SQTSearchScanDAO sqtSpectrumDAO;
     private SQTHeaderDAO sqtHeaderDAO;
-    private MsSearchDAO<SQTSearch, SQTSearchDb> sqtSearchDAO;
+    private MsSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtSearchDAO;
     
     // DAO for deleting experiments or searches
     private MsDeletionDAO deletionDAO;
@@ -211,7 +211,7 @@ public class DAOFactory {
         return sqtResultDAO;
     }
     
-    public MsSearchDAO<SQTSearch, SQTSearchDb> getSqtSearchDAO() {
+    public MsSearchDAO<SQTRunSearch, SQTRunSearchDb> getSqtSearchDAO() {
         return sqtSearchDAO;
     }
     

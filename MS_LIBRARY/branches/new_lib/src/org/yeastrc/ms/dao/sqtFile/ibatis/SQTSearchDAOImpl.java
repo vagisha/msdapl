@@ -13,13 +13,13 @@ import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
-import org.yeastrc.ms.domain.MsRunSearch;
-import org.yeastrc.ms.domain.MsRunSearchDb;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
-import org.yeastrc.ms.domain.sqtFile.SQTSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -27,7 +27,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * 
  */
 public class SQTSearchDAOImpl extends BaseSqlMapDAO 
-    implements MsSearchDAO<SQTSearch, SQTSearchDb> {
+    implements MsSearchDAO<SQTRunSearch, SQTRunSearchDb> {
 
     private MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao;
     private SQTHeaderDAO headerDao;
@@ -46,8 +46,8 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
         this.resultDao = resultDao;
     }
     
-    public SQTSearchDb loadSearch(int searchId) {
-        return (SQTSearchDb) queryForObject("MsSearch.select", searchId);
+    public SQTRunSearchDb loadSearch(int searchId) {
+        return (SQTRunSearchDb) queryForObject("MsSearch.select", searchId);
     }
     
     @Override
@@ -65,7 +65,7 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
         return searchDao.loadSearchIdForRunAndExperiment(runId, searchGroupId);
     }
     
-    public List<SQTSearchDb> loadSearchesForRun(int runId) {
+    public List<SQTRunSearchDb> loadSearchesForRun(int runId) {
         return queryForList("MsSearch.selectSearchesForRun", runId);
     }
     
@@ -74,7 +74,7 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
      * @param search
      * @return
      */
-    public int saveSearch (SQTSearch search, int runId, int searchGroupId) {
+    public int saveSearch (SQTRunSearch search, int runId, int searchGroupId) {
         
         // save the search
         int searchId = searchDao.saveSearch(search, runId, searchGroupId);

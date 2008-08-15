@@ -4,18 +4,17 @@
  * July 2, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.impl;
+package org.yeastrc.ms.domain.search.impl;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsSearchModificationDb;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseDbImpl;
 
 public class MsRunSearchDbImpl implements MsRunSearchDb {
 

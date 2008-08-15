@@ -3,15 +3,15 @@ package org.yeastrc.ms.domain.sqtFile.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.impl.MsRunSearchDbImpl;
+import org.yeastrc.ms.domain.search.impl.MsRunSearchDbImpl;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 
-public class SQTSearchDbImpl extends MsRunSearchDbImpl implements SQTSearchDb {
+public class SQTRunSearchDbImpl extends MsRunSearchDbImpl implements SQTRunSearchDb {
 
     private List<? super SQTHeaderDb> headers;
     
-    public SQTSearchDbImpl() {
+    public SQTRunSearchDbImpl() {
         headers = new ArrayList<SQTHeaderDb>();
     }
 

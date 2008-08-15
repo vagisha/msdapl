@@ -31,8 +31,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
-import org.yeastrc.ms.domain.sqtFile.SQTSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 import org.yeastrc.ms.parser.sqtFile.PeptideResult;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
@@ -50,8 +50,8 @@ public class DbToSqtFileConverter {
         try {
             outFile = new BufferedWriter(new FileWriter(outputFile));
 
-            MsSearchDAO<SQTSearch, SQTSearchDb> searchDao = DAOFactory.instance().getSqtSearchDAO();
-            SQTSearchDb run = searchDao.loadSearch(dbSearchId);
+            MsSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = DAOFactory.instance().getSqtSearchDAO();
+            SQTRunSearchDb run = searchDao.loadSearch(dbSearchId);
             if (run == null) {
                 System.err.println("No search found with id: "+dbSearchId);
                 return;
@@ -175,7 +175,7 @@ public class DbToSqtFileConverter {
         return scanDao.load(scanId);
     }
     
-    private void printSqtHeader(SQTSearchDb search) throws IOException {
+    private void printSqtHeader(SQTRunSearchDb search) throws IOException {
         SQTHeader sqtHeader = new SQTHeader();
         List<SQTHeaderDb> headerList = search.getHeaders();
         Collections.sort(headerList, new Comparator<SQTHeaderDb>() {

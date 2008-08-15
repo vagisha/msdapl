@@ -5,14 +5,14 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.MsRunSearch;
-import org.yeastrc.ms.domain.MsRunSearchDb;
 import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchDb;
+import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 
 public class MsSearchDAOImplTest extends BaseDAOTestCase {
 
@@ -95,14 +95,14 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(SearchFileFormat.SQT_SEQ, search.getSearchFileFormat());
         int searchId_1 = searchDao.saveSearch(search, 21, 0); // runId = 21
         MsRunSearchDb searchDb = searchDao.loadSearch(searchId_1);
-        assertTrue(searchDb instanceof SQTSearchDb);
+        assertTrue(searchDb instanceof SQTRunSearchDb);
         assertEquals(SearchFileFormat.SQT_SEQ, searchDb.getSearchFileFormat());
         
         search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false, false);
         assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
         int searchId_2 = searchDao.saveSearch(search, 21, 0);
         searchDb = searchDao.loadSearch(searchId_2);
-        assertFalse(searchDb instanceof SQTSearchDb);
+        assertFalse(searchDb instanceof SQTRunSearchDb);
         assertEquals(SearchFileFormat.PEPXML, searchDb.getSearchFileFormat());
         
         searchDao.deleteSearch(searchId_1);
