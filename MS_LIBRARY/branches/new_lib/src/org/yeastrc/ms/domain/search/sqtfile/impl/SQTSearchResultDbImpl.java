@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain.sqtFile.impl;
+package org.yeastrc.ms.domain.search.sqtfile.impl;
 
 import java.math.BigDecimal;
 

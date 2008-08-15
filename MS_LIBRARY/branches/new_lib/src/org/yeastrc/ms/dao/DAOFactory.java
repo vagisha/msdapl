@@ -43,8 +43,8 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;

@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
 
 public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {

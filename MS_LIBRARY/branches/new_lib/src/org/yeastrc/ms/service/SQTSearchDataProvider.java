@@ -6,8 +6,8 @@
  */
 package org.yeastrc.ms.service;
 
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
 import org.yeastrc.ms.parser.DataProviderException;
 
 /**

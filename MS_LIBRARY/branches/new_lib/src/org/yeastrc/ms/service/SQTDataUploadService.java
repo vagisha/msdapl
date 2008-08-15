@@ -34,9 +34,9 @@ import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsSearchModification.ModificationType;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultScoresDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 

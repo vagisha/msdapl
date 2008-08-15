@@ -1,11 +1,11 @@
-package org.yeastrc.ms.domain.sqtFile.impl;
+package org.yeastrc.ms.domain.search.sqtfile.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.impl.MsRunSearchDbImpl;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
 public class SQTRunSearchDbImpl extends MsRunSearchDbImpl implements SQTRunSearchDb {
 

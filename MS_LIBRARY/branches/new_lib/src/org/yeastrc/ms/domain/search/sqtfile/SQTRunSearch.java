@@ -1,9 +1,8 @@
-package org.yeastrc.ms.domain.sqtFile;
+package org.yeastrc.ms.domain.search.sqtfile;
 
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 
 public interface SQTRunSearch extends MsRunSearch {
 

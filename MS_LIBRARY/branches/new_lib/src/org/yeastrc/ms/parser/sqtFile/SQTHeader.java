@@ -14,7 +14,7 @@ import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 
 
 public class SQTHeader implements SQTRunSearch {

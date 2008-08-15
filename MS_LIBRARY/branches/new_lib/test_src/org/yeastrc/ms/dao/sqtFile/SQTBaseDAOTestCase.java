@@ -15,8 +15,8 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearch;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 

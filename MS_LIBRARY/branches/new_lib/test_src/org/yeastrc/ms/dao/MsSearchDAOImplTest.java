@@ -12,7 +12,7 @@ import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.sqtFile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
 public class MsSearchDAOImplTest extends BaseDAOTestCase {
 
