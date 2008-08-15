@@ -32,11 +32,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
         assertTrue(run.getEnzymeList().size() == 3);
         
         
-        int runId = ms2RunDao.saveRun(run, 123); // save the run
-        
-        List<Integer> expIds = expDao.loadExperimentIdsForRun(runId);
-        assertEquals(1, expIds.size());
-        assertEquals(123, expIds.get(0).intValue());
+        int runId = ms2RunDao.saveRun(run, "remoteServer", "remoteDirectory"); // save the run
         
         saveScansForRun(runId, 20); // add scans for this run
         
@@ -64,52 +60,6 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
             assertEquals(0, chargeDao.loadScanChargeIdsForScan(scanId).size());
             assertEquals(0, iAnalDao.loadAnalysisForScan(scanId).size());
         }
-    }
-    
-    public void testLoadExperimentRuns() {
-        // do we get a list of type List<MS2FileRun>?
-        MS2Run run = makeMS2Run("File1", true, true); // run with enzyme info and headers
-        ms2RunDao.saveRun(run, 1);
-        run = makeMS2Run("File2", true, true);
-        ms2RunDao.saveRun(run, 1);
-        
-        List<MS2RunDb> runList = ms2RunDao.loadExperimentRuns(1);
-        List<Integer> runIdList = expDao.loadRunIdsForExperiment(1);
-        assertEquals(runIdList.size(), runList.size());
-        assertEquals(2, runList.size());
-        
-        for (MS2RunDb r: runList) {
-            assertEquals(3, r.getHeaderList().size());
-        }
-        
-        deleteRunsForExperiment(1);
-        runList = ms2RunDao.loadExperimentRuns(1);
-        assertEquals(0, runList.size());
-    }
-    
-    
-    public void testGetRunsUniqueToExperiment() {
-        MS2Run run1 = makeMS2Run("File1", true, true); // run with enzyme info and headers
-        MS2Run run2 = makeMS2Run("File2", true, true); // run with enzyme info and headers
-        MS2Run run3 = makeMS2Run("File3", true, true); // run with enzyme info and headers
-        
-        // save run1 for two experiments
-        int runId1 = ms2RunDao.saveRun(run1, 120);
-        expDao.saveRunExperiment(99, runId1);
-        
-        // save run2 for one experiment
-        int runId2 = ms2RunDao.saveRun(run2, 99);
-        
-        // save run3 for one experiment
-        int runId3 = ms2RunDao.saveRun(run3, 120);
-        
-        List<Integer> uniqueRunIds = expDao.loadRunIdsUniqueToExperiment(99);
-        assertEquals(1, uniqueRunIds.size());
-        assertEquals(runId2, uniqueRunIds.get(0).intValue());
-        
-        uniqueRunIds = expDao.loadRunIdsUniqueToExperiment(120);
-        assertEquals(1, uniqueRunIds.size());
-        assertEquals(runId3, uniqueRunIds.get(0).intValue());
     }
     
     private MS2Run makeMS2Run(String fileName, boolean addEnzymes, boolean addHeaders) {

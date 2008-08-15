@@ -4,7 +4,7 @@
 <sqlMap namespace="MsScan"> 
 
 	<typeAlias alias="MsScanDb" type="org.yeastrc.ms.domain.impl.MsScanDbImpl"/>
-	<typeAlias alias="MsScan" type="org.yeastrc.ms.domain.MsScan"/>
+	<typeAlias alias="MsScan" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanSqlMapParam"/>
 	<typeAlias alias="MsScanData" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
 	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
 	
@@ -20,7 +20,7 @@
 		<result property="precursorScanNum" column="prescanNumber" nullValue="-1"/>
 		<result property="retentionTime" column="retentionTime" />
 		<result property="fragmentationType" column="fragmentationType" />
-		<result property="isCentroid" 
+		<result property="dataConversionType" 
 				column="isCentroid" 
 				typeHandler="DataConversionTypeHandler"
 				/>
@@ -40,7 +40,9 @@
 		<parameter property="precursorScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
-		<parameter property="isCentroid" jdbcType="CHAR"/>
+		<parameter property="dataConversionType" 
+					typeHandler="DataConversionTypeHandler"
+					jdbcType="CHAR"/>
 		<parameter property="peakCount" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	

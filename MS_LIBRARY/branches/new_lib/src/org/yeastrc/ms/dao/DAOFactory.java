@@ -113,14 +113,14 @@ public class DAOFactory {
         expDAO = new MsExperimentDAOImpl(sqlMap);
         enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
         scanDAO = new MsScanDAOImpl(sqlMap);
-        runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO, scanDAO, expDAO);
+        runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO);
         
         ms2FileHeadersDAO = new MS2HeaderDAOImpl(sqlMap);
         ms2ChgIAnalysisDAO = new MS2ChargeIndependentAnalysisDAOImpl(sqlMap);
         ms2ChgDAnalysisDAO = new MS2ChargeDependentAnalysisDAOImpl(sqlMap);
         ms2FileScanChargeDAO = new MS2ScanChargeDAOImpl(sqlMap, ms2ChgDAnalysisDAO);
         ms2ScanDAO = new MS2ScanDAOImpl(sqlMap, scanDAO, ms2ChgIAnalysisDAO, ms2FileScanChargeDAO);
-        ms2RunDAO = new MS2RunDAOImpl(sqlMap, runDAO, ms2FileHeadersDAO, ms2ScanDAO);
+        ms2RunDAO = new MS2RunDAOImpl(sqlMap, runDAO);
         
         
         // Search related

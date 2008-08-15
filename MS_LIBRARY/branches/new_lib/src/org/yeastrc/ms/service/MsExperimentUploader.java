@@ -110,11 +110,8 @@ public class MsExperimentUploader {
         
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
-        // make a new entry in the msExperment table first
-        runExperimentId =  uploadExperiment(remoteServer, remoteDirectory, expDate);
-        
         try {
-            uploadRunAndSearchFilesToDb(runExperimentId, fileDirectory, filenames, remoteServer);
+            uploadRunAndSearchFilesToDb(fileDirectory, filenames, remoteServer, remoteDirectory);
         }
         catch (UploadException e) {
             uploadExceptionList.add(e);
@@ -196,12 +193,13 @@ public class MsExperimentUploader {
      * @return
      * @throws UploadException 
      */
-    private void uploadRunAndSearchFilesToDb(int experimentId, String fileDirectory, Set<String> filenames, String serverAddress) throws UploadException {
+    private void uploadRunAndSearchFilesToDb(String fileDirectory, Set<String> filenames, String serverAddress, String serverDirectory) throws UploadException {
         
+        // TODO save an entry in the msSearch table
         for (String filename: filenames) {
 
             // Upload the run first.
-            int runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2",experimentId);
+            int runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2", serverAddress, serverDirectory);
             
             // if the sqt file does not exist go on to the next run
             String sqtFile = fileDirectory+File.separator+filename+".sqt";
@@ -209,13 +207,13 @@ public class MsExperimentUploader {
                 continue;
             
             // now upload the search result 
-            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId, experimentId, serverAddress);
+//            uploadSQTSearch(fileDirectory+File.separator+filename+".sqt", runId, serverAddress);
         }
     }
 
     // Any exceptions that happens during sha1sum calculation, parsing or upload
     // will be punted up to the calling function. 
-    private int uploadMS2Run(String filePath, int experimentId) throws UploadException {
+    private int uploadMS2Run(String filePath, String serverAddress, String serverDirectory) throws UploadException {
         numRunsToUpload++;
         Ms2FileReader ms2Provider = new Ms2FileReader();
         MS2DataUploadService uploadService = new MS2DataUploadService();
@@ -230,7 +228,7 @@ public class MsExperimentUploader {
         
         try {
             ms2Provider.open(filePath, sha1Sum);
-            int runId = uploadService.uploadMS2Run(ms2Provider,experimentId, sha1Sum);
+            int runId = uploadService.uploadMS2Run(ms2Provider, sha1Sum, serverAddress, serverDirectory);
             numRunsUploaded++;
             return runId;
         }
@@ -367,53 +365,53 @@ public class MsExperimentUploader {
     
     void deleteExperiment(int experimentId) {
         
-        MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
-        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
-        
-        List<Integer> uniqueRunIds = expDao.loadRunIdsUniqueToExperiment(experimentId);
-        for (Integer runId: uniqueRunIds) {
-            runDao.delete(runId);
-        }
-        
-        // delete the experiment. This will also delete all related searches and entries from msExperimentRun table
-        expDao.delete(experimentId);
-        log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
+//        MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
+//        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
+//        
+//        List<Integer> uniqueRunIds = expDao.loadRunIdsUniqueToExperiment(experimentId);
+//        for (Integer runId: uniqueRunIds) {
+//            runDao.delete(runId);
+//        }
+//        
+//        // delete the experiment. This will also delete all related searches and entries from msExperimentRun table
+//        expDao.delete(experimentId);
+//        log.error("DELETED RUNS, SEARCHES and EXPERIMENT for experimentID: "+experimentId);
     }
     
-    public static int[] getScanAndSearchIdFor(int experimentId, String runFileScanString) {
-        // parse the filename to get the filename, scan number and charge
-        // e.g. NE063005ph8s02.17247.17247.2
-        Matcher match = fileNamePattern.matcher(runFileScanString);
-        if (!match.matches()) {
-            log.error("!!!INVALID FILENAME FROM DTASELECT RESULT: "+runFileScanString);
-            return new int[0];
-        }
-        String runFileName = match.group(1)+".ms2";
-        int scanNum = Integer.parseInt(match.group(2));
-        
-        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
-        int runId = runDao.loadRunIdForExperimentAndFileName(experimentId, runFileName);
-        if (runId == 0) {
-            log.error("!!!NO RUN FOUND FOR EXPERIMENT: "+experimentId+"; fileName: "+runFileName);
-            return new int[0];
-        }
-        
-        MsScanDAO<MsScan, MsScanDb>scanDao = DAOFactory.instance().getMsScanDAO();
-        int scanId = scanDao.loadScanIdForScanNumRun(scanNum, runId);
-        if (scanId == 0) {
-            log.error("!!!NO SCAN FOUND FOR SCAN NUMBER: "+scanNum+"; runId: "+runId+"; fileName: "+runFileName);
-            return new int[0];
-        }
-        
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-        int searchId = searchDao.loadSearchIdForRunAndExperiment(runId, experimentId);
-        if (searchId == 0) {
-            log.error("!!!NO SEARCH FOUND FOR RUNID: "+runId+"; experimentId: "+experimentId+"; fileName: "+runFileName);
-            return new int[0];
-        }
-        
-        return new int[]{scanId, searchId};
-    }
+//    public static int[] getScanAndSearchIdFor(int experimentId, String runFileScanString) {
+//        // parse the filename to get the filename, scan number and charge
+//        // e.g. NE063005ph8s02.17247.17247.2
+//        Matcher match = fileNamePattern.matcher(runFileScanString);
+//        if (!match.matches()) {
+//            log.error("!!!INVALID FILENAME FROM DTASELECT RESULT: "+runFileScanString);
+//            return new int[0];
+//        }
+//        String runFileName = match.group(1)+".ms2";
+//        int scanNum = Integer.parseInt(match.group(2));
+//        
+//        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
+//        int runId = runDao.loadRunIdForExperimentAndFileName(experimentId, runFileName);
+//        if (runId == 0) {
+//            log.error("!!!NO RUN FOUND FOR EXPERIMENT: "+experimentId+"; fileName: "+runFileName);
+//            return new int[0];
+//        }
+//        
+//        MsScanDAO<MsScan, MsScanDb>scanDao = DAOFactory.instance().getMsScanDAO();
+//        int scanId = scanDao.loadScanIdForScanNumRun(scanNum, runId);
+//        if (scanId == 0) {
+//            log.error("!!!NO SCAN FOUND FOR SCAN NUMBER: "+scanNum+"; runId: "+runId+"; fileName: "+runFileName);
+//            return new int[0];
+//        }
+//        
+//        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+//        int searchId = searchDao.loadSearchIdForRunAndExperiment(runId, experimentId);
+//        if (searchId == 0) {
+//            log.error("!!!NO SEARCH FOUND FOR RUNID: "+runId+"; experimentId: "+experimentId+"; fileName: "+runFileName);
+//            return new int[0];
+//        }
+//        
+//        return new int[]{scanId, searchId};
+//    }
     
     public static void main(String[] args) throws UploadException {
         long start = System.currentTimeMillis();

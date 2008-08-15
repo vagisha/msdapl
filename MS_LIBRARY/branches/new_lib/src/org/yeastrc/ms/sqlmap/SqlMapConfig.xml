@@ -28,7 +28,7 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsEnzymeSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsExperimentSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunLocationSqlMap.xml"/>
 	
 	
 	<!-- Related to peptide searches -->
@@ -53,6 +53,6 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchResultSqlMap.xml"/>
 	
 	<!-- Related to deletion -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/DeletionSqlMap.xml"/>
+	<!-- <sqlMap resource="org/yeastrc/ms/sqlmap/DeletionSqlMap.xml"/> -->
 
 </sqlMapConfig>	

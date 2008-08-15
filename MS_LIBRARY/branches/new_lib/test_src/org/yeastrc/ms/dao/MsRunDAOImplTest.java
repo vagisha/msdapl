@@ -7,12 +7,11 @@ import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.MsEnzymeDb;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsRunLocationDb;
 import org.yeastrc.ms.domain.RunFileFormat;
 
 public class MsRunDAOImplTest extends BaseDAOTestCase {
 
-    private static final int msExperimentId_1 = 1;
-    private static final int msExperimentId_2 = 25;
     
     protected void setUp() throws Exception {
         super.setUp();
@@ -20,87 +19,65 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     protected void tearDown() throws Exception {
         super.tearDown();
-        deleteRunsForExperiment(msExperimentId_1);
-        deleteRunsForExperiment(msExperimentId_2);
     }
     
-    public void testSaveAndLoad() {
+    public void testSaveLoadAndDelete() {
         MsRun run = createDefaultRun();
-        int runId = runDao.saveRun(run, msExperimentId_1);
+        int runId = runDao.saveRun(run, "remoteServer", "remoteDirectory");
         MsRunDb runDb = runDao.loadRun(runId);
         checkRun(run, runDb);
-    }
-    
-    public void testDeleteRunsForExperiment() {
-        runDao.saveRun(createDefaultRun(), msExperimentId_1);
-        runDao.saveRun(createDefaultRun(), msExperimentId_1);
-        runDao.saveRun(createDefaultRun(), msExperimentId_2); // different experiment
-        
-        int origSize = expDao.loadRunIdsForExperiment(msExperimentId_1).size();
-        assertTrue(origSize == 2);
-        
-        // delete experiment 2 runs
-        deleteRunsForExperiment(msExperimentId_2); 
-        assertEquals(origSize, expDao.loadRunIdsForExperiment(msExperimentId_1).size());
-        
-        deleteRunsForExperiment(msExperimentId_1); 
-        assertEquals(0, expDao.loadRunIdsForExperiment(msExperimentId_1).size());
-    }
-    
-    public void testSaveWithInvalidExpId() {
-        MsRun run1 = createDefaultRun();
-        try {
-            runDao.saveRun(run1, 0);// we should not be able to save a run with experimentId == 0
-            fail("Should not be able to save run with experimentId of 0");
-        }
-        catch(RuntimeException e) {}
+        runDao.delete(runId);
+        assertNull(runDao.loadRun(runId));
     }
     
     public void testSaveAndLoadRunFileFormats() {
         MsRun run = createRunForFormat(RunFileFormat.MS2);
-        int runId = runDao.saveRun(run, msExperimentId_1);
-        MsRunDb runDb = runDao.loadRun(runId);
+        int id1 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        MsRunDb runDb = runDao.loadRun(id1);
         assertEquals(RunFileFormat.MS2, runDb.getRunFileFormat());
         
         run = createRunForFormat(RunFileFormat.UNKNOWN);
-        runId = runDao.saveRun(run, msExperimentId_1);
-        runDb = runDao.loadRun(runId);
+        int id2 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        runDb = runDao.loadRun(id2);
         assertEquals(RunFileFormat.UNKNOWN, runDb.getRunFileFormat());
         
         run = createRunForFormat(null);
-        runId = runDao.saveRun(run, msExperimentId_1);
-        runDb = runDao.loadRun(runId);
+        int id3 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        runDb = runDao.loadRun(id3);
         assertEquals(RunFileFormat.UNKNOWN, runDb.getRunFileFormat());
+        
+        runDao.delete(id1);
+        runDao.delete(id2);
+        runDao.delete(id3);
+        assertNull(runDao.loadRun(id1));
+        assertNull(runDao.loadRun(id2));
+        assertNull(runDao.loadRun(id3));
     }
     
-    public void testLoadRunsForExperiment() {
-        MsRun run = createDefaultRun();
-        runDao.saveRun(run, msExperimentId_1);
-        runDao.saveRun(createDefaultRun(), msExperimentId_2);
-        List <MsRunDb> runs = runDao.loadExperimentRuns(msExperimentId_1);
-        assertEquals(1, runs.size());
-        assertEquals(1, runDao.loadExperimentRuns(msExperimentId_2).size());
-        checkRun(run, runs.get(0));
-    }
-   
-
     public void testLoadRunsForFileNameAndSha1Sum() {
         MsRun run = createDefaultRun();
-        runDao.saveRun(run, msExperimentId_1);
+        int id1 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
         run = createDefaultRun();
-        runDao.saveRun(run, msExperimentId_2);
+        int id2 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
         
         List<Integer> runs = runDao.runIdsFor(run.getFileName(), run.getSha1Sum());
         assertEquals(2, runs.size());
+        
+        runDao.delete(id1);
+        runDao.delete(id2);
+        assertNull(runDao.loadRun(id1));
+        assertNull(runDao.loadRun(id2));
     }
     
     public void testSaveAndLoadRunWithNoEnzymes() {
         // create a run and save it
-        int runId = runDao.saveRun(createDefaultRun(), msExperimentId_1);
+        int runId = runDao.saveRun(createDefaultRun(), "remoteServer", "remoteDirectory");
         
         // read back the run
         MsRunDb dbRun = runDao.loadRun(runId);
         assertEquals(0, dbRun.getEnzymeList().size());
+        runDao.delete(runId);
+        assertNull(runDao.loadRun(runId));
     }
     
     public void testSaveAndLoadRunWithEnzymeInfo() {
@@ -121,7 +98,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         MsRun run1 = createRunWEnzymeInfo(enzymeList1);
         
         // save the run
-        int runId_1 = runDao.saveRun(run1, msExperimentId_1);
+        int runId_1 = runDao.saveRun(run1, "remoteServer", "remoteDirectory");
         
         // now read back the run and make sure it has the enzyme information
         MsRunDb runFromDb_1 = runDao.loadRun(runId_1);
@@ -135,7 +112,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         MsRun run2 = createRunWEnzymeInfo(enzymeList2);
         
         // save the run
-        int runId_2 = runDao.saveRun(run2, msExperimentId_1);
+        int runId_2 = runDao.saveRun(run2, "remoteServer", "remoteDirectory");
         
         // now read back the run and make sure it has the enzyme information
         MsRunDb runFromDb_2 = runDao.loadRun(runId_2);
@@ -144,6 +121,10 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(1, enzymes.size());
         checkEnzyme(enzyme3, enzymes.get(0));
         
+        runDao.delete(runId_1);
+        runDao.delete(runId_2);
+        assertNull(runDao.loadRun(runId_1));
+        assertNull(runDao.loadRun(runId_2));
     }
     
 
@@ -159,14 +140,12 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertNotNull(enzyme3);
         
         
-        // create a run with enzyme information
+        // create a run with enzyme information and save it
         List <MsEnzyme> enzymeList1 = new ArrayList<MsEnzyme>(2);
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
         MsRun run1 = createRunWEnzymeInfo(enzymeList1);
-        
-        // save the run
-        int runId_1 = runDao.saveRun(run1, msExperimentId_1);
+        int runId_1 = runDao.saveRun(run1, "remoteServer", "remoteDirectory");
         
         // now read back the run and make sure it has the enzyme information
         MsRunDb runFromDb_1 = runDao.loadRun(runId_1);
@@ -175,48 +154,50 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(2, enzymes.size());
         
         
-        // save another run for ANOTHER experiment
+        // save another run 
         List <MsEnzyme> enzymeList2 = new ArrayList<MsEnzyme>(1);
         enzymeList2.add(enzyme3);
         MsRun run2 = createRunWEnzymeInfo(enzymeList2);
+        int runId_2 = runDao.saveRun(run2, "remoteServer", "remoteDirectory");
         
-        // save the run
-        int runId_2 = runDao.saveRun(run2, msExperimentId_2);
+        // now read back the run and make sure it has the enzyme information
+        MsRunDb runFromDb_2 = runDao.loadRun(runId_2);
+        enzymes = runFromDb_1.getEnzymeList();
+        assertNotNull(enzymes);
+        assertEquals(2, enzymes.size());
+        
         
         // save some scans for the runs
         saveScansForRun(runId_1, 10);
         saveScansForRun(runId_2, 5);
         
         // make sure the run and associated enzyme information got saved (RUN 1)
-        assertEquals(1, runDao.loadExperimentRuns(msExperimentId_1).size());
         assertEquals(2, enzymeDao.loadEnzymesForRun(runId_1).size());
         assertEquals(10, scanDao.loadScanIdsForRun(runId_1).size());
         
         // make sure the run and associated enzyme information got saved (RUN 2)
-        assertEquals(1, runDao.loadExperimentRuns(msExperimentId_2).size());
         assertEquals(1, enzymeDao.loadEnzymesForRun(runId_2).size());
         assertEquals(5, scanDao.loadScanIdsForRun(runId_2).size());
         
-        // now delete the runs for experiment 1
-        deleteRunsForExperiment(msExperimentId_1);
+        // now delete the first run
+        runDao.delete(runId_1);
         
         // make sure the run is deleted ...
-        assertEquals(0, runDao.loadExperimentRuns(msExperimentId_1).size());
+        assertNull(runDao.loadRun(runId_1));
         // ... and the associated enzyme information is deleted ...
         assertEquals(0, enzymeDao.loadEnzymesForRun(runId_1).size());
         // ... and all scans for the run are deleted.
         assertEquals(0, scanDao.loadScanIdsForRun(runId_1).size());
         
-        // make sure nothing was delete for experiment 2
-        assertEquals(1, runDao.loadExperimentRuns(msExperimentId_2).size());
+        // make sure nothing was delete for Run 2
         assertEquals(1, enzymeDao.loadEnzymesForRun(runId_2).size());
         assertEquals(5, scanDao.loadScanIdsForRun(runId_2).size());
         
-        // now delete the runs for experiment 1
-        deleteRunsForExperiment(msExperimentId_2);
+        // now delete the second run
+        runDao.delete(runId_2);
         
         // make sure the run is deleted ...
-        assertEquals(0, runDao.loadExperimentRuns(msExperimentId_2).size());
+        assertNull(runDao.loadRun(runId_2));
         // ... and the associated enzyme information is deleted ...
         assertEquals(0, enzymeDao.loadEnzymesForRun(runId_2).size());
         // ... and all scans for the run are deleted.
@@ -224,6 +205,50 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
     }
 
+    
+    public void testRunLocation() {
+        MsRun run1 = createDefaultRun();
+        String server = "my.host";
+        String remoteDir = "/my/server/directory";
+        
+        int runId = runDao.saveRun(run1, server, remoteDir);
+        List<MsRunLocationDb> locDbList = runDao.loadLocationsForRun(runId);
+        assertEquals(1, locDbList.size());
+        
+        MsRunLocationDb locDb = locDbList.get(0);
+        assertEquals(server, locDb.getServerAddress());
+        assertEquals(remoteDir, locDb.getServerDirectory());
+        assertEquals(runId, locDb.getRunId());
+        
+        List<MsRunLocationDb> matchingLocs = runDao.loadMatchingRunLocations(runId, server, remoteDir);
+        assertEquals(1, matchingLocs.size());
+        locDb = matchingLocs.get(0);
+        assertEquals(server, locDb.getServerAddress());
+        assertEquals(remoteDir, locDb.getServerDirectory());
+        assertEquals(runId, locDb.getRunId());
+        
+        // save another location for the run
+        runDao.saveRunLocation(server, "/my/server/directory/2", runId);
+        locDbList = runDao.loadLocationsForRun(runId);
+        assertEquals(2, locDbList.size());
+        assertEquals(locDbList.get(0).getRunId(), locDbList.get(1).getRunId());
+        assertEquals(locDbList.get(0).getServerAddress(), locDbList.get(1).getServerAddress());
+        assertNotSame(locDbList.get(0).getServerDirectory(), locDbList.get(1).getServerDirectory());
+        
+        matchingLocs = runDao.loadMatchingRunLocations(runId, server, "/my/server/directory/2");
+        assertEquals(1, matchingLocs.size());
+        locDb = matchingLocs.get(0);
+        assertEquals(server, locDb.getServerAddress());
+        assertEquals("/my/server/directory/2", locDb.getServerDirectory());
+        assertEquals(runId, locDb.getRunId());
+        
+        // try to find a matching location that does not exist
+        assertEquals(0, runDao.loadMatchingRunLocations(runId, server, "directory").size());
+        
+        runDao.delete(runId);
+        assertEquals(0, runDao.loadLocationsForRun(runId).size());
+        assertNull(runDao.loadRun(runId));
+    }
     
     
     public static class MsRunTest implements MsRun {

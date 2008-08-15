@@ -75,18 +75,6 @@ public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
         
     }
     
-    public void testDataConversionTypeForScan() {
-        MS2Scan scan1 = makeMS2Scan(23, 32, null, false, false);
-        try {
-            ms2ScanDao.save(scan1, 56);
-            fail("DataConversionTupe cannot be null");
-        }
-        catch(IllegalArgumentException e) {e.printStackTrace();}
-        
-        int id1 = ms2ScanDao.save(scan1, 56);
-        MS2ScanDb scan1_db = ms2ScanDao.load(id1);
-        super.checkScan(scan1, scan1_db);
-    }
     public static final class MS2ScanTest extends MsScanTest implements MS2Scan {
 
         private List<MS2Field> analysisList = new ArrayList<MS2Field>();

@@ -4,18 +4,28 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsRunLocation;
+import org.yeastrc.ms.domain.MsRunLocationDb;
 import org.yeastrc.ms.domain.RunFileFormat;
 
 public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
 
     /**
      * Saves the given run in the database and returns the database id for the run.
-     * Any enzyme information is saved
-     * An entry is creatd in msExperimentRun linking this run to the experiment.
+     * Any enzyme information is saved.
+     * The location of the run is saved as well.
      * @param run
+     * @param runLocation
      * @return
      */
-    public abstract int saveRun(I run, int experimentId);
+    public abstract int saveRun(I run, String serverAddress, String serverDirectory);
+    
+    
+    /**
+     * Saves the original location of the run corresponding to the runId.
+     * @param runLocation
+     */
+    public abstract void saveRunLocation(String serverAddress, String serverDirectory, int runId);
     
     
     /**
@@ -26,21 +36,12 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
     public abstract O loadRun(int runId);
     
     /**
-     * Returns the list of runs for the given experiment ID.
-     * The returned runs have associated enzyme related information
-     * @param msExperimentId
+     * Returns the list of runs for the given runIds
+     * The returned runs have any associated enzyme related information as well.
+     * @param runIdList
      * @return
      */
-    public abstract List<O> loadExperimentRuns(int msExperimentId);
-    
-    /**
-     * Returns the runId for the given experiment and file name. Returns
-     * 0 if no matching run was found
-     * @param experimentId
-     * @param fileName
-     * @return
-     */
-    public abstract int loadRunIdForExperimentAndFileName(int experimentId, String fileName);
+    public abstract List<O> loadRuns(List<Integer> runIdList);
     
     /**
      * Returns a list of run IDs for runs in the database with the given file name
@@ -53,7 +54,24 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
     
     
     /**
+     * Returns a list of locations for the given run
+     * @param runId
+     * @return
+     */
+    public abstract List<MsRunLocationDb> loadLocationsForRun(int runId);
+    
+    /**
+     * Returns locations with the given runId, serverAddress and serverDirectory.
+     * @param runId
+     * @param serverAddress
+     * @param serverDirectory
+     * @return
+     */
+    public abstract List<MsRunLocationDb> loadMatchingRunLocations(int runId, String serverAddress, String serverDirectory);
+    
+    /**
      * Deletes the run with the given id. Enzyme information and scans are also deleted
+     * Any location entries for this run are also deleted.
      * @param runId
      */
     public abstract void delete(int runId);

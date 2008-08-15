@@ -1,37 +1,29 @@
 package org.yeastrc.ms.dao.ms2File.ibatis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.ms2File.MS2HeaderDAO;
 import org.yeastrc.ms.domain.MsRun;
 import org.yeastrc.ms.domain.MsRunDb;
+import org.yeastrc.ms.domain.MsRunLocationDb;
 import org.yeastrc.ms.domain.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Run;
 import org.yeastrc.ms.domain.ms2File.MS2RunDb;
-import org.yeastrc.ms.domain.ms2File.MS2Scan;
-import org.yeastrc.ms.domain.ms2File.MS2ScanDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2RunDb> {
 
     private MsRunDAO<MsRun, MsRunDb> msRunDao;
-    private MS2HeaderDAO ms2HeaderDao;
-    private MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDao;
     
-    
-    
-    public MS2RunDAOImpl(SqlMapClient sqlMap, MsRunDAO<MsRun, MsRunDb> msRunDao,
-            MS2HeaderDAO ms2HeaderDao, MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDao) {
+    public MS2RunDAOImpl(SqlMapClient sqlMap, MsRunDAO<MsRun, MsRunDb> msRunDao) {
         super(sqlMap);
         this.msRunDao = msRunDao;
-        this.ms2HeaderDao = ms2HeaderDao;
-        this.ms2ScanDao = ms2ScanDao;
     }
 
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
@@ -41,10 +33,10 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
     /**
      * Saves the run along with MS2 file specific information
      */
-    public int saveRun(MS2Run run, int experimentId) {
+    public int saveRun(MS2Run run, String serverAddress, String serverDirectory) {
 
-        // save the run
-        int runId = msRunDao.saveRun(run, experimentId);
+        // save the run and location
+        int runId = msRunDao.saveRun(run, serverAddress, serverDirectory);
 
         MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
         for (MS2Field header: run.getHeaderList()) {
@@ -53,28 +45,47 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
         return runId;
     }
 
-
+    @Override
+    public void saveRunLocation(String serverAddress, String serverDirectory,
+            int runId) {
+        msRunDao.saveRunLocation(serverAddress, serverDirectory, runId);
+    }
+    
     public MS2RunDb loadRun(int runId) {
         // MsRun.select has a discriminator and will instantiate the
         // appropriate type of run object
         return (MS2RunDb) queryForObject("MsRun.select", runId);
     }
 
-    public List<MS2RunDb> loadExperimentRuns(int msExperimentId) {
-        return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
+    @Override
+    public List<MS2RunDb> loadRuns(List<Integer> runIdList) {
+        if (runIdList.size() == 0)
+            return new ArrayList<MS2RunDb>(0);
+        StringBuilder buf = new StringBuilder();
+        for (Integer i: runIdList) {
+            buf.append(","+i);
+        }
+        buf.deleteCharAt(0);
+        return queryForList("MsRun.selectRuns", buf.toString());
+    }
+    
+    @Override
+    public List<MsRunLocationDb> loadLocationsForRun(int runId) {
+        return msRunDao.loadLocationsForRun(runId);
     }
 
     @Override
-    public int loadRunIdForExperimentAndFileName(int experimentId, String fileName) {
-      return msRunDao.loadRunIdForExperimentAndFileName(experimentId, fileName);
+    public List<MsRunLocationDb> loadMatchingRunLocations(int runId,
+            String serverAddress, String serverDirectory) {
+        return msRunDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
     }
     
     public List<Integer> runIdsFor(String fileName, String sha1Sum) {
-
         return msRunDao.runIdsFor(fileName, sha1Sum);
     }
 
     public void delete(int runId) {
         msRunDao.delete(runId);
     }
+    
 }

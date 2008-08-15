@@ -46,6 +46,7 @@ import org.yeastrc.ms.domain.SearchFileFormat;
 import org.yeastrc.ms.domain.ValidationStatus;
 import org.yeastrc.ms.domain.MsEnzyme.Sense;
 import org.yeastrc.ms.util.PeakConverterDouble;
+import org.yeastrc.ms.domain.DataConversionType;
 
 /**
  * 
@@ -379,7 +380,7 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     // SCAN
     //---------------------------------------------------------------------------------
-    protected MsScan makeMsScan(int scanNum, int precursorScanNum) {
+    protected MsScan makeMsScan(int scanNum, int precursorScanNum, DataConversionType convType) {
         MsScanTest scan = new MsScanTest();
         scan.setStartScanNum(scanNum);
         scan.setEndScanNum(scanNum);
@@ -388,11 +389,12 @@ public class BaseDAOTestCase extends TestCase {
         scan.setPrecursorMz(new BigDecimal("123.45"));
         scan.setPrecursorScanNum(precursorScanNum);
         scan.setRetentionTime(new BigDecimal("98.7"));
+        scan.setDataConversionType(convType);
         return scan;
     }
 
-    protected MsScan makeMsScanWithPeakData(int scanNum, int precursorScanNum) {
-        MsScanTest scan = (MsScanTest) makeMsScan(scanNum, precursorScanNum);
+    protected MsScan makeMsScanWithPeakData(int scanNum, int precursorScanNum, DataConversionType convType) {
+        MsScanTest scan = (MsScanTest) makeMsScan(scanNum, precursorScanNum, convType);
         List<String[]> peaks = new ArrayList<String[]>(10);
         Random r = new Random();
         for (int i = 0; i < 10; i++) {
@@ -410,7 +412,7 @@ public class BaseDAOTestCase extends TestCase {
         Random random = new Random();
         for (int i = 0; i < scanCount; i++) {
             int scanNum = random.nextInt(100);
-            MsScan scan = makeMsScanWithPeakData(scanNum, 26);
+            MsScan scan = makeMsScanWithPeakData(scanNum, 26, DataConversionType.CENTROID);
             scanDao.save(scan, runId);
         }
     }
@@ -424,6 +426,7 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getRetentionTime().doubleValue(), output.getRetentionTime().doubleValue());
         assertEquals(input.getEndScanNum(), output.getEndScanNum());
         assertEquals(input.getDataConversionType(), output.getDataConversionType());
+        assertEquals(input.getPeakCount(), output.getPeakCount());
         Iterator<String[]> ipiter = input.peakIterator();
         List<double[]> peakList = new PeakConverterDouble().convert(output.peakDataString());
         Iterator<double[]> opiter = peakList.iterator();
@@ -480,11 +483,4 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(inputRun.getRunFileFormat(), outputRun.getRunFileFormat());
         assertEquals(inputRun.getEnzymeList().size(), outputRun.getEnzymeList().size());
     }
-
-    protected void deleteRunsForExperiment(int experimentId) {
-        List<Integer> uniqueRuns = expDao.loadRunIdsUniqueToExperiment(experimentId);
-        for (Integer runId: uniqueRuns)
-            runDao.delete(runId);
-    }
-
 }

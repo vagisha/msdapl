@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.dao.ibatis.MsScanDAOImpl.DataConversionTypeHandler;
 import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
@@ -22,7 +23,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testSaveLoadDelete() {
-        MsScan scan = makeMsScan(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        MsScan scan = makeMsScan(2, 1, DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         int scanId = scanDao.save(scan, 1, 1); // runId = 1; precursorScanId = 1;
         MsScanDb scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
@@ -33,7 +34,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
 
 
     public void testInvalidValues() {
-        MsScan scan = makeMsScan(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        MsScan scan = makeMsScan(2, 1, DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         try {
             scanDao.save(scan, 0, 1); // runId = 0; precursorScanId  1;
             fail("RunId cannot be 0");
@@ -42,7 +43,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testSaveScanWithNoPrecursorScanId() {
-        MsScan scan = makeMsScan(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        MsScan scan = makeMsScan(2, 1,DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         int scanId = scanDao.save(scan, 1); // runID = 1
         MsScanDb scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
@@ -53,9 +54,9 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
 
     public void testLoadScanIdsForRun() {
         int[] ids = new int[3];
-        ids[0] = scanDao.save((makeMsScan(2, 1)), 3); // runId = 3
-        ids[1] = scanDao.save((makeMsScan(3, 1)), 3);
-        ids[2] = scanDao.save((makeMsScan(4, 1)), 3);
+        ids[0] = scanDao.save((makeMsScan(2, 1,DataConversionType.CENTROID)), 3); // runId = 3
+        ids[1] = scanDao.save((makeMsScan(3, 1,DataConversionType.CENTROID)), 3);
+        ids[2] = scanDao.save((makeMsScan(4, 1,DataConversionType.CENTROID)), 3);
         
         List<Integer> scanIdList = scanDao.loadScanIdsForRun(3);
         Collections.sort(scanIdList);
@@ -69,7 +70,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
     
     public void testSaveLoadPeakData() {
-        MsScan scan = makeMsScanWithPeakData(2, 1); // scanNumber = 2; precursorScanNum = 1;
+        MsScan scan = makeMsScanWithPeakData(2, 1,DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         
         int scanId = scanDao.save(scan, 1, 1); // runId = 1; precursorScanId = 1;
         MsScanDb scanDb = scanDao.load(scanId);
@@ -79,6 +80,45 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         assertNull(scanDao.load(scanId));
     }
 
+    public void testDataConversionTypeForScan() {
+        MsScan scan = makeMsScan(35, 53, null);
+        try {
+            scanDao.save(scan, 56);
+            fail("DataConversionType cannot be null");
+        }
+        catch(Exception e) {}
+        
+        scan = makeMsScan(35, 53, DataConversionType.CENTROID);
+        int id = scanDao.save(scan, 56);
+        MsScanDb scan_db = scanDao.load(id);
+        checkScan(scan, scan_db);
+        
+        scan = makeMsScan(36, 35, DataConversionType.NON_CENTROID);
+        id = scanDao.save(scan, 56);
+        scan_db = scanDao.load(id);
+        checkScan(scan, scan_db);
+        
+        scan = makeMsScan(37, 35, DataConversionType.UNKNOWN);
+        id = scanDao.save(scan, 56);
+        scan_db = scanDao.load(id);
+        checkScan(scan, scan_db);
+        
+        // clean up
+        scanDao.deleteScansForRun(56);
+        assertEquals(0, scanDao.loadScanIdsForRun(56).size());
+    }
+    
+    public void testPeakCount() {
+        MsScan scan = makeMsScanWithPeakData(35, 53, DataConversionType.CENTROID);
+        assertTrue(scan.getPeakCount() > 0);
+        int scanId = scanDao.save(scan, 27);
+        MsScanDb scan_db = scanDao.load(scanId);
+        checkScan(scan, scan_db);
+        assertEquals(scan.getPeakCount(), scan_db.getPeakCount());
+        scanDao.delete(scanId);
+        assertNull(scanDao.load(scanId));
+    }
+    
     public static class MsScanTest implements MsScan {
 
         private int startScanNum;

@@ -30,37 +30,8 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         return (MsExperimentDb)queryForObject("MsExperiment.select", msExperimentId);
     }
     
-    @Override
-    public List<Integer> loadExperimentIdsForRun(int runId) {
-        return queryForList("MsExperiment.selectExperimentIdsForRun", runId);
-    }
-
-    @Override
-    public List<Integer> loadRunIdsForExperiment(int experimentId) {
-        return queryForList("MsExperiment.selectRunIdsForExperiment", experimentId);
-    }
-    
-    @Override
-    public List<Integer> loadRunIdsUniqueToExperiment(int experimentId) {
-        List<Integer> runIdsForExp = loadRunIdsForExperiment(experimentId);
-        List<Integer> uniqueRunIds = new ArrayList<Integer>();
-        for (Integer runId: runIdsForExp) {
-            if (loadExperimentIdsForRun(runId).size() == 1)
-                uniqueRunIds.add(runId);
-        }
-        return uniqueRunIds;
-    }
-    
     public int save(MsExperiment experiment) {
         return saveAndReturnId("MsExperiment.insert", experiment);
-    }
-    
-    @Override
-    public void saveRunExperiment(int experimentId, int runId) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("experimentId", experimentId);
-        map.put("runId", runId);
-        save("MsExperiment.insertRunExperiment", map);
     }
     
     public List<Integer> selectAllExperimentIds() {

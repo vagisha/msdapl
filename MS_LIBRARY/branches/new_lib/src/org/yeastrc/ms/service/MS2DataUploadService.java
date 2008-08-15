@@ -11,12 +11,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsExperimentDAO;
 import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
+import org.yeastrc.ms.domain.MsRunLocationDb;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.domain.ms2File.MS2ChargeDependentAnalysisDb;
@@ -56,9 +56,10 @@ public class MS2DataUploadService {
      * @return
      * @throws UploadException 
      */
-    public int uploadMS2Run(MS2RunDataProvider provider, int experimentId, String sha1Sum) throws UploadException {
+    public int uploadMS2Run(MS2RunDataProvider provider, String sha1Sum, 
+            final String serverAddress, final String serverDirectory) throws UploadException {
 
-        log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
+        log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName());
         long startTime = System.currentTimeMillis();
         
         // reset all caches etc.
@@ -73,11 +74,14 @@ public class MS2DataUploadService {
 
         // if run is already in the database return the runId of the existing run
         if (runId > 0)  {
-            // first save an entry in the msExperimentRun table
-            saveExperimentRun(experimentId, runId);
+            // first save the original location of the MS2 file if the location is new.
+            List<MsRunLocationDb> runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
+            if (runLocs.size() == 0) {
+                runDao.saveRunLocation(serverAddress, serverDirectory, runId);
+            }
             log.info("Run with name: "+provider.getFileName()+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
-            log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
+            log.info("END MS2 FILE UPLOAD: "+provider.getFileName());
             return runId;
         }
 
@@ -91,8 +95,7 @@ public class MS2DataUploadService {
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
-        
-        runId = runDao.saveRun(header, experimentId);
+        runId = runDao.saveRun(header, serverAddress, serverDirectory);
         log.info("Uploaded top-level run information with runId: "+runId);
 
         // upload each of the scans
@@ -140,7 +143,7 @@ public class MS2DataUploadService {
         
         long endTime = System.currentTimeMillis();
         log.info("Uploaded "+uploaded+" out of "+all+" scans for runId: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds");
-        log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"; EXPERIMENT_ID: "+experimentId);
+        log.info("END MS2 FILE UPLOAD: "+provider.getFileName());
         return runId;
     }
 
@@ -148,11 +151,6 @@ public class MS2DataUploadService {
         // clean up any cached data
         dAnalysisList.clear();
         iAnalysisList.clear();
-    }
-    
-    private void saveExperimentRun(int experimentId, int runId) {
-       MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
-       expDao.saveRunExperiment(experimentId, runId);
     }
     
     private void saveChargeDependentAnalysis(MS2ScanCharge scanCharge, final int scanChargeId) {

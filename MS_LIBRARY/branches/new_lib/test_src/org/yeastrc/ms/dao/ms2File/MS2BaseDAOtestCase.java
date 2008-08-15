@@ -119,11 +119,11 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         return scan;
     }
     
-    protected void saveScansForRun(int runId, int scanCount, DataConversionType convtype) {
+    protected void saveScansForRun(int runId, int scanCount) {
         Random random = new Random();
         for (int i = 0; i < scanCount; i++) {
             int scanNum = random.nextInt(100);
-            MS2Scan scan = makeMS2Scan(scanNum, 25, convtype, true, true);
+            MS2Scan scan = makeMS2Scan(scanNum, 25, DataConversionType.NON_CENTROID, true, true);
             ms2ScanDao.save(scan, runId);
         }
     }

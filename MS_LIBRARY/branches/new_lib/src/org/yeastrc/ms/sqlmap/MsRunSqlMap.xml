@@ -70,6 +70,10 @@
         SELECT * FROM msRun WHERE id=#id#
     </select> 
     
+    <select id="selectRuns" resultMap="msRunResult" parameterClass="String"> 
+        SELECT * FROM msRun WHERE id IN ($runIds$)
+    </select> 
+    
     <select id="selectRunsForExperiment" resultMap="msRunResult" parameterClass="Integer"> 
         SELECT * FROM msRun as run, msExperimentRun as expRun
         WHERE run.id = expRun.runID
