@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.parser.AbstractReader;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -24,6 +25,8 @@ import org.yeastrc.ms.service.MS2RunDataProvider;
 public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider {
 
     private String sha1Sum;
+    
+    private DataConversionType dataConversionType;
 
     private static final Logger log = Logger.getLogger(Ms2FileReader.class);
 
@@ -66,6 +69,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         
         header.setFileName(fileName);
         header.setSha1Sum(sha1Sum);
+        this.dataConversionType = header.getDataConversionType();
         return header;
     }
 
@@ -101,7 +105,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                     "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: "+scan.getStartScanNum(), 
                     currentLine);
         }
-
+        scan.setDataConversionType(this.dataConversionType);
         return scan;
     }
    

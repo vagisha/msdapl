@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
@@ -32,6 +33,8 @@ public class Scan implements MS2Scan {
     private BigDecimal retentionTime;
     private String activationType;
 
+    private DataConversionType dataConversionType = DataConversionType.UNKNOWN;
+    
     private List<String[]> peakList;
 
     private List<MS2ScanCharge> chargeStates;
@@ -139,6 +142,22 @@ public class Scan implements MS2Scan {
         this.activationType = actType;
     }
 
+    
+    // In MS2 files there is a file header if the data is centroided.  We will need to set it 
+    // for each scan.
+    public void setDataConversionType(DataConversionType convType) {
+        this.dataConversionType = convType;
+    }
+    
+    @Override
+    public DataConversionType getDataConversionType() {
+        return this.dataConversionType;
+    }
+    
+    public int getPeakCount() {
+        return peakList.size();
+    }
+    
     public int getMsLevel() {
         return 2;
     }

@@ -36,5 +36,9 @@ interface MsScanBase {
     public abstract BigDecimal getRetentionTime();
 
     public abstract String getFragmentationType();
+    
+    public abstract DataConversionType getDataConversionType();
+    
+    public abstract int getPeakCount();
 
 }

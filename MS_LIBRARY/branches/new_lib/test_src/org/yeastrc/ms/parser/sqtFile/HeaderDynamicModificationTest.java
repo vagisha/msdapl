@@ -140,13 +140,39 @@ public class HeaderDynamicModificationTest extends TestCase {
         }
     }
     
-    public void testAddDynamicModsWithSign() {
+    public void testAddDynamicModsWithSignPlus() {
         SQTHeader header = new SQTHeader();
         char[] modChars = new char[]{'A', 'B', 'C'};
         StringBuilder buf = new StringBuilder();
         for (char c: modChars)
             buf.append(c);
-        buf.append("*=-123.4");
+        buf.append("*=+123.4");
+        String modString = buf.toString();
+        System.out.println("Mod string is: "+modString);
+        try {
+            header.addDynamicMods(modString);
+        }
+        catch (SQTParseException e) {
+            fail("Valid dynamic modification string");
+        }
+        List<MsSearchModification> mods = header.getDynamicModifications();
+        assertEquals(3, mods.size());
+
+        int i = 0; 
+        for (MsSearchModification mod: mods) {
+            assertEquals(mod.getModifiedResidue(), modChars[i++]);
+            assertEquals(mod.getModificationMass(), new BigDecimal("123.4"));
+            assertEquals(mod.getModificationSymbol(), '*');
+        }
+    }
+    
+    public void testAddDynamicModsWithSignMinus() {
+        SQTHeader header = new SQTHeader();
+        char[] modChars = new char[]{'A', 'B', 'C'};
+        StringBuilder buf = new StringBuilder();
+        for (char c: modChars)
+            buf.append(c);
+        buf.append("#=-123.4");
         String modString = buf.toString();
         System.out.println("Mod string is: "+modString);
         try {
@@ -162,7 +188,9 @@ public class HeaderDynamicModificationTest extends TestCase {
         for (MsSearchModification mod: mods) {
             assertEquals(mod.getModifiedResidue(), modChars[i++]);
             assertEquals(mod.getModificationMass(), new BigDecimal("-123.4"));
-            assertEquals(mod.getModificationSymbol(), '*');
+            assertEquals(mod.getModificationSymbol(), '#');
         }
     }
+    
+    
 }

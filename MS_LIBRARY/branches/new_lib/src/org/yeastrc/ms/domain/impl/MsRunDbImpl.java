@@ -22,7 +22,8 @@ public class MsRunDbImpl implements MsRunDb {
     private String conversionSW; // software used to convert the RAW file
     private String conversionSWVersion; // version of the conversion software used
     private String conversionSWOptions; // options used for conversion
-    private String dataType; // centroid / profile etc. 
+    
+    private DataConversionType dataConversionType; // centroid etc.
 
     // acquisition instrument
     private String instrumentVendor;

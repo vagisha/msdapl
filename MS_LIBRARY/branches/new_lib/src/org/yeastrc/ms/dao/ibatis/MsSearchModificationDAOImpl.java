@@ -14,7 +14,6 @@ import org.yeastrc.ms.domain.MsSearchModification;
 import org.yeastrc.ms.domain.MsSearchModificationDb;
 import org.yeastrc.ms.domain.MsSearchResultDynamicModDb;
 import org.yeastrc.ms.domain.MsSearchResultModification;
-import org.yeastrc.ms.domain.sqtFile.SQTSearchResultScoresDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

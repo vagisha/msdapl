@@ -7,17 +7,24 @@
 package org.yeastrc.ms.dao.ibatis;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.crypto.Data;
+
 import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.extensions.ParameterSetter;
+import com.ibatis.sqlmap.client.extensions.ResultGetter;
+import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 /**
  * 
@@ -127,6 +134,16 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         public Iterator<String[]> peakIterator() {
             return scan.peakIterator();
         }
+
+        @Override
+        public boolean getIsCentroid() {
+            return scan.getIsCentroid();
+        }
+
+        @Override
+        public int getPeakCount() {
+            return scan.getPeakCount();
+        }
     }
     
     /**
@@ -154,6 +171,51 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
                 builder.addPeak(peak[0], peak[1]);
             }
             return builder.getPeaksAsString();
+        }
+    }
+  
+    //---------------------------------------------------------------------------------------
+    /** 
+     * Type handler for converting between 'F', 'T' from database to DataConversionType
+     */
+    public static class DataConversionTypeHandler implements TypeHandlerCallback {
+
+        private static final String TRUE = "T";
+        private static final String FALSE = "F";
+        
+        public Object getResult(ResultGetter getter) throws SQLException {
+            return trueFalseToDataConversionType(getter.getString());
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            DataConversionType type = dataConversionTypeToTrueFalse((DataConversionType)parameter);
+            if (type == null)
+                setter.setNull(S)
+//           setter.setString(booleanToTrueFalse((Boolean)parameter));
+        }
+
+        public Object valueOf(String s) {
+            return null;
+        }
+        
+        private String dataConversionTypeToTrueFalse(DataConversionType type) {
+            if (type == null)
+                throw new IllegalArgumentException("Cannot convert a null value to T or F");
+            if (type == DataConversionType.CENTROID)                 return TRUE;
+            else if (type == DataConversionType.NON_CENTROID)        return FALSE;
+            else                                                     return null;
+        }
+        
+        private DataConversionType trueFalseToDataConversionType(String val) {
+            if (val == null)    
+                return DataConversionType.UNKNOWN;
+            if (TRUE.equalsIgnoreCase(val))
+                return DataConversionType.CENTROID;
+            else if (FALSE.equalsIgnoreCase(val))
+                return DataConversionType.NON_CENTROID;
+            else
+                throw new IllegalArgumentException("Cannot convert "+val+" to DataConversionType");
         }
     }
 }

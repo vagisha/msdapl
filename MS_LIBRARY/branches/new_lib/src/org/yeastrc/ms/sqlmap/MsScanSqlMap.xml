@@ -4,8 +4,9 @@
 <sqlMap namespace="MsScan"> 
 
 	<typeAlias alias="MsScanDb" type="org.yeastrc.ms.domain.impl.MsScanDbImpl"/>
-	<typeAlias alias="MsScan" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanSqlMapParam"/>
+	<typeAlias alias="MsScan" type="org.yeastrc.ms.domain.MsScan"/>
 	<typeAlias alias="MsScanData" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
+	<typeAlias alias="IsCentroidTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
 	
 	
 	<resultMap class="MsScanDb" id="msScanResult">
@@ -19,6 +20,11 @@
 		<result property="precursorScanNum" column="prescanNumber" nullValue="-1"/>
 		<result property="retentionTime" column="retentionTime" />
 		<result property="fragmentationType" column="fragmentationType" />
+		<result property="isCentroid" 
+				column="isCentroid" 
+				typeHandler="IsCentroidTypeHandler"
+				/>
+		<result property="peakCount" column="peakCount" nullValue="-1" />
 		<result property="peakData" column="data" />
 	</resultMap>
 	
@@ -34,12 +40,16 @@
 		<parameter property="precursorScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="retentionTime" jdbcType="DECIMAL" />
 		<parameter property="fragmentationType" jdbcType="VARCHAR"/>
+		<parameter property="isCentroid" jdbcType="CHAR"/>
+		<parameter property="peakCount" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
 	<parameterMap class="MsScanData" id="msScanDataParam">
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="peakData" jdbcType="LONGBLOB" />
 	</parameterMap>
+	
+	
 	
     <select id="selectScanIdsForRun" resultClass="Integer" parameterClass="Integer"> 
         SELECT id FROM msScan WHERE runID = #id#
@@ -56,6 +66,8 @@
     			prescanNumber, 
     			retentionTime,
     			fragmentationType,
+    			isCentroid,
+    			peakCount,
     			UNCOMPRESS(data) as data 
     			FROM msScan, msScanData
     			WHERE msScan.id = msScanData.scanID
@@ -75,8 +87,10 @@
     						preScanID, 
     						prescanNumber,
     						retentionTime, 
-    						fragmentationType) 
-    	VALUES (?,?,?,?,?,?,?,?,?)
+    						fragmentationType,
+    						isCentroid,
+    						peakCount) 
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

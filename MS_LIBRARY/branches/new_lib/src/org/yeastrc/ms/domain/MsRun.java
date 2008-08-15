@@ -38,9 +38,7 @@ interface MsRunBase {
 
     public abstract String getSha1Sum();
 
-    // TODO: rename method.  getDataConversion(Processing)Method()??
-    // centroid, profile etc.
-    public abstract String getDataType();
-
+    public abstract DataConversionType getDataConversionType();
+    
     public abstract String getAcquisitionMethod();
 }

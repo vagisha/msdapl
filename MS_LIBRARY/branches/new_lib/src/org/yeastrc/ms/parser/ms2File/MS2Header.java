@@ -9,6 +9,7 @@ package org.yeastrc.ms.parser.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.MsEnzyme;
 import org.yeastrc.ms.domain.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
@@ -29,7 +30,7 @@ public class MS2Header implements MS2Run {
     private String instrumentModel;
     private String instrumentSN;
     private String acquisionMethod;
-    private String dataType;
+    private DataConversionType dataConversionType = DataConversionType.UNKNOWN;
     private StringBuilder comment;
     
     public MS2Header() {
@@ -64,13 +65,13 @@ public class MS2Header implements MS2Run {
             instrumentSN = value;
         if (isAcquisitionMethod(name))
             acquisionMethod = value;
-        if (isDataType(name))
-            dataType = value;
+        if (isDataType(name)) 
+            setDataConversionType(value);
         if (isComment(name)) {
             comment.append(value+";");
         }
     }
-    
+
     public int headerCount() {
         return headerList.size();
     }
@@ -130,8 +131,15 @@ public class MS2Header implements MS2Run {
         return acquisionMethod;
     }
     
-    public String getDataType() {
-        return dataType;
+    private void setDataConversionType(String value) {
+        if (value.toUpperCase().contains(DataConversionType.CENTROID.name()))
+            this.dataConversionType = DataConversionType.CENTROID;
+        else
+            this.dataConversionType = DataConversionType.NON_CENTROID;
+    }
+    
+    public DataConversionType getDataConversionType() {
+        return this.dataConversionType;
     }
     
     public String getComment() {

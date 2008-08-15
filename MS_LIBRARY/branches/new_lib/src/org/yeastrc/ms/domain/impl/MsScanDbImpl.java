@@ -6,11 +6,9 @@
  */
 package org.yeastrc.ms.domain.impl;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.MsScanDb;
-import org.yeastrc.ms.util.PeakUtils;
 
 /**
  * 
@@ -31,6 +29,10 @@ public class MsScanDbImpl implements MsScanDb {
     private BigDecimal precursorMz;  // 0 if this is a MS1 scan
     private int precursorScanId = 0; // id (database) of the precursor scan.  0 if this is a MS1 scan
     private int precursorScanNum = -1; // scan number of the precursor scan
+    
+    private boolean isCentroid;
+    
+    private int peakCount;
     
     private String peakString;
     
@@ -118,7 +120,22 @@ public class MsScanDbImpl implements MsScanDb {
         this.precursorMz = precursorMz;
     }
 
-
+    public boolean getIsCentroid() {
+        return this.isCentroid;
+    }
+    
+    public void setIsCentroid(boolean isCentroid) {
+        this.isCentroid = isCentroid;
+    }
+    
+    public int getPeakCount() {
+        return this.peakCount;
+    }
+    
+    public void setPeakCount(int peakCount) {
+        this.peakCount = peakCount;
+    }
+    
     public void setPeakData(String peaks) {
         peakString = peaks;
     }
