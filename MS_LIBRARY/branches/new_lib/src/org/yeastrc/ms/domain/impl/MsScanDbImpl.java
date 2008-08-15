@@ -8,6 +8,7 @@ package org.yeastrc.ms.domain.impl;
 
 import java.math.BigDecimal;
 
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.MsScanDb;
 
 /**
@@ -30,7 +31,7 @@ public class MsScanDbImpl implements MsScanDb {
     private int precursorScanId = 0; // id (database) of the precursor scan.  0 if this is a MS1 scan
     private int precursorScanNum = -1; // scan number of the precursor scan
     
-    private boolean isCentroid;
+    private DataConversionType dataConversionType;
     
     private int peakCount;
     
@@ -120,12 +121,12 @@ public class MsScanDbImpl implements MsScanDb {
         this.precursorMz = precursorMz;
     }
 
-    public boolean getIsCentroid() {
-        return this.isCentroid;
+    public DataConversionType getDataConversionType() {
+        return this.dataConversionType;
     }
     
-    public void setIsCentroid(boolean isCentroid) {
-        this.isCentroid = isCentroid;
+    public void setDataConversionType(DataConversionType convType) {
+        this.dataConversionType = convType;
     }
     
     public int getPeakCount() {

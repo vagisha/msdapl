@@ -12,6 +12,7 @@ import org.yeastrc.ms.dao.MsRunDAO;
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.dao.ms2File.MS2RunDAOImplTest.MS2RunTest;
 import org.yeastrc.ms.dao.ms2File.MS2ScanDAOImplTest.MS2ScanTest;
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.RunFileFormat;
 import org.yeastrc.ms.domain.ms2File.MS2ChargeDependentAnalysisDb;
 import org.yeastrc.ms.domain.ms2File.MS2ChargeIndependentAnalysisDb;
@@ -92,7 +93,9 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
     //---------------------------------------------------------------------------------------
     // MS2 scan 
     //---------------------------------------------------------------------------------------
-    protected MS2Scan makeMS2Scan(int scanNum, int precursorScanNum, boolean addScanCharges,
+    protected MS2Scan makeMS2Scan(int scanNum, int precursorScanNum, 
+            DataConversionType convType,
+            boolean addScanCharges,
             boolean addChgIAnalysis) {
         MS2ScanTest scan = new MS2ScanTest();
         scan.setStartScanNum(scanNum);
@@ -102,6 +105,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         scan.setPrecursorMz(new BigDecimal("123.45"));
         scan.setPrecursorScanNum(precursorScanNum);
         scan.setRetentionTime(new BigDecimal("98.7"));
+        scan.setDataConversionType(convType);
         
         if (addScanCharges) {
             scan.addScanCharge(makeMS2ScanCharge(2, "100.0", true));
@@ -115,11 +119,11 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         return scan;
     }
     
-    protected void saveScansForRun(int runId, int scanCount) {
+    protected void saveScansForRun(int runId, int scanCount, DataConversionType convtype) {
         Random random = new Random();
         for (int i = 0; i < scanCount; i++) {
             int scanNum = random.nextInt(100);
-            MS2Scan scan = makeMS2Scan(scanNum, 25, true, true);
+            MS2Scan scan = makeMS2Scan(scanNum, 25, convtype, true, true);
             ms2ScanDao.save(scan, runId);
         }
     }

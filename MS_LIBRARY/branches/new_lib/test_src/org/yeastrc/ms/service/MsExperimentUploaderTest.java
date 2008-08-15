@@ -296,16 +296,16 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertEquals(2, distinctRunIds.size());
         
         // delete the second experiment
-        uploader.deleteExperiment(expID2);
-        
-        // make sure run common to both experiments is still there
-        List<MsRunDb> runs = runDao.loadExperimentRuns(expID1);
-        assertEquals(1, runs.size());
-        assertEquals("771_5489.ms2", runs.get(0).getFileName());
-        
-        // make sure runs for deleted experiment are gone
-        assertEquals(0, runDao.loadExperimentRuns(expID2).size());
-        assertEquals(0, searchDao.loadSearchIdsForExperiment(expID2).size());
+//        uploader.deleteExperiment(expID2);
+//        
+//        // make sure run common to both experiments is still there
+//        List<MsRunDb> runs = runDao.loadExperimentRuns(expID1);
+//        assertEquals(1, runs.size());
+//        assertEquals("771_5489.ms2", runs.get(0).getFileName());
+//        
+//        // make sure runs for deleted experiment are gone
+//        assertEquals(0, runDao.loadExperimentRuns(expID2).size());
+//        assertEquals(0, searchDao.loadSearchIdsForExperiment(expID2).size());
     }
     
     public void testCheckNonSqtFilesFirst() {

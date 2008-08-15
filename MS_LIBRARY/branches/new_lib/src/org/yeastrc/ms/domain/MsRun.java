@@ -38,7 +38,5 @@ interface MsRunBase {
 
     public abstract String getSha1Sum();
 
-    public abstract DataConversionType getDataConversionType();
-    
     public abstract String getAcquisitionMethod();
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.yeastrc.ms.dao.MsScanDAOImplTest.MsScanTest;
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.ms2File.MS2Field;
 import org.yeastrc.ms.domain.ms2File.MS2Scan;
 import org.yeastrc.ms.domain.ms2File.MS2ScanCharge;
@@ -38,7 +39,7 @@ public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
         int[] scanIds = new int[10];
         for (int i = 0; i < 10; i++) {
             int scanNum = random.nextInt(100);
-            MS2Scan scan = makeMS2Scan(scanNum, 0, false, false); // precursorScanNum = 0;
+            MS2Scan scan = makeMS2Scan(scanNum, 0, DataConversionType.CENTROID, false, false); // precursorScanNum = 0;
             scanIds[i] = ms2ScanDao.save(scan, runId);
         }
         
@@ -59,9 +60,10 @@ public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
         assertEquals(0, scanDb.getScanChargeList().size());
         
         // save a scan WITH both charge independent analysis and scan charges
-        MS2Scan scan = makeMS2Scan(420, 0, true, true);// scanNum = 420; precursorScanNum = 0s
+        MS2Scan scan = makeMS2Scan(420, 0, DataConversionType.CENTROID, true, true);// scanNum = 420; precursorScanNum = 0s
         int scanId = ms2ScanDao.save(scan, runId);
         MS2ScanDb scan_db = ms2ScanDao.load(scanId);
+        assertEquals(DataConversionType.CENTROID, scan_db.getDataConversionType());
         assertEquals(3, scan_db.getChargeIndependentAnalysisList().size());
         assertEquals(2, scan_db.getScanChargeList().size());
         
@@ -73,6 +75,18 @@ public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
         
     }
     
+    public void testDataConversionTypeForScan() {
+        MS2Scan scan1 = makeMS2Scan(23, 32, null, false, false);
+        try {
+            ms2ScanDao.save(scan1, 56);
+            fail("DataConversionTupe cannot be null");
+        }
+        catch(IllegalArgumentException e) {e.printStackTrace();}
+        
+        int id1 = ms2ScanDao.save(scan1, 56);
+        MS2ScanDb scan1_db = ms2ScanDao.load(id1);
+        super.checkScan(scan1, scan1_db);
+    }
     public static final class MS2ScanTest extends MsScanTest implements MS2Scan {
 
         private List<MS2Field> analysisList = new ArrayList<MS2Field>();

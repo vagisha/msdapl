@@ -13,8 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.crypto.Data;
-
 import org.yeastrc.ms.dao.MsScanDAO;
 import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.MsScan;
@@ -136,13 +134,13 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         }
 
         @Override
-        public boolean getIsCentroid() {
-            return scan.getIsCentroid();
+        public int getPeakCount() {
+            return scan.getPeakCount();
         }
 
         @Override
-        public int getPeakCount() {
-            return scan.getPeakCount();
+        public DataConversionType getDataConversionType() {
+            return scan.getDataConversionType();
         }
     }
     
@@ -189,10 +187,11 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
 
         public void setParameter(ParameterSetter setter, Object parameter)
                 throws SQLException {
-            DataConversionType type = dataConversionTypeToTrueFalse((DataConversionType)parameter);
+            String type = dataConversionTypeToTrueFalse((DataConversionType)parameter);
             if (type == null)
-                setter.setNull(S)
-//           setter.setString(booleanToTrueFalse((Boolean)parameter));
+                setter.setNull(java.sql.Types.CHAR);
+            else
+                setter.setString(type);
         }
 
         public Object valueOf(String s) {

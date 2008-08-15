@@ -23,8 +23,6 @@ public class MsRunDbImpl implements MsRunDb {
     private String conversionSWVersion; // version of the conversion software used
     private String conversionSWOptions; // options used for conversion
     
-    private DataConversionType dataConversionType; // centroid etc.
-
     // acquisition instrument
     private String instrumentVendor;
     private String instrumentModel;
@@ -138,14 +136,6 @@ public class MsRunDbImpl implements MsRunDb {
 
     public void setSha1Sum(String sha1Sum) {
         this.sha1Sum = sha1Sum;
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
     }
 
     public String getAcquisitionMethod() {

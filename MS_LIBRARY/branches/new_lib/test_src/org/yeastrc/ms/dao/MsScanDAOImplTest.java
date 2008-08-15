@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.domain.DataConversionType;
 import org.yeastrc.ms.domain.MsScan;
 import org.yeastrc.ms.domain.MsScanDb;
 
@@ -88,6 +89,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         private String fragmentationType;
         private int endScanNum;
         private List<String[]> peakList = new ArrayList<String[]>();
+        private DataConversionType convType;
 
         public int getEndScanNum() {
             return this.endScanNum;
@@ -155,6 +157,15 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
 
         public void setStartScanNum(int scanNum) {
             this.startScanNum = scanNum;
+        }
+
+        @Override
+        public DataConversionType getDataConversionType() {
+            return convType;
+        }
+        
+        public void setDataConversionType(DataConversionType convType) {
+            this.convType = convType;
         }
     }
 }

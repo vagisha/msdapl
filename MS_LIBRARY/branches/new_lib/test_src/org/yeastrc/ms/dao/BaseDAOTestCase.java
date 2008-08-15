@@ -423,6 +423,7 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getPrecursorScanNum(), output.getPrecursorScanNum());
         assertEquals(input.getRetentionTime().doubleValue(), output.getRetentionTime().doubleValue());
         assertEquals(input.getEndScanNum(), output.getEndScanNum());
+        assertEquals(input.getDataConversionType(), output.getDataConversionType());
         Iterator<String[]> ipiter = input.peakIterator();
         List<double[]> peakList = new PeakConverterDouble().convert(output.peakDataString());
         Iterator<double[]> opiter = peakList.iterator();
@@ -470,7 +471,6 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(inputRun.getConversionSWOptions(), outputRun.getConversionSWOptions());
         assertEquals(inputRun.getConversionSWVersion(), outputRun.getConversionSWVersion());
         assertEquals(inputRun.getCreationDate(), outputRun.getCreationDate());
-        assertEquals(inputRun.getDataType(), outputRun.getDataType());
         assertEquals(inputRun.getFileName(), outputRun.getFileName());
         assertEquals(inputRun.getInstrumentModel(), outputRun.getInstrumentModel());
         assertEquals(inputRun.getInstrumentSN(), outputRun.getInstrumentSN());
