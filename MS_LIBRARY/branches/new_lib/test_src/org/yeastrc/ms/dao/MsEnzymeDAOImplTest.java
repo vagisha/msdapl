@@ -3,7 +3,7 @@ package org.yeastrc.ms.dao;
 import java.util.Arrays;
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsEnzymeDAO.EnzymeProperties;
+import org.yeastrc.ms.dao.general.MsEnzymeDAO.EnzymeProperties;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;

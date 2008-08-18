@@ -4,33 +4,42 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.ibatis.MsDeletionDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsEnzymeDAOImpl;
+import org.yeastrc.ms.dao.general.MsDeletionDAO;
+import org.yeastrc.ms.dao.general.MsEnzymeDAO;
+import org.yeastrc.ms.dao.general.ibatis.MsDeletionDAOImpl;
+import org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl;
 import org.yeastrc.ms.dao.ibatis.MsExperimentDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsRunDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsScanDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsSearchDatabaseDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsSearchResultDAOImpl;
-import org.yeastrc.ms.dao.ibatis.MsSearchResultProteinDAOImpl;
-import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2HeaderDAO;
-import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2ChargeDependentAnalysisDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2ChargeIndependentAnalysisDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2HeaderDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2RunDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanChargeDAOImpl;
-import org.yeastrc.ms.dao.ms2File.ibatis.MS2ScanDAOImpl;
-import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTHeaderDAOImpl;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchDAOImpl;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchResultDAOImpl;
-import org.yeastrc.ms.dao.sqtFile.ibatis.SQTSearchScanDAOImpl;
+import org.yeastrc.ms.dao.run.MsRunDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl;
+import org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl;
+import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
+import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ChargeDependentAnalysisDAOImpl;
+import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ChargeIndependentAnalysisDAOImpl;
+import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2HeaderDAOImpl;
+import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2RunDAOImpl;
+import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ScanChargeDAOImpl;
+import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ScanDAOImpl;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
+import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchDatabaseDAOImpl;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchResultProteinDAOImpl;
+import org.yeastrc.ms.dao.search.sequest.SQTSearchResultDAO;
+import org.yeastrc.ms.dao.search.sequest.ibatis.SQTSearchDAOImpl;
+import org.yeastrc.ms.dao.search.sequest.ibatis.SQTSearchResultDAOImpl;
+import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
+import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTHeaderDAOImpl;
+import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTSearchScanDAOImpl;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -78,7 +87,6 @@ public class DAOFactory {
     private static DAOFactory instance = new DAOFactory();
     
     // DAOs for run related objects
-    private MsExperimentDAO expDAO;
     private MsEnzymeDAO enzymeDAO;
     private MsRunDAO<MsRun, MsRunDb> runDAO;
     private MsScanDAO<MsScan, MsScanDb> scanDAO;
@@ -110,7 +118,6 @@ public class DAOFactory {
     private DAOFactory() {
         
         // Run related
-        expDAO = new MsExperimentDAOImpl(sqlMap);
         enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
         scanDAO = new MsScanDAOImpl(sqlMap);
         runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO);
@@ -141,10 +148,6 @@ public class DAOFactory {
     
     public static DAOFactory instance() {
         return instance;
-    }
-    
-    public MsExperimentDAO getMsExperimentDAO() {
-        return expDAO;
     }
     
     public MsRunDAO<MsRun, MsRunDb> getMsRunDAO() {

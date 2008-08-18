@@ -11,11 +11,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAO;
+import org.yeastrc.ms.dao.run.MsRunDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.domain.run.MsRunLocationDb;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;

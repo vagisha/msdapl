@@ -6,8 +6,10 @@ import java.util.Arrays;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsSearchDAO;
-import org.yeastrc.ms.dao.MsSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchDAOImplTest.SQTSearchTest;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;

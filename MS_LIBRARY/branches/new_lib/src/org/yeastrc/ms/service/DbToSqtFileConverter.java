@@ -15,12 +15,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsScanDAO;
-import org.yeastrc.ms.dao.MsSearchDAO;
-import org.yeastrc.ms.dao.MsSearchModificationDAO;
-import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.search.sequest.SQTSearchResultDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsSearchModification;

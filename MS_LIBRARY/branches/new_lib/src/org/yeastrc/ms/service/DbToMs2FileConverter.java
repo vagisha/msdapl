@@ -8,8 +8,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsRunDAO;
-import org.yeastrc.ms.dao.MsScanDAO;
+import org.yeastrc.ms.dao.run.MsRunDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.run.ms2file.MS2Field;
 import org.yeastrc.ms.domain.run.ms2file.MS2HeaderDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;

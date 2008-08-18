@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.search.MsSearchModificationDb;
 
 public class DynamicModLookupUtil {
