@@ -57,7 +57,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         // delete the result
         sqtResDao.delete(resultId);
         assertNull(resultDao.load(resultId));
-        assertEquals(0, resultDao.loadResultIdsForSearch(1).size());
+        assertEquals(0, resultDao.loadResultIdsForRunSearch(1).size());
         assertNull(sqtResDao.load(resultId));
     }
     

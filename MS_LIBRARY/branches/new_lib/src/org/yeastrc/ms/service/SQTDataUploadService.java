@@ -15,11 +15,11 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
-import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsSearchResultModSqlMapParam;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSqlMapParam;
-import org.yeastrc.ms.dao.search.sequest.SQTSearchResultDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -152,7 +152,7 @@ public class SQTDataUploadService {
         SQTRunSearch search = provider.getSearchHeader();
         // save the search and return the database id
         MsSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = daoFactory.getSqtSearchDAO();
-        return searchDao.saveSearch(search, runId, experimentId);
+        return searchDao.saveRunSearch(search, runId, experimentId);
     }
     
     private void uploadSearchScan(SQTSearchScan scan, int searchId, int scanId) {
@@ -162,7 +162,7 @@ public class SQTDataUploadService {
     
     private int uploadSearchResult(SequestRunSearchResult result, int searchId, int scanId) {
         
-        MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
+        MsRunSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
         int resultId = resultDao.saveResultOnly(result, searchId, scanId);
         
         // upload dynamic mods for this result
@@ -232,8 +232,8 @@ public class SQTDataUploadService {
     }
     
     private void uploadSqtResultBuffer() {
-        SQTSearchResultDAO sqtResultDao = daoFactory.getSqtResultDAO();
-        sqtResultDao.saveAllSqtResultScores(sqtResultScoresList);
+        SequestRunSearchResultDAO sqtResultDao = daoFactory.getSequestResultDAO();
+        sqtResultDao.saveAllSequestResultData(sqtResultScoresList);
         sqtResultScoresList.clear();
     }
     
@@ -262,7 +262,7 @@ public class SQTDataUploadService {
     
     public static List<Integer> getSearchIdsForExperiment(int experimentId) {
         MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-        return searchDao.loadSearchIdsForExperiment(experimentId);
+        return searchDao.loadRunSearchIdsForSearch(experimentId);
     }
     
     public static void deleteSearch(int searchId) {

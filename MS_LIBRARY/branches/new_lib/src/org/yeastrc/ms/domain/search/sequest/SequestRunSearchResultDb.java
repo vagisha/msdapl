@@ -12,6 +12,7 @@ import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
 /**
  * 
  */
-public interface SequestRunSearchResultDb extends SequestRunSearchResultBase, MsRunSearchResultDb {
-
+public interface SequestRunSearchResultDb extends MsRunSearchResultDb {
+    
+    public SequestResultData getSequestResultData();
 }

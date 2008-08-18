@@ -1,14 +1,13 @@
 package org.yeastrc.ms.dao.search.ibatis;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
-import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.search.MsRunSearchResult;
@@ -24,25 +23,25 @@ import com.ibatis.sqlmap.client.extensions.ParameterSetter;
 import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
-public class MsSearchResultDAOImpl extends BaseSqlMapDAO 
-        implements MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> {
+public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO 
+        implements MsRunSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> {
 
     private MsSearchResultProteinDAO matchDao;
     private MsSearchModificationDAO modDao;
     
-    public MsSearchResultDAOImpl(SqlMapClient sqlMap, MsSearchResultProteinDAO matchDao,
+    public MsRunSearchResultDAOImpl(SqlMapClient sqlMap, MsSearchResultProteinDAO matchDao,
             MsSearchModificationDAO modDao) {
         super(sqlMap);
         this.matchDao = matchDao;
-        this.modDao =  modDao;
+        this.modDao = modDao;
     }
 
     public MsRunSearchResultDb load(int id) {
-        return (MsRunSearchResultDb) queryForObject("MsSearchResult.select", id);
+        return (MsRunSearchResultDb) queryForObject("MsRunSearchResult.select", id);
     }
     
-    public List<Integer> loadResultIdsForSearch(int searchId) {
-        return queryForList("MsSearchResult.selectResultIdsForSearch", searchId);
+    public List<Integer> loadResultIdsForRunSearch(int searchId) {
+        return queryForList("MsRunSearchResult.selectResultIdsForSearch", searchId);
     }
     
     public List<Integer> loadResultIdsForSearchScanCharge(int searchId, int scanId, int charge) {
@@ -50,16 +49,16 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         map.put("searchId", searchId);
         map.put("scanId", scanId);
         map.put("charge", charge);
-        return queryForList("MsSearchResult.selectResultIdsForSearchScanCharge", map);
+        return queryForList("MsRunSearchResult.selectResultIdsForSearchScanCharge", map);
     }
     
-    public int save(MsRunSearchResult searchResult, int searchId, int scanId) {
+    public int save(MsRunSearchResult searchResult, String searchDbName, int searchId, int scanId) {
         
         int resultId = saveResultOnly(searchResult, searchId, scanId);
         
         // save any protein matches
         for(MsSearchResultProtein protein: searchResult.getProteinMatchList()) {
-            matchDao.save(protein, resultId);
+            matchDao.save(protein, searchDbName, resultId);
         }
         
         // save any dynamic modifications for this result
@@ -71,7 +70,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     public int saveResultOnly(MsRunSearchResult searchResult, int searchId, int scanId) {
 
         MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(searchId, scanId, searchResult);
-        return saveAndReturnId("MsSearchResult.insert", resultDb);
+        return saveAndReturnId("MsRunSearchResult.insert", resultDb);
     }
 
     void saveDynamicModsForResult(int searchId, int resultId, MsSearchResultPeptide peptide) {
@@ -86,59 +85,32 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     }
     
     public void delete(int resultId) {
-        
-        // delete any protein matches for this result
-        matchDao.delete(resultId);
-        
-        // delete any dynamic modifications associated with this result
-        modDao.deleteDynamicModificationsForResult(resultId);
-        
-        delete("MsSearchResult.delete", resultId);
+        delete("MsRunSearchResult.delete", resultId);
     }
 
-    public void deleteResultsForSearch(int searchId) {
-       List<Integer> resultIds = loadResultIdsForSearch(searchId);
-       for (Integer id: resultIds) 
-           delete(id);
-    }
-    
-    
     /**
      * Convenience class for encapsulating searchId, scanId and search result
      */
     public class MsSearchResultSqlMapParam implements MsRunSearchResult {
 
-        private int searchId;
+        private int runSearchId;
         private int scanId;
         private MsRunSearchResult result;
         
-        public MsSearchResultSqlMapParam(int searchId, int scanId, MsRunSearchResult result) {
-            this.searchId = searchId;
+        public MsSearchResultSqlMapParam(int runSearchId, int scanId, MsRunSearchResult result) {
+            this.runSearchId = runSearchId;
             this.scanId = scanId;
             this.result = result;
         }
         public int getSearchId() {
-            return searchId;
+            return runSearchId;
         }
         public int getScanId() {
             return scanId;
         }
 
-
-        public BigDecimal getCalculatedMass() {
-            return result.getCalculatedMass();
-        }
-
         public int getCharge() {
             return result.getCharge();
-        }
-
-        public int getNumIonsMatched() {
-            return result.getNumIonsMatched();
-        }
-
-        public int getNumIonsPredicted() {
-            return result.getNumIonsPredicted();
         }
 
         public List<MsSearchResultProtein> getProteinMatchList() {

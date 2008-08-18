@@ -19,7 +19,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
-import org.yeastrc.ms.dao.search.sequest.SQTSearchResultDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
@@ -62,8 +62,8 @@ public class DbToSqtFileConverter {
             List<MsSearchModification> dynaMods = getDynaModsForSearch(dbSearchId);
             
             SQTSearchScanDAO scanDao = DAOFactory.instance().getSqtSpectrumDAO();
-            SQTSearchResultDAO resultDao = DAOFactory.instance().getSqtResultDAO();
-            List<Integer> resultIds = resultDao.loadResultIdsForSearch(dbSearchId);
+            SequestRunSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
+            List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(dbSearchId);
             int currCharge = -1;
             int currScanId = -1;
             ScanResult currScan = null;

@@ -28,7 +28,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         
         int runId_1 = 21;
         assertEquals(0, searchDao.loadSearchesForRun(runId_1).size()); // runId = 1
-        assertEquals(0, searchDao.loadSearchIdsForRun(runId_1).size()); // runId = 1
+        assertEquals(0, searchDao.loadRunSearchIdsForRun(runId_1).size()); // runId = 1
         
         // create and save a search with no seq. db information or modifications or enzymes
         MsRunSearch search_1 = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
@@ -37,10 +37,10 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, search_1.getStaticModifications().size());
         assertEquals(0, search_1.getDynamicModifications().size());
         
-        int searchId_1 = searchDao.saveSearch(search_1, runId_1, 32); // runId = 21; experimentId = 32
+        int searchId_1 = searchDao.saveRunSearch(search_1, runId_1, 32); // runId = 21; experimentId = 32
         List<MsRunSearchDb> searchList = (List<MsRunSearchDb>) searchDao.loadSearchesForRun(runId_1);
         assertEquals(1, searchList.size());
-        assertEquals(0, resultDao.loadResultIdsForSearch(searchId_1).size());
+        assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_1).size());
         checkSearch(search_1, searchList.get(0));
         
         
@@ -52,7 +52,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         
         
         int runId_2 = 23;
-        int searchId_2 = searchDao.saveSearch(search_2, runId_2, 32); // runId = 23; experimentId = 32
+        int searchId_2 = searchDao.saveRunSearch(search_2, runId_2, 32); // runId = 23; experimentId = 32
         searchList = searchDao.loadSearchesForRun(runId_2);
         assertEquals(1, searchList.size());
         assertEquals(2, seqDbDao.loadSearchDatabases(searchId_2).size());
@@ -66,7 +66,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         MsRunSearchResult r2 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3;
         int r1_id = resultDao.save(r1, searchId_2, 2);
         int r2_id = resultDao.save(r2, searchId_2, 3);
-        assertEquals(2, resultDao.loadResultIdsForSearch(searchId_2).size());
+        assertEquals(2, resultDao.loadResultIdsForRunSearch(searchId_2).size());
         
         assertTrue(r1.getProteinMatchList().size() > 0);
         assertEquals(r1.getProteinMatchList().size(), matchDao.loadResultProteins(r1_id).size());
@@ -93,14 +93,14 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     public void testReturnedSearchType() {
         MsRunSearch search = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
         assertEquals(SearchFileFormat.SQT_SEQ, search.getSearchFileFormat());
-        int searchId_1 = searchDao.saveSearch(search, 21, 0); // runId = 21
+        int searchId_1 = searchDao.saveRunSearch(search, 21, 0); // runId = 21
         MsRunSearchDb searchDb = searchDao.loadSearch(searchId_1);
         assertTrue(searchDb instanceof SQTRunSearchDb);
         assertEquals(SearchFileFormat.SQT_SEQ, searchDb.getSearchFileFormat());
         
         search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false, false);
         assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
-        int searchId_2 = searchDao.saveSearch(search, 21, 0);
+        int searchId_2 = searchDao.saveRunSearch(search, 21, 0);
         searchDb = searchDao.loadSearch(searchId_2);
         assertFalse(searchDb instanceof SQTRunSearchDb);
         assertEquals(SearchFileFormat.PEPXML, searchDb.getSearchFileFormat());
@@ -114,11 +114,11 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     }
     
     private void testSearchDeleted(int runId, int searchId, int[] resultIds) {
-        assertEquals(0, searchDao.loadSearchIdsForRun(runId).size());
+        assertEquals(0, searchDao.loadRunSearchIdsForRun(runId).size());
         assertEquals(0, seqDbDao.loadSearchDatabases(searchId).size());
         assertEquals(0, modDao.loadStaticModificationsForSearch(searchId).size());
         assertEquals(0, modDao.loadDynamicModificationsForSearch(searchId).size());
-        assertEquals(0, resultDao.loadResultIdsForSearch(searchId).size());
+        assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId).size());
         for (int id: resultIds) {
             assertEquals(0, matchDao.loadResultProteins(id).size());
             assertEquals(0, modDao.loadDynamicModificationsForSearchResult(id).size());

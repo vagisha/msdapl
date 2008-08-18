@@ -222,7 +222,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
       
       assertEquals(3, exceptionList.size());
       assertEquals(3, runDao.loadExperimentRuns(1).size());
-      assertEquals(0, searchDao.loadSearchIdsForExperiment(1).size());
+      assertEquals(0, searchDao.loadRunSearchIdsForSearch(1).size());
       
     }
     
@@ -240,7 +240,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         
         assertEquals(1, exceptions.size());
         assertEquals(1, runDao.loadExperimentRuns(1).size());
-        assertEquals(0, searchDao.loadSearchIdsForExperiment(1).size());
+        assertEquals(0, searchDao.loadRunSearchIdsForSearch(1).size());
     }
     
     public void testUploadExperimntNoScanIdFound() {
@@ -259,7 +259,7 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         
         assertEquals(1, exceptions.size());
         assertEquals(1, runDao.loadExperimentRuns(1).size());
-        assertEquals(0, searchDao.loadSearchIdsForExperiment(1).size());
+        assertEquals(0, searchDao.loadRunSearchIdsForSearch(1).size());
     }
 
     public void testDeleteExperiment() {
@@ -280,11 +280,11 @@ public class MsExperimentUploaderTest extends BaseDAOTestCase {
         assertEquals(2, expID2);
         
         // make sure everything got uploaded
-        assertEquals(1, searchDao.loadSearchIdsForExperiment(expID1).size());
+        assertEquals(1, searchDao.loadRunSearchIdsForSearch(expID1).size());
         List<MsRunDb> runs1 = runDao.loadExperimentRuns(expID1);
         assertEquals(1, runs1.size());
         
-        assertEquals(2, searchDao.loadSearchIdsForExperiment(expID2).size());
+        assertEquals(2, searchDao.loadRunSearchIdsForSearch(expID2).size());
         List<MsRunDb> runs2 = runDao.loadExperimentRuns(expID2);
         assertEquals(2, runs2.size());
         

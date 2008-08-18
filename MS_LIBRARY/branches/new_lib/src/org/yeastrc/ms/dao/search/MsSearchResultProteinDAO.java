@@ -10,10 +10,11 @@ public interface MsSearchResultProteinDAO {
     public abstract List<MsSearchResultProteinDb> loadResultProteins(int resultId);
 
     /**
-     * @param proteinMatch
-     * @param resultId database id of the search result this protein match is associated with
+     * @param resultProtein
+     * @param searchDbName -- name of the database used for the search.
+     * @param resultId database id of the search result associated with this protein match
      */
-    public abstract void save(MsSearchResultProtein proteinMatch, int resultId);
+    public abstract void save(MsSearchResultProtein protein, String searchDbName, int resultId);
 
     public abstract void delete(int resultId);
 

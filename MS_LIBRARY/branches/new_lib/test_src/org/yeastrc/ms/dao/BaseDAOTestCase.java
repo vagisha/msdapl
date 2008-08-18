@@ -29,7 +29,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
-import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.general.MsEnzyme;
@@ -66,7 +66,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
 
     protected MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-    protected MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao = 
+    protected MsRunSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao = 
         DAOFactory.instance().getMsSearchResultDAO();
     protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
     protected MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();

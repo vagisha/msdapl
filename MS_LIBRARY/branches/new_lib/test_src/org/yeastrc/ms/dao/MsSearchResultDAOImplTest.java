@@ -101,7 +101,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         // delete ALL results for searchId_1
         resultDao.deleteResultsForSearch(searchId_1);
         // make sure everything was deleted
-        assertEquals(0, resultDao.loadResultIdsForSearch(searchId_1).size());
+        assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_1).size());
         assertNull(resultDao.load(resultId_1));
         assertNull(resultDao.load(resultId_2));
         assertEquals(0, modDao.loadDynamicModificationsForSearchResult(resultId_1).size());
@@ -117,7 +117,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         // delete ALL results for searchId_2
         resultDao.deleteResultsForSearch(searchId_2);
         // make sure everything was deleted
-        assertEquals(0, resultDao.loadResultIdsForSearch(searchId_2).size());
+        assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_2).size());
         assertNull(resultDao.load(resultId_3));
         assertEquals(0, modDao.loadDynamicModificationsForSearchResult(resultId_3).size());
         assertEquals(0, matchDao.loadResultProteins(resultId_3).size());

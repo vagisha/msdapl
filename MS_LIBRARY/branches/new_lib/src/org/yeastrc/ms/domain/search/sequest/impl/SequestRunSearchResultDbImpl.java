@@ -3,25 +3,18 @@ package org.yeastrc.ms.domain.search.sequest.impl;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.impl.MsSearchResultDbImpl;
+import org.yeastrc.ms.domain.search.impl.SequestResultDataImpl;
+import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResultDb;
 
-public class SequestRunSearchResultDbImpl extends MsSearchResultDbImpl implements SequestRunSearchResultDb {
+public class SequestRunSearchResultDbImpl extends MsSearchResultDbImpl implements SequestRunSearchResultDb, SequestResultData {
 
     private int resultId; 
-    private int xCorrRank;
-    private int spRank;
-    private BigDecimal deltaCN;
-    private BigDecimal xCorr;
-    private BigDecimal sp;
-    private double evalue;
+    private SequestResultDataImpl sequestData;
     
-    private BigDecimal calculatedMass;
-    
-    private int predictedIons;
-    private int matchingIons;
-    
-    
-    public SequestRunSearchResultDbImpl() {}
+    public SequestRunSearchResultDbImpl() {
+        sequestData = new SequestResultDataImpl();
+    }
     
     /**
      * @return the resultId
@@ -40,95 +33,100 @@ public class SequestRunSearchResultDbImpl extends MsSearchResultDbImpl implement
      * @return the xCorrRank
      */
     public int getxCorrRank() {
-        return xCorrRank;
+        return sequestData.getxCorrRank();
     }
     /**
-     * @param corrRank the xCorrRank to set
+     * @param xcorrRank the xCorrRank to set
      */
-    public void setxCorrRank(int corrRank) {
-        xCorrRank = corrRank;
+    public void setxCorrRank(int xcorrRank) {
+        sequestData.setXcorrRank(xcorrRank);
     }
     /**
      * @return the spRank
      */
     public int getSpRank() {
-        return spRank;
+        return sequestData.getSpRank();
     }
     /**
      * @param spRank the spRank to set
      */
     public void setSpRank(int spRank) {
-        this.spRank = spRank;
+        sequestData.setSpRank(spRank);
     }
     /**
      * @return the deltaCN
      */
     public BigDecimal getDeltaCN() {
-        return deltaCN;
+        return sequestData.getDeltaCN();
     }
     /**
      * @param deltaCN the deltaCN to set
      */
     public void setDeltaCN(BigDecimal deltaCN) {
-        this.deltaCN = deltaCN;
+        sequestData.setDeltaCN(deltaCN);
     }
     /**
      * @return the xCorr
      */
     public BigDecimal getxCorr() {
-        return xCorr;
+        return sequestData.getxCorr();
     }
     /**
-     * @param corr the xCorr to set
+     * @param xcorr the xCorr to set
      */
-    public void setxCorr(BigDecimal corr) {
-        xCorr = corr;
+    public void setxCorr(BigDecimal xcorr) {
+        sequestData.setXcorr(xcorr);
     }
     /**
      * @return the sp
      */
     public BigDecimal getSp() {
-        return sp;
+        return sequestData.getSp();
     }
     /**
      * @param sp the sp to set
      */
     public void setSp(BigDecimal sp) {
-        this.sp = sp;
+        sequestData.setSp(sp);
     }
     
-    public double geteValue() {
-        return evalue;
+    public Double geteValue() {
+        return sequestData.geteValue();
     }
     
-    public void seteValue(double evalue) {
-        this.evalue = evalue;
+    public void seteValue(Double evalue) {
+        sequestData.setEvalue(evalue);
     }
 
     @Override
     public BigDecimal getCalculatedMass() {
-        return calculatedMass;
+        return sequestData.getCalculatedMass();
     }
 
     public void setCalculatedMass(BigDecimal calculatedMass) {
-        this.calculatedMass = calculatedMass;
+        sequestData.setCalculatedMass(calculatedMass);
     }
     
     @Override
     public int getMatchingIons() {
-        return this.matchingIons;
+        return sequestData.getMatchingIons();
     }
 
     public void setMatchingIons(int matchingIons) {
-        this.matchingIons = matchingIons;
+        sequestData.setMatchingIons(matchingIons);
     }
     
     @Override
     public int getPredictedIons() {
-        return predictedIons;
+        return sequestData.getPredictedIons();
     }
     
-    public void setPredictedIons() {
-        this.predictedIons = predictedIons;
+    public void setPredictedIons(int predictedIons) {
+        sequestData.setPredictedIons(predictedIons);
+    }
+
+    @Override
+    public SequestResultData getSequestResultData() {
+        return sequestData;
     }
 }
