@@ -6,26 +6,22 @@
  */
 package org.yeastrc.ms.domain.search.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
 
-public class MsSearchResultDbImpl implements MsSearchResultDb {
+public class MsSearchResultDbImpl implements MsRunSearchResultDb {
 
     private int id; // unique id (database) for this search result
-    private int searchId; // id (database) of the search this result belongs to
+    private int runSearchId; // id (database) of the run search this result belongs to
     private int scanId; // id (database) of the scan with which this result is associated
 
     private int charge; 
-    private BigDecimal calculatedMass;
-    private int numIonsMatched;
-    private int numIonsPredicted;
     private ValidationStatus validationStatus = ValidationStatus.UNVALIDATED;
 
     private List<? super MsSearchResultProteinDb> proteinMatchList;
@@ -53,15 +49,15 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
     /**
      * @return the searchId
      */
-    public int getSearchId() {
-        return searchId;
+    public int getRunSearchId() {
+        return runSearchId;
     }
 
     /**
      * @param searchId the searchId to set
      */
     public void setSearchId(int searchId) {
-        this.searchId = searchId;
+        this.runSearchId = searchId;
     }
 
     /**
@@ -92,49 +88,6 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
         this.charge = charge;
     }
 
-    /**
-     * @return the calculatedMass
-     */
-    public BigDecimal getCalculatedMass() {
-        return calculatedMass;
-    }
-
-    /**
-     * @param calculatedMass the calculatedMass to set
-     */
-    public void setCalculatedMass(BigDecimal calculatedMass) {
-        this.calculatedMass = calculatedMass;
-    }
-
-    /**
-     * @return the numIonsMatched
-     */
-    public int getNumIonsMatched() {
-        return numIonsMatched;
-    }
-
-    /**
-     * @param numIonsMatched the numIonsMatched to set
-     */
-    public void setNumIonsMatched(int numIonsMatched) {
-        this.numIonsMatched = numIonsMatched;
-    }
-
-    /**
-     * @return the numIonsPredicted
-     */
-    public int getNumIonsPredicted() {
-        return numIonsPredicted;
-    }
-
-    /**
-     * @param numPredictedIons the numPredictedIons to set
-     */
-    public void setNumIonsPredicted(int numPredictedIons) {
-        this.numIonsPredicted = numPredictedIons;
-    }
-
-    
     // ----------------------------------------------------------------------------------------
     // Validation status for this result
     // ----------------------------------------------------------------------------------------
@@ -144,11 +97,6 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
     public void setValidationStatus(ValidationStatus validationStatus) {
         this.validationStatus = validationStatus;
     }
-
-//    public void setValidationStatusString(String status) {
-//        if (status != null && status.length() > 0)
-//            this.validationStatus = ValidationStatus.instance(Character.valueOf(status.charAt(0)));
-//    }
 
     public ValidationStatus getValidationStatus() {
         return validationStatus;

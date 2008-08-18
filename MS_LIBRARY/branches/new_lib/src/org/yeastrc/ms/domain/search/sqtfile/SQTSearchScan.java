@@ -3,13 +3,13 @@ package org.yeastrc.ms.domain.search.sqtfile;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
 
 public interface SQTSearchScan extends SQTSearchScanBase {
 
     public abstract int getScanNumber();
     
-    public abstract List<SQTSearchResult> getScanResults();
+    public abstract List<SequestRunSearchResult> getScanResults();
 
 }
 

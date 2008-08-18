@@ -14,9 +14,9 @@ import java.util.Map;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAO;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultScoresDb;
 
@@ -27,10 +27,10 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  */
 public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchResultDAO {
 
-    private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
+    private MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao;
     
     public SQTSearchResultDAOImpl(SqlMapClient sqlMap,
-            MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao) {
+            MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao) {
         super(sqlMap);
         this.resultDao = resultDao;
     }
@@ -39,7 +39,7 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
         return (SQTSearchResultDb) queryForObject("SqtResult.select", resultId);
     }
     
-    public int save(SQTSearchResult sqtResult, int searchId, int scanId) {
+    public int save(SequestRunSearchResult sqtResult, int searchId, int scanId) {
         
         // first save the base result
         int resultId = resultDao.save(sqtResult, searchId, scanId);
@@ -51,7 +51,7 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
     }
     
     @Override
-    public int saveResultOnly(SQTSearchResult searchResult, int searchId,
+    public int saveResultOnly(SequestRunSearchResult searchResult, int searchId,
             int scanId) {
         int resultId = resultDao.saveResultOnly(searchResult, searchId, scanId);
         
@@ -63,7 +63,7 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
     }
     
     @Override
-    public void saveSqtResultOnly(SQTSearchResult searchResult, int resultId) {
+    public void saveSqtResultOnly(SequestRunSearchResult searchResult, int resultId) {
         // now save the SQT specific information
         SQTSearchResultSqlMapParam resultDb = new SQTSearchResultSqlMapParam(resultId, searchResult);
         save("SqtResult.insert", resultDb);
@@ -124,9 +124,9 @@ public class SQTSearchResultDAOImpl extends BaseSqlMapDAO implements SQTSearchRe
     public class SQTSearchResultSqlMapParam {
         
         private int resultId;
-        private SQTSearchResult result;
+        private SequestRunSearchResult result;
         
-        public SQTSearchResultSqlMapParam(int resultId, SQTSearchResult result) {
+        public SQTSearchResultSqlMapParam(int resultId, SequestRunSearchResult result) {
             this.resultId = resultId;
             this.result = result;
         }

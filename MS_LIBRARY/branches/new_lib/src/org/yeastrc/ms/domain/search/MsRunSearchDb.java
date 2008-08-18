@@ -6,14 +6,11 @@
  */
 package org.yeastrc.ms.domain.search;
 
-import java.util.List;
-
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
 
 /**
  * 
  */
-public interface MsRunSearchDb extends MsRunSearchBase {
+public interface MsRunSearchDb extends MsRunSearch {
 
     /**
      * @return database id of the run on which this search was done.
@@ -29,24 +26,5 @@ public interface MsRunSearchDb extends MsRunSearchBase {
      * @return database id of this search
      */
     public abstract int getId();
-
-    /**
-     * @return the searchDatabases
-     */
-    public abstract List<MsSearchDatabaseDb> getSearchDatabases();
-
-    /**
-     * @return the staticModifications
-     */
-    public abstract List<MsSearchModificationDb> getStaticModifications();
-
-    /**
-     * @return the dynamicModifications
-     */
-    public abstract List<MsSearchModificationDb> getDynamicModifications();
     
-    /**
-     * @return the enzymes used for this search
-     */
-    public abstract List<MsEnzymeDb> getEnzymeList();
 }

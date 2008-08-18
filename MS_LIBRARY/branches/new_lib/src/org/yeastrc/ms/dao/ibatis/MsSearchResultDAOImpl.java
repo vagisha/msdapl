@@ -10,8 +10,8 @@ import org.yeastrc.ms.dao.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.MsSearchResultDAO;
 import org.yeastrc.ms.dao.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
@@ -24,7 +24,7 @@ import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 public class MsSearchResultDAOImpl extends BaseSqlMapDAO 
-        implements MsSearchResultDAO<MsSearchResult, MsSearchResultDb> {
+        implements MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> {
 
     private MsSearchResultProteinDAO matchDao;
     private MsSearchModificationDAO modDao;
@@ -36,8 +36,8 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         this.modDao =  modDao;
     }
 
-    public MsSearchResultDb load(int id) {
-        return (MsSearchResultDb) queryForObject("MsSearchResult.select", id);
+    public MsRunSearchResultDb load(int id) {
+        return (MsRunSearchResultDb) queryForObject("MsSearchResult.select", id);
     }
     
     public List<Integer> loadResultIdsForSearch(int searchId) {
@@ -52,7 +52,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForSearchScanCharge", map);
     }
     
-    public int save(MsSearchResult searchResult, int searchId, int scanId) {
+    public int save(MsRunSearchResult searchResult, int searchId, int scanId) {
         
         int resultId = saveResultOnly(searchResult, searchId, scanId);
         
@@ -67,7 +67,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return resultId;
     }
     
-    public int saveResultOnly(MsSearchResult searchResult, int searchId, int scanId) {
+    public int saveResultOnly(MsRunSearchResult searchResult, int searchId, int scanId) {
 
         MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(searchId, scanId, searchResult);
         return saveAndReturnId("MsSearchResult.insert", resultDb);
@@ -105,13 +105,13 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     /**
      * Convenience class for encapsulating searchId, scanId and search result
      */
-    public class MsSearchResultSqlMapParam implements MsSearchResult {
+    public class MsSearchResultSqlMapParam implements MsRunSearchResult {
 
         private int searchId;
         private int scanId;
-        private MsSearchResult result;
+        private MsRunSearchResult result;
         
-        public MsSearchResultSqlMapParam(int searchId, int scanId, MsSearchResult result) {
+        public MsSearchResultSqlMapParam(int searchId, int scanId, MsRunSearchResult result) {
             this.searchId = searchId;
             this.scanId = scanId;
             this.result = result;

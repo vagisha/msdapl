@@ -1,11 +1,11 @@
-package org.yeastrc.ms.domain.search.sqtfile.impl;
+package org.yeastrc.ms.domain.search.sequest.impl;
 
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.impl.MsSearchResultDbImpl;
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResultDb;
 
-public class SQTSearchResultDbImpl extends MsSearchResultDbImpl implements SQTSearchResultDb {
+public class SequestRunSearchResultDbImpl extends MsSearchResultDbImpl implements SequestRunSearchResultDb {
 
     private int resultId; 
     private int xCorrRank;
@@ -13,8 +13,15 @@ public class SQTSearchResultDbImpl extends MsSearchResultDbImpl implements SQTSe
     private BigDecimal deltaCN;
     private BigDecimal xCorr;
     private BigDecimal sp;
+    private double evalue;
     
-    public SQTSearchResultDbImpl() {}
+    private BigDecimal calculatedMass;
+    
+    private int predictedIons;
+    private int matchingIons;
+    
+    
+    public SequestRunSearchResultDbImpl() {}
     
     /**
      * @return the resultId
@@ -88,5 +95,40 @@ public class SQTSearchResultDbImpl extends MsSearchResultDbImpl implements SQTSe
      */
     public void setSp(BigDecimal sp) {
         this.sp = sp;
+    }
+    
+    public double geteValue() {
+        return evalue;
+    }
+    
+    public void seteValue(double evalue) {
+        this.evalue = evalue;
+    }
+
+    @Override
+    public BigDecimal getCalculatedMass() {
+        return calculatedMass;
+    }
+
+    public void setCalculatedMass(BigDecimal calculatedMass) {
+        this.calculatedMass = calculatedMass;
+    }
+    
+    @Override
+    public int getMatchingIons() {
+        return this.matchingIons;
+    }
+
+    public void setMatchingIons(int matchingIons) {
+        this.matchingIons = matchingIons;
+    }
+    
+    @Override
+    public int getPredictedIons() {
+        return predictedIons;
+    }
+    
+    public void setPredictedIons() {
+        this.predictedIons = predictedIons;
     }
 }

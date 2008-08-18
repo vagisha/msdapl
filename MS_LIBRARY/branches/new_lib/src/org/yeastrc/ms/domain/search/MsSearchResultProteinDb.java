@@ -10,7 +10,7 @@ package org.yeastrc.ms.domain.search;
 /**
  * 
  */
-public interface MsSearchResultProteinDb extends MsSearchResultProtein {
+public interface MsSearchResultProteinDb {
 
     /**
      * @return database id of the search result this protein matches.
@@ -21,4 +21,9 @@ public interface MsSearchResultProteinDb extends MsSearchResultProtein {
      * @return database id of this protein match
      */
     public abstract int getId();
+    
+    /**
+     * @return database id of the protein (from the NR_SEQ database).
+     */
+    public abstract int getProteinId();
 }

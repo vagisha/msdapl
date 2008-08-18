@@ -7,8 +7,13 @@
 package org.yeastrc.ms.domain.search.impl;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.MsSearchModificationDb;
 
 /**
  * @param <MsRun>
@@ -23,6 +28,20 @@ public class MsSearchDbImpl implements MsSearchDb {
     private String serverDirectory;
     private String analysisProgramName;
     private String analysisProgramVersion;
+    
+    private List<? super MsSearchDatabaseDb> searchDatabases;
+    
+    private List<? super MsSearchModificationDb> staticModifications;
+    
+    private List<? super MsSearchModificationDb> dynamicModifications;
+    
+    private List<? super MsEnzymeDb> enzymes;
+    
+    public MsSearchDbImpl() {
+        searchDatabases = new ArrayList<MsSearchDatabaseDb>();
+        staticModifications = new ArrayList<MsSearchModificationDb>();
+        dynamicModifications = new ArrayList<MsSearchModificationDb>();
+    }
     
     /**
      * @return the id
@@ -95,5 +114,74 @@ public class MsSearchDbImpl implements MsSearchDb {
         return searchDate;
     }
     
+    //------------------------------------------------------------------------------------------------------
+    // database(s) used for the search
+    //------------------------------------------------------------------------------------------------------
+    public List<MsSearchDatabaseDb> getSearchDatabases() {
+        return (List<MsSearchDatabaseDb>) searchDatabases;
+    }
+
+    /**
+     * @param searchDatabases the searchDatabases to set
+     */
+    public void setSearchDatabases(List<? super MsSearchDatabaseDb> searchDatabases) {
+        this.searchDatabases = searchDatabases;
+    }
+
+    public void addSearchDatabase(MsSearchDatabaseDbImpl database) {
+        searchDatabases.add(database);
+    }
+
+    //------------------------------------------------------------------------------------------------------
+    // static modifications used for the search
+    //------------------------------------------------------------------------------------------------------
+    public List<MsSearchModificationDb> getStaticModifications() {
+        return (List<MsSearchModificationDb>) staticModifications;
+    }
+
+    /**
+     * @param staticModifications the staticModifications to set
+     */
+    public void setStaticModifications(List<? super MsSearchModificationDb> staticModifications) {
+        this.staticModifications = staticModifications;
+    }
+    
+    public void addStaticModification(MsSearchModificationDb mod) {
+        staticModifications.add(mod);
+    }
+
+    //------------------------------------------------------------------------------------------------------
+    // dynamic modifications used for the search
+    //------------------------------------------------------------------------------------------------------
+    public List<MsSearchModificationDb> getDynamicModifications() {
+        return (List<MsSearchModificationDb>) dynamicModifications;
+    }
+
+    /**
+     * @param dynamicModifications the dynamicModifications to set
+     */
+    public void setDynamicModifications(List<? super MsSearchModificationDb> dynamicModifications) {
+        this.dynamicModifications = dynamicModifications;
+    }
+    
+    public void addDynamicModification(MsSearchModificationDb mod) {
+        dynamicModifications.add(mod);
+    }
+
+    //------------------------------------------------------------------------------------------------------
+    // enzymes used for the search
+    //------------------------------------------------------------------------------------------------------
+    @Override
+    public List<MsEnzymeDb> getEnzymeList() {
+        return (List<MsEnzymeDb>) enzymes;
+    }
+    
+    public void addEnzyme(MsEnzymeDb enzyme) {
+        enzymes.add(enzyme);
+    }
+    
+    public void setEnzymeList(List<? super MsEnzymeDb> enzymes) {
+        this.enzymes = enzymes;
+    }
    
 }

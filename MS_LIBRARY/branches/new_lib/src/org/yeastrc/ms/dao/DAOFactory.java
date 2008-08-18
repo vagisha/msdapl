@@ -41,8 +41,8 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
@@ -93,7 +93,7 @@ public class DAOFactory {
     
     // DAOs for peptide search related objects
     private MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDAO;
-    private MsSearchResultDAO <MsSearchResult, MsSearchResultDb> searchResultDAO;
+    private MsSearchResultDAO <MsRunSearchResult, MsRunSearchResultDb> searchResultDAO;
     private MsSearchResultProteinDAO resultProteinDAO;
     private MsSearchModificationDAO modDAO;
     private MsSearchDatabaseDAO seqDbDao;
@@ -187,7 +187,7 @@ public class DAOFactory {
         return searchDAO;
     }
     
-    public MsSearchResultDAO <MsSearchResult, MsSearchResultDb> getMsSearchResultDAO() {
+    public MsSearchResultDAO <MsRunSearchResult, MsRunSearchResultDb> getMsSearchResultDAO() {
         return searchResultDAO;
     }
     

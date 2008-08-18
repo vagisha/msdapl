@@ -1,10 +1,9 @@
 package org.yeastrc.ms.domain.search;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 
-public interface MsSearchResult extends MsSearchResultBase {
+public interface MsRunSearchResult extends MsRunSearchResultBase {
 
     /**
      * @return the scan number for this result
@@ -23,27 +22,12 @@ public interface MsSearchResult extends MsSearchResultBase {
     
 }
 
-interface MsSearchResultBase {
+interface MsRunSearchResultBase {
     
     /**
      * @return the charge
      */
     public abstract int getCharge();
-
-    /**
-     * @return the calculatedMass
-     */
-    public abstract BigDecimal getCalculatedMass();
-
-    /**
-     * @return the numIonsMatched
-     */
-    public abstract int getNumIonsMatched();
-
-    /**
-     * @return the numPredictedIons
-     */
-    public abstract int getNumIonsPredicted();
 
     /**
      * @return the validationStatus

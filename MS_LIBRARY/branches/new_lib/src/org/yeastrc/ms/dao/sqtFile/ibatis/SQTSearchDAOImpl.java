@@ -15,7 +15,7 @@ import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -32,13 +32,13 @@ public class SQTSearchDAOImpl extends BaseSqlMapDAO
     private MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao;
     private SQTHeaderDAO headerDao;
     private SQTSearchScanDAO spectrumDao;
-    private MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao;
+    private MsSearchResultDAO<SequestRunSearchResult, SQTSearchResultDb> resultDao;
     
     public SQTSearchDAOImpl(SqlMapClient sqlMap,
             MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao,
             SQTHeaderDAO headerDao,
             SQTSearchScanDAO spectrumDao,
-            MsSearchResultDAO<SQTSearchResult, SQTSearchResultDb> resultDao) {
+            MsSearchResultDAO<SequestRunSearchResult, SQTSearchResultDb> resultDao) {
         super(sqlMap);
         this.searchDao = searchDao;
         this.headerDao = headerDao;

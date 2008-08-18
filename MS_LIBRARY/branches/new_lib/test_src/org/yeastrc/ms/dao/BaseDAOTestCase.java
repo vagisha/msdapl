@@ -38,8 +38,8 @@ import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.MsSearchModificationDb;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
@@ -58,7 +58,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
 
     protected MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-    protected MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = 
+    protected MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao = 
         DAOFactory.instance().getMsSearchResultDAO();
     protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
     protected MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
@@ -98,7 +98,7 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH RESULT
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchResult makeSearchResult(int searchId, int charge,String peptide, boolean addPrMatch, boolean addDynaMod) {
+    protected MsRunSearchResult makeSearchResult(int searchId, int charge,String peptide, boolean addPrMatch, boolean addDynaMod) {
 
         //!!------------ RESET the dynamic mod lookup table --------------------------------
         DynamicModLookupUtil.instance().reset();
@@ -153,7 +153,7 @@ public class BaseDAOTestCase extends TestCase {
         peptide.setDynamicModifications(resultDynaMods);
     }
 
-    protected void checkSearchResult(MsSearchResult input, MsSearchResultDb output) {
+    protected void checkSearchResult(MsRunSearchResult input, MsRunSearchResultDb output) {
         if(input.getCalculatedMass() != null)
             assertEquals(input.getCalculatedMass().doubleValue(), output.getCalculatedMass().doubleValue());
         assertEquals(input.getCharge(), output.getCharge());

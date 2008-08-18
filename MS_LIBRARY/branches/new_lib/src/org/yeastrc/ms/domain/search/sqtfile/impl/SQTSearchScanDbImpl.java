@@ -7,9 +7,7 @@
 package org.yeastrc.ms.domain.search.sqtfile.impl;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 
 /**
@@ -121,13 +119,6 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
      */
     public void setLowestSp(BigDecimal lowestSp) {
         this.lowestSp = lowestSp;
-    }
-    
-    /**
-     * This method is not implements for SQTSearchScanDbImpl
-     */
-    public List<SQTSearchResultDb> getScanResults() {
-        throw new UnsupportedOperationException("getScanResults is not supported by SQTSearchScanDbImpl");
     }
     
     @Override

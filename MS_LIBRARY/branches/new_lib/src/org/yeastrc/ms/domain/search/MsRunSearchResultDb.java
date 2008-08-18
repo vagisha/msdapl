@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * 
  */
-public interface MsSearchResultDb extends MsSearchResultBase {
+public interface MsRunSearchResultDb extends MsRunSearchResultBase {
 
     /**
-     * @return database id of the search this result belongs to.
+     * @return database id of the run search this result belongs to.
      */
-    public abstract int getSearchId();
+    public abstract int getRunSearchId();
     
     /**
      * @return database id of the scan for which this result was returned. 

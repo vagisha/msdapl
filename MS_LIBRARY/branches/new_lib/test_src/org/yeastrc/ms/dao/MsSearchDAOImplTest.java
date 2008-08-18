@@ -10,7 +10,7 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
@@ -62,8 +62,8 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         checkSearch(search_2, searchList.get(0));
         
         // add results for the search
-        MsSearchResult r1 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3
-        MsSearchResult r2 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3;
+        MsRunSearchResult r1 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3
+        MsRunSearchResult r2 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3;
         int r1_id = resultDao.save(r1, searchId_2, 2);
         int r2_id = resultDao.save(r2, searchId_2, 3);
         assertEquals(2, resultDao.loadResultIdsForSearch(searchId_2).size());

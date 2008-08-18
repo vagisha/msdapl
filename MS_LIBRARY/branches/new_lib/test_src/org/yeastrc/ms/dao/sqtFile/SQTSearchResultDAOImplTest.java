@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultTest;
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 
 public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
@@ -49,7 +49,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         // make sure everything got saved
         assertNotNull(resultDao.load(resultId));
         SQTSearchResultDb sqtResult_db = sqtResDao.load(resultId);
-        assertEquals(sqtResult_db.getSearchId(), 1);
+        assertEquals(sqtResult_db.getRunSearchId(), 1);
         assertEquals(resultId, sqtResult_db.getId());
         checkSearchResult(result, sqtResult_db);
         
@@ -61,7 +61,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sqtResDao.load(resultId));
     }
     
-    private void checkSearchResult(SQTSearchResult input, SQTSearchResultDb output) {
+    private void checkSearchResult(SequestRunSearchResult input, SQTSearchResultDb output) {
         super.checkSearchResult(input, output);
         assertEquals(input.getDeltaCN().doubleValue(), output.getDeltaCN().doubleValue());
         assertEquals(input.getSp().doubleValue(), output.getSp().doubleValue());
@@ -85,7 +85,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 
         return result;
     }
-    public static final class SQTSearchResultTest extends MsSearchResultTest implements SQTSearchResult {
+    public static final class SQTSearchResultTest extends MsSearchResultTest implements SequestRunSearchResult {
 
         private BigDecimal deltaCN;
         private int spRank;

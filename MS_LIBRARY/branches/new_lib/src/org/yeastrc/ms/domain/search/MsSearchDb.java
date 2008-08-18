@@ -7,11 +7,14 @@
 package org.yeastrc.ms.domain.search;
 
 import java.sql.Date;
+import java.util.List;
+
+import org.yeastrc.ms.domain.general.MsEnzymeDb;
 
 /**
  * 
  */
-public interface MsSearchDb extends MsSearch {
+public interface MsSearchDb extends MsSearchBase {
 
     /**
      * @return the database id for this search
@@ -22,4 +25,24 @@ public interface MsSearchDb extends MsSearch {
      * @return the date this search was uploaded
      */
     public abstract Date getUploadDate();
+    
+    /**
+     * @return the searchDatabases
+     */
+    public abstract List<MsSearchDatabaseDb> getSearchDatabases();
+
+    /**
+     * @return the staticModifications
+     */
+    public abstract List<MsSearchModificationDb> getStaticModifications();
+
+    /**
+     * @return the dynamicModifications
+     */
+    public abstract List<MsSearchModificationDb> getDynamicModifications();
+    
+    /**
+     * @return the enzymes used for this search
+     */
+    public abstract List<MsEnzymeDb> getEnzymeList();
 }

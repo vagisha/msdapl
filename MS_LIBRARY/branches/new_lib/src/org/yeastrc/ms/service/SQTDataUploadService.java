@@ -26,13 +26,13 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultModification;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsSearchModification.ModificationType;
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultScoresDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
@@ -113,7 +113,7 @@ public class SQTDataUploadService {
             uploadSearchScan(scan, uploadedSearchId, scanId); 
 
             // save all the search results for this scan
-            for (SQTSearchResult result: scan.getScanResults()) {
+            for (SequestRunSearchResult result: scan.getScanResults()) {
                 uploadSearchResult(result, uploadedSearchId, scanId);
                 numResults++;
                 numProteins += result.getProteinMatchList().size();
@@ -160,9 +160,9 @@ public class SQTDataUploadService {
         spectrumDataDao.save(scan, searchId, scanId);
     }
     
-    private int uploadSearchResult(SQTSearchResult result, int searchId, int scanId) {
+    private int uploadSearchResult(SequestRunSearchResult result, int searchId, int scanId) {
         
-        MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
+        MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
         int resultId = resultDao.saveResultOnly(result, searchId, scanId);
         
         // upload dynamic mods for this result
@@ -177,7 +177,7 @@ public class SQTDataUploadService {
         return resultId;
     }
 
-    private void uploadProteinMatches(SQTSearchResult result, int resultId) {
+    private void uploadProteinMatches(SequestRunSearchResult result, int resultId) {
         // upload the protein matches if the cache has enough entries
         if (proteinMatchList.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();
@@ -194,7 +194,7 @@ public class SQTDataUploadService {
         proteinMatchList.clear();
     }
     
-    private void uploadResultMods(SQTSearchResult result, int resultId, int searchId) {
+    private void uploadResultMods(SequestRunSearchResult result, int resultId, int searchId) {
         // upload the result dynamic modifications if the cache has enough entries
         if (resultModList.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();
@@ -215,7 +215,7 @@ public class SQTDataUploadService {
         resultModList.clear();
     }
     
-    private void uploadSQTResult(SQTSearchResult result, int resultId) {
+    private void uploadSQTResult(SequestRunSearchResult result, int resultId) {
         // upload the SQT file specific result information if the cache has enough entries
         if (sqtResultScoresList.size() >= BUF_SIZE) {
             uploadSqtResultBuffer();

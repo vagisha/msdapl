@@ -25,8 +25,8 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
+import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -42,11 +42,11 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO
 
     private MsSearchDatabaseDAO seqDbDao;
     private MsSearchModificationDAO modDao;
-    private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
+    private MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao;
     private MsEnzymeDAO enzymeDao;
     
     public MsSearchDAOImpl(SqlMapClient sqlMap, 
-            MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao,
+            MsSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao,
             MsSearchDatabaseDAO seqDbDao,
             MsSearchModificationDAO modDao,
             MsEnzymeDAO enzymeDao) {

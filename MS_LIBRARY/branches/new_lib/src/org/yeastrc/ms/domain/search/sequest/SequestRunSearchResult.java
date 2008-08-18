@@ -1,18 +1,14 @@
-/**
- * SQTSearchResultScores.java
- * @author Vagisha Sharma
- * Jul 20, 2008
- * @version 1.0
- */
 package org.yeastrc.ms.domain.search.sequest;
 
 import java.math.BigDecimal;
 
-/**
- * 
- */
-public interface SQTSearchResultScores {
+import org.yeastrc.ms.domain.search.MsRunSearchResult;
 
+public interface SequestRunSearchResult extends MsRunSearchResult, SequestRunSearchResultBase {
+    
+}
+
+interface SequestRunSearchResultBase {
     /**
      * @return the xCorrRank
      */
@@ -37,4 +33,15 @@ public interface SQTSearchResultScores {
      * @return the sp
      */
     public abstract BigDecimal getSp();
+
+    /**
+     * @return the e-value
+     */
+    public abstract double geteValue();
+
+    public abstract BigDecimal getCalculatedMass();
+
+    public abstract int getMatchingIons();
+
+    public abstract int getPredictedIons();
 }
