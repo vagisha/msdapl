@@ -11,5 +11,5 @@ package org.yeastrc.ms.domain.search;
  */
 public interface MsResidueModification extends MsModification {
 
-    public char getModifiedResidue();
+    public abstract char getModifiedResidue();
 }

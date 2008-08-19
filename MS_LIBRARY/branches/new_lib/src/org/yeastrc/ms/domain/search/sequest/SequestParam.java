@@ -11,9 +11,9 @@ package org.yeastrc.ms.domain.search.sequest;
  */
 public interface SequestParam {
 
-    public abstract String paramName();
+    public abstract String getParamName();
     
-    public abstract String paramValue();
+    public abstract String getParamValue();
     
 }
 

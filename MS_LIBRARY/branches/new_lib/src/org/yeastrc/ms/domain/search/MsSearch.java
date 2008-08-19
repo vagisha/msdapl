@@ -24,12 +24,12 @@ public interface MsSearch extends MsSearchBase {
     /**
      * @return the staticModifications
      */
-    public abstract List<MsSearchModification> getStaticModifications();
+    public abstract List<MsResidueModification> getStaticModifications();
 
     /**
      * @return the dynamicModifications
      */
-    public abstract List<MsSearchModification> getDynamicModifications();
+    public abstract List<MsResidueModification> getDynamicModifications();
     
     /**
      * @return the enzymes used for this search

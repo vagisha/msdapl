@@ -14,5 +14,5 @@ public interface MsTerminalModification extends MsModification {
 
     public enum Terminal {CTERM, NTERM};
     
-    public Terminal modifiedTerminal();
+    public Terminal getModifiedTerminal();
 }

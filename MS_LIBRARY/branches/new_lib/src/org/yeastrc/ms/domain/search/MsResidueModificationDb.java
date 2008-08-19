@@ -13,5 +13,5 @@ public interface MsResidueModificationDb extends MsResidueModification {
     
     public abstract int getId();
     
-    public abstract int gerSearchId();
+    public abstract int getSearchId();
 }

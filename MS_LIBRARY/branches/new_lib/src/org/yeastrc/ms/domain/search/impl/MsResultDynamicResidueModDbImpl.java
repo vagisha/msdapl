@@ -2,24 +2,23 @@ package org.yeastrc.ms.domain.search.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsSearchResultDynamicModDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
 
 
 
-public class MsSearchResultDynamicModDbImpl implements MsSearchResultDynamicModDb {
+public class MsResultDynamicResidueModDbImpl implements MsResultDynamicResidueModDb {
 
     private int modId;
     private int resultId;
     private int modPosition;
     private char modifiedResidue;
     private BigDecimal modificationMass;
-    private char modificationSymbol = nullCharacter;
-
+    private char modificationSymbol;
     
     /**
      * @return the modId
      */
-    public int getModificationId() {
+    public int getModification() {
         return modId;
     }
     /**
@@ -65,23 +64,6 @@ public class MsSearchResultDynamicModDbImpl implements MsSearchResultDynamicModD
         this.modifiedResidue = modifiedResidue;
     }
 
-    /**
-     * JDBC does not understand Character, so we need to return a String
-     * @return
-     */
-    public String getModifiedResidueString() {
-        return Character.toString(modifiedResidue);
-    }
-
-    /**
-     * JDBC does not understand Character so we will get the value as String
-     * @param modifiedResidue
-     */
-    public void setModifiedResidueString(String modifiedResidue) {
-        if (modifiedResidue.length() > 0)
-            this.modifiedResidue = modifiedResidue.charAt(0);
-    }
-
     public BigDecimal getModificationMass() {
         return modificationMass;
     }
@@ -102,26 +84,6 @@ public class MsSearchResultDynamicModDbImpl implements MsSearchResultDynamicModD
      */
     public void setModificationSymbol(char modificationSymbol) {
         this.modificationSymbol = modificationSymbol;
-    }
-    
-    /**
-     * JDBC does not understand Character, so we need to return a String
-     * @return
-     */
-    public String getModificationSymbolString() {
-        return Character.toString(modificationSymbol);
-    }
-    /**
-     * JDBC does not understand Character so we will get the value as String
-     * @param modificationSymbol
-     */
-    public void setModificationSymbolString(String modificationSymbol) {
-        if (modificationSymbol.length() > 0)
-            this.modificationSymbol = modificationSymbol.charAt(0);
-    }
-    
-    public ModificationType getModificationType() {
-        return ModificationType.DYNAMIC;
     }
 
 }

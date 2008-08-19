@@ -3,26 +3,28 @@ package org.yeastrc.ms.dao.search;
 import java.util.List;
 
 import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsSearchResultModSqlMapParam;
-import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsSearchModificationDb;
-import org.yeastrc.ms.domain.search.MsSearchResultDynamicModDb;
-import org.yeastrc.ms.domain.search.MsSearchResultModification;
+import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
 
 public interface MsSearchModificationDAO {
 
     //-------------------------------------------------------------------------------------------
     // Modifications associated with a search
     //-------------------------------------------------------------------------------------------
-    public abstract List<MsSearchModificationDb> loadStaticModificationsForSearch(int searchId);
+    public abstract List<MsResidueModificationDb> loadStaticModificationsForSearch(int searchId);
 
-    public abstract void saveStaticModification(MsSearchModification mod, int searchId);
+    public abstract void saveStaticModification(MsResidueModification mod, int searchId);
 
     public abstract void deleteStaticModificationsForSearch(int searchId);
 
-    public abstract List<MsSearchModificationDb> loadDynamicModificationsForSearch(int searchId);
+    public abstract List<MsResidueModificationDb> loadDynamicModificationsForSearch(int searchId);
 
-    public abstract int saveDynamicModification(MsSearchModification mod, int searchId);
+    public abstract int saveDynamicModification(MsResidueModification mod, int searchId);
 
+//    public abstract List<MsResidueModificationDb> loadDynamicModificationsForSearch(int searchId);
+//
+//    public abstract int saveDynamicModification(MsResidueModification mod, int searchId);
     
     /**
      * This will delete all dynamic modifications for a search.
@@ -36,10 +38,10 @@ public interface MsSearchModificationDAO {
     // Modifications (dynamic only) associated with a search result
     //-------------------------------------------------------------------------------------------
     
-    public abstract List<MsSearchResultDynamicModDb> loadDynamicModificationsForSearchResult(
+    public abstract List<MsResultDynamicResidueModDb> loadDynamicModificationsForSearchResult(
             int resultId);
     
-    public abstract void saveDynamicModificationForSearchResult(MsSearchResultModification mod, 
+    public abstract void saveDynamicModificationForSearchResult(MsResultDynamicResidueModDb mod, 
             int resultId, int modificationId);
 
     public abstract void saveAllDynamicModificationForSearchResult(List<MsSearchResultModSqlMapParam> modList);

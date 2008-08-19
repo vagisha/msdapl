@@ -18,4 +18,6 @@ public interface MsResultDynamicResidueMod {
     public abstract BigDecimal getModificationMass();
 
     public abstract char getModificationSymbol();
+    
+    public abstract int getModifiedPosition();
 }

@@ -50,7 +50,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNotNull(resultDao.load(resultId));
         SQTSearchResultDb sqtResult_db = sqtResDao.load(resultId);
         assertEquals(sqtResult_db.getRunSearchId(), 1);
-        assertEquals(resultId, sqtResult_db.getId());
+        assertEquals(resultId, sqtResult_db.getModification());
         checkSearchResult(result, sqtResult_db);
         
         
