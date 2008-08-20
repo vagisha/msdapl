@@ -17,7 +17,7 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
-import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsSearchResultModSqlMapParam;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsResultResidueModSqlMapParam;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultProteinDAOImpl.MsResultProteinSqlMapParam;
 import org.yeastrc.ms.dao.search.sequest.SequestRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
@@ -58,13 +58,13 @@ public class SQTDataUploadService {
     // these are the things we will cache and do bulk-inserts
     List<MsSearchResultProteinDb> proteinMatchList; // protein matches
     List<SQTSearchResultScoresDb> sqtResultScoresList; // sequest scores
-    List<MsSearchResultModSqlMapParam> resultModList; // dynamic modifications
+    List<MsResultResidueModSqlMapParam> resultModList; // dynamic modifications
     
     
     public SQTDataUploadService() {
         proteinMatchList = new ArrayList<MsSearchResultProteinDb>();
         sqtResultScoresList = new ArrayList<SQTSearchResultScoresDb>();
-        resultModList = new ArrayList<MsSearchResultModSqlMapParam>();
+        resultModList = new ArrayList<MsResultResidueModSqlMapParam>();
     }
     
     /**
@@ -200,18 +200,18 @@ public class SQTDataUploadService {
             uploadProteinMatchBuffer();
         }
         // add the dynamic modifications for this result to the cache
-        for (MsSearchResultModification mod: result.getResultPeptide().getDynamicModifications()) {
+        for (MsSearchResultModification mod: result.getResultPeptide().getResidueDynamicModifications()) {
             if (mod == null || mod.getModificationType() == ModificationType.STATIC)
                 continue;
-            int modId = DynamicModLookupUtil.instance().getDynamicModificationId(searchId, 
+            int modId = DynamicModLookupUtil.instance().getDynamicResidueModificationId(searchId, 
                     mod.getModifiedResidue(), mod.getModificationMass());
-            resultModList.add(new MsSearchResultModSqlMapParam(resultId, modId, mod.getModifiedPosition()));
+            resultModList.add(new MsResultResidueModSqlMapParam(resultId, modId, mod.getModifiedPosition()));
         }
     }
 
     private void uploadResultModBuffer() {
         MsSearchModificationDAO modDao = daoFactory.getMsSearchModDAO();
-        modDao.saveAllDynamicModificationForSearchResult(resultModList);
+        modDao.saveAllDynamicResidueModsForResult(resultModList);
         resultModList.clear();
     }
     

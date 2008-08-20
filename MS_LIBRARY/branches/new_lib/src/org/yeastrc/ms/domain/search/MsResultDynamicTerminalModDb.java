@@ -1,7 +1,7 @@
 /**
- * MsResultDynamicResidueModDb.java
+ * MsResultDynamicTerminalModDb.java
  * @author Vagisha Sharma
- * Aug 18, 2008
+ * Aug 19, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.domain.search;
@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.search;
 /**
  * 
  */
-public interface MsResultDynamicResidueModDb extends MsResultDynamicResidueMod {
+public interface MsResultDynamicTerminalModDb extends MsTerminalModification {
 
     /**
      * @return database id of the modification which appears in the peptide sequence of the result

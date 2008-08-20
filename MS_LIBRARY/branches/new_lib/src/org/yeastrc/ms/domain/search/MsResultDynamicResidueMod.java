@@ -6,18 +6,11 @@
  */
 package org.yeastrc.ms.domain.search;
 
-import java.math.BigDecimal;
 
 /**
  * 
  */
-public interface MsResultDynamicResidueMod {
+public interface MsResultDynamicResidueMod extends MsResidueModification {
 
-    public char getModifiedResidue();
-    
-    public abstract BigDecimal getModificationMass();
-
-    public abstract char getModificationSymbol();
-    
     public abstract int getModifiedPosition();
 }

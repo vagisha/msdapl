@@ -2,30 +2,32 @@ package org.yeastrc.ms.dao.search;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsSearchResultModSqlMapParam;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
 
 public interface MsSearchModificationDAO {
 
     //-------------------------------------------------------------------------------------------
-    // Modifications associated with a search
+    // Modifications associated with a search (STATIC RESIDUE) 
     //-------------------------------------------------------------------------------------------
-    public abstract List<MsResidueModificationDb> loadStaticModificationsForSearch(int searchId);
+    public abstract List<MsResidueModificationDb> loadStaticResidueModsForSearch(int searchId);
 
-    public abstract void saveStaticModification(MsResidueModification mod, int searchId);
+    public abstract void saveStaticResidueMod(MsResidueModification mod, int searchId);
 
-    public abstract void deleteStaticModificationsForSearch(int searchId);
+    public abstract void deleteStaticResidueModsForSearch(int searchId);
 
-    public abstract List<MsResidueModificationDb> loadDynamicModificationsForSearch(int searchId);
+    //-------------------------------------------------------------------------------------------
+    // Modifications associated with a search (DYNAMIC RESIDUE) 
+    //-------------------------------------------------------------------------------------------
+    public abstract List<MsResidueModificationDb> loadDynamicResidueModsForSearch(int searchId);
 
-    public abstract int saveDynamicModification(MsResidueModification mod, int searchId);
+    public abstract int saveDynamicResidueMod(MsResidueModification mod, int searchId);
 
-//    public abstract List<MsResidueModificationDb> loadDynamicModificationsForSearch(int searchId);
-//
-//    public abstract int saveDynamicModification(MsResidueModification mod, int searchId);
-    
     /**
      * This will delete all dynamic modifications for a search.
      * If any of the modifications are related to results from the search 
@@ -34,18 +36,48 @@ public interface MsSearchModificationDAO {
      */
     public abstract void deleteDynamicModificationsForSearch(int searchId);
     
-    //-------------------------------------------------------------------------------------------
-    // Modifications (dynamic only) associated with a search result
-    //-------------------------------------------------------------------------------------------
     
-    public abstract List<MsResultDynamicResidueModDb> loadDynamicModificationsForSearchResult(
-            int resultId);
+    //-------------------------------------------------------------------------------------------
+    // Modifications associated with a search (STATIC TERMINAL) 
+    //-------------------------------------------------------------------------------------------
+    public abstract List<MsTerminalModificationDb> loadStaticTerminalModsForSearch(int searchId);
+
+    public abstract int saveStaticTerminalMod(MsTerminalModification mod, int searchId);
+
+    public abstract void deleteStaticTerminalModsForSearch(int searchId);
     
-    public abstract void saveDynamicModificationForSearchResult(MsResultDynamicResidueModDb mod, 
+    
+    //-------------------------------------------------------------------------------------------
+    // Modifications associated with a search (DYNAMIC TERMINAL) 
+    //-------------------------------------------------------------------------------------------
+    public abstract List<MsTerminalModificationDb> loadDynamicTerminalModsForSearch(int searchId);
+
+    public abstract int saveDynamicTerminalMod(MsTerminalModification mod, int searchId);
+
+    public abstract void deleteDynamicTerminalModsForSearch(int searchId);
+    
+    
+    //-------------------------------------------------------------------------------------------
+    // Modifications associated with a search result (DYNAMIC RESIDUE)
+    //-------------------------------------------------------------------------------------------
+    public abstract List<MsResultDynamicResidueModDb> loadDynamicResidueModsForResult(int resultId);
+    
+    public abstract void saveDynamicResidueModForResult(MsResultDynamicResidueMod mod, 
             int resultId, int modificationId);
 
-    public abstract void saveAllDynamicModificationForSearchResult(List<MsSearchResultModSqlMapParam> modList);
+    public abstract void saveAllDynamicResidueModsForResult(List<MsResultDynamicResidueModDb> modList);
     
-    public void deleteDynamicModificationsForResult(int resultId);
+    public void deleteDynamicResidueModsForResult(int resultId);
+    
+    //-------------------------------------------------------------------------------------------
+    // Modifications associated with a search result (DYNAMIC TERMINAL)
+    //-------------------------------------------------------------------------------------------
+    public abstract List<MsResultDynamicTerminalModDb> loadDynamicTerminalModsForResult(int resultId);
+    
+    public abstract void saveDynamicTerminalModForResult(int resultId, int modificationId);
 
+    public abstract void saveAllDynamicTerminalModsForResult(List<MsResultDynamicTerminalModDb> modList);
+    
+    public void deleteDynamicTerminalModsForResult(int resultId);
+    
 }

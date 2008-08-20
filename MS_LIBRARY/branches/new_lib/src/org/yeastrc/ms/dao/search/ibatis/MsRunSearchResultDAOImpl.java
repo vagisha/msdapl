@@ -10,13 +10,13 @@ import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearchResult;
 import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
-import org.yeastrc.ms.domain.search.MsSearchResultModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.ValidationStatus;
-import org.yeastrc.ms.domain.search.MsSearchModification.ModificationType;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -75,12 +75,27 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
 
     void saveDynamicModsForResult(int searchId, int resultId, MsSearchResultPeptide peptide) {
         
-        for (MsSearchResultModification mod: peptide.getDynamicModifications()) {
-            if (mod == null || mod.getModificationType() == ModificationType.STATIC)
+        saveDynamicResidueMods(searchId, resultId, peptide);
+        saveDynamicTerminalMods(searchId, resultId, peptide);
+    }
+
+    private void saveDynamicResidueMods(int searchId, int resultId,
+            MsSearchResultPeptide peptide) {
+        for (MsResultDynamicResidueMod mod: peptide.getResidueDynamicModifications()) {
+            if (mod == null)
                 continue;
-            int modId = DynamicModLookupUtil.instance().getDynamicModificationId(searchId, 
-                    mod.getModifiedResidue(), mod.getModificationMass());
-            modDao.saveDynamicModificationForSearchResult(mod, resultId, modId);
+            int modId = DynamicModLookupUtil.instance().getDynamicResidueModificationId(searchId, mod);
+            modDao.saveDynamicResidueModForResult(mod, resultId, modId);
+        }
+    }
+    
+    private void saveDynamicTerminalMods(int searchId, int resultId,
+            MsSearchResultPeptide peptide) {
+        for (MsTerminalModification mod: peptide.getTerminalDynamicModifications()) {
+            if (mod == null)
+                continue;
+            int modId = DynamicModLookupUtil.instance().getDynamicTerminalModificationId(searchId, mod);
+            modDao.saveDynamicTerminalModForResult(resultId, modId);
         }
     }
     

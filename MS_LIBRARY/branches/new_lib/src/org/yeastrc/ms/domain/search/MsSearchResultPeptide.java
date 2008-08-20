@@ -18,7 +18,7 @@ public interface MsSearchResultPeptide extends MsSearchResultPeptideBase {
      * Returns a list of dynamic modifications, along with the index (0-based) at which 
      * they are present, in the peptide sequence for this result.
      */
-    public abstract List<MsResultDynamicResidueMod> getDynamicModifications();
+    public abstract List<MsResultDynamicResidueMod> getResidueDynamicModifications();
     
     /**
      * Returns a list of terminal dynamic modifications.

@@ -513,7 +513,7 @@ public class SQTHeader implements SQTRunSearch {
     /**
      * @return the staticMods
      */
-    public List<MsSearchModification> getStaticModifications() {
+    public List<MsSearchModification> getStaticResidueMods() {
         if (staticMods == null)
             return new ArrayList<MsSearchModification>(0);
         return staticMods;

@@ -129,7 +129,7 @@ public class HeaderStaticModificationTest extends TestCase {
             fail("Valid static mod string");
         }
         
-        List<MsSearchModification> mods = header.getStaticModifications();
+        List<MsSearchModification> mods = header.getStaticResidueMods();
         assertEquals(3, mods.size());
 
         int i = 0; 

@@ -18,7 +18,7 @@ public class MsResultDynamicResidueModDbImpl implements MsResultDynamicResidueMo
     /**
      * @return the modId
      */
-    public int getModification() {
+    public int getModificationId() {
         return modId;
     }
     /**

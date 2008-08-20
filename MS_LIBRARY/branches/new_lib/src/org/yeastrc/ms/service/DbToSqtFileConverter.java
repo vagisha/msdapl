@@ -147,7 +147,7 @@ public class DbToSqtFileConverter {
     
     private List<MsSearchModification> getDynaModsForSearch(int dbSearchId) {
         MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicModificationsForSearch(dbSearchId);
+        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(dbSearchId);
         List<MsSearchModification> mods = new ArrayList<MsSearchModification>(dynaMods.size());
         for (MsSearchModificationDb mod: dynaMods) {
             mods.add(mod);

@@ -31,16 +31,16 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         MsSearchModification mod2_2 = makeStaticMod('Y', "54.3");
 
         // save them to the database
-        modDao.saveStaticModification(mod1_1, 1); // searchId = 1
-        modDao.saveStaticModification(mod1_2, 1);
-        modDao.saveStaticModification(mod2_1, 2); // searchId = 2
-        modDao.saveStaticModification(mod2_2, 2);
+        modDao.saveStaticResidueMod(mod1_1, 1); // searchId = 1
+        modDao.saveStaticResidueMod(mod1_2, 1);
+        modDao.saveStaticResidueMod(mod2_1, 2); // searchId = 2
+        modDao.saveStaticResidueMod(mod2_2, 2);
 
         // load them back
-        List<MsSearchModificationDb> modList1 = modDao.loadStaticModificationsForSearch(1);
+        List<MsSearchModificationDb> modList1 = modDao.loadStaticResidueModsForSearch(1);
         assertEquals(2, modList1.size());
 
-        List<MsSearchModificationDb> modList2 = modDao.loadStaticModificationsForSearch(2);
+        List<MsSearchModificationDb> modList2 = modDao.loadStaticResidueModsForSearch(2);
         assertEquals(2, modList2.size());
 
         // sort by id
@@ -55,12 +55,12 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
 
         // now delete the modifications
-        modDao.deleteStaticModificationsForSearch(1);
-        modList1 = modDao.loadStaticModificationsForSearch(1);
+        modDao.deleteStaticResidueModsForSearch(1);
+        modList1 = modDao.loadStaticResidueModsForSearch(1);
         assertEquals(0, modList1.size());
 
-        modDao.deleteStaticModificationsForSearch(2);
-        modList2 = modDao.loadStaticModificationsForSearch(2);
+        modDao.deleteStaticResidueModsForSearch(2);
+        modList2 = modDao.loadStaticResidueModsForSearch(2);
         assertEquals(0, modList2.size());
 
     }
@@ -110,15 +110,15 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         int searchId = 0;
         for (int i = 0; i < mods.length; i++) {
             searchId = i % 2  == 0 ? 2 : 1; // even numbers get a search id of 2; odd numbers get 1
-            modDao.saveDynamicModification(mods[i], searchId);
+            modDao.saveDynamicResidueMod(mods[i], searchId);
             searchId = searchId == 1 ? wid1++ : wid2++;
         }
 
         // read them back and make sure inserted values were accurate
-        List<MsSearchModificationDb> modList1 = modDao.loadDynamicModificationsForSearch(1);
+        List<MsSearchModificationDb> modList1 = modDao.loadDynamicResidueModsForSearch(1);
         assertEquals(2, modList1.size());
 
-        List<MsSearchModificationDb> modList2 = modDao.loadDynamicModificationsForSearch(2);
+        List<MsSearchModificationDb> modList2 = modDao.loadDynamicResidueModsForSearch(2);
         assertEquals(2, modList2.size());
 
         // sort them
@@ -140,11 +140,11 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
         // now delete the modifications
         modDao.deleteDynamicModificationsForSearch(1);
-        modList1 = modDao.loadDynamicModificationsForSearch(1);
+        modList1 = modDao.loadDynamicResidueModsForSearch(1);
         assertEquals(0, modList1.size());
 
         modDao.deleteDynamicModificationsForSearch(2);
-        modList2 = modDao.loadDynamicModificationsForSearch(2);
+        modList2 = modDao.loadDynamicResidueModsForSearch(2);
         assertEquals(0, modList2.size());
     }
 
@@ -160,10 +160,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
 
         // save them to the database
-        int mod1_1Id = modDao.saveDynamicModification(mods[0], 1); // searchId = 1
-        int mod1_2Id = modDao.saveDynamicModification(mods[1], 1);
-        int mod2_1Id = modDao.saveDynamicModification(mods[2], 2); // searchId = 2
-        int mod2_2Id = modDao.saveDynamicModification(mods[3], 2);
+        int mod1_1Id = modDao.saveDynamicResidueMod(mods[0], 1); // searchId = 1
+        int mod1_2Id = modDao.saveDynamicResidueMod(mods[1], 1);
+        int mod2_1Id = modDao.saveDynamicResidueMod(mods[2], 2); // searchId = 2
+        int mod2_2Id = modDao.saveDynamicResidueMod(mods[3], 2);
 
         // save some dynamic modifications for two search results
         MsSearchResultModification rmod1_1 = makeResultDynamicMod(residue[0], mass[0], symbol[0], 10);
@@ -171,15 +171,15 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         MsSearchResultModification rmod2_1 = makeResultDynamicMod(residue[2], mass[2], symbol[2], 1);
         MsSearchResultModification rmod2_2 = makeResultDynamicMod(residue[3], mass[3], symbol[3], 2);
         
-        modDao.saveDynamicModificationForSearchResult(rmod1_1, 3, getModId(1, mods[0])); // mod, resultId, modificationId
-        modDao.saveDynamicModificationForSearchResult(rmod1_2, 3, getModId(1, mods[1]));
-        modDao.saveDynamicModificationForSearchResult(rmod2_1, 4, getModId(2, mods[2]));
-        modDao.saveDynamicModificationForSearchResult(rmod2_2, 4, getModId(2, mods[3]));
+        modDao.saveDynamicResidueModForResult(rmod1_1, 3, getModId(1, mods[0])); // mod, resultId, modificationId
+        modDao.saveDynamicResidueModForResult(rmod1_2, 3, getModId(1, mods[1]));
+        modDao.saveDynamicResidueModForResult(rmod2_1, 4, getModId(2, mods[2]));
+        modDao.saveDynamicResidueModForResult(rmod2_2, 4, getModId(2, mods[3]));
 
         // load dynamic modifications for the two search results
-        List<MsSearchResultDynamicModDb> resultMods1 = modDao.loadDynamicModificationsForSearchResult(3);
+        List<MsSearchResultDynamicModDb> resultMods1 = modDao.loadDynamicResidueModsForResult(3);
         assertEquals(2, resultMods1.size());
-        List<MsSearchResultDynamicModDb> resultMods2 = modDao.loadDynamicModificationsForSearchResult(4);
+        List<MsSearchResultDynamicModDb> resultMods2 = modDao.loadDynamicResidueModsForResult(4);
         assertEquals(2, resultMods2.size());
 
 
@@ -199,21 +199,21 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
         // delete the search and result modification entries
         modDao.deleteDynamicModificationsForSearch(1);
-        assertEquals(0, modDao.loadDynamicModificationsForSearch(1).size());
-        assertEquals(0, modDao.loadDynamicModificationsForSearchResult(3).size());
+        assertEquals(0, modDao.loadDynamicResidueModsForSearch(1).size());
+        assertEquals(0, modDao.loadDynamicResidueModsForResult(3).size());
         // the other one should still be there
-        assertEquals(2, modDao.loadDynamicModificationsForSearch(2).size());
-        assertEquals(2, modDao.loadDynamicModificationsForSearchResult(4).size());
+        assertEquals(2, modDao.loadDynamicResidueModsForSearch(2).size());
+        assertEquals(2, modDao.loadDynamicResidueModsForResult(4).size());
 
         modDao.deleteDynamicModificationsForSearch(2);
-        assertEquals(0, modDao.loadDynamicModificationsForSearch(2).size());
-        assertEquals(0, modDao.loadDynamicModificationsForSearchResult(4).size());
+        assertEquals(0, modDao.loadDynamicResidueModsForSearch(2).size());
+        assertEquals(0, modDao.loadDynamicResidueModsForResult(4).size());
 
     }
 
     private int getModId(int searchId, MsSearchModification mod) {
         DynamicModLookupUtil util = DynamicModLookupUtil.instance();
-        return util.getDynamicModificationId(searchId, mod.getModifiedResidue(), mod.getModificationMass());
+        return util.getDynamicResidueModificationId(searchId, mod.getModifiedResidue(), mod.getModificationMass());
     }
 
     private void compareResultMods(MsSearchModification searchMod,

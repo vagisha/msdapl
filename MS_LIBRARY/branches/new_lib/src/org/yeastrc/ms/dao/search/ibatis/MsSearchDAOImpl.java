@@ -16,10 +16,11 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDb;
-import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -55,14 +56,24 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
             seqDbDao.saveSearchDatabase(seqDb, searchId);
         }
         
-        // save any static modifications used for the search
-        for (MsSearchModification staticMod: search.getStaticModifications()) {
-            modDao.saveStaticModification(staticMod, searchId);
+        // save any static residue modifications used for the search
+        for (MsResidueModification staticMod: search.getStaticResidueMods()) {
+            modDao.saveStaticResidueMod(staticMod, searchId);
         }
         
-        // save any dynamic modifications used for the search
-        for (MsSearchModification dynaMod: search.getDynamicModifications()) {
-            modDao.saveDynamicModification(dynaMod, searchId);
+        // save any dynamic residue modifications used for the search
+        for (MsResidueModification dynaMod: search.getDynamicResidueMods()) {
+            modDao.saveDynamicResidueMod(dynaMod, searchId);
+        }
+        
+        // save any static terminal modifications used for the search
+        for (MsTerminalModification staticMod: search.getStaticTerminalMods()) {
+            modDao.saveStaticTerminalMod(staticMod, searchId);
+        }
+        
+        // save any dynamic residue modifications used for the search
+        for (MsTerminalModification dynaMod: search.getDynamicTerminalMods()) {
+            modDao.saveDynamicTerminalMod(dynaMod, searchId);
         }
         
         // save any enzymes used for the search
@@ -70,7 +81,6 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
         for (MsEnzyme enzyme: enzymes) 
             // use the enzyme name attribute only to look for a matching enzyme.
             enzymeDao.saveEnzymeforSearch(enzyme, searchId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
-        
         
         return searchId;
     }

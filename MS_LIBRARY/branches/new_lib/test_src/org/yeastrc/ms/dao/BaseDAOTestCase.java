@@ -147,7 +147,7 @@ public class BaseDAOTestCase extends TestCase {
 
     protected void addResultDynamicModifications(MsSearchResultPeptideTest peptide, int searchId) {
 
-        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicModificationsForSearch(searchId);
+        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
 
         List<MsSearchResultModification> resultDynaMods = new ArrayList<MsSearchResultModification>(dynaMods.size());
         int pos = 1;
@@ -178,7 +178,7 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getPreResidue(), output.getPreResidue());
         assertEquals(input.getPostResidue(), output.getPostResidue());
         assertEquals(input.getSequenceLength(), output.getSequenceLength());
-        assertEquals(input.getDynamicModifications().size(), output.getDynamicModifications().size());
+        assertEquals(input.getResidueDynamicModifications().size(), output.getDynamicModifications().size());
     }
     
     //-----------------------------------------------------------------------------------------------------
@@ -356,8 +356,8 @@ public class BaseDAOTestCase extends TestCase {
     
     protected void checkSearch(MsRunSearch input, MsRunSearchDb output) {
         assertEquals(input.getSearchDatabases().size(), output.getSearchDatabases().size());
-        assertEquals(input.getStaticModifications().size(), output.getStaticModifications().size());
-        assertEquals(input.getDynamicModifications().size(), output.getDynamicModifications().size());
+        assertEquals(input.getStaticResidueMods().size(), output.getStaticResidueMods().size());
+        assertEquals(input.getDynamicResidueMods().size(), output.getDynamicResidueMods().size());
         assertEquals(input.getEnzymeList().size(), output.getEnzymeList().size());
         assertEquals(input.getFragmentMassTolerance().doubleValue(), output.getFragmentMassTolerance().doubleValue());
         assertEquals(input.getFragmentMassType(), output.getFragmentMassType());

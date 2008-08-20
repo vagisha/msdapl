@@ -24,27 +24,27 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         // modifications for searchId_1
         MsSearchModification mod1 = makeStaticMod('C', "50.0");
-        modDao.saveStaticModification(mod1, searchId_1);
+        modDao.saveStaticResidueMod(mod1, searchId_1);
         MsSearchModification mod2 = makeStaticMod('S', "80.0");
-        modDao.saveStaticModification(mod2, searchId_1);
+        modDao.saveStaticResidueMod(mod2, searchId_1);
         
         MsSearchModification dmod1 = makeDynamicMod('A', "10.0", '*');
-        modDao.saveDynamicModification(dmod1, searchId_1);
+        modDao.saveDynamicResidueMod(dmod1, searchId_1);
         MsSearchModification dmod2 = makeDynamicMod('B', "20.0", '#');
-        modDao.saveDynamicModification(dmod2, searchId_1);
+        modDao.saveDynamicResidueMod(dmod2, searchId_1);
         
         // modifications for searchId_2
         MsSearchModification mod3 = makeStaticMod('M', "16.0");
-        modDao.saveStaticModification(mod3, searchId_2);
+        modDao.saveStaticResidueMod(mod3, searchId_2);
         MsSearchModification mod4 = makeStaticMod('S', "80.0");
-        modDao.saveStaticModification(mod4, searchId_2);
+        modDao.saveStaticResidueMod(mod4, searchId_2);
         
         MsSearchModification dmod3 = makeDynamicMod('X', "100.0", '*');
-        modDao.saveDynamicModification(dmod3, searchId_2);
+        modDao.saveDynamicResidueMod(dmod3, searchId_2);
         MsSearchModification dmod4 = makeDynamicMod('Y', "90.0", '\u0000');
-        modDao.saveDynamicModification(dmod4, searchId_2);
+        modDao.saveDynamicResidueMod(dmod4, searchId_2);
         MsSearchModification dmod5 = makeDynamicMod('A', "10.0", '#');
-        modDao.saveDynamicModification(dmod5, searchId_2);
+        modDao.saveDynamicResidueMod(dmod5, searchId_2);
         
     }
     
@@ -52,11 +52,11 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         super.tearDown();
         // delete modifications for searchId_1
         modDao.deleteDynamicModificationsForSearch(searchId_1);
-        modDao.deleteStaticModificationsForSearch(searchId_1);
+        modDao.deleteStaticResidueModsForSearch(searchId_1);
         
         // delete modifications for searchId_2
         modDao.deleteDynamicModificationsForSearch(searchId_2);
-        modDao.deleteStaticModificationsForSearch(searchId_2);
+        modDao.deleteStaticResidueModsForSearch(searchId_2);
     }
 
     public void testOperationsOnMsSearchResult() {
@@ -104,14 +104,14 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_1).size());
         assertNull(resultDao.load(resultId_1));
         assertNull(resultDao.load(resultId_2));
-        assertEquals(0, modDao.loadDynamicModificationsForSearchResult(resultId_1).size());
+        assertEquals(0, modDao.loadDynamicResidueModsForResult(resultId_1).size());
         assertEquals(0, matchDao.loadResultProteins(resultId_1).size());
-        assertEquals(0, modDao.loadDynamicModificationsForSearchResult(resultId_2).size());
+        assertEquals(0, modDao.loadDynamicResidueModsForResult(resultId_2).size());
         assertEquals(0, matchDao.loadResultProteins(resultId_2).size());
         
         // these are for searchId_2 so should still exist
         assertNotNull(resultDao.load(resultId_3)); 
-        assertEquals(3, modDao.loadDynamicModificationsForSearchResult(resultId_3).size());
+        assertEquals(3, modDao.loadDynamicResidueModsForResult(resultId_3).size());
         assertEquals(2,  matchDao.loadResultProteins(resultId_3).size());
         
         // delete ALL results for searchId_2
@@ -119,7 +119,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         // make sure everything was deleted
         assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_2).size());
         assertNull(resultDao.load(resultId_3));
-        assertEquals(0, modDao.loadDynamicModificationsForSearchResult(resultId_3).size());
+        assertEquals(0, modDao.loadDynamicResidueModsForResult(resultId_3).size());
         assertEquals(0, matchDao.loadResultProteins(resultId_3).size());
     }
     
@@ -207,7 +207,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         private char postResidue;
         private List<MsSearchResultModification> dynamicModifications = new ArrayList<MsSearchResultModification>();;
         
-        public List<MsSearchResultModification> getDynamicModifications() {
+        public List<MsSearchResultModification> getDynamicResidueMods() {
             return dynamicModifications;
         }
         public String getPeptideSequence() {

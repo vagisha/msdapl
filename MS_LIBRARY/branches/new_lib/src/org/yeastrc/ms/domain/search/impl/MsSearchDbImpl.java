@@ -36,9 +36,9 @@ public class MsSearchDbImpl implements MsSearchDb {
     
     private List<? super MsResidueModificationDb> dynamicResidueMods;
     
-    private List<? super MsTerminalModificationDb> terminalStaticMods;
+    private List<? super MsTerminalModificationDb> staticTerminalMods;
     
-    private List<? super MsTerminalModificationDb> terminalDynamicMods;
+    private List<? super MsTerminalModificationDb> dynamicTerminalMods;
     
     private List<? super MsEnzymeDb> enzymes;
     
@@ -46,8 +46,8 @@ public class MsSearchDbImpl implements MsSearchDb {
         searchDatabases = new ArrayList<MsSearchDatabaseDb>();
         staticResidueMods = new ArrayList<MsResidueModificationDb>();
         dynamicResidueMods = new ArrayList<MsResidueModificationDb>();
-        terminalStaticMods = new ArrayList<MsTerminalModificationDb>();
-        terminalDynamicMods = new ArrayList<MsTerminalModificationDb>();
+        staticTerminalMods = new ArrayList<MsTerminalModificationDb>();
+        dynamicTerminalMods = new ArrayList<MsTerminalModificationDb>();
     }
     
     /**
@@ -140,9 +140,9 @@ public class MsSearchDbImpl implements MsSearchDb {
     }
 
     //------------------------------------------------------------------------------------------------------
-    // static modifications used for the search
+    // static residue modifications used for the search
     //------------------------------------------------------------------------------------------------------
-    public List<MsResidueModificationDb> getStaticModifications() {
+    public List<MsResidueModificationDb> getStaticResidueMods() {
         return (List<MsResidueModificationDb>) staticResidueMods;
     }
 
@@ -158,9 +158,9 @@ public class MsSearchDbImpl implements MsSearchDb {
     }
 
     //------------------------------------------------------------------------------------------------------
-    // dynamic modifications used for the search
+    // dynamic residue modifications used for the search
     //------------------------------------------------------------------------------------------------------
-    public List<MsResidueModificationDb> getDynamicModifications() {
+    public List<MsResidueModificationDb> getDynamicResidueMods() {
         return (List<MsResidueModificationDb>) dynamicResidueMods;
     }
 
@@ -176,31 +176,31 @@ public class MsSearchDbImpl implements MsSearchDb {
     }
     
     //------------------------------------------------------------------------------------------------------
-    // terminal static modifications used for the search
+    // static terminal modifications used for the search
     //------------------------------------------------------------------------------------------------------
-    public List<MsTerminalModificationDb> getTerminalStaticModifications() {
-        return (List<MsTerminalModificationDb>) terminalStaticMods;
+    public List<MsTerminalModificationDb> getStaticTerminalMods() {
+        return (List<MsTerminalModificationDb>) staticTerminalMods;
     }
 
     /**
      * @param staticResidueMods the staticModifications to set
      */
     public void setTerminalStaticModifications(List<? super MsTerminalModificationDb> termStaticMods) {
-        this.terminalStaticMods = termStaticMods;
+        this.staticTerminalMods = termStaticMods;
     }
     
     //------------------------------------------------------------------------------------------------------
-    // dynamic modifications used for the search
+    // dynamic terminal modifications used for the search
     //------------------------------------------------------------------------------------------------------
-    public List<MsTerminalModificationDb> getTerminalDynamicModifications() {
-        return (List<MsTerminalModificationDb>) terminalDynamicMods;
+    public List<MsTerminalModificationDb> getDynamicTerminalMods() {
+        return (List<MsTerminalModificationDb>) dynamicTerminalMods;
     }
 
     /**
      * @param dynamicResidueMods the dynamicModifications to set
      */
     public void setTerminalDynamicModifications(List<? super MsTerminalModificationDb> termDynaMods) {
-        this.terminalDynamicMods = termDynaMods;
+        this.dynamicTerminalMods = termDynaMods;
     }
 
     //------------------------------------------------------------------------------------------------------

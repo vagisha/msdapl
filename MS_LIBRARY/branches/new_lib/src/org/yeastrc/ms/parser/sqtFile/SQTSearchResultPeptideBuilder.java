@@ -47,7 +47,7 @@ public final class SQTSearchResultPeptideBuilder {
         
         return new MsSearchResultPeptide() {
 
-            public List<MsSearchResultModification> getDynamicModifications() {
+            public List<MsSearchResultModification> getDynamicResidueMods() {
                 return resultMods;
             }
             public String getPeptideSequence() {
