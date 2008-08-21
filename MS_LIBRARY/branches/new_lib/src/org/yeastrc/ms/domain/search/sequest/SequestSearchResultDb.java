@@ -6,13 +6,13 @@
  */
 package org.yeastrc.ms.domain.search.sequest;
 
-import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
 
 
 /**
  * 
  */
-public interface SequestRunSearchResultDb extends MsRunSearchResultDb {
+public interface SequestSearchResultDb extends MsSearchResultDb {
     
     public SequestResultData getSequestResultData();
 }

@@ -107,11 +107,11 @@
 	<!-- ================================================================================= -->
 	<!-- QUERIES FOR STATIC RESIDUE MODIFICATIONS -->
 	<!-- ================================================================================= -->
-    <select id="selectResidueStaticModsForSearch" resultMap="msStaticResidueModResult" parameterClass="Integer">
+    <select id="selectStaticResidueModsForSearch" resultMap="msStaticResidueModResult" parameterClass="Integer">
     	SELECT * FROM msSearchStaticMod WHERE searchID= #id#
     </select>
     
-    <insert id="insertResidueStaticMod" parameterMap="msStaticResidueModParam">
+    <insert id="insertStaticResidueMod" parameterMap="msStaticResidueModParam">
     	INSERT INTO msSearchStaticMod (
     	searchID,
     	residue,
@@ -119,7 +119,7 @@
     	VALUES (?,?,?)
     </insert>
     
-    <delete id="deleteResidueStaticModsForSearch" parameterClass="Integer">
+    <delete id="deleteStaticResidueModsForSearch" parameterClass="Integer">
 		DELETE FROM msSearchStaticMod WHERE searchID=#id#
     </delete>
     
@@ -127,11 +127,11 @@
 	<!-- ================================================================================= -->
 	<!-- QUERIES FOR DYNAMIC RESIDUE MODIFICATIONS -->
 	<!-- ================================================================================= -->
-    <select id="selectResidueDynaModsForSearch" resultMap="msDynamicResidueModResult" parameterClass="Integer">
+    <select id="selectDynamicResidueModsForSearch" resultMap="msDynamicResidueModResult" parameterClass="Integer">
     	SELECT * FROM msSearchDynamicMod WHERE searchID= #id#
     </select>
     
-    <insert id="insertResidueDynaMod" parameterMap="msDynamicResidueModParam">
+    <insert id="insertDynaaminResidueMod" parameterMap="msDynamicResidueModParam">
     	INSERT INTO msSearchDynamicMod (
     	searchID,
     	residue,
@@ -143,7 +143,7 @@
     	</selectKey>
     </insert>
     
-     <delete id="deleteResidueDynaModsForSearch" parameterClass="Integer">
+     <delete id="deleteDynamicResidueModsForSearch" parameterClass="Integer">
 		DELETE FROM msSearchDynamicMod WHERE searchID=#id#
     </delete>
     
@@ -151,11 +151,11 @@
     <!-- ================================================================================= -->
 	<!-- QUERIES FOR STATIC TERMINAL MODIFICATIONS -->
 	<!-- ================================================================================= -->
-    <select id="selectTerminalStaticModsForSearch" resultMap="msStaticTerminalModResult" parameterClass="Integer">
+    <select id="selectStaticTerminalModsForSearch" resultMap="msStaticTerminalModResult" parameterClass="Integer">
     	SELECT * FROM msSearchTerminalStaticMod WHERE searchID= #id#
     </select>
     
-    <insert id="insertTerminalStaticMod" parameterMap="msStaticTerminalModParam">
+    <insert id="insertStaticTerminalMod" parameterMap="msStaticTerminalModParam">
     	INSERT INTO msSearchTerminalStaticMod (
     	searchID,
     	terminus,
@@ -163,18 +163,18 @@
     	VALUES (?,?,?)
     </insert>
     
-    <delete id="deleteTerminalStaticModsForSearch" parameterClass="Integer">
+    <delete id="deleteStaticTerminalModsForSearch" parameterClass="Integer">
 		DELETE FROM msSearchTerminalStaticMod WHERE searchID=#id#
     </delete>
     
     <!-- ================================================================================= -->
 	<!-- QUERIES FOR DYNAMIC TERMINAL MODIFICATIONS -->
 	<!-- ================================================================================= -->
-    <select id="selectTerminalDynamicModsForSearch" resultMap="msDynamicTerminalModResult" parameterClass="Integer">
+    <select id="selectDynamicTerminalModsForSearch" resultMap="msDynamicTerminalModResult" parameterClass="Integer">
     	SELECT * FROM msSearchTerminalDynamicMod WHERE searchID= #id#
     </select>
     
-    <insert id="insertTerminalDynaMod" parameterMap="msDynamicTerminalModParam">
+    <insert id="insertDynaminTerminalMod" parameterMap="msDynamicTerminalModParam">
     	INSERT INTO msSearchTerminalDynamicMod (
     	searchID,
     	terminus,
@@ -183,7 +183,7 @@
     	VALUES (?,?,?,?)
     </insert>
     
-    <delete id="deleteTerminalDynaModsForSearch" parameterClass="Integer">
+    <delete id="deleteDynamicTerminalModsForSearch" parameterClass="Integer">
 		DELETE FROM msSearchTerminalDynamicMod WHERE searchID=#id#
     </delete>
     
@@ -191,14 +191,14 @@
     <!-- ================================================================================= -->
 	<!-- QUERIES FOR DYNAMIC RESIDUE MODIFICATIONS (FOR A SEARCH RESULT) -->
 	<!-- ================================================================================= -->
-    <select id="selectDynaResidueModsForResult" resultMap="msResultDynaResidueModResult" parameterClass="Integer">
+    <select id="selectDynamicResidueModsForResult" resultMap="msResultDynaResidueModResult" parameterClass="Integer">
     	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID, rMod.position
     	FROM msSearchDynamicMod AS sMod, msDynamicModResult AS rMod
     	WHERE sMod.id = rMod.modID
     	AND rMod.resultID= #id#
     </select>
     
-    <insert id="insertResultDynaResidueMod" parameterMap="msResultDynaResidueModParam">
+    <insert id="insertResultDynamicResidueMod" parameterMap="msResultDynaResidueModParam">
     	INSERT INTO msDynamicModResult (
     	resultID,
     	modID,
@@ -206,36 +206,36 @@
     	VALUES (?,?,?)
     </insert>
     
-    <insert id="insertAllResultDynaResidueMods" parameterClass="String">
+    <insert id="insertAllResultDynamicResidueMods" parameterClass="String">
     	INSERT INTO msDynamicModResult (resultID, modID, position) VALUES $values$
     </insert>
     
-    <delete id="deleteDynaResidueModsForResult" parameterClass="Integer">
+    <delete id="deleteDynamicResidueModsForResult" parameterClass="Integer">
 		DELETE FROM msDynamicModResult WHERE resultID = #resultId#
     </delete>
     
     <!-- ================================================================================= -->
 	<!-- QUERIES FOR DYNAMIC TERMINAL MODIFICATIONS (FOR A SEARCH RESULT) -->
 	<!-- ================================================================================= -->
-    <select id="selectDynaTerminalModsForResult" resultMap="msResultDynaTerminalModResult" parameterClass="Integer">
+    <select id="selectDynamicTerminalModsForResult" resultMap="msResultDynaTerminalModResult" parameterClass="Integer">
     	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID
     	FROM msSearchTerminalDynamicMod AS sMod, msTerminalDynamicModResult AS rMod
     	WHERE sMod.id = rMod.modID
     	AND rMod.resultID= #id#
     </select>
     
-    <insert id="insertResultDynaTerminalMod" parameterMap="msResultDynaTerminalModParam">
+    <insert id="insertResultDynamicTerminalMod" parameterMap="msResultDynaTerminalModParam">
     	INSERT INTO msTerminalDynamicModResult (
     	resultID,
     	modID)
     	VALUES (?,?)
     </insert>
     
-    <insert id="insertAllResultDynaTerminalMods" parameterClass="String">
+    <insert id="insertAllResultDynamicTerminalMods" parameterClass="String">
     	INSERT INTO msTerminalDynamicModResult (resultID, modID) VALUES $values$
     </insert>
     
-    <delete id="deleteDynaTerminalModsForResult" parameterClass="Integer">
+    <delete id="deleteDynamicTerminalModsForResult" parameterClass="Integer">
 		DELETE FROM msTerminalDynamicModResult WHERE resultID = #resultId#
     </delete>
     

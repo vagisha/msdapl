@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
-import org.yeastrc.ms.domain.search.MsRunSearchResult;
-import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
@@ -23,36 +23,36 @@ import com.ibatis.sqlmap.client.extensions.ParameterSetter;
 import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
-public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO 
-        implements MsRunSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> {
+public class MsSearchResultDAOImpl extends BaseSqlMapDAO 
+        implements MsSearchResultDAO<MsSearchResult, MsSearchResultDb> {
 
     private MsSearchResultProteinDAO matchDao;
     private MsSearchModificationDAO modDao;
     
-    public MsRunSearchResultDAOImpl(SqlMapClient sqlMap, MsSearchResultProteinDAO matchDao,
+    public MsSearchResultDAOImpl(SqlMapClient sqlMap, MsSearchResultProteinDAO matchDao,
             MsSearchModificationDAO modDao) {
         super(sqlMap);
         this.matchDao = matchDao;
         this.modDao = modDao;
     }
 
-    public MsRunSearchResultDb load(int id) {
-        return (MsRunSearchResultDb) queryForObject("MsRunSearchResult.select", id);
+    public MsSearchResultDb load(int id) {
+        return (MsSearchResultDb) queryForObject("MsRunSearchResult.select", id);
     }
     
-    public List<Integer> loadResultIdsForRunSearch(int searchId) {
-        return queryForList("MsRunSearchResult.selectResultIdsForSearch", searchId);
+    public List<Integer> loadResultIdsForRunSearch(int runSearchId) {
+        return queryForList("MsRunSearchResult.selectResultIdsForRunSearch", runSearchId);
     }
     
-    public List<Integer> loadResultIdsForSearchScanCharge(int searchId, int scanId, int charge) {
+    public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge) {
         Map<String, Integer> map = new HashMap<String, Integer>(3);
-        map.put("searchId", searchId);
+        map.put("runSearchId", runSearchId);
         map.put("scanId", scanId);
         map.put("charge", charge);
-        return queryForList("MsRunSearchResult.selectResultIdsForSearchScanCharge", map);
+        return queryForList("MsRunSearchResult.selectResultIdsForRunSearchScanCharge", map);
     }
     
-    public int save(MsRunSearchResult searchResult, String searchDbName, int searchId, int scanId) {
+    public int save(MsSearchResult searchResult, String searchDbName, int searchId, int scanId) {
         
         int resultId = saveResultOnly(searchResult, searchId, scanId);
         
@@ -61,19 +61,19 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
             matchDao.save(protein, searchDbName, resultId);
         }
         
-        // save any dynamic modifications for this result
+        // save any dynamic (residue and terminal) modifications for this result
         saveDynamicModsForResult(searchId, resultId, searchResult.getResultPeptide());
         
         return resultId;
     }
     
-    public int saveResultOnly(MsRunSearchResult searchResult, int searchId, int scanId) {
+    public int saveResultOnly(MsSearchResult searchResult, int searchId, int scanId) {
 
         MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(searchId, scanId, searchResult);
         return saveAndReturnId("MsRunSearchResult.insert", resultDb);
     }
 
-    void saveDynamicModsForResult(int searchId, int resultId, MsSearchResultPeptide peptide) {
+    private void saveDynamicModsForResult(int searchId, int resultId, MsSearchResultPeptide peptide) {
         
         saveDynamicResidueMods(searchId, resultId, peptide);
         saveDynamicTerminalMods(searchId, resultId, peptide);
@@ -81,7 +81,7 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
 
     private void saveDynamicResidueMods(int searchId, int resultId,
             MsSearchResultPeptide peptide) {
-        for (MsResultDynamicResidueMod mod: peptide.getResidueDynamicModifications()) {
+        for (MsResultDynamicResidueMod mod: peptide.getDynamicResidueModifications()) {
             if (mod == null)
                 continue;
             int modId = DynamicModLookupUtil.instance().getDynamicResidueModificationId(searchId, mod);
@@ -91,7 +91,7 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
     
     private void saveDynamicTerminalMods(int searchId, int resultId,
             MsSearchResultPeptide peptide) {
-        for (MsTerminalModification mod: peptide.getTerminalDynamicModifications()) {
+        for (MsTerminalModification mod: peptide.getDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
             int modId = DynamicModLookupUtil.instance().getDynamicTerminalModificationId(searchId, mod);
@@ -104,38 +104,28 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
     }
 
     /**
-     * Convenience class for encapsulating searchId, scanId and search result
+     * Convenience class for encapsulating runSearchId, scanId and search result
      */
-    public class MsSearchResultSqlMapParam implements MsRunSearchResult {
+    public class MsSearchResultSqlMapParam {
 
         private int runSearchId;
         private int scanId;
-        private MsRunSearchResult result;
+        private MsSearchResult result;
         
-        public MsSearchResultSqlMapParam(int runSearchId, int scanId, MsRunSearchResult result) {
+        public MsSearchResultSqlMapParam(int runSearchId, int scanId, MsSearchResult result) {
             this.runSearchId = runSearchId;
             this.scanId = scanId;
             this.result = result;
         }
-        public int getSearchId() {
+        public int getRunSearchId() {
             return runSearchId;
         }
         public int getScanId() {
             return scanId;
         }
-
         public int getCharge() {
             return result.getCharge();
         }
-
-        public List<MsSearchResultProtein> getProteinMatchList() {
-            return result.getProteinMatchList();
-        }
-
-        public MsSearchResultPeptide getResultPeptide() {
-            return result.getResultPeptide();
-        }
-
         public ValidationStatus getValidationStatus() {
             return result.getValidationStatus();
         }
@@ -150,10 +140,6 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
         }
         public int getSequenceLength() {
             return result.getResultPeptide().getSequenceLength();
-        }
-        @Override
-        public int getScanNumber() {
-            throw new UnsupportedOperationException("getScanNumber is not supported by MsSearchResultSqlMapParam");
         }
     }
 
@@ -189,6 +175,5 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
                 throw new IllegalArgumentException("Unrecognized validation status: "+statusStr);
             return status;
         }
-        
     }
 }

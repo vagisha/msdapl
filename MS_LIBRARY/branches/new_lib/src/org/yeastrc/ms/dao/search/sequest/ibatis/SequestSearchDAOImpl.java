@@ -10,6 +10,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
 
@@ -29,15 +30,17 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO <
     }
     
     public SequestSearchDb loadSearch(int searchId) {
-        return (SequestSearchDb) queryForObject("MsSearch.select", searchId);
+        return (SequestSearchDb) queryForObject("SequestSearch.select", searchId);
     }
     
     public int saveSearch(SequestSearch search) {
         
         int searchId = searchDao.saveSearch(search);
         
-        //TODO save Sequest parameters
-        
+        // save sequest search parameters
+        for (SequestParam param: search.getSequestParams()) {
+            save("SequestSearch.insertParams", new SequestParamSqlMapParam(searchId, param));
+        }
         return searchId;
     }
     
@@ -45,4 +48,28 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO <
         searchDao.deleteSearch(searchId);
     }
 
+    
+    public static final class SequestParamSqlMapParam implements SequestParam {
+
+        private int searchId;
+        private SequestParam param;
+        
+        public SequestParamSqlMapParam(int searchId, SequestParam param) {
+            this.searchId = searchId;
+            this.param = param;
+        }
+        
+        public int getSearchId() {
+            return searchId;
+        }
+        @Override
+        public String getParamName() {
+            return param.getParamName();
+        }
+
+        @Override
+        public String getParamValue() {
+            return param.getParamValue();
+        }
+    }
 }

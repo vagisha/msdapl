@@ -5,28 +5,14 @@ import java.math.BigDecimal;
 import org.yeastrc.ms.domain.search.impl.MsSearchResultDbImpl;
 import org.yeastrc.ms.domain.search.impl.SequestResultDataImpl;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 
-public class SequestRunSearchResultDbImpl extends MsSearchResultDbImpl implements SequestRunSearchResultDb, SequestResultData {
+public class SequestSearchResultDbImpl extends MsSearchResultDbImpl implements SequestSearchResultDb, SequestResultData {
 
-    private int resultId; 
     private SequestResultDataImpl sequestData;
     
-    public SequestRunSearchResultDbImpl() {
+    public SequestSearchResultDbImpl() {
         sequestData = new SequestResultDataImpl();
-    }
-    
-    /**
-     * @return the resultId
-     */
-    public int getResultId() {
-        return resultId;
-    }
-    /**
-     * @param resultId the resultId to set
-     */
-    public void setResultId(int resultId) {
-        this.resultId = resultId;
     }
     
     /**

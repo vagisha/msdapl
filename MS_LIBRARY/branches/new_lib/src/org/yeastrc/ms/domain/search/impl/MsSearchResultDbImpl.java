@@ -9,13 +9,13 @@ package org.yeastrc.ms.domain.search.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
 
-public class MsSearchResultDbImpl implements MsRunSearchResultDb {
+public class MsSearchResultDbImpl implements MsSearchResultDb {
 
     private int id; // unique id (database) for this search result
     private int runSearchId; // id (database) of the run search this result belongs to

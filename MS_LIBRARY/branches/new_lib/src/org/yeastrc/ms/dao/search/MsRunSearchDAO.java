@@ -18,8 +18,6 @@ public interface MsRunSearchDAO <I extends MsRunSearch, O extends MsRunSearchDb>
 
     public abstract O loadRunSearch(int searchId);
     
-    public abstract List<O> loadSearchesForRun(int runId);
-
     /**
      * Returns the database ids of individual run searches in a search group.
      * @param searchId

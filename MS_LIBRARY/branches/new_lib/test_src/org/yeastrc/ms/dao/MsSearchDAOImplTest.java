@@ -10,7 +10,7 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsRunSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
@@ -62,23 +62,23 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         checkSearch(search_2, searchList.get(0));
         
         // add results for the search
-        MsRunSearchResult r1 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3
-        MsRunSearchResult r2 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3;
+        MsSearchResult r1 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3
+        MsSearchResult r2 = makeSearchResult(searchId_2, 3, "PEPTIDE1", true, true); // charge = 3;
         int r1_id = resultDao.save(r1, searchId_2, 2);
         int r2_id = resultDao.save(r2, searchId_2, 3);
         assertEquals(2, resultDao.loadResultIdsForRunSearch(searchId_2).size());
         
         assertTrue(r1.getProteinMatchList().size() > 0);
         assertEquals(r1.getProteinMatchList().size(), matchDao.loadResultProteins(r1_id).size());
-        assertTrue(r1.getResultPeptide().getResidueDynamicModifications().size() > 0);
-        assertEquals(r1.getResultPeptide().getResidueDynamicModifications().size(), 
+        assertTrue(r1.getResultPeptide().getDynamicResidueModifications().size() > 0);
+        assertEquals(r1.getResultPeptide().getDynamicResidueModifications().size(), 
                         modDao.loadDynamicResidueModsForResult(r1_id).size());
         
         
         assertTrue(r2.getProteinMatchList().size() > 0);
         assertEquals(r2.getProteinMatchList().size(), matchDao.loadResultProteins(r2_id).size());
-        assertTrue(r2.getResultPeptide().getResidueDynamicModifications().size() > 0);
-        assertEquals(r2.getResultPeptide().getResidueDynamicModifications().size(),
+        assertTrue(r2.getResultPeptide().getDynamicResidueModifications().size() > 0);
+        assertEquals(r2.getResultPeptide().getDynamicResidueModifications().size(),
                         modDao.loadDynamicResidueModsForResult(r2_id).size());
         
         // delete the searches

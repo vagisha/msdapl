@@ -15,5 +15,5 @@ import com.sun.tools.javac.util.List;
  */
 public interface SequestSearch extends MsSearch {
     
-    public abstract List<SequestParam> sequestParams();
+    public abstract List<SequestParam> getSequestParams();
 }

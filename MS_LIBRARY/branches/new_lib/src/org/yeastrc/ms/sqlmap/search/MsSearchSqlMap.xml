@@ -3,122 +3,67 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearch"> 
 
-    <typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.impl.MsSearchDbImpl"/>
-	<typeAlias alias="SequestSearchDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl"/>
-	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.SearchFileFormat"/>
-	<typeAlias alias="SearchTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$SearchFileFormatTypeHandler"/>
-	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$MsSearchSqlMapParam" />
-	
+    <typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.search.impl.MsSearchDbImpl"/>
+    <typeAlias alias="MsSearch" type="org.yeastrc.ms.domain.search.MsSearch"/>
 	
 	<resultMap class="MsSearchDb" id="msSearchResult">
 		<result property="id" column="id" />
 		<result property="searchDate" column="expDate" />
 		<result property="serverAddress" column="serverAddress" />
 		<result property="serverDirectory" column="serverDirectory" />
-	</resultMap>
-	
-	
-	
-	
-	<resultMap class="MsSearchDb" id="msSearchResult">
-		<result property="id" column="id" />
-		<result property="experimentId" column="experimentID" nullValue="0"/>
-		<result property="runId" column="runID" nullValue="0"/>
-		<result property="searchFileFormat" column="originalFileType"
-				javaType="SearchType" jdbcType="VARCHAR"
-				typeHandler="SearchTypeHandler"/>
-		<result property="searchEngineName" column="analysisProgramName" />
-		<result property="searchEngineVersion" column="analysisProgramVersion" />
-		<result property="searchDate" column="searchDate" />
-		<result property="searchDuration" column="searchDuration" nullValue="0"/>
-		<result property="precursorMassType" column="precursorMassMethod" />
-		<result property="precursorMassTolerance" column="precursorMassTolerance"/>
-		<result property="fragmentMassType" column="fragmentMassMethod" />
-		<result property="fragmentMassTolerance" column="fragmentMassTolerance"/>
+		<result property="analysisProgramName" column="analysisProgramName" />
+		<result property="analysisProgramVersion" column="analysisProgramVersion" />
+		<result property="uploadDate" column="uploadDate" />
 		<result property="enzymeList" 
 				column="id" 
 				select="MsEnzyme.selectEnzymesForSearch"/>
 		<result property="searchDatabases" 
 				select="MsDatabase.selectSearchDatabases" 
 				column="id"/>
-		<result property="staticModifications" 
-				select="MsSearchMod.selectStaticModsForSearch" 
+		<result property="staticResidueMods" 
+				select="selectStaticResidueModsForSearch" 
 				column="id" />
-		<result property="dynamicModifications"
-				select="MsSearchMod.selectDynaModsForSearch"
+		<result property="dynamicResidueMods" 
+				select="selectDynamicResidueModsForSearch" 
 				column="id" />
-		<discriminator javaType="SearchType" jdbcType="VARCHAR" 
-						column="originalFileType" 
-						typeHandler="SearchTypeHandler">
-			<subMap value="SQT_NSEQ" resultMap="sqtSearchResult" />	
-			<subMap value="SQT_SEQ" resultMap="sqtSearchResult" />						
-		</discriminator>
+		<result property="staticTerminalMods" 
+				select="selectStaticTerminalModsForSearch" 
+				column="id" />
+		<result property="dynamicTerminalMods" 
+				select="selectDynamicTerminalModsForSearch" 
+				column="id" />
 	</resultMap>
 	
-	<resultMap class="SqtSearchDb" id="sqtSearchResult" extends="MsSearch.msSearchResult">
-		<result property="headers" 
-				select="SqtHeader.selectHeadersForSearch" 
-				column="id"/>
-	</resultMap> 
-	
 	<parameterMap class="MsSearch" id="msSearchParam">
-		<parameter property="experimentId" jdbcType="INTEGER"/>
-		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="searchFileFormat" 
-					jdbcType="VARCHAR" 
-					javaType="SearchType" 
-					typeHandler="SearchTypeHandler"
-		/>
-		<parameter property="searchEngineName" jdbcType="VARCHAR" />
-		<parameter property="searchEngineVersion" jdbcType="VARCHAR"/>
+		<parameter property="id" jdbcType="INTEGER"/>
 		<parameter property="searchDate" jdbcType="DATE" />
-		<parameter property="searchDuration" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="precursorMassType" jdbcType="VARCHAR" />
-		<parameter property="precursorMassTolerance" jdbcType="DECIMAL" />
-		<parameter property="fragmentMassType" jdbcType="VARCHAR" />
-		<parameter property="fragmentMassTolerance" jdbcType="DECIMAL" />
+		<parameter property="serverAddress" jdbcType="VARCHAR" />
+		<parameter property="serverDirectory" jdbcType="VARCHAR" />
+		<parameter property="analysisProgramName" jdbcType="VARCHAR" />
+		<parameter property="analysisProgramVersion" jdbcType="VARCHAR"/>
+		<parameter property="uploadDate" jdbcType="DATE" />
 	</parameterMap>
 	
+	
     <select id="select" resultMap="msSearchResult" parameterClass="Integer">
-    	SELECT * FROM msPeptideSearch WHERE id = #id#
+    	SELECT * FROM msSearch WHERE id = #id#
     </select>
     
-    <select id="selectSearchesForRun" resultMap="msSearchResult" parameterClass="Integer">
-    	SELECT * FROM msPeptideSearch WHERE runID = #id#
-    </select>
-    
-    <select id="selectSearchIdsForRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT id FROM msPeptideSearch WHERE runID = #id#
-    </select>
-    
-    <select id="selectSearchIdsForExperiment" resultClass="Integer" parameterClass="Integer">
-    	SELECT id FROM msPeptideSearch WHERE experimentID = #id#
-    </select>
-    
-    <select id="selectSearchIdForRunAndExperiment" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msPeptideSearch WHERE runID = #runId# AND experimentID=#experimentId#
-    </select>
     
     <insert id="insert" parameterMap="msSearchParam">
-    	INSERT INTO msPeptideSearch (
-    	experimentID,
-    	runID,
-    	originalFileType,
+    	INSERT INTO msSearch (
+    	expDate,
+    	serverAddress,
+    	serverDirectory,
     	analysisProgramName,
-    	analysisProgramVersion,
-    	searchDate,
-    	searchDuration,
-    	precursorMassMethod,
-    	precursorMassTolerance,
-    	fragmentMassMethod,
-    	fragmentMassTolerance) 
-    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
+    	analysisProgramVersion)
+    	VALUES (?,?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM msPeptideSearch WHERE id=#id#		    
+		DELETE FROM msSearch WHERE id=#id#		    
     </delete>
 </sqlMap>

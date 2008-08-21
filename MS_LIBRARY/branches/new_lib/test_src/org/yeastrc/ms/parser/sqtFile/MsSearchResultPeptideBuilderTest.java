@@ -206,7 +206,7 @@ public class MsSearchResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRNYFEAFEMPG", resultPeptide.getPeptideSequence());
         
-        List<MsSearchResultModification> resultMods = (List<MsSearchResultModification>) resultPeptide.getResidueDynamicModifications();
+        List<MsSearchResultModification> resultMods = (List<MsSearchResultModification>) resultPeptide.getDynamicResidueModifications();
         assertEquals(2, resultMods.size());
         Collections.sort(resultMods, new Comparator<MsSearchResultModification>() {
             public int compare(MsSearchResultModification o1,
@@ -281,7 +281,7 @@ public class MsSearchResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRSFEAFSMPG", resultPeptide.getPeptideSequence());
         
-        List<MsSearchResultModification> resultMods = (List<MsSearchResultModification>) resultPeptide.getResidueDynamicModifications();
+        List<MsSearchResultModification> resultMods = (List<MsSearchResultModification>) resultPeptide.getDynamicResidueModifications();
         assertEquals(2, resultMods.size());
         Collections.sort(resultMods, new Comparator<MsSearchResultModification>() {
             public int compare(MsSearchResultModification o1,
@@ -319,7 +319,7 @@ public class MsSearchResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRSFEAFSMPG", resultPeptide.getPeptideSequence());
         
-        List<MsSearchResultModification> resultMods = (List<MsSearchResultModification>) resultPeptide.getResidueDynamicModifications();
+        List<MsSearchResultModification> resultMods = (List<MsSearchResultModification>) resultPeptide.getDynamicResidueModifications();
         assertEquals(3, resultMods.size());
         Collections.sort(resultMods, new Comparator<MsSearchResultModification>() {
             public int compare(MsSearchResultModification o1,

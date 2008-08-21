@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultTest;
-import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 
 public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
@@ -61,7 +61,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sqtResDao.load(resultId));
     }
     
-    private void checkSearchResult(SequestRunSearchResult input, SQTSearchResultDb output) {
+    private void checkSearchResult(SequestSearchResult input, SQTSearchResultDb output) {
         super.checkSearchResult(input, output);
         assertEquals(input.getDeltaCN().doubleValue(), output.getDeltaCN().doubleValue());
         assertEquals(input.getSp().doubleValue(), output.getSp().doubleValue());
@@ -85,7 +85,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 
         return result;
     }
-    public static final class SQTSearchResultTest extends MsSearchResultTest implements SequestRunSearchResult {
+    public static final class SQTSearchResultTest extends MsSearchResultTest implements SequestSearchResult {
 
         private BigDecimal deltaCN;
         private int spRank;

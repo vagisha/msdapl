@@ -8,12 +8,12 @@ import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
-import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 
 /**
  * Represents a 'M' line in the SQT file
  */
-public class PeptideResult implements SequestRunSearchResult {
+public class PeptideResult implements SequestSearchResult {
 
     private int xcorrRank;
     private int spRank;

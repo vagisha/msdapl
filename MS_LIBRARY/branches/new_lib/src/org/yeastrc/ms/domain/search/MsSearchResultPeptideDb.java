@@ -15,14 +15,14 @@ import java.util.List;
 public interface MsSearchResultPeptideDb extends MsSearchResultPeptideBase {
 
     /**
-     * Returns a list of dynamic modifications, along with the index (0-based) at which 
+     * Returns a list of dynamic residue modifications, along with the index (0-based) at which 
      * they are present, in the peptide sequence for this result.
      */
-    public abstract List<MsResultDynamicResidueModDb> getDynamicModifications();
+    public abstract List<MsResultDynamicResidueModDb> getDynamicResidueModifications();
     
     /**
-     * Returns a list of terminal dynamic modifications.
+     * Returns a list of dynamic residue modifications.
      * @return
      */
-    public abstract List<MsTerminalModificationDb> getTerminalDynamicModifications();
+    public abstract List<MsTerminalModificationDb> getDynamicTerminalModifications();
 }

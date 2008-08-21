@@ -52,6 +52,9 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchSqlMap.xml" />
 
 
+	<!-- Related to Sequest files -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/sequest/SequestSearchSqlMap.xml"/>
+	
 	<!-- Related to SQT files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTHeaderSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchScanSqlMap.xml"/>

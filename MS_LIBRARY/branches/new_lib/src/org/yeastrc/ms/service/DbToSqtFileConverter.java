@@ -19,7 +19,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestRunSearchResultDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
@@ -62,7 +62,7 @@ public class DbToSqtFileConverter {
             List<MsSearchModification> dynaMods = getDynaModsForSearch(dbSearchId);
             
             SQTSearchScanDAO scanDao = DAOFactory.instance().getSqtSpectrumDAO();
-            SequestRunSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
+            SequestSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
             List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(dbSearchId);
             int currCharge = -1;
             int currScanId = -1;
@@ -121,7 +121,7 @@ public class DbToSqtFileConverter {
     private String reconstructPeptideSequence(int dbSearchId, SQTSearchResultDb resultDb) {
         // dynamic modifications for the search
         MsSearchResultPeptideDb peptideSeq = resultDb.getResultPeptide();
-        List<MsSearchResultDynamicModDb> resultMods = peptideSeq.getDynamicModifications();
+        List<MsSearchResultDynamicModDb> resultMods = peptideSeq.getDynamicResidueModifications();
         Collections.sort(resultMods, new Comparator<MsSearchResultDynamicModDb>() {
             public int compare(MsSearchResultDynamicModDb o1,
                     MsSearchResultDynamicModDb o2) {

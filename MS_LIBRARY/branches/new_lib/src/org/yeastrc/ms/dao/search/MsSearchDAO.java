@@ -26,5 +26,5 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
      * @param searchId
      */
     public abstract void deleteSearch(int searchId);
-
+    
 }

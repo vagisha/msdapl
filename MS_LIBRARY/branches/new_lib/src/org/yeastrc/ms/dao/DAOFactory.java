@@ -21,19 +21,19 @@ import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2RunDAOImpl;
 import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ScanChargeDAOImpl;
 import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ScanDAOImpl;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.ibatis.MsRunSearchDAOImpl;
-import org.yeastrc.ms.dao.search.ibatis.MsRunSearchResultDAOImpl;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchDatabaseDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultProteinDAOImpl;
-import org.yeastrc.ms.dao.search.sequest.SequestRunSearchResultDAO;
-import org.yeastrc.ms.dao.search.sequest.ibatis.SequestRunSearchResultDAOImpl;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
@@ -50,8 +50,8 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsRunSearchResult;
-import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
@@ -108,7 +108,7 @@ public class DAOFactory {
     // DAOs for search related objects
     private MsSearchDAO<MsSearch, MsSearchDb> searchDAO;
     private MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDAO;
-    private MsRunSearchResultDAO <MsRunSearchResult, MsRunSearchResultDb> searchResultDAO;
+    private MsSearchResultDAO <MsSearchResult, MsSearchResultDb> searchResultDAO;
     private MsSearchResultProteinDAO resultProteinDAO;
     private MsSearchModificationDAO modDAO;
     private MsSearchDatabaseDAO seqDbDao;
@@ -119,7 +119,7 @@ public class DAOFactory {
     private MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtRunSearchDAO;
     
     // DAOs for Sequest related objects
-    private SequestRunSearchResultDAO sequestResultDAO;
+    private SequestSearchResultDAO sequestResultDAO;
     private MsSearchDAO<SequestSearch, SequestSearchDb> sequestSearchDAO;
     
     
@@ -144,7 +144,7 @@ public class DAOFactory {
         seqDbDao = new MsSearchDatabaseDAOImpl(sqlMap);
         modDAO = new MsSearchModificationDAOImpl(sqlMap);
         resultProteinDAO = new MsSearchResultProteinDAOImpl(sqlMap);
-        searchResultDAO = new MsRunSearchResultDAOImpl(sqlMap, resultProteinDAO, modDAO);
+        searchResultDAO = new MsSearchResultDAOImpl(sqlMap, resultProteinDAO, modDAO);
         runSearchDAO = new MsRunSearchDAOImpl(sqlMap);
         searchDAO = new MsSearchDAOImpl(sqlMap, seqDbDao, modDAO, enzymeDAO);
         
@@ -154,7 +154,7 @@ public class DAOFactory {
         sqtRunSearchDAO = new SQTRunSearchDAOImpl(sqlMap, runSearchDAO, sqtHeaderDAO);
         
         // sequest search related
-        sequestResultDAO = new SequestRunSearchResultDAOImpl(sqlMap, searchResultDAO);
+        sequestResultDAO = new SequestSearchResultDAOImpl(sqlMap, searchResultDAO);
         sequestSearchDAO = new SequestSearchDAOImpl(sqlMap, searchDAO);
         
     }
@@ -219,7 +219,7 @@ public class DAOFactory {
         return runSearchDAO;
     }
     
-    public MsRunSearchResultDAO <MsRunSearchResult, MsRunSearchResultDb> getMsSearchResultDAO() {
+    public MsSearchResultDAO <MsSearchResult, MsSearchResultDb> getMsSearchResultDAO() {
         return searchResultDAO;
     }
     
@@ -253,7 +253,7 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // Sequest SEARCH related
     //-------------------------------------------------------------------------------------------
-    public SequestRunSearchResultDAO getSequestResultDAO() {
+    public SequestSearchResultDAO getSequestResultDAO() {
         return sequestResultDAO;
     }
     

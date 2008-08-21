@@ -36,10 +36,6 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
         return (MsRunSearchDb) queryForObject("MsRunSearch.select", runSearchId);
     }
     
-    public List<MsRunSearchDb> loadSearchesForRun(int runId) {
-        return queryForList("MsRunSearch.selectSearchesForRun", runId);
-    }
-    
     @Override
     public List<Integer> loadRunSearchIdsForSearch(int searchId) {
         return queryForList("MsRunSearch.selectRunSearchIdsForSearch", searchId);
@@ -103,7 +99,7 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
     /**
      * Convenience class for encapsulating a MsRunSearch and associated runId
      */
-    public class MsRunSearchSqlMapParam implements MsRunSearch {
+    public class MsRunSearchSqlMapParam implements MsRunSearchDb {
 
         private int runId;
         private int searchId;
@@ -115,14 +111,11 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
             this.search = search;
         }
 
-        /**
-         * @return the runId
-         */
         public int getRunId() {
             return runId;
         }
         
-        public int getExperimentId() {
+        public int getSearchId() {
             return searchId;
         }
         
@@ -136,6 +129,10 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
 
         public int getSearchDuration() {
             return search.getSearchDuration();
+        }
+
+        public int getId() {
+            throw new UnsupportedOperationException("getId() is not supported by MsRunSearchSqlMapParam");
         }
     }
 }

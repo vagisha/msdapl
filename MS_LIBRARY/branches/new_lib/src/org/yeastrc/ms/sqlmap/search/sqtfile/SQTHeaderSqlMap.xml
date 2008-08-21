@@ -4,18 +4,18 @@
 <sqlMap namespace="SqtHeader"> 
 
 
-	<typeAlias alias="SqtHeaderDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTHeaderDbImpl"/>
-	<typeAlias alias="SqtHeader" type="org.yeastrc.ms.dao.sqtFile.ibatic.SQTHeaderDAOImpl$SQTHeaderSqlMapParam"/>
+	<typeAlias alias="SqtHeaderOut" type="org.yeastrc.ms.domain.sqtFile.impl.SQTHeaderDbImpl"/>
+	<typeAlias alias="SqtHeaderIn" type="org.yeastrc.ms.domain.sqtFile.SQTHeaderDb"/>
 	
 	
-	<resultMap class="SqtHeaderDb" id="headerResult">
+	<resultMap class="SqtHeaderOut" id="headerResult">
 		<result property="id" column="id"/>
 		<result property="searchId" column="searchID" nullValue="0"/>
 		<result property="name" column="header"/>
 		<result property="value" column="value"/>
 	</resultMap>
 	
-	<parameterMap class="SqtHeader" id="headerParam">
+	<parameterMap class="SqtHeaderIn" id="headerParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>

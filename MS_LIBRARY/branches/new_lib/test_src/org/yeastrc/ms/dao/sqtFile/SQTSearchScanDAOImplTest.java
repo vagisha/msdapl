@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 
@@ -100,8 +100,8 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
             }
 
             @Override
-            public List<SequestRunSearchResult> getScanResults() {
-                return new ArrayList<SequestRunSearchResult>(0);
+            public List<SequestSearchResult> getScanResults() {
+                return new ArrayList<SequestSearchResult>(0);
             }
 
             @Override

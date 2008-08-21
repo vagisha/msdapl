@@ -3,7 +3,7 @@ package org.yeastrc.ms.domain.search;
 import java.util.List;
 
 
-public interface MsRunSearchResult extends MsRunSearchResultBase {
+public interface MsSearchResult extends MsRunSearchResultBase {
 
     /**
      * @return the scan number for this result

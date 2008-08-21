@@ -39,64 +39,64 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     // Modifications associated with a search (STATIC RESIDUE) 
     //-------------------------------------------------------------------------------------------
     public List<MsResidueModificationDb> loadStaticResidueModsForSearch(int searchId) {
-        return queryForList("MsSearchMod.selectResidueStaticModsForSearch", searchId);
+        return queryForList("MsSearchMod.selectStaticResidueModsForSearch", searchId);
     }
 
     public void saveStaticResidueMod(MsResidueModification mod, int searchId) {
         MsResidueModSqlMapParam modDb = new MsResidueModSqlMapParam(searchId, mod);
-        save("MsSearchMod.insertResidueStaticMod", modDb);
+        save("MsSearchMod.insertStaticResidueMod", modDb);
     }
 
     public void deleteStaticResidueModsForSearch(int searchId) {
-        delete("MsSearchMod.deleteResidueStaticModsForSearch", searchId);
+        delete("MsSearchMod.deleteStaticResidueModsForSearch", searchId);
     }
 
     //-------------------------------------------------------------------------------------------
     // Modifications associated with a search (DYNAMIC RESIDUE) 
     //-------------------------------------------------------------------------------------------
     public List<MsResidueModificationDb> loadDynamicResidueModsForSearch(int searchId) {
-        return queryForList("MsSearchMod.selectResidueDynaModsForSearch", searchId);
+        return queryForList("MsSearchMod.selectDynamicResidueModsForSearch", searchId);
     }
 
     public int saveDynamicResidueMod(MsResidueModification mod, int searchId) {
         MsResidueModSqlMapParam modDb = new MsResidueModSqlMapParam(searchId, mod);
-        return saveAndReturnId("MsSearchMod.insertResidueDynaMod", modDb);
+        return saveAndReturnId("MsSearchMod.insertDynamicResidueMod", modDb);
     }
 
     public void deleteDynamicModificationsForSearch(int searchId) {
-        delete("MsSearchMod.deleteResidueDynaModsForSearch", searchId);
+        delete("MsSearchMod.deleteDynamicResidueModsForSearch", searchId);
     }
 
     //-------------------------------------------------------------------------------------------
     // Modifications associated with a search (STATIC TERMINAL) 
     //-------------------------------------------------------------------------------------------
     public List<MsTerminalModificationDb> loadStaticTerminalModsForSearch(int searchId) {
-        return queryForList("MsSearchMod.selectTerminalStaticModsForSearch", searchId);
+        return queryForList("MsSearchMod.selectStaticTerminalModsForSearch", searchId);
     }
 
     public int saveStaticTerminalMod(MsTerminalModification mod, int searchId) {
         MsTerminalModSqlMapParam modDb = new MsTerminalModSqlMapParam(searchId, mod);
-        return saveAndReturnId("MsSearchMod.insertTerminalStaticMod", modDb);
+        return saveAndReturnId("MsSearchMod.insertStaticTerminalMod", modDb);
     }
 
     public void deleteStaticTerminalModsForSearch(int searchId) {
-        delete("MsSearchMod.deleteTerminalStaticModsForSearch", searchId);
+        delete("MsSearchMod.deleteStaticTerminalModsForSearch", searchId);
     }
     
     //-------------------------------------------------------------------------------------------
     // Modifications associated with a search (DYNAMIC TERMINAL) 
     //-------------------------------------------------------------------------------------------
     public  List<MsTerminalModificationDb> loadDynamicTerminalModsForSearch(int searchId) {
-        return queryForList("MsSearchMod.selectTerminalDynaModsForSearch", searchId);
+        return queryForList("MsSearchMod.selectDynamicTerminalModsForSearch", searchId);
     }
 
     public  int saveDynamicTerminalMod(MsTerminalModification mod, int searchId) {
         MsTerminalModSqlMapParam modDb = new MsTerminalModSqlMapParam(searchId, mod);
-        return saveAndReturnId("MsSearchMod.insertTerminalDynaMod", modDb);
+        return saveAndReturnId("MsSearchMod.insertDynamicTerminalMod", modDb);
     }
 
     public  void deleteDynamicTerminalModsForSearch(int searchId) {
-        delete("MsSearchMod.deleteTerminalDynaModsForSearch", searchId);
+        delete("MsSearchMod.deleteDynamicTerminalModsForSearch", searchId);
     }
     
     //-------------------------------------------------------------------------------------------
@@ -104,13 +104,13 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     //-------------------------------------------------------------------------------------------
     public List<MsResultDynamicResidueModDb> loadDynamicResidueModsForResult(
             int resultId) {
-        return queryForList("MsSearchMod.selectDynaResidueModsForResult", resultId);
+        return queryForList("MsSearchMod.selectDynamicResidueModsForResult", resultId);
     }
 
     public void saveDynamicResidueModForResult(MsResultDynamicResidueMod mod, int resultId,
             int modificationId) {
         MsResultResidueModSqlMapParam modDb = new MsResultResidueModSqlMapParam(resultId, modificationId, mod.getModifiedPosition());
-        save("MsSearchMod.insertResultDynaResidueMod", modDb);
+        save("MsSearchMod.insertResultDynamicResidueMod", modDb);
     }
     
     public void saveAllDynamicResidueModsForResult(List<MsResultDynamicResidueModDb> modList) {
@@ -127,11 +127,11 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
             values.append(")");
         }
         values.deleteCharAt(0);
-        save("MsSearchMod.insertAllResultDynaResidueMods", values.toString());
+        save("MsSearchMod.insertAllResultDynamicResidueMods", values.toString());
     }
 
     public void deleteDynamicResidueModsForResult(int resultId) {
-        delete("MsSearchMod.deleteDynaResidueModsForResult", resultId);
+        delete("MsSearchMod.deleteDynamicResidueModsForResult", resultId);
     }
     
     //-------------------------------------------------------------------------------------------
@@ -139,12 +139,12 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     //-------------------------------------------------------------------------------------------
     public List<MsResultDynamicTerminalModDb> loadDynamicTerminalModsForResult(
             int resultId) {
-        return queryForList("MsSearchMod.selectDynaTerminalModsForResult", resultId);
+        return queryForList("MsSearchMod.selectDynamicTerminalModsForResult", resultId);
     }
 
     public void saveDynamicTerminalModForResult(int resultId, int modificationId) {
         MsResultTerminalModSqlMapParam modDb = new MsResultTerminalModSqlMapParam(resultId, modificationId);
-        save("MsSearchMod.insertResultDynaTerminalMod", modDb);
+        save("MsSearchMod.insertResultDynamicTerminalMod", modDb);
     }
     
     public void saveAllDynamicTerminalModsForResult(List<MsResultDynamicTerminalModDb> modList) {
@@ -159,11 +159,11 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
             values.append(")");
         }
         values.deleteCharAt(0);
-        save("MsSearchMod.insertAllResultDynaTerminalMods", values.toString());
+        save("MsSearchMod.insertAllResultDynamicTerminalMods", values.toString());
     }
 
     public void deleteDynamicTerminalModsForResult(int resultId) {
-        delete("MsSearchMod.deleteDynaTerminalModsForResult", resultId);
+        delete("MsSearchMod.deleteDynamicTerminalModsForResult", resultId);
     }
 
 

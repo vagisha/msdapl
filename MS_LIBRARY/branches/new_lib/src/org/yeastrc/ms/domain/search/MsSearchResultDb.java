@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 
  */
-public interface MsRunSearchResultDb extends MsRunSearchResultBase {
+public interface MsSearchResultDb extends MsRunSearchResultBase {
 
     /**
      * @return database id of the run search this result belongs to.

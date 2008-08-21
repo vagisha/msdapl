@@ -7,14 +7,14 @@ import java.util.Arrays;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.sqtFile.SQTSearchDAOImplTest.SQTSearchTest;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -23,7 +23,7 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 
     protected SQTHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
-    protected MsRunSearchResultDAO<SequestRunSearchResult, SQTSearchResultDb> sqtResDao = DAOFactory.instance().getSequestResultDAO();
+    protected MsSearchResultDAO<SequestSearchResult, SQTSearchResultDb> sqtResDao = DAOFactory.instance().getSequestResultDAO();
     protected MsSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtSearchDao = DAOFactory.instance().getSqtSearchDAO();
     protected SQTSearchScanDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
 

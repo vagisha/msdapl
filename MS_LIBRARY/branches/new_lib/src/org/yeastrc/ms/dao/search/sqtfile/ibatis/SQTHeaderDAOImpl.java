@@ -45,7 +45,7 @@ public class SQTHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDAO {
         delete("SqtHeader.deleteHeadersForSearch", searchId);
     }
 
-    public static final class SQTHeaderSqlMapParam {
+    public static final class SQTHeaderSqlMapParam implements SQTHeaderDb {
         private int searchId;
         private String name;
         private String value;
@@ -62,6 +62,9 @@ public class SQTHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDAO {
         }
         public String getValue() {
             return value;
+        }
+        public int getId() {
+            throw new UnsupportedOperationException("getId() not supported by SQTHeaderSqlMapParam");
         }
     }
 }

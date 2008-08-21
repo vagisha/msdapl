@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="SequestResult"> 
+
+
+	<typeAlias alias="SequestResultOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SequestSearchResultDbImpl"/>
+	<typeAlias alias="SequestResultDataIn" type="org.yeastrc.ms.domain.search.sqtfile.SequestResultDataDb"/>
+	
+	
+	<resultMap class="SequestResultOut" id="sequestResultResult" extends="MsSearchResult.msSearchResult">
+		<result property="xCorrRank" column="XCorrRank" nullValue="0"/>
+		<result property="spRank" column="spRank" nullValue="0"/>
+		<result property="deltaCN" column="deltaCN"/>
+		<result property="xCorr" column="XCorr"/>
+		<result property="sp" column="sp"/>
+		<result property="calculatedMass" column="calculatedMass" />
+		<result property="numIonsMatched" column="matchingIons" nullValue="0"/>
+		<result property="numIonsPredicted" column="predictedIons" nullValue="0"/>
+	</resultMap>
+	
+	<parameterMap class="SequestResultDataIn" id="sequestResultDataParam">
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="sp" jdbcType="DECIMAL"/>
+		<parameter property="spRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="xCorr" jdbcType="DECIMAL"/>
+		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="deltaCN" jdbcType="DECIMAL"/>
+		<parameter property="evalue" jdbcType="DOUBLE" nullValue="0" />
+		<parameter property="calculatedMass" jdbcType="DECIMAL" />
+		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="predictedIons" jdbcType="INTEGER" nullValue="0"/>
+	</parameterMap>
+	
+
+    <select id="select" resultMap="sequestResultResult" parameterClass="Integer">
+		SELECT * FROM msRunSearchResult, SQTSearchResult 
+		WHERE SQTSearchResult.resultID = msRunSearchResult.id
+		AND msRunSearchResult.id = #id#
+	</select>
+    
+    <insert id="insert" parameterMap="sequestResultDataParam">
+    	INSERT INTO SQTSearchResult 
+    	(resultID, 
+    	sp,
+    	spRank,
+    	XCorr,
+    	XCorrRank 
+    	deltaCN, 
+    	evalue,
+    	calculatedMass,
+    	matchingIons,
+    	predictedIons) 
+    	VALUES (?,?,?,?,?,?,?,?,?)
+    </insert>
+    
+    <insert id="insertAll" parameterClass="String">
+    	INSERT INTO SQTSearchResult (
+    	(resultID, 
+    	sp,
+    	spRank,
+    	XCorr,
+    	XCorrRank 
+    	deltaCN, 
+    	evalue,
+    	calculatedMass,
+    	matchingIons,
+    	predictedIons) 
+    	VALUES $values$
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM SQTSearchResult WHERE resultID=#id#
+    </delete>
+    
+</sqlMap>

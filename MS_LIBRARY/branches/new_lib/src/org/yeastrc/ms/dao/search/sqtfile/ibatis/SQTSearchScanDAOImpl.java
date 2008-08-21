@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
-import org.yeastrc.ms.domain.search.sequest.SequestRunSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanDbImpl;
 
@@ -85,7 +85,7 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
             return scan.getTotalIntensity();
         }
 
-        public List<SequestRunSearchResult> getScanResults() {
+        public List<SequestSearchResult> getScanResults() {
             throw new UnsupportedOperationException("getScanResults is not supported by SQTSearchScanSqlMapParam");
         }
 

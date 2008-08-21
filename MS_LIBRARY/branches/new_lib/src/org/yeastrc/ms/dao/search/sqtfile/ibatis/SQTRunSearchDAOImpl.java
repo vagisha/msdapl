@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.search.sqtfile.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
@@ -38,16 +36,10 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
         this.headerDao = headerDao;
     }
     
-    
     public SQTRunSearchDb loadRunSearch(int runSearchId) {
         return (SQTRunSearchDb) queryForObject("MsRunSearch.select", runSearchId);
     }
     
-    public List<SQTRunSearchDb> loadSearchesForRun(int runId) {
-        return queryForList("MsRunSearch.selectSearchesForRun", runId);
-    }
-    
-    @Override
     public List<Integer> loadRunSearchIdsForSearch(int searchId) {
         return runSearchDao.loadRunSearchIdsForSearch(searchId);
     }
@@ -56,15 +48,8 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
         return runSearchDao.loadRunSearchIdsForRun(runId);
     }
     
-    @Override
     public int loadIdForRunAndSearch(int runId, int searchId) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("runId", runId);
-        map.put("searchId", searchId);
-        Integer runSearchId = (Integer)queryForObject("MsRunSearch.selectIdForRunAndSearch", map);
-        if (runSearchId != null)
-            return runSearchId;
-        return 0;
+        return runSearchDao.loadIdForRunAndSearch(runId, searchId);
     }
     
     /**
@@ -81,7 +66,6 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
         for (SQTField h: search.getHeaders()) {
             headerDao.saveSQTHeader(h, searchId);
         }
-        
         return searchId;
     }
     

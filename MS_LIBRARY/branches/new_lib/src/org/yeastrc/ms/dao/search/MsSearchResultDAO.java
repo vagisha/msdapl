@@ -2,10 +2,10 @@ package org.yeastrc.ms.dao.search;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsRunSearchResult;
-import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
 
-public interface MsRunSearchResultDAO<I extends MsRunSearchResult, O extends MsRunSearchResultDb> {
+public interface MsSearchResultDAO<I extends MsSearchResult, O extends MsSearchResultDb> {
 
     public abstract O load(int resultId);
 

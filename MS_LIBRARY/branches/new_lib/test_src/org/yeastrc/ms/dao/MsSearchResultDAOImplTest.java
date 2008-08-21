@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsRunSearchResult;
-import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
@@ -63,39 +63,39 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         assertNull(resultDao.load(searchId_1));
         
         // insert a search result with NO extra information
-        MsRunSearchResult result1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", false, false);
+        MsSearchResult result1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", false, false);
         int resultId_1 = resultDao.save(result1, searchId_1, 123);// scanId = 123
         
         // read it back
-        MsRunSearchResultDb resultdb1 = resultDao.load(resultId_1);
+        MsSearchResultDb resultdb1 = resultDao.load(resultId_1);
         assertNotNull(resultdb1);
         assertEquals(0, resultdb1.getProteinMatchList().size());
-        assertEquals(0, resultdb1.getResultPeptide().getDynamicModifications().size());
+        assertEquals(0, resultdb1.getResultPeptide().getDynamicResidueModifications().size());
         checkSearchResult(result1, resultdb1);
        
         
         // save another result this time save protein matches
-        MsRunSearchResult result2 = makeSearchResult(searchId_1, 3, "PEPTIDE2", true, false);
+        MsSearchResult result2 = makeSearchResult(searchId_1, 3, "PEPTIDE2", true, false);
         int resultId_2 = resultDao.save(result2, searchId_1, 123); // scanId = 123
         
         // read it back
-        MsRunSearchResultDb resultdb2 = resultDao.load(resultId_2);
+        MsSearchResultDb resultdb2 = resultDao.load(resultId_2);
         assertNotNull(resultdb2);
         assertEquals(2, resultdb2.getProteinMatchList().size());
-        assertEquals(0, resultdb2.getResultPeptide().getDynamicModifications().size());
+        assertEquals(0, resultdb2.getResultPeptide().getDynamicResidueModifications().size());
         checkSearchResult(result2, resultdb2);
         
         
         // save another result this time save protein matches AND dynamic mods
         // this time use searchId_2
-        MsRunSearchResult result3 = makeSearchResult(searchId_2, 3, "PEPTIDE3", true, true);
+        MsSearchResult result3 = makeSearchResult(searchId_2, 3, "PEPTIDE3", true, true);
         int resultId_3 = resultDao.save(result3, searchId_2, 321);
         
         // read it back
-        MsRunSearchResultDb resultdb3 = resultDao.load(resultId_3);
+        MsSearchResultDb resultdb3 = resultDao.load(resultId_3);
         assertNotNull(resultdb3);
         assertEquals(2, resultdb3.getProteinMatchList().size());
-        assertEquals(3, resultdb3.getResultPeptide().getDynamicModifications().size());
+        assertEquals(3, resultdb3.getResultPeptide().getDynamicResidueModifications().size());
         
         
         // delete ALL results for searchId_1
@@ -123,7 +123,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, matchDao.loadResultProteins(resultId_3).size());
     }
     
-    public static class MsSearchResultTest implements MsRunSearchResult {
+    public static class MsSearchResultTest implements MsSearchResult {
 
         private ValidationStatus validationStatus;
         private MsSearchResultPeptide resultPeptide;
