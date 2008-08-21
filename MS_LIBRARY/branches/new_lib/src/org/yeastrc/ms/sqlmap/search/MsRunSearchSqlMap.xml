@@ -1,23 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
-<sqlMap namespace="MsSearch"> 
+<sqlMap namespace="MsRunSearch"> 
 
-    <typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.impl.MsSearchDbImpl"/>
-	<typeAlias alias="SequestSearchDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl"/>
+	<typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.impl.MsSearchDbImpl"/>
+	<typeAlias alias="SQTSearchDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl"/>
 	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.SearchFileFormat"/>
 	<typeAlias alias="SearchTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$SearchFileFormatTypeHandler"/>
 	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$MsSearchSqlMapParam" />
-	
-	
-	<resultMap class="MsSearchDb" id="msSearchResult">
-		<result property="id" column="id" />
-		<result property="searchDate" column="expDate" />
-		<result property="serverAddress" column="serverAddress" />
-		<result property="serverDirectory" column="serverDirectory" />
-	</resultMap>
-	
-	
 	
 	
 	<resultMap class="MsSearchDb" id="msSearchResult">
@@ -121,4 +111,5 @@
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM msPeptideSearch WHERE id=#id#		    
     </delete>
+    
 </sqlMap>
