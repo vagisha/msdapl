@@ -3,10 +3,9 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsScan"> 
 
-	<typeAlias alias="MsScanDb" type="org.yeastrc.ms.domain.impl.MsScanDbImpl"/>
-	<typeAlias alias="MsScan" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanSqlMapParam"/>
-	<typeAlias alias="MsScanData" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
-	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
+	<typeAlias alias="MsScanDb" type="org.yeastrc.ms.domain.run.impl.MsScanDbImpl"/>
+	<typeAlias alias="MsScanData" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
+	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
 	
 	
 	<resultMap class="MsScanDb" id="msScanResult">
@@ -29,8 +28,7 @@
 	</resultMap>
 	
 	
-	
-	<parameterMap class="MsScan" id="msScanParam">
+	<parameterMap class="MsScanDb" id="msScanParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="startScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="endScanNum" jdbcType="INTEGER" nullValue="-1"/>

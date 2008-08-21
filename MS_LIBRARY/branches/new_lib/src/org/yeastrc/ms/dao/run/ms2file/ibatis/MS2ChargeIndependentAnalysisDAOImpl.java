@@ -63,7 +63,7 @@ public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
         delete("MS2ChgIAnalysis.deleteByScanId", scanId);
     }
 
-    public static final class MS2ChgIndepAnSqlMapParam {
+    public static final class MS2ChgIndepAnSqlMapParam implements MS2ChargeIndependentAnalysisDb {
         private int scanId;
         private String name;
         private String value;
@@ -80,6 +80,9 @@ public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
         }
         public String getValue() {
             return value;
+        }
+        public int getId() {
+            throw new UnsupportedOperationException("getId() not supported by MS2ChgIndepAnSqlMapParam");
         }
     }
 }

@@ -12,7 +12,7 @@ public interface MS2ScanChargeDAO {
     
     public abstract List<MS2ScanChargeDb> loadScanChargesForScan(int scanId);
     
-    public abstract List<MS2ScanChargeDb> loadScanChargesForScan(int scanId, int charge);
+    public abstract List<MS2ScanChargeDb> loadScanChargesForScanAndCharge(int scanId, int charge);
     
     
     /**

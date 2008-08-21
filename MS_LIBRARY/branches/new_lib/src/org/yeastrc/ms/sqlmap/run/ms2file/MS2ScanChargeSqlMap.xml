@@ -3,8 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2ScanCharge"> 
 
-	<typeAlias alias="ScanChargeDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2ScanChargeDbImpl"/>
-	<typeAlias alias="ScanCharge" type="org.yeastrc.ms.dao.ibatis.MS2ScanChargeDAOImpl$MS2ScanChargeSqlMapParam"/>
+	<typeAlias alias="ScanChargeDb" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ScanChargeDbImpl"/>
 	
 	<resultMap class="ScanChargeDb" id="scanChargeResult">
 		<result property="id" column="id" />
@@ -14,7 +13,7 @@
 		<result property="chargeDependentAnalysis" column="id" select="MS2ChgDAnalysis.selectAnalysisForCharge" />
 	</resultMap>
 	
-	<parameterMap class="ScanCharge" id="scanChargeParam">
+	<parameterMap class="ScanChargeDb" id="scanChargeParam">
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="charge" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="mass" jdbcType="DECIMAL" />
@@ -40,7 +39,6 @@
       		select last_insert_id() as id
     	</selectKey>
     </insert>
-    
     
     <delete id="deleteByScanId" parameterClass="Integer">
     	DELETE FROM MS2FileScanCharge WHERE scanID=#id#

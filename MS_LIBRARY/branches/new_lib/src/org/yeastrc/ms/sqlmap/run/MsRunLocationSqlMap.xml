@@ -3,8 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRunLocation"> 
 
-	<typeAlias alias="MsRunLocation" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$MsRunLocationSqlParam" />
-	<typeAlias alias="MsRunLocationDb" type="org.yeastrc.ms.domain.impl.MsRunLocationDbImpl" />
+	<typeAlias alias="MsRunLocationDb" type="org.yeastrc.ms.domain.run.impl.MsRunLocationDbImpl" />
 	
 	<resultMap class="MsRunLocationDb" id="msRunLocationResult">
 		<result property="id" column="id" />
@@ -14,7 +13,7 @@
 		<result property="serverDirectory" column="serverDirectory" />
 	</resultMap>
 	
-	<parameterMap class="MsRunLocation" id="msRunLocationParam">
+	<parameterMap class="MsRunLocationDb" id="msRunLocationParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverDirectory" jdbcType="VARCHAR"/>

@@ -68,18 +68,11 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         delete("MsScan.deletePeakData", scanId);
     }
 
-    public void deleteScansForRun(int runId) {
-        List<Integer> scanIds = loadScanIdsForRun(runId);
-        for (Integer scanId: scanIds) {
-            delete(scanId);
-        }
-    }
-
     /**
      * Convenience class for encapsulating a MsScan along with the associated runId 
      * and precursorScanId (if any)
      */
-    public static class MsScanSqlMapParam implements MsScan {
+    public static class MsScanSqlMapParam implements MsScanDb {
 
         private int runId;
         private int precursorScanId;
@@ -91,9 +84,6 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
             this.scan = scan;
         }
 
-        /**
-         * @return the runId
-         */
         public int getRunId() {
             return runId;
         }
@@ -142,6 +132,16 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         @Override
         public DataConversionType getDataConversionType() {
             return scan.getDataConversionType();
+        }
+
+        @Override
+        public int getId() {
+            throw new UnsupportedOperationException("getId() not supported by MsScanSqlMapParam");
+        }
+
+        @Override
+        public String peakDataString() {
+            throw new UnsupportedOperationException("peakDataString() not supported by MsScanSqlMapParam");
         }
     }
     
@@ -196,14 +196,12 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         }
 
         public Object valueOf(String s) {
-            return null;
+            return trueFalseToDataConversionType(s);
         }
         
         private String dataConversionTypeToTrueFalse(DataConversionType type) {
-            if (type == null)
-                throw new IllegalArgumentException("Cannot convert a null value to T or F");
-            if (type == DataConversionType.CENTROID)                 return TRUE;
-            else if (type == DataConversionType.NON_CENTROID)        return FALSE;
+            if (DataConversionType.CENTROID == type)                 return TRUE;
+            else if (DataConversionType.NON_CENTROID == type)        return FALSE;
             else                                                     return null;
         }
         

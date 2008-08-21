@@ -3,19 +3,15 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsEnzyme"> 
 
-	<typeAlias alias="MsEnzymeDb" type="org.yeastrc.ms.domain.impl.MsEnzymeDbImpl"/>
-	<typeAlias alias="MsEnzyme" type="org.yeastrc.ms.domain.MsEnzyme"/>
-	<typeAlias alias="EnzymeSense" type="org.yeastrc.ms.domain.MsEnzyme$Sense"/>
-	<typeAlias alias="SenseHandler" type="org.yeastrc.ms.dao.ibatis.MsEnzymeDAOImpl$SenseTypeHandler"/>
+	<typeAlias alias="MsEnzymeDb" type="org.yeastrc.ms.domain.general.impl.MsEnzymeDbImpl"/>
+	<typeAlias alias="MsEnzyme" type="org.yeastrc.ms.domain.general.MsEnzyme"/>
+	<typeAlias alias="SenseHandler" type="org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl$SenseTypeHandler"/>
 	
 	
 	<resultMap class="MsEnzymeDb" id="msEnzymeResult">
 		<result property="id" column="id" />
 		<result property="name" column="name" />
-		<result property="sense" column="sense" 
-				javaType="EnzymeSense"
-				jdbcType="SMALLINT"
-				typeHandler="SenseHandler"/>
+		<result property="sense" column="sense" typeHandler="SenseHandler"/>
 		<result property="cut" column="cut" />
 		<result property="nocut" column="nocut" />
 		<result property="description" column="description" />
@@ -23,9 +19,7 @@
 	
 	<parameterMap class="MsEnzyme" id="msEnzymeParam">
 		<parameter property="name" jdbcType="VARCHAR" />
-		<parameter property="sense" jdbcType="SMALLINT" 
-				   javaType="EnzymeSense"
-				   typeHandler="SenseHandler" />
+		<parameter property="sense" jdbcType="SMALLINT" typeHandler="SenseHandler" />
 		<parameter property="cut" jdbcType="VARCHAR"/>	
 		<parameter property="nocut" jdbcType="VARCHAR"/>
 		<parameter property="description" jdbcType="TEXT"/>

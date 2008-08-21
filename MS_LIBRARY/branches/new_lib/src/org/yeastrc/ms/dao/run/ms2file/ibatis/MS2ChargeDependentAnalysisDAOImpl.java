@@ -63,7 +63,7 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
         delete("MS2ChgDAnalysis.deleteByScanChargeId", scanChargeId);
     }
 
-    public static final class MS2ChgDepAnSqlMapParam {
+    public static final class MS2ChgDepAnSqlMapParam implements MS2ChargeDependentAnalysisDb {
         private int scanChargeId;
         private String name;
         private String value;
@@ -80,6 +80,10 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
         }
         public String getValue() {
             return value;
+        }
+        @Override
+        public int getId() {
+            throw new UnsupportedOperationException("getId() not supported by MS2ChgDepAnSqlMapParam");
         }
     }
 }

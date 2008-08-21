@@ -80,43 +80,15 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MS2Scan, 
         return scanId;
     }
     
-    
     public int save(MS2Scan scan, int runId) {
         return save(scan, runId, 0);
     }
     
     /**
-     * Deletes all scans (and associated MS2 file format specific information) for 
-     * the given run.  If the run is not of type MS2 nothing is deleted
-     */
-    public void deleteScansForRun(int runId) {
-        
-        // delete MS2 specific data first
-        List<Integer> scanIds = loadScanIdsForRun(runId);
-        for (Integer id: scanIds) {
-            deleteMS2Data(id);
-        }
-        
-        // delete all parent scans
-        msScanDao.deleteScansForRun(runId);
-    }
-
-    /**
      * Deletes the scan along with any MS2 file format specific information
      */
     public void delete(int scanId) {
-        
-        deleteMS2Data(scanId);
-        
-        // delete the parent scan
         msScanDao.delete(scanId);
     }
 
-    private void deleteMS2Data(int scanId) {
-        // delete any charge independent analysis associated with the scans in the run.
-        iAnalDao.deleteByScanId(scanId);
-        
-        // delete any scan charge information associated with the scan.
-        chargeDao.deleteByScanId(scanId);
-    }
 }

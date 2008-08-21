@@ -26,10 +26,11 @@ import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.general.MsEnzyme;
@@ -43,12 +44,11 @@ import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsSearchModificationDb;
 import org.yeastrc.ms.domain.search.MsRunSearchResult;
 import org.yeastrc.ms.domain.search.MsRunSearchResultDb;
-import org.yeastrc.ms.domain.search.MsSearchResultModification;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
@@ -63,9 +63,9 @@ public class BaseDAOTestCase extends TestCase {
 
     protected MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
     protected MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
-    protected MsExperimentDAO expDao = DAOFactory.instance().getMsExperimentDAO();
 
-    protected MsSearchDAO<MsRunSearch, MsRunSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+    protected MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+    protected MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
     protected MsRunSearchResultDAO<MsRunSearchResult, MsRunSearchResultDb> resultDao = 
         DAOFactory.instance().getMsSearchResultDAO();
     protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
@@ -145,30 +145,29 @@ public class BaseDAOTestCase extends TestCase {
         result.setProteinMatchList(matchProteins);
     }
 
-    protected void addResultDynamicModifications(MsSearchResultPeptideTest peptide, int searchId) {
-
-        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
-
-        List<MsSearchResultModification> resultDynaMods = new ArrayList<MsSearchResultModification>(dynaMods.size());
-        int pos = 1;
-        for (MsSearchModificationDb mod: dynaMods) {
-            MsSearchResultModification resMod = makeResultDynamicMod(mod.getModifiedResidue(), 
-                    mod.getModificationMass().toString(), 
-                    mod.getModificationSymbol(), 
-                    pos++);
-            resultDynaMods.add(resMod);
-        }
-        peptide.setDynamicModifications(resultDynaMods);
-    }
+//    protected void addResultDynamicModifications(MsSearchResultPeptideTest peptide, int searchId) {
+//
+//        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
+//
+//        List<MsSearchResultModification> resultDynaMods = new ArrayList<MsSearchResultModification>(dynaMods.size());
+//        int pos = 1;
+//        for (MsSearchModificationDb mod: dynaMods) {
+//            MsSearchResultModification resMod = makeResultDynamicMod(mod.getModifiedResidue(), 
+//                    mod.getModificationMass().toString(), 
+//                    mod.getModificationSymbol(), 
+//                    pos++);
+//            resultDynaMods.add(resMod);
+//        }
+//        peptide.setDynamicModifications(resultDynaMods);
+//    }
 
     protected void checkSearchResult(MsRunSearchResult input, MsRunSearchResultDb output) {
-        if(input.getCalculatedMass() != null)
-            assertEquals(input.getCalculatedMass().doubleValue(), output.getCalculatedMass().doubleValue());
         assertEquals(input.getCharge(), output.getCharge());
-        assertEquals(input.getNumIonsMatched(), output.getNumIonsMatched());
-        assertEquals(input.getNumIonsPredicted(), output.getNumIonsPredicted());
+        if (input.getValidationStatus() == null)
+            assertEquals(ValidationStatus.UNKNOWN, output.getValidationStatus());
+        else ()
         assertNull(input.getValidationStatus());
-        assertEquals(ValidationStatus.UNKNOWN, output.getValidationStatus());
+        
         assertEquals(input.getProteinMatchList().size(), output.getProteinMatchList().size());
         checkResultPeptide(input.getResultPeptide(), output.getResultPeptide());
     }
@@ -227,48 +226,48 @@ public class BaseDAOTestCase extends TestCase {
         return mod;
     }
 
-    protected MsSearchModification makeDynamicMod(final char modChar, final String modMass, final char modSymbol) {
-        MsSearchModification mod = new MsSearchModification() {
-            public BigDecimal getModificationMass() {
-                return new BigDecimal(modMass);
-            }
-            public char getModificationSymbol() {
-                return modSymbol;
-            }
-            public ModificationType getModificationType() {
-                return ModificationType.DYNAMIC;
-            }
-            public char getModifiedResidue() {
-                return modChar;
-            }};
-        return mod;
-    }
-    
-    protected MsSearchResultModification makeResultDynamicMod(final char modChar, final String modMass,
-            final char modSymbol, final int modPos) {
-        MsSearchResultModification mod = new MsSearchResultModification() {
-            public BigDecimal getModificationMass() {
-                return new BigDecimal(modMass);
-            }
-            public char getModificationSymbol() {
-                return modSymbol;
-            }
-            public ModificationType getModificationType() {
-                return ModificationType.DYNAMIC;
-            }
-            public char getModifiedResidue() {
-                return modChar;
-            }
-            public int getModifiedPosition() {
-                return modPos;
-            }};
-        return mod;
-    }
+//    protected MsSearchModification makeDynamicMod(final char modChar, final String modMass, final char modSymbol) {
+//        MsSearchModification mod = new MsSearchModification() {
+//            public BigDecimal getModificationMass() {
+//                return new BigDecimal(modMass);
+//            }
+//            public char getModificationSymbol() {
+//                return modSymbol;
+//            }
+//            public ModificationType getModificationType() {
+//                return ModificationType.DYNAMIC;
+//            }
+//            public char getModifiedResidue() {
+//                return modChar;
+//            }};
+//        return mod;
+//    }
+//    
+//    protected MsSearchResultModification makeResultDynamicMod(final char modChar, final String modMass,
+//            final char modSymbol, final int modPos) {
+//        MsSearchResultModification mod = new MsSearchResultModification() {
+//            public BigDecimal getModificationMass() {
+//                return new BigDecimal(modMass);
+//            }
+//            public char getModificationSymbol() {
+//                return modSymbol;
+//            }
+//            public ModificationType getModificationType() {
+//                return ModificationType.DYNAMIC;
+//            }
+//            public char getModifiedResidue() {
+//                return modChar;
+//            }
+//            public int getModifiedPosition() {
+//                return modPos;
+//            }};
+//        return mod;
+//    }
 
     //-----------------------------------------------------------------------------------------------------
     // SEARCH
     //-----------------------------------------------------------------------------------------------------
-    protected MsRunSearch makePeptideSearch(SearchFileFormat format, boolean addSeqDb,
+    protected MsRunSearch makeSearch(SearchFileFormat format, boolean addSeqDb,
             boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
 
         MsSearchTest search = new MsSearchTest();
@@ -290,18 +289,18 @@ public class BaseDAOTestCase extends TestCase {
             search.setSearchDatabases(Arrays.asList(new MsSearchDatabase[]{db1, db2}));
         }
 
-        if (addStaticMods) {
-            MsSearchModification mod1 = makeStaticMod('C', "50.0");
-            MsSearchModification mod2 = makeStaticMod('S', "80.0");
-            search.setStaticModifications(Arrays.asList(new MsSearchModification[]{mod1, mod2}));
-        }
-
-        if (addDynaMods) {
-            MsSearchModification dmod1 = makeDynamicMod('A', "10.0", '*');
-            MsSearchModification dmod2 = makeDynamicMod('B', "20.0", '#');
-            MsSearchModification dmod3 = makeDynamicMod('C', "30.0", '@');
-            search.setDynamicModifications(Arrays.asList(new MsSearchModification[]{dmod1, dmod2, dmod3}));
-        }
+//        if (addStaticMods) {
+//            MsSearchModification mod1 = makeStaticMod('C', "50.0");
+//            MsSearchModification mod2 = makeStaticMod('S', "80.0");
+//            search.setStaticModifications(Arrays.asList(new MsSearchModification[]{mod1, mod2}));
+//        }
+//
+//        if (addDynaMods) {
+//            MsSearchModification dmod1 = makeDynamicMod('A', "10.0", '*');
+//            MsSearchModification dmod2 = makeDynamicMod('B', "20.0", '#');
+//            MsSearchModification dmod3 = makeDynamicMod('C', "30.0", '@');
+//            search.setDynamicModifications(Arrays.asList(new MsSearchModification[]{dmod1, dmod2, dmod3}));
+//        }
 
         if (addEnzymes) {
             MsEnzyme enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
@@ -354,19 +353,21 @@ public class BaseDAOTestCase extends TestCase {
         return cal.getTimeInMillis();
     }
     
-    protected void checkSearch(MsRunSearch input, MsRunSearchDb output) {
+    protected void checkSearch(MsSearch input, MsSearchDb output) {
         assertEquals(input.getSearchDatabases().size(), output.getSearchDatabases().size());
         assertEquals(input.getStaticResidueMods().size(), output.getStaticResidueMods().size());
         assertEquals(input.getDynamicResidueMods().size(), output.getDynamicResidueMods().size());
+        assertEquals(input.getStaticTerminalMods().size(), output.getStaticTerminalMods().size());
+        assertEquals(input.getDynamicTerminalMods().size(), output.getDynamicTerminalMods().size());
         assertEquals(input.getEnzymeList().size(), output.getEnzymeList().size());
-        assertEquals(input.getFragmentMassTolerance().doubleValue(), output.getFragmentMassTolerance().doubleValue());
-        assertEquals(input.getFragmentMassType(), output.getFragmentMassType());
-        assertEquals(input.getPrecursorMassTolerance().doubleValue(), output.getPrecursorMassTolerance().doubleValue());
-        assertEquals(input.getPrecursorMassType(), output.getPrecursorMassType());
         assertEquals(input.getSearchDate().toString(), output.getSearchDate().toString());
-        assertEquals(input.getSearchDuration(), output.getSearchDuration());
         assertEquals(input.getAnalysisProgramName(), output.getAnalysisProgramName());
         assertEquals(input.getAnalysisProgramVersion(), output.getAnalysisProgramVersion());
+    }
+    
+    protected void checkRunSearch(MsRunSearch input, MsRunSearchDb output) {
+        assertEquals(input.getSearchDate().toString(), output.getSearchDate().toString());
+        assertEquals(input.getSearchDuration(), output.getSearchDuration());
         assertEquals(input.getSearchFileFormat(), output.getSearchFileFormat());
     }
 

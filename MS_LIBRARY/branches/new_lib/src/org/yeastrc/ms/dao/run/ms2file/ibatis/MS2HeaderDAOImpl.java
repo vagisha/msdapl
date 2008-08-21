@@ -6,9 +6,7 @@
  */
 package org.yeastrc.ms.dao.run.ms2file.ibatis;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
@@ -38,15 +36,8 @@ public class MS2HeaderDAOImpl extends BaseSqlMapDAO implements MS2HeaderDAO {
     public void deleteHeadersForRunId(int runId) {
         delete("MS2Header.deleteByRunId", runId);
     }
-
-    public void deleteHeadersForRunIds(List<Integer> runIds) {
-        if (runIds == null || runIds.size() == 0)   return;
-        Map<String, List<Integer>> map = new HashMap<String, List<Integer>>(1);
-        map.put("runIdList", runIds);
-        delete("MS2Header.deleteByRunIds", map);
-    }
     
-    public static final class MS2HeaderSqlMapParam {
+    public static final class MS2HeaderSqlMapParam implements MS2HeaderDb {
         private int runId;
         private String name;
         private String value;
@@ -63,6 +54,9 @@ public class MS2HeaderDAOImpl extends BaseSqlMapDAO implements MS2HeaderDAO {
         }
         public String getValue() {
             return value;
+        }
+        public int getId() {
+            throw new UnsupportedOperationException("getId() not supported by MS2HeaderSqlMapParam");
         }
     }
 }

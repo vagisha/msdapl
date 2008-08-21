@@ -31,7 +31,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, searchDao.loadRunSearchIdsForRun(runId_1).size()); // runId = 1
         
         // create and save a search with no seq. db information or modifications or enzymes
-        MsRunSearch search_1 = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
+        MsRunSearch search_1 = makeSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
         assertEquals(167, search_1.getSearchDuration());
         assertEquals(0, search_1.getSearchDatabases().size());
         assertEquals(0, search_1.getStaticResidueMods().size());
@@ -45,7 +45,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         
         
         // create and save a search with seq. db information and modifications AND enzymes
-        MsRunSearch search_2 = makePeptideSearch(SearchFileFormat.SQT_SEQ, true, true, true, true);
+        MsRunSearch search_2 = makeSearch(SearchFileFormat.SQT_SEQ, true, true, true, true);
         assertTrue(search_2.getSearchDatabases().size() > 0);
         assertTrue(search_2.getStaticResidueMods().size() > 0);
         assertTrue(search_2.getDynamicResidueMods().size() > 0);
@@ -91,14 +91,14 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testReturnedSearchType() {
-        MsRunSearch search = makePeptideSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
+        MsRunSearch search = makeSearch(SearchFileFormat.SQT_SEQ, false, false, false, false);
         assertEquals(SearchFileFormat.SQT_SEQ, search.getSearchFileFormat());
         int searchId_1 = searchDao.saveRunSearch(search, 21, 0); // runId = 21
         MsRunSearchDb searchDb = searchDao.loadSearch(searchId_1);
         assertTrue(searchDb instanceof SQTRunSearchDb);
         assertEquals(SearchFileFormat.SQT_SEQ, searchDb.getSearchFileFormat());
         
-        search = makePeptideSearch(SearchFileFormat.PEPXML, false, false, false, false);
+        search = makeSearch(SearchFileFormat.PEPXML, false, false, false, false);
         assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
         int searchId_2 = searchDao.saveRunSearch(search, 21, 0);
         searchDb = searchDao.loadSearch(searchId_2);

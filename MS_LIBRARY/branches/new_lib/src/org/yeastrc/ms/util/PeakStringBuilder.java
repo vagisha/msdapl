@@ -21,14 +21,14 @@ public class PeakStringBuilder {
     public void addPeak(String mz, String rt) {
 
         peakBuffer.append(trimTrailingZeros(mz));
-        peakBuffer.append(":");
+        peakBuffer.append(" ");
         peakBuffer.append(trimTrailingZeros(rt));
-        peakBuffer.append(";");
+        peakBuffer.append("\n");
     }
 
     public String getPeaksAsString() {
         if (peakBuffer.length() > 0)
-            return peakBuffer.substring(0, peakBuffer.length() - 1);
+            return peakBuffer.substring(0, peakBuffer.length() - 1); // remove last new-line.
         return "";
     }
 

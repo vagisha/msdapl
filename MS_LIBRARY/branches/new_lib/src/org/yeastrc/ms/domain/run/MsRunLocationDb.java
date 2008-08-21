@@ -23,6 +23,8 @@ public interface MsRunLocationDb extends MsRunLocation {
      */
     public abstract int getRunId();
     
-    
+    /**
+     * @return the createDate
+     */
     public abstract Date getCreateDate();
 }

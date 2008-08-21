@@ -21,7 +21,7 @@ public class PeakConverterString {
         if (peakString == null || peakString.length() == 0)
             return peakList;
 
-        String[] peaksStr = peakString.split(";");
+        String[] peaksStr = peakString.split("\\n");
         for (String peak: peaksStr) {
             String [] peakVals = splitPeakVals(peak);
             peakList.add(peakVals);
@@ -30,7 +30,7 @@ public class PeakConverterString {
     }
 
     private String[] splitPeakVals(String peak) {
-        int i = peak.indexOf(":");
+        int i = peak.indexOf(" ");
         String[] vals = new String[2];
         vals[0] = peak.substring(0, i);
         if (vals[0].lastIndexOf('.') == -1) vals[0] = vals[0]+".0";

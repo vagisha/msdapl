@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.run.ibatis;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,7 +148,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
     /** 
      * Convenience class
      */
-    public static final class MsRunLocationSqlParam {
+    public static final class MsRunLocationSqlParam implements MsRunLocationDb {
         
         private final int runId;
         private final String serverAddress;
@@ -160,5 +161,11 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         public int getRunId() {return runId;}
         public String getServerAddress() {return serverAddress;}
         public String getServerDirectory() {return serverDirectory;}
+        public Date getCreateDate() {
+            throw new UnsupportedOperationException("getCreateDate() not supported by MsRunLocationSqlParam");
+        }
+        public int getId() {
+            throw new UnsupportedOperationException("getId() not supported by MsRunLocationSqlParam");
+        }
     }
 }

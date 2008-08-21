@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2Scan"> 
 
-	<typeAlias alias="MS2ScanDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2ScanDbImpl"/>
+	<typeAlias alias="MS2ScanDb" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ScanDbImpl"/>
 	
 	<resultMap class="MS2ScanDb" id="MS2ScanResult" extends="MsScan.msScanResult">
 		<result property="scanChargeList" 
@@ -16,7 +16,7 @@
 	
 	
 	<select id="select" resultMap="MS2ScanResult" parameterClass="Integer">
-    	SELECT id, 
+		SELECT id, 
     			runID, 
     			startScanNumber, 
     			endScanNumber, 
@@ -26,6 +26,8 @@
     			prescanNumber, 
     			retentionTime,
     			fragmentationType,
+    			isCentroid,
+    			peakCount,
     			UNCOMPRESS(data) as data 
     			FROM msScan, msScanData
     			WHERE msScan.id = msScanData.scanID

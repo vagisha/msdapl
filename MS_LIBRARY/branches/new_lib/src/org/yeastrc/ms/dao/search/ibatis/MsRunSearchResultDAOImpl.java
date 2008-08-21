@@ -163,10 +163,7 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
     public static final class ValidationStatusTypeHandler implements TypeHandlerCallback {
 
         public Object getResult(ResultGetter getter) throws SQLException {
-            String statusStr = getter.getString();
-            if (getter.wasNull() || statusStr.length() == 0)
-                return ValidationStatus.UNKNOWN;
-            return ValidationStatus.instance(statusStr.charAt(0));
+            return stringToValidationStatus(getter.getString());
         }
 
         public void setParameter(ParameterSetter setter, Object parameter)
@@ -178,10 +175,19 @@ public class MsRunSearchResultDAOImpl extends BaseSqlMapDAO
                 setter.setString(Character.toString(status.getStatusChar()));
         }
 
-        public Object valueOf(String s) {
-            if (s == null || s.length() == 0)
+        public Object valueOf(String statusStr) {
+            return stringToValidationStatus(statusStr);
+        }
+
+        private Object stringToValidationStatus(String statusStr) {
+            if (statusStr == null)
                 return ValidationStatus.UNKNOWN;
-            return ValidationStatus.instance(s.charAt(0));
+            if (statusStr.length() != 1)
+                throw new IllegalArgumentException("Cannot convert \""+statusStr+"\" to ValidationStatus");
+            ValidationStatus status = ValidationStatus.instance(statusStr.charAt(0));
+            if (status == ValidationStatus.UNKNOWN)
+                throw new IllegalArgumentException("Unrecognized validation status: "+statusStr);
+            return status;
         }
         
     }

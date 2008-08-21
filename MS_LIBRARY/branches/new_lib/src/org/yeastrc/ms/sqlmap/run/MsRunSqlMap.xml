@@ -3,19 +3,17 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRun"> 
 
-	<typeAlias alias="MsRun" type="org.yeastrc.ms.domain.MsRun" />
-	<typeAlias alias="MsRunDb" type="org.yeastrc.ms.domain.impl.MsRunDbImpl"/>
-	<typeAlias alias="MS2RunDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2RunDbImpl"/>
-	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.RunFileFormat"/>
-	<typeAlias alias="RunTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsRunDAOImpl$RunFileFormatTypeHandler"/>
+	<typeAlias alias="MsRun" type="org.yeastrc.ms.domain.run.MsRun" />
+	<typeAlias alias="MsRunDb" type="org.yeastrc.ms.domain.run.impl.MsRunDbImpl"/>
+	<typeAlias alias="MS2RunDb" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2RunDbImpl"/>
+	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.run.RunFileFormat"/>
+	<typeAlias alias="RunTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl$RunFileFormatTypeHandler"/>
 	
 	
 	<resultMap class="MsRunDb" id="msRunResult">
 		<result property="id" column="id" />
 		<result property="fileName" column="filename" />
-		<result property="runFileFormat" column="originalFileType"
-				javaType="RunType" jdbcType="VARCHAR"
-				typeHandler="RunTypeHandler"/>
+		<result property="runFileFormat" column="originalFileType" typeHandler="RunTypeHandler"/>
 		<result property="sha1Sum" column="sha1Sum" />
 		<result property="creationDate" column="creationTime" />
 		<result property="conversionSW" column="extractor" />
@@ -54,10 +52,7 @@
 		<parameter property="instrumentVendor" jdbcType="VARCHAR"/>
 		<parameter property="instrumentSN" jdbcType="VARCHAR"/>
 		<parameter property="acquisitionMethod" jdbcType="VARCHAR" />
-		<parameter property="runFileFormat" 
-					jdbcType="VARCHAR" 
-					javaType="RunType" 
-					typeHandler="RunTypeHandler"
+		<parameter property="runFileFormat" jdbcType="VARCHAR" typeHandler="RunTypeHandler"
 		/>
 		<parameter property="comment" jdbcType="VARCHAR"/>
 	</parameterMap>

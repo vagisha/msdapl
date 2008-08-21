@@ -12,7 +12,4 @@ public interface MS2HeaderDAO {
     public abstract List<MS2HeaderDb> loadHeadersForRun(int runId);
     
     public abstract void deleteHeadersForRunId(int runId);
-    
-    public abstract void deleteHeadersForRunIds(List<Integer> runIds);
-
 }

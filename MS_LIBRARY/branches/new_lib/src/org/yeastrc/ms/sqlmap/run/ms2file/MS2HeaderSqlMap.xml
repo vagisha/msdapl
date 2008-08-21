@@ -3,8 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2Header"> 
 
-	<typeAlias alias="HeaderDb" type="org.yeastrc.ms.domain.ms2File.impl.MS2HeaderDbImpl"/>
-	<typeAlias alias="Header" type="org.yeastrc.ms.dao.ms2File.ibatis.MS2HeaderDAOImpl$MS2HeaderSqlMapParam"/>
+	<typeAlias alias="HeaderDb" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2HeaderDbImpl"/>
 	
 	<resultMap class="HeaderDb" id="headerResult">
 		<result property="id" column="id" />
@@ -13,7 +12,7 @@
 		<result property="value" column="value" />
 	</resultMap>
 	
-	<parameterMap class="Header" id="headerParam">
+	<parameterMap class="HeaderDb" id="headerParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>
@@ -32,17 +31,6 @@
     
     <delete id="deleteByRunId" parameterClass="Integer">
 		DELETE FROM MS2FileHeader WHERE runID=#runId#		    
-    </delete>
-    
-    <delete id="deleteByRunIds" parameterClass="java.util.Map">
-		DELETE FROM MS2FileHeader
-		<iterate property="runIdList"
-    			open="WHERE runID IN("
-    			close=")"
-    			conjunction=","
-    			>
-    			#runIdList[]#
-    		</iterate>
     </delete>
     
 </sqlMap>

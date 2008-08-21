@@ -22,7 +22,7 @@ public class PeakConverterDouble  {
         if (peakString == null || peakString.length() == 0)
             return peakList;
         
-        String[] peaksStr = peakString.split(";");
+        String[] peaksStr = peakString.split("\\n");
         for (String peak: peaksStr) {
             String [] peakVals = splitPeakVals(peak);
             double[] peakData = new double[2];
@@ -35,7 +35,7 @@ public class PeakConverterDouble  {
     }
 
     private String[] splitPeakVals(String peak) {
-        int i = peak.indexOf(":");
+        int i = peak.indexOf(" ");
         String[] vals = new String[2];
         vals[0] = peak.substring(0, i);
         vals[1] = peak.substring(i+1, peak.length());

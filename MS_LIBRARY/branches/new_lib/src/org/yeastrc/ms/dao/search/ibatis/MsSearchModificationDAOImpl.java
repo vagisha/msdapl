@@ -7,6 +7,7 @@
 package org.yeastrc.ms.dao.search.ibatis;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -18,8 +19,12 @@ import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
 import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.extensions.ParameterSetter;
+import com.ibatis.sqlmap.client.extensions.ResultGetter;
+import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 /**
  * 
@@ -280,6 +285,73 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
 
         public int getModificationId() {
             return modId;
+        }
+    }
+    
+    /**
+     * Type handler for converting between Java's Character and SQL's CHAR type.
+     */
+    public static final class CharTypeHandler implements TypeHandlerCallback {
+
+        public Object getResult(ResultGetter getter) throws SQLException {
+            return stringToChar(getter.getString());
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            Character status = (Character) parameter;
+            if (status == null)
+                setter.setNull(java.sql.Types.CHAR);
+            else
+                setter.setString(status.toString());
+        }
+
+        public Object valueOf(String s) {
+            return stringToChar(s);
+        }
+        
+        private Character stringToChar(String charStr) {
+            // if charStr is NULL the value (\u0000) will be used for modificationSymbol
+            if (charStr == null || charStr.length() == 0)
+                return Character.valueOf('\u0000');
+            if (charStr.length() > 1)
+                throw new IllegalArgumentException("Cannot convert "+charStr+" to Character");
+            return Character.valueOf(charStr.charAt(0));
+        }
+    }
+    
+    /**
+     * Type handler for converting between MsTerminalModification.Terminal and SQL's CHAR type.
+     */
+    public static final class TerminalTypeHandler implements TypeHandlerCallback {
+
+        public Object getResult(ResultGetter getter) throws SQLException {
+            return stringToTerminal(getter.getString());
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            Terminal terminal = (Terminal) parameter;
+            if (terminal == null)
+                throw new IllegalArgumentException("Terminal value for terminal modification cannot be null");
+//                setter.setNull(java.sql.Types.CHAR);
+            else
+                setter.setString(String.valueOf(terminal.toChar()));
+        }
+
+        public Object valueOf(String s) {
+            return stringToTerminal(s);
+        }
+        
+        private Terminal stringToTerminal(String termStr) {
+            if (termStr == null)
+                throw new IllegalArgumentException("String representing MsTerminalModification.Terminal cannot be null");
+            if (termStr.length() != 1)
+                throw new IllegalArgumentException("Cannot convert "+termStr+" to Terminal");
+            Terminal term = Terminal.instance(Character.valueOf(termStr.charAt(0)));
+            if (term == null)
+                throw new IllegalArgumentException("Invalid Terminal value: "+termStr);
+            return term;
         }
     }
 }

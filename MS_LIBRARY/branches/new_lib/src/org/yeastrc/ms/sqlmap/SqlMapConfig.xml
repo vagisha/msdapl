@@ -24,27 +24,32 @@
     	</dataSource>
 	</transactionManager>
 	
+	<!--  General sqlmaps -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/general/MsEnzymeSqlMap.xml"/>
+	<!-- <sqlMap resource="org/yeastrc/ms/sqlmap/DeletionSqlMap.xml"/> -->
+	
+	
 	<!-- Related to experiments and runs -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsEnzymeSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsScanSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsRunLocationSqlMap.xml"/>
-	
-	
-	<!-- Related to peptide searches -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchDatabaseSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchResultProteinSqlMap.xml" />
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchModificationSqlMap.xml" />
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchResultSqlMap.xml" />
-	<sqlMap resource="org/yeastrc/ms/sqlmap/MsSearchSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/MsScanSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/MsRunSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/MsRunLocationSqlMap.xml"/>
 
 	
 	<!-- Related to MS2 files -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2HeaderSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ChargeDependentAnalysisSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ScanChargeSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ChargeIndependentAnalysisSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/ms2File/MS2ScanSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2HeaderSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2ChargeDependentAnalysisSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2f/MS2ScanChargeSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2ChargeIndependentAnalysisSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2ScanSqlMap.xml"/>
+	
+	
+	<!-- Related to peptide searches -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchDatabaseSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchModificationSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchResultProteinSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchResultSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsRunSearchSqlMap.xml" />
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchSqlMap.xml" />
 
 
 	<!-- Related to SQT files -->
@@ -52,7 +57,4 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchScanSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchResultSqlMap.xml"/>
 	
-	<!-- Related to deletion -->
-	<!-- <sqlMap resource="org/yeastrc/ms/sqlmap/DeletionSqlMap.xml"/> -->
-
 </sqlMapConfig>	

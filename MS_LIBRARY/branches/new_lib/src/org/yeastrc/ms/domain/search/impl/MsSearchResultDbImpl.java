@@ -22,7 +22,7 @@ public class MsSearchResultDbImpl implements MsRunSearchResultDb {
     private int scanId; // id (database) of the scan with which this result is associated
 
     private int charge; 
-    private ValidationStatus validationStatus = ValidationStatus.UNVALIDATED;
+    private ValidationStatus validationStatus = ValidationStatus.UNKNOWN;
 
     private List<? super MsSearchResultProteinDb> proteinMatchList;
 

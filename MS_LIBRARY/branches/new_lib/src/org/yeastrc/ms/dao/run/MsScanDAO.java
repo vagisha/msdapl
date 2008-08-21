@@ -42,12 +42,6 @@ public interface MsScanDAO <I extends MsScan, O extends MsScanDb> {
     public abstract void delete(int scanId);
     
     /**
-     * Deletes all scans for the given run.
-     * @param runId
-     */
-    public abstract void deleteScansForRun(int runId);
-
-    /**
      * Returns the database id for the scan with the given scan number and runId
      * @param scanNum
      * @param runId

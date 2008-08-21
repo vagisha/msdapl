@@ -3,8 +3,8 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearch"> 
 
-	<typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.impl.MsSearchDbImpl"/>
-	<typeAlias alias="SQTSearchDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl"/>
+    <typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.impl.MsSearchDbImpl"/>
+	<typeAlias alias="SequestSearchDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchDbImpl"/>
 	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.SearchFileFormat"/>
 	<typeAlias alias="SearchTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$SearchFileFormatTypeHandler"/>
 	<typeAlias alias="MsSearch" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$MsSearchSqlMapParam" />
@@ -111,5 +111,4 @@
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM msPeptideSearch WHERE id=#id#		    
     </delete>
-    
 </sqlMap>
