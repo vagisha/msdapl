@@ -76,8 +76,8 @@ public class SequestSearchResultDbImpl extends MsSearchResultDbImpl implements S
         sequestData.setSp(sp);
     }
     
-    public Double geteValue() {
-        return sequestData.geteValue();
+    public Double getEvalue() {
+        return sequestData.getEvalue();
     }
     
     public void seteValue(Double evalue) {

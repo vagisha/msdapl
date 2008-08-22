@@ -14,6 +14,7 @@
 		<result property="deltaCN" column="deltaCN"/>
 		<result property="xCorr" column="XCorr"/>
 		<result property="sp" column="sp"/>
+		<result property="evalue" column="evalue"/>
 		<result property="calculatedMass" column="calculatedMass" />
 		<result property="numIonsMatched" column="matchingIons" nullValue="0"/>
 		<result property="numIonsPredicted" column="predictedIons" nullValue="0"/>

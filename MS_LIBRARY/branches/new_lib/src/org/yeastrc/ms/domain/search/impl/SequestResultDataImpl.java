@@ -57,7 +57,7 @@ public class SequestResultDataImpl implements SequestResultData {
     }
 
     @Override
-    public Double geteValue() {
+    public Double getEvalue() {
         return evalue;
     }
 

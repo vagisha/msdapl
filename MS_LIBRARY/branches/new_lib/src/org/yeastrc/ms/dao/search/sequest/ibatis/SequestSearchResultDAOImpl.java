@@ -93,7 +93,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             values.append(",");
             values.append(data.getDeltaCN());
             values.append(",");
-            values.append(data.geteValue());
+            values.append(data.getEvalue());
             values.append(",");
             values.append(data.getCalculatedMass());
             values.append(",");
@@ -163,8 +163,8 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             return result.getPredictedIons();
         }
 
-        public Double geteValue() {
-            return result.geteValue();
+        public Double getEvalue() {
+            return result.getEvalue();
         }
     }
 }

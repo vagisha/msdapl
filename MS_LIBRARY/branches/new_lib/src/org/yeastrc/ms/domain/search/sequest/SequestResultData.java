@@ -41,7 +41,7 @@ public interface SequestResultData {
     /**
      * @return the e-value
      */
-    public abstract Double geteValue();
+    public abstract Double getEvalue();
 
     public abstract BigDecimal getCalculatedMass();
 
