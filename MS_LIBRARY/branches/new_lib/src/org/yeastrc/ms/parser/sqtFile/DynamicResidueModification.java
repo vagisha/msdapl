@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.MsResidueModification;
 
-public class DynamicModification implements MsResidueModification {
+public class DynamicResidueModification implements MsResidueModification {
 
     private char modificationChar;
     private BigDecimal modificationMass;
     private char modificationSymbol;
     
-    public DynamicModification(char modChar, BigDecimal modMass, char modSymbol) {
+    public DynamicResidueModification(char modChar, BigDecimal modMass, char modSymbol) {
         this.modificationChar = modChar;
         this.modificationMass = modMass;
         this.modificationSymbol = modSymbol;

@@ -269,7 +269,7 @@ public class SQTHeader implements SQTRunSearch {
         // this modification may be for multiple residues; 
         // add one StaticModification for each residue character
         for (int i = 0; i < modChars.length(); i++) {
-            staticMods.add(new StaticModification(modChars.charAt(i), mass));
+            staticMods.add(new StaticResidueModification(modChars.charAt(i), mass));
         }
     }
     
@@ -334,7 +334,7 @@ public class SQTHeader implements SQTRunSearch {
         // this modification may be for multiple residues; 
         // add one StaticModification for each residue character
         for (int i = 0; i < modChars.length(); i++) {
-            dynaMods.add(new DynamicModification(modChars.charAt(i), mass, modSymbol));
+            dynaMods.add(new DynamicResidueModification(modChars.charAt(i), mass, modSymbol));
         }
     }
 

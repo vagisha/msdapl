@@ -12,7 +12,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
-import org.yeastrc.ms.parser.sqtFile.SequestResultPeptideBuilder;
 
 /**
  * Represents a 'M' line in the SQT file

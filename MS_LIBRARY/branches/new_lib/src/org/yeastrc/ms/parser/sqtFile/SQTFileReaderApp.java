@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
+
 
 public class SQTFileReaderApp {
 
@@ -18,7 +21,7 @@ public class SQTFileReaderApp {
         
         BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
         
-        SQTFileReader reader = new SQTFileReader("remoteServer");
+        SequestSQTFileReader reader = new SequestSQTFileReader("remoteServer", false);
         try {
             reader.open(file);
             SQTHeader header = reader.getSearchHeader();
@@ -26,7 +29,7 @@ public class SQTFileReaderApp {
             writer.write(header.toString());
             writer.write("\n");
             while (reader.hasNextSearchScan()) {
-                SearchScan scan = reader.getNextSearchScan();
+                SequestSearchScan scan = reader.getNextSearchScan();
                 System.out.println(scan.toString());
                 writer.write(scan.toString());
                 writer.write("\n");

@@ -4,7 +4,7 @@
  * Jul 13, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.parser.sqtFile;
+package org.yeastrc.ms.parser.sqtFile.sequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,6 +16,7 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
  * 

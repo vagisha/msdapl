@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.MsResidueModification;
 
-public class StaticModification implements MsResidueModification {
+public class StaticResidueModification implements MsResidueModification {
 
     private char modificationChar;
     private BigDecimal modificationMass;
     
-    public StaticModification(char modChar, BigDecimal modMass) {
+    public StaticResidueModification(char modChar, BigDecimal modMass) {
         this.modificationChar = modChar;
         this.modificationMass = modMass;
     }

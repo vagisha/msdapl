@@ -149,31 +149,6 @@ public abstract class  SQTFileReader <E extends SQTSearchScan> extends AbstractR
         return currentLine != null;
     }
 
-    /**
-     * Returns the next scan in the file. 
-     * @return
-     * @throws DataProviderException if the scan or any of its associated results were invalid
-     */
-//    public ScanResult getNextSearchScan() throws DataProviderException {
-//
-//        ScanResult scan = parseScan(currentLine);
-//        advanceLine();
-//
-//        while(currentLine != null) {
-//            // is this one of the results for the scan ('M' line)
-//            if (isResultLine(currentLine)) {
-//                PeptideResult result = parsePeptideResult(scan.getStartScan(), scan.getCharge());
-//                if (result != null) 
-//                    scan.addPeptideResult(result);
-//            }
-//            else {
-//                break;
-//            }
-//        }
-//        
-//        return scan;
-//    }
-
     protected SearchScan parseScan(String line) throws DataProviderException {
 
         // make sure we have a scan line

@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 import org.yeastrc.ms.domain.search.MsSearchModification;
 import org.yeastrc.ms.domain.search.MsSearchResultModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 
 /**
  * 
