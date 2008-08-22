@@ -23,7 +23,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
  */
 public class MsSearchResultPeptideBuilderTest extends TestCase {
 
-    SQTSearchResultPeptideBuilder builder = SQTSearchResultPeptideBuilder.instance();
+    SequestResultPeptideBuilder builder = SequestResultPeptideBuilder.instance();
     
     protected void setUp() throws Exception {
         super.setUp();

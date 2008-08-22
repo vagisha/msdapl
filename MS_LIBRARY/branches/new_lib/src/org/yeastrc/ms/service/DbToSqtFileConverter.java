@@ -33,10 +33,10 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
-import org.yeastrc.ms.parser.sqtFile.PeptideResult;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
-import org.yeastrc.ms.parser.sqtFile.ScanResult;
+import org.yeastrc.ms.parser.sqtFile.SearchScan;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
 
 /**
  * 
@@ -66,7 +66,7 @@ public class DbToSqtFileConverter {
             List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(dbSearchId);
             int currCharge = -1;
             int currScanId = -1;
-            ScanResult currScan = null;
+            SearchScan currScan = null;
             for (Integer resultId: resultIds) {
                 SQTSearchResultDb result = resultDao.load(resultId);
                 if (result.getScanId() != currScanId || result.getCharge() != currCharge) {
@@ -79,7 +79,7 @@ public class DbToSqtFileConverter {
                     SQTSearchScanDb scanDb = scanDao.load(dbSearchId, currScanId, currCharge);
                     currScan = makeScanResult(scanDb);
                 }
-                PeptideResult peptResult = new PeptideResult(dynaMods);
+                SequestResult peptResult = new SequestResult(dynaMods);
                 peptResult.setCharge(result.getCharge());
                 peptResult.setDeltaCN(result.getDeltaCN());
                 peptResult.setMass(result.getCalculatedMass());
@@ -155,8 +155,8 @@ public class DbToSqtFileConverter {
         return mods;
     }
 
-    private ScanResult makeScanResult(SQTSearchScanDb resultScan) {
-        ScanResult scanResult = new ScanResult();
+    private SearchScan makeScanResult(SQTSearchScanDb resultScan) {
+        SearchScan scanResult = new SearchScan();
         MsScanDb msScan = getScanForId(resultScan.getScanId());
         scanResult.setStartScan(msScan.getStartScanNum());
         scanResult.setEndScan(msScan.getStartScanNum());

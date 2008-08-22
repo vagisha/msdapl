@@ -26,7 +26,7 @@ public class SQTFileReaderApp {
             writer.write(header.toString());
             writer.write("\n");
             while (reader.hasNextSearchScan()) {
-                ScanResult scan = reader.getNextSearchScan();
+                SearchScan scan = reader.getNextSearchScan();
                 System.out.println(scan.toString());
                 writer.write(scan.toString());
                 writer.write("\n");

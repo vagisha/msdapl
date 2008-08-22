@@ -13,7 +13,7 @@ import org.yeastrc.ms.parser.DataProviderException;
 /**
  * 
  */
-public interface SQTSearchDataProvider {
+public interface SQTSearchDataProvider <E extends SQTSearchScan> {
 
     public abstract String getFileName();
     
@@ -21,7 +21,7 @@ public interface SQTSearchDataProvider {
     
     public abstract boolean hasNextSearchScan();
     
-    public abstract SQTSearchScan getNextSearchScan() throws DataProviderException;
+    public abstract E getNextSearchScan() throws DataProviderException;
     
     public abstract void close();
 }

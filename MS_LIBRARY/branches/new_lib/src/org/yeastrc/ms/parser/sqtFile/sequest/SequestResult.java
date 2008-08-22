@@ -1,19 +1,23 @@
-package org.yeastrc.ms.parser.sqtFile;
+package org.yeastrc.ms.parser.sqtFile.sequest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.parser.sqtFile.DbLocus;
+import org.yeastrc.ms.parser.sqtFile.SQTParseException;
+import org.yeastrc.ms.parser.sqtFile.SequestResultPeptideBuilder;
 
 /**
  * Represents a 'M' line in the SQT file
  */
-public class PeptideResult implements SequestSearchResult {
+public class SequestResult implements SequestSearchResult {
 
     private int xcorrRank;
     private int spRank;
@@ -21,6 +25,7 @@ public class PeptideResult implements SequestSearchResult {
     private BigDecimal deltaCN; 
     private BigDecimal xcorr;
     private BigDecimal sp;
+    private double evalue;
     private int numMatchingIons;    // Fragment ions matching this sequence 
     private int numPredictedIons;   // Fragment ions predicted for this sequence 
     private String sequence;
@@ -35,23 +40,17 @@ public class PeptideResult implements SequestSearchResult {
     
     private List<MsSearchResultProtein> matchingLoci;
 
-    private List<MsSearchModification> seachDynaMods;
+    private List<MsResidueModification> seachDynaResidueMods;
+    
     private MsSearchResultPeptide resultPeptide = null;
     
 
-    public PeptideResult(List<MsSearchModification> searchDynamicMods) {
+    public SequestResult(List<MsResidueModification> searchDynamicMods) {
         matchingLoci = new ArrayList<MsSearchResultProtein>();
         if (searchDynamicMods != null)
-            this.seachDynaMods = searchDynamicMods;
+            this.seachDynaResidueMods = searchDynamicMods;
         else
-            seachDynaMods = new ArrayList<MsSearchModification>(0);
-    }
-
-    /**
-     * @return the xcorrRank
-     */
-    public int getxCorrRank() {
-        return xcorrRank;
+            seachDynaResidueMods = new ArrayList<MsResidueModification>(0);
     }
 
     /**
@@ -62,24 +61,10 @@ public class PeptideResult implements SequestSearchResult {
     }
 
     /**
-     * @return the spRank
-     */
-    public int getSpRank() {
-        return spRank;
-    }
-
-    /**
      * @param spRank the spRank to set
      */
     public void setSpRank(int spRank) {
         this.spRank = spRank;
-    }
-
-    /**
-     * @return the mass
-     */
-    public BigDecimal getCalculatedMass() {
-        return mass;
     }
 
     /**
@@ -90,24 +75,10 @@ public class PeptideResult implements SequestSearchResult {
     }
 
     /**
-     * @return the deltaCN
-     */
-    public BigDecimal getDeltaCN() {
-        return deltaCN;
-    }
-
-    /**
      * @param deltaCN the deltaCN to set
      */
     public void setDeltaCN(BigDecimal deltaCN) {
         this.deltaCN = deltaCN;
-    }
-
-    /**
-     * @return the xcorr
-     */
-    public BigDecimal getxCorr() {
-        return xcorr;
     }
 
     /**
@@ -118,13 +89,6 @@ public class PeptideResult implements SequestSearchResult {
     }
 
     /**
-     * @return the sp
-     */
-    public BigDecimal getSp() {
-        return sp;
-    }
-
-    /**
      * @param sp the sp to set
      */
     public void setSp(BigDecimal sp) {
@@ -132,12 +96,12 @@ public class PeptideResult implements SequestSearchResult {
     }
 
     /**
-     * @return the numMatchingIons
+     * @param evalue
      */
-    public int getNumIonsMatched() {
-        return numMatchingIons;
+    public void setEvalue(double evalue) {
+        this.evalue = evalue;
     }
-
+    
     /**
      * @param numMatchingIons the numMatchingIons to set
      */
@@ -146,24 +110,10 @@ public class PeptideResult implements SequestSearchResult {
     }
 
     /**
-     * @return the numPredictedIons
-     */
-    public int getNumIonsPredicted() {
-        return numPredictedIons;
-    }
-
-    /**
      * @param numPredictedIons the numPredictedIons to set
      */
     public void setNumPredictedIons(int numPredictedIons) {
         this.numPredictedIons = numPredictedIons;
-    }
-
-    /**
-     * @return the sequence
-     */
-    public String getResultSequence() {
-        return sequence;
     }
 
     /**
@@ -187,13 +137,6 @@ public class PeptideResult implements SequestSearchResult {
         this.validationStatus = validationStatus;
     }
 
-    /**
-     * @return the matchingLoci
-     */
-    public List<MsSearchResultProtein> getMatchingLoci() {
-        return matchingLoci;
-    }
-
     public void addMatchingLocus(String accession, String description) {
         DbLocus locus = new DbLocus(accession, description);
         addMatchingLocus(locus);
@@ -203,6 +146,77 @@ public class PeptideResult implements SequestSearchResult {
         matchingLoci.add(locus);
     }
 
+    public List<MsSearchResultProtein> getProteinMatchList() {
+        return this.matchingLoci;
+    }    
+
+    public void setCharge(int charge) {
+        this.charge = charge;
+    }
+
+    public int getCharge() {
+        return charge;
+    }
+
+    public MsSearchResultPeptide getResultPeptide() {
+        if (resultPeptide != null)
+            return resultPeptide;
+        try {
+            buildPeptideResult();
+        }
+        catch (SQTParseException e) {
+            throw new RuntimeException("Error building SQT peptide result", e);
+        }
+        return resultPeptide;
+    }
+    
+    public void buildPeptideResult() throws SQTParseException {
+        if (resultPeptide == null)
+            resultPeptide = SequestResultPeptideBuilder.instance().build(sequence, seachDynaResidueMods);
+    }
+    
+    @Override
+    public int getScanNumber() {
+        return this.scanNumber;
+    }
+
+    public void setScanNumber(int scanNumber) {
+        this.scanNumber = scanNumber;
+    }
+
+    @Override
+    public SequestResultData getSequestResultData() {
+        return new SequestResultData() {
+
+            public BigDecimal getCalculatedMass() {
+                return mass;
+            }
+            public BigDecimal getDeltaCN() {
+                return deltaCN;
+            }
+            public Double getEvalue() {
+                return evalue;
+            }
+            public int getMatchingIons() {
+                return numMatchingIons;
+            }
+            public int getPredictedIons() {
+                return numPredictedIons;
+            }
+            public BigDecimal getSp() {
+                return sp;
+            }
+            public int getSpRank() {
+                return spRank;
+            }
+            public BigDecimal getxCorr() {
+                return xcorr;
+            }
+            public int getxCorrRank() {
+                return xcorrRank;
+            }};
+    }
+    
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("M\t");
@@ -234,43 +248,5 @@ public class PeptideResult implements SequestSearchResult {
         }
         buf.deleteCharAt(buf.length() -1); // delete last new line
         return buf.toString();
-    }
-
-    public void setCharge(int charge) {
-        this.charge = charge;
-    }
-
-    public int getCharge() {
-        return charge;
-    }
-
-    public List<MsSearchResultProtein> getProteinMatchList() {
-        return this.matchingLoci;
-    }
-
-    public MsSearchResultPeptide getResultPeptide() {
-        if (resultPeptide != null)
-            return resultPeptide;
-        try {
-            buildPeptideResult();
-        }
-        catch (SQTParseException e) {
-            throw new RuntimeException("Error building SQT peptide result", e);
-        }
-        return resultPeptide;
-    }
-    
-    public void buildPeptideResult() throws SQTParseException {
-        if (resultPeptide == null)
-            resultPeptide = SQTSearchResultPeptideBuilder.instance().build(sequence, seachDynaMods);
-    }
-    
-    @Override
-    public int getScanNumber() {
-        return this.scanNumber;
-    }
-
-    public void setScanNumber(int scanNumber) {
-        this.scanNumber = scanNumber;
     }
 }

@@ -2,9 +2,9 @@ package org.yeastrc.ms.parser.sqtFile;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 
-public class StaticModification implements MsSearchModification {
+public class StaticModification implements MsResidueModification {
 
     private char modificationChar;
     private BigDecimal modificationMass;
@@ -29,11 +29,6 @@ public class StaticModification implements MsSearchModification {
     }
 
     public char getModificationSymbol() {
-        return MsSearchModification.nullCharacter;
+        return '\u0000';
     }
-
-    public ModificationType getModificationType() {
-        return MsSearchModification.ModificationType.STATIC;
-    }
-
 }

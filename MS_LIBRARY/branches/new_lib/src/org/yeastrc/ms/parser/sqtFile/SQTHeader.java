@@ -10,8 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -57,8 +56,8 @@ public class SQTHeader implements SQTRunSearch {
     private String serverAddress;
     
     private List<SQTField> headerItems;
-    private List<MsSearchModification> staticMods;
-    private List<MsSearchModification> dynaMods;
+    private List<MsResidueModification> staticMods;
+    private List<MsResidueModification> dynaMods;
     private List<MsEnzyme> enzymes;
     
     
@@ -233,7 +232,7 @@ public class SQTHeader implements SQTRunSearch {
      */
     void addStaticMods(String value) throws SQTParseException {
         
-        if (staticMods == null) staticMods = new ArrayList<MsSearchModification>();
+        if (staticMods == null) staticMods = new ArrayList<MsResidueModification>();
         
         // if there were no modifications we will get a empty string
         value = value.trim();
@@ -290,7 +289,7 @@ public class SQTHeader implements SQTRunSearch {
      */
     void addDynamicMods(String value) throws SQTParseException {
         
-        if (dynaMods == null)   dynaMods = new ArrayList<MsSearchModification>();
+        if (dynaMods == null)   dynaMods = new ArrayList<MsResidueModification>();
         
         // if there were no modifications we will get a empty string
         value = value.trim();
@@ -468,63 +467,63 @@ public class SQTHeader implements SQTRunSearch {
     }
     
 
-    /**
-     * @return the sqtGenerator
-     */
-    public String getSearchEngineName() {
-        return sqtGenerator;
-    }
-
-    /**
-     * @return the sqtGeneratorVersion
-     */
-    public String getSearchEngineVersion() {
-        return sqtGeneratorVersion;
-    }
+//    /**
+//     * @return the sqtGenerator
+//     */
+//    public String getSearchEngineName() {
+//        return sqtGenerator;
+//    }
+//
+//    /**
+//     * @return the sqtGeneratorVersion
+//     */
+//    public String getSearchEngineVersion() {
+//        return sqtGeneratorVersion;
+//    }
     
-    /**
-     * @return the fragmentMassType
-     */
-    public String getFragmentMassType() {
-        return fragmentMassType;
-    }
+//    /**
+//     * @return the fragmentMassType
+//     */
+//    public String getFragmentMassType() {
+//        return fragmentMassType;
+//    }
+//
+//    /**
+//     * @return the fragmentMassTolerance
+//     */
+//    public BigDecimal getFragmentMassTolerance() {
+//        return fragmentMassTolerance;
+//    }
+//
+//    /**
+//     * @return the precursorMassType
+//     */
+//    public String getPrecursorMassType() {
+//        return precursorMassType;
+//    }
+//
+//    /**
+//     * @return the precursorMassTolerance
+//     */
+//    public BigDecimal getPrecursorMassTolerance() {
+//        return precursorMassTolerance;
+//    }
 
-    /**
-     * @return the fragmentMassTolerance
-     */
-    public BigDecimal getFragmentMassTolerance() {
-        return fragmentMassTolerance;
-    }
-
-    /**
-     * @return the precursorMassType
-     */
-    public String getPrecursorMassType() {
-        return precursorMassType;
-    }
-
-    /**
-     * @return the precursorMassTolerance
-     */
-    public BigDecimal getPrecursorMassTolerance() {
-        return precursorMassTolerance;
-    }
-
-    /**
-     * @return the staticMods
-     */
-    public List<MsSearchModification> getStaticResidueMods() {
-        if (staticMods == null)
-            return new ArrayList<MsSearchModification>(0);
-        return staticMods;
-    }
+//    /**
+//     * @return the staticMods
+//     */
+//    public List<MsResidueModification> getStaticResidueMods() {
+//        if (staticMods == null)
+//            return new ArrayList<MsResidueModification>(0);
+//        return staticMods;
+//    }
 
     /**
      * @return the dynaMods
      */
-    public List<MsSearchModification> getDynamicModifications() {
+    public List<MsResidueModification> getDynamicModifications() {
         if (dynaMods == null)
-            return new ArrayList<MsSearchModification>(0);
+            return new ArrayList<MsResidueModification>(0);
         return dynaMods;
     }
 
@@ -547,11 +546,11 @@ public class SQTHeader implements SQTRunSearch {
             return SearchFileFormat.UNKNOWN;
     }
 
-    public List<MsSearchDatabase> getSearchDatabases() {
-        List<MsSearchDatabase> dbList = new ArrayList<MsSearchDatabase>(1);
-        dbList.add(database);
-        return dbList;
-    }
+//    public List<MsSearchDatabase> getSearchDatabases() {
+//        List<MsSearchDatabase> dbList = new ArrayList<MsSearchDatabase>(1);
+//        dbList.add(database);
+//        return dbList;
+//    }
 
     public Date getSearchDate() {
         return this.startDate;
@@ -582,8 +581,8 @@ public class SQTHeader implements SQTRunSearch {
         return dateFormat.parse(timeStr).getTime();
     }
     
-    @Override
-    public List<MsEnzyme> getEnzymeList() {
-        return enzymes;
-    }
+//    @Override
+//    public List<MsEnzyme> getEnzymeList() {
+//        return enzymes;
+//    }
 }

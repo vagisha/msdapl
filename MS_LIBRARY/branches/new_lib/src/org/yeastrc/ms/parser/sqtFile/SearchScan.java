@@ -6,11 +6,12 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
 
 /**
  * Represents a 'S' line in the SQT file
  */
-public class ScanResult implements SQTSearchScan {
+public class SearchScan implements SQTSearchScan {
 
     private int startScan;
     private int endScan;
@@ -24,7 +25,7 @@ public class ScanResult implements SQTSearchScan {
     
     private List<SequestSearchResult> resultList;
     
-    public ScanResult() {
+    public SearchScan() {
         resultList = new ArrayList<SequestSearchResult>();
     }
     
@@ -158,7 +159,7 @@ public class ScanResult implements SQTSearchScan {
         this.numMatching = numMatching;
     }
 
-    public void addPeptideResult(PeptideResult result) {
+    public void addPeptideResult(SequestResult result) {
         resultList.add(result);
     }
     
