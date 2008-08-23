@@ -22,13 +22,14 @@ import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.SearchParamsDataProvider;
 import org.yeastrc.ms.parser.sqtFile.Database;
 
 
 /**
  * 
  */
-public class SequestParamsParser {
+public class SequestParamsParser implements SearchParamsDataProvider {
 
     private String remoteServer;
 
@@ -81,6 +82,10 @@ public class SequestParamsParser {
         return staticTerminalModifications;
     }
 
+    public List<MsTerminalModification> getDynamicTerminalMods() {
+        return new ArrayList<MsTerminalModification>(0);
+    }
+    
     public boolean reportEvalue() {
         return reportEvalue;
     }
