@@ -1,4 +1,4 @@
-package org.yeastrc.ms.parser.sqtFile;
+package org.yeastrc.ms.parser;
 
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 

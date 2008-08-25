@@ -18,12 +18,15 @@ import java.util.regex.Pattern;
 
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.Database;
+import org.yeastrc.ms.parser.ResidueModification;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
-import org.yeastrc.ms.parser.sqtFile.Database;
+import org.yeastrc.ms.parser.TerminalModification;
 
 
 /**
@@ -50,9 +53,10 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     static final Pattern staticTermModPattern = Pattern.compile("^add\\_([N|C])\\_terminus$");
     static final Pattern staticResidueModPattern = Pattern.compile("add\\_([A-Z])\\_[\\w]+");
     static final Pattern enzymePattern = Pattern.compile("^(\\d+)\\.\\s+(\\S+)\\s+([0|1])\\s+([[\\-]|[A-Z]]+)\\s+([[\\-]|[A-Z]]+)$");
+    static final Pattern modCharsPattern = Pattern.compile("[A-Z]+");
 
 
-    private static final char[] modChars = {'*', '#', '@'};
+    private static final char[] modSymbols = {'*', '#', '@'};
 
     public SequestParamsParser(String remoteServer) {
         this.remoteServer = remoteServer;
@@ -62,7 +66,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         dynamicResidueModifications = new ArrayList<MsResidueModification>();
     }
 
-    public Database getSearchDatabase() {
+    public MsSearchDatabase getSearchDatabase() {
         return database;
     }
 
@@ -201,7 +205,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         catch(NumberFormatException e) {throw new DataProviderException("Error parsing modification mass: "+paramValue);}
 
         if (modMass.doubleValue() > 0.0)
-            staticTerminalModifications.add(new TerminalModification(term, modMass));
+            staticTerminalModifications.add(new TerminalModification(term, modMass, '\u0000'));
         return true;
     }
 
@@ -221,6 +225,8 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     }
 
     void parseDynamicResidueMods(String modString) throws DataProviderException {
+        
+        dynamicResidueModifications.clear();
         // e.g. diff_search_options = 0.0000 S 9.0 C 16.0 M 0.0000 X 0.0000 T 0.0000 Y
         // modString is: 0.0000 S 9.0 C 16.0 M 0.0000 X 0.0000 T 0.0000 Y
         // SEQUEST assigns 3 symbols (*, #, @) to the first, second, and third modification, respectively
@@ -241,18 +247,21 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             // don't consider modifications with mass-shift of 0;
             if (mass.doubleValue() <= 0.0) continue; 
 
-            // modified residue should be a single character. 
-            char modResidue;
-            if (tokens[i+1].length() != 1)
-                throw new DataProviderException(currentLineNum, "Invalid char for modified residue: "+tokens[i+1], currentLine);
-            modResidue = tokens[i+1].charAt(0);
+            // modified residues(s) can only be upper-case characters
+            String modChars = tokens[i+1];
+            if (!modCharsPattern.matcher(modChars).matches())
+                throw new DataProviderException(currentLineNum, "Invalid char(s) for modified residue: "+tokens[i+1], currentLine);
 
             // if we have already used up all the modifications characters throw an exception.
             // We should have had only 3 dynamic residue modifications
-            if (modCharIdx == modChars.length)
+            if (modCharIdx == modSymbols.length)
                 throw new DataProviderException(currentLineNum, "Only three modifications are supported", currentLine);
-
-            dynamicResidueModifications.add(new ResidueModification(modResidue, mass, modChars[modCharIdx++]));
+            
+            
+            for (int j = 0; j < modChars.length(); j++) {
+                dynamicResidueModifications.add(new ResidueModification(modChars.charAt(j), mass, modSymbols[modCharIdx]));
+            }
+            modCharIdx++;
         }
     }
 
@@ -272,35 +281,6 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         else {
             return null;
         }
-    }
-
-    private static final class ResidueModification implements MsResidueModification {
-
-        private char modifiedResidue;
-        private char modSymbol;
-        private BigDecimal modMass;
-        public ResidueModification(char modifiedResidue, BigDecimal modMass, char modSymbol) {
-            this.modifiedResidue = modifiedResidue;
-            this.modMass = modMass;
-            this.modSymbol = modSymbol;
-        }
-        public char getModifiedResidue() {return modifiedResidue;}
-        public BigDecimal getModificationMass() {return modMass;}
-        public char getModificationSymbol() {return modSymbol;}
-    }
-
-    private static final class TerminalModification implements MsTerminalModification {
-
-        private BigDecimal modMass;
-        private Terminal terminal;
-
-        public TerminalModification(Terminal modTerminal, BigDecimal modMass) {
-            this.modMass = modMass;
-            this.terminal = modTerminal;
-        }
-        public BigDecimal getModificationMass() {return modMass;}
-        public char getModificationSymbol() {return '\u0000';}
-        public Terminal getModifiedTerminal() {return terminal;}
     }
 
     /**
