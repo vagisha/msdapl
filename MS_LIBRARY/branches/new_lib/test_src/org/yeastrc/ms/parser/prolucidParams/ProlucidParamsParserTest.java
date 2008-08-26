@@ -13,6 +13,8 @@ import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.PrimaryScore;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.SecondaryScore;
 
 public class ProlucidParamsParserTest extends TestCase {
 
@@ -268,4 +270,31 @@ public class ProlucidParamsParserTest extends TestCase {
         assertEquals(200.0, dynaTermMods.get(1).getModificationMass().doubleValue());
     }
 
+    public void testGetPrimaryScoreType() {
+        // format 1
+        try {
+            parser.parseParamsFile("remote.server", format1file);
+        }
+        catch (DataProviderException e) {
+            e.printStackTrace();
+            fail("Valid file");
+        }
+        assertNotNull(parser.getPrimaryScoreType());
+        assertEquals(PrimaryScore.XCORR, parser.getPrimaryScoreType());
+        assertNotNull(parser.getSecondaryScoreType());
+        assertEquals(SecondaryScore.DELTA_CN, parser.getSecondaryScoreType());
+        
+        // format 2
+        try {
+            parser.parseParamsFile("remote.server", format2file);
+        }
+        catch (DataProviderException e) {
+            e.printStackTrace();
+            fail("Valid file");
+        }
+        assertNotNull(parser.getPrimaryScoreType());
+        assertEquals(PrimaryScore.BIN_PROB, parser.getPrimaryScoreType());
+        assertNotNull(parser.getSecondaryScoreType());
+        assertEquals(SecondaryScore.DELTA_CN, parser.getSecondaryScoreType());
+    }
 }

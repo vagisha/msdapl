@@ -18,7 +18,7 @@
                 0 - default Binomial Probability This is not pep-prob probability score (by Rovshan), but similar. In Sequest, Sp score is the preliminary score. In Prolucid, the binomial probability score is the preliminary score.
                 1 - XCorr
             -->
-            <primary_score_type>2</primary_score_type>
+            <primary_score_type>0</primary_score_type>
 
             <!--Secondary score type
                 0 - Binomial Probability 

@@ -29,14 +29,15 @@ import org.yeastrc.ms.parser.TerminalModification;
 
 public class ProlucidParamsParser implements SearchParamsDataProvider {
 
-    public static enum SCORE {BIN_PROB, XCORR, ZSCORE};
+    public static enum PrimaryScore {BIN_PROB, XCORR};
+    public static enum SecondaryScore {ZSCORE, DELTA_CN};
 
     private String remoteServer;
 
     private List<ProlucidParam> parentParams; // normally we should have only one parent (the <parameter> element)
 
-    private SCORE primaryScore;
-    private SCORE secondaryScore;
+    private PrimaryScore primaryScore;
+    private SecondaryScore secondaryScore;
 
     private Database database;
     private MsEnzyme enzyme;
@@ -72,6 +73,14 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     public List<MsTerminalModification> getDynamicTerminalMods() {
         return dynamicTerminalModifications;
     }
+    
+    public PrimaryScore getPrimaryScoreType() {
+        return primaryScore;
+    }
+    
+    public SecondaryScore getSecondaryScoreType() {
+        return secondaryScore;
+    }
 
     private void init(String remoteServer) {
         this.remoteServer = remoteServer;
@@ -82,6 +91,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         dynamicTerminalModifications = new ArrayList<MsTerminalModification>();
         this.database = null;
         this.enzyme = null;
+        this.primaryScore = null;
+        this.secondaryScore = null;
     }
 
     public void parseParamsFile(String remoteServer, String filePath) throws DataProviderException {
@@ -181,12 +192,55 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         else if (node.getParamElementName().equalsIgnoreCase("modifications"))
             parseModificationInfo(node);
         else if (node.getParamElementName().equalsIgnoreCase("primary_score_type"))
-            parsePrimaryScoreType(node);
+            parsePrimaryScoreTypeFormat2(node);
         else if (node.getParamElementName().equalsIgnoreCase("secondary_score_type"))
-            parseSecondaryScoreType(node);
+            parseSecondaryScoreTypeFormat2(node);
+        else if (node.getParamElementName().equalsIgnoreCase("additional_estimate"))
+            parsePrimaryScoreTypeFormat1(node);
+        else if (node.getParamElementName().equalsIgnoreCase("confidence"))
+            parseSecondaryScoreTypeFormat1(node);
     }
 
-    private void parsePrimaryScoreType(ProlucidParamNode node) throws DataProviderException {
+    /**
+     * <!--ADDITIONAL_ESTIMATE 
+     *      0 - default Binomial Probability 
+     *      1 - XCORRR
+     *  -->
+     * @param node
+     * @throws DataProviderException 
+     */
+    private void parsePrimaryScoreTypeFormat1(ProlucidParamNode node) throws DataProviderException {
+        String val = node.getParamElementValue();
+        if (val == null)
+            throw new DataProviderException("Value of additional_estimate cannot be null");
+        int ival = 0;
+        try {ival = Integer.parseInt(val);}
+        catch(NumberFormatException e) {
+            throw new DataProviderException("Invalid value for additional_estimate: "+val+". Allowed values: 0,1"); 
+        }
+        switch(ival) {
+            case 0:
+                primaryScore = PrimaryScore.BIN_PROB;
+                break;
+            case 1:
+                primaryScore = PrimaryScore.XCORR;
+                break;
+            default:
+                throw new DataProviderException("Invalid value for additional_estimate: "+val+". Allowed values: 0,1"); 
+        }
+    }
+
+    
+    /**
+     * From the annotated search.xml (http://bart.scripps.edu/wiki/index.php/ProLuCID)
+     * <!--Primary score type
+     *      0 - default Binomial Probability This is not pep-prob probability score (by Rovshan), but similar. In Sequest, Sp score is the preliminary score. In Prolucid, the binomial probability score is the preliminary score.
+     *      1 - XCorr
+     *  -->
+     * @param node
+     * @throws DataProviderException
+     */
+    private void parsePrimaryScoreTypeFormat2(ProlucidParamNode node) throws DataProviderException {
         String val = node.getParamElementValue();
         if (val == null)
             throw new DataProviderException("Value of primary_score_type cannot be null");
@@ -197,17 +251,62 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
         switch(ival) {
             case 0:
-                primaryScore = SCORE.BIN_PROB;
+                primaryScore = PrimaryScore.BIN_PROB;
                 break;
             case 1:
-                primaryScore = SCORE.XCORR;
+                primaryScore = PrimaryScore.XCORR;
                 break;
             default:
                 throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1"); 
         }
     }
     
-    private void parseSecondaryScoreType(ProlucidParamNode node) throws DataProviderException {
+    
+    /**
+     * <!--CONFIDENCE
+     *      0 - deltaCn 
+     *      1 - T Score 
+     * -->
+     * @param node
+     * @throws DataProviderException
+     */
+    private void parseSecondaryScoreTypeFormat1(ProlucidParamNode node) throws DataProviderException {
+        String val = node.getParamElementValue();
+        if (val == null)
+            throw new DataProviderException("Value of confidence cannot be null");
+        int ival = 0;
+        try {ival = Integer.parseInt(val);}
+        catch(NumberFormatException e) {
+            throw new DataProviderException("Invalid value for confidence: "+val+". Allowed values: 0,1"); 
+        }
+        switch(ival) {
+            case 0:
+                secondaryScore = SecondaryScore.DELTA_CN;
+                break;
+            case 1:
+                secondaryScore = SecondaryScore.ZSCORE;
+                break;
+            default:
+                throw new DataProviderException("Invalid value for confidence: "+val+". Allowed values: 0,1"); 
+        }
+    }
+    
+    
+    /**
+     * From the annotated search.xml (http://bart.scripps.edu/wiki/index.php/ProLuCID)
+     * <!--Secondary score type
+     *      0 - Binomial Probability
+     *      1 - XCorr
+     *      2  Zscore Zscore is Prolucid's answer to Sequest's delCN. delCN =(XCorr of the top hit - XCorr of the second hit)/XCorr of the top hit.
+     *      Zscore = (XCorr of the top hit - average XCorr of the 2nd , 3rd, and 500th hits)/standard deviation of the XCorr's of the 2nd , 3rd, and 500th hits. A Zscore of 5 means that the top hit is 5 STD away from the average. A good Zscore cutoff is 4.5, and 5 is even better.
+     *  -->
+     *  NOTE: When I look at the annotations for primary and secondary score types, they don't make sense.  They appear to allow both primary AND secondary score
+     *  to be XCorr (or Binomial Probability). I am assuming that when secondary score value is either 0 or 1, the secondary score type is DeltaCN.
+     *  
+     * @param node
+     * @throws DataProviderException
+     */
+    private void parseSecondaryScoreTypeFormat2(ProlucidParamNode node) throws DataProviderException {
         String val = node.getParamElementValue();
         if (val == null)
             throw new DataProviderException("Value of secondary_score_type cannot be null");
@@ -218,13 +317,13 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
         switch(ival) {
             case 0:
-                secondaryScore = SCORE.BIN_PROB;
+                secondaryScore = SecondaryScore.DELTA_CN;
                 break;
             case 1:
-                secondaryScore = SCORE.XCORR;
+                secondaryScore = SecondaryScore.DELTA_CN;
                 break;
             case 2:
-                secondaryScore = SCORE.ZSCORE;
+                secondaryScore = SecondaryScore.ZSCORE;
                 break;
             default:
                 throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1,2"); 
@@ -310,7 +409,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     /**
-     * Example: 
+     * FORMAT 2 Example: 
      * <n_term>
      *      <static_mod>
      *          <symbol>*</symbol>
