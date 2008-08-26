@@ -116,7 +116,7 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Error parsing number(s). "+e.getMessage(), line);
         }
         
-        result.setResultSequence(tokens[9]);
+        result.setOriginalPeptideSequence(tokens[9]);
         result.setValidationStatus(tokens[10].charAt(0));
         result.setCharge(charge);
         result.setScanNumber(scanNumber);

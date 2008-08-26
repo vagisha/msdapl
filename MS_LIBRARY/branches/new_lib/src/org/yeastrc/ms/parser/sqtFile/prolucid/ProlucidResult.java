@@ -1,4 +1,10 @@
-package org.yeastrc.ms.parser.sqtFile.sequest;
+/**
+ * ProlucidResult.java
+ * @author Vagisha Sharma
+ * Aug 26, 2008
+ * @version 1.0
+ */
+package org.yeastrc.ms.parser.sqtFile.prolucid;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -6,14 +12,16 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SQTSearchResult;
 
-
-public class SequestResult extends SQTSearchResult implements SequestSearchResult {
+/**
+ * 
+ */
+public class ProlucidResult extends SQTSearchResult implements ProlucidSearchResult{
 
     private MsSearchResultPeptide resultPeptide = null;
     
@@ -21,23 +29,33 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     private int numPredictedIons;
     
     private List<MsResidueModification> searchDynaResidueMods;
+    private List<MsTerminalModification> searchDynaTermMods;
+    
+    private BigDecimal mass; // Calculated M+H+ value for this sequence
     
     private int xcorrRank;
     private int spRank;
-    private BigDecimal mass; // Calculated M+H+ value for this sequence
-    private BigDecimal deltaCN; 
-    private BigDecimal xcorr;
-    private BigDecimal sp;
-    private double evalue;
     
-    public SequestResult(List<MsResidueModification> searchDynaResidueMods) {
+    private Double binomialScore;
+    private BigDecimal sp;
+    private BigDecimal xcorr;
+    private Double zscore;
+    private BigDecimal deltaCN;
+    
+    
+    public ProlucidResult(List<MsResidueModification> searchDynaResidueMods, List<MsTerminalModification> searchDynaTermMods) {
         super();
         if (searchDynaResidueMods != null)
             this.searchDynaResidueMods = searchDynaResidueMods;
         else
             this.searchDynaResidueMods = new ArrayList<MsResidueModification>(0);
+        
+        if (searchDynaTermMods != null)
+            this.searchDynaTermMods = searchDynaTermMods;
+        else
+            this.searchDynaTermMods = new ArrayList<MsTerminalModification>(0);
     }
-
+    
     /**
      * @param numMatchingIons the numMatchingIons to set
      */
@@ -93,83 +111,71 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     public void setSp(BigDecimal sp) {
         this.sp = sp;
     }
-
-    /**
-     * @param evalue
-     */
-    public void setEvalue(double evalue) {
-        this.evalue = evalue;
+    
+    public void setBinomialScore(Double binomialScore) {
+        this.binomialScore = binomialScore;
     }
     
-    public MsSearchResultPeptide buildPeptideResult() throws SQTParseException {
-        if (resultPeptide != null)
-            return resultPeptide;
-        
-        resultPeptide = SequestResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods);
-        return resultPeptide;
-    }
-    
-    public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append("M\t");
-        buf.append(xcorrRank);
-        buf.append("\t");
-        buf.append(spRank);
-        buf.append("\t");
-        buf.append(mass);
-        buf.append("\t");
-        buf.append(deltaCN.stripTrailingZeros());
-        buf.append("\t");
-        buf.append(xcorr.stripTrailingZeros());
-        buf.append("\t");
-        buf.append(sp.stripTrailingZeros());
-        buf.append("\t");
-        buf.append(numMatchingIons);
-        buf.append("\t");
-        buf.append(numPredictedIons);
-        buf.append("\t");
-        buf.append(getOriginalPeptideSequence());
-        buf.append("\t");
-        buf.append(getValidationStatus());
-    
-        buf.append("\n");
-    
-        for (MsSearchResultProtein locus: getProteinMatchList()) {
-            buf.append(locus.toString());
-            buf.append("\n");
-        }
-        buf.deleteCharAt(buf.length() -1); // delete last new line
-        return buf.toString();
+    public void setZscore(Double zscore) {
+        this.zscore = zscore;
     }
     
     @Override
-    public SequestResultData getSequestResultData() {
-        return new SequestResultData() {
+    public MsSearchResultPeptide buildPeptideResult() throws SQTParseException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    @Override
+    public ProlucidResultData getProlucidResultData() {
+        return new ProlucidResultData() {
+
+            @Override
+            public Double getBinomialScore() {
+                return binomialScore;
+            }
+
+            @Override
             public BigDecimal getCalculatedMass() {
                 return mass;
             }
+
+            @Override
             public BigDecimal getDeltaCN() {
                 return deltaCN;
             }
-            public Double getEvalue() {
-                return evalue;
-            }
+
+            @Override
             public int getMatchingIons() {
                 return numMatchingIons;
             }
+
+            @Override
             public int getPredictedIons() {
                 return numPredictedIons;
             }
+
+            @Override
             public BigDecimal getSp() {
                 return sp;
             }
+
+            @Override
             public int getSpRank() {
                 return spRank;
             }
+
+            @Override
+            public Double getZscore() {
+                return zscore;
+            }
+
+            @Override
             public BigDecimal getxCorr() {
                 return xcorr;
             }
+
+            @Override
             public int getxCorrRank() {
                 return xcorrRank;
             }};

@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.parser.sqtFile.sequest;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +15,7 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.parser.ResultResidueModification;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -31,7 +31,8 @@ public final class SequestResultPeptideBuilder {
         return instance;
     }
 
-    public MsSearchResultPeptide build(String resultSequence, List<? extends MsResidueModification> dynaMods) 
+    public MsSearchResultPeptide build(String resultSequence, 
+                List<? extends MsResidueModification> dynaResidueMods) 
     throws SQTParseException {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new SQTParseException("sequence cannot be null or empty");
@@ -44,7 +45,7 @@ public final class SequestResultPeptideBuilder {
         final char preResidue = getPreResidue(resultSequence);
         final char postResidue = getPostResidue(resultSequence);
         String dotless = removeDots(resultSequence);
-        final List<MsResultDynamicResidueMod> resultMods = getResultMods(dotless, dynaMods);
+        final List<MsResultDynamicResidueMod> resultMods = getResultMods(dotless, dynaResidueMods);
         final String justPeptide = getOnlyPeptideSequence(dotless);
         
         return new MsSearchResultPeptide() {
@@ -105,7 +106,7 @@ public final class SequestResultPeptideBuilder {
                 throw new SQTParseException("No matching modification found: "+modifiedChar+x+"; sequence: "+peptide);
             
             // found a match!!
-            resultMods.add(new ResultMod(modifiedChar, x, matchingMod.getModificationMass(), modCharIndex));
+            resultMods.add(new ResultResidueModification(modifiedChar, x, matchingMod.getModificationMass(), modCharIndex));
         }
         
         return resultMods;
@@ -138,35 +139,5 @@ public final class SequestResultPeptideBuilder {
     public static String getOnlyPeptide(String peptideAndExtras) throws SQTParseException {
         String dotless = removeDots(peptideAndExtras);
         return getOnlyPeptideSequence(dotless);
-    }
-    
-    private static class ResultMod implements MsResultDynamicResidueMod {
-
-        private char modResidue;
-        private char modSymbol;
-        private BigDecimal modMass;
-        private int position;
-
-        public ResultMod(char modResidue, char modSymbol, BigDecimal modMass, int position) {
-            this.modResidue = modResidue;
-            this.modSymbol = modSymbol;
-            this.modMass = modMass;
-            this.position = position;
-        }
-        public BigDecimal getModificationMass() {
-            return modMass;
-        }
-
-        public char getModificationSymbol() {
-            return modSymbol;
-        }
-
-        public char getModifiedResidue() {
-            return modResidue;
-        }
-        
-        public int getModifiedPosition() {
-            return this.position;
-        }
     }
 }

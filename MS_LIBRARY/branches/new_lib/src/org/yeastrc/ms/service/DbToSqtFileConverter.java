@@ -85,7 +85,7 @@ public class DbToSqtFileConverter {
                 peptResult.setMass(result.getCalculatedMass());
                 peptResult.setNumMatchingIons(result.getNumIonsMatched());
                 peptResult.setNumPredictedIons(result.getNumIonsPredicted());
-                peptResult.setResultSequence(reconstructPeptideSequence(dbSearchId, result));
+                peptResult.setOriginalPeptideSequence(reconstructPeptideSequence(dbSearchId, result));
                 peptResult.setScanNumber(currScan.getScanNumber());
                 peptResult.setSp(result.getSp());
                 peptResult.setSpRank(result.getSpRank());
