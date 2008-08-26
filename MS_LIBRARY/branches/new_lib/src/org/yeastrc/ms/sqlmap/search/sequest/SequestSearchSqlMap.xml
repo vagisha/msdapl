@@ -29,7 +29,7 @@
     </select>
     
     <select id="selectParams" resultMap="sequestParamResult" parameterClass="Integer">
-    	SELECT * FROM SQTParams WHERE id = #id#
+    	SELECT * FROM SQTParams WHERE searchID = #id#
     </select>
     
     <insert id="insertParams" parameterMap="sequestParamParam">

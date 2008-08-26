@@ -4,7 +4,7 @@
  * Aug 18, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.impl;
+package org.yeastrc.ms.domain.search.sequest.impl;
 
 import java.math.BigDecimal;
 

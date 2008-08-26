@@ -3,7 +3,6 @@ package org.yeastrc.ms.domain.search.sequest.impl;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.impl.MsSearchResultDbImpl;
-import org.yeastrc.ms.domain.search.impl.SequestResultDataImpl;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 

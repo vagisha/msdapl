@@ -1,54 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
-<sqlMap namespace="SequestResult"> 
+<sqlMap namespace="ProlucidResult"> 
 
 
-	<typeAlias alias="SequestResultOut" type="org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultDbImpl"/>
-	<typeAlias alias="SequestResultDataIn" type="org.yeastrc.ms.domain.search.sequest.SequestResultDataDb"/>
+	<typeAlias alias="ProlucidResultOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidSearchResultDbImpl"/>
+	<typeAlias alias="ProlucidResultDataIn" type="org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataDb"/>
 	
 	
-	<resultMap class="SequestResultOut" id="sequestResultResult" extends="MsSearchResult.msSearchResult">
+	<resultMap class="ProlucidResultOut" id="prolucidResultResult" extends="MsSearchResult.msSearchResult">
 		<result property="xCorrRank" column="XCorrRank" nullValue="0"/>
-		<result property="spRank" column="spRank" nullValue="0"/>
-		<result property="deltaCN" column="deltaCN"/>
+		<result property="binomialScore" column="binomialScore" />
 		<result property="xCorr" column="XCorr"/>
-		<result property="sp" column="sp"/>
-		<result property="evalue" column="evalue"/>
+		<result property="zscore" column="ZScore"/>
+		<result property="deltaCN" column="deltaCN"/>
 		<result property="calculatedMass" column="calculatedMass" />
 		<result property="numIonsMatched" column="matchingIons" nullValue="0"/>
 		<result property="numIonsPredicted" column="predictedIons" nullValue="0"/>
 	</resultMap>
 	
-	<parameterMap class="SequestResultDataIn" id="sequestResultDataParam">
+	<parameterMap class="ProlucidResultDataIn" id="prolucidResultDataParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="sp" jdbcType="DECIMAL"/>
-		<parameter property="spRank" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="xCorr" jdbcType="DECIMAL"/>
 		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="binomialScore" jdbcType="DOUBLE"/>
+		<parameter property="xCorr" jdbcType="DECIMAL"/>
+		<parameter property="zscore" jdbcType="DOUBLE"/>
 		<parameter property="deltaCN" jdbcType="DECIMAL"/>
-		<parameter property="evalue" jdbcType="DOUBLE" nullValue="0" />
 		<parameter property="calculatedMass" jdbcType="DECIMAL" />
 		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="predictedIons" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
 
-    <select id="select" resultMap="sequestResultResult" parameterClass="Integer">
-		SELECT * FROM msRunSearchResult, SQTSearchResult 
-		WHERE SQTSearchResult.resultID = msRunSearchResult.id
+    <select id="select" resultMap="prolucidResultResult" parameterClass="Integer">
+		SELECT * FROM msRunSearchResult, ProLuCIDSearchResult 
+		WHERE ProLuCIDSearchResult.resultID = msRunSearchResult.id
 		AND msRunSearchResult.id = #id#
 	</select>
     
-    <insert id="insert" parameterMap="sequestResultDataParam">
-    	INSERT INTO SQTSearchResult 
+    <insert id="insert" parameterMap="prolucidResultDataParam">
+    	INSERT INTO ProLuCIDSearchResult 
     	(resultID, 
-    	sp,
-    	spRank,
+    	XCorrRank,
+    	binomialScore,
     	XCorr,
-    	XCorrRank 
+    	ZScore 
     	deltaCN, 
-    	evalue,
     	calculatedMass,
     	matchingIons,
     	predictedIons) 
@@ -56,14 +53,13 @@
     </insert>
     
     <insert id="insertAll" parameterClass="String">
-    	INSERT INTO SQTSearchResult (
+    	INSERT INTO ProLuCIDSearchResult (
     	(resultID, 
-    	sp,
-    	spRank,
+    	XCorrRank,
+    	binomialScore,
     	XCorr,
-    	XCorrRank 
+    	ZScore 
     	deltaCN, 
-    	evalue,
     	calculatedMass,
     	matchingIons,
     	predictedIons) 
@@ -71,7 +67,7 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM SQTSearchResult WHERE resultID=#id#
+		DELETE FROM ProLuCIDearchResult WHERE resultID=#id#
     </delete>
     
 </sqlMap>

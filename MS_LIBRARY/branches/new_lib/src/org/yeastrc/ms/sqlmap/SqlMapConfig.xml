@@ -29,7 +29,7 @@
 	<!-- <sqlMap resource="org/yeastrc/ms/sqlmap/DeletionSqlMap.xml"/> -->
 	
 	
-	<!-- Related to experiments and runs -->
+	<!-- Related to runs -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/run/MsScanSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/run/MsRunSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/run/MsRunLocationSqlMap.xml"/>
@@ -38,7 +38,7 @@
 	<!-- Related to MS2 files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2HeaderSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2ChargeDependentAnalysisSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2f/MS2ScanChargeSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2ScanChargeSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2ChargeIndependentAnalysisSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/run/ms2file/MS2ScanSqlMap.xml"/>
 	
@@ -51,13 +51,16 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsRunSearchSqlMap.xml" />
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchSqlMap.xml" />
 
+	<!-- Related to SQT files -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTHeaderSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchScanSqlMap.xml"/>
 
 	<!-- Related to Sequest files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sequest/SequestSearchSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/sequest/SequestSearchResultSqlMap.xml"/>
 	
-	<!-- Related to SQT files -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTHeaderSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchScanSqlMap.xml"/>
+	<!-- Related to ProLuCID files -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/prolucid/ProlucidSearchSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/prolucid/ProlucidSearchResultSqlMap.xml"/>
 	
 </sqlMapConfig>	

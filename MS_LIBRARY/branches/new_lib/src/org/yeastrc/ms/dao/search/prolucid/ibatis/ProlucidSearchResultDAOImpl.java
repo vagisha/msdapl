@@ -1,99 +1,111 @@
 /**
- * SQTSearchResultDAOImpl.java
+ * ProlucidSearchResultDAOImpl.java
  * @author Vagisha Sharma
- * Jul 4, 2008
+ * Aug 26, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.search.sequest.ibatis;
+package org.yeastrc.ms.dao.search.prolucid.ibatis;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestResultDataDb;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements SequestSearchResultDAO {
+public class ProlucidSearchResultDAOImpl extends BaseSqlMapDAO implements
+ProlucidSearchResultDAO {
 
     private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
-    
-    public SequestSearchResultDAOImpl(SqlMapClient sqlMap,
+
+    public ProlucidSearchResultDAOImpl(SqlMapClient sqlMap,
             MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao) {
         super(sqlMap);
         this.resultDao = resultDao;
     }
-    
-    public SequestSearchResultDb load(int resultId) {
-        return (SequestSearchResultDb) queryForObject("SequestResult.select", resultId);
+
+    @Override
+    public ProlucidSearchResultDb load(int resultId) {
+        return (ProlucidSearchResultDb) queryForObject("ProlucidResult.select", resultId);
     }
-    
+
     @Override
     public List<Integer> loadResultIdsForRunSearch(int runSearchId) {
         return resultDao.loadResultIdsForRunSearch(runSearchId);
     }
 
     @Override
-    public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge) {
+    public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId,
+            int scanId, int charge) {
         return resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
     }
-    
-    public int save(SequestSearchResult searchResult, String searchDbName, int runSearchId, int scanId) {
-        
+
+
+    @Override
+    public int save(ProlucidSearchResult searchResult, String searchDbName,
+            int runSearchId, int scanId) {
         // first save the base result
         int resultId = resultDao.save(searchResult, searchDbName, runSearchId, scanId);
-        
-        // now save the Sequest specific information
-        SequestResultDataSqlMapParam resultDb = new SequestResultDataSqlMapParam(resultId, searchResult.getSequestResultData());
-        save("SequestResult.insert", resultDb);
+
+        // now save the ProLuCID specific information
+        ProlucidResultDataSqlMapParam resultDb = new ProlucidResultDataSqlMapParam(resultId, searchResult.getProlucidResultData());
+        save("ProlucidResult.insert", resultDb);
         return resultId;
     }
-    
+
     @Override
-    public int saveResultOnly(SequestSearchResult searchResult, int runSearchId,
-            int scanId) {
+    public int saveResultOnly(ProlucidSearchResult searchResult,
+            int runSearchId, int scanId) {
         // save the base result (saves data to msRunSearchResult table only).
         int resultId = resultDao.saveResultOnly(searchResult, runSearchId, scanId);
-        
-        // now save the Sequest specific information
-        SequestResultDataSqlMapParam resultDb = new SequestResultDataSqlMapParam(resultId, searchResult.getSequestResultData());
-        save("SequestResult.insert", resultDb);
-        
+
+        // now save the ProLuCID specific information
+        ProlucidResultDataSqlMapParam resultDb = new ProlucidResultDataSqlMapParam(resultId, searchResult.getProlucidResultData());
+        save("ProlucidResult.insert", resultDb);
+
         return resultId;
     }
-    
+
+    //  resultID, 
+    //  XCorrRank,
+    //  binomialScore,
+    //  XCorr,
+    //  ZScore 
+    //  deltaCN, 
+    //  calculatedMass,
+    //  matchingIons,
+    //  predictedIons
     @Override
-    public void saveAllSequestResultData(List<SequestResultDataDb> resultDataList) {
+    public void saveAllProlucidResultData(
+            List<ProlucidResultDataDb> resultDataList) {
         if (resultDataList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for ( SequestResultDataDb data: resultDataList) {
+        for (ProlucidResultDataDb data: resultDataList) {
             values.append(",(");
             values.append(data.getResultId());
-            values.append(",");
-            values.append(data.getSp());
-            values.append(",");
-            int spRank = data.getSpRank();
-            values.append(spRank == -1 ? "NULL" : spRank);
-            values.append(",");
-            values.append(data.getxCorr());
             values.append(",");
             int xcorrRank = data.getxCorrRank();
             values.append(xcorrRank == -1 ? "NULL" : xcorrRank);
             values.append(",");
-            values.append(data.getDeltaCN());
+            values.append(data.getBinomialScore());
             values.append(",");
-            values.append(data.getEvalue());
+            values.append(data.getxCorr());
+            values.append(",");
+            values.append(data.getZscore());
+            values.append(",");
+            values.append(data.getDeltaCN());
             values.append(",");
             values.append(data.getCalculatedMass());
             values.append(",");
@@ -105,24 +117,21 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             values.append(")");
         }
         values.deleteCharAt(0);
-        
-        save("SequestResult.insertAll", values.toString());
+
+        save("ProlucidResult.insertAll", values.toString());
     }
-    
-    /**
-     * Deletes the search result and any Sequest specific information associated with the result
-     * @param resultId
-     */
+
+    @Override
     public void delete(int resultId) {
         resultDao.delete(resultId);
     }
 
-    public static final class SequestResultDataSqlMapParam implements SequestResultDataDb {
-        
+    public static final class ProlucidResultDataSqlMapParam implements ProlucidResultDataDb {
+
         private int resultId;
-        private SequestResultData result;
-        
-        public SequestResultDataSqlMapParam(int resultId, SequestResultData result) {
+        private ProlucidResultData result;
+
+        public ProlucidResultDataSqlMapParam(int resultId, ProlucidResultData result) {
             this.resultId = resultId;
             this.result = result;
         }
@@ -163,8 +172,12 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             return result.getPredictedIons();
         }
 
-        public Double getEvalue() {
-            return result.getEvalue();
+        public Double getBinomialScore() {
+            return result.getBinomialScore();
+        }
+
+        public Double getZscore() {
+            return result.getZscore();
         }
     }
 }

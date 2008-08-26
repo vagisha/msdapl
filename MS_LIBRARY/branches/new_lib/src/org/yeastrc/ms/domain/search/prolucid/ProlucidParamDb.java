@@ -11,7 +11,9 @@ package org.yeastrc.ms.domain.search.prolucid;
  */
 public interface ProlucidParamDb {
 
-public abstract String getParamElementName();
+    public abstract int getId();
+    
+    public abstract String getParamElementName();
     
     public abstract String getParamElementValue();
 

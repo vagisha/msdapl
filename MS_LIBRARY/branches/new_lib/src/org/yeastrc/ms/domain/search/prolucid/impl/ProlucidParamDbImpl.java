@@ -16,6 +16,7 @@ public class ProlucidParamDbImpl implements ProlucidParamDb {
     private String elName;
     private String elValue;
     private int parentElId;
+    private int id;
     
     @Override
     public String getParamElementName() {
@@ -44,4 +45,11 @@ public class ProlucidParamDbImpl implements ProlucidParamDb {
         this.parentElId = parentElId;
     }
 
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
+    }
 }
