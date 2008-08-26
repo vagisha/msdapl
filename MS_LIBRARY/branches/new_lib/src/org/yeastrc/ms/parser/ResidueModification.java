@@ -16,14 +16,21 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 public class ResidueModification implements MsResidueModification {
 
     private char modifiedResidue;
-    private char modSymbol;
+    private char modSymbol = '\u0000';
     private BigDecimal modMass;
+    
+    
+    public ResidueModification(char modifiedResidue, BigDecimal modMass) {
+        this.modifiedResidue = modifiedResidue;
+        this.modMass = modMass;
+    }
     
     public ResidueModification(char modifiedResidue, BigDecimal modMass, char modSymbol) {
         this.modifiedResidue = modifiedResidue;
         this.modMass = modMass;
         this.modSymbol = modSymbol;
     }
+    
     public char getModifiedResidue() {return modifiedResidue;}
     public BigDecimal getModificationMass() {return modMass;}
     public char getModificationSymbol() {return modSymbol;}

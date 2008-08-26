@@ -23,6 +23,7 @@ import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.Database;
 import org.yeastrc.ms.parser.Enzyme;
+import org.yeastrc.ms.parser.ResidueModification;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
 import org.yeastrc.ms.parser.TerminalModification;
 
@@ -254,9 +255,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         
         BigDecimal mass = null;
         try {mass = new BigDecimal(massShift);}
-        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for n_term modification: "+massShift, e);
+        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for n_term modification: "+massShift, e);}
         
-        }
         TerminalModification mod = new TerminalModification(Terminal.NTERM, mass, symbol.charAt(0));
         
         if (isStatic)
@@ -284,9 +284,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         
         BigDecimal mass = null;
         try {mass = new BigDecimal(massShift);}
-        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for c_term modification: "+massShift, e);
+        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for c_term modification: "+massShift, e);}
         
-        }
         TerminalModification mod = new TerminalModification(Terminal.CTERM, mass, symbol.charAt(0));
         
         if (isStatic)
@@ -296,8 +295,36 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
    
     // parse <static_mods> element
-    private void parseStaticResidueMod(ProlucidParam child) {
-
+    private void parseStaticResidueMods(ProlucidParam node) throws DataProviderException {
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("static_mod"))
+                parseStaticResidueMod(child);
+        }
+    }
+    
+    private void parseStaticResidueMod(ProlucidParam node) throws DataProviderException {
+        String massShift = null;
+        String residue = null;
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equals(residue)) {
+                if (residue != null)
+                    throw new DataProviderException("Error parsing static residue modification.");
+                residue = child.getParamElementValue();
+            }
+            else if (child.getParamElementName().equals("mass_shift")) {
+                massShift = child.getParamElementValue();
+            }
+        }
+        
+        if (residue == null || residue.length() != 1)
+            throw new DataProviderException("Invalid residue for static modification: "+residue);
+        
+        BigDecimal mass = null;
+        try {mass = new BigDecimal(massShift);}
+        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for static residue modification: "+massShift, e);}
+        
+        ResidueModification mod = new ResidueModification(residue.charAt(0), mass);
+        this.staticResidueModifications.add(mod);
     }
 
     // parse <diff_mods> element
