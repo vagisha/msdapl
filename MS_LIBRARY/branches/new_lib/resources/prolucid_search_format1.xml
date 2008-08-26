@@ -82,20 +82,41 @@
         <modifications>
             <n_term>
                 <symbol>*</symbol>
-                <!--<mass_shift>156.1</mass_shift>-->
                 <mass_shift>156.1011</mass_shift>
                 <is_static_mod>false</is_static_mod>
             </n_term>
+	    <n_term>
+                <symbol>*</symbol>
+                <mass_shift>987.654</mass_shift>
+                <is_static_mod>true</is_static_mod>
+            </n_term>
+
             <c_term>
-                <symbol>x</symbol>
-                <mass_shift>0</mass_shift>
+                <symbol>y</symbol>
+                <mass_shift>123.4567</mass_shift>
                 <is_static_mod>false</is_static_mod>
             </c_term>
+	    <c_term>
+                <symbol>x</symbol>
+                <mass_shift>0.0</mass_shift>
+                <is_static_mod>true</is_static_mod>
+            </c_term>
+
+    	    <c_term>
+                <symbol>x</symbol>
+                <mass_shift>10.0</mass_shift>
+                <is_static_mod>true</is_static_mod>
+            </c_term>
+
             <static_mods>
                 <!-- may loop, but each residue should have just one static_mod -->
                 <static_mod>
                     <residue>C</residue>
                     <mass_shift>57.02146</mass_shift>
+                </static_mod>
+		<static_mod>
+                    <residue>M</residue>
+                    <mass_shift>0.000</mass_shift>
                 </static_mod>
             </static_mods>
             
@@ -103,13 +124,21 @@
                 <!-- may loop -->
                 <diff_mod>
                     <symbol>#</symbol>
-                    <mass_shift>0</mass_shift>
+                    <mass_shift>80.0</mass_shift>
                     <residues>
                         <residue>T</residue>
                         <residue>S</residue>
                     </residues>
                 </diff_mod>
-            </diff_mods>
+	   <diff_mod>
+                    <symbol>#</symbol>
+                    <mass_shift>0</mass_shift>
+                    <residues>
+                        <residue>M</residue>
+                        <residue>C</residue>
+                    </residues>
+           </diff_mod>
+	</diff_mods>
         </modifications>
         <enzyme_info>
             <!-- enzyme specificity:

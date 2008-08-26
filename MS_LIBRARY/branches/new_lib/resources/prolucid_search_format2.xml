@@ -92,26 +92,26 @@ Zscore = (XCorr of the top hit - average XCorr of the 2nd , 3rd, and 500th hits)
             <n_term>
                 <static_mod>
                     <symbol>*</symbol>
-                    <mass_shift>0</mass_shift>
+                    <mass_shift>123.4567</mass_shift>
                 </static_mod>
                 <diff_mods>
                     <!-- may loop -->
                     <diff_mod>
                         <symbol>*</symbol>
-                        <mass_shift>0</mass_shift>
+                        <mass_shift>9876.5432</mass_shift>
                     </diff_mod>
                 </diff_mods>
             </n_term>
             <c_term>
                 <static_mod>
                     <symbol>*</symbol>
-                    <mass_shift>0</mass_shift>
+                    <mass_shift>100.0</mass_shift>
                 </static_mod>
                 <diff_mods>
                     <!-- may loop -->
                    <diff_mod>
                         <symbol>*</symbol>
-                        <mass_shift>0</mass_shift>
+                        <mass_shift>200.0</mass_shift>
                    </diff_mod>
                 </diff_mods>
             </c_term>
@@ -210,14 +210,14 @@ Zscore = (XCorr of the top hit - average XCorr of the 2nd , 3rd, and 500th hits)
                         <residue>T</residue>
                     </residues>
                 </diff_mod>
-                	<!-- <diff_mod>
+		<diff_mod>
                     <symbol>phosphorylation</symbol>
                     <mass_shift>-18.01056</mass_shift>
                     <residues>
-                        <residue>S</residue>
-                        <residue>T</residue>
+                        <residue>A</residue>
+                        <residue>B</residue>
                     </residues>
-                </diff_mod> --> <!--  Neutral loss of phosphoric acid is commented out for ms2 data. For ms3 data, search with both +79.9663 and -18.01056. -->
+                </diff_mod>  <!--  Neutral loss of phosphoric acid is commented out for ms2 data. For ms3 data, search with both +79.9663 and -18.01056. -->
 
             </diff_mods>
         </modifications>

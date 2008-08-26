@@ -29,10 +29,14 @@ import org.yeastrc.ms.parser.TerminalModification;
 
 public class ProlucidParamsParser implements SearchParamsDataProvider {
 
+    public static enum SCORE {BIN_PROB, XCORR, ZSCORE};
+
     private String remoteServer;
 
     private List<ProlucidParam> parentParams; // normally we should have only one parent (the <parameter> element)
 
+    private SCORE primaryScore;
+    private SCORE secondaryScore;
 
     private Database database;
     private MsEnzyme enzyme;
@@ -69,16 +73,21 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return dynamicTerminalModifications;
     }
 
-    public ProlucidParamsParser(String remoteServer) {
+    private void init(String remoteServer) {
         this.remoteServer = remoteServer;
         parentParams = new ArrayList<ProlucidParam>();
         staticResidueModifications = new ArrayList<MsResidueModification>();
         staticTerminalModifications = new ArrayList<MsTerminalModification>();
         dynamicResidueModifications = new ArrayList<MsResidueModification>();
         dynamicTerminalModifications = new ArrayList<MsTerminalModification>();
+        this.database = null;
+        this.enzyme = null;
     }
 
-    public void parseParamsFile(String filePath) throws DataProviderException {
+    public void parseParamsFile(String remoteServer, String filePath) throws DataProviderException {
+
+        init(remoteServer);
+
         DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
         f.setIgnoringComments(true);
         DocumentBuilder b = null;
@@ -165,13 +174,63 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     private void extractUsefulInfo(ProlucidParamNode node) throws DataProviderException {
-        if (node.getParamElementName().equals("database"))
+        if (node.getParamElementName().equalsIgnoreCase("database"))
             parseDatabaseInfo(node);
-        else if (node.getParamElementName().equals("enzyme_info"))
+        else if (node.getParamElementName().equalsIgnoreCase("enzyme_info"))
             parseEnzymeInfo(node);
-        else if (node.getParamElementName().equals("modifications"))
+        else if (node.getParamElementName().equalsIgnoreCase("modifications"))
             parseModificationInfo(node);
+        else if (node.getParamElementName().equalsIgnoreCase("primary_score_type"))
+            parsePrimaryScoreType(node);
+        else if (node.getParamElementName().equalsIgnoreCase("secondary_score_type"))
+            parseSecondaryScoreType(node);
     }
+
+    private void parsePrimaryScoreType(ProlucidParamNode node) throws DataProviderException {
+        String val = node.getParamElementValue();
+        if (val == null)
+            throw new DataProviderException("Value of primary_score_type cannot be null");
+        int ival = 0;
+        try {ival = Integer.parseInt(val);}
+        catch(NumberFormatException e) {
+            throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1"); 
+        }
+        switch(ival) {
+            case 0:
+                primaryScore = SCORE.BIN_PROB;
+                break;
+            case 1:
+                primaryScore = SCORE.XCORR;
+                break;
+            default:
+                throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1"); 
+        }
+    }
+    
+    private void parseSecondaryScoreType(ProlucidParamNode node) throws DataProviderException {
+        String val = node.getParamElementValue();
+        if (val == null)
+            throw new DataProviderException("Value of secondary_score_type cannot be null");
+        int ival = 0;
+        try {ival = Integer.parseInt(val);}
+        catch(NumberFormatException e) {
+            throw new DataProviderException("Invalid value for secondary_score_type: "+val+". Allowed values: 0,1,2"); 
+        }
+        switch(ival) {
+            case 0:
+                secondaryScore = SCORE.BIN_PROB;
+                break;
+            case 1:
+                secondaryScore = SCORE.XCORR;
+                break;
+            case 2:
+                secondaryScore = SCORE.ZSCORE;
+                break;
+            default:
+                throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1,2"); 
+        }
+    }
+
 
     private void parseDatabaseInfo(ProlucidParam node) throws DataProviderException {
         String dbPath = null;
@@ -221,44 +280,169 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         e.setName(name);
         e.setCut(cut);
         e.setSense(sense);
+        this.enzyme = e;
     }
 
+    // parse <modifications> element
     private void parseModificationInfo(ProlucidParam node) throws DataProviderException {
         for (ProlucidParam child: node.getChildParamElements()) {
-            if (node.getParamElementName().equalsIgnoreCase("n_term"))
+            if (child.getParamElementName().equalsIgnoreCase("n_term"))
                 parseNtermMod(child);
-            else if (node.getParamElementName().equalsIgnoreCase("c_term"))
+            else if (child.getParamElementName().equalsIgnoreCase("c_term"))
                 parseCtermMod(child);
-            else if (node.getParamElementName().equalsIgnoreCase("static_mods"))
-                parseStaticResidueMod(child);
-            else if (node.getParamElementName().equalsIgnoreCase("diff_mods"))
+            else if (child.getParamElementName().equalsIgnoreCase("static_mods"))
+                parseStaticResidueMods(child);
+            else if (child.getParamElementName().equalsIgnoreCase("diff_mods"))
                 parseDynamicResidueMods(child);
         }
     }
 
     // parse <n_term> element
     private void parseNtermMod(ProlucidParam node) throws DataProviderException {
-        String symbol = null;
-        String massShift = null;
-        boolean isStatic = false;
-        
+
         for (ProlucidParam child: node.getChildParamElements()) {
-            if (child.getParamElementName().equalsIgnoreCase("symbol"))
-                symbol = child.getParamElementValue();
-            else if (child.getParamElementName().equalsIgnoreCase("mass_shift"))
-                massShift = child.getParamElementValue();
+            if (child.getParamElementName().equals("static_mod")) {
+                parseNtermModFormat2(node);
+                return;
+            }
+        }
+        parseNtermModFormat1(node);
+    }
+
+    /**
+     * Example: 
+     * <n_term>
+     *      <static_mod>
+     *          <symbol>*</symbol>
+     *          <mass_shift>0</mass_shift>
+     *      </static_mod>
+     *      <diff_mods>
+     *          <diff_mod>
+     *              <symbol>*</symbol>
+     *              <mass_shift>0</mass_shift>
+     *          </diff_mod>
+     *      </diff_mods>
+     * </n_term>
+     * @param node
+     * @throws DataProviderException
+     */
+    private void parseNtermModFormat2(ProlucidParam node) throws DataProviderException {
+
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("static_mod")) {
+                parseStaticTermModFormat2(Terminal.NTERM, child);
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("diff_mods")) {
+                for (ProlucidParam c: child.getChildParamElements()) {
+                    if (c.getParamElementName().equalsIgnoreCase("diff_mod")) {
+                        parseDynamicTermModFormat2(Terminal.NTERM, c);
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseStaticTermModFormat2(Terminal term, ProlucidParam node) throws DataProviderException {
+        char symbol = 0;
+        BigDecimal mass = null;
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("symbol")) {
+                String s = child.getParamElementValue();
+                if (s == null || s.length() != 1)
+                    throw new DataProviderException("Invalid modification symbol for terminal modification: "+s); 
+                symbol = s.charAt(0);
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("mass_shift")) {
+                try {mass = new BigDecimal(child.getParamElementValue());}
+                catch(NumberFormatException e) {
+                    throw new DataProviderException("Invalid mass_shift for terminal modification: "+child.getParamElementValue(), e);
+                }
+            }
+        }
+
+        if (mass == null)
+            throw new DataProviderException("No mass_shift found for terminal modification");
+
+        // if mass shift is 0, ignore this modification
+        if (mass.doubleValue() == 0)
+            return;
+
+        TerminalModification mod = new TerminalModification(term, mass, symbol);
+        this.staticTerminalModifications.add(mod);
+    }
+
+    private void parseDynamicTermModFormat2(Terminal term, ProlucidParam node) throws DataProviderException {
+        char symbol = 0;
+        BigDecimal mass = null;
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("symbol")) {
+                String s = child.getParamElementValue();
+                if (s == null || s.length() != 1)
+                    throw new DataProviderException("Invalid modification symbol for terminal modification: "+s); 
+                symbol = s.charAt(0);
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("mass_shift")) {
+                try {mass = new BigDecimal(child.getParamElementValue());}
+                catch(NumberFormatException e) {
+                    throw new DataProviderException("Invalid mass_shift for terminal modification: "+child.getParamElementValue(), e);
+                }
+            }
+        }
+
+        if (mass == null)
+            throw new DataProviderException("No mass_shift found for terminal modification");
+
+        // if mass shift is 0, ignore this modification
+        if (mass.doubleValue() == 0)
+            return;
+
+        TerminalModification mod = new TerminalModification(term, mass, symbol);
+        this.dynamicTerminalModifications.add(mod);
+    }
+
+    /**
+     * Example: 
+     * <n_term>
+     *      <symbol>*</symbol>
+     *      <mass_shift>156.1011</mass_shift>
+     *      <is_static_mod>false</is_static_mod>
+     * </n_term>
+     * @param node
+     * @throws DataProviderException
+     */
+    private void parseNtermModFormat1(ProlucidParam node) throws DataProviderException {
+        char symbol = 0;
+        BigDecimal mass = null;
+        Boolean isStatic = null;
+
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("symbol")) {
+                String s = child.getParamElementValue();
+                if (s == null || s.length() != 1)
+                    throw new DataProviderException("Invalid modification symbol for n_term modification: "+s); 
+                symbol = s.charAt(0);
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("mass_shift")) {
+                try {mass = new BigDecimal(child.getParamElementValue());}
+                catch(NumberFormatException e) {
+                    throw new DataProviderException("Invalid mass_shift for n_term modification: "+child.getParamElementValue(), e);
+                }
+            }
             else if (child.getParamElementName().equalsIgnoreCase("is_static_mod"))
                 isStatic = Boolean.valueOf(child.getParamElementValue());
         }
-        if (symbol == null || symbol.length() != 1)
-            throw new DataProviderException("Invalid modification symbol for n_term modification: "+symbol);
-        
-        BigDecimal mass = null;
-        try {mass = new BigDecimal(massShift);}
-        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for n_term modification: "+massShift, e);}
-        
-        TerminalModification mod = new TerminalModification(Terminal.NTERM, mass, symbol.charAt(0));
-        
+
+        if (mass == null)
+            throw new DataProviderException("No mass_shift found for n_term modification");
+        if (isStatic == null)
+            throw new DataProviderException("Missing information if n-term modification is static or terminal");
+
+        // if mass shift is 0, ignore this modification
+        if (mass.doubleValue() == 0)
+            return;
+
+        TerminalModification mod = new TerminalModification(Terminal.NTERM, mass, symbol);
+
         if (isStatic)
             this.staticTerminalModifications.add(mod);
         else
@@ -267,33 +451,102 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
 
     // parse <c_term> element
     private void parseCtermMod(ProlucidParam node) throws DataProviderException {
-        String symbol = null;
-        String massShift = null;
-        boolean isStatic = false;
-        
+
         for (ProlucidParam child: node.getChildParamElements()) {
-            if (child.getParamElementName().equalsIgnoreCase("symbol"))
-                symbol = child.getParamElementValue();
-            else if (child.getParamElementName().equalsIgnoreCase("mass_shift"))
-                massShift = child.getParamElementValue();
-            else if (child.getParamElementName().equalsIgnoreCase("is_static_mod"))
-                isStatic = Boolean.valueOf(child.getParamElementValue());
+            if (child.getParamElementName().equals("static_mod")) {
+                parseCtermModFormat2(node);
+                return;
+            }
         }
-        if (symbol == null || symbol.length() != 1)
-            throw new DataProviderException("Invalid modification symbol for c_term modification: "+symbol);
-        
+        parseCtermModFormat1(node);
+    }
+
+    /**
+     * Example: 
+     * <c_term>
+     *      <static_mod>
+     *          <symbol>*</symbol>
+     *          <mass_shift>0</mass_shift>
+     *      </static_mod>
+     *      <diff_mods>
+     *          <diff_mod>
+     *              <symbol>*</symbol>
+     *              <mass_shift>0</mass_shift>
+     *          </diff_mod>
+     *      </diff_mods>
+     * </c_term>
+     * @param node
+     * @throws DataProviderException
+     */
+    private void parseCtermModFormat2(ProlucidParam node) throws DataProviderException {
+
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("static_mod")) {
+                parseStaticTermModFormat2(Terminal.CTERM, child);
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("diff_mods")) {
+                for (ProlucidParam c: child.getChildParamElements()) {
+                    if (c.getParamElementName().equalsIgnoreCase("diff_mod")) {
+                        parseDynamicTermModFormat2(Terminal.CTERM, c);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Example: 
+     * <c_term>
+     *      <symbol>*</symbol>
+     *      <mass_shift>156.1011</mass_shift>
+     *      <is_static_mod>false</is_static_mod>
+     * </c_term>
+     * @param node
+     * @throws DataProviderException
+     */
+    private void parseCtermModFormat1(ProlucidParam node) throws DataProviderException {
+        char symbol = 0;
         BigDecimal mass = null;
-        try {mass = new BigDecimal(massShift);}
-        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for c_term modification: "+massShift, e);}
-        
-        TerminalModification mod = new TerminalModification(Terminal.CTERM, mass, symbol.charAt(0));
-        
+        Boolean isStatic = null;
+
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("symbol")) {
+                String s = child.getParamElementValue();
+                if (s == null || s.length() != 1)
+                    throw new DataProviderException("Invalid modification symbol for c_term modification: "+s); 
+                symbol = s.charAt(0);
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("mass_shift")){
+                try {mass = new BigDecimal(child.getParamElementValue());}
+                catch(NumberFormatException e) {
+                    throw new DataProviderException("Invalid mass_shift for c_term modification: "+child.getParamElementValue(), e);
+                }
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("is_static_mod")) {
+                String s = child.getParamElementValue();
+                if (!s.equalsIgnoreCase("true") && !s.equalsIgnoreCase("false"))
+                    throw new DataProviderException("Invalid value for is_static_mod element");
+                isStatic = Boolean.valueOf(child.getParamElementValue());
+            }
+        }
+
+        if (mass == null)
+            throw new DataProviderException("No mass_shift found for c_term modification");
+        if (isStatic == null)
+            throw new DataProviderException("Missing information if c-term modification is static or terminal");
+
+        // if mass shift is 0, ignore this modification
+        if (mass.doubleValue() == 0)
+            return;
+
+        TerminalModification mod = new TerminalModification(Terminal.CTERM, mass, symbol);
+
         if (isStatic)
             this.staticTerminalModifications.add(mod);
         else
             this.dynamicTerminalModifications.add(mod);
     }
-   
+
     // parse <static_mods> element
     private void parseStaticResidueMods(ProlucidParam node) throws DataProviderException {
         for (ProlucidParam child: node.getChildParamElements()) {
@@ -301,35 +554,82 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
                 parseStaticResidueMod(child);
         }
     }
-    
+
+    // parse <static_mod> element
     private void parseStaticResidueMod(ProlucidParam node) throws DataProviderException {
-        String massShift = null;
-        String residue = null;
+        BigDecimal mass = null;
+        char residue = 0;
         for (ProlucidParam child: node.getChildParamElements()) {
-            if (child.getParamElementName().equals(residue)) {
-                if (residue != null)
-                    throw new DataProviderException("Error parsing static residue modification.");
-                residue = child.getParamElementValue();
+            if (child.getParamElementName().equalsIgnoreCase("residue")) {
+                if (residue != 0)
+                    throw new DataProviderException("Error parsing static residue modification. More than one residue found for static modification");
+                String s = child.getParamElementValue();
+                if (s == null || s.length() != 1)
+                    throw new DataProviderException("Invalid residue for static modification: "+s); 
+                residue = s.charAt(0);
             }
-            else if (child.getParamElementName().equals("mass_shift")) {
-                massShift = child.getParamElementValue();
+            else if (child.getParamElementName().equalsIgnoreCase("mass_shift")) {
+                try {mass = new BigDecimal(child.getParamElementValue());}
+                catch(NumberFormatException e) {
+                    throw new DataProviderException("Invalid mass_shift for static residue modification: "+child.getParamElementValue(), e);
+                }
+                // if mass shift is 0, ignore this modification
+                if (mass.doubleValue() == 0)
+                    return;
             }
         }
-        
-        if (residue == null || residue.length() != 1)
-            throw new DataProviderException("Invalid residue for static modification: "+residue);
-        
-        BigDecimal mass = null;
-        try {mass = new BigDecimal(massShift);}
-        catch(NumberFormatException e) {throw new DataProviderException("Invalid mass_shift for static residue modification: "+massShift, e);}
-        
-        ResidueModification mod = new ResidueModification(residue.charAt(0), mass);
+
+        ResidueModification mod = new ResidueModification(residue, mass);
         this.staticResidueModifications.add(mod);
     }
 
     // parse <diff_mods> element
-    private void parseDynamicResidueMods(ProlucidParam child) {
+    private void parseDynamicResidueMods(ProlucidParam node) throws DataProviderException {
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("diff_mod"))
+                parseDynamicMod(child);
+        }
+    }
 
+    // parse <diff_mod> element
+    private void parseDynamicMod(ProlucidParam node) throws DataProviderException {
+        char modSymbol = 0;
+        BigDecimal mass = null;
+        List<Character> modResidues = new ArrayList<Character>();
+
+        for (ProlucidParam child: node.getChildParamElements()) {
+            if (child.getParamElementName().equalsIgnoreCase("mass_shift")) {
+                try {mass = new BigDecimal(child.getParamElementValue());}
+                catch(NumberFormatException e) {
+                    throw new DataProviderException("Invalid mass_shift for static residue modification: "+child.getParamElementValue(), e);
+                }
+                // if mass shift is 0, ignore this modification
+                if (mass.doubleValue() == 0)
+                    return;
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("symbol")) {
+                String s = child.getParamElementValue();
+                // TODO  <symbol> can have a string value. e.g. "phosporylation"
+//              if (s == null || s.length() != 1)
+                if (s == null || s.length() < 1)
+                    throw new DataProviderException("Invalid modification symbol for dynamic residue modification: "+s); 
+                modSymbol = s.charAt(0);
+            }
+            else if (child.getParamElementName().equalsIgnoreCase("residues")) {
+                for (ProlucidParam cr: child.getChildParamElements()) {
+                    if (cr.getParamElementName().equals("residue")) {
+                        String s = cr.getParamElementValue();
+                        if (s == null || s.length() != 1)
+                            throw new DataProviderException("Invalid residue for dynamic residue modification: "+s); 
+                        modResidues.add(s.charAt(0));
+                    }
+                }
+            }
+        }
+        for (Character res: modResidues) {
+            ResidueModification mod = new ResidueModification(res, mass, modSymbol);
+            dynamicResidueModifications.add(mod);
+        }
     }
 
     private static final class ProlucidParamNode implements ProlucidParam {
@@ -367,8 +667,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
 
     public static void main(String[] args) throws DataProviderException {
         String file = "resources/prolucid_search_format1.xml";
-        ProlucidParamsParser parser = new ProlucidParamsParser("remote.server");
-        parser.parseParamsFile(file);
+        ProlucidParamsParser parser = new ProlucidParamsParser();
+        parser.parseParamsFile("remote.server", file);
     }
 
 }
