@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl.DataConversionTypeHandler;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
@@ -25,11 +24,12 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
 
     public void testSaveLoadDelete() {
         MsScan scan = makeMsScan(2, 1, DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
-        int scanId = scanDao.save(scan, 1, 1); // runId = 1; precursorScanId = 1;
+        int scanId = scanDao.save(scan, 99, 230); // runId = 99; precursorScanId = 230;
         MsScanDb scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
         // clean up
-        scanDao.deleteScansForRun(1);
+        scanDao.delete(scanId);
+        assertEquals(0, scanDao.loadScanIdsForRun(99).size());
         assertNull(scanDao.load(scanId));
     }
 
@@ -45,11 +45,12 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
 
     public void testSaveScanWithNoPrecursorScanId() {
         MsScan scan = makeMsScan(2, 1,DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
-        int scanId = scanDao.save(scan, 1); // runID = 1
+        int scanId = scanDao.save(scan, 99); // runID = 99
         MsScanDb scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
         // clean up
-        scanDao.deleteScansForRun(1);
+        scanDao.delete(scanId);
+        assertEquals(0, scanDao.loadScanIdsForRun(99).size());
         assertNull(scanDao.load(scanId));
     }
 
@@ -66,8 +67,12 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
             assertEquals(Integer.valueOf(ids[i]), scanIdList.get(i));
         }
         // clean up
-        scanDao.deleteScansForRun(3);
+        List<Integer> scanIds = scanDao.loadScanIdsForRun(3);
+        for (Integer id: scanIds)
+            scanDao.delete(id);
         assertEquals(0, scanDao.loadScanIdsForRun(3).size());
+        for (int id: ids)
+            assertNull(scanDao.load(id));
     }
     
     public void testSaveLoadPeakData() {
@@ -77,7 +82,8 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         MsScanDb scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
         // clean up
-        scanDao.deleteScansForRun(1);
+        scanDao.delete(scanId);
+        assertEquals(0, scanDao.loadScanIdsForRun(1).size());
         assertNull(scanDao.load(scanId));
     }
 
@@ -85,9 +91,8 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         MsScan scan = makeMsScan(35, 53, null);
         try {
             scanDao.save(scan, 56);
-            fail("DataConversionType cannot be null");
         }
-        catch(Exception e) {}
+        catch(Exception e) {e.printStackTrace(); fail("DataConversionType can be null");}
         
         scan = makeMsScan(35, 53, DataConversionType.CENTROID);
         int id = scanDao.save(scan, 56);
@@ -105,7 +110,9 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         checkScan(scan, scan_db);
         
         // clean up
-        scanDao.deleteScansForRun(56);
+        List<Integer> scanIds = scanDao.loadScanIdsForRun(56);
+        for (Integer i: scanIds)
+            scanDao.delete(i);
         assertEquals(0, scanDao.loadScanIdsForRun(56).size());
     }
     

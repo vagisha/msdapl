@@ -3,12 +3,13 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsScan"> 
 
-	<typeAlias alias="MsScanDb" type="org.yeastrc.ms.domain.run.impl.MsScanDbImpl"/>
+	<typeAlias alias="MsScanOut" type="org.yeastrc.ms.domain.run.impl.MsScanDbImpl"/>
+	<typeAlias alias="MsScanIn" type="org.yeastrc.ms.domain.run.MsScanDb"/>
 	<typeAlias alias="MsScanData" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
 	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
 	
 	
-	<resultMap class="MsScanDb" id="msScanResult">
+	<resultMap class="MsScanOut" id="msScanResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" nullValue="0" />
 		<result property="startScanNum" column="startScanNumber" nullValue="-1"/>
@@ -28,7 +29,7 @@
 	</resultMap>
 	
 	
-	<parameterMap class="MsScanDb" id="msScanParam">
+	<parameterMap class="MsScanIn" id="msScanParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="startScanNum" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="endScanNum" jdbcType="INTEGER" nullValue="-1"/>
