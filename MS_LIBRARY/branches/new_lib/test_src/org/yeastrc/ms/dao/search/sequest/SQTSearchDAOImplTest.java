@@ -1,9 +1,10 @@
-package org.yeastrc.ms.dao.sqtFile;
+package org.yeastrc.ms.dao.search.sequest;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsSearchDAOImplTest.MsSearchTest;
+import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
+import org.yeastrc.ms.dao.search.sqtfile.SQTBaseDAOTestCase;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;

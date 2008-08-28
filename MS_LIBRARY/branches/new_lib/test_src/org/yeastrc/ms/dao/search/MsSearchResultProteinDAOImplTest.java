@@ -1,9 +1,10 @@
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.search;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 

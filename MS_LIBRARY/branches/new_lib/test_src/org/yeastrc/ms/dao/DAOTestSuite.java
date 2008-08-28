@@ -3,14 +3,14 @@ package org.yeastrc.ms.dao;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.yeastrc.ms.dao.ms2File.MS2ChargeDependentAnalysisDAOImplTest;
-import org.yeastrc.ms.dao.ms2File.MS2ChargeIndependentAnalysisDAOImplTest;
-import org.yeastrc.ms.dao.ms2File.MS2RunDAOImplTest;
-import org.yeastrc.ms.dao.ms2File.MS2ScanChargeDAOImplTest;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchDAOImplTest;
-import org.yeastrc.ms.dao.sqtFile.SQTHeaderDAOImplTest;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchResultDAOImplTest;
-import org.yeastrc.ms.dao.sqtFile.SQTSearchScanDAOImplTest;
+import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAOImplTest;
+import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAOImplTest;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAOImplTest;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAOImplTest;
+import org.yeastrc.ms.dao.search.sequest.SQTSearchDAOImplTest;
+import org.yeastrc.ms.dao.search.sequest.SQTSearchResultDAOImplTest;
+import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAOImplTest;
+import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAOImplTest;
 
 public class DAOTestSuite {
 

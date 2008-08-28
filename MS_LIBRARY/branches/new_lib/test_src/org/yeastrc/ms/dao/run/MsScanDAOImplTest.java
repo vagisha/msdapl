@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.run;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl.DataConversionTypeHandler;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;

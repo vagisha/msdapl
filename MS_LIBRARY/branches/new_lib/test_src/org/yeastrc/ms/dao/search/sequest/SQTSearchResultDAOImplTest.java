@@ -1,9 +1,10 @@
-package org.yeastrc.ms.dao.sqtFile;
+package org.yeastrc.ms.dao.search.sequest;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
-import org.yeastrc.ms.dao.MsSearchResultDAOImplTest.MsSearchResultTest;
+import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
+import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
+import org.yeastrc.ms.dao.search.sqtfile.SQTBaseDAOTestCase;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
 

@@ -1,10 +1,11 @@
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.search;
 
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResult;

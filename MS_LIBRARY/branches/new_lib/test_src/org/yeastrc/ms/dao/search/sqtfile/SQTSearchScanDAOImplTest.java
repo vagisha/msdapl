@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dao.sqtFile;
+package org.yeastrc.ms.dao.search.sqtfile;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

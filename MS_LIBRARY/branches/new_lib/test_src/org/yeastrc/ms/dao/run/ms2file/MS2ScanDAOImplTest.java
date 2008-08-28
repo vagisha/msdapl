@@ -1,11 +1,11 @@
-package org.yeastrc.ms.dao.ms2File;
+package org.yeastrc.ms.dao.run.ms2file;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import org.yeastrc.ms.dao.MsScanDAOImplTest.MsScanTest;
+import org.yeastrc.ms.dao.run.MsScanDAOImplTest.MsScanTest;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.ms2file.MS2Field;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;

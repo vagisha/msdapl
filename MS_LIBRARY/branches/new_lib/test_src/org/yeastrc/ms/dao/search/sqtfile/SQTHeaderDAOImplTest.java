@@ -4,7 +4,7 @@
  * Jul 4, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.sqtFile;
+package org.yeastrc.ms.dao.search.sqtfile;
 
 import java.util.Collections;
 import java.util.Comparator;

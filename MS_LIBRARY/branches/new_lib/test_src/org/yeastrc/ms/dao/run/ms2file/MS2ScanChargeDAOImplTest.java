@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dao.ms2File;
+package org.yeastrc.ms.dao.run.ms2file;
 
 import java.util.Collections;
 import java.util.Comparator;

@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dao.ms2File;
+package org.yeastrc.ms.dao.run.ms2file;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -8,14 +8,14 @@ import java.util.Random;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.ms2File.MS2RunDAOImplTest.MS2RunTest;
-import org.yeastrc.ms.dao.ms2File.MS2ScanDAOImplTest.MS2ScanTest;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAOImplTest.MS2RunTest;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAOImplTest.MS2ScanTest;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb;

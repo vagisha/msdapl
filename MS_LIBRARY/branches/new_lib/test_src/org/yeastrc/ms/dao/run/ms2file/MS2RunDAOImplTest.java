@@ -1,9 +1,9 @@
-package org.yeastrc.ms.dao.ms2File;
+package org.yeastrc.ms.dao.run.ms2file;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dao.MsRunDAOImplTest.MsRunTest;
+import org.yeastrc.ms.dao.run.MsRunDAOImplTest.MsRunTest;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Field;
