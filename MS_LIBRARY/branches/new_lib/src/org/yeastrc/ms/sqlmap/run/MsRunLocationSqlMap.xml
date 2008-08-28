@@ -3,9 +3,10 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRunLocation"> 
 
-	<typeAlias alias="MsRunLocationDb" type="org.yeastrc.ms.domain.run.impl.MsRunLocationDbImpl" />
+	<typeAlias alias="MsRunLocationDbImpl" type="org.yeastrc.ms.domain.run.impl.MsRunLocationDbImpl" />
+	<typeAlias alias="MsRunLocationDb" type="org.yeastrc.ms.domain.run.MsRunLocationDb" />
 	
-	<resultMap class="MsRunLocationDb" id="msRunLocationResult">
+	<resultMap class="MsRunLocationDbImpl" id="msRunLocationResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" nullValue="0"/>
 		<result property="createDate" column="createDate" />
@@ -28,7 +29,7 @@
     	SELECT * FROM msRunLocation WHERE runID=#runId#
     </select>
     
-     <select id="selectMatchingLocations" resultMap="msRunLocationResult" parameterClass="MsRunLocation">
+     <select id="selectMatchingLocations" resultMap="msRunLocationResult" parameterClass="MsRunLocationDb">
     	SELECT * FROM msRunLocation 
     	WHERE runID=#runId#
     	AND serverAddress=#serverAddress#

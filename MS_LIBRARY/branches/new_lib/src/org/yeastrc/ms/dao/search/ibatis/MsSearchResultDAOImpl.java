@@ -81,7 +81,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
 
     private void saveDynamicResidueMods(int searchId, int resultId,
             MsSearchResultPeptide peptide) {
-        for (MsResultDynamicResidueMod mod: peptide.getDynamicResidueModifications()) {
+        for (MsResultDynamicResidueMod mod: peptide.getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
             int modId = DynamicModLookupUtil.instance().getDynamicResidueModificationId(searchId, mod);

@@ -23,16 +23,16 @@ public class MsLibTests {
 
     public static Test suite() {
         
-//        resetDatabase();
+        resetDatabase();
         
         TestSuite suite = new TestSuite("Test for org.yeastrc.ms");
         //$JUnit-BEGIN$
         
-//        // domain classes
-//        suite.addTestSuite(MsScanDbImplTest.class);
-//        
-//        // dao classes
-//        suite.addTest(DAOTestSuite.suite());
+        // domain classes
+        suite.addTestSuite(MsScanDbImplTest.class);
+        
+        // dao classes
+        suite.addTest(DAOTestSuite.suite());
         
         // parser classes
         suite.addTest(SQTParserTests.suite());

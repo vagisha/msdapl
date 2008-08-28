@@ -78,7 +78,7 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
     //-----------------------------------------------------------------------------------------
     // DYNAMIC MODIFICATIONS
     //-----------------------------------------------------------------------------------------
-    public List<MsResultDynamicResidueModDb> getDynamicResidueModifications() {
+    public List<MsResultDynamicResidueModDb> getResultDynamicResidueModifications() {
         return (List<MsResultDynamicResidueModDb>) dynamicMods;
     }
     

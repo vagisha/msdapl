@@ -450,7 +450,7 @@ public class SequestSQTDataUploadService {
             uploadProteinMatchBuffer();
         }
         // add the dynamic modifications for this result to the cache
-        for (MsResultDynamicResidueMod mod: result.getResultPeptide().getDynamicResidueModifications()) {
+        for (MsResultDynamicResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
             int modId = DynamicModLookupUtil.instance().getDynamicResidueModificationId(searchId, 

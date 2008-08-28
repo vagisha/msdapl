@@ -143,7 +143,7 @@ public class DbToSqtFileConverter {
     private String reconstructSequestPeptideSequence(int searchId, SequestSearchResultDb resultDb) {
         // dynamic modifications for the search
         MsSearchResultPeptideDb peptideSeq = resultDb.getResultPeptide();
-        List<MsResultDynamicResidueModDb> resultMods = peptideSeq.getDynamicResidueModifications();
+        List<MsResultDynamicResidueModDb> resultMods = peptideSeq.getResultDynamicResidueModifications();
         Collections.sort(resultMods, new Comparator<MsResultDynamicResidueModDb>() {
             public int compare(MsResultDynamicResidueModDb o1,
                     MsResultDynamicResidueModDb o2) {

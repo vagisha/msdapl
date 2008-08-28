@@ -166,10 +166,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         int mod2_2Id = modDao.saveDynamicResidueMod(mods[3], 2);
 
         // save some dynamic modifications for two search results
-        MsSearchResultModification rmod1_1 = makeResultDynamicMod(residue[0], mass[0], symbol[0], 10);
-        MsSearchResultModification rmod1_2 = makeResultDynamicMod(residue[1], mass[1], symbol[1], 20);
-        MsSearchResultModification rmod2_1 = makeResultDynamicMod(residue[2], mass[2], symbol[2], 1);
-        MsSearchResultModification rmod2_2 = makeResultDynamicMod(residue[3], mass[3], symbol[3], 2);
+        MsSearchResultModification rmod1_1 = makeResultDynamicResidueMod(residue[0], mass[0], symbol[0], 10);
+        MsSearchResultModification rmod1_2 = makeResultDynamicResidueMod(residue[1], mass[1], symbol[1], 20);
+        MsSearchResultModification rmod2_1 = makeResultDynamicResidueMod(residue[2], mass[2], symbol[2], 1);
+        MsSearchResultModification rmod2_2 = makeResultDynamicResidueMod(residue[3], mass[3], symbol[3], 2);
         
         modDao.saveDynamicResidueModForResult(rmod1_1, 3, getModId(1, mods[0])); // mod, resultId, modificationId
         modDao.saveDynamicResidueModForResult(rmod1_2, 3, getModId(1, mods[1]));

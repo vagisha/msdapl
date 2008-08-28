@@ -63,7 +63,7 @@ public final class SequestResultPeptideBuilder {
                 if (justPeptide == null)    return 0;
                 return justPeptide.length();
             }
-            public List<MsResultDynamicResidueMod> getDynamicResidueModifications() {
+            public List<MsResultDynamicResidueMod> getResultDynamicResidueModifications() {
                 return resultMods;
             }
             public List<MsTerminalModification> getDynamicTerminalModifications() {

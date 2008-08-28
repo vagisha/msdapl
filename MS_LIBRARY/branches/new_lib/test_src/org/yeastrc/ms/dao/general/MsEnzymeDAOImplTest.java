@@ -1,8 +1,9 @@
-package org.yeastrc.ms.dao;
+package org.yeastrc.ms.dao.general;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO.EnzymeProperties;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;

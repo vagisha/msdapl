@@ -8,12 +8,12 @@ package org.yeastrc.ms.domain.search.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
 
 /**
  * 
  */
-public class MsTerminalModificationDbImpl implements MsTerminalModification {
+public class MsTerminalModificationDbImpl implements MsTerminalModificationDb {
 
     private int id;
     private int searchId;

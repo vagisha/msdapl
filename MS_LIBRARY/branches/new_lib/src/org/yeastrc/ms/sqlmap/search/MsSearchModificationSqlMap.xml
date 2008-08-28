@@ -3,18 +3,18 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearchMod"> 
 
-	<typeAlias alias="MsResidueModDb" type="org.yeastrc.ms.domain.impl.MsResidueModificationDb"/>
-	<typeAlias alias="MsTerminalModDb" type="org.yeastrc.ms.domain.impl.MsTerminalModificationDb"/>
-	<typeAlias alias="MsResultDynaResidueModDb" type="org.yeastrc.ms.domain.impl.MsResultDynamicResidueModDb"/>
-	<typeAlias alias="MsResultDynaTerminalModDb" type="org.yeastrc.ms.domain.impl.MsResultDynamicTerminalModDb"/>
+	<typeAlias alias="MsResidueModDb" type="org.yeastrc.ms.domain.search.impl.MsResidueModificationDbImpl"/>
+	<typeAlias alias="MsTerminalModDb" type="org.yeastrc.ms.domain.search.impl.MsTerminalModificationDbImpl"/>
+	<typeAlias alias="MsResultDynaResidueModDb" type="org.yeastrc.ms.domain.search.impl.MsResultDynamicResidueModDbImpl"/>
+	<typeAlias alias="MsResultDynaTerminalModDb" type="org.yeastrc.ms.domain.search.impl.MsResultDynamicTerminalModDbImpl"/>
 		
-	<typeAlias alias="CharTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$CharTypeHandler"/>
-	<typeAlias alias="TerminalTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$TerminalTypeHandler"/>
+	<typeAlias alias="CharTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$CharTypeHandler"/>
+	<typeAlias alias="TerminalTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$TerminalTypeHandler"/>
 	
-	<typeAlias alias="MsResidueMod" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$MsResidueModSqlMapParam" />
-	<typeAlias alias="MsTerminalMod" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$MsTerminalModSqlMapParam" />
-	<typeAlias alias="MsResultResidueMod" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$MsResultTerminalModSqlMapParam" />
-	<typeAlias alias="MsResultTerminalMod" type="org.yeastrc.ms.dao.ibatis.MsSearchModificationDAOImpl$MsResultResidueModSqlMapParam" />
+	<typeAlias alias="MsResidueMod" type="org.yeastrc.ms.dao.ibatis.search.MsSearchModificationDAOImpl$MsResidueModSqlMapParam" />
+	<typeAlias alias="MsTerminalMod" type="org.yeastrc.ms.dao.ibatis.search.MsSearchModificationDAOImpl$MsTerminalModSqlMapParam" />
+	<typeAlias alias="MsResultResidueMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultTerminalModSqlMapParam" />
+	<typeAlias alias="MsResultTerminalMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultResidueModSqlMapParam" />
 	
 	
 	<!-- ==================================== Result Maps ===================================== -->

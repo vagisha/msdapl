@@ -39,8 +39,8 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 
         SQTSearchTest search = new SQTSearchTest();
         search.setSearchFileFormat(SearchFileFormat.SQT_SEQ);
-        search.setSearchEngineName("Sequest");
-        search.setSearchEngineVersion("1.0");
+        search.setAnalysisProgramName("Sequest");
+        search.setAnalysisProgramVersion("1.0");
         long startTime = getTime("01/29/2008, 03:34 AM", false);
         long endTime = getTime("01/29/2008, 06:21 AM", false);
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
@@ -59,14 +59,14 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         if (addStaticMods) {
             MsSearchModification mod1 = makeStaticMod('C', "50.0");
             MsSearchModification mod2 = makeStaticMod('S', "80.0");
-            search.setStaticModifications(Arrays.asList(new MsSearchModification[]{mod1, mod2}));
+            search.setStaticResidueMods(Arrays.asList(new MsSearchModification[]{mod1, mod2}));
         }
 
         if (addDynaMods) {
             MsSearchModification dmod1 = makeDynamicMod('A', "10.0", '*');
             MsSearchModification dmod2 = makeDynamicMod('B', "20.0", '#');
             MsSearchModification dmod3 = makeDynamicMod('C', "30.0", '@');
-            search.setDynamicModifications(Arrays.asList(new MsSearchModification[]{dmod1, dmod2, dmod3}));
+            search.setResultDynamicResidueMods(Arrays.asList(new MsSearchModification[]{dmod1, dmod2, dmod3}));
         }
 
 

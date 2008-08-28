@@ -207,7 +207,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRNYFEAFEMPG", resultPeptide.getPeptideSequence());
         
-        List<MsResultDynamicResidueMod> resultMods = (List<MsResultDynamicResidueMod>) resultPeptide.getDynamicResidueModifications();
+        List<MsResultDynamicResidueMod> resultMods = (List<MsResultDynamicResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(2, resultMods.size());
         Collections.sort(resultMods, new Comparator<MsResultDynamicResidueMod>() {
             public int compare(MsResultDynamicResidueMod o1,
@@ -282,7 +282,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRSFEAFSMPG", resultPeptide.getPeptideSequence());
         
-        List<MsResultDynamicResidueMod> resultMods = (List<MsResultDynamicResidueMod>) resultPeptide.getDynamicResidueModifications();
+        List<MsResultDynamicResidueMod> resultMods = (List<MsResultDynamicResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(2, resultMods.size());
         Collections.sort(resultMods, new Comparator<MsResultDynamicResidueMod>() {
             public int compare(MsResultDynamicResidueMod o1,
@@ -320,7 +320,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRSFEAFSMPG", resultPeptide.getPeptideSequence());
         
-        List<MsResultDynamicResidueMod> resultMods = (List<MsResultDynamicResidueMod>) resultPeptide.getDynamicResidueModifications();
+        List<MsResultDynamicResidueMod> resultMods = (List<MsResultDynamicResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(3, resultMods.size());
         Collections.sort(resultMods, new Comparator<MsResultDynamicResidueMod>() {
             public int compare(MsResultDynamicResidueMod o1,
