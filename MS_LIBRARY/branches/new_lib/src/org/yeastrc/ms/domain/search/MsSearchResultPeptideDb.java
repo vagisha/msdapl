@@ -24,5 +24,5 @@ public interface MsSearchResultPeptideDb extends MsSearchResultPeptideBase {
      * Returns a list of dynamic residue modifications.
      * @return
      */
-    public abstract List<MsTerminalModificationDb> getDynamicTerminalModifications();
+    public abstract List<MsResultDynamicTerminalModDb> getResultDynamicTerminalModifications();
 }

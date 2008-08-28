@@ -13,8 +13,8 @@
 	
 	<typeAlias alias="MsResidueMod" type="org.yeastrc.ms.dao.ibatis.search.MsSearchModificationDAOImpl$MsResidueModSqlMapParam" />
 	<typeAlias alias="MsTerminalMod" type="org.yeastrc.ms.dao.ibatis.search.MsSearchModificationDAOImpl$MsTerminalModSqlMapParam" />
-	<typeAlias alias="MsResultResidueMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultTerminalModSqlMapParam" />
-	<typeAlias alias="MsResultTerminalMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultResidueModSqlMapParam" />
+	<typeAlias alias="MsResultResidueMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultResidueModSqlMapParam" />
+	<typeAlias alias="MsResultTerminalMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultTerminalModSqlMapParam" />
 	
 	
 	<!-- ==================================== Result Maps ===================================== -->

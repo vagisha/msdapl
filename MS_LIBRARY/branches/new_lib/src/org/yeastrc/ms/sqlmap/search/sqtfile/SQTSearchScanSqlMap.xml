@@ -4,8 +4,8 @@
 <sqlMap namespace="SqtSpectrum"> 
 
 
-	<typeAlias alias="SqtSpectrumDb" type="org.yeastrc.ms.domain.sqtFile.impl.SQTSearchScanDbImpl"/>
-	<typeAlias alias="SqtSpectrum" type="org.yeastrc.ms.dao.sqtFile.ibatic.SQTSearchScanDAOImpl$SQTSearchScanSqlMapParam"/>
+	<typeAlias alias="SqtSpectrumDb" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanDbImpl"/>
+	<typeAlias alias="SqtSpectrum" type="org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTSearchScanDAOImpl$SQTSearchScanSqlMapParam"/>
 	
 	<resultMap class="SqtSpectrumDb" id="sqtSpectrumResult" >
 		<result property="searchId" column="searchID" nullValue="0"/>

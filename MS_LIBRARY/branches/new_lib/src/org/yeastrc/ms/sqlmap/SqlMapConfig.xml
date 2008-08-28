@@ -52,15 +52,15 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/MsSearchSqlMap.xml" />
 
 	<!-- Related to SQT files -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTHeaderSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/sqtFile/SQTSearchScanSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/sqtfile/SQTHeaderSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/sqtfile/SQTSearchScanSqlMap.xml"/>
 
 	<!-- Related to Sequest files -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/sequest/SequestSearchSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/sequest/SequestSearchResultSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/sequest/SequestSearchSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/sequest/SequestSearchResultSqlMap.xml"/>
 	
 	<!-- Related to ProLuCID files -->
-	<sqlMap resource="org/yeastrc/ms/sqlmap/prolucid/ProlucidSearchSqlMap.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/prolucid/ProlucidSearchResultSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/prolucid/ProlucidSearchSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/prolucid/ProlucidSearchResultSqlMap.xml"/>
 	
 </sqlMapConfig>	

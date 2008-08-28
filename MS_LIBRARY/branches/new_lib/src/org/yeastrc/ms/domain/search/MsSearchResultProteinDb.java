@@ -18,11 +18,6 @@ public interface MsSearchResultProteinDb {
     public abstract int getResultId();
     
     /**
-     * @return database id of this protein match
-     */
-    public abstract int getId();
-    
-    /**
      * @return database id of the protein (from the NR_SEQ database).
      */
     public abstract int getProteinId();

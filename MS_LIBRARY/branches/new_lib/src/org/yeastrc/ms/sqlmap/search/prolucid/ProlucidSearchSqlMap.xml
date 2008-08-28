@@ -15,6 +15,7 @@
 	
 	<resultMap class="ProlucidParamOut" id="prolucidParamResult">
 		<result property="id" column="id" nullValue="0" />
+		<result property="searchId" column="searchID" nullValue="0" />
 		<result property="paramElementName" column="elementName"/>
 		<result property="paramElementValue" column="value"/>
 		<result property="parentParamElementId" column="parentID" nullValue="0" />
@@ -27,7 +28,7 @@
 		<parameter property="parentParamElementId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
-	<select id="select" resultMap="sequestSearchResult" parameterClass="Integer">
+	<select id="select" resultMap="prolucidSearchResult" parameterClass="Integer">
     	SELECT * FROM msSearch WHERE id = #id#
     </select>
     

@@ -69,10 +69,6 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         public int getProteinId() {
             return proteinId;
         }
-        @Override
-        public int getId() {
-            return 0;
-        }
     }
 }
 

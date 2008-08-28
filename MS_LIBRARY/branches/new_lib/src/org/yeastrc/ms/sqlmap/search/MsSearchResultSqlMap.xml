@@ -37,13 +37,13 @@
 	
 	
 	<parameterMap class="MsSearchResultIn" id="msSearchResultParam">
-		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="charge" jdbcType="TINYINT" nullValue="0"/>
 		<parameter property="peptideSequence" jdbcType="VARCHAR"/>
 		<parameter property="preResidueString" jdbcType="CHAR" nullValue=""/>
 		<parameter property="postResidueString" jdbcType="CHAR" nullValue=""/>
-		<parameter property="validationStatus" jdbcType="CHAR" javaType="VStatus" typeHandler="VStatusHandler"/>
+		<parameter property="validationStatus" jdbcType="CHAR" typeHandler="VStatusHandler"/>
 	</parameterMap>
 	
 	

@@ -3,7 +3,6 @@ package org.yeastrc.ms.dao.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.MsLibTests;
 import org.yeastrc.ms.dao.MsRunDAOImplTest.MsRunTest;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
@@ -16,8 +15,8 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        MsLibTests.resetDatabase();
-        MsLibTests.addEnzymes();
+        resetDatabase();
+        addEnzymes();
     }
 
     protected void tearDown() throws Exception {

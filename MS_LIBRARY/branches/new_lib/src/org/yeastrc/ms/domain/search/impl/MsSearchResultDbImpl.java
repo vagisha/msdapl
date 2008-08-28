@@ -54,10 +54,10 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
     }
 
     /**
-     * @param searchId the searchId to set
+     * @param runSearchId the runSearchId to set
      */
-    public void setSearchId(int searchId) {
-        this.runSearchId = searchId;
+    public void setRunSearchId(int runSearchId) {
+        this.runSearchId = runSearchId;
     }
 
     /**

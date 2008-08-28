@@ -20,6 +20,7 @@ public class MsRunSearchDbImpl implements MsRunSearchDb {
     private SearchFileFormat originalFileType;
     private Date searchDate;
     private int searchDuration; // number of minutes for the search
+    private Date uploadDate;
     
     
     /**
@@ -91,5 +92,13 @@ public class MsRunSearchDbImpl implements MsRunSearchDb {
      */
     public void setSearchDuration(int searchDuration) {
         this.searchDuration = searchDuration;
+    }
+    
+    public Date getUploadDate() {
+        return this.uploadDate;
+    }
+    
+    public void setUploadDate(Date date) {
+        this.uploadDate = date;
     }
 }

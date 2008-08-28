@@ -35,13 +35,11 @@
 	</resultMap>
 	
 	<parameterMap class="MsSearch" id="msSearchParam">
-		<parameter property="id" jdbcType="INTEGER"/>
 		<parameter property="searchDate" jdbcType="DATE" />
 		<parameter property="serverAddress" jdbcType="VARCHAR" />
 		<parameter property="serverDirectory" jdbcType="VARCHAR" />
 		<parameter property="analysisProgramName" jdbcType="VARCHAR" />
 		<parameter property="analysisProgramVersion" jdbcType="VARCHAR"/>
-		<parameter property="uploadDate" jdbcType="DATE" />
 	</parameterMap>
 	
 	

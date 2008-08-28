@@ -79,7 +79,7 @@ public class SequestSearchResultDbImpl extends MsSearchResultDbImpl implements S
         return sequestData.getEvalue();
     }
     
-    public void seteValue(Double evalue) {
+    public void setEvalue(Double evalue) {
         sequestData.setEvalue(evalue);
     }
 

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
-import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
 
 public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
 
@@ -15,12 +15,12 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
     private char postResidue = '\u0000';
     
     private List<? super MsResultDynamicResidueModDb> dynamicMods;
-    private List<? super MsTerminalModificationDb> terminalDynamicMods;
+    private List<? super MsResultDynamicTerminalModDb> terminalDynamicMods;
     
     
     public MsSearchResultPeptideDbImpl() {
         dynamicMods = new ArrayList<MsResultDynamicResidueModDb>();
-        terminalDynamicMods = new ArrayList<MsTerminalModificationDb>();
+        terminalDynamicMods = new ArrayList<MsResultDynamicTerminalModDb>();
     }
 
     @Override
@@ -82,26 +82,26 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
         return (List<MsResultDynamicResidueModDb>) dynamicMods;
     }
     
-    public void addDynamicModification(MsResultDynamicResidueModDb modification) {
+    public void addDynamicResidueModification(MsResultDynamicResidueModDb modification) {
         dynamicMods.add(modification);
     }
     
-    public void setDynamicModifications(List<? super MsResultDynamicResidueModDb> dynaMods) {
+    public void setDynamicResidueModifications(List<? super MsResultDynamicResidueModDb> dynaMods) {
         this.dynamicMods = dynaMods;
     }
     
     //-----------------------------------------------------------------------------------------
     // TERMINAL DYNAMIC MODIFICATIONS
     //-----------------------------------------------------------------------------------------
-    public List<MsTerminalModificationDb> getDynamicTerminalModifications() {
-        return (List<MsTerminalModificationDb>) terminalDynamicMods;
+    public List<MsResultDynamicTerminalModDb> getResultDynamicTerminalModifications() {
+        return (List<MsResultDynamicTerminalModDb>) terminalDynamicMods;
     }
     
-    public void addDynamicModification(MsTerminalModificationDb modification) {
+    public void addDynamicTerminalModification(MsResultDynamicTerminalModDb modification) {
         terminalDynamicMods.add(modification);
     }
     
-    public void setTerminalDynamicModifications(List<? super MsTerminalModificationDb> termDynaMods) {
+    public void setDynamicTerminalModifications(List<? super MsResultDynamicTerminalModDb> termDynaMods) {
         this.terminalDynamicMods = termDynaMods;
     }
 }

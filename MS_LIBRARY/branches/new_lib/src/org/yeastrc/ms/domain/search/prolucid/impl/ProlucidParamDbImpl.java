@@ -17,6 +17,7 @@ public class ProlucidParamDbImpl implements ProlucidParamDb {
     private String elValue;
     private int parentElId;
     private int id;
+    private int searchId;
     
     @Override
     public String getParamElementName() {
@@ -33,15 +34,15 @@ public class ProlucidParamDbImpl implements ProlucidParamDb {
         return parentElId;
     }
 
-    public void setElName(String elName) {
+    public void setParamElementName(String elName) {
         this.elName = elName;
     }
 
-    public void setElValue(String elValue) {
+    public void setParamElementValue(String elValue) {
         this.elValue = elValue;
     }
 
-    public void setParentElId(int parentElId) {
+    public void setParentParamElementId(int parentElId) {
         this.parentElId = parentElId;
     }
 
@@ -51,5 +52,13 @@ public class ProlucidParamDbImpl implements ProlucidParamDb {
     
     public void setId(int id) {
         this.id = id;
+    }
+    
+    public int getSearchId() {
+        return searchId;
+    }
+    
+    public void setSearchId(int id) {
+        this.searchId = id;
     }
 }

@@ -13,6 +13,8 @@ public interface ProlucidParamDb {
 
     public abstract int getId();
     
+    public abstract int getSearchId();
+    
     public abstract String getParamElementName();
     
     public abstract String getParamElementValue();

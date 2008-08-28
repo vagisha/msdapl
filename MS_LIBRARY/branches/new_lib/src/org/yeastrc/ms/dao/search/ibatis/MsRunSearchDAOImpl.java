@@ -134,5 +134,9 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
         public int getId() {
             throw new UnsupportedOperationException("getId() is not supported by MsRunSearchSqlMapParam");
         }
+
+        public Date getUploadDate() {
+            throw new UnsupportedOperationException("getUploadDate() is not supported by MsRunSearchSqlMapParam");
+        }
     }
 }

@@ -3,20 +3,17 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsResultProtein"> 
 
-	<typeAlias alias="MsResultProteinDb" type="org.yeastrc.ms.domain.impl.MsSearchResultProteinDbImpl"/>
-	<typeAlias alias="MsResultProtein" type="org.yeastrc.ms.domain.MsSearchResultProteinDb"/>
+	<typeAlias alias="MsResultProteinDbImpl" type="org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl"/>
+	<typeAlias alias="MsResultProteinDb" type="org.yeastrc.ms.domain.search.MsSearchResultProteinDb"/>
 	
-	<resultMap class="MsResultProteinDb" id="msResultProteinResult">
-		<result property="id" column="id"/>
+	<resultMap class="MsResultProteinDbImpl" id="msResultProteinResult">
 		<result property="resultId" column="resultID" nullValue="0"/>
-		<result property="accession" column="accession"/>
-		<result property="description" column="description"/>
+		<result property="proteinId" column="proteinID" nullValue="0"/>
 	</resultMap>
 	
-	<parameterMap class="MsResultProtein" id="msResultProteinParam">
+	<parameterMap class="MsResultProteinDb" id="msResultProteinParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="accession" jdbcType="VARCHAR"/>
-		<parameter property="description" jdbcType="VARCHAR"/>
+		<parameter property="proteinId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
     <select id="selectResultProteins" resultMap="msResultProteinResult" parameterClass="Integer">
@@ -27,13 +24,12 @@
     <insert id="insert" parameterMap="msResultProteinParam">
     	INSERT INTO msProteinMatch (
     	resultID,
-    	accession,
-    	description)
-    	VALUES (?,?,?)
+    	proteinID,)
+    	VALUES (?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
-    	INSERT INTO msProteinMatch (resultId, accession, description) VALUES $values$
+    	INSERT INTO msProteinMatch (resultID, proteinID) VALUES $values$
     </insert>
     
     <delete id="deleteForResultId" parameterClass="Integer">

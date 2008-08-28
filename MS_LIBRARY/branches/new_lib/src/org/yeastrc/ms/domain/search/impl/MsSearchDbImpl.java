@@ -149,11 +149,11 @@ public class MsSearchDbImpl implements MsSearchDb {
     /**
      * @param staticResidueMods the staticModifications to set
      */
-    public void setStaticModifications(List<? super MsResidueModificationDb> staticModifications) {
+    public void setStaticResidueMods(List<? super MsResidueModificationDb> staticModifications) {
         this.staticResidueMods = staticModifications;
     }
     
-    public void addStaticModification(MsResidueModificationDb mod) {
+    public void addStaticResidueModification(MsResidueModificationDb mod) {
         staticResidueMods.add(mod);
     }
 
@@ -167,11 +167,11 @@ public class MsSearchDbImpl implements MsSearchDb {
     /**
      * @param dynamicResidueMods the dynamicModifications to set
      */
-    public void setDynamicModifications(List<? super MsResidueModificationDb> dynamicModifications) {
+    public void setDynamicResidueMods(List<? super MsResidueModificationDb> dynamicModifications) {
         this.dynamicResidueMods = dynamicModifications;
     }
     
-    public void addDynamicModification(MsResidueModificationDb mod) {
+    public void addDynamicResidueModification(MsResidueModificationDb mod) {
         dynamicResidueMods.add(mod);
     }
     
@@ -185,7 +185,7 @@ public class MsSearchDbImpl implements MsSearchDb {
     /**
      * @param staticResidueMods the staticModifications to set
      */
-    public void setTerminalStaticModifications(List<? super MsTerminalModificationDb> termStaticMods) {
+    public void setStaticTerminalMods(List<? super MsTerminalModificationDb> termStaticMods) {
         this.staticTerminalMods = termStaticMods;
     }
     
@@ -199,7 +199,7 @@ public class MsSearchDbImpl implements MsSearchDb {
     /**
      * @param dynamicResidueMods the dynamicModifications to set
      */
-    public void setTerminalDynamicModifications(List<? super MsTerminalModificationDb> termDynaMods) {
+    public void setDynamicTerminalMods(List<? super MsTerminalModificationDb> termDynaMods) {
         this.dynamicTerminalMods = termDynaMods;
     }
 

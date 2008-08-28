@@ -7,8 +7,8 @@
 	<typeAlias alias="MsRunSearchIn" type="org.yeastrc.ms.domain.search.MsRunSearchDb"/>
 	<typeAlias alias="SQTRunSearchOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchDbImpl"/>
 	
-	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.SearchFileFormat"/>
-	<typeAlias alias="SearchTypeHandler" type="org.yeastrc.ms.dao.ibatis.MsSearchDAOImpl$SearchFileFormatTypeHandler"/>
+	<typeAlias alias="SearchType" type="org.yeastrc.ms.domain.search.SearchFileFormat"/>
+	<typeAlias alias="SearchTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsRunSearchDAOImpl$SearchFileFormatTypeHandler"/>
 	
 	
 	<resultMap class="MsRunSearchOut" id="msRunSearchResult">
@@ -30,7 +30,7 @@
 	</resultMap>
 	
 	<!--  SQT Files -->
-	<resultMap class="SQTRunSearchOut" id="sqtSearchResult" extends="MsSearch.msRunSearchResult">
+	<resultMap class="SQTRunSearchOut" id="sqtSearchResult" extends="MsRunSearch.msRunSearchResult">
 		<result property="headers" 
 				select="SqtHeader.selectHeadersForSearch" 
 				column="id"/>

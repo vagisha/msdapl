@@ -14,6 +14,8 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
     
     protected void setUp() throws Exception {
         super.setUp();
+        resetDatabase();
+        addEnzymes();
     }
 
     protected void tearDown() throws Exception {

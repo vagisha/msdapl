@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.dao;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,12 +81,57 @@ public class BaseDAOTestCase extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
+        
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
     }
 
+    public static void resetDatabase() {
+        System.out.println("Resetting database");
+        String script = "src/resetDatabase.sh";
+        try {
+            Process proc = Runtime.getRuntime().exec("sh "+script);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+            String line = reader.readLine();
+            while(line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            reader.close();
+            proc.waitFor();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void addEnzymes() {
+        System.out.println("Adding enzymes");
+        String script = "src/addEnzymes.sh";
+        try {
+            Process proc = Runtime.getRuntime().exec("sh "+script);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+            String line = reader.readLine();
+            while(line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            reader.close();
+            proc.waitFor();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
     //-----------------------------------------------------------------------------------------------------
     // SEARCH DATABASE
     //-----------------------------------------------------------------------------------------------------
@@ -183,7 +231,7 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getPostResidue(), output.getPostResidue());
         assertEquals(input.getSequenceLength(), output.getSequenceLength());
         assertEquals(input.getResultDynamicResidueModifications().size(), output.getResultDynamicResidueModifications().size());
-        assertEquals(input.getDynamicTerminalModifications().size(), output.getDynamicTerminalModifications().size());
+        assertEquals(input.getDynamicTerminalModifications().size(), output.getResultDynamicTerminalModifications().size());
     }
     
     //-----------------------------------------------------------------------------------------------------

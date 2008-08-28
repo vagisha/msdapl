@@ -15,8 +15,8 @@
 		<result property="zscore" column="ZScore"/>
 		<result property="deltaCN" column="deltaCN"/>
 		<result property="calculatedMass" column="calculatedMass" />
-		<result property="numIonsMatched" column="matchingIons" nullValue="0"/>
-		<result property="numIonsPredicted" column="predictedIons" nullValue="0"/>
+		<result property="matchingIons" column="matchingIons" nullValue="0"/>
+		<result property="predictedIons" column="predictedIons" nullValue="0"/>
 	</resultMap>
 	
 	<parameterMap class="ProlucidResultDataIn" id="prolucidResultDataParam">

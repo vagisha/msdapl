@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain.search;
 
+import java.sql.Date;
+
 
 /**
  * 
@@ -26,5 +28,8 @@ public interface MsRunSearchDb extends MsRunSearch {
      * @return database id of this search
      */
     public abstract int getId();
+    
+    
+    public abstract Date getUploadDate();
     
 }
