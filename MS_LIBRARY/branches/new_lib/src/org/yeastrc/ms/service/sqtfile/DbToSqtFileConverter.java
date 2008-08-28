@@ -17,6 +17,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
@@ -27,6 +28,9 @@ import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
@@ -60,12 +64,15 @@ public class DbToSqtFileConverter {
                 System.err.println("No run search found with id: "+runSearchId);
                 return;
             }
+            
+            int searchDatabaseId = getSearchDatabaseId(runSearch.getSearchId());
+            
             printSqtHeader(runSearch);
             outFile.write("\n");
             SearchFileFormat origFileType = runSearch.getSearchFileFormat();
             if (origFileType == SearchFileFormat.SQT_SEQ || 
                 origFileType == SearchFileFormat.SQT_NSEQ) {
-                printSequestSQTData(runSearch, outFile);
+                printSequestSQTData(runSearch, searchDatabaseId, outFile);
             }
             else if (origFileType == SearchFileFormat.SQT_PLUCID) {
                 // TODO
@@ -79,7 +86,16 @@ public class DbToSqtFileConverter {
         }
     }
 
-    private void printSequestSQTData(SQTRunSearchDb runSearch, BufferedWriter outFile) throws IOException {
+    private int getSearchDatabaseId(int searchId) {
+        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearchDb search = searchDao.loadSearch(searchId);
+        List<MsSearchDatabaseDb> db = search.getSearchDatabases();
+        if (db.size() == 0)
+            return 0;
+        return NrSeqLookupUtil.getDatabaseId(db.get(0).getServerPath());
+    }
+    
+    private void printSequestSQTData(SQTRunSearchDb runSearch, int searchDatabaseId, BufferedWriter outFile) throws IOException {
         
         List<MsResidueModificationDb> dynaResidueModsDb = getDynaResidueModsForSearch(runSearch.getSearchId());
         
@@ -122,9 +138,10 @@ public class DbToSqtFileConverter {
             peptResult.setxCorrRank(data.getxCorrRank());
             peptResult.setEvalue(data.getEvalue());
             
+            
             List<MsSearchResultProteinDb> proteins = getProteinsForResultId(resultId);
             for (MsSearchResultProteinDb pr: proteins) {
-                peptResult.addMatchingLocus(NrSeqLookupUtil.getProteinAccession(pr.getProteinId()), null);
+                peptResult.addMatchingLocus(NrSeqLookupUtil.getProteinAccession(searchDatabaseId, pr.getProteinId()), null);
             }
             currScan.addPeptideResult(peptResult);
         }

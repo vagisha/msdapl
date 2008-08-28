@@ -38,9 +38,58 @@ SET character_set_client = @saved_cs_client;
 -- Dumping data for table `msDigestionEnzyme`
 --
 
+#
+# SEQUEST_ENZYME_INFO _must_ be at the end of this parameters file
+#
+#[SEQUEST_ENZYME_INFO]
+#0.  No_Enzyme              			0      -           -
+#1.  Trypsin                				1      KR          P
+#2.  Chymotrypsin           		1      FWY         P
+#3.  Clostripain            				1      R           -
+#4.  Cyanogen_Bromide			1      M           -
+#5.  IodosoBenzoate      			1      W           -
+#6.  Proline_Endopept     		1      P           -
+#7.  Staph_Protease         		1      E           -
+#8.  Trypsin_K              				1      K           P
+#9.  Trypsin_R              				1      R           P
+#10. AspN                  		 		0      D           -
+#11. Cymotryp/Modified      	1      FWYL        P
+#12. Elastase               				1      ALIV        P
+#13. Elastase/Tryp/Chymo    1      ALIVKRWFY   P
+
+
+# [SEQUEST_ENZYME_INFO]
+# 0.	No_Enzyme			0	-		-
+# 1.	Trypsin				1	KR		-
+# 2.	Trypsin(KRLNH)			1	KRLNH		-
+# 3.	Chymotrypsin			1	FWYL		-
+# 4.	Chymotrypsin(FWY)		1	FWY		P
+# 5.	Clostripain			1	R		-
+# 6.	Cyanogen_Bromide		1	M		-
+# 7.	IodosoBenzoate			1	W		-
+# 8.	Proline_Endopept		1	P		-
+# 9.	Staph_Protease			1	E		-
+# 10.	Trypsin_K			1	K		P
+# 11.	Trypsin_R			1	R		P
+# 12.	GluC				1	ED		-
+# 13.	LysC				1	K		-
+# 14.	AspN				0	D		-
+# 15.	Elastase			1	ALIV		P
+# 16.	Elastase/Tryp/Chymo		1	ALIVKRWFY	P
+
+
+
 LOCK TABLES `msDigestionEnzyme` WRITE;
 /*!40000 ALTER TABLE `msDigestionEnzyme` DISABLE KEYS */;
-INSERT INTO `msDigestionEnzyme` VALUES (1,'Trypsin',1,'KR','P',NULL),(2,'Arg-C',1,'R','P',NULL),(3,'Arg-N',0,'BD','',NULL),(4,'Asp-N_ambic',0,'DE','',NULL),(5,'Chmymotrypsin',1,'FYWL','P',NULL),(6,'CNBr',1,'M','',NULL),(7,'Formic_acid',1,'D','',NULL),(8,'Lys-C',1,'K','P',NULL),(9,'Lys-C/P',1,'K','',NULL),(10,'PepsinA',1,'FL','',NULL),(11,'Tryp-CNBr',1,'KRM','P',NULL),(12,'TrypChymo',1,'FYWLKR','P',NULL),(13,'Trypsin/P',1,'KR','',NULL);
+
+INSERT INTO `msDigestionEnzyme` VALUES 
+(1,'Trypsin',1,'KR','P',NULL),
+(2,'Chymotrypsin',1,'FYWL','P',NULL),
+(3,'Chymotrypsin(FWY)',1,'FYW','P',NULL),
+(4,'Asp-N_ambic',0,'DE','',NULL)
+;
+
+/*!40000 ALTER TABLE `msDigestionEnzyme` ENABLE KEYS */;;
 /*!40000 ALTER TABLE `msDigestionEnzyme` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

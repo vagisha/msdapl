@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="NrSeq"> 
+
+    <select id="selectProteinAccession" resultClass="String" parameterClass="java.util.Map"> 
+        SELECT accessionString FROM tblProteinDatabase 
+        WHERE databaseID = #databaseId# 
+        AND proteinID=#proteinId#
+    </select> 
+    
+    <select id="selectDatabaseId" resultClass="Integer" parameterClass="String"> 
+        SELECT id FROM tblDatabase WHERE name = #name#
+    </select>
+    
+    <select id="selectProteinId" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT pr.proteinID
+        FROM tblDatabase as db, tblProteinDatabase as pr 
+        WHERE db.name = #dbName#
+        AND pr.accessionString = #accession#
+        AND db.id = pr.databaseID
+    </select>
+    
+</sqlMap>
