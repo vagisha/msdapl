@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
-public class MiscTest extends TestCase {
+public class DTASelectFileNameParseTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();

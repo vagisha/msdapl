@@ -14,6 +14,7 @@ import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParserTest;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParserTest;
 import org.yeastrc.ms.parser.sqtFile.SQTParserTests;
 import org.yeastrc.ms.service.MsExperimentUploaderTest;
+import org.yeastrc.ms.util.DTASelectFileNameParseTest;
 import org.yeastrc.ms.util.PeakStringBuilderTest;
 import org.yeastrc.ms.util.PeakUtilsTest;
 import org.yeastrc.ms.util.Sha1SumCalculatorTest;
@@ -22,7 +23,7 @@ public class MsLibTests {
 
     public static Test suite() {
         
-        resetDatabase();
+//        resetDatabase();
         
         TestSuite suite = new TestSuite("Test for org.yeastrc.ms");
         //$JUnit-BEGIN$
@@ -40,10 +41,11 @@ public class MsLibTests {
         suite.addTestSuite(ProlucidParamsParserTest.class);
         
         // utility classes
-//        suite.addTestSuite(PeakStringBuilderTest.class);
-//        suite.addTestSuite(PeakUtilsTest.class);
-//        suite.addTestSuite(Sha1SumCalculatorTest.class);
-//        
+        suite.addTestSuite(PeakStringBuilderTest.class);
+        suite.addTestSuite(PeakUtilsTest.class);
+        suite.addTestSuite(Sha1SumCalculatorTest.class);
+        suite.addTestSuite(DTASelectFileNameParseTest.class);
+        
 //        // upload classes
 //        suite.addTestSuite(MsExperimentUploaderTest.class);
         

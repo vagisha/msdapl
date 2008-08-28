@@ -16,22 +16,10 @@ public class PeakStringBuilderTest extends TestCase {
         PeakStringBuilder builder = new PeakStringBuilder();
         assertEquals("", builder.getPeaksAsString());
         
-//        try {
-//            builder.addPeak("dummy", "100.0");
-//            fail("Invalid m/z value");
-//        }
-//        catch(IllegalArgumentException e) {}
-//        
-//        try {
-//            builder.addPeak("100.0", "dummy");
-//            fail("Invalid rt value");
-//        }
-//        catch(IllegalArgumentException e) {}
-        
         builder.addPeak("100.000", "200.1230");
-        assertEquals("100:200.123", builder.getPeaksAsString());
+        assertEquals("100 200.123", builder.getPeaksAsString());
         builder.addPeak("123.4", "987.600001000");
-        assertEquals("100:200.123;123.4:987.600001", builder.getPeaksAsString());
+        assertEquals("100 200.123\n123.4 987.600001", builder.getPeaksAsString());
     }
     
     public void testTrimTrailingZeros() {
