@@ -5,6 +5,9 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.parser.DataProviderException;
+
 import junit.framework.TestCase;
 
 public class HeaderTest extends TestCase {
@@ -152,7 +155,11 @@ public class HeaderTest extends TestCase {
     }
     
     public void testParseHeader() {
-        SQTFileReader reader = new SQTFileReader(null);
+        SQTFileReader reader = new SQTFileReader(null){
+            public SQTSearchScan getNextSearchScan()
+                    throws DataProviderException {
+                throw new UnsupportedOperationException();
+            }};
         String header = "H       Precursor/Fragment Ion Isotopes AVG/MONO";
         String[] parsed = reader.parseHeader(header);
         assertEquals(2, parsed.length);

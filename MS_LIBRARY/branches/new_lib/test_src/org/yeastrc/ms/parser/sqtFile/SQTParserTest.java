@@ -6,6 +6,8 @@ import java.io.StringReader;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class SQTParserTest extends TestCase {
@@ -21,7 +23,7 @@ public class SQTParserTest extends TestCase {
     public void testParseScan() {
 //      String line = "S  00016\t00016\t1\t0 \t shamu046\t 742.52000\t 0.0\t0.0 \t0";
         String line = "S       01718   01718   1       0       node0269        993.88000        0.0    0.0     0";
-        SQTFileReader reader = new SQTFileReader(null);
+        SQTFileReader reader = getSQTFileReader();
         try {
             reader.parseScan(line);
         }
@@ -34,7 +36,7 @@ public class SQTParserTest extends TestCase {
 
 
     public void testParseLocus() {
-        SQTFileReader reader = new SQTFileReader(null);
+        SQTFileReader reader = getSQTFileReader();
 
         String locus = "H\tName\tValue";
         try {reader.parseLocus(locus); fail("Not a 'L' line");}
@@ -89,25 +91,24 @@ public class SQTParserTest extends TestCase {
         }
     }
 
-    public void testIsSequestSQT () throws IOException {
+    public void testGetSearchFileType () throws IOException {
         Reader reader = new StringReader(percolatorHeader());
-        assertFalse(SQTFileReader.isSequestSQT(reader));
+        assertEquals(SearchFileFormat.SQT_PERC, SQTFileReader.getSearchFileType("dummy", reader));
 
         reader = new StringReader(prolucidHeader1());
-        assertFalse(SQTFileReader.isSequestSQT(reader));
+        assertEquals(SearchFileFormat.SQT_PLUCID, SQTFileReader.getSearchFileType("dummy", reader));
 
         reader = new StringReader(prolucidHeader2());
-        assertFalse(SQTFileReader.isSequestSQT(reader));
-
+        assertEquals(SearchFileFormat.SQT_PLUCID, SQTFileReader.getSearchFileType("dummy", reader));
+        
         reader = new StringReader(unrecognizedHeader());
-        assertFalse(SQTFileReader.isSequestSQT(reader));
+        assertEquals(SearchFileFormat.UNKNOWN, SQTFileReader.getSearchFileType("dummy", reader));
 
         reader = new StringReader(sequestHeader());
-        assertTrue(SQTFileReader.isSequestSQT(reader));
-        
-        reader = new StringReader(normSequestHeader());
-        assertTrue(SQTFileReader.isSequestSQT(reader));
+        assertEquals(SearchFileFormat.SQT_SEQ, SQTFileReader.getSearchFileType("dummy", reader));
 
+        reader = new StringReader(normSequestHeader());
+        assertEquals(SearchFileFormat.SQT_NSEQ, SQTFileReader.getSearchFileType("dummy", reader));
     }
 
     private String percolatorHeader() {
@@ -171,6 +172,7 @@ public class SQTParserTest extends TestCase {
 
     private String unrecognizedHeader() {
         StringBuilder buf = new StringBuilder();
+        buf.append("H       SQTGenerator   \n");
         buf.append("H       SQTGeneratorVersion     0.1\n");
         buf.append("H       Database        /bluefish/people-a/alisark/dbase/worm/WormBase_C-elegans_na_12-17-2006_con_reversed.fasta\n");
         buf.append("H       PrecursorMasses mono\n");
@@ -198,7 +200,7 @@ public class SQTParserTest extends TestCase {
         buf.append("H       DBLocusCount    68280\n");
         buf.append("H       PrecursorMasses AVG\n");
         buf.append("H       FragmentMasses  MONO\n");
-        buf.append("H       Alg-PreMassTol  ^E\n");
+        buf.append("H       Alg-PreMassTol  \n");
         buf.append("H       Alg-FragMassTol 0.0\n");
         buf.append("H       Alg-XCorrMode   0\n");
         buf.append("H       StaticMod       C=160.160\n");
@@ -239,5 +241,15 @@ public class SQTParserTest extends TestCase {
         buf.append("M         1       3      423.533        0.0000   0.2379   66.7    2      6          L.PLPP.S    U\n");
         buf.append("L       YAR068W\n");
         return buf.toString();
+    }
+    
+    private SQTFileReader getSQTFileReader() {
+        return new SQTFileReader(null){
+
+            @Override
+            public SQTSearchScan getNextSearchScan()
+                    throws DataProviderException {
+                throw new UnsupportedOperationException();
+            }};
     }
 }

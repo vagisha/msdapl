@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
-import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,9 +41,9 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         super.open(filePath);
     }
 
-    public void open(String fileName, InputStream inStream, String sha1Sum) throws DataProviderException {
+    public void open(String fileName, Reader input, String sha1Sum) throws DataProviderException {
         this.sha1Sum = sha1Sum;
-        super.open(fileName, inStream);
+        super.open(fileName, input);
     }
 
     public MS2Header getRunHeader() throws DataProviderException {

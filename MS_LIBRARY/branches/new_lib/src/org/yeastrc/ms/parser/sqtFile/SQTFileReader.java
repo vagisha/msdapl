@@ -1,5 +1,6 @@
 package org.yeastrc.ms.parser.sqtFile;
 
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +30,48 @@ public abstract class SQTFileReader extends AbstractReader
 //    private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
     
     
-    public static SearchFileFormat getSearchFileType(String filePath) throws DataProviderException {
+    public static SearchFileFormat getSearchFileType(String filePath) {
+        SQTFileReader reader = new SQTFileReader(null){
+            @Override
+            public SQTSearchScan getNextSearchScan()
+            throws DataProviderException {
+                throw new UnsupportedOperationException("");
+            }};
+            
+            try {
+                reader.open(filePath);
+                SQTHeader header = reader.getSearchHeader();
+                return header.getSearchFileFormat();
+            }
+            catch (DataProviderException e) {
+                e.printStackTrace();
+            }
+            finally {
+                reader.close();
+            }
+            return SearchFileFormat.UNKNOWN;
+    }
+    
+    public static SearchFileFormat getSearchFileType(String fileName, Reader input) {
         SQTFileReader reader = new SQTFileReader(null){
             @Override
             public SQTSearchScan getNextSearchScan()
                     throws DataProviderException {
                 throw new UnsupportedOperationException("");
             }};
-            SQTHeader header = reader.getSearchHeader();
-            reader.close();
-            return header.getSearchFileFormat();
+            
+            try {
+                reader.open(fileName, input);
+                SQTHeader header = reader.getSearchHeader();
+                return header.getSearchFileFormat();
+            }
+            catch (DataProviderException e) {
+                e.printStackTrace();
+            }
+            finally {
+                reader.close();
+            }
+            return SearchFileFormat.UNKNOWN;
     }
     
     public SQTFileReader(String serverAddress) {

@@ -5,8 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,9 +37,9 @@ public abstract class AbstractReader {
         advanceLine();
     }
 
-    public void open(String fileName, InputStream inStream) throws DataProviderException {
+    public void open(String fileName, Reader input) throws DataProviderException  {
         this.fileName = fileName;
-        reader = new BufferedReader(new InputStreamReader(inStream));
+        reader = new BufferedReader(input);
         advanceLine();
     }
     

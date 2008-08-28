@@ -71,10 +71,10 @@ public class SQTHeader implements SQTRunSearch {
    
     public boolean isValid() {
         if (sqtGenerator == null)           return false;
-        if (sqtGeneratorVersion == null)    return false;
-        if (database == null)               return false;
-        if (fragmentMassType == null)       return false;
-        if (precursorMassType == null)      return false;
+//        if (sqtGeneratorVersion == null)    return false;
+//        if (database == null)               return false;
+//        if (fragmentMassType == null)       return false;
+//        if (precursorMassType == null)      return false;
 //        if (startTimeString == null)        return false;
 //        if (staticMods == null)             return false;
 //        if (dynaMods == null)               return false;
@@ -85,14 +85,14 @@ public class SQTHeader implements SQTRunSearch {
     public static final String requiredHeaders() {
        StringBuilder buf = new StringBuilder();
        buf.append(SQTGENERATOR);
-       buf.append(", ");
-       buf.append(SQTGENERATOR_VERSION);
-       buf.append(", ");
-       buf.append(DATABASE);
-       buf.append(", ");
-       buf.append(FRAGMENT_MASS_TYPE);
-       buf.append(", ");
-       buf.append(PRECURSOR_MASS_TYPE);
+//       buf.append(", ");
+//       buf.append(SQTGENERATOR_VERSION);
+//       buf.append(", ");
+//       buf.append(DATABASE);
+//       buf.append(", ");
+//       buf.append(FRAGMENT_MASS_TYPE);
+//       buf.append(", ");
+//       buf.append(PRECURSOR_MASS_TYPE);
 //       buf.append(", ");
 //       buf.append(STATIC_MOD);
 //       buf.append(", ");
@@ -516,19 +516,19 @@ public class SQTHeader implements SQTRunSearch {
 //        return precursorMassTolerance;
 //    }
 
-//    /**
-//     * @return the staticMods
-//     */
-//    public List<MsResidueModification> getStaticResidueMods() {
-//        if (staticMods == null)
-//            return new ArrayList<MsResidueModification>(0);
-//        return staticMods;
-//    }
+    /**
+     * @return the staticMods
+     */
+    public List<MsResidueModification> getStaticResidueMods() {
+        if (staticMods == null)
+            return new ArrayList<MsResidueModification>(0);
+        return staticMods;
+    }
 
     /**
      * @return the dynaMods
      */
-    public List<MsResidueModification> getDynamicModifications() {
+    public List<MsResidueModification> getDynamicResidueModifications() {
         if (dynaMods == null)
             return new ArrayList<MsResidueModification>(0);
         return dynaMods;
@@ -542,6 +542,15 @@ public class SQTHeader implements SQTRunSearch {
         if (sqtType != null)
             return sqtType;
         
+        // make a check for Percolator first
+        // Percolator files do not add Percolator to the sqtGenerator header.
+        // Look for it in the other headers
+        for(SQTField f: headerItems) {
+            if (f.getName().equalsIgnoreCase(PERCOLATOR)) {
+                sqtType = SearchFileFormat.SQT_PERC;
+                return sqtType;
+            }
+        }
         if (sqtGenerator.equalsIgnoreCase(SEQUEST))
             sqtType = SearchFileFormat.SQT_SEQ;
         else if (sqtGenerator.equalsIgnoreCase(SEQUEST_NORM))
@@ -553,17 +562,7 @@ public class SQTHeader implements SQTRunSearch {
         else if (sqtGenerator.equalsIgnoreCase(PEPPROBE))
             sqtType = SearchFileFormat.SQT_PPROBE;
         else {
-            // Percolator files do not add Percolator to the sqtGenerator header.
-            // Look for it in the other headers
-            for(SQTField f: headerItems) {
-                if (f.getName().equalsIgnoreCase(PERCOLATOR)) {
-                    sqtType = SearchFileFormat.SQT_PERC;
-                    break;
-                }
-            }
-            // if we still do not know the sqt file type
-            if (sqtType != null)
-                sqtType = SearchFileFormat.UNKNOWN;
+            sqtType = SearchFileFormat.UNKNOWN;
         }
         return sqtType;
     }

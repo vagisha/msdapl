@@ -96,7 +96,7 @@ public class SequestSQTDataUploadService {
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
 //    private long dbSequenceLength;
 //    private int dbProteinCount;
-    private String sequestVersion;
+    private String sequestVersion = "uninit";
    
     
     private void init() {
@@ -114,7 +114,7 @@ public class SequestSQTDataUploadService {
         
 //        dbSequenceLength = 0;
 //        dbProteinCount = 0;
-        sequestVersion = null;
+        sequestVersion = "uninit";
         
         if (proteinMatchList != null)
             proteinMatchList.clear();
@@ -189,8 +189,9 @@ public class SequestSQTDataUploadService {
 
         // Update the "sequenceLength" and "proteinCount" columns in the msSequenceDataDetail table
         // TODO
+        
         // Update the "analysisProgramVersion" in the msSearch table
-        if (sequestVersion != null) {
+        if (sequestVersion != null && !("uninit".equals(sequestVersion))) {
             updateSequestVersion(searchId, sequestVersion);
         }
     }
@@ -377,7 +378,17 @@ public class SequestSQTDataUploadService {
         SQTRunSearch search = provider.getSearchHeader();
         if (search instanceof SQTHeader) {
             SQTHeader header = (SQTHeader)search;
-            this.sequestVersion = header.getSearchEngineVersion();
+            // this is the first time we are assigning a value to sequestVersion
+            if ("uninit".equals(sequestVersion))
+                this.sequestVersion = header.getSearchEngineVersion();
+            
+            // make sure the sequestVersion value is same in all sqt header
+            // if not we set sequestVersion to null so that the analysisProgramVersion field does
+            // not get updated. 
+            if (sequestVersion != null &&
+                    !sequestVersion.equals(header.getSearchEngineVersion())) {
+                this.sequestVersion = null;
+            }
         }
         // save the run search and return the database id
         MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = daoFactory.getSqtRunSerachDAO();

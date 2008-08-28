@@ -3,9 +3,9 @@ package org.yeastrc.ms.parser.sqtFile;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchModification;
-
 import junit.framework.TestCase;
+
+import org.yeastrc.ms.domain.search.MsResidueModification;
 
 public class HeaderDynamicModificationTest extends TestCase {
 
@@ -129,11 +129,11 @@ public class HeaderDynamicModificationTest extends TestCase {
         catch (SQTParseException e) {
             fail("Valid dynamic modification string");
         }
-        List<MsSearchModification> mods = header.getDynamicModifications();
+        List<MsResidueModification> mods = header.getDynamicResidueModifications();
         assertEquals(3, mods.size());
 
         int i = 0; 
-        for (MsSearchModification mod: mods) {
+        for (MsResidueModification mod: mods) {
             assertEquals(mod.getModifiedResidue(), modChars[i++]);
             assertEquals(mod.getModificationMass(), new BigDecimal("123.4"));
             assertEquals(mod.getModificationSymbol(), '*');
@@ -155,11 +155,11 @@ public class HeaderDynamicModificationTest extends TestCase {
         catch (SQTParseException e) {
             fail("Valid dynamic modification string");
         }
-        List<MsSearchModification> mods = header.getDynamicModifications();
+        List<MsResidueModification> mods = header.getDynamicResidueModifications();
         assertEquals(3, mods.size());
 
         int i = 0; 
-        for (MsSearchModification mod: mods) {
+        for (MsResidueModification mod: mods) {
             assertEquals(mod.getModifiedResidue(), modChars[i++]);
             assertEquals(mod.getModificationMass(), new BigDecimal("123.4"));
             assertEquals(mod.getModificationSymbol(), '*');
@@ -181,16 +181,14 @@ public class HeaderDynamicModificationTest extends TestCase {
         catch (SQTParseException e) {
             fail("Valid dynamic modification string");
         }
-        List<MsSearchModification> mods = header.getDynamicModifications();
+        List<MsResidueModification> mods = header.getDynamicResidueModifications();
         assertEquals(3, mods.size());
 
         int i = 0; 
-        for (MsSearchModification mod: mods) {
+        for (MsResidueModification mod: mods) {
             assertEquals(mod.getModifiedResidue(), modChars[i++]);
             assertEquals(mod.getModificationMass(), new BigDecimal("-123.4"));
             assertEquals(mod.getModificationSymbol(), '#');
         }
     }
-    
-    
 }

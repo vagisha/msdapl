@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.search.MsSearchModification;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 
 public class HeaderStaticModificationTest extends TestCase {
 
@@ -129,11 +129,11 @@ public class HeaderStaticModificationTest extends TestCase {
             fail("Valid static mod string");
         }
         
-        List<MsSearchModification> mods = header.getStaticResidueMods();
+        List<MsResidueModification> mods = header.getStaticResidueMods();
         assertEquals(3, mods.size());
 
         int i = 0; 
-        for (MsSearchModification mod: mods) {
+        for (MsResidueModification mod: mods) {
             assertEquals(mod.getModifiedResidue(), modChars[i++]);
             assertEquals(mod.getModificationMass(), new BigDecimal("123.4"));
         }
