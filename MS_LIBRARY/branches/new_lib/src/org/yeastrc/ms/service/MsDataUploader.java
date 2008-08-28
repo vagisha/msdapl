@@ -25,7 +25,7 @@ import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
-import org.yeastrc.ms.service.sqtfile.SQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 public class MsDataUploader {
@@ -277,7 +277,7 @@ public class MsDataUploader {
             final String serverDirectory, Map<String, Integer> runIdMap,
             final Date searchDate) {
         
-        SQTDataUploadService service = new SQTDataUploadService();
+        SequestSQTDataUploadService service = new SequestSQTDataUploadService();
         service.uploadSQTSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
         this.uploadExceptionList.addAll(service.getUploadExceptionList());
         this.searchId = service.getUploadedSearchId();

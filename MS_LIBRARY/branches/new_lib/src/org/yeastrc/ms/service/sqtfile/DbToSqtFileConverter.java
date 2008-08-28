@@ -16,19 +16,23 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
+import org.yeastrc.ms.dao.util.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
-import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsSearchModificationDb;
-import org.yeastrc.ms.domain.search.MsSearchResultDynamicModDb;
+import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
-import org.yeastrc.ms.domain.search.sequest.SQTSearchResultDb;
+import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.sequest.SequestResultData;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
@@ -45,72 +49,90 @@ public class DbToSqtFileConverter {
 
     private BufferedWriter outFile = null;
 
-    public void convertToSqt(int dbSearchId, String outputFile) throws IOException {
+    public void convertToSqt(int runSearchId, String outputFile) throws IOException {
 
         try {
             outFile = new BufferedWriter(new FileWriter(outputFile));
 
-            MsSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = DAOFactory.instance().getSqtSearchDAO();
-            SQTRunSearchDb run = searchDao.loadSearch(dbSearchId);
-            if (run == null) {
-                System.err.println("No search found with id: "+dbSearchId);
+            MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = DAOFactory.instance().getSqtRunSerachDAO();
+            SQTRunSearchDb runSearch = searchDao.loadRunSearch(runSearchId);
+            if (runSearch == null) {
+                System.err.println("No run search found with id: "+runSearchId);
                 return;
             }
-            printSqtHeader(run);
+            printSqtHeader(runSearch);
             outFile.write("\n");
-
-            List<MsSearchModification> dynaMods = getDynaModsForSearch(dbSearchId);
+            SearchFileFormat origFileType = runSearch.getSearchFileFormat();
+            if (origFileType == SearchFileFormat.SQT_SEQ || 
+                origFileType == SearchFileFormat.SQT_NSEQ) {
+                printSequestSQTData(runSearch, outFile);
+            }
+            else if (origFileType == SearchFileFormat.SQT_PLUCID) {
+                // TODO
+            }
             
-            SQTSearchScanDAO scanDao = DAOFactory.instance().getSqtSpectrumDAO();
-            SequestSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
-            List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(dbSearchId);
-            int currCharge = -1;
-            int currScanId = -1;
-            SearchScan currScan = null;
-            for (Integer resultId: resultIds) {
-                SQTSearchResultDb result = resultDao.load(resultId);
-                if (result.getScanId() != currScanId || result.getCharge() != currCharge) {
-                    if (currScan != null) {
-                        outFile.write(currScan.toString());
-                        outFile.write("\n");
-                    }
-                    currScanId = result.getScanId();
-                    currCharge = result.getCharge();
-                    SQTSearchScanDb scanDb = scanDao.load(dbSearchId, currScanId, currCharge);
-                    currScan = makeScanResult(scanDb);
-                }
-                SequestResult peptResult = new SequestResult(dynaMods);
-                peptResult.setCharge(result.getCharge());
-                peptResult.setDeltaCN(result.getDeltaCN());
-                peptResult.setMass(result.getCalculatedMass());
-                peptResult.setNumMatchingIons(result.getNumIonsMatched());
-                peptResult.setNumPredictedIons(result.getNumIonsPredicted());
-                peptResult.setOriginalPeptideSequence(reconstructPeptideSequence(dbSearchId, result));
-                peptResult.setScanNumber(currScan.getScanNumber());
-                peptResult.setSp(result.getSp());
-                peptResult.setSpRank(result.getSpRank());
-                peptResult.setValidationStatus(result.getValidationStatus().getStatusChar());
-                peptResult.setXcorr(result.getxCorr());
-                peptResult.setxCorrRank(result.getxCorrRank());
-                
-                List<MsSearchResultProteinDb> proteins = getProteinsForResultId(resultId);
-                for (MsSearchResultProteinDb pr: proteins) {
-                    peptResult.addMatchingLocus(pr.getAccession(), pr.getDescription());
-                }
-                currScan.addPeptideResult(peptResult);
-            }
-            // print the last one
-            if (currScan != null) {
-                outFile.write(currScan.toString());
-                outFile.write("\n");
-            }
             outFile.flush();
         }
         finally {
             if (outFile != null)
                 outFile.close();
         }
+    }
 
+    private void printSequestSQTData(SQTRunSearchDb runSearch, BufferedWriter outFile) throws IOException {
+        
+        List<MsResidueModificationDb> dynaResidueModsDb = getDynaResidueModsForSearch(runSearch.getSearchId());
+        
+        SQTSearchScanDAO scanDao = DAOFactory.instance().getSqtSpectrumDAO();
+        
+        SequestSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
+        List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(runSearch.getId());
+        int currCharge = -1;
+        int currScanId = -1;
+        SearchScan currScan = null;
+        for (Integer resultId: resultIds) {
+            SequestSearchResultDb result = resultDao.load(resultId);
+            if (result.getScanId() != currScanId || result.getCharge() != currCharge) {
+                if (currScan != null) {
+                    outFile.write(currScan.toString());
+                    outFile.write("\n");
+                }
+                currScanId = result.getScanId();
+                currCharge = result.getCharge();
+                SQTSearchScanDb scanDb = scanDao.load(runSearch.getId(), currScanId, currCharge);
+                currScan = makeScanResult(scanDb);
+            }
+            List<MsResidueModification> dynaResidueMods = new ArrayList<MsResidueModification>();
+            for (MsResidueModificationDb modDb: dynaResidueModsDb) {
+                dynaResidueMods.add(modDb);
+            }
+            SequestResult peptResult = new SequestResult(dynaResidueMods);
+            SequestResultData data = result.getSequestResultData();
+            peptResult.setCharge(result.getCharge());
+            peptResult.setDeltaCN(data.getDeltaCN());
+            peptResult.setMass(data.getCalculatedMass());
+            peptResult.setNumMatchingIons(data.getMatchingIons());
+            peptResult.setNumPredictedIons(data.getPredictedIons());
+            peptResult.setOriginalPeptideSequence(reconstructSequestPeptideSequence(runSearch.getSearchId(), result));
+            peptResult.setScanNumber(currScan.getScanNumber());
+            peptResult.setSp(data.getSp());
+            peptResult.setSpRank(data.getSpRank());
+            peptResult.setValidationStatus(result.getValidationStatus().getStatusChar());
+            peptResult.setXcorr(data.getxCorr());
+            peptResult.setxCorrRank(data.getxCorrRank());
+            peptResult.setEvalue(data.getEvalue());
+            
+            List<MsSearchResultProteinDb> proteins = getProteinsForResultId(resultId);
+            for (MsSearchResultProteinDb pr: proteins) {
+                peptResult.addMatchingLocus(NrSeqLookupUtil.getProteinAccession(pr.getProteinId()), null);
+            }
+            currScan.addPeptideResult(peptResult);
+        }
+        // print the last one
+        if (currScan != null) {
+            outFile.write(currScan.toString());
+            outFile.write("\n");
+        }
     }
 
     private List<MsSearchResultProteinDb> getProteinsForResultId(Integer resultId) {
@@ -118,13 +140,13 @@ public class DbToSqtFileConverter {
         return proteinDao.loadResultProteins(resultId);
     }
 
-    private String reconstructPeptideSequence(int dbSearchId, SQTSearchResultDb resultDb) {
+    private String reconstructSequestPeptideSequence(int searchId, SequestSearchResultDb resultDb) {
         // dynamic modifications for the search
         MsSearchResultPeptideDb peptideSeq = resultDb.getResultPeptide();
-        List<MsSearchResultDynamicModDb> resultMods = peptideSeq.getDynamicResidueModifications();
-        Collections.sort(resultMods, new Comparator<MsSearchResultDynamicModDb>() {
-            public int compare(MsSearchResultDynamicModDb o1,
-                    MsSearchResultDynamicModDb o2) {
+        List<MsResultDynamicResidueModDb> resultMods = peptideSeq.getDynamicResidueModifications();
+        Collections.sort(resultMods, new Comparator<MsResultDynamicResidueModDb>() {
+            public int compare(MsResultDynamicResidueModDb o1,
+                    MsResultDynamicResidueModDb o2) {
                 return new Integer(o1.getModifiedPosition()).compareTo(new Integer(o2.getModifiedPosition()));
             }});
         
@@ -132,7 +154,7 @@ public class DbToSqtFileConverter {
         StringBuilder fullSeq = new StringBuilder();
         fullSeq.append(peptideSeq.getPreResidue()+".");
         int lastIdx = 0;
-        for (MsSearchResultDynamicModDb mod: resultMods) {
+        for (MsResultDynamicResidueModDb mod: resultMods) {
             int pos = mod.getModifiedPosition();
             fullSeq.append(justSeq.substring(lastIdx, pos+1));
             fullSeq.append(mod.getModificationSymbol());
@@ -145,14 +167,16 @@ public class DbToSqtFileConverter {
         return fullSeq.toString();
     }
     
-    private List<MsSearchModification> getDynaModsForSearch(int dbSearchId) {
+    private List<MsResidueModificationDb> getDynaResidueModsForSearch(int dbSearchId) {
         MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-        List<MsSearchModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(dbSearchId);
-        List<MsSearchModification> mods = new ArrayList<MsSearchModification>(dynaMods.size());
-        for (MsSearchModificationDb mod: dynaMods) {
-            mods.add(mod);
-        }
-        return mods;
+        List<MsResidueModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(dbSearchId);
+        return dynaMods;
+    }
+    
+    private List<MsTerminalModificationDb> getDynaTermModsForSearch(int dbSearchId) {
+        MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
+        List<MsTerminalModificationDb> dynaMods = modDao.loadDynamicTerminalModsForSearch(dbSearchId);
+        return dynaMods;
     }
 
     private SearchScan makeScanResult(SQTSearchScanDb resultScan) {

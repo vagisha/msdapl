@@ -24,7 +24,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 
     protected SQTHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
     protected MsSearchResultDAO<SequestSearchResult, SQTSearchResultDb> sqtResDao = DAOFactory.instance().getSequestResultDAO();
-    protected MsSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtSearchDao = DAOFactory.instance().getSqtSearchDAO();
+    protected MsSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtSearchDao = DAOFactory.instance().getSqtRunSerachDAO();
     protected SQTSearchScanDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
 
     protected void setUp() throws Exception {

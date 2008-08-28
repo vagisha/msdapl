@@ -27,4 +27,8 @@ public class NrSeqLookupUtil {
         // TODO
         return 0;
     }
+    
+    public static String getProteinAccession(int proteinId) {
+        return null;
+    }
 }

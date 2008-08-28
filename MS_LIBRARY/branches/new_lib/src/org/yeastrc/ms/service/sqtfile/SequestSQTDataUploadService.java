@@ -65,9 +65,9 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 /**
  * 
  */
-public class SQTDataUploadService {
+public class SequestSQTDataUploadService {
 
-    private static final Logger log = Logger.getLogger(SQTDataUploadService.class);
+    private static final Logger log = Logger.getLogger(SequestSQTDataUploadService.class);
     
     private static final DAOFactory daoFactory = DAOFactory.instance();
     
@@ -380,7 +380,7 @@ public class SQTDataUploadService {
             this.sequestVersion = header.getSearchEngineVersion();
         }
         // save the run search and return the database id
-        MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = daoFactory.getSqtSearchDAO();
+        MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = daoFactory.getSqtRunSerachDAO();
         return runSearchDao.saveRunSearch(search, runId, searchId);
     }
     
