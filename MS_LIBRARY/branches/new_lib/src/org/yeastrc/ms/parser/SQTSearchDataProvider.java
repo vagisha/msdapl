@@ -4,16 +4,15 @@
  * Jul 14, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.parser;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
-import org.yeastrc.ms.parser.DataProviderException;
 
 /**
  * 
  */
-public interface SQTSearchDataProvider <E extends SQTSearchScan> {
+public interface SQTSearchDataProvider {
 
     public abstract String getFileName();
     
@@ -21,7 +20,7 @@ public interface SQTSearchDataProvider <E extends SQTSearchScan> {
     
     public abstract boolean hasNextSearchScan();
     
-    public abstract E getNextSearchScan() throws DataProviderException;
+    public abstract SQTSearchScan getNextSearchScan() throws DataProviderException;
     
     public abstract void close();
 }

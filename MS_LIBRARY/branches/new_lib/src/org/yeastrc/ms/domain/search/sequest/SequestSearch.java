@@ -6,9 +6,9 @@
  */
 package org.yeastrc.ms.domain.search.sequest;
 
-import org.yeastrc.ms.domain.search.MsSearch;
+import java.util.List;
 
-import com.sun.tools.javac.util.List;
+import org.yeastrc.ms.domain.search.MsSearch;
 
 /**
  * 

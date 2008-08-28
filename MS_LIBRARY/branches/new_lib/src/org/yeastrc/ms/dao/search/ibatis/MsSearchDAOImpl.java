@@ -7,7 +7,9 @@
 package org.yeastrc.ms.dao.search.ibatis;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO.EnzymeProperties;
@@ -51,42 +53,55 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
         
         int searchId = saveAndReturnId("MsSearch.insert", search);
         
-        // save any database information associated with the search 
-        for (MsSearchDatabase seqDb: search.getSearchDatabases()) {
-            seqDbDao.saveSearchDatabase(seqDb, searchId);
+        try {
+            // save any database information associated with the search 
+            for (MsSearchDatabase seqDb: search.getSearchDatabases()) {
+                seqDbDao.saveSearchDatabase(seqDb, searchId);
+            }
+
+            // save any static residue modifications used for the search
+            for (MsResidueModification staticMod: search.getStaticResidueMods()) {
+                modDao.saveStaticResidueMod(staticMod, searchId);
+            }
+
+            // save any dynamic residue modifications used for the search
+            for (MsResidueModification dynaMod: search.getDynamicResidueMods()) {
+                modDao.saveDynamicResidueMod(dynaMod, searchId);
+            }
+
+            // save any static terminal modifications used for the search
+            for (MsTerminalModification staticMod: search.getStaticTerminalMods()) {
+                modDao.saveStaticTerminalMod(staticMod, searchId);
+            }
+
+            // save any dynamic residue modifications used for the search
+            for (MsTerminalModification dynaMod: search.getDynamicTerminalMods()) {
+                modDao.saveDynamicTerminalMod(dynaMod, searchId);
+            }
+
+            // save any enzymes used for the search
+            List<MsEnzyme> enzymes = search.getEnzymeList();
+            for (MsEnzyme enzyme: enzymes) 
+                // use the enzyme name attribute only to look for a matching enzyme.
+                enzymeDao.saveEnzymeforSearch(enzyme, searchId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
         }
-        
-        // save any static residue modifications used for the search
-        for (MsResidueModification staticMod: search.getStaticResidueMods()) {
-            modDao.saveStaticResidueMod(staticMod, searchId);
+        catch(RuntimeException e) {
+            deleteSearch(searchId); // this will delete anything that got saved with the searchId
+            throw e;
         }
-        
-        // save any dynamic residue modifications used for the search
-        for (MsResidueModification dynaMod: search.getDynamicResidueMods()) {
-            modDao.saveDynamicResidueMod(dynaMod, searchId);
-        }
-        
-        // save any static terminal modifications used for the search
-        for (MsTerminalModification staticMod: search.getStaticTerminalMods()) {
-            modDao.saveStaticTerminalMod(staticMod, searchId);
-        }
-        
-        // save any dynamic residue modifications used for the search
-        for (MsTerminalModification dynaMod: search.getDynamicTerminalMods()) {
-            modDao.saveDynamicTerminalMod(dynaMod, searchId);
-        }
-        
-        // save any enzymes used for the search
-        List<MsEnzyme> enzymes = search.getEnzymeList();
-        for (MsEnzyme enzyme: enzymes) 
-            // use the enzyme name attribute only to look for a matching enzyme.
-            enzymeDao.saveEnzymeforSearch(enzyme, searchId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
-        
         return searchId;
+    }
+    
+    @Override
+    public void updateSearchAnalysisProgramVersion(int searchId,
+            String versionStr) {
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("searchId", searchId);
+        map.put("analysisProgramVersion", versionStr);
+        update("MsSearch.updateAnalysisProgramVersion", map);
     }
     
     public void deleteSearch(int searchId) {
         delete("MsSearch.delete", searchId);
     }
-
 }

@@ -15,6 +15,7 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.parser.Database;
+import org.yeastrc.ms.parser.ResidueModification;
 
 
 public class SQTHeader implements SQTRunSearch {
@@ -61,6 +62,7 @@ public class SQTHeader implements SQTRunSearch {
     private List<MsResidueModification> dynaMods;
     private List<MsEnzyme> enzymes;
     
+    private SearchFileFormat sqtType = null;
     
     public SQTHeader() {
         headerItems = new ArrayList<SQTField>();
@@ -270,7 +272,7 @@ public class SQTHeader implements SQTRunSearch {
         // this modification may be for multiple residues; 
         // add one StaticModification for each residue character
         for (int i = 0; i < modChars.length(); i++) {
-            staticMods.add(new StaticResidueModification(modChars.charAt(i), mass));
+            staticMods.add(new ResidueModification(modChars.charAt(i), mass));
         }
     }
     
@@ -335,7 +337,7 @@ public class SQTHeader implements SQTRunSearch {
         // this modification may be for multiple residues; 
         // add one StaticModification for each residue character
         for (int i = 0; i < modChars.length(); i++) {
-            dynaMods.add(new DynamicResidueModification(modChars.charAt(i), mass, modSymbol));
+            dynaMods.add(new ResidueModification(modChars.charAt(i), mass, modSymbol));
         }
     }
 
@@ -475,12 +477,16 @@ public class SQTHeader implements SQTRunSearch {
 //        return sqtGenerator;
 //    }
 //
-//    /**
-//     * @return the sqtGeneratorVersion
-//     */
-//    public String getSearchEngineVersion() {
-//        return sqtGeneratorVersion;
-//    }
+    /**
+     * @return the sqtGeneratorVersion
+     */
+    public String getSearchEngineVersion() {
+        return sqtGeneratorVersion;
+    }
+    
+    public Database getSearchDatabase() {
+        return this.database;
+    }
     
 //    /**
 //     * @return the fragmentMassType
@@ -533,18 +539,33 @@ public class SQTHeader implements SQTRunSearch {
     }
 
     public SearchFileFormat getSearchFileFormat() {
+        if (sqtType != null)
+            return sqtType;
+        
         if (sqtGenerator.equalsIgnoreCase(SEQUEST))
-            return SearchFileFormat.SQT_SEQ;
+            sqtType = SearchFileFormat.SQT_SEQ;
         else if (sqtGenerator.equalsIgnoreCase(SEQUEST_NORM))
-            return SearchFileFormat.SQT_NSEQ;
+            sqtType = SearchFileFormat.SQT_NSEQ;
         else if (sqtGenerator.equalsIgnoreCase(PERCOLATOR))
-            return SearchFileFormat.SQT_PERC;
+            sqtType = SearchFileFormat.SQT_PERC;
         else if (sqtGenerator.equalsIgnoreCase(PROLUCID))
-            return SearchFileFormat.SQT_PLUCID;
+            sqtType = SearchFileFormat.SQT_PLUCID;
         else if (sqtGenerator.equalsIgnoreCase(PEPPROBE))
-            return SearchFileFormat.SQT_PPROBE;
-        else
-            return SearchFileFormat.UNKNOWN;
+            sqtType = SearchFileFormat.SQT_PPROBE;
+        else {
+            // Percolator files do not add Percolator to the sqtGenerator header.
+            // Look for it in the other headers
+            for(SQTField f: headerItems) {
+                if (f.getName().equalsIgnoreCase(PERCOLATOR)) {
+                    sqtType = SearchFileFormat.SQT_PERC;
+                    break;
+                }
+            }
+            // if we still do not know the sqt file type
+            if (sqtType != null)
+                sqtType = SearchFileFormat.UNKNOWN;
+        }
+        return sqtType;
     }
 
 //    public List<MsSearchDatabase> getSearchDatabases() {

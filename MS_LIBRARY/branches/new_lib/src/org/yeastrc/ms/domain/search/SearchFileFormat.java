@@ -6,16 +6,26 @@
  */
 package org.yeastrc.ms.domain.search;
 
+import org.yeastrc.ms.parser.sqtFile.SQTHeader;
+
 public enum SearchFileFormat {
 
-    SQT_SEQ, 
-    SQT_NSEQ, 
-    SQT_PLUCID, 
-    SQT_PPROBE, 
-    SQT_PERC, 
-    PEPXML, 
-    UNKNOWN;
+    SQT_SEQ(SQTHeader.SEQUEST), 
+    SQT_NSEQ(SQTHeader.SEQUEST_NORM), 
+    SQT_PLUCID(SQTHeader.PROLUCID), 
+    SQT_PPROBE(SQTHeader.PEPPROBE), 
+    SQT_PERC(SQTHeader.PERCOLATOR), 
+    PEPXML("pepxml"), 
+    UNKNOWN("Unknown");
 
+    private String typeName;
+    private SearchFileFormat(String typeName) {
+        this.typeName = typeName;
+    }
+    public String getTypeName() {
+        return typeName;
+    }
+    
     public static SearchFileFormat instance(String extString) {
         if (extString.equalsIgnoreCase(SearchFileFormat.SQT_SEQ.name()))
             return SearchFileFormat.SQT_SEQ;

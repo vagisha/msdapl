@@ -1,4 +1,4 @@
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.service.ms2file;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

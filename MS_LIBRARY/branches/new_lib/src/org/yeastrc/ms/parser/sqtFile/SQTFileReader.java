@@ -1,14 +1,8 @@
 package org.yeastrc.ms.parser.sqtFile;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -16,13 +10,12 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
-import org.yeastrc.ms.parser.AbstractReader;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.service.SQTSearchDataProvider;
+import org.yeastrc.ms.parser.SQTSearchDataProvider;
 
 
-public abstract class  SQTFileReader <E extends SQTSearchScan> extends AbstractReader 
-    implements SQTSearchDataProvider<E>  {
+public abstract class SQTFileReader extends AbstractReader 
+    implements SQTSearchDataProvider  {
 
     private List<MsResidueModification> searchDynamicResidueMods;
     private List<MsTerminalModification> searchDynamicTerminalMods;
@@ -33,59 +26,19 @@ public abstract class  SQTFileReader <E extends SQTSearchScan> extends AbstractR
 
     private static final Pattern headerPattern = Pattern.compile("^H\\s+([\\S]+)\\s*(.*)");
     private static final Pattern locusPattern = Pattern.compile("^L\\s+([\\S]+)\\s*(.*)");
-    private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
+//    private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
     
     
-    public static SearchFileFormat getSearchFileType(String filePath) throws FileNotFoundException, IOException {
-        return getSearchFileType(new FileReader(filePath));
-    }
-    
-    public static SearchFileFormat getSearchFileType(Reader reader) throws IOException {
-        Matcher match = null;
-        BufferedReader bReader = null;
-        bReader = new BufferedReader(reader);
-        String line;
-        try {
-            line = bReader.readLine();
-            if (line != null)   line = line.trim();
-            while(line != null && isHeaderLine(line)) {
-                if (line.contains("Percolator"))    {
-                    return SearchFileFormat.SQT_PERC;
-                }
-                match = sqtGenPattern.matcher(line);
-                if (match.matches()) {
-                    String genProg = match.group(1);
-                    if (genProg != null) {
-                        if (genProg.equalsIgnoreCase(SQTHeader.SEQUEST))
-                            return SearchFileFormat.SQT_SEQ;
-                        else if (genProg.equalsIgnoreCase(SQTHeader.SEQUEST_NORM))
-                            return SearchFileFormat.SQT_NSEQ;
-                        else if (genProg.equalsIgnoreCase(SQTHeader.PROLUCID))
-                            return SearchFileFormat.SQT_PLUCID;
-                        else if (genProg.equalsIgnoreCase(SQTHeader.PEPPROBE))
-                            return SearchFileFormat.SQT_PPROBE;
-                        else {
-                            log.warn("Unrecognized SQT generating program found in header: "+genProg);
-                            return null;
-                        }
-                    }
-                    else {
-                        log.warn("No SQT generating program name found: "+line);
-                        return null;
-                    }
-                }
-                line = bReader.readLine();
-                if (line != null)   line = line.trim();
-            }
-        }
-        finally {
-            if (bReader != null) {
-                try {bReader.close();}
-                catch (IOException e) {}
-            }
-        }
-        log.warn("No sqt generating program found in header.");
-        return null;
+    public static SearchFileFormat getSearchFileType(String filePath) throws DataProviderException {
+        SQTFileReader reader = new SQTFileReader(null){
+            @Override
+            public SQTSearchScan getNextSearchScan()
+                    throws DataProviderException {
+                throw new UnsupportedOperationException("");
+            }};
+            SQTHeader header = reader.getSearchHeader();
+            reader.close();
+            return header.getSearchFileFormat();
     }
     
     public SQTFileReader(String serverAddress) {

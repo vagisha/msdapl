@@ -21,7 +21,7 @@ import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 /**
  * 
  */
-public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
+public class SequestSQTFileReader extends SQTFileReader {
 
     private boolean useEvalue = false;
     

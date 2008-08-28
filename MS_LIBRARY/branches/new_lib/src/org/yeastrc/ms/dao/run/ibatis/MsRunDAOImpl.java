@@ -42,22 +42,27 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         
         int runId = saveAndReturnId("MsRun.insert", run);
         
-        // save location information for the original file
-        saveRunLocation(serverAddress, serverDirectory, runId);
+        try {
+            // save location information for the original file
+            saveRunLocation(serverAddress, serverDirectory, runId);
         
-        // save the enzyme information
-        List<MsEnzyme> enzymes = run.getEnzymeList();
-        for (MsEnzyme enzyme: enzymes) 
-            // use the enzyme name attribute only to look for a matching enzyme.
-            enzymeDao.saveEnzymeforRun(enzyme, runId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
-        
+            // save the enzyme information
+            List<MsEnzyme> enzymes = run.getEnzymeList();
+            for (MsEnzyme enzyme: enzymes) 
+                // use the enzyme name attribute only to look for a matching enzyme.
+                enzymeDao.saveEnzymeforRun(enzyme, runId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
+        }
+        catch(RuntimeException e) {
+            delete(runId); // this will delete anything that got saved with this runId;
+            throw e;
+        }
         return runId;
     }
 
     @Override
     public void saveRunLocation(final String serverAddress, final String serverDirectory,
             final int runId) {
-            save("MsRunLocation.insert", new MsRunLocationSqlParam(runId, serverAddress, serverDirectory));
+        save("MsRunLocation.insert", new MsRunLocationSqlParam(runId, serverAddress, serverDirectory));
             
     }
     
@@ -78,6 +83,17 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
     }
     
 
+    @Override
+    public int loadRunIdForSearchAndFileName(int searchId, String runFileName) {
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("fileName", runFileName);
+        map.put("searchId", searchId);
+        Integer runId = (Integer)queryForObject("MsRun.selectRunIdForSearchAndFileName", map);
+        if (runId == null)
+            return 0;
+        return runId;
+    }
+    
     @Override
     public List<MsRunLocationDb> loadLocationsForRun(int runId) {
         return queryForList("MsRunLocation.selectLocationsForRun", runId);

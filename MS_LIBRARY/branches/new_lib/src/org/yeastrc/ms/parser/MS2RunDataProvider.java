@@ -4,11 +4,10 @@
  * Jul 14, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.parser;
 
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
-import org.yeastrc.ms.parser.DataProviderException;
 
 /**
  * 

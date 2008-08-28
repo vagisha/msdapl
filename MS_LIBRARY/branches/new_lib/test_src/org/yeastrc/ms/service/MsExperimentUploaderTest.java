@@ -14,14 +14,16 @@ import org.yeastrc.ms.MsLibTests;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.ms2file.DbToMs2FileConverter;
+import org.yeastrc.ms.service.sqtfile.DbToSqtFileConverter;
 
 public class MsExperimentUploaderTest extends BaseDAOTestCase {
 
-    private MsExperimentUploader uploader = null;
+    private MsDataUploader uploader = null;
     
     protected void setUp() throws Exception {
         super.setUp();
-        uploader = new MsExperimentUploader();
+        uploader = new MsDataUploader();
         MsLibTests.resetDatabase();
     }
 

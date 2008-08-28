@@ -26,13 +26,22 @@ public class UploadException extends Exception {
         
         RUNTIME_MS2_ERROR       ("", ERROR),
         
-        UNSUPPORTED_SQT         ("Non-SEQUEST sqt files are not supported", WARN),
+        UNSUPPORTED_SQT         ("Unsupported sqt file found", WARN),
+        MULTIPLE_SQT_TYPES      ("More than one sqt file types found", WARN),
         INVALID_SQT_HEADER      ("Invalid SQT header", WARN),
         INVALID_SQT_SCAN        ("Invalid SQT scan", WARN),
         NO_SCANID_FOR_SQT_SCAN  ("No database scanID found for SQT scan", WARN),
         READ_ERROR_SQT          ("Error reading SQT file", ERROR),
         
+        MISSING_SEQUEST_PARAMS  ("Missing sequest.params file.", WARN),
+        MISSING_PROLUCID_PARAMS ("Missing search.xml files.", WARN),
+        UNKNOWN_PARAMS          ("Unknown parameters file for search.", WARN),
+        PARAM_PARSING_ERROR     ("Error parsing parameters file", WARN),
+        
+        PROTEIN_NOT_FOUND     ("Protein not found in database", WARN),
+        
         RUNTIME_SQT_ERROR       ("", WARN)
+        
         ;
       
         private String message = "";

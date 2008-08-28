@@ -4,7 +4,7 @@
  * Jul 14, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.service.ms2file;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +27,8 @@ import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.MS2RunDataProvider;
+import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 /**
@@ -48,6 +50,12 @@ public class MS2DataUploadService {
         iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisDb>();
     }
 
+    private void reset() {
+        // clean up any cached data
+        dAnalysisList.clear();
+        iAnalysisList.clear();
+    }
+    
     /**
      * provider should be closed after this method returns
      * @param provider
@@ -57,7 +65,7 @@ public class MS2DataUploadService {
      * @throws UploadException 
      */
     public int uploadMS2Run(MS2RunDataProvider provider, String sha1Sum, 
-            final String serverAddress, final String serverDirectory) throws UploadException {
+            final String serverAddress, final String serverDirectory) throws UploadException  {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName());
         long startTime = System.currentTimeMillis();
@@ -147,12 +155,6 @@ public class MS2DataUploadService {
         return runId;
     }
 
-    private void reset() {
-        // clean up any cached data
-        dAnalysisList.clear();
-        iAnalysisList.clear();
-    }
-    
     private void saveChargeDependentAnalysis(MS2ScanCharge scanCharge, final int scanChargeId) {
         if (dAnalysisList.size() > BUF_SIZE) {
             saveChargeDependentAnalysis();

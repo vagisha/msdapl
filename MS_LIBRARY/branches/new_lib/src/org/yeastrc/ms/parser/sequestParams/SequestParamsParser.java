@@ -20,6 +20,7 @@ import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -90,10 +91,19 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return new ArrayList<MsTerminalModification>(0);
     }
     
+    @Override
+    public String getSearchProgramName() {
+        return SearchFileFormat.SQT_SEQ.getTypeName();
+    }
+    
     public boolean reportEvalue() {
         return reportEvalue;
     }
 
+    public List<SequestParam> getParamList() {
+        return this.paramList;
+    }
+    
     public void parseParamsFile(String filePath) throws DataProviderException {
         BufferedReader reader = null;
         try {
@@ -292,5 +302,4 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         SequestParamsParser parser = new SequestParamsParser("remote.server");
         parser.parseParamsFile(paramFile);
     }
-
 }

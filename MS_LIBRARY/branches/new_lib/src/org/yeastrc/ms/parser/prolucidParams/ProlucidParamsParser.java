@@ -18,6 +18,7 @@ import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -74,6 +75,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return dynamicTerminalModifications;
     }
     
+    public String getSearchProgramName() {
+        return SearchFileFormat.SQT_PLUCID.getTypeName();
+    }
+    
     public PrimaryScore getPrimaryScoreType() {
         return primaryScore;
     }
@@ -82,6 +87,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return secondaryScore;
     }
 
+    public List<ProlucidParam> getParamList() {
+        return this.parentParams;
+    }
+    
     private void init(String remoteServer) {
         this.remoteServer = remoteServer;
         parentParams = new ArrayList<ProlucidParam>();
@@ -180,11 +189,11 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
             if (childNode != null)
                 thisNode.addChildParamElement(childNode);
         }
-        extractUsefulInfo(thisNode);
+        extractRequiredInfo(thisNode);
         return thisNode;
     }
 
-    private void extractUsefulInfo(ProlucidParamNode node) throws DataProviderException {
+    private void extractRequiredInfo(ProlucidParamNode node) throws DataProviderException {
         if (node.getParamElementName().equalsIgnoreCase("database"))
             parseDatabaseInfo(node);
         else if (node.getParamElementName().equalsIgnoreCase("enzyme_info"))
@@ -769,5 +778,4 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         ProlucidParamsParser parser = new ProlucidParamsParser();
         parser.parseParamsFile("remote.server", file);
     }
-
 }

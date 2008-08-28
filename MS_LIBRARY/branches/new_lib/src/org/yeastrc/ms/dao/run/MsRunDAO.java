@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
-import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.MsRunLocationDb;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 
@@ -52,6 +51,14 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
      */
     public abstract List<Integer> runIdsFor(String fileName, String sha1Sum);
     
+    /**
+     * Returns the runID for a run with the given file name that was searched in a
+     * search group represented by the given searchId.
+     * @param searchId
+     * @param runFileName
+     * @return
+     */
+    public abstract int loadRunIdForSearchAndFileName(int searchId, String runFileName);
     
     /**
      * Returns a list of locations for the given run

@@ -16,7 +16,7 @@ import org.yeastrc.ms.domain.search.MsRunSearchDb;
  */
 public interface MsRunSearchDAO <I extends MsRunSearch, O extends MsRunSearchDb> {
 
-    public abstract O loadRunSearch(int searchId);
+    public abstract O loadRunSearch(int runSearchId);
     
     /**
      * Returns the database ids of individual run searches in a search group.
@@ -53,7 +53,7 @@ public interface MsRunSearchDAO <I extends MsRunSearch, O extends MsRunSearchDb>
 
     /**
      * Deletes the search (for a single run).
-     * @param searchId
+     * @param runSearchId
      */
-    public abstract void deleteRunSearch(int searchId);
+    public abstract void deleteRunSearch(int runSearchId);
 }

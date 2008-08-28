@@ -3,7 +3,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.service.MS2FileValidator;
+import org.yeastrc.ms.service.ms2file.MS2FileValidator;
 
 
 public class YatesRunMS2Validator {

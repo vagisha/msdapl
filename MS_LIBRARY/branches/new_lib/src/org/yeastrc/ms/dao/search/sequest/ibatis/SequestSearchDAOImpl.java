@@ -38,10 +38,22 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO <
         int searchId = searchDao.saveSearch(search);
         
         // save sequest search parameters
-        for (SequestParam param: search.getSequestParams()) {
-            save("SequestSearch.insertParams", new SequestParamSqlMapParam(searchId, param));
+        try {
+            for (SequestParam param: search.getSequestParams()) {
+                save("SequestSearch.insertParams", new SequestParamSqlMapParam(searchId, param));
+            }
+        }
+        catch(RuntimeException e) {
+           deleteSearch(searchId);
+           throw e;
         }
         return searchId;
+    }
+    
+    @Override
+    public void updateSearchAnalysisProgramVersion(int searchId,
+            String versionStr) {
+        searchDao.updateSearchAnalysisProgramVersion(searchId, versionStr);
     }
     
     public void deleteSearch(int searchId) {

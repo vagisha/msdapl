@@ -4,7 +4,7 @@
  * Jul 28, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.service.sqtfile;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

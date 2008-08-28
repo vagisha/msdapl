@@ -1,7 +1,9 @@
 package org.yeastrc.ms.dao.run.ms2file.ibatis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -37,10 +39,15 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
 
         // save the run and location
         int runId = msRunDao.saveRun(run, serverAddress, serverDirectory);
-
-        MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-        for (MS2Field header: run.getHeaderList()) {
-            headerDao.save(header, runId);
+        try {
+            MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
+            for (MS2Field header: run.getHeaderList()) {
+                headerDao.save(header, runId);
+            }
+        }
+        catch(RuntimeException e) {
+            delete(runId);// this will delete anything that got saved with this runId;
+            throw e;
         }
         return runId;
     }
@@ -84,6 +91,11 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
         return msRunDao.runIdsFor(fileName, sha1Sum);
     }
 
+    @Override
+    public int loadRunIdForSearchAndFileName(int searchId, String runFileName) {
+        return msRunDao.loadRunIdForSearchAndFileName(searchId, runFileName);
+    }
+    
     public void delete(int runId) {
         msRunDao.delete(runId);
     }

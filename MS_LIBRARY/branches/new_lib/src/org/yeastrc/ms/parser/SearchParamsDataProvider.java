@@ -29,4 +29,7 @@ public interface SearchParamsDataProvider {
     public abstract List<MsTerminalModification> getStaticTerminalMods();
 
     public abstract List<MsTerminalModification> getDynamicTerminalMods();
+    
+    public abstract String getSearchProgramName();
+    
 }

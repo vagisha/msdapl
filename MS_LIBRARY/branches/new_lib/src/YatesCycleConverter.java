@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.zip.ZipException;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.service.MsExperimentUploader;
+import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
 
 /**
@@ -39,7 +39,7 @@ public class YatesCycleConverter {
             }
             
             // upload data to msData database
-            MsExperimentUploader uploader = new MsExperimentUploader();
+            MsDataUploader uploader = new MsDataUploader();
             int experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dataDir, new Date(), true);
             
             // delete the files

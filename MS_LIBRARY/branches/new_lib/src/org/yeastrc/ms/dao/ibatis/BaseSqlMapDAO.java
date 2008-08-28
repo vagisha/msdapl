@@ -129,4 +129,19 @@ public class BaseSqlMapDAO {
             throw new RuntimeException("Failed to execute deleteAll statement: "+statementName, e);
         }
     }
+    
+    /**
+     * 
+     * @param statementName
+     * @param parameterObject
+     */
+    public void update(String statementName, Object parameterObject) {
+        try {
+            sqlMap.update(statementName, parameterObject);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute update statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute updaate statement: "+statementName, e);
+        }
+    }
 }

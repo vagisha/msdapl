@@ -83,6 +83,13 @@
         AND run.filename=#fileName#
     </select> 
     
+    <select id="selectRunIdForSearchAndFileName" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT r.id from msRun as r, msRunSearch as s
+    	WHERE s.searchID=#searchId#
+    	AND r.filename=#fileName#
+    	AND s.runID = r.id
+    </select>
+    
     <insert id="insert" parameterMap="msRunParam">
     	INSERT INTO MsRun ( filename, 
     						sha1Sum,

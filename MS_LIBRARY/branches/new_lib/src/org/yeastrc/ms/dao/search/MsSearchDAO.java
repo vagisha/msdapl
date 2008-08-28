@@ -20,6 +20,14 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
      * @return database id of the search
      */
     public abstract int saveSearch(I search);
+    
+    /**
+     * Updates the value of the analysisProgramVersion in msSearch table
+     * @param searchId
+     * @param versionStr
+     */
+    public abstract void updateSearchAnalysisProgramVersion(int searchId, String versionStr);
+    
 
     /**
      * Deletes the search
