@@ -16,6 +16,8 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     protected void setUp() throws Exception {
         super.setUp();
+        resetDatabase();
+        addEnzymes();
     }
     
     protected void tearDown() throws Exception {

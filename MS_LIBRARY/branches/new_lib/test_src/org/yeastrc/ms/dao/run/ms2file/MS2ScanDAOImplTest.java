@@ -25,7 +25,9 @@ public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
         super.tearDown();
         
         // clean up
-        ms2ScanDao.deleteScansForRun(runId);
+        List<Integer> scanIds = scanDao.loadScanIdsForRun(runId);
+        for (Integer id: scanIds)
+            ms2ScanDao.delete(id);
         assertEquals(0, ms2ScanDao.loadScanIdsForRun(runId).size());
     }
 
@@ -68,7 +70,14 @@ public class MS2ScanDAOImplTest extends MS2BaseDAOtestCase {
         assertEquals(2, scan_db.getScanChargeList().size());
         
         // delete the scan and make sure everything got deleted
-        ms2ScanDao.deleteScansForRun(runId);
+        List<Integer> ids = scanDao.loadScanIdsForRun(runId);
+        for (Integer id: ids)
+            ms2ScanDao.delete(id);
+        // make sure the 10 scans saved first are deleted
+        for (int id: scanIds) {
+            assertNull(ms2ScanDao.load(id));
+        }
+        // make sure last scan (WITH charge dependent and independent analysis) is deleted.
         assertNull(ms2ScanDao.load(scanId));
         assertEquals(0, chargeDao.loadScanChargesForScan(scanId).size());
         assertEquals(0, iAnalDao.loadAnalysisForScan(scanId).size());

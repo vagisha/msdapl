@@ -3,16 +3,17 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2ChgDAnalysis"> 
 
-	<typeAlias alias="DAnalysisDb" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisDbImpl"/>
-	
-	<resultMap class="DAnalysisDb" id="danalysisResult">
+	<typeAlias alias="DAnalysisOut" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisDbImpl"/>
+	<typeAlias alias="DAnalysisIn" type="org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb"/>
+		
+	<resultMap class="DAnalysisOut" id="danalysisResult">
 		<result property="id" column="id" />
 		<result property="scanChargeId" column="scanChargeID" nullValue="0" />
 		<result property="name" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
 	
-	<parameterMap class="DAanalysisDb" id="danalysisParam">
+	<parameterMap class="DAanalysisIn" id="danalysisParam">
 		<parameter property="scanChargeId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>

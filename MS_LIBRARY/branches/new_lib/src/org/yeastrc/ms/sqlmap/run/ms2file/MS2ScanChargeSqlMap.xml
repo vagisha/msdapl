@@ -3,9 +3,10 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2ScanCharge"> 
 
-	<typeAlias alias="ScanChargeDb" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ScanChargeDbImpl"/>
-	
-	<resultMap class="ScanChargeDb" id="scanChargeResult">
+	<typeAlias alias="ScanChargeOut" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2ScanChargeDbImpl"/>
+	<typeAlias alias="ScanChargeIn" type="org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb"/>
+		
+	<resultMap class="ScanChargeOut" id="scanChargeResult">
 		<result property="id" column="id" />
 		<result property="scanId" column="scanID" nullValue="0"/>
 		<result property="charge" column="charge" nullValue="0"/>
@@ -13,7 +14,7 @@
 		<result property="chargeDependentAnalysis" column="id" select="MS2ChgDAnalysis.selectAnalysisForCharge" />
 	</resultMap>
 	
-	<parameterMap class="ScanChargeDb" id="scanChargeParam">
+	<parameterMap class="ScanChargeIn" id="scanChargeParam">
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="charge" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="mass" jdbcType="DECIMAL" />
