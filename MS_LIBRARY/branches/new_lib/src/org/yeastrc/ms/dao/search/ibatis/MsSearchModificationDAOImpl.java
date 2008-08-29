@@ -74,9 +74,9 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return queryForList("MsSearchMod.selectStaticTerminalModsForSearch", searchId);
     }
 
-    public int saveStaticTerminalMod(MsTerminalModification mod, int searchId) {
+    public void saveStaticTerminalMod(MsTerminalModification mod, int searchId) {
         MsTerminalModSqlMapParam modDb = new MsTerminalModSqlMapParam(searchId, mod);
-        return saveAndReturnId("MsSearchMod.insertStaticTerminalMod", modDb);
+        save("MsSearchMod.insertStaticTerminalMod", modDb);
     }
 
     public void deleteStaticTerminalModsForSearch(int searchId) {

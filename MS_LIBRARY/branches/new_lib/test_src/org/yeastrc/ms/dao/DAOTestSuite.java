@@ -7,8 +7,8 @@ import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAOImplTest;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAOImplTest;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAOImplTest;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAOImplTest;
-import org.yeastrc.ms.dao.search.sequest.SQTSearchDAOImplTest;
-import org.yeastrc.ms.dao.search.sequest.SQTSearchResultDAOImplTest;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAOImplTest;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAOImplTest;
 import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAOImplTest;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAOImplTest;
 

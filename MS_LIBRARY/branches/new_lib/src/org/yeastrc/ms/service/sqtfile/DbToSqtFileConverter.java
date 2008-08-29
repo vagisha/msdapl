@@ -58,7 +58,7 @@ public class DbToSqtFileConverter {
         try {
             outFile = new BufferedWriter(new FileWriter(outputFile));
 
-            MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = DAOFactory.instance().getSqtRunSerachDAO();
+            MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = DAOFactory.instance().getSqtRunSearchDAO();
             SQTRunSearchDb runSearch = searchDao.loadRunSearch(runSearchId);
             if (runSearch == null) {
                 System.err.println("No run search found with id: "+runSearchId);

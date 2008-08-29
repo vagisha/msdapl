@@ -81,13 +81,13 @@
 	
 	<parameterMap class="MsTerminalMod" id="msStaticTerminalModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="modificationTerminal" jdbcType="CHAR" typeHandler="TerminalTypeHandler"/>
+		<parameter property="modifiedTerminal" jdbcType="CHAR" typeHandler="TerminalTypeHandler"/>
 		<parameter property="modificationMass" jdbcType="DECIMAL"/>
 	</parameterMap>
 	
 	<parameterMap class="MsTerminalMod" id="msDynamicTerminalModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="modificationTerminal" jdbcType="CHAR" typeHandler="TerminalTypeHandler"/>
+		<parameter property="modifiedTerminal" jdbcType="CHAR" typeHandler="TerminalTypeHandler"/>
 		<parameter property="modificationMass" jdbcType="DECIMAL"/>
 		<parameter property="modificationSymbol" jdbcType="DECIMAL" typeHandler="CharTypeHandler"/>
 	</parameterMap>
@@ -174,13 +174,16 @@
     	SELECT * FROM msSearchTerminalDynamicMod WHERE searchID= #id#
     </select>
     
-    <insert id="insertDynaminTerminalMod" parameterMap="msDynamicTerminalModParam">
+    <insert id="insertDynamicTerminalMod" parameterMap="msDynamicTerminalModParam">
     	INSERT INTO msSearchTerminalDynamicMod (
     	searchID,
     	terminus,
     	modifier,
     	symbol)
     	VALUES (?,?,?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
     </insert>
     
     <delete id="deleteDynamicTerminalModsForSearch" parameterClass="Integer">

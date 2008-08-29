@@ -242,7 +242,7 @@ public class DAOFactory {
         return sqtHeaderDAO;
     }
     
-    public MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> getSqtRunSerachDAO() {
+    public MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> getSqtRunSearchDAO() {
         return sqtRunSearchDAO;
     }
     

@@ -25,11 +25,11 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
     public void testOperationsForStaticModifications() {
 
         // create some static modification objects
-        MsResidueModification mod1_1 = makeStaticMod('A', "123.4");
-        MsResidueModification mod1_2 = makeStaticMod('B', "56.7");
+        MsResidueModification mod1_1 = makeStaticResidueMod('A', "123.4");
+        MsResidueModification mod1_2 = makeStaticResidueMod('B', "56.7");
 
-        MsResidueModification mod2_1 = makeStaticMod('X', "987.6");
-        MsResidueModification mod2_2 = makeStaticMod('Y', "54.3");
+        MsResidueModification mod2_1 = makeStaticResidueMod('X', "987.6");
+        MsResidueModification mod2_2 = makeStaticResidueMod('Y', "54.3");
 
         // save them to the database
         modDao.saveStaticResidueMod(mod1_1, 1); // searchId = 1
@@ -95,7 +95,7 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
         MsResidueModification[] mods = new MsResidueModification[residue.length];
         for (int i = 0; i < residue.length; i++) {
-            mods[i] = makeDynamicMod(residue[i], mass[i], symbol[i]);
+            mods[i] = makeDynamicResidueMod(residue[i], mass[i], symbol[i]);
         }
         return mods;
     }

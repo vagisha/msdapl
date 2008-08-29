@@ -54,19 +54,19 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
     
     /**
      * Saves the search as well as any SQT headers associated with the search.
-     * @param search
+     * @param runSearch
      * @return
      */
-    public int saveRunSearch (SQTRunSearch search, int runId, int searchGroupId) {
+    public int saveRunSearch (SQTRunSearch runSearch, int runId, int searchId) {
         
-        // save the search
-        int searchId = runSearchDao.saveRunSearch(search, runId, searchGroupId);
+        // save the run_search
+        int runSearchId = runSearchDao.saveRunSearch(runSearch, runId, searchId);
         
         // save the headers
-        for (SQTField h: search.getHeaders()) {
-            headerDao.saveSQTHeader(h, searchId);
+        for (SQTField h: runSearch.getHeaders()) {
+            headerDao.saveSQTHeader(h, runSearchId);
         }
-        return searchId;
+        return runSearchId;
     }
     
     /**

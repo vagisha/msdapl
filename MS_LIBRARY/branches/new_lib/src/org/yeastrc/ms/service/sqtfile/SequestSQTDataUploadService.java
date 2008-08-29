@@ -392,7 +392,7 @@ public class SequestSQTDataUploadService {
             }
         }
         // save the run search and return the database id
-        MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = daoFactory.getSqtRunSerachDAO();
+        MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = daoFactory.getSqtRunSearchDAO();
         return runSearchDao.saveRunSearch(search, runId, searchId);
     }
     

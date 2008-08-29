@@ -60,10 +60,13 @@ import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.ResidueModification;
 import org.yeastrc.ms.parser.ResultResidueModification;
+import org.yeastrc.ms.parser.TerminalModification;
 import org.yeastrc.ms.util.PeakConverterDouble;
 
 /**
@@ -240,12 +243,20 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // MODIFICATIONS
     //-----------------------------------------------------------------------------------------------------
-    protected MsResidueModification makeStaticMod(final char modChar, final String modMass) {
+    protected MsResidueModification makeStaticResidueMod(final char modChar, final String modMass) {
         return new ResidueModification(modChar, new BigDecimal(modMass));
     }
 
-    protected MsResidueModification makeDynamicMod(final char modChar, final String modMass, final char modSymbol) {
+    protected MsResidueModification makeDynamicResidueMod(final char modChar, final String modMass, final char modSymbol) {
         return new ResidueModification(modChar, new BigDecimal(modMass), modSymbol);
+    }
+    
+    protected MsTerminalModification makeStaticTerminalMod(final Terminal term, final String modMass, final char modChar) {
+        return new TerminalModification(term, new BigDecimal(modMass), modChar);
+    }
+
+    protected MsTerminalModification makeDynamicTerminalMod(final Terminal term, final String modMass, final char modChar) {
+        return new TerminalModification(term, new BigDecimal(modMass), modChar);
     }
     
     protected MsResultDynamicResidueMod makeResultDynamicResidueMod(final char modChar, final String modMass,
@@ -270,15 +281,15 @@ public class BaseDAOTestCase extends TestCase {
         }
 
         if (addStaticMods) {
-            MsResidueModification mod1 = makeStaticMod('C', "50.0");
-            MsResidueModification mod2 = makeStaticMod('S', "80.0");
+            MsResidueModification mod1 = makeStaticResidueMod('C', "50.0");
+            MsResidueModification mod2 = makeStaticResidueMod('S', "80.0");
             search.setStaticResidueMods(Arrays.asList(new MsResidueModification[]{mod1, mod2}));
         }
 
         if (addDynaMods) {
-            MsResidueModification dmod1 = makeDynamicMod('A', "10.0", '*');
-            MsResidueModification dmod2 = makeDynamicMod('B', "20.0", '#');
-            MsResidueModification dmod3 = makeDynamicMod('C', "30.0", '@');
+            MsResidueModification dmod1 = makeDynamicResidueMod('A', "10.0", '*');
+            MsResidueModification dmod2 = makeDynamicResidueMod('B', "20.0", '#');
+            MsResidueModification dmod3 = makeDynamicResidueMod('C', "30.0", '@');
             search.setDynamicResidueMods(Arrays.asList(new MsResidueModification[]{dmod1, dmod2, dmod3}));
         }
 

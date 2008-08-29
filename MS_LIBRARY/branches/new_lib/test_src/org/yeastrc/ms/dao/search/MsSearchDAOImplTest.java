@@ -140,7 +140,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         }
 
         public void setStaticTerminalMods(List<MsTerminalModification> mods) {
-            this.dynamicTerminalModifications = mods;
+            this.staticTerminalModifications = mods;
         }
         
         public void setAnalysisProgramName(String searchEngineName) {

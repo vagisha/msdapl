@@ -42,7 +42,7 @@ public interface MsSearchModificationDAO {
     //-------------------------------------------------------------------------------------------
     public abstract List<MsTerminalModificationDb> loadStaticTerminalModsForSearch(int searchId);
 
-    public abstract int saveStaticTerminalMod(MsTerminalModification mod, int searchId);
+    public abstract void saveStaticTerminalMod(MsTerminalModification mod, int searchId);
 
     public abstract void deleteStaticTerminalModsForSearch(int searchId);
     

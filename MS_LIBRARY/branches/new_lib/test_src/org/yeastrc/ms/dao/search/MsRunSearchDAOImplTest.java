@@ -20,14 +20,14 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         super.setUp();
         
         // modifications for searchId_1
-        MsResidueModification mod1 = makeStaticMod('C', "50.0");
+        MsResidueModification mod1 = makeStaticResidueMod('C', "50.0");
         modDao.saveStaticResidueMod(mod1, searchId_1);
-        MsResidueModification mod2 = makeStaticMod('S', "80.0");
+        MsResidueModification mod2 = makeStaticResidueMod('S', "80.0");
         modDao.saveStaticResidueMod(mod2, searchId_1);
         
-        MsResidueModification dmod1 = makeDynamicMod('A', "10.0", '*');
+        MsResidueModification dmod1 = makeDynamicResidueMod('A', "10.0", '*');
         modDao.saveDynamicResidueMod(dmod1, searchId_1);
-        MsResidueModification dmod2 = makeDynamicMod('B', "20.0", '#');
+        MsResidueModification dmod2 = makeDynamicResidueMod('B', "20.0", '#');
         modDao.saveDynamicResidueMod(dmod2, searchId_1);
     }
 
