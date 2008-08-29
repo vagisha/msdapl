@@ -1,5 +1,8 @@
 package org.yeastrc.ms.dao.util;
 
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+
 import junit.framework.TestCase;
 
 public class NrSeqLookupUtilTest extends TestCase {
@@ -19,13 +22,16 @@ public class NrSeqLookupUtilTest extends TestCase {
         assertEquals(25, NrSeqLookupUtil.getProteinId(databaseName, accession));
         
         databaseName = "dummy";
-        assertEquals(0, NrSeqLookupUtil.getProteinId(databaseName, accession));
+        try {NrSeqLookupUtil.getProteinId(databaseName, accession); fail("No match should be found");}
+        catch(NrSeqLookupException e){}
+        
         
         databaseName = "my/test/database2";
-        assertEquals(0, NrSeqLookupUtil.getProteinId(databaseName, accession));
+        try {NrSeqLookupUtil.getProteinId(databaseName, accession); fail("No match should be found");}
+        catch(NrSeqLookupException e){}
         
-        accession = "accession_string_2";
-        assertEquals(27, NrSeqLookupUtil.getProteinId(databaseName, accession));
+        accession = "accession_string_4";
+        assertEquals(28, NrSeqLookupUtil.getProteinId(databaseName, accession));
     }
     
     public void testGetDatabaseId() {
@@ -36,10 +42,12 @@ public class NrSeqLookupUtilTest extends TestCase {
         assertEquals(2, NrSeqLookupUtil.getDatabaseId(database));
         
         database = "database_does_not_exist";
-        assertEquals(0, NrSeqLookupUtil.getDatabaseId(database));
+        try {NrSeqLookupUtil.getDatabaseId(database); fail("No match should be found");}
+        catch(NrSeqLookupException e){}
         
         database = null;
-        assertEquals(0, NrSeqLookupUtil.getDatabaseId(database));
+        try {NrSeqLookupUtil.getDatabaseId(database); fail("No match should be found");}
+        catch(NrSeqLookupException e){}
     }
     
     public void testGetProteinAccession() {
@@ -49,9 +57,10 @@ public class NrSeqLookupUtilTest extends TestCase {
         assertEquals("accession_string_1", NrSeqLookupUtil.getProteinAccession(searchDatabaseId, proteinId));
         
         searchDatabaseId = 2;
-        assertNull(NrSeqLookupUtil.getProteinAccession(searchDatabaseId, proteinId));
+        try {NrSeqLookupUtil.getProteinAccession(searchDatabaseId, proteinId); fail("No match should be found");}
+        catch(NrSeqLookupException e){}
         
-        proteinId = 27;
-        assertEquals("accession_string_2", NrSeqLookupUtil.getProteinAccession(searchDatabaseId, proteinId));
+        proteinId = 28;
+        assertEquals("accession_string_4", NrSeqLookupUtil.getProteinAccession(searchDatabaseId, proteinId));
     }
 }

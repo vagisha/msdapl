@@ -10,7 +10,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -31,6 +33,8 @@ import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
+import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
@@ -81,7 +85,6 @@ public class BaseDAOTestCase extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        
     }
 
     protected void tearDown() throws Exception {
@@ -157,21 +160,17 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH RESULT
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchResult makeSearchResult(int searchId, int charge,String peptide, boolean addPrMatch, boolean addDynaResMod) {
+    protected MsSearchResult makeSearchResult(int searchId, int runSearchId, int charge,String peptide, boolean addDynaResMod) {
 
         //!!------------ RESET the dynamic mod lookup table --------------------------------
         DynamicModLookupUtil.instance().reset();
         //!!------------ RESET the dynamic mod lookup table --------------------------------
-        
         
         MsSearchResultTest result = makeSearchResult(charge, peptide);
         MsSearchResultPeptideTest resultPeptide = new MsSearchResultPeptideTest();
         resultPeptide.setPeptideSequence(peptide);
         result.setResultPeptide(resultPeptide);
         
-        // add protein matches
-        if (addPrMatch)     addProteinMatches(result);
-
         // add dynamic modifications
         if (addDynaResMod)     addResultDynamicModifications(resultPeptide, searchId);
 
@@ -182,18 +181,6 @@ public class BaseDAOTestCase extends TestCase {
         MsSearchResultTest result = new MsSearchResultTest();
         result.setCharge(charge);
         return result;
-    }
-
-    protected void addProteinMatches(MsSearchResultTest result) {
-
-        List<MsSearchResultProtein> matchProteins = new ArrayList<MsSearchResultProtein>(2);
-      
-        matchProteins.add(makeResultProtein("Accession_"+result.getResultPeptide().getPeptideSequence()+"_1", 
-                "Description_"+result.getResultPeptide().getPeptideSequence()+"_1"));
-
-        matchProteins.add(makeResultProtein("Accession_"+result.getResultPeptide().getPeptideSequence()+"_2", null));
-        
-        result.setProteinMatchList(matchProteins);
     }
 
     protected void addResultDynamicModifications(MsSearchResultPeptideTest peptide, int searchId) {
@@ -220,7 +207,8 @@ public class BaseDAOTestCase extends TestCase {
             assertEquals(input.getValidationStatus(), output.getValidationStatus());
         }
         assertNull(input.getValidationStatus());
-        
+        // make sure the scan number in input matches scan number of scan with scanId in output
+//        assertEquals(input.getScanNumber(), scanDao.load(output.getScanId()).getStartScanNum());
         assertEquals(input.getProteinMatchList().size(), output.getProteinMatchList().size());
         checkResultPeptide(input.getResultPeptide(), output.getResultPeptide());
     }
@@ -237,13 +225,6 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH RESULT PROTEIN
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchResultProtein makeResultProtein(int resultId, int matchId, boolean useNullDescription) {
-        if (useNullDescription)
-            return makeResultProtein(makeAccessionString(resultId, matchId), null);
-        else
-            return makeResultProtein(makeAccessionString(resultId, matchId), makeDescriptionString(resultId, matchId));
-    }
-    
     protected MsSearchResultProtein makeResultProtein(final String acc, final String desc) {
         MsSearchResultProtein match = new MsSearchResultProtein() {
             public String getAccession() {
@@ -256,10 +237,6 @@ public class BaseDAOTestCase extends TestCase {
         return match;
     }
 
-    private String makeAccessionString(int resultId, int matchId){ return "res_"+resultId+"_accession_"+matchId;}
-    private String makeDescriptionString(int resultId, int matchId){ return "res_"+resultId+"_description_"+matchId;}
-    
-    
     //-----------------------------------------------------------------------------------------------------
     // MODIFICATIONS
     //-----------------------------------------------------------------------------------------------------
@@ -279,48 +256,65 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH
     //-----------------------------------------------------------------------------------------------------
-    protected MsRunSearch makeSearch(SearchFileFormat format, boolean addSeqDb,
-            boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
+    protected MsSearch makeSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
 
-//        MsSearchTest search = new MsSearchTest();
-//        search.setSearchFileFormat(format);
-//        search.setAnalysisProgramName("Sequest");
-//        search.setAnalysisProgramVersion("1.0");
-//        long startTime = getTime("01/29/2008, 03:34 AM", false);
-//        long endTime = getTime("01/29/2008, 06:21 AM", false);
-//        search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
-//        search.setSearchDuration(searchTimeMinutes(startTime, endTime));
-//        search.setPrecursorMassType("AVG");
-//        search.setPrecursorMassTolerance(new BigDecimal("3.000"));
-//        search.setFragmentMassType("MONO");
-//        search.setFragmentMassTolerance(new BigDecimal("0.0"));
-//
-//        if (addSeqDb) {
-//            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1", 100, 20);
-//            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2", 200, 40);
-//            search.setSearchDatabases(Arrays.asList(new MsSearchDatabase[]{db1, db2}));
-//        }
-//
-//        if (addStaticMods) {
-//            MsResidueModification mod1 = makeStaticMod('C', "50.0");
-//            MsResidueModification mod2 = makeStaticMod('S', "80.0");
-//            search.set(Arrays.asList(new MsResidueModification[]{mod1, mod2}));
-//        }
-//
-//        if (addDynaMods) {
-//            MsSearchModification dmod1 = makeDynamicMod('A', "10.0", '*');
-//            MsSearchModification dmod2 = makeDynamicMod('B', "20.0", '#');
-//            MsSearchModification dmod3 = makeDynamicMod('C', "30.0", '@');
-//            search.setDynamicResidueMods(Arrays.asList(new MsSearchModification[]{dmod1, dmod2, dmod3}));
-//        }
-//
-//        if (addEnzymes) {
-//            MsEnzyme enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
-//            MsEnzyme enzyme2 = makeDigestionEnzyme("Trypsin", null, null, null);
-//            search.setEnzymeList(Arrays.asList(new MsEnzyme[]{enzyme1, enzyme2}));
-//        }
-//        return search;
-        return null;
+        MsSearchTest search = new MsSearchTest();
+        search.setAnalysisProgramName("Sequest");
+        search.setAnalysisProgramVersion("1.0");
+        search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
+
+        if (addSeqDb) {
+            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1", 100, 20);
+            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2", 200, 40);
+            search.setSearchDatabases(Arrays.asList(new MsSearchDatabase[]{db1, db2}));
+        }
+
+        if (addStaticMods) {
+            MsResidueModification mod1 = makeStaticMod('C', "50.0");
+            MsResidueModification mod2 = makeStaticMod('S', "80.0");
+            search.setStaticResidueMods(Arrays.asList(new MsResidueModification[]{mod1, mod2}));
+        }
+
+        if (addDynaMods) {
+            MsResidueModification dmod1 = makeDynamicMod('A', "10.0", '*');
+            MsResidueModification dmod2 = makeDynamicMod('B', "20.0", '#');
+            MsResidueModification dmod3 = makeDynamicMod('C', "30.0", '@');
+            search.setDynamicResidueMods(Arrays.asList(new MsResidueModification[]{dmod1, dmod2, dmod3}));
+        }
+
+        if (addEnzymes) {
+            MsEnzyme enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
+            MsEnzyme enzyme2 = makeDigestionEnzyme("Trypsin", null, null, null);
+            search.setEnzymeList(Arrays.asList(new MsEnzyme[]{enzyme1, enzyme2}));
+        }
+        return search;
+    }
+    
+    protected void checkSearch(MsSearch input, MsSearchDb output) {
+        assertEquals(input.getSearchDatabases().size(), output.getSearchDatabases().size());
+        assertEquals(input.getStaticResidueMods().size(), output.getStaticResidueMods().size());
+        assertEquals(input.getDynamicResidueMods().size(), output.getDynamicResidueMods().size());
+        assertEquals(input.getStaticTerminalMods().size(), output.getStaticTerminalMods().size());
+        assertEquals(input.getDynamicTerminalMods().size(), output.getDynamicTerminalMods().size());
+        assertEquals(input.getEnzymeList().size(), output.getEnzymeList().size());
+        assertEquals(input.getSearchDate().toString(), output.getSearchDate().toString());
+        assertEquals(input.getAnalysisProgramName(), output.getAnalysisProgramName());
+        assertEquals(input.getAnalysisProgramVersion(), output.getAnalysisProgramVersion());
+    }
+    
+    //-----------------------------------------------------------------------------------------------------
+    // RUN SEARCH
+    //-----------------------------------------------------------------------------------------------------
+    protected MsRunSearch makeRunSearch(SearchFileFormat format) {
+
+        MsRunSearchTest runSearch = new MsRunSearchTest();
+        runSearch.setFileFormat(format);
+        long startTime = getTime("01/29/2008, 03:34 AM", false);
+        long endTime = getTime("01/29/2008, 06:21 AM", false);
+        runSearch.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
+        runSearch.setSearchDuration(searchTimeMinutes(startTime, endTime));
+
+        return runSearch;
     }
 
     protected int  searchTimeMinutes(long startTime, long endTime) {
@@ -364,18 +358,6 @@ public class BaseDAOTestCase extends TestCase {
             cal.set(Calendar.MILLISECOND, 0);
         }
         return cal.getTimeInMillis();
-    }
-    
-    protected void checkSearch(MsSearch input, MsSearchDb output) {
-        assertEquals(input.getSearchDatabases().size(), output.getSearchDatabases().size());
-        assertEquals(input.getStaticResidueMods().size(), output.getStaticResidueMods().size());
-        assertEquals(input.getDynamicResidueMods().size(), output.getDynamicResidueMods().size());
-        assertEquals(input.getStaticTerminalMods().size(), output.getStaticTerminalMods().size());
-        assertEquals(input.getDynamicTerminalMods().size(), output.getDynamicTerminalMods().size());
-        assertEquals(input.getEnzymeList().size(), output.getEnzymeList().size());
-        assertEquals(input.getSearchDate().toString(), output.getSearchDate().toString());
-        assertEquals(input.getAnalysisProgramName(), output.getAnalysisProgramName());
-        assertEquals(input.getAnalysisProgramVersion(), output.getAnalysisProgramVersion());
     }
     
     protected void checkRunSearch(MsRunSearch input, MsRunSearchDb output) {

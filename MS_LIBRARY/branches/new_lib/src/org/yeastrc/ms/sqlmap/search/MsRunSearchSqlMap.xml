@@ -46,7 +46,6 @@
 		/>
 		<parameter property="searchDate" jdbcType="DATE" />
 		<parameter property="searchDuration" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="uploadDate" jdbcType="DATE" />
 	</parameterMap>
 	
     <select id="select" resultMap="msRunSearchResult" parameterClass="Integer">
@@ -58,7 +57,7 @@
     </select>
     
     <select id="selectRunSearchIdsForRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT id FROM msRunearch WHERE runID = #id#
+    	SELECT id FROM msRunSearch WHERE runID = #id#
     </select>
     
     <select id="selectRunSearchIdsForSearch" resultClass="Integer" parameterClass="Integer">
@@ -75,9 +74,8 @@
     	runID,
     	originalFileType,
     	searchDate,
-    	searchDuration,
-    	uploadDate) 
-    	VALUES (?,?,?,?,?,?)
+    	searchDuration) 
+    	VALUES (?,?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

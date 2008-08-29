@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.search.MsSearchModification;
-import org.yeastrc.ms.domain.search.MsSearchModificationDb;
-import org.yeastrc.ms.domain.search.MsSearchResultDynamicModDb;
-import org.yeastrc.ms.domain.search.MsSearchResultModification;
+import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
 
 public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
@@ -25,11 +25,11 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
     public void testOperationsForStaticModifications() {
 
         // create some static modification objects
-        MsSearchModification mod1_1 = makeStaticMod('A', "123.4");
-        MsSearchModification mod1_2 = makeStaticMod('B', "56.7");
+        MsResidueModification mod1_1 = makeStaticMod('A', "123.4");
+        MsResidueModification mod1_2 = makeStaticMod('B', "56.7");
 
-        MsSearchModification mod2_1 = makeStaticMod('X', "987.6");
-        MsSearchModification mod2_2 = makeStaticMod('Y', "54.3");
+        MsResidueModification mod2_1 = makeStaticMod('X', "987.6");
+        MsResidueModification mod2_2 = makeStaticMod('Y', "54.3");
 
         // save them to the database
         modDao.saveStaticResidueMod(mod1_1, 1); // searchId = 1
@@ -38,10 +38,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         modDao.saveStaticResidueMod(mod2_2, 2);
 
         // load them back
-        List<MsSearchModificationDb> modList1 = modDao.loadStaticResidueModsForSearch(1);
+        List<MsResidueModificationDb> modList1 = modDao.loadStaticResidueModsForSearch(1);
         assertEquals(2, modList1.size());
 
-        List<MsSearchModificationDb> modList2 = modDao.loadStaticResidueModsForSearch(2);
+        List<MsResidueModificationDb> modList2 = modDao.loadStaticResidueModsForSearch(2);
         assertEquals(2, modList2.size());
 
         // sort by id
@@ -88,12 +88,12 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         doDynamicModTest(residue, mass, symbol);
     }
 
-    private MsSearchModification[] createDynaMods(String[] mass, char[] residue, char[] symbol) {
+    private MsResidueModification[] createDynaMods(String[] mass, char[] residue, char[] symbol) {
         assertTrue(residue.length > 0);
         assertEquals(mass.length, residue.length);
         assertEquals(residue.length, symbol.length);
 
-        MsSearchModification[] mods = new MsSearchModification[residue.length];
+        MsResidueModification[] mods = new MsResidueModification[residue.length];
         for (int i = 0; i < residue.length; i++) {
             mods[i] = makeDynamicMod(residue[i], mass[i], symbol[i]);
         }
@@ -102,7 +102,7 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
     private void doDynamicModTest(char[] residue, String[] mass, char[] symbol) {
 
-        MsSearchModification[] mods = createDynaMods(mass, residue, symbol);
+        MsResidueModification[] mods = createDynaMods(mass, residue, symbol);
         assertEquals(residue.length, mods.length);
 
         // save them
@@ -116,10 +116,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         }
 
         // read them back and make sure inserted values were accurate
-        List<MsSearchModificationDb> modList1 = modDao.loadDynamicResidueModsForSearch(1);
+        List<MsResidueModificationDb> modList1 = modDao.loadDynamicResidueModsForSearch(1);
         assertEquals(2, modList1.size());
 
-        List<MsSearchModificationDb> modList2 = modDao.loadDynamicResidueModsForSearch(2);
+        List<MsResidueModificationDb> modList2 = modDao.loadDynamicResidueModsForSearch(2);
         assertEquals(2, modList2.size());
 
         // sort them
@@ -128,7 +128,7 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
 
         // combine the two lists and sort by id
-        List<MsSearchModificationDb> modList = new ArrayList<MsSearchModificationDb>(modList1.size() + modList2.size());
+        List<MsResidueModificationDb> modList = new ArrayList<MsResidueModificationDb>(modList1.size() + modList2.size());
         modList.addAll(modList1);
         modList.addAll(modList2);
         Collections.sort(modList, new MsSearchModComparator());
@@ -156,7 +156,7 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         String[] mass = new String[] {"123.4", "56.7","987.6","54.3"};
         char[] residue = new char[]{'A', 'B', 'X', 'Y'};
         char[] symbol = new char[] {'*', '#', '&', '@'};
-        MsSearchModification[] mods = createDynaMods(mass, residue, symbol);
+        MsResidueModification[] mods = createDynaMods(mass, residue, symbol);
         assertEquals(residue.length, mods.length);
 
 
@@ -167,10 +167,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         int mod2_2Id = modDao.saveDynamicResidueMod(mods[3], 2);
 
         // save some dynamic modifications for two search results
-        MsSearchResultModification rmod1_1 = makeResultDynamicResidueMod(residue[0], mass[0], symbol[0], 10);
-        MsSearchResultModification rmod1_2 = makeResultDynamicResidueMod(residue[1], mass[1], symbol[1], 20);
-        MsSearchResultModification rmod2_1 = makeResultDynamicResidueMod(residue[2], mass[2], symbol[2], 1);
-        MsSearchResultModification rmod2_2 = makeResultDynamicResidueMod(residue[3], mass[3], symbol[3], 2);
+        MsResultDynamicResidueMod rmod1_1 = makeResultDynamicResidueMod(residue[0], mass[0], symbol[0], 10);
+        MsResultDynamicResidueMod rmod1_2 = makeResultDynamicResidueMod(residue[1], mass[1], symbol[1], 20);
+        MsResultDynamicResidueMod rmod2_1 = makeResultDynamicResidueMod(residue[2], mass[2], symbol[2], 1);
+        MsResultDynamicResidueMod rmod2_2 = makeResultDynamicResidueMod(residue[3], mass[3], symbol[3], 2);
         
         modDao.saveDynamicResidueModForResult(rmod1_1, 3, getModId(1, mods[0])); // mod, resultId, modificationId
         modDao.saveDynamicResidueModForResult(rmod1_2, 3, getModId(1, mods[1]));
@@ -178,9 +178,9 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         modDao.saveDynamicResidueModForResult(rmod2_2, 4, getModId(2, mods[3]));
 
         // load dynamic modifications for the two search results
-        List<MsSearchResultDynamicModDb> resultMods1 = modDao.loadDynamicResidueModsForResult(3);
+        List<MsResultDynamicResidueModDb> resultMods1 = modDao.loadDynamicResidueModsForResult(3);
         assertEquals(2, resultMods1.size());
-        List<MsSearchResultDynamicModDb> resultMods2 = modDao.loadDynamicResidueModsForResult(4);
+        List<MsResultDynamicResidueModDb> resultMods2 = modDao.loadDynamicResidueModsForResult(4);
         assertEquals(2, resultMods2.size());
 
 
@@ -212,49 +212,46 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
     }
 
-    private int getModId(int searchId, MsSearchModification mod) {
+    private int getModId(int searchId, MsResidueModification mod) {
         DynamicModLookupUtil util = DynamicModLookupUtil.instance();
         return util.getDynamicResidueModificationId(searchId, mod.getModifiedResidue(), mod.getModificationMass());
     }
 
-    private void compareResultMods(MsSearchModification searchMod,
-            MsSearchResultDynamicModDb resultMod, int resultId,
+    private void compareResultMods(MsResidueModification searchMod,
+            MsResultDynamicResidueModDb resultMod, int resultId,
             int modId) {
         assertEquals(resultId, resultMod.getResultId());
         assertEquals(modId, resultMod.getModificationId());
-        assertEquals(searchMod.getModificationType(), resultMod.getModificationType());
         assertEquals(searchMod.getModificationMass().doubleValue(), resultMod.getModificationMass().doubleValue());
         assertEquals(searchMod.getModifiedResidue(), resultMod.getModifiedResidue());
         assertEquals(searchMod.getModificationSymbol(), resultMod.getModificationSymbol());
 
     }
 
-    private void compareStaticMods(MsSearchModification input, MsSearchModificationDb output, int searchId) {
+    private void compareStaticMods(MsResidueModification input, MsResidueModificationDb output, int searchId) {
         assertEquals(searchId, output.getSearchId());
         assertEquals(input.getModifiedResidue(), output.getModifiedResidue());
         assertEquals(input.getModificationMass().doubleValue(), output.getModificationMass().doubleValue());
-        assertEquals(MsSearchModification.nullCharacter, output.getModificationSymbol());
-        assertEquals(MsSearchModification.ModificationType.STATIC, output.getModificationType());
+        assertEquals('\u0000', output.getModificationSymbol());
     }
 
-    private void compareDynamicMods(MsSearchModification input, MsSearchModificationDb output, int searchId) {
+    private void compareDynamicMods(MsResidueModification input, MsResidueModificationDb output, int searchId) {
         assertEquals(searchId, output.getSearchId());
         assertEquals(input.getModifiedResidue(), output.getModifiedResidue());
         assertEquals(input.getModificationMass().doubleValue(), output.getModificationMass().doubleValue());
         assertEquals(input.getModificationSymbol(), output.getModificationSymbol());
-        assertEquals(MsSearchModification.ModificationType.DYNAMIC, output.getModificationType());
     }
 
     private static final class MsSearchResultDynamicModComparator implements
-    Comparator<MsSearchResultDynamicModDb> {
-        public int compare(MsSearchResultDynamicModDb o1,
-                MsSearchResultDynamicModDb o2) {
+    Comparator<MsResultDynamicResidueModDb> {
+        public int compare(MsResultDynamicResidueModDb o1,
+                MsResultDynamicResidueModDb o2) {
             return new Integer(o1.getModifiedPosition()).compareTo(new Integer(o2.getModifiedPosition()));
         }
     }
 
-    private static final class MsSearchModComparator implements Comparator<MsSearchModificationDb> {
-        public int compare(MsSearchModificationDb o1, MsSearchModificationDb o2) {
+    private static final class MsSearchModComparator implements Comparator<MsResidueModificationDb> {
+        public int compare(MsResidueModificationDb o1, MsResidueModificationDb o2) {
             return new Integer(o1.getId()).compareTo(o2.getId());
         }
     }

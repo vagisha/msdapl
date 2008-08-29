@@ -4,7 +4,7 @@
  * Aug 18, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.util;
+package org.yeastrc.ms.dao.nrseq;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -51,7 +51,14 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
     
     private NrSeqLookupUtil() {}
     
-    public static int getProteinId(String databaseName, String accession) {
+    /**
+     * 
+     * @param databaseName
+     * @param accession
+     * @return
+     * @throws NrSeqLookupException if no matching database entry is found
+     */
+    public static int getProteinId(String databaseName, String accession) throws NrSeqLookupException {
         Map<String, String> map = new HashMap<String, String>(2);
         map.put("dbName", databaseName);
         map.put("accession", accession);
@@ -65,11 +72,17 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
         }
         if (id == null)
-            return 0;
+            throw new NrSeqLookupException(databaseName, accession);
         return id;
     }
     
-    public static int getDatabaseId(String databaseName) {
+    /**
+     * 
+     * @param databaseName
+     * @return
+     * @throws NrSeqLookupException if no matching database entry is found
+     */
+    public static int getDatabaseId(String databaseName) throws NrSeqLookupException {
         String statementName = "NrSeq.selectDatabaseId";
         Integer id = null;
         try {
@@ -80,17 +93,27 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
         }
         if (id == null)
-            return 0;
+            throw new NrSeqLookupException(databaseName);
         return id;
     }
     
-    public static String getProteinAccession(int searchDatabaseId, int proteinId) {
+    /**
+     * 
+     * @param searchDatabaseId
+     * @param proteinId
+     * @return
+     * @throws NrSeqLookupException if no matching database entry is found
+     */
+    public static String getProteinAccession(int searchDatabaseId, int proteinId) throws NrSeqLookupException {
         String statementName = "NrSeq.selectProteinAccession";
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("databaseId", searchDatabaseId);
         map.put("proteinId", proteinId);
         try {
-            return (String) sqlMap.queryForObject(statementName, map);
+            String acc = (String) sqlMap.queryForObject(statementName, map);
+            if (acc == null)
+                throw new NrSeqLookupException(searchDatabaseId, proteinId);
+            return acc;
         }
         catch (SQLException e) {
             log.error("Failed to execute select statement: ", e);

@@ -53,10 +53,10 @@ ProlucidSearchResultDAO {
 
 
     @Override
-    public int save(ProlucidSearchResult searchResult, String searchDbName,
+    public int save(int searchId, String searchDbName, ProlucidSearchResult searchResult,
             int runSearchId, int scanId) {
         // first save the base result
-        int resultId = resultDao.save(searchResult, searchDbName, runSearchId, scanId);
+        int resultId = resultDao.save(searchId, searchDbName, searchResult, runSearchId, scanId);
 
         // now save the ProLuCID specific information
         ProlucidResultDataSqlMapParam resultDb = new ProlucidResultDataSqlMapParam(resultId, searchResult.getProlucidResultData());

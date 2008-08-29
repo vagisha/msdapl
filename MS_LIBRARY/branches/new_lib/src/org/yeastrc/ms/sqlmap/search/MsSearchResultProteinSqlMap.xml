@@ -24,7 +24,7 @@
     <insert id="insert" parameterMap="msResultProteinParam">
     	INSERT INTO msProteinMatch (
     	resultID,
-    	proteinID,)
+    	proteinID)
     	VALUES (?,?)
     </insert>
     

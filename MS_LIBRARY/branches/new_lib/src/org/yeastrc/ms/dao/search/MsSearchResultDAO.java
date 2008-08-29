@@ -21,13 +21,14 @@ public interface MsSearchResultDAO<I extends MsSearchResult, O extends MsSearchR
      * Any dynamic modifications associated with this result are saved in 
      * the msDynamicModResult table
      * 
-     * @param searchResult
+     * @param searchId
      * @param searchDbName
+     * @param searchResult
      * @param runSearchId
      * @param scanId
      * @return id (in msPeptideSearchResult) for this search result
      */
-    public abstract int save(I searchResult, String searchDbName, int runSearchId, int scanId);
+    public abstract int save(int searchId, String searchDbName, I searchResult, int runSearchId, int scanId);
 
     /**
      * Saves the search result in the msPeptideSearchResult table. 

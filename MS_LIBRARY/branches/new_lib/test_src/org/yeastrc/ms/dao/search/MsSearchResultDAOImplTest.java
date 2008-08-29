@@ -3,6 +3,7 @@ package org.yeastrc.ms.dao.search;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
@@ -18,8 +19,11 @@ import org.yeastrc.ms.domain.search.ValidationStatus;
 public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
 
     
-    private int searchId_1 = 25;
-    private int searchId_2 = 98;
+    private int runSearchId_1 = 25;
+    private int runSearchId_2 = 98;
+    
+    private int searchId_1 = 99;
+//    private int searchId_2 = 100;
     
     protected void setUp() throws Exception {
         super.setUp();
@@ -36,37 +40,37 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         modDao.saveDynamicResidueMod(dmod2, searchId_1);
         
         // modifications for searchId_2
-        MsResidueModification mod3 = makeStaticMod('M', "16.0");
-        modDao.saveStaticResidueMod(mod3, searchId_2);
-        MsResidueModification mod4 = makeStaticMod('S', "80.0");
-        modDao.saveStaticResidueMod(mod4, searchId_2);
-        
-        MsResidueModification dmod3 = makeDynamicMod('X', "100.0", '*');
-        modDao.saveDynamicResidueMod(dmod3, searchId_2);
-        MsResidueModification dmod4 = makeDynamicMod('Y', "90.0", '\u0000');
-        modDao.saveDynamicResidueMod(dmod4, searchId_2);
-        MsResidueModification dmod5 = makeDynamicMod('A', "10.0", '#');
-        modDao.saveDynamicResidueMod(dmod5, searchId_2);
+//        MsResidueModification mod3 = makeStaticMod('M', "16.0");
+//        modDao.saveStaticResidueMod(mod3, searchId_2);
+//        MsResidueModification mod4 = makeStaticMod('S', "80.0");
+//        modDao.saveStaticResidueMod(mod4, searchId_2);
+//        
+//        MsResidueModification dmod3 = makeDynamicMod('X', "100.0", '*');
+//        modDao.saveDynamicResidueMod(dmod3, searchId_2);
+//        MsResidueModification dmod4 = makeDynamicMod('Y', "90.0", '\u0000');
+//        modDao.saveDynamicResidueMod(dmod4, searchId_2);
+//        MsResidueModification dmod5 = makeDynamicMod('A', "10.0", '#');
+//        modDao.saveDynamicResidueMod(dmod5, searchId_2);
         
     }
     
     protected void tearDown() throws Exception {
         super.tearDown();
         // delete modifications for searchId_1
-        modDao.deleteDynamicModificationsForSearch(searchId_1);
-        modDao.deleteStaticResidueModsForSearch(searchId_1);
+        modDao.deleteDynamicModificationsForSearch(runSearchId_1);
+        modDao.deleteStaticResidueModsForSearch(runSearchId_1);
         
         // delete modifications for searchId_2
-        modDao.deleteDynamicModificationsForSearch(searchId_2);
-        modDao.deleteStaticResidueModsForSearch(searchId_2);
+        modDao.deleteDynamicModificationsForSearch(runSearchId_2);
+        modDao.deleteStaticResidueModsForSearch(runSearchId_2);
     }
 
     public void testOperationsOnMsSearchResult() {
-        assertNull(resultDao.load(searchId_1));
+        assertNull(resultDao.load(runSearchId_1));
         
         // insert a search result with NO extra information
-        MsSearchResult result1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", false, false);
-        int resultId_1 = resultDao.save(result1, "dummy_db", searchId_1, 123);// scanId = 123
+        MsSearchResult result1 = makeSearchResult(searchId_1, runSearchId_1, 3, "PEPTIDE1", false);
+        int resultId_1 = resultDao.save(searchId_1, "dummy_db", result1,  runSearchId_1, 123);// scanId = 123
         
         // read it back
         MsSearchResultDb resultdb1 = resultDao.load(resultId_1);
@@ -77,8 +81,9 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
        
         
         // save another result this time save protein matches
-        MsSearchResult result2 = makeSearchResult(searchId_1, 3, "PEPTIDE2", true, false);
-        int resultId_2 = resultDao.save(result2, "dummy_db", searchId_1, 123); // scanId = 123
+        MsSearchResultTest result2 = (MsSearchResultTest)makeSearchResult(searchId_1, runSearchId_1, 3, "PEPTIDE2", false);
+        addProteinMatches(result2);
+        int resultId_2 = resultDao.save(searchId_1, "my/test/database", result2, runSearchId_1, 123); // scanId = 123
         
         // read it back
         MsSearchResultDb resultdb2 = resultDao.load(resultId_2);
@@ -88,22 +93,30 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         checkSearchResult(result2, resultdb2);
         
         
-        // save another result this time save protein matches AND dynamic mods
-        // this time use searchId_2
-        MsSearchResult result3 = makeSearchResult(searchId_2, 3, "PEPTIDE3", true, true);
-        int resultId_3 = resultDao.save(result3, "dummy_db", searchId_2, 321);
+        // save another result this time save dynamic mods
+        // this time use runSearchId_2
+        MsSearchResult result3 = makeSearchResult(searchId_1, runSearchId_2, 3, "PEPTIDE3", true);
+        int resultId_3 = resultDao.save(searchId_1, "dummy_db", result3,  runSearchId_2, 321);
         
         // read it back
         MsSearchResultDb resultdb3 = resultDao.load(resultId_3);
         assertNotNull(resultdb3);
-        assertEquals(2, resultdb3.getProteinMatchList().size());
-        assertEquals(3, resultdb3.getResultPeptide().getResultDynamicResidueModifications().size());
+        assertEquals(0, resultdb3.getProteinMatchList().size());
+        assertEquals(2, resultdb3.getResultPeptide().getResultDynamicResidueModifications().size());
         
         
-        // delete ALL results for searchId_1
-//        resultDao.deleteResultsForSearch(searchId_1);
+        // delete ALL results for runSearchId_1
+        List<Integer> resultIdList = resultDao.loadResultIdsForRunSearch(runSearchId_1);
+        assertEquals(2, resultIdList.size());
+        Collections.sort(resultIdList);
+        assertEquals(resultId_1, resultIdList.get(0).intValue());
+        assertEquals(resultId_2, resultIdList.get(1).intValue());
+        resultDao.delete(resultId_1);
+        resultDao.delete(resultId_2);
+        
+        
         // make sure everything was deleted
-        assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_1).size());
+        assertEquals(0, resultDao.loadResultIdsForRunSearch(runSearchId_1).size());
         assertNull(resultDao.load(resultId_1));
         assertNull(resultDao.load(resultId_2));
         assertEquals(0, modDao.loadDynamicResidueModsForResult(resultId_1).size());
@@ -113,16 +126,31 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         // these are for searchId_2 so should still exist
         assertNotNull(resultDao.load(resultId_3)); 
-        assertEquals(3, modDao.loadDynamicResidueModsForResult(resultId_3).size());
-        assertEquals(2,  matchDao.loadResultProteins(resultId_3).size());
+        assertEquals(2, modDao.loadDynamicResidueModsForResult(resultId_3).size());
+        assertEquals(0,  matchDao.loadResultProteins(resultId_3).size());
         
         // delete ALL results for searchId_2
-//        resultDao.deleteResultsForSearch(searchId_2);
+        resultIdList = resultDao.loadResultIdsForRunSearch(runSearchId_2);
+        assertEquals(1, resultIdList.size());
+        assertEquals(resultId_3, resultIdList.get(0).intValue());
+        resultDao.delete(resultId_3);
+        
         // make sure everything was deleted
-        assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_2).size());
+        assertEquals(0, resultDao.loadResultIdsForRunSearch(runSearchId_2).size());
         assertNull(resultDao.load(resultId_3));
         assertEquals(0, modDao.loadDynamicResidueModsForResult(resultId_3).size());
         assertEquals(0, matchDao.loadResultProteins(resultId_3).size());
+    }
+    
+    protected void addProteinMatches(MsSearchResultTest result) {
+
+        List<MsSearchResultProtein> matchProteins = new ArrayList<MsSearchResultProtein>(2);
+      
+        matchProteins.add(makeResultProtein("accession_string_1", null));
+
+        matchProteins.add(makeResultProtein("accession_string_2", null));
+        
+        result.setProteinMatchList(matchProteins);
     }
     
     public static class MsSearchResultTest implements MsSearchResult {

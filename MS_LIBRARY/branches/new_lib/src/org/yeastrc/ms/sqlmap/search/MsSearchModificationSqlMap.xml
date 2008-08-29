@@ -131,7 +131,7 @@
     	SELECT * FROM msSearchDynamicMod WHERE searchID= #id#
     </select>
     
-    <insert id="insertDynaaminResidueMod" parameterMap="msDynamicResidueModParam">
+    <insert id="insertDynamicResidueMod" parameterMap="msDynamicResidueModParam">
     	INSERT INTO msSearchDynamicMod (
     	searchID,
     	residue,
@@ -218,7 +218,7 @@
 	<!-- QUERIES FOR DYNAMIC TERMINAL MODIFICATIONS (FOR A SEARCH RESULT) -->
 	<!-- ================================================================================= -->
     <select id="selectDynamicTerminalModsForResult" resultMap="msResultDynaTerminalModResult" parameterClass="Integer">
-    	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID
+    	SELECT sMod.terminus, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID
     	FROM msSearchTerminalDynamicMod AS sMod, msTerminalDynamicModResult AS rMod
     	WHERE sMod.id = rMod.modID
     	AND rMod.resultID= #id#

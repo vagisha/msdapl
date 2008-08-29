@@ -37,11 +37,11 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     }
 
     public MsSearchResultDb load(int id) {
-        return (MsSearchResultDb) queryForObject("MsRunSearchResult.select", id);
+        return (MsSearchResultDb) queryForObject("MsSearchResult.select", id);
     }
     
     public List<Integer> loadResultIdsForRunSearch(int runSearchId) {
-        return queryForList("MsRunSearchResult.selectResultIdsForRunSearch", runSearchId);
+        return queryForList("MsSearchResult.selectResultIdsForRunSearch", runSearchId);
     }
     
     public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge) {
@@ -49,12 +49,12 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         map.put("runSearchId", runSearchId);
         map.put("scanId", scanId);
         map.put("charge", charge);
-        return queryForList("MsRunSearchResult.selectResultIdsForRunSearchScanCharge", map);
+        return queryForList("MsSearchResult.selectResultIdsForRunSearchScanCharge", map);
     }
     
-    public int save(MsSearchResult searchResult, String searchDbName, int searchId, int scanId) {
+    public int save(int searchId, String searchDbName, MsSearchResult searchResult, int runSearchId, int scanId) {
         
-        int resultId = saveResultOnly(searchResult, searchId, scanId);
+        int resultId = saveResultOnly(searchResult, runSearchId, scanId);
         
         // save any protein matches
         for(MsSearchResultProtein protein: searchResult.getProteinMatchList()) {
@@ -67,10 +67,10 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return resultId;
     }
     
-    public int saveResultOnly(MsSearchResult searchResult, int searchId, int scanId) {
+    public int saveResultOnly(MsSearchResult searchResult, int runSearchId, int scanId) {
 
-        MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(searchId, scanId, searchResult);
-        return saveAndReturnId("MsRunSearchResult.insert", resultDb);
+        MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(runSearchId, scanId, searchResult);
+        return saveAndReturnId("MsSearchResult.insert", resultDb);
     }
 
     private void saveDynamicModsForResult(int searchId, int resultId, MsSearchResultPeptide peptide) {
@@ -100,7 +100,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     }
     
     public void delete(int resultId) {
-        delete("MsRunSearchResult.delete", resultId);
+        delete("MsSearchResult.delete", resultId);
     }
 
     /**

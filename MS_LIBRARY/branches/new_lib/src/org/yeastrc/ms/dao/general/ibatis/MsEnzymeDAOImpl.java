@@ -78,9 +78,6 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
     
     public int saveEnzyme(MsEnzyme enzyme, List<EnzymeProperties> params) {
         
-        // TODO if the enzyme given to us already has a database id
-        // exucute an update.  If no database entry was found for the id
-        // throw an exception
         String name = null,  cut = null,  nocut = null;
         Sense sense = null;
         for (EnzymeProperties param: params) {
@@ -202,12 +199,10 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
 
         public void setParameter(ParameterSetter setter, Object parameter)
                 throws SQLException {
-            if (parameter == null)
-                throw new IllegalArgumentException("Sense cannot be null");
-            if (parameter != Sense.UNKNOWN)
+            if (parameter == null || parameter == Sense.UNKNOWN)
+                setter.setNull(java.sql.Types.TINYINT);
+            else 
                 setter.setShort(((Sense)parameter).getShortVal());
-            else
-                setter.setNull(java.sql.Types.SMALLINT);
         }
 
         public Object valueOf(String s) {

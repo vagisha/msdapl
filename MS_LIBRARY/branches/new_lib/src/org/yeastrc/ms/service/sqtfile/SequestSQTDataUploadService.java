@@ -17,6 +17,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
@@ -26,7 +28,6 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.dao.util.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
@@ -424,15 +425,16 @@ public class SequestSQTDataUploadService {
         }
         // add the protein matches for this result to the cache
         for (MsSearchResultProtein match: result.getProteinMatchList()) {
-            final int proteinId = NrSeqLookupUtil.getProteinId(searchDbName, match.getAccession());
-            if (proteinId == 0) {
-               UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
-               ex.setErrorMessage("No match found for protein: "+match.getAccession()+" in database: "+searchDbName);
+            int proteinId = 0;
+            try {proteinId = NrSeqLookupUtil.getProteinId(searchDbName, match.getAccession());}
+            catch(NrSeqLookupException e) {
+               UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND, e);
+               ex.setErrorMessage(e.getMessage());
                throw ex;
             }
+            final int pid = proteinId;
             proteinMatchList.add(new MsSearchResultProteinDb(){
-                public int getId() { throw new UnsupportedOperationException("getId() not supported by anonymous class");}
-                public int getProteinId() { return proteinId; }
+                public int getProteinId() { return pid; }
                 public int getResultId() { return resultId; }
                 });
         }

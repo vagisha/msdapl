@@ -21,16 +21,16 @@
 				select="MsDatabase.selectSearchDatabases" 
 				column="id"/>
 		<result property="staticResidueMods" 
-				select="selectStaticResidueModsForSearch" 
+				select="MsSearchMod.selectStaticResidueModsForSearch" 
 				column="id" />
 		<result property="dynamicResidueMods" 
-				select="selectDynamicResidueModsForSearch" 
+				select="MsSearchMod.selectDynamicResidueModsForSearch" 
 				column="id" />
 		<result property="staticTerminalMods" 
-				select="selectStaticTerminalModsForSearch" 
+				select="MsSearchMod.selectStaticTerminalModsForSearch" 
 				column="id" />
 		<result property="dynamicTerminalMods" 
-				select="selectDynamicTerminalModsForSearch" 
+				select="MsSearchMod.selectDynamicTerminalModsForSearch" 
 				column="id" />
 	</resultMap>
 	
