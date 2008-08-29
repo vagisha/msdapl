@@ -13,9 +13,9 @@ package org.yeastrc.ms.domain.search.sqtfile;
 public interface SQTHeaderDb extends SQTField {
 
     /**
-     * @return database id of the search to which this header bolongs
+     * @return database id of the search to which this header belongs
      */
-    public abstract int getSearchId();
+    public abstract int getRunSearchId();
     
     /**
      * @return database id of this header.

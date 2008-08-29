@@ -15,6 +15,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanDbImpl;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -28,9 +29,9 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
         super(sqlMap);
     }
     
-    public SQTSearchScanDbImpl load(int searchId, int scanId, int charge) {
+    public SQTSearchScanDbImpl load(int runSearchId, int scanId, int charge) {
         Map<String, Integer> map = new HashMap<String, Integer>(3);
-        map.put("searchId", searchId);
+        map.put("runSearchId", runSearchId);
         map.put("scanId", scanId);
         map.put("charge", charge);
         return (SQTSearchScanDbImpl) queryForObject("SqtSpectrum.select", map);
@@ -41,24 +42,24 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
         save("SqtSpectrum.insert", scanDataDb);
     }
     
-    public void deleteForSearch(int searchId) {
-        delete("SqtSpectrum.deleteForSearch", searchId);
+    public void deleteForRunSearch(int runSearchId) {
+        delete("SqtSpectrum.deleteForRunSearch", runSearchId);
     }
 
-    public static final class SQTSearchScanSqlMapParam implements SQTSearchScan {
+    public static final class SQTSearchScanSqlMapParam implements SQTSearchScanDb {
 
-        private int searchId;
+        private int runSearchId;
         private int scanId;
         private SQTSearchScan scan;
         
-        public SQTSearchScanSqlMapParam(int searchId, int scanId, SQTSearchScan scan) {
-            this.searchId = searchId;
+        public SQTSearchScanSqlMapParam(int runSearchId, int scanId, SQTSearchScan scan) {
+            this.runSearchId = runSearchId;
             this.scanId = scanId;
             this.scan = scan;
         }
 
-        public int getSearchId() {
-            return searchId;
+        public int getRunSearchId() {
+            return runSearchId;
         }
 
         public int getScanId() {
@@ -87,11 +88,6 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
 
         public List<SequestSearchResult> getScanResults() {
             throw new UnsupportedOperationException("getScanResults is not supported by SQTSearchScanSqlMapParam");
-        }
-
-        @Override
-        public int getScanNumber() {
-            return scan.getScanNumber();
         }
 
         @Override

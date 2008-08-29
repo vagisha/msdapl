@@ -1,10 +1,7 @@
 package org.yeastrc.ms.dao.search.sqtfile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 
@@ -50,12 +47,12 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         SQTSearchScanDb data_db = sqtSpectrumDao.load(1024, 4201, 3);
         assertNotNull(data_db);
         
-        assertEquals(1024, data_db.getSearchId());
+        assertEquals(1024, data_db.getRunSearchId());
         assertEquals(4201, data_db.getScanId());
         assertEquals(null, data_db.getLowestSp());
         checkSearchScan(data, data_db);
         
-        sqtSpectrumDao.deleteForSearch(1024);
+        sqtSpectrumDao.deleteForRunSearch(1024);
         data_db = sqtSpectrumDao.load(1024, 4201, 3);
         assertNull(data_db);
     }
@@ -97,11 +94,6 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
             public int getScanNumber() {
                 // TODO Auto-generated method stub
                 return 0;
-            }
-
-            @Override
-            public List<SequestSearchResult> getScanResults() {
-                return new ArrayList<SequestSearchResult>(0);
             }
 
             @Override

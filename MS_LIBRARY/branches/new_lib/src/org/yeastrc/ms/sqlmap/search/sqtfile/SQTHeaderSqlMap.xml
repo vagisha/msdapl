@@ -10,31 +10,31 @@
 	
 	<resultMap class="SqtHeaderOut" id="headerResult">
 		<result property="id" column="id"/>
-		<result property="searchId" column="searchID" nullValue="0"/>
+		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="name" column="header"/>
 		<result property="value" column="value"/>
 	</resultMap>
 	
 	<parameterMap class="SqtHeaderIn" id="headerParam">
-		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="name" jdbcType="VARCHAR"/>
 		<parameter property="value" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
     
-    <select id="selectHeadersForSearch" resultMap="headerResult" parameterClass="Integer">
-		SELECT * FROM SQTSearchHeader WHERE searchID = #id#
+    <select id="selectHeadersForRunSearch" resultMap="headerResult" parameterClass="Integer">
+		SELECT * FROM SQTFileHeader WHERE runSearchID = #id#
 	</select>
 	
     
     <insert id="insertHeader" parameterMap="headerParam">
-    	INSERT INTO SQTSearchHeader (searchID, header, value) 
+    	INSERT INTO SQTFileHeader (runSearchID, header, value) 
     	VALUES (?,?,?)
     </insert>
     
     
-    <delete id="deleteHeadersForSearch" parameterClass="Integer">
-		DELETE FROM SQTSearchHeader WHERE searchID=#id#
+    <delete id="deleteHeadersForRunSearch" parameterClass="Integer">
+		DELETE FROM SQTFileHeader WHERE runSearchID=#id#
     </delete>
     
 </sqlMap>

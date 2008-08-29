@@ -5,7 +5,7 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 public class SQTHeaderDbImpl implements SQTHeaderDb {
 
     private int id;
-    private int searchId;
+    private int runSearchId;
     private String name;
     private String value;
     
@@ -24,14 +24,14 @@ public class SQTHeaderDbImpl implements SQTHeaderDb {
     /**
      * @return the searchId
      */
-    public int getSearchId() {
-        return searchId;
+    public int getRunSearchId() {
+        return runSearchId;
     }
     /**
-     * @param searchId the searchId to set
+     * @param runSearchId the runSearchId to set
      */
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
+    public void setRunSearchId(int runSearchId) {
+        this.runSearchId = runSearchId;
     }
     
     public String getName() {

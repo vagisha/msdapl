@@ -3,7 +3,7 @@ package org.yeastrc.ms.dao.search.sequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
+import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
 import org.yeastrc.ms.dao.search.sqtfile.SQTBaseDAOTestCase;
 import org.yeastrc.ms.domain.search.sqtfile.SQTField;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -27,7 +27,7 @@ public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sqtSearchDao.loadSearch(1));
         
         // save a search (don't add any SQT headers)
-        SQTRunSearch search_1 = makeSQTSearch(false, false, false, false);
+        SQTRunSearch search_1 = makeSQTRunSearch(false, false, false, false);
         assertEquals(0, search_1.getHeaders().size());
         int searchId_1 = sqtSearchDao.saveRunSearch(search_1, 1, 1); // runId = 1; // searchGroupId = 1
         
@@ -43,7 +43,7 @@ public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {
         checkSQTSearch(search_1, search_1_db);
         
         // save another search (add SQT headers)
-        SQTRunSearch search_2 = makeSQTSearch(false, false, false, true);
+        SQTRunSearch search_2 = makeSQTRunSearch(false, false, false, true);
         assertEquals(2, search_2.getHeaders().size());
         int searchId_2 = sqtSearchDao.saveRunSearch(search_2, 1, 1); // runId = 1; // searchGroupId = 1
         
@@ -63,11 +63,11 @@ public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {
         // delete the searches
         sqtSearchDao.deleteSearch(searchId_1);
         assertNull(sqtSearchDao.loadSearch(searchId_1));
-        assertEquals(0, sqtHeaderDao.loadSQTHeadersForSearch(searchId_1).size());
+        assertEquals(0, sqtHeaderDao.loadSQTHeadersForRunSearch(searchId_1).size());
         
         sqtSearchDao.deleteSearch(searchId_2);
         assertNull(sqtSearchDao.loadSearch(searchId_2));
-        assertEquals(0, sqtHeaderDao.loadSQTHeadersForSearch(searchId_2).size());
+        assertEquals(0, sqtHeaderDao.loadSQTHeadersForRunSearch(searchId_2).size());
         
     }
     
@@ -76,7 +76,7 @@ public class SQTSearchDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(input.getHeaders().size(), output.getHeaders().size());
     }
     
-    public static final class SQTSearchTest extends MsSearchTest implements SQTRunSearch {
+    public static final class SQTRunSearchTest extends MsRunSearchTest implements SQTRunSearch {
 
         private List<SQTField> headers = new ArrayList<SQTField>();
 

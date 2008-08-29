@@ -23,7 +23,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public void testOperationsOnSqtSearchResult() {
         
         // try to get the result for a result id that does not exist in the table
-        SQTSearchResultDb res = sqtResDao.load(1);
+        SQTSearchResultDb res = sequestResDao.load(1);
         assertNull(res);
         
         // insert one result in to the table
@@ -32,7 +32,7 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         // we have not yet set any of the SQT file specific values. Saving the 
         // result at this point should fail
         try {
-            sqtResDao.save(result, 1, 1);
+            sequestResDao.save(result, 1, 1);
             fail("Was able to save SQTSearchResult with null values!");
         }
         catch (RuntimeException e){
@@ -45,21 +45,21 @@ public class SQTSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         result.setSp(new BigDecimal("123.4"));
         result.setDeltaCN(new BigDecimal("0.001"));
         
-        int resultId = sqtResDao.save(result, 1, 1);
+        int resultId = sequestResDao.save(result, 1, 1);
         
         // make sure everything got saved
         assertNotNull(resultDao.load(resultId));
-        SQTSearchResultDb sqtResult_db = sqtResDao.load(resultId);
+        SQTSearchResultDb sqtResult_db = sequestResDao.load(resultId);
         assertEquals(sqtResult_db.getRunSearchId(), 1);
         assertEquals(resultId, sqtResult_db.getModificationId());
         checkSearchResult(result, sqtResult_db);
         
         
         // delete the result
-        sqtResDao.delete(resultId);
+        sequestResDao.delete(resultId);
         assertNull(resultDao.load(resultId));
         assertEquals(0, resultDao.loadResultIdsForRunSearch(1).size());
-        assertNull(sqtResDao.load(resultId));
+        assertNull(sequestResDao.load(resultId));
     }
     
     private void checkSearchResult(SequestSearchResult input, SQTSearchResultDb output) {

@@ -16,7 +16,7 @@ public interface SQTSearchScanDb extends SQTSearchScanBase {
     /**
      * @return the database id of the search to which this scan result belongs
      */
-    public abstract int getSearchId();
+    public abstract int getRunSearchId();
     
     /**
      * @return the database id of the scan

@@ -17,7 +17,7 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
 
     private int scanId;
     private int charge;
-    private int searchId;
+    private int runSearchId;
     private int processTime;
     private String serverName;
     private BigDecimal totalIntensity;
@@ -51,16 +51,16 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
         this.charge = charge;
     }
     /**
-     * @return the searchId
+     * @return the runSearchId
      */
-    public int getSearchId() {
-        return searchId;
+    public int getRunSearchId() {
+        return runSearchId;
     }
     /**
-     * @param searchId the searchId to set
+     * @param runSearchId the searchId to set
      */
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
+    public void setRunSearchId(int runSearchId) {
+        this.runSearchId = runSearchId;
     }
     /**
      * @return the processTime

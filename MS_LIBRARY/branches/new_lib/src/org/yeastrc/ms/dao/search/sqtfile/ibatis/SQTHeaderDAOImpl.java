@@ -24,38 +24,32 @@ public class SQTHeaderDAOImpl extends BaseSqlMapDAO implements SQTHeaderDAO {
         super(sqlMap);
     }
     
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO#loadSQTHeadersForSearch(int)
-     */
-    public List<SQTHeaderDb> loadSQTHeadersForSearch(int searchId) {
-        return queryForList("SqtHeader.selectHeadersForSearch", searchId);
+    
+    public List<SQTHeaderDb> loadSQTHeadersForRunSearch(int runSearchId) {
+        return queryForList("SqtHeader.selectHeadersForRunSearch", runSearchId);
     }
     
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO#saveSQTHeader(org.yeastrc.ms.dto.sqtFile.SQTSearchHeader)
-     */
-    public void saveSQTHeader(SQTField header, int searchId) {
-        save("SqtHeader.insertHeader", new SQTHeaderSqlMapParam(searchId, header.getName(), header.getValue()));
+    
+    public void saveSQTHeader(SQTField header, int runSearchId) {
+        save("SqtHeader.insertHeader", new SQTHeaderSqlMapParam(runSearchId, header.getName(), header.getValue()));
     }
     
-    /* (non-Javadoc)
-     * @see org.yeastrc.ms.dao.sqtFile.SQTSearchHeaderDAO#deleteSQTHeadersForSearch(int)
-     */
-    public void deleteSQTHeadersForSearch(int searchId) {
-        delete("SqtHeader.deleteHeadersForSearch", searchId);
+    
+    public void deleteSQTHeadersForRunSearch(int runSearchId) {
+        delete("SqtHeader.deleteHeadersForRunSearch", runSearchId);
     }
 
     public static final class SQTHeaderSqlMapParam implements SQTHeaderDb {
-        private int searchId;
+        private int runSearchId;
         private String name;
         private String value;
-        public SQTHeaderSqlMapParam(int searchId, String name, String value) {
-            this.searchId = searchId;
+        public SQTHeaderSqlMapParam(int runSearchId, String name, String value) {
+            this.runSearchId = runSearchId;
             this.name = name;
             this.value = value;
         }
-        public int getSearchId() {
-            return searchId;
+        public int getRunSearchId() {
+            return runSearchId;
         }
         public String getName() {
             return name;

@@ -7,10 +7,10 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 
 public interface SQTHeaderDAO {
 
-    public abstract List<SQTHeaderDb> loadSQTHeadersForSearch(int searchId);
+    public abstract List<SQTHeaderDb> loadSQTHeadersForRunSearch(int runSearchId);
 
-    public abstract void saveSQTHeader(SQTField header, int searchId);
+    public abstract void saveSQTHeader(SQTField header, int runSearchId);
 
-    public abstract void deleteSQTHeadersForSearch(int searchId);
+    public abstract void deleteSQTHeadersForRunSearch(int runSearchId);
 
 }

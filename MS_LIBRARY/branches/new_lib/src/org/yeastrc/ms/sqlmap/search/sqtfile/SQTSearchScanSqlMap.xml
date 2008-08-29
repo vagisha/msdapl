@@ -4,11 +4,11 @@
 <sqlMap namespace="SqtSpectrum"> 
 
 
-	<typeAlias alias="SqtSpectrumDb" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanDbImpl"/>
-	<typeAlias alias="SqtSpectrum" type="org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTSearchScanDAOImpl$SQTSearchScanSqlMapParam"/>
+	<typeAlias alias="SqtSpectrumOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanDbImpl"/>
+	<typeAlias alias="SqtSpectrumIn" type="org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb"/>
 	
-	<resultMap class="SqtSpectrumDb" id="sqtSpectrumResult" >
-		<result property="searchId" column="searchID" nullValue="0"/>
+	<resultMap class="SqtSpectrumOut" id="sqtSpectrumResult" >
+		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="scanId" column="scanID" nullValue="0"/>
 		<result property="charge" column="charge" nullValue="0"/>
 		<result property="processTime" column="processTime" nullValue="0"/>
@@ -20,8 +20,8 @@
 	</resultMap>
 	
 	
-	<parameterMap class="SqtSpectrum" id="sqtSpectrumParam">
-		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
+	<parameterMap class="SqtSpectrumIn" id="sqtSpectrumParam">
+		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="charge" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="processTime" jdbcType="INTEGER" nullValue="0"/>
@@ -35,14 +35,14 @@
     
     <select id="select" resultMap="sqtSpectrumResult" parameterClass="java.util.Map">
 		SELECT * FROM SQTSpectrumData
-		WHERE searchID = #searchId#
+		WHERE runSearchID = #runSearchId#
 		AND scanID = #scanId#
 		AND charge = #charge#
 	</select>
 	
     <insert id="insert" parameterMap="sqtSpectrumParam">
     	INSERT INTO SQTSpectrumData 
-    	(searchID, 
+    	(runSearchID, 
     	scanID, 
     	charge, 
     	processTime, 
@@ -54,7 +54,7 @@
     	VALUES (?,?,?,?,?,?,?,?,?)
     </insert>
     
-    <delete id="deleteForSearch" parameterClass="Integer">
+    <delete id="deleteForRunSearch" parameterClass="Integer">
 		DELETE FROM SQTSpectrumData WHERE searchID=#id#
     </delete>
     

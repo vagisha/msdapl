@@ -5,10 +5,10 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 
 public interface SQTSearchScanDAO {
 
-    public abstract SQTSearchScanDb load(int searchId, int scanId, int charge);
+    public abstract SQTSearchScanDb load(int runSearchId, int scanId, int charge);
     
-    public abstract void save(SQTSearchScan scanData, int searchId, int scanId);
+    public abstract void save(SQTSearchScan scanData, int runSearchId, int scanId);
 
-    public abstract void deleteForSearch(int searchId);
+    public abstract void deleteForRunSearch(int runSearchId);
 
 }
