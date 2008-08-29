@@ -57,7 +57,7 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
         assertTrue(search_2_db.getStaticResidueMods().size() > 0);
         assertTrue(search_2_db.getStaticTerminalMods().size() > 0);
         assertTrue(search_2_db.getSearchDatabases().size() > 0);
-        assertTrue(search_2_db.getEnzymeList().size() > 0);
+        assertTrue(search_2_db.getEnzymeList().size() == 0);
         checkSequestSearch(search_2, search_2_db);
         
         // delete the searches
