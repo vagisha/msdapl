@@ -16,7 +16,7 @@
 		<result property="totalIntensity" column="totalIntensity"/>
 		<result property="observedMass" column="observedMass"/>
 		<result property="lowestSp" column="lowestSp"/>
-		<result property="sequenceMatches" column="sequenceMatches"/>
+		<result property="sequenceMatches" column="sequenceMatches" nullValue="-1"/>
 	</resultMap>
 	
 	
@@ -29,7 +29,7 @@
 		<parameter property="totalIntensity" jdbcType="DECIMAL"/>
 		<parameter property="observedMass" jdbcType="DECIMAL"/>
 		<parameter property="lowestSp" jdbcType="DECIMAL"/>
-		<parameter property="sequenceMatches" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="sequenceMatches" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
     
@@ -55,7 +55,7 @@
     </insert>
     
     <delete id="deleteForRunSearch" parameterClass="Integer">
-		DELETE FROM SQTSpectrumData WHERE searchID=#id#
+		DELETE FROM SQTSpectrumData WHERE runSearchID=#id#
     </delete>
     
 </sqlMap>

@@ -23,7 +23,7 @@ public class SQTSearchScanDbImpl implements SQTSearchScanDb {
     private BigDecimal totalIntensity;
     private BigDecimal observedMass;
     private BigDecimal lowestSp;
-    private int sequenceMatches;
+    private int sequenceMatches = -1;
     
     /**
      * @return the scanId

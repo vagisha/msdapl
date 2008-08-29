@@ -17,32 +17,32 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
 
     public void testOperationsOnSQTSpectrumData() {
         
-        assertNull(sqtSpectrumDao.load(1, 1, 1)); // searchId = 1; scanId = 1; charge = 1
+        assertNull(sqtSpectrumDao.load(34, 1, 1)); // runSearchId = 34; scanId = 1; charge = 1
         
         SQTSearchScan data = makeSearchScan(3, 0); // charge = 3; processtime = 0
         
         try {
-            sqtSpectrumDao.save(data, 0, 1); // searchId = 0; scanId = 1;
-            fail("Cannot save search scan with searchId of 0");
+            sqtSpectrumDao.save(data, 0, 1); // runSearchId = 0; scanId = 1;
+            fail("Cannot save search scan with runSearchId of 0");
         }
         catch (RuntimeException e) {System.out.println("RuntimeException");}
         
         try {
-            sqtSpectrumDao.save(data, 1, 0); // searchId = 1; scanId = 0;
+            sqtSpectrumDao.save(data, 1, 0); // runSearchId = 1; scanId = 0;
             fail("Cannot save search scan with scanId of 0");
         }
         catch (RuntimeException e) {System.out.println("RuntimeException");}
         
         data = makeSearchScan(0,0); // charge = 0; processtime = 0
         try {
-            sqtSpectrumDao.save(data, 1, 1); // searchId = 1; scanId = 1;
+            sqtSpectrumDao.save(data, 1, 1); // runearchId = 1; scanId = 1;
             fail("Cannot save search scan with charge of 0");
         }
         catch (RuntimeException e) {System.out.println("RuntimeException");}
         
-        data = makeSearchScan(3,0);
+        data = makeSearchScan(3,0); // charge = 3; processtime = 0
         
-        sqtSpectrumDao.save(data, 1024, 4201);
+        sqtSpectrumDao.save(data, 1024, 4201); // runSearchId = 1024; scanId = 4201
         
         SQTSearchScanDb data_db = sqtSpectrumDao.load(1024, 4201, 3);
         assertNotNull(data_db);
@@ -64,7 +64,7 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(input.getServerName(), output.getServerName());
         assertEquals(input.getTotalIntensity().doubleValue(), output.getTotalIntensity().doubleValue());
         assertEquals(input.getSequenceMatches(), output.getSequenceMatches());
-        assertEquals(input.getObservedMass(), output.getObservedMass());
+        assertEquals(input.getObservedMass().doubleValue(), output.getObservedMass().doubleValue());
     }
     
     private SQTSearchScan makeSearchScan(final int charge, final int processTime) {

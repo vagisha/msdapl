@@ -32,7 +32,7 @@
 	<!--  SQT Files -->
 	<resultMap class="SQTRunSearchOut" id="sqtSearchResult" extends="MsRunSearch.msRunSearchResult">
 		<result property="headers" 
-				select="SqtHeader.selectHeadersForSearch" 
+				select="SqtHeader.selectHeadersForRunSearch" 
 				column="id"/>
 	</resultMap> 
 	
