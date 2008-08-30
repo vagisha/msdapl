@@ -244,7 +244,7 @@ public class SQTParserTest extends TestCase {
     }
     
     private SQTFileReader getSQTFileReader() {
-        return new SQTFileReader(null){
+        return new SQTFileReader(){
 
             @Override
             public SQTSearchScan getNextSearchScan()

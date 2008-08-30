@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.yeastrc.ms.dao.DAOTestSuite;
+import org.yeastrc.ms.dao.util.NrSeqLookupUtilTest;
 import org.yeastrc.ms.domain.impl.MsScanDbImplTest;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReaderTest;
 import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParserTest;
@@ -38,6 +39,7 @@ public class MsLibTests {
         suite.addTestSuite(PeakUtilsTest.class);
         suite.addTestSuite(Sha1SumCalculatorTest.class);
         suite.addTestSuite(DTASelectFileNameParseTest.class);
+        suite.addTestSuite(NrSeqLookupUtilTest.class);
         
 //        // upload classes
 //        suite.addTestSuite(MsExperimentUploaderTest.class);

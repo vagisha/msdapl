@@ -21,7 +21,7 @@ public class SQTFileReaderApp {
         
         BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
         
-        SequestSQTFileReader reader = new SequestSQTFileReader("remoteServer", false);
+        SequestSQTFileReader reader = new SequestSQTFileReader();
         try {
             reader.open(file);
             SQTHeader header = reader.getSearchHeader();

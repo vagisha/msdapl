@@ -162,6 +162,45 @@ public class SequestParamsParserTest extends TestCase {
             assertEquals(79.7663, dynaResidueMods.get(i).getModificationMass().doubleValue());
             assertEquals('*', dynaResidueMods.get(i).getModificationSymbol());
         }
+        
+        modString = "+80.0000 STY -99.9 GVD 0.0 X";
+        
+        try {
+            parser.parseDynamicResidueMods(modString);
+        }
+        catch (DataProviderException e) {
+            fail("Valid dynamic mod string");
+            e.printStackTrace();
+        }
+        dynaResidueMods = parser.getDynamicResidueMods();
+        assertEquals(6, dynaResidueMods.size());
+
+        Collections.sort(dynaResidueMods, new Comparator<MsResidueModification>() {
+            public int compare(MsResidueModification o1,
+                    MsResidueModification o2) {
+                return Character.valueOf(o1.getModifiedResidue()).compareTo(Character.valueOf(o2.getModifiedResidue()));
+            }});
+        
+        assertEquals('D', dynaResidueMods.get(0).getModifiedResidue());
+        assertEquals('#', dynaResidueMods.get(0).getModificationSymbol());
+        assertEquals(-99.9, dynaResidueMods.get(0).getModificationMass().doubleValue());
+        assertEquals('G', dynaResidueMods.get(1).getModifiedResidue());
+        assertEquals('#', dynaResidueMods.get(1).getModificationSymbol());
+        assertEquals(-99.9, dynaResidueMods.get(1).getModificationMass().doubleValue());
+        assertEquals('S', dynaResidueMods.get(2).getModifiedResidue());
+        assertEquals('*', dynaResidueMods.get(2).getModificationSymbol());
+        assertEquals(80.0, dynaResidueMods.get(2).getModificationMass().doubleValue());
+        assertEquals('T', dynaResidueMods.get(3).getModifiedResidue());
+        assertEquals('*', dynaResidueMods.get(3).getModificationSymbol());
+        assertEquals(80.0, dynaResidueMods.get(3).getModificationMass().doubleValue());
+        assertEquals('V', dynaResidueMods.get(4).getModifiedResidue());
+        assertEquals('#', dynaResidueMods.get(4).getModificationSymbol());
+        assertEquals(-99.9, dynaResidueMods.get(4).getModificationMass().doubleValue());
+        assertEquals('Y', dynaResidueMods.get(5).getModifiedResidue());
+        assertEquals('*', dynaResidueMods.get(5).getModificationSymbol());
+        assertEquals(80.0, dynaResidueMods.get(5).getModificationMass().doubleValue());
+        
+        
     }
 
     public void testParseParamsFile() {

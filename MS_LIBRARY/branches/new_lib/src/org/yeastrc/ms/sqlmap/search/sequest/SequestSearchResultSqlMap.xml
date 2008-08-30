@@ -56,17 +56,17 @@
     </insert>
     
     <insert id="insertAll" parameterClass="String">
-    	INSERT INTO SQTSearchResult (
+    	INSERT INTO SQTSearchResult 
     	(resultID, 
     	sp,
     	spRank,
     	XCorr,
-    	XCorrRank 
+    	XCorrRank, 
     	deltaCN, 
     	evalue,
     	calculatedMass,
     	matchingIons,
-    	predictedIons) 
+    	predictedIons)
     	VALUES $values$
     </insert>
     

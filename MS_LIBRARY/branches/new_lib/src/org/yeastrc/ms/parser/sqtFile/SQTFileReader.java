@@ -29,9 +29,25 @@ public abstract class SQTFileReader extends AbstractReader
     private static final Pattern locusPattern = Pattern.compile("^L\\s+([\\S]+)\\s*(.*)");
 //    private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
     
+    public void init() {
+        serverAddress = null;
+        searchDynamicResidueMods.clear();
+        searchDynamicTerminalMods.clear();
+    }
     
+    public void open(String filePath, String serverAddress) throws DataProviderException{
+        this.serverAddress = serverAddress;
+        super.open(filePath);
+     }
+
+     public void open(String fileName, Reader input, String serverAddress) throws DataProviderException  {
+         this.serverAddress = serverAddress;
+         super.open(fileName, input);
+     }
+     
     public static SearchFileFormat getSearchFileType(String filePath) {
-        SQTFileReader reader = new SQTFileReader(null){
+        
+        SQTFileReader reader = new SQTFileReader(){
             @Override
             public SQTSearchScan getNextSearchScan()
             throws DataProviderException {
@@ -53,7 +69,8 @@ public abstract class SQTFileReader extends AbstractReader
     }
     
     public static SearchFileFormat getSearchFileType(String fileName, Reader input) {
-        SQTFileReader reader = new SQTFileReader(null){
+        
+        SQTFileReader reader = new SQTFileReader(){
             @Override
             public SQTSearchScan getNextSearchScan()
                     throws DataProviderException {
@@ -74,8 +91,7 @@ public abstract class SQTFileReader extends AbstractReader
             return SearchFileFormat.UNKNOWN;
     }
     
-    public SQTFileReader(String serverAddress) {
-        this.serverAddress = serverAddress;
+    public SQTFileReader() {
         searchDynamicResidueMods = new ArrayList<MsResidueModification>();
         searchDynamicTerminalMods = new ArrayList<MsTerminalModification>();
     }

@@ -134,14 +134,15 @@ public class BaseSqlMapDAO {
      * 
      * @param statementName
      * @param parameterObject
+     * @return number of rows updated
      */
-    public void update(String statementName, Object parameterObject) {
+    public int update(String statementName, Object parameterObject) {
         try {
-            sqlMap.update(statementName, parameterObject);
+            return sqlMap.update(statementName, parameterObject);
         }
         catch (SQLException e) {
             log.error("Failed to execute update statement: "+statementName, e);
-            throw new RuntimeException("Failed to execute updaate statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute update statement: "+statementName, e);
         }
     }
 }

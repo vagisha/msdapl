@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.parser.sqtFile.sequest;
 
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +26,24 @@ public class SequestSQTFileReader extends SQTFileReader {
 
     private boolean useEvalue = false;
     
-    public SequestSQTFileReader(String serverAddress, boolean useEvalue) {
-        super(serverAddress);
-        this.useEvalue = useEvalue;
+    public SequestSQTFileReader() {
+        super();
     }
 
+    public void open(String filePath, String serverAddress, boolean useEvalue) throws DataProviderException{
+        super.open(filePath, serverAddress);
+        this.useEvalue = useEvalue;
+     }
+
+     public void open(String fileName, Reader input, String serverAddress, boolean useEvalue) throws DataProviderException  {
+         super.open(fileName, input, serverAddress);
+         this.useEvalue = useEvalue;
+     }
+     
+     public void init() {
+         super.init();
+         useEvalue = false;
+     }
     /**
      * Returns the next scan in the file. 
      * @return

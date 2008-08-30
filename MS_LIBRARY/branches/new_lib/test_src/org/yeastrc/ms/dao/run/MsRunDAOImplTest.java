@@ -63,7 +63,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         run = createDefaultRun();
         int id2 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
         
-        List<Integer> runs = runDao.runIdsFor(run.getFileName(), run.getSha1Sum());
+        List<Integer> runs = runDao.loadRunIdsForFileNameAndSha1Sum(run.getFileName(), run.getSha1Sum());
         assertEquals(2, runs.size());
         
         runDao.delete(id1);

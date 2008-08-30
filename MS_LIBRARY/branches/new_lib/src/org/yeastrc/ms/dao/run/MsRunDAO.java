@@ -49,7 +49,15 @@ public interface MsRunDAO <I extends MsRun, O extends MsRunDb>{
      * @param sha1Sum
      * @return
      */
-    public abstract List<Integer> runIdsFor(String fileName, String sha1Sum);
+    public abstract List<Integer> loadRunIdsForFileNameAndSha1Sum(String fileName, String sha1Sum);
+    
+    
+    /**
+     * Returns a list of runIDs for runs in the database with the given filename.
+     * @param fileName
+     * @return
+     */
+    public abstract List<Integer> loadRunIdsForFileName(String fileName);
     
     /**
      * Returns the runID for a run with the given file name that was searched in a

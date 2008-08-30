@@ -104,6 +104,12 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return this.paramList;
     }
     
+    public boolean isEnzymeUsedForSearch() {
+        if (enzyme == null || enzyme.getName().equalsIgnoreCase("No_Enzyme"))
+            return false;
+        else return true;
+    }
+    
     public void parseParamsFile(String filePath) throws DataProviderException {
         BufferedReader reader = null;
         try {
@@ -144,7 +150,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             }
         }
         if (database == null || enzyme == null)
-            throw new DataProviderException("No database of enzyme information found in file: "+filePath);
+            throw new DataProviderException("No database and/or enzyme information found in file: "+filePath);
     }
 
     void parseEnzymes(BufferedReader reader) throws IOException {
@@ -214,7 +220,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         try {modMass = new BigDecimal(paramValue);}
         catch(NumberFormatException e) {throw new DataProviderException("Error parsing modification mass: "+paramValue);}
 
-        if (modMass.doubleValue() > 0.0)
+        if (modMass.doubleValue() != 0.0)
             staticTerminalModifications.add(new TerminalModification(term, modMass, '\u0000'));
         return true;
     }
@@ -229,7 +235,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         try {modMass = new BigDecimal(paramValue);}
         catch(NumberFormatException e) {throw new DataProviderException("Error parsing modification mass: "+paramValue);}
 
-        if (modMass.doubleValue() > 0.0)
+        if (modMass.doubleValue() != 0.0)
             staticResidueModifications.add(new ResidueModification(modResidue, modMass, '\u0000'));
         return true;
     }
@@ -255,7 +261,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             catch(NumberFormatException e) {throw new DataProviderException(currentLineNum, "Error parsing modification mass: "+tokens[i], currentLine, e);}
 
             // don't consider modifications with mass-shift of 0;
-            if (mass.doubleValue() <= 0.0) continue; 
+            if (mass.doubleValue() == 0.0) continue; 
 
             // modified residues(s) can only be upper-case characters
             String modChars = tokens[i+1];

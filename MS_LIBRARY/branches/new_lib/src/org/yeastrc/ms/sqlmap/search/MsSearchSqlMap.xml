@@ -67,7 +67,7 @@
     
     <update id="updateAnalysisProgramVersion" parameterClass="java.util.Map">
     	UPDATE msSearch
-    	SET analysisProgramVersion="#analysisProgramVersion#"
+    	SET analysisProgramVersion=#analysisProgramVersion#
     	WHERE id=#searchId#
     </update>
 </sqlMap>

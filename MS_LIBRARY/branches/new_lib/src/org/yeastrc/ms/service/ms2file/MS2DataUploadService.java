@@ -82,7 +82,7 @@ public class MS2DataUploadService {
 
         // if run is already in the database return the runId of the existing run
         if (runId > 0)  {
-            // first save the original location of the MS2 file if the location is new.
+            // first save the original location (on remote server) of the MS2 file if the location is new.
             List<MsRunLocationDb> runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
             if (runLocs.size() == 0) {
                 runDao.saveRunLocation(serverAddress, serverDirectory, runId);
@@ -215,7 +215,7 @@ public class MS2DataUploadService {
     int getMatchingRunId(String fileName, String sha1Sum) {
 
         MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
-        List <Integer> runIds = runDao.runIdsFor(fileName, sha1Sum);
+        List <Integer> runIds = runDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
 
         // return the database of the first matching run found
         if (runIds.size() > 0)

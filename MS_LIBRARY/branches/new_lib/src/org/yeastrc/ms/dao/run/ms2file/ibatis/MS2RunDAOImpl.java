@@ -87,8 +87,13 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
         return msRunDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
     }
     
-    public List<Integer> runIdsFor(String fileName, String sha1Sum) {
-        return msRunDao.runIdsFor(fileName, sha1Sum);
+    @Override
+    public List<Integer> loadRunIdsForFileName(String fileName) {
+        return msRunDao.loadRunIdsForFileName(fileName);
+    }
+    
+    public List<Integer> loadRunIdsForFileNameAndSha1Sum(String fileName, String sha1Sum) {
+        return msRunDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
     }
 
     @Override
@@ -99,5 +104,4 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MS2Run, MS2
     public void delete(int runId) {
         msRunDao.delete(runId);
     }
-    
 }

@@ -40,7 +40,7 @@ public class UploadException extends Exception {
         
         PROTEIN_NOT_FOUND     ("Protein not found in database", WARN),
         
-        RUNTIME_SQT_ERROR       ("", WARN)
+        RUNTIME_SQT_ERROR       ("Runtime exception.", WARN)
         
         ;
       

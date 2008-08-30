@@ -112,13 +112,10 @@ public class MsDataUploader {
             throw ex;
         }
         
-        // (4). make sure there are no unsupported .sqt files. Get the sqt file type. This method may throw an UploadException. 
-        SearchFileFormat sqtType = getSqtType(fileDirectory, filenames);
-        
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
         try {
-            uploadRunAndSearchFilesToDb(fileDirectory, filenames, remoteServer, remoteDirectory, sqtType, searchDate);
+            uploadRunAndSearchFilesToDb(fileDirectory, filenames, remoteServer, remoteDirectory, searchDate);
         }
         catch (UploadException e) { // this should only result from ms2 file upload
             uploadExceptionList.add(e);
@@ -190,28 +187,16 @@ public class MsDataUploader {
      * @throws UploadException 
      */
     private void uploadRunAndSearchFilesToDb(String fileDirectory, Set<String> filenames, 
-            String serverAddress, String serverDirectory,
-            SearchFileFormat sqtType, Date searchDate) throws UploadException  {
+            String serverAddress, String serverDirectory, Date searchDate) throws UploadException  {
         
         // upload the runs first. This could throw an upload exception
         Map<String, Integer> runIdMap = uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
         
-        // parse the parameters file and create a new entry in the msSearch table
-        if (sqtType == SearchFileFormat.SQT_SEQ) {
-            uploadSequestSearches(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
-            
-        }
-        else if (sqtType == SearchFileFormat.SQT_PLUCID) {
-            uploadProlucidSearches(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
-        }
-        else {
-            UploadException ex = new UploadException(ERROR_CODE.UNKNOWN_PARAMS);
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            throw ex;
-        }
+        // now upload the searches
+        uploadSearches(fileDirectory, filenames, serverAddress,
+                        serverDirectory, searchDate, runIdMap);
     }
-    
+
     // returns a mapping of filenames to runIDs
     private Map<String, Integer> uploadRuns(String fileDirectory, Set<String> filenames, String serverAddress, String serverDirectory) throws UploadException {
         Map<String, Integer> runIdMap = new HashMap<String, Integer>(filenames.size());
@@ -258,6 +243,35 @@ public class MsDataUploader {
         }
         finally {
             ms2Provider.close();
+        }
+    }
+    
+    private void uploadSearches(String fileDirectory, Set<String> filenames,
+            String serverAddress, String serverDirectory, Date searchDate,
+            Map<String, Integer> runIdMap) {
+        
+        // make sure there are no unsupported .sqt files. Get the sqt file type. This method may throw an UploadException. 
+        SearchFileFormat sqtType = null;
+        try {
+            sqtType = getSqtType(fileDirectory, filenames);
+        }
+        catch (UploadException e) {
+            return; // don't go forward if there was a problem getting the sqt file type.
+        }
+        
+        // parse the parameters file and create a new entry in the msSearch table
+        if (sqtType == SearchFileFormat.SQT_SEQ) {
+            uploadSequestSearches(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
+            
+        }
+        else if (sqtType == SearchFileFormat.SQT_PLUCID) {
+            uploadProlucidSearches(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
+        }
+        else {
+            UploadException ex = new UploadException(ERROR_CODE.UNKNOWN_PARAMS);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            return;
         }
     }
     

@@ -27,6 +27,7 @@ public abstract class AbstractReader {
     }
     
     public void open(String filePath) throws DataProviderException{
+        init();
         try {
             reader = new BufferedReader(new FileReader(filePath));
         }
@@ -38,6 +39,7 @@ public abstract class AbstractReader {
     }
 
     public void open(String fileName, Reader input) throws DataProviderException  {
+        init();
         this.fileName = fileName;
         reader = new BufferedReader(input);
         advanceLine();
@@ -87,4 +89,5 @@ public abstract class AbstractReader {
     }
     
     protected abstract boolean isValidLine(String line);
+    protected abstract void init();
 }

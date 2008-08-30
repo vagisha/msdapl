@@ -36,9 +36,14 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
     private static final Pattern chargeStatePattern = Pattern.compile("^Z\\s+(\\d+)\\s+(\\d+\\.?\\d*)\\s*$");
 
 
+    protected void init() {
+        this.sha1Sum = null;
+        dataConversionType = null;
+    }
+    
     public void open(String filePath, String sha1Sum) throws DataProviderException {
-        this.sha1Sum = sha1Sum;
         super.open(filePath);
+        this.sha1Sum = sha1Sum;
     }
 
     public void open(String fileName, Reader input, String sha1Sum) throws DataProviderException {

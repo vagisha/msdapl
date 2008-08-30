@@ -70,11 +70,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         return (MsRunDb) queryForObject("MsRun.select", runId);
     }
     
-    public List<MsRunDb> loadExperimentRuns(int msExperimentId) {
-        return queryForList("MsRun.selectRunsForExperiment", msExperimentId);
-    }
-    
-    public List<Integer> runIdsFor(String fileName, String sha1Sum) {
+    public List<Integer> loadRunIdsForFileNameAndSha1Sum(String fileName, String sha1Sum) {
         Map<String, String> map = new HashMap<String, String>(2);
         map.put("fileName", fileName);
         map.put("sha1Sum", sha1Sum);
@@ -83,6 +79,11 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
     }
     
 
+    @Override
+    public List<Integer> loadRunIdsForFileName(String fileName) {
+        return queryForList("MsRun.selectRunIdsForFileName", fileName);
+    }
+    
     @Override
     public int loadRunIdForSearchAndFileName(int searchId, String runFileName) {
         Map<String, Object> map = new HashMap<String, Object>(2);

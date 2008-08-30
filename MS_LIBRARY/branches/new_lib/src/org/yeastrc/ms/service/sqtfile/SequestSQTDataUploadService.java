@@ -88,9 +88,6 @@ public class SequestSQTDataUploadService {
     private int searchId;
     private int lastUploadedRunSearchId;
     
-    private boolean usesEvalue = false;
-    private String searchDbName;
-    
     private int numSearchesToUpload = 0;
     private int numSearchesUploaded = 0;
     
@@ -107,8 +104,6 @@ public class SequestSQTDataUploadService {
         
         searchId = 0;
         lastUploadedRunSearchId = 0;
-        usesEvalue = false;
-        searchDbName = null;
         
         numSearchesToUpload = 0;
         numSearchesUploaded = 0;
@@ -165,8 +160,20 @@ public class SequestSQTDataUploadService {
 
         init();// reset all caches etc.
         
-        // parse the parameter file and upload to-level search data
-        searchId = uploadSearch(fileDirectory, remoteServer, remoteDirectory, searchDate);
+        // parse the parameter file 
+        SequestParamsParser parser = parseSequestParams(fileDirectory, remoteServer);
+        if (parser == null)
+            return;
+        
+        // dynamic residue mods found in the params file
+        List<MsResidueModification> dynaResMods = parser.getDynamicResidueMods();
+        // do the parameters indicate that e-value will be reported in the resuting sqt files? 
+        boolean usesEvalue = parser.reportEvalue();
+        // database used for the search (will be used to look up protein ids later)
+        String searchDbName = parser.getSearchDatabase().getServerPath();
+        
+        // Upload to-level search data
+        searchId = uploadSearchParams(parser, remoteServer, remoteDirectory, searchDate);
         // if an error happened while parsing or uploading the parameters file don't go any further.
         if (searchId == 0)
             return;
@@ -184,12 +191,12 @@ public class SequestSQTDataUploadService {
             }
             // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
             // but the experiment upload will continue.
-            uploadSequestSqtFile(remoteServer, filePath, searchId, runId);
+            uploadSequestSqtFile(remoteServer, filePath, searchId, runId, dynaResMods, usesEvalue, searchDbName);
         }
         
 
         // Update the "sequenceLength" and "proteinCount" columns in the msSequenceDataDetail table
-        // TODO
+        // TODO really??
         
         // Update the "analysisProgramVersion" in the msSearch table
         if (sequestVersion != null && !("uninit".equals(sequestVersion))) {
@@ -197,6 +204,50 @@ public class SequestSQTDataUploadService {
         }
     }
     
+    private SequestParamsParser parseSequestParams(String fileDirectory, final String remoteServer) {
+        
+        log.info("BEGIN Sequest search UPLOAD -- parsing sequest.params");
+        String paramFile = fileDirectory+File.separator+SEQUEST_PARAMS_FILE;
+        if (!(new File(paramFile).exists())) {
+            UploadException ex = new UploadException(ERROR_CODE.MISSING_SEQUEST_PARAMS);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED", ex);
+            return null;
+        }
+        // parse the parameters file
+        final SequestParamsParser parser = new SequestParamsParser(remoteServer);
+        try {
+            parser.parseParamsFile(paramFile);
+            return parser;
+        }
+        catch (DataProviderException e) {
+            UploadException ex = new UploadException(ERROR_CODE.PARAM_PARSING_ERROR);
+            ex.setFile(paramFile);
+            ex.setErrorMessage(e.getMessage());
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED", ex);
+            return null;
+        }
+    }
+    
+    // parse and upload data from the sequest.params file
+    private int uploadSearchParams(SequestParamsParser parser, final String remoteServer, 
+            final String remoteDirectory, final Date searchDate) {
+        
+        // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
+        try {
+            MsSearchDAO<SequestSearch, SequestSearchDb> searchDAO = DAOFactory.instance().getSequestSearchDAO();
+            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate));
+        }
+        catch(RuntimeException e) {
+            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
+            ex.setErrorMessage(e.getMessage());
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED", ex);
+            return 0;
+        }
+    }
+
     private void updateSequestVersion(int searchId, String sequestVersion) {
         try {
             MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
@@ -207,63 +258,24 @@ public class SequestSQTDataUploadService {
         }
     }
     
-    // parse and upload data from the sequest.params file
-    private int uploadSearch(String fileDirectory, final String remoteServer, final String remoteDirectory, final Date searchDate) {
-        
-        log.info("BEGIN Sequest search UPLOAD");
-        String paramFile = fileDirectory+File.separator+SEQUEST_PARAMS_FILE;
-        if (!(new File(paramFile).exists())) {
-            UploadException ex = new UploadException(ERROR_CODE.MISSING_SEQUEST_PARAMS);
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            return 0;
-        }
-        // parse the parameters file
-        final SequestParamsParser parser = new SequestParamsParser(remoteServer);
-        try {
-            parser.parseParamsFile(paramFile);
-        }
-        catch (DataProviderException e) {
-            UploadException ex = new UploadException(ERROR_CODE.PARAM_PARSING_ERROR);
-            ex.setFile(paramFile);
-            ex.setErrorMessage(e.getMessage());
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            return 0;
-        }
-        
-        // do the parameters indicate that e-value will be reported in the resuting sqt files? 
-        this.usesEvalue = parser.reportEvalue();
-        // database used for the search (will be used to look up protein ids later)
-        this.searchDbName = parser.getSearchDatabase().getServerPath();
-        
-        // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
-        try {
-            MsSearchDAO<SequestSearch, SequestSearchDb> searchDAO = DAOFactory.instance().getSequestSearchDAO();
-            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate));
-        }
-        catch(RuntimeException e) {
-            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR);
-            ex.setFile(paramFile);
-            ex.setErrorMessage(e.getMessage());
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            return 0;
-        }
-    }
-
     // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
     // but the experiment upload will continue.
-    private void uploadSequestSqtFile(final String remoteServer, String filePath, int searchId, int runId) {
+    private void uploadSequestSqtFile(final String remoteServer, String filePath, 
+            int searchId, int runId, List<MsResidueModification> dynaResMods, 
+            boolean usesEvalue, String searchDbName) {
+        
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
         numSearchesToUpload++;
         lastUploadedRunSearchId = 0;
         long startTime = System.currentTimeMillis();
-        SequestSQTFileReader provider = new SequestSQTFileReader(remoteServer, usesEvalue);
+        SequestSQTFileReader provider = new SequestSQTFileReader();
+        
         try {
-            provider.open(filePath);
+            provider.open(filePath, remoteServer, usesEvalue);
+            provider.setDynamicResidueMods(dynaResMods);
         }
         catch (DataProviderException e) {
+            provider.close();
             UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_SQT, e);
             ex.setFile(filePath);
             ex.setErrorMessage(e.getMessage()+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
@@ -271,10 +283,9 @@ public class SequestSQTDataUploadService {
             log.error(ex.getMessage(), ex);
             return;
         }
-        finally {provider.close();}
         
         try {
-            uploadSequestSqtFile(provider, searchId, runId);
+            uploadSequestSqtFile(provider, searchId, runId, searchDbName);
         }
         catch (UploadException e) {
             deleteLastUploadedRunSearch(); // if something was uploaded delete it
@@ -304,7 +315,7 @@ public class SequestSQTDataUploadService {
     }
     
     // parse and upload a sqt file
-    private void uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId) throws UploadException {
+    private void uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, String searchDbName) throws UploadException {
         
         try {
             lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
@@ -336,7 +347,7 @@ public class SequestSQTDataUploadService {
 
             // save all the search results for this scan
             for (SequestSearchResult result: scan.getScanResults()) {
-                uploadSearchResult(result, searchId, scanId);
+                uploadSearchResult(result, searchId, scanId, searchDbName);
                 numResults++;
                 numProteins += result.getProteinMatchList().size();
             }
@@ -357,7 +368,12 @@ public class SequestSQTDataUploadService {
             @Override
             public List<MsTerminalModification> getDynamicTerminalMods() {return parser.getDynamicTerminalMods();}
             @Override
-            public List<MsEnzyme> getEnzymeList() {return Arrays.asList(new MsEnzyme[]{parser.getSearchEnzyme()});}
+            public List<MsEnzyme> getEnzymeList() {
+                if (parser.isEnzymeUsedForSearch())
+                    return Arrays.asList(new MsEnzyme[]{parser.getSearchEnzyme()});
+                else 
+                    return new ArrayList<MsEnzyme>(0);
+            }
             @Override
             public List<MsSearchDatabase> getSearchDatabases() {return Arrays.asList(new MsSearchDatabase[]{parser.getSearchDatabase()});}
             @Override
@@ -401,13 +417,13 @@ public class SequestSQTDataUploadService {
         spectrumDataDao.save(scan, runSearchId, scanId);
     }
     
-    private int uploadSearchResult(SequestSearchResult result, int searchId, int scanId) throws UploadException {
+    private int uploadSearchResult(SequestSearchResult result, int searchId, int scanId, String searchDbName) throws UploadException {
         
         MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
         int resultId = resultDao.saveResultOnly(result, searchId, scanId); // uploads data to the msRunSearchResult table ONLY
         
         // upload the protein matches
-        uploadProteinMatches(result, resultId);
+        uploadProteinMatches(result, resultId, searchDbName);
         
         // upload dynamic mods for this result
         uploadResultMods(result, resultId, searchId);
@@ -418,7 +434,7 @@ public class SequestSQTDataUploadService {
         return resultId;
     }
 
-    private void uploadProteinMatches(SequestSearchResult result, final int resultId) throws UploadException {
+    private void uploadProteinMatches(SequestSearchResult result, final int resultId, String searchDbName) throws UploadException {
         // upload the protein matches if the cache has enough entries
         if (proteinMatchList.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();

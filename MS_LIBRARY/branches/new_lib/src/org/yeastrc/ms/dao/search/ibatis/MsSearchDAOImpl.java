@@ -93,12 +93,12 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
     }
     
     @Override
-    public void updateSearchAnalysisProgramVersion(int searchId,
+    public int updateSearchAnalysisProgramVersion(int searchId,
             String versionStr) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("searchId", searchId);
         map.put("analysisProgramVersion", versionStr);
-        update("MsSearch.updateAnalysisProgramVersion", map);
+        return update("MsSearch.updateAnalysisProgramVersion", map);
     }
     
     public void deleteSearch(int searchId) {

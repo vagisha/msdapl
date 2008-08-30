@@ -54,9 +54,9 @@ private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
     }
     
     @Override
-    public void updateSearchAnalysisProgramVersion(int searchId,
+    public int updateSearchAnalysisProgramVersion(int searchId,
             String versionStr) {
-        searchDao.updateSearchAnalysisProgramVersion(searchId, versionStr);
+        return searchDao.updateSearchAnalysisProgramVersion(searchId, versionStr);
     }
     
     public void deleteSearch(int searchId) {

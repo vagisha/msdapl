@@ -25,8 +25,9 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
      * Updates the value of the analysisProgramVersion in msSearch table
      * @param searchId
      * @param versionStr
+     * @return number of rows updated
      */
-    public abstract void updateSearchAnalysisProgramVersion(int searchId, String versionStr);
+    public abstract int updateSearchAnalysisProgramVersion(int searchId, String versionStr);
     
 
     /**
