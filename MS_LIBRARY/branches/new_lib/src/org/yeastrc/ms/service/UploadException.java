@@ -37,8 +37,9 @@ public class UploadException extends Exception {
         MISSING_PROLUCID_PARAMS ("Missing search.xml files.", WARN),
         UNKNOWN_PARAMS          ("Unknown parameters file for search.", WARN),
         PARAM_PARSING_ERROR     ("Error parsing parameters file", WARN),
+        NO_RUN_SEARCHES_UPLOADED("No run searches were uploaded", WARN),
         
-        PROTEIN_NOT_FOUND     ("Protein not found in database", WARN),
+        PROTEIN_NOT_FOUND       ("Protein not found in database", WARN),
         
         RUNTIME_SQT_ERROR       ("Runtime exception.", WARN)
         

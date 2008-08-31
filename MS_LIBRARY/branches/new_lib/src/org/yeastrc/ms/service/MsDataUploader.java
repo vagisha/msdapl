@@ -3,7 +3,6 @@ package org.yeastrc.ms.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,19 +19,15 @@ import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
-import org.yeastrc.ms.util.Sha1SumCalculator;
 
 public class MsDataUploader {
 
     private static final Logger log = Logger.getLogger(MsDataUploader.class);
     
-    private int searchId;
     private int numRunsToUpload = 0;
     private int numRunsUploaded = 0;
     private int numSearchesToUpload = 0;
@@ -44,9 +39,10 @@ public class MsDataUploader {
     
     private void resetUploader() {
         uploadExceptionList.clear();
-        searchId = 0;
         numRunsToUpload = 0;
         numRunsUploaded = 0;
+        numSearchesToUpload = 0;
+        numSearchesUploaded = 0;
     }
     
     public List<UploadException> getUploadExceptionList() {
@@ -114,8 +110,9 @@ public class MsDataUploader {
         
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
+        int searchId = 0;
         try {
-            uploadRunAndSearchFilesToDb(fileDirectory, filenames, remoteServer, remoteDirectory, searchDate);
+            searchId = uploadRunAndSearchFilesToDb(fileDirectory, filenames, remoteServer, remoteDirectory, searchDate);
         }
         catch (UploadException e) { // this should only result from ms2 file upload
             uploadExceptionList.add(e);
@@ -127,13 +124,14 @@ public class MsDataUploader {
         }
         
         long end = System.currentTimeMillis();
-        log.info("END EXPERIMENT (id: "+searchId+") UPLOAD: "+((end - start)/(1000L))+"seconds"+
+        log.info("END EXPERIMENT UPLOAD: "+((end - start)/(1000L))+"seconds"+
                 "\n\tTime: "+(new Date().toString())+
                 "\n\t#Runs in Directory: "+numRunsToUpload+"; #Uploaded: "+numRunsUploaded+
+                "\n\tSEARCH ID: "+searchId+
                 "\n\t#Searches in Directory: "+numSearchesToUpload+"; #Uploaded: "+numSearchesUploaded+
                 "\n\tRemote server: "+remoteServer+
                 "\n\tRemote directory: "+remoteDirectory+
-                "\n\tDirectory: "+fileDirectory+
+                "\n\tUpload Directory: "+fileDirectory+
                 "\n\n");
         
         return searchId;
@@ -182,71 +180,49 @@ public class MsDataUploader {
      * @param serverAddress
      * @param serverDirectory
      * @param sqtType
-     * @return
+     * @return searchId
      * @throws UploadException 
      * @throws UploadException 
      */
-    private void uploadRunAndSearchFilesToDb(String fileDirectory, Set<String> filenames, 
+    private int uploadRunAndSearchFilesToDb(String fileDirectory, Set<String> filenames, 
             String serverAddress, String serverDirectory, Date searchDate) throws UploadException  {
         
         // upload the runs first. This could throw an upload exception
         Map<String, Integer> runIdMap = uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
         
-        // now upload the searches
-        uploadSearches(fileDirectory, filenames, serverAddress,
+        // now upload the searches. No exception will be thrown if the upload fails
+        return uploadSearches(fileDirectory, filenames, serverAddress,
                         serverDirectory, searchDate, runIdMap);
     }
 
-    // returns a mapping of filenames to runIDs
+    /**
+     * Returns a mapping of filenames to runIDs
+     * @param fileDirectory
+     * @param filenames
+     * @param serverAddress
+     * @param serverDirectory
+     * @return
+     * @throws UploadException
+     */
     private Map<String, Integer> uploadRuns(String fileDirectory, Set<String> filenames, String serverAddress, String serverDirectory) throws UploadException {
-        Map<String, Integer> runIdMap = new HashMap<String, Integer>(filenames.size());
-        for (String filename: filenames) {
-            int runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2", serverAddress, serverDirectory);
-            runIdMap.put(filename, runId);
-        }
-        return runIdMap;
-    }
-    
-
-    // Any exceptions that happens during sha1sum calculation, parsing or upload
-    // will be propagated up to the calling function. 
-    private int uploadMS2Run(String filePath, String serverAddress, String serverDirectory) throws UploadException {
-        numRunsToUpload++;
-        Ms2FileReader ms2Provider = new Ms2FileReader();
         MS2DataUploadService uploadService = new MS2DataUploadService();
-        String sha1Sum;
-        try {
-            sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
-        }
-        catch (Exception e) {
-            UploadException ex = logAndAddUploadException(ERROR_CODE.SHA1SUM_CALC_ERROR, e, filePath, null, e.getMessage());
-            throw ex;
-        }
-        
-        try {
-            ms2Provider.open(filePath, sha1Sum);
-            int runId = uploadService.uploadMS2Run(ms2Provider, sha1Sum, serverAddress, serverDirectory);
-            numRunsUploaded++;
-            return runId;
-        }
-        catch (DataProviderException e) {
-            UploadException ex = logAndAddUploadException(ERROR_CODE.READ_ERROR_MS2, e, filePath, null, e.getMessage());
-            throw ex;
-        }
-        catch (RuntimeException e) { // most likely due to SQL exception
-            UploadException ex = logAndAddUploadException(ERROR_CODE.RUNTIME_MS2_ERROR, e, filePath, null, e.getMessage());
-            throw ex;
-        }
-        catch(UploadException e) {
-            e.setFile(filePath);
-            throw e;
-        }
-        finally {
-            ms2Provider.close();
-        }
+        Map<String, Integer> runMapIds = uploadService.uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
+        this.numRunsToUpload = uploadService.getNumRunsToUpload();
+        this.numRunsUploaded = uploadService.getNumRunsUploaded();
+        this.uploadExceptionList.addAll(uploadService.getUploadExceptionList());
+        return runMapIds;
     }
-    
-    private void uploadSearches(String fileDirectory, Set<String> filenames,
+
+    /**
+     * @param fileDirectory
+     * @param filenames
+     * @param serverAddress
+     * @param serverDirectory
+     * @param searchDate
+     * @param runIdMap
+     * @return searchId
+     */
+    private int uploadSearches(String fileDirectory, Set<String> filenames,
             String serverAddress, String serverDirectory, Date searchDate,
             Map<String, Integer> runIdMap) {
         
@@ -256,41 +232,40 @@ public class MsDataUploader {
             sqtType = getSqtType(fileDirectory, filenames);
         }
         catch (UploadException e) {
-            return; // don't go forward if there was a problem getting the sqt file type.
+            return 0; // don't go forward if there was a problem getting the sqt file type.
         }
         
-        // parse the parameters file and create a new entry in the msSearch table
-        if (sqtType == SearchFileFormat.SQT_SEQ) {
-            uploadSequestSearches(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
-            
+        // upload the search
+        if (sqtType == SearchFileFormat.SQT_SEQ || sqtType == SearchFileFormat.SQT_NSEQ) {
+            return uploadSequestSearch(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
         }
         else if (sqtType == SearchFileFormat.SQT_PLUCID) {
-            uploadProlucidSearches(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
+            return uploadProlucidSearch(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
         }
         else {
             UploadException ex = new UploadException(ERROR_CODE.UNKNOWN_PARAMS);
             uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            return;
+            log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED.", ex);
+            return 0;
         }
     }
     
     // upload sequest sqt files
-    private void uploadSequestSearches(String fileDirectory,
+    private int uploadSequestSearch(String fileDirectory,
             Set<String> filenames, final String serverAddress,
             final String serverDirectory, Map<String, Integer> runIdMap,
             final Date searchDate) {
         
         SequestSQTDataUploadService service = new SequestSQTDataUploadService();
-        service.uploadSQTSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
+        int searchId = service.uploadSequestSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
         this.uploadExceptionList.addAll(service.getUploadExceptionList());
-        this.searchId = service.getUploadedSearchId();
         this.numSearchesToUpload = service.getNumSearchesToUpload();
         this.numSearchesUploaded = service.getNumSearchesUploaded();
+        return searchId;
     }
 
     // upload prolucid sqt files
-    private void uploadProlucidSearches(String fileDirectory,
+    private int uploadProlucidSearch(String fileDirectory,
             Set<String> filenames, String serverAddress,
             String serverDirectory, Map<String, Integer> runIdMap,
             Date searchDate) {
@@ -299,22 +274,7 @@ public class MsDataUploader {
 //        this.numSearchesToUpload = service.getNumSearchesToUpload();
 //        this.numSearchesUploaded = service.getNumSearchesUploaded();
         // TODO
-
-    }
-    
-    
-    private UploadException logAndAddUploadException(ERROR_CODE errCode, Exception sourceException, String file, String directory, String message) {
-        UploadException ex = null;
-        if (sourceException == null)
-            ex = new UploadException(errCode);
-        else
-            ex = new UploadException(errCode, sourceException);
-        ex.setFile(file);
-        ex.setDirectory(directory);
-        ex.setErrorMessage(message);
-        uploadExceptionList.add(ex);
-        log.error(ex.getMessage(), ex);
-        return ex;
+        return 0;
     }
     
     /**

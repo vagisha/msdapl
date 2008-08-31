@@ -2,6 +2,7 @@ package org.yeastrc.ms.service;
 
 
 import java.util.Date;
+import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -240,86 +241,85 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
 //            assertEquals(expId2, expIds.get(1).intValue());
 //        }
 //    }
-//
-//    public void testUploadInvalidMS2_S() {
-//        String dir = "test_resources/invalid_ms2_S_dir";
-//        try {
-//            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
-//            fail("2.ms2 is invalid");
-//        }
-//        catch (UploadException e1) {
-//            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
-//            String msg = "Invalid 'Z' line.\n\tLINE NUMBER: 37\n\tLINE: Z\t1\t1372.55laksdjflkasf;a";
-//            System.out.println(e1.getMessage());
-//            assertTrue(e1.getMessage().contains(msg));
-//        }
-//        assertEquals(0, expDao.selectAllExperimentIds().size());
-//        assertNull(runDao.loadRun(1));
-//        assertNull(searchDao.loadSearch(1));
-//    }
-//    
-//    public void testUploadInvalidMS2_peak() {
-//        String dir = "test_resources/invalid_ms2_peak_dir";
-//        try {
-//            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
-//            fail("1.ms2 is invalid");
-//        }
-//        catch (UploadException e1) {
-//            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
-//            String msg = "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: 11"+
-//            "\n\tLINE NUMBER: 61\n\tLINE: S\t000012\t000012\t1394.58000";
-//            System.out.println(e1.getMessage());
-//            assertTrue(e1.getMessage().contains(msg));
-//        }
-//        assertEquals(0, expDao.selectAllExperimentIds().size());
-//        assertNull(runDao.loadRun(1));
-//        assertNull(searchDao.loadSearch(1));
-//    }
-//    
-//    public void testUploadInvalidMS2_Z() {
-//        String dir = "test_resources/invalid_ms2_Z_dir";
-//        try {
-//            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
-//            fail("1.ms2 is invalid");
-//        }
-//        catch (UploadException e1) {
-//            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
-//            String msg = "Invalid 'Z' line.\n\tLINE NUMBER: 60\n\tLINE: Z\t1\t1394.58 invalid Z line";
-//            System.out.println(e1.getMessage());
-//            assertTrue(e1.getMessage().contains(msg));
-//        }
-//        assertEquals(0, expDao.selectAllExperimentIds().size());
-//        assertNull(runDao.loadRun(1));
-//        assertNull(searchDao.loadSearch(1));
-//    }
-//    
-//    public void testUploadInvalidSQTFiles() {
-//      String dir = "test_resources/invalid_sqt_dir";
-//      try {
-//          uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
-//      }
-//      catch (UploadException e1) {
-//         fail("Valid ms2 files in directory");
-//      }
-//      List<UploadException> exceptionList = uploader.getUploadExceptionList();
-//      assertEquals(1, exceptionList.size());
-//      String warnings = "WARNING: Unsupported sqt file found"+
-//                          "\n\tFile: test_resources/invalid_sqt_dir/percolator.sqt";
-//      
-//      assertEquals(warnings, uploader.getUploadWarnings().trim());
-//      // the ms2 files should still be there but no searches should have been uploaded. 
-//      List<Integer> runIds = runDao.loadRunIdsForFileName("percolator.ms2");
-//      assertEquals(1, runIds.size());
-//      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
-//      runIds = runDao.loadRunIdsForFileName("pepprobe.ms2");
-//      assertEquals(1, runIds.size());
-//      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
-//      runIds = runDao.loadRunIdsForFileName("prolucid.ms2");
-//      assertEquals(1, runIds.size());
-//      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
-//      
-//    }
-//    
+
+    public void testUploadInvalidMS2_S() {
+        String dir = "test_resources/invalid_ms2_S_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+            fail("2.ms2 is invalid");
+        }
+        catch (UploadException e1) {
+            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
+            String msg = "Invalid 'Z' line.\n\tLINE NUMBER: 37\n\tLINE: Z\t1\t1372.55laksdjflkasf;a";
+            System.out.println(e1.getMessage());
+            assertTrue(e1.getMessage().contains(msg));
+        }
+        assertNull(runDao.loadRun(1));
+        assertNull(searchDao.loadSearch(1));
+    }
+    
+    public void testUploadInvalidMS2_peak() {
+        String dir = "test_resources/invalid_ms2_peak_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+            fail("1.ms2 is invalid");
+        }
+        catch (UploadException e1) {
+            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
+            String msg = "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: 11"+
+            "\n\tLINE NUMBER: 61\n\tLINE: S\t000012\t000012\t1394.58000";
+            System.out.println(e1.getMessage());
+            assertTrue(e1.getMessage().contains(msg));
+        }
+        assertEquals(0, runDao.loadRunIdsForFileName("1.ms2").size());
+        assertEquals(1, runDao.loadRunIdsForFileName("2.ms2").size());
+        assertNull(searchDao.loadSearch(1));
+    }
+    
+    public void testUploadInvalidMS2_Z() {
+        String dir = "test_resources/invalid_ms2_Z_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+            fail("1.ms2 is invalid");
+        }
+        catch (UploadException e1) {
+            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
+            String msg = "Invalid 'Z' line.\n\tLINE NUMBER: 60\n\tLINE: Z\t1\t1394.58 invalid Z line";
+            System.out.println(e1.getMessage());
+            assertTrue(e1.getMessage().contains(msg));
+        }
+        assertEquals(0, runDao.loadRunIdsForFileName("1.ms2").size());
+        assertEquals(1, runDao.loadRunIdsForFileName("2.ms2").size());
+        assertNull(searchDao.loadSearch(1));
+    }
+    
+    public void testUploadInvalidSQTFiles() {
+      String dir = "test_resources/invalid_sqt_dir";
+      try {
+          uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+      }
+      catch (UploadException e1) {
+         fail("Valid ms2 files in directory");
+      }
+      List<UploadException> exceptionList = uploader.getUploadExceptionList();
+      assertEquals(1, exceptionList.size());
+      String warnings = "WARNING: Unsupported sqt file found"+
+                          "\n\tFile: test_resources/invalid_sqt_dir/percolator.sqt";
+      
+      assertEquals(warnings, uploader.getUploadWarnings().trim());
+      // the ms2 files should still be there but no searches should have been uploaded. 
+      List<Integer> runIds = runDao.loadRunIdsForFileName("percolator.ms2");
+      assertEquals(1, runIds.size());
+      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
+      runIds = runDao.loadRunIdsForFileName("pepprobe.ms2");
+      assertEquals(1, runIds.size());
+      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
+      runIds = runDao.loadRunIdsForFileName("prolucid.ms2");
+      assertEquals(1, runIds.size());
+      assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
+      
+    }
+    
 //    public void testUploadExperimentInvalidSQTHeader() {
 //        String dir = "test_resources/invalidSQTHeader_dir";
 //        try {
@@ -338,25 +338,25 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
 //        assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runIds.get(0)).size());
 //    }
     
-//    public void testUploadExperimntNoScanIdFound() {
-//        String dir = "test_resources/noScanIdFound_dir";
-//        try {
-//            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date(), false);
-//        }
-//        catch (UploadException e) {
-//            fail("Valid ms2 file in directory");
-//        }
-//        
-//        List<UploadException> exceptions = uploader.getUploadExceptionList();
-//        assertEquals(1, exceptions.size());
+    public void testUploadExperimntNoScanIdFound() {
+        String dir = "test_resources/noScanIdFound_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        }
+        catch (UploadException e) {
+            fail("Valid ms2 file in directory");
+        }
+        
+        List<UploadException> exceptions = uploader.getUploadExceptionList();
+        assertEquals(2, exceptions.size());
 //        System.out.println(uploader.getUploadWarnings());
-//        assertEquals(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN, exceptions.get(0).getErrorCode());
-//        
-//        assertEquals(1, exceptions.size());
-//        assertEquals(1, runDao.loadExperimentRuns(1).size());
-//        assertEquals(0, searchDao.loadRunSearchIdsForSearch(1).size());
-//    }
-//
+        assertEquals(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN, exceptions.get(0).getErrorCode());
+        assertEquals(ERROR_CODE.NO_RUN_SEARCHES_UPLOADED, exceptions.get(1).getErrorCode());
+        
+        assertEquals(1, runDao.loadRunIdsForFileName("771_5489.ms2").size());
+        assertNull(searchDao.loadSearch(1));
+    }
+
 //    public void testDeleteExperiment() {
 //        String exp1Dir = "test_resources/deleteExperiment_dir/one"; //has ONE ms2, sqt pair
 //        String exp2Dir = "test_resources/deleteExperiment_dir/two"; //has TWO ms2, sqt pair (one of them is the same as above)

@@ -1,9 +1,7 @@
 package org.yeastrc.ms.dao.run.ms2file.ibatis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;

@@ -38,9 +38,15 @@ private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
         
         int searchId = searchDao.saveSearch(search);
         // save ProLuCID search parameters
-        for (ProlucidParam param: search.getProlucidParams()) {
-            // insert top level elements with parentID=0
-            insertProlucidParam(param, 0, searchId);
+        try {
+            for (ProlucidParam param: search.getProlucidParams()) {
+                // insert top level elements with parentID=0
+                insertProlucidParam(param, 0, searchId);
+            }
+        }
+        catch(RuntimeException e) {
+            deleteSearch(searchId);
+            throw e;
         }
         return searchId;
     }

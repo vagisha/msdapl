@@ -6,8 +6,12 @@
  */
 package org.yeastrc.ms.service.ms2file;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -28,8 +32,10 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
+import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.util.Sha1SumCalculator;
 
 /**
  * 
@@ -42,18 +48,169 @@ public class MS2DataUploadService {
 
     public static final int BUF_SIZE = 1000;
     
+    // these are the things we will cache and do bulk-inserts
     private List<MS2ChargeDependentAnalysisDb> dAnalysisList;
     private List<MS2ChargeIndependentAnalysisDb> iAnalysisList;
+    
+    private int lastUploadedRunId = 0;
+    private List<UploadException> uploadExceptionList;
+    
+    private int numRunsToUpload = 0;
+    private int numRunsUploaded = 0;
     
     public MS2DataUploadService() {
         dAnalysisList = new ArrayList<MS2ChargeDependentAnalysisDb>();
         iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisDb>();
+        
+        uploadExceptionList = new ArrayList<UploadException>();
     }
 
     private void reset() {
         // clean up any cached data
+        resetCaches();
+        
+        uploadExceptionList.clear();
+        
+        numRunsToUpload = 0;
+        numRunsUploaded = 0;
+    }
+
+    private void resetCaches() {
         dAnalysisList.clear();
         iAnalysisList.clear();
+        
+        lastUploadedRunId = 0;
+    }
+    
+    public void deleteLastUploadedRun() {
+        if (lastUploadedRunId != 0)
+            deleteRun(lastUploadedRunId);
+    }
+    
+    public static void deleteRun(Integer runId) {
+        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+        runDao.delete(runId);
+    }
+    
+    public List<UploadException> getUploadExceptionList() {
+        return uploadExceptionList;
+    }
+    
+    public int getNumRunsToUpload() {
+        return numRunsToUpload;
+    }
+    
+    public int getNumRunsUploaded() {
+        return numRunsUploaded;
+    }
+    
+    /**
+     * Uploaded the ms2 files in the directory to the database.  Returns a mapping of uploaded filenames to database runIds. 
+     * @param fileDirectory
+     * @param filenames
+     * @param serverAddress
+     * @param serverDirectory
+     * @return
+     * @throws UploadException
+     */
+    public Map<String, Integer> uploadRuns(String fileDirectory, Set<String> filenames, String serverAddress, String serverDirectory) throws UploadException {
+        
+        reset(); // reset all caches etc. 
+        
+        this.numRunsToUpload = filenames.size();
+        
+        Map<String, Integer> runIdMap = new HashMap<String, Integer>(filenames.size());
+        for (String filename: filenames) {
+            int runId = 0;
+            try {
+                runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2", serverAddress, serverDirectory);
+                numRunsUploaded++;
+            }
+            catch (UploadException e) {
+                deleteLastUploadedRun();
+                throw e;
+            }
+            runIdMap.put(filename, runId);
+        }
+        return runIdMap;
+    }
+    
+    private int uploadMS2Run(String filePath, String serverAddress, String serverDirectory) throws UploadException {
+        
+        // first check if the file in already in the database. If it is, return its database id
+        // If a run with the same file name and SHA-1 hash code already exists in the 
+        // database we will not upload it
+        String sha1Sum = calculateSha1Sum(filePath);
+        int runId = getRunIdForFile(filePath, serverAddress, serverDirectory, sha1Sum);
+        if (runId > 0)
+            return runId;
+        
+        Ms2FileReader ms2Provider = new Ms2FileReader();
+        try {
+            ms2Provider.open(filePath, sha1Sum);
+            runId = uploadMS2Run(ms2Provider, serverAddress, serverDirectory);
+            return runId;
+        }
+        catch (DataProviderException e) {
+            UploadException ex = logAndAddUploadException(ERROR_CODE.READ_ERROR_MS2, e, filePath, null, e.getMessage());
+            throw ex;
+        }
+        catch (RuntimeException e) { // most likely due to SQL exception
+            UploadException ex = logAndAddUploadException(ERROR_CODE.RUNTIME_MS2_ERROR, e, filePath, null, e.getMessage());
+            throw ex;
+        }
+        catch(UploadException e) {
+            e.setFile(filePath);
+            throw e;
+        }
+        finally {
+            ms2Provider.close();
+        }
+    }
+
+    private int getRunIdForFile(String filePath, String serverAddress, String serverDirectory, String sha1Sum) throws UploadException {
+    
+        String fileName = new File(filePath).getName();
+        
+        int runId = getMatchingRunId(fileName, sha1Sum);
+        
+        // If run is already in the database return the runId of the existing run
+        if (runId > 0)  {
+            MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+            // first save the original location (on remote server) of the MS2 file if the location is not in the database already.
+            List<MsRunLocationDb> runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
+            if (runLocs.size() == 0) {
+                runDao.saveRunLocation(serverAddress, serverDirectory, runId);
+            }
+            log.info("Run with name: "+fileName+" and sha1Sum: "+sha1Sum+
+                    " found in the database; runID: "+runId);
+            log.info("END MS2 FILE UPLOAD: "+fileName);
+            return runId;
+        }
+        return 0;
+    }
+    
+    private String calculateSha1Sum(String filePath) throws UploadException {
+        String sha1Sum;
+        try {
+            sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
+        }
+        catch (Exception e) {
+            UploadException ex = logAndAddUploadException(ERROR_CODE.SHA1SUM_CALC_ERROR, e, filePath, null, e.getMessage());
+            throw ex;
+        }
+        return sha1Sum;
+    }
+    
+    int getMatchingRunId(String fileName, String sha1Sum) {
+
+        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+        List <Integer> runIds = runDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
+
+        // return the database of the first matching run found
+        if (runIds.size() > 0)
+            return runIds.get(0);
+        return 0;
     }
     
     /**
@@ -64,36 +221,19 @@ public class MS2DataUploadService {
      * @return
      * @throws UploadException 
      */
-    public int uploadMS2Run(MS2RunDataProvider provider, String sha1Sum, 
+    private int uploadMS2Run(MS2RunDataProvider provider,
             final String serverAddress, final String serverDirectory) throws UploadException  {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName());
         long startTime = System.currentTimeMillis();
         
-        // reset all caches etc.
-        reset();
+        // reset all caches.
+        resetCaches();
         
         MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
 
-        // determine if this run is already in the database
-        // if a run with the same file name and SHA-1 hash code already exists in the 
-        // database we will not upload it
-        int runId = getMatchingRunId(provider.getFileName(), sha1Sum);
 
-        // if run is already in the database return the runId of the existing run
-        if (runId > 0)  {
-            // first save the original location (on remote server) of the MS2 file if the location is new.
-            List<MsRunLocationDb> runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
-            if (runLocs.size() == 0) {
-                runDao.saveRunLocation(serverAddress, serverDirectory, runId);
-            }
-            log.info("Run with name: "+provider.getFileName()+" and sha1Sum: "+sha1Sum+
-                    " found in the database; runID: "+runId);
-            log.info("END MS2 FILE UPLOAD: "+provider.getFileName());
-            return runId;
-        }
-
-        // if run is NOT in the database get the top-level run information and upload it
+        // Get the top-level run information and upload it
         MS2Run header;
         try {
             header = provider.getRunHeader();
@@ -103,7 +243,8 @@ public class MS2DataUploadService {
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
-        runId = runDao.saveRun(header, serverAddress, serverDirectory);
+        int runId = runDao.saveRun(header, serverAddress, serverDirectory);
+        lastUploadedRunId = runId;
         log.info("Uploaded top-level run information with runId: "+runId);
 
         // upload each of the scans
@@ -138,7 +279,6 @@ public class MS2DataUploadService {
             uploaded++;
             all++;
         }
-        
         
         // if no scans were uploaded for this run throw an exception
         if (uploaded == 0) {
@@ -212,19 +352,17 @@ public class MS2DataUploadService {
             saveChargeDependentAnalysis();
     }
     
-    int getMatchingRunId(String fileName, String sha1Sum) {
-
-        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
-        List <Integer> runIds = runDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
-
-        // return the database of the first matching run found
-        if (runIds.size() > 0)
-            return runIds.get(0);
-        return 0;
-    }
-    
-    public static void deleteRun(Integer runId) {
-        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
-        runDao.delete(runId);
+    private UploadException logAndAddUploadException(ERROR_CODE errCode, Exception sourceException, String file, String directory, String message) {
+        UploadException ex = null;
+        if (sourceException == null)
+            ex = new UploadException(errCode);
+        else
+            ex = new UploadException(errCode, sourceException);
+        ex.setFile(file);
+        ex.setDirectory(directory);
+        ex.setErrorMessage(message);
+        uploadExceptionList.add(ex);
+        log.error(ex.getMessage(), ex);
+        return ex;
     }
 }

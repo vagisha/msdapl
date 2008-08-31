@@ -85,7 +85,6 @@ public class SequestSQTDataUploadService {
     
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
-    private int searchId;
     private int lastUploadedRunSearchId;
     
     private int numSearchesToUpload = 0;
@@ -97,41 +96,36 @@ public class SequestSQTDataUploadService {
     private String sequestVersion = "uninit";
    
     
-    private void init() {
+    public SequestSQTDataUploadService() {
+        this.proteinMatchList = new ArrayList<MsSearchResultProteinDb>();
+        this.sequestResultDataList = new ArrayList<SequestResultDataDb>();
+        this.resultModList = new ArrayList<MsResultDynamicResidueModDb>();
+        
+        this.uploadExceptionList = new ArrayList<UploadException>();
+    }
+    
+    private void reset() {
         
         // RESET THE DYNAMIC MOD LOOKUP UTILITY
         dynaModLookup.reset();
         
-        searchId = 0;
-        lastUploadedRunSearchId = 0;
-        
         numSearchesToUpload = 0;
         numSearchesUploaded = 0;
         
-//        dbSequenceLength = 0;
-//        dbProteinCount = 0;
-        sequestVersion = "uninit";
+        resetCaches();
         
-        if (proteinMatchList != null)
-            proteinMatchList.clear();
-        else
-            proteinMatchList = new ArrayList<MsSearchResultProteinDb>();
-        if (sequestResultDataList != null)
-            sequestResultDataList.clear();
-        else
-            sequestResultDataList = new ArrayList<SequestResultDataDb>();
-        if (resultModList != null)
-            resultModList.clear();
-        else
-            resultModList = new ArrayList<MsResultDynamicResidueModDb>();
-        if (uploadExceptionList != null)
-            uploadExceptionList.clear();
-        else
-            uploadExceptionList = new ArrayList<UploadException>();
+        uploadExceptionList.clear();
     }
-    
-    public int getUploadedSearchId() {
-        return searchId;
+
+    private void resetCaches() {
+        proteinMatchList.clear();
+        sequestResultDataList.clear();
+        resultModList.clear();
+
+        lastUploadedRunSearchId = 0;
+//      dbSequenceLength = 0;
+//      dbProteinCount = 0;
+        sequestVersion = "uninit";
     }
     
     public List<UploadException> getUploadExceptionList() {
@@ -146,6 +140,11 @@ public class SequestSQTDataUploadService {
         return numSearchesUploaded;
     }
     
+    public static void deleteSearch(int searchId) {
+        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+        searchDao.deleteSearch(searchId);
+    }
+    
     /**
      * @param fileDirectory 
      * @param fileNames names of sqt files (without the .sqt extension)
@@ -153,17 +152,20 @@ public class SequestSQTDataUploadService {
      * @param remoteServer 
      * @param remoteDirectory 
      * @param searchDate 
-     * @return
+     * @return searchId
      * @throws UploadException 
      */
-    public void uploadSQTSearch(String fileDirectory, Set<String> fileNames, Map<String,Integer> runIdMap, String remoteServer, String remoteDirectory, Date searchDate) {
+    public int uploadSequestSearch(String fileDirectory, Set<String> fileNames, Map<String,Integer> runIdMap, String remoteServer, String remoteDirectory, Date searchDate) {
 
-        init();// reset all caches etc.
+        reset();// reset all caches etc.
+        
+        // get the number of sqt file in the directory
+        this.numSearchesToUpload = getNumFilesToUpload(fileDirectory, fileNames);
         
         // parse the parameter file 
         SequestParamsParser parser = parseSequestParams(fileDirectory, remoteServer);
         if (parser == null)
-            return;
+            return 0;
         
         // dynamic residue mods found in the params file
         List<MsResidueModification> dynaResMods = parser.getDynamicResidueMods();
@@ -173,10 +175,10 @@ public class SequestSQTDataUploadService {
         String searchDbName = parser.getSearchDatabase().getServerPath();
         
         // Upload to-level search data
-        searchId = uploadSearchParams(parser, remoteServer, remoteDirectory, searchDate);
+        int searchId = uploadSearchParams(parser, remoteServer, remoteDirectory, searchDate);
         // if an error happened while parsing or uploading the parameters file don't go any further.
         if (searchId == 0)
-            return;
+            return 0;
         
         // now upload the individual sqt files
         for (String file: fileNames) {
@@ -190,11 +192,19 @@ public class SequestSQTDataUploadService {
                 continue;
             }
             // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
-            // but the experiment upload will continue.
+            // but the rest of the upload will continue.
             uploadSequestSqtFile(remoteServer, filePath, searchId, runId, dynaResMods, usesEvalue, searchDbName);
         }
         
-
+        // if no sqt files were uploaded delete the top level search
+        if (numSearchesUploaded == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.NO_RUN_SEARCHES_UPLOADED);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED", ex);
+            deleteSearch(searchId);
+            searchId = 0;
+        }
+        
         // Update the "sequenceLength" and "proteinCount" columns in the msSequenceDataDetail table
         // TODO really??
         
@@ -202,8 +212,19 @@ public class SequestSQTDataUploadService {
         if (sequestVersion != null && !("uninit".equals(sequestVersion))) {
             updateSequestVersion(searchId, sequestVersion);
         }
+        
+        return searchId;
     }
     
+    private int getNumFilesToUpload(String fileDirectory, Set<String> fileNames) {
+        int num = 0;
+        for (String file: fileNames) {
+           if ((new File(fileDirectory+File.separator+file+".sqt")).exists())
+               num++;
+        }
+        return num;
+    }
+
     private SequestParamsParser parseSequestParams(String fileDirectory, final String remoteServer) {
         
         log.info("BEGIN Sequest search UPLOAD -- parsing sequest.params");
@@ -264,8 +285,9 @@ public class SequestSQTDataUploadService {
             int searchId, int runId, List<MsResidueModification> dynaResMods, 
             boolean usesEvalue, String searchDbName) {
         
+        resetCaches();
+        
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
-        numSearchesToUpload++;
         lastUploadedRunSearchId = 0;
         long startTime = System.currentTimeMillis();
         SequestSQTFileReader provider = new SequestSQTFileReader();
@@ -527,12 +549,6 @@ public class SequestSQTDataUploadService {
         return scanId;
     }
     
-    
-    public static void deleteSearch(int searchId) {
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-        searchDao.deleteSearch(searchId);
-    }
-   
     private void deleteLastUploadedRunSearch() {
         if (lastUploadedRunSearchId == 0)
             return;
