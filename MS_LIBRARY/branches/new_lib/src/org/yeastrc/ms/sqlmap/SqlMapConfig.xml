@@ -11,6 +11,14 @@
 		lazyLoadingEnabled="true"
 	/>
 	
+	<typeAlias alias="CharTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$CharTypeHandler"/>
+	<typeAlias alias="TerminalTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$TerminalTypeHandler"/>
+	<typeAlias alias="Terminal" type="org.yeastrc.ms.domain.search.MsTerminalModification$Terminal"/>
+	
+	<typeHandler jdbcType="CHAR" javaType="java.lang.Character" callback="CharTypeHandler"/>
+	<typeHandler jdbcType="CHAR" javaType="Terminal" callback="TerminalTypeHandler"/>
+	
+	
 	<transactionManager type="JDBC">
 		<dataSource type="SIMPLE"> 
       		<property name="JDBC.Driver" 
@@ -23,6 +31,8 @@
                 value="${db.password}"/> 
     	</dataSource>
 	</transactionManager>
+	
+	
 	
 	<!--  General sqlmaps -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/general/MsEnzymeSqlMap.xml"/>

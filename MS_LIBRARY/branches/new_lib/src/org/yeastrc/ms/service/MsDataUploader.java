@@ -22,6 +22,7 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
+import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
 
 public class MsDataUploader {
@@ -269,12 +270,12 @@ public class MsDataUploader {
             Set<String> filenames, String serverAddress,
             String serverDirectory, Map<String, Integer> runIdMap,
             Date searchDate) {
-//        this.uploadExceptionList.addAll(service.getUploadExceptionList());
-//        this.searchId = service.getUploadedSearchId();
-//        this.numSearchesToUpload = service.getNumSearchesToUpload();
-//        this.numSearchesUploaded = service.getNumSearchesUploaded();
-        // TODO
-        return 0;
+        ProlucidSQTDataUploadService service = new ProlucidSQTDataUploadService();
+        int searchId = service.uploadProlucidSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
+        this.uploadExceptionList.addAll(service.getUploadExceptionList());
+        this.numSearchesToUpload = service.getNumSearchesToUpload();
+        this.numSearchesUploaded = service.getNumSearchesUploaded();
+        return searchId;
     }
     
     /**

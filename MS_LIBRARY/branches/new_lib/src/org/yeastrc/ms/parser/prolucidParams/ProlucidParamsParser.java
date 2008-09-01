@@ -91,19 +91,33 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return this.parentParams;
     }
     
+    public boolean isEnzymeUsedForSearch() {
+        if (enzyme == null || enzyme.getName().equalsIgnoreCase("No_Enzyme"))
+            return false;
+        return true;
+    }
+    
     private void init(String remoteServer) {
         this.remoteServer = remoteServer;
-        parentParams = new ArrayList<ProlucidParam>();
-        staticResidueModifications = new ArrayList<MsResidueModification>();
-        staticTerminalModifications = new ArrayList<MsTerminalModification>();
-        dynamicResidueModifications = new ArrayList<MsResidueModification>();
-        dynamicTerminalModifications = new ArrayList<MsTerminalModification>();
+        parentParams.clear();
+        staticResidueModifications.clear();
+        staticTerminalModifications.clear();
+        dynamicResidueModifications.clear();
+        dynamicTerminalModifications.clear();
         this.database = null;
         this.enzyme = null;
         this.primaryScore = null;
         this.secondaryScore = null;
     }
 
+    public ProlucidParamsParser() {
+        parentParams = new ArrayList<ProlucidParam>();
+        staticResidueModifications = new ArrayList<MsResidueModification>();
+        staticTerminalModifications = new ArrayList<MsTerminalModification>();
+        dynamicResidueModifications = new ArrayList<MsResidueModification>();
+        dynamicTerminalModifications = new ArrayList<MsTerminalModification>();
+    }
+    
     public void parseParamsFile(String remoteServer, String filePath) throws DataProviderException {
 
         init(remoteServer);

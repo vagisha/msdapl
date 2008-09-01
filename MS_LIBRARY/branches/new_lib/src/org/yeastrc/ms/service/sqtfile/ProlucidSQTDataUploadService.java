@@ -1,7 +1,7 @@
 /**
- * SQTDataUploadService.java
+ * ProlucidSQTDataUploadService.java
  * @author Vagisha Sharma
- * Jul 15, 2008
+ * Aug 31, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.service.sqtfile;
@@ -16,54 +16,49 @@ import java.util.Map;
 import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestResultDataDb;
-import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.PrimaryScore;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.SecondaryScore;
+import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidSQTFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 /**
  * 
  */
-public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
+public class ProlucidSQTDataUploadService extends AbstractSQTDataUploadService {
 
+private static final String PROLUCID_PARAMS_FILE = "search.xml";
     
-    private static final String SEQUEST_PARAMS_FILE = "sequest.params";
-    
-    // these are the things we will cache and do bulk-inserts
-    List<SequestResultDataDb> sequestResultDataList; // sequest scores
+    List<ProlucidResultDataDb> prolucidResultDataList; // prolucid scores
     
     
-    public SequestSQTDataUploadService() {
+    public ProlucidSQTDataUploadService() {
         super();
-        this.sequestResultDataList = new ArrayList<SequestResultDataDb>();
+        this.prolucidResultDataList = new ArrayList<ProlucidResultDataDb>();
     }
-
+    
     void resetCaches() {
         super.resetCaches();
-        sequestResultDataList.clear();
+        prolucidResultDataList.clear();
     }
     
     /**
@@ -76,7 +71,7 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
      * @return searchId
      * @throws UploadException 
      */
-    public int uploadSequestSearch(String fileDirectory, Set<String> fileNames, Map<String,Integer> runIdMap, String remoteServer, String remoteDirectory, Date searchDate) {
+    public int uploadProlucidSearch(String fileDirectory, Set<String> fileNames, Map<String,Integer> runIdMap, String remoteServer, String remoteDirectory, Date searchDate) {
 
         reset();// reset all caches etc.
         
@@ -84,14 +79,21 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         this.numSearchesToUpload = getNumFilesToUpload(fileDirectory, fileNames);
         
         // parse the parameter file 
-        SequestParamsParser parser = parseSequestParams(fileDirectory, remoteServer);
+        ProlucidParamsParser parser = parseProlucidParams(fileDirectory, remoteServer);
         if (parser == null)
             return 0;
         
         // dynamic residue mods found in the params file
         List<MsResidueModification> dynaResMods = parser.getDynamicResidueMods();
-        // do the parameters indicate that e-value will be reported in the resuting sqt files? 
-        boolean usesEvalue = parser.reportEvalue();
+        // dynamic terminal mods found in the params file
+        List<MsTerminalModification> dynaTermMods = parser.getDynamicTerminalMods();
+        
+        // primary score type used for the search 
+        PrimaryScore primaryScoreType = parser.getPrimaryScoreType();
+        // secondary score type used for the search
+        SecondaryScore secondaryScoreType = parser.getSecondaryScoreType();
+        
+        
         // database used for the search (will be used to look up protein ids later)
         String searchDbName = parser.getSearchDatabase().getServerPath();
         
@@ -104,7 +106,6 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         // initialize the Modification lookup map
         dynaModLookup = new DynamicModLookupUtil(searchId);
         
-        
         // now upload the individual sqt files
         for (String file: fileNames) {
             String filePath = fileDirectory+File.separator+file+".sqt";
@@ -113,12 +114,12 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
                 continue;
             Integer runId = runIdMap.get(file); 
             if (runId == null) {
-                log.error("No runId for sqt file: "+file);
+                log.error("No runId for sqt file: "+file); // this should never happen
                 continue;
             }
             // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
             // but the rest of the upload will continue.
-            uploadSequestSqtFile(remoteServer, filePath, searchId, runId, dynaResMods, usesEvalue, searchDbName);
+            uploadProlucidSqtFile(remoteServer, filePath, searchId, runId, dynaResMods, dynaTermMods, searchDbName, primaryScoreType, secondaryScoreType);
         }
         
         // if no sqt files were uploaded delete the top level search
@@ -141,18 +142,18 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         return searchId;
     }
     
-    private SequestParamsParser parseSequestParams(String fileDirectory, final String remoteServer) {
+    private ProlucidParamsParser parseProlucidParams(String fileDirectory, final String remoteServer) {
         
-        log.info("BEGIN Sequest search UPLOAD -- parsing sequest.params");
-        String paramFile = fileDirectory+File.separator+SEQUEST_PARAMS_FILE;
+        log.info("BEGIN ProLuCID search upload -- parsing search.xml");
+        String paramFile = fileDirectory+File.separator+PROLUCID_PARAMS_FILE;
         if (!(new File(paramFile).exists())) {
-            UploadException ex = new UploadException(ERROR_CODE.MISSING_SEQUEST_PARAMS);
+            UploadException ex = new UploadException(ERROR_CODE.MISSING_PROLUCID_PARAMS);
             uploadExceptionList.add(ex);
             log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED", ex);
             return null;
         }
         // parse the parameters file
-        final SequestParamsParser parser = new SequestParamsParser();
+        final ProlucidParamsParser parser = new ProlucidParamsParser();
         try {
             parser.parseParamsFile(remoteServer, paramFile);
             return parser;
@@ -167,13 +168,13 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         }
     }
     
-    // parse and upload data from the sequest.params file
-    private int uploadSearchParams(SequestParamsParser parser, final String remoteServer, 
+    // parse and upload data from the search.xml file
+    private int uploadSearchParams(ProlucidParamsParser parser, final String remoteServer, 
             final String remoteDirectory, final Date searchDate) {
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            MsSearchDAO<SequestSearch, SequestSearchDb> searchDAO = DAOFactory.instance().getSequestSearchDAO();
+            MsSearchDAO<ProlucidSearch, ProlucidSearchDb> searchDAO = DAOFactory.instance().getProlucidSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate));
         }
         catch(RuntimeException e) {
@@ -185,23 +186,25 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         }
     }
 
-    
     // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
     // but the experiment upload will continue.
-    private void uploadSequestSqtFile(final String remoteServer, String filePath, 
-            int searchId, int runId, List<MsResidueModification> dynaResMods, 
-            boolean usesEvalue, String searchDbName) {
+    private void uploadProlucidSqtFile(final String remoteServer, String filePath, 
+            int searchId, int runId, 
+            List<MsResidueModification> dynaResMods, List<MsTerminalModification> dynaTermMods,
+            String searchDbName, 
+            PrimaryScore primaryScoreType, SecondaryScore secondaryScoreType) {
         
         resetCaches();
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
         lastUploadedRunSearchId = 0;
         long startTime = System.currentTimeMillis();
-        SequestSQTFileReader provider = new SequestSQTFileReader();
+        ProlucidSQTFileReader provider = new ProlucidSQTFileReader();
         
         try {
-            provider.open(filePath, remoteServer, usesEvalue);
+            provider.open(filePath, remoteServer, primaryScoreType, secondaryScoreType);
             provider.setDynamicResidueMods(dynaResMods);
+            provider.setDynamicTerminalMods(dynaTermMods);
         }
         catch (DataProviderException e) {
             provider.close();
@@ -214,7 +217,7 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         }
         
         try {
-            uploadSequestSqtFile(provider, searchId, runId, searchDbName);
+            uploadProlucidSqtFile(provider, searchId, runId, searchDbName);
         }
         catch (UploadException e) {
             deleteLastUploadedRunSearch(); // if something was uploaded delete it
@@ -244,7 +247,7 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
     }
     
     // parse and upload a sqt file
-    private void uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, String searchDbName) throws UploadException {
+    private void uploadProlucidSqtFile(ProlucidSQTFileReader provider, int searchId, int runId, String searchDbName) throws UploadException {
         
         try {
             lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
@@ -260,7 +263,7 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         int numResults = 0;
         int numProteins = 0;
         while (provider.hasNextSearchScan()) {
-            SequestSearchScan scan = null;
+            ProlucidSearchScan scan = null;
             try {
                 scan = provider.getNextSearchScan();
             }
@@ -275,7 +278,7 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
             uploadSearchScan(scan, lastUploadedRunSearchId, scanId); 
 
             // save all the search results for this scan
-            for (SequestSearchResult result: scan.getScanResults()) {
+            for (ProlucidSearchResult result: scan.getScanResults()) {
                 uploadSearchResult(result, searchId, scanId, searchDbName);
                 numResults++;
                 numProteins += result.getProteinMatchList().size();
@@ -288,10 +291,10 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
     }
 
     
-    private SequestSearch makeSearchObject(final SequestParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
-        return new SequestSearch() {
+    private ProlucidSearch makeSearchObject(final ProlucidParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
+        return new ProlucidSearch() {
             @Override
-            public List<SequestParam> getSequestParams() {return parser.getParamList();}
+            public List<ProlucidParam> getProlucidParams() {return parser.getParamList();}
             @Override
             public List<MsResidueModification> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
             @Override
@@ -312,14 +315,14 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
             @Override
             public String getAnalysisProgramName() {return parser.getSearchProgramName();}
             @Override
-            public String getAnalysisProgramVersion() {return null;} // we don't have this information in sequest.params
+            public String getAnalysisProgramVersion() {return null;} // we don't have this information in search.xml
             public Date getSearchDate() {return searchDate;}
             public String getServerAddress() {return remoteServer;}
             public String getServerDirectory() {return remoteDirectory;}
         };
     }
     
-    private int uploadSearchResult(SequestSearchResult result, int searchId, int scanId, String searchDbName) throws UploadException {
+    private int uploadSearchResult(ProlucidSearchResult result, int searchId, int scanId, String searchDbName) throws UploadException {
         
         MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
         int resultId = resultDao.saveResultOnly(result, searchId, scanId); // uploads data to the msRunSearchResult table ONLY
@@ -331,67 +334,39 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         uploadResultResidueMods(result, resultId, searchId);
         
         // upload the SQT file specific information for this result.
-        uploadSequestResultData(result.getSequestResultData(), resultId);
+        uploadProlucidResultData(result.getProlucidResultData(), resultId);
         
         return resultId;
     }
 
-    private void uploadProteinMatches(SequestSearchResult result, final int resultId, String searchDbName) throws UploadException {
-        // upload the protein matches if the cache has enough entries
-        if (proteinMatchList.size() >= BUF_SIZE) {
-            uploadProteinMatchBuffer();
+    private void uploadProlucidResultData(ProlucidResultData resultData, int resultId) {
+        // upload the Prolucid specific result information if the cache has enough entries
+        if (prolucidResultDataList.size() >= BUF_SIZE) {
+            uploadProlucidResultBuffer();
         }
-        // add the protein matches for this result to the cache
-        for (MsSearchResultProtein match: result.getProteinMatchList()) {
-            int proteinId = 0;
-            try {proteinId = NrSeqLookupUtil.getProteinId(searchDbName, match.getAccession());}
-            catch(NrSeqLookupException e) {
-               UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND, e);
-               ex.setErrorMessage(e.getMessage());
-               throw ex;
-            }
-            final int pid = proteinId;
-            proteinMatchList.add(new MsSearchResultProteinDb(){
-                public int getProteinId() { return pid; }
-                public int getResultId() { return resultId; }
-                });
-        }
-    }
-
-    private void uploadProteinMatchBuffer() {
-        MsSearchResultProteinDAO matchDao = daoFactory.getMsProteinMatchDAO();
-        matchDao.saveAll(proteinMatchList);
-        proteinMatchList.clear();
-    }
-    
-    
-    private void uploadSequestResultData(SequestResultData resultData, int resultId) {
-        // upload the Sequest specific result information if the cache has enough entries
-        if (sequestResultDataList.size() >= BUF_SIZE) {
-            uploadSequestResultBuffer();
-        }
-        // add the Sequest specific information for this result to the cache
+        // add the Prolucid specific information for this result to the cache
         ResultData resultDataDb = new ResultData(resultId, resultData);
-        sequestResultDataList.add(resultDataDb);
+        prolucidResultDataList.add(resultDataDb);
     }
     
-    private void uploadSequestResultBuffer() {
-        SequestSearchResultDAO sqtResultDao = daoFactory.getSequestResultDAO();
-        sqtResultDao.saveAllSequestResultData(sequestResultDataList);
-        sequestResultDataList.clear();
+    private void uploadProlucidResultBuffer() {
+        ProlucidSearchResultDAO sqtResultDao = daoFactory.getProlucidResultDAO();
+        sqtResultDao.saveAllProlucidResultData(prolucidResultDataList);
+        prolucidResultDataList.clear();
     }
     
-    void flush() {
+    protected void flush() {
         super.flush();
-        if (sequestResultDataList.size() > 0) {
-            uploadSequestResultBuffer();
+        if (prolucidResultDataList.size() > 0) {
+            uploadProlucidResultBuffer();
         }
     }
     
-    private static final class ResultData implements SequestResultDataDb {
-        private final SequestResultData data;
+    static final class ResultData implements ProlucidResultDataDb {
+        
+        private final ProlucidResultData data;
         private final int resultId;
-        public ResultData(int resultId, SequestResultData data) {
+        public ResultData(int resultId, ProlucidResultData data) {
             this.data = data;
             this.resultId = resultId;
         }
@@ -406,10 +381,6 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         @Override
         public BigDecimal getDeltaCN() {
             return data.getDeltaCN();
-        }
-        @Override
-        public Double getEvalue() {
-            return data.getEvalue();
         }
         @Override
         public int getMatchingIons() {
@@ -434,6 +405,14 @@ public class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
         @Override
         public int getxCorrRank() {
             return data.getxCorrRank();
+        }
+        @Override
+        public Double getBinomialScore() {
+            return data.getBinomialScore();
+        }
+        @Override
+        public Double getZscore() {
+            return data.getZscore();
         }
     }
 }

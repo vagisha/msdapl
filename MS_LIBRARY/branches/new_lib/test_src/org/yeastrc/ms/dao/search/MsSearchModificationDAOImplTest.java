@@ -6,16 +6,19 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 
 public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
+        resetDatabase();
     }
 
     protected void tearDown() throws Exception {
@@ -99,6 +102,17 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         }
         return mods;
     }
+    
+    private MsTerminalModification[] createDynaTermMods(String[] mass, Terminal[] terminals) {
+        assertTrue(mass.length > 0);
+        assertEquals(mass.length, terminals.length);
+
+        MsTerminalModification[] mods = new MsTerminalModification[mass.length];
+        for (int i = 0; i < mass.length; i++) {
+            mods[i] = makeDynamicTerminalMod(terminals[i], mass[i], '\u0000');
+        }
+        return mods;
+    }
 
     private void doDynamicModTest(char[] residue, String[] mass, char[] symbol) {
 
@@ -140,17 +154,17 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         }
 
         // now delete the modifications
-        modDao.deleteDynamicModificationsForSearch(1);
+        modDao.deleteDynamicResidueModsForSearch(1);
         modList1 = modDao.loadDynamicResidueModsForSearch(1);
         assertEquals(0, modList1.size());
 
-        modDao.deleteDynamicModificationsForSearch(2);
+        modDao.deleteDynamicResidueModsForSearch(2);
         modList2 = modDao.loadDynamicResidueModsForSearch(2);
         assertEquals(0, modList2.size());
     }
 
 
-    public void testOperationsForDynaModsForSearchResult() {
+    public void testOperationsForDynaResModsForSearchResult() {
 
         // create some dynamic mods 
         String[] mass = new String[] {"123.4", "56.7","987.6","54.3"};
@@ -172,10 +186,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         MsResultDynamicResidueMod rmod2_1 = makeResultDynamicResidueMod(residue[2], mass[2], symbol[2], 1);
         MsResultDynamicResidueMod rmod2_2 = makeResultDynamicResidueMod(residue[3], mass[3], symbol[3], 2);
         
-        modDao.saveDynamicResidueModForResult(rmod1_1, 3, getModId(1, mods[0])); // mod, resultId, modificationId
-        modDao.saveDynamicResidueModForResult(rmod1_2, 3, getModId(1, mods[1]));
-        modDao.saveDynamicResidueModForResult(rmod2_1, 4, getModId(2, mods[2]));
-        modDao.saveDynamicResidueModForResult(rmod2_2, 4, getModId(2, mods[3]));
+        modDao.saveDynamicResidueModForResult(rmod1_1, 3, getDynaResModId(1, mods[0])); // mod, resultId, modificationId
+        modDao.saveDynamicResidueModForResult(rmod1_2, 3, getDynaResModId(1, mods[1]));
+        modDao.saveDynamicResidueModForResult(rmod2_1, 4, getDynaResModId(2, mods[2]));
+        modDao.saveDynamicResidueModForResult(rmod2_2, 4, getDynaResModId(2, mods[3]));
 
         // load dynamic modifications for the two search results
         List<MsResultDynamicResidueModDb> resultMods1 = modDao.loadDynamicResidueModsForResult(3);
@@ -189,41 +203,122 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         // make sure to save dynamic modifications for search result in increasing order of position.
         Collections.sort(resultMods1, new MsSearchResultDynamicModComparator());
 
-        compareResultMods(mods[0], resultMods1.get(0), 3, mod1_1Id);
-        compareResultMods(mods[1], resultMods1.get(1), 3, mod1_2Id);
+        compareResultResidueMods(mods[0], resultMods1.get(0), 3, mod1_1Id);
+        compareResultResidueMods(mods[1], resultMods1.get(1), 3, mod1_2Id);
 
 
         Collections.sort(resultMods2, new MsSearchResultDynamicModComparator());
-        compareResultMods(mods[2], resultMods2.get(0), 4, mod2_1Id);
-        compareResultMods(mods[3], resultMods2.get(1), 4, mod2_2Id);
+        compareResultResidueMods(mods[2], resultMods2.get(0), 4, mod2_1Id);
+        compareResultResidueMods(mods[3], resultMods2.get(1), 4, mod2_2Id);
 
 
         // delete the search and result modification entries
-        modDao.deleteDynamicModificationsForSearch(1);
+        modDao.deleteDynamicResidueModsForSearch(1);
         assertEquals(0, modDao.loadDynamicResidueModsForSearch(1).size());
         assertEquals(0, modDao.loadDynamicResidueModsForResult(3).size());
         // the other one should still be there
         assertEquals(2, modDao.loadDynamicResidueModsForSearch(2).size());
         assertEquals(2, modDao.loadDynamicResidueModsForResult(4).size());
 
-        modDao.deleteDynamicModificationsForSearch(2);
+        modDao.deleteDynamicResidueModsForSearch(2);
         assertEquals(0, modDao.loadDynamicResidueModsForSearch(2).size());
         assertEquals(0, modDao.loadDynamicResidueModsForResult(4).size());
 
     }
 
-    private int getModId(int searchId, MsResidueModification mod) {
-        DynamicModLookupUtil util = DynamicModLookupUtil.instance();
-        return util.getDynamicResidueModificationId(searchId, mod.getModifiedResidue(), mod.getModificationMass());
+    
+    public void testOperationsForDynaTermModsForSearchResult() {
+
+        // create some dynamic mods 
+        String[] mass = new String[] {"123.4", "56.7","987.6","54.3"};
+        Terminal[] terminals = new Terminal[]{Terminal.NTERM, Terminal.CTERM, Terminal.NTERM, Terminal.NTERM};
+        MsTerminalModification[] mods = createDynaTermMods(mass, terminals);
+        assertEquals(mass.length, mods.length);
+
+
+        // save them to the database
+        int mod1_1Id = modDao.saveDynamicTerminalMod(mods[0], 1); // searchId = 1
+        int mod1_2Id = modDao.saveDynamicTerminalMod(mods[1], 1);
+        int mod2_1Id = modDao.saveDynamicTerminalMod(mods[2], 2); // searchId = 2
+        int mod2_2Id = modDao.saveDynamicTerminalMod(mods[3], 2);
+
+        // save some dynamic modifications for two search results
+        modDao.saveDynamicTerminalModForResult(3, getDynaTermModId(1, mods[0])); // mod, resultId, modificationId
+        modDao.saveDynamicTerminalModForResult(3, getDynaTermModId(1, mods[1]));
+        modDao.saveDynamicTerminalModForResult(4, getDynaTermModId(2, mods[2]));
+        modDao.saveDynamicTerminalModForResult(4, getDynaTermModId(2, mods[3]));
+
+        // load dynamic terminal modifications for the two search results
+        List<MsResultDynamicTerminalModDb> resultMods1 = modDao.loadDynamicTerminalModsForResult(3);
+        assertEquals(2, resultMods1.size());
+        List<MsResultDynamicTerminalModDb> resultMods2 = modDao.loadDynamicTerminalModsForResult(4);
+        assertEquals(2, resultMods2.size());
+
+
+        // make sure the values saved and read back are accurate
+        // NOTE: sort by modId; msDynamicModResult table does not have a id field so we sort by position.
+        // make sure to save dynamic modifications for search result in increasing order of position.
+        Collections.sort(resultMods1, new Comparator<MsResultDynamicTerminalModDb>(){
+            public int compare(MsResultDynamicTerminalModDb o1,
+                    MsResultDynamicTerminalModDb o2) {
+                return Integer.valueOf(o1.getModificationId()).compareTo(Integer.valueOf(o2.getModificationId()));
+            }});
+
+        compareResultTerminalMods(mods[0], resultMods1.get(0), 3, mod1_1Id);
+        compareResultTerminalMods(mods[1], resultMods1.get(1), 3, mod1_2Id);
+
+
+        Collections.sort(resultMods2, new Comparator<MsResultDynamicTerminalModDb>(){
+            public int compare(MsResultDynamicTerminalModDb o1,
+                    MsResultDynamicTerminalModDb o2) {
+                return Integer.valueOf(o1.getModificationId()).compareTo(Integer.valueOf(o2.getModificationId()));
+            }});
+        compareResultTerminalMods(mods[2], resultMods2.get(0), 4, mod2_1Id);
+        compareResultTerminalMods(mods[3], resultMods2.get(1), 4, mod2_2Id);
+
+
+        // delete the search and result modification entries
+        modDao.deleteDynamicTerminalModsForSearch(1);
+        assertEquals(0, modDao.loadDynamicTerminalModsForSearch(1).size());
+        assertEquals(0, modDao.loadDynamicTerminalModsForResult(3).size());
+        // the other one should still be there
+        assertEquals(2, modDao.loadDynamicTerminalModsForSearch(2).size());
+        assertEquals(2, modDao.loadDynamicTerminalModsForResult(4).size());
+
+        modDao.deleteDynamicTerminalModsForSearch(2);
+        assertEquals(0, modDao.loadDynamicTerminalModsForSearch(2).size());
+        assertEquals(0, modDao.loadDynamicTerminalModsForResult(4).size());
+
+    }
+    
+    private int getDynaResModId(int searchId, MsResidueModification mod) {
+        return modDao.loadMatchingDynamicResidueModId(searchId, mod);
+//        DynamicModLookupUtil util = DynamicModLookupUtil.instance();
+//        return util.getDynamicResidueModificationId(searchId, mod.getModifiedResidue(), mod.getModificationMass());
+    }
+    
+    private int getDynaTermModId(int searchId, MsTerminalModification mod) {
+        return modDao.loadMatchingDynamicTerminalModId(searchId, mod);
     }
 
-    private void compareResultMods(MsResidueModification searchMod,
+    private void compareResultResidueMods(MsResidueModification searchMod,
             MsResultDynamicResidueModDb resultMod, int resultId,
             int modId) {
         assertEquals(resultId, resultMod.getResultId());
         assertEquals(modId, resultMod.getModificationId());
         assertEquals(searchMod.getModificationMass().doubleValue(), resultMod.getModificationMass().doubleValue());
         assertEquals(searchMod.getModifiedResidue(), resultMod.getModifiedResidue());
+        assertEquals(searchMod.getModificationSymbol(), resultMod.getModificationSymbol());
+
+    }
+    
+    private void compareResultTerminalMods(MsTerminalModification searchMod,
+            MsResultDynamicTerminalModDb resultMod, int resultId,
+            int modId) {
+        assertEquals(resultId, resultMod.getResultId());
+        assertEquals(modId, resultMod.getModificationId());
+        assertEquals(searchMod.getModificationMass().doubleValue(), resultMod.getModificationMass().doubleValue());
+        assertEquals(searchMod.getModifiedTerminal(), resultMod.getModifiedTerminal());
         assertEquals(searchMod.getModificationSymbol(), resultMod.getModificationSymbol());
 
     }

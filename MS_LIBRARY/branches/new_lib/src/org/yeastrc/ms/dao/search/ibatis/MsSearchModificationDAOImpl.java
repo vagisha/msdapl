@@ -63,7 +63,7 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return saveAndReturnId("MsSearchMod.insertDynamicResidueMod", modDb);
     }
 
-    public void deleteDynamicModificationsForSearch(int searchId) {
+    public void deleteDynamicResidueModsForSearch(int searchId) {
         delete("MsSearchMod.deleteDynamicResidueModsForSearch", searchId);
     }
 
@@ -107,6 +107,16 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return queryForList("MsSearchMod.selectDynamicResidueModsForResult", resultId);
     }
 
+    @Override
+    public int loadMatchingDynamicResidueModId(int searchId,
+            MsResidueModification mod) {
+        MsResidueModSqlMapParam modDb = new MsResidueModSqlMapParam(searchId, mod);
+        Integer modId = (Integer)queryForObject("MsSearchMod.selectMatchingDynaResModId", modDb);
+        if (modId == null)
+            return 0;
+        return modId;
+    }
+    
     public void saveDynamicResidueModForResult(MsResultDynamicResidueMod mod, int resultId,
             int modificationId) {
         MsResultResidueModSqlMapParam modDb = new MsResultResidueModSqlMapParam(resultId, modificationId, mod.getModifiedPosition());
@@ -142,6 +152,16 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return queryForList("MsSearchMod.selectDynamicTerminalModsForResult", resultId);
     }
 
+    @Override
+    public int loadMatchingDynamicTerminalModId(
+            int searchId, MsTerminalModification mod) {
+        MsTerminalModSqlMapParam modDb = new MsTerminalModSqlMapParam(searchId, mod);
+        Integer modId = (Integer)queryForObject("MsSearchMod.selectMatchingDynaTermModId", modDb);
+        if (modId == null)
+            return 0;
+        return modId;
+    }
+    
     public void saveDynamicTerminalModForResult(int resultId, int modificationId) {
         MsResultTerminalModSqlMapParam modDb = new MsResultTerminalModSqlMapParam(resultId, modificationId);
         save("MsSearchMod.insertResultDynamicTerminalMod", modDb);
@@ -354,4 +374,5 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
             return term;
         }
     }
+
 }

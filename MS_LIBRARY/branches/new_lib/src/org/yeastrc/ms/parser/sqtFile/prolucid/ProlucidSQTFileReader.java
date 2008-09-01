@@ -1,20 +1,22 @@
 /**
- * SequestSQTFileReader.java
+ * ProlucidSQTFileReader.java
  * @author Vagisha Sharma
- * Aug 21, 2008
+ * Aug 30, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.parser.sqtFile.sequest;
+package org.yeastrc.ms.parser.sqtFile.prolucid;
 
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.PrimaryScore;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.SecondaryScore;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
@@ -22,42 +24,45 @@ import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 /**
  * 
  */
-public class SequestSQTFileReader extends SQTFileReader {
+public class ProlucidSQTFileReader extends SQTFileReader {
 
-    private boolean useEvalue = false;
-
-    public SequestSQTFileReader() {
-        super();
-    }
-
-    public void open(String filePath, String serverAddress, boolean useEvalue) throws DataProviderException{
-        super.open(filePath, serverAddress);
-        this.useEvalue = useEvalue;
-    }
-
-    public void open(String fileName, Reader input, String serverAddress, boolean useEvalue) throws DataProviderException  {
-        super.open(fileName, input, serverAddress);
-        this.useEvalue = useEvalue;
-    }
-
+    
+    private PrimaryScore primaryScoreType;
+    private SecondaryScore secondaryScoreType;
+    
     public void init() {
         super.init();
-        useEvalue = false;
+        primaryScoreType = null;
+        secondaryScoreType = null;
     }
+    
+    public void open(String filePath, String serverAddress, PrimaryScore primaryScore, SecondaryScore secondaryScore) throws DataProviderException{
+        super.open(filePath, serverAddress);
+        this.primaryScoreType = primaryScore;
+        this.secondaryScoreType = secondaryScore;
+    }
+    
+    public void open(String fileName, Reader input, String serverAddress, PrimaryScore primaryScore, SecondaryScore secondaryScore) throws DataProviderException  {
+        super.open(fileName, input, serverAddress);
+        this.primaryScoreType = primaryScore;
+        this.secondaryScoreType = secondaryScore;
+    }
+    
+    
     /**
      * Returns the next scan in the file. 
      * @return
      * @throws DataProviderException if the scan or any of its associated results were invalid
      */
     @Override
-    public SequestSearchScan getNextSearchScan() throws DataProviderException {
-        SeqSearchScan scan = new SeqSearchScan(parseScan(currentLine));
+    public ProlucidSearchScan getNextSearchScan() throws DataProviderException {
+        PlucidSearchScan scan = new PlucidSearchScan(parseScan(currentLine));
         advanceLine();
 
         while(currentLine != null) {
             // is this one of the results for the scan ('M' line)
             if (isResultLine(currentLine)) {
-                SequestSearchResult result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
+                ProlucidSearchResult result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
                 if (result != null) 
                     scan.addSearchResult(result);
             }
@@ -75,9 +80,9 @@ public class SequestSQTFileReader extends SQTFileReader {
      * @return
      * @throws DataProviderException 
      */
-    private SequestSearchResult parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
+    private ProlucidSearchResult parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
 
-        SequestResult result = parsePeptideResult(currentLine, scanNumber, charge);
+        ProlucidResult result = parsePeptideResult(currentLine, scanNumber, charge);
 
         advanceLine();
 
@@ -105,24 +110,23 @@ public class SequestSQTFileReader extends SQTFileReader {
      *                         there was an error parsing numbers in the line OR
      *                         there was an error parsing the peptide sequence in this 'M' line.
      */
-    SequestResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
+    ProlucidResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
 
         String[] tokens = line.split("\\s+");
         if (tokens.length != 11) {
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-        SequestResult result = new SequestResult(getDynamicResidueMods());
+        ProlucidResult result = new ProlucidResult(getDynamicResidueMods(), getDynamicTerminalMods());
         try {
             result.setxCorrRank(Integer.parseInt(tokens[1]));
             result.setSpRank(Integer.parseInt(tokens[2]));
             result.setMass(new BigDecimal(tokens[3]));
-            result.setDeltaCN(new BigDecimal(tokens[4]));
+//            result.setDeltaCN(new BigDecimal(tokens[4]));
+            result.setBinomialScore(Double.valueOf(tokens[4]));
             result.setXcorr(new BigDecimal(tokens[5]));
-            if (useEvalue)
-                result.setEvalue(Double.parseDouble(tokens[6]));
-            else
-                result.setSp(new BigDecimal(tokens[6]));
+//            result.setSp(new BigDecimal(tokens[6]));
+            result.setZscore(Double.valueOf(tokens[6]));
             result.setNumMatchingIons(Integer.parseInt(tokens[7]));
             result.setNumPredictedIons(Integer.parseInt(tokens[8]));
         }
@@ -145,19 +149,20 @@ public class SequestSQTFileReader extends SQTFileReader {
         return result;
     }
 
-    private static final class SeqSearchScan implements SequestSearchScan {
+
+    private static final class PlucidSearchScan implements ProlucidSearchScan {
 
         private SQTSearchScan scan;
-        private List<SequestSearchResult> resultList;
+        private List<ProlucidSearchResult> resultList;
 
-        public SeqSearchScan(SQTSearchScan scan) {
+        public PlucidSearchScan(SQTSearchScan scan) {
             this.scan = scan;
-            resultList = new ArrayList<SequestSearchResult>();
+            resultList = new ArrayList<ProlucidSearchResult>();
         }
-        public void addSearchResult(SequestSearchResult result) {
+        public void addSearchResult(ProlucidSearchResult result) {
             resultList.add(result);
         }
-        public List<SequestSearchResult> getScanResults() {
+        public List<ProlucidSearchResult> getScanResults() {
             return resultList;
         }
         public int getScanNumber() {
@@ -186,4 +191,3 @@ public class SequestSQTFileReader extends SQTFileReader {
         }
     }
 }
-

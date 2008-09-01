@@ -21,7 +21,7 @@ public class SequestParamsParserTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        parser = new SequestParamsParser("remove.server");
+        parser = new SequestParamsParser();
     }
 
     protected void tearDown() throws Exception {
@@ -206,11 +206,11 @@ public class SequestParamsParserTest extends TestCase {
     public void testParseParamsFile() {
         String file = "resources/sequest.params";
         try {
-            parser.parseParamsFile(file);
+            parser.parseParamsFile("remote.server", file);
             // database
             MsSearchDatabase db = parser.getSearchDatabase();
             assertNotNull(db);
-            assertEquals("remove.server", db.getServerAddress());
+            assertEquals("remote.server", db.getServerAddress());
             assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", db.getServerPath());
             assertEquals(0, db.getSequenceLength());
             assertEquals(0, db.getProteinCount());

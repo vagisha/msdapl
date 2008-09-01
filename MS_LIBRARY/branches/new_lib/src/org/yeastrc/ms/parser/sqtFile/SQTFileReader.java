@@ -38,12 +38,12 @@ public abstract class SQTFileReader extends AbstractReader
     public void open(String filePath, String serverAddress) throws DataProviderException{
         this.serverAddress = serverAddress;
         super.open(filePath);
-     }
+    }
 
-     public void open(String fileName, Reader input, String serverAddress) throws DataProviderException  {
-         this.serverAddress = serverAddress;
-         super.open(fileName, input);
-     }
+    public void open(String fileName, Reader input, String serverAddress) throws DataProviderException  {
+        this.serverAddress = serverAddress;
+        super.open(fileName, input);
+    }
      
     public static SearchFileFormat getSearchFileType(String filePath) {
         

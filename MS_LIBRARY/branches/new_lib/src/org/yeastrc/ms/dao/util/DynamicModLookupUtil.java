@@ -15,38 +15,32 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 
 public class DynamicModLookupUtil {
 
-    private static int currentSearchId = 0;
-    private static DynamicModLookupUtil instance = new DynamicModLookupUtil();
 
     private MsSearchModificationDAO modDao;
 
     private static Map<String, Integer> residueModMap;
     private static Map<String, Integer> terminalModMap;
+    
+    private int searchId;
 
-    private DynamicModLookupUtil(){
+    public DynamicModLookupUtil(int searchId){
         modDao = DAOFactory.instance().getMsSearchModDAO();
         residueModMap = new HashMap<String, Integer>();
         terminalModMap = new HashMap<String, Integer>();
+        buildModLookups(searchId);
+        this.searchId = searchId;
     }
 
-    public static DynamicModLookupUtil instance() {
-        return instance;
+    public int getSearchId() {
+        return searchId;
     }
-
-    public void reset() {
-        residueModMap.clear();
-        terminalModMap.clear();
-        currentSearchId = 0;
-    }
-
-    private synchronized void buildModLookups(int searchId) {
-        if (currentSearchId == searchId)    return;
-        currentSearchId = searchId;
+    
+    private void buildModLookups(int searchId) {
         buildResidueModLookup(searchId);
         buildTerminalModLookup(searchId);
     }
     
-    private synchronized void buildResidueModLookup(int searchId) {
+    private void buildResidueModLookup(int searchId) {
         residueModMap.clear();
         List<MsResidueModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
         String key = null;
@@ -56,7 +50,7 @@ public class DynamicModLookupUtil {
         }
     }
 
-    private synchronized void buildTerminalModLookup(int searchId) {
+    private void buildTerminalModLookup(int searchId) {
         terminalModMap.clear();
         List<MsTerminalModificationDb> dynaMods = modDao.loadDynamicTerminalModsForSearch(searchId);
         String key = null;
@@ -71,7 +65,7 @@ public class DynamicModLookupUtil {
      * @param mod
      * @return
      */
-    public synchronized int getDynamicResidueModificationId(int searchId, MsResidueModification mod) {
+    public int getDynamicResidueModificationId(int searchId, MsResidueModification mod) {
         return getDynamicResidueModificationId(searchId, mod.getModifiedResidue(), mod.getModificationMass());
     }
     
@@ -82,8 +76,7 @@ public class DynamicModLookupUtil {
      * @return
      * @throws RuntimeException if no matching modification was found
      */
-    public synchronized int getDynamicResidueModificationId(int searchId, char modChar, BigDecimal modMass) {
-        buildModLookups(searchId);
+    public int getDynamicResidueModificationId(int searchId, char modChar, BigDecimal modMass) {
         Integer modId = residueModMap.get(modChar+""+modMass.doubleValue());
         if (modId != null)  return modId;
         throw new RuntimeException("No matching dynamic residue modification found for: searchId: "+
@@ -96,7 +89,7 @@ public class DynamicModLookupUtil {
      * @param mod
      * @return
      */
-    public synchronized int getDynamicTerminalModificationId(int searchId, MsTerminalModification mod) {
+    public int getDynamicTerminalModificationId(int searchId, MsTerminalModification mod) {
         return getDynamicTerminalModificationId(searchId, mod.getModifiedTerminal(), mod.getModificationMass());
     }
     
@@ -107,8 +100,7 @@ public class DynamicModLookupUtil {
      * @return
      * @throws RuntimeException if no matching modification was found
      */
-    public synchronized int getDynamicTerminalModificationId(int searchId, Terminal modTerminal, BigDecimal modMass) {
-        buildModLookups(searchId);
+    public int getDynamicTerminalModificationId(int searchId, Terminal modTerminal, BigDecimal modMass) {
         Integer modId = terminalModMap.get(modTerminal+""+modMass.doubleValue());
         if (modId != null)  return modId;
         throw new RuntimeException("No matching dynamic terminal modification found for: searchId: "+

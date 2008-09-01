@@ -3,6 +3,7 @@ package org.yeastrc.ms;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOTestSuite;
 import org.yeastrc.ms.dao.util.NrSeqLookupUtilTest;
 import org.yeastrc.ms.domain.impl.MsScanDbImplTest;
@@ -10,6 +11,7 @@ import org.yeastrc.ms.parser.ms2File.Ms2FileReaderTest;
 import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParserTest;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParserTest;
 import org.yeastrc.ms.parser.sqtFile.SQTParserTests;
+import org.yeastrc.ms.service.MsDataUploaderTest;
 import org.yeastrc.ms.util.DTASelectFileNameParseTest;
 import org.yeastrc.ms.util.PeakStringBuilderTest;
 import org.yeastrc.ms.util.PeakUtilsTest;
@@ -21,6 +23,8 @@ public class MsLibTests {
         
         TestSuite suite = new TestSuite("Test for org.yeastrc.ms");
         //$JUnit-BEGIN$
+        
+        BaseDAOTestCase.resetDatabase();
         
         // domain classes
         suite.addTestSuite(MsScanDbImplTest.class);
@@ -41,8 +45,8 @@ public class MsLibTests {
         suite.addTestSuite(DTASelectFileNameParseTest.class);
         suite.addTestSuite(NrSeqLookupUtilTest.class);
         
-//        // upload classes
-//        suite.addTestSuite(MsExperimentUploaderTest.class);
+        // upload classes
+        suite.addTestSuite(MsDataUploaderTest.class);
         
         //$JUnit-END$
         return suite;

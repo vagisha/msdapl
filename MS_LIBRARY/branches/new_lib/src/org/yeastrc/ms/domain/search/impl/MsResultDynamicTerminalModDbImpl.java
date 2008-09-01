@@ -45,7 +45,7 @@ public class MsResultDynamicTerminalModDbImpl implements
         return modifiedTerminal;
     }
 
-    public void setModificationTerminal(Terminal terminal) {
+    public void setModifiedTerminal(Terminal terminal) {
         this.modifiedTerminal = terminal;
     }
     

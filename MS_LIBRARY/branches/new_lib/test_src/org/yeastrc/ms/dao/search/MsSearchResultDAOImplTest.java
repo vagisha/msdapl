@@ -57,11 +57,11 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
         // delete modifications for searchId_1
-        modDao.deleteDynamicModificationsForSearch(runSearchId_1);
+        modDao.deleteDynamicResidueModsForSearch(runSearchId_1);
         modDao.deleteStaticResidueModsForSearch(runSearchId_1);
         
         // delete modifications for searchId_2
-        modDao.deleteDynamicModificationsForSearch(runSearchId_2);
+        modDao.deleteDynamicResidueModsForSearch(runSearchId_2);
         modDao.deleteStaticResidueModsForSearch(runSearchId_2);
     }
 

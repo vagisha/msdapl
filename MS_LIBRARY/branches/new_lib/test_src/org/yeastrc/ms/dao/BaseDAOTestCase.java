@@ -37,7 +37,6 @@ import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
 import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
-import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
@@ -166,7 +165,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsSearchResult makeSearchResult(int searchId, int runSearchId, int charge,String peptide, boolean addDynaResMod) {
 
         //!!------------ RESET the dynamic mod lookup table --------------------------------
-        DynamicModLookupUtil.instance().reset();
+//        DynamicModLookupUtil.instance().reset();
         //!!------------ RESET the dynamic mod lookup table --------------------------------
         
         MsSearchResultTest result = makeSearchResult(charge, peptide);
@@ -263,7 +262,7 @@ public class BaseDAOTestCase extends TestCase {
             final char modSymbol, final int modPos) {
         return new ResultResidueModification(modChar, modSymbol, new BigDecimal(modMass), modPos);
     }
-
+    
     //-----------------------------------------------------------------------------------------------------
     // SEARCH
     //-----------------------------------------------------------------------------------------------------

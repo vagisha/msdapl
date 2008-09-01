@@ -23,7 +23,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO <ProlucidSearch, ProlucidSearchDb> {
 
     
-private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
+    private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
     
     public ProlucidSearchDAOImpl(SqlMapClient sqlMap, MsSearchDAO<MsSearch, MsSearchDb> searchDao) {
         super(sqlMap);

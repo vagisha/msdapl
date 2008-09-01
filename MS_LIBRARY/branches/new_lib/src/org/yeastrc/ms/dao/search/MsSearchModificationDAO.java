@@ -26,6 +26,8 @@ public interface MsSearchModificationDAO {
     //-------------------------------------------------------------------------------------------
     public abstract List<MsResidueModificationDb> loadDynamicResidueModsForSearch(int searchId);
 
+    public abstract int loadMatchingDynamicResidueModId(int searchId, MsResidueModification mod);
+    
     public abstract int saveDynamicResidueMod(MsResidueModification mod, int searchId);
 
     /**
@@ -34,7 +36,7 @@ public interface MsSearchModificationDAO {
      * they are deleted as well (from the msDynamicModResult table).
      * @param searchId
      */
-    public abstract void deleteDynamicModificationsForSearch(int searchId);
+    public abstract void deleteDynamicResidueModsForSearch(int searchId);
     
     
     //-------------------------------------------------------------------------------------------
@@ -51,6 +53,8 @@ public interface MsSearchModificationDAO {
     // Modifications associated with a search (DYNAMIC TERMINAL) 
     //-------------------------------------------------------------------------------------------
     public abstract List<MsTerminalModificationDb> loadDynamicTerminalModsForSearch(int searchId);
+    
+    public abstract int loadMatchingDynamicTerminalModId(int searchId, MsTerminalModification mod);
 
     public abstract int saveDynamicTerminalMod(MsTerminalModification mod, int searchId);
 

@@ -21,20 +21,23 @@ import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2RunDAOImpl;
 import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ScanChargeDAOImpl;
 import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ScanDAOImpl;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.ibatis.MsRunSearchDAOImpl;
-import org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchDatabaseDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultProteinDAOImpl;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
+import org.yeastrc.ms.dao.search.prolucid.ibatis.ProlucidSearchDAOImpl;
+import org.yeastrc.ms.dao.search.prolucid.ibatis.ProlucidSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchDAOImpl;
+import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTHeaderDAOImpl;
@@ -50,10 +53,12 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchDb;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -122,6 +127,10 @@ public class DAOFactory {
     private SequestSearchResultDAO sequestResultDAO;
     private MsSearchDAO<SequestSearch, SequestSearchDb> sequestSearchDAO;
     
+    // DAOs for Prolucid related objects
+    private ProlucidSearchResultDAO prolucidResultDAO;
+    private MsSearchDAO<ProlucidSearch, ProlucidSearchDb> prolucidSearchDAO;
+    
     
     private DAOFactory() {
         
@@ -156,6 +165,10 @@ public class DAOFactory {
         // sequest search related
         sequestResultDAO = new SequestSearchResultDAOImpl(sqlMap, searchResultDAO);
         sequestSearchDAO = new SequestSearchDAOImpl(sqlMap, searchDAO);
+        
+        // prolucid search related
+        prolucidResultDAO = new ProlucidSearchResultDAOImpl(sqlMap, searchResultDAO);
+        prolucidSearchDAO = new ProlucidSearchDAOImpl(sqlMap, searchDAO);
         
     }
     
@@ -259,6 +272,17 @@ public class DAOFactory {
     
     public MsSearchDAO<SequestSearch, SequestSearchDb> getSequestSearchDAO() {
         return sequestSearchDAO;
+    }
+    
+    //-------------------------------------------------------------------------------------------
+    // ProLuCID SEARCH related
+    //-------------------------------------------------------------------------------------------
+    public ProlucidSearchResultDAO getProlucidResultDAO() {
+        return prolucidResultDAO;
+    }
+    
+    public MsSearchDAO<ProlucidSearch, ProlucidSearchDb> getProlucidSearchDAO() {
+        return prolucidSearchDAO;
     }
     
 }

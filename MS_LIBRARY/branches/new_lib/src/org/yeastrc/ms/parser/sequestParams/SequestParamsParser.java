@@ -59,14 +59,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
 
     private static final char[] modSymbols = {'*', '#', '@'};
 
-    public SequestParamsParser(String remoteServer) {
-        this.remoteServer = remoteServer;
-        paramList = new ArrayList<SequestParam>();
-        staticResidueModifications = new ArrayList<MsResidueModification>();
-        staticTerminalModifications = new ArrayList<MsTerminalModification>();
-        dynamicResidueModifications = new ArrayList<MsResidueModification>();
-    }
-
+    
     public MsSearchDatabase getSearchDatabase() {
         return database;
     }
@@ -110,7 +103,25 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         else return true;
     }
     
-    public void parseParamsFile(String filePath) throws DataProviderException {
+    public SequestParamsParser() {
+        paramList = new ArrayList<SequestParam>();
+        staticResidueModifications = new ArrayList<MsResidueModification>();
+        staticTerminalModifications = new ArrayList<MsTerminalModification>();
+        dynamicResidueModifications = new ArrayList<MsResidueModification>();
+    }
+
+    private void init(String remoteServer) {
+        this.remoteServer = remoteServer;
+        paramList.clear();
+        staticResidueModifications.clear();
+        staticTerminalModifications.clear();
+        dynamicResidueModifications.clear();
+    }
+    
+    public void parseParamsFile(String remoteServer, String filePath) throws DataProviderException {
+        
+        init(remoteServer);
+        
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(filePath));
@@ -305,7 +316,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
      */
     public static void main(String[] args) throws DataProviderException {
         String paramFile = "resources/sequest.params";
-        SequestParamsParser parser = new SequestParamsParser("remote.server");
-        parser.parseParamsFile(paramFile);
+        SequestParamsParser parser = new SequestParamsParser();
+        parser.parseParamsFile("remote.server", paramFile);
     }
 }
