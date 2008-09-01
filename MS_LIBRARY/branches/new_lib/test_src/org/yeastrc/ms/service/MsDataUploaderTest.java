@@ -21,7 +21,103 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+   
+    public void testUploadProlucidData() throws DataProviderException {
+        String dir = "test_resources/validProlucidData_dir1";
+        
+//        String dbName = "/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta";
+//        Set<String> uniqueAccessions = new HashSet<String>();
+//        
+//        // parse the sequest params file:
+//        SequestParamsParser parser = new SequestParamsParser("remote.server");
+//        parser.parseParamsFile(dir+File.separator+"sequest.params");
+//        
+//        int dbId = NrSeqLookupUtil.getDatabaseId(parser.getSearchDatabase().getServerPath());
+//        assertEquals(3, dbId);
+//        
+//        int proteinId = 1;
+//        StringBuilder buf = new StringBuilder();
+//        buf.append("INSERT INTO tblProteinDatabase (proteinID, databaseID, accessionString, isCurrent) VALUES ");
+//        
+//        
+//        List<MsResidueModification> dynaResidueMods = new ArrayList<MsResidueModification>();
+//        dynaResidueMods.add(new ResidueModification('G', BigDecimal.ZERO, '#'));
+//        dynaResidueMods.add(new ResidueModification('V', BigDecimal.ZERO, '#'));
+//        dynaResidueMods.add(new ResidueModification('D', BigDecimal.ZERO, '#'));
+//        dynaResidueMods.add(new ResidueModification('S', BigDecimal.ZERO, '*'));
+//        dynaResidueMods.add(new ResidueModification('T', BigDecimal.ZERO, '*'));
+//        dynaResidueMods.add(new ResidueModification('Y', BigDecimal.ZERO, '*'));
+//        
+//        List<MsResidueModification> modsFromParams = parser.getDynamicResidueMods();
+//        assertEquals(dynaResidueMods.size(), modsFromParams.size());
+//        
+//        Comparator<MsResidueModification> comp = new Comparator<MsResidueModification>() {
+//
+//            public int compare(MsResidueModification o1,
+//                    MsResidueModification o2) {
+//                return Character.valueOf(o1.getModificationSymbol()).compareTo(Character.valueOf(o2.getModificationSymbol()));
+//            }};
+//        Collections.sort(dynaResidueMods, comp);
+//        Collections.sort(modsFromParams, comp);
+//        for (int i = 0; i < dynaResidueMods.size(); i++) {
+//            MsResidueModification m1 = dynaResidueMods.get(i);
+//            MsResidueModification m2 = modsFromParams.get(i);
+//            assertEquals(m1.getModifiedResidue(), m2.getModifiedResidue());
+//            assertEquals(m2.getModificationMass(), m2.getModificationMass());
+//            assertEquals(m1.getModificationSymbol(), m2.getModificationSymbol());
+//        }
+//        
+//        // read the first file.
+//        SequestSQTFileReader reader = new SequestSQTFileReader();
+//        reader.open(dir+File.separator+"1.sqt");
+//        reader.setDynamicResidueMods(modsFromParams);
+//        reader.getSearchHeader();
+//        while (reader.hasNextSearchScan()) {
+//            SequestSearchScan scan = reader.getNextSearchScan();
+//            for (SequestSearchResult result : scan.getScanResults()) {
+//                for (MsSearchResultProtein pr : result.getProteinMatchList()) {
+//                    uniqueAccessions.add(pr.getAccession());
+//                    
+//                }
+//            }
+//        }
+//        reader.close();
+//        
+//        for (String acc: uniqueAccessions) {
+//            buf.append("("+proteinId+", "+dbId+", \""+acc+"\", 'T'),");
+//            proteinId++;
+//        }
+//        
+//        // read the second file
+//        reader = new SequestSQTFileReader();
+//        reader.open(dir+File.separator+"2.sqt");
+//        reader.setDynamicResidueMods(modsFromParams);
+//        reader.getSearchHeader();
+//        while (reader.hasNextSearchScan()) {
+//            SequestSearchScan scan = reader.getNextSearchScan();
+//            for (SequestSearchResult result : scan.getScanResults()) {
+//                for (MsSearchResultProtein pr : result.getProteinMatchList()) {
+//                    proteinId++;
+//                    buf.append("("+proteinId+", "+dbId+", \""+pr.getAccession()+"\", 'T'),");
+//                }
+//            }
+//        }
+//        reader.close();
+//        
+//        buf.deleteCharAt(buf.length() -1); // delete last comma
+//        System.out.println(buf.toString());
+        
+        
+        MsDataUploader uploader = new MsDataUploader();
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new java.util.Date());
+        }
+        catch (UploadException e) {
+            e.printStackTrace();
+            fail("Data is valid");
+        }
+        assertEquals(0, uploader.getUploadExceptionList().size());
+    }
     
     public void testUploadSequestData() throws DataProviderException {
         String dir = "test_resources/validSequestData_dir";

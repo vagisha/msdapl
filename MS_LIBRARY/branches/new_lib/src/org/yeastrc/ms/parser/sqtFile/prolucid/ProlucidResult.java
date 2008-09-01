@@ -122,8 +122,11 @@ public class ProlucidResult extends SQTSearchResult implements ProlucidSearchRes
     
     @Override
     public MsSearchResultPeptide buildPeptideResult() throws SQTParseException {
-        // TODO Auto-generated method stub
-        return null;
+        if (resultPeptide != null)
+            return resultPeptide;
+        
+        resultPeptide = ProlucidResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods, searchDynaTermMods);
+        return resultPeptide;
     }
 
     @Override

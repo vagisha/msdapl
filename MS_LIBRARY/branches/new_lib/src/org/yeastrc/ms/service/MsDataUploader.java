@@ -152,8 +152,8 @@ public class MsDataUploader {
             SearchFileFormat myType = SQTFileReader.getSearchFileType(sqtFile);
             
             // For now we support only sequest, ee-normalized sequest and ProLuCID sqt files. 
-            if (SearchFileFormat.SQT_SEQ != myType&& 
-                    SearchFileFormat.SQT_NSEQ != myType&&
+            if (SearchFileFormat.SQT_SEQ != myType && 
+                    SearchFileFormat.SQT_NSEQ != myType &&
                     SearchFileFormat.SQT_PLUCID != myType) {
                 UploadException ex = new UploadException(ERROR_CODE.UNSUPPORTED_SQT);
                 ex.setFile(sqtFile);

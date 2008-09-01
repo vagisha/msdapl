@@ -53,12 +53,12 @@
     </insert>
     
     <insert id="insertAll" parameterClass="String">
-    	INSERT INTO ProLuCIDSearchResult (
+    	INSERT INTO ProLuCIDSearchResult
     	(resultID, 
     	XCorrRank,
     	binomialScore,
     	XCorr,
-    	ZScore 
+    	ZScore, 
     	deltaCN, 
     	calculatedMass,
     	matchingIons,

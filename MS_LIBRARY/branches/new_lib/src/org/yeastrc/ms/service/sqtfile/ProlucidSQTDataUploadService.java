@@ -333,6 +333,9 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         // upload dynamic mods for this result
         uploadResultResidueMods(result, resultId, searchId);
         
+        // upload dynamic terminal mods for this result
+        uploadResultTerminalMods(result, resultId, searchId);
+        
         // upload the SQT file specific information for this result.
         uploadProlucidResultData(result.getProlucidResultData(), resultId);
         

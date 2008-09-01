@@ -28,7 +28,7 @@ public final class ProlucidResultPeptideBuilder {
 
     public static final ProlucidResultPeptideBuilder instance = new ProlucidResultPeptideBuilder();
     
-    static final Pattern singleMod = Pattern.compile("\\((\\d+\\.?\\d*)\\)");
+    static final Pattern singleMod = Pattern.compile("\\(([+|-]?\\d+\\.?\\d*)\\)");
     static final Pattern multipleMods = Pattern.compile("("+singleMod.toString()+")+");
     static final Pattern nTermModPattern = Pattern.compile("^"+multipleMods);
     static final Pattern cTermModPattern = Pattern.compile(multipleMods+"$");
