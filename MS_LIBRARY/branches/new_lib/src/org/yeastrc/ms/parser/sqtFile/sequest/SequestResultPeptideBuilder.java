@@ -37,7 +37,8 @@ public final class SequestResultPeptideBuilder {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new SQTParseException("sequence cannot be null or empty");
         
-//        System.out.println("BUILDING");
+        if (dynaResidueMods == null)
+            dynaResidueMods = new ArrayList<MsResidueModification>(0);
         
         if (resultSequence.length() < 5)
             throw new SQTParseException("sequence appears to be invalid: "+resultSequence);

@@ -81,7 +81,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         String sequence = "A.BC#DE@F.G";
         String dotless = null;
         try {
-            dotless = builder.removeDots(sequence);
+            dotless = SequestResultPeptideBuilder.removeDots(sequence);
         }
         catch (SQTParseException e1) {
             fail("Valid peptide sequence");
@@ -89,39 +89,39 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals("BC#DE@F", dotless);
         
         sequence = "ABCD";
-        try{builder.removeDots(sequence);fail("No dots");}
+        try{SequestResultPeptideBuilder.removeDots(sequence);fail("No dots");}
         catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
         
         sequence = ".ABCD";
-        try{builder.removeDots(sequence);fail("Only 1 dot");}
+        try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
         catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
         
         sequence = "A.BCD";
-        try{builder.removeDots(sequence);fail("Only 1 dot");}
+        try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
         catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
         
         sequence = "ABCD.";
-        try{builder.removeDots(sequence);fail("Only 1 dot");}
+        try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
         catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
         
         sequence = "ABC.D";
-        try{builder.removeDots(sequence);fail("Only 1 dot");}
+        try{SequestResultPeptideBuilder.removeDots(sequence);fail("Only 1 dot");}
         catch(SQTParseException e){assertEquals("Sequence does not have .(dots) in the expected position: "+sequence, e.getMessage());}
         
-        try {builder.removeDots("A.BCD.EF"); fail("Dot in the wrong position");}
+        try {SequestResultPeptideBuilder.removeDots("A.BCD.EF"); fail("Dot in the wrong position");}
         catch(SQTParseException e) {assertEquals("Sequence does not have .(dots) in the expected position: A.BCD.EF", e.getMessage());}
         
-        try {builder.removeDots("AB.CD.F"); fail("Dot in the wrong position");}
+        try {SequestResultPeptideBuilder.removeDots("AB.CD.F"); fail("Dot in the wrong position");}
         catch(SQTParseException e) {assertEquals("Sequence does not have .(dots) in the expected position: AB.CD.F", e.getMessage());}
         
-        try {builder.removeDots("AB.CD"); fail("Dot in the wrong position");}
+        try {SequestResultPeptideBuilder.removeDots("AB.CD"); fail("Dot in the wrong position");}
         catch(SQTParseException e) {assertEquals("Sequence does not have .(dots) in the expected position: AB.CD", e.getMessage());}
     }
     
     public void testGetOnlyPeptideSequence() {
         String seq = "B123CD#E*";
         try {
-            assertEquals("BCDE", builder.getOnlyPeptideSequence(seq));
+            assertEquals("BCDE", SequestResultPeptideBuilder.getOnlyPeptideSequence(seq));
         }
         catch (SQTParseException e) {
             fail("Valid sequence for this method");
@@ -140,7 +140,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         catch(SQTParseException e) {assertEquals("No matching modification found: A.; sequence: "+seq, e.getMessage());}
         
         try {
-            seq = builder.removeDots(seq);
+            seq = SequestResultPeptideBuilder.removeDots(seq);
         }
         catch (SQTParseException e) {
             fail("Valid sequence");
@@ -234,7 +234,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         String seq = "L.Gi|62822520|gb|AAY15068.1|SGVSIVNAVTYEPTVAGRPNAV.H";
         String dotLessUpperCase = null;
         try {
-            dotLessUpperCase = builder.removeDots(seq).toUpperCase();
+            dotLessUpperCase = SequestResultPeptideBuilder.removeDots(seq).toUpperCase();
         }
         catch (SQTParseException e1) {
             fail("Valid sequence for removeDots method");
@@ -270,7 +270,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         dynaMods.add(new Mod('S', '#', "111.0"));
         dynaMods.add(new Mod('T', '*', "80.0"));
         
-        String seq = "I.QKLRS*FEAFS#MPG.S";
+        String seq = "I.QKLRS*FEAFS#MPGT*.S";
         MsSearchResultPeptide resultPeptide = null;
         try {
             resultPeptide = builder.build(seq, dynaMods);
@@ -280,10 +280,10 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         }
         assertEquals('I', resultPeptide.getPreResidue());
         assertEquals('S', resultPeptide.getPostResidue());
-        assertEquals("QKLRSFEAFSMPG", resultPeptide.getPeptideSequence());
+        assertEquals("QKLRSFEAFSMPGT", resultPeptide.getPeptideSequence());
         
         List<MsResultDynamicResidueMod> resultMods = (List<MsResultDynamicResidueMod>) resultPeptide.getResultDynamicResidueModifications();
-        assertEquals(2, resultMods.size());
+        assertEquals(3, resultMods.size());
         Collections.sort(resultMods, new Comparator<MsResultDynamicResidueMod>() {
             public int compare(MsResultDynamicResidueMod o1,
                     MsResultDynamicResidueMod o2) {
@@ -300,6 +300,13 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals('#', mod.getModificationSymbol());
         assertEquals(9, mod.getModifiedPosition());
         assertEquals(BigDecimal.valueOf(111.0), mod.getModificationMass());
+        
+        mod = resultMods.get(2);
+        assertEquals('T', mod.getModifiedResidue());
+        assertEquals('*', mod.getModificationSymbol());
+        assertEquals(13, mod.getModifiedPosition());
+        assertEquals(BigDecimal.valueOf(80.0), mod.getModificationMass());
+
     }
     
     public void testBuildOneCharTwoMods() {

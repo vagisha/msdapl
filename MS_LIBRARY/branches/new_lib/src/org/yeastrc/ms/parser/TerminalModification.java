@@ -25,6 +25,11 @@ public class TerminalModification implements MsTerminalModification {
         this.modSymbol = modSymbol;
     }
     
+    public TerminalModification(Terminal modTerminal, BigDecimal modMass) {
+        this.modMass = modMass;
+        this.terminal = modTerminal;
+    }
+    
     public BigDecimal getModificationMass() {return modMass;}
     public char getModificationSymbol() {return modSymbol;}
     public Terminal getModifiedTerminal() {return terminal;}

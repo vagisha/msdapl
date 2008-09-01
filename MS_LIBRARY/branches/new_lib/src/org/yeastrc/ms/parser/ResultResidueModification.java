@@ -16,7 +16,7 @@ import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 public class ResultResidueModification implements MsResultDynamicResidueMod {
 
     private char modResidue;
-    private char modSymbol;
+    private char modSymbol = '\u0000';
     private BigDecimal modMass;
     private int position;
 
@@ -26,6 +26,13 @@ public class ResultResidueModification implements MsResultDynamicResidueMod {
         this.modMass = modMass;
         this.position = position;
     }
+    
+    public ResultResidueModification(char modResidue, BigDecimal modMass, int position) {
+        this.modResidue = modResidue;
+        this.modMass = modMass;
+        this.position = position;
+    }
+    
     public BigDecimal getModificationMass() {
         return modMass;
     }
