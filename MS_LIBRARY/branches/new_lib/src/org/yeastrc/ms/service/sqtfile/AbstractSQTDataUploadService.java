@@ -3,6 +3,8 @@ package org.yeastrc.ms.service.sqtfile;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +32,7 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
@@ -52,7 +55,7 @@ public abstract class AbstractSQTDataUploadService {
     static final int BUF_SIZE = 1000;
 
     // these are the things we will cache and do bulk-inserts
-    List<MsSearchResultProteinDb> proteinMatchList;
+    LinkedHashSet<MsSearchResultProteinDb> proteinMatchSet;
     List<MsResultDynamicResidueModDb> resultResidueModList;
     List<MsResultDynamicTerminalModDb> resultTerminalModList;
 
@@ -70,9 +73,9 @@ public abstract class AbstractSQTDataUploadService {
     int lastUploadedRunSearchId;
 
     public AbstractSQTDataUploadService() {
-        this.proteinMatchList = new ArrayList<MsSearchResultProteinDb>();
-        this.resultResidueModList = new ArrayList<MsResultDynamicResidueModDb>();
-        this.resultTerminalModList = new ArrayList<MsResultDynamicTerminalModDb>();
+        this.proteinMatchSet = new LinkedHashSet<MsSearchResultProteinDb>(BUF_SIZE);
+        this.resultResidueModList = new ArrayList<MsResultDynamicResidueModDb>(BUF_SIZE);
+        this.resultTerminalModList = new ArrayList<MsResultDynamicTerminalModDb>(BUF_SIZE);
         this.uploadExceptionList = new ArrayList<UploadException>();
     }
     
@@ -91,7 +94,7 @@ public abstract class AbstractSQTDataUploadService {
 
     void resetCaches() {
         
-        proteinMatchList.clear();
+        proteinMatchSet.clear();
         resultResidueModList.clear();
         resultTerminalModList.clear();
 
@@ -173,33 +176,36 @@ public abstract class AbstractSQTDataUploadService {
         spectrumDataDao.save(scan, runSearchId, scanId);
     }
 
-    final void uploadProteinMatches(MsSearchResult result, final int resultId, String searchDbName)
+    final void uploadProteinMatches(MsSearchResult result, final int resultId, int databaseId)
         throws UploadException {
         // upload the protein matches if the cache has enough entries
-        if (proteinMatchList.size() >= BUF_SIZE) {
+        if (proteinMatchSet.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();
         }
         // add the protein matches for this result to the cache
         for (MsSearchResultProtein match: result.getProteinMatchList()) {
             int proteinId = 0;
-            try {proteinId = NrSeqLookupUtil.getProteinId(searchDbName, match.getAccession());}
+            try {proteinId = NrSeqLookupUtil.getProteinId(databaseId, match.getAccession());}
             catch(NrSeqLookupException e) {
                 UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND, e);
                 ex.setErrorMessage(e.getMessage());
                 throw ex;
             }
-            final int pid = proteinId;
-            proteinMatchList.add(new MsSearchResultProteinDb(){
-                public int getProteinId() { return pid; }
-                public int getResultId() { return resultId; }
-            });
+            
+            // NOTE: we are using a Set for the proteinMatches.  ONLY UNIQUE ENTRIES WILL BE ADDED.
+            MsSearchResultProteinDbImpl prMatch = new MsSearchResultProteinDbImpl();
+            prMatch.setProteinId(proteinId);
+            prMatch.setResultId(resultId);
+            proteinMatchSet.add(prMatch);
         }
     }
-
+    
     private void uploadProteinMatchBuffer() {
         MsSearchResultProteinDAO matchDao = daoFactory.getMsProteinMatchDAO();
-        matchDao.saveAll(proteinMatchList);
-        proteinMatchList.clear();
+        List<MsSearchResultProteinDb> list = new ArrayList<MsSearchResultProteinDb>(proteinMatchSet.size());
+        list.addAll(proteinMatchSet);
+        matchDao.saveAll(list);
+        proteinMatchSet.clear();
     }
 
     // RESIDUE DYNAMIC MODIFICATION
@@ -256,7 +262,7 @@ public abstract class AbstractSQTDataUploadService {
     }
 
     void flush() {
-        if (proteinMatchList.size() > 0) {
+        if (proteinMatchSet.size() > 0) {
             uploadProteinMatchBuffer();
         }
         if (resultResidueModList.size() > 0) {

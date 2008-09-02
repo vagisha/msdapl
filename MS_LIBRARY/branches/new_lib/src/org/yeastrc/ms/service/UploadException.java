@@ -39,6 +39,7 @@ public class UploadException extends Exception {
         PARAM_PARSING_ERROR     ("Error parsing parameters file", WARN),
         NO_RUN_SEARCHES_UPLOADED("No run searches were uploaded", WARN),
         
+        SEARCHDB_NOT_FOUND      ("No matching search database found", WARN),
         PROTEIN_NOT_FOUND       ("Protein not found in database", WARN),
         
         RUNTIME_SQT_ERROR       ("Runtime exception.", WARN)

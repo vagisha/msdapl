@@ -63,7 +63,7 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         map.put("dbName", databaseName);
         map.put("accession", accession);
         Integer id = null;
-        String statementName = "NrSeq.selectProteinId";
+        String statementName = "NrSeq.selectProteinIdForDbName";
         try {
             id = (Integer) sqlMap.queryForObject(statementName, map);
         }
@@ -73,6 +73,31 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
         if (id == null)
             throw new NrSeqLookupException(databaseName, accession);
+        return id;
+    }
+    
+    /**
+     * 
+     * @param databaseId
+     * @param accession
+     * @return
+     * @throws NrSeqLookupException if no matching database entry is found
+     */
+    public static int getProteinId(int databaseId, String accession) throws NrSeqLookupException {
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("dbId", databaseId);
+        map.put("accession", accession);
+        Integer id = null;
+        String statementName = "NrSeq.selectProteinIdForDbId";
+        try {
+            id = (Integer) sqlMap.queryForObject(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+        if (id == null)
+            throw new NrSeqLookupException(databaseId, accession);
         return id;
     }
     

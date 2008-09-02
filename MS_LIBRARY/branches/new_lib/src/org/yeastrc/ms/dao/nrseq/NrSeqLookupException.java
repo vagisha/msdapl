@@ -15,6 +15,10 @@ public class NrSeqLookupException extends RuntimeException {
         super("No proteinID found for database: "+dbName+" and accession: "+accession);
     }
     
+    public NrSeqLookupException(int dbId, String accession) {
+        super("No proteinID found for databaseId: "+dbId+" and accession: "+accession);
+    }
+    
     public NrSeqLookupException(String dbName) {
         super("No database found with name: "+dbName);
     }

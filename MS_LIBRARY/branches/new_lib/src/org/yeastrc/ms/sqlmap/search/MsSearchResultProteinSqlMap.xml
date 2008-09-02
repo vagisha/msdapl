@@ -20,6 +20,11 @@
     	SELECT * FROM msProteinMatch WHERE resultID= #id#
     </select>
     
+    <select id="selectResultProteinCount" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(*) FROM msProteinMatch 
+    	WHERE resultID= #resultId#
+    	AND proteinID = #proteinId#
+    </select>
     
     <insert id="insert" parameterMap="msResultProteinParam">
     	INSERT INTO msProteinMatch (

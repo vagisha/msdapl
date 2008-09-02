@@ -31,4 +31,17 @@ public class MsSearchResultProteinDbImpl implements MsSearchResultProteinDb {
     public void setProteinId(int id) {
         this.proteinId = id;
     }
+    
+    public boolean equals(Object obj) {
+        if (obj == this)   return true;
+        if (!(obj instanceof MsSearchResultProteinDbImpl)) return false;
+        
+        MsSearchResultProteinDbImpl that = (MsSearchResultProteinDbImpl) obj;
+        return (this.proteinId == that.getProteinId() && 
+                this.resultId == that.getResultId());
+    }
+    
+    public int hashCode(){
+        return (resultId+""+proteinId).hashCode();
+    }
 }

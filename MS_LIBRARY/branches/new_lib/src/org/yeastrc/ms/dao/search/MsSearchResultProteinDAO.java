@@ -9,6 +9,7 @@ public interface MsSearchResultProteinDAO {
 
     public abstract List<MsSearchResultProteinDb> loadResultProteins(int resultId);
 
+    public abstract boolean resultProteinExists(int resultId, int proteinId);
     /**
      * @param resultProtein
      * @param searchDbName -- name of the database used for the search.

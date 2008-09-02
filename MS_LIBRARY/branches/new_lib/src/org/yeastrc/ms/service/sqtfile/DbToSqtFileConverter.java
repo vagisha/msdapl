@@ -92,7 +92,7 @@ public class DbToSqtFileConverter {
         List<MsSearchDatabaseDb> db = search.getSearchDatabases();
         if (db.size() == 0)
             return 0;
-        return NrSeqLookupUtil.getDatabaseId(db.get(0).getServerPath());
+        return NrSeqLookupUtil.getDatabaseId(db.get(0).getDatabaseFileName());
     }
     
     private void printSequestSQTData(SQTRunSearchDb runSearch, int searchDatabaseId, BufferedWriter outFile) throws IOException {

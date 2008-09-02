@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
@@ -44,7 +46,7 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 /**
  * 
  */
-public class ProlucidSQTDataUploadService extends AbstractSQTDataUploadService {
+public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadService {
 
 private static final String PROLUCID_PARAMS_FILE = "search.xml";
     
@@ -95,7 +97,16 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         
         
         // database used for the search (will be used to look up protein ids later)
-        String searchDbName = parser.getSearchDatabase().getServerPath();
+        String searchDbName = new File(parser.getSearchDatabase().getServerPath()).getName();
+        int searchDbId = 0; 
+        try {searchDbId = NrSeqLookupUtil.getDatabaseId(searchDbName);}
+        catch(NrSeqLookupException e) {
+            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND, e);
+            ex.setErrorMessage(e.getMessage());
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED", ex);
+            return 0;
+        }
         
         // Upload to-level search data
         int searchId = uploadSearchParams(parser, remoteServer, remoteDirectory, searchDate);
@@ -119,7 +130,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             }
             // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
             // but the rest of the upload will continue.
-            uploadProlucidSqtFile(remoteServer, filePath, searchId, runId, dynaResMods, dynaTermMods, searchDbName, primaryScoreType, secondaryScoreType);
+            uploadProlucidSqtFile(remoteServer, filePath, searchId, runId, dynaResMods, dynaTermMods, searchDbId, primaryScoreType, secondaryScoreType);
         }
         
         // if no sqt files were uploaded delete the top level search
@@ -191,7 +202,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     private void uploadProlucidSqtFile(final String remoteServer, String filePath, 
             int searchId, int runId, 
             List<MsResidueModification> dynaResMods, List<MsTerminalModification> dynaTermMods,
-            String searchDbName, 
+            int searchDbId, 
             PrimaryScore primaryScoreType, SecondaryScore secondaryScoreType) {
         
         resetCaches();
@@ -217,7 +228,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         }
         
         try {
-            uploadProlucidSqtFile(provider, searchId, runId, searchDbName);
+            uploadProlucidSqtFile(provider, searchId, runId, searchDbId);
         }
         catch (UploadException e) {
             deleteLastUploadedRunSearch(); // if something was uploaded delete it
@@ -247,7 +258,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     }
     
     // parse and upload a sqt file
-    private void uploadProlucidSqtFile(ProlucidSQTFileReader provider, int searchId, int runId, String searchDbName) throws UploadException {
+    private void uploadProlucidSqtFile(ProlucidSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
         try {
             lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
@@ -279,7 +290,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
 
             // save all the search results for this scan
             for (ProlucidSearchResult result: scan.getScanResults()) {
-                uploadSearchResult(result, searchId, scanId, searchDbName);
+                uploadSearchResult(result, lastUploadedRunSearchId, scanId, searchDbId);
                 numResults++;
                 numProteins += result.getProteinMatchList().size();
             }
@@ -322,19 +333,19 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         };
     }
     
-    private int uploadSearchResult(ProlucidSearchResult result, int searchId, int scanId, String searchDbName) throws UploadException {
+    private int uploadSearchResult(ProlucidSearchResult result, int runSearchId, int scanId, int searchDbId) throws UploadException {
         
         MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
-        int resultId = resultDao.saveResultOnly(result, searchId, scanId); // uploads data to the msRunSearchResult table ONLY
+        int resultId = resultDao.saveResultOnly(result, runSearchId, scanId); // uploads data to the msRunSearchResult table ONLY
         
         // upload the protein matches
-        uploadProteinMatches(result, resultId, searchDbName);
+        uploadProteinMatches(result, resultId, searchDbId);
         
         // upload dynamic mods for this result
-        uploadResultResidueMods(result, resultId, searchId);
+        uploadResultResidueMods(result, resultId, runSearchId);
         
         // upload dynamic terminal mods for this result
-        uploadResultTerminalMods(result, resultId, searchId);
+        uploadResultTerminalMods(result, resultId, runSearchId);
         
         // upload the SQT file specific information for this result.
         uploadProlucidResultData(result.getProlucidResultData(), resultId);

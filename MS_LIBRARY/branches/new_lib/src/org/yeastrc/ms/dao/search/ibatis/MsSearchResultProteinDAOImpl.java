@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
@@ -28,6 +30,18 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
 
     public List<MsSearchResultProteinDb> loadResultProteins(int resultId) {
         return queryForList("MsResultProtein.selectResultProteins", resultId);
+    }
+    
+    @Override
+    public boolean resultProteinExists(int resultId, int proteinId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("resultId", resultId);
+        map.put("proteinId", proteinId);
+        
+        Integer count = (Integer) queryForObject("MsResultProtein.selectResultProteinCount", map);
+        if (count == null || count == 0)
+            return false;
+        return true;
     }
     
     public void save(MsSearchResultProtein resultProtein, String searchDbName, int resultId) {

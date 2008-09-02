@@ -13,12 +13,19 @@
         SELECT id FROM tblDatabase WHERE name = #name#
     </select>
     
-    <select id="selectProteinId" resultClass="Integer" parameterClass="java.util.Map"> 
+    <select id="selectProteinIdForDbName" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT pr.proteinID
         FROM tblDatabase as db, tblProteinDatabase as pr 
         WHERE db.name = #dbName#
         AND pr.accessionString = #accession#
         AND db.id = pr.databaseID
+    </select>
+    
+    <select id="selectProteinIdForDbId" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT proteinID
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND accessionString = #accession#
     </select>
     
 </sqlMap>

@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain.search.impl;
 
+import java.io.File;
+
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 
 /**
@@ -78,6 +80,13 @@ public class MsSearchDatabaseDbImpl implements MsSearchDatabaseDb {
      */
     public void setProteinCount(int proteinCount) {
         this.proteinCount = proteinCount;
+    }
+    
+    @Override
+    public String getDatabaseFileName() {
+        if (serverPath != null)
+            return new File(serverPath).getName();
+        return null;
     }
     
     
