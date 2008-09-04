@@ -6,17 +6,23 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
 
@@ -53,8 +59,8 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         
         checkSearch(searchId, experimentDate);
         
-        checkRunSearch(searchId, runId1);
-        checkRunSearch(searchId, runId2);
+        checkFirstRunSearch(searchId, runId1);
+        checkSecondRunSearch(searchId, runId2);
         
     }
     
@@ -213,8 +219,54 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
            assertEquals("", param.getParamValue());
     }
     
-    private void checkRunSearch(int searchId, int runId) {
+    // 2.sqt
+    private void checkSecondRunSearch(int searchId, int runId) {
+        MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
+        int runSearchId = runSearchDao.loadIdForRunAndSearch(runId, searchId);
+        SQTRunSearchDb runSearch = runSearchDao.loadRunSearch(runSearchId);
+        assertNotNull(runSearch);
+        assertEquals(runId, runSearch.getRunId());
+        assertEquals(searchId, runSearch.getSearchId());
+        assertEquals(runSearchId, runSearch.getId());
+        assertEquals(SearchFileFormat.SQT_SEQ, runSearch.getSearchFileFormat());
+        assertEquals(SearchProgram.SEQUEST, runSearch.getSearchProgram());
+        // TODO check search date and search duration
+        List<SQTHeaderDb> headerList = runSearch.getHeaders();
+        assertEquals(24, headerList.size());
         
+        String headerSec = "H\tSQTGenerator SEQUEST\n"+ 
+                "H\tSQTGeneratorVersion\t3.0\n"+ 
+                "H\tComment\tSEQUEST was written by J Eng and JR Yates, III\n"+ 
+                "H\tComment\tSEQUEST ref. J. Am. Soc. Mass Spectrom., 1994, v. 4, p. 976\n"+ 
+                "H\tComment\tSEQUEST ref. Eng,J.K.; McCormack A.L.; Yates J.R.\n"+ 
+                "H\tComment\tSEQUEST is licensed to Finnigan Corp.\n"+ 
+                "H\tComment\tParalellization Program is run_ms2\n"+ 
+                "H\tComment\trun_ms2 was written by Rovshan Sadygov\n"+ 
+                "H\tStartTime\t01/29/2008, 03:34 AM\n"+ 
+                "H\tEndTime\t01/29/2008, 06:21 AM\n"+ 
+                "H\tDatabase\t/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta\n"+ 
+                "H\tDBSeqLength\t96816536\n"+ 
+                "H\tDBLocusCount\t271842\n"+ 
+                "H\tPrecursorMasses\tAVG\n"+ 
+                "H\tFragmentMasses\tMONO\n"+ 
+                "H\tAlg-PreMassTol\t3.000\n"+ 
+                "H\tAlg-FragMassTol\t0.0\n"+ 
+                "H\tAlg-XCorrMode\t0\n"+ 
+                "H\tStaticMod\tC=160.139\n"+ 
+                "H\tDiffMod\tSTY*=+80.000 \n"+ 
+                "H\tAlg-MaxDiffMod\t3H      Alg-DisplayTop  5\n"+ 
+                "H\tAlg-IonSeries\t0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0\n"+ 
+                "H\tEnzymeSpec\tNo_Enzyme\n";
+        StringBuilder headerFromDb = new StringBuilder();
+        for (SQTHeaderDb header: headerList) {
+            headerFromDb.append("\nH\t"+header.getName()+"\t"+header.getValue());
+        }
+        headerFromDb.deleteCharAt(0);
+        assertEquals(headerSec, headerFromDb);
+        
+        // spectrum data
+        SQTSearchScanDAO scanDao = DAOFactory.instance().getSqtSpectrumDAO();
+        List<Integer> searchScanIds = scanDao.
     }
     
     private int getRunId(String runFileName) {
