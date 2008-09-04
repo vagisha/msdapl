@@ -20,26 +20,26 @@ public class HeaderTest extends TestCase {
         super.tearDown();
     }
 
-    public void testMultipleDatabases() {
-        SQTHeader header = new SQTHeader();
-        String filePath = "/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta";
-        assertFalse(header.multipleDatabases(filePath));
-
-        filePath = "     /scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta       ";
-        assertFalse(header.multipleDatabases(filePath));
-
-        filePath = "/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta,/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta";
-        assertTrue(header.multipleDatabases(filePath));
-
-        filePath = "/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta, ";
-        assertTrue(header.multipleDatabases(filePath));
-
-        filePath = ", /scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta";
-        assertTrue(header.multipleDatabases(filePath));
-
-        filePath = "/path/1  /path/2 ";
-        assertTrue(header.multipleDatabases(filePath));
-    }
+//    public void testMultipleDatabases() {
+//        SQTHeader header = new SQTHeader();
+//        String filePath = "/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta";
+//        assertFalse(header.multipleDatabases(filePath));
+//
+//        filePath = "     /scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta       ";
+//        assertFalse(header.multipleDatabases(filePath));
+//
+//        filePath = "/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta,/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta";
+//        assertTrue(header.multipleDatabases(filePath));
+//
+//        filePath = "/scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta, ";
+//        assertTrue(header.multipleDatabases(filePath));
+//
+//        filePath = ", /scratch/yates/NCBI-RefSeq_human_na_01-19-2007_reversed.fasta";
+//        assertTrue(header.multipleDatabases(filePath));
+//
+//        filePath = "/path/1  /path/2 ";
+//        assertTrue(header.multipleDatabases(filePath));
+//    }
 
     public void testGetTime() {
 

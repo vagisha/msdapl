@@ -10,6 +10,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParamDb;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
@@ -60,9 +61,14 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO 
     }
     
     @Override
-    public int updateSearchAnalysisProgramVersion(int searchId,
+    public int updateSearchProgramVersion(int searchId,
             String versionStr) {
-        return searchDao.updateSearchAnalysisProgramVersion(searchId, versionStr);
+        return searchDao.updateSearchProgramVersion(searchId, versionStr);
+    }
+    
+    @Override
+    public int updateSearchProgram(int searchId, SearchProgram program) {
+        return searchDao.updateSearchProgram(searchId, program);
     }
     
     public void deleteSearch(int searchId) {

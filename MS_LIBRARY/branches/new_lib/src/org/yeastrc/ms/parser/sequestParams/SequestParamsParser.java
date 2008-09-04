@@ -20,7 +20,7 @@ import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -84,9 +84,12 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return new ArrayList<MsTerminalModification>(0);
     }
     
+    // NOTE: sequest.params does not tell us if the algorithm used was sequest
+    // or ee-normalized sequest.  That information is available in the sqt files
+    // This method returns sequest as the SearchProgram.
     @Override
-    public String getSearchProgramName() {
-        return SearchFileFormat.SQT_SEQ.getTypeName();
+    public SearchProgram getSearchProgram() {
+        return SearchProgram.SEQUEST;
     }
     
     public boolean reportEvalue() {

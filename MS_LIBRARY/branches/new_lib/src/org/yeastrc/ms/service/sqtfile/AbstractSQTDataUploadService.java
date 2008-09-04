@@ -35,8 +35,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
@@ -70,7 +70,8 @@ public abstract class AbstractSQTDataUploadService {
     private int numSearchesUploaded = 0;
     
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
-//    String programVersion = "uninit";
+    private String programVersion = "uninit";
+    private SearchProgram programFromSqt = null;
 
     int lastUploadedRunSearchId;
     int searchId;
@@ -97,6 +98,7 @@ public abstract class AbstractSQTDataUploadService {
         searchId = 0;
         searchDatabaseId = 0;
         programVersion = "uninit";
+        programFromSqt = null;
     }
 
     // called before uploading each sqt file and in the reset() method.
@@ -146,25 +148,33 @@ public abstract class AbstractSQTDataUploadService {
     static void updateProgramVersion(int searchId, String programVersion) {
         try {
             MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-            searchDao.updateSearchAnalysisProgramVersion(searchId, programVersion);
+            searchDao.updateSearchProgramVersion(searchId, programVersion);
         }
         catch(RuntimeException e) {
-            log.warn("Error updating prolucid version for searchID: "+searchId, e);
+            log.warn("Error updating program version for searchID: "+searchId, e);
         }
     }
 
+    static void updateProgram(int searchId, SearchProgram program) {
+        try {
+            MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+            searchDao.updateSearchProgram(searchId, program);
+        }
+        catch(RuntimeException e) {
+            log.warn("Error updating search program for searchID: "+searchId, e);
+        }
+    }
+    
     //--------------------------------------------------------------------------------------------------
     // To be implemented by subclasses
-    abstract int uploadSearchParameters(String paramFileDirectory, String remoteServer, String remoteDirectory, Date searchDate);
+    abstract int uploadSearchParameters(String paramFileDirectory, String remoteServer, String remoteDirectory, Date searchDate) throws UploadException;
     
     // NOTE: this method should be called AFTER uploadSearchParameters.
     abstract MsSearchDatabase getSearchDatabase();
     
+    abstract SearchProgram getSearchProgram();
+    
     abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
-    
-    abstract String getAnalysisProgramVersion();
-    
-    abstract void uploadProgramSearchResult();
     //--------------------------------------------------------------------------------------------------
     
     /**
@@ -183,9 +193,14 @@ public abstract class AbstractSQTDataUploadService {
         this.numSearchesToUpload = getNumFilesToUpload(fileDirectory, fileNames);
         
         // parse and upload the search parameters
-        searchId = uploadSearchParameters(fileDirectory, remoteServer, remoteDirectory, searchDate);
-        if (searchId == 0)
+        try {
+            searchId = uploadSearchParameters(fileDirectory, remoteServer, remoteDirectory, searchDate);
+        }
+        catch (UploadException e) {
+            uploadExceptionList.add(e);
+            log.error(e.getMessage()+"\n\t!!!SEARCH WILL NOT BE UPLOADED", e);
             return 0;
+        }
         
         // get the id of the search database used (will be used to look up protein ids later)
         MsSearchDatabase db = getSearchDatabase();
@@ -198,12 +213,12 @@ public abstract class AbstractSQTDataUploadService {
             UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
             ex.setErrorMessage("No database ID found for: "+searchDbName);
             uploadExceptionList.add(ex);
-            log.error(ex.getMessage()+"\n\tDELETING SEARCH...", ex);
+            log.error(ex.getMessage()+"\n\t!!!DELETING SEARCH...", ex);
             deleteSearch(searchId);
             return 0;
         }
         
-        // initialize the Modification lookup map
+        // initialize the Modification lookup map; will be used when uploading modifications for search results
         dynaModLookup = new DynamicModLookupUtil(searchId);
         
         
@@ -222,9 +237,16 @@ public abstract class AbstractSQTDataUploadService {
                 return 0;
             }
             resetCaches();
-            // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
-            // but the rest of the upload will continue.
-            uploadSqtFile(filePath, runId);
+            try {
+                uploadSqtFile(filePath, runId);
+                numSearchesUploaded++;
+            }
+            catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage()+"\n\t!!!DELETING SEARCH...", ex);
+                deleteSearch(searchId);
+                return 0;
+            }
         }
         
         // if no sqt files were uploaded delete the top level search
@@ -237,30 +259,50 @@ public abstract class AbstractSQTDataUploadService {
         }
         
         // Update the "analysisProgramVersion" in the msSearch table
-        if (getAnalysisProgramVersion() != null) {
+        if (this.programVersion != null && this.programVersion != "uninit") {
             updateProgramVersion(searchId, programVersion);
+        }
+        
+        // if search program from sqt files is not the same as the defalt program returned by the uploader, update it in the msSearch table
+        // For now we do this only for SEQUEST and EE-normalized SEQUEST
+        if (getSearchProgram() == SearchProgram.SEQUEST && this.programFromSqt == SearchProgram.EE_NORM_SEQUEST) {
+            updateProgram(searchId, programFromSqt);
         }
         
         return searchId;
     }
     
+    // SEARCH RESULT
     final int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int searchId)
         throws DataProviderException {
 
         SQTRunSearch search = provider.getSearchHeader();
         if (search instanceof SQTHeader) {
             SQTHeader header = (SQTHeader)search;
-            // this is the first time we are assigning a value to prolucidVersion
+            
+            // SEARCH PROGRAM VERSION IN THE SQT FILE
+            // this is the first time we are assigning a value to program version
             if ("uninit".equals(programVersion))
                 this.programVersion = header.getSearchEngineVersion();
 
-            // make sure the prolucidVersion value is same in all sqt header
-            // if not we set Version to null so that the analysisProgramVersion field does
-            // not get updated. 
-            if (programVersion != null &&
-                    !programVersion.equals(header.getSearchEngineVersion())) {
-                this.programVersion = null;
+            // make sure the SQTGeneratorVersion value is same in all sqt headers
+            if (programVersion == null) {
+                if (header.getSearchEngineVersion() != null)
+                    throw new DataProviderException("Value of SQTGeneratorVersion is not nulllthe same in all SQT files.");
             }
+            else if (!programVersion.equals(header.getSearchEngineVersion())) {
+                throw new DataProviderException("Value of SQTGeneratorVersion is not the same in all SQT files.");
+            }
+            
+            // SEARCH PROGRAM IN THE SQT FILE
+            if (programFromSqt == null)
+                this.programFromSqt = header.getSearchProgram();
+            
+            // make sure program is same in all sqt headers
+            if (programFromSqt == null || programFromSqt == SearchProgram.UNKNOWN || programFromSqt != header.getSearchProgram()) {
+                throw new DataProviderException("Value of SQTGenerator is missing or not the same in all SQT files.");
+            }
+            
         }
         // save the run search and return the database id
         MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = daoFactory.getSqtRunSearchDAO();
@@ -289,6 +331,7 @@ public abstract class AbstractSQTDataUploadService {
         return resultId;
     }
 
+    // PROTEIN MATCHES
     final void uploadProteinMatches(MsSearchResult result, final String peptide, final int resultId, int databaseId)
         throws UploadException {
         // upload the protein matches if the cache has enough entries

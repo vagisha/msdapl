@@ -12,6 +12,9 @@ import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParserTest;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParserTest;
 import org.yeastrc.ms.parser.sqtFile.SQTParserTests;
 import org.yeastrc.ms.service.MsDataUploaderTest;
+import org.yeastrc.ms.service.ms2file.MS2DataUploadServiceTest;
+import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadServiceTest;
 import org.yeastrc.ms.util.DTASelectFileNameParseTest;
 import org.yeastrc.ms.util.PeakStringBuilderTest;
 import org.yeastrc.ms.util.PeakUtilsTest;
@@ -46,7 +49,10 @@ public class MsLibTests {
         suite.addTestSuite(NrSeqLookupUtilTest.class);
         
         // upload classes
+        suite.addTestSuite(MS2DataUploadServiceTest.class);
+        suite.addTestSuite(SequestSQTDataUploadServiceTest.class);
         suite.addTestSuite(MsDataUploaderTest.class);
+        
         
         //$JUnit-END$
         return suite;

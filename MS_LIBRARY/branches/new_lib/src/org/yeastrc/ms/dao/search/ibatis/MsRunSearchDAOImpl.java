@@ -17,6 +17,7 @@ import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -137,6 +138,11 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
 
         public Date getUploadDate() {
             throw new UnsupportedOperationException("getUploadDate() is not supported by MsRunSearchSqlMapParam");
+        }
+
+        @Override
+        public SearchProgram getSearchProgram() {
+            throw new UnsupportedOperationException("getSearchProgram() is not supported by MsRunSearchSqlMapParam");
         }
     }
 }

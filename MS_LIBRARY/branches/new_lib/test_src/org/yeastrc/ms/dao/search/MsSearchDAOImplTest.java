@@ -10,6 +10,7 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.SearchProgram;
 
 public class MsSearchDAOImplTest extends BaseDAOTestCase {
 
@@ -79,7 +80,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         private List<MsSearchDatabase> searchDatabases = new ArrayList<MsSearchDatabase>();
         private List<MsEnzyme> enzymes = new ArrayList<MsEnzyme>();
         private String searchEngineVersion;
-        private String searchEngineName;
+        private SearchProgram searchProgram;
         private Date searchDate;
 
 
@@ -143,13 +144,13 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
             this.staticTerminalModifications = mods;
         }
         
-        public void setAnalysisProgramName(String searchEngineName) {
-            this.searchEngineName = searchEngineName;
+        public void setSearchProgram(SearchProgram searchProgram) {
+            this.searchProgram = searchProgram;
         }
         
         @Override
-        public String getAnalysisProgramName() {
-            return searchEngineName;
+        public SearchProgram getSearchProgram() {
+            return searchProgram;
         }
 
         public void setAnalysisProgramVersion(String searchEngineVersion) {
@@ -157,7 +158,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         }
         
         @Override
-        public String getAnalysisProgramVersion() {
+        public String getSearchProgramVersion() {
             return searchEngineVersion;
         }
 

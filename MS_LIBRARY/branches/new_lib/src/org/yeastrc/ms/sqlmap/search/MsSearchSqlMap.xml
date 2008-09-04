@@ -6,13 +6,17 @@
     <typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.search.impl.MsSearchDbImpl"/>
     <typeAlias alias="MsSearch" type="org.yeastrc.ms.domain.search.MsSearch"/>
 	
+	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>
+	<typeAlias alias="ProgramTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl$SearchProgramTypeHandler"/>
+	
 	<resultMap class="MsSearchDb" id="msSearchResult">
 		<result property="id" column="id" />
 		<result property="searchDate" column="expDate" />
 		<result property="serverAddress" column="serverAddress" />
 		<result property="serverDirectory" column="serverDirectory" />
-		<result property="analysisProgramName" column="analysisProgramName" />
-		<result property="analysisProgramVersion" column="analysisProgramVersion" />
+		<result property="searchProgram" column="analysisProgramName" 
+				typeHandler="ProgramTypeHandler"/>
+		<result property="searchProgramVersion" column="analysisProgramVersion" />
 		<result property="uploadDate" column="uploadDate" />
 		<result property="enzymeList" 
 				column="id" 
@@ -35,11 +39,11 @@
 	</resultMap>
 	
 	<parameterMap class="MsSearch" id="msSearchParam">
-		<parameter property="searchDate" jdbcType="DATE" />
-		<parameter property="serverAddress" jdbcType="VARCHAR" />
-		<parameter property="serverDirectory" jdbcType="VARCHAR" />
-		<parameter property="analysisProgramName" jdbcType="VARCHAR" />
-		<parameter property="analysisProgramVersion" jdbcType="VARCHAR"/>
+		<parameter property="searchDate" />
+		<parameter property="serverAddress" />
+		<parameter property="serverDirectory"  />
+		<parameter property="searchProgram" typeHandler="ProgramTypeHandler"/>
+		<parameter property="searchProgramVersion"/>
 	</parameterMap>
 	
 	
@@ -70,4 +74,16 @@
     	SET analysisProgramVersion=#analysisProgramVersion#
     	WHERE id=#searchId#
     </update>
+    
+    <parameterMap class="java.util.Map" id="updateProgParam">
+		<parameter property="searchId"  />
+		<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
+	</parameterMap>
+	
+    <update id="updateAnalysisProgram" parameterMap="updateProgParam">
+    	UPDATE msSearch
+    	SET analysisProgram=#analysisProgram#
+    	WHERE id=#searchId#
+    </update>
+    
 </sqlMap>

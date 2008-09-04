@@ -10,6 +10,7 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
 public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
@@ -166,6 +167,11 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
 
         public void setSearchDuration(int searchDuration) {
             this.searchDuration = searchDuration;
+        }
+
+        @Override
+        public SearchProgram getSearchProgram() {
+            return SearchProgram.programForFileFormat(fileFormat);
         }
     }
 }

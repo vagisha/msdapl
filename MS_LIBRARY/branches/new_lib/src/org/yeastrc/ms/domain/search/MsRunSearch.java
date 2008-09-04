@@ -10,6 +10,10 @@ public interface MsRunSearch {
     public abstract SearchFileFormat getSearchFileFormat();
 
     /**
+     * @return searchProgram
+     */
+    public abstract SearchProgram getSearchProgram();
+    /**
      * @return the searchDate
      */
     public abstract Date getSearchDate();

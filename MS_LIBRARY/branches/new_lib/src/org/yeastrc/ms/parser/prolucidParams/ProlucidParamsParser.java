@@ -18,7 +18,7 @@ import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -75,8 +75,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return dynamicTerminalModifications;
     }
     
-    public String getSearchProgramName() {
-        return SearchFileFormat.SQT_PLUCID.getTypeName();
+    public SearchProgram getSearchProgram() {
+        return SearchProgram.PROLUCID;
     }
     
     public PrimaryScore getPrimaryScoreType() {

@@ -12,6 +12,7 @@ import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
@@ -65,8 +66,8 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         
         assertEquals("remoteServer", search.getServerAddress());
         assertEquals("remoteDirectory", search.getServerDirectory());
-        assertEquals("SEQUEST", search.getAnalysisProgramName());
-        assertEquals("3.0", search.getAnalysisProgramVersion());
+        assertEquals(SearchProgram.SEQUEST, search.getSearchProgram());
+        assertEquals("3.0", search.getSearchProgramVersion());
 //        System.out.println(date.toString());
 //        System.out.println(search.getSearchDate().toString());
 //        assertEquals(date.getTime(), search.getSearchDate().getTime()); TODO

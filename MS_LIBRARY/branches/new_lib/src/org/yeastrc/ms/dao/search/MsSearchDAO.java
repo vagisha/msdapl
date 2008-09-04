@@ -2,6 +2,7 @@ package org.yeastrc.ms.dao.search;
 
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.SearchProgram;
 
 public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
 
@@ -27,9 +28,17 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
      * @param versionStr
      * @return number of rows updated
      */
-    public abstract int updateSearchAnalysisProgramVersion(int searchId, String versionStr);
+    public abstract int updateSearchProgramVersion(int searchId, String versionStr);
     
 
+    /**
+     * Updates the value of the analysisProgram in msSearch table
+     * @param searchId
+     * @param program
+     * @return number of rows updated.
+     */
+    public abstract int updateSearchProgram(int searchId, SearchProgram program);
+    
     /**
      * Deletes the search
      * @param searchId

@@ -33,8 +33,8 @@ public class MsSearchResultProteinDAOImplTest extends BaseDAOTestCase {
     private static final String acc6 = "accession_string_6";
     private static final int prid6 = 30;
     
-    private static final String searchDb1 = "my/test/database";
-    private static final String searchDb2 = "my/test/database2";
+    private static final String searchDb1 = "database";
+    private static final String searchDb2 = "database2";
     
     protected void setUp() throws Exception {
         super.setUp();

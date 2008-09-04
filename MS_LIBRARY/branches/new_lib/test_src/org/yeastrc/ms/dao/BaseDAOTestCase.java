@@ -61,6 +61,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.ResidueModification;
@@ -269,7 +270,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsSearch makeSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
 
         MsSearchTest search = new MsSearchTest();
-        search.setAnalysisProgramName("Sequest");
+        search.setSearchProgram(SearchProgram.SEQUEST);
         search.setAnalysisProgramVersion("1.0");
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
 
@@ -308,8 +309,8 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getDynamicTerminalMods().size(), output.getDynamicTerminalMods().size());
         assertEquals(input.getEnzymeList().size(), output.getEnzymeList().size());
         assertEquals(input.getSearchDate().toString(), output.getSearchDate().toString());
-        assertEquals(input.getAnalysisProgramName(), output.getAnalysisProgramName());
-        assertEquals(input.getAnalysisProgramVersion(), output.getAnalysisProgramVersion());
+        assertEquals(input.getSearchProgram(), output.getSearchProgram());
+        assertEquals(input.getSearchProgramVersion(), output.getSearchProgramVersion());
     }
     
     //-----------------------------------------------------------------------------------------------------

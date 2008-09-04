@@ -15,6 +15,7 @@ import org.yeastrc.ms.domain.search.MsResidueModificationDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.SearchProgram;
 
 /**
  * @param <MsRun>
@@ -27,7 +28,7 @@ public class MsSearchDbImpl implements MsSearchDb {
     private Date searchDate;
     private String serverAddress;
     private String serverDirectory;
-    private String analysisProgramName;
+    private SearchProgram analysisProgram;
     private String analysisProgramVersion;
     
     private List<? super MsSearchDatabaseDb> searchDatabases;
@@ -87,19 +88,19 @@ public class MsSearchDbImpl implements MsSearchDb {
         this.serverDirectory = directory;
     }
 
-    public String getAnalysisProgramName() {
-        return analysisProgramName;
+    public SearchProgram getSearchProgram() {
+        return analysisProgram;
     }
     
-    public void setAnalysisProgramName(String programName) {
-        this.analysisProgramName = programName;
+    public void setSearchProgram(SearchProgram program) {
+        this.analysisProgram = program;
     }
     
-    public String getAnalysisProgramVersion() {
+    public String getSearchProgramVersion() {
         return analysisProgramVersion;
     }
     
-    public void setAnalysisProgramVersion(String programVersion) {
+    public void setSearchProgramVersion(String programVersion) {
         this.analysisProgramVersion = programVersion;
     }
 

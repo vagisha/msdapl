@@ -12,6 +12,7 @@ import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.SearchProgram;
 
 /**
  * 
@@ -30,6 +31,6 @@ public interface SearchParamsDataProvider {
 
     public abstract List<MsTerminalModification> getDynamicTerminalMods();
     
-    public abstract String getSearchProgramName();
+    public abstract SearchProgram getSearchProgram();
     
 }

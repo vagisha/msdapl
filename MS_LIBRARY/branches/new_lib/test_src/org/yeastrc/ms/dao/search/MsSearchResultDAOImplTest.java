@@ -83,7 +83,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         // save another result this time save protein matches
         MsSearchResultTest result2 = (MsSearchResultTest)makeSearchResult(searchId_1, runSearchId_1, 3, "PEPTIDE2", false);
         addProteinMatches(result2);
-        int resultId_2 = resultDao.save(searchId_1, "my/test/database", result2, runSearchId_1, 123); // scanId = 123
+        int resultId_2 = resultDao.save(searchId_1, "database", result2, runSearchId_1, 123); // scanId = 123
         
         // read it back
         MsSearchResultDb resultdb2 = resultDao.load(resultId_2);

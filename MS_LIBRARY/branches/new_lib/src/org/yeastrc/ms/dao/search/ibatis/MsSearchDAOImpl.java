@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +24,12 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import com.ibatis.sqlmap.client.extensions.ParameterSetter;
+import com.ibatis.sqlmap.client.extensions.ResultGetter;
+import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 /**
  * 
@@ -93,7 +98,7 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
     }
     
     @Override
-    public int updateSearchAnalysisProgramVersion(int searchId,
+    public int updateSearchProgramVersion(int searchId,
             String versionStr) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("searchId", searchId);
@@ -101,7 +106,41 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
         return update("MsSearch.updateAnalysisProgramVersion", map);
     }
     
+    @Override
+    public int updateSearchProgram(int searchId, SearchProgram program) {
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("searchId", searchId);
+        map.put("analysisProgram", program);
+        return update("MsSearch.updateAnalysisProgram", map);
+    }
+    
     public void deleteSearch(int searchId) {
         delete("MsSearch.delete", searchId);
+    }
+    
+    //---------------------------------------------------------------------------------------
+    /** 
+     * Type handler for converting between SearchProgram and JDBC's VARCHAR types. 
+     */
+    public static class SearchProgramTypeHandler implements TypeHandlerCallback {
+
+        public Object getResult(ResultGetter getter) throws SQLException {
+            String program = getter.getString();
+            if (getter.wasNull())
+                return SearchProgram.UNKNOWN;
+            return SearchProgram.instance(program);
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            if (parameter == null)
+                setter.setNull(java.sql.Types.VARCHAR);
+            else
+                setter.setString(((SearchProgram)parameter).name());
+        }
+
+        public Object valueOf(String s) {
+            return SearchProgram.instance(s);
+        }
     }
 }

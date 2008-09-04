@@ -16,38 +16,38 @@ public class NrSeqLookupUtilTest extends TestCase {
     }
 
     public void testGetProteinId() {
-        String databaseName = "my/test/database";
+        String databaseName = "database";
         String accession = "accession_string_1";
         
         assertEquals(25, NrSeqLookupUtil.getProteinId(databaseName, accession));
         
         databaseName = "dummy";
-        try {NrSeqLookupUtil.getProteinId(databaseName, accession); fail("No match should be found");}
-        catch(NrSeqLookupException e){}
+        int id = NrSeqLookupUtil.getProteinId(databaseName, accession);
+        assertEquals(0, id);
         
         
-        databaseName = "my/test/database2";
-        try {NrSeqLookupUtil.getProteinId(databaseName, accession); fail("No match should be found");}
-        catch(NrSeqLookupException e){}
+        databaseName = "database2";
+        id = NrSeqLookupUtil.getProteinId(databaseName, accession);
+        assertEquals(0, id);
         
         accession = "accession_string_4";
         assertEquals(28, NrSeqLookupUtil.getProteinId(databaseName, accession));
     }
     
     public void testGetDatabaseId() {
-        String database = "my/test/database";
+        String database = "database";
         assertEquals(1, NrSeqLookupUtil.getDatabaseId(database));
         
-        database = "my/test/database2";
+        database = "database2";
         assertEquals(2, NrSeqLookupUtil.getDatabaseId(database));
         
         database = "database_does_not_exist";
-        try {NrSeqLookupUtil.getDatabaseId(database); fail("No match should be found");}
-        catch(NrSeqLookupException e){}
+        int id = NrSeqLookupUtil.getDatabaseId(database);
+        assertEquals(0, id);
         
         database = null;
-        try {NrSeqLookupUtil.getDatabaseId(database); fail("No match should be found");}
-        catch(NrSeqLookupException e){}
+        id = NrSeqLookupUtil.getDatabaseId(database);
+        assertEquals(0, id);
     }
     
     public void testGetProteinAccession() {

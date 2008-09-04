@@ -70,11 +70,11 @@ interface MsSearchBase {
     /**
      * @return the analysisProgramName
      */
-    public abstract String getAnalysisProgramName();
+    public abstract SearchProgram getSearchProgram();
 
     /**
      * @return the analysisProgramVersion
      */
-    public abstract String getAnalysisProgramVersion();
+    public abstract String getSearchProgramVersion();
 
 }

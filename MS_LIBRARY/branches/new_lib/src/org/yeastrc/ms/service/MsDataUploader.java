@@ -165,7 +165,7 @@ public class MsDataUploader {
             if (sqtType == null) sqtType = myType;
             if (myType != sqtType) {
                 UploadException ex = new UploadException(ERROR_CODE.MULTIPLE_SQT_TYPES);
-                ex.setErrorMessage("Found SQT files of types: "+sqtType.getTypeName()+", "+myType.getTypeName());
+                ex.setErrorMessage("Found SQT files of types: "+sqtType.getFormatType()+", "+myType.getFormatType());
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage(), ex);
                 throw ex;
@@ -192,8 +192,15 @@ public class MsDataUploader {
         Map<String, Integer> runIdMap = uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
         
         // now upload the searches. No exception will be thrown if the upload fails
-        return uploadSearches(fileDirectory, filenames, serverAddress,
+        try {
+            return uploadSearches(fileDirectory, filenames, serverAddress,
                         serverDirectory, searchDate, runIdMap);
+        }
+        // We should have caught all exceptions in the SQT upload classes but just in case anything slipped through...
+        catch(RuntimeException e) {
+            log.error("Error uploading search", e);
+            return 0;
+        }
     }
 
     /**
@@ -258,7 +265,7 @@ public class MsDataUploader {
             final Date searchDate) {
         
         SequestSQTDataUploadService service = new SequestSQTDataUploadService();
-        int searchId = service.uploadSequestSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
+        int searchId = service.uploadSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
         this.uploadExceptionList.addAll(service.getUploadExceptionList());
         this.numSearchesToUpload = service.getNumSearchesToUpload();
         this.numSearchesUploaded = service.getNumSearchesUploaded();
@@ -271,7 +278,7 @@ public class MsDataUploader {
             String serverDirectory, Map<String, Integer> runIdMap,
             Date searchDate) {
         ProlucidSQTDataUploadService service = new ProlucidSQTDataUploadService();
-        int searchId = service.uploadProlucidSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
+        int searchId = service.uploadSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
         this.uploadExceptionList.addAll(service.getUploadExceptionList());
         this.numSearchesToUpload = service.getNumSearchesToUpload();
         this.numSearchesUploaded = service.getNumSearchesUploaded();
