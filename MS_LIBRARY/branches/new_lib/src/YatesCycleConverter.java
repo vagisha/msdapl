@@ -32,7 +32,7 @@ public class YatesCycleConverter {
        
         log.info("STARTED UPLOAD: "+new Date());
 //        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/UploadTest/dataDir";
-        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/2930";
+        String dataDir = "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/2930/FromServer/parc";
         for (Integer runId: yatesRunIds) {
             log.info("------UPLOADING YATES runID: "+runId);
 //            List<YatesTablesUtils.YatesCycle> cycles = YatesTablesUtils.getCyclesForRun(runId);

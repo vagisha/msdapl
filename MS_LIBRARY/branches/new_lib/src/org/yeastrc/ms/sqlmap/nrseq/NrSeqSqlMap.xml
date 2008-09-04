@@ -13,7 +13,7 @@
         SELECT id FROM tblDatabase WHERE name = #name#
     </select>
     
-    <select id="selectProteinIdForDbName" resultClass="Integer" parameterClass="java.util.Map"> 
+    <select id="selectProteinIdForDbNameExactMatch" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT pr.proteinID
         FROM tblDatabase as db, tblProteinDatabase as pr 
         WHERE db.name = #dbName#
@@ -21,11 +21,36 @@
         AND db.id = pr.databaseID
     </select>
     
-    <select id="selectProteinIdForDbId" resultClass="Integer" parameterClass="java.util.Map"> 
+    <select id="selectProteinIdForDbName" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT pr.proteinID
+        FROM tblDatabase as db, tblProteinDatabase as pr 
+        WHERE db.name = #dbName#
+        AND pr.accessionString LIKE #accession#
+        AND db.id = pr.databaseID
+    </select>
+    
+    <select id="selectProteinIdForDbIdExactMatch" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT proteinID
         FROM tblProteinDatabase 
         WHERE databaseID = #dbId#
         AND accessionString = #accession#
+    </select>
+    
+    <select id="selectProteinIdForDbId" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT proteinID
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND accessionString LIKE #accession#
+    </select>
+    
+    <select id="selectProteinIdForDbIdAndPeptide" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT pr.id
+        FROM tblProteinSequence as seq, tblProtein as pr, tblProteinDatabase as pd 
+        WHERE pd.databaseID = #dbId#
+        AND pd.accessionString LIKE #accession#
+        AND seq.sequence LIKE #sequence#
+        AND seq.id = pr.sequenceID
+        AND pr.id = pd.databaseID
     </select>
     
 </sqlMap>

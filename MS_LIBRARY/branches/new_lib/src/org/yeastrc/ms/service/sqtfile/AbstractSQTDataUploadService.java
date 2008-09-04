@@ -2,20 +2,21 @@ package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
@@ -27,12 +28,15 @@ import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
@@ -50,7 +54,7 @@ public abstract class AbstractSQTDataUploadService {
 
     static final DAOFactory daoFactory = DAOFactory.instance();
 
-    DynamicModLookupUtil dynaModLookup;
+    private DynamicModLookupUtil dynaModLookup;
 
     static final int BUF_SIZE = 1000;
 
@@ -60,18 +64,18 @@ public abstract class AbstractSQTDataUploadService {
     List<MsResultDynamicTerminalModDb> resultTerminalModList;
 
 
-    List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
+    private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
 
-    int numSearchesToUpload = 0;
-    int numSearchesUploaded = 0;
+    private int numSearchesToUpload = 0;
+    private int numSearchesUploaded = 0;
     
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
-//  private long dbSequenceLength;
-//  private int dbProteinCount;
-    String programVersion = "uninit";
+//    String programVersion = "uninit";
 
     int lastUploadedRunSearchId;
-
+    int searchId;
+    int searchDatabaseId;
+    
     public AbstractSQTDataUploadService() {
         this.proteinMatchSet = new LinkedHashSet<MsSearchResultProteinDb>(BUF_SIZE);
         this.resultResidueModList = new ArrayList<MsResultDynamicResidueModDb>(BUF_SIZE);
@@ -79,7 +83,7 @@ public abstract class AbstractSQTDataUploadService {
         this.uploadExceptionList = new ArrayList<UploadException>();
     }
     
-    final void reset() {
+    void reset() {
 
         // RESET THE DYNAMIC MOD LOOKUP UTILITY
         dynaModLookup = null;
@@ -90,8 +94,12 @@ public abstract class AbstractSQTDataUploadService {
         resetCaches();
 
         uploadExceptionList.clear();
+        searchId = 0;
+        searchDatabaseId = 0;
+        programVersion = "uninit";
     }
 
+    // called before uploading each sqt file and in the reset() method.
     void resetCaches() {
         
         proteinMatchSet.clear();
@@ -99,9 +107,6 @@ public abstract class AbstractSQTDataUploadService {
         resultTerminalModList.clear();
 
         lastUploadedRunSearchId = 0;
-        //      dbSequenceLength = 0;
-        //      dbProteinCount = 0;
-        programVersion = "uninit";
     }
 
     public final List<UploadException> getUploadExceptionList() {
@@ -148,6 +153,97 @@ public abstract class AbstractSQTDataUploadService {
         }
     }
 
+    //--------------------------------------------------------------------------------------------------
+    // To be implemented by subclasses
+    abstract int uploadSearchParameters(String paramFileDirectory, String remoteServer, String remoteDirectory, Date searchDate);
+    
+    // NOTE: this method should be called AFTER uploadSearchParameters.
+    abstract MsSearchDatabase getSearchDatabase();
+    
+    abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
+    
+    abstract String getAnalysisProgramVersion();
+    
+    abstract void uploadProgramSearchResult();
+    //--------------------------------------------------------------------------------------------------
+    
+    /**
+     * @param fileDirectory 
+     * @param fileNames names of sqt files (without the .sqt extension)
+     * @param runIdMap map mapping file names to runIds in database
+     * @param remoteServer 
+     * @param remoteDirectory 
+     * @param searchDate 
+     */
+    public int uploadSearch(String fileDirectory, Set<String> fileNames, Map<String,Integer> runIdMap, String remoteServer, String remoteDirectory, Date searchDate) {
+
+        reset();// reset all caches etc.
+        
+        // get the number of sqt file in the directory
+        this.numSearchesToUpload = getNumFilesToUpload(fileDirectory, fileNames);
+        
+        // parse and upload the search parameters
+        searchId = uploadSearchParameters(fileDirectory, remoteServer, remoteDirectory, searchDate);
+        if (searchId == 0)
+            return 0;
+        
+        // get the id of the search database used (will be used to look up protein ids later)
+        MsSearchDatabase db = getSearchDatabase();
+        String searchDbName = null;
+        if (db != null) {
+            searchDbName = new File(getSearchDatabase().getServerPath()).getName();
+            searchDatabaseId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+        }
+        if (searchDatabaseId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
+            ex.setErrorMessage("No database ID found for: "+searchDbName);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage()+"\n\tDELETING SEARCH...", ex);
+            deleteSearch(searchId);
+            return 0;
+        }
+        
+        // initialize the Modification lookup map
+        dynaModLookup = new DynamicModLookupUtil(searchId);
+        
+        
+        // now upload the individual sqt files
+        for (String file: fileNames) {
+            String filePath = fileDirectory+File.separator+file+".sqt";
+            // if the file does not exist skip over to the next
+            if (!(new File(filePath).exists()))
+                continue;
+            Integer runId = runIdMap.get(file); 
+            if (runId == null) {
+                UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SQT);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage()+"\n\tDELETING SEARCH...", ex);
+                deleteSearch(searchId);
+                return 0;
+            }
+            resetCaches();
+            // Consume any exceptions during parsing and upload of a sqt file. If exceptions occur, this search will be deleted
+            // but the rest of the upload will continue.
+            uploadSqtFile(filePath, runId);
+        }
+        
+        // if no sqt files were uploaded delete the top level search
+        if (numSearchesUploaded == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.NO_RUN_SEARCHES_UPLOADED);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage()+"\n\tDELETING SEARCH", ex);
+            deleteSearch(searchId);
+            searchId = 0;
+        }
+        
+        // Update the "analysisProgramVersion" in the msSearch table
+        if (getAnalysisProgramVersion() != null) {
+            updateProgramVersion(searchId, programVersion);
+        }
+        
+        return searchId;
+    }
+    
     final int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int searchId)
         throws DataProviderException {
 
@@ -176,7 +272,24 @@ public abstract class AbstractSQTDataUploadService {
         spectrumDataDao.save(scan, runSearchId, scanId);
     }
 
-    final void uploadProteinMatches(MsSearchResult result, final int resultId, int databaseId)
+    final int uploadBaseSearchResult(MsSearchResult result, int runSearchId, int scanId) throws UploadException {
+        
+        MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
+        int resultId = resultDao.saveResultOnly(result, runSearchId, scanId); // uploads data to the msRunSearchResult table ONLY
+        
+        // upload the protein matches
+        uploadProteinMatches(result, result.getResultPeptide().getPeptideSequence(), resultId, searchDatabaseId);
+        
+        // upload dynamic mods for this result
+        uploadResultResidueMods(result, resultId, runSearchId);
+        
+        // no dynamic terminal mods for sequest
+        uploadResultTerminalMods(result, resultId, searchId);
+        
+        return resultId;
+    }
+
+    final void uploadProteinMatches(MsSearchResult result, final String peptide, final int resultId, int databaseId)
         throws UploadException {
         // upload the protein matches if the cache has enough entries
         if (proteinMatchSet.size() >= BUF_SIZE) {
@@ -184,12 +297,26 @@ public abstract class AbstractSQTDataUploadService {
         }
         // add the protein matches for this result to the cache
         for (MsSearchResultProtein match: result.getProteinMatchList()) {
-            int proteinId = 0;
-            try {proteinId = NrSeqLookupUtil.getProteinId(databaseId, match.getAccession());}
-            catch(NrSeqLookupException e) {
-                UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND, e);
-                ex.setErrorMessage(e.getMessage());
-                throw ex;
+            int proteinId = NrSeqLookupUtil.getProteinId(databaseId, match.getAccession());
+            if (proteinId == 0) {
+                // try again
+                List<Integer> matchingIds = NrSeqLookupUtil.getProteinIdsLikeAccession(databaseId, match.getAccession());
+                if (matchingIds.size() == 1)
+                    proteinId = matchingIds.get(0);
+                else {
+                    // last ditch attempt
+                    matchingIds = NrSeqLookupUtil.getProteinIdsForPeptide(databaseId, match.getAccession(), peptide);
+                    
+                    if (matchingIds.size() == 1)
+                        proteinId = matchingIds.get(0);
+                    
+                    // can't do anymore
+                    else {
+                        UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
+                        ex.setErrorMessage("No matching protein found for databaseId: "+databaseId+" and accession: "+match.getAccession());
+                        throw ex;
+                    }
+                }
             }
             
             // NOTE: we are using a Set for the proteinMatches.  ONLY UNIQUE ENTRIES WILL BE ADDED.
@@ -209,7 +336,7 @@ public abstract class AbstractSQTDataUploadService {
     }
 
     // RESIDUE DYNAMIC MODIFICATION
-    void uploadResultResidueMods(MsSearchResult result, int resultId, int searchId) {
+    void uploadResultResidueMods(MsSearchResult result, int resultId, int searchId) throws UploadException {
         // upload the result dynamic residue modifications if the cache has enough entries
         if (resultResidueModList.size() >= BUF_SIZE) {
             uploadResultResidueModBuffer();
@@ -219,7 +346,15 @@ public abstract class AbstractSQTDataUploadService {
             if (mod == null)
                 continue;
             int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
-                    mod.getModifiedResidue(), mod.getModificationMass()); // throws a RuntimeException
+                    mod.getModifiedResidue(), mod.getModificationMass()); 
+            if (modId == 0) {
+                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
+                ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
+                        searchId+
+                        "; modResidue: "+mod.getModifiedResidue()+
+                        "; modMass: "+mod.getModificationMass().doubleValue());
+                throw ex;
+            }
             resultResidueModList.add(new ResultResidueMod(mod.getModifiedResidue(), 
                     mod.getModificationSymbol(),
                     mod.getModificationMass(), 
@@ -236,7 +371,7 @@ public abstract class AbstractSQTDataUploadService {
     }
     
     // TERMINAL DYNAMIC MODIFICATION
-    void uploadResultTerminalMods(MsSearchResult result, int resultId, int searchId) {
+    void uploadResultTerminalMods(MsSearchResult result, int resultId, int searchId) throws UploadException {
         // upload the result dynamic terminal modifications if the cache has enough entries
         if (resultTerminalModList.size() >= BUF_SIZE) {
             uploadResultTerminalModBuffer();
@@ -246,7 +381,15 @@ public abstract class AbstractSQTDataUploadService {
             if (mod == null)
                 continue;
             int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
-                    mod.getModifiedTerminal(), mod.getModificationMass()); // throws a RuntimeException
+                    mod.getModifiedTerminal(), mod.getModificationMass()); 
+            if (modId == 0) {
+                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
+                ex.setErrorMessage("No matching dynamic terminal modification found for: searchId: "+
+                        searchId+
+                        "; modTerminal: "+mod.getModifiedTerminal()+
+                        "; modMass: "+mod.getModificationMass().doubleValue());
+                throw ex;
+            }
             resultTerminalModList.add(new ResultTerminalMod(mod.getModifiedTerminal(), 
                     mod.getModificationSymbol(),
                     mod.getModificationMass(), 

@@ -28,16 +28,20 @@ public class UploadException extends Exception {
         
         UNSUPPORTED_SQT         ("Unsupported sqt file found", WARN),
         MULTIPLE_SQT_TYPES      ("More than one sqt file types found", WARN),
+        NO_RUNID_FOR_SQT        ("No runID found for sqt file", WARN),
         INVALID_SQT_HEADER      ("Invalid SQT header", WARN),
         INVALID_SQT_SCAN        ("Invalid SQT scan", WARN),
         NO_SCANID_FOR_SQT_SCAN  ("No database scanID found for SQT scan", WARN),
         READ_ERROR_SQT          ("Error reading SQT file", ERROR),
+        
+        MOD_LOOKUP_FAILED       ("Modification lookup failed", WARN),
         
         MISSING_SEQUEST_PARAMS  ("Missing sequest.params file.", WARN),
         MISSING_PROLUCID_PARAMS ("Missing search.xml files.", WARN),
         UNKNOWN_PARAMS          ("Unknown parameters file for search.", WARN),
         PARAM_PARSING_ERROR     ("Error parsing parameters file", WARN),
         NO_RUN_SEARCHES_UPLOADED("No run searches were uploaded", WARN),
+        AMBIG_PROG_VERSION      ("Ambiguous analysis program version in sqt files", WARN),
         
         SEARCHDB_NOT_FOUND      ("No matching search database found", WARN),
         PROTEIN_NOT_FOUND       ("Protein not found in database", WARN),

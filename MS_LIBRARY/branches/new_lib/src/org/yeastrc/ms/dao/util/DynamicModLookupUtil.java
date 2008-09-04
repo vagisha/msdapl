@@ -74,14 +74,11 @@ public class DynamicModLookupUtil {
      * @param modChar
      * @param modMass
      * @return
-     * @throws RuntimeException if no matching modification was found
      */
     public int getDynamicResidueModificationId(int searchId, char modChar, BigDecimal modMass) {
         Integer modId = residueModMap.get(modChar+""+modMass.doubleValue());
         if (modId != null)  return modId;
-        throw new RuntimeException("No matching dynamic residue modification found for: searchId: "+
-                searchId+"; modChar: "+
-                modChar+"; modMass: "+modMass.doubleValue());
+        return 0;
     }
     
     /**
@@ -97,15 +94,11 @@ public class DynamicModLookupUtil {
      * @param searchId
      * @param modTerminal
      * @param modMass
-     * @return
-     * @throws RuntimeException if no matching modification was found
+     * @return 0 if no match is found
      */
     public int getDynamicTerminalModificationId(int searchId, Terminal modTerminal, BigDecimal modMass) {
         Integer modId = terminalModMap.get(modTerminal+""+modMass.doubleValue());
         if (modId != null)  return modId;
-        throw new RuntimeException("No matching dynamic terminal modification found for: searchId: "+
-                searchId+
-                "; modTerminal: "+modTerminal+
-                "; modMass: "+modMass.doubleValue());
+        return 0;
     }
 }

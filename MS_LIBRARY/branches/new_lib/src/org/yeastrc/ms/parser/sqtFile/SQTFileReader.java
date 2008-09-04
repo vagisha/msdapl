@@ -21,7 +21,6 @@ public abstract class SQTFileReader extends AbstractReader
     private List<MsResidueModification> searchDynamicResidueMods;
     private List<MsTerminalModification> searchDynamicTerminalMods;
     
-    private String serverAddress;
 
     private static final Logger log = Logger.getLogger(SQTFileReader.class);
 
@@ -30,21 +29,10 @@ public abstract class SQTFileReader extends AbstractReader
 //    private static final Pattern sqtGenPattern = Pattern.compile("^H\\s+SQTGenerator\\s+(.*)");
     
     public void init() {
-        serverAddress = null;
         searchDynamicResidueMods.clear();
         searchDynamicTerminalMods.clear();
     }
     
-    public void open(String filePath, String serverAddress) throws DataProviderException{
-        this.serverAddress = serverAddress;
-        super.open(filePath);
-    }
-
-    public void open(String fileName, Reader input, String serverAddress) throws DataProviderException  {
-        this.serverAddress = serverAddress;
-        super.open(fileName, input);
-    }
-     
     public static SearchFileFormat getSearchFileType(String filePath) {
         
         SQTFileReader reader = new SQTFileReader(){
@@ -117,8 +105,6 @@ public abstract class SQTFileReader extends AbstractReader
     public SQTHeader getSearchHeader()  throws DataProviderException {
 
         SQTHeader header = new SQTHeader();
-        // if any search databases are found; set the server path
-        header.setServerAddress(serverAddress);
         
         while (isHeaderLine(currentLine)) {
             String[] nameAndVal = parseHeader(currentLine);
@@ -130,7 +116,6 @@ public abstract class SQTFileReader extends AbstractReader
             throw new DataProviderException("Invalid SQT Header. One or more required headers is missing. "+
                     "Required headers:\n\t"+SQTHeader.requiredHeaders());
         
-//        this.searchDynamicResidueMods = header.getDynamicModifications();
         return header;
     }
 

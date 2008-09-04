@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
@@ -98,11 +97,10 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         
         // database used for the search (will be used to look up protein ids later)
         String searchDbName = new File(parser.getSearchDatabase().getServerPath()).getName();
-        int searchDbId = 0; 
-        try {searchDbId = NrSeqLookupUtil.getDatabaseId(searchDbName);}
-        catch(NrSeqLookupException e) {
-            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND, e);
-            ex.setErrorMessage(e.getMessage());
+        int searchDbId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+        if (searchDbId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
+            ex.setErrorMessage("No database ID found for: "+searchDbName);
             uploadExceptionList.add(ex);
             log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED", ex);
             return 0;
@@ -339,7 +337,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         int resultId = resultDao.saveResultOnly(result, runSearchId, scanId); // uploads data to the msRunSearchResult table ONLY
         
         // upload the protein matches
-        uploadProteinMatches(result, resultId, searchDbId);
+        uploadProteinMatches(result, result.getResultPeptide().getPeptideSequence(), resultId, searchDbId);
         
         // upload dynamic mods for this result
         uploadResultResidueMods(result, resultId, runSearchId);

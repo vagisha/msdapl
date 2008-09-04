@@ -30,13 +30,13 @@ public class SequestSQTFileReader extends SQTFileReader {
         super();
     }
 
-    public void open(String filePath, String serverAddress, boolean useEvalue) throws DataProviderException{
-        super.open(filePath, serverAddress);
+    public void open(String filePath, boolean useEvalue) throws DataProviderException{
+        super.open(filePath);
         this.useEvalue = useEvalue;
     }
 
-    public void open(String fileName, Reader input, String serverAddress, boolean useEvalue) throws DataProviderException  {
-        super.open(fileName, input, serverAddress);
+    public void open(String fileName, Reader input, boolean useEvalue) throws DataProviderException  {
+        super.open(fileName, input);
         this.useEvalue = useEvalue;
     }
 

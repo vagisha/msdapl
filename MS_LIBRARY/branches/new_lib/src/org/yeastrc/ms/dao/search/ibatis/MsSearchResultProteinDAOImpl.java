@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
@@ -44,8 +45,13 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         return true;
     }
     
+    /**
+     * @throws NrSeqLookupException if no matching id was found for the protein.
+     */
     public void save(MsSearchResultProtein resultProtein, String searchDbName, int resultId) {
         int proteinId = NrSeqLookupUtil.getProteinId(searchDbName, resultProtein.getAccession());
+        if (proteinId == 0)
+            throw new NrSeqLookupException(searchDbName, resultProtein.getAccession());
         save("MsResultProtein.insert", new MsResultProteinSqlMapParam(resultId, proteinId));
     }
     

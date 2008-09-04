@@ -36,14 +36,14 @@ public class ProlucidSQTFileReader extends SQTFileReader {
         secondaryScoreType = null;
     }
     
-    public void open(String filePath, String serverAddress, PrimaryScore primaryScore, SecondaryScore secondaryScore) throws DataProviderException{
-        super.open(filePath, serverAddress);
+    public void open(String filePath, PrimaryScore primaryScore, SecondaryScore secondaryScore) throws DataProviderException{
+        super.open(filePath);
         this.primaryScoreType = primaryScore;
         this.secondaryScoreType = secondaryScore;
     }
     
-    public void open(String fileName, Reader input, String serverAddress, PrimaryScore primaryScore, SecondaryScore secondaryScore) throws DataProviderException  {
-        super.open(fileName, input, serverAddress);
+    public void open(String fileName, Reader input, PrimaryScore primaryScore, SecondaryScore secondaryScore) throws DataProviderException  {
+        super.open(fileName, input);
         this.primaryScoreType = primaryScore;
         this.secondaryScoreType = secondaryScore;
     }
