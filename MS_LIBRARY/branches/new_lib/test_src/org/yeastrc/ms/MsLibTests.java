@@ -13,7 +13,6 @@ import org.yeastrc.ms.parser.sequestParams.SequestParamsParserTest;
 import org.yeastrc.ms.parser.sqtFile.SQTParserTests;
 import org.yeastrc.ms.service.MsDataUploaderTest;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadServiceTest;
-import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadServiceTest;
 import org.yeastrc.ms.util.DTASelectFileNameParseTest;
 import org.yeastrc.ms.util.PeakStringBuilderTest;

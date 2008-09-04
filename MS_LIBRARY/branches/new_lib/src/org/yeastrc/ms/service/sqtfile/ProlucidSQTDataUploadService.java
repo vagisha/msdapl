@@ -30,8 +30,7 @@ import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser;
-import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.PrimaryScore;
-import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.SecondaryScore;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.Score;
 import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidSQTFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -48,8 +47,9 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     private MsSearchDatabase db = null;
     private List<MsResidueModification> dynaResidueMods;
     private List<MsTerminalModification> dynaTermMods;
-    private PrimaryScore primaryScoreType;
-    private SecondaryScore secondaryScoreType;
+    private Score spColScore;
+    private Score xcorrColScore;
+    private Score deltaCnColScore;
     
     
     public ProlucidSQTDataUploadService() {
@@ -64,7 +64,9 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         dynaResidueMods.clear();
         dynaTermMods.clear();
         db = null;
-        primaryScoreType = null;
+        spColScore = null;
+        xcorrColScore = null;
+        deltaCnColScore = null;
     }
     
     // resetCaches() is called by reset() in the superclass.
@@ -91,10 +93,12 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         db = parser.getSearchDatabase();
         dynaResidueMods = parser.getDynamicResidueMods();
         dynaTermMods = parser.getDynamicTerminalMods();
-        // primary score type used for the search 
-        primaryScoreType = parser.getPrimaryScoreType();
-        // secondary score type used for the search
-        secondaryScoreType = parser.getSecondaryScoreType();
+        // what is the score type in the sp column
+        spColScore = parser.getSpColumnScore();
+        // what is the score type in the xcorr column
+        xcorrColScore = parser.getXcorrColumnScore();
+        // what is the score type in the deltaCN column
+        deltaCnColScore = parser.getDeltaCNColumnScore();
         
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
@@ -141,7 +145,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         ProlucidSQTFileReader provider = new ProlucidSQTFileReader();
         
         try {
-            provider.open(filePath, primaryScoreType, secondaryScoreType);
+            provider.open(filePath, spColScore, xcorrColScore, deltaCnColScore);
             provider.setDynamicResidueMods(dynaResidueMods);
             provider.setDynamicTerminalMods(dynaTermMods);
         }

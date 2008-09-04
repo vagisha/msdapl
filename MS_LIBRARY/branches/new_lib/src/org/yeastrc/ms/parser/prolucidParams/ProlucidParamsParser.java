@@ -30,15 +30,15 @@ import org.yeastrc.ms.parser.TerminalModification;
 
 public class ProlucidParamsParser implements SearchParamsDataProvider {
 
-    public static enum PrimaryScore {BIN_PROB, XCORR};
-    public static enum SecondaryScore {ZSCORE, DELTA_CN};
+    public static enum Score {SP, BIN_PROB, XCORR, DELTA_CN, ZSCORE, BLANK};
 
     private String remoteServer;
 
     private List<ProlucidParam> parentParams; // normally we should have only one parent (the <parameter> element)
 
-    private PrimaryScore primaryScore;
-    private SecondaryScore secondaryScore;
+    private Score xcorrColumnScore;
+    private Score spColumnScore;
+    private Score deltaCNColumnScore;
 
     private Database database;
     private MsEnzyme enzyme;
@@ -79,14 +79,18 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return SearchProgram.PROLUCID;
     }
     
-    public PrimaryScore getPrimaryScoreType() {
-        return primaryScore;
+    public Score getXcorrColumnScore() {
+        return xcorrColumnScore;
     }
     
-    public SecondaryScore getSecondaryScoreType() {
-        return secondaryScore;
+    public Score getSpColumnScore() {
+        return spColumnScore;
     }
 
+    public Score getDeltaCNColumnScore() {
+        return deltaCNColumnScore;
+    }
+    
     public List<ProlucidParam> getParamList() {
         return this.parentParams;
     }
@@ -106,8 +110,9 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         dynamicTerminalModifications.clear();
         this.database = null;
         this.enzyme = null;
-        this.primaryScore = null;
-        this.secondaryScore = null;
+        this.xcorrColumnScore = Score.XCORR;
+        this.spColumnScore = Score.SP;
+        this.deltaCNColumnScore = Score.DELTA_CN;
     }
 
     public ProlucidParamsParser() {
@@ -140,6 +145,14 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         catch (IOException e) {
             throw new DataProviderException("Error reading file: ", e);
         }
+        
+        // make sure the three score types are different
+        if (spColumnScore == xcorrColumnScore)
+            throw new DataProviderException("Score types for Sp and XCorr columns cannot be the same: "+spColumnScore);
+        if (spColumnScore == deltaCNColumnScore)
+            throw new DataProviderException("Score types for Sp and DeltaCN columns cannot be the same: "+spColumnScore);
+        if (xcorrColumnScore == deltaCNColumnScore)
+            throw new DataProviderException("Score types for the XCorr and DeltaCN columns cannot be the same: "+xcorrColumnScore);
     }
 
     private void parseDocument(Document doc) throws DataProviderException {
@@ -243,10 +256,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
         switch(ival) {
             case 0:
-                primaryScore = PrimaryScore.BIN_PROB;
+                xcorrColumnScore = Score.BIN_PROB;
                 break;
             case 1:
-                primaryScore = PrimaryScore.XCORR;
+                xcorrColumnScore = Score.XCORR;
                 break;
             default:
                 throw new DataProviderException("Invalid value for additional_estimate: "+val+". Allowed values: 0,1"); 
@@ -260,6 +273,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
      *      0 - default Binomial Probability This is not pep-prob probability score (by Rovshan), but similar. In Sequest, Sp score is the preliminary score. In Prolucid, the binomial probability score is the preliminary score.
      *      1 - XCorr
      *  -->
+     *  FROM DANIEL COCIORVA
+     *  - XCorr column will contain the "primary_score_type" (which is usually XCorr, but not always)
+     *  - DeltCN column will contain DeltCN, which is derived from the primary score. Its value is always between 0 and 1, regardless on which primary score type it is based. So you needn't mess with this one.
+     *  - Sp column will contain the "secondary_score_type" (which is usually ZScore, but not always).
      * @param node
      * @throws DataProviderException
      */
@@ -274,10 +291,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
         switch(ival) {
             case 0:
-                primaryScore = PrimaryScore.BIN_PROB;
+                xcorrColumnScore = Score.BIN_PROB;
                 break;
             case 1:
-                primaryScore = PrimaryScore.XCORR;
+                xcorrColumnScore = Score.XCORR;
                 break;
             default:
                 throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1"); 
@@ -290,6 +307,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
      *      0 - deltaCn 
      *      1 - T Score 
      * -->
+     * NOTE: Assuming "T Score" is the same as "Z score"
      * @param node
      * @throws DataProviderException
      */
@@ -304,10 +322,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
         switch(ival) {
             case 0:
-                secondaryScore = SecondaryScore.DELTA_CN;
+                deltaCNColumnScore = Score.DELTA_CN;
                 break;
             case 1:
-                secondaryScore = SecondaryScore.ZSCORE;
+                deltaCNColumnScore = Score.ZSCORE;
                 break;
             default:
                 throw new DataProviderException("Invalid value for confidence: "+val+". Allowed values: 0,1"); 
@@ -323,9 +341,11 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
      *      2  Zscore Zscore is Prolucid's answer to Sequest's delCN. delCN =(XCorr of the top hit - XCorr of the second hit)/XCorr of the top hit.
      *      Zscore = (XCorr of the top hit - average XCorr of the 2nd , 3rd, and 500th hits)/standard deviation of the XCorr's of the 2nd , 3rd, and 500th hits. A Zscore of 5 means that the top hit is 5 STD away from the average. A good Zscore cutoff is 4.5, and 5 is even better.
      *  -->
-     *  NOTE: When I look at the annotations for primary and secondary score types, they don't make sense.  They appear to allow both primary AND secondary score
-     *  to be XCorr (or Binomial Probability). I am assuming that when secondary score value is either 0 or 1, the secondary score type is DeltaCN.
      *  
+     *  FROM DANIEL COCIORVA
+     *  - XCorr column will contain the "primary_score_type" (which is usually XCorr, but not always)
+     *  - DeltCN column will contain DeltCN, which is derived from the primary score. Its value is always between 0 and 1, regardless on which primary score type it is based. So you needn't mess with this one.
+     *  - Sp column will contain the "secondary_score_type" (which is usually ZScore, but not always).
      * @param node
      * @throws DataProviderException
      */
@@ -340,13 +360,13 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
         switch(ival) {
             case 0:
-                secondaryScore = SecondaryScore.DELTA_CN;
+                spColumnScore = Score.BIN_PROB;
                 break;
             case 1:
-                secondaryScore = SecondaryScore.DELTA_CN;
+                spColumnScore = Score.XCORR;
                 break;
             case 2:
-                secondaryScore = SecondaryScore.ZSCORE;
+                spColumnScore = Score.ZSCORE;
                 break;
             default:
                 throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1,2"); 

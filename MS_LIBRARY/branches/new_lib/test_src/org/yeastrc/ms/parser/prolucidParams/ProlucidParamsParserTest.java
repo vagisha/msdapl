@@ -13,8 +13,7 @@ import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.PrimaryScore;
-import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.SecondaryScore;
+import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.Score;
 
 public class ProlucidParamsParserTest extends TestCase {
 
@@ -270,8 +269,8 @@ public class ProlucidParamsParserTest extends TestCase {
         assertEquals(200.0, dynaTermMods.get(1).getModificationMass().doubleValue());
     }
 
-    public void testGetPrimaryScoreType() {
-        // format 1
+    public void testGetScoreTypes() {
+        // format 1 (old format)
         try {
             parser.parseParamsFile("remote.server", format1file);
         }
@@ -279,12 +278,14 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        assertNotNull(parser.getPrimaryScoreType());
-        assertEquals(PrimaryScore.XCORR, parser.getPrimaryScoreType());
-        assertNotNull(parser.getSecondaryScoreType());
-        assertEquals(SecondaryScore.DELTA_CN, parser.getSecondaryScoreType());
+        assertNotNull(parser.getSpColumnScore());
+        assertEquals(Score.SP, parser.getSpColumnScore());
+        assertNotNull(parser.getXcorrColumnScore());
+        assertEquals(Score.XCORR, parser.getXcorrColumnScore());
+        assertNotNull(parser.getDeltaCNColumnScore());
+        assertEquals(Score.DELTA_CN, parser.getDeltaCNColumnScore());
         
-        // format 2
+        // format 2 (new format)
         try {
             parser.parseParamsFile("remote.server", format2file);
         }
@@ -292,9 +293,11 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        assertNotNull(parser.getPrimaryScoreType());
-        assertEquals(PrimaryScore.BIN_PROB, parser.getPrimaryScoreType());
-        assertNotNull(parser.getSecondaryScoreType());
-        assertEquals(SecondaryScore.DELTA_CN, parser.getSecondaryScoreType());
+        assertNotNull(parser.getSpColumnScore());
+        assertEquals(Score.BIN_PROB, parser.getSpColumnScore());
+        assertNotNull(parser.getXcorrColumnScore());
+        assertEquals(Score.XCORR, parser.getXcorrColumnScore());
+        assertNotNull(parser.getDeltaCNColumnScore());
+        assertEquals(Score.DELTA_CN, parser.getDeltaCNColumnScore());
     }
 }
