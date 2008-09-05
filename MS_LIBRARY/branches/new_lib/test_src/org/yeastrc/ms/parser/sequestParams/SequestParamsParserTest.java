@@ -212,8 +212,6 @@ public class SequestParamsParserTest extends TestCase {
             assertNotNull(db);
             assertEquals("remote.server", db.getServerAddress());
             assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", db.getServerPath());
-            assertEquals(0, db.getSequenceLength());
-            assertEquals(0, db.getProteinCount());
 
             // enzyme
             MsEnzyme enzyme = parser.getSearchEnzyme();

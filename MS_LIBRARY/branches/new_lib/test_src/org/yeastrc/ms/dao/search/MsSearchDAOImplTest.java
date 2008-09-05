@@ -31,7 +31,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, search_1.getDynamicResidueMods().size());
         assertEquals(0, search_1.getEnzymeList().size());
         
-        int searchId_1 = searchDao.saveSearch(search_1);
+        int searchId_1 = searchDao.saveSearch(search_1, 256); // proteinDatabaseId = 256
         assertEquals(0, resultDao.loadResultIdsForRunSearch(searchId_1).size());
         checkSearch(search_1, searchDao.loadSearch(searchId_1));
         
@@ -43,7 +43,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertTrue(search_2.getDynamicResidueMods().size() > 0);
         assertTrue(search_2.getEnzymeList().size() > 0);
         
-        int searchId_2 = searchDao.saveSearch(search_2);
+        int searchId_2 = searchDao.saveSearch(search_2, 256); // proteinDatabaseId = 256
         assertEquals(2, seqDbDao.loadSearchDatabases(searchId_2).size());
         assertEquals(2, modDao.loadStaticResidueModsForSearch(searchId_2).size());
         assertEquals(3, modDao.loadDynamicResidueModsForSearch(searchId_2).size());

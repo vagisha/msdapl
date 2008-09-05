@@ -18,6 +18,11 @@ public interface MsSearchDatabaseDb extends MsSearchDatabase {
     public abstract int getId();
     
     /**
+     * @return id of the nrseq protein database
+     */
+    public abstract int getSequenceDatabaseId();
+    
+    /**
      * The name of the fasta file
      * @return
      */

@@ -77,15 +77,17 @@ ProlucidSearchResultDAO {
         return resultId;
     }
 
-    //  resultID, 
-    //  XCorrRank,
-    //  binomialScore,
-    //  XCorr,
-    //  ZScore 
-    //  deltaCN, 
-    //  calculatedMass,
-    //  matchingIons,
-    //  predictedIons
+    // resultID, 
+    // spRank,
+    // XCorrRank,
+    // sp,
+    // binomialProbability,
+    // XCorr,
+    // ZScore 
+    // deltaCN, 
+    // calculatedMass,
+    // matchingIons,
+    // predictedIons)
     @Override
     public void saveAllProlucidResultData(
             List<ProlucidResultDataDb> resultDataList) {
@@ -96,10 +98,13 @@ ProlucidSearchResultDAO {
             values.append(",(");
             values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
-            int xcorrRank = data.getxCorrRank();
-            values.append(xcorrRank == -1 ? "NULL" : xcorrRank);
+            values.append(data.getSpRank() == -1 ? "NULL" : data.getSpRank());
             values.append(",");
-            values.append(data.getBinomialScore());
+            values.append(data.getxCorrRank()== -1 ? "NULL" : data.getxCorrRank());
+            values.append(",");
+            values.append(data.getSp());
+            values.append(",");
+            values.append(data.getBinomialProbability());
             values.append(",");
             values.append(data.getxCorr());
             values.append(",");
@@ -109,15 +114,14 @@ ProlucidSearchResultDAO {
             values.append(",");
             values.append(data.getCalculatedMass());
             values.append(",");
-            int mIons = data.getMatchingIons();
-            values.append(mIons == -1 ? "NULL" : mIons);
+            values.append(data.getMatchingIons() == -1 ? "NULL" : data.getMatchingIons());
             values.append(",");
-            int pIons = data.getPredictedIons();
-            values.append(pIons == -1 ? "NULL" : pIons);
+            values.append(data.getPredictedIons() == -1 ? "NULL" : data.getPredictedIons()  );
             values.append(")");
         }
         values.deleteCharAt(0);
 
+        System.out.println(values.toString());
         save("ProlucidResult.insertAll", values.toString());
     }
 
@@ -172,8 +176,8 @@ ProlucidSearchResultDAO {
             return result.getPredictedIons();
         }
 
-        public Double getBinomialScore() {
-            return result.getBinomialScore();
+        public Double getBinomialProbability() {
+            return result.getBinomialProbability();
         }
 
         public Double getZscore() {

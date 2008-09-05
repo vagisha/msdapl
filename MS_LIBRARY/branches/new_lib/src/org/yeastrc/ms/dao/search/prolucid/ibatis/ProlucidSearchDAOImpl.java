@@ -35,9 +35,9 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO 
         return (ProlucidSearchDb) queryForObject("ProlucidSearch.select", searchId);
     }
     
-    public int saveSearch(ProlucidSearch search) {
+    public int saveSearch(ProlucidSearch search, int sequenceDatabaseId) {
         
-        int searchId = searchDao.saveSearch(search);
+        int searchId = searchDao.saveSearch(search, sequenceDatabaseId);
         // save ProLuCID search parameters
         try {
             for (ProlucidParam param: search.getProlucidParams()) {

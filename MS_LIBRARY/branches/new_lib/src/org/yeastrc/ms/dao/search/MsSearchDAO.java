@@ -16,11 +16,10 @@ public interface MsSearchDAO <I extends MsSearch, O extends MsSearchDb>{
      * 4. any terminal (static and dynamic) modifications
      * 5. any associated enzyme information for the search.
      * @param search
-     * @param runId
-     * @param experimentId
+     * @param sequenceDatabaseId -- id from nrseq's tblDatabase table
      * @return database id of the search
      */
-    public abstract int saveSearch(I search);
+    public abstract int saveSearch(I search, int sequenceDatabaseId);
     
     /**
      * Updates the value of the analysisProgramVersion in msSearch table

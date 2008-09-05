@@ -91,8 +91,6 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, dbs.size());
         assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", dbs.get(0).getServerPath());
         assertEquals("remoteServer", dbs.get(0).getServerAddress());
-        assertEquals(0, dbs.get(0).getProteinCount());
-        assertEquals(0, dbs.get(0).getSequenceLength());
         
         // check search enzymes
         List<MsEnzymeDb> enzymes = search.getEnzymeList();

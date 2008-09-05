@@ -12,14 +12,4 @@ public interface MsSearchDatabase {
      */
     public abstract String getServerPath();
 
-    /**
-     * @return the sequenceLength
-     */
-    public abstract long getSequenceLength();
-
-    /**
-     * @return the proteinCount
-     */
-    public abstract int getProteinCount();
-
 }

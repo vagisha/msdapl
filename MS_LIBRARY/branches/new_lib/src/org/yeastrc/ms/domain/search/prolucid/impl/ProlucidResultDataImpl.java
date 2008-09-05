@@ -21,7 +21,7 @@ public class ProlucidResultDataImpl implements ProlucidResultData {
     private int predictedIons = -1;
     
     private BigDecimal sp;
-    private Double binomialScore;
+    private Double binomialProbability;
     private BigDecimal xcorr;
     private Double zscore;
     private BigDecimal deltaCN;
@@ -64,8 +64,8 @@ public class ProlucidResultDataImpl implements ProlucidResultData {
     }
     
     @Override
-    public Double getBinomialScore() {
-        return binomialScore;
+    public Double getBinomialProbability() {
+        return binomialProbability;
     }
     
     @Override
@@ -100,8 +100,8 @@ public class ProlucidResultDataImpl implements ProlucidResultData {
         this.sp = sp;
     }
 
-    public void setBinomialScore(Double binomialScore) {
-        this.binomialScore = binomialScore;
+    public void setBinomialProbability(Double binomialProbability) {
+        this.binomialProbability = binomialProbability;
     }
 
     public void setXcorr(BigDecimal xcorr) {

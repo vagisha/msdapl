@@ -44,8 +44,6 @@ public class ProlucidParamsParserTest extends TestCase {
         assertNotNull(db);
         assertEquals("remote.server", db.getServerAddress());
         assertEquals("/bluefish/people-b/applications/yates/dbase/EBI-IPI_mouse_3.06_05-10-2005_origrev_con.fasta", db.getServerPath());
-        assertEquals(0, db.getSequenceLength());
-        assertEquals(0, db.getProteinCount());
 
         // format 2
         try {
@@ -59,8 +57,6 @@ public class ProlucidParamsParserTest extends TestCase {
         assertNotNull(db);
         assertEquals("remote.server", db.getServerAddress());
         assertEquals("/garibaldi/people-b/applications/yates/dbase/WormBase_C-elegans_wp180_08-19-2007_reversed.fasta", db.getServerPath());
-        assertEquals(0, db.getSequenceLength());
-        assertEquals(0, db.getProteinCount());
     }
 
     public void testGetSearchEnzyme() {

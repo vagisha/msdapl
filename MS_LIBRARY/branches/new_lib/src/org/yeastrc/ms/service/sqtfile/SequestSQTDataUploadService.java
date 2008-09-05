@@ -93,7 +93,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
             MsSearchDAO<SequestSearch, SequestSearchDb> searchDAO = DAOFactory.instance().getSequestSearchDAO();
-            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate));
+            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate), sequenceDatabaseId);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
@@ -146,7 +146,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
         
         try {
-            uploadSequestSqtFile(provider, searchId, runId, searchDatabaseId);
+            uploadSequestSqtFile(provider, searchId, runId, sequenceDatabaseId);
         }
         catch (UploadException ex) {
             ex.setFile(filePath);

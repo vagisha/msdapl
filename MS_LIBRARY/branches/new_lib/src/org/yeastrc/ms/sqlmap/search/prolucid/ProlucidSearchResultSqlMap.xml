@@ -9,8 +9,10 @@
 	
 	
 	<resultMap class="ProlucidResultOut" id="prolucidResultResult" extends="MsSearchResult.msSearchResult">
+		<result property="spRank" column="spRank" nullValue="-1"/>
 		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
-		<result property="binomialScore" column="binomialScore" />
+		<result property="sp" column="sp" />
+		<result property="binomialProbability" column="binomialProbability" />
 		<result property="xCorr" column="XCorr"/>
 		<result property="zscore" column="ZScore"/>
 		<result property="deltaCN" column="deltaCN"/>
@@ -21,8 +23,10 @@
 	
 	<parameterMap class="ProlucidResultDataIn" id="prolucidResultDataParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="spRank" jdbcType="INTEGER" nullValue="-1" />
 		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="-1"/>
-		<parameter property="binomialScore" jdbcType="DOUBLE"/>
+		<parameter property="sp" jdbcType="DECIMAL" />
+		<parameter property="binomialProbability" jdbcType="DOUBLE"/>
 		<parameter property="xCorr" jdbcType="DECIMAL"/>
 		<parameter property="zscore" jdbcType="DOUBLE"/>
 		<parameter property="deltaCN" jdbcType="DECIMAL"/>
@@ -41,24 +45,28 @@
     <insert id="insert" parameterMap="prolucidResultDataParam">
     	INSERT INTO ProLuCIDSearchResult 
     	(resultID, 
+    	spRank,
     	XCorrRank,
-    	binomialScore,
+    	sp,
+    	binomialProbability,
     	XCorr,
-    	ZScore 
+    	ZScore, 
     	deltaCN, 
     	calculatedMass,
     	matchingIons,
     	predictedIons) 
-    	VALUES (?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
     	INSERT INTO ProLuCIDSearchResult
     	(resultID, 
+    	spRank,
     	XCorrRank,
-    	binomialScore,
+    	sp,
+    	binomialProbability,
     	XCorr,
-    	ZScore, 
+    	ZScore,
     	deltaCN, 
     	calculatedMass,
     	matchingIons,

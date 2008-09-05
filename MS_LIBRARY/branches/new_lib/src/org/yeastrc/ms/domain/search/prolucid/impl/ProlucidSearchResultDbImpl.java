@@ -84,12 +84,12 @@ public class ProlucidSearchResultDbImpl extends MsSearchResultDbImpl implements 
         prolucidData.setSp(sp);
     }
     
-    public Double getBinomialScore() {
-        return prolucidData.getBinomialScore();
+    public Double getBinomialProbability() {
+        return prolucidData.getBinomialProbability();
     }
     
-    public void setBinomialScore(Double binomialScore) {
-        prolucidData.setBinomialScore(binomialScore);
+    public void setBinomialProbability(Double binomialProbability) {
+        prolucidData.setBinomialProbability(binomialProbability);
     }
     
     public Double getZscore() {

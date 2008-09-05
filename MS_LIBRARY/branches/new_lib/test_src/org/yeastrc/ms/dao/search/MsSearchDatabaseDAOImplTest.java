@@ -40,19 +40,19 @@ public class MsSearchDatabaseDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, dbs_2.size());
         
         // create a sequence database and assign it to both the search ids
-        MsSearchDatabase db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1", 100, 20);
+        MsSearchDatabase db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1");
         // assign this database to searchId_1; this will return the id from the msSequenceDatabaseDetails table
-        int db1_id = seqDbDao.saveSearchDatabase(db1, searchId_1);
+        int db1_id = seqDbDao.saveSearchDatabase(db1, searchId_1, 293); // proteinDatabaseId = 293
         
         // we assign the same database to searchId_2.  Since no new entry should be created in 
         // msSequenceDatabaseDetails table, the returned id should be the same as the one above
-        assertEquals(db1_id, seqDbDao.saveSearchDatabase(db1, searchId_2));
+        assertEquals(db1_id, seqDbDao.saveSearchDatabase(db1, searchId_2, 293)); // proteinDatabaseId = 293
         
         // create another dababase with some null values
-        MsSearchDatabase db2 = makeSequenceDatabase("serverAddress_1", null, null, 20);
+        MsSearchDatabase db2 = makeSequenceDatabase("serverAddress_1", null);
         // assign the database to searchId_1; we should get a different id since a new entry will be
         // created in msSequenceDatabaseDetails
-        int db2_id = seqDbDao.saveSearchDatabase(db2, searchId_1);
+        int db2_id = seqDbDao.saveSearchDatabase(db2, searchId_1, 293);
         assertNotSame(db1_id, db2_id);
         
         // load the databases associated with searchId_1 and check the returned objects
@@ -84,8 +84,6 @@ public class MsSearchDatabaseDAOImplTest extends BaseDAOTestCase {
     }
     
     protected void checkDatabase(MsSearchDatabase input, MsSearchDatabaseDb output) {
-        assertEquals(input.getSequenceLength(), output.getSequenceLength());
-        assertEquals(input.getProteinCount(), output.getProteinCount());
         assertEquals(input.getServerAddress(), output.getServerAddress());
         assertEquals(input.getServerPath(), output.getServerPath());
     }

@@ -4,32 +4,30 @@
 <sqlMap namespace="MsDatabase"> 
 
 
-	<typeAlias alias="MsDatabaseDb" type="org.yeastrc.ms.domain.search.impl.MsSearchDatabaseDbImpl"/>
-	<typeAlias alias="MsDatabase" type="org.yeastrc.ms.domain.search.MsSearchDatabase"/>
+	<typeAlias alias="MsDatabaseOut" type="org.yeastrc.ms.domain.search.impl.MsSearchDatabaseDbImpl"/>
+	<typeAlias alias="MsDatabaseIn" type="org.yeastrc.ms.domain.search.MsSearchDatabaseDb"/>
 	
 	
-	<resultMap class="MsDatabaseDb" id="msDatabaseResult">
+	<resultMap class="MsDatabaseOut" id="msDatabaseResult">
 		<result property="id" column="id"/>
+		<result property="sequenceDatabaseId" column="sequenceDatabaseID" nullValue="0" />
 		<result property="serverAddress" column="serverAddress"/>
 		<result property="serverPath" column="serverPath"/>
-		<result property="sequenceLength" column="sequenceLength" nullValue="0"/>
-		<result property="proteinCount" column="proteinCount" nullValue="0"/>
 	</resultMap>
 	
 	
 	
-	<parameterMap class="MsDatabase" id="msDatabaseParam">
+	<parameterMap class="MsDatabaseIn" id="msDatabaseParam">
+		<parameter property="sequenceDatabaseId"/>
 		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverPath" jdbcType="VARCHAR"/>
-		<parameter property="sequenceLength" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="proteinCount" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
 	
 	<!-- ================================================================================= -->
 	<!-- QUERIES INVOLVING ONLY msSequenceDatabaseDetails TABLE -->
 	<!-- ================================================================================= -->
-    <select id="selectDatabaseIdMatchAllCols" resultClass="Integer" parameterClass="MsDatabase">
+    <select id="selectDatabaseIdMatchAllCols" resultClass="Integer" parameterClass="MsDatabaseIn">
     	SELECT id FROM msSequenceDatabaseDetail WHERE 
     	<dynamic open="serverAddress">
     		<isNull property="serverAddress">
@@ -47,17 +45,15 @@
     			= #serverPath#
     		</isNotNull>
     	</dynamic>
-    	AND sequenceLength= #sequenceLength#
-    	AND proteinCount = #proteinCount#
+    	AND sequenceDatabaseID = #sequenceDatabaseId#
     </select>
     
     <insert id="insertDatabase" parameterMap="msDatabaseParam">
     	INSERT INTO msSequenceDatabaseDetail (
+    	sequenceDatabaseID,
     	serverAddress,
-    	serverPath,
-    	sequenceLength,
-    	proteinCount)
-    	VALUES (?,?,?,?)
+    	serverPath)
+    	VALUES (?,?,?)
     	<selectKey resultClass="int">
     		select last_insert_id() as id
     	</selectKey>

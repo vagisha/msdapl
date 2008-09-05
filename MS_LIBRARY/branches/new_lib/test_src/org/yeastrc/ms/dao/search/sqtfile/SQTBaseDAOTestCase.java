@@ -50,8 +50,8 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
         
         if (addSeqDb) {
-            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1", 100, 20);
-            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2", 200, 40);
+            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1");
+            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2");
             search.setSearchDatabases(Arrays.asList(new MsSearchDatabase[]{db1, db2}));
         }
 

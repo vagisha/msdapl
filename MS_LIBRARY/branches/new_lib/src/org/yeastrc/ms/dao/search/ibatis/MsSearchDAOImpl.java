@@ -54,14 +54,14 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
         return (MsSearchDb) queryForObject("MsSearch.select", searchId);
     }
     
-    public int saveSearch(MsSearch search) {
+    public int saveSearch(MsSearch search, int sequenceDatabaseId) {
         
         int searchId = saveAndReturnId("MsSearch.insert", search);
         
         try {
             // save any database information associated with the search 
             for (MsSearchDatabase seqDb: search.getSearchDatabases()) {
-                seqDbDao.saveSearchDatabase(seqDb, searchId);
+                seqDbDao.saveSearchDatabase(seqDb, searchId, sequenceDatabaseId);
             }
 
             // save any static residue modifications used for the search

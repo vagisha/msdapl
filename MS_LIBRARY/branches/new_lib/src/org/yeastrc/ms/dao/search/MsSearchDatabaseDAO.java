@@ -17,8 +17,9 @@ public interface MsSearchDatabaseDAO {
      * msSequenceDatabaseDetails table, it is saved first.
      * @param database
      * @param searchId
-     * @return id of the sequence database that was linked to the searchId
+     * @param sequenceDatabaseId (from nrseq's tblDatabase).
+     * @return id (from msSequenceDatabaseDetail) of the database that was linked to the searchId
      */
-    public abstract int saveSearchDatabase(MsSearchDatabase database, int searchId);
+    public abstract int saveSearchDatabase(MsSearchDatabase database, int searchId, int sequenceDatabaseId);
 
 }

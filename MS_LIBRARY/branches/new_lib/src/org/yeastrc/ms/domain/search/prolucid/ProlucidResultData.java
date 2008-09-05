@@ -32,9 +32,9 @@ public interface ProlucidResultData {
     public abstract BigDecimal getSp();
     
     /**
-     * @return the binomial score
+     * @return the binomial probability
      */
-    public abstract Double getBinomialScore();
+    public abstract Double getBinomialProbability();
     
     /**
      * @return the xCorr

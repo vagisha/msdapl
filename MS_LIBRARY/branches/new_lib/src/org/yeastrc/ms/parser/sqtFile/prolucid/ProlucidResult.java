@@ -134,7 +134,7 @@ public class ProlucidResult extends SQTSearchResult implements ProlucidSearchRes
         return new ProlucidResultData() {
 
             @Override
-            public Double getBinomialScore() {
+            public Double getBinomialProbability() {
                 return binomialScore;
             }
 

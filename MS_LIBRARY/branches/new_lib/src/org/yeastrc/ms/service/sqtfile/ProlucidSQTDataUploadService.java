@@ -104,7 +104,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
             MsSearchDAO<ProlucidSearch, ProlucidSearchDb> searchDAO = DAOFactory.instance().getProlucidSearchDAO();
-            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate));
+            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate), sequenceDatabaseId);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
@@ -158,7 +158,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         }
         
         try {
-            uploadProlucidSqtFile(provider, searchId, runId, searchDatabaseId);
+            uploadProlucidSqtFile(provider, searchId, runId, sequenceDatabaseId);
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
@@ -333,8 +333,8 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             return data.getxCorrRank();
         }
         @Override
-        public Double getBinomialScore() {
-            return data.getBinomialScore();
+        public Double getBinomialProbability() {
+            return data.getBinomialProbability();
         }
         @Override
         public Double getZscore() {

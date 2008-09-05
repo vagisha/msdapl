@@ -75,7 +75,7 @@ public abstract class AbstractSQTDataUploadService {
 
     int lastUploadedRunSearchId;
     int searchId;
-    int searchDatabaseId;
+    int sequenceDatabaseId; // nrseq database id
     
     public AbstractSQTDataUploadService() {
         this.proteinMatchSet = new LinkedHashSet<MsSearchResultProteinDb>(BUF_SIZE);
@@ -96,7 +96,7 @@ public abstract class AbstractSQTDataUploadService {
 
         uploadExceptionList.clear();
         searchId = 0;
-        searchDatabaseId = 0;
+        sequenceDatabaseId = 0;
         programVersion = "uninit";
         programFromSqt = null;
     }
@@ -207,9 +207,9 @@ public abstract class AbstractSQTDataUploadService {
         String searchDbName = null;
         if (db != null) {
             searchDbName = new File(getSearchDatabase().getServerPath()).getName();
-            searchDatabaseId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+            sequenceDatabaseId = NrSeqLookupUtil.getDatabaseId(searchDbName);
         }
-        if (searchDatabaseId == 0) {
+        if (sequenceDatabaseId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
             ex.setErrorMessage("No database ID found for: "+searchDbName);
             uploadExceptionList.add(ex);
@@ -320,7 +320,7 @@ public abstract class AbstractSQTDataUploadService {
         int resultId = resultDao.saveResultOnly(result, runSearchId, scanId); // uploads data to the msRunSearchResult table ONLY
         
         // upload the protein matches
-        uploadProteinMatches(result, result.getResultPeptide().getPeptideSequence(), resultId, searchDatabaseId);
+        uploadProteinMatches(result, result.getResultPeptide().getPeptideSequence(), resultId, sequenceDatabaseId);
         
         // upload dynamic mods for this result
         uploadResultResidueMods(result, resultId, runSearchId);

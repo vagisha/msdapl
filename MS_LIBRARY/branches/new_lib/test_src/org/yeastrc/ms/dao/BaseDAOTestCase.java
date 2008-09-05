@@ -141,15 +141,8 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH DATABASE
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchDatabase makeSequenceDatabase(final String serverAddress, final String serverPath,
-            final Integer seqLength, final Integer proteinCount) {
+    protected MsSearchDatabase makeSequenceDatabase(final String serverAddress, final String serverPath) {
         MsSearchDatabase db = new MsSearchDatabase(){
-            public int getProteinCount() {
-                return proteinCount == null ? 0 : proteinCount;
-            }
-            public long getSequenceLength() {
-                return seqLength == null ? 0 : seqLength;
-            }
             public String getServerAddress() {
                 return serverAddress;
             }
@@ -275,8 +268,8 @@ public class BaseDAOTestCase extends TestCase {
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
 
         if (addSeqDb) {
-            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1", 100, 20);
-            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2", 200, 40);
+            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1");
+            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2");
             search.setSearchDatabases(Arrays.asList(new MsSearchDatabase[]{db1, db2}));
         }
 
