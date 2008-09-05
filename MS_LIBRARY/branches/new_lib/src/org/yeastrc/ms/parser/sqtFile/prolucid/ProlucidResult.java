@@ -25,16 +25,16 @@ public class ProlucidResult extends SQTSearchResult implements ProlucidSearchRes
 
     private MsSearchResultPeptide resultPeptide = null;
     
-    private int numMatchingIons;
-    private int numPredictedIons;
+    private int numMatchingIons = -1;
+    private int numPredictedIons = -1;
     
     private List<MsResidueModification> searchDynaResidueMods;
     private List<MsTerminalModification> searchDynaTermMods;
     
     private BigDecimal mass; // Calculated M+H+ value for this sequence
     
-    private int xcorrRank;
-    private int spRank;
+    private int xcorrRank = -1;
+    private int spRank = -1;
     
     private Double binomialScore;
     private BigDecimal sp;

@@ -9,26 +9,26 @@
 	
 	
 	<resultMap class="ProlucidResultOut" id="prolucidResultResult" extends="MsSearchResult.msSearchResult">
-		<result property="xCorrRank" column="XCorrRank" nullValue="0"/>
+		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
 		<result property="binomialScore" column="binomialScore" />
 		<result property="xCorr" column="XCorr"/>
 		<result property="zscore" column="ZScore"/>
 		<result property="deltaCN" column="deltaCN"/>
 		<result property="calculatedMass" column="calculatedMass" />
-		<result property="matchingIons" column="matchingIons" nullValue="0"/>
-		<result property="predictedIons" column="predictedIons" nullValue="0"/>
+		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
+		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
 	</resultMap>
 	
 	<parameterMap class="ProlucidResultDataIn" id="prolucidResultDataParam">
-		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="binomialScore" jdbcType="DOUBLE"/>
 		<parameter property="xCorr" jdbcType="DECIMAL"/>
 		<parameter property="zscore" jdbcType="DOUBLE"/>
 		<parameter property="deltaCN" jdbcType="DECIMAL"/>
 		<parameter property="calculatedMass" jdbcType="DECIMAL" />
-		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="predictedIons" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="predictedIons" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
 

@@ -94,7 +94,7 @@ ProlucidSearchResultDAO {
         StringBuilder values = new StringBuilder();
         for (ProlucidResultDataDb data: resultDataList) {
             values.append(",(");
-            values.append(data.getResultId());
+            values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
             int xcorrRank = data.getxCorrRank();
             values.append(xcorrRank == -1 ? "NULL" : xcorrRank);

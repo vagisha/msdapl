@@ -79,7 +79,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         StringBuilder values = new StringBuilder();
         for ( SequestResultDataDb data: resultDataList) {
             values.append(",(");
-            values.append(data.getResultId());
+            values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
             values.append(data.getSp());
             values.append(",");
