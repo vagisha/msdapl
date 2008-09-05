@@ -1,7 +1,6 @@
 package org.yeastrc.ms.dao.search;
 
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -158,26 +157,12 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         private ValidationStatus validationStatus;
         private MsSearchResultPeptide resultPeptide;
         private List<MsSearchResultProtein> proteinMatchList = new ArrayList<MsSearchResultProtein>();
-        private int numIonsPredicted;
-        private int numIonsMatched;
         private int charge;
-        private BigDecimal calculatedMass;
         private int scanNumber;
 
-        public BigDecimal getCalculatedMass() {
-            return calculatedMass;
-        }
-
+        
         public int getCharge() {
             return charge;
-        }
-
-        public int getNumIonsMatched() {
-            return numIonsMatched;
-        }
-
-        public int getNumIonsPredicted() {
-            return numIonsPredicted;
         }
 
         public List<MsSearchResultProtein> getProteinMatchList() {
@@ -204,20 +189,8 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
             this.proteinMatchList = proteinMatchList;
         }
 
-        public void setNumIonsPredicted(int numIonsPredicted) {
-            this.numIonsPredicted = numIonsPredicted;
-        }
-
-        public void setNumIonsMatched(int numIonsMatched) {
-            this.numIonsMatched = numIonsMatched;
-        }
-
         public void setCharge(int charge) {
             this.charge = charge;
-        }
-
-        public void setCalculatedMass(BigDecimal calculatedMass) {
-            this.calculatedMass = calculatedMass;
         }
 
         @Override

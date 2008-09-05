@@ -9,28 +9,28 @@
 	
 	
 	<resultMap class="SequestResultOut" id="sequestResultResult" extends="MsSearchResult.msSearchResult">
-		<result property="xCorrRank" column="XCorrRank" nullValue="0"/>
-		<result property="spRank" column="spRank" nullValue="0"/>
+		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
+		<result property="spRank" column="spRank" nullValue="-1"/>
 		<result property="deltaCN" column="deltaCN"/>
 		<result property="xCorr" column="XCorr"/>
 		<result property="sp" column="sp"/>
 		<result property="evalue" column="evalue"/>
 		<result property="calculatedMass" column="calculatedMass" />
-		<result property="matchingIons" column="matchingIons" nullValue="0"/>
-		<result property="predictedIons" column="predictedIons" nullValue="0"/>
+		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
+		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
 	</resultMap>
 	
 	<parameterMap class="SequestResultDataIn" id="sequestResultDataParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="sp" jdbcType="DECIMAL"/>
-		<parameter property="spRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="spRank" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="xCorr" jdbcType="DECIMAL"/>
-		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="deltaCN" jdbcType="DECIMAL"/>
-		<parameter property="evalue" jdbcType="DOUBLE" nullValue="0" />
+		<parameter property="evalue" jdbcType="DOUBLE" />
 		<parameter property="calculatedMass" jdbcType="DECIMAL" />
-		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="predictedIons" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="predictedIons" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
 

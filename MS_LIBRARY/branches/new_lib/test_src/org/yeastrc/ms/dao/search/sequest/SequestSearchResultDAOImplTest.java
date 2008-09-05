@@ -11,7 +11,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 
 public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 
-//    public static BigDecimal sp;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -43,8 +42,9 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         result.setXCorrRank(1);
         result.setXCorr(new BigDecimal("0.50"));
         result.setSpRank(1);
-        result.setSp(new BigDecimal("123.4"));
+        result.setSp(new BigDecimal("123.5"));
         result.setDeltaCN(new BigDecimal("0.001"));
+        result.setMatchingIons(200);
         
         int resultId = sequestResDao.save(97, "dummy_db", result, 45, 32); // searchId = 97; searchResultId = 45; scanId = 32
         

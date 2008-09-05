@@ -65,7 +65,7 @@
     </select>
     
     <select id="selectIdForRunAndSearch" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msRunSearch WHERE runID = #runId# AND searchID=#experimentId#
+    	SELECT id FROM msRunSearch WHERE runID = #runId# AND searchID=#searchId#
     </select>
     
     <insert id="insert" parameterMap="msRunSearchParam">

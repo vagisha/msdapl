@@ -8,21 +8,28 @@ import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsResultTerminalModSqlMapParam;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
 
@@ -59,7 +66,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         
         checkSearch(searchId, experimentDate);
         
-        checkFirstRunSearch(searchId, runId1);
+//        checkFirstRunSearch(searchId, runId1);
         checkSecondRunSearch(searchId, runId2);
         
     }
@@ -223,6 +230,8 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
     private void checkSecondRunSearch(int searchId, int runId) {
         MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
         int runSearchId = runSearchDao.loadIdForRunAndSearch(runId, searchId);
+        
+        assertTrue(runSearchId != 0);
         SQTRunSearchDb runSearch = runSearchDao.loadRunSearch(runSearchId);
         assertNotNull(runSearch);
         assertEquals(runId, runSearch.getRunId());
@@ -232,9 +241,15 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(SearchProgram.SEQUEST, runSearch.getSearchProgram());
         // TODO check search date and search duration
         List<SQTHeaderDb> headerList = runSearch.getHeaders();
-        assertEquals(24, headerList.size());
+        assertEquals(23, headerList.size());
+        Collections.sort(headerList, new Comparator<SQTHeaderDb>() {
+            public int compare(SQTHeaderDb o1, SQTHeaderDb o2) {
+                return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
+            }});
         
-        String headerSec = "H\tSQTGenerator SEQUEST\n"+ 
+        // check headers. 
+        String headerSec = 
+                "H\tSQTGenerator\tSEQUEST\n"+ 
                 "H\tSQTGeneratorVersion\t3.0\n"+ 
                 "H\tComment\tSEQUEST was written by J Eng and JR Yates, III\n"+ 
                 "H\tComment\tSEQUEST ref. J. Am. Soc. Mass Spectrom., 1994, v. 4, p. 976\n"+ 
@@ -254,19 +269,171 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
                 "H\tAlg-XCorrMode\t0\n"+ 
                 "H\tStaticMod\tC=160.139\n"+ 
                 "H\tDiffMod\tSTY*=+80.000 \n"+ 
-                "H\tAlg-MaxDiffMod\t3H      Alg-DisplayTop  5\n"+ 
+                "H\tAlg-MaxDiffMod\t3H\tAlg-DisplayTop\t5\n"+ 
                 "H\tAlg-IonSeries\t0 1 1 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0\n"+ 
-                "H\tEnzymeSpec\tNo_Enzyme\n";
-        StringBuilder headerFromDb = new StringBuilder();
-        for (SQTHeaderDb header: headerList) {
-            headerFromDb.append("\nH\t"+header.getName()+"\t"+header.getValue());
+                "H\tEnzymeSpec\tNo_Enzyme";
+        String[] tokens = headerSec.split("\\n");
+        assertEquals(tokens.length, headerList.size());
+        for (int i = 0; i < tokens.length; i++) {
+            SQTHeaderDb header = headerList.get(i);
+            assertEquals(tokens[i].trim(), "H\t"+header.getName()+"\t"+header.getValue());
         }
-        headerFromDb.deleteCharAt(0);
-        assertEquals(headerSec, headerFromDb);
+        
+        // check search results
+        SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
+        List<Integer> resultIds = seqResDao.loadResultIdsForRunSearch(runSearchId);
+        assertEquals(8, resultIds.size());
+        
         
         // spectrum data
-        SQTSearchScanDAO scanDao = DAOFactory.instance().getSqtSpectrumDAO();
-        List<Integer> searchScanIds = scanDao.
+        SQTSearchScanDAO searchScanDao = DAOFactory.instance().getSqtSpectrumDAO();
+        // S       00023   00023   1       22      shamu048        866.46000       1892.2  56.4    4716510
+        int scanId = this.scanDao.loadScanIdForScanNumRun(23, runId);
+        assertEquals(23, this.scanDao.load(scanId).getStartScanNum());
+        SQTSearchScanDb scan = searchScanDao.load(runSearchId, scanId, 1);
+        assertNotNull(scan);
+        assertEquals(scanId, scan.getScanId());
+        assertEquals(1, scan.getCharge());
+        assertEquals(runSearchId, scan.getRunSearchId());
+        assertEquals(22, scan.getProcessTime());
+        assertEquals("shamu048", scan.getServerName());
+        assertEquals(866.46, scan.getObservedMass().doubleValue());
+        assertEquals(1892.2, scan.getTotalIntensity().doubleValue());
+        assertEquals(56.4, scan.getLowestSp().doubleValue());
+        assertEquals(4716510, scan.getSequenceMatches());
+        // check results for this scan + charge combination
+        resultIds = seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1);
+        assertEquals(4, resultIds.size()); // number of results for this scan + charge combination
+        Collections.sort(resultIds);
+        // M         1       4      866.96470      0.00000  1.1529   3.137   9     14          L.S*D#MSASRT*Y*.T   U
+        SequestSearchResultDb res = seqResDao.load(resultIds.get(0));
+        assertEquals(1, res.getCharge());
+        assertEquals(scanId, res.getScanId());
+        assertEquals(runSearchId, res.getRunSearchId());
+        assertEquals(1, res.getSequestResultData().getxCorrRank());
+        assertEquals(4, res.getSequestResultData().getSpRank());
+        assertEquals(866.9647, res.getSequestResultData().getCalculatedMass().doubleValue());
+        assertEquals(0.0, res.getSequestResultData().getDeltaCN().doubleValue());
+        assertEquals(1.1529, res.getSequestResultData().getxCorr().doubleValue());
+        assertEquals(3.137, res.getSequestResultData().getEvalue().doubleValue());
+        assertNull(res.getSequestResultData().getSp());
+        assertEquals(9, res.getSequestResultData().getMatchingIons());
+        assertEquals(14, res.getSequestResultData().getPredictedIons());
+        assertEquals(ValidationStatus.UNVALIDATED, res.getValidationStatus());
+        assertEquals('L', res.getResultPeptide().getPreResidue());
+        assertEquals('T', res.getResultPeptide().getPostResidue());
+        assertEquals("SDMSASRTY", res.getResultPeptide().getPeptideSequence());
+        List<MsResultDynamicResidueModDb> resMods = res.getResultPeptide().getResultDynamicResidueModifications();
+        List<MsResultDynamicTerminalModDb> termMods = res.getResultPeptide().getResultDynamicTerminalModifications();
+        assertEquals(4, resMods.size());
+        assertEquals(0, termMods.size());
+        Collections.sort(resMods, new Comparator<MsResultDynamicResidueModDb>(){
+            public int compare(MsResultDynamicResidueModDb o1,
+                    MsResultDynamicResidueModDb o2) {
+                return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
+            }});
+        assertEquals(0, resMods.get(0).getModifiedPosition());
+        assertEquals('S', resMods.get(0).getModifiedResidue());
+        assertEquals('*', resMods.get(0).getModificationSymbol());
+        assertEquals(79.9876, resMods.get(0).getModificationMass().doubleValue());
+        assertEquals(1, resMods.get(1).getModifiedPosition());
+        assertEquals('D', resMods.get(1).getModifiedResidue());
+        assertEquals('#', resMods.get(1).getModificationSymbol());
+        assertEquals(-99.9, resMods.get(1).getModificationMass().doubleValue());
+        assertEquals(7, resMods.get(2).getModifiedPosition());
+        assertEquals('T', resMods.get(2).getModifiedResidue());
+        assertEquals('*', resMods.get(2).getModificationSymbol());
+        assertEquals(79.9876, resMods.get(2).getModificationMass().doubleValue());
+        assertEquals(8, resMods.get(3).getModifiedPosition());
+        assertEquals('Y', resMods.get(3).getModifiedResidue());
+        assertEquals('*', resMods.get(3).getModificationSymbol());
+        assertEquals(79.9876, resMods.get(3).getModificationMass().doubleValue());
+        
+        //M         2     200      865.91874      0.0311   1.117    2.953   8     16        T.SG#TSSAS*LR.K      V
+        res = seqResDao.load(resultIds.get(1));
+        assertEquals(1, res.getCharge());
+        assertEquals(scanId, res.getScanId());
+        assertEquals(runSearchId, res.getRunSearchId());
+        assertEquals(2, res.getSequestResultData().getxCorrRank());
+        assertEquals(200, res.getSequestResultData().getSpRank());
+        assertEquals(865.91874, res.getSequestResultData().getCalculatedMass().doubleValue());
+        assertEquals(0.0311, res.getSequestResultData().getDeltaCN().doubleValue());
+        assertEquals(1.117, res.getSequestResultData().getxCorr().doubleValue());
+        assertEquals(2.953, res.getSequestResultData().getEvalue().doubleValue());
+        assertEquals(8, res.getSequestResultData().getMatchingIons());
+        assertEquals(16, res.getSequestResultData().getPredictedIons());
+        assertEquals(ValidationStatus.VALID, res.getValidationStatus());
+        assertEquals('T', res.getResultPeptide().getPreResidue());
+        assertEquals('K', res.getResultPeptide().getPostResidue());
+        assertEquals("SGTSSASLR", res.getResultPeptide().getPeptideSequence());
+        resMods = res.getResultPeptide().getResultDynamicResidueModifications();
+        termMods = res.getResultPeptide().getResultDynamicTerminalModifications();
+        assertEquals(2, resMods.size());
+        assertEquals(0, termMods.size());
+        Collections.sort(resMods, new Comparator<MsResultDynamicResidueModDb>(){
+            public int compare(MsResultDynamicResidueModDb o1,
+                    MsResultDynamicResidueModDb o2) {
+                return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
+            }});
+        assertEquals(1, resMods.get(0).getModifiedPosition());
+        assertEquals('G', resMods.get(0).getModifiedResidue());
+        assertEquals('#', resMods.get(0).getModificationSymbol());
+        assertEquals(-99.9, resMods.get(0).getModificationMass().doubleValue());
+        assertEquals(6, resMods.get(1).getModifiedPosition());
+        assertEquals('S', resMods.get(1).getModifiedResidue());
+        assertEquals('*', resMods.get(1).getModificationSymbol());
+        assertEquals(79.9876, resMods.get(1).getModificationMass().doubleValue());
+        
+        
+        
+        // S       00020   00020   1       22      shamu049        807.67000       2681.7  95.3    5138490
+        scanId = this.scanDao.loadScanIdForScanNumRun(20, runId);
+        assertEquals(20, this.scanDao.load(scanId).getStartScanNum());
+        assertEquals(2, seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1).size()); // number of results for this scan + charge combination
+        scan = searchScanDao.load(runSearchId, scanId, 1);
+        assertNotNull(scan);
+        assertEquals(scanId, scan.getScanId());
+        assertEquals(1, scan.getCharge());
+        assertEquals(runSearchId, scan.getRunSearchId());
+        assertEquals(22, scan.getProcessTime());
+        assertEquals("shamu049", scan.getServerName());
+        assertEquals(807.67, scan.getObservedMass().doubleValue());
+        assertEquals(2681.7, scan.getTotalIntensity().doubleValue());
+        assertEquals(95.3, scan.getLowestSp().doubleValue());
+        assertEquals(5138490, scan.getSequenceMatches());
+        
+        // S       00010   00010   1       23      shamu050        717.62000       4000.6  111.6   5928764
+        scanId = this.scanDao.loadScanIdForScanNumRun(10, runId);
+        assertEquals(10, this.scanDao.load(scanId).getStartScanNum());
+        assertEquals(0, seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1).size()); // number of results for this scan + charge combination
+        scan = searchScanDao.load(runSearchId, scanId, 1);
+        assertNotNull(scan);
+        assertEquals(scanId, scan.getScanId());
+        assertEquals(1, scan.getCharge());
+        assertEquals(runSearchId, scan.getRunSearchId());
+        assertEquals(23, scan.getProcessTime());
+        assertEquals("shamu050", scan.getServerName());
+        assertEquals(717.62, scan.getObservedMass().doubleValue());
+        assertEquals(4000.6, scan.getTotalIntensity().doubleValue());
+        assertEquals(111.6, scan.getLowestSp().doubleValue());
+        assertEquals(5928764, scan.getSequenceMatches());
+
+        // S       00026   00026   1       23      shamu048        817.33000       2044.4  69.6    5697304
+        scanId = this.scanDao.loadScanIdForScanNumRun(26, runId);
+        assertEquals(26, this.scanDao.load(scanId).getStartScanNum());
+        assertEquals(2, seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1).size()); // number of results for this scan + charge combination
+        scan = searchScanDao.load(runSearchId, scanId, 1);
+        assertNotNull(scan);
+        assertEquals(scanId, scan.getScanId());
+        assertEquals(1, scan.getCharge());
+        assertEquals(runSearchId, scan.getRunSearchId());
+        assertEquals(23, scan.getProcessTime());
+        assertEquals("shamu048", scan.getServerName());
+        assertEquals(817.33, scan.getObservedMass().doubleValue());
+        assertEquals(2044.4, scan.getTotalIntensity().doubleValue());
+        assertEquals(69.6, scan.getLowestSp().doubleValue());
+        assertEquals(5697304, scan.getSequenceMatches());
+
     }
     
     private int getRunId(String runFileName) {

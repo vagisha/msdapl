@@ -129,9 +129,9 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         StringBuilder values = new StringBuilder();
         for (MsResultDynamicResidueModDb mod: modList) {
             values.append(",(");
-            values.append(mod.getResultId());
+            values.append(mod.getResultId() == 0 ? "NULL" : mod.getResultId());
             values.append(",");
-            values.append(mod.getModificationId());
+            values.append(mod.getModificationId() == 0 ? "NULL" : mod.getModificationId());
             values.append(",");
             values.append(mod.getModifiedPosition());
             values.append(")");
@@ -173,9 +173,9 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         StringBuilder values = new StringBuilder();
         for (MsResultDynamicTerminalModDb mod: modList) {
             values.append(",(");
-            values.append(mod.getResultId());
+            values.append(mod.getResultId() == 0 ? "NULL" : mod.getResultId());
             values.append(",");
-            values.append(mod.getModificationId());
+            values.append(mod.getModificationId() == 0 ? "NULL" : mod.getModificationId());
             values.append(")");
         }
         values.deleteCharAt(0);

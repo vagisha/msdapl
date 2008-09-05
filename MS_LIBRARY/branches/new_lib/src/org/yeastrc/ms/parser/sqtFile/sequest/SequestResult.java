@@ -17,18 +17,18 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
 
     private MsSearchResultPeptide resultPeptide = null;
     
-    private int numMatchingIons;
-    private int numPredictedIons;
+    private int numMatchingIons = -1;
+    private int numPredictedIons = -1;
     
     private List<MsResidueModification> searchDynaResidueMods;
     
-    private int xcorrRank;
-    private int spRank;
+    private int xcorrRank = -1;
+    private int spRank = -1;
     private BigDecimal mass; // Calculated M+H+ value for this sequence
     private BigDecimal deltaCN; 
     private BigDecimal xcorr;
     private BigDecimal sp;
-    private double evalue;
+    private Double evalue;
     
     public SequestResult(List<MsResidueModification> searchDynaResidueMods) {
         super();
@@ -97,7 +97,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     /**
      * @param evalue
      */
-    public void setEvalue(double evalue) {
+    public void setEvalue(Double evalue) {
         this.evalue = evalue;
     }
     

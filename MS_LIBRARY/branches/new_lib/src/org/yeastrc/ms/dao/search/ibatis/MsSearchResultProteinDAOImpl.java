@@ -62,9 +62,9 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         StringBuilder values = new StringBuilder();
         for (MsSearchResultProteinDb match: proteinMatchList) {
             values.append(",(");
-            values.append(match.getResultId());
+            values.append(match.getResultId() == 0 ? "NULL" : match.getResultId());
             values.append(",");
-            values.append(match.getProteinId());
+            values.append(match.getProteinId() == 0 ? "NULL" : match.getProteinId());
             values.append(")");
         }
         values.deleteCharAt(0);
