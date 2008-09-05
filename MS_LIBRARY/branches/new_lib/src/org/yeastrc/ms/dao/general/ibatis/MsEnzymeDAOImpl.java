@@ -15,7 +15,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -72,11 +72,11 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
         return queryForList("MsEnzyme.selectEnzymes", properties);
     }
     
-    public int saveEnzyme(MsEnzymeI enzyme) {
+    public int saveEnzyme(MsEnzymeIn enzyme) {
         return saveEnzyme(enzyme, Arrays.asList(EnzymeProperties.values()));
     }
     
-    public int saveEnzyme(MsEnzymeI enzyme, List<EnzymeProperties> params) {
+    public int saveEnzyme(MsEnzymeIn enzyme, List<EnzymeProperties> params) {
         
         String name = null,  cut = null,  nocut = null;
         Sense sense = null;
@@ -113,12 +113,12 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
         return queryForList("MsEnzyme.selectEnzymesForRun", runId);
     }
     
-    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId) {
+    public int saveEnzymeforRun(MsEnzymeIn enzyme, int runId) {
         
         return saveEnzymeforRun(enzyme, runId, Arrays.asList(EnzymeProperties.values()));
     }
     
-    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId, List<EnzymeProperties> properties) {
+    public int saveEnzymeforRun(MsEnzymeIn enzyme, int runId, List<EnzymeProperties> properties) {
         
         int enzymeId = saveEnzyme(enzyme, properties);
         
@@ -152,12 +152,12 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
     }
     
     @Override
-    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId) {
+    public int saveEnzymeforSearch(MsEnzymeIn enzyme, int searchId) {
         return saveEnzymeforSearch(enzyme, searchId, Arrays.asList(EnzymeProperties.values()));
     }
 
     @Override
-    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId,
+    public int saveEnzymeforSearch(MsEnzymeIn enzyme, int searchId,
             List<EnzymeProperties> properties) {
         int enzymeId = saveEnzyme(enzyme, properties);
         

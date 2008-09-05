@@ -8,7 +8,7 @@ package org.yeastrc.ms.domain.general;
 
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
-public interface MsEnzymeI {
+public interface MsEnzymeIn {
 
     /**
      * Name of the enzyme

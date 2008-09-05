@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.search;
 import java.sql.Date;
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 
 /**
  * 
@@ -24,29 +24,29 @@ public interface MsSearch extends MsSearchBase {
     /**
      * @return the static residue modifications
      */
-    public abstract List<MsResidueModification> getStaticResidueMods();
+    public abstract List<MsResidueModificationIn> getStaticResidueMods();
 
     /**
      * @return the dynamic residue modifications
      */
-    public abstract List<MsResidueModification> getDynamicResidueMods();
+    public abstract List<MsResidueModificationIn> getDynamicResidueMods();
     
     /**
      * @return the static terminal modifications
      */
-    public abstract List<MsTerminalModification> getStaticTerminalMods();
+    public abstract List<MsTerminalModificationIn> getStaticTerminalMods();
 
     /**
      * @return the dynamic terminal modifications
      */
-    public abstract List<MsTerminalModification> getDynamicTerminalMods();
+    public abstract List<MsTerminalModificationIn> getDynamicTerminalMods();
     
     
     
     /**
      * @return the enzymes used for this search
      */
-    public abstract List<MsEnzymeI> getEnzymeList();
+    public abstract List<MsEnzymeIn> getEnzymeList();
    
 }
 

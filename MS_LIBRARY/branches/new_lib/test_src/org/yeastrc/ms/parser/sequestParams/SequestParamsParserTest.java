@@ -8,9 +8,9 @@ import java.util.regex.Matcher;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.general.MsEnzymeI;
-import org.yeastrc.ms.domain.general.MsEnzymeI.Sense;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -71,7 +71,7 @@ public class SequestParamsParserTest extends TestCase {
         String line = "0.  No_Enzyme              0      -           -";
         Matcher m = SequestParamsParser.enzymePattern.matcher(line);
         assertTrue(m.matches());
-        MsEnzymeI enzyme = parser.matchEnzyme(m, "1");
+        MsEnzymeIn enzyme = parser.matchEnzyme(m, "1");
         assertNull(enzyme);
         enzyme = parser.matchEnzyme(m, "0");
         assertNotNull(enzyme);
@@ -142,12 +142,12 @@ public class SequestParamsParserTest extends TestCase {
             fail("Valid dynamic mod string");
             e.printStackTrace();
         }
-        List<MsResidueModification> dynaResidueMods = parser.getDynamicResidueMods();
+        List<MsResidueModificationIn> dynaResidueMods = parser.getDynamicResidueMods();
         assertEquals(5, dynaResidueMods.size());
 
-        Collections.sort(dynaResidueMods, new Comparator<MsResidueModification>() {
-            public int compare(MsResidueModification o1,
-                    MsResidueModification o2) {
+        Collections.sort(dynaResidueMods, new Comparator<MsResidueModificationIn>() {
+            public int compare(MsResidueModificationIn o1,
+                    MsResidueModificationIn o2) {
                 return Character.valueOf(o1.getModifiedResidue()).compareTo(Character.valueOf(o2.getModifiedResidue()));
             }});
         
@@ -175,9 +175,9 @@ public class SequestParamsParserTest extends TestCase {
         dynaResidueMods = parser.getDynamicResidueMods();
         assertEquals(6, dynaResidueMods.size());
 
-        Collections.sort(dynaResidueMods, new Comparator<MsResidueModification>() {
-            public int compare(MsResidueModification o1,
-                    MsResidueModification o2) {
+        Collections.sort(dynaResidueMods, new Comparator<MsResidueModificationIn>() {
+            public int compare(MsResidueModificationIn o1,
+                    MsResidueModificationIn o2) {
                 return Character.valueOf(o1.getModifiedResidue()).compareTo(Character.valueOf(o2.getModifiedResidue()));
             }});
         
@@ -214,7 +214,7 @@ public class SequestParamsParserTest extends TestCase {
             assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", db.getServerPath());
 
             // enzyme
-            MsEnzymeI enzyme = parser.getSearchEnzyme();
+            MsEnzymeIn enzyme = parser.getSearchEnzyme();
             assertNotNull(enzyme);
             assertEquals("No_Enzyme", enzyme.getName());
             assertNull(enzyme.getDescription());
@@ -226,9 +226,9 @@ public class SequestParamsParserTest extends TestCase {
             assertEquals(0, parser.getStaticTerminalMods().size());
             assertEquals(0, parser.getDynamicResidueMods().size());
 
-            List<MsResidueModification> resMods = parser.getStaticResidueMods();
+            List<MsResidueModificationIn> resMods = parser.getStaticResidueMods();
             assertEquals(1, resMods.size());
-            MsResidueModification mod = resMods.get(0);
+            MsResidueModificationIn mod = resMods.get(0);
             assertEquals('C', mod.getModifiedResidue());
             assertTrue(57.0 == mod.getModificationMass().doubleValue());
             assertEquals('\u0000', mod.getModificationSymbol());

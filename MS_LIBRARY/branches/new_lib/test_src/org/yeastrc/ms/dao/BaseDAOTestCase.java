@@ -22,7 +22,6 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
-import org.yeastrc.ms.dao.general.MsEnzymeDAOImplTest;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.MsRunDAOImplTest.MsRunTest;
@@ -38,9 +37,9 @@ import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
-import org.yeastrc.ms.domain.general.impl.MsEnzymeInImpl;
+import org.yeastrc.ms.domain.general.impl.MsEnzymeImpl;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
@@ -48,8 +47,8 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsResidueModificationDb;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
+import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearch;
@@ -60,14 +59,14 @@ import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.parser.ResidueModification;
-import org.yeastrc.ms.parser.ResultResidueModification;
-import org.yeastrc.ms.parser.TerminalModification;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsResultResidueModImpl;
+import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
 import org.yeastrc.ms.util.PeakConverterDouble;
 
 /**
@@ -182,12 +181,12 @@ public class BaseDAOTestCase extends TestCase {
 
     protected void addResultDynamicModifications(MsSearchResultPeptideTest peptide, int searchId) {
 
-        List<MsResidueModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
+        List<MsResidueModification> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
 
-        List<MsResultDynamicResidueMod> resultDynaMods = new ArrayList<MsResultDynamicResidueMod>(dynaMods.size());
+        List<MsResultResidueModIn> resultDynaMods = new ArrayList<MsResultResidueModIn>(dynaMods.size());
         int pos = 1;
-        for (MsResidueModificationDb mod: dynaMods) {
-            MsResultDynamicResidueMod resMod = makeResultDynamicResidueMod(mod.getModifiedResidue(), 
+        for (MsResidueModification mod: dynaMods) {
+            MsResultResidueModIn resMod = makeResultDynamicResidueMod(mod.getModifiedResidue(), 
                     mod.getModificationMass().toString(), 
                     mod.getModificationSymbol(), 
                     pos++);
@@ -237,25 +236,41 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // MODIFICATIONS
     //-----------------------------------------------------------------------------------------------------
-    protected MsResidueModification makeStaticResidueMod(final char modChar, final String modMass) {
-        return new ResidueModification(modChar, new BigDecimal(modMass));
+    protected MsResidueModificationIn makeStaticResidueMod(final char modChar, final String modMass) {
+        MsResidueModificationImpl mod = new MsResidueModificationImpl();
+        mod.setModifiedResidue(modChar);
+        mod.setModificationMass(new BigDecimal(modMass));
+        return mod;
     }
 
-    protected MsResidueModification makeDynamicResidueMod(final char modChar, final String modMass, final char modSymbol) {
-        return new ResidueModification(modChar, new BigDecimal(modMass), modSymbol);
+    protected MsResidueModificationIn makeDynamicResidueMod(final char modChar, final String modMass, final char modSymbol) {
+        MsResidueModificationImpl mod = new MsResidueModificationImpl();
+        mod.setModifiedResidue(modChar);
+        mod.setModificationSymbol(modSymbol);
+        mod.setModificationMass(new BigDecimal(modMass));
+        return mod;
     }
     
-    protected MsTerminalModification makeStaticTerminalMod(final Terminal term, final String modMass, final char modChar) {
-        return new TerminalModification(term, new BigDecimal(modMass), modChar);
+    protected MsTerminalModificationIn makeStaticTerminalMod(final Terminal term, final String modMass, final char modSymbol) {
+        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        mod.setModificationMass(new BigDecimal(modMass));
+        mod.setModifiedTerminal(term);
+        mod.setModificationSymbol(modSymbol);
+        return mod;
     }
 
-    protected MsTerminalModification makeDynamicTerminalMod(final Terminal term, final String modMass, final char modChar) {
-        return new TerminalModification(term, new BigDecimal(modMass), modChar);
+    protected MsTerminalModificationIn makeDynamicTerminalMod(final Terminal term, final String modMass, final char modSymbol) {
+        return makeStaticTerminalMod(term, modMass, modSymbol);
     }
     
-    protected MsResultDynamicResidueMod makeResultDynamicResidueMod(final char modChar, final String modMass,
+    protected MsResultResidueModIn makeResultDynamicResidueMod(final char modChar, final String modMass,
             final char modSymbol, final int modPos) {
-        return new ResultResidueModification(modChar, modSymbol, new BigDecimal(modMass), modPos);
+        MsResultResidueModImpl mod = new MsResultResidueModImpl();
+        mod.setModificationMass(new BigDecimal(modMass));
+        mod.setModificationSymbol(modSymbol);
+        mod.setModifiedPosition(modPos);
+        mod.setModifiedResidue(modChar);
+        return mod;
     }
     
     //-----------------------------------------------------------------------------------------------------
@@ -275,22 +290,22 @@ public class BaseDAOTestCase extends TestCase {
         }
 
         if (addStaticMods) {
-            MsResidueModification mod1 = makeStaticResidueMod('C', "50.0");
-            MsResidueModification mod2 = makeStaticResidueMod('S', "80.0");
-            search.setStaticResidueMods(Arrays.asList(new MsResidueModification[]{mod1, mod2}));
+            MsResidueModificationIn mod1 = makeStaticResidueMod('C', "50.0");
+            MsResidueModificationIn mod2 = makeStaticResidueMod('S', "80.0");
+            search.setStaticResidueMods(Arrays.asList(new MsResidueModificationIn[]{mod1, mod2}));
         }
 
         if (addDynaMods) {
-            MsResidueModification dmod1 = makeDynamicResidueMod('A', "10.0", '*');
-            MsResidueModification dmod2 = makeDynamicResidueMod('B', "20.0", '#');
-            MsResidueModification dmod3 = makeDynamicResidueMod('C', "30.0", '@');
-            search.setDynamicResidueMods(Arrays.asList(new MsResidueModification[]{dmod1, dmod2, dmod3}));
+            MsResidueModificationIn dmod1 = makeDynamicResidueMod('A', "10.0", '*');
+            MsResidueModificationIn dmod2 = makeDynamicResidueMod('B', "20.0", '#');
+            MsResidueModificationIn dmod3 = makeDynamicResidueMod('C', "30.0", '@');
+            search.setDynamicResidueMods(Arrays.asList(new MsResidueModificationIn[]{dmod1, dmod2, dmod3}));
         }
 
         if (addEnzymes) {
-            MsEnzymeI enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
-            MsEnzymeI enzyme2 = makeDigestionEnzyme("Trypsin", null, null, null);
-            search.setEnzymeList(Arrays.asList(new MsEnzymeI[]{enzyme1, enzyme2}));
+            MsEnzymeIn enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
+            MsEnzymeIn enzyme2 = makeDigestionEnzyme("Trypsin", null, null, null);
+            search.setEnzymeList(Arrays.asList(new MsEnzymeIn[]{enzyme1, enzyme2}));
         }
         return search;
     }
@@ -374,8 +389,8 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     // ENZYME
     //---------------------------------------------------------------------------------
-    protected MsEnzymeI makeDigestionEnzyme(String name, Sense sense,String cut, String nocut) {
-        MsEnzymeInImpl enzyme = new MsEnzymeInImpl();
+    protected MsEnzymeIn makeDigestionEnzyme(String name, Sense sense,String cut, String nocut) {
+        MsEnzymeImpl enzyme = new MsEnzymeImpl();
         enzyme.setName(name);
         enzyme.setSense(sense);
         enzyme.setCut(cut);
@@ -383,7 +398,7 @@ public class BaseDAOTestCase extends TestCase {
         return enzyme;
     }
 
-    protected void checkEnzyme(MsEnzymeI inputEnzyme, MsEnzyme outputEnzyme) {
+    protected void checkEnzyme(MsEnzymeIn inputEnzyme, MsEnzyme outputEnzyme) {
         assertEquals(inputEnzyme.getName(), outputEnzyme.getName());
         assertEquals(inputEnzyme.getSense(), outputEnzyme.getSense());
         assertEquals(inputEnzyme.getCut(), outputEnzyme.getCut());
@@ -455,7 +470,7 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     // RUN
     //---------------------------------------------------------------------------------
-    protected MsRun createRunWEnzymeInfo(List<MsEnzymeI> enzymes) {
+    protected MsRun createRunWEnzymeInfo(List<MsEnzymeIn> enzymes) {
         MsRunTest run = createDefaultRun();
         run.setEnzymeList(enzymes);
         return run;

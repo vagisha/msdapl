@@ -8,11 +8,11 @@ package org.yeastrc.ms.domain.run;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 
 public interface MsRun extends MsRunBase {
 
-    public abstract List<MsEnzymeI> getEnzymeList();
+    public abstract List<MsEnzymeIn> getEnzymeList();
 
 }
 

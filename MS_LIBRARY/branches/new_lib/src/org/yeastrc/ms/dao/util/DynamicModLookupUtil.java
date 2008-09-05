@@ -8,9 +8,9 @@ import java.util.Map;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsResidueModificationDb;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 
 public class DynamicModLookupUtil {
@@ -42,9 +42,9 @@ public class DynamicModLookupUtil {
     
     private void buildResidueModLookup(int searchId) {
         residueModMap.clear();
-        List<MsResidueModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
+        List<MsResidueModification> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
         String key = null;
-        for (MsResidueModificationDb mod: dynaMods) {
+        for (MsResidueModification mod: dynaMods) {
             key = mod.getModifiedResidue()+""+mod.getModificationMass().doubleValue();
             residueModMap.put(key, mod.getId());
         }
@@ -52,9 +52,9 @@ public class DynamicModLookupUtil {
 
     private void buildTerminalModLookup(int searchId) {
         terminalModMap.clear();
-        List<MsTerminalModificationDb> dynaMods = modDao.loadDynamicTerminalModsForSearch(searchId);
+        List<MsTerminalModification> dynaMods = modDao.loadDynamicTerminalModsForSearch(searchId);
         String key = null;
-        for (MsTerminalModificationDb mod: dynaMods) {
+        for (MsTerminalModification mod: dynaMods) {
             key = mod.getModifiedTerminal()+""+mod.getModificationMass().doubleValue();
             terminalModMap.put(key, mod.getId());
         }
@@ -65,7 +65,7 @@ public class DynamicModLookupUtil {
      * @param mod
      * @return
      */
-    public int getDynamicResidueModificationId(int searchId, MsResidueModification mod) {
+    public int getDynamicResidueModificationId(int searchId, MsResidueModificationIn mod) {
         return getDynamicResidueModificationId(searchId, mod.getModifiedResidue(), mod.getModificationMass());
     }
     
@@ -86,7 +86,7 @@ public class DynamicModLookupUtil {
      * @param mod
      * @return
      */
-    public int getDynamicTerminalModificationId(int searchId, MsTerminalModification mod) {
+    public int getDynamicTerminalModificationId(int searchId, MsTerminalModificationIn mod) {
         return getDynamicTerminalModificationId(searchId, mod.getModifiedTerminal(), mod.getModificationMass());
     }
     

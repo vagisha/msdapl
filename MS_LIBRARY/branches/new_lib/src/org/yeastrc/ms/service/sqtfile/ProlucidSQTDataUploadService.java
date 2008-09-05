@@ -16,10 +16,10 @@ import java.util.List;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
@@ -45,8 +45,8 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     List<ProlucidResultDataDb> prolucidResultDataList; // prolucid scores
     
     private MsSearchDatabase db = null;
-    private List<MsResidueModification> dynaResidueMods;
-    private List<MsTerminalModification> dynaTermMods;
+    private List<MsResidueModificationIn> dynaResidueMods;
+    private List<MsTerminalModificationIn> dynaTermMods;
     private Score spColScore;
     private Score xcorrColScore;
     private Score deltaCnColScore;
@@ -55,8 +55,8 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     public ProlucidSQTDataUploadService() {
         super();
         this.prolucidResultDataList = new ArrayList<ProlucidResultDataDb>();
-        this.dynaResidueMods = new ArrayList<MsResidueModification>();
-        this.dynaTermMods = new ArrayList<MsTerminalModification>();
+        this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
+        this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
     }
     
     void reset() {
@@ -231,22 +231,22 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             @Override
             public List<ProlucidParam> getProlucidParams() {return parser.getParamList();}
             @Override
-            public List<MsResidueModification> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
+            public List<MsResidueModificationIn> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
             @Override
-            public List<MsTerminalModification> getDynamicTerminalMods() {return parser.getDynamicTerminalMods();}
+            public List<MsTerminalModificationIn> getDynamicTerminalMods() {return parser.getDynamicTerminalMods();}
             @Override
-            public List<MsEnzymeI> getEnzymeList() {
+            public List<MsEnzymeIn> getEnzymeList() {
                 if (parser.isEnzymeUsedForSearch())
-                    return Arrays.asList(new MsEnzymeI[]{parser.getSearchEnzyme()});
+                    return Arrays.asList(new MsEnzymeIn[]{parser.getSearchEnzyme()});
                 else 
-                    return new ArrayList<MsEnzymeI>(0);
+                    return new ArrayList<MsEnzymeIn>(0);
             }
             @Override
             public List<MsSearchDatabase> getSearchDatabases() {return Arrays.asList(new MsSearchDatabase[]{parser.getSearchDatabase()});}
             @Override
-            public List<MsResidueModification> getStaticResidueMods() {return parser.getStaticResidueMods();}
+            public List<MsResidueModificationIn> getStaticResidueMods() {return parser.getStaticResidueMods();}
             @Override
-            public List<MsTerminalModification> getStaticTerminalMods() {return parser.getStaticTerminalMods();}
+            public List<MsTerminalModificationIn> getStaticTerminalMods() {return parser.getStaticTerminalMods();}
             @Override
             public SearchProgram getSearchProgram() {return parser.getSearchProgram();}
             @Override

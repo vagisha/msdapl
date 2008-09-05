@@ -26,14 +26,14 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsResidueModificationDb;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
-import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
@@ -97,7 +97,7 @@ public class DbToSqtFileConverter {
     
     private void printSequestSQTData(SQTRunSearchDb runSearch, int searchDatabaseId, BufferedWriter outFile) throws IOException {
         
-        List<MsResidueModificationDb> dynaResidueModsDb = getDynaResidueModsForSearch(runSearch.getSearchId());
+        List<MsResidueModification> dynaResidueModsDb = getDynaResidueModsForSearch(runSearch.getSearchId());
         
         SQTSearchScanDAO scanDao = DAOFactory.instance().getSqtSpectrumDAO();
         
@@ -118,8 +118,8 @@ public class DbToSqtFileConverter {
                 SQTSearchScanDb scanDb = scanDao.load(runSearch.getId(), currScanId, currCharge);
                 currScan = makeScanResult(scanDb);
             }
-            List<MsResidueModification> dynaResidueMods = new ArrayList<MsResidueModification>();
-            for (MsResidueModificationDb modDb: dynaResidueModsDb) {
+            List<MsResidueModificationIn> dynaResidueMods = new ArrayList<MsResidueModificationIn>();
+            for (MsResidueModification modDb: dynaResidueModsDb) {
                 dynaResidueMods.add(modDb);
             }
             SequestResult peptResult = new SequestResult(dynaResidueMods);
@@ -160,10 +160,10 @@ public class DbToSqtFileConverter {
     private String reconstructSequestPeptideSequence(int searchId, SequestSearchResultDb resultDb) {
         // dynamic modifications for the search
         MsSearchResultPeptideDb peptideSeq = resultDb.getResultPeptide();
-        List<MsResultDynamicResidueModDb> resultMods = peptideSeq.getResultDynamicResidueModifications();
-        Collections.sort(resultMods, new Comparator<MsResultDynamicResidueModDb>() {
-            public int compare(MsResultDynamicResidueModDb o1,
-                    MsResultDynamicResidueModDb o2) {
+        List<MsResultDynamicResidueMod> resultMods = peptideSeq.getResultDynamicResidueModifications();
+        Collections.sort(resultMods, new Comparator<MsResultDynamicResidueMod>() {
+            public int compare(MsResultDynamicResidueMod o1,
+                    MsResultDynamicResidueMod o2) {
                 return new Integer(o1.getModifiedPosition()).compareTo(new Integer(o2.getModifiedPosition()));
             }});
         
@@ -171,7 +171,7 @@ public class DbToSqtFileConverter {
         StringBuilder fullSeq = new StringBuilder();
         fullSeq.append(peptideSeq.getPreResidue()+".");
         int lastIdx = 0;
-        for (MsResultDynamicResidueModDb mod: resultMods) {
+        for (MsResultDynamicResidueMod mod: resultMods) {
             int pos = mod.getModifiedPosition();
             fullSeq.append(justSeq.substring(lastIdx, pos+1));
             fullSeq.append(mod.getModificationSymbol());
@@ -184,15 +184,15 @@ public class DbToSqtFileConverter {
         return fullSeq.toString();
     }
     
-    private List<MsResidueModificationDb> getDynaResidueModsForSearch(int dbSearchId) {
+    private List<MsResidueModification> getDynaResidueModsForSearch(int dbSearchId) {
         MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-        List<MsResidueModificationDb> dynaMods = modDao.loadDynamicResidueModsForSearch(dbSearchId);
+        List<MsResidueModification> dynaMods = modDao.loadDynamicResidueModsForSearch(dbSearchId);
         return dynaMods;
     }
     
-    private List<MsTerminalModificationDb> getDynaTermModsForSearch(int dbSearchId) {
+    private List<MsTerminalModification> getDynaTermModsForSearch(int dbSearchId) {
         MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-        List<MsTerminalModificationDb> dynaMods = modDao.loadDynamicTerminalModsForSearch(dbSearchId);
+        List<MsTerminalModification> dynaMods = modDao.loadDynamicTerminalModsForSearch(dbSearchId);
         return dynaMods;
     }
 

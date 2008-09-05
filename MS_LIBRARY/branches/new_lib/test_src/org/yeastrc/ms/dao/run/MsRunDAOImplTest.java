@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
@@ -95,7 +95,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertNotNull(enzyme3);
         
         // create a run with enzyme information
-        List <MsEnzymeI> enzymeList1 = new ArrayList<MsEnzymeI>(2);
+        List <MsEnzymeIn> enzymeList1 = new ArrayList<MsEnzymeIn>(2);
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
         MsRun run1 = createRunWEnzymeInfo(enzymeList1);
@@ -110,7 +110,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(2, enzymes.size());
         
         // save another run for this experiment
-        List <MsEnzymeI> enzymeList2 = new ArrayList<MsEnzymeI>(1);
+        List <MsEnzymeIn> enzymeList2 = new ArrayList<MsEnzymeIn>(1);
         enzymeList2.add(enzyme3);
         MsRun run2 = createRunWEnzymeInfo(enzymeList2);
         
@@ -144,7 +144,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         
         // create a run with enzyme information and save it
-        List <MsEnzymeI> enzymeList1 = new ArrayList<MsEnzymeI>(2);
+        List <MsEnzymeIn> enzymeList1 = new ArrayList<MsEnzymeIn>(2);
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
         MsRun run1 = createRunWEnzymeInfo(enzymeList1);
@@ -158,7 +158,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         
         // save another run 
-        List <MsEnzymeI> enzymeList2 = new ArrayList<MsEnzymeI>(1);
+        List <MsEnzymeIn> enzymeList2 = new ArrayList<MsEnzymeIn>(1);
         enzymeList2.add(enzyme3);
         MsRun run2 = createRunWEnzymeInfo(enzymeList2);
         int runId_2 = runDao.saveRun(run2, "remoteServer", "remoteDirectory");
@@ -263,7 +263,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         private String instrumentSN;
         private String instrumentModel;
         private String fileName;
-        private List<MsEnzymeI> enzymeList = new ArrayList<MsEnzymeI>();
+        private List<MsEnzymeIn> enzymeList = new ArrayList<MsEnzymeIn>();
         private String dataType;
         private String creationDate;
         private String conversionSWVersion;
@@ -296,7 +296,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
             this.fileName = fileName;
         }
 
-        public void setEnzymeList(List<MsEnzymeI> enzymeList) {
+        public void setEnzymeList(List<MsEnzymeIn> enzymeList) {
             this.enzymeList = enzymeList;
         }
 
@@ -356,7 +356,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
             return this.dataType;
         }
 
-        public List<MsEnzymeI> getEnzymeList() {
+        public List<MsEnzymeIn> getEnzymeList() {
             return this.enzymeList;
         }
 

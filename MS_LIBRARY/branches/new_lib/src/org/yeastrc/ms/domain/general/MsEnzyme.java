@@ -10,7 +10,7 @@ package org.yeastrc.ms.domain.general;
 /**
  * 
  */
-public interface MsEnzyme extends MsEnzymeI {
+public interface MsEnzyme extends MsEnzymeIn {
 
     public static enum Sense {
         

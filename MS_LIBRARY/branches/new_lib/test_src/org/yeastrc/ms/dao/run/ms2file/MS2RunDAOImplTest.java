@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.run.MsRunDAOImplTest.MsRunTest;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.run.ms2file.MS2Field;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
@@ -73,7 +73,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
             assertNotNull(enzyme1);
             assertNotNull(enzyme2);
             assertNotNull(enzyme3);
-            List<MsEnzymeI> enzymes = new ArrayList<MsEnzymeI>(3);
+            List<MsEnzymeIn> enzymes = new ArrayList<MsEnzymeIn>(3);
             enzymes.add(enzyme1);
             enzymes.add(enzyme2);
             enzymes.add(enzyme3);

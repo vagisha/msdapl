@@ -12,9 +12,9 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAOImplTest.SequestSearchTest;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
@@ -56,23 +56,23 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         }
 
         if (addStaticMods) {
-            MsResidueModification mod1 = makeStaticResidueMod('C', "50.0");
-            MsResidueModification mod2 = makeStaticResidueMod('S', "80.0");
-            search.setStaticResidueMods(Arrays.asList(new MsResidueModification[]{mod1, mod2}));
+            MsResidueModificationIn mod1 = makeStaticResidueMod('C', "50.0");
+            MsResidueModificationIn mod2 = makeStaticResidueMod('S', "80.0");
+            search.setStaticResidueMods(Arrays.asList(new MsResidueModificationIn[]{mod1, mod2}));
             
-            MsTerminalModification tmod1 = makeStaticTerminalMod(Terminal.NTERM, "95.0", '\u0000');
-            search.setStaticTerminalMods(Arrays.asList(new MsTerminalModification[]{tmod1}));
+            MsTerminalModificationIn tmod1 = makeStaticTerminalMod(Terminal.NTERM, "95.0", '\u0000');
+            search.setStaticTerminalMods(Arrays.asList(new MsTerminalModificationIn[]{tmod1}));
         }
 
         if (addDynaMods) {
-            MsResidueModification dmod1 = makeDynamicResidueMod('A', "10.0", '*');
-            MsResidueModification dmod2 = makeDynamicResidueMod('B', "20.0", '#');
-            MsResidueModification dmod3 = makeDynamicResidueMod('C', "30.0", '@');
-            search.setDynamicResidueMods(Arrays.asList(new MsResidueModification[]{dmod1, dmod2, dmod3}));
+            MsResidueModificationIn dmod1 = makeDynamicResidueMod('A', "10.0", '*');
+            MsResidueModificationIn dmod2 = makeDynamicResidueMod('B', "20.0", '#');
+            MsResidueModificationIn dmod3 = makeDynamicResidueMod('C', "30.0", '@');
+            search.setDynamicResidueMods(Arrays.asList(new MsResidueModificationIn[]{dmod1, dmod2, dmod3}));
             
-            MsTerminalModification tmod1 = makeDynamicTerminalMod(Terminal.CTERM, "79.9876", '^');
-            MsTerminalModification tmod2 = makeDynamicTerminalMod(Terminal.NTERM, "0.76543", '$');
-            search.setDynamicTerminalMods(Arrays.asList(new MsTerminalModification[]{tmod1, tmod2}));
+            MsTerminalModificationIn tmod1 = makeDynamicTerminalMod(Terminal.CTERM, "79.9876", '^');
+            MsTerminalModificationIn tmod2 = makeDynamicTerminalMod(Terminal.NTERM, "0.76543", '$');
+            search.setDynamicTerminalMods(Arrays.asList(new MsTerminalModificationIn[]{tmod1, tmod2}));
         }
         
         List<SequestParam> params = new ArrayList<SequestParam>(10);

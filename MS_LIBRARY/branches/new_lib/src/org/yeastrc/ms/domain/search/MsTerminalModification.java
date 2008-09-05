@@ -1,5 +1,5 @@
 /**
- * MsTerminalModification.java
+ * MsTerminalModificationDb.java
  * @author Vagisha Sharma
  * Aug 18, 2008
  * @version 1.0
@@ -7,10 +7,11 @@
 package org.yeastrc.ms.domain.search;
 
 
+
 /**
  * 
  */
-public interface MsTerminalModification extends MsModification {
+public interface MsTerminalModification extends MsTerminalModificationIn {
 
     final char N = 'N';
     final char C = 'C';
@@ -30,5 +31,7 @@ public interface MsTerminalModification extends MsModification {
         public char toChar() {return myChar;}
     };
     
-    public Terminal getModifiedTerminal();
+    public abstract int getId();
+    
+    public abstract int getSearchId();
 }

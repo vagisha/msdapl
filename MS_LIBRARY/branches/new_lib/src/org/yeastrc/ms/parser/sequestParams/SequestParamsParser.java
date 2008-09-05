@@ -16,20 +16,20 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
-import org.yeastrc.ms.domain.general.impl.MsEnzymeInImpl;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.general.impl.MsEnzymeImpl;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.Database;
-import org.yeastrc.ms.parser.ResidueModification;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
-import org.yeastrc.ms.parser.TerminalModification;
 
 
 /**
@@ -44,10 +44,10 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     private boolean reportEvalue = false;
     private Database database;
     private String enzymeCode;
-    private MsEnzymeI enzyme;
-    private List<MsResidueModification> staticResidueModifications;
-    private List<MsTerminalModification> staticTerminalModifications;
-    private List<MsResidueModification> dynamicResidueModifications;
+    private MsEnzymeIn enzyme;
+    private List<MsResidueModificationIn> staticResidueModifications;
+    private List<MsTerminalModificationIn> staticTerminalModifications;
+    private List<MsResidueModificationIn> dynamicResidueModifications;
 
     private int currentLineNum = 0;
     private String currentLine;
@@ -66,24 +66,24 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return database;
     }
 
-    public MsEnzymeI getSearchEnzyme() {
+    public MsEnzymeIn getSearchEnzyme() {
         return enzyme;
     }
 
-    public List<MsResidueModification> getDynamicResidueMods() {
+    public List<MsResidueModificationIn> getDynamicResidueMods() {
         return dynamicResidueModifications;
     }
 
-    public List<MsResidueModification> getStaticResidueMods() {
+    public List<MsResidueModificationIn> getStaticResidueMods() {
         return staticResidueModifications;
     }
 
-    public List<MsTerminalModification> getStaticTerminalMods() {
+    public List<MsTerminalModificationIn> getStaticTerminalMods() {
         return staticTerminalModifications;
     }
 
-    public List<MsTerminalModification> getDynamicTerminalMods() {
-        return new ArrayList<MsTerminalModification>(0);
+    public List<MsTerminalModificationIn> getDynamicTerminalMods() {
+        return new ArrayList<MsTerminalModificationIn>(0);
     }
     
     // NOTE: sequest.params does not tell us if the algorithm used was sequest
@@ -110,9 +110,9 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     
     public SequestParamsParser() {
         paramList = new ArrayList<SequestParam>();
-        staticResidueModifications = new ArrayList<MsResidueModification>();
-        staticTerminalModifications = new ArrayList<MsTerminalModification>();
-        dynamicResidueModifications = new ArrayList<MsResidueModification>();
+        staticResidueModifications = new ArrayList<MsResidueModificationIn>();
+        staticTerminalModifications = new ArrayList<MsTerminalModificationIn>();
+        dynamicResidueModifications = new ArrayList<MsResidueModificationIn>();
     }
 
     private void init(String remoteServer) {
@@ -176,7 +176,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             // if we don't get a match it means we are no longer looking at enzymes. 
             if (!m.matches())
                 break;
-            MsEnzymeI enz = matchEnzyme(m, this.enzymeCode);
+            MsEnzymeIn enz = matchEnzyme(m, this.enzymeCode);
             if (enz != null) {
                 this.enzyme = enz;
                 break;
@@ -184,7 +184,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         }
     }
     
-    MsEnzymeI matchEnzyme(Matcher m, String enzymeCode) {
+    MsEnzymeIn matchEnzyme(Matcher m, String enzymeCode) {
         String enzCode = m.group(1);
         if (!enzCode.equals(enzymeCode))
             return null;
@@ -192,7 +192,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         final String sense = m.group(3);
         final String cut = m.group(4);
         final String noCut = m.group(5);
-        MsEnzymeInImpl enz = new MsEnzymeInImpl();
+        MsEnzymeImpl enz = new MsEnzymeImpl();
         enz.setCut(cut);
         enz.setDescription(null);
         enz.setName(enzName);
@@ -236,8 +236,12 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         try {modMass = new BigDecimal(paramValue);}
         catch(NumberFormatException e) {throw new DataProviderException("Error parsing modification mass: "+paramValue);}
 
-        if (modMass.doubleValue() != 0.0)
-            staticTerminalModifications.add(new TerminalModification(term, modMass, '\u0000'));
+        if (modMass.doubleValue() != 0.0) {
+            MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+            mod.setModificationMass(modMass);
+            mod.setModifiedTerminal(term);
+            staticTerminalModifications.add(mod);
+        }
         return true;
     }
 
@@ -251,8 +255,12 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         try {modMass = new BigDecimal(paramValue);}
         catch(NumberFormatException e) {throw new DataProviderException("Error parsing modification mass: "+paramValue);}
 
-        if (modMass.doubleValue() != 0.0)
-            staticResidueModifications.add(new ResidueModification(modResidue, modMass, '\u0000'));
+        if (modMass.doubleValue() != 0.0) {
+            MsResidueModificationImpl mod = new MsResidueModificationImpl();
+            mod.setModificationMass(modMass);
+            mod.setModifiedResidue(modResidue);
+            staticResidueModifications.add(mod);
+        }
         return true;
     }
 
@@ -291,7 +299,11 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             
             
             for (int j = 0; j < modChars.length(); j++) {
-                dynamicResidueModifications.add(new ResidueModification(modChars.charAt(j), mass, modSymbols[modCharIdx]));
+                MsResidueModificationImpl mod = new MsResidueModificationImpl();
+                mod.setModificationMass(mass);
+                mod.setModifiedResidue(modChars.charAt(j));
+                mod.setModificationSymbol(modSymbols[modCharIdx]);
+                dynamicResidueModifications.add(mod);
             }
             modCharIdx++;
         }

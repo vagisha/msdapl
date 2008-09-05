@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
@@ -28,8 +28,8 @@ public class ProlucidResult extends SQTSearchResult implements ProlucidSearchRes
     private int numMatchingIons = -1;
     private int numPredictedIons = -1;
     
-    private List<MsResidueModification> searchDynaResidueMods;
-    private List<MsTerminalModification> searchDynaTermMods;
+    private List<MsResidueModificationIn> searchDynaResidueMods;
+    private List<MsTerminalModificationIn> searchDynaTermMods;
     
     private BigDecimal mass; // Calculated M+H+ value for this sequence
     
@@ -43,17 +43,17 @@ public class ProlucidResult extends SQTSearchResult implements ProlucidSearchRes
     private BigDecimal deltaCN;
     
     
-    public ProlucidResult(List<MsResidueModification> searchDynaResidueMods, List<MsTerminalModification> searchDynaTermMods) {
+    public ProlucidResult(List<MsResidueModificationIn> searchDynaResidueMods, List<MsTerminalModificationIn> searchDynaTermMods) {
         super();
         if (searchDynaResidueMods != null)
             this.searchDynaResidueMods = searchDynaResidueMods;
         else
-            this.searchDynaResidueMods = new ArrayList<MsResidueModification>(0);
+            this.searchDynaResidueMods = new ArrayList<MsResidueModificationIn>(0);
         
         if (searchDynaTermMods != null)
             this.searchDynaTermMods = searchDynaTermMods;
         else
-            this.searchDynaTermMods = new ArrayList<MsTerminalModification>(0);
+            this.searchDynaTermMods = new ArrayList<MsTerminalModificationIn>(0);
     }
     
     /**

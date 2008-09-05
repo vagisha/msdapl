@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -18,8 +18,8 @@ import org.yeastrc.ms.parser.SQTSearchDataProvider;
 public abstract class SQTFileReader extends AbstractReader 
     implements SQTSearchDataProvider  {
 
-    private List<MsResidueModification> searchDynamicResidueMods;
-    private List<MsTerminalModification> searchDynamicTerminalMods;
+    private List<MsResidueModificationIn> searchDynamicResidueMods;
+    private List<MsTerminalModificationIn> searchDynamicTerminalMods;
     
 
     private static final Logger log = Logger.getLogger(SQTFileReader.class);
@@ -80,25 +80,25 @@ public abstract class SQTFileReader extends AbstractReader
     }
     
     public SQTFileReader() {
-        searchDynamicResidueMods = new ArrayList<MsResidueModification>();
-        searchDynamicTerminalMods = new ArrayList<MsTerminalModification>();
+        searchDynamicResidueMods = new ArrayList<MsResidueModificationIn>();
+        searchDynamicTerminalMods = new ArrayList<MsTerminalModificationIn>();
     }
     
-    public void setDynamicResidueMods(List<MsResidueModification> dynaResidueMods) {
+    public void setDynamicResidueMods(List<MsResidueModificationIn> dynaResidueMods) {
         if (dynaResidueMods != null)
             this.searchDynamicResidueMods = dynaResidueMods;
     }
     
-    protected List<MsResidueModification> getDynamicResidueMods() {
+    protected List<MsResidueModificationIn> getDynamicResidueMods() {
         return this.searchDynamicResidueMods;
     }
     
-    public void setDynamicTerminalMods(List<MsTerminalModification> dynaTerminalMods) {
+    public void setDynamicTerminalMods(List<MsTerminalModificationIn> dynaTerminalMods) {
         if (dynaTerminalMods != null)
             this.searchDynamicTerminalMods = dynaTerminalMods;
     }
     
-    protected List<MsTerminalModification> getDynamicTerminalMods() {
+    protected List<MsTerminalModificationIn> getDynamicTerminalMods() {
         return this.searchDynamicTerminalMods;
     }
     

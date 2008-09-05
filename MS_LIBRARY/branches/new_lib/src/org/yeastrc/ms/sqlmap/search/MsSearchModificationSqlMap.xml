@@ -3,21 +3,23 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearchMod"> 
 
-	<typeAlias alias="MsResidueModDb" type="org.yeastrc.ms.domain.search.impl.MsResidueModificationDbImpl"/>
-	<typeAlias alias="MsTerminalModDb" type="org.yeastrc.ms.domain.search.impl.MsTerminalModificationDbImpl"/>
-	<typeAlias alias="MsResultDynaResidueModDb" type="org.yeastrc.ms.domain.search.impl.MsResultDynamicResidueModDbImpl"/>
-	<typeAlias alias="MsResultDynaTerminalModDb" type="org.yeastrc.ms.domain.search.impl.MsResultDynamicTerminalModDbImpl"/>
+	<typeAlias alias="MsResidueModOut" type="org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl"/>
+	<typeAlias alias="MsTerminalModOut" type="org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl"/>
+	
+	<typeAlias alias="MsResultResidueModOut" type="org.yeastrc.ms.domain.search.impl.MsResultDynamicResidueModImpl"/>
+	<typeAlias alias="MsResultTerminalModOut" type="org.yeastrc.ms.domain.search.impl.MsResultTerminalModImpl"/>
 		
-	<typeAlias alias="MsResidueMod" type="org.yeastrc.ms.domain.search.MsResidueModificationDb" />
-	<typeAlias alias="MsTerminalMod" type="org.yeastrc.ms.domain.search.MsTerminalModificationDb" />
-	<typeAlias alias="MsResultResidueMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultResidueModSqlMapParam" />
-	<typeAlias alias="MsResultTerminalMod" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$MsResultTerminalModSqlMapParam" />
+	<typeAlias alias="MsResidueModIn" type="org.yeastrc.ms.domain.search.MsResidueModification" />
+	<typeAlias alias="MsTerminalModIn" type="org.yeastrc.ms.domain.search.MsTerminalModification" />
+	
+	<typeAlias alias="MsResultResidueModIn" type="org.yeastrc.ms.domain.search.ResultResidueModIdentifier" />
+	<typeAlias alias="MsResultTerminalModIn" type="org.yeastrc.ms.domain.search.ResultModIdentifier" />
 	
 	
 	
 	<!-- ==================================== Result Maps ===================================== -->
 	<!-- STATIC RESIDUE MODIFICATION for SEARCH -->
-	<resultMap class="MsResidueModDb" id="msStaticResidueModResult">
+	<resultMap class="MsResidueModOut" id="msStaticResidueModResult">
 		<result property="id" column="id"/>
 		<result property="searchId" column="searchID"/>
 		<result property="modifiedResidue" column="residue" jdbcType="CHAR" javaType="java.lang.Character"/>
@@ -25,12 +27,12 @@
 	</resultMap>
 	
 	<!-- DYNAMIC RESIDUE MODIFICATION for SEARCH -->
-	<resultMap class="MsResidueModDb" id="msDynamicResidueModResult" extends="msStaticResidueModResult">
+	<resultMap class="MsResidueModOut" id="msDynamicResidueModResult" extends="msStaticResidueModResult">
 		<result property="modificationSymbol" column="symbol" jdbcType="CHAR" javaType="java.lang.Character" />
 	</resultMap>
 	
 	<!-- DYNAMIC RESIDUE MODIFICATION  for RESULT-->
-	<resultMap class="MsResultDynaResidueModDb" id="msResultDynaResidueModResult">
+	<resultMap class="MsResultResidueModOut" id="msResultDynaResidueModResult">
 		<result property="modificationId" column="modID"/>
 		<result property="resultId" column="resultID"/>
 		<result property="modifiedPosition" column="position"/>
@@ -41,7 +43,7 @@
 	
 	
 	<!-- STATIC TERMINAL MODIFICATION for SEARCH -->
-	<resultMap class="MsTerminalModDb" id="msStaticTerminalModResult">
+	<resultMap class="MsTerminalModOut" id="msStaticTerminalModResult">
 		<result property="id" column="id"/>
 		<result property="searchId" column="searchID"/>
 		<result property="modifiedTerminal" column="terminus" jdbcType="CHAR" javaType="Terminal" />
@@ -49,12 +51,12 @@
 	</resultMap>
 	
 	<!-- DYNAMIC TERMINAL MODIFICATION for SEARCH -->
-	<resultMap class="MsTerminalModDb" id="msDynamicTerminalModResult" extends="msStaticTerminalModResult">
+	<resultMap class="MsTerminalModOut" id="msDynamicTerminalModResult" extends="msStaticTerminalModResult">
 		<result property="modificationSymbol" column="symbol" jdbcType="CHAR" javaType="java.lang.Character" />
 	</resultMap>
 	
 	<!-- DYNAMIC TERMINAL MODIFICATION  for RESULT-->
-	<resultMap class="MsResultDynaTerminalModDb" id="msResultDynaTerminalModResult">
+	<resultMap class="MsResultTerminalModOut" id="msResultDynaTerminalModResult">
 		<result property="modificationId" column="modID"/>
 		<result property="resultId" column="resultID"/>
 		<result property="modifiedTerminal" column="terminus" jdbcType="CHAR" javaType="Terminal" />
@@ -64,39 +66,39 @@
 	
 	
 	<!-- ==================================== Parameter Maps ===================================== -->
-	<parameterMap class="MsResidueMod" id="msStaticResidueModParam">
+	<parameterMap class="MsResidueModIn" id="msStaticResidueModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modifiedResidue" jdbcType="CHAR" javaType="java.lang.Character" />
 		<parameter property="modificationMass" jdbcType="DECIMAL"/>
 	</parameterMap>
 	
-	<parameterMap class="MsResidueMod" id="msDynamicResidueModParam">
+	<parameterMap class="MsResidueModIn" id="msDynamicResidueModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modifiedResidue" jdbcType="CHAR" javaType="java.lang.Character" />
 		<parameter property="modificationMass" jdbcType="DECIMAL"/>
 		<parameter property="modificationSymbol" jdbcType="CHAR" javaType="java.lang.Character" />
 	</parameterMap>
 	
-	<parameterMap class="MsTerminalMod" id="msStaticTerminalModParam">
+	<parameterMap class="MsTerminalModIn" id="msStaticTerminalModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modifiedTerminal" jdbcType="CHAR" javaType="Terminal" />
 		<parameter property="modificationMass" jdbcType="DECIMAL"/>
 	</parameterMap>
 	
-	<parameterMap class="MsTerminalMod" id="msDynamicTerminalModParam">
+	<parameterMap class="MsTerminalModIn" id="msDynamicTerminalModParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modifiedTerminal" jdbcType="CHAR" javaType="Terminal" />
 		<parameter property="modificationMass" jdbcType="DECIMAL"/>
 		<parameter property="modificationSymbol" jdbcType="CHAR" javaType="java.lang.Character" />
 	</parameterMap>
 	
-	<parameterMap class="MsResultResidueMod" id="msResultDynaResidueModParam">
+	<parameterMap class="MsResultResidueModIn" id="msResultDynaResidueModParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modificationId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modifiedPosition" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
-	<parameterMap class="MsResultTerminalMod" id="msResultDynaTerminalModParam">
+	<parameterMap class="MsResultTerminalModIn" id="msResultDynaTerminalModParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="modificationId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>

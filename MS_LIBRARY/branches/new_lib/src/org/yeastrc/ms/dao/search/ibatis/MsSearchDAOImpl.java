@@ -18,12 +18,12 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDb;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -65,28 +65,28 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
             }
 
             // save any static residue modifications used for the search
-            for (MsResidueModification staticMod: search.getStaticResidueMods()) {
+            for (MsResidueModificationIn staticMod: search.getStaticResidueMods()) {
                 modDao.saveStaticResidueMod(staticMod, searchId);
             }
 
             // save any dynamic residue modifications used for the search
-            for (MsResidueModification dynaMod: search.getDynamicResidueMods()) {
+            for (MsResidueModificationIn dynaMod: search.getDynamicResidueMods()) {
                 modDao.saveDynamicResidueMod(dynaMod, searchId);
             }
 
             // save any static terminal modifications used for the search
-            for (MsTerminalModification staticMod: search.getStaticTerminalMods()) {
+            for (MsTerminalModificationIn staticMod: search.getStaticTerminalMods()) {
                 modDao.saveStaticTerminalMod(staticMod, searchId);
             }
 
             // save any dynamic residue modifications used for the search
-            for (MsTerminalModification dynaMod: search.getDynamicTerminalMods()) {
+            for (MsTerminalModificationIn dynaMod: search.getDynamicTerminalMods()) {
                 modDao.saveDynamicTerminalMod(dynaMod, searchId);
             }
 
             // save any enzymes used for the search
-            List<MsEnzymeI> enzymes = search.getEnzymeList();
-            for (MsEnzymeI enzyme: enzymes) 
+            List<MsEnzymeIn> enzymes = search.getEnzymeList();
+            for (MsEnzymeIn enzyme: enzymes) 
                 // use the enzyme name attribute only to look for a matching enzyme.
                 enzymeDao.saveEnzymeforSearch(enzyme, searchId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
         }

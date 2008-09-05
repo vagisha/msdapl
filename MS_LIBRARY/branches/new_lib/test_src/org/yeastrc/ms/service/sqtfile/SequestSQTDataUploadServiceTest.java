@@ -8,16 +8,15 @@ import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsResultTerminalModSqlMapParam;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeI.Sense;
-import org.yeastrc.ms.domain.search.MsResidueModificationDb;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
-import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
+import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
-import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.ValidationStatus;
@@ -101,19 +100,19 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals("P", enzymes.get(0).getNocut());
         
         // check the static residue modifications
-        List<MsResidueModificationDb> staticResMods = search.getStaticResidueMods();
+        List<MsResidueModification> staticResMods = search.getStaticResidueMods();
         assertEquals(1, staticResMods.size());
         assertEquals(160.1390, staticResMods.get(0).getModificationMass().doubleValue());
         assertEquals('C', staticResMods.get(0).getModifiedResidue());
         assertEquals(0, staticResMods.get(0).getModificationSymbol());
         
         // check the static terminal modifications
-        List<MsTerminalModificationDb> staticTermMods = search.getStaticTerminalMods();
+        List<MsTerminalModification> staticTermMods = search.getStaticTerminalMods();
         assertEquals(2, staticTermMods.size());
-        Collections.sort(staticTermMods, new Comparator<MsTerminalModificationDb>(){
+        Collections.sort(staticTermMods, new Comparator<MsTerminalModification>(){
             @Override
-            public int compare(MsTerminalModificationDb o1,
-                    MsTerminalModificationDb o2) {
+            public int compare(MsTerminalModification o1,
+                    MsTerminalModification o2) {
                 return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
             }});
         assertEquals(Terminal.CTERM, staticTermMods.get(0).getModifiedTerminal());
@@ -127,12 +126,12 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(searchId, staticTermMods.get(1).getSearchId());
         
         // check the dynamic residue modifications
-        List<MsResidueModificationDb> dynaResMods = search.getDynamicResidueMods();
+        List<MsResidueModification> dynaResMods = search.getDynamicResidueMods();
         assertEquals(6, dynaResMods.size());
-        Collections.sort(dynaResMods, new Comparator<MsResidueModificationDb>(){
+        Collections.sort(dynaResMods, new Comparator<MsResidueModification>(){
             @Override
-            public int compare(MsResidueModificationDb o1,
-                    MsResidueModificationDb o2) {
+            public int compare(MsResidueModification o1,
+                    MsResidueModification o2) {
                 return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
             }});
         String modChars = "STYGVD";
@@ -321,13 +320,13 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals('L', res.getResultPeptide().getPreResidue());
         assertEquals('T', res.getResultPeptide().getPostResidue());
         assertEquals("SDMSASRTY", res.getResultPeptide().getPeptideSequence());
-        List<MsResultDynamicResidueModDb> resMods = res.getResultPeptide().getResultDynamicResidueModifications();
-        List<MsResultDynamicTerminalModDb> termMods = res.getResultPeptide().getResultDynamicTerminalModifications();
+        List<MsResultDynamicResidueMod> resMods = res.getResultPeptide().getResultDynamicResidueModifications();
+        List<MsResultTerminalMod> termMods = res.getResultPeptide().getResultDynamicTerminalModifications();
         assertEquals(4, resMods.size());
         assertEquals(0, termMods.size());
-        Collections.sort(resMods, new Comparator<MsResultDynamicResidueModDb>(){
-            public int compare(MsResultDynamicResidueModDb o1,
-                    MsResultDynamicResidueModDb o2) {
+        Collections.sort(resMods, new Comparator<MsResultDynamicResidueMod>(){
+            public int compare(MsResultDynamicResidueMod o1,
+                    MsResultDynamicResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
         assertEquals(0, resMods.get(0).getModifiedPosition());
@@ -368,9 +367,9 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         termMods = res.getResultPeptide().getResultDynamicTerminalModifications();
         assertEquals(2, resMods.size());
         assertEquals(0, termMods.size());
-        Collections.sort(resMods, new Comparator<MsResultDynamicResidueModDb>(){
-            public int compare(MsResultDynamicResidueModDb o1,
-                    MsResultDynamicResidueModDb o2) {
+        Collections.sort(resMods, new Comparator<MsResultDynamicResidueMod>(){
+            public int compare(MsResultDynamicResidueMod o1,
+                    MsResultDynamicResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
         assertEquals(1, resMods.get(0).getModifiedPosition());

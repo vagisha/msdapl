@@ -4,7 +4,7 @@
 <sqlMap namespace="MsEnzyme"> 
 
 	<typeAlias alias="MsEnzymeOut" type="org.yeastrc.ms.domain.general.impl.MsEnzymeImpl"/>
-	<typeAlias alias="MsEnzymeIn" type="org.yeastrc.ms.domain.general.MsEnzymeI"/>
+	<typeAlias alias="MsEnzymeIn" type="org.yeastrc.ms.domain.general.MsEnzymeIn"/>
 	<typeAlias alias="SenseHandler" type="org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl$SenseTypeHandler"/>
 	
 	

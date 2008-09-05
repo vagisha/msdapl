@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
@@ -21,14 +21,14 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         super.setUp();
         
         // modifications for searchId_1
-        MsResidueModification mod1 = makeStaticResidueMod('C', "50.0");
+        MsResidueModificationIn mod1 = makeStaticResidueMod('C', "50.0");
         modDao.saveStaticResidueMod(mod1, searchId_1);
-        MsResidueModification mod2 = makeStaticResidueMod('S', "80.0");
+        MsResidueModificationIn mod2 = makeStaticResidueMod('S', "80.0");
         modDao.saveStaticResidueMod(mod2, searchId_1);
         
-        MsResidueModification dmod1 = makeDynamicResidueMod('A', "10.0", '*');
+        MsResidueModificationIn dmod1 = makeDynamicResidueMod('A', "10.0", '*');
         modDao.saveDynamicResidueMod(dmod1, searchId_1);
-        MsResidueModification dmod2 = makeDynamicResidueMod('B', "20.0", '#');
+        MsResidueModificationIn dmod2 = makeDynamicResidueMod('B', "20.0", '#');
         modDao.saveDynamicResidueMod(dmod2, searchId_1);
     }
 

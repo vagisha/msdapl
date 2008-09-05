@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 public class MsSearchDAOImplTest extends BaseDAOTestCase {
@@ -72,13 +72,13 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     
     public static class MsSearchTest implements MsSearch {
 
-        private List<MsResidueModification> dynamicResidueModifications = new ArrayList<MsResidueModification>();
-        private List<MsResidueModification> staticResidueModifications = new ArrayList<MsResidueModification>();
-        private List<MsTerminalModification> dynamicTerminalModifications = new ArrayList<MsTerminalModification>();
-        private List<MsTerminalModification> staticTerminalModifications = new ArrayList<MsTerminalModification>();
+        private List<MsResidueModificationIn> dynamicResidueModifications = new ArrayList<MsResidueModificationIn>();
+        private List<MsResidueModificationIn> staticResidueModifications = new ArrayList<MsResidueModificationIn>();
+        private List<MsTerminalModificationIn> dynamicTerminalModifications = new ArrayList<MsTerminalModificationIn>();
+        private List<MsTerminalModificationIn> staticTerminalModifications = new ArrayList<MsTerminalModificationIn>();
         
         private List<MsSearchDatabase> searchDatabases = new ArrayList<MsSearchDatabase>();
-        private List<MsEnzymeI> enzymes = new ArrayList<MsEnzymeI>();
+        private List<MsEnzymeIn> enzymes = new ArrayList<MsEnzymeIn>();
         private String searchEngineVersion;
         private SearchProgram searchProgram;
         private Date searchDate;
@@ -100,47 +100,47 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
             this.searchDate = searchDate;
         }
         
-        public List<MsResidueModification> getStaticResidueMods() {
+        public List<MsResidueModificationIn> getStaticResidueMods() {
             return staticResidueModifications;
         }
 
         public void setStaticResidueMods(
-                List<MsResidueModification> staticModifications) {
+                List<MsResidueModificationIn> staticModifications) {
             this.staticResidueModifications = staticModifications;
         }
         
-        public List<MsResidueModification> getDynamicResidueMods() {
+        public List<MsResidueModificationIn> getDynamicResidueMods() {
             return dynamicResidueModifications;
         }
 
         public void setDynamicResidueMods(
-                List<MsResidueModification> dynaResMods) {
+                List<MsResidueModificationIn> dynaResMods) {
             this.dynamicResidueModifications = dynaResMods;
         }
 
-        public List<MsEnzymeI> getEnzymeList() {
+        public List<MsEnzymeIn> getEnzymeList() {
             return enzymes;
         }
         
-        public void setEnzymeList(List<MsEnzymeI> enzymeList) {
+        public void setEnzymeList(List<MsEnzymeIn> enzymeList) {
             this.enzymes = enzymeList;
         }
 
         @Override
-        public List<MsTerminalModification> getDynamicTerminalMods() {
+        public List<MsTerminalModificationIn> getDynamicTerminalMods() {
             return dynamicTerminalModifications;
         }
 
-        public void setDynamicTerminalMods(List<MsTerminalModification> mods) {
+        public void setDynamicTerminalMods(List<MsTerminalModificationIn> mods) {
             this.dynamicTerminalModifications = mods;
         }
         
         @Override
-        public List<MsTerminalModification> getStaticTerminalMods() {
+        public List<MsTerminalModificationIn> getStaticTerminalMods() {
             return staticTerminalModifications;
         }
 
-        public void setStaticTerminalMods(List<MsTerminalModification> mods) {
+        public void setStaticTerminalMods(List<MsTerminalModificationIn> mods) {
             this.staticTerminalModifications = mods;
         }
         

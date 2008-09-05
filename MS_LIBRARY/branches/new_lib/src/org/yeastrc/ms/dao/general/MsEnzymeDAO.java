@@ -3,7 +3,7 @@ package org.yeastrc.ms.dao.general;
 import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
 public interface MsEnzymeDAO {
@@ -31,7 +31,7 @@ public interface MsEnzymeDAO {
      * @param enzyme
      * @return
      */
-    public int saveEnzyme(MsEnzymeI enzyme);
+    public int saveEnzyme(MsEnzymeIn enzyme);
     
     /**
      * Saves the enzyme if it does not already exist in the database.
@@ -39,7 +39,7 @@ public interface MsEnzymeDAO {
      * @param properties -- list of properties used to look for a matching enzyme before saving
      * @return
      */
-    public int saveEnzyme(MsEnzymeI enzyme, List<EnzymeProperties> properties);
+    public int saveEnzyme(MsEnzymeIn enzyme, List<EnzymeProperties> properties);
     
     
     /**
@@ -51,7 +51,7 @@ public interface MsEnzymeDAO {
      * @param runId
      * @return
      */
-    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId);
+    public int saveEnzymeforRun(MsEnzymeIn enzyme, int runId);
     
     /**
      * Saves an entry in msRunEnzyme linking the enzyme with the runId.
@@ -63,7 +63,7 @@ public interface MsEnzymeDAO {
      * @param properties
      * @return
      */
-    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId, List<EnzymeProperties> properties);
+    public int saveEnzymeforRun(MsEnzymeIn enzyme, int runId, List<EnzymeProperties> properties);
     
     
     /**
@@ -90,7 +90,7 @@ public interface MsEnzymeDAO {
      * @param searchId
      * @return
      */
-    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId);
+    public int saveEnzymeforSearch(MsEnzymeIn enzyme, int searchId);
     
     /**
      * Saves an entry in msSearchEnzyme linking the enzyme with the searchId.
@@ -102,7 +102,7 @@ public interface MsEnzymeDAO {
      * @param properties
      * @return
      */
-    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId, List<EnzymeProperties> properties);
+    public int saveEnzymeforSearch(MsEnzymeIn enzyme, int searchId, List<EnzymeProperties> properties);
     
     
     /**

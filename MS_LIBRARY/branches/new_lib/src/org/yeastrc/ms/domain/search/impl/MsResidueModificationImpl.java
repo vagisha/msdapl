@@ -8,18 +8,18 @@ package org.yeastrc.ms.domain.search.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsResidueModificationDb;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 
 /**
  * 
  */
-public class MsResidueModificationDbImpl implements MsResidueModificationDb {
+public class MsResidueModificationImpl implements MsResidueModification {
 
     private int id;
     private int searchId;
     private BigDecimal modificationMass;
-    private char modificationSymbol = '\u0000';
-    private char modifiedResidue;
+    private char modificationSymbol = EMPTY_CHAR;
+    private char modifiedResidue = EMPTY_CHAR;
     
 
     public char getModifiedResidue() {

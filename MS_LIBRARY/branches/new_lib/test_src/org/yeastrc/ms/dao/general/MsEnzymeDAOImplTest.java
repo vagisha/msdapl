@@ -6,7 +6,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO.EnzymeProperties;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
 public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
@@ -67,7 +67,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, enzymes.size());
         
         // create and save the enzyme
-        MsEnzymeI iEnzyme = makeDigestionEnzyme("Dummy", Sense.UNKNOWN, "ABC", null);
+        MsEnzymeIn iEnzyme = makeDigestionEnzyme("Dummy", Sense.UNKNOWN, "ABC", null);
         // create a link between the enzyme and the runID
         // this should also save a new entry in the msDigestionEnzyme table
         int enzymeId_2 = enzymeDao.saveEnzymeforRun(iEnzyme, runId1);
@@ -121,7 +121,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, enzymes.size());
         
         // create and save the enzyme
-        MsEnzymeI iEnzyme = makeDigestionEnzyme("Dummy", Sense.UNKNOWN, "ABC", null);
+        MsEnzymeIn iEnzyme = makeDigestionEnzyme("Dummy", Sense.UNKNOWN, "ABC", null);
         // create a link between the enzyme and the serachID
         // this should also save a new entry in the msDigestionEnzyme table
         int enzymeId_2 = enzymeDao.saveEnzymeforSearch(iEnzyme, searchId1);
@@ -158,7 +158,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
     
     public void testSenseValue() {
         
-        MsEnzymeI enzyme = super.makeDigestionEnzyme("Dummy", Sense.UNKNOWN, null, null);
+        MsEnzymeIn enzyme = super.makeDigestionEnzyme("Dummy", Sense.UNKNOWN, null, null);
         assertEquals(Sense.UNKNOWN, enzyme.getSense());
         int enzymeId_1 = enzymeDao.saveEnzyme(enzyme);
         MsEnzyme enzyme_db = enzymeDao.loadEnzyme(enzymeId_1);

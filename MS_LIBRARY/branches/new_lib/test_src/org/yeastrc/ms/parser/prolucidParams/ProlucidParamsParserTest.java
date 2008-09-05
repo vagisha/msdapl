@@ -6,11 +6,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.general.MsEnzymeI;
-import org.yeastrc.ms.domain.general.MsEnzymeI.Sense;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.Score;
@@ -68,7 +68,7 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        MsEnzymeI enzyme = parser.getSearchEnzyme();
+        MsEnzymeIn enzyme = parser.getSearchEnzyme();
         assertNotNull(enzyme);
         assertEquals("trypsin", enzyme.getName());
         assertEquals(Sense.CTERM, enzyme.getSense());
@@ -102,12 +102,12 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        List<MsResidueModification> dynaResMods = parser.getDynamicResidueMods();
+        List<MsResidueModificationIn> dynaResMods = parser.getDynamicResidueMods();
         assertNotNull(dynaResMods);
         assertEquals(2, dynaResMods.size());
-        Collections.sort(dynaResMods, new Comparator<MsResidueModification>() {
-            public int compare(MsResidueModification o1,
-                    MsResidueModification o2) {
+        Collections.sort(dynaResMods, new Comparator<MsResidueModificationIn>() {
+            public int compare(MsResidueModificationIn o1,
+                    MsResidueModificationIn o2) {
                 return Character.valueOf(o1.getModifiedResidue()).compareTo(Character.valueOf(o2.getModifiedResidue()));
             }});
         assertEquals('S', dynaResMods.get(0).getModifiedResidue());
@@ -128,9 +128,9 @@ public class ProlucidParamsParserTest extends TestCase {
         dynaResMods = parser.getDynamicResidueMods();
         assertNotNull(dynaResMods);
         assertEquals(5, dynaResMods.size());
-        Collections.sort(dynaResMods, new Comparator<MsResidueModification>() {
-            public int compare(MsResidueModification o1,
-                    MsResidueModification o2) {
+        Collections.sort(dynaResMods, new Comparator<MsResidueModificationIn>() {
+            public int compare(MsResidueModificationIn o1,
+                    MsResidueModificationIn o2) {
                 return Character.valueOf(o1.getModifiedResidue()).compareTo(Character.valueOf(o2.getModifiedResidue()));
             }});
         assertEquals('A', dynaResMods.get(0).getModifiedResidue());
@@ -159,7 +159,7 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        List<MsResidueModification> staticResMods = parser.getStaticResidueMods();
+        List<MsResidueModificationIn> staticResMods = parser.getStaticResidueMods();
         assertNotNull(staticResMods);
         assertEquals(1, staticResMods.size());
         
@@ -189,7 +189,7 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        List<MsTerminalModification> staticTermMods = parser.getStaticTerminalMods();
+        List<MsTerminalModificationIn> staticTermMods = parser.getStaticTerminalMods();
         assertNotNull(staticTermMods);
         assertEquals(2, staticTermMods.size());
         
@@ -232,7 +232,7 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        List<MsTerminalModification> dynaTermMods = parser.getDynamicTerminalMods();
+        List<MsTerminalModificationIn> dynaTermMods = parser.getDynamicTerminalMods();
         assertNotNull(dynaTermMods);
         assertEquals(2, dynaTermMods.size());
         

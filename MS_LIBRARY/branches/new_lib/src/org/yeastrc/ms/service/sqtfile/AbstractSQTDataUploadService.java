@@ -1,7 +1,6 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -22,9 +21,7 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
-import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
+import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearch;
@@ -34,16 +31,18 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.ResultModIdentifier;
+import org.yeastrc.ms.domain.search.ResultResidueModIdentifier;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl;
+import org.yeastrc.ms.domain.search.impl.ResultModIdentifierImpl;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModIdentifierImpl;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.ResultResidueModification;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
-import org.yeastrc.ms.parser.TerminalModification;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -60,8 +59,8 @@ public abstract class AbstractSQTDataUploadService {
 
     // these are the things we will cache and do bulk-inserts
     LinkedHashSet<MsSearchResultProteinDb> proteinMatchSet;
-    List<MsResultDynamicResidueModDb> resultResidueModList;
-    List<MsResultDynamicTerminalModDb> resultTerminalModList;
+    List<ResultResidueModIdentifier> resultResidueModList;
+    List<ResultModIdentifier> resultTerminalModList;
 
 
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
@@ -79,8 +78,8 @@ public abstract class AbstractSQTDataUploadService {
     
     public AbstractSQTDataUploadService() {
         this.proteinMatchSet = new LinkedHashSet<MsSearchResultProteinDb>(BUF_SIZE);
-        this.resultResidueModList = new ArrayList<MsResultDynamicResidueModDb>(BUF_SIZE);
-        this.resultTerminalModList = new ArrayList<MsResultDynamicTerminalModDb>(BUF_SIZE);
+        this.resultResidueModList = new ArrayList<ResultResidueModIdentifier>(BUF_SIZE);
+        this.resultTerminalModList = new ArrayList<ResultModIdentifier>(BUF_SIZE);
         this.uploadExceptionList = new ArrayList<UploadException>();
     }
     
@@ -385,7 +384,7 @@ public abstract class AbstractSQTDataUploadService {
             uploadResultResidueModBuffer();
         }
         // add the dynamic residue modifications for this result to the cache
-        for (MsResultDynamicResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
+        for (MsResultResidueModIn mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
             int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
@@ -398,12 +397,8 @@ public abstract class AbstractSQTDataUploadService {
                         "; modMass: "+mod.getModificationMass().doubleValue());
                 throw ex;
             }
-            resultResidueModList.add(new ResultResidueMod(mod.getModifiedResidue(), 
-                    mod.getModificationSymbol(),
-                    mod.getModificationMass(), 
-                    mod.getModifiedPosition(),
-                    resultId,
-                    modId));
+            ResultResidueModIdentifierImpl resultMod = new ResultResidueModIdentifierImpl(resultId, modId, mod.getModifiedPosition());
+            resultResidueModList.add(resultMod);
         }
     }
 
@@ -420,7 +415,7 @@ public abstract class AbstractSQTDataUploadService {
             uploadResultTerminalModBuffer();
         }
         // add the dynamic terminal modifications for this result to the cache
-        for (MsTerminalModification mod: result.getResultPeptide().getDynamicTerminalModifications()) {
+        for (MsTerminalModificationIn mod: result.getResultPeptide().getDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
             int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
@@ -433,11 +428,8 @@ public abstract class AbstractSQTDataUploadService {
                         "; modMass: "+mod.getModificationMass().doubleValue());
                 throw ex;
             }
-            resultTerminalModList.add(new ResultTerminalMod(mod.getModifiedTerminal(), 
-                    mod.getModificationSymbol(),
-                    mod.getModificationMass(), 
-                    resultId,
-                    modId));
+            ResultModIdentifierImpl resultMod = new ResultModIdentifierImpl(resultId, modId);
+            resultTerminalModList.add(resultMod);
         }
     }
 
@@ -471,41 +463,5 @@ public abstract class AbstractSQTDataUploadService {
             return;
         MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
         searchDao.deleteSearch(searchId);
-    }
-
-    private static final class ResultResidueMod extends ResultResidueModification implements MsResultDynamicResidueModDb {
-
-        private final int resultId;
-        private final int modId;
-        public ResultResidueMod(char modResidue, char modSymbol,
-                BigDecimal modMass, int position, int resultId, int modId) {
-            super(modResidue, modSymbol, modMass, position);
-            this.resultId = resultId;
-            this.modId = modId;
-        }
-        public int getModificationId() {
-            return modId;
-        }
-        public int getResultId() {
-            return resultId;
-        }
-    }
-    
-    private static final class ResultTerminalMod extends TerminalModification implements MsResultDynamicTerminalModDb {
-
-        private final int resultId;
-        private final int modId;
-        public ResultTerminalMod(Terminal modifiedTerminal, char modSymbol,
-                BigDecimal modMass, int resultId, int modId) {
-            super(modifiedTerminal, modMass, modSymbol);
-            this.resultId = resultId;
-            this.modId = modId;
-        }
-        public int getModificationId() {
-            return modId;
-        }
-        public int getResultId() {
-            return resultId;
-        }
     }
 }

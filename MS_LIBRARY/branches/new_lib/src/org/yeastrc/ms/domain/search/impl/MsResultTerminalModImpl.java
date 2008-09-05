@@ -8,19 +8,20 @@ package org.yeastrc.ms.domain.search.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 
 /**
  * 
  */
-public class MsResultDynamicTerminalModDbImpl implements
-        MsResultDynamicTerminalModDb {
+public class MsResultTerminalModImpl implements
+        MsResultTerminalMod {
 
     private int modId;
     private int resultId;
     private Terminal modifiedTerminal;
     private BigDecimal modificationMass;
-    private char modificationSymbol;
+    private char modificationSymbol = EMPTY_CHAR;
     
     @Override
     public int getModificationId() {

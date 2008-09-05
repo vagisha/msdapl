@@ -34,22 +34,22 @@ public interface MsSearchDb extends MsSearchBase {
     /**
      * @return the staticModifications
      */
-    public abstract List<MsResidueModificationDb> getStaticResidueMods();
+    public abstract List<MsResidueModification> getStaticResidueMods();
 
     /**
      * @return the dynamicModifications
      */
-    public abstract List<MsResidueModificationDb> getDynamicResidueMods();
+    public abstract List<MsResidueModification> getDynamicResidueMods();
     
     /**
      * @return the terminal static modifications
      */
-    public abstract List<MsTerminalModificationDb> getStaticTerminalMods();
+    public abstract List<MsTerminalModification> getStaticTerminalMods();
     
     /**
      * @return the terminal dynamic modifications
      */
-    public abstract List<MsTerminalModificationDb> getDynamicTerminalMods();
+    public abstract List<MsTerminalModification> getDynamicTerminalMods();
     
     /**
      * @return the enzymes used for this search

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
@@ -20,7 +20,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     private int numMatchingIons = -1;
     private int numPredictedIons = -1;
     
-    private List<MsResidueModification> searchDynaResidueMods;
+    private List<MsResidueModificationIn> searchDynaResidueMods;
     
     private int xcorrRank = -1;
     private int spRank = -1;
@@ -30,12 +30,12 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     private BigDecimal sp;
     private Double evalue;
     
-    public SequestResult(List<MsResidueModification> searchDynaResidueMods) {
+    public SequestResult(List<MsResidueModificationIn> searchDynaResidueMods) {
         super();
         if (searchDynaResidueMods != null)
             this.searchDynaResidueMods = searchDynaResidueMods;
         else
-            this.searchDynaResidueMods = new ArrayList<MsResidueModification>(0);
+            this.searchDynaResidueMods = new ArrayList<MsResidueModificationIn>(0);
     }
 
     /**

@@ -8,17 +8,17 @@ package org.yeastrc.ms.domain.search.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsTerminalModificationDb;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 
 /**
  * 
  */
-public class MsTerminalModificationDbImpl implements MsTerminalModificationDb {
+public class MsTerminalModificationImpl implements MsTerminalModification {
 
     private int id;
     private int searchId;
     private BigDecimal modificationMass;
-    private char modificationSymbol = '\u0000';
+    private char modificationSymbol = EMPTY_CHAR;
     private Terminal modTerminal;
 
     /**

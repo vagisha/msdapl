@@ -8,10 +8,10 @@ package org.yeastrc.ms.parser;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzymeI;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 /**
@@ -21,15 +21,15 @@ public interface SearchParamsDataProvider {
 
     public abstract MsSearchDatabase getSearchDatabase();
 
-    public abstract MsEnzymeI getSearchEnzyme();
+    public abstract MsEnzymeIn getSearchEnzyme();
 
-    public abstract List<MsResidueModification> getDynamicResidueMods();
+    public abstract List<MsResidueModificationIn> getDynamicResidueMods();
 
-    public abstract List<MsResidueModification> getStaticResidueMods();
+    public abstract List<MsResidueModificationIn> getStaticResidueMods();
 
-    public abstract List<MsTerminalModification> getStaticTerminalMods();
+    public abstract List<MsTerminalModificationIn> getStaticTerminalMods();
 
-    public abstract List<MsTerminalModification> getDynamicTerminalMods();
+    public abstract List<MsTerminalModificationIn> getDynamicTerminalMods();
     
     public abstract SearchProgram getSearchProgram();
     

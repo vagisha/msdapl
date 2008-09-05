@@ -2,18 +2,18 @@ package org.yeastrc.ms.domain.search.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
+import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
 
 
 
-public class MsResultDynamicResidueModDbImpl implements MsResultDynamicResidueModDb {
+public class MsResultResidueModImpl implements MsResultDynamicResidueMod {
 
     private int modId;
     private int resultId;
     private int modPosition;
-    private char modifiedResidue;
+    private char modifiedResidue = EMPTY_CHAR;
     private BigDecimal modificationMass;
-    private char modificationSymbol;
+    private char modificationSymbol = EMPTY_CHAR;
     
     /**
      * @return the modId

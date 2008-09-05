@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
+import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.parser.ResultResidueModification;
+import org.yeastrc.ms.domain.search.impl.MsResultResidueModImpl;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -42,16 +42,16 @@ public final class ProlucidResultPeptideBuilder {
     }
 
     public MsSearchResultPeptide build(String resultSequence, 
-            List<? extends MsResidueModification> dynaResidueMods,
-            List<? extends MsTerminalModification> dynaTerminalMods) 
+            List<? extends MsResidueModificationIn> dynaResidueMods,
+            List<? extends MsTerminalModificationIn> dynaTerminalMods) 
     throws SQTParseException {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new SQTParseException("sequence cannot be null or empty");
 
         if (dynaResidueMods == null)
-            dynaResidueMods = new ArrayList<MsResidueModification>(0);
+            dynaResidueMods = new ArrayList<MsResidueModificationIn>(0);
         if (dynaTerminalMods == null)
-            dynaTerminalMods = new ArrayList<MsTerminalModification>(0);
+            dynaTerminalMods = new ArrayList<MsTerminalModificationIn>(0);
 
         if (resultSequence.length() < 5)
             throw new SQTParseException("sequence appears to be invalid: "+resultSequence);
@@ -60,9 +60,9 @@ public final class ProlucidResultPeptideBuilder {
         final char postResidue = getPostResidue(resultSequence);
         String dotless = removeDots(resultSequence);
         // get the terminal mods first
-        final List<MsTerminalModification> termMods = getResultTerminalMods(dotless, dynaTerminalMods, dynaResidueMods);
+        final List<MsTerminalModificationIn> termMods = getResultTerminalMods(dotless, dynaTerminalMods, dynaResidueMods);
         // now the residue mods
-        final List<MsResultDynamicResidueMod> residueMods = getResultResidueMods(dotless, dynaResidueMods, dynaTerminalMods);
+        final List<MsResultResidueModIn> residueMods = getResultResidueMods(dotless, dynaResidueMods, dynaTerminalMods);
         
         final String justPeptide = getOnlyPeptideSequence(dotless);
 
@@ -81,10 +81,10 @@ public final class ProlucidResultPeptideBuilder {
                 if (justPeptide == null)    return 0;
                 return justPeptide.length();
             }
-            public List<MsResultDynamicResidueMod> getResultDynamicResidueModifications() {
+            public List<MsResultResidueModIn> getResultDynamicResidueModifications() {
                 return residueMods;
             }
-            public List<MsTerminalModification> getDynamicTerminalModifications() {
+            public List<MsTerminalModificationIn> getDynamicTerminalModifications() {
                 return termMods;
             }};
     }
@@ -109,28 +109,28 @@ public final class ProlucidResultPeptideBuilder {
      * @return
      * @throws SQTParseException
      */
-    List<MsTerminalModification> getResultTerminalMods(String peptide, 
-            List<? extends MsTerminalModification> dynaTermMods,
-            List<? extends MsResidueModification> dynaResMods) throws SQTParseException {
+    List<MsTerminalModificationIn> getResultTerminalMods(String peptide, 
+            List<? extends MsTerminalModificationIn> dynaTermMods,
+            List<? extends MsResidueModificationIn> dynaResMods) throws SQTParseException {
 
         if (dynaResMods == null)
-            dynaResMods = new ArrayList<MsResidueModification>(0);
+            dynaResMods = new ArrayList<MsResidueModificationIn>(0);
         if (dynaTermMods == null)
-            dynaTermMods = new ArrayList<MsTerminalModification>(0);
+            dynaTermMods = new ArrayList<MsTerminalModificationIn>(0);
         
         
         // create a map of the dynamic residue modifications for the search for easy access.
-        Map<String, MsResidueModification> resModMap = new HashMap<String, MsResidueModification>(dynaResMods.size());
-        for (MsResidueModification mod: dynaResMods)
+        Map<String, MsResidueModificationIn> resModMap = new HashMap<String, MsResidueModificationIn>(dynaResMods.size());
+        for (MsResidueModificationIn mod: dynaResMods)
             resModMap.put(mod.getModifiedResidue()+""+mod.getModificationMass(), mod);
         
         // create a map of the dynamic terminal modifications for the search
-        Map<String, MsTerminalModification> termModMap = new HashMap<String, MsTerminalModification>(dynaTermMods.size());
-        for (MsTerminalModification mod: dynaTermMods) 
+        Map<String, MsTerminalModificationIn> termModMap = new HashMap<String, MsTerminalModificationIn>(dynaTermMods.size());
+        for (MsTerminalModificationIn mod: dynaTermMods) 
             termModMap.put(mod.getModifiedTerminal().toChar()+""+mod.getModificationMass(), mod);
         
         
-        List<MsTerminalModification> resultMods = new ArrayList<MsTerminalModification>();
+        List<MsTerminalModificationIn> resultMods = new ArrayList<MsTerminalModificationIn>();
         
         // get any n-term mods
         Matcher m = nTermModPattern.matcher(peptide);
@@ -144,7 +144,7 @@ public final class ProlucidResultPeptideBuilder {
             while (nm.find()) {
                 String modMass = nm.group(1);
                 // is this a valid N-terminal modification?
-                MsTerminalModification mod = termModMap.get(Terminal.NTERM.toChar()+modMass);
+                MsTerminalModificationIn mod = termModMap.get(Terminal.NTERM.toChar()+modMass);
                 if (mod != null) {
                     
                     // if this is also a valid residue modification throw an exception
@@ -171,7 +171,7 @@ public final class ProlucidResultPeptideBuilder {
             while (cm.find()) {
                 String modMass = cm.group(1);
                 // is this a valid C-terminal modification?
-                MsTerminalModification mod = termModMap.get(Terminal.CTERM.toChar()+modMass);
+                MsTerminalModificationIn mod = termModMap.get(Terminal.CTERM.toChar()+modMass);
                 if (mod != null) {
                     
                     // if this is also a valid residue modification throw an exception
@@ -197,27 +197,27 @@ public final class ProlucidResultPeptideBuilder {
      * @return
      * @throws SQTParseException
      */
-    List<MsResultDynamicResidueMod> getResultResidueMods(String peptide, 
-            List<? extends MsResidueModification> dynaResMods,
-            List<? extends MsTerminalModification> dynaTermMods) throws SQTParseException {
+    List<MsResultResidueModIn> getResultResidueMods(String peptide, 
+            List<? extends MsResidueModificationIn> dynaResMods,
+            List<? extends MsTerminalModificationIn> dynaTermMods) throws SQTParseException {
 
         if (dynaResMods == null)
-            dynaResMods = new ArrayList<MsResidueModification>(0);
+            dynaResMods = new ArrayList<MsResidueModificationIn>(0);
         if (dynaTermMods == null)
-            dynaTermMods = new ArrayList<MsTerminalModification>(0);
+            dynaTermMods = new ArrayList<MsTerminalModificationIn>(0);
         
         // create a map of the dynamic residue modifications for the search for easy access.
-        Map<String, MsResidueModification> modMap = new HashMap<String, MsResidueModification>(dynaResMods.size());
-        for (MsResidueModification mod: dynaResMods)
+        Map<String, MsResidueModificationIn> modMap = new HashMap<String, MsResidueModificationIn>(dynaResMods.size());
+        for (MsResidueModificationIn mod: dynaResMods)
             modMap.put(mod.getModifiedResidue()+""+mod.getModificationMass(), mod);
 
         // create a map of the dynamic terminal modifications for the search
-        Map<String, MsTerminalModification> termModMap = new HashMap<String, MsTerminalModification>(dynaTermMods.size());
-        for (MsTerminalModification mod: dynaTermMods) 
+        Map<String, MsTerminalModificationIn> termModMap = new HashMap<String, MsTerminalModificationIn>(dynaTermMods.size());
+        for (MsTerminalModificationIn mod: dynaTermMods) 
             termModMap.put(mod.getModifiedTerminal().toChar()+""+mod.getModificationMass(), mod);
         
         
-        List<MsResultDynamicResidueMod> resultMods = new ArrayList<MsResultDynamicResidueMod>();
+        List<MsResultResidueModIn> resultMods = new ArrayList<MsResultResidueModIn>();
         int modCharIndex = -1;
         int matchedPatternsLength = 0;
         Matcher m = multipleMods.matcher(peptide);
@@ -243,9 +243,13 @@ public final class ProlucidResultPeptideBuilder {
                         continue;
                     
                     // this is a dynamic residue modification for sure. Make sure it is a valid one
-                    MsResidueModification mod = modMap.get(modChar+""+modMass);
+                    MsResidueModificationIn mod = modMap.get(modChar+""+modMass);
                     if (mod != null) {
-                        resultMods.add(new ResultResidueModification(mod.getModifiedResidue(), mod.getModificationMass(), modCharIndex));
+                        MsResultResidueModImpl resultMod = new MsResultResidueModImpl();
+                        resultMod.setModificationMass(mod.getModificationMass());
+                        resultMod.setModifiedResidue(mod.getModifiedResidue());
+                        resultMod.setModifiedPosition(modCharIndex);
+                        resultMods.add(resultMod);
                     }
                     else {
                         throw new SQTParseException("No matching modification found for modified char: "+modChar+"; mass: "+modMass+" in sequence: "+peptide);
@@ -268,9 +272,13 @@ public final class ProlucidResultPeptideBuilder {
                     }
                     
                     // this is a dynamic residue modification for sure. Make sure it is a valid one
-                    MsResidueModification mod = modMap.get(modChar+""+modMass);
+                    MsResidueModificationIn mod = modMap.get(modChar+""+modMass);
                     if (mod != null) {
-                        resultMods.add(new ResultResidueModification(mod.getModifiedResidue(), mod.getModificationMass(), modCharIndex));
+                        MsResultResidueModImpl resultMod = new MsResultResidueModImpl();
+                        resultMod.setModificationMass(mod.getModificationMass());
+                        resultMod.setModifiedResidue(mod.getModifiedResidue());
+                        resultMod.setModifiedPosition(modCharIndex);
+                        resultMods.add(resultMod);
                     }
                     else {
                         throw new SQTParseException("No matching modification found for modified char: "+modChar+"; mass: "+modMass+" in sequence: "+peptide);

@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
+import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.parser.ResultResidueModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.impl.MsResultResidueModImpl;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -32,13 +32,13 @@ public final class SequestResultPeptideBuilder {
     }
 
     public MsSearchResultPeptide build(String resultSequence, 
-                List<? extends MsResidueModification> dynaResidueMods) 
+                List<? extends MsResidueModificationIn> dynaResidueMods) 
     throws SQTParseException {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new SQTParseException("sequence cannot be null or empty");
         
         if (dynaResidueMods == null)
-            dynaResidueMods = new ArrayList<MsResidueModification>(0);
+            dynaResidueMods = new ArrayList<MsResidueModificationIn>(0);
         
         if (resultSequence.length() < 5)
             throw new SQTParseException("sequence appears to be invalid: "+resultSequence);
@@ -46,7 +46,7 @@ public final class SequestResultPeptideBuilder {
         final char preResidue = getPreResidue(resultSequence);
         final char postResidue = getPostResidue(resultSequence);
         String dotless = removeDots(resultSequence);
-        final List<MsResultDynamicResidueMod> resultMods = getResultMods(dotless, dynaResidueMods);
+        final List<MsResultResidueModIn> resultMods = getResultMods(dotless, dynaResidueMods);
         final String justPeptide = getOnlyPeptideSequence(dotless);
         
         return new MsSearchResultPeptide() {
@@ -64,11 +64,11 @@ public final class SequestResultPeptideBuilder {
                 if (justPeptide == null)    return 0;
                 return justPeptide.length();
             }
-            public List<MsResultDynamicResidueMod> getResultDynamicResidueModifications() {
+            public List<MsResultResidueModIn> getResultDynamicResidueModifications() {
                 return resultMods;
             }
-            public List<MsTerminalModification> getDynamicTerminalModifications() {
-                return new ArrayList<MsTerminalModification>(0);
+            public List<MsTerminalModificationIn> getDynamicTerminalModifications() {
+                return new ArrayList<MsTerminalModificationIn>(0);
             }};
     }
 
@@ -84,14 +84,14 @@ public final class SequestResultPeptideBuilder {
         throw new SQTParseException("Invalid peptide sequence; cannot get POST residue: "+sequence);
     }
     
-    List<MsResultDynamicResidueMod> getResultMods(String peptide, List<? extends MsResidueModification> dynaMods) throws SQTParseException {
+    List<MsResultResidueModIn> getResultMods(String peptide, List<? extends MsResidueModificationIn> dynaMods) throws SQTParseException {
         
         // create a map of the dynamic modifications for the search for easy access.
-        Map<String, MsResidueModification> modMap = new HashMap<String, MsResidueModification>(dynaMods.size());
-        for (MsResidueModification mod: dynaMods)
+        Map<String, MsResidueModificationIn> modMap = new HashMap<String, MsResidueModificationIn>(dynaMods.size());
+        for (MsResidueModificationIn mod: dynaMods)
             modMap.put(mod.getModifiedResidue()+""+mod.getModificationSymbol(), mod);
         
-        List<MsResultDynamicResidueMod> resultMods = new ArrayList<MsResultDynamicResidueMod>();
+        List<MsResultResidueModIn> resultMods = new ArrayList<MsResultResidueModIn>();
         char modifiedChar = 0;
         int modCharIndex = -1;
         for (int i = 0; i < peptide.length(); i++) {
@@ -102,12 +102,17 @@ public final class SequestResultPeptideBuilder {
                 modCharIndex++;
                 continue;
             }
-            MsResidueModification matchingMod = modMap.get(modifiedChar+""+x);
+            MsResidueModificationIn matchingMod = modMap.get(modifiedChar+""+x);
             if (matchingMod == null)
                 throw new SQTParseException("No matching modification found: "+modifiedChar+x+"; sequence: "+peptide);
             
             // found a match!!
-            resultMods.add(new ResultResidueModification(modifiedChar, x, matchingMod.getModificationMass(), modCharIndex));
+            MsResultResidueModImpl resultMod = new MsResultResidueModImpl();
+            resultMod.setModificationMass(matchingMod.getModificationMass());
+            resultMod.setModifiedResidue(modifiedChar);
+            resultMod.setModificationSymbol(x);
+            resultMod.setModifiedPosition(modCharIndex);
+            resultMods.add(resultMod);
         }
         
         return resultMods;
