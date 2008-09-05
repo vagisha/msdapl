@@ -18,7 +18,7 @@ import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO.EnzymeProperties;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.domain.run.MsRunLocationDb;
@@ -47,8 +47,8 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
             saveRunLocation(serverAddress, serverDirectory, runId);
         
             // save the enzyme information
-            List<MsEnzyme> enzymes = run.getEnzymeList();
-            for (MsEnzyme enzyme: enzymes) 
+            List<MsEnzymeI> enzymes = run.getEnzymeList();
+            for (MsEnzymeI enzyme: enzymes) 
                 // use the enzyme name attribute only to look for a matching enzyme.
                 enzymeDao.saveEnzymeforRun(enzyme, runId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
         }

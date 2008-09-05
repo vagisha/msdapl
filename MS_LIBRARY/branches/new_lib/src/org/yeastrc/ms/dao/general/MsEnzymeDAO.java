@@ -3,7 +3,7 @@ package org.yeastrc.ms.dao.general;
 import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
 public interface MsEnzymeDAO {
@@ -12,15 +12,15 @@ public interface MsEnzymeDAO {
     public enum EnzymeProperties {NAME, SENSE, CUT, NOTCUT};
     
     
-    public MsEnzymeDb loadEnzyme(int enzymeId);
+    public MsEnzyme loadEnzyme(int enzymeId);
     
-    public List<MsEnzymeDb> loadEnzymes(String name);
+    public List<MsEnzyme> loadEnzymes(String name);
     
-    public List<MsEnzymeDb> loadEnzymes(String name, Sense sense, String cut, String nocut);
+    public List<MsEnzyme> loadEnzymes(String name, Sense sense, String cut, String nocut);
     
-    public List<MsEnzymeDb> loadEnzymesForRun(int runId);
+    public List<MsEnzyme> loadEnzymesForRun(int runId);
     
-    public List<MsEnzymeDb> loadEnzymesForSearch(int searchId);
+    public List<MsEnzyme> loadEnzymesForSearch(int searchId);
     
     public abstract void deleteEnzymeById(int enzymeId);
     
@@ -31,7 +31,7 @@ public interface MsEnzymeDAO {
      * @param enzyme
      * @return
      */
-    public int saveEnzyme(MsEnzyme enzyme);
+    public int saveEnzyme(MsEnzymeI enzyme);
     
     /**
      * Saves the enzyme if it does not already exist in the database.
@@ -39,7 +39,7 @@ public interface MsEnzymeDAO {
      * @param properties -- list of properties used to look for a matching enzyme before saving
      * @return
      */
-    public int saveEnzyme(MsEnzyme enzyme, List<EnzymeProperties> properties);
+    public int saveEnzyme(MsEnzymeI enzyme, List<EnzymeProperties> properties);
     
     
     /**
@@ -51,7 +51,7 @@ public interface MsEnzymeDAO {
      * @param runId
      * @return
      */
-    public int saveEnzymeforRun(MsEnzyme enzyme, int runId);
+    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId);
     
     /**
      * Saves an entry in msRunEnzyme linking the enzyme with the runId.
@@ -63,7 +63,7 @@ public interface MsEnzymeDAO {
      * @param properties
      * @return
      */
-    public int saveEnzymeforRun(MsEnzyme enzyme, int runId, List<EnzymeProperties> properties);
+    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId, List<EnzymeProperties> properties);
     
     
     /**
@@ -90,7 +90,7 @@ public interface MsEnzymeDAO {
      * @param searchId
      * @return
      */
-    public int saveEnzymeforSearch(MsEnzyme enzyme, int searchId);
+    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId);
     
     /**
      * Saves an entry in msSearchEnzyme linking the enzyme with the searchId.
@@ -102,7 +102,7 @@ public interface MsEnzymeDAO {
      * @param properties
      * @return
      */
-    public int saveEnzymeforSearch(MsEnzyme enzyme, int searchId, List<EnzymeProperties> properties);
+    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId, List<EnzymeProperties> properties);
     
     
     /**

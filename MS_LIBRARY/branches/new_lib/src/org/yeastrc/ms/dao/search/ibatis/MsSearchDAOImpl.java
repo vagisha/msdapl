@@ -18,7 +18,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
-import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
@@ -85,8 +85,8 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
             }
 
             // save any enzymes used for the search
-            List<MsEnzyme> enzymes = search.getEnzymeList();
-            for (MsEnzyme enzyme: enzymes) 
+            List<MsEnzymeI> enzymes = search.getEnzymeList();
+            for (MsEnzymeI enzyme: enzymes) 
                 // use the enzyme name attribute only to look for a matching enzyme.
                 enzymeDao.saveEnzymeforSearch(enzyme, searchId, Arrays.asList(new EnzymeProperties[] {EnzymeProperties.NAME}));
         }

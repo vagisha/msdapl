@@ -8,7 +8,7 @@ package org.yeastrc.ms.domain.run;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzyme;
 
 /**
  * 
@@ -23,5 +23,5 @@ public interface MsRunDb extends MsRunBase {
     /**
      * @ return the list of enzymes for this run.
      */
-    public abstract List<MsEnzymeDb> getEnzymeList();
+    public abstract List<MsEnzyme> getEnzymeList();
 }

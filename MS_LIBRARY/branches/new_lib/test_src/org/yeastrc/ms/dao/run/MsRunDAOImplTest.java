@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
 import org.yeastrc.ms.domain.run.MsRunLocationDb;
@@ -86,16 +86,16 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     public void testSaveAndLoadRunWithEnzymeInfo() {
         
         // load some enzymes from the database
-        MsEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
-        MsEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
-        MsEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
+        MsEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
+        MsEnzyme enzyme2 = enzymeDao.loadEnzyme(2);
+        MsEnzyme enzyme3 = enzymeDao.loadEnzyme(3);
         
         assertNotNull(enzyme1);
         assertNotNull(enzyme2);
         assertNotNull(enzyme3);
         
         // create a run with enzyme information
-        List <MsEnzyme> enzymeList1 = new ArrayList<MsEnzyme>(2);
+        List <MsEnzymeI> enzymeList1 = new ArrayList<MsEnzymeI>(2);
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
         MsRun run1 = createRunWEnzymeInfo(enzymeList1);
@@ -105,12 +105,12 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         // now read back the run and make sure it has the enzyme information
         MsRunDb runFromDb_1 = runDao.loadRun(runId_1);
-        List<MsEnzymeDb> enzymes = runFromDb_1.getEnzymeList();
+        List<MsEnzyme> enzymes = runFromDb_1.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());
         
         // save another run for this experiment
-        List <MsEnzyme> enzymeList2 = new ArrayList<MsEnzyme>(1);
+        List <MsEnzymeI> enzymeList2 = new ArrayList<MsEnzymeI>(1);
         enzymeList2.add(enzyme3);
         MsRun run2 = createRunWEnzymeInfo(enzymeList2);
         
@@ -134,9 +134,9 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     public void testSaveAndDeleteRunsWithEnzymeInfoAndScans() {
         
         // load some enzymes from the database
-        MsEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
-        MsEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
-        MsEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
+        MsEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
+        MsEnzyme enzyme2 = enzymeDao.loadEnzyme(2);
+        MsEnzyme enzyme3 = enzymeDao.loadEnzyme(3);
         
         assertNotNull(enzyme1);
         assertNotNull(enzyme2);
@@ -144,7 +144,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         
         // create a run with enzyme information and save it
-        List <MsEnzyme> enzymeList1 = new ArrayList<MsEnzyme>(2);
+        List <MsEnzymeI> enzymeList1 = new ArrayList<MsEnzymeI>(2);
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
         MsRun run1 = createRunWEnzymeInfo(enzymeList1);
@@ -152,13 +152,13 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         
         // now read back the run and make sure it has the enzyme information
         MsRunDb runFromDb_1 = runDao.loadRun(runId_1);
-        List<MsEnzymeDb> enzymes = runFromDb_1.getEnzymeList();
+        List<MsEnzyme> enzymes = runFromDb_1.getEnzymeList();
         assertNotNull(enzymes);
         assertEquals(2, enzymes.size());
         
         
         // save another run 
-        List <MsEnzyme> enzymeList2 = new ArrayList<MsEnzyme>(1);
+        List <MsEnzymeI> enzymeList2 = new ArrayList<MsEnzymeI>(1);
         enzymeList2.add(enzyme3);
         MsRun run2 = createRunWEnzymeInfo(enzymeList2);
         int runId_2 = runDao.saveRun(run2, "remoteServer", "remoteDirectory");
@@ -263,7 +263,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         private String instrumentSN;
         private String instrumentModel;
         private String fileName;
-        private List<MsEnzyme> enzymeList = new ArrayList<MsEnzyme>();
+        private List<MsEnzymeI> enzymeList = new ArrayList<MsEnzymeI>();
         private String dataType;
         private String creationDate;
         private String conversionSWVersion;
@@ -296,7 +296,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
             this.fileName = fileName;
         }
 
-        public void setEnzymeList(List<MsEnzyme> enzymeList) {
+        public void setEnzymeList(List<MsEnzymeI> enzymeList) {
             this.enzymeList = enzymeList;
         }
 
@@ -356,7 +356,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
             return this.dataType;
         }
 
-        public List<MsEnzyme> getEnzymeList() {
+        public List<MsEnzymeI> getEnzymeList() {
             return this.enzymeList;
         }
 

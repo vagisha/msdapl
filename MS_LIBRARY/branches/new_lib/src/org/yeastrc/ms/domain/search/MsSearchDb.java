@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.search;
 import java.sql.Date;
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzyme;
 
 /**
  * 
@@ -54,5 +54,5 @@ public interface MsSearchDb extends MsSearchBase {
     /**
      * @return the enzymes used for this search
      */
-    public abstract List<MsEnzymeDb> getEnzymeList();
+    public abstract List<MsEnzyme> getEnzymeList();
 }

@@ -6,8 +6,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeI.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
@@ -68,7 +68,7 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        MsEnzyme enzyme = parser.getSearchEnzyme();
+        MsEnzymeI enzyme = parser.getSearchEnzyme();
         assertNotNull(enzyme);
         assertEquals("trypsin", enzyme.getName());
         assertEquals(Sense.CTERM, enzyme.getSense());

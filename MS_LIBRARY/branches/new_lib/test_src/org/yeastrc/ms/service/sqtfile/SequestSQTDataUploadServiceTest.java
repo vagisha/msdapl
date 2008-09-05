@@ -11,8 +11,8 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl.MsResultTerminalModSqlMapParam;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
-import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
 import org.yeastrc.ms.domain.search.MsResultDynamicResidueModDb;
 import org.yeastrc.ms.domain.search.MsResultDynamicTerminalModDb;
@@ -93,7 +93,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals("remoteServer", dbs.get(0).getServerAddress());
         
         // check search enzymes
-        List<MsEnzymeDb> enzymes = search.getEnzymeList();
+        List<MsEnzyme> enzymes = search.getEnzymeList();
         assertEquals(1, enzymes.size());
         assertEquals("Elastase/Tryp/Chymo", enzymes.get(0).getName());
         assertEquals(Sense.NTERM, enzymes.get(0).getSense());

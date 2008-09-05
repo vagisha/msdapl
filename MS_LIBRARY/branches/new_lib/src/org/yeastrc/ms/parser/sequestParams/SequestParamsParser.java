@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.impl.MsEnzymeInImpl;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
@@ -42,7 +44,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     private boolean reportEvalue = false;
     private Database database;
     private String enzymeCode;
-    private MsEnzyme enzyme;
+    private MsEnzymeI enzyme;
     private List<MsResidueModification> staticResidueModifications;
     private List<MsTerminalModification> staticTerminalModifications;
     private List<MsResidueModification> dynamicResidueModifications;
@@ -64,7 +66,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return database;
     }
 
-    public MsEnzyme getSearchEnzyme() {
+    public MsEnzymeI getSearchEnzyme() {
         return enzyme;
     }
 
@@ -174,7 +176,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             // if we don't get a match it means we are no longer looking at enzymes. 
             if (!m.matches())
                 break;
-            MsEnzyme enz = matchEnzyme(m, this.enzymeCode);
+            MsEnzymeI enz = matchEnzyme(m, this.enzymeCode);
             if (enz != null) {
                 this.enzyme = enz;
                 break;
@@ -182,7 +184,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         }
     }
     
-    MsEnzyme matchEnzyme(Matcher m, String enzymeCode) {
+    MsEnzymeI matchEnzyme(Matcher m, String enzymeCode) {
         String enzCode = m.group(1);
         if (!enzCode.equals(enzymeCode))
             return null;
@@ -190,13 +192,13 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         final String sense = m.group(3);
         final String cut = m.group(4);
         final String noCut = m.group(5);
-        return new MsEnzyme() {
-            public String getCut() {return cut;}
-            public String getDescription() {return null;}
-            public String getName() {return enzName;}
-            public String getNocut() {return noCut;}
-            public Sense getSense() {return Sense.instance(Short.parseShort(sense));
-            }};
+        MsEnzymeInImpl enz = new MsEnzymeInImpl();
+        enz.setCut(cut);
+        enz.setDescription(null);
+        enz.setName(enzName);
+        enz.setNocut(noCut);
+        enz.setSense(Sense.instance(Short.parseShort(sense)));
+        return enz;
     }
 
     private void addParam(SequestParam param) throws DataProviderException {

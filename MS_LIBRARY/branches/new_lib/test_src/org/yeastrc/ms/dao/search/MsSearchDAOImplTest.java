@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
@@ -78,7 +78,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         private List<MsTerminalModification> staticTerminalModifications = new ArrayList<MsTerminalModification>();
         
         private List<MsSearchDatabase> searchDatabases = new ArrayList<MsSearchDatabase>();
-        private List<MsEnzyme> enzymes = new ArrayList<MsEnzyme>();
+        private List<MsEnzymeI> enzymes = new ArrayList<MsEnzymeI>();
         private String searchEngineVersion;
         private SearchProgram searchProgram;
         private Date searchDate;
@@ -118,11 +118,11 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
             this.dynamicResidueModifications = dynaResMods;
         }
 
-        public List<MsEnzyme> getEnzymeList() {
+        public List<MsEnzymeI> getEnzymeList() {
             return enzymes;
         }
         
-        public void setEnzymeList(List<MsEnzyme> enzymeList) {
+        public void setEnzymeList(List<MsEnzymeI> enzymeList) {
             this.enzymes = enzymeList;
         }
 

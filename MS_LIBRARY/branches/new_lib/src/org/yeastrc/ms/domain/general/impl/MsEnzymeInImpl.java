@@ -1,10 +1,19 @@
+/**
+ * Enzyme.java
+ * @author Vagisha Sharma
+ * Aug 25, 2008
+ * @version 1.0
+ */
 package org.yeastrc.ms.domain.general.impl;
 
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
-public class MsEnzymeDbImpl implements MsEnzymeDb {
+/**
+ * 
+ */
+public class MsEnzymeInImpl implements MsEnzymeI {
 
-    private int id; // id (database) from the enzyme
     private String name; // Name of the enzyme
     private Sense sense = Sense.UNKNOWN; // terminal at which the enzyme cleaves.
     private String cut; // amino acid residue(s) where the enzyme cleaves
@@ -12,18 +21,6 @@ public class MsEnzymeDbImpl implements MsEnzymeDb {
     private String description; 
     
     
-    /**
-     * @return the id
-     */
-    public int getId() {
-        return id;
-    }
-    /**
-     * @param id the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
     /**
      * @return the name
      */
@@ -84,4 +81,5 @@ public class MsEnzymeDbImpl implements MsEnzymeDb {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }

@@ -15,7 +15,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -35,17 +35,17 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
     //------------------------------------------------------------------------------------------------
     // SAVE, LOAD and DELETE enzymes (msDigestionEnzyme table)
     //------------------------------------------------------------------------------------------------
-    public MsEnzymeDb loadEnzyme(int enzymeId) {
-        return (MsEnzymeDb) queryForObject("MsEnzyme.selectEnzymeById", enzymeId);
+    public MsEnzyme loadEnzyme(int enzymeId) {
+        return (MsEnzyme) queryForObject("MsEnzyme.selectEnzymeById", enzymeId);
     }
 
-    public List<MsEnzymeDb> loadEnzymes(String name) {
+    public List<MsEnzyme> loadEnzymes(String name) {
         Map<String, Object> properties = new HashMap<String, Object>(1);
         properties.put("name", name);
         return loadEnzymes(properties);
     }
 
-    public List<MsEnzymeDb> loadEnzymes(String name, Sense sense, String cut,
+    public List<MsEnzyme> loadEnzymes(String name, Sense sense, String cut,
             String nocut) {
         Map<String, Object> map = makeParamMap(name, sense, cut, nocut);
         return loadEnzymes(map);
@@ -66,17 +66,17 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
         return (sense.getShortVal());
     }
     
-    private List<MsEnzymeDb> loadEnzymes(Map<String, Object> properties) {
+    private List<MsEnzyme> loadEnzymes(Map<String, Object> properties) {
         if (properties == null || properties.size() == 0)
             return null;
         return queryForList("MsEnzyme.selectEnzymes", properties);
     }
     
-    public int saveEnzyme(MsEnzyme enzyme) {
+    public int saveEnzyme(MsEnzymeI enzyme) {
         return saveEnzyme(enzyme, Arrays.asList(EnzymeProperties.values()));
     }
     
-    public int saveEnzyme(MsEnzyme enzyme, List<EnzymeProperties> params) {
+    public int saveEnzyme(MsEnzymeI enzyme, List<EnzymeProperties> params) {
         
         String name = null,  cut = null,  nocut = null;
         Sense sense = null;
@@ -93,7 +93,7 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
         
         Map<String, Object> properties = makeParamMap(name, sense, cut, nocut);
         
-        List<MsEnzymeDb> enzymesFromDb = loadEnzymes(properties);
+        List<MsEnzyme> enzymesFromDb = loadEnzymes(properties);
         // if we found an enzyme return its database id
         if (enzymesFromDb.size() > 0)   
             return enzymesFromDb.get(0).getId();
@@ -109,16 +109,16 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
     //------------------------------------------------------------------------------------------------
     // Enzymes for a RUN
     //------------------------------------------------------------------------------------------------
-    public List<MsEnzymeDb> loadEnzymesForRun(int runId) {
+    public List<MsEnzyme> loadEnzymesForRun(int runId) {
         return queryForList("MsEnzyme.selectEnzymesForRun", runId);
     }
     
-    public int saveEnzymeforRun(MsEnzyme enzyme, int runId) {
+    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId) {
         
         return saveEnzymeforRun(enzyme, runId, Arrays.asList(EnzymeProperties.values()));
     }
     
-    public int saveEnzymeforRun(MsEnzyme enzyme, int runId, List<EnzymeProperties> properties) {
+    public int saveEnzymeforRun(MsEnzymeI enzyme, int runId, List<EnzymeProperties> properties) {
         
         int enzymeId = saveEnzyme(enzyme, properties);
         
@@ -147,17 +147,17 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
     // Enzymes for a SEARCH
     //------------------------------------------------------------------------------------------------
     @Override
-    public List<MsEnzymeDb> loadEnzymesForSearch(int searchId) {
+    public List<MsEnzyme> loadEnzymesForSearch(int searchId) {
         return queryForList("MsEnzyme.selectEnzymesForSearch", searchId);
     }
     
     @Override
-    public int saveEnzymeforSearch(MsEnzyme enzyme, int searchId) {
+    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId) {
         return saveEnzymeforSearch(enzyme, searchId, Arrays.asList(EnzymeProperties.values()));
     }
 
     @Override
-    public int saveEnzymeforSearch(MsEnzyme enzyme, int searchId,
+    public int saveEnzymeforSearch(MsEnzymeI enzyme, int searchId,
             List<EnzymeProperties> properties) {
         int enzymeId = saveEnzyme(enzyme, properties);
         

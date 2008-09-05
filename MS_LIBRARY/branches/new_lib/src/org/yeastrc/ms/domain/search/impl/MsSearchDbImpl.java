@@ -10,7 +10,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModificationDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 import org.yeastrc.ms.domain.search.MsSearchDb;
@@ -41,7 +41,7 @@ public class MsSearchDbImpl implements MsSearchDb {
     
     private List<? super MsTerminalModificationDb> dynamicTerminalMods;
     
-    private List<? super MsEnzymeDb> enzymes;
+    private List<? super MsEnzyme> enzymes;
     
     public MsSearchDbImpl() {
         searchDatabases = new ArrayList<MsSearchDatabaseDb>();
@@ -208,15 +208,15 @@ public class MsSearchDbImpl implements MsSearchDb {
     // enzymes used for the search
     //------------------------------------------------------------------------------------------------------
     @Override
-    public List<MsEnzymeDb> getEnzymeList() {
-        return (List<MsEnzymeDb>) enzymes;
+    public List<MsEnzyme> getEnzymeList() {
+        return (List<MsEnzyme>) enzymes;
     }
     
-    public void addEnzyme(MsEnzymeDb enzyme) {
+    public void addEnzyme(MsEnzyme enzyme) {
         enzymes.add(enzyme);
     }
     
-    public void setEnzymeList(List<? super MsEnzymeDb> enzymes) {
+    public void setEnzymeList(List<? super MsEnzyme> enzymes) {
         this.enzymes = enzymes;
     }
 }

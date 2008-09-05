@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
+import org.yeastrc.ms.domain.general.MsEnzymeI.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
@@ -71,7 +71,7 @@ public class SequestParamsParserTest extends TestCase {
         String line = "0.  No_Enzyme              0      -           -";
         Matcher m = SequestParamsParser.enzymePattern.matcher(line);
         assertTrue(m.matches());
-        MsEnzyme enzyme = parser.matchEnzyme(m, "1");
+        MsEnzymeI enzyme = parser.matchEnzyme(m, "1");
         assertNull(enzyme);
         enzyme = parser.matchEnzyme(m, "0");
         assertNotNull(enzyme);
@@ -214,7 +214,7 @@ public class SequestParamsParserTest extends TestCase {
             assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", db.getServerPath());
 
             // enzyme
-            MsEnzyme enzyme = parser.getSearchEnzyme();
+            MsEnzymeI enzyme = parser.getSearchEnzyme();
             assertNotNull(enzyme);
             assertEquals("No_Enzyme", enzyme.getName());
             assertNull(enzyme.getDescription());

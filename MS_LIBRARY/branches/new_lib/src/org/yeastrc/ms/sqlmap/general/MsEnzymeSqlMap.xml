@@ -3,12 +3,12 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsEnzyme"> 
 
-	<typeAlias alias="MsEnzymeDb" type="org.yeastrc.ms.domain.general.impl.MsEnzymeDbImpl"/>
-	<typeAlias alias="MsEnzyme" type="org.yeastrc.ms.domain.general.MsEnzyme"/>
+	<typeAlias alias="MsEnzymeOut" type="org.yeastrc.ms.domain.general.impl.MsEnzymeImpl"/>
+	<typeAlias alias="MsEnzymeIn" type="org.yeastrc.ms.domain.general.MsEnzymeI"/>
 	<typeAlias alias="SenseHandler" type="org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl$SenseTypeHandler"/>
 	
 	
-	<resultMap class="MsEnzymeDb" id="msEnzymeResult">
+	<resultMap class="MsEnzymeOut" id="msEnzymeResult">
 		<result property="id" column="id" />
 		<result property="name" column="name" />
 		<result property="sense" column="sense" typeHandler="SenseHandler"/>
@@ -17,7 +17,7 @@
 		<result property="description" column="description" />
 	</resultMap>
 	
-	<parameterMap class="MsEnzyme" id="msEnzymeParam">
+	<parameterMap class="MsEnzymeIn" id="msEnzymeParam">
 		<parameter property="name" jdbcType="VARCHAR" />
 		<parameter property="sense" jdbcType="SMALLINT" typeHandler="SenseHandler" />
 		<parameter property="cut" jdbcType="VARCHAR"/>	

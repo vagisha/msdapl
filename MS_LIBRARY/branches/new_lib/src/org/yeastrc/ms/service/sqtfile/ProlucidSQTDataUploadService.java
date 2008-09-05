@@ -16,7 +16,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
-import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
@@ -235,11 +235,11 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             @Override
             public List<MsTerminalModification> getDynamicTerminalMods() {return parser.getDynamicTerminalMods();}
             @Override
-            public List<MsEnzyme> getEnzymeList() {
+            public List<MsEnzymeI> getEnzymeList() {
                 if (parser.isEnzymeUsedForSearch())
-                    return Arrays.asList(new MsEnzyme[]{parser.getSearchEnzyme()});
+                    return Arrays.asList(new MsEnzymeI[]{parser.getSearchEnzyme()});
                 else 
-                    return new ArrayList<MsEnzyme>(0);
+                    return new ArrayList<MsEnzymeI>(0);
             }
             @Override
             public List<MsSearchDatabase> getSearchDatabases() {return Arrays.asList(new MsSearchDatabase[]{parser.getSearchDatabase()});}

@@ -13,8 +13,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.impl.MsEnzymeInImpl;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
@@ -23,7 +24,6 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.Database;
-import org.yeastrc.ms.parser.Enzyme;
 import org.yeastrc.ms.parser.ResidueModification;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
 import org.yeastrc.ms.parser.TerminalModification;
@@ -41,7 +41,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     private Score deltaCNColumnScore;
 
     private Database database;
-    private MsEnzyme enzyme;
+    private MsEnzymeI enzyme;
     private List<MsResidueModification> staticResidueModifications;
     private List<MsTerminalModification> staticTerminalModifications;
     private List<MsResidueModification> dynamicResidueModifications;
@@ -55,7 +55,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return database;
     }
 
-    public MsEnzyme getSearchEnzyme() {
+    public MsEnzymeI getSearchEnzyme() {
         return enzyme;
     }
 
@@ -418,7 +418,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         if (name == null || sense == null || cut.length() == 0) {
             throw new DataProviderException("Invalid enzyme information. One or more required values (name, type, residue) are missing");
         }
-        Enzyme e = new Enzyme();
+        MsEnzymeInImpl e = new MsEnzymeInImpl();
         e.setName(name);
         e.setCut(cut);
         e.setSense(sense);

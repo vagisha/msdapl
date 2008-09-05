@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.run.MsRunDAOImplTest.MsRunTest;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Field;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
@@ -66,14 +66,14 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
         MS2RunTest run = super.makeMS2Run(fileName);
         if (addEnzymes) {
             // load some enzymes from the database
-            MsEnzymeDb enzyme1 = enzymeDao.loadEnzyme(1);
-            MsEnzymeDb enzyme2 = enzymeDao.loadEnzyme(2);
-            MsEnzymeDb enzyme3 = enzymeDao.loadEnzyme(3);
+            MsEnzyme enzyme1 = enzymeDao.loadEnzyme(1);
+            MsEnzyme enzyme2 = enzymeDao.loadEnzyme(2);
+            MsEnzyme enzyme3 = enzymeDao.loadEnzyme(3);
             
             assertNotNull(enzyme1);
             assertNotNull(enzyme2);
             assertNotNull(enzyme3);
-            List<MsEnzyme> enzymes = new ArrayList<MsEnzyme>(3);
+            List<MsEnzymeI> enzymes = new ArrayList<MsEnzymeI>(3);
             enzymes.add(enzyme1);
             enzymes.add(enzyme2);
             enzymes.add(enzyme3);

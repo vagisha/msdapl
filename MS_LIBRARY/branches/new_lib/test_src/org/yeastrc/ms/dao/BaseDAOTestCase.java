@@ -38,8 +38,9 @@ import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeDb;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.impl.MsEnzymeInImpl;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
@@ -287,9 +288,9 @@ public class BaseDAOTestCase extends TestCase {
         }
 
         if (addEnzymes) {
-            MsEnzyme enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
-            MsEnzyme enzyme2 = makeDigestionEnzyme("Trypsin", null, null, null);
-            search.setEnzymeList(Arrays.asList(new MsEnzyme[]{enzyme1, enzyme2}));
+            MsEnzymeI enzyme1 = makeDigestionEnzyme("TestEnzyme", Sense.UNKNOWN, null, null);
+            MsEnzymeI enzyme2 = makeDigestionEnzyme("Trypsin", null, null, null);
+            search.setEnzymeList(Arrays.asList(new MsEnzymeI[]{enzyme1, enzyme2}));
         }
         return search;
     }
@@ -373,11 +374,16 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     // ENZYME
     //---------------------------------------------------------------------------------
-    protected MsEnzyme makeDigestionEnzyme(String name, Sense sense,String cut, String nocut) {
-        return new MsEnzymeDAOImplTest.MsEnzymeTest(name, sense, cut, nocut);
+    protected MsEnzymeI makeDigestionEnzyme(String name, Sense sense,String cut, String nocut) {
+        MsEnzymeInImpl enzyme = new MsEnzymeInImpl();
+        enzyme.setName(name);
+        enzyme.setSense(sense);
+        enzyme.setCut(cut);
+        enzyme.setNocut(nocut);
+        return enzyme;
     }
 
-    protected void checkEnzyme(MsEnzyme inputEnzyme, MsEnzymeDb outputEnzyme) {
+    protected void checkEnzyme(MsEnzymeI inputEnzyme, MsEnzyme outputEnzyme) {
         assertEquals(inputEnzyme.getName(), outputEnzyme.getName());
         assertEquals(inputEnzyme.getSense(), outputEnzyme.getSense());
         assertEquals(inputEnzyme.getCut(), outputEnzyme.getCut());
@@ -449,7 +455,7 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     // RUN
     //---------------------------------------------------------------------------------
-    protected MsRun createRunWEnzymeInfo(List<MsEnzyme> enzymes) {
+    protected MsRun createRunWEnzymeInfo(List<MsEnzymeI> enzymes) {
         MsRunTest run = createDefaultRun();
         run.setEnzymeList(enzymes);
         return run;

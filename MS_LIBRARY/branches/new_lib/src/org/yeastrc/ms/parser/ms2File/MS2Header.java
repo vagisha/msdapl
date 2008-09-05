@@ -9,7 +9,7 @@ package org.yeastrc.ms.parser.ms2File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzyme;
+import org.yeastrc.ms.domain.general.MsEnzymeI;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2Field;
@@ -152,8 +152,8 @@ public class MS2Header implements MS2Run {
     }
 
     // MS2 files don't have any enzyme information
-    public List<MsEnzyme> getEnzymeList() {
-        return new ArrayList<MsEnzyme>(0);
+    public List<MsEnzymeI> getEnzymeList() {
+        return new ArrayList<MsEnzymeI>(0);
     }
 
     public String getInstrumentVendor() {
