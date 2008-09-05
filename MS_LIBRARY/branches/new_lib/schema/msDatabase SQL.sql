@@ -15,7 +15,6 @@ CREATE TABLE msRun (
    instrumentVendor VARCHAR(255),
    instrumentType VARCHAR(255),
    instrumentSN VARCHAR(255),
-   dataType VARCHAR(255),
    acquisitionMethod VARCHAR(255),
    originalFileType VARCHAR(10),
    separateDigestion ENUM('T','F'),
@@ -133,6 +132,15 @@ CREATE TABLE SQTParams (
 );
 ALTER TABLE SQTParams ADD INDEX(searchID,param);
 
+CREATE TABLE ProLuCIDParams (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   searchID INT UNSIGNED NOT NULL,
+   elementName VARCHAR(255) NOT NULL,
+   value TEXT,
+   parentID INT UNSIGNED
+);
+ALTER TABLE ProLuCIDParams ADD INDEX(searchID,elementName);
+
 
 CREATE TABLE msRunSearch (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -206,8 +214,7 @@ CREATE TABLE msSequenceDatabaseDetail (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    serverAddress VARCHAR(100),
    serverPath VARCHAR(500),
-   sequenceLength INT UNSIGNED,
-   proteinCount INT UNSIGNED
+   sequenceDatabaseID INT UNSIGNED NOT NULL
 );
 
 CREATE TABLE msSearchDatabase (
@@ -275,7 +282,7 @@ CREATE TABLE SQTSearchResult (
    spRank INT UNSIGNED NOT NULL,
    deltaCN DECIMAL(10,5) NOT NULL,
    XCorr DECIMAL(10,5) NOT NULL,
-   sp DECIMAL(10,5) NOT NULL,
+   sp DECIMAL(10,5),
    calculatedMass DECIMAL(18,9),
    matchingIons INT UNSIGNED,
    predictedIons INT UNSIGNED,
@@ -287,6 +294,27 @@ ALTER TABLE SQTSearchResult ADD INDEX(deltaCN);
 ALTER TABLE SQTSearchResult ADD INDEX(XCorr);
 ALTER TABLE SQTSearchResult ADD INDEX(sp);
 
+CREATE TABLE ProLuCIDSearchResult (
+   resultID INT UNSIGNED NOT NULL PRIMARY KEY,
+   XCorrRank INT UNSIGNED NOT NULL,
+   spRank INT UNSIGNED NOT NULL,
+   deltaCN DECIMAL(10,5),
+   ZScore DOUBLE,
+   XCorr DECIMAL(10,5),
+   binomialProbability DOUBLE UNSIGNED,
+   sp DECIMAL(10,5),
+   calculatedMass DECIMAL(18,9),
+   matchingIons INT UNSIGNED,
+   predictedIons INT UNSIGNED
+);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(XCorrRank);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(spRank);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(deltaCN);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(ZScore);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(XCorr);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(binomialProbability);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(sp);
+
 
 # TRIGGERS TO ENSURE CASCADING DELETES
 
@@ -296,6 +324,7 @@ CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
  BEGIN
    DELETE FROM msProteinMatch WHERE resultID = OLD.id;
    DELETE FROM SQTSearchResult WHERE resultID = OLD.id;
+   DELETE FROM ProLuCIDSearchResult WHERE resultID = OLD.id;
    DELETE FROM msDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM msTerminalDynamicModResult WHERE resultID = OLD.id;
  END;
@@ -391,6 +420,7 @@ CREATE TRIGGER msSearch_bdelete BEFORE DELETE ON msSearch
  BEGIN
    DELETE FROM msSearchDatabase WHERE searchID = OLD.id;
    DELETE FROM SQTParams WHERE searchID = OLD.id;
+   DELETE FROM ProLuCIDParams WHERE searchID = OLD.id;
    DELETE FROM msSearchEnzyme WHERE searchID = OLD.id;
    DELETE FROM msRunSearch WHERE searchID = OLD.id;
    DELETE FROM msSearchStaticMod WHERE searchID = OLD.id;
