@@ -253,17 +253,21 @@ public class BaseDAOTestCase extends TestCase {
         return mod;
     }
     
-    protected MsTerminalModificationIn makeStaticTerminalMod(final Terminal term, final String modMass, final char modSymbol) {
+    protected MsTerminalModificationIn makeStaticTerminalMod(final Terminal term, final String modMass) {
+        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        if (modMass != null)
+            mod.setModificationMass(new BigDecimal(modMass));
+        mod.setModifiedTerminal(term);
+        return mod;
+    }
+
+    protected MsTerminalModificationIn makeDynamicTerminalMod(final Terminal term, final String modMass, final char modSymbol) {
         MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
         if (modMass != null)
             mod.setModificationMass(new BigDecimal(modMass));
         mod.setModifiedTerminal(term);
         mod.setModificationSymbol(modSymbol);
         return mod;
-    }
-
-    protected MsTerminalModificationIn makeDynamicTerminalMod(final Terminal term, final String modMass, final char modSymbol) {
-        return makeStaticTerminalMod(term, modMass, modSymbol);
     }
     
     protected MsResultResidueModIn makeResultDynamicResidueMod(final char modChar, final String modMass,
