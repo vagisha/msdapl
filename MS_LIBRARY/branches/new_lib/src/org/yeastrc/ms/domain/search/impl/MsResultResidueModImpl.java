@@ -10,7 +10,7 @@ public class MsResultResidueModImpl implements MsResultDynamicResidueMod {
 
     private int modId;
     private int resultId;
-    private int modPosition;
+    private int modPosition = -1;
     private char modifiedResidue = EMPTY_CHAR;
     private BigDecimal modificationMass;
     private char modificationSymbol = EMPTY_CHAR;

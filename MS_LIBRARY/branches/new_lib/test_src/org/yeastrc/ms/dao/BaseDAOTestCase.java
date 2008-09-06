@@ -239,7 +239,8 @@ public class BaseDAOTestCase extends TestCase {
     protected MsResidueModificationIn makeStaticResidueMod(final char modChar, final String modMass) {
         MsResidueModificationImpl mod = new MsResidueModificationImpl();
         mod.setModifiedResidue(modChar);
-        mod.setModificationMass(new BigDecimal(modMass));
+        if (modMass != null)
+            mod.setModificationMass(new BigDecimal(modMass));
         return mod;
     }
 
@@ -247,13 +248,15 @@ public class BaseDAOTestCase extends TestCase {
         MsResidueModificationImpl mod = new MsResidueModificationImpl();
         mod.setModifiedResidue(modChar);
         mod.setModificationSymbol(modSymbol);
-        mod.setModificationMass(new BigDecimal(modMass));
+        if (modMass != null)
+            mod.setModificationMass(new BigDecimal(modMass));
         return mod;
     }
     
     protected MsTerminalModificationIn makeStaticTerminalMod(final Terminal term, final String modMass, final char modSymbol) {
         MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
-        mod.setModificationMass(new BigDecimal(modMass));
+        if (modMass != null)
+            mod.setModificationMass(new BigDecimal(modMass));
         mod.setModifiedTerminal(term);
         mod.setModificationSymbol(modSymbol);
         return mod;
@@ -266,7 +269,8 @@ public class BaseDAOTestCase extends TestCase {
     protected MsResultResidueModIn makeResultDynamicResidueMod(final char modChar, final String modMass,
             final char modSymbol, final int modPos) {
         MsResultResidueModImpl mod = new MsResultResidueModImpl();
-        mod.setModificationMass(new BigDecimal(modMass));
+        if (modMass != null)
+            mod.setModificationMass(new BigDecimal(modMass));
         mod.setModificationSymbol(modSymbol);
         mod.setModifiedPosition(modPos);
         mod.setModifiedResidue(modChar);

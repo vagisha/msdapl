@@ -288,7 +288,7 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         public void setParameter(ParameterSetter setter, Object parameter)
                 throws SQLException {
             Character status = (Character) parameter;
-            if (status == null)
+            if (status == null || status.charValue() == 0)
                 setter.setNull(java.sql.Types.CHAR);
             else
                 setter.setString(status.toString());
@@ -300,10 +300,10 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         
         private Character stringToChar(String charStr) {
             // if charStr is NULL the value (\u0000) will be used for modificationSymbol
-            if (charStr == null || charStr.length() == 0)
+            if (charStr == null)
                 return Character.valueOf('\u0000');
-            if (charStr.length() > 1)
-                throw new IllegalArgumentException("Cannot convert "+charStr+" to Character");
+            if (charStr.length() != 1)
+                throw new IllegalArgumentException("Cannot convert \""+charStr+"\" to Character");
             return Character.valueOf(charStr.charAt(0));
         }
     }
