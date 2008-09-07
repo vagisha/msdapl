@@ -31,7 +31,7 @@ import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
@@ -137,8 +137,8 @@ public class DbToSqtFileConverter {
             peptResult.setEvalue(data.getEvalue());
             
             
-            List<MsSearchResultProteinDb> proteins = getProteinsForResultId(resultId);
-            for (MsSearchResultProteinDb pr: proteins) {
+            List<MsSearchResultProtein> proteins = getProteinsForResultId(resultId);
+            for (MsSearchResultProtein pr: proteins) {
                 peptResult.addMatchingLocus(NrSeqLookupUtil.getProteinAccession(searchDatabaseId, pr.getProteinId()), null);
             }
             currScan.addPeptideResult(peptResult);
@@ -150,7 +150,7 @@ public class DbToSqtFileConverter {
         }
     }
 
-    private List<MsSearchResultProteinDb> getProteinsForResultId(Integer resultId) {
+    private List<MsSearchResultProtein> getProteinsForResultId(Integer resultId) {
         MsSearchResultProteinDAO proteinDao = DAOFactory.instance().getMsProteinMatchDAO();
         return proteinDao.loadResultProteins(resultId);
     }

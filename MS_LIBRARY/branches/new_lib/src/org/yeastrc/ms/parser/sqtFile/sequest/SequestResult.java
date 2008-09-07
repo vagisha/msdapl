@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
@@ -134,7 +134,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     
         buf.append("\n");
     
-        for (MsSearchResultProtein locus: getProteinMatchList()) {
+        for (MsSearchResultProteinIn locus: getProteinMatchList()) {
             buf.append(locus.toString());
             buf.append("\n");
         }

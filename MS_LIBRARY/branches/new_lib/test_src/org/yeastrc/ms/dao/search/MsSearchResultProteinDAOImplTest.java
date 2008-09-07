@@ -6,19 +6,19 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 
 public class MsSearchResultProteinDAOImplTest extends BaseDAOTestCase {
 
 
-    private MsSearchResultProtein match1_1;
-    private MsSearchResultProtein match1_2;
-    private MsSearchResultProtein match1_3;
+    private MsSearchResultProteinIn match1_1;
+    private MsSearchResultProteinIn match1_2;
+    private MsSearchResultProteinIn match1_3;
     
-    private MsSearchResultProtein match2_1;
-    private MsSearchResultProtein match2_2;
-    private MsSearchResultProtein match2_3;
+    private MsSearchResultProteinIn match2_1;
+    private MsSearchResultProteinIn match2_2;
+    private MsSearchResultProteinIn match2_3;
     
     private static final String acc1 = "accession_string_1";
     private static final int prid1 = 25;
@@ -67,10 +67,10 @@ public class MsSearchResultProteinDAOImplTest extends BaseDAOTestCase {
            matchDao.save(match2_3, searchDb2, 2);
            
            // load them back
-           List<MsSearchResultProteinDb> result1_matchList = matchDao.loadResultProteins(1);
+           List<MsSearchResultProtein> result1_matchList = matchDao.loadResultProteins(1);
            assertEquals(3, result1_matchList.size());
            
-           List<MsSearchResultProteinDb> result2_matchList = matchDao.loadResultProteins(2);
+           List<MsSearchResultProtein> result2_matchList = matchDao.loadResultProteins(2);
            assertEquals(3, result2_matchList.size());
            
            // order results by proteinID
@@ -100,13 +100,13 @@ public class MsSearchResultProteinDAOImplTest extends BaseDAOTestCase {
            assertEquals(0, result2_matchList.size());
     }
     
-    private void compareMatches(String databaseName, int resultId, MsSearchResultProtein input, MsSearchResultProteinDb output) {
+    private void compareMatches(String databaseName, int resultId, MsSearchResultProteinIn input, MsSearchResultProtein output) {
         assertEquals(resultId, output.getResultId());
         assertEquals(input.getAccession(), NrSeqLookupUtil.getProteinAccession(NrSeqLookupUtil.getDatabaseId(databaseName), output.getProteinId()));
     }
     
-    private static final class MsProteinMatchComparator implements Comparator<MsSearchResultProteinDb> {
-        public int compare(MsSearchResultProteinDb o1, MsSearchResultProteinDb o2) {
+    private static final class MsProteinMatchComparator implements Comparator<MsSearchResultProtein> {
+        public int compare(MsSearchResultProtein o1, MsSearchResultProtein o2) {
             return new Integer(o1.getProteinId()).compareTo(new Integer(o2.getProteinId()));
         }
     }

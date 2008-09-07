@@ -15,7 +15,8 @@ import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
+import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -29,7 +30,7 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         super(sqlMap);
     }
 
-    public List<MsSearchResultProteinDb> loadResultProteins(int resultId) {
+    public List<MsSearchResultProtein> loadResultProteins(int resultId) {
         return queryForList("MsResultProtein.selectResultProteins", resultId);
     }
     
@@ -48,19 +49,19 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
     /**
      * @throws NrSeqLookupException if no matching id was found for the protein.
      */
-    public void save(MsSearchResultProtein resultProtein, String searchDbName, int resultId) {
+    public void save(MsSearchResultProteinIn resultProtein, String searchDbName, int resultId) {
         int proteinId = NrSeqLookupUtil.getProteinId(searchDbName, resultProtein.getAccession());
         if (proteinId == 0)
             throw new NrSeqLookupException(searchDbName, resultProtein.getAccession());
-        save("MsResultProtein.insert", new MsResultProteinSqlMapParam(resultId, proteinId));
+        save("MsResultProtein.insert", new MsSearchResultProteinBean(resultId, proteinId));
     }
     
     @Override
-    public void saveAll(List<MsSearchResultProteinDb> proteinMatchList) {
+    public void saveAll(List<MsSearchResultProtein> proteinMatchList) {
         if (proteinMatchList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (MsSearchResultProteinDb match: proteinMatchList) {
+        for (MsSearchResultProtein match: proteinMatchList) {
             values.append(",(");
             values.append(match.getResultId() == 0 ? "NULL" : match.getResultId());
             values.append(",");
@@ -74,21 +75,6 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
     
     public void delete(int resultId) {
         delete("MsResultProtein.deleteForResultId", resultId);
-    }
-   
-    public static final class MsResultProteinSqlMapParam implements MsSearchResultProteinDb {
-        private int resultId;
-        private int proteinId;
-        public MsResultProteinSqlMapParam(int resultId, int proteinId) {
-            this.resultId = resultId;
-            this.proteinId = proteinId;
-        }
-        public int getResultId() {
-            return resultId;
-        }
-        public int getProteinId() {
-            return proteinId;
-        }
     }
 }
 

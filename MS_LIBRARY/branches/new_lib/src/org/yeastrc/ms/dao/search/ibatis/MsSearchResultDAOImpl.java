@@ -13,7 +13,7 @@ import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
@@ -58,7 +58,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         int resultId = saveResultOnly(searchResult, runSearchId, scanId);
         
         // save any protein matches
-        for(MsSearchResultProtein protein: searchResult.getProteinMatchList()) {
+        for(MsSearchResultProteinIn protein: searchResult.getProteinMatchList()) {
             matchDao.save(protein, searchDbName, resultId);
         }
         

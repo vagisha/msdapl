@@ -6,13 +6,20 @@
  */
 package org.yeastrc.ms.domain.search.impl;
 
-import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 
 
-public class MsSearchResultProteinDbImpl implements MsSearchResultProteinDb {
+public class MsSearchResultProteinBean implements MsSearchResultProtein {
 
     private int resultId;
     private int proteinId; // database id of the protein (from NR_SEQ database)
+    
+    public MsSearchResultProteinBean() {}
+    
+    public MsSearchResultProteinBean(int resultId, int proteinId) {
+        this.resultId = resultId;
+        this.proteinId = proteinId;
+    }
     
     public int getResultId() {
         return resultId;
@@ -34,9 +41,9 @@ public class MsSearchResultProteinDbImpl implements MsSearchResultProteinDb {
     
     public boolean equals(Object obj) {
         if (obj == this)   return true;
-        if (!(obj instanceof MsSearchResultProteinDbImpl)) return false;
+        if (!(obj instanceof MsSearchResultProteinBean)) return false;
         
-        MsSearchResultProteinDbImpl that = (MsSearchResultProteinDbImpl) obj;
+        MsSearchResultProteinBean that = (MsSearchResultProteinBean) obj;
         return (this.proteinId == that.getProteinId() && 
                 this.resultId == that.getResultId());
     }

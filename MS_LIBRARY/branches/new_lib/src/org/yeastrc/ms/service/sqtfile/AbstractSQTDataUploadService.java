@@ -26,13 +26,13 @@ import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ResultModIdentifier;
 import org.yeastrc.ms.domain.search.ResultResidueModIdentifier;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl;
+import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinBean;
 import org.yeastrc.ms.domain.search.impl.ResultModIdentifierImpl;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIdentifierImpl;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
@@ -56,7 +56,7 @@ public abstract class AbstractSQTDataUploadService {
     static final int BUF_SIZE = 1000;
 
     // these are the things we will cache and do bulk-inserts
-    LinkedHashSet<MsSearchResultProteinDb> proteinMatchSet;
+    LinkedHashSet<MsSearchResultProtein> proteinMatchSet;
     List<ResultResidueModIdentifier> resultResidueModList;
     List<ResultModIdentifier> resultTerminalModList;
 
@@ -75,7 +75,7 @@ public abstract class AbstractSQTDataUploadService {
     int sequenceDatabaseId; // nrseq database id
     
     public AbstractSQTDataUploadService() {
-        this.proteinMatchSet = new LinkedHashSet<MsSearchResultProteinDb>(BUF_SIZE);
+        this.proteinMatchSet = new LinkedHashSet<MsSearchResultProtein>(BUF_SIZE);
         this.resultResidueModList = new ArrayList<ResultResidueModIdentifier>(BUF_SIZE);
         this.resultTerminalModList = new ArrayList<ResultModIdentifier>(BUF_SIZE);
         this.uploadExceptionList = new ArrayList<UploadException>();
@@ -336,7 +336,7 @@ public abstract class AbstractSQTDataUploadService {
             uploadProteinMatchBuffer();
         }
         // add the protein matches for this result to the cache
-        for (MsSearchResultProtein match: result.getProteinMatchList()) {
+        for (MsSearchResultProteinIn match: result.getProteinMatchList()) {
             int proteinId = NrSeqLookupUtil.getProteinId(databaseId, match.getAccession());
             if (proteinId == 0) {
                 // try again
@@ -360,7 +360,7 @@ public abstract class AbstractSQTDataUploadService {
             }
             
             // NOTE: we are using a Set for the proteinMatches.  ONLY UNIQUE ENTRIES WILL BE ADDED.
-            MsSearchResultProteinDbImpl prMatch = new MsSearchResultProteinDbImpl();
+            MsSearchResultProteinBean prMatch = new MsSearchResultProteinBean();
             prMatch.setProteinId(proteinId);
             prMatch.setResultId(resultId);
             proteinMatchSet.add(prMatch);
@@ -369,7 +369,7 @@ public abstract class AbstractSQTDataUploadService {
     
     private void uploadProteinMatchBuffer() {
         MsSearchResultProteinDAO matchDao = daoFactory.getMsProteinMatchDAO();
-        List<MsSearchResultProteinDb> list = new ArrayList<MsSearchResultProteinDb>(proteinMatchSet.size());
+        List<MsSearchResultProtein> list = new ArrayList<MsSearchResultProtein>(proteinMatchSet.size());
         list.addAll(proteinMatchSet);
         matchDao.saveAll(list);
         proteinMatchSet.clear();

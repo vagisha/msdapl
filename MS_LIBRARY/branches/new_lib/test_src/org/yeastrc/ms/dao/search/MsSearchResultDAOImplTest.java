@@ -11,7 +11,7 @@ import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
@@ -143,7 +143,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
     
     protected void addProteinMatches(MsSearchResultTest result) {
 
-        List<MsSearchResultProtein> matchProteins = new ArrayList<MsSearchResultProtein>(2);
+        List<MsSearchResultProteinIn> matchProteins = new ArrayList<MsSearchResultProteinIn>(2);
       
         matchProteins.add(makeResultProtein("accession_string_1", null));
 
@@ -156,7 +156,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
 
         private ValidationStatus validationStatus;
         private MsSearchResultPeptide resultPeptide;
-        private List<MsSearchResultProtein> proteinMatchList = new ArrayList<MsSearchResultProtein>();
+        private List<MsSearchResultProteinIn> proteinMatchList = new ArrayList<MsSearchResultProteinIn>();
         private int charge;
         private int scanNumber;
 
@@ -165,7 +165,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
             return charge;
         }
 
-        public List<MsSearchResultProtein> getProteinMatchList() {
+        public List<MsSearchResultProteinIn> getProteinMatchList() {
             return proteinMatchList;
         }
 
@@ -185,7 +185,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
             this.resultPeptide = resultPeptide;
         }
 
-        public void setProteinMatchList(List<MsSearchResultProtein> proteinMatchList) {
+        public void setProteinMatchList(List<MsSearchResultProteinIn> proteinMatchList) {
             this.proteinMatchList = proteinMatchList;
         }
 

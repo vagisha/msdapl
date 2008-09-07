@@ -1,16 +1,24 @@
+/**
+ * MsSearchResultProteinDb.java
+ * @author Vagisha Sharma
+ * Jul 11, 2008
+ * @version 1.0
+ */
 package org.yeastrc.ms.domain.search;
 
+
+/**
+ * 
+ */
 public interface MsSearchResultProtein {
 
-
     /**
-     * @param the accession
+     * @return database id of the search result this protein matches.
      */
-    public abstract String getAccession();
+    public abstract int getResultId();
     
     /**
-     * @return the description
+     * @return database id of the protein (from the NR_SEQ database).
      */
-    public abstract String getDescription();
-
+    public abstract int getProteinId();
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
 /**
@@ -17,11 +17,11 @@ public abstract class SQTSearchResult implements MsSearchResult {
     private char validationStatus;
     private int charge;
     private int scanNumber;
-    private List<MsSearchResultProtein> matchingLoci;
+    private List<MsSearchResultProteinIn> matchingLoci;
     private MsSearchResultPeptide resultPeptide = null;
 
     public SQTSearchResult() {
-        matchingLoci = new ArrayList<MsSearchResultProtein>();
+        matchingLoci = new ArrayList<MsSearchResultProteinIn>();
     }
 
     @Override
@@ -50,7 +50,7 @@ public abstract class SQTSearchResult implements MsSearchResult {
         matchingLoci.add(locus);
     }
 
-    public List<MsSearchResultProtein> getProteinMatchList() {
+    public List<MsSearchResultProteinIn> getProteinMatchList() {
         return this.matchingLoci;
     }
     

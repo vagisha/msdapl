@@ -3,15 +3,15 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsResultProtein"> 
 
-	<typeAlias alias="MsResultProteinDbImpl" type="org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl"/>
-	<typeAlias alias="MsResultProteinDb" type="org.yeastrc.ms.domain.search.MsSearchResultProteinDb"/>
+	<typeAlias alias="MsResultProteinOut" type="org.yeastrc.ms.domain.search.impl.MsSearchResultProteinBean"/>
+	<typeAlias alias="MsResultProteinIn" type="org.yeastrc.ms.domain.search.MsSearchResultProtein"/>
 	
-	<resultMap class="MsResultProteinDbImpl" id="msResultProteinResult">
+	<resultMap class="MsResultProteinOut" id="msResultProteinResult">
 		<result property="resultId" column="resultID" nullValue="0"/>
 		<result property="proteinId" column="proteinID" nullValue="0"/>
 	</resultMap>
 	
-	<parameterMap class="MsResultProteinDb" id="msResultProteinParam">
+	<parameterMap class="MsResultProteinIn" id="msResultProteinParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="proteinId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>

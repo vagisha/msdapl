@@ -13,7 +13,7 @@ public interface MsSearchResult extends MsRunSearchResultBase {
     /**
      * @return the proteinMatchList
      */
-    public abstract List<MsSearchResultProtein> getProteinMatchList();
+    public abstract List<MsSearchResultProteinIn> getProteinMatchList();
 
     /**
      * @return the peptideResult

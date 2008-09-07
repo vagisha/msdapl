@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
 
@@ -24,13 +24,13 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
     private int charge; 
     private ValidationStatus validationStatus = ValidationStatus.UNKNOWN;
 
-    private List<? super MsSearchResultProteinDb> proteinMatchList;
+    private List<? super MsSearchResultProtein> proteinMatchList;
 
     private MsSearchResultPeptideDb resultPeptide;
 
 
     public MsSearchResultDbImpl() {
-        proteinMatchList = new ArrayList<MsSearchResultProteinDb>();
+        proteinMatchList = new ArrayList<MsSearchResultProtein>();
     }
 
     /**
@@ -131,15 +131,15 @@ public class MsSearchResultDbImpl implements MsSearchResultDb {
     /**
      * @param proteinMatchList the proteinMatchList to set
      */
-    public void setProteinMatchList(List<MsSearchResultProteinDb> proteinMatchList) {
+    public void setProteinMatchList(List<MsSearchResultProtein> proteinMatchList) {
         this.proteinMatchList = proteinMatchList;
     }
 
-    public void addProteinMatch(MsSearchResultProteinDb match) {
+    public void addProteinMatch(MsSearchResultProtein match) {
         proteinMatchList.add(match);
     }
 
-    public List<MsSearchResultProteinDb> getProteinMatchList() {
-        return (List<MsSearchResultProteinDb>) proteinMatchList;
+    public List<MsSearchResultProtein> getProteinMatchList() {
+        return (List<MsSearchResultProtein>) proteinMatchList;
     }
 }

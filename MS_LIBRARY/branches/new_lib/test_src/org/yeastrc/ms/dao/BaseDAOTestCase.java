@@ -58,7 +58,7 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
@@ -221,8 +221,8 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH RESULT PROTEIN
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchResultProtein makeResultProtein(final String acc, final String desc) {
-        MsSearchResultProtein match = new MsSearchResultProtein() {
+    protected MsSearchResultProteinIn makeResultProtein(final String acc, final String desc) {
+        MsSearchResultProteinIn match = new MsSearchResultProteinIn() {
             public String getAccession() {
                 return acc;
             }
