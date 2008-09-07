@@ -8,8 +8,9 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.sqtfile.SQTField;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.impl.HeaderItem;
 
 
 public class SQTHeader implements SQTRunSearch {
@@ -30,13 +31,13 @@ public class SQTHeader implements SQTRunSearch {
     private int searchDuration = -1;
     
     
-    private List<SQTField> headerItems;
+    private List<SQTHeaderItemIn> headerItems;
     
     private SearchFileFormat sqtType = null;
     private SearchProgram program = null;
     
     public SQTHeader() {
-        headerItems = new ArrayList<SQTField>();
+        headerItems = new ArrayList<SQTHeaderItemIn>();
     }
    
     public boolean isValid() {
@@ -134,7 +135,7 @@ public class SQTHeader implements SQTRunSearch {
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        for (SQTField h: headerItems) {
+        for (SQTHeaderItemIn h: headerItems) {
             buf.append(h.toString());
             buf.append("\n");
         }
@@ -158,7 +159,7 @@ public class SQTHeader implements SQTRunSearch {
         return sqtGeneratorVersion;
     }
     
-    public List<SQTField> getHeaders() {
+    public List<SQTHeaderItemIn> getHeaders() {
        return headerItems;
     }
 
@@ -169,7 +170,7 @@ public class SQTHeader implements SQTRunSearch {
         // make a check for Percolator first
         // Percolator files do not add Percolator to the sqtGenerator header.
         // Look for it in the other headers
-        for(SQTField f: headerItems) {
+        for(SQTHeaderItemIn f: headerItems) {
             if (f.getName().equalsIgnoreCase(SearchProgram.PERCOLATOR.displayName())) {
                 sqtType = SearchFileFormat.SQT_PERC;
                 return sqtType;

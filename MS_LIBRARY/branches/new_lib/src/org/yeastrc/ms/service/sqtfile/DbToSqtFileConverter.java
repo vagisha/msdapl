@@ -37,7 +37,7 @@ import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
-import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
@@ -218,13 +218,13 @@ public class DbToSqtFileConverter {
     
     private void printSqtHeader(SQTRunSearchDb search) throws IOException {
         SQTHeader sqtHeader = new SQTHeader();
-        List<SQTHeaderDb> headerList = search.getHeaders();
-        Collections.sort(headerList, new Comparator<SQTHeaderDb>() {
-            public int compare(SQTHeaderDb o1, SQTHeaderDb o2) {
+        List<SQTHeaderItem> headerList = search.getHeaders();
+        Collections.sort(headerList, new Comparator<SQTHeaderItem>() {
+            public int compare(SQTHeaderItem o1, SQTHeaderItem o2) {
                 return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
             }});
 
-        for (SQTHeaderDb header: headerList) {
+        for (SQTHeaderItem header: headerList) {
             try {
                 sqtHeader.addHeaderItem(header.getName(), header.getValue());
             }

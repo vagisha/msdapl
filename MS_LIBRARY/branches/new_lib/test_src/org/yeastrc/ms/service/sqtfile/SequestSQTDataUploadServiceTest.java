@@ -25,7 +25,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
-import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
@@ -237,10 +237,10 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(SearchFileFormat.SQT_SEQ, runSearch.getSearchFileFormat());
         assertEquals(SearchProgram.SEQUEST, runSearch.getSearchProgram());
         // TODO check search date and search duration
-        List<SQTHeaderDb> headerList = runSearch.getHeaders();
+        List<SQTHeaderItem> headerList = runSearch.getHeaders();
         assertEquals(23, headerList.size());
-        Collections.sort(headerList, new Comparator<SQTHeaderDb>() {
-            public int compare(SQTHeaderDb o1, SQTHeaderDb o2) {
+        Collections.sort(headerList, new Comparator<SQTHeaderItem>() {
+            public int compare(SQTHeaderItem o1, SQTHeaderItem o2) {
                 return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
             }});
         
@@ -272,7 +272,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         String[] tokens = headerSec.split("\\n");
         assertEquals(tokens.length, headerList.size());
         for (int i = 0; i < tokens.length; i++) {
-            SQTHeaderDb header = headerList.get(i);
+            SQTHeaderItem header = headerList.get(i);
             assertEquals(tokens[i].trim(), "H\t"+header.getName()+"\t"+header.getValue());
         }
         

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
-import org.yeastrc.ms.domain.search.sqtfile.SQTField;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
@@ -75,17 +75,17 @@ public class SQTRunSearchDAOTest extends SQTBaseDAOTestCase {
     
     public static final class SQTRunSearchTest extends MsRunSearchTest implements SQTRunSearch {
 
-        private List<SQTField> headers = new ArrayList<SQTField>();
+        private List<SQTHeaderItemIn> headers = new ArrayList<SQTHeaderItemIn>();
 
-        public List<SQTField> getHeaders() {
+        public List<SQTHeaderItemIn> getHeaders() {
             return headers ;
         }
 
-        public void setHeaders(List<SQTField> headers) {
+        public void setHeaders(List<SQTHeaderItemIn> headers) {
             this.headers = headers;
         }
 
-        public void addHeader(SQTField header) {
+        public void addHeader(SQTHeaderItemIn header) {
             headers.add(header);
         }
     }

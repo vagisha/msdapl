@@ -1,11 +1,13 @@
-package org.yeastrc.ms.parser.sqtFile;
+package org.yeastrc.ms.domain.search.sqtfile.impl;
 
-import org.yeastrc.ms.domain.search.sqtfile.SQTField;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
 
-public class HeaderItem implements SQTField {
+public class HeaderItem implements SQTHeaderItemIn {
     
     private String name;
     private String value;
+    
+    public HeaderItem() {}
     
     public HeaderItem(String name, String value) {
         this.name = name;

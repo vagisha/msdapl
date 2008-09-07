@@ -23,7 +23,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
-import org.yeastrc.ms.domain.search.sqtfile.SQTField;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
@@ -60,7 +60,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
             MsResidueModificationIn mod2 = makeStaticResidueMod('S', "80.0");
             search.setStaticResidueMods(Arrays.asList(new MsResidueModificationIn[]{mod1, mod2}));
             
-            MsTerminalModificationIn tmod1 = makeStaticTerminalMod(Terminal.NTERM, "95.0", '\u0000');
+            MsTerminalModificationIn tmod1 = makeStaticTerminalMod(Terminal.NTERM, "95.0");
             search.setStaticTerminalMods(Arrays.asList(new MsTerminalModificationIn[]{tmod1}));
         }
 
@@ -105,8 +105,8 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
     }
 
 
-    protected SQTField makeHeader(final String name, final String value) {
-        SQTField h = new SQTField() {
+    protected SQTHeaderItemIn makeHeader(final String name, final String value) {
+        SQTHeaderItemIn h = new SQTHeaderItemIn() {
             public String getName() {
                 return name;
             }
@@ -118,17 +118,17 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
     
     public static final class SQTRunSearchTest extends MsRunSearchTest implements SQTRunSearch {
 
-        private List<SQTField> headers = new ArrayList<SQTField>();
+        private List<SQTHeaderItemIn> headers = new ArrayList<SQTHeaderItemIn>();
 
-        public List<SQTField> getHeaders() {
+        public List<SQTHeaderItemIn> getHeaders() {
             return headers ;
         }
 
-        public void setHeaders(List<SQTField> headers) {
+        public void setHeaders(List<SQTHeaderItemIn> headers) {
             this.headers = headers;
         }
 
-        public void addHeader(SQTField header) {
+        public void addHeader(SQTHeaderItemIn header) {
             headers.add(header);
         }
     }

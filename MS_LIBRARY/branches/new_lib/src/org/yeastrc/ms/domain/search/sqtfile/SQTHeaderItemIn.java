@@ -7,7 +7,7 @@
 package org.yeastrc.ms.domain.search.sqtfile;
 
 
-public interface SQTField {
+public interface SQTHeaderItemIn {
 
     /**
      * @return the name of the field

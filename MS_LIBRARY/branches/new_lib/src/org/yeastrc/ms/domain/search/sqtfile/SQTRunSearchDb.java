@@ -19,5 +19,5 @@ public interface SQTRunSearchDb extends MsRunSearchDb {
      * Returns a list of headers associated with this SQT file
      * @return
      */
-    public abstract List<SQTHeaderDb> getHeaders();
+    public abstract List<SQTHeaderItem> getHeaders();
 }

@@ -4,8 +4,8 @@
 <sqlMap namespace="SqtHeader"> 
 
 
-	<typeAlias alias="SqtHeaderOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTHeaderDbImpl"/>
-	<typeAlias alias="SqtHeaderIn" type="org.yeastrc.ms.domain.search.sqtfile.SQTHeaderDb"/>
+	<typeAlias alias="SqtHeaderOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.HeaderItemBean"/>
+	<typeAlias alias="SqtHeaderIn" type="org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem"/>
 	
 	
 	<resultMap class="SqtHeaderOut" id="headerResult">

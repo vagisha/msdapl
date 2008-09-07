@@ -10,6 +10,6 @@ public interface SQTRunSearch extends MsRunSearch {
      * Returns a list of headers associated with this SQT file
      * @return
      */
-    public abstract List<SQTField> getHeaders();
+    public abstract List<SQTHeaderItemIn> getHeaders();
 
 }
