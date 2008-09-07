@@ -22,9 +22,4 @@ public interface MsSearchDatabase extends MsSearchDatabaseIn {
      */
     public abstract int getSequenceDatabaseId();
     
-    /**
-     * The name of the fasta file
-     * @return
-     */
-    public abstract String getDatabaseFileName();
 }

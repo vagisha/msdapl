@@ -4,8 +4,8 @@
 <sqlMap namespace="ProlucidResult"> 
 
 
-	<typeAlias alias="ProlucidResultOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidSearchResultDbImpl"/>
-	<typeAlias alias="ProlucidResultDataIn" type="org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataDb"/>
+	<typeAlias alias="ProlucidResultOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidSearchResultBean"/>
+	<typeAlias alias="ProlucidResultDataIn" type="org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId"/>
 	
 	
 	<resultMap class="ProlucidResultOut" id="prolucidResultResult" extends="MsSearchResult.msSearchResult">

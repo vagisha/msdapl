@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsResultProtein"> 
 
-	<typeAlias alias="MsResultProteinOut" type="org.yeastrc.ms.domain.search.impl.MsSearchResultProteinBean"/>
+	<typeAlias alias="MsResultProteinOut" type="org.yeastrc.ms.domain.search.impl.SearchResultProteinBean"/>
 	<typeAlias alias="MsResultProteinIn" type="org.yeastrc.ms.domain.search.MsSearchResultProtein"/>
 	
 	<resultMap class="MsResultProteinOut" id="msResultProteinResult">

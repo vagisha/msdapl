@@ -4,8 +4,8 @@
 <sqlMap namespace="SequestResult"> 
 
 
-	<typeAlias alias="SequestResultOut" type="org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultDbImpl"/>
-	<typeAlias alias="SequestResultDataIn" type="org.yeastrc.ms.domain.search.sequest.SequestResultDataDb"/>
+	<typeAlias alias="SequestResultOut" type="org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean"/>
+	<typeAlias alias="SequestResultDataIn" type="org.yeastrc.ms.domain.search.sequest.SequestResultDataWId"/>
 	
 	
 	<resultMap class="SequestResultOut" id="sequestResultResult" extends="MsSearchResult.msSearchResult">

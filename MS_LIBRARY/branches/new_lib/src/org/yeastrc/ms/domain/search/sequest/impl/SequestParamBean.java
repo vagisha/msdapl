@@ -16,6 +16,13 @@ public class SequestParamBean implements SequestParam {
     private String name;
     private String value;
     
+    public SequestParamBean() {}
+    
+    public SequestParamBean(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+    
     @Override
     public String getParamName() {
         return name;

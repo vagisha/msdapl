@@ -3,11 +3,11 @@ package org.yeastrc.ms.domain.search.sqtfile.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.impl.MsRunSearchBean;
+import org.yeastrc.ms.domain.search.impl.RunSearchBean;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 
-public class SQTRunSearchBean extends MsRunSearchBean implements SQTRunSearch {
+public class SQTRunSearchBean extends RunSearchBean implements SQTRunSearch {
 
     private List<SQTHeaderItem> headers;
     

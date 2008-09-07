@@ -12,4 +12,9 @@ public interface MsSearchDatabaseIn {
      */
     public abstract String getServerPath();
 
+    /**
+     * The name of the fasta file
+     * @return
+     */
+    public abstract String getDatabaseFileName();
 }

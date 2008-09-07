@@ -15,7 +15,6 @@ public class ResidueModificationBean extends ResidueModification implements
         MsResidueModification {
 
     private int id;
-    private int searchId;
     
     /**
      * @return the id
@@ -31,17 +30,4 @@ public class ResidueModificationBean extends ResidueModification implements
         this.id = id;
     }
     
-    /**
-     * @return the searchId
-     */
-    public int getSearchId() {
-        return searchId;
-    }
-
-    /**
-     * @param searchId the serachId to set
-     */
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
-    }
 }

@@ -12,10 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.impl.ResultResidueMod;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -46,30 +47,17 @@ public final class SequestResultPeptideBuilder {
         final char preResidue = getPreResidue(resultSequence);
         final char postResidue = getPostResidue(resultSequence);
         String dotless = removeDots(resultSequence);
-        final List<MsResultResidueModIn> resultMods = getResultMods(dotless, dynaResidueMods);
+        final List<MsResultResidueMod> resultMods = getResultMods(dotless, dynaResidueMods);
         final String justPeptide = getOnlyPeptideSequence(dotless);
         
-        return new MsSearchResultPeptide() {
-
-            public String getPeptideSequence() {
-                return justPeptide;
-            }
-            public char getPostResidue() {
-                return postResidue;
-            }
-            public char getPreResidue() {
-                return preResidue;
-            }
-            public int getSequenceLength() {
-                if (justPeptide == null)    return 0;
-                return justPeptide.length();
-            }
-            public List<MsResultResidueModIn> getResultDynamicResidueModifications() {
-                return resultMods;
-            }
-            public List<MsTerminalModificationIn> getDynamicTerminalModifications() {
-                return new ArrayList<MsTerminalModificationIn>(0);
-            }};
+        SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
+        resultPeptide.setPeptideSequence(justPeptide);
+        resultPeptide.setPreResidue(preResidue);
+        resultPeptide.setPostResidue(postResidue);
+        resultPeptide.setDynamicResidueModifications(resultMods);
+        resultPeptide.setDynamicTerminalModifications(new ArrayList<MsResultTerminalMod>(0));
+        
+        return resultPeptide;
     }
 
     char getPreResidue(String sequence) throws SQTParseException {
@@ -84,14 +72,14 @@ public final class SequestResultPeptideBuilder {
         throw new SQTParseException("Invalid peptide sequence; cannot get POST residue: "+sequence);
     }
     
-    List<MsResultResidueModIn> getResultMods(String peptide, List<? extends MsResidueModificationIn> dynaMods) throws SQTParseException {
+    List<MsResultResidueMod> getResultMods(String peptide, List<? extends MsResidueModificationIn> dynaMods) throws SQTParseException {
         
         // create a map of the dynamic modifications for the search for easy access.
         Map<String, MsResidueModificationIn> modMap = new HashMap<String, MsResidueModificationIn>(dynaMods.size());
         for (MsResidueModificationIn mod: dynaMods)
             modMap.put(mod.getModifiedResidue()+""+mod.getModificationSymbol(), mod);
         
-        List<MsResultResidueModIn> resultMods = new ArrayList<MsResultResidueModIn>();
+        List<MsResultResidueMod> resultMods = new ArrayList<MsResultResidueMod>();
         char modifiedChar = 0;
         int modCharIndex = -1;
         for (int i = 0; i < peptide.length(); i++) {
@@ -107,7 +95,7 @@ public final class SequestResultPeptideBuilder {
                 throw new SQTParseException("No matching modification found: "+modifiedChar+x+"; sequence: "+peptide);
             
             // found a match!!
-            ResultResidueMod resultMod = new ResultResidueMod();
+            ResultResidueModBean resultMod = new ResultResidueModBean();
             resultMod.setModificationMass(matchingMod.getModificationMass());
             resultMod.setModifiedResidue(modifiedChar);
             resultMod.setModificationSymbol(x);

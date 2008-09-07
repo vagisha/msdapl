@@ -12,12 +12,10 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -27,17 +25,17 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class ProlucidSearchResultDAOImpl extends BaseSqlMapDAO implements
 ProlucidSearchResultDAO {
 
-    private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
+    private MsSearchResultDAO resultDao;
 
     public ProlucidSearchResultDAOImpl(SqlMapClient sqlMap,
-            MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao) {
+            MsSearchResultDAO resultDao) {
         super(sqlMap);
         this.resultDao = resultDao;
     }
 
     @Override
-    public ProlucidSearchResultDb load(int resultId) {
-        return (ProlucidSearchResultDb) queryForObject("ProlucidResult.select", resultId);
+    public ProlucidSearchResult load(int resultId) {
+        return (ProlucidSearchResult) queryForObject("ProlucidResult.select", resultId);
     }
 
     @Override
@@ -53,7 +51,7 @@ ProlucidSearchResultDAO {
 
 
     @Override
-    public int save(int searchId, String searchDbName, ProlucidSearchResult searchResult,
+    public int save(int searchId, String searchDbName, ProlucidSearchResultIn searchResult,
             int runSearchId, int scanId) {
         // first save the base result
         int resultId = resultDao.save(searchId, searchDbName, searchResult, runSearchId, scanId);
@@ -65,7 +63,7 @@ ProlucidSearchResultDAO {
     }
 
     @Override
-    public int saveResultOnly(ProlucidSearchResult searchResult,
+    public int saveResultOnly(ProlucidSearchResultIn searchResult,
             int runSearchId, int scanId) {
         // save the base result (saves data to msRunSearchResult table only).
         int resultId = resultDao.saveResultOnly(searchResult, runSearchId, scanId);
@@ -90,11 +88,11 @@ ProlucidSearchResultDAO {
     // predictedIons)
     @Override
     public void saveAllProlucidResultData(
-            List<ProlucidResultDataDb> resultDataList) {
+            List<ProlucidResultDataWId> resultDataList) {
         if (resultDataList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (ProlucidResultDataDb data: resultDataList) {
+        for (ProlucidResultDataWId data: resultDataList) {
             values.append(",(");
             values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
@@ -130,7 +128,7 @@ ProlucidSearchResultDAO {
         resultDao.delete(resultId);
     }
 
-    public static final class ProlucidResultDataSqlMapParam implements ProlucidResultDataDb {
+    public static final class ProlucidResultDataSqlMapParam implements ProlucidResultDataWId {
 
         private int resultId;
         private ProlucidResultData result;

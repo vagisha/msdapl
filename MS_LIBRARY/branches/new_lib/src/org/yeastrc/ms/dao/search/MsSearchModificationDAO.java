@@ -6,8 +6,8 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.ResultModIdentifier;
-import org.yeastrc.ms.domain.search.ResultResidueModIdentifier;
+import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
+import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 
 public interface MsSearchModificationDAO {
 
@@ -67,9 +67,9 @@ public interface MsSearchModificationDAO {
     
     public abstract void saveDynamicResidueModForResult(int resultId, int modificationId, int modifiedPosition);
     
-    public abstract void saveDynamicResidueModForResult(ResultResidueModIdentifier modIdentifier);
+    public abstract void saveDynamicResidueModForResult(MsResultResidueModIds modIdentifier);
 
-    public abstract void saveAllDynamicResidueModsForResult(List<ResultResidueModIdentifier> modList);
+    public abstract void saveAllDynamicResidueModsForResult(List<MsResultResidueModIds> modList);
     
     public void deleteDynamicResidueModsForResult(int resultId);
     
@@ -80,9 +80,9 @@ public interface MsSearchModificationDAO {
     
     public abstract void saveDynamicTerminalModForResult(int resultId, int modificationId);
     
-    public abstract void saveDynamicTerminalModForResult(ResultModIdentifier modIdentifier);
+    public abstract void saveDynamicTerminalModForResult(MsResultTerminalModIds modIdentifier);
 
-    public abstract void saveAllDynamicTerminalModsForResult(List<ResultModIdentifier> modList);
+    public abstract void saveAllDynamicTerminalModsForResult(List<MsResultTerminalModIds> modList);
     
     public void deleteDynamicTerminalModsForResult(int resultId);
     

@@ -30,12 +30,12 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
@@ -105,7 +105,7 @@ public class DbToSqtFileConverter {
         int currScanId = -1;
         SearchScan currScan = null;
         for (Integer resultId: resultIds) {
-            SequestSearchResultDb result = resultDao.load(resultId);
+            SequestSearchResult result = resultDao.load(resultId);
             if (result.getScanId() != currScanId || result.getCharge() != currCharge) {
                 if (currScan != null) {
                     outFile.write(currScan.toString());
@@ -155,9 +155,9 @@ public class DbToSqtFileConverter {
         return proteinDao.loadResultProteins(resultId);
     }
 
-    private String reconstructSequestPeptideSequence(int searchId, SequestSearchResultDb resultDb) {
+    private String reconstructSequestPeptideSequence(int searchId, SequestSearchResult resultDb) {
         // dynamic modifications for the search
-        MsSearchResultPeptideDb peptideSeq = resultDb.getResultPeptide();
+        MsSearchResultPeptide peptideSeq = resultDb.getResultPeptide();
         List<MsResultResidueMod> resultMods = peptideSeq.getResultDynamicResidueModifications();
         Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
             public int compare(MsResultResidueMod o1,

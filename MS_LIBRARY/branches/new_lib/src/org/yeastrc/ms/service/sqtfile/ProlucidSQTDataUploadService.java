@@ -23,9 +23,9 @@ import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchIn;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser;
@@ -41,7 +41,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
 
 private static final String PROLUCID_PARAMS_FILE = "search.xml";
     
-    List<ProlucidResultDataDb> prolucidResultDataList; // prolucid scores
+    List<ProlucidResultDataWId> prolucidResultDataList; // prolucid scores
     
     private MsSearchDatabaseIn db = null;
     private List<MsResidueModificationIn> dynaResidueMods;
@@ -53,7 +53,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     
     public ProlucidSQTDataUploadService() {
         super();
-        this.prolucidResultDataList = new ArrayList<ProlucidResultDataDb>();
+        this.prolucidResultDataList = new ArrayList<ProlucidResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
     }
@@ -212,7 +212,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             uploadSearchScan(scan, lastUploadedRunSearchId, scanId); 
 
             // save all the search results for this scan
-            for (ProlucidSearchResult result: scan.getScanResults()) {
+            for (ProlucidSearchResultIn result: scan.getScanResults()) {
                 uploadSearchResult(result, lastUploadedRunSearchId, scanId);
                 numResults++;
                 numProteins += result.getProteinMatchList().size();
@@ -256,7 +256,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         };
     }
     
-    void uploadSearchResult(ProlucidSearchResult result, int runSearchId, int scanId) throws UploadException {
+    void uploadSearchResult(ProlucidSearchResultIn result, int runSearchId, int scanId) throws UploadException {
         
         int resultId = super.uploadBaseSearchResult(result, runSearchId, scanId);
         
@@ -287,7 +287,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         }
     }
     
-    static final class ResultData implements ProlucidResultDataDb {
+    static final class ResultData implements ProlucidResultDataWId {
         
         private final ProlucidResultData data;
         private final int resultId;

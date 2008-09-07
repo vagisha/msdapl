@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsEnzyme"> 
 
-	<typeAlias alias="MsEnzymeOut" type="org.yeastrc.ms.domain.general.impl.MsEnzymeBean"/>
+	<typeAlias alias="MsEnzymeOut" type="org.yeastrc.ms.domain.general.impl.EnzymeBean"/>
 	<typeAlias alias="MsEnzymeIn" type="org.yeastrc.ms.domain.general.MsEnzymeIn"/>
 	<typeAlias alias="SenseHandler" type="org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl$SenseTypeHandler"/>
 	

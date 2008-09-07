@@ -9,11 +9,11 @@
 	<typeAlias alias="MsResultResidueModOut" type="org.yeastrc.ms.domain.search.impl.ResultResidueModBean"/>
 	<typeAlias alias="MsResultTerminalModOut" type="org.yeastrc.ms.domain.search.impl.ResultTerminalModBean"/>
 		
-	<typeAlias alias="MsResidueModIn" type="org.yeastrc.ms.domain.search.MsResidueModification" />
-	<typeAlias alias="MsTerminalModIn" type="org.yeastrc.ms.domain.search.MsTerminalModification" />
+	<typeAlias alias="MsResidueModIn" type="org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap" />
+	<typeAlias alias="MsTerminalModIn" type="org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap" />
 	
-	<typeAlias alias="MsResultResidueModIn" type="org.yeastrc.ms.domain.search.ResultResidueModIdentifier" />
-	<typeAlias alias="MsResultTerminalModIn" type="org.yeastrc.ms.domain.search.ResultModIdentifier" />
+	<typeAlias alias="MsResultResidueModIn" type="org.yeastrc.ms.domain.search.ResultResidueModIds" />
+	<typeAlias alias="MsResultTerminalModIn" type="org.yeastrc.ms.domain.search.ResultTerminalModIds" />
 	
 	<typeAlias alias="TerminalTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl$TerminalTypeHandler"/>
 	
@@ -23,7 +23,6 @@
 	<!-- STATIC RESIDUE MODIFICATION for SEARCH -->
 	<resultMap class="MsResidueModOut" id="msStaticResidueModResult">
 		<result property="id" column="id"/>
-		<result property="searchId" column="searchID" nullValue="0"/>
 		<result property="modifiedResidue" column="residue" jdbcType="CHAR" javaType="java.lang.Character"/>
 		<result property="modificationMass" column="modifier"/>
 	</resultMap>
@@ -35,8 +34,6 @@
 	
 	<!-- DYNAMIC RESIDUE MODIFICATION  for RESULT-->
 	<resultMap class="MsResultResidueModOut" id="msResultDynaResidueModResult">
-		<result property="modificationId" column="modID" nullValue="0"/>
-		<result property="resultId" column="resultID" nullValue="0"/>
 		<result property="modifiedPosition" column="position" nullValue="-1"/>
 		<result property="modifiedResidue" column="residue" jdbcType="CHAR" javaType="java.lang.Character" />
 		<result property="modificationMass" column="modifier"/>
@@ -47,7 +44,6 @@
 	<!-- STATIC TERMINAL MODIFICATION for SEARCH -->
 	<resultMap class="MsTerminalModOut" id="msStaticTerminalModResult">
 		<result property="id" column="id"/>
-		<result property="searchId" column="searchID" nullValue="0"/>
 		<result property="modifiedTerminal" column="terminus" typeHandler="TerminalTypeHandler" />
 		<result property="modificationMass" column="modifier"/>
 	</resultMap>
@@ -59,8 +55,6 @@
 	
 	<!-- DYNAMIC TERMINAL MODIFICATION  for RESULT-->
 	<resultMap class="MsResultTerminalModOut" id="msResultDynaTerminalModResult">
-		<result property="modificationId" column="modID" nullValue="0"/>
-		<result property="resultId" column="resultID" nullValue="0"/>
 		<result property="modifiedTerminal" column="terminus" typeHandler="TerminalTypeHandler" />
 		<result property="modificationMass" column="modifier"/>
 		<result property="modificationSymbol" column="symbol" jdbcType="CHAR" javaType="java.lang.Character" />
@@ -211,7 +205,7 @@
 	<!-- QUERIES FOR DYNAMIC RESIDUE MODIFICATIONS (FOR A SEARCH RESULT) -->
 	<!-- ================================================================================= -->
     <select id="selectDynamicResidueModsForResult" resultMap="msResultDynaResidueModResult" parameterClass="Integer">
-    	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID, rMod.position
+    	SELECT sMod.residue, sMod.modifier, sMod.symbol, rMod.position
     	FROM msSearchDynamicMod AS sMod, msDynamicModResult AS rMod
     	WHERE sMod.id = rMod.modID
     	AND rMod.resultID= #id#
@@ -237,7 +231,7 @@
 	<!-- QUERIES FOR DYNAMIC TERMINAL MODIFICATIONS (FOR A SEARCH RESULT) -->
 	<!-- ================================================================================= -->
     <select id="selectDynamicTerminalModsForResult" resultMap="msResultDynaTerminalModResult" parameterClass="Integer">
-    	SELECT sMod.terminus, sMod.modifier, sMod.symbol, rMod.modID, rMod.resultID
+    	SELECT sMod.terminus, sMod.modifier, sMod.symbol
     	FROM msSearchTerminalDynamicMod AS sMod, msTerminalDynamicModResult AS rMod
     	WHERE sMod.id = rMod.modID
     	AND rMod.resultID= #id#

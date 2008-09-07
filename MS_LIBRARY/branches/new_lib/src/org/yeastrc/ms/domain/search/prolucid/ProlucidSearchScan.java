@@ -15,5 +15,5 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
  */
 public interface ProlucidSearchScan extends SQTSearchScanIn {
     
-    public abstract List<ProlucidSearchResult> getScanResults();
+    public abstract List<ProlucidSearchResultIn> getScanResults();
 }

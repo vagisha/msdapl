@@ -22,23 +22,22 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultResidueModIds;
+import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.ResultModIdentifier;
-import org.yeastrc.ms.domain.search.ResultResidueModIdentifier;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinBean;
-import org.yeastrc.ms.domain.search.impl.ResultModIdentifierImpl;
-import org.yeastrc.ms.domain.search.impl.ResultResidueModIdentifierImpl;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
+import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
+import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
-import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchImpl;
-import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanImpl;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchWrap;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
@@ -57,8 +56,8 @@ public abstract class AbstractSQTDataUploadService {
 
     // these are the things we will cache and do bulk-inserts
     LinkedHashSet<MsSearchResultProtein> proteinMatchSet;
-    List<ResultResidueModIdentifier> resultResidueModList;
-    List<ResultModIdentifier> resultTerminalModList;
+    List<MsResultResidueModIds> resultResidueModList;
+    List<MsResultTerminalModIds> resultTerminalModList;
 
 
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
@@ -76,8 +75,8 @@ public abstract class AbstractSQTDataUploadService {
     
     public AbstractSQTDataUploadService() {
         this.proteinMatchSet = new LinkedHashSet<MsSearchResultProtein>(BUF_SIZE);
-        this.resultResidueModList = new ArrayList<ResultResidueModIdentifier>(BUF_SIZE);
-        this.resultTerminalModList = new ArrayList<ResultModIdentifier>(BUF_SIZE);
+        this.resultResidueModList = new ArrayList<MsResultResidueModIds>(BUF_SIZE);
+        this.resultTerminalModList = new ArrayList<MsResultTerminalModIds>(BUF_SIZE);
         this.uploadExceptionList = new ArrayList<UploadException>();
     }
     
@@ -303,17 +302,17 @@ public abstract class AbstractSQTDataUploadService {
         }
         // save the run search and return the database id
         SQTRunSearchDAO runSearchDao = daoFactory.getSqtRunSearchDAO();
-        return runSearchDao.saveRunSearch(new SQTRunSearchImpl(search, searchId, runId));
+        return runSearchDao.saveRunSearch(new SQTRunSearchWrap(search, searchId, runId));
     }
 
     final void uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) {
         SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        spectrumDataDao.save(new SQTSearchScanImpl(scan, runSearchId, scanId));
+        spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
     }
 
-    final int uploadBaseSearchResult(MsSearchResult result, int runSearchId, int scanId) throws UploadException {
+    final int uploadBaseSearchResult(MsSearchResultIn result, int runSearchId, int scanId) throws UploadException {
         
-        MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = DAOFactory.instance().getMsSearchResultDAO();
+        MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
         int resultId = resultDao.saveResultOnly(result, runSearchId, scanId); // uploads data to the msRunSearchResult table ONLY
         
         // upload the protein matches
@@ -329,7 +328,7 @@ public abstract class AbstractSQTDataUploadService {
     }
 
     // PROTEIN MATCHES
-    final void uploadProteinMatches(MsSearchResult result, final String peptide, final int resultId, int databaseId)
+    final void uploadProteinMatches(MsSearchResultIn result, final String peptide, final int resultId, int databaseId)
         throws UploadException {
         // upload the protein matches if the cache has enough entries
         if (proteinMatchSet.size() >= BUF_SIZE) {
@@ -360,7 +359,7 @@ public abstract class AbstractSQTDataUploadService {
             }
             
             // NOTE: we are using a Set for the proteinMatches.  ONLY UNIQUE ENTRIES WILL BE ADDED.
-            MsSearchResultProteinBean prMatch = new MsSearchResultProteinBean();
+            SearchResultProteinBean prMatch = new SearchResultProteinBean();
             prMatch.setProteinId(proteinId);
             prMatch.setResultId(resultId);
             proteinMatchSet.add(prMatch);
@@ -376,13 +375,13 @@ public abstract class AbstractSQTDataUploadService {
     }
 
     // RESIDUE DYNAMIC MODIFICATION
-    void uploadResultResidueMods(MsSearchResult result, int resultId, int searchId) throws UploadException {
+    void uploadResultResidueMods(MsSearchResultIn result, int resultId, int searchId) throws UploadException {
         // upload the result dynamic residue modifications if the cache has enough entries
         if (resultResidueModList.size() >= BUF_SIZE) {
             uploadResultResidueModBuffer();
         }
         // add the dynamic residue modifications for this result to the cache
-        for (MsResultResidueModIn mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
+        for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
             int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
@@ -395,7 +394,7 @@ public abstract class AbstractSQTDataUploadService {
                         "; modMass: "+mod.getModificationMass().doubleValue());
                 throw ex;
             }
-            ResultResidueModIdentifierImpl resultMod = new ResultResidueModIdentifierImpl(resultId, modId, mod.getModifiedPosition());
+            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modId, mod.getModifiedPosition());
             resultResidueModList.add(resultMod);
         }
     }
@@ -407,13 +406,13 @@ public abstract class AbstractSQTDataUploadService {
     }
     
     // TERMINAL DYNAMIC MODIFICATION
-    void uploadResultTerminalMods(MsSearchResult result, int resultId, int searchId) throws UploadException {
+    void uploadResultTerminalMods(MsSearchResultIn result, int resultId, int searchId) throws UploadException {
         // upload the result dynamic terminal modifications if the cache has enough entries
         if (resultTerminalModList.size() >= BUF_SIZE) {
             uploadResultTerminalModBuffer();
         }
         // add the dynamic terminal modifications for this result to the cache
-        for (MsTerminalModificationIn mod: result.getResultPeptide().getDynamicTerminalModifications()) {
+        for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
             int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
@@ -426,7 +425,7 @@ public abstract class AbstractSQTDataUploadService {
                         "; modMass: "+mod.getModificationMass().doubleValue());
                 throw ex;
             }
-            ResultModIdentifierImpl resultMod = new ResultModIdentifierImpl(resultId, modId);
+            ResultTerminalModIds resultMod = new ResultTerminalModIds(resultId, modId);
             resultTerminalModList.add(resultMod);
         }
     }

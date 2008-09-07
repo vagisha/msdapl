@@ -1,7 +1,7 @@
 /**
- * IMsSearchResultPeptide.java
+ * MsSearchResultPeptideDb.java
  * @author Vagisha Sharma
- * Jul 9, 2008
+ * Jul 11, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.domain.search;
@@ -12,22 +12,20 @@ import java.util.List;
 /**
  * 
  */
-public interface MsSearchResultPeptide extends MsSearchResultPeptideBase {
+public interface MsSearchResultPeptide {
 
     /**
      * Returns a list of dynamic residue modifications, along with the index (0-based) at which 
      * they are present, in the peptide sequence for this result.
      */
-    public abstract List<MsResultResidueModIn> getResultDynamicResidueModifications();
+    public abstract List<MsResultResidueMod> getResultDynamicResidueModifications();
     
     /**
      * Returns a list of dynamic terminal modifications.
      * @return
      */
-    public abstract List<MsTerminalModificationIn> getDynamicTerminalModifications();
-}
+    public abstract List<MsResultTerminalMod> getResultDynamicTerminalModifications();
 
-interface MsSearchResultPeptideBase {
     
     public abstract String getPeptideSequence();
     
@@ -36,5 +34,4 @@ interface MsSearchResultPeptideBase {
     public abstract char getPostResidue();
     
     public abstract int getSequenceLength();
-    
 }

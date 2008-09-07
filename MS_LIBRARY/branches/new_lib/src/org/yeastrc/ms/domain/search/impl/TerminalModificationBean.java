@@ -15,7 +15,6 @@ public class TerminalModificationBean extends TerminalModification implements
         MsTerminalModification {
 
     private int id;
-    private int searchId;
     
     /**
      * @return the id
@@ -29,19 +28,5 @@ public class TerminalModificationBean extends TerminalModification implements
      */
     public void setId(int id) {
         this.id = id;
-    }
-
-    /**
-     * @return the searchId
-     */
-    public int getSearchId() {
-        return searchId;
-    }
-
-    /**
-     * @param searchId the serachId to set
-     */
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
     }
 }

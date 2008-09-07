@@ -9,14 +9,14 @@ package org.yeastrc.ms.domain.search.prolucid.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.impl.MsSearchBean;
+import org.yeastrc.ms.domain.search.impl.SearchBean;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
 
 /**
  * 
  */
-public class ProlucidSearchBean extends MsSearchBean implements ProlucidSearch {
+public class ProlucidSearchBean extends SearchBean implements ProlucidSearch {
 
     private List<ProlucidParam> paramList;
 

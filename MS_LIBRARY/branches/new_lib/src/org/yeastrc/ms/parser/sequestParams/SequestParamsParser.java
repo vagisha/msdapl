@@ -318,9 +318,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         if (m.matches()) {
             final String paramName = m.group(1).trim();
             final String paramVal = m.group(2).trim();
-            SequestParamBean param = new SequestParamBean();
-            param.setParamName(paramName);
-            param.setParamValue(paramVal);
+            SequestParamBean param = new SequestParamBean(paramName, paramVal);
             return param;
         }
         else {

@@ -14,11 +14,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.impl.ResultResidueMod;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
+import org.yeastrc.ms.domain.search.impl.ResultTerminalModBean;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -42,8 +45,8 @@ public final class ProlucidResultPeptideBuilder {
     }
 
     public MsSearchResultPeptide build(String resultSequence, 
-            List<? extends MsResidueModificationIn> dynaResidueMods,
-            List<? extends MsTerminalModificationIn> dynaTerminalMods) 
+            List<MsResidueModificationIn> dynaResidueMods,
+            List<MsTerminalModificationIn> dynaTerminalMods) 
     throws SQTParseException {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new SQTParseException("sequence cannot be null or empty");
@@ -60,33 +63,18 @@ public final class ProlucidResultPeptideBuilder {
         final char postResidue = getPostResidue(resultSequence);
         String dotless = removeDots(resultSequence);
         // get the terminal mods first
-        final List<MsTerminalModificationIn> termMods = getResultTerminalMods(dotless, dynaTerminalMods, dynaResidueMods);
+        final List<MsResultTerminalMod> termMods = getResultTerminalMods(dotless, dynaTerminalMods, dynaResidueMods);
         // now the residue mods
-        final List<MsResultResidueModIn> residueMods = getResultResidueMods(dotless, dynaResidueMods, dynaTerminalMods);
+        final List<MsResultResidueMod> residueMods = getResultResidueMods(dotless, dynaResidueMods, dynaTerminalMods);
         
         final String justPeptide = getOnlyPeptideSequence(dotless);
-
-        return new MsSearchResultPeptide() {
-
-            public String getPeptideSequence() {
-                return justPeptide;
-            }
-            public char getPostResidue() {
-                return postResidue;
-            }
-            public char getPreResidue() {
-                return preResidue;
-            }
-            public int getSequenceLength() {
-                if (justPeptide == null)    return 0;
-                return justPeptide.length();
-            }
-            public List<MsResultResidueModIn> getResultDynamicResidueModifications() {
-                return residueMods;
-            }
-            public List<MsTerminalModificationIn> getDynamicTerminalModifications() {
-                return termMods;
-            }};
+        SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
+        resultPeptide.setPeptideSequence(justPeptide);
+        resultPeptide.setPreResidue(preResidue);
+        resultPeptide.setPostResidue(postResidue);
+        resultPeptide.setDynamicResidueModifications(residueMods);
+        resultPeptide.setDynamicTerminalModifications(termMods);
+        return resultPeptide;
     }
 
     char getPreResidue(String sequence) throws SQTParseException {
@@ -109,9 +97,9 @@ public final class ProlucidResultPeptideBuilder {
      * @return
      * @throws SQTParseException
      */
-    List<MsTerminalModificationIn> getResultTerminalMods(String peptide, 
-            List<? extends MsTerminalModificationIn> dynaTermMods,
-            List<? extends MsResidueModificationIn> dynaResMods) throws SQTParseException {
+    List<MsResultTerminalMod> getResultTerminalMods(String peptide, 
+            List<MsTerminalModificationIn> dynaTermMods,
+            List<MsResidueModificationIn> dynaResMods) throws SQTParseException {
 
         if (dynaResMods == null)
             dynaResMods = new ArrayList<MsResidueModificationIn>(0);
@@ -130,7 +118,7 @@ public final class ProlucidResultPeptideBuilder {
             termModMap.put(mod.getModifiedTerminal().toChar()+""+mod.getModificationMass(), mod);
         
         
-        List<MsTerminalModificationIn> resultMods = new ArrayList<MsTerminalModificationIn>();
+        List<MsResultTerminalMod> resultMods = new ArrayList<MsResultTerminalMod>();
         
         // get any n-term mods
         Matcher m = nTermModPattern.matcher(peptide);
@@ -154,7 +142,11 @@ public final class ProlucidResultPeptideBuilder {
                                 +" and modification for residue: "+firstNonModChar+" and mass: "+modMass);
                     
                     // add this to result mods
-                    resultMods.add(mod);
+                    ResultTerminalModBean rmod = new ResultTerminalModBean();
+                    rmod.setModificationMass(mod.getModificationMass());
+                    rmod.setModificationSymbol(mod.getModificationSymbol());
+                    rmod.setModifiedTerminal(mod.getModifiedTerminal());
+                    resultMods.add(rmod);
                 }
             }
         }
@@ -181,7 +173,11 @@ public final class ProlucidResultPeptideBuilder {
                                 +" and modification for residue: "+modChar+" and mass: "+modMass);
                     
                     // add this to result mods
-                    resultMods.add(mod);
+                    ResultTerminalModBean rmod = new ResultTerminalModBean();
+                    rmod.setModificationMass(mod.getModificationMass());
+                    rmod.setModificationSymbol(mod.getModificationSymbol());
+                    rmod.setModifiedTerminal(mod.getModifiedTerminal());
+                    resultMods.add(rmod);
                 }
             }
         }
@@ -197,7 +193,7 @@ public final class ProlucidResultPeptideBuilder {
      * @return
      * @throws SQTParseException
      */
-    List<MsResultResidueModIn> getResultResidueMods(String peptide, 
+    List<MsResultResidueMod> getResultResidueMods(String peptide, 
             List<? extends MsResidueModificationIn> dynaResMods,
             List<? extends MsTerminalModificationIn> dynaTermMods) throws SQTParseException {
 
@@ -217,7 +213,7 @@ public final class ProlucidResultPeptideBuilder {
             termModMap.put(mod.getModifiedTerminal().toChar()+""+mod.getModificationMass(), mod);
         
         
-        List<MsResultResidueModIn> resultMods = new ArrayList<MsResultResidueModIn>();
+        List<MsResultResidueMod> resultMods = new ArrayList<MsResultResidueMod>();
         int modCharIndex = -1;
         int matchedPatternsLength = 0;
         Matcher m = multipleMods.matcher(peptide);
@@ -245,7 +241,7 @@ public final class ProlucidResultPeptideBuilder {
                     // this is a dynamic residue modification for sure. Make sure it is a valid one
                     MsResidueModificationIn mod = modMap.get(modChar+""+modMass);
                     if (mod != null) {
-                        ResultResidueMod resultMod = new ResultResidueMod();
+                        ResultResidueModBean resultMod = new ResultResidueModBean();
                         resultMod.setModificationMass(mod.getModificationMass());
                         resultMod.setModifiedResidue(mod.getModifiedResidue());
                         resultMod.setModifiedPosition(modCharIndex);
@@ -274,7 +270,7 @@ public final class ProlucidResultPeptideBuilder {
                     // this is a dynamic residue modification for sure. Make sure it is a valid one
                     MsResidueModificationIn mod = modMap.get(modChar+""+modMass);
                     if (mod != null) {
-                        ResultResidueMod resultMod = new ResultResidueMod();
+                        ResultResidueModBean resultMod = new ResultResidueModBean();
                         resultMod.setModificationMass(mod.getModificationMass());
                         resultMod.setModifiedResidue(mod.getModifiedResidue());
                         resultMod.setModifiedPosition(modCharIndex);

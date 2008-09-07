@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -103,7 +103,7 @@ public class ProlucidSQTFileReader extends SQTFileReader {
         while(currentLine != null) {
             // is this one of the results for the scan ('M' line)
             if (isResultLine(currentLine)) {
-                ProlucidSearchResult result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
+                ProlucidSearchResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
                 if (result != null) 
                     scan.addSearchResult(result);
             }
@@ -121,7 +121,7 @@ public class ProlucidSQTFileReader extends SQTFileReader {
      * @return
      * @throws DataProviderException 
      */
-    private ProlucidSearchResult parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
+    private ProlucidSearchResultIn parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
 
         ProlucidResult result = parsePeptideResult(currentLine, scanNumber, charge);
 
@@ -238,16 +238,16 @@ public class ProlucidSQTFileReader extends SQTFileReader {
     private static final class PlucidSearchScan implements ProlucidSearchScan {
 
         private SQTSearchScanIn scan;
-        private List<ProlucidSearchResult> resultList;
+        private List<ProlucidSearchResultIn> resultList;
 
         public PlucidSearchScan(SQTSearchScanIn scan) {
             this.scan = scan;
-            resultList = new ArrayList<ProlucidSearchResult>();
+            resultList = new ArrayList<ProlucidSearchResultIn>();
         }
-        public void addSearchResult(ProlucidSearchResult result) {
+        public void addSearchResult(ProlucidSearchResultIn result) {
             resultList.add(result);
         }
-        public List<ProlucidSearchResult> getScanResults() {
+        public List<ProlucidSearchResultIn> getScanResults() {
             return resultList;
         }
         public int getScanNumber() {

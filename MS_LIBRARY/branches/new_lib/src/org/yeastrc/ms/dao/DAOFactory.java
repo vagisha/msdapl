@@ -54,8 +54,6 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -106,7 +104,7 @@ public class DAOFactory {
     // DAOs for search related objects
     private MsSearchDAO searchDAO;
     private MsRunSearchDAO runSearchDAO;
-    private MsSearchResultDAO <MsSearchResult, MsSearchResultDb> searchResultDAO;
+    private MsSearchResultDAO searchResultDAO;
     private MsSearchResultProteinDAO resultProteinDAO;
     private MsSearchModificationDAO modDAO;
     private MsSearchDatabaseDAO seqDbDao;
@@ -225,7 +223,7 @@ public class DAOFactory {
         return runSearchDAO;
     }
     
-    public MsSearchResultDAO <MsSearchResult, MsSearchResultDb> getMsSearchResultDAO() {
+    public MsSearchResultDAO getMsSearchResultDAO() {
         return searchResultDAO;
     }
     

@@ -8,12 +8,12 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SQTSearchResult;
 
 
-public class SequestResult extends SQTSearchResult implements SequestSearchResult {
+public class SequestResult extends SQTSearchResult implements SequestSearchResultIn {
 
     private MsSearchResultPeptide resultPeptide = null;
     

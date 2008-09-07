@@ -15,11 +15,11 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.ResultModIdentifier;
-import org.yeastrc.ms.domain.search.ResultResidueModIdentifier;
+import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
+import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.impl.ResultModIdentifierImpl;
-import org.yeastrc.ms.domain.search.impl.ResultResidueModIdentifierImpl;
+import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -113,19 +113,19 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     
     public void saveDynamicResidueModForResult(int resultId,
             int modificationId, int modifiedPosition) {
-        ResultResidueModIdentifierImpl modDb = new ResultResidueModIdentifierImpl(resultId, modificationId, modifiedPosition);
+        ResultResidueModIds modDb = new ResultResidueModIds(resultId, modificationId, modifiedPosition);
         this.saveDynamicResidueModForResult(modDb);
     }
     
-    public void saveDynamicResidueModForResult(ResultResidueModIdentifier modIdentifier) {
+    public void saveDynamicResidueModForResult(MsResultResidueModIds modIdentifier) {
         save("MsSearchMod.insertResultDynamicResidueMod", modIdentifier);
     }
     
-    public void saveAllDynamicResidueModsForResult(List<ResultResidueModIdentifier> modList) {
+    public void saveAllDynamicResidueModsForResult(List<MsResultResidueModIds> modList) {
         if (modList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (ResultResidueModIdentifier mod: modList) {
+        for (MsResultResidueModIds mod: modList) {
             values.append(",(");
             values.append(mod.getResultId() == 0 ? "NULL" : mod.getResultId());
             values.append(",");
@@ -160,19 +160,19 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     }
     
     public void saveDynamicTerminalModForResult(int resultId, int modificationId) {
-        ResultModIdentifierImpl modDb = new ResultModIdentifierImpl(resultId, modificationId);
+        ResultTerminalModIds modDb = new ResultTerminalModIds(resultId, modificationId);
         this.saveDynamicTerminalModForResult(modDb);
     }
     
-    public void saveDynamicTerminalModForResult(ResultModIdentifier modIdentifier) {
+    public void saveDynamicTerminalModForResult(MsResultTerminalModIds modIdentifier) {
         save("MsSearchMod.insertResultDynamicTerminalMod", modIdentifier);
     }
     
-    public void saveAllDynamicTerminalModsForResult(List<ResultModIdentifier> modList) {
+    public void saveAllDynamicTerminalModsForResult(List<MsResultTerminalModIds> modList) {
         if (modList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (ResultModIdentifier mod: modList) {
+        for (MsResultTerminalModIds mod: modList) {
             values.append(",(");
             values.append(mod.getResultId() == 0 ? "NULL" : mod.getResultId());
             values.append(",");

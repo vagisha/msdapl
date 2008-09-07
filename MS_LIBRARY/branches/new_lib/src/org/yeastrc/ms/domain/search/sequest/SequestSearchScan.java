@@ -15,5 +15,5 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
  */
 public interface SequestSearchScan extends SQTSearchScanIn {
 
-    public abstract List<SequestSearchResult> getScanResults();
+    public abstract List<SequestSearchResultIn> getScanResults();
 }

@@ -12,6 +12,4 @@ package org.yeastrc.ms.domain.search;
 public interface MsResidueModification extends MsResidueModificationIn {
     
     public abstract int getId();
-    
-    public abstract int getSearchId();
 }

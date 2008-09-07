@@ -7,13 +7,12 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
-import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
 
 public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
 
@@ -29,14 +28,14 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         // modifications for searchId_1
         MsResidueModificationIn mod1 = makeStaticResidueMod('C', "50.0");
-        modDao.saveStaticResidueMod(mod1);
+        modDao.saveStaticResidueMod(new MsResidueModificationWrap(mod1, searchId_1));
         MsResidueModificationIn mod2 = makeStaticResidueMod('S', "80.0");
-        modDao.saveStaticResidueMod(mod2);
+        modDao.saveStaticResidueMod(new MsResidueModificationWrap(mod2, searchId_1));
         
         MsResidueModificationIn dmod1 = makeDynamicResidueMod('A', "10.0", '*');
-        modDao.saveDynamicResidueMod(dmod1);
+        modDao.saveDynamicResidueMod(new MsResidueModificationWrap(dmod1, searchId_1));
         MsResidueModificationIn dmod2 = makeDynamicResidueMod('B', "20.0", '#');
-        modDao.saveDynamicResidueMod(dmod2);
+        modDao.saveDynamicResidueMod(new MsResidueModificationWrap(dmod2, searchId_1));
         
         // modifications for searchId_2
 //        MsResidueModification mod3 = makeStaticMod('M', "16.0");
@@ -68,11 +67,11 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         assertNull(resultDao.load(runSearchId_1));
         
         // insert a search result with NO extra information
-        MsSearchResult result1 = makeSearchResult(searchId_1, runSearchId_1, 3, "PEPTIDE1", false);
+        MsSearchResultIn result1 = makeSearchResult(searchId_1, runSearchId_1, 3, "PEPTIDE1", false);
         int resultId_1 = resultDao.save(searchId_1, "dummy_db", result1,  runSearchId_1, 123);// scanId = 123
         
         // read it back
-        MsSearchResultDb resultdb1 = resultDao.load(resultId_1);
+        MsSearchResult resultdb1 = resultDao.load(resultId_1);
         assertNotNull(resultdb1);
         assertEquals(0, resultdb1.getProteinMatchList().size());
         assertEquals(0, resultdb1.getResultPeptide().getResultDynamicResidueModifications().size());
@@ -85,7 +84,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         int resultId_2 = resultDao.save(searchId_1, "database", result2, runSearchId_1, 123); // scanId = 123
         
         // read it back
-        MsSearchResultDb resultdb2 = resultDao.load(resultId_2);
+        MsSearchResult resultdb2 = resultDao.load(resultId_2);
         assertNotNull(resultdb2);
         assertEquals(2, resultdb2.getProteinMatchList().size());
         assertEquals(0, resultdb2.getResultPeptide().getResultDynamicResidueModifications().size());
@@ -94,11 +93,11 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         // save another result this time save dynamic mods
         // this time use runSearchId_2
-        MsSearchResult result3 = makeSearchResult(searchId_1, runSearchId_2, 3, "PEPTIDE3", true);
+        MsSearchResultIn result3 = makeSearchResult(searchId_1, runSearchId_2, 3, "PEPTIDE3", true);
         int resultId_3 = resultDao.save(searchId_1, "dummy_db", result3,  runSearchId_2, 321);
         
         // read it back
-        MsSearchResultDb resultdb3 = resultDao.load(resultId_3);
+        MsSearchResult resultdb3 = resultDao.load(resultId_3);
         assertNotNull(resultdb3);
         assertEquals(0, resultdb3.getProteinMatchList().size());
         assertEquals(2, resultdb3.getResultPeptide().getResultDynamicResidueModifications().size());
@@ -152,7 +151,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         result.setProteinMatchList(matchProteins);
     }
     
-    public static class MsSearchResultTest implements MsSearchResult {
+    public static class MsSearchResultTest implements MsSearchResultIn {
 
         private ValidationStatus validationStatus;
         private MsSearchResultPeptide resultPeptide;
@@ -200,53 +199,6 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         public void setScanNumber(int scanNum) {
             this.scanNumber = scanNum;
-        }
-    }
-    
-    public static class MsSearchResultPeptideTest implements MsSearchResultPeptide {
-
-        private String peptideSequence;
-        private char preResidue;
-        private char postResidue;
-        private List<MsResultResidueModIn> dynamicResModifications = new ArrayList<MsResultResidueModIn>();
-        private List<MsTerminalModificationIn> dynamicTermModifications = new ArrayList<MsTerminalModificationIn>();
-        
-        public String getPeptideSequence() {
-            return peptideSequence;
-        }
-        public char getPostResidue() {
-            return postResidue;
-        }
-        public char getPreResidue() {
-            return preResidue;
-        }
-        public int getSequenceLength() {
-            return peptideSequence.length();
-        }
-        public void setPeptideSequence(String peptideSequence) {
-            this.peptideSequence = peptideSequence;
-        }
-        public void setPreResidue(char preResidue) {
-            this.preResidue = preResidue;
-        }
-        public void setPostResidue(char postResidue) {
-            this.postResidue = postResidue;
-        }
-        public void setResultDynamicResidueMods(
-                List<MsResultResidueModIn> dynaResMods) {
-            this.dynamicResModifications = dynaResMods;
-        }
-        public void setDynamicTerminalMods(
-                List<MsTerminalModificationIn> dynaTermMods) {
-            this.dynamicTermModifications = dynaTermMods;
-        }
-        @Override
-        public List<MsResultResidueModIn> getResultDynamicResidueModifications() {
-            return dynamicResModifications;
-        }
-        @Override
-        public List<MsTerminalModificationIn> getDynamicTerminalModifications() {
-            return dynamicTermModifications;
         }
     }
 }

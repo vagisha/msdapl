@@ -15,7 +15,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
@@ -145,7 +145,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         catch (SQTParseException e) {
             fail("Valid sequence");
         }
-        List<MsResultResidueModIn> resultMods = new ArrayList<MsResultResidueModIn>(0);
+        List<MsResultResidueMod> resultMods = new ArrayList<MsResultResidueMod>(0);
         try {
             resultMods = builder.getResultMods(seq, dynaMods);
         }
@@ -153,12 +153,12 @@ public class SequestResultPeptideBuilderTest extends TestCase {
             fail("Valid sequence");
         }
         assertEquals(2, resultMods.size());
-        Collections.sort(resultMods, new Comparator<MsResultResidueModIn>() {
-            public int compare(MsResultResidueModIn o1,
-                    MsResultResidueModIn o2) {
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
-        MsResultResidueModIn mod = resultMods.get(0);
+        MsResultResidueMod mod = resultMods.get(0);
         assertEquals('S', mod.getModifiedResidue());
         assertEquals('*', mod.getModificationSymbol());
         assertEquals(0, mod.getModifiedPosition());
@@ -207,14 +207,14 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRNYFEAFEMPG", resultPeptide.getPeptideSequence());
         
-        List<MsResultResidueModIn> resultMods = (List<MsResultResidueModIn>) resultPeptide.getResultDynamicResidueModifications();
+        List<MsResultResidueMod> resultMods = (List<MsResultResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(2, resultMods.size());
-        Collections.sort(resultMods, new Comparator<MsResultResidueModIn>() {
-            public int compare(MsResultResidueModIn o1,
-                    MsResultResidueModIn o2) {
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
-        MsResultResidueModIn mod = resultMods.get(0);
+        MsResultResidueMod mod = resultMods.get(0);
         assertEquals('Y', mod.getModifiedResidue());
         assertEquals('*', mod.getModificationSymbol());
         assertEquals(5, mod.getModifiedPosition());
@@ -282,14 +282,14 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRSFEAFSMPGT", resultPeptide.getPeptideSequence());
         
-        List<MsResultResidueModIn> resultMods = (List<MsResultResidueModIn>) resultPeptide.getResultDynamicResidueModifications();
+        List<MsResultResidueMod> resultMods = (List<MsResultResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(3, resultMods.size());
-        Collections.sort(resultMods, new Comparator<MsResultResidueModIn>() {
-            public int compare(MsResultResidueModIn o1,
-                    MsResultResidueModIn o2) {
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
-        MsResultResidueModIn mod = resultMods.get(0);
+        MsResultResidueMod mod = resultMods.get(0);
         assertEquals('S', mod.getModifiedResidue());
         assertEquals('*', mod.getModificationSymbol());
         assertEquals(4, mod.getModifiedPosition());
@@ -327,14 +327,14 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRSFEAFSMPG", resultPeptide.getPeptideSequence());
         
-        List<MsResultResidueModIn> resultMods = (List<MsResultResidueModIn>) resultPeptide.getResultDynamicResidueModifications();
+        List<MsResultResidueMod> resultMods = (List<MsResultResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(3, resultMods.size());
-        Collections.sort(resultMods, new Comparator<MsResultResidueModIn>() {
-            public int compare(MsResultResidueModIn o1,
-                    MsResultResidueModIn o2) {
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
-        MsResultResidueModIn mod = resultMods.get(0);
+        MsResultResidueMod mod = resultMods.get(0);
         assertEquals('S', mod.getModifiedResidue());
         assertEquals('*', mod.getModificationSymbol());
         assertEquals(4, mod.getModifiedPosition());

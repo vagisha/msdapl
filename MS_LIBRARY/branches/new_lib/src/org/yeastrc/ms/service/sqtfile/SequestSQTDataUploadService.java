@@ -23,9 +23,9 @@ import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestResultDataDb;
+import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
@@ -43,7 +43,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     
     
     // these are the things we will cache and do bulk-inserts
-    List<SequestResultDataDb> sequestResultDataList; // sequest scores
+    List<SequestResultDataWId> sequestResultDataList; // sequest scores
     
     private MsSearchDatabaseIn db = null;
     private boolean usesEvalue = false;
@@ -52,7 +52,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     
     public SequestSQTDataUploadService() {
         super();
-        this.sequestResultDataList = new ArrayList<SequestResultDataDb>();
+        this.sequestResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
     }
@@ -198,7 +198,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             uploadSearchScan(scan, lastUploadedRunSearchId, scanId); 
 
             // save all the search results for this scan
-            for (SequestSearchResult result: scan.getScanResults()) {
+            for (SequestSearchResultIn result: scan.getScanResults()) {
                 uploadSearchResult(result, lastUploadedRunSearchId, scanId);
                 numResults++;
             }
@@ -241,7 +241,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         };
     }
     
-    void uploadSearchResult(SequestSearchResult result, int runSearchId, int scanId) throws UploadException {
+    void uploadSearchResult(SequestSearchResultIn result, int runSearchId, int scanId) throws UploadException {
         
         int resultId = super.uploadBaseSearchResult(result, runSearchId, scanId);
         
@@ -272,7 +272,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
     }
     
-    private static final class ResultData implements SequestResultDataDb {
+    private static final class ResultData implements SequestResultDataWId {
         private final SequestResultData data;
         private final int resultId;
         public ResultData(int resultId, SequestResultData data) {

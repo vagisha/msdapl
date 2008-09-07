@@ -2,12 +2,12 @@ package org.yeastrc.ms.dao.search.sequest;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.dao.search.sqtfile.SQTBaseDAOTestCase;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 
 public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 
@@ -23,7 +23,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public void testOperationsOnSqtSearchResult() {
         
         // try to get the result for a result id that does not exist in the table
-        SequestSearchResultDb res = sequestResDao.load(1);
+        SequestSearchResult res = sequestResDao.load(1);
         assertNull(res);
         
         // insert one result in to the table
@@ -50,7 +50,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         
         // make sure everything got saved
         assertNotNull(resultDao.load(resultId));
-        SequestSearchResultDb sqtResult_db = sequestResDao.load(resultId);
+        SequestSearchResult sqtResult_db = sequestResDao.load(resultId);
         assertEquals(sqtResult_db.getRunSearchId(), 45);
         assertEquals(sqtResult_db.getScanId(), 32);
         assertEquals(resultId, sqtResult_db.getId());
@@ -63,7 +63,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sequestResDao.load(resultId));
     }
     
-    private void checkSearchResult(SequestSearchResult input, SequestSearchResultDb output) {
+    private void checkSearchResult(SequestSearchResultIn input, SequestSearchResult output) {
         super.checkSearchResult(input, output);
         
         SequestResultData iData = input.getSequestResultData();
@@ -83,13 +83,13 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     private SequestSearchResultTest makeSequestResult(int charge,String peptide) {
         SequestSearchResultTest result = new SequestSearchResultTest();
         result.setCharge(charge);
-        MsSearchResultPeptideTest resultPeptide = new MsSearchResultPeptideTest();
+        SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
         resultPeptide.setPeptideSequence(peptide);
         result.setResultPeptide(resultPeptide);
 
         return result;
     }
-    public static final class SequestSearchResultTest extends MsSearchResultTest implements SequestSearchResult {
+    public static final class SequestSearchResultTest extends MsSearchResultTest implements SequestSearchResultIn {
 
         private BigDecimal deltaCN;
         private int spRank;

@@ -34,7 +34,6 @@ import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
 import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
-import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultPeptideTest;
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
@@ -48,16 +47,15 @@ import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
@@ -65,7 +63,9 @@ import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
-import org.yeastrc.ms.domain.search.impl.ResultResidueMod;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
+import org.yeastrc.ms.domain.search.impl.SearchDatabase;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.impl.TerminalModification;
 import org.yeastrc.ms.util.PeakConverterDouble;
 
@@ -79,8 +79,7 @@ public class BaseDAOTestCase extends TestCase {
 
     protected MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
     protected MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
-    protected MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = 
-        DAOFactory.instance().getMsSearchResultDAO();
+    protected MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
     protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
     protected MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
     protected MsSearchResultProteinDAO matchDao = DAOFactory.instance().getMsProteinMatchDAO();
@@ -142,28 +141,23 @@ public class BaseDAOTestCase extends TestCase {
     // SEARCH DATABASE
     //-----------------------------------------------------------------------------------------------------
     protected MsSearchDatabaseIn makeSequenceDatabase(final String serverAddress, final String serverPath) {
-        MsSearchDatabaseIn db = new MsSearchDatabaseIn(){
-            public String getServerAddress() {
-                return serverAddress;
-            }
-            public String getServerPath() {
-                return serverPath;
-            }};
-       
+        SearchDatabase db = new SearchDatabase();
+        db.setServerAddress(serverAddress);
+        db.setServerPath(serverPath);
         return db;
     }
 
     //-----------------------------------------------------------------------------------------------------
     // SEARCH RESULT
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchResult makeSearchResult(int searchId, int runSearchId, int charge,String peptide, boolean addDynaResMod) {
+    protected MsSearchResultIn makeSearchResult(int searchId, int runSearchId, int charge,String peptide, boolean addDynaResMod) {
 
         //!!------------ RESET the dynamic mod lookup table --------------------------------
 //        DynamicModLookupUtil.instance().reset();
         //!!------------ RESET the dynamic mod lookup table --------------------------------
         
         MsSearchResultTest result = makeSearchResult(charge, peptide);
-        MsSearchResultPeptideTest resultPeptide = new MsSearchResultPeptideTest();
+        SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
         resultPeptide.setPeptideSequence(peptide);
         result.setResultPeptide(resultPeptide);
         
@@ -179,23 +173,23 @@ public class BaseDAOTestCase extends TestCase {
         return result;
     }
 
-    protected void addResultDynamicModifications(MsSearchResultPeptideTest peptide, int searchId) {
+    protected void addResultDynamicModifications(SearchResultPeptideBean peptide, int searchId) {
 
         List<MsResidueModification> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
 
-        List<MsResultResidueModIn> resultDynaMods = new ArrayList<MsResultResidueModIn>(dynaMods.size());
+        List<MsResultResidueMod> resultDynaMods = new ArrayList<MsResultResidueMod>(dynaMods.size());
         int pos = 1;
         for (MsResidueModification mod: dynaMods) {
-            MsResultResidueModIn resMod = makeResultDynamicResidueMod(mod.getModifiedResidue(), 
+            MsResultResidueMod resMod = makeResultDynamicResidueMod(mod.getModifiedResidue(), 
                     mod.getModificationMass().toString(), 
                     mod.getModificationSymbol(), 
                     pos++);
             resultDynaMods.add(resMod);
         }
-        peptide.setResultDynamicResidueMods(resultDynaMods);
+        peptide.setDynamicResidueModifications(resultDynaMods);
     }
 
-    protected void checkSearchResult(MsSearchResult input, MsSearchResultDb output) {
+    protected void checkSearchResult(MsSearchResultIn input, MsSearchResult output) {
         assertEquals(input.getCharge(), output.getCharge());
         if (input.getValidationStatus() == null)
             assertEquals(ValidationStatus.UNKNOWN, output.getValidationStatus());
@@ -209,13 +203,13 @@ public class BaseDAOTestCase extends TestCase {
         checkResultPeptide(input.getResultPeptide(), output.getResultPeptide());
     }
     
-    protected void checkResultPeptide(MsSearchResultPeptide input, MsSearchResultPeptideDb output) {
+    protected void checkResultPeptide(MsSearchResultPeptide input, MsSearchResultPeptide output) {
         assertEquals(input.getPeptideSequence(), output.getPeptideSequence());
         assertEquals(input.getPreResidue(), output.getPreResidue());
         assertEquals(input.getPostResidue(), output.getPostResidue());
         assertEquals(input.getSequenceLength(), output.getSequenceLength());
         assertEquals(input.getResultDynamicResidueModifications().size(), output.getResultDynamicResidueModifications().size());
-        assertEquals(input.getDynamicTerminalModifications().size(), output.getResultDynamicTerminalModifications().size());
+        assertEquals(input.getResultDynamicTerminalModifications().size(), output.getResultDynamicTerminalModifications().size());
     }
     
     //-----------------------------------------------------------------------------------------------------
@@ -270,9 +264,9 @@ public class BaseDAOTestCase extends TestCase {
         return mod;
     }
     
-    protected MsResultResidueModIn makeResultDynamicResidueMod(final char modChar, final String modMass,
+    protected MsResultResidueMod makeResultDynamicResidueMod(final char modChar, final String modMass,
             final char modSymbol, final int modPos) {
-        ResultResidueMod mod = new ResultResidueMod();
+        ResultResidueModBean mod = new ResultResidueModBean();
         if (modMass != null)
             mod.setModificationMass(new BigDecimal(modMass));
         mod.setModificationSymbol(modSymbol);

@@ -14,7 +14,7 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.impl.SQTHeaderItemImpl;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTHeaderItemWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -63,7 +63,7 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
         
         // save the headers
         for (SQTHeaderItem h: runSearch.getHeaders()) {
-            headerDao.saveSQTHeader(new SQTHeaderItemImpl(h, runSearchId));
+            headerDao.saveSQTHeader(new SQTHeaderItemWrap(h, runSearchId));
         }
         return runSearchId;
     }

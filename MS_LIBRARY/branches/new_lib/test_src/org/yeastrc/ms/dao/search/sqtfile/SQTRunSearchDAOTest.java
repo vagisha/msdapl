@@ -7,7 +7,7 @@ import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
-import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchImpl;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchWrap;
 
 public class SQTRunSearchDAOTest extends SQTBaseDAOTestCase {
 
@@ -27,7 +27,7 @@ public class SQTRunSearchDAOTest extends SQTBaseDAOTestCase {
         // save a search (don't add any SQT headers)
         SQTRunSearchIn runSearch_1 = makeSQTRunSearch(false);
         assertEquals(0, runSearch_1.getHeaders().size());
-        int runSearchId_1 = sqtRunSearchDao.saveRunSearch(new SQTRunSearchImpl(runSearch_1, 1, 1)); // runId = 1; // searchId = 1
+        int runSearchId_1 = sqtRunSearchDao.saveRunSearch(new SQTRunSearchWrap(runSearch_1, 1, 1)); // runId = 1; // searchId = 1
         
         // load the search using the general MsRunSearch DAO and make sure
         // the class of the returned object is SQTRunSearch
@@ -43,7 +43,7 @@ public class SQTRunSearchDAOTest extends SQTBaseDAOTestCase {
         // save another search (add SQT headers)
         SQTRunSearchIn runSearch_2 = makeSQTRunSearch(true);
         assertEquals(2, runSearch_2.getHeaders().size());
-        int runSearchId_2 = sqtRunSearchDao.saveRunSearch(new SQTRunSearchImpl(runSearch_2, 65, 1)); // runId = 1; // searchId = 65
+        int runSearchId_2 = sqtRunSearchDao.saveRunSearch(new SQTRunSearchWrap(runSearch_2, 65, 1)); // runId = 1; // searchId = 65
         
         // load the search with headers and check values
         SQTRunSearch runSearchDb_2 = sqtRunSearchDao.loadRunSearch(runSearchId_2);

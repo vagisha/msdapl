@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao.search.sqtfile;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
-import org.yeastrc.ms.domain.search.sqtfile.impl.SQTHeaderItemImpl;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTHeaderItemWrap;
 
 /**
  * 
@@ -33,16 +33,16 @@ public class SQTHeaderDAOImplTest extends SQTBaseDAOTestCase {
         
         // insert some headers for a couple of run_search ids
         SQTHeaderItem h1_1 = makeHeader(1, 1, false);
-        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemImpl(h1_1, 1)); // runSearchId = 1
+        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemWrap(h1_1, 1)); // runSearchId = 1
         SQTHeaderItem h1_2 = makeHeader(1, 2, false);
-        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemImpl(h1_2, 1)); // runSearchId = 1;
+        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemWrap(h1_2, 1)); // runSearchId = 1;
         
         SQTHeaderItem h2_1 = makeHeader(2, 1, true);
-        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemImpl(h2_1, 2)); // runSearchId = 2;
+        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemWrap(h2_1, 2)); // runSearchId = 2;
         SQTHeaderItem h2_2 = makeHeader(2, 2, false);
-        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemImpl(h2_2, 2));
+        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemWrap(h2_2, 2));
         SQTHeaderItem h2_3 = makeHeader(2, 3, false);
-        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemImpl(h2_3, 2));
+        sqtHeaderDao.saveSQTHeader(new SQTHeaderItemWrap(h2_3, 2));
         
         // check the number of headers saved
         headers_1 = sqtHeaderDao.loadSQTHeadersForRunSearch(1);

@@ -55,9 +55,12 @@ public class DAOTestSuite {
         suite.addTestSuite(SQTHeaderDAOImplTest.class);
         suite.addTestSuite(SQTSearchScanDAOImplTest.class);
         suite.addTestSuite(SQTRunSearchDAOTest.class);
+        
+        // Sequest search
         suite.addTestSuite(SequestSearchResultDAOImplTest.class);
         suite.addTestSuite(SequestSearchDAOImplTest.class);
-        
+
+        // TODO Prolucid search
         
         //$JUnit-END$
         return suite;

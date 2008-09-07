@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearch"> 
 
-    <typeAlias alias="MsSearchOut" type="org.yeastrc.ms.domain.search.impl.MsSearchBean"/>
+    <typeAlias alias="MsSearchOut" type="org.yeastrc.ms.domain.search.impl.SearchBean"/>
     <typeAlias alias="MsSearchIn" type="org.yeastrc.ms.domain.search.MsSearchIn"/>
 	
 	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>

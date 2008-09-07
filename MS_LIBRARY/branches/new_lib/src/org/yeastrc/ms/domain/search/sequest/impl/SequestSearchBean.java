@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.search.sequest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.impl.MsSearchBean;
+import org.yeastrc.ms.domain.search.impl.SearchBean;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 
@@ -17,7 +17,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 /**
  * 
  */
-public class SequestSearchBean extends MsSearchBean implements SequestSearch {
+public class SequestSearchBean extends SearchBean implements SequestSearch {
 
     private List<SequestParam> paramList;
     

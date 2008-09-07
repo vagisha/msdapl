@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -57,7 +57,7 @@ public class SequestSQTFileReader extends SQTFileReader {
         while(currentLine != null) {
             // is this one of the results for the scan ('M' line)
             if (isResultLine(currentLine)) {
-                SequestSearchResult result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
+                SequestSearchResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
                 if (result != null) 
                     scan.addSearchResult(result);
             }
@@ -75,7 +75,7 @@ public class SequestSQTFileReader extends SQTFileReader {
      * @return
      * @throws DataProviderException 
      */
-    private SequestSearchResult parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
+    private SequestSearchResultIn parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
 
         SequestResult result = parsePeptideResult(currentLine, scanNumber, charge);
 
@@ -148,16 +148,16 @@ public class SequestSQTFileReader extends SQTFileReader {
     private static final class SeqSearchScan implements SequestSearchScan {
 
         private SQTSearchScanIn scan;
-        private List<SequestSearchResult> resultList;
+        private List<SequestSearchResultIn> resultList;
 
         public SeqSearchScan(SQTSearchScanIn scan) {
             this.scan = scan;
-            resultList = new ArrayList<SequestSearchResult>();
+            resultList = new ArrayList<SequestSearchResultIn>();
         }
-        public void addSearchResult(SequestSearchResult result) {
+        public void addSearchResult(SequestSearchResultIn result) {
             resultList.add(result);
         }
-        public List<SequestSearchResult> getScanResults() {
+        public List<SequestSearchResultIn> getScanResults() {
             return resultList;
         }
         public int getScanNumber() {

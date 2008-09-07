@@ -3,7 +3,7 @@ package org.yeastrc.ms.parser.sqtFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
@@ -11,7 +11,7 @@ import org.yeastrc.ms.domain.search.ValidationStatus;
 /**
  * Represents a 'M' line in the SQT file
  */
-public abstract class SQTSearchResult implements MsSearchResult {
+public abstract class SQTSearchResult implements MsSearchResultIn {
 
     private String sequence;
     private char validationStatus;

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
 
@@ -23,10 +23,10 @@ public class SearchScan implements SQTSearchScanIn {
     private BigDecimal lowestSp; // Lowest Sp value for top 500 spectra
     private int numMatching; // Number of sequences matching this precursor ion
     
-    private List<SequestSearchResult> resultList;
+    private List<SequestSearchResultIn> resultList;
     
     public SearchScan() {
-        resultList = new ArrayList<SequestSearchResult>();
+        resultList = new ArrayList<SequestSearchResultIn>();
     }
     
     /**
@@ -186,7 +186,7 @@ public class SearchScan implements SQTSearchScanIn {
         
         buf.append("\n");
         
-        for (SequestSearchResult res: resultList) {
+        for (SequestSearchResultIn res: resultList) {
             buf.append(res.toString());
             buf.append("\n");
         }
@@ -204,7 +204,7 @@ public class SearchScan implements SQTSearchScanIn {
         return getServer();
     }
 
-    public List<SequestSearchResult> getScanResults() {
+    public List<SequestSearchResultIn> getScanResults() {
         return this.resultList;
     }
 }

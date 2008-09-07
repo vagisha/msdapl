@@ -9,15 +9,16 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
-import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
-import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
+import org.yeastrc.ms.domain.search.impl.MsSearchResultWrap;
+import org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -25,7 +26,7 @@ import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 public class MsSearchResultDAOImpl extends BaseSqlMapDAO 
-        implements MsSearchResultDAO<MsSearchResult, MsSearchResultDb> {
+        implements MsSearchResultDAO {
 
     private MsSearchResultProteinDAO matchDao;
     private MsSearchModificationDAO modDao;
@@ -37,8 +38,8 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         this.modDao = modDao;
     }
 
-    public MsSearchResultDb load(int id) {
-        return (MsSearchResultDb) queryForObject("MsSearchResult.select", id);
+    public MsSearchResult load(int id) {
+        return (MsSearchResult) queryForObject("MsSearchResult.select", id);
     }
     
     public List<Integer> loadResultIdsForRunSearch(int runSearchId) {
@@ -53,7 +54,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForRunSearchScanCharge", map);
     }
     
-    public int save(int searchId, String searchDbName, MsSearchResult searchResult, int runSearchId, int scanId) {
+    public int save(int searchId, String searchDbName, MsSearchResultIn searchResult, int runSearchId, int scanId) {
         
         int resultId = saveResultOnly(searchResult, runSearchId, scanId);
         
@@ -68,9 +69,9 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return resultId;
     }
     
-    public int saveResultOnly(MsSearchResult searchResult, int runSearchId, int scanId) {
+    public int saveResultOnly(MsSearchResultIn searchResult, int runSearchId, int scanId) {
 
-        MsSearchResultSqlMapParam resultDb = new MsSearchResultSqlMapParam(runSearchId, scanId, searchResult);
+        MsSearchResultWrap resultDb = new MsSearchResultWrap(searchResult, runSearchId, scanId);
         return saveAndReturnId("MsSearchResult.insert", resultDb);
     }
 
@@ -82,20 +83,20 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
 
     private void saveDynamicResidueMods(int searchId, int resultId,
             MsSearchResultPeptide peptide) {
-        for (MsResultResidueModIn mod: peptide.getResultDynamicResidueModifications()) {
+        for (MsResultResidueMod mod: peptide.getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
-            int modId = modDao.loadMatchingDynamicResidueModId(new MsResidueModificationImpl(mod, searchId));
+            int modId = modDao.loadMatchingDynamicResidueModId(new MsResidueModificationWrap(mod, searchId));
             modDao.saveDynamicResidueModForResult(resultId, modId, mod.getModifiedPosition());
         }
     }
     
     private void saveDynamicTerminalMods(int searchId, int resultId,
             MsSearchResultPeptide peptide) {
-        for (MsTerminalModificationIn mod: peptide.getDynamicTerminalModifications()) {
+        for (MsTerminalModificationIn mod: peptide.getResultDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
-            int modId = modDao.loadMatchingDynamicTerminalModId(new MsTerminalModificationImpl(mod, searchId));
+            int modId = modDao.loadMatchingDynamicTerminalModId(new MsTerminalModificationWrap(mod, searchId));
             modDao.saveDynamicTerminalModForResult(resultId, modId);
         }
     }
@@ -104,45 +105,6 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         delete("MsSearchResult.delete", resultId);
     }
 
-    /**
-     * Convenience class for encapsulating runSearchId, scanId and search result
-     */
-    public class MsSearchResultSqlMapParam {
-
-        private int runSearchId;
-        private int scanId;
-        private MsSearchResult result;
-        
-        public MsSearchResultSqlMapParam(int runSearchId, int scanId, MsSearchResult result) {
-            this.runSearchId = runSearchId;
-            this.scanId = scanId;
-            this.result = result;
-        }
-        public int getRunSearchId() {
-            return runSearchId;
-        }
-        public int getScanId() {
-            return scanId;
-        }
-        public int getCharge() {
-            return result.getCharge();
-        }
-        public ValidationStatus getValidationStatus() {
-            return result.getValidationStatus();
-        }
-        public String getPeptideSequence() {
-            return result.getResultPeptide().getPeptideSequence();
-        }
-        public String getPreResidueString() {
-            return Character.toString(result.getResultPeptide().getPreResidue());
-        }
-        public String getPostResidueString() {
-            return Character.toString(result.getResultPeptide().getPostResidue());
-        }
-        public int getSequenceLength() {
-            return result.getResultPeptide().getSequenceLength();
-        }
-    }
 
     /**
      * Type handler for converting between ValidationType and SQL's CHAR type.

@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain.search.impl;
 
+import java.io.File;
+
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 
 /**
@@ -34,5 +36,12 @@ public class SearchDatabase implements MsSearchDatabaseIn {
      */
     public void setServerPath(String serverPath) {
         this.serverPath = serverPath;
+    }
+    
+    @Override
+    public String getDatabaseFileName() {
+        if (serverPath != null)
+            return new File(serverPath).getName();
+        return null;
     }
 }

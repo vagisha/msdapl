@@ -11,35 +11,20 @@ import org.yeastrc.ms.domain.search.MsResultResidueMod;
 /**
  * 
  */
-public class ResultResidueModBean extends ResultResidueMod implements
-        MsResultResidueMod {
+public class ResultResidueModBean extends ResidueModification implements MsResultResidueMod {
 
-    private int modId;
-    private int resultId;
-    
+    private int modPosition = -1;
     
     /**
-     * @return the modId
+     * @return the modPosition
      */
-    public int getModificationId() {
-        return modId;
+    public int getModifiedPosition() {
+        return modPosition;
     }
     /**
-     * @param modId the modId to set
+     * @param modPosition the modPosition to set
      */
-    public void setModificationId(int modId) {
-        this.modId = modId;
-    }
-    /**
-     * @return the resultId
-     */
-    public int getResultId() {
-        return resultId;
-    }
-    /**
-     * @param resultId the resultId to set
-     */
-    public void setResultId(int resultId) {
-        this.resultId = resultId;
+    public void setModifiedPosition(int modPosition) {
+        this.modPosition = modPosition;
     }
 }

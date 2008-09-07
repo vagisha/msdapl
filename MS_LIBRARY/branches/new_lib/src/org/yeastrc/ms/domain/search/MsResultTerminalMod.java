@@ -9,6 +9,6 @@ package org.yeastrc.ms.domain.search;
 /**
  * 
  */
-public interface MsResultTerminalMod extends MsTerminalModificationIn, ResultModIdentifier {
+public interface MsResultTerminalMod extends MsTerminalModificationIn {
 
 }

@@ -2,12 +2,12 @@ package org.yeastrc.ms.dao.search.sequest;
 
 import java.util.List;
 
-import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.domain.search.sequest.SequestResultDataDb;
+import org.yeastrc.ms.dao.search.GenericSearchResultDAO;
+import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 
-public interface SequestSearchResultDAO extends MsSearchResultDAO<SequestSearchResult, SequestSearchResultDb> {
+public interface SequestSearchResultDAO extends GenericSearchResultDAO<SequestSearchResultIn, SequestSearchResult> {
 
-    public abstract void saveAllSequestResultData(List<SequestResultDataDb> dataList);
+    public abstract void saveAllSequestResultData(List<SequestResultDataWId> dataList);
 }

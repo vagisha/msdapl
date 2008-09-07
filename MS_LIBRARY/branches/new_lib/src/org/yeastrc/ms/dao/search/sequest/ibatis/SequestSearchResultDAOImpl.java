@@ -12,12 +12,10 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestResultDataDb;
+import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -26,16 +24,16 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  */
 public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements SequestSearchResultDAO {
 
-    private MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao;
+    private MsSearchResultDAO resultDao;
     
     public SequestSearchResultDAOImpl(SqlMapClient sqlMap,
-            MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao) {
+            MsSearchResultDAO resultDao) {
         super(sqlMap);
         this.resultDao = resultDao;
     }
     
-    public SequestSearchResultDb load(int resultId) {
-        return (SequestSearchResultDb) queryForObject("SequestResult.select", resultId);
+    public SequestSearchResult load(int resultId) {
+        return (SequestSearchResult) queryForObject("SequestResult.select", resultId);
     }
     
     @Override
@@ -48,7 +46,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         return resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
     }
     
-    public int save(int searchId, String searchDbName, SequestSearchResult searchResult, int runSearchId, int scanId) {
+    public int save(int searchId, String searchDbName, SequestSearchResultIn searchResult, int runSearchId, int scanId) {
         
         // first save the base result
         int resultId = resultDao.save(searchId, searchDbName, searchResult, runSearchId, scanId);
@@ -60,7 +58,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
     
     @Override
-    public int saveResultOnly(SequestSearchResult searchResult, int runSearchId,
+    public int saveResultOnly(SequestSearchResultIn searchResult, int runSearchId,
             int scanId) {
         // save the base result (saves data to msRunSearchResult table only).
         int resultId = resultDao.saveResultOnly(searchResult, runSearchId, scanId);
@@ -73,11 +71,11 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
     
     @Override
-    public void saveAllSequestResultData(List<SequestResultDataDb> resultDataList) {
+    public void saveAllSequestResultData(List<SequestResultDataWId> resultDataList) {
         if (resultDataList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for ( SequestResultDataDb data: resultDataList) {
+        for ( SequestResultDataWId data: resultDataList) {
             values.append(",(");
             values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
@@ -117,7 +115,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         resultDao.delete(resultId);
     }
 
-    public static final class SequestResultDataSqlMapParam implements SequestResultDataDb {
+    public static final class SequestResultDataSqlMapParam implements SequestResultDataWId {
         
         private int resultId;
         private SequestResultData result;

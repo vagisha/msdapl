@@ -14,14 +14,14 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SQTSearchResult;
 
 /**
  * 
  */
-public class ProlucidResult extends SQTSearchResult implements ProlucidSearchResult{
+public class ProlucidResult extends SQTSearchResult implements ProlucidSearchResultIn{
 
     private MsSearchResultPeptide resultPeptide = null;
     

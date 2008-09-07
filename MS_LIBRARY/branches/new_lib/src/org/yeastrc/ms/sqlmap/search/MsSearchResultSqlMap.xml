@@ -4,17 +4,17 @@
 <sqlMap namespace="MsSearchResult"> 
 
 	
-	<typeAlias alias="MsSearchResultOut" type="org.yeastrc.ms.domain.search.impl.MsSearchResultDbImpl" />
-	<typeAlias alias="MsSearchResultPeptideOut" type="org.yeastrc.ms.domain.search.impl.MsSearchResultPeptideDbImpl" />
-	<typeAlias alias="MsSearchResultIn" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl$MsSearchResultSqlMapParam" />
+	<typeAlias alias="MsSearchResultOut" type="org.yeastrc.ms.domain.search.impl.SearchResultBean" />
+	<typeAlias alias="MsSearchResultPeptideOut" type="org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean" />
+	<typeAlias alias="MsSearchResultIn" type="org.yeastrc.ms.domain.search.impl.MsSearchResultWrap" />
 	
 	<typeAlias alias="VStatusHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl$ValidationStatusTypeHandler" />
 	
 	
 	<resultMap class="MsSearchResultPeptideOut" id="msSearchResultPeptideResult">
 		<result property="peptideSequence" column="peptide" />
-		<result property="preResidueString" column="preResidue" javaType="java.lang.String" nullValue=""/>
-		<result property="postResidueString" column="postResidue" javaType="java.lang.String" nullValue=""/>
+		<result property="preResidue" column="preResidue" typeHandler="CharTypeHandler" />
+		<result property="postResidue" column="postResidue" typeHandler="CharTypeHandler" />
 		<result property="dynamicResidueModifications"
 				select="MsSearchMod.selectDynamicResidueModsForResult"
 				column="id" />

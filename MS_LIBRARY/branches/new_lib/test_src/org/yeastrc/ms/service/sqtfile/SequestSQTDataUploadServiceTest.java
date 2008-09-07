@@ -23,7 +23,7 @@ import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
@@ -116,12 +116,12 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(Terminal.CTERM, staticTermMods.get(0).getModifiedTerminal());
         assertEquals(123.4567, staticTermMods.get(0).getModificationMass().doubleValue());
         assertEquals(0, staticTermMods.get(0).getModificationSymbol());
-        assertEquals(searchId, staticTermMods.get(0).getSearchId());
+//        assertEquals(searchId, staticTermMods.get(0).getSearchId());
         
         assertEquals(Terminal.NTERM, staticTermMods.get(1).getModifiedTerminal());
         assertEquals(987.6543, staticTermMods.get(1).getModificationMass().doubleValue());
         assertEquals(0, staticTermMods.get(1).getModificationSymbol());
-        assertEquals(searchId, staticTermMods.get(1).getSearchId());
+//        assertEquals(searchId, staticTermMods.get(1).getSearchId());
         
         // check the dynamic residue modifications
         List<MsResidueModification> dynaResMods = search.getDynamicResidueMods();
@@ -297,7 +297,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(4, resultIds.size()); // number of results for this scan + charge combination
         Collections.sort(resultIds);
         // M         1       4      866.96470      0.00000  1.1529   3.137   9     14          L.S*D#MSASRT*Y*.T   U
-        SequestSearchResultDb res = seqResDao.load(resultIds.get(0));
+        SequestSearchResult res = seqResDao.load(resultIds.get(0));
         assertEquals(1, res.getCharge());
         assertEquals(scanId, res.getScanId());
         assertEquals(runSearchId, res.getRunSearchId());

@@ -32,6 +32,4 @@ public interface MsTerminalModification extends MsTerminalModificationIn {
     };
     
     public abstract int getId();
-    
-    public abstract int getSearchId();
 }

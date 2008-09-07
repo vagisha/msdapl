@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultResidueModIn;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
@@ -258,7 +259,7 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
             assertEquals("No matching modification found for modified char: M; mass: 45.0 in sequence: "+seq, e.getMessage());
         }
         
-        List<MsResultResidueModIn> resultMods = new ArrayList<MsResultResidueModIn>();
+        List<MsResultResidueMod> resultMods = new ArrayList<MsResultResidueMod>();
         
         // conflicting n-terminal and residue modifications.-- getResultResidueMods will 
         // treat it as a terminal modification
@@ -294,12 +295,12 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
             fail("Valid sequence");
         }
         assertEquals(2, resultMods.size());
-        Collections.sort(resultMods, new Comparator<MsResultResidueModIn>() {
-            public int compare(MsResultResidueModIn o1,
-                    MsResultResidueModIn o2) {
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
-        MsResultResidueModIn mod = resultMods.get(0);
+        MsResultResidueMod mod = resultMods.get(0);
         assertEquals('S', mod.getModifiedResidue());
         assertEquals('\u0000', mod.getModificationSymbol());
         assertEquals(0, mod.getModifiedPosition());
@@ -371,7 +372,7 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
         }
         
         
-        List<MsTerminalModificationIn> resultMods = new ArrayList<MsTerminalModificationIn>();
+        List<MsResultTerminalMod> resultMods = new ArrayList<MsResultTerminalMod>();
         
         seq = "SM";
         resultMods.clear();
@@ -443,17 +444,17 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
         assertEquals("SKLRNYFEAFEMPM", resultPeptide.getPeptideSequence());
         
         // RESIDUE MODS
-        List<MsResultResidueModIn> resultResMods = (List<MsResultResidueModIn>) resultPeptide.getResultDynamicResidueModifications();
+        List<MsResultResidueMod> resultResMods = (List<MsResultResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(3, resultResMods.size());
-        Collections.sort(resultResMods, new Comparator<MsResultResidueModIn>() {
-            public int compare(MsResultResidueModIn o1,
-                    MsResultResidueModIn o2) {
+        Collections.sort(resultResMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
-        for (MsResultResidueModIn mod: resultResMods)
+        for (MsResultResidueMod mod: resultResMods)
             assertEquals('\u0000', mod.getModificationSymbol());
         
-        MsResultResidueModIn mod = resultResMods.get(0);
+        MsResultResidueMod mod = resultResMods.get(0);
         assertEquals('S', mod.getModifiedResidue());
         assertEquals(0, mod.getModifiedPosition());
         assertEquals(BigDecimal.valueOf(80.0), mod.getModificationMass());
@@ -469,7 +470,7 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
         assertEquals(BigDecimal.valueOf(16.0), mod.getModificationMass());
         
         // TERMINAL MODS
-        List<MsTerminalModificationIn> resultTermMods = resultPeptide.getDynamicTerminalModifications();
+        List<MsResultTerminalMod> resultTermMods = resultPeptide.getResultDynamicTerminalModifications();
         assertEquals(2, resultTermMods.size());
         Collections.sort(resultTermMods, new Comparator<MsTerminalModificationIn>() {
             public int compare(MsTerminalModificationIn o1,
@@ -515,14 +516,14 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
         assertEquals('S', resultPeptide.getPostResidue());
         assertEquals("QKLRSFEAFSMPG", resultPeptide.getPeptideSequence());
         
-        List<MsResultResidueModIn> resultMods = (List<MsResultResidueModIn>) resultPeptide.getResultDynamicResidueModifications();
+        List<MsResultResidueMod> resultMods = (List<MsResultResidueMod>) resultPeptide.getResultDynamicResidueModifications();
         assertEquals(4, resultMods.size());
-        Collections.sort(resultMods, new Comparator<MsResultResidueModIn>() {
-            public int compare(MsResultResidueModIn o1,
-                    MsResultResidueModIn o2) {
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
-        MsResultResidueModIn mod = resultMods.get(0);
+        MsResultResidueMod mod = resultMods.get(0);
         assertEquals('S', mod.getModifiedResidue());
         assertEquals('\u0000', mod.getModificationSymbol());
         assertEquals(4, mod.getModifiedPosition());

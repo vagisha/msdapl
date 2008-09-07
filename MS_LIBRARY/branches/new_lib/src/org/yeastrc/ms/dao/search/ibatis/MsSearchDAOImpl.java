@@ -25,9 +25,9 @@ import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
-import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseImpl;
-import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
+import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseWrap;
+import org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -64,27 +64,27 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
         try {
             // save any database information associated with the search 
             for (MsSearchDatabaseIn seqDb: search.getSearchDatabases()) {
-                seqDbDao.saveSearchDatabase(new MsSearchDatabaseImpl(seqDb, sequenceDatabaseId), searchId);
+                seqDbDao.saveSearchDatabase(new MsSearchDatabaseWrap(seqDb, sequenceDatabaseId), searchId);
             }
 
             // save any static residue modifications used for the search
             for (final MsResidueModificationIn staticMod: search.getStaticResidueMods()) {
-                modDao.saveStaticResidueMod(new MsResidueModificationImpl(staticMod, searchId));
+                modDao.saveStaticResidueMod(new MsResidueModificationWrap(staticMod, searchId));
             }
 
             // save any dynamic residue modifications used for the search
             for (final MsResidueModificationIn dynaMod: search.getDynamicResidueMods()) {
-                modDao.saveDynamicResidueMod(new MsResidueModificationImpl(dynaMod, searchId));
+                modDao.saveDynamicResidueMod(new MsResidueModificationWrap(dynaMod, searchId));
             }
 
             // save any static terminal modifications used for the search
             for (final MsTerminalModificationIn staticMod: search.getStaticTerminalMods()) {
-                modDao.saveStaticTerminalMod(new MsTerminalModificationImpl(staticMod, searchId));
+                modDao.saveStaticTerminalMod(new MsTerminalModificationWrap(staticMod, searchId));
             }
 
             // save any dynamic residue modifications used for the search
             for (final MsTerminalModificationIn dynaMod: search.getDynamicTerminalMods()) {
-                modDao.saveDynamicTerminalMod(new MsTerminalModificationImpl(dynaMod, searchId));
+                modDao.saveDynamicTerminalMod(new MsTerminalModificationWrap(dynaMod, searchId));
             }
 
             // save any enzymes used for the search
