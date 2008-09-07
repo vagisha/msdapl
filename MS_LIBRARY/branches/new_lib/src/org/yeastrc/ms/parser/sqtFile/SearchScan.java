@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
 
 /**
  * Represents a 'S' line in the SQT file
  */
-public class SearchScan implements SQTSearchScan {
+public class SearchScan implements SQTSearchScanIn {
 
     private int startScan;
     private int endScan;

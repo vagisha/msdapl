@@ -3,7 +3,8 @@ package org.yeastrc.ms.dao.search.sqtfile;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanImpl;
 
 public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
 
@@ -19,32 +20,32 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         
         assertNull(sqtSpectrumDao.load(34, 1, 1)); // runSearchId = 34; scanId = 1; charge = 1
         
-        SQTSearchScan data = makeSearchScan(3, 0); // charge = 3; processtime = 0
+        SQTSearchScanIn data = makeSearchScan(3, 0); // charge = 3; processtime = 0
         
         try {
-            sqtSpectrumDao.save(data, 0, 1); // runSearchId = 0; scanId = 1;
+            sqtSpectrumDao.save(new SQTSearchScanImpl(data, 0, 1)); // runSearchId = 0; scanId = 1;
             fail("Cannot save search scan with runSearchId of 0");
         }
         catch (RuntimeException e) {System.out.println("RuntimeException");}
         
         try {
-            sqtSpectrumDao.save(data, 1, 0); // runSearchId = 1; scanId = 0;
+            sqtSpectrumDao.save(new SQTSearchScanImpl(data, 1, 0)); // runSearchId = 1; scanId = 0;
             fail("Cannot save search scan with scanId of 0");
         }
         catch (RuntimeException e) {System.out.println("RuntimeException");}
         
         data = makeSearchScan(0,0); // charge = 0; processtime = 0
         try {
-            sqtSpectrumDao.save(data, 1, 1); // runearchId = 1; scanId = 1;
+            sqtSpectrumDao.save(new SQTSearchScanImpl(data, 1, 1)); // runearchId = 1; scanId = 1;
             fail("Cannot save search scan with charge of 0");
         }
         catch (RuntimeException e) {System.out.println("RuntimeException");}
         
         data = makeSearchScan(3,0); // charge = 3; processtime = 0
         
-        sqtSpectrumDao.save(data, 1024, 4201); // runSearchId = 1024; scanId = 4201
+        sqtSpectrumDao.save(new SQTSearchScanImpl(data, 1024, 4201)); // runSearchId = 1024; scanId = 4201
         
-        SQTSearchScanDb data_db = sqtSpectrumDao.load(1024, 4201, 3);
+        SQTSearchScan data_db = sqtSpectrumDao.load(1024, 4201, 3);
         assertNotNull(data_db);
         
         assertEquals(1024, data_db.getRunSearchId());
@@ -57,7 +58,7 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(data_db);
     }
     
-    private void checkSearchScan(SQTSearchScan input, SQTSearchScanDb output) {
+    private void checkSearchScan(SQTSearchScanIn input, SQTSearchScan output) {
         assertEquals(input.getCharge(), output.getCharge());
         assertEquals(input.getLowestSp(), output.getLowestSp());
         assertEquals(input.getProcessTime(), output.getProcessTime());
@@ -67,8 +68,8 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(input.getObservedMass().doubleValue(), output.getObservedMass().doubleValue());
     }
     
-    private SQTSearchScan makeSearchScan(final int charge, final int processTime) {
-        SQTSearchScan scan = new SQTSearchScan() {
+    private SQTSearchScanIn makeSearchScan(final int charge, final int processTime) {
+        SQTSearchScanIn scan = new SQTSearchScanIn() {
 
             public int getCharge() {
                 return charge;

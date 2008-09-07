@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
@@ -147,10 +147,10 @@ public class SequestSQTFileReader extends SQTFileReader {
 
     private static final class SeqSearchScan implements SequestSearchScan {
 
-        private SQTSearchScan scan;
+        private SQTSearchScanIn scan;
         private List<SequestSearchResult> resultList;
 
-        public SeqSearchScan(SQTSearchScan scan) {
+        public SeqSearchScan(SQTSearchScanIn scan) {
             this.scan = scan;
             resultList = new ArrayList<SequestSearchResult>();
         }

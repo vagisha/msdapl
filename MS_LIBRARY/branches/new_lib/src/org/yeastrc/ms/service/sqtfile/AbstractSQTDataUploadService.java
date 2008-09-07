@@ -36,8 +36,9 @@ import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl;
 import org.yeastrc.ms.domain.search.impl.ResultModIdentifierImpl;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIdentifierImpl;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchImpl;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanImpl;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
@@ -305,9 +306,9 @@ public abstract class AbstractSQTDataUploadService {
         return runSearchDao.saveRunSearch(new SQTRunSearchImpl(search, searchId, runId));
     }
 
-    final void uploadSearchScan(SQTSearchScan scan, int runSearchId, int scanId) {
+    final void uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) {
         SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        spectrumDataDao.save(scan, runSearchId, scanId);
+        spectrumDataDao.save(new SQTSearchScanImpl(scan, runSearchId, scanId));
     }
 
     final int uploadBaseSearchResult(MsSearchResult result, int runSearchId, int scanId) throws UploadException {

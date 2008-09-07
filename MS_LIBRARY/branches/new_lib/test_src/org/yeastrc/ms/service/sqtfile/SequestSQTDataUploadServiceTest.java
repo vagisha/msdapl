@@ -26,7 +26,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
 
@@ -281,7 +281,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         // S       00023   00023   1       22      shamu048        866.46000       1892.2  56.4    4716510
         int scanId = this.scanDao.loadScanIdForScanNumRun(23, runId);
         assertEquals(23, this.scanDao.load(scanId).getStartScanNum());
-        SQTSearchScanDb scan = searchScanDao.load(runSearchId, scanId, 1);
+        SQTSearchScan scan = searchScanDao.load(runSearchId, scanId, 1);
         assertNotNull(scan);
         assertEquals(scanId, scan.getScanId());
         assertEquals(1, scan.getCharge());

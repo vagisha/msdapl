@@ -4,8 +4,8 @@
 <sqlMap namespace="SqtSpectrum"> 
 
 
-	<typeAlias alias="SqtSpectrumOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanDbImpl"/>
-	<typeAlias alias="SqtSpectrumIn" type="org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb"/>
+	<typeAlias alias="SqtSpectrumOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanBean"/>
+	<typeAlias alias="SqtSpectrumIn" type="org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan"/>
 	
 	<resultMap class="SqtSpectrumOut" id="sqtSpectrumResult" >
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>

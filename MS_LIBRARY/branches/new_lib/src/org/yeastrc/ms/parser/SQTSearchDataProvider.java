@@ -7,7 +7,7 @@
 package org.yeastrc.ms.parser;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 
 /**
  * 
@@ -20,7 +20,7 @@ public interface SQTSearchDataProvider {
     
     public abstract boolean hasNextSearchScan();
     
-    public abstract SQTSearchScan getNextSearchScan() throws DataProviderException;
+    public abstract SQTSearchScanIn getNextSearchScan() throws DataProviderException;
     
     public abstract void close();
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.Score;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
@@ -237,10 +237,10 @@ public class ProlucidSQTFileReader extends SQTFileReader {
 
     private static final class PlucidSearchScan implements ProlucidSearchScan {
 
-        private SQTSearchScan scan;
+        private SQTSearchScanIn scan;
         private List<ProlucidSearchResult> resultList;
 
-        public PlucidSearchScan(SQTSearchScan scan) {
+        public PlucidSearchScan(SQTSearchScanIn scan) {
             this.scan = scan;
             resultList = new ArrayList<ProlucidSearchResult>();
         }

@@ -8,12 +8,12 @@ package org.yeastrc.ms.domain.search.sqtfile.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 
 /**
  * 
  */
-public class SQTSearchScanDbImpl implements SQTSearchScanDb {
+public class SQTSearchScanBean implements SQTSearchScan {
 
     private int scanId;
     private int charge;

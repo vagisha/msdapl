@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
 
@@ -37,7 +37,7 @@ public abstract class SQTFileReader extends AbstractReader
         
         SQTFileReader reader = new SQTFileReader(){
             @Override
-            public SQTSearchScan getNextSearchScan()
+            public SQTSearchScanIn getNextSearchScan()
             throws DataProviderException {
                 throw new UnsupportedOperationException("");
             }};
@@ -60,7 +60,7 @@ public abstract class SQTFileReader extends AbstractReader
         
         SQTFileReader reader = new SQTFileReader(){
             @Override
-            public SQTSearchScan getNextSearchScan()
+            public SQTSearchScanIn getNextSearchScan()
                     throws DataProviderException {
                 throw new UnsupportedOperationException("");
             }};

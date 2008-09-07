@@ -7,7 +7,7 @@ import java.io.StringReader;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class SQTParserTest extends TestCase {
@@ -247,7 +247,7 @@ public class SQTParserTest extends TestCase {
         return new SQTFileReader(){
 
             @Override
-            public SQTSearchScan getNextSearchScan()
+            public SQTSearchScanIn getNextSearchScan()
                     throws DataProviderException {
                 throw new UnsupportedOperationException();
             }};

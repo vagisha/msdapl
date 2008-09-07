@@ -38,7 +38,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SearchScan;
@@ -113,7 +113,7 @@ public class DbToSqtFileConverter {
                 }
                 currScanId = result.getScanId();
                 currCharge = result.getCharge();
-                SQTSearchScanDb scanDb = scanDao.load(runSearch.getId(), currScanId, currCharge);
+                SQTSearchScan scanDb = scanDao.load(runSearch.getId(), currScanId, currCharge);
                 currScan = makeScanResult(scanDb);
             }
             List<MsResidueModificationIn> dynaResidueMods = new ArrayList<MsResidueModificationIn>();
@@ -194,7 +194,7 @@ public class DbToSqtFileConverter {
         return dynaMods;
     }
 
-    private SearchScan makeScanResult(SQTSearchScanDb resultScan) {
+    private SearchScan makeScanResult(SQTSearchScan resultScan) {
         SearchScan scanResult = new SearchScan();
         MsScanDb msScan = getScanForId(resultScan.getScanId());
         scanResult.setStartScan(msScan.getStartScanNum());

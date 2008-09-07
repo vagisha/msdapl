@@ -8,12 +8,12 @@ package org.yeastrc.ms.domain.search.sequest;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 
 /**
  * 
  */
-public interface SequestSearchScan extends SQTSearchScan {
+public interface SequestSearchScan extends SQTSearchScanIn {
 
     public abstract List<SequestSearchResult> getScanResults();
 }
