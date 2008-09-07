@@ -12,8 +12,8 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -26,7 +26,7 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
         super(sqlMap);
     }
 
-    public List<MsSearchDatabaseDb> loadSearchDatabases(int searchId) {
+    public List<MsSearchDatabase> loadSearchDatabases(int searchId) {
         return queryForList("MsDatabase.selectSearchDatabases", searchId);
     }
     
@@ -34,7 +34,7 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
         delete("MsDatabase.deleteSearchDatabases", searchId);
     }
     
-    public int saveSearchDatabase(MsSearchDatabase database, int searchId, int sequenceDatabaseId) {
+    public int saveSearchDatabase(MsSearchDatabaseIn database, int searchId, int sequenceDatabaseId) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("searchId", searchId);
@@ -51,20 +51,20 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
     }
     
     
-    private List<Integer> loadMatchingDatabaseIds(MsSearchDatabaseDb database) {
+    private List<Integer> loadMatchingDatabaseIds(MsSearchDatabase database) {
         return queryForList("MsDatabase.selectDatabaseIdMatchAllCols", database);
     }
     
-    private int saveDatabase(MsSearchDatabaseDb database) {
+    private int saveDatabase(MsSearchDatabase database) {
         return saveAndReturnId("MsDatabase.insertDatabase", database);
     }
     
-    public static final class MsSearchDatabaseDbSqlMapParam implements MsSearchDatabaseDb {
+    public static final class MsSearchDatabaseDbSqlMapParam implements MsSearchDatabase {
 
-        private MsSearchDatabase db;
+        private MsSearchDatabaseIn db;
         private int sequenceDatabaseId;
         
-        public MsSearchDatabaseDbSqlMapParam(MsSearchDatabase db, int sequenceDatabaseId) {
+        public MsSearchDatabaseDbSqlMapParam(MsSearchDatabaseIn db, int sequenceDatabaseId) {
             this.db = db;
             this.sequenceDatabaseId = sequenceDatabaseId;
         }

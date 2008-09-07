@@ -18,7 +18,7 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
@@ -46,7 +46,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     // these are the things we will cache and do bulk-inserts
     List<SequestResultDataDb> sequestResultDataList; // sequest scores
     
-    private MsSearchDatabase db = null;
+    private MsSearchDatabaseIn db = null;
     private boolean usesEvalue = false;
     private List<MsResidueModificationIn> dynaResidueMods;
     private List<MsTerminalModificationIn> dynaTermMods;
@@ -71,7 +71,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         sequestResultDataList.clear();
     }
     
-    MsSearchDatabase getSearchDatabase() {
+    MsSearchDatabaseIn getSearchDatabase() {
         return db;
     }
 
@@ -227,7 +227,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                     return new ArrayList<MsEnzymeIn>(0);
             }
             @Override
-            public List<MsSearchDatabase> getSearchDatabases() {return Arrays.asList(new MsSearchDatabase[]{parser.getSearchDatabase()});}
+            public List<MsSearchDatabaseIn> getSearchDatabases() {return Arrays.asList(new MsSearchDatabaseIn[]{parser.getSearchDatabase()});}
             @Override
             public List<MsResidueModificationIn> getStaticResidueMods() {return parser.getStaticResidueMods();}
             @Override

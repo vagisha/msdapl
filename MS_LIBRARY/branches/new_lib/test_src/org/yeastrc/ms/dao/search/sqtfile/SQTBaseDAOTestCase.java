@@ -13,7 +13,7 @@ import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAOImplTest.SequestSearchTest;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
@@ -50,9 +50,9 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
         
         if (addSeqDb) {
-            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1");
-            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2");
-            search.setSearchDatabases(Arrays.asList(new MsSearchDatabase[]{db1, db2}));
+            MsSearchDatabaseIn db1 = makeSequenceDatabase("serverAddress", "path1");
+            MsSearchDatabaseIn db2 = makeSequenceDatabase("serverAddress", "path2");
+            search.setSearchDatabases(Arrays.asList(new MsSearchDatabaseIn[]{db1, db2}));
         }
 
         if (addStaticMods) {

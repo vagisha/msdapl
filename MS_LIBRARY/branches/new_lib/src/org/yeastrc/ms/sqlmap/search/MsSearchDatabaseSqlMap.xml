@@ -4,8 +4,8 @@
 <sqlMap namespace="MsDatabase"> 
 
 
-	<typeAlias alias="MsDatabaseOut" type="org.yeastrc.ms.domain.search.impl.MsSearchDatabaseDbImpl"/>
-	<typeAlias alias="MsDatabaseIn" type="org.yeastrc.ms.domain.search.MsSearchDatabaseDb"/>
+	<typeAlias alias="MsDatabaseOut" type="org.yeastrc.ms.domain.search.impl.MsSearchDatabaseBean"/>
+	<typeAlias alias="MsDatabaseIn" type="org.yeastrc.ms.domain.search.MsSearchDatabase"/>
 	
 	
 	<resultMap class="MsDatabaseOut" id="msDatabaseResult">

@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -40,7 +40,7 @@ public class ProlucidParamsParserTest extends TestCase {
             e.printStackTrace();
             fail("Valid file");
         }
-        MsSearchDatabase db = parser.getSearchDatabase();
+        MsSearchDatabaseIn db = parser.getSearchDatabase();
         assertNotNull(db);
         assertEquals("remote.server", db.getServerAddress());
         assertEquals("/bluefish/people-b/applications/yates/dbase/EBI-IPI_mouse_3.06_05-10-2005_origrev_con.fasta", db.getServerPath());

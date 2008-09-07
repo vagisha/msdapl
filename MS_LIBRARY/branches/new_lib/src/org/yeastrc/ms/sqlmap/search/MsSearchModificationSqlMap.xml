@@ -3,11 +3,11 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearchMod"> 
 
-	<typeAlias alias="MsResidueModOut" type="org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl"/>
-	<typeAlias alias="MsTerminalModOut" type="org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl"/>
+	<typeAlias alias="MsResidueModOut" type="org.yeastrc.ms.domain.search.impl.ResidueModificationBean"/>
+	<typeAlias alias="MsTerminalModOut" type="org.yeastrc.ms.domain.search.impl.TerminalModificationBean"/>
 	
-	<typeAlias alias="MsResultResidueModOut" type="org.yeastrc.ms.domain.search.impl.MsResultResidueModImpl"/>
-	<typeAlias alias="MsResultTerminalModOut" type="org.yeastrc.ms.domain.search.impl.MsResultTerminalModImpl"/>
+	<typeAlias alias="MsResultResidueModOut" type="org.yeastrc.ms.domain.search.impl.ResultResidueModBean"/>
+	<typeAlias alias="MsResultTerminalModOut" type="org.yeastrc.ms.domain.search.impl.ResultTerminalModBean"/>
 		
 	<typeAlias alias="MsResidueModIn" type="org.yeastrc.ms.domain.search.MsResidueModification" />
 	<typeAlias alias="MsTerminalModIn" type="org.yeastrc.ms.domain.search.MsTerminalModification" />

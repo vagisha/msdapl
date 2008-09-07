@@ -18,7 +18,7 @@ import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.impl.MsResultResidueModImpl;
+import org.yeastrc.ms.domain.search.impl.ResultResidueMod;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -245,7 +245,7 @@ public final class ProlucidResultPeptideBuilder {
                     // this is a dynamic residue modification for sure. Make sure it is a valid one
                     MsResidueModificationIn mod = modMap.get(modChar+""+modMass);
                     if (mod != null) {
-                        MsResultResidueModImpl resultMod = new MsResultResidueModImpl();
+                        ResultResidueMod resultMod = new ResultResidueMod();
                         resultMod.setModificationMass(mod.getModificationMass());
                         resultMod.setModifiedResidue(mod.getModifiedResidue());
                         resultMod.setModifiedPosition(modCharIndex);
@@ -274,7 +274,7 @@ public final class ProlucidResultPeptideBuilder {
                     // this is a dynamic residue modification for sure. Make sure it is a valid one
                     MsResidueModificationIn mod = modMap.get(modChar+""+modMass);
                     if (mod != null) {
-                        MsResultResidueModImpl resultMod = new MsResultResidueModImpl();
+                        ResultResidueMod resultMod = new ResultResidueMod();
                         resultMod.setModificationMass(mod.getModificationMass());
                         resultMod.setModifiedResidue(mod.getModifiedResidue());
                         resultMod.setModifiedPosition(modCharIndex);

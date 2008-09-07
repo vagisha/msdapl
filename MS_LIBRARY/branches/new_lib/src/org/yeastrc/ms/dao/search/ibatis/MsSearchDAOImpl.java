@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,10 +20,12 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
@@ -56,32 +59,60 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
     
     public int saveSearch(MsSearch search, int sequenceDatabaseId) {
         
-        int searchId = saveAndReturnId("MsSearch.insert", search);
+        final int searchId = saveAndReturnId("MsSearch.insert", search);
         
         try {
             // save any database information associated with the search 
-            for (MsSearchDatabase seqDb: search.getSearchDatabases()) {
+            for (MsSearchDatabaseIn seqDb: search.getSearchDatabases()) {
                 seqDbDao.saveSearchDatabase(seqDb, searchId, sequenceDatabaseId);
             }
 
             // save any static residue modifications used for the search
-            for (MsResidueModificationIn staticMod: search.getStaticResidueMods()) {
-                modDao.saveStaticResidueMod(staticMod, searchId);
+            for (final MsResidueModificationIn staticMod: search.getStaticResidueMods()) {
+                MsResidueModification mod = new MsResidueModification() {
+                    public int getId() {throw new UnsupportedOperationException();}
+                    public int getSearchId() {return searchId;}
+                    public char getModifiedResidue() {return staticMod.getModifiedResidue();}
+                    public BigDecimal getModificationMass() {return staticMod.getModificationMass();}
+                    public char getModificationSymbol() {return staticMod.getModificationSymbol();}
+                    };
+                modDao.saveStaticResidueMod(mod);
             }
 
             // save any dynamic residue modifications used for the search
-            for (MsResidueModificationIn dynaMod: search.getDynamicResidueMods()) {
-                modDao.saveDynamicResidueMod(dynaMod, searchId);
+            for (final MsResidueModificationIn dynaMod: search.getDynamicResidueMods()) {
+                MsResidueModification mod = new MsResidueModification() {
+                    public int getId() {throw new UnsupportedOperationException();}
+                    public int getSearchId() {return searchId;}
+                    public char getModifiedResidue() {return dynaMod.getModifiedResidue();}
+                    public BigDecimal getModificationMass() {return dynaMod.getModificationMass();}
+                    public char getModificationSymbol() {return dynaMod.getModificationSymbol();}
+                    };
+                modDao.saveDynamicResidueMod(mod);
             }
 
             // save any static terminal modifications used for the search
-            for (MsTerminalModificationIn staticMod: search.getStaticTerminalMods()) {
-                modDao.saveStaticTerminalMod(staticMod, searchId);
+            for (final MsTerminalModificationIn staticMod: search.getStaticTerminalMods()) {
+                MsTerminalModification mod = new MsTerminalModification(){
+                    public int getId() {throw new UnsupportedOperationException();}
+                    public int getSearchId() {return searchId;}
+                    public Terminal getModifiedTerminal() {return staticMod.getModifiedTerminal();}
+                    public BigDecimal getModificationMass() {return staticMod.getModificationMass();}
+                    public char getModificationSymbol() {return staticMod.getModificationSymbol();}
+                    };
+                modDao.saveStaticTerminalMod(mod);
             }
 
             // save any dynamic residue modifications used for the search
-            for (MsTerminalModificationIn dynaMod: search.getDynamicTerminalMods()) {
-                modDao.saveDynamicTerminalMod(dynaMod, searchId);
+            for (final MsTerminalModificationIn dynaMod: search.getDynamicTerminalMods()) {
+                MsTerminalModification mod = new MsTerminalModification(){
+                    public int getId() {throw new UnsupportedOperationException();}
+                    public int getSearchId() {return searchId;}
+                    public Terminal getModifiedTerminal() {return dynaMod.getModifiedTerminal();}
+                    public BigDecimal getModificationMass() {return dynaMod.getModificationMass();}
+                    public char getModificationSymbol() {return dynaMod.getModificationSymbol();}
+                    };
+                modDao.saveDynamicTerminalMod(mod);
             }
 
             // save any enzymes used for the search

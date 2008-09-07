@@ -3,7 +3,7 @@ package org.yeastrc.ms.domain.search.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 
@@ -14,12 +14,12 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
     private char preResidue = '\u0000';
     private char postResidue = '\u0000';
     
-    private List<? super MsResultDynamicResidueMod> dynamicMods;
+    private List<? super MsResultResidueMod> dynamicMods;
     private List<? super MsResultTerminalMod> terminalDynamicMods;
     
     
     public MsSearchResultPeptideDbImpl() {
-        dynamicMods = new ArrayList<MsResultDynamicResidueMod>();
+        dynamicMods = new ArrayList<MsResultResidueMod>();
         terminalDynamicMods = new ArrayList<MsResultTerminalMod>();
     }
 
@@ -78,15 +78,15 @@ public class MsSearchResultPeptideDbImpl  implements MsSearchResultPeptideDb {
     //-----------------------------------------------------------------------------------------
     // DYNAMIC MODIFICATIONS
     //-----------------------------------------------------------------------------------------
-    public List<MsResultDynamicResidueMod> getResultDynamicResidueModifications() {
-        return (List<MsResultDynamicResidueMod>) dynamicMods;
+    public List<MsResultResidueMod> getResultDynamicResidueModifications() {
+        return (List<MsResultResidueMod>) dynamicMods;
     }
     
-    public void addDynamicResidueModification(MsResultDynamicResidueMod modification) {
+    public void addDynamicResidueModification(MsResultResidueMod modification) {
         dynamicMods.add(modification);
     }
     
-    public void setDynamicResidueModifications(List<? super MsResultDynamicResidueMod> dynaMods) {
+    public void setDynamicResidueModifications(List<? super MsResultResidueMod> dynaMods) {
         this.dynamicMods = dynaMods;
     }
     

@@ -6,18 +6,15 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ResultModIdentifier;
 import org.yeastrc.ms.domain.search.ResultResidueModIdentifier;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
@@ -45,9 +42,8 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return queryForList("MsSearchMod.selectStaticResidueModsForSearch", searchId);
     }
 
-    public void saveStaticResidueMod(MsResidueModificationIn mod, int searchId) {
-        MsResidueModSqlMapParam modDb = new MsResidueModSqlMapParam(searchId, mod);
-        save("MsSearchMod.insertStaticResidueMod", modDb);
+    public void saveStaticResidueMod(MsResidueModification mod) {
+        save("MsSearchMod.insertStaticResidueMod", mod);
     }
 
     public void deleteStaticResidueModsForSearch(int searchId) {
@@ -61,9 +57,8 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return queryForList("MsSearchMod.selectDynamicResidueModsForSearch", searchId);
     }
 
-    public int saveDynamicResidueMod(MsResidueModificationIn mod, int searchId) {
-        MsResidueModSqlMapParam modDb = new MsResidueModSqlMapParam(searchId, mod);
-        return saveAndReturnId("MsSearchMod.insertDynamicResidueMod", modDb);
+    public int saveDynamicResidueMod(MsResidueModification mod) {
+        return saveAndReturnId("MsSearchMod.insertDynamicResidueMod", mod);
     }
 
     public void deleteDynamicResidueModsForSearch(int searchId) {
@@ -77,9 +72,8 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return queryForList("MsSearchMod.selectStaticTerminalModsForSearch", searchId);
     }
 
-    public void saveStaticTerminalMod(MsTerminalModificationIn mod, int searchId) {
-        MsTerminalModSqlMapParam modDb = new MsTerminalModSqlMapParam(searchId, mod);
-        save("MsSearchMod.insertStaticTerminalMod", modDb);
+    public void saveStaticTerminalMod(MsTerminalModification mod) {
+        save("MsSearchMod.insertStaticTerminalMod", mod);
     }
 
     public void deleteStaticTerminalModsForSearch(int searchId) {
@@ -93,9 +87,8 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
         return queryForList("MsSearchMod.selectDynamicTerminalModsForSearch", searchId);
     }
 
-    public  int saveDynamicTerminalMod(MsTerminalModificationIn mod, int searchId) {
-        MsTerminalModSqlMapParam modDb = new MsTerminalModSqlMapParam(searchId, mod);
-        return saveAndReturnId("MsSearchMod.insertDynamicTerminalMod", modDb);
+    public  int saveDynamicTerminalMod(MsTerminalModification mod) {
+        return saveAndReturnId("MsSearchMod.insertDynamicTerminalMod", mod);
     }
 
     public  void deleteDynamicTerminalModsForSearch(int searchId) {
@@ -105,16 +98,14 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     //-------------------------------------------------------------------------------------------
     // Modifications (DYNAMIC RESIDUE) associated with a search result
     //-------------------------------------------------------------------------------------------
-    public List<MsResultDynamicResidueMod> loadDynamicResidueModsForResult(
+    public List<MsResultResidueMod> loadDynamicResidueModsForResult(
             int resultId) {
         return queryForList("MsSearchMod.selectDynamicResidueModsForResult", resultId);
     }
 
     @Override
-    public int loadMatchingDynamicResidueModId(int searchId,
-            MsResidueModificationIn mod) {
-        MsResidueModSqlMapParam modDb = new MsResidueModSqlMapParam(searchId, mod);
-        Integer modId = (Integer)queryForObject("MsSearchMod.selectMatchingDynaResModId", modDb);
+    public int loadMatchingDynamicResidueModId(MsResidueModification mod) {
+        Integer modId = (Integer)queryForObject("MsSearchMod.selectMatchingDynaResModId", mod);
         if (modId == null)
             return 0;
         return modId;
@@ -161,9 +152,8 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
 
     @Override
     public int loadMatchingDynamicTerminalModId(
-            int searchId, MsTerminalModificationIn mod) {
-        MsTerminalModSqlMapParam modDb = new MsTerminalModSqlMapParam(searchId, mod);
-        Integer modId = (Integer)queryForObject("MsSearchMod.selectMatchingDynaTermModId", modDb);
+            MsTerminalModification mod) {
+        Integer modId = (Integer)queryForObject("MsSearchMod.selectMatchingDynaTermModId", mod);
         if (modId == null)
             return 0;
         return modId;
@@ -196,85 +186,6 @@ public class MsSearchModificationDAOImpl extends BaseSqlMapDAO implements MsSear
     public void deleteDynamicTerminalModsForResult(int resultId) {
         delete("MsSearchMod.deleteDynamicTerminalModsForResult", resultId);
     }
-
-
-    //-------------------------------------------------------------------------------------------
-    // Class for inserting data into the database.  
-    // The save methods will be passed an object of type MsResidueModification, along with 
-    // a searchId.  We have 3 options: 
-    // 1. Use inline parameters
-    // 2. Use a parameter map of type java.util.Map
-    // 3. Create a class that holds the MsSearchModification and searchId and use this as the
-    // param class.  We use the 3rd options because using a bean in a parameter map helps us 
-    // catch any mismatches between the bean property and sql param map when the map is loaded,
-    // rather than when the map is first used. With a java.util.Map iBatis has no way of detecting 
-    // a name mismatch since a Map is built at runtime rather than compile time. 
-    // Usnig a bean is also supposed to have better performance.
-    //-------------------------------------------------------------------------------------------
-    public static final class MsResidueModSqlMapParam implements MsResidueModification {
-
-        private int searchId;
-        private MsResidueModificationIn mod;
-
-        public MsResidueModSqlMapParam(int searchId, MsResidueModificationIn mod) {
-            this.searchId = searchId;
-            this.mod = mod;
-        }
-
-        public int getSearchId() {
-            return searchId;
-        }
-
-        public BigDecimal getModificationMass() {
-            return mod.getModificationMass();
-        }
-
-        public int getId() {
-            throw new UnsupportedOperationException("getId() method not supported by MsResidueModSqlMapParam");
-        }
-        
-        public char getModifiedResidue() {
-            return mod.getModifiedResidue();
-        }
-
-        public char getModificationSymbol() {
-            return mod.getModificationSymbol();
-        }
-    }
-    
-    public static final class MsTerminalModSqlMapParam implements MsTerminalModification {
-
-        private int searchId;
-        private MsTerminalModificationIn mod;
-
-        public MsTerminalModSqlMapParam(int searchId, MsTerminalModificationIn mod) {
-            this.searchId = searchId;
-            this.mod = mod;
-        }
-
-        public int getSearchId() {
-            return searchId;
-        }
-
-        public BigDecimal getModificationMass() {
-            return mod.getModificationMass();
-        }
-
-        @Override
-        public int getId() {
-            throw new UnsupportedOperationException("getId() method not supported by MsTerminalModSqlMapParam");
-        }
-        
-        public char getModificationSymbol() {
-            return mod.getModificationSymbol();
-        }
-
-        @Override
-        public Terminal getModifiedTerminal() {
-            return mod.getModifiedTerminal();
-        }
-    }
-    
 
     /**
      * Type handler for converting between Java's Character and SQL's CHAR type.

@@ -1,15 +1,30 @@
+/**
+ * MsSearchDatabaseDb.java
+ * @author Vagisha Sharma
+ * Jul 11, 2008
+ * @version 1.0
+ */
 package org.yeastrc.ms.domain.search;
 
-public interface MsSearchDatabase {
+
+/**
+ * 
+ */
+public interface MsSearchDatabase extends MsSearchDatabaseIn {
 
     /**
-     * @return the serverAddress
+     * @return database id of the search database
      */
-    public abstract String getServerAddress();
-
+    public abstract int getId();
+    
     /**
-     * @return the serverPath
+     * @return id of the nrseq protein database
      */
-    public abstract String getServerPath();
-
+    public abstract int getSequenceDatabaseId();
+    
+    /**
+     * The name of the fasta file
+     * @return
+     */
+    public abstract String getDatabaseFileName();
 }

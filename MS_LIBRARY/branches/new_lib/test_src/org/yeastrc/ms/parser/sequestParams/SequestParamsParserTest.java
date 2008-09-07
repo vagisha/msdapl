@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.parser.DataProviderException;
 
@@ -208,7 +208,7 @@ public class SequestParamsParserTest extends TestCase {
         try {
             parser.parseParamsFile("remote.server", file);
             // database
-            MsSearchDatabase db = parser.getSearchDatabase();
+            MsSearchDatabaseIn db = parser.getSearchDatabase();
             assertNotNull(db);
             assertEquals("remote.server", db.getServerAddress());
             assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", db.getServerPath());

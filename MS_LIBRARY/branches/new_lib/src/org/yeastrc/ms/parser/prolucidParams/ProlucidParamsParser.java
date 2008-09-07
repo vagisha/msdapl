@@ -15,17 +15,17 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
-import org.yeastrc.ms.domain.general.impl.MsEnzymeImpl;
+import org.yeastrc.ms.domain.general.impl.Enzyme;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
-import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
+import org.yeastrc.ms.domain.search.impl.ResidueModification;
+import org.yeastrc.ms.domain.search.impl.SearchDatabase;
+import org.yeastrc.ms.domain.search.impl.TerminalModification;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.Database;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
 
 public class ProlucidParamsParser implements SearchParamsDataProvider {
@@ -40,7 +40,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     private Score spColumnScore;
     private Score deltaCNColumnScore;
 
-    private Database database;
+    private MsSearchDatabaseIn database;
     private MsEnzymeIn enzyme;
     private List<MsResidueModificationIn> staticResidueModifications;
     private List<MsTerminalModificationIn> staticTerminalModifications;
@@ -51,7 +51,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return parentParams;
     }
 
-    public MsSearchDatabase getSearchDatabase() {
+    public MsSearchDatabaseIn getSearchDatabase() {
         return database;
     }
 
@@ -387,9 +387,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         if (dbPath == null) {
             throw new DataProviderException("No search database found");
         }
-        this.database = new Database();
-        database.setServerAddress(remoteServer);
-        database.setServerPath(dbPath);
+        SearchDatabase db = new SearchDatabase();
+        db.setServerAddress(remoteServer);
+        db.setServerPath(dbPath);
+        this.database = db;
     }
 
     private void parseEnzymeInfo(ProlucidParam node) throws DataProviderException {
@@ -418,7 +419,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         if (name == null || sense == null || cut.length() == 0) {
             throw new DataProviderException("Invalid enzyme information. One or more required values (name, type, residue) are missing");
         }
-        MsEnzymeImpl e = new MsEnzymeImpl();
+        Enzyme e = new Enzyme();
         e.setName(name);
         e.setCut(cut);
         e.setSense(sense);
@@ -509,7 +510,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         if (mass.doubleValue() == 0)
             return;
 
-        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        TerminalModification mod = new TerminalModification();
         mod.setModificationMass(mass);
         mod.setModificationSymbol(symbol);
         mod.setModifiedTerminal(term);
@@ -541,7 +542,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         if (mass.doubleValue() == 0)
             return;
 
-        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        TerminalModification mod = new TerminalModification();
         mod.setModificationMass(mass);
         mod.setModificationSymbol(symbol);
         mod.setModifiedTerminal(term);
@@ -589,7 +590,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         if (mass.doubleValue() == 0)
             return;
 
-        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        TerminalModification mod = new TerminalModification();
         mod.setModificationMass(mass);
         mod.setModificationSymbol(symbol);
         mod.setModifiedTerminal(Terminal.NTERM);
@@ -689,7 +690,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         if (mass.doubleValue() == 0)
             return;
 
-        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        TerminalModification mod = new TerminalModification();
         mod.setModificationMass(mass);
         mod.setModificationSymbol(symbol);
         mod.setModifiedTerminal(Terminal.CTERM);
@@ -731,7 +732,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
             }
         }
 
-        MsResidueModificationImpl mod = new MsResidueModificationImpl();
+        ResidueModification mod = new ResidueModification();
         mod.setModificationMass(mass);
         mod.setModifiedResidue(residue);
         this.staticResidueModifications.add(mod);
@@ -781,7 +782,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
             }
         }
         for (Character res: modResidues) {
-            MsResidueModificationImpl mod = new MsResidueModificationImpl();
+            ResidueModification mod = new ResidueModification();
             mod.setModificationMass(mass);
             mod.setModifiedResidue(res);
             mod.setModificationSymbol(modSymbol);

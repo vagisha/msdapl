@@ -9,6 +9,7 @@ package org.yeastrc.ms.domain.search.impl;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 
 /**
  * 
@@ -17,63 +18,31 @@ public class MsTerminalModificationImpl implements MsTerminalModification {
 
     private int id;
     private int searchId;
-    private BigDecimal modificationMass;
-    private char modificationSymbol = EMPTY_CHAR;
-    private Terminal modTerminal;
+    private MsTerminalModificationIn mod;
+    
+    public MsTerminalModificationImpl(MsTerminalModificationIn mod, int searchId) {
+        this.mod = mod;
+        this.searchId = searchId;
+    }
 
-    /**
-     * @return the id
-     */
     public int getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    /**
-     * @return the searchId
-     */
     public int getSearchId() {
         return searchId;
     }
 
-    /**
-     * @param searchId the serachId to set
-     */
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
-    }
-
     public BigDecimal getModificationMass() {
-        return modificationMass;
+        return mod.getModificationMass();
     }
 
-    /**
-     * @param modificationMass the modificationMass to set
-     */
-    public void setModificationMass(BigDecimal modificationMass) {
-        this.modificationMass = modificationMass;
-    }
-    
     public char getModificationSymbol() {
-        return modificationSymbol;
-    }
-    
-    public void setModificationSymbol(char modSymbol) {
-        this.modificationSymbol = modSymbol;
+        return mod.getModificationSymbol();
     }
     
     @Override
     public Terminal getModifiedTerminal() {
-        return modTerminal;
-    }
-
-    public void setModifiedTerminal(Terminal terminal) {
-        this.modTerminal = terminal;
+        return mod.getModifiedTerminal();
     }
 }

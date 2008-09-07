@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.impl.MsResultResidueModImpl;
+import org.yeastrc.ms.domain.search.impl.ResultResidueMod;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -107,7 +107,7 @@ public final class SequestResultPeptideBuilder {
                 throw new SQTParseException("No matching modification found: "+modifiedChar+x+"; sequence: "+peptide);
             
             // found a match!!
-            MsResultResidueModImpl resultMod = new MsResultResidueModImpl();
+            ResultResidueMod resultMod = new ResultResidueMod();
             resultMod.setModificationMass(matchingMod.getModificationMass());
             resultMod.setModifiedResidue(modifiedChar);
             resultMod.setModificationSymbol(x);

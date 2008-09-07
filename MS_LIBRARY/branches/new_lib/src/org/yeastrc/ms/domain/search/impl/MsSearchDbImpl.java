@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchProgram;
@@ -31,7 +31,7 @@ public class MsSearchDbImpl implements MsSearchDb {
     private SearchProgram analysisProgram;
     private String analysisProgramVersion;
     
-    private List<? super MsSearchDatabaseDb> searchDatabases;
+    private List<? super MsSearchDatabase> searchDatabases;
     
     private List<? super MsResidueModification> staticResidueMods;
     
@@ -44,7 +44,7 @@ public class MsSearchDbImpl implements MsSearchDb {
     private List<? super MsEnzyme> enzymes;
     
     public MsSearchDbImpl() {
-        searchDatabases = new ArrayList<MsSearchDatabaseDb>();
+        searchDatabases = new ArrayList<MsSearchDatabase>();
         staticResidueMods = new ArrayList<MsResidueModification>();
         dynamicResidueMods = new ArrayList<MsResidueModification>();
         staticTerminalMods = new ArrayList<MsTerminalModification>();
@@ -125,18 +125,18 @@ public class MsSearchDbImpl implements MsSearchDb {
     //------------------------------------------------------------------------------------------------------
     // database(s) used for the search
     //------------------------------------------------------------------------------------------------------
-    public List<MsSearchDatabaseDb> getSearchDatabases() {
-        return (List<MsSearchDatabaseDb>) searchDatabases;
+    public List<MsSearchDatabase> getSearchDatabases() {
+        return (List<MsSearchDatabase>) searchDatabases;
     }
 
     /**
      * @param searchDatabases the searchDatabases to set
      */
-    public void setSearchDatabases(List<? super MsSearchDatabaseDb> searchDatabases) {
+    public void setSearchDatabases(List<? super MsSearchDatabase> searchDatabases) {
         this.searchDatabases = searchDatabases;
     }
 
-    public void addSearchDatabase(MsSearchDatabaseDbImpl database) {
+    public void addSearchDatabase(MsSearchDatabaseImpl database) {
         searchDatabases.add(database);
     }
 

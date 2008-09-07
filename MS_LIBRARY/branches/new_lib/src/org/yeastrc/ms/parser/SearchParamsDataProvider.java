@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
@@ -19,7 +19,7 @@ import org.yeastrc.ms.domain.search.SearchProgram;
  */
 public interface SearchParamsDataProvider {
 
-    public abstract MsSearchDatabase getSearchDatabase();
+    public abstract MsSearchDatabaseIn getSearchDatabase();
 
     public abstract MsEnzymeIn getSearchEnzyme();
 

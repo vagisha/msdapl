@@ -25,7 +25,7 @@ import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
@@ -169,7 +169,7 @@ public abstract class AbstractSQTDataUploadService {
     abstract int uploadSearchParameters(String paramFileDirectory, String remoteServer, String remoteDirectory, Date searchDate) throws UploadException;
     
     // NOTE: this method should be called AFTER uploadSearchParameters.
-    abstract MsSearchDatabase getSearchDatabase();
+    abstract MsSearchDatabaseIn getSearchDatabase();
     
     abstract SearchProgram getSearchProgram();
     
@@ -202,7 +202,7 @@ public abstract class AbstractSQTDataUploadService {
         }
         
         // get the id of the search database used (will be used to look up protein ids later)
-        MsSearchDatabase db = getSearchDatabase();
+        MsSearchDatabaseIn db = getSearchDatabase();
         String searchDbName = null;
         if (db != null) {
             searchDbName = new File(getSearchDatabase().getServerPath()).getName();

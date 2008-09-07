@@ -29,14 +29,14 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         // modifications for searchId_1
         MsResidueModificationIn mod1 = makeStaticResidueMod('C', "50.0");
-        modDao.saveStaticResidueMod(mod1, searchId_1);
+        modDao.saveStaticResidueMod(mod1);
         MsResidueModificationIn mod2 = makeStaticResidueMod('S', "80.0");
-        modDao.saveStaticResidueMod(mod2, searchId_1);
+        modDao.saveStaticResidueMod(mod2);
         
         MsResidueModificationIn dmod1 = makeDynamicResidueMod('A', "10.0", '*');
-        modDao.saveDynamicResidueMod(dmod1, searchId_1);
+        modDao.saveDynamicResidueMod(dmod1);
         MsResidueModificationIn dmod2 = makeDynamicResidueMod('B', "20.0", '#');
-        modDao.saveDynamicResidueMod(dmod2, searchId_1);
+        modDao.saveDynamicResidueMod(dmod2);
         
         // modifications for searchId_2
 //        MsResidueModification mod3 = makeStaticMod('M', "16.0");

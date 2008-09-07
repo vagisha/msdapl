@@ -27,9 +27,9 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
@@ -89,7 +89,7 @@ public class DbToSqtFileConverter {
     private int getSearchDatabaseId(int searchId) {
         MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
         MsSearchDb search = searchDao.loadSearch(searchId);
-        List<MsSearchDatabaseDb> db = search.getSearchDatabases();
+        List<MsSearchDatabase> db = search.getSearchDatabases();
         if (db.size() == 0)
             return 0;
         return NrSeqLookupUtil.getDatabaseId(db.get(0).getDatabaseFileName());
@@ -160,10 +160,10 @@ public class DbToSqtFileConverter {
     private String reconstructSequestPeptideSequence(int searchId, SequestSearchResultDb resultDb) {
         // dynamic modifications for the search
         MsSearchResultPeptideDb peptideSeq = resultDb.getResultPeptide();
-        List<MsResultDynamicResidueMod> resultMods = peptideSeq.getResultDynamicResidueModifications();
-        Collections.sort(resultMods, new Comparator<MsResultDynamicResidueMod>() {
-            public int compare(MsResultDynamicResidueMod o1,
-                    MsResultDynamicResidueMod o2) {
+        List<MsResultResidueMod> resultMods = peptideSeq.getResultDynamicResidueModifications();
+        Collections.sort(resultMods, new Comparator<MsResultResidueMod>() {
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return new Integer(o1.getModifiedPosition()).compareTo(new Integer(o2.getModifiedPosition()));
             }});
         
@@ -171,7 +171,7 @@ public class DbToSqtFileConverter {
         StringBuilder fullSeq = new StringBuilder();
         fullSeq.append(peptideSeq.getPreResidue()+".");
         int lastIdx = 0;
-        for (MsResultDynamicResidueMod mod: resultMods) {
+        for (MsResultResidueMod mod: resultMods) {
             int pos = mod.getModifiedPosition();
             fullSeq.append(justSeq.substring(lastIdx, pos+1));
             fullSeq.append(mod.getModificationSymbol());

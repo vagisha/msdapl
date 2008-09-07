@@ -13,9 +13,9 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseDb;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
@@ -86,7 +86,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertNotNull(search.getUploadDate());
         
         // check search databases
-        List<MsSearchDatabaseDb> dbs = search.getSearchDatabases();
+        List<MsSearchDatabase> dbs = search.getSearchDatabases();
         assertEquals(1, dbs.size());
         assertEquals("/net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta", dbs.get(0).getServerPath());
         assertEquals("remoteServer", dbs.get(0).getServerAddress());
@@ -320,13 +320,13 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals('L', res.getResultPeptide().getPreResidue());
         assertEquals('T', res.getResultPeptide().getPostResidue());
         assertEquals("SDMSASRTY", res.getResultPeptide().getPeptideSequence());
-        List<MsResultDynamicResidueMod> resMods = res.getResultPeptide().getResultDynamicResidueModifications();
+        List<MsResultResidueMod> resMods = res.getResultPeptide().getResultDynamicResidueModifications();
         List<MsResultTerminalMod> termMods = res.getResultPeptide().getResultDynamicTerminalModifications();
         assertEquals(4, resMods.size());
         assertEquals(0, termMods.size());
-        Collections.sort(resMods, new Comparator<MsResultDynamicResidueMod>(){
-            public int compare(MsResultDynamicResidueMod o1,
-                    MsResultDynamicResidueMod o2) {
+        Collections.sort(resMods, new Comparator<MsResultResidueMod>(){
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
         assertEquals(0, resMods.get(0).getModifiedPosition());
@@ -367,9 +367,9 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         termMods = res.getResultPeptide().getResultDynamicTerminalModifications();
         assertEquals(2, resMods.size());
         assertEquals(0, termMods.size());
-        Collections.sort(resMods, new Comparator<MsResultDynamicResidueMod>(){
-            public int compare(MsResultDynamicResidueMod o1,
-                    MsResultDynamicResidueMod o2) {
+        Collections.sort(resMods, new Comparator<MsResultResidueMod>(){
+            public int compare(MsResultResidueMod o1,
+                    MsResultResidueMod o2) {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
         assertEquals(1, resMods.get(0).getModifiedPosition());

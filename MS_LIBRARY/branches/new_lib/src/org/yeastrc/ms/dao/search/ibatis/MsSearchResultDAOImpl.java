@@ -16,6 +16,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -83,7 +85,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         for (MsResultResidueModIn mod: peptide.getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
-            int modId = modDao.loadMatchingDynamicResidueModId(searchId, mod);
+            int modId = modDao.loadMatchingDynamicResidueModId(new MsResidueModificationImpl(mod, searchId));
             modDao.saveDynamicResidueModForResult(resultId, modId, mod.getModifiedPosition());
         }
     }
@@ -93,7 +95,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         for (MsTerminalModificationIn mod: peptide.getDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
-            int modId = modDao.loadMatchingDynamicTerminalModId(searchId, mod);
+            int modId = modDao.loadMatchingDynamicTerminalModId(new MsTerminalModificationImpl(mod, searchId));
             modDao.saveDynamicTerminalModForResult(resultId, modId);
         }
     }

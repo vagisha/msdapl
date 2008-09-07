@@ -9,42 +9,26 @@ package org.yeastrc.ms.domain.search.impl;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 
 /**
  * 
  */
 public class MsResidueModificationImpl implements MsResidueModification {
 
-    private int id;
     private int searchId;
-    private BigDecimal modificationMass;
-    private char modificationSymbol = EMPTY_CHAR;
-    private char modifiedResidue = EMPTY_CHAR;
-    
+    private MsResidueModificationIn mod;
 
-    public char getModifiedResidue() {
-        return modifiedResidue;
-    }
-
-    /**
-     * @param modifiedResidue the modifiedResidue to set
-     */
-    public void setModifiedResidue(char modifiedResidue) {
-        this.modifiedResidue = modifiedResidue;
+    public MsResidueModificationImpl(MsResidueModificationIn mod, int searchId) {
+        this.mod = mod;
+        this.searchId = searchId;
     }
     
     /**
      * @return the id
      */
     public int getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -54,29 +38,19 @@ public class MsResidueModificationImpl implements MsResidueModification {
         return searchId;
     }
 
-    /**
-     * @param searchId the serachId to set
-     */
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
+    @Override
+    public char getModifiedResidue() {
+        return mod.getModifiedResidue();
     }
 
+    @Override
     public BigDecimal getModificationMass() {
-        return modificationMass;
+        return mod.getModificationMass();
     }
 
-    /**
-     * @param modificationMass the modificationMass to set
-     */
-    public void setModificationMass(BigDecimal modificationMass) {
-        this.modificationMass = modificationMass;
-    }
-    
+    @Override
     public char getModificationSymbol() {
-        return modificationSymbol;
+        return mod.getModificationSymbol();
     }
-    
-    public void setModificationSymbol(char modSymbol) {
-        this.modificationSymbol = modSymbol;
-    }
+   
 }

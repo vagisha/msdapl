@@ -8,12 +8,14 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultDynamicResidueMod;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIdentifierImpl;
 
 public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
@@ -37,10 +39,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         MsResidueModificationIn mod2_2 = makeStaticResidueMod('Y', "54.3");
 
         // save them to the database
-        modDao.saveStaticResidueMod(mod1_1, 1); // searchId = 1
-        modDao.saveStaticResidueMod(mod1_2, 1);
-        modDao.saveStaticResidueMod(mod2_1, 2); // searchId = 2
-        modDao.saveStaticResidueMod(mod2_2, 2);
+        modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod1_1, 1)); // searchId = 1
+        modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod1_2, 1));
+        modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod2_1, 2)); // searchId = 2
+        modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod2_2, 2));
 
         // load them back
         List<MsResidueModification> modList1 = modDao.loadStaticResidueModsForSearch(1);
@@ -68,14 +70,6 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         modDao.deleteStaticResidueModsForSearch(2);
         modList2 = modDao.loadStaticResidueModsForSearch(2);
         assertEquals(0, modList2.size());
-        
-        
-        MsResidueModificationIn mod = makeDynamicResidueMod('a', "20.0", '\u0000');
-        modDao.saveDynamicResidueMod(mod, 25);
-        
-        MsTerminalModificationIn tmod = makeDynamicTerminalMod(Terminal.CTERM, "45.12345678", '\u0000');
-        modDao.saveDynamicTerminalMod(tmod, 25);
-
     }
 
     public void testSaveNullValuesNotAllowed() {
@@ -83,15 +77,15 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         char nochar = 0;
         // test static residue mod
         MsResidueModificationIn mod = makeStaticResidueMod(nochar, "40.0");
-        try {modDao.saveStaticResidueMod(mod, 56); fail("residue cannot be null");}
+        try {modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod, 1)); fail("residue cannot be null");}
         catch(RuntimeException e) {System.out.println(e.getMessage());}
         
         mod = makeStaticResidueMod('A', null);
-        try {modDao.saveStaticResidueMod(mod, 56); fail("mass shift cannot be null");}
+        try {modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod, 1)); fail("mass shift cannot be null");}
         catch(RuntimeException e) {System.out.println(e.getMessage());}
         
         mod = makeStaticResidueMod('A', "40.0");
-        modDao.saveStaticResidueMod(mod, 56);
+        modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod, 56));
         List<MsResidueModification> modsDb = modDao.loadStaticResidueModsForSearch(56);
         assertEquals(1, modsDb.size());
         assertEquals(56, modsDb.get(0).getSearchId());
@@ -101,15 +95,15 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         
         // test static terminal mod
         MsTerminalModificationIn tmod = makeStaticTerminalMod(null, "40.0");
-        try {modDao.saveStaticTerminalMod(tmod, 85); fail("terminus cannot be null");}
+        try {modDao.saveStaticTerminalMod(new MsTerminalModificationImpl(tmod, 1)); fail("terminus cannot be null");}
         catch(RuntimeException e) {System.out.println(e.getMessage());}
         
         tmod = makeStaticTerminalMod(Terminal.NTERM, null);
-        try {modDao.saveStaticTerminalMod(tmod, 85); fail("mass shift cannot be null");}
+        try {modDao.saveStaticTerminalMod(new MsTerminalModificationImpl(tmod, 1)); fail("mass shift cannot be null");}
         catch(RuntimeException e) {System.out.println(e.getMessage());}
         
         tmod = makeStaticTerminalMod(Terminal.CTERM, "40.123456789");
-        modDao.saveStaticTerminalMod(tmod, 85);
+        modDao.saveStaticTerminalMod(new MsTerminalModificationImpl(tmod, 85));
         List<MsTerminalModification> tmodsDb = modDao.loadStaticTerminalModsForSearch(85);
         assertEquals(1, tmodsDb.size());
         assertEquals(85, tmodsDb.get(0).getSearchId());
@@ -119,15 +113,15 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         
         // test dynamic residue mod
         mod = makeDynamicResidueMod(nochar, "98.4", nochar);
-        try {modDao.saveDynamicResidueMod(mod, 25);fail("residue cannot be null");}
+        try {modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod, 1));fail("residue cannot be null");}
         catch(RuntimeException e){}
         
         mod = makeDynamicResidueMod('B', null, nochar);
-        try {modDao.saveDynamicResidueMod(mod, 25);fail("mass cannot be null");}
+        try {modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod, 1));fail("mass cannot be null");}
         catch(RuntimeException e){}
         
         mod = makeDynamicResidueMod('B', "98.4", nochar);
-        modDao.saveDynamicResidueMod(mod, 65);
+        modDao.saveDynamicResidueMod(new MsResidueModificationImpl(mod, 65));
         modsDb = modDao.loadDynamicResidueModsForSearch(65);
         assertEquals(1, modsDb.size());
         MsResidueModification m = modsDb.get(0);
@@ -137,18 +131,18 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         
         // test dynamic terminal mod
         tmod = makeDynamicTerminalMod(null, "40.0", 'p');
-        try {modDao.saveDynamicTerminalMod(tmod, 85); fail("terminus cannot be null");}
+        try {modDao.saveStaticTerminalMod(new MsTerminalModificationImpl(tmod, 1)); fail("terminus cannot be null");}
         catch(RuntimeException e) {System.out.println(e.getMessage());}
         
         tmod = makeDynamicTerminalMod(Terminal.NTERM, null, nochar);
-        try {modDao.saveDynamicTerminalMod(tmod, 85); fail("mass shift cannot be null");}
+        try {modDao.saveStaticTerminalMod(new MsTerminalModificationImpl(tmod, 1)); fail("mass shift cannot be null");}
         catch(RuntimeException e) {System.out.println(e.getMessage());}
         
         tmod = makeDynamicTerminalMod(Terminal.NTERM, "40.123456789", 'p');
-        modDao.saveDynamicTerminalMod(tmod, 85);
-        tmodsDb = modDao.loadDynamicTerminalModsForSearch(85);
+        modDao.saveDynamicTerminalMod(new MsTerminalModificationImpl(tmod, 97));
+        tmodsDb = modDao.loadDynamicTerminalModsForSearch(97);
         assertEquals(1, tmodsDb.size());
-        assertEquals(85, tmodsDb.get(0).getSearchId());
+        assertEquals(97, tmodsDb.get(0).getSearchId());
         assertEquals(Terminal.NTERM, tmodsDb.get(0).getModifiedTerminal());
         assertEquals(40.123456789, tmodsDb.get(0).getModificationMass().doubleValue());
         assertEquals('p', tmodsDb.get(0).getModificationSymbol());
@@ -209,7 +203,7 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         int searchId = 0;
         for (int i = 0; i < mods.length; i++) {
             searchId = i % 2  == 0 ? 2 : 1; // even numbers get a search id of 2; odd numbers get 1
-            modDao.saveDynamicResidueMod(mods[i], searchId);
+            modDao.saveDynamicResidueMod(new MsResidueModificationImpl(mods[i], searchId));
             searchId = searchId == 1 ? wid1++ : wid2++;
         }
 
@@ -259,10 +253,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
 
         // save them to the database
-        int mod1_1Id = modDao.saveDynamicResidueMod(mods[0], 1); // searchId = 1
-        int mod1_2Id = modDao.saveDynamicResidueMod(mods[1], 1);
-        int mod2_1Id = modDao.saveDynamicResidueMod(mods[2], 2); // searchId = 2
-        int mod2_2Id = modDao.saveDynamicResidueMod(mods[3], 2);
+        int mod1_1Id = modDao.saveDynamicResidueMod(new MsResidueModificationImpl(mods[0], 1)); // searchId = 1
+        int mod1_2Id = modDao.saveDynamicResidueMod(new MsResidueModificationImpl(mods[1], 1));
+        int mod2_1Id = modDao.saveDynamicResidueMod(new MsResidueModificationImpl(mods[2], 2)); // searchId = 2
+        int mod2_2Id = modDao.saveDynamicResidueMod(new MsResidueModificationImpl(mods[3], 2));
 
         // save some dynamic modifications for two search results
         MsResultResidueModIn rmod1_1 = makeResultDynamicResidueMod(residue[0], mass[0], symbol[0], 10);
@@ -276,9 +270,9 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
         modDao.saveDynamicResidueModForResult(new ResultResidueModIdentifierImpl(4, getDynaResModId(2, mods[3]), rmod2_2.getModifiedPosition()));
 
         // load dynamic modifications for the two search results
-        List<MsResultDynamicResidueMod> resultMods1 = modDao.loadDynamicResidueModsForResult(3);
+        List<MsResultResidueMod> resultMods1 = modDao.loadDynamicResidueModsForResult(3);
         assertEquals(2, resultMods1.size());
-        List<MsResultDynamicResidueMod> resultMods2 = modDao.loadDynamicResidueModsForResult(4);
+        List<MsResultResidueMod> resultMods2 = modDao.loadDynamicResidueModsForResult(4);
         assertEquals(2, resultMods2.size());
 
 
@@ -321,10 +315,10 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
 
 
         // save them to the database
-        int mod1_1Id = modDao.saveDynamicTerminalMod(mods[0], 1); // searchId = 1
-        int mod1_2Id = modDao.saveDynamicTerminalMod(mods[1], 1);
-        int mod2_1Id = modDao.saveDynamicTerminalMod(mods[2], 2); // searchId = 2
-        int mod2_2Id = modDao.saveDynamicTerminalMod(mods[3], 2);
+        int mod1_1Id = modDao.saveDynamicTerminalMod(new MsTerminalModificationImpl(mods[0], 1)); // searchId = 1
+        int mod1_2Id = modDao.saveDynamicTerminalMod(new MsTerminalModificationImpl(mods[1], 1));
+        int mod2_1Id = modDao.saveDynamicTerminalMod(new MsTerminalModificationImpl(mods[2], 2)); // searchId = 2
+        int mod2_2Id = modDao.saveDynamicTerminalMod(new MsTerminalModificationImpl(mods[3], 2));
 
         // save some dynamic modifications for two search results
         modDao.saveDynamicTerminalModForResult(3, getDynaTermModId(1, mods[0])); // mod, resultId, modificationId
@@ -376,15 +370,15 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
     }
     
     private int getDynaResModId(int searchId, MsResidueModificationIn mod) {
-        return modDao.loadMatchingDynamicResidueModId(searchId, mod);
+        return modDao.loadMatchingDynamicResidueModId(new MsResidueModificationImpl(mod, searchId));
     }
     
     private int getDynaTermModId(int searchId, MsTerminalModificationIn mod) {
-        return modDao.loadMatchingDynamicTerminalModId(searchId, mod);
+        return modDao.loadMatchingDynamicTerminalModId(new MsTerminalModificationImpl(mod, searchId));
     }
 
     private void compareResultResidueMods(MsResidueModificationIn searchMod,
-            MsResultDynamicResidueMod resultMod, int resultId,
+            MsResultResidueMod resultMod, int resultId,
             int modId) {
         assertEquals(resultId, resultMod.getResultId());
         assertEquals(modId, resultMod.getModificationId());
@@ -420,9 +414,9 @@ public class MsSearchModificationDAOImplTest extends BaseDAOTestCase {
     }
 
     private static final class MsSearchResultDynamicModComparator implements
-    Comparator<MsResultDynamicResidueMod> {
-        public int compare(MsResultDynamicResidueMod o1,
-                MsResultDynamicResidueMod o2) {
+    Comparator<MsResultResidueMod> {
+        public int compare(MsResultResidueMod o1,
+                MsResultResidueMod o2) {
             return new Integer(o1.getModifiedPosition()).compareTo(new Integer(o2.getModifiedPosition()));
         }
     }

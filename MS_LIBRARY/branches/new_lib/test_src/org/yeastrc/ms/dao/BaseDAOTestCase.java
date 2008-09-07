@@ -39,7 +39,7 @@ import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
-import org.yeastrc.ms.domain.general.impl.MsEnzymeImpl;
+import org.yeastrc.ms.domain.general.impl.Enzyme;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsRunDb;
@@ -52,7 +52,7 @@ import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
@@ -64,9 +64,9 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
-import org.yeastrc.ms.domain.search.impl.MsResultResidueModImpl;
-import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
+import org.yeastrc.ms.domain.search.impl.ResidueModification;
+import org.yeastrc.ms.domain.search.impl.ResultResidueMod;
+import org.yeastrc.ms.domain.search.impl.TerminalModification;
 import org.yeastrc.ms.util.PeakConverterDouble;
 
 /**
@@ -141,8 +141,8 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH DATABASE
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchDatabase makeSequenceDatabase(final String serverAddress, final String serverPath) {
-        MsSearchDatabase db = new MsSearchDatabase(){
+    protected MsSearchDatabaseIn makeSequenceDatabase(final String serverAddress, final String serverPath) {
+        MsSearchDatabaseIn db = new MsSearchDatabaseIn(){
             public String getServerAddress() {
                 return serverAddress;
             }
@@ -237,7 +237,7 @@ public class BaseDAOTestCase extends TestCase {
     // MODIFICATIONS
     //-----------------------------------------------------------------------------------------------------
     protected MsResidueModificationIn makeStaticResidueMod(final char modChar, final String modMass) {
-        MsResidueModificationImpl mod = new MsResidueModificationImpl();
+        ResidueModification mod = new ResidueModification();
         mod.setModifiedResidue(modChar);
         if (modMass != null)
             mod.setModificationMass(new BigDecimal(modMass));
@@ -245,7 +245,7 @@ public class BaseDAOTestCase extends TestCase {
     }
 
     protected MsResidueModificationIn makeDynamicResidueMod(final char modChar, final String modMass, final char modSymbol) {
-        MsResidueModificationImpl mod = new MsResidueModificationImpl();
+        ResidueModification mod = new ResidueModification();
         mod.setModifiedResidue(modChar);
         mod.setModificationSymbol(modSymbol);
         if (modMass != null)
@@ -254,7 +254,7 @@ public class BaseDAOTestCase extends TestCase {
     }
     
     protected MsTerminalModificationIn makeStaticTerminalMod(final Terminal term, final String modMass) {
-        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        TerminalModification mod = new TerminalModification();
         if (modMass != null)
             mod.setModificationMass(new BigDecimal(modMass));
         mod.setModifiedTerminal(term);
@@ -262,7 +262,7 @@ public class BaseDAOTestCase extends TestCase {
     }
 
     protected MsTerminalModificationIn makeDynamicTerminalMod(final Terminal term, final String modMass, final char modSymbol) {
-        MsTerminalModificationImpl mod = new MsTerminalModificationImpl();
+        TerminalModification mod = new TerminalModification();
         if (modMass != null)
             mod.setModificationMass(new BigDecimal(modMass));
         mod.setModifiedTerminal(term);
@@ -272,7 +272,7 @@ public class BaseDAOTestCase extends TestCase {
     
     protected MsResultResidueModIn makeResultDynamicResidueMod(final char modChar, final String modMass,
             final char modSymbol, final int modPos) {
-        MsResultResidueModImpl mod = new MsResultResidueModImpl();
+        ResultResidueMod mod = new ResultResidueMod();
         if (modMass != null)
             mod.setModificationMass(new BigDecimal(modMass));
         mod.setModificationSymbol(modSymbol);
@@ -292,9 +292,9 @@ public class BaseDAOTestCase extends TestCase {
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
 
         if (addSeqDb) {
-            MsSearchDatabase db1 = makeSequenceDatabase("serverAddress", "path1");
-            MsSearchDatabase db2 = makeSequenceDatabase("serverAddress", "path2");
-            search.setSearchDatabases(Arrays.asList(new MsSearchDatabase[]{db1, db2}));
+            MsSearchDatabaseIn db1 = makeSequenceDatabase("serverAddress", "path1");
+            MsSearchDatabaseIn db2 = makeSequenceDatabase("serverAddress", "path2");
+            search.setSearchDatabases(Arrays.asList(new MsSearchDatabaseIn[]{db1, db2}));
         }
 
         if (addStaticMods) {
@@ -398,7 +398,7 @@ public class BaseDAOTestCase extends TestCase {
     // ENZYME
     //---------------------------------------------------------------------------------
     protected MsEnzymeIn makeDigestionEnzyme(String name, Sense sense,String cut, String nocut) {
-        MsEnzymeImpl enzyme = new MsEnzymeImpl();
+        Enzyme enzyme = new Enzyme();
         enzyme.setName(name);
         enzyme.setSense(sense);
         enzyme.setCut(cut);

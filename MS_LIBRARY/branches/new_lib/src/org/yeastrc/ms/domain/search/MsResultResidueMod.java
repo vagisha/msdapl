@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.search;
 /**
  * 
  */
-public interface MsResultDynamicResidueMod extends MsResultResidueModIn, ResultModIdentifier {
+public interface MsResultResidueMod extends MsResultResidueModIn, ResultModIdentifier {
 
     
 }

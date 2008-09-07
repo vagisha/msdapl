@@ -29,7 +29,7 @@ public interface MsSearchDb extends MsSearchBase {
     /**
      * @return the searchDatabases
      */
-    public abstract List<MsSearchDatabaseDb> getSearchDatabases();
+    public abstract List<MsSearchDatabase> getSearchDatabases();
 
     /**
      * @return the staticModifications

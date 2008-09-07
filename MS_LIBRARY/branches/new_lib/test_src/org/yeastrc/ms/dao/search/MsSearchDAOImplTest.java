@@ -8,7 +8,7 @@ import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
@@ -77,18 +77,18 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         private List<MsTerminalModificationIn> dynamicTerminalModifications = new ArrayList<MsTerminalModificationIn>();
         private List<MsTerminalModificationIn> staticTerminalModifications = new ArrayList<MsTerminalModificationIn>();
         
-        private List<MsSearchDatabase> searchDatabases = new ArrayList<MsSearchDatabase>();
+        private List<MsSearchDatabaseIn> searchDatabases = new ArrayList<MsSearchDatabaseIn>();
         private List<MsEnzymeIn> enzymes = new ArrayList<MsEnzymeIn>();
         private String searchEngineVersion;
         private SearchProgram searchProgram;
         private Date searchDate;
 
 
-        public List<MsSearchDatabase> getSearchDatabases() {
+        public List<MsSearchDatabaseIn> getSearchDatabases() {
             return searchDatabases;
         }
 
-        public void setSearchDatabases(List<MsSearchDatabase> searchDatabases) {
+        public void setSearchDatabases(List<MsSearchDatabaseIn> searchDatabases) {
             this.searchDatabases = searchDatabases;
         }
         

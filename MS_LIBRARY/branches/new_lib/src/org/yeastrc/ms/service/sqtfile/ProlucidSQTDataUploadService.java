@@ -18,7 +18,7 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
@@ -44,7 +44,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     
     List<ProlucidResultDataDb> prolucidResultDataList; // prolucid scores
     
-    private MsSearchDatabase db = null;
+    private MsSearchDatabaseIn db = null;
     private List<MsResidueModificationIn> dynaResidueMods;
     private List<MsTerminalModificationIn> dynaTermMods;
     private Score spColScore;
@@ -75,7 +75,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         prolucidResultDataList.clear();
     }
     
-    MsSearchDatabase getSearchDatabase() {
+    MsSearchDatabaseIn getSearchDatabase() {
         return db;
     }
 
@@ -242,7 +242,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
                     return new ArrayList<MsEnzymeIn>(0);
             }
             @Override
-            public List<MsSearchDatabase> getSearchDatabases() {return Arrays.asList(new MsSearchDatabase[]{parser.getSearchDatabase()});}
+            public List<MsSearchDatabaseIn> getSearchDatabases() {return Arrays.asList(new MsSearchDatabaseIn[]{parser.getSearchDatabase()});}
             @Override
             public List<MsResidueModificationIn> getStaticResidueMods() {return parser.getStaticResidueMods();}
             @Override
