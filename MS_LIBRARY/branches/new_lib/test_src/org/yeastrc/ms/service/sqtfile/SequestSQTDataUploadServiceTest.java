@@ -7,7 +7,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
@@ -23,7 +23,6 @@ import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -71,8 +70,8 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
     }
     
     private void checkSearch(int searchId, java.util.Date date) {
-        MsSearchDAO<SequestSearch, SequestSearchDb> searchDao = DAOFactory.instance().getSequestSearchDAO();
-        SequestSearchDb search = searchDao.loadSearch(searchId);
+        SequestSearchDAO searchDao = DAOFactory.instance().getSequestSearchDAO();
+        SequestSearch search = searchDao.loadSearch(searchId);
         assertNotNull(search);
         assertNull(searchDao.loadSearch(24));
         

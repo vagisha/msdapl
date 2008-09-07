@@ -3,13 +3,13 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsSearch"> 
 
-    <typeAlias alias="MsSearchDb" type="org.yeastrc.ms.domain.search.impl.MsSearchDbImpl"/>
-    <typeAlias alias="MsSearch" type="org.yeastrc.ms.domain.search.MsSearch"/>
+    <typeAlias alias="MsSearchOut" type="org.yeastrc.ms.domain.search.impl.MsSearchBean"/>
+    <typeAlias alias="MsSearchIn" type="org.yeastrc.ms.domain.search.MsSearchIn"/>
 	
 	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>
 	<typeAlias alias="ProgramTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl$SearchProgramTypeHandler"/>
 	
-	<resultMap class="MsSearchDb" id="msSearchResult">
+	<resultMap class="MsSearchOut" id="msSearchResult">
 		<result property="id" column="id" />
 		<result property="searchDate" column="expDate" />
 		<result property="serverAddress" column="serverAddress" />
@@ -38,7 +38,7 @@
 				column="id" />
 	</resultMap>
 	
-	<parameterMap class="MsSearch" id="msSearchParam">
+	<parameterMap class="MsSearchIn" id="msSearchParam">
 		<parameter property="searchDate" />
 		<parameter property="serverAddress" />
 		<parameter property="serverDirectory"  />

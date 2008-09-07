@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -24,8 +24,7 @@ import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataDb;
-import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -92,7 +91,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            MsSearchDAO<SequestSearch, SequestSearchDb> searchDAO = DAOFactory.instance().getSequestSearchDAO();
+            SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate), sequenceDatabaseId);
         }
         catch(RuntimeException e) {
@@ -211,8 +210,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     }
 
     
-    private SequestSearch makeSearchObject(final SequestParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
-        return new SequestSearch() {
+    private SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
+        return new SequestSearchIn() {
             @Override
             public List<SequestParam> getSequestParams() {return parser.getParamList();}
             @Override

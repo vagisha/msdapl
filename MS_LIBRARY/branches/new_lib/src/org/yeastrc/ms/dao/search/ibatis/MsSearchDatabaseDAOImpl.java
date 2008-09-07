@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -34,17 +33,17 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
         delete("MsDatabase.deleteSearchDatabases", searchId);
     }
     
-    public int saveSearchDatabase(MsSearchDatabaseIn database, int searchId, int sequenceDatabaseId) {
+    public int saveSearchDatabase(MsSearchDatabase database, int searchId) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("searchId", searchId);
         
-        List<Integer> dbIds = loadMatchingDatabaseIds(new MsSearchDatabaseDbSqlMapParam(database, sequenceDatabaseId));
+        List<Integer> dbIds = loadMatchingDatabaseIds(database);
         if (dbIds.size() > 0) {
             map.put("databaseId", dbIds.get(0));
         }
         else {
-            map.put("databaseId", saveDatabase(new MsSearchDatabaseDbSqlMapParam(database, sequenceDatabaseId)));
+            map.put("databaseId", saveDatabase(database));
         }
         save("MsDatabase.insertSearchDatabase", map);
         return map.get("databaseId");
@@ -57,40 +56,5 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
     
     private int saveDatabase(MsSearchDatabase database) {
         return saveAndReturnId("MsDatabase.insertDatabase", database);
-    }
-    
-    public static final class MsSearchDatabaseDbSqlMapParam implements MsSearchDatabase {
-
-        private MsSearchDatabaseIn db;
-        private int sequenceDatabaseId;
-        
-        public MsSearchDatabaseDbSqlMapParam(MsSearchDatabaseIn db, int sequenceDatabaseId) {
-            this.db = db;
-            this.sequenceDatabaseId = sequenceDatabaseId;
-        }
-        
-        public String getDatabaseFileName() {
-            throw new UnsupportedOperationException("getDatabaseFileName() not supported by MsSearchDatabaseDbSqlMapParam");
-        }
-
-        @Override
-        public int getId() {
-            throw new UnsupportedOperationException("getId() not supported by MsSearchDatabaseDbSqlMapParam");
-        }
-
-        @Override
-        public int getSequenceDatabaseId() {
-            return sequenceDatabaseId;
-        }
-
-        @Override
-        public String getServerAddress() {
-            return db.getServerAddress();
-        }
-
-        @Override
-        public String getServerPath() {
-            return db.getServerPath();
-        }
     }
 }

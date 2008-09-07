@@ -14,18 +14,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataDb;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -103,7 +102,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            MsSearchDAO<ProlucidSearch, ProlucidSearchDb> searchDAO = DAOFactory.instance().getProlucidSearchDAO();
+            ProlucidSearchDAO searchDAO = DAOFactory.instance().getProlucidSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate), sequenceDatabaseId);
         }
         catch(RuntimeException e) {
@@ -226,10 +225,10 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     }
 
     
-    private ProlucidSearch makeSearchObject(final ProlucidParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
-        return new ProlucidSearch() {
+    private ProlucidSearchIn makeSearchObject(final ProlucidParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
+        return new ProlucidSearchIn() {
             @Override
-            public List<ProlucidParam> getProlucidParams() {return parser.getParamList();}
+            public List<ProlucidParamIn> getProlucidParams() {return parser.getParamList();}
             @Override
             public List<MsResidueModificationIn> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
             @Override

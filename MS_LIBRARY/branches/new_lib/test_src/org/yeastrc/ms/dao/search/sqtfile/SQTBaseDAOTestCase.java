@@ -8,9 +8,9 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAOImplTest.SequestSearchTest;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
@@ -19,8 +19,7 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
-import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
@@ -32,7 +31,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
     protected SQTHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
     protected MsSearchResultDAO<SequestSearchResult, SequestSearchResultDb> sequestResDao = DAOFactory.instance().getSequestResultDAO();
     protected MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtRunSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
-    protected MsSearchDAO<SequestSearch, SequestSearchDb> sequestSearchDao = DAOFactory.instance().getSequestSearchDAO();
+    protected SequestSearchDAO sequestSearchDao = DAOFactory.instance().getSequestSearchDAO();
     protected SQTSearchScanDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
 
     protected void setUp() throws Exception {
@@ -43,7 +42,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         super.tearDown();
     }
 
-    protected SequestSearch makeSequestSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods) {
+    protected SequestSearchIn makeSequestSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods) {
         SequestSearchTest search = new SequestSearchTest();
         search.setSearchProgram(SearchProgram.SEQUEST);
         search.setAnalysisProgramVersion("1.0");

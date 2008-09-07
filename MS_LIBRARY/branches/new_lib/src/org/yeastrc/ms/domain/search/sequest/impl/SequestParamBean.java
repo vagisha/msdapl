@@ -11,7 +11,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestParam;
 /**
  * 
  */
-public class SequestParamImpl implements SequestParam {
+public class SequestParamBean implements SequestParam {
 
     private String name;
     private String value;

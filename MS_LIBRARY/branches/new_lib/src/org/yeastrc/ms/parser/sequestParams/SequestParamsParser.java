@@ -28,6 +28,7 @@ import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.domain.search.impl.SearchDatabase;
 import org.yeastrc.ms.domain.search.impl.TerminalModification;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestParamBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
 
@@ -317,10 +318,10 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         if (m.matches()) {
             final String paramName = m.group(1).trim();
             final String paramVal = m.group(2).trim();
-            return new SequestParam(){
-                public String getParamName() {return paramName;}
-                public String getParamValue() {return paramVal;}
-            };
+            SequestParamBean param = new SequestParamBean();
+            param.setParamName(paramName);
+            param.setParamValue(paramVal);
+            return param;
         }
         else {
             return null;

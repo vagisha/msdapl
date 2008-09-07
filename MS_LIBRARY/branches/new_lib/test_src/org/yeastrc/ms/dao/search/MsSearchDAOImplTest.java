@@ -7,7 +7,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
@@ -25,7 +25,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
     public void testOperationsOnMsSearch() {
         
         // create and save a search with no seq. db information or modifications or enzymes
-        MsSearch search_1 = makeSearch(false, false, false, false);
+        MsSearchIn search_1 = makeSearch(false, false, false, false);
         assertEquals(0, search_1.getSearchDatabases().size());
         assertEquals(0, search_1.getStaticResidueMods().size());
         assertEquals(0, search_1.getDynamicResidueMods().size());
@@ -37,7 +37,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         
         
         // create and save a search with seq. db information and modifications AND enzymes
-        MsSearch search_2 = makeSearch(true, true, true, true);
+        MsSearchIn search_2 = makeSearch(true, true, true, true);
         assertTrue(search_2.getSearchDatabases().size() > 0);
         assertTrue(search_2.getStaticResidueMods().size() > 0);
         assertTrue(search_2.getDynamicResidueMods().size() > 0);
@@ -70,7 +70,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, runSearchDao.loadRunSearchIdsForSearch(searchId).size());
     }
     
-    public static class MsSearchTest implements MsSearch {
+    public static class MsSearchTest implements MsSearchIn {
 
         private List<MsResidueModificationIn> dynamicResidueModifications = new ArrayList<MsResidueModificationIn>();
         private List<MsResidueModificationIn> staticResidueModifications = new ArrayList<MsResidueModificationIn>();

@@ -3,9 +3,9 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="ProlucidSearch"> 
 
-	<typeAlias alias="ProlucidSearchOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidSearchDbImpl"/>
-	<typeAlias alias="ProlucidParamIn" type="org.yeastrc.ms.domain.search.prolucid.ProlucidParamDb" />
-	<typeAlias alias="ProlucidParamOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidParamDbImpl" />
+	<typeAlias alias="ProlucidSearchOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidSearchBean"/>
+	<typeAlias alias="ProlucidParamIn" type="org.yeastrc.ms.dao.search.prolucid.ibatis.ProlucidSearchDAOImpl$ProlucidParamSqlMapParam" />
+	<typeAlias alias="ProlucidParamOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidParamBean" />
 	
 	<resultMap class="ProlucidSearchOut" id="prolucidSearchResult" extends="MsSearch.msSearchResult" >
 		<result property="prolucidParams" 
@@ -15,7 +15,6 @@
 	
 	<resultMap class="ProlucidParamOut" id="prolucidParamResult">
 		<result property="id" column="id" nullValue="0" />
-		<result property="searchId" column="searchID" nullValue="0" />
 		<result property="paramElementName" column="elementName"/>
 		<result property="paramElementValue" column="value"/>
 		<result property="parentParamElementId" column="parentID" nullValue="0" />

@@ -11,8 +11,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
+import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseImpl;
 
 /**
  * 
@@ -42,17 +43,17 @@ public class MsSearchDatabaseDAOImplTest extends BaseDAOTestCase {
         // create a sequence database and assign it to both the search ids
         MsSearchDatabaseIn db1 = makeSequenceDatabase("serverAddress_1", "serverPath_1");
         // assign this database to searchId_1; this will return the id from the msSequenceDatabaseDetails table
-        int db1_id = seqDbDao.saveSearchDatabase(db1, searchId_1, 293); // proteinDatabaseId = 293
+        int db1_id = seqDbDao.saveSearchDatabase(new MsSearchDatabaseImpl(db1, 293), searchId_1); // proteinDatabaseId = 293
         
         // we assign the same database to searchId_2.  Since no new entry should be created in 
         // msSequenceDatabaseDetails table, the returned id should be the same as the one above
-        assertEquals(db1_id, seqDbDao.saveSearchDatabase(db1, searchId_2, 293)); // proteinDatabaseId = 293
+        assertEquals(db1_id, seqDbDao.saveSearchDatabase(new MsSearchDatabaseImpl(db1, 293), searchId_2)); // proteinDatabaseId = 293
         
         // create another dababase with some null values
         MsSearchDatabaseIn db2 = makeSequenceDatabase("serverAddress_1", null);
         // assign the database to searchId_1; we should get a different id since a new entry will be
         // created in msSequenceDatabaseDetails
-        int db2_id = seqDbDao.saveSearchDatabase(db2, searchId_1, 293);
+        int db2_id = seqDbDao.saveSearchDatabase(new MsSearchDatabaseImpl(db2, 293), searchId_1);
         assertNotSame(db1_id, db2_id);
         
         // load the databases associated with searchId_1 and check the returned objects

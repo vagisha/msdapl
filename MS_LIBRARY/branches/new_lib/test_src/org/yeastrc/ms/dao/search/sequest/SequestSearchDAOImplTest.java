@@ -7,8 +7,8 @@ import java.util.List;
 import org.yeastrc.ms.dao.search.MsSearchDAOImplTest.MsSearchTest;
 import org.yeastrc.ms.dao.search.sqtfile.SQTBaseDAOTestCase;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
 
 
 public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
@@ -28,12 +28,12 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sequestSearchDao.loadSearch(1));
         
         // save a search (don't add any extra information)
-        SequestSearch search_1 = makeSequestSearch(false, false, false);
+        SequestSearchIn search_1 = makeSequestSearch(false, false, false);
         assertEquals(0, search_1.getSearchDatabases().size());
         int searchId_1 = sequestSearchDao.saveSearch(search_1, 987); // proteinDatabaseId = 987
         
         // load using our specialized SequestSearchDAO
-        SequestSearchDb search_1_db = sequestSearchDao.loadSearch(searchId_1);
+        SequestSearch search_1_db = sequestSearchDao.loadSearch(searchId_1);
         assertNotNull(search_1_db);
         assertEquals(searchId_1, search_1_db.getId());
         assertEquals(0, search_1_db.getDynamicResidueMods().size());
@@ -45,11 +45,11 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
         checkSequestSearch(search_1, search_1_db);
         
         // save another search (add extra information)
-        SequestSearch search_2 = makeSequestSearch(true, true, true);
+        SequestSearchIn search_2 = makeSequestSearch(true, true, true);
         int searchId_2 = sequestSearchDao.saveSearch(search_2, 789); // proteinDatabaseId = 789
         
         // load the search and check values
-        SequestSearchDb search_2_db = sequestSearchDao.loadSearch(searchId_2);
+        SequestSearch search_2_db = sequestSearchDao.loadSearch(searchId_2);
         assertNotNull(search_2_db);
         assertEquals(searchId_2, search_2_db.getId());
         assertTrue(search_2_db.getDynamicResidueMods().size() > 0);
@@ -69,7 +69,7 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
         
     }
     
-    protected void checkSequestSearch(SequestSearch input, SequestSearchDb output) {
+    protected void checkSequestSearch(SequestSearchIn input, SequestSearch output) {
         super.checkSearch(input, output);
         
         List<SequestParam> inputParams = input.getSequestParams();
@@ -94,7 +94,7 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
         }
     }
     
-    public static final class SequestSearchTest extends MsSearchTest implements SequestSearch {
+    public static final class SequestSearchTest extends MsSearchTest implements SequestSearchIn {
 
         private List<SequestParam> params;
         

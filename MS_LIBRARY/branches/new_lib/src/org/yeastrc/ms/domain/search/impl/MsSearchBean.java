@@ -1,5 +1,5 @@
 /**
- * Experiment.java
+ * MsSearchBean.java
  * @author Vagisha Sharma
  * Jun 16, 2008
  * @version 1.0
@@ -13,15 +13,12 @@ import java.util.List;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
-/**
- * @param <MsRun>
- * 
- */
-public class MsSearchDbImpl implements MsSearchDb {
+
+public class MsSearchBean implements MsSearch {
 
     private int id;
     private Date uploadDate;
@@ -31,19 +28,19 @@ public class MsSearchDbImpl implements MsSearchDb {
     private SearchProgram analysisProgram;
     private String analysisProgramVersion;
     
-    private List<? super MsSearchDatabase> searchDatabases;
+    private List<MsSearchDatabase> searchDatabases;
     
-    private List<? super MsResidueModification> staticResidueMods;
+    private List<MsResidueModification> staticResidueMods;
     
-    private List<? super MsResidueModification> dynamicResidueMods;
+    private List<MsResidueModification> dynamicResidueMods;
     
-    private List<? super MsTerminalModification> staticTerminalMods;
+    private List<MsTerminalModification> staticTerminalMods;
     
-    private List<? super MsTerminalModification> dynamicTerminalMods;
+    private List<MsTerminalModification> dynamicTerminalMods;
     
-    private List<? super MsEnzyme> enzymes;
+    private List<MsEnzyme> enzymes;
     
-    public MsSearchDbImpl() {
+    public MsSearchBean() {
         searchDatabases = new ArrayList<MsSearchDatabase>();
         staticResidueMods = new ArrayList<MsResidueModification>();
         dynamicResidueMods = new ArrayList<MsResidueModification>();
@@ -126,67 +123,55 @@ public class MsSearchDbImpl implements MsSearchDb {
     // database(s) used for the search
     //------------------------------------------------------------------------------------------------------
     public List<MsSearchDatabase> getSearchDatabases() {
-        return (List<MsSearchDatabase>) searchDatabases;
+        return searchDatabases;
     }
 
     /**
      * @param searchDatabases the searchDatabases to set
      */
-    public void setSearchDatabases(List<? super MsSearchDatabase> searchDatabases) {
+    public void setSearchDatabases(List<MsSearchDatabase> searchDatabases) {
         this.searchDatabases = searchDatabases;
-    }
-
-    public void addSearchDatabase(MsSearchDatabaseImpl database) {
-        searchDatabases.add(database);
     }
 
     //------------------------------------------------------------------------------------------------------
     // static residue modifications used for the search
     //------------------------------------------------------------------------------------------------------
     public List<MsResidueModification> getStaticResidueMods() {
-        return (List<MsResidueModification>) staticResidueMods;
+        return staticResidueMods;
     }
 
     /**
      * @param staticResidueMods the staticModifications to set
      */
-    public void setStaticResidueMods(List<? super MsResidueModification> staticModifications) {
+    public void setStaticResidueMods(List<MsResidueModification> staticModifications) {
         this.staticResidueMods = staticModifications;
     }
     
-    public void addStaticResidueModification(MsResidueModification mod) {
-        staticResidueMods.add(mod);
-    }
-
     //------------------------------------------------------------------------------------------------------
     // dynamic residue modifications used for the search
     //------------------------------------------------------------------------------------------------------
     public List<MsResidueModification> getDynamicResidueMods() {
-        return (List<MsResidueModification>) dynamicResidueMods;
+        return dynamicResidueMods;
     }
 
     /**
      * @param dynamicResidueMods the dynamicModifications to set
      */
-    public void setDynamicResidueMods(List<? super MsResidueModification> dynamicModifications) {
+    public void setDynamicResidueMods(List<MsResidueModification> dynamicModifications) {
         this.dynamicResidueMods = dynamicModifications;
-    }
-    
-    public void addDynamicResidueModification(MsResidueModification mod) {
-        dynamicResidueMods.add(mod);
     }
     
     //------------------------------------------------------------------------------------------------------
     // static terminal modifications used for the search
     //------------------------------------------------------------------------------------------------------
     public List<MsTerminalModification> getStaticTerminalMods() {
-        return (List<MsTerminalModification>) staticTerminalMods;
+        return staticTerminalMods;
     }
 
     /**
      * @param staticResidueMods the staticModifications to set
      */
-    public void setStaticTerminalMods(List<? super MsTerminalModification> termStaticMods) {
+    public void setStaticTerminalMods(List<MsTerminalModification> termStaticMods) {
         this.staticTerminalMods = termStaticMods;
     }
     
@@ -194,13 +179,13 @@ public class MsSearchDbImpl implements MsSearchDb {
     // dynamic terminal modifications used for the search
     //------------------------------------------------------------------------------------------------------
     public List<MsTerminalModification> getDynamicTerminalMods() {
-        return (List<MsTerminalModification>) dynamicTerminalMods;
+        return dynamicTerminalMods;
     }
 
     /**
      * @param dynamicResidueMods the dynamicModifications to set
      */
-    public void setDynamicTerminalMods(List<? super MsTerminalModification> termDynaMods) {
+    public void setDynamicTerminalMods(List<MsTerminalModification> termDynaMods) {
         this.dynamicTerminalMods = termDynaMods;
     }
 
@@ -209,14 +194,10 @@ public class MsSearchDbImpl implements MsSearchDb {
     //------------------------------------------------------------------------------------------------------
     @Override
     public List<MsEnzyme> getEnzymeList() {
-        return (List<MsEnzyme>) enzymes;
+        return enzymes;
     }
     
-    public void addEnzyme(MsEnzyme enzyme) {
-        enzymes.add(enzyme);
-    }
-    
-    public void setEnzymeList(List<? super MsEnzyme> enzymes) {
+    public void setEnzymeList(List<MsEnzyme> enzymes) {
         this.enzymes = enzymes;
     }
 }

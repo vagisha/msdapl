@@ -32,9 +32,11 @@ import org.yeastrc.ms.dao.search.ibatis.MsSearchDatabaseDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultProteinDAOImpl;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ibatis.ProlucidSearchDAOImpl;
 import org.yeastrc.ms.dao.search.prolucid.ibatis.ProlucidSearchResultDAOImpl;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchDAOImpl;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl;
@@ -53,14 +55,8 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchDb;
-import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
@@ -111,7 +107,7 @@ public class DAOFactory {
     private MS2ChargeIndependentAnalysisDAO ms2ChgIAnalysisDAO;
     
     // DAOs for search related objects
-    private MsSearchDAO<MsSearch, MsSearchDb> searchDAO;
+    private MsSearchDAO searchDAO;
     private MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDAO;
     private MsSearchResultDAO <MsSearchResult, MsSearchResultDb> searchResultDAO;
     private MsSearchResultProteinDAO resultProteinDAO;
@@ -125,11 +121,11 @@ public class DAOFactory {
     
     // DAOs for Sequest related objects
     private SequestSearchResultDAO sequestResultDAO;
-    private MsSearchDAO<SequestSearch, SequestSearchDb> sequestSearchDAO;
+    private SequestSearchDAO sequestSearchDAO;
     
     // DAOs for Prolucid related objects
     private ProlucidSearchResultDAO prolucidResultDAO;
-    private MsSearchDAO<ProlucidSearch, ProlucidSearchDb> prolucidSearchDAO;
+    private ProlucidSearchDAO prolucidSearchDAO;
     
     
     private DAOFactory() {
@@ -224,7 +220,7 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // SEARCH related
     //-------------------------------------------------------------------------------------------
-    public MsSearchDAO<MsSearch, MsSearchDb> getMsSearchDAO() {
+    public MsSearchDAO getMsSearchDAO() {
         return searchDAO;
     }
     
@@ -270,7 +266,7 @@ public class DAOFactory {
         return sequestResultDAO;
     }
     
-    public MsSearchDAO<SequestSearch, SequestSearchDb> getSequestSearchDAO() {
+    public SequestSearchDAO getSequestSearchDAO() {
         return sequestSearchDAO;
     }
     
@@ -281,7 +277,7 @@ public class DAOFactory {
         return prolucidResultDAO;
     }
     
-    public MsSearchDAO<ProlucidSearch, ProlucidSearchDb> getProlucidSearchDAO() {
+    public ProlucidSearchDAO getProlucidSearchDAO() {
         return prolucidSearchDAO;
     }
     

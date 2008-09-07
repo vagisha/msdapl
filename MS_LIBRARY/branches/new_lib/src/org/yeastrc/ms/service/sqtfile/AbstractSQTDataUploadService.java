@@ -24,9 +24,7 @@ import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
-import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
@@ -146,7 +144,7 @@ public abstract class AbstractSQTDataUploadService {
 
     static void updateProgramVersion(int searchId, String programVersion) {
         try {
-            MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
             searchDao.updateSearchProgramVersion(searchId, programVersion);
         }
         catch(RuntimeException e) {
@@ -156,7 +154,7 @@ public abstract class AbstractSQTDataUploadService {
 
     static void updateProgram(int searchId, SearchProgram program) {
         try {
-            MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
             searchDao.updateSearchProgram(searchId, program);
         }
         catch(RuntimeException e) {
@@ -461,7 +459,7 @@ public abstract class AbstractSQTDataUploadService {
     public static void deleteSearch(int searchId) {
         if (searchId == 0)
             return;
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         searchDao.deleteSearch(searchId);
     }
 }

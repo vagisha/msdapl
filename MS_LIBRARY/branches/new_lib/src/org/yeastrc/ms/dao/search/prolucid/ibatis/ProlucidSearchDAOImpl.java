@@ -8,39 +8,38 @@ package org.yeastrc.ms.dao.search.prolucid.ibatis;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidParamDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchIn;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO <ProlucidSearch, ProlucidSearchDb> {
+public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSearchDAO {
 
     
-    private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
+    private MsSearchDAO searchDao;
     
-    public ProlucidSearchDAOImpl(SqlMapClient sqlMap, MsSearchDAO<MsSearch, MsSearchDb> searchDao) {
+    public ProlucidSearchDAOImpl(SqlMapClient sqlMap, MsSearchDAO searchDao) {
         super(sqlMap);
         this.searchDao = searchDao;
     }
     
-    public ProlucidSearchDb loadSearch(int searchId) {
-        return (ProlucidSearchDb) queryForObject("ProlucidSearch.select", searchId);
+    public ProlucidSearch loadSearch(int searchId) {
+        return (ProlucidSearch) queryForObject("ProlucidSearch.select", searchId);
     }
     
-    public int saveSearch(ProlucidSearch search, int sequenceDatabaseId) {
+    public int saveSearch(ProlucidSearchIn search, int sequenceDatabaseId) {
         
         int searchId = searchDao.saveSearch(search, sequenceDatabaseId);
         // save ProLuCID search parameters
         try {
-            for (ProlucidParam param: search.getProlucidParams()) {
+            for (ProlucidParamIn param: search.getProlucidParams()) {
                 // insert top level elements with parentID=0
                 insertProlucidParam(param, 0, searchId);
             }
@@ -53,9 +52,9 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO 
     }
     
     // recursively insert all the param elements
-    private void insertProlucidParam(ProlucidParam param, int parentParamId, int searchId) {
+    private void insertProlucidParam(ProlucidParamIn param, int parentParamId, int searchId) {
         int paramId = saveAndReturnId("ProlucidSearch.insertParams", new ProlucidParamSqlMapParam(searchId, parentParamId, param));
-        for (ProlucidParam child: param.getChildParamElements()) {
+        for (ProlucidParamIn child: param.getChildParamElements()) {
             insertProlucidParam(child, paramId, searchId);
         }
     }
@@ -75,14 +74,14 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO 
         searchDao.deleteSearch(searchId);
     }
     
-    public static final class ProlucidParamSqlMapParam implements ProlucidParamDb {
+    public static final class ProlucidParamSqlMapParam implements ProlucidParam {
 
         private int searchId;
         private int parentId;
         private String elName;
         private String elValue;
         
-        public ProlucidParamSqlMapParam(int searchId, int parentId, ProlucidParam param) {
+        public ProlucidParamSqlMapParam(int searchId, int parentId, ProlucidParamIn param) {
             this.searchId = searchId;
             this.elName = param.getParamElementName();
             this.elValue = param.getParamElementValue();

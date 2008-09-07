@@ -1,5 +1,5 @@
 /**
- * ProlucidSearch.java
+ * ProlucidSearchDb.java
  * @author Vagisha Sharma
  * Aug 26, 2008
  * @version 1.0

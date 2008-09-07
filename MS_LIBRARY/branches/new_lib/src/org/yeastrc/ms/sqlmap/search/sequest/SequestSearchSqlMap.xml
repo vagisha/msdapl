@@ -3,22 +3,22 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="SequestSearch"> 
 
-	<typeAlias alias="SequestSearchDb" type="org.yeastrc.ms.domain.search.sequest.impl.SequestSearchDbImpl"/>
-	<typeAlias alias="SequestParam" type="org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchDAOImpl$SequestParamSqlMapParam" />
-	<typeAlias alias="SequestParamImpl" type="org.yeastrc.ms.domain.search.sequest.impl.SequestParamImpl" />
+	<typeAlias alias="SequestSearchOut" type="org.yeastrc.ms.domain.search.sequest.impl.SequestSearchBean"/>
+	<typeAlias alias="SequestParamIn" type="org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchDAOImpl$SequestParamSqlMapParam" />
+	<typeAlias alias="SequestParamOut" type="org.yeastrc.ms.domain.search.sequest.impl.SequestParamBean" />
 	
-	<resultMap class="SequestSearchDb" id="sequestSearchResult" extends="MsSearch.msSearchResult" >
+	<resultMap class="SequestSearchOut" id="sequestSearchResult" extends="MsSearch.msSearchResult" >
 		<result property="sequestParams" 
 				column="id" 
 				select="SequestSearch.selectParams"/>
 	</resultMap>
 	
-	<resultMap class="SequestParamImpl" id="sequestParamResult">
+	<resultMap class="SequestParamOut" id="sequestParamResult">
 		<result property="paramName" column="param"/>
 		<result property="paramValue" column="value"/>
 	</resultMap>
 	
-	<parameterMap class="SequestParam" id="sequestParamParam">
+	<parameterMap class="SequestParamIn" id="sequestParamParam">
 		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="paramName" jdbcType="VARCHAR" />
 		<parameter property="paramValue" jdbcType="VARCHAR"/>

@@ -1,5 +1,5 @@
 /**
- * MsSearch.java
+ * MsSearchDb.java
  * @author Vagisha Sharma
  * Aug 15, 2008
  * @version 1.0
@@ -9,7 +9,7 @@ package org.yeastrc.ms.domain.search;
 import java.sql.Date;
 import java.util.List;
 
-import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.general.MsEnzyme;
 
 /**
  * 
@@ -17,64 +17,42 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 public interface MsSearch extends MsSearchBase {
 
     /**
+     * @return the database id for this search
+     */
+    public abstract int getId();
+    
+    /**
+     * @return the date this search was uploaded
+     */
+    public abstract Date getUploadDate();
+    
+    /**
      * @return the searchDatabases
      */
-    public abstract List<MsSearchDatabaseIn> getSearchDatabases();
-    
-    /**
-     * @return the static residue modifications
-     */
-    public abstract List<MsResidueModificationIn> getStaticResidueMods();
+    public abstract List<MsSearchDatabase> getSearchDatabases();
 
     /**
-     * @return the dynamic residue modifications
+     * @return the staticModifications
      */
-    public abstract List<MsResidueModificationIn> getDynamicResidueMods();
-    
-    /**
-     * @return the static terminal modifications
-     */
-    public abstract List<MsTerminalModificationIn> getStaticTerminalMods();
+    public abstract List<MsResidueModification> getStaticResidueMods();
 
     /**
-     * @return the dynamic terminal modifications
+     * @return the dynamicModifications
      */
-    public abstract List<MsTerminalModificationIn> getDynamicTerminalMods();
+    public abstract List<MsResidueModification> getDynamicResidueMods();
     
+    /**
+     * @return the terminal static modifications
+     */
+    public abstract List<MsTerminalModification> getStaticTerminalMods();
     
+    /**
+     * @return the terminal dynamic modifications
+     */
+    public abstract List<MsTerminalModification> getDynamicTerminalMods();
     
     /**
      * @return the enzymes used for this search
      */
-    public abstract List<MsEnzymeIn> getEnzymeList();
-   
-}
-
-interface MsSearchBase {
-    
-    /**
-     * @return the serverAddress
-     */
-    public abstract String getServerAddress();
-
-    /**
-     * @return the serverDirectory
-     */
-    public abstract String getServerDirectory();
-
-    /**
-     * @return the searchDate
-     */
-    public abstract Date getSearchDate();
-    
-    /**
-     * @return the analysisProgramName
-     */
-    public abstract SearchProgram getSearchProgram();
-
-    /**
-     * @return the analysisProgramVersion
-     */
-    public abstract String getSearchProgramVersion();
-
+    public abstract List<MsEnzyme> getEnzymeList();
 }

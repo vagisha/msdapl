@@ -51,9 +51,9 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
-import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
@@ -77,7 +77,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
     protected MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
 
-    protected MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
+    protected MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
     protected MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
     protected MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = 
         DAOFactory.instance().getMsSearchResultDAO();
@@ -284,7 +284,7 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearch makeSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
+    protected MsSearchIn makeSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
 
         MsSearchTest search = new MsSearchTest();
         search.setSearchProgram(SearchProgram.SEQUEST);
@@ -318,7 +318,7 @@ public class BaseDAOTestCase extends TestCase {
         return search;
     }
     
-    protected void checkSearch(MsSearch input, MsSearchDb output) {
+    protected void checkSearch(MsSearchIn input, MsSearch output) {
         assertEquals(input.getSearchDatabases().size(), output.getSearchDatabases().size());
         assertEquals(input.getStaticResidueMods().size(), output.getStaticResidueMods().size());
         assertEquals(input.getDynamicResidueMods().size(), output.getDynamicResidueMods().size());

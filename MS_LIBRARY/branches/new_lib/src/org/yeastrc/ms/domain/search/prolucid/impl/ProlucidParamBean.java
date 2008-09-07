@@ -6,18 +6,17 @@
  */
 package org.yeastrc.ms.domain.search.prolucid.impl;
 
-import org.yeastrc.ms.domain.search.prolucid.ProlucidParamDb;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 
 /**
  * 
  */
-public class ProlucidParamDbImpl implements ProlucidParamDb {
+public class ProlucidParamBean implements ProlucidParam {
 
     private String elName;
     private String elValue;
     private int parentElId;
     private int id;
-    private int searchId;
     
     @Override
     public String getParamElementName() {
@@ -52,13 +51,5 @@ public class ProlucidParamDbImpl implements ProlucidParamDb {
     
     public void setId(int id) {
         this.id = id;
-    }
-    
-    public int getSearchId() {
-        return searchId;
-    }
-    
-    public void setSearchId(int id) {
-        this.searchId = id;
     }
 }

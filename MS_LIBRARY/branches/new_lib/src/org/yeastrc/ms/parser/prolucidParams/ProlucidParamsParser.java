@@ -24,7 +24,7 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.domain.search.impl.SearchDatabase;
 import org.yeastrc.ms.domain.search.impl.TerminalModification;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
 
@@ -34,7 +34,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
 
     private String remoteServer;
 
-    private List<ProlucidParam> parentParams; // normally we should have only one parent (the <parameter> element)
+    private List<ProlucidParamIn> parentParams; // normally we should have only one parent (the <parameter> element)
 
     private Score xcorrColumnScore;
     private Score spColumnScore;
@@ -47,7 +47,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     private List<MsResidueModificationIn> dynamicResidueModifications;
     private List<MsTerminalModificationIn> dynamicTerminalModifications;
 
-    public List<ProlucidParam> getParentParamElement() {
+    public List<ProlucidParamIn> getParentParamElement() {
         return parentParams;
     }
 
@@ -91,7 +91,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return deltaCNColumnScore;
     }
     
-    public List<ProlucidParam> getParamList() {
+    public List<ProlucidParamIn> getParamList() {
         return this.parentParams;
     }
     
@@ -116,7 +116,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     public ProlucidParamsParser() {
-        parentParams = new ArrayList<ProlucidParam>();
+        parentParams = new ArrayList<ProlucidParamIn>();
         staticResidueModifications = new ArrayList<MsResidueModificationIn>();
         staticTerminalModifications = new ArrayList<MsTerminalModificationIn>();
         dynamicResidueModifications = new ArrayList<MsResidueModificationIn>();
@@ -167,12 +167,12 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     private void printParams() {
-        for (ProlucidParam n: this.parentParams) {
+        for (ProlucidParamIn n: this.parentParams) {
             printParam(n, 0);
         }
     }
 
-    private void printParam(ProlucidParam param, int indent) {
+    private void printParam(ProlucidParamIn param, int indent) {
         String tab = "";
         for (int i = 0; i < indent; i++) {
             tab += "\t";
@@ -182,8 +182,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
             System.out.print(param.getParamElementValue());
         System.out.println("");
 
-        List<ProlucidParam> childNodes = param.getChildParamElements();
-        for (ProlucidParam child: childNodes) {
+        List<ProlucidParamIn> childNodes = param.getChildParamElements();
+        for (ProlucidParamIn child: childNodes) {
             printParam(child, indent+1);
         }
 
@@ -374,9 +374,9 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
 
-    private void parseDatabaseInfo(ProlucidParam node) throws DataProviderException {
+    private void parseDatabaseInfo(ProlucidParamIn node) throws DataProviderException {
         String dbPath = null;
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equals("database_name")) {
                 // there should only be one database.
                 if (dbPath != null)
@@ -393,17 +393,17 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         this.database = db;
     }
 
-    private void parseEnzymeInfo(ProlucidParam node) throws DataProviderException {
+    private void parseEnzymeInfo(ProlucidParamIn node) throws DataProviderException {
         String name = null;
         Sense sense = null;
         String cut = "";
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             // enzyme name
             if (child.getParamElementName().equalsIgnoreCase("name"))
                 name = child.getParamElementValue();
             // residues at which this enzyme cuts
             else if (child.getParamElementName().equalsIgnoreCase("residues")) {
-                for (ProlucidParam cr: child.getChildParamElements()) {
+                for (ProlucidParamIn cr: child.getChildParamElements()) {
                     if (cr.getParamElementName().equals("residue"))
                         cut+= cr.getParamElementValue();
                 }
@@ -427,8 +427,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     // parse <modifications> element
-    private void parseModificationInfo(ProlucidParam node) throws DataProviderException {
-        for (ProlucidParam child: node.getChildParamElements()) {
+    private void parseModificationInfo(ProlucidParamIn node) throws DataProviderException {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("n_term"))
                 parseNtermMod(child);
             else if (child.getParamElementName().equalsIgnoreCase("c_term"))
@@ -441,9 +441,9 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     // parse <n_term> element
-    private void parseNtermMod(ProlucidParam node) throws DataProviderException {
+    private void parseNtermMod(ProlucidParamIn node) throws DataProviderException {
 
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equals("static_mod")) {
                 parseNtermModFormat2(node);
                 return;
@@ -469,14 +469,14 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
      * @param node
      * @throws DataProviderException
      */
-    private void parseNtermModFormat2(ProlucidParam node) throws DataProviderException {
+    private void parseNtermModFormat2(ProlucidParamIn node) throws DataProviderException {
 
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("static_mod")) {
                 parseStaticTermModFormat2(Terminal.NTERM, child);
             }
             else if (child.getParamElementName().equalsIgnoreCase("diff_mods")) {
-                for (ProlucidParam c: child.getChildParamElements()) {
+                for (ProlucidParamIn c: child.getChildParamElements()) {
                     if (c.getParamElementName().equalsIgnoreCase("diff_mod")) {
                         parseDynamicTermModFormat2(Terminal.NTERM, c);
                     }
@@ -485,10 +485,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
     }
 
-    private void parseStaticTermModFormat2(Terminal term, ProlucidParam node) throws DataProviderException {
+    private void parseStaticTermModFormat2(Terminal term, ProlucidParamIn node) throws DataProviderException {
         char symbol = 0;
         BigDecimal mass = null;
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("symbol")) {
                 String s = child.getParamElementValue();
                 if (s == null || s.length() != 1)
@@ -517,10 +517,10 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         this.staticTerminalModifications.add(mod);
     }
 
-    private void parseDynamicTermModFormat2(Terminal term, ProlucidParam node) throws DataProviderException {
+    private void parseDynamicTermModFormat2(Terminal term, ProlucidParamIn node) throws DataProviderException {
         char symbol = 0;
         BigDecimal mass = null;
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("symbol")) {
                 String s = child.getParamElementValue();
                 if (s == null || s.length() != 1)
@@ -559,12 +559,12 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
      * @param node
      * @throws DataProviderException
      */
-    private void parseNtermModFormat1(ProlucidParam node) throws DataProviderException {
+    private void parseNtermModFormat1(ProlucidParamIn node) throws DataProviderException {
         char symbol = 0;
         BigDecimal mass = null;
         Boolean isStatic = null;
 
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("symbol")) {
                 String s = child.getParamElementValue();
                 if (s == null || s.length() != 1)
@@ -601,9 +601,9 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     // parse <c_term> element
-    private void parseCtermMod(ProlucidParam node) throws DataProviderException {
+    private void parseCtermMod(ProlucidParamIn node) throws DataProviderException {
 
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equals("static_mod")) {
                 parseCtermModFormat2(node);
                 return;
@@ -629,14 +629,14 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
      * @param node
      * @throws DataProviderException
      */
-    private void parseCtermModFormat2(ProlucidParam node) throws DataProviderException {
+    private void parseCtermModFormat2(ProlucidParamIn node) throws DataProviderException {
 
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("static_mod")) {
                 parseStaticTermModFormat2(Terminal.CTERM, child);
             }
             else if (child.getParamElementName().equalsIgnoreCase("diff_mods")) {
-                for (ProlucidParam c: child.getChildParamElements()) {
+                for (ProlucidParamIn c: child.getChildParamElements()) {
                     if (c.getParamElementName().equalsIgnoreCase("diff_mod")) {
                         parseDynamicTermModFormat2(Terminal.CTERM, c);
                     }
@@ -655,12 +655,12 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
      * @param node
      * @throws DataProviderException
      */
-    private void parseCtermModFormat1(ProlucidParam node) throws DataProviderException {
+    private void parseCtermModFormat1(ProlucidParamIn node) throws DataProviderException {
         char symbol = 0;
         BigDecimal mass = null;
         Boolean isStatic = null;
 
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("symbol")) {
                 String s = child.getParamElementValue();
                 if (s == null || s.length() != 1)
@@ -701,18 +701,18 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     // parse <static_mods> element
-    private void parseStaticResidueMods(ProlucidParam node) throws DataProviderException {
-        for (ProlucidParam child: node.getChildParamElements()) {
+    private void parseStaticResidueMods(ProlucidParamIn node) throws DataProviderException {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("static_mod"))
                 parseStaticResidueMod(child);
         }
     }
 
     // parse <static_mod> element
-    private void parseStaticResidueMod(ProlucidParam node) throws DataProviderException {
+    private void parseStaticResidueMod(ProlucidParamIn node) throws DataProviderException {
         BigDecimal mass = null;
         char residue = 0;
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("residue")) {
                 if (residue != 0)
                     throw new DataProviderException("Error parsing static residue modification. More than one residue found for static modification");
@@ -739,20 +739,20 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     }
 
     // parse <diff_mods> element
-    private void parseDynamicResidueMods(ProlucidParam node) throws DataProviderException {
-        for (ProlucidParam child: node.getChildParamElements()) {
+    private void parseDynamicResidueMods(ProlucidParamIn node) throws DataProviderException {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("diff_mod"))
                 parseDynamicMod(child);
         }
     }
 
     // parse <diff_mod> element
-    private void parseDynamicMod(ProlucidParam node) throws DataProviderException {
+    private void parseDynamicMod(ProlucidParamIn node) throws DataProviderException {
         char modSymbol = 0;
         BigDecimal mass = null;
         List<Character> modResidues = new ArrayList<Character>();
 
-        for (ProlucidParam child: node.getChildParamElements()) {
+        for (ProlucidParamIn child: node.getChildParamElements()) {
             if (child.getParamElementName().equalsIgnoreCase("mass_shift")) {
                 try {mass = new BigDecimal(child.getParamElementValue());}
                 catch(NumberFormatException e) {
@@ -771,7 +771,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
                 modSymbol = s.charAt(0);
             }
             else if (child.getParamElementName().equalsIgnoreCase("residues")) {
-                for (ProlucidParam cr: child.getChildParamElements()) {
+                for (ProlucidParamIn cr: child.getChildParamElements()) {
                     if (cr.getParamElementName().equals("residue")) {
                         String s = cr.getParamElementValue();
                         if (s == null || s.length() != 1)
@@ -790,11 +790,11 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         }
     }
 
-    private static final class ProlucidParamNode implements ProlucidParam {
+    private static final class ProlucidParamNode implements ProlucidParamIn {
 
         private String elName;
         private String elValue;
-        private List<ProlucidParam> childElList = new ArrayList<ProlucidParam>();
+        private List<ProlucidParamIn> childElList = new ArrayList<ProlucidParamIn>();
 
         @Override
         public String getParamElementName() {
@@ -805,11 +805,11 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
             return elValue;
         }
         @Override
-        public List<ProlucidParam> getChildParamElements() {
+        public List<ProlucidParamIn> getChildParamElements() {
             return childElList;
         }
 
-        public void addChildParamElement(ProlucidParam param) {
+        public void addChildParamElement(ProlucidParamIn param) {
             childElList.add(param);
         }
 

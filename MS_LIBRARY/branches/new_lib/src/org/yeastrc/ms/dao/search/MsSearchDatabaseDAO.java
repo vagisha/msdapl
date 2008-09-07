@@ -2,7 +2,6 @@ package org.yeastrc.ms.dao.search;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 
 public interface MsSearchDatabaseDAO {
@@ -17,9 +16,8 @@ public interface MsSearchDatabaseDAO {
      * msSequenceDatabaseDetails table, it is saved first.
      * @param database
      * @param searchId
-     * @param sequenceDatabaseId (from nrseq's tblDatabase).
      * @return id (from msSequenceDatabaseDetail) of the database that was linked to the searchId
      */
-    public abstract int saveSearchDatabase(MsSearchDatabaseIn database, int searchId, int sequenceDatabaseId);
+    public abstract int saveSearchDatabase(MsSearchDatabase database, int searchId);
 
 }

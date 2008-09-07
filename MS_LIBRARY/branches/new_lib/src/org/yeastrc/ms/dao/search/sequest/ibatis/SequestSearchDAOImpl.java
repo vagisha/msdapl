@@ -8,33 +8,31 @@ package org.yeastrc.ms.dao.search.sequest.ibatis;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDb;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchDb;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class SequestSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO <SequestSearch, SequestSearchDb> {
+public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearchDAO {
 
-    private MsSearchDAO<MsSearch, MsSearchDb> searchDao;
+    private MsSearchDAO searchDao;
     
-    public SequestSearchDAOImpl(SqlMapClient sqlMap, 
-            MsSearchDAO<MsSearch, MsSearchDb> searchDao) {
+    public SequestSearchDAOImpl(SqlMapClient sqlMap, MsSearchDAO searchDao) {
         super(sqlMap);
         this.searchDao = searchDao;
     }
     
-    public SequestSearchDb loadSearch(int searchId) {
-        return (SequestSearchDb) queryForObject("SequestSearch.select", searchId);
+    public SequestSearch loadSearch(int searchId) {
+        return (SequestSearch) queryForObject("SequestSearch.select", searchId);
     }
     
-    public int saveSearch(SequestSearch search, int sequenceDatabaseId) {
+    public int saveSearch(SequestSearchIn search, int sequenceDatabaseId) {
         
         int searchId = searchDao.saveSearch(search, sequenceDatabaseId);
         

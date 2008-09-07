@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,14 +19,15 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
-import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
-import org.yeastrc.ms.domain.search.MsSearchDb;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
+import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseImpl;
+import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -37,7 +37,7 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 /**
  * 
  */
-public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSearch, MsSearchDb> {
+public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
 
     private MsSearchDatabaseDAO seqDbDao;
     private MsSearchModificationDAO modDao;
@@ -53,66 +53,38 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO<MsSear
         this.enzymeDao = enzymeDao;
     }
     
-    public MsSearchDb loadSearch(int searchId) {
-        return (MsSearchDb) queryForObject("MsSearch.select", searchId);
+    public MsSearch loadSearch(int searchId) {
+        return (MsSearch) queryForObject("MsSearch.select", searchId);
     }
     
-    public int saveSearch(MsSearch search, int sequenceDatabaseId) {
+    public int saveSearch(MsSearchIn search, int sequenceDatabaseId) {
         
         final int searchId = saveAndReturnId("MsSearch.insert", search);
         
         try {
             // save any database information associated with the search 
             for (MsSearchDatabaseIn seqDb: search.getSearchDatabases()) {
-                seqDbDao.saveSearchDatabase(seqDb, searchId, sequenceDatabaseId);
+                seqDbDao.saveSearchDatabase(new MsSearchDatabaseImpl(seqDb, sequenceDatabaseId), searchId);
             }
 
             // save any static residue modifications used for the search
             for (final MsResidueModificationIn staticMod: search.getStaticResidueMods()) {
-                MsResidueModification mod = new MsResidueModification() {
-                    public int getId() {throw new UnsupportedOperationException();}
-                    public int getSearchId() {return searchId;}
-                    public char getModifiedResidue() {return staticMod.getModifiedResidue();}
-                    public BigDecimal getModificationMass() {return staticMod.getModificationMass();}
-                    public char getModificationSymbol() {return staticMod.getModificationSymbol();}
-                    };
-                modDao.saveStaticResidueMod(mod);
+                modDao.saveStaticResidueMod(new MsResidueModificationImpl(staticMod, searchId));
             }
 
             // save any dynamic residue modifications used for the search
             for (final MsResidueModificationIn dynaMod: search.getDynamicResidueMods()) {
-                MsResidueModification mod = new MsResidueModification() {
-                    public int getId() {throw new UnsupportedOperationException();}
-                    public int getSearchId() {return searchId;}
-                    public char getModifiedResidue() {return dynaMod.getModifiedResidue();}
-                    public BigDecimal getModificationMass() {return dynaMod.getModificationMass();}
-                    public char getModificationSymbol() {return dynaMod.getModificationSymbol();}
-                    };
-                modDao.saveDynamicResidueMod(mod);
+                modDao.saveDynamicResidueMod(new MsResidueModificationImpl(dynaMod, searchId));
             }
 
             // save any static terminal modifications used for the search
             for (final MsTerminalModificationIn staticMod: search.getStaticTerminalMods()) {
-                MsTerminalModification mod = new MsTerminalModification(){
-                    public int getId() {throw new UnsupportedOperationException();}
-                    public int getSearchId() {return searchId;}
-                    public Terminal getModifiedTerminal() {return staticMod.getModifiedTerminal();}
-                    public BigDecimal getModificationMass() {return staticMod.getModificationMass();}
-                    public char getModificationSymbol() {return staticMod.getModificationSymbol();}
-                    };
-                modDao.saveStaticTerminalMod(mod);
+                modDao.saveStaticTerminalMod(new MsTerminalModificationImpl(staticMod, searchId));
             }
 
             // save any dynamic residue modifications used for the search
             for (final MsTerminalModificationIn dynaMod: search.getDynamicTerminalMods()) {
-                MsTerminalModification mod = new MsTerminalModification(){
-                    public int getId() {throw new UnsupportedOperationException();}
-                    public int getSearchId() {return searchId;}
-                    public Terminal getModifiedTerminal() {return dynaMod.getModifiedTerminal();}
-                    public BigDecimal getModificationMass() {return dynaMod.getModificationMass();}
-                    public char getModificationSymbol() {return dynaMod.getModificationSymbol();}
-                    };
-                modDao.saveDynamicTerminalMod(mod);
+                modDao.saveDynamicTerminalMod(new MsTerminalModificationImpl(dynaMod, searchId));
             }
 
             // save any enzymes used for the search

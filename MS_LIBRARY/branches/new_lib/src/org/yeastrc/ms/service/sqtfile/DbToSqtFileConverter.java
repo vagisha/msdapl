@@ -30,7 +30,6 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.MsSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptideDb;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinDb;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
@@ -87,8 +86,8 @@ public class DbToSqtFileConverter {
     }
 
     private int getSearchDatabaseId(int searchId) {
-        MsSearchDAO<MsSearch, MsSearchDb> searchDao = DAOFactory.instance().getMsSearchDAO();
-        MsSearchDb search = searchDao.loadSearch(searchId);
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearch search = searchDao.loadSearch(searchId);
         List<MsSearchDatabase> db = search.getSearchDatabases();
         if (db.size() == 0)
             return 0;

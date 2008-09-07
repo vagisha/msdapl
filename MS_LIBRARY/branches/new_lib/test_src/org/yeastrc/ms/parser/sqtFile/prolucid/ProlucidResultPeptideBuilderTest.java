@@ -10,12 +10,13 @@ import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
+import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
-import org.yeastrc.ms.domain.search.impl.MsTerminalModificationImpl;
+import org.yeastrc.ms.domain.search.impl.ResidueModification;
+import org.yeastrc.ms.domain.search.impl.TerminalModification;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 public class ProlucidResultPeptideBuilderTest extends TestCase {
@@ -222,19 +223,19 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
     
     public void testGetResultResidueMods() {
         
-        List<ResidueModification> resMods = new ArrayList<ResidueModification>(5);
-        resMods.add(new ResidueModification('S', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('T', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('Y', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('M', new BigDecimal("16.0")));
-        resMods.add(new ResidueModification('M', new BigDecimal("80.0")));
+        List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(5);
+        resMods.add(makeResidueModification('S', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('T', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('Y', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('M', new BigDecimal("16.0")));
+        resMods.add(makeResidueModification('M', new BigDecimal("80.0")));
         
         List<MsTerminalModificationIn> termMods = new ArrayList<MsTerminalModificationIn>(5);
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("10.10")));
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("20.20")));
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("80.0")));
-        termMods.add(new TerminalModification(Terminal.CTERM, new BigDecimal("80.0")));
-        termMods.add(new TerminalModification(Terminal.CTERM, new BigDecimal("90.90")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("10.10")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("20.20")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("80.0")));
+        termMods.add(makeTerminalModification(Terminal.CTERM, new BigDecimal("80.0")));
+        termMods.add(makeTerminalModification(Terminal.CTERM, new BigDecimal("90.90")));
         
         
         // no matching residue modification
@@ -313,20 +314,20 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
     
     public void testGetResultTerminalMods() {
         
-        List<ResidueModification> resMods = new ArrayList<ResidueModification>(5);
-        resMods.add(new ResidueModification('S', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('T', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('Y', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('M', new BigDecimal("16.0")));
-        resMods.add(new ResidueModification('M', new BigDecimal("80.0")));
+        List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(5);
+        resMods.add(makeResidueModification('S', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('T', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('Y', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('M', new BigDecimal("16.0")));
+        resMods.add(makeResidueModification('M', new BigDecimal("80.0")));
         
         List<MsTerminalModificationIn> termMods = new ArrayList<MsTerminalModificationIn>(5);
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("10.10")));
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("20.20")));
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("80.0")));
-        termMods.add(new TerminalModification(Terminal.CTERM, new BigDecimal("80.0")));
-        termMods.add(new TerminalModification(Terminal.CTERM, new BigDecimal("90.90")));
-        termMods.add(new TerminalModification(Terminal.CTERM, new BigDecimal("100.0")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("10.10")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("20.20")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("80.0")));
+        termMods.add(makeTerminalModification(Terminal.CTERM, new BigDecimal("80.0")));
+        termMods.add(makeTerminalModification(Terminal.CTERM, new BigDecimal("90.90")));
+        termMods.add(makeTerminalModification(Terminal.CTERM, new BigDecimal("100.0")));
         
         
         // no matching n-terminal modification; will be ignored by getResultTerminalMods
@@ -416,17 +417,17 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
     
     
     public void testBuild() {
-        List<ResidueModification> resMods = new ArrayList<ResidueModification>(5);
-        resMods.add(new ResidueModification('S', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('T', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('Y', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('M', new BigDecimal("16.0")));
+        List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(5);
+        resMods.add(makeResidueModification('S', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('T', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('Y', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('M', new BigDecimal("16.0")));
         
         List<MsTerminalModificationIn> termMods = new ArrayList<MsTerminalModificationIn>(5);
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("10.0")));
-        termMods.add(new TerminalModification(Terminal.NTERM, new BigDecimal("80.0")));
-        termMods.add(new TerminalModification(Terminal.CTERM, new BigDecimal("90.0")));
-        termMods.add(new TerminalModification(Terminal.CTERM, new BigDecimal("16.0")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("10.0")));
+        termMods.add(makeTerminalModification(Terminal.NTERM, new BigDecimal("80.0")));
+        termMods.add(makeTerminalModification(Terminal.CTERM, new BigDecimal("90.0")));
+        termMods.add(makeTerminalModification(Terminal.CTERM, new BigDecimal("16.0")));
         
         String seq = "I.(10.0)S(80.0)KLRNY(80.0)FEAFEM(16.0)PM(90.0).S";
         MsSearchResultPeptide resultPeptide = null;
@@ -495,11 +496,11 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
     }
     
     public void testBuildOneCharTwoMods() {
-        List<ResidueModification> resMods = new ArrayList<ResidueModification>(5);
-        resMods.add(new ResidueModification('S', new BigDecimal("80.0")));
-        resMods.add(new ResidueModification('S', new BigDecimal("90.0")));
-        resMods.add(new ResidueModification('M', new BigDecimal("16.0")));
-        resMods.add(new ResidueModification('M', new BigDecimal("80.0")));
+        List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(5);
+        resMods.add(makeResidueModification('S', new BigDecimal("80.0")));
+        resMods.add(makeResidueModification('S', new BigDecimal("90.0")));
+        resMods.add(makeResidueModification('M', new BigDecimal("16.0")));
+        resMods.add(makeResidueModification('M', new BigDecimal("80.0")));
         
         
         String seq = "I.QKLRS(80.0)(90.0)FEAFS(90.0)M(80.0)PG.S";
@@ -546,19 +547,17 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
         assertEquals(BigDecimal.valueOf(80.0), mod.getModificationMass());
     }
     
-    private static final class ResidueModification extends MsResidueModificationImpl {
-        public ResidueModification(char modChar, BigDecimal modMass) {
-            super();
-            setModificationMass(modMass);
-            setModifiedResidue(modChar);
-        }
+    private MsResidueModificationIn makeResidueModification(char modResidue, BigDecimal mass) {
+        ResidueModification mod = new ResidueModification();
+        mod.setModificationMass(mass);
+        mod.setModifiedResidue(modResidue);
+        return mod;
     }
     
-    private static final class TerminalModification extends MsTerminalModificationImpl {
-        public TerminalModification(Terminal term, BigDecimal modMass) {
-            super();
-            setModifiedTerminal(term);
-            setModificationMass(modMass);
-        }
+    private MsTerminalModificationIn makeTerminalModification(Terminal modTerminal, BigDecimal mass) {
+        TerminalModification mod = new TerminalModification();
+        mod.setModificationMass(mass);
+        mod.setModifiedTerminal(modTerminal);
+        return mod;
     }
 }
