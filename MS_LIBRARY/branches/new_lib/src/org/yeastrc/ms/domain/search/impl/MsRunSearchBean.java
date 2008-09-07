@@ -8,11 +8,11 @@ package org.yeastrc.ms.domain.search.impl;
 
 import java.sql.Date;
 
-import org.yeastrc.ms.domain.search.MsRunSearchDb;
+import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
-public class MsRunSearchDbImpl implements MsRunSearchDb {
+public class MsRunSearchBean implements MsRunSearch {
 
     private int id; // unique id (database) for this search result
     private int searchId; // id of the search group this search belongs to

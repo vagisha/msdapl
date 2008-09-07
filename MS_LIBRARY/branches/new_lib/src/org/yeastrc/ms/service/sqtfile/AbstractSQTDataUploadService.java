@@ -17,13 +17,12 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsResultResidueModIn;
-import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
@@ -36,9 +35,9 @@ import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.impl.MsSearchResultProteinDbImpl;
 import org.yeastrc.ms.domain.search.impl.ResultModIdentifierImpl;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIdentifierImpl;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchImpl;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
@@ -269,11 +268,11 @@ public abstract class AbstractSQTDataUploadService {
         return searchId;
     }
     
-    // SEARCH RESULT
+    // RUN SEARCH
     final int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int searchId)
         throws DataProviderException {
 
-        SQTRunSearch search = provider.getSearchHeader();
+        SQTRunSearchIn search = provider.getSearchHeader();
         if (search instanceof SQTHeader) {
             SQTHeader header = (SQTHeader)search;
             
@@ -302,8 +301,8 @@ public abstract class AbstractSQTDataUploadService {
             
         }
         // save the run search and return the database id
-        MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = daoFactory.getSqtRunSearchDAO();
-        return runSearchDao.saveRunSearch(search, runId, searchId);
+        SQTRunSearchDAO runSearchDao = daoFactory.getSqtRunSearchDAO();
+        return runSearchDao.saveRunSearch(new SQTRunSearchImpl(search, searchId, runId));
     }
 
     final void uploadSearchScan(SQTSearchScan scan, int runSearchId, int scanId) {
@@ -452,7 +451,7 @@ public abstract class AbstractSQTDataUploadService {
     final void deleteLastUploadedRunSearch() {
         if (lastUploadedRunSearchId == 0)
             return;
-        MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
+        MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
         runSearchDao.deleteRunSearch(lastUploadedRunSearchId);
     }
 

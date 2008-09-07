@@ -10,15 +10,15 @@ package org.yeastrc.ms.domain.search.sqtfile;
 /**
  * 
  */
-public interface SQTHeaderItem extends SQTHeaderItemIn {
+public interface SQTHeaderItem {
 
     /**
-     * @return database id of the search to which this header belongs
+     * @return the name of the field
      */
-    public abstract int getRunSearchId();
-    
+    public abstract String getName();
+
     /**
-     * @return database id of this header.
+     * @return the value of the field
      */
-    public abstract int getId();
+    public abstract String getValue();
 }

@@ -17,11 +17,11 @@ import java.util.List;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanDb;
@@ -38,7 +38,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
@@ -57,8 +56,8 @@ public class DbToSqtFileConverter {
         try {
             outFile = new BufferedWriter(new FileWriter(outputFile));
 
-            MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> searchDao = DAOFactory.instance().getSqtRunSearchDAO();
-            SQTRunSearchDb runSearch = searchDao.loadRunSearch(runSearchId);
+            SQTRunSearchDAO searchDao = DAOFactory.instance().getSqtRunSearchDAO();
+            SQTRunSearch runSearch = searchDao.loadRunSearch(runSearchId);
             if (runSearch == null) {
                 System.err.println("No run search found with id: "+runSearchId);
                 return;
@@ -94,7 +93,7 @@ public class DbToSqtFileConverter {
         return NrSeqLookupUtil.getDatabaseId(db.get(0).getDatabaseFileName());
     }
     
-    private void printSequestSQTData(SQTRunSearchDb runSearch, int searchDatabaseId, BufferedWriter outFile) throws IOException {
+    private void printSequestSQTData(SQTRunSearch runSearch, int searchDatabaseId, BufferedWriter outFile) throws IOException {
         
         List<MsResidueModification> dynaResidueModsDb = getDynaResidueModsForSearch(runSearch.getSearchId());
         
@@ -215,13 +214,9 @@ public class DbToSqtFileConverter {
         return scanDao.load(scanId);
     }
     
-    private void printSqtHeader(SQTRunSearchDb search) throws IOException {
+    private void printSqtHeader(SQTRunSearch search) throws IOException {
         SQTHeader sqtHeader = new SQTHeader();
         List<SQTHeaderItem> headerList = search.getHeaders();
-        Collections.sort(headerList, new Comparator<SQTHeaderItem>() {
-            public int compare(SQTHeaderItem o1, SQTHeaderItem o2) {
-                return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
-            }});
 
         for (SQTHeaderItem header: headerList) {
             try {

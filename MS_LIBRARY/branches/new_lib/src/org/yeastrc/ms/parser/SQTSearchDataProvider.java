@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.parser;
 
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 
 /**
@@ -16,7 +16,7 @@ public interface SQTSearchDataProvider {
 
     public abstract String getFileName();
     
-    public abstract SQTRunSearch getSearchHeader() throws DataProviderException;
+    public abstract SQTRunSearchIn getSearchHeader() throws DataProviderException;
     
     public abstract boolean hasNextSearchScan();
     

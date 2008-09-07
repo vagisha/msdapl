@@ -7,11 +7,13 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsRunSearchDb;
+import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.impl.MsResidueModificationImpl;
+import org.yeastrc.ms.domain.search.impl.MsRunSearchImpl;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 
 public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
 
@@ -22,14 +24,14 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         
         // modifications for searchId_1
         MsResidueModificationIn mod1 = makeStaticResidueMod('C', "50.0");
-        modDao.saveStaticResidueMod(mod1);
+        modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod1, searchId_1));
         MsResidueModificationIn mod2 = makeStaticResidueMod('S', "80.0");
-        modDao.saveStaticResidueMod(mod2);
+        modDao.saveStaticResidueMod(new MsResidueModificationImpl(mod2, searchId_1));
         
         MsResidueModificationIn dmod1 = makeDynamicResidueMod('A', "10.0", '*');
-        modDao.saveDynamicResidueMod(dmod1);
+        modDao.saveDynamicResidueMod(new MsResidueModificationImpl(dmod1, searchId_1));
         MsResidueModificationIn dmod2 = makeDynamicResidueMod('B', "20.0", '#');
-        modDao.saveDynamicResidueMod(dmod2);
+        modDao.saveDynamicResidueMod(new MsResidueModificationImpl(dmod2, searchId_1));
     }
 
     protected void tearDown() throws Exception {
@@ -46,22 +48,22 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, runSearchDao.loadRunSearchIdsForRun(runId).size()); 
 
         // create and save a run search
-        MsRunSearch runSearch_1 = makeRunSearch(SearchFileFormat.SQT_SEQ);
+        MsRunSearchIn runSearch_1 = makeRunSearch(SearchFileFormat.SQT_SEQ);
         assertEquals(167, runSearch_1.getSearchDuration());
         assertEquals(SearchFileFormat.SQT_SEQ, runSearch_1.getSearchFileFormat());
 
-        int runSearchId_1 = runSearchDao.saveRunSearch(runSearch_1, runId, 32); // runId = 21; searchId = 32
+        int runSearchId_1 = runSearchDao.saveRunSearch(new MsRunSearchImpl(runSearch_1, 32, runId)); // runId = 21; searchId = 32
         List<Integer> idList = runSearchDao.loadRunSearchIdsForRun(runId);
         assertEquals(1, idList.size());
         assertEquals(runSearchId_1, idList.get(0).intValue());
         assertEquals(0, resultDao.loadResultIdsForRunSearch(runSearchId_1).size());
-        MsRunSearchDb runSearchDb_1 = runSearchDao.loadRunSearch(idList.get(0));
+        MsRunSearch runSearchDb_1 = runSearchDao.loadRunSearch(idList.get(0));
         checkRunSearch(runSearch_1, runSearchDb_1);
         assertEquals(32, runSearchDb_1.getSearchId());
 
         // create and save another run search for the same run
-        MsRunSearch search_2 = makeRunSearch(SearchFileFormat.SQT_PLUCID);
-        int runSearchId_2 = runSearchDao.saveRunSearch(search_2, runId, 87); // runId = 21; searchId = 87
+        MsRunSearchIn search_2 = makeRunSearch(SearchFileFormat.SQT_PLUCID);
+        int runSearchId_2 = runSearchDao.saveRunSearch(new MsRunSearchImpl(search_2, 87, runId)); // runId = 21; searchId = 87
         idList = runSearchDao.loadRunSearchIdsForRun(runId);
         assertEquals(2, idList.size());
         Collections.sort(idList);
@@ -71,7 +73,7 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         runSearchDb_1 = runSearchDao.loadRunSearch(idList.get(0));
         checkRunSearch(runSearch_1, runSearchDb_1);
         assertEquals(32, runSearchDb_1.getSearchId());
-        MsRunSearchDb runSearchDb_2 = runSearchDao.loadRunSearch(idList.get(1));
+        MsRunSearch runSearchDb_2 = runSearchDao.loadRunSearch(idList.get(1));
         checkRunSearch(search_2, runSearchDb_2);
         assertEquals(87, runSearchDb_2.getSearchId());
 
@@ -105,19 +107,19 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
 
     
     public void testReturnedSearchType() {
-      MsRunSearch search = makeRunSearch(SearchFileFormat.SQT_SEQ);
+      MsRunSearchIn search = makeRunSearch(SearchFileFormat.SQT_SEQ);
       assertEquals(SearchFileFormat.SQT_SEQ, search.getSearchFileFormat());
-      int runSearchId_1 = runSearchDao.saveRunSearch(search, 21, 0); // runId = 21
-      MsRunSearchDb searchDb = runSearchDao.loadRunSearch(runSearchId_1);
-      assertTrue(searchDb instanceof SQTRunSearchDb);
+      int runSearchId_1 = runSearchDao.saveRunSearch(new MsRunSearchImpl(search, 45, 21)); // runId = 21
+      MsRunSearch searchDb = runSearchDao.loadRunSearch(runSearchId_1);
+      assertTrue(searchDb instanceof SQTRunSearch);
       assertEquals(SearchFileFormat.SQT_SEQ, searchDb.getSearchFileFormat());
       
       search = makeRunSearch(SearchFileFormat.PEPXML);
       assertEquals(SearchFileFormat.PEPXML, search.getSearchFileFormat());
-      int runSearchId_2 = runSearchDao.saveRunSearch(search, 21, 0);
+      int runSearchId_2 = runSearchDao.saveRunSearch(new MsRunSearchImpl(search, 54, 21));
       searchDb = runSearchDao.loadRunSearch(runSearchId_2);
-      assertTrue(searchDb instanceof MsRunSearchDb);
-      assertFalse(searchDb instanceof SQTRunSearchDb);
+      assertTrue(searchDb instanceof MsRunSearch);
+      assertFalse(searchDb instanceof SQTRunSearch);
       assertEquals(SearchFileFormat.PEPXML, searchDb.getSearchFileFormat());
       
       runSearchDao.deleteRunSearch(runSearchId_1);
@@ -137,7 +139,7 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         }
     }
 
-    public static class MsRunSearchTest implements MsRunSearch {
+    public static class MsRunSearchTest implements MsRunSearchIn {
 
         private Date searchDate;
         private SearchFileFormat fileFormat;

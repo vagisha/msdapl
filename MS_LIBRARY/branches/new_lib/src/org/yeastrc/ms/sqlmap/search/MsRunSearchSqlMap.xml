@@ -3,9 +3,9 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRunSearch"> 
 
-	<typeAlias alias="MsRunSearchOut" type="org.yeastrc.ms.domain.search.impl.MsRunSearchDbImpl"/>
-	<typeAlias alias="MsRunSearchIn" type="org.yeastrc.ms.domain.search.MsRunSearchDb"/>
-	<typeAlias alias="SQTRunSearchOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchDbImpl"/>
+	<typeAlias alias="MsRunSearchOut" type="org.yeastrc.ms.domain.search.impl.MsRunSearchBean"/>
+	<typeAlias alias="MsRunSearchIn" type="org.yeastrc.ms.domain.search.MsRunSearch"/>
+	<typeAlias alias="SQTRunSearchOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchBean"/>
 	
 	<typeAlias alias="FileFormatType" type="org.yeastrc.ms.domain.search.SearchFileFormat"/>
 	<typeAlias alias="FileFormatTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsRunSearchDAOImpl$SearchFileFormatTypeHandler"/>
@@ -37,7 +37,7 @@
 	</resultMap> 
 	
 	<parameterMap class="MsRunSearchIn" id="msRunSearchParam">
-		<parameter property="searchId" jdbcType="INTEGER"/>
+		<parameter property="searchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="searchFileFormat" 
 					jdbcType="VARCHAR" 

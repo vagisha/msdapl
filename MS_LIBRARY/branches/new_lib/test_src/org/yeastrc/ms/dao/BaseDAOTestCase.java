@@ -50,10 +50,10 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueModIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.MsSearchIn;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
+import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
+import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
@@ -78,7 +78,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
 
     protected MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-    protected MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
+    protected MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
     protected MsSearchResultDAO<MsSearchResult, MsSearchResultDb> resultDao = 
         DAOFactory.instance().getMsSearchResultDAO();
     protected MsSearchDatabaseDAO seqDbDao = DAOFactory.instance().getMsSequenceDatabaseDAO();
@@ -333,7 +333,7 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // RUN SEARCH
     //-----------------------------------------------------------------------------------------------------
-    protected MsRunSearch makeRunSearch(SearchFileFormat format) {
+    protected MsRunSearchIn makeRunSearch(SearchFileFormat format) {
 
         MsRunSearchTest runSearch = new MsRunSearchTest();
         runSearch.setFileFormat(format);
@@ -388,7 +388,7 @@ public class BaseDAOTestCase extends TestCase {
         return cal.getTimeInMillis();
     }
     
-    protected void checkRunSearch(MsRunSearch input, MsRunSearchDb output) {
+    protected void checkRunSearch(MsRunSearchIn input, MsRunSearch output) {
         assertEquals(input.getSearchDate().toString(), output.getSearchDate().toString());
         assertEquals(input.getSearchDuration(), output.getSearchDuration());
         assertEquals(input.getSearchFileFormat(), output.getSearchFileFormat());

@@ -11,30 +11,54 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 /**
  * 
  */
-public class HeaderItemBean extends HeaderItem implements SQTHeaderItem {
+public class HeaderItemBean implements SQTHeaderItem {
 
-    private int id;
-    private int runSearchId;
+    private String name;
+    private String value;
     
-    /**
-     * @return the id
-     */
-    public int getId() {
-        return id;
+    public HeaderItemBean() {}
+    
+    public HeaderItemBean(String name, String value) {
+        this.name = name;
+        this.value = value;
     }
     
-    public void setId(int id) {
-        this.id = id;
-    }
-    
-    /**
-     * @return the searchId
-     */
-    public int getRunSearchId() {
-        return runSearchId;
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("H\t");
+        buf.append(name);
+        if (value != null) {
+            buf.append("\t");
+            buf.append(value);
+        }
+        return buf.toString();
     }
 
-    public void setRunSearchId(int runSearchId) {
-        this.runSearchId = runSearchId;
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 }

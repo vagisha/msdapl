@@ -1,26 +1,35 @@
+/**
+ * MsSearchDb.java
+ * @author Vagisha Sharma
+ * Jul 11, 2008
+ * @version 1.0
+ */
 package org.yeastrc.ms.domain.search;
 
 import java.sql.Date;
 
-public interface MsRunSearch {
+
+/**
+ * 
+ */
+public interface MsRunSearch extends MsRunSearchIn {
+
+    /**
+     * @return database id of the run on which this search was done.
+     */
+    public abstract int getRunId();
+
+    /**
+     * @return database id of the search group
+     */
+    public abstract int getSearchId();
     
     /**
-     * @return the originalFileType
+     * @return database id of this search
      */
-    public abstract SearchFileFormat getSearchFileFormat();
-
-    /**
-     * @return searchProgram
-     */
-    public abstract SearchProgram getSearchProgram();
-    /**
-     * @return the searchDate
-     */
-    public abstract Date getSearchDate();
-
-    /**
-     * @return the time taken for the search (in minutes)
-     */
-    public abstract int getSearchDuration();
+    public abstract int getId();
+    
+    
+    public abstract Date getUploadDate();
     
 }

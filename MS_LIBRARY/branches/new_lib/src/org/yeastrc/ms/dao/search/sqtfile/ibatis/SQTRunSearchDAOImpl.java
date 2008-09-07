@@ -11,11 +11,9 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
-import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsRunSearchDb;
-import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
+import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTHeaderItemImpl;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -24,21 +22,21 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * 
  */
 public class SQTRunSearchDAOImpl extends BaseSqlMapDAO 
-    implements MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> {
+    implements SQTRunSearchDAO {
 
-    private MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDao;
+    private MsRunSearchDAO runSearchDao;
     private SQTHeaderDAO headerDao;
     
     public SQTRunSearchDAOImpl(SqlMapClient sqlMap,
-            MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDao,
+            MsRunSearchDAO runSearchDao,
             SQTHeaderDAO headerDao) {
         super(sqlMap);
         this.runSearchDao = runSearchDao;
         this.headerDao = headerDao;
     }
     
-    public SQTRunSearchDb loadRunSearch(int runSearchId) {
-        return (SQTRunSearchDb) queryForObject("MsRunSearch.select", runSearchId);
+    public SQTRunSearch loadRunSearch(int runSearchId) {
+        return (SQTRunSearch) queryForObject("MsRunSearch.select", runSearchId);
     }
     
     public List<Integer> loadRunSearchIdsForSearch(int searchId) {
@@ -58,13 +56,13 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
      * @param runSearch
      * @return
      */
-    public int saveRunSearch (SQTRunSearch runSearch, int runId, int searchId) {
+    public int saveRunSearch (SQTRunSearch runSearch) {
         
         // save the run_search
-        int runSearchId = runSearchDao.saveRunSearch(runSearch, runId, searchId);
+        int runSearchId = runSearchDao.saveRunSearch(runSearch);
         
         // save the headers
-        for (SQTHeaderItemIn h: runSearch.getHeaders()) {
+        for (SQTHeaderItem h: runSearch.getHeaders()) {
             headerDao.saveSQTHeader(new SQTHeaderItemImpl(h, runSearchId));
         }
         return runSearchId;

@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAOImplTest.MsRunSearchTest;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
@@ -22,15 +21,14 @@ import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
-import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 
 public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 
     protected SQTHeaderDAO sqtHeaderDao = DAOFactory.instance().getSqtHeaderDAO();
     protected MsSearchResultDAO<SequestSearchResult, SequestSearchResultDb> sequestResDao = DAOFactory.instance().getSequestResultDAO();
-    protected MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtRunSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
+    protected SQTRunSearchDAO sqtRunSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
     protected SequestSearchDAO sequestSearchDao = DAOFactory.instance().getSequestSearchDAO();
     protected SQTSearchScanDAO sqtSpectrumDao = DAOFactory.instance().getSqtSpectrumDAO();
 
@@ -87,7 +85,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
         return search;
     }
     
-    protected SQTRunSearch makeSQTRunSearch(boolean addHeaders) {
+    protected SQTRunSearchIn makeSQTRunSearch(boolean addHeaders) {
 
         SQTRunSearchTest runSearch = new SQTRunSearchTest();
         runSearch.setFileFormat(SearchFileFormat.SQT_SEQ);
@@ -104,8 +102,8 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
     }
 
 
-    protected SQTHeaderItemIn makeHeader(final String name, final String value) {
-        SQTHeaderItemIn h = new SQTHeaderItemIn() {
+    protected SQTHeaderItem makeHeader(final String name, final String value) {
+        SQTHeaderItem h = new SQTHeaderItem() {
             public String getName() {
                 return name;
             }
@@ -115,19 +113,19 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
             return h;
     }
     
-    public static final class SQTRunSearchTest extends MsRunSearchTest implements SQTRunSearch {
+    public static final class SQTRunSearchTest extends MsRunSearchTest implements SQTRunSearchIn {
 
-        private List<SQTHeaderItemIn> headers = new ArrayList<SQTHeaderItemIn>();
+        private List<SQTHeaderItem> headers = new ArrayList<SQTHeaderItem>();
 
-        public List<SQTHeaderItemIn> getHeaders() {
+        public List<SQTHeaderItem> getHeaders() {
             return headers ;
         }
 
-        public void setHeaders(List<SQTHeaderItemIn> headers) {
+        public void setHeaders(List<SQTHeaderItem> headers) {
             this.headers = headers;
         }
 
-        public void addHeader(SQTHeaderItemIn header) {
+        public void addHeader(SQTHeaderItem header) {
             headers.add(header);
         }
     }

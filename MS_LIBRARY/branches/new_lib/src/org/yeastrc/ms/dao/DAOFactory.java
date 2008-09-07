@@ -41,6 +41,7 @@ import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchDAOImpl;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTRunSearchDAOImpl;
@@ -53,12 +54,8 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
-import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultDb;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -108,7 +105,7 @@ public class DAOFactory {
     
     // DAOs for search related objects
     private MsSearchDAO searchDAO;
-    private MsRunSearchDAO<MsRunSearch, MsRunSearchDb> runSearchDAO;
+    private MsRunSearchDAO runSearchDAO;
     private MsSearchResultDAO <MsSearchResult, MsSearchResultDb> searchResultDAO;
     private MsSearchResultProteinDAO resultProteinDAO;
     private MsSearchModificationDAO modDAO;
@@ -117,7 +114,7 @@ public class DAOFactory {
     // DAOs for SQT file related objects
     private SQTSearchScanDAO sqtSpectrumDAO;
     private SQTHeaderDAO sqtHeaderDAO;
-    private MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> sqtRunSearchDAO;
+    private SQTRunSearchDAO sqtRunSearchDAO;
     
     // DAOs for Sequest related objects
     private SequestSearchResultDAO sequestResultDAO;
@@ -224,7 +221,7 @@ public class DAOFactory {
         return searchDAO;
     }
     
-    public MsRunSearchDAO<MsRunSearch, MsRunSearchDb> getMsRunSearchDAO() {
+    public MsRunSearchDAO getMsRunSearchDAO() {
         return runSearchDAO;
     }
     
@@ -251,7 +248,7 @@ public class DAOFactory {
         return sqtHeaderDAO;
     }
     
-    public MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> getSqtRunSearchDAO() {
+    public SQTRunSearchDAO getSqtRunSearchDAO() {
         return sqtRunSearchDAO;
     }
     

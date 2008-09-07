@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +14,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsRunSearchDb;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -27,14 +24,14 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 /**
  * 
  */
-public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO <MsRunSearch, MsRunSearchDb>{
+public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO {
     
     public MsRunSearchDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
     
-    public MsRunSearchDb loadRunSearch(int runSearchId) {
-        return (MsRunSearchDb) queryForObject("MsRunSearch.select", runSearchId);
+    public MsRunSearch loadRunSearch(int runSearchId) {
+        return (MsRunSearch) queryForObject("MsRunSearch.select", runSearchId);
     }
     
     @Override
@@ -57,9 +54,8 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
         return 0;
     }
     
-    public int saveRunSearch(MsRunSearch search, int runId, int searchId) {
-        MsRunSearchSqlMapParam searchDb = new MsRunSearchSqlMapParam(search, runId, searchId);
-        return saveAndReturnId("MsRunSearch.insert", searchDb);
+    public int saveRunSearch(MsRunSearch search) {
+        return saveAndReturnId("MsRunSearch.insert", search);
     }
     
     public void deleteRunSearch(int runSearchId) {
@@ -94,55 +90,4 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
     }
     
     //---------------------------------------------------------------------------------------
-    
-    //---------------------------------------------------------------------------------------
-    
-    /**
-     * Convenience class for encapsulating a MsRunSearch and associated runId
-     */
-    public class MsRunSearchSqlMapParam implements MsRunSearchDb {
-
-        private int runId;
-        private int searchId;
-        private MsRunSearch search;
-        
-        public MsRunSearchSqlMapParam(MsRunSearch search, int runId, int searchId) {
-            this.runId = runId;
-            this.searchId = searchId;
-            this.search = search;
-        }
-
-        public int getRunId() {
-            return runId;
-        }
-        
-        public int getSearchId() {
-            return searchId;
-        }
-        
-        public SearchFileFormat getSearchFileFormat() {
-            return search.getSearchFileFormat();
-        }
-
-        public Date getSearchDate() {
-            return search.getSearchDate();
-        }
-
-        public int getSearchDuration() {
-            return search.getSearchDuration();
-        }
-
-        public int getId() {
-            throw new UnsupportedOperationException("getId() is not supported by MsRunSearchSqlMapParam");
-        }
-
-        public Date getUploadDate() {
-            throw new UnsupportedOperationException("getUploadDate() is not supported by MsRunSearchSqlMapParam");
-        }
-
-        @Override
-        public SearchProgram getSearchProgram() {
-            throw new UnsupportedOperationException("getSearchProgram() is not supported by MsRunSearchSqlMapParam");
-        }
-    }
 }

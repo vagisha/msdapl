@@ -8,12 +8,12 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.impl.HeaderItem;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
+import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
+import org.yeastrc.ms.domain.search.sqtfile.impl.HeaderItemBean;
 
 
-public class SQTHeader implements SQTRunSearch {
+public class SQTHeader implements SQTRunSearchIn {
 
     // required headers 
     private static final String SQTGENERATOR_VERSION = "SQTGeneratorVersion";
@@ -31,13 +31,13 @@ public class SQTHeader implements SQTRunSearch {
     private int searchDuration = -1;
     
     
-    private List<SQTHeaderItemIn> headerItems;
+    private List<SQTHeaderItem> headerItems;
     
     private SearchFileFormat sqtType = null;
     private SearchProgram program = null;
     
     public SQTHeader() {
-        headerItems = new ArrayList<SQTHeaderItemIn>();
+        headerItems = new ArrayList<SQTHeaderItem>();
     }
    
     public boolean isValid() {
@@ -65,7 +65,7 @@ public class SQTHeader implements SQTRunSearch {
         if (name == null)
             throw new SQTParseException("name for Header cannot be null.");
         
-        headerItems.add(new HeaderItem(name, value));
+        headerItems.add(new HeaderItemBean(name, value));
         
         // if there is no value for this header ignore it; It will still get added to the 
         // headerItems list. 
@@ -135,7 +135,7 @@ public class SQTHeader implements SQTRunSearch {
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        for (SQTHeaderItemIn h: headerItems) {
+        for (SQTHeaderItem h: headerItems) {
             buf.append(h.toString());
             buf.append("\n");
         }
@@ -159,7 +159,7 @@ public class SQTHeader implements SQTRunSearch {
         return sqtGeneratorVersion;
     }
     
-    public List<SQTHeaderItemIn> getHeaders() {
+    public List<SQTHeaderItem> getHeaders() {
        return headerItems;
     }
 
@@ -170,7 +170,7 @@ public class SQTHeader implements SQTRunSearch {
         // make a check for Percolator first
         // Percolator files do not add Percolator to the sqtGenerator header.
         // Look for it in the other headers
-        for(SQTHeaderItemIn f: headerItems) {
+        for(SQTHeaderItem f: headerItems) {
             if (f.getName().equalsIgnoreCase(SearchProgram.PERCOLATOR.displayName())) {
                 sqtType = SearchFileFormat.SQT_PERC;
                 return sqtType;

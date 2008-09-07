@@ -1,14 +1,13 @@
 package org.yeastrc.ms.domain.search.sqtfile.impl;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
-import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItemIn;
 
 public class SQTHeaderItemImpl implements SQTHeaderItem {
 
     private int runSearchId;
-    private SQTHeaderItemIn headerItem;
+    private SQTHeaderItem headerItem;
     
-    public SQTHeaderItemImpl(SQTHeaderItemIn headerItem, int runSearchId) {
+    public SQTHeaderItemImpl(SQTHeaderItem headerItem, int runSearchId) {
         this.headerItem = headerItem;
         this.runSearchId = runSearchId;
     }

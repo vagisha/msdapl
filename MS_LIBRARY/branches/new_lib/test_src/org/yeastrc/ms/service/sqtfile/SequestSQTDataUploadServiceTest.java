@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
@@ -26,7 +26,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchDb;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanDb;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
@@ -224,11 +223,11 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
     
     // 2.sqt
     private void checkSecondRunSearch(int searchId, int runId) {
-        MsRunSearchDAO<SQTRunSearch, SQTRunSearchDb> runSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
+        SQTRunSearchDAO runSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
         int runSearchId = runSearchDao.loadIdForRunAndSearch(runId, searchId);
         
         assertTrue(runSearchId != 0);
-        SQTRunSearchDb runSearch = runSearchDao.loadRunSearch(runSearchId);
+        SQTRunSearch runSearch = runSearchDao.loadRunSearch(runSearchId);
         assertNotNull(runSearch);
         assertEquals(runId, runSearch.getRunId());
         assertEquals(searchId, runSearch.getSearchId());
@@ -238,10 +237,6 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         // TODO check search date and search duration
         List<SQTHeaderItem> headerList = runSearch.getHeaders();
         assertEquals(23, headerList.size());
-        Collections.sort(headerList, new Comparator<SQTHeaderItem>() {
-            public int compare(SQTHeaderItem o1, SQTHeaderItem o2) {
-                return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
-            }});
         
         // check headers. 
         String headerSec = 
