@@ -150,7 +150,7 @@ public class RunBean implements MsRun {
         return enzymeList; 
     }
     
-    public void  setEnzymeList(List<? extends MsEnzyme> enzymeList) {
-        this.enzymeList = (List<MsEnzyme>) enzymeList;
+    public void  setEnzymeList(List<MsEnzyme> enzymeList) {
+        this.enzymeList = enzymeList;
     }
 }

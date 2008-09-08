@@ -40,10 +40,10 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.general.impl.Enzyme;
 import org.yeastrc.ms.domain.run.DataConversionType;
-import org.yeastrc.ms.domain.run.MsRunIn;
 import org.yeastrc.ms.domain.run.MsRun;
-import org.yeastrc.ms.domain.run.MsScanIn;
+import org.yeastrc.ms.domain.run.MsRunIn;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -67,7 +67,7 @@ import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.impl.SearchDatabase;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.impl.TerminalModification;
-import org.yeastrc.ms.util.PeakConverterDouble;
+import org.yeastrc.ms.util.PeakConverterString;
 
 /**
  * 
@@ -459,13 +459,13 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getDataConversionType(), output.getDataConversionType());
         assertEquals(input.getPeakCount(), output.getPeakCount());
         Iterator<String[]> ipiter = input.peakIterator();
-        List<double[]> peakList = new PeakConverterDouble().convert(output.peakDataString());
-        Iterator<double[]> opiter = peakList.iterator();
+        List<String[]> peakList = new PeakConverterString().convert(output.peakDataString());
+        Iterator<String[]> opiter = peakList.iterator();
         while(ipiter.hasNext()) {
             String[] ipeak = ipiter.next();
-            double[] opeak = opiter.next();
-            assertEquals(Double.parseDouble(ipeak[0]), opeak[0]);
-            assertEquals(Double.parseDouble(ipeak[1]), opeak[1]);
+            String[] opeak = opiter.next();
+            assertEquals(ipeak[0], opeak[0]);
+            assertEquals(ipeak[1], opeak[1]);
         }
     }
     

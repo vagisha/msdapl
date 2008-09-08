@@ -70,7 +70,7 @@
     			fragmentationType,
     			isCentroid,
     			peakCount,
-    			UNCOMPRESS(data) as data 
+    			data as data 
     			FROM msScan, msScanData
     			WHERE msScan.id = msScanData.scanID
     			AND id= #id#
@@ -100,7 +100,7 @@
     
     <insert id="insertPeakData" parameterMap="msScanDataParam">
     	INSERT INTO msScanData (scanID,data) 
-    	VALUES (?,COMPRESS(?))
+    	VALUES (?,?)
     </insert>
     
     <delete id="delete" parameterClass="Integer">

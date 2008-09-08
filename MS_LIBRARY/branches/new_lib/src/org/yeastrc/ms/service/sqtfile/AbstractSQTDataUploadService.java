@@ -200,7 +200,7 @@ public abstract class AbstractSQTDataUploadService {
         MsSearchDatabaseIn db = getSearchDatabase();
         String searchDbName = null;
         if (db != null) {
-            searchDbName = new File(getSearchDatabase().getServerPath()).getName();
+            searchDbName = getSearchDatabase().getDatabaseFileName();
             sequenceDatabaseId = NrSeqLookupUtil.getDatabaseId(searchDbName);
         }
         if (sequenceDatabaseId == 0) {

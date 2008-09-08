@@ -34,7 +34,7 @@ public class MsScanDbImplTest extends TestCase {
             peaks.add(peak);
             builder.addPeak(peak[0], peak[1]);
         }
-        scanDb.setPeakData(builder.getPeaksAsString());
+        scanDb.setPeakData(PeakUtils.compressPeakStringGZIP(builder.getPeaksAsString()));
         List<double[]> peakList = new PeakConverterDouble().convert(scanDb.peakDataString());
         int i = 0;
         for (double[] peak: peakList) {

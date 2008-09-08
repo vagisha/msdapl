@@ -6,10 +6,12 @@
  */
 package org.yeastrc.ms.domain.run.impl;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.util.PeakUtils;
 
 /**
  * 
@@ -137,8 +139,13 @@ public class ScanBean implements MsScan {
         this.peakCount = peakCount;
     }
     
-    public void setPeakData(String peaks) {
-        peakString = peaks;
+    public void setPeakData(byte[] peaks) {
+        try {
+            peakString = PeakUtils.decompressPeaksGZIP(peaks);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Error decompressing peak data", e);
+        }
     }
 
     @Override

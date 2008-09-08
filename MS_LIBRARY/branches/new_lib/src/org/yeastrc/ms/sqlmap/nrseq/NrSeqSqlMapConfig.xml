@@ -18,9 +18,9 @@
       		<property name="JDBC.ConnectionURL" 
                 value="${db.nrseq.url}"/> 
       		<property name="JDBC.Username" 
-                value="${db.user}"/> 
+                value="${db.nrseq.user}"/> 
       		<property name="JDBC.Password" 
-                value="${db.password}"/> 
+                value="${db.nrseq.password}"/> 
     	</dataSource>
 	</transactionManager>
 	
