@@ -296,13 +296,11 @@ ALTER TABLE SQTSearchResult ADD INDEX(sp);
 
 CREATE TABLE ProLuCIDSearchResult (
    resultID INT UNSIGNED NOT NULL PRIMARY KEY,
-   XCorrRank INT UNSIGNED NOT NULL,
-   spRank INT UNSIGNED NOT NULL,
-   deltaCN DECIMAL(10,5),
-   ZScore DOUBLE,
-   XCorr DECIMAL(10,5),
-   binomialProbability DOUBLE UNSIGNED,
-   sp DECIMAL(10,5),
+   primaryScoreRank INT UNSIGNED NOT NULL,
+   secondaryScoreRank INT UNSIGNED NOT NULL,
+   deltaCN DECIMAL(10,5),  NOT NULL,
+   primaryScore DOUBLE, NOT NULL,
+   secondaryScore DOUBLE NOT NULL,
    calculatedMass DECIMAL(18,9),
    matchingIons INT UNSIGNED,
    predictedIons INT UNSIGNED
