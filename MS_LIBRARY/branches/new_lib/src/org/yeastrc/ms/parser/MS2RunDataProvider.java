@@ -6,8 +6,8 @@
  */
 package org.yeastrc.ms.parser;
 
-import org.yeastrc.ms.domain.run.ms2file.MS2Run;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 
 /**
  * 
@@ -16,11 +16,11 @@ public interface MS2RunDataProvider  {
 
     public abstract String getFileName();
     
-    public abstract MS2Run getRunHeader() throws DataProviderException;
+    public abstract MS2RunIn getRunHeader() throws DataProviderException;
     
     public abstract boolean hasNextScan();
     
-    public abstract MS2Scan getNextScan() throws DataProviderException;
+    public abstract MS2ScanIn getNextScan() throws DataProviderException;
     
     public abstract void close();
 }

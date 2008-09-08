@@ -8,33 +8,24 @@ import java.util.Random;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAOImplTest.MS2RunTest;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAOImplTest.MS2ScanTest;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.RunFileFormat;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
-import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 
 public class MS2BaseDAOtestCase extends BaseDAOTestCase {
 
     protected MS2ScanChargeDAO chargeDao = DAOFactory.instance().getMS2FileScanChargeDAO();
     protected MS2ChargeDependentAnalysisDAO dAnalDao = DAOFactory.instance().getMs2FileChargeDAnalysisDAO();
     protected MS2ChargeIndependentAnalysisDAO iAnalDao = DAOFactory.instance().getMs2FileChargeIAnalysisDAO();
-    protected MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
+    protected MS2ScanDAO ms2ScanDao = DAOFactory.instance().getMS2FileScanDAO();
     protected MS2HeaderDAO ms2HeaderDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-    protected MsRunDAO<MS2Run, MS2RunDb> ms2RunDao = DAOFactory.instance().getMS2FileRunDAO();
+    protected MS2RunDAO ms2RunDao = DAOFactory.instance().getMS2FileRunDAO();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -47,8 +38,8 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
     //---------------------------------------------------------------------------------------
     // charge dependent and independent analysis
     //---------------------------------------------------------------------------------------
-    protected MS2Field makeAnalysis(final String name, final String value) {
-        MS2Field dAnalysis = new MS2Field() {
+    protected MS2NameValuePair makeAnalysis(final String name, final String value) {
+        MS2NameValuePair dAnalysis = new MS2NameValuePair() {
             public String getName() {
                 return name;
             }
@@ -58,12 +49,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         return dAnalysis;
     }
 
-    protected void compare(MS2Field a1, MS2ChargeDependentAnalysisDb a2) {
-        assertEquals(a1.getName(), a2.getName());
-        assertEquals(a1.getValue(), a2.getValue());
-    }
-    
-    protected void compare(MS2Field a1, MS2ChargeIndependentAnalysisDb a2) {
+    protected void compare(MS2NameValuePair a1, MS2NameValuePair a2) {
         assertEquals(a1.getName(), a2.getName());
         assertEquals(a1.getValue(), a2.getValue());
     }
@@ -77,14 +63,14 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
             public int getCharge() {
                 return charge;
             }
-            public List<MS2Field> getChargeDependentAnalysisList() {
+            public List<MS2NameValuePair> getChargeDependentAnalysisList() {
                 if (addChgDepAnalysis) {
-                    MS2Field da1 = makeAnalysis("name_1", "value_1");
-                    MS2Field da2 = makeAnalysis("name_2", "value_2");
-                    return Arrays.asList(new MS2Field[] {da1, da2});
+                    MS2NameValuePair da1 = makeAnalysis("name_1", "value_1");
+                    MS2NameValuePair da2 = makeAnalysis("name_2", "value_2");
+                    return Arrays.asList(new MS2NameValuePair[] {da1, da2});
                 }
                 else {
-                    return new ArrayList<MS2Field>(0);
+                    return new ArrayList<MS2NameValuePair>(0);
                 }
             }
             public BigDecimal getMass() {
@@ -97,7 +83,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
     //---------------------------------------------------------------------------------------
     // MS2 scan 
     //---------------------------------------------------------------------------------------
-    protected MS2Scan makeMS2Scan(int scanNum, int precursorScanNum, 
+    protected MS2ScanIn makeMS2Scan(int scanNum, int precursorScanNum, 
             DataConversionType convType,
             boolean addScanCharges,
             boolean addChgIAnalysis) {
@@ -127,7 +113,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         Random random = new Random();
         for (int i = 0; i < scanCount; i++) {
             int scanNum = random.nextInt(100);
-            MS2Scan scan = makeMS2Scan(scanNum, 25, DataConversionType.NON_CENTROID, true, true);
+            MS2ScanIn scan = makeMS2Scan(scanNum, 25, DataConversionType.NON_CENTROID, true, true);
             ms2ScanDao.save(scan, runId);
         }
     }
@@ -151,7 +137,7 @@ public class MS2BaseDAOtestCase extends BaseDAOTestCase {
         return run;
     }
     
-    protected void checkRun(MS2Run inputRun, MS2RunDb outputRun) {
+    protected void checkRun(MS2RunIn inputRun, MS2Run outputRun) {
         super.checkRun(inputRun, outputRun);
         assertEquals(inputRun.getHeaderList().size(), outputRun.getHeaderList().size());
     }

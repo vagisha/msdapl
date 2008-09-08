@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
-import org.yeastrc.ms.domain.run.ms2file.MS2HeaderDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2HeaderWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -24,39 +24,16 @@ public class MS2HeaderDAOImpl extends BaseSqlMapDAO implements MS2HeaderDAO {
         super(sqlMap);
     }
 
-    public void save(MS2Field header, int runId) {
-        MS2HeaderSqlMapParam headerDb = new MS2HeaderSqlMapParam(runId, header.getName(), header.getValue());
+    public void save(MS2NameValuePair header, int runId) {
+        MS2HeaderWrap headerDb = new MS2HeaderWrap(header, runId);
         save("MS2Header.insert", headerDb);
     }
     
-    public List<MS2HeaderDb> loadHeadersForRun(int runId) {
+    public List<MS2NameValuePair> loadHeadersForRun(int runId) {
         return queryForList("MS2Header.selectHeadersForRun", runId);
     }
 
     public void deleteHeadersForRunId(int runId) {
         delete("MS2Header.deleteByRunId", runId);
-    }
-    
-    public static final class MS2HeaderSqlMapParam implements MS2HeaderDb {
-        private int runId;
-        private String name;
-        private String value;
-        public MS2HeaderSqlMapParam(int runId, String name, String value) {
-            this.runId = runId;
-            this.name = name;
-            this.value = value;
-        }
-        public int getRunId() {
-            return runId;
-        }
-        public String getName() {
-            return name;
-        }
-        public String getValue() {
-            return value;
-        }
-        public int getId() {
-            throw new UnsupportedOperationException("getId() not supported by MS2HeaderSqlMapParam");
-        }
     }
 }

@@ -16,8 +16,8 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -28,13 +28,13 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 /**
  * 
  */
-public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, MsScanDb> {
+public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
 
     public MsScanDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
-    public int save(MsScan scan, int runId, int precursorScanId) {
+    public int save(MsScanIn scan, int runId, int precursorScanId) {
         MsScanSqlMapParam scanDb = new MsScanSqlMapParam(runId, precursorScanId, scan);
         int scanId = saveAndReturnId("MsScan.insert", scanDb);
         // save the peak data
@@ -42,12 +42,12 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         return scanId;
     }
 
-    public int save(MsScan scan, int runId) {
+    public int save(MsScanIn scan, int runId) {
         return save(scan, runId, 0); // a value of 0 for precursorScanId should insert NULL in the database.
     }
     
-    public MsScanDb load(int scanId) {
-        return (MsScanDb) queryForObject("MsScan.select", scanId);
+    public MsScan load(int scanId) {
+        return (MsScan) queryForObject("MsScan.select", scanId);
     }
 
     public List<Integer> loadScanIdsForRun(int runId) {
@@ -72,13 +72,13 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
      * Convenience class for encapsulating a MsScan along with the associated runId 
      * and precursorScanId (if any)
      */
-    public static class MsScanSqlMapParam implements MsScanDb {
+    public static class MsScanSqlMapParam implements MsScan {
 
         private int runId;
         private int precursorScanId;
-        private MsScan scan;
+        private MsScanIn scan;
 
-        public MsScanSqlMapParam(int runId, int precursorScanId, MsScan scan) {
+        public MsScanSqlMapParam(int runId, int precursorScanId, MsScanIn scan) {
             this.runId = runId;
             this.precursorScanId = precursorScanId;
             this.scan = scan;
@@ -151,7 +151,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
     public static class MsScanDataSqlMapParam {
         private int scanId;
         private String peakData;
-        public MsScanDataSqlMapParam(int scanId, MsScan scan) {
+        public MsScanDataSqlMapParam(int scanId, MsScanIn scan) {
             this.scanId = scanId;
             this.peakData = getPeakString(scan);
         }
@@ -161,7 +161,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO<MsScan, Ms
         public String getPeakData() {
             return peakData;
         }
-        private String getPeakString(MsScan scan) {
+        private String getPeakString(MsScanIn scan) {
             Iterator<String[]> peakIterator = scan.peakIterator();
             String[] peak = null;
             PeakStringBuilder builder = new PeakStringBuilder();

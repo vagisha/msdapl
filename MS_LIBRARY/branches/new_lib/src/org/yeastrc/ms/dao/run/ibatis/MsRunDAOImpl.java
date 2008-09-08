@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.dao.run.ibatis;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,16 +19,17 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.run.MsRun;
-import org.yeastrc.ms.domain.run.MsRunDb;
-import org.yeastrc.ms.domain.run.MsRunLocationDb;
+import org.yeastrc.ms.domain.run.MsRunIn;
+import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.RunFileFormat;
+import org.yeastrc.ms.domain.run.impl.MsRunLocationWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
 import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
-public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRunDb> {
+public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
 
     private MsEnzymeDAO enzymeDao;
     
@@ -38,7 +38,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
         this.enzymeDao = enzymeDao;
     }
 
-    public int saveRun(MsRun run, String serverAddress, String serverDirectory) {
+    public int saveRun(MsRunIn run, String serverAddress, String serverDirectory) {
         
         int runId = saveAndReturnId("MsRun.insert", run);
         
@@ -62,12 +62,12 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
     @Override
     public void saveRunLocation(final String serverAddress, final String serverDirectory,
             final int runId) {
-        save("MsRunLocation.insert", new MsRunLocationSqlParam(runId, serverAddress, serverDirectory));
+        save("MsRunLocation.insert", new MsRunLocationWrap(serverAddress, serverDirectory, runId));
             
     }
     
-    public MsRunDb loadRun(int runId) {
-        return (MsRunDb) queryForObject("MsRun.select", runId);
+    public MsRun loadRun(int runId) {
+        return (MsRun) queryForObject("MsRun.select", runId);
     }
     
     public List<Integer> loadRunIdsForFileNameAndSha1Sum(String fileName, String sha1Sum) {
@@ -96,20 +96,21 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
     }
     
     @Override
-    public List<MsRunLocationDb> loadLocationsForRun(int runId) {
+    public List<MsRunLocation> loadLocationsForRun(int runId) {
         return queryForList("MsRunLocation.selectLocationsForRun", runId);
     }
 
     @Override
-    public List<MsRunLocationDb> loadMatchingRunLocations(final int runId,
+    public List<MsRunLocation> loadMatchingRunLocations(final int runId,
             final String serverAddress, final String serverDirectory) {
-        return queryForList("MsRunLocation.selectMatchingLocations", new MsRunLocationSqlParam(runId, serverAddress, serverDirectory));
+        MsRunLocationWrap loc = new MsRunLocationWrap(serverAddress, serverDirectory, runId);
+        return queryForList("MsRunLocation.selectMatchingLocations", loc);
     }
 
     @Override
-    public List<MsRunDb> loadRuns(List<Integer> runIdList) {
+    public List<MsRun> loadRuns(List<Integer> runIdList) {
         if (runIdList.size() == 0)
-            return new ArrayList<MsRunDb>(0);
+            return new ArrayList<MsRun>(0);
         StringBuilder buf = new StringBuilder();
         for (Integer i: runIdList) {
             buf.append(","+i);
@@ -127,7 +128,7 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
     }
    
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
-        MsRunDb run = loadRun(runId);
+        MsRun run = loadRun(runId);
         
         if (run == null) {
             throw new Exception("No run found for runId: "+runId);
@@ -158,31 +159,6 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO<MsRun, MsRun
 
         public Object valueOf(String s) {
             return RunFileFormat.instance(s);
-        }
-    }
-   
-  //---------------------------------------------------------------------------------------
-    /** 
-     * Convenience class
-     */
-    public static final class MsRunLocationSqlParam implements MsRunLocationDb {
-        
-        private final int runId;
-        private final String serverAddress;
-        private final String serverDirectory;
-        public MsRunLocationSqlParam(int runId, String serverAddress, String serverDirectory) {
-            this.runId = runId;
-            this.serverAddress = serverAddress;
-            this.serverDirectory = serverDirectory;
-        }
-        public int getRunId() {return runId;}
-        public String getServerAddress() {return serverAddress;}
-        public String getServerDirectory() {return serverDirectory;}
-        public Date getCreateDate() {
-            throw new UnsupportedOperationException("getCreateDate() not supported by MsRunLocationSqlParam");
-        }
-        public int getId() {
-            throw new UnsupportedOperationException("getId() not supported by MsRunLocationSqlParam");
         }
     }
 }

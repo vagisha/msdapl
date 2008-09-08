@@ -13,7 +13,9 @@ import org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ChargeDependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2ChargeIndependentAnalysisDAOImpl;
 import org.yeastrc.ms.dao.run.ms2file.ibatis.MS2HeaderDAOImpl;
@@ -46,14 +48,6 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTRunSearchDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTSearchScanDAOImpl;
-import org.yeastrc.ms.domain.run.MsRun;
-import org.yeastrc.ms.domain.run.MsRunDb;
-import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Run;
-import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -90,12 +84,12 @@ public class DAOFactory {
     private MsEnzymeDAO enzymeDAO;
     
     // DAOs for run related objects
-    private MsRunDAO<MsRun, MsRunDb> runDAO;
-    private MsScanDAO<MsScan, MsScanDb> scanDAO;
+    private MsRunDAO runDAO;
+    private MsScanDAO scanDAO;
     
     // DAOs related to MS2 files. 
-    private MsRunDAO<MS2Run, MS2RunDb> ms2RunDAO;
-    private MsScanDAO<MS2Scan, MS2ScanDb> ms2ScanDAO;
+    private MS2RunDAO ms2RunDAO;
+    private MS2ScanDAO ms2ScanDAO;
     private MS2ScanChargeDAO ms2FileScanChargeDAO;
     private MS2HeaderDAO ms2FileHeadersDAO;
     private MS2ChargeDependentAnalysisDAO ms2ChgDAnalysisDAO;
@@ -177,22 +171,22 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // RUN related
     //-------------------------------------------------------------------------------------------
-    public MsRunDAO<MsRun, MsRunDb> getMsRunDAO() {
+    public MsRunDAO getMsRunDAO() {
         return runDAO;
     }
     
-    public MsScanDAO<MsScan, MsScanDb> getMsScanDAO() {
+    public MsScanDAO getMsScanDAO() {
         return scanDAO;
     }
     
     //-------------------------------------------------------------------------------------------
     // MS2 RUN related
     //-------------------------------------------------------------------------------------------
-    public MsRunDAO<MS2Run, MS2RunDb> getMS2FileRunDAO() {
+    public MS2RunDAO getMS2FileRunDAO() {
         return ms2RunDAO;
     }
     
-    public MsScanDAO<MS2Scan, MS2ScanDb> getMS2FileScanDAO() {
+    public MS2ScanDAO getMS2FileScanDAO() {
         return ms2ScanDAO;
     }
     

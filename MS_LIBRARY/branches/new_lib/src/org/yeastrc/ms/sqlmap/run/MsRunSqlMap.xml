@@ -3,14 +3,14 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRun"> 
 
-	<typeAlias alias="MsRun" type="org.yeastrc.ms.domain.run.MsRun" />
-	<typeAlias alias="MsRunDb" type="org.yeastrc.ms.domain.run.impl.MsRunDbImpl"/>
-	<typeAlias alias="MS2RunDb" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2RunDbImpl"/>
+	<typeAlias alias="MsRunIn" type="org.yeastrc.ms.domain.run.MsRunIn" />
+	<typeAlias alias="MsRunOut" type="org.yeastrc.ms.domain.run.impl.RunBean"/>
+	<typeAlias alias="MS2RunOut" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2RunBean"/>
 	<typeAlias alias="RunType" type="org.yeastrc.ms.domain.run.RunFileFormat"/>
 	<typeAlias alias="RunTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl$RunFileFormatTypeHandler"/>
 	
 	
-	<resultMap class="MsRunDb" id="msRunResult">
+	<resultMap class="MsRunOut" id="msRunResult">
 		<result property="id" column="id" />
 		<result property="fileName" column="filename" />
 		<result property="runFileFormat" column="originalFileType" typeHandler="RunTypeHandler"/>
@@ -34,14 +34,14 @@
 		</discriminator>
 	</resultMap>
 	
-	<resultMap class="MS2RunDb" id="ms2RunResult" extends="MsRun.msRunResult">
+	<resultMap class="MS2RunOut" id="ms2RunResult" extends="MsRun.msRunResult">
 		<result property="headerList" 
 				column="id" 
 				select="MS2Header.selectHeadersForRun" />
 	</resultMap>
 	
 	
-	<parameterMap class="MsRun" id="msRunParam">
+	<parameterMap class="MsRunIn" id="msRunParam">
 		<parameter property="fileName" jdbcType="VARCHAR"/>
 		<parameter property="sha1Sum" jdbcType="CHAR"/>
 		<parameter property="creationDate" jdbcType="VARCHAR"/>

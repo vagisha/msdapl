@@ -15,21 +15,20 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
-import org.yeastrc.ms.domain.run.MsRunLocationDb;
-import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
-import org.yeastrc.ms.domain.run.ms2file.MS2Run;
-import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.MsRunLocation;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisWrap;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
@@ -49,8 +48,8 @@ public class MS2DataUploadService {
     public static final int BUF_SIZE = 1000;
     
     // these are the things we will cache and do bulk-inserts
-    private List<MS2ChargeDependentAnalysisDb> dAnalysisList;
-    private List<MS2ChargeIndependentAnalysisDb> iAnalysisList;
+    private List<MS2ChargeDependentAnalysisWId> dAnalysisList;
+    private List<MS2ChargeIndependentAnalysisWId> iAnalysisList;
     
     private int lastUploadedRunId = 0;
     private List<UploadException> uploadExceptionList;
@@ -59,8 +58,8 @@ public class MS2DataUploadService {
     private int numRunsUploaded = 0;
     
     public MS2DataUploadService() {
-        dAnalysisList = new ArrayList<MS2ChargeDependentAnalysisDb>();
-        iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisDb>();
+        dAnalysisList = new ArrayList<MS2ChargeDependentAnalysisWId>();
+        iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisWId>();
         
         uploadExceptionList = new ArrayList<UploadException>();
     }
@@ -88,7 +87,7 @@ public class MS2DataUploadService {
     }
     
     public static void deleteRun(Integer runId) {
-        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         runDao.delete(runId);
     }
     
@@ -176,9 +175,9 @@ public class MS2DataUploadService {
         
         // If run is already in the database return the runId of the existing run
         if (runId > 0)  {
-            MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+            MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
             // first save the original location (on remote server) of the MS2 file if the location is not in the database already.
-            List<MsRunLocationDb> runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
+            List<MsRunLocation> runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
             if (runLocs.size() == 0) {
                 runDao.saveRunLocation(serverAddress, serverDirectory, runId);
             }
@@ -204,7 +203,7 @@ public class MS2DataUploadService {
     
     int getMatchingRunId(String fileName, String sha1Sum) {
 
-        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         List <Integer> runIds = runDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
 
         // return the database of the first matching run found
@@ -230,11 +229,11 @@ public class MS2DataUploadService {
         // reset all caches.
         resetCaches();
         
-        MsRunDAO<MS2Run, MS2RunDb> runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
 
 
         // Get the top-level run information and upload it
-        MS2Run header;
+        MS2RunIn header;
         try {
             header = provider.getRunHeader();
         }
@@ -248,11 +247,11 @@ public class MS2DataUploadService {
         log.info("Uploaded top-level run information with runId: "+runId);
 
         // upload each of the scans
-        MsScanDAO<MsScan, MsScanDb> scanDao = daoFactory.getMsScanDAO();
+        MsScanDAO scanDao = daoFactory.getMsScanDAO();
         int all = 0;
         int uploaded = 0;
         while(provider.hasNextScan()) {
-            MS2Scan scan;
+            MS2ScanIn scan;
             try {
                 scan = provider.getNextScan();
             }
@@ -300,17 +299,8 @@ public class MS2DataUploadService {
             saveChargeDependentAnalysis();
         }
         
-        for (final MS2Field dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
-            dAnalysisList.add(new MS2ChargeDependentAnalysisDb() {
-                @Override
-                public int getId() {return 0;}
-                @Override
-                public int getScanChargeId() {return scanChargeId;}
-                @Override
-                public String getName() {return dAnalysis.getName();}
-                @Override
-                public String getValue() {return dAnalysis.getValue();}
-            });
+        for (final MS2NameValuePair dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
+            dAnalysisList.add(new MS2ChargeDependentAnalysisWrap(dAnalysis, scanChargeId));
         }
     }
 
@@ -320,22 +310,13 @@ public class MS2DataUploadService {
         dAnalysisList.clear();
     }
 
-    private void saveChargeIndependentAnalysis(MS2Scan scan, final int scanId) {
+    private void saveChargeIndependentAnalysis(MS2ScanIn scan, final int scanId) {
         if (iAnalysisList.size() > BUF_SIZE) {
             saveChargeIndependentAnalysis();
         }
         
-        for (final MS2Field iAnalysis: scan.getChargeIndependentAnalysisList()) {
-            iAnalysisList.add(new MS2ChargeIndependentAnalysisDb() {
-                @Override
-                public int getId() {return 0;}
-                @Override
-                public int getScanId() {return scanId;}
-                @Override
-                public String getName() {return iAnalysis.getName();}
-                @Override
-                public String getValue() {return iAnalysis.getValue();}
-            });
+        for (final MS2NameValuePair iAnalysis: scan.getChargeIndependentAnalysisList()) {
+            iAnalysisList.add(new MS2ChargeIndependentAnalysisWrap(iAnalysis, scanId));
         }
     }
 

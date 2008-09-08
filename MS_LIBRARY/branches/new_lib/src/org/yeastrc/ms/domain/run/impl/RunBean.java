@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.run.MsRunDb;
+import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 
 
-public class MsRunDbImpl implements MsRunDb {
+public class RunBean implements MsRun {
 
     private int id; // unique id (database) for this run
 
@@ -34,7 +34,7 @@ public class MsRunDbImpl implements MsRunDb {
 
     private List <MsEnzyme> enzymeList;
 
-    public MsRunDbImpl() {
+    public RunBean() {
         enzymeList = new ArrayList<MsEnzyme>();
     }
 
@@ -148,10 +148,6 @@ public class MsRunDbImpl implements MsRunDb {
 
     public List<MsEnzyme> getEnzymeList() {
         return enzymeList; 
-    }
-
-    public void addEnzyme(MsEnzyme enzyme) {
-        enzymeList.add(enzyme);
     }
     
     public void  setEnzymeList(List<? extends MsEnzyme> enzymeList) {

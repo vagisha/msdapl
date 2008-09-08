@@ -3,9 +3,10 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsScan"> 
 
-	<typeAlias alias="MsScanOut" type="org.yeastrc.ms.domain.run.impl.MsScanDbImpl"/>
-	<typeAlias alias="MsScanIn" type="org.yeastrc.ms.domain.run.MsScanDb"/>
-	<typeAlias alias="MsScanData" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
+	<typeAlias alias="MsScanOut" type="org.yeastrc.ms.domain.run.impl.ScanBean"/>
+	<typeAlias alias="MsScanIn" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MMsScanSqlMapParam"/>
+	<typeAlias alias="MsScanDataIn" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
+	
 	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
 	
 	
@@ -45,7 +46,7 @@
 		<parameter property="peakCount" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
-	<parameterMap class="MsScanData" id="msScanDataParam">
+	<parameterMap class="MsScanDataIn" id="msScanDataParam">
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="peakData" jdbcType="LONGBLOB" />
 	</parameterMap>

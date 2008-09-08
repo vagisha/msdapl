@@ -20,8 +20,6 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
@@ -122,7 +120,7 @@ public abstract class AbstractSQTDataUploadService {
     static int getScanId(int runId, int scanNumber)
             throws UploadException {
 
-        MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
         if (scanId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN);

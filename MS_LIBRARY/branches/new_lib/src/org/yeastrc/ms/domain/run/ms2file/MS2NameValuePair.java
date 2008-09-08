@@ -6,7 +6,7 @@
  */
 package org.yeastrc.ms.domain.run.ms2file;
 
-public interface MS2Field {
+public interface MS2NameValuePair {
 
     /**
      * @return the name of the field

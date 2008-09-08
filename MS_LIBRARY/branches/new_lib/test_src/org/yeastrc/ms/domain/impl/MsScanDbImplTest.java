@@ -7,7 +7,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-import org.yeastrc.ms.domain.run.impl.MsScanDbImpl;
+import org.yeastrc.ms.domain.run.impl.ScanBean;
 import org.yeastrc.ms.util.PeakConverterDouble;
 import org.yeastrc.ms.util.PeakStringBuilder;
 import org.yeastrc.ms.util.PeakUtils;
@@ -23,7 +23,7 @@ public class MsScanDbImplTest extends TestCase {
     }
 
     public final void testParsePeaksAsString() throws IOException, ClassNotFoundException {
-        MsScanDbImpl scanDb = new MsScanDbImpl();
+        ScanBean scanDb = new ScanBean();
         PeakStringBuilder builder = new PeakStringBuilder();
         List<String[]> peaks = new ArrayList<String[]>(10);
         Random r = new Random();

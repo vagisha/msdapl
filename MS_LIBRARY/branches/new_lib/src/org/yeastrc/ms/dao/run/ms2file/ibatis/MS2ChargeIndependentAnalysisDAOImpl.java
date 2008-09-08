@@ -10,8 +10,9 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -25,21 +26,21 @@ public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
         super(sqlMap);
     }
 
-    public List<MS2ChargeIndependentAnalysisDb> loadAnalysisForScan(int scanId) {
+    public List<MS2NameValuePair> loadAnalysisForScan(int scanId) {
         return queryForList("MS2ChgIAnalysis.selectAnalysisForScan", scanId);
     }
 
-    public void save(MS2Field analysis, int scanId) {
-        MS2ChgIndepAnSqlMapParam analysisDb = new MS2ChgIndepAnSqlMapParam(scanId, analysis.getName(), analysis.getValue());
+    public void save(MS2NameValuePair analysis, int scanId) {
+        MS2ChargeIndependentAnalysisWrap analysisDb = new MS2ChargeIndependentAnalysisWrap(analysis, scanId);
         save("MS2ChgIAnalysis.insert", analysisDb);
     }
 
     @Override
-    public void saveAll(List<MS2ChargeIndependentAnalysisDb> analysisList) {
+    public void saveAll(List<MS2ChargeIndependentAnalysisWId> analysisList) {
         if (analysisList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (MS2ChargeIndependentAnalysisDb analysis: analysisList) {
+        for (MS2ChargeIndependentAnalysisWId analysis: analysisList) {
             values.append("(");
             values.append(analysis.getScanId());
             values.append(",");
@@ -61,28 +62,5 @@ public class MS2ChargeIndependentAnalysisDAOImpl extends BaseSqlMapDAO
     
     public void deleteByScanId(int scanId) {
         delete("MS2ChgIAnalysis.deleteByScanId", scanId);
-    }
-
-    public static final class MS2ChgIndepAnSqlMapParam implements MS2ChargeIndependentAnalysisDb {
-        private int scanId;
-        private String name;
-        private String value;
-        public MS2ChgIndepAnSqlMapParam(int scanId, String name, String value) {
-            this.scanId = scanId;
-            this.name = name;
-            this.value = value;
-        }
-        public int getScanId() {
-            return scanId;
-        }
-        public String getName() {
-            return name;
-        }
-        public String getValue() {
-            return value;
-        }
-        public int getId() {
-            throw new UnsupportedOperationException("getId() not supported by MS2ChgIndepAnSqlMapParam");
-        }
     }
 }

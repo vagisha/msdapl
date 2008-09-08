@@ -3,16 +3,15 @@ package org.yeastrc.ms.dao.run.ms2file;
 import java.util.List;
 
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb;
 
 public interface MS2ScanChargeDAO {
 
     
     public abstract List<Integer> loadScanChargeIdsForScan(int scanId);
     
-    public abstract List<MS2ScanChargeDb> loadScanChargesForScan(int scanId);
+    public abstract List<MS2ScanCharge> loadScanChargesForScan(int scanId);
     
-    public abstract List<MS2ScanChargeDb> loadScanChargesForScanAndCharge(int scanId, int charge);
+    public abstract List<MS2ScanCharge> loadScanChargesForScanAndCharge(int scanId, int charge);
     
     
     /**

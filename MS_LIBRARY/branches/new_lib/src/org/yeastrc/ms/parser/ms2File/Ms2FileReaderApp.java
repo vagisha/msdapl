@@ -8,7 +8,7 @@ package org.yeastrc.ms.parser.ms2File;
 
 import java.io.File;
 
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 
@@ -29,7 +29,7 @@ public class Ms2FileReaderApp {
             MS2Header header = reader.getRunHeader();
             System.out.println(header.toString());
             while (reader.hasNextScan()) {
-                MS2Scan scan = reader.getNextScan();
+                MS2ScanIn scan = reader.getNextScan();
                 System.out.println(scan.toString());
             }
             

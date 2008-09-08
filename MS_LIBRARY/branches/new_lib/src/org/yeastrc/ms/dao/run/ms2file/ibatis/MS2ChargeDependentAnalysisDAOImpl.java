@@ -10,8 +10,9 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
-import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -25,21 +26,21 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
         super(sqlMap);
     }
 
-    public List<MS2ChargeDependentAnalysisDb> loadAnalysisForScanCharge(int scanChargeId) {
+    public List<MS2NameValuePair> loadAnalysisForScanCharge(int scanChargeId) {
         return queryForList("MS2ChgDAnalysis.selectAnalysisForCharge", scanChargeId);
     }
 
-    public void save(MS2Field analysis, int scanChargeId) {
-        MS2ChgDepAnSqlMapParam analysisDb = new MS2ChgDepAnSqlMapParam(scanChargeId, analysis.getName(), analysis.getValue());
+    public void save(MS2NameValuePair analysis, int scanChargeId) {
+        MS2ChargeDependentAnalysisWrap analysisDb = new MS2ChargeDependentAnalysisWrap(analysis, scanChargeId);
         save("MS2ChgDAnalysis.insert", analysisDb);
     }
 
     @Override
-    public void saveAll(List<MS2ChargeDependentAnalysisDb> analysisList) {
+    public void saveAll(List<MS2ChargeDependentAnalysisWId> analysisList) {
         if (analysisList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for (MS2ChargeDependentAnalysisDb analysis: analysisList) {
+        for (MS2ChargeDependentAnalysisWId analysis: analysisList) {
             values.append("(");
             values.append(analysis.getScanChargeId());
             values.append(",");
@@ -61,29 +62,5 @@ public class MS2ChargeDependentAnalysisDAOImpl extends BaseSqlMapDAO
     
     public void deleteByScanChargeId(int scanChargeId) {
         delete("MS2ChgDAnalysis.deleteByScanChargeId", scanChargeId);
-    }
-
-    public static final class MS2ChgDepAnSqlMapParam implements MS2ChargeDependentAnalysisDb {
-        private int scanChargeId;
-        private String name;
-        private String value;
-        public MS2ChgDepAnSqlMapParam(int scanChargeId, String name, String value) {
-            this.scanChargeId = scanChargeId;
-            this.name = name;
-            this.value = value;
-        }
-        public int getScanChargeId() {
-            return scanChargeId;
-        }
-        public String getName() {
-            return name;
-        }
-        public String getValue() {
-            return value;
-        }
-        @Override
-        public int getId() {
-            throw new UnsupportedOperationException("getId() not supported by MS2ChgDepAnSqlMapParam");
-        }
     }
 }

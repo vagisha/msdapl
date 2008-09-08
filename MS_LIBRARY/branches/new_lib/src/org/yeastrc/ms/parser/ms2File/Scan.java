@@ -12,14 +12,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.run.DataConversionType;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 
 /**
  * 
  */
-public class Scan implements MS2Scan {
+public class Scan implements MS2ScanIn {
 
     public static final String PRECURSOR_SCAN = "PrecursorScan"; // precursor scan number
     public static final String ACTIVATION_TYPE = "ActivationType";
@@ -39,12 +40,12 @@ public class Scan implements MS2Scan {
 
     private List<MS2ScanCharge> chargeStates;
 
-    private List<MS2Field> analysisItems;
+    private List<MS2NameValuePair> analysisItems;
 
 
     public Scan() {
         chargeStates = new ArrayList<MS2ScanCharge>();
-        analysisItems = new ArrayList<MS2Field>();
+        analysisItems = new ArrayList<MS2NameValuePair>();
         peakList = new ArrayList<String[]>();
     }
 
@@ -53,7 +54,7 @@ public class Scan implements MS2Scan {
     }
 
     @Override
-    public List<MS2Field> getChargeIndependentAnalysisList() {
+    public List<MS2NameValuePair> getChargeIndependentAnalysisList() {
         return this.analysisItems;
     }
 
@@ -97,7 +98,7 @@ public class Scan implements MS2Scan {
     public List<MS2ScanCharge> getScanChargeList() {
         return this.chargeStates;
     }
-    public void addChargeState(ScanCharge chargeState) {
+    public void addChargeState(ScanChargeBean chargeState) {
         chargeStates.add(chargeState);
     }
 
@@ -174,7 +175,7 @@ public class Scan implements MS2Scan {
         }
         buf.append("\n");
         // charge independent analysis
-        for (MS2Field item: analysisItems) {
+        for (MS2NameValuePair item: analysisItems) {
             buf.append("I\t");
             buf.append(item.getName());
             if (item.getValue() != null) {

@@ -17,7 +17,7 @@ public interface MS2ScanCharge extends MS2ScanChargeBase {
     /**
      * @return the list of charge dependent analyses for this scan + charge
      */
-    public abstract List<MS2Field> getChargeDependentAnalysisList();
+    public abstract List<MS2NameValuePair> getChargeDependentAnalysisList();
 
 }
 

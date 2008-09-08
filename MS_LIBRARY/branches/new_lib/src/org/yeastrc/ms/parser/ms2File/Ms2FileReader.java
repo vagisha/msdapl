@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.run.DataConversionType;
-import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
+import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
 import org.yeastrc.ms.parser.sqtFile.AbstractReader;
@@ -82,7 +83,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return currentLine != null;
     }
 
-    public MS2Scan getNextScan() throws DataProviderException {
+    public MS2ScanIn getNextScan() throws DataProviderException {
 
         Scan scan = parseScan(currentLine);
 
@@ -91,7 +92,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         while(currentLine != null) {
             // is this one of the charge states of the scan?
             if (isChargeLine(currentLine)) {
-                ScanCharge sc = parseScanCharge();
+                ScanChargeBean sc = parseScanCharge();
                 scan.addChargeState(sc);
             }
             // is this one of the charge independent analysis for this scan?
@@ -139,9 +140,9 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return scan;
     }
 
-    private ScanCharge parseScanCharge() throws DataProviderException {
+    private ScanChargeBean parseScanCharge() throws DataProviderException {
         
-        ScanCharge scanCharge = parseScanCharge(currentLine);
+        ScanChargeBean scanCharge = parseScanCharge(currentLine);
 
         // parse any charge dependent analysis associated with this charge state
         advanceLine();
@@ -152,11 +153,11 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return scanCharge;
     }
 
-    ScanCharge parseScanCharge(String line) throws DataProviderException {
+    ScanChargeBean parseScanCharge(String line) throws DataProviderException {
         
         Matcher match = chargeStatePattern.matcher(line);
         if (match.matches()) {
-            ScanCharge scanCharge = new ScanCharge();
+            ScanChargeBean scanCharge = new ScanChargeBean();
             scanCharge.setCharge(Integer.parseInt(match.group(1)));
             scanCharge.setMass(new BigDecimal(match.group(2)));
             return scanCharge;
@@ -166,7 +167,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         }
     }
 
-    void parseChargeDependentAnalysis(String line, ScanCharge scanCharge) {
+    void parseChargeDependentAnalysis(String line, ScanChargeBean scanCharge) {
         String[] nameAndVal = parseChargeDependentAnalysis(line);
         if (nameAndVal.length == 2) {
             scanCharge.addAnalysisItem(nameAndVal[0], nameAndVal[1]);

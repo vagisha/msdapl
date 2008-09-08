@@ -6,12 +6,12 @@
  */
 package org.yeastrc.ms.parser.ms2File;
 
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 
 /**
  * 
  */
-public class HeaderItem implements MS2Field {
+public class HeaderItem implements MS2NameValuePair {
 
     private String name;
     private String value;

@@ -10,17 +10,15 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.domain.run.DataConversionType;
-import org.yeastrc.ms.domain.run.MsRunLocationDb;
+import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.RunFileFormat;
-import org.yeastrc.ms.domain.run.ms2file.MS2HeaderDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
-import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.util.Sha1SumCalculator;
@@ -59,7 +57,7 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         
         // make sure there is only one run location for runId1
         // check values from msRunLocation table
-        List<MsRunLocationDb> locs = runDao.loadLocationsForRun(runId1);
+        List<MsRunLocation> locs = runDao.loadLocationsForRun(runId1);
         assertEquals(1, locs.size());
         assertEquals("remote.server", locs.get(0).getServerAddress());
         assertEquals("remote/directory", locs.get(0).getServerDirectory());
@@ -82,8 +80,8 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         
         // the runs will not be uploaded again but we should have two locations for the each run
         locs = runDao.loadLocationsForRun(runId1);
-        Collections.sort(locs, new Comparator<MsRunLocationDb>(){
-            public int compare(MsRunLocationDb o1, MsRunLocationDb o2) {
+        Collections.sort(locs, new Comparator<MsRunLocation>(){
+            public int compare(MsRunLocation o1, MsRunLocation o2) {
                 return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
             }});
         assertEquals(2, locs.size());
@@ -95,8 +93,8 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(runId1, locs.get(1).getRunId());
         
         locs = runDao.loadLocationsForRun(runId2);
-        Collections.sort(locs, new Comparator<MsRunLocationDb>(){
-            public int compare(MsRunLocationDb o1, MsRunLocationDb o2) {
+        Collections.sort(locs, new Comparator<MsRunLocation>(){
+            public int compare(MsRunLocation o1, MsRunLocation o2) {
                 return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
             }});
         assertEquals(2, locs.size());
@@ -161,8 +159,8 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         int runId = runIds.get(0);
         assertNotSame(0, runId);
         
-        MsRunDAO<MS2Run, MS2RunDb> ms2runDao = DAOFactory.instance().getMS2FileRunDAO();
-        MS2RunDb run = ms2runDao.loadRun(runId);
+        MS2RunDAO ms2runDao = DAOFactory.instance().getMS2FileRunDAO();
+        MS2Run run = ms2runDao.loadRun(runId);
         assertNotNull(run);
         
         // check values from msRun table
@@ -197,13 +195,13 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(0, enzymeDao.loadEnzymesForRun(runId).size());
         
         // check values from msRunLocation table
-        List<MsRunLocationDb> locs = runDao.loadLocationsForRun(runId);
+        List<MsRunLocation> locs = runDao.loadLocationsForRun(runId);
         assertEquals(1, locs.size());
         assertEquals("remoteServer", locs.get(0).getServerAddress());
         assertEquals("remoteDirectory", locs.get(0).getServerDirectory());
         assertEquals(runId, locs.get(0).getRunId());
         // testting the other method: should really be in test class for runDao
-        List<MsRunLocationDb> locs2 = runDao.loadMatchingRunLocations(runId, "remoteServer", "remoteDirectory");
+        List<MsRunLocation> locs2 = runDao.loadMatchingRunLocations(runId, "remoteServer", "remoteDirectory");
         assertEquals(1, locs2.size());
         assertEquals("remoteServer", locs2.get(0).getServerAddress());
         assertEquals("remoteDirectory", locs2.get(0).getServerDirectory());
@@ -211,12 +209,8 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         
         // check values in MS2FileHeaders table
         MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-        List<MS2HeaderDb> headers = headerDao.loadHeadersForRun(runId);
-        Collections.sort(headers, new Comparator<MS2HeaderDb>() {
-
-            public int compare(MS2HeaderDb o1, MS2HeaderDb o2) {
-                return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
-            }});
+        List<MS2NameValuePair> headers = headerDao.loadHeadersForRun(runId);
+        
         if (runFileName.equals("1.ms2")) {
             assertEquals(5, headers.size());
             int i = 0;
@@ -273,10 +267,10 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         List<Integer> scanIds = scanDao.loadScanIdsForRun(runId);
         assertEquals(22, scanIds.size());
         Collections.sort(scanIds);
-        MsScanDAO<MS2Scan, MS2ScanDb> ms2scanDo = DAOFactory.instance().getMS2FileScanDAO();
+        MS2ScanDAO ms2scanDo = DAOFactory.instance().getMS2FileScanDAO();
         
         for (int id = 0; id < scanIds.size(); id++) {
-            MS2ScanDb scan = ms2scanDo.load(scanIds.get(id));
+            MS2Scan scan = ms2scanDo.load(scanIds.get(id));
             assertEquals(-1, scan.getPrecursorScanNum());
             assertEquals(0, scan.getPrecursorScanId());
             assertNull(scan.getFragmentationType());
@@ -286,7 +280,7 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
             assertEquals(0, scan.getChargeIndependentAnalysisList().size());
         }
         int i = 0;
-        MS2ScanDb scan = ms2scanDo.load(scanIds.get(i++));
+        MS2Scan scan = ms2scanDo.load(scanIds.get(i++));
         assertEquals(2, scan.getStartScanNum());
         assertEquals(2, scan.getEndScanNum());
         assertEquals(535.96, scan.getPrecursorMz().doubleValue());
@@ -322,10 +316,10 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         List<Integer> scanIds = scanDao.loadScanIdsForRun(runId);
         assertEquals(13, scanIds.size());
         Collections.sort(scanIds);
-        MsScanDAO<MS2Scan, MS2ScanDb> ms2scanDo = DAOFactory.instance().getMS2FileScanDAO();
+        MS2ScanDAO ms2scanDo = DAOFactory.instance().getMS2FileScanDAO();
         
         for (int id = 0; id < scanIds.size(); id++) {
-            MS2ScanDb scan = ms2scanDo.load(scanIds.get(id));
+            MS2Scan scan = ms2scanDo.load(scanIds.get(id));
             assertEquals(0, scan.getPrecursorScanId());
             assertEquals("CID", scan.getFragmentationType());
             assertEquals(DataConversionType.CENTROID, scan.getDataConversionType());
@@ -334,7 +328,7 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
             assertNotSame(0, scan.getChargeIndependentAnalysisList().size());
         }
         int i = 0;
-        MS2ScanDb scan = ms2scanDo.load(scanIds.get(i++));
+        MS2Scan scan = ms2scanDo.load(scanIds.get(i++));
         assertEquals(2, scan.getStartScanNum());
         assertEquals(2, scan.getEndScanNum());
         assertEquals(1, scan.getPrecursorScanNum());

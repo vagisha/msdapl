@@ -14,10 +14,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.domain.run.MsRun;
-import org.yeastrc.ms.domain.run.MsRunDb;
-import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -334,14 +330,14 @@ public class MsDataUploader {
         String runFileName = match.group(1)+".ms2";
         int scanNum = Integer.parseInt(match.group(2));
         
-        MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
+        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
         int runId = runDao.loadRunIdForSearchAndFileName(searchId, runFileName);
         if (runId == 0) {
             log.error("!!!NO RUN FOUND FOR SearchId: "+searchId+"; fileName: "+runFileName);
             return 0;
         }
         
-        MsScanDAO<MsScan, MsScanDb>scanDao = DAOFactory.instance().getMsScanDAO();
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         int scanId = scanDao.loadScanIdForScanNumRun(scanNum, runId);
         if (scanId == 0) {
             log.error("!!!NO SCAN FOUND FOR SCAN NUMBER: "+scanNum+"; runId: "+runId+"; fileName: "+runFileName);

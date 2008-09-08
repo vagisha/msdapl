@@ -1,44 +1,35 @@
 /**
- * MsScan.java
+ * MsScanDb.java
  * @author Vagisha Sharma
  * Jul 11, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.domain.run;
 
-import java.math.BigDecimal;
-import java.util.Iterator;
 
 
-
+/**
+ * 
+ */
 public interface MsScan extends MsScanBase {
 
     /**
-     * String[0] = m/z; String[1] = RT
-     * @return
+     * @return database id of the run this scan belongs to
      */
-    public Iterator<String[]> peakIterator();
-
-}
-
-interface MsScanBase {
-
-    public abstract int getStartScanNum();
-
-    public abstract int getEndScanNum();
-
-    public abstract int getMsLevel();
-
-    public abstract BigDecimal getPrecursorMz();
-
-    public abstract int getPrecursorScanNum();
-
-    public abstract BigDecimal getRetentionTime();
-
-    public abstract String getFragmentationType();
+    public abstract int getRunId();
     
-    public abstract DataConversionType getDataConversionType();
+    /**
+     * @return database if of the scan
+     */
+    public abstract int getId();
     
-    public abstract int getPeakCount();
+    /**
+     * @return database id of the precursor scan if it exists, 0 otherwise.
+     * Return value of this method for MS1 scans will always be 0.
+     */
+    public abstract int getPrecursorScanId();
+    
 
+    public abstract String peakDataString();
+    
 }

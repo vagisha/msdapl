@@ -24,7 +24,6 @@ import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
@@ -196,7 +195,7 @@ public class DbToSqtFileConverter {
 
     private SearchScan makeScanResult(SQTSearchScan resultScan) {
         SearchScan scanResult = new SearchScan();
-        MsScanDb msScan = getScanForId(resultScan.getScanId());
+        MsScan msScan = getScanForId(resultScan.getScanId());
         scanResult.setStartScan(msScan.getStartScanNum());
         scanResult.setEndScan(msScan.getStartScanNum());
         scanResult.setCharge(resultScan.getCharge());
@@ -209,8 +208,8 @@ public class DbToSqtFileConverter {
         return scanResult;
     }
 
-    private MsScanDb getScanForId(int scanId) {
-        MsScanDAO<MsScan, MsScanDb>scanDao = DAOFactory.instance().getMsScanDAO();
+    private MsScan getScanForId(int scanId) {
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         return scanDao.load(scanId);
     }
     

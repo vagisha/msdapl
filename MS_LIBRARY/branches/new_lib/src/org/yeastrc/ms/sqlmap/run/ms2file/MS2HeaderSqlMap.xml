@@ -3,12 +3,10 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MS2Header"> 
 
-	<typeAlias alias="HeaderOut" type="org.yeastrc.ms.domain.run.ms2file.impl.MS2HeaderDbImpl"/>
-	<typeAlias alias="HeaderIn" type="org.yeastrc.ms.domain.run.ms2file.MS2HeaderDb"/>
+	<typeAlias alias="HeaderOut" type="org.yeastrc.ms.domain.run.ms2file.impl.NameValuePairBean"/>
+	<typeAlias alias="HeaderIn" type="org.yeastrc.ms.domain.run.impl.ms2file.MS2HeaderWrap"/>
 	
 	<resultMap class="HeaderOut" id="headerResult">
-		<result property="id" column="id" />
-		<result property="runId" column="runID" />
 		<result property="name" column="header" />
 		<result property="value" column="value" />
 	</resultMap>
@@ -20,7 +18,7 @@
 	</parameterMap>
 	
     <select id="selectHeadersForRun" resultMap="headerResult" parameterClass="Integer"> 
-        SELECT * FROM MS2FileHeader where runID=#id#
+        SELECT * FROM MS2FileHeader where runID=#id# ORDER BY id
     </select> 
     
     <insert id="insert" parameterMap="headerParam">

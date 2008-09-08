@@ -3,10 +3,10 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="MsRunLocation"> 
 
-	<typeAlias alias="MsRunLocationDbImpl" type="org.yeastrc.ms.domain.run.impl.MsRunLocationDbImpl" />
-	<typeAlias alias="MsRunLocationDb" type="org.yeastrc.ms.domain.run.MsRunLocationDb" />
+	<typeAlias alias="MsRunLocationOut" type="org.yeastrc.ms.domain.run.impl.RunLocationBean" />
+	<typeAlias alias="MsRunLocationIn" type="org.yeastrc.ms.domain.run.impl.MsRunLocationWrap" />
 	
-	<resultMap class="MsRunLocationDbImpl" id="msRunLocationResult">
+	<resultMap class="MsRunLocationOut" id="msRunLocationResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" nullValue="0"/>
 		<result property="createDate" column="createDate" />
@@ -14,7 +14,7 @@
 		<result property="serverDirectory" column="serverDirectory" />
 	</resultMap>
 	
-	<parameterMap class="MsRunLocationDb" id="msRunLocationParam">
+	<parameterMap class="MsRunLocationIn" id="msRunLocationParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverDirectory" jdbcType="VARCHAR"/>
@@ -29,7 +29,7 @@
     	SELECT * FROM msRunLocation WHERE runID=#runId#
     </select>
     
-     <select id="selectMatchingLocations" resultMap="msRunLocationResult" parameterClass="MsRunLocationDb">
+     <select id="selectMatchingLocations" resultMap="msRunLocationResult" parameterClass="MsRunLocationIn">
     	SELECT * FROM msRunLocation 
     	WHERE runID=#runId#
     	AND serverAddress=#serverAddress#

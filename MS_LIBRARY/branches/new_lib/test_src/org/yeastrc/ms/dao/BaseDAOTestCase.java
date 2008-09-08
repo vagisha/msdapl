@@ -40,10 +40,10 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.general.impl.Enzyme;
 import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.MsRunIn;
 import org.yeastrc.ms.domain.run.MsRun;
-import org.yeastrc.ms.domain.run.MsRunDb;
+import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -74,8 +74,8 @@ import org.yeastrc.ms.util.PeakConverterDouble;
  */
 public class BaseDAOTestCase extends TestCase {
 
-    protected MsScanDAO<MsScan, MsScanDb> scanDao = DAOFactory.instance().getMsScanDAO();
-    protected MsRunDAO<MsRun, MsRunDb> runDao = DAOFactory.instance().getMsRunDAO();
+    protected MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+    protected MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
 
     protected MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
     protected MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
@@ -411,7 +411,7 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     // SCAN
     //---------------------------------------------------------------------------------
-    protected MsScan makeMsScan(int scanNum, int precursorScanNum, DataConversionType convType) {
+    protected MsScanIn makeMsScan(int scanNum, int precursorScanNum, DataConversionType convType) {
         MsScanTest scan = new MsScanTest();
         scan.setStartScanNum(scanNum);
         scan.setEndScanNum(scanNum);
@@ -424,7 +424,7 @@ public class BaseDAOTestCase extends TestCase {
         return scan;
     }
 
-    protected MsScan makeMsScanWithPeakData(int scanNum, int precursorScanNum, DataConversionType convType) {
+    protected MsScanIn makeMsScanWithPeakData(int scanNum, int precursorScanNum, DataConversionType convType) {
         MsScanTest scan = (MsScanTest) makeMsScan(scanNum, precursorScanNum, convType);
         List<String[]> peaks = new ArrayList<String[]>(10);
         Random r = new Random();
@@ -443,12 +443,12 @@ public class BaseDAOTestCase extends TestCase {
         Random random = new Random();
         for (int i = 0; i < scanCount; i++) {
             int scanNum = random.nextInt(100);
-            MsScan scan = makeMsScanWithPeakData(scanNum, 26, DataConversionType.CENTROID);
+            MsScanIn scan = makeMsScanWithPeakData(scanNum, 26, DataConversionType.CENTROID);
             scanDao.save(scan, runId);
         }
     }
     
-    protected void checkScan (MsScan input, MsScanDb output) {
+    protected void checkScan (MsScanIn input, MsScan output) {
         assertEquals(input.getStartScanNum(), output.getStartScanNum());
         assertEquals(input.getFragmentationType(), output.getFragmentationType());
         assertEquals(input.getMsLevel(), output.getMsLevel());
@@ -472,7 +472,7 @@ public class BaseDAOTestCase extends TestCase {
     //---------------------------------------------------------------------------------
     // RUN
     //---------------------------------------------------------------------------------
-    protected MsRun createRunWEnzymeInfo(List<MsEnzymeIn> enzymes) {
+    protected MsRunIn createRunWEnzymeInfo(List<MsEnzymeIn> enzymes) {
         MsRunTest run = createDefaultRun();
         run.setEnzymeList(enzymes);
         return run;
@@ -498,7 +498,7 @@ public class BaseDAOTestCase extends TestCase {
         return run;
     }
 
-    protected void checkRun(MsRun inputRun, MsRunDb outputRun) {
+    protected void checkRun(MsRunIn inputRun, MsRun outputRun) {
         assertEquals(inputRun.getAcquisitionMethod(), outputRun.getAcquisitionMethod());
         assertEquals(inputRun.getComment(), outputRun.getComment());
         assertEquals(inputRun.getConversionSW(), outputRun.getConversionSW());

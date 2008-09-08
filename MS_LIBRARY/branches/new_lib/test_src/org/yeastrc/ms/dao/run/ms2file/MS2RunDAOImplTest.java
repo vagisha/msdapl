@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.run.MsRunDAOImplTest.MsRunTest;
-import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
-import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
-import org.yeastrc.ms.domain.run.ms2file.impl.MS2HeaderDbImpl;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
+import org.yeastrc.ms.domain.run.ms2file.impl.NameValuePairBean;
 
 public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 
@@ -25,7 +25,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
 
 
     public void testSaveLoadAndDelete() {
-        MS2Run run = makeMS2Run("MyFile1", true, true); // run with enzyme info and headers
+        MS2RunIn run = makeMS2Run("MyFile1", true, true); // run with enzyme info and headers
         
         assertTrue(run.getHeaderList().size() == 3);
         assertTrue(run.getEnzymeList().size() == 3);
@@ -36,7 +36,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
         saveScansForRun(runId, 20); // add scans for this run
         
         
-        MS2RunDb run_db = ms2RunDao.loadRun(runId);
+        MS2Run run_db = ms2RunDao.loadRun(runId);
         checkRun(run, run_db);
         assertEquals(run.getEnzymeList().size(), enzymeDao.loadEnzymesForRun(runId).size());
         assertEquals(run.getHeaderList().size(), ms2HeaderDao.loadHeadersForRun(runId).size());
@@ -61,7 +61,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
         }
     }
     
-    private MS2Run makeMS2Run(String fileName, boolean addEnzymes, boolean addHeaders) {
+    private MS2RunIn makeMS2Run(String fileName, boolean addEnzymes, boolean addHeaders) {
         
         MS2RunTest run = super.makeMS2Run(fileName);
         if (addEnzymes) {
@@ -89,21 +89,21 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
         return run;
     }
     
-    private MS2HeaderDbImpl makeMS2Header(String name, String value) {
-        MS2HeaderDbImpl header = new MS2HeaderDbImpl();
+    private MS2NameValuePair makeMS2Header(String name, String value) {
+        NameValuePairBean header = new NameValuePairBean();
         header.setName(name);
         header.setValue(value);
         return header;
     }
     
-    public static final class MS2RunTest extends MsRunTest implements MS2Run {
+    public static final class MS2RunTest extends MsRunTest implements MS2RunIn {
 
-        private List<MS2Field> headers = new ArrayList<MS2Field>();
+        private List<MS2NameValuePair> headers = new ArrayList<MS2NameValuePair>();
         
-        public List<MS2Field> getHeaderList() {
+        public List<MS2NameValuePair> getHeaderList() {
             return headers;
         }
-        public void addHeader(MS2Field header) {
+        public void addHeader(MS2NameValuePair header) {
             headers.add(header);
         }
     }

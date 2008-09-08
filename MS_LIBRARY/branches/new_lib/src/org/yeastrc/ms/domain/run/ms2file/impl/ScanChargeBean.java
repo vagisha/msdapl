@@ -4,26 +4,27 @@
  * Jun 16, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.parser.ms2File;
+package org.yeastrc.ms.domain.run.ms2file.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.parser.ms2File.HeaderItem;
 
 /**
  * 
  */
-public class ScanCharge implements MS2ScanCharge {
+public class ScanChargeBean implements MS2ScanCharge {
 
     private int charge;
     private BigDecimal mass;
-    private List<MS2Field> analysisItems;
+    private List<MS2NameValuePair> analysisItems;
 
-    public ScanCharge() {
-        analysisItems = new ArrayList<MS2Field>();
+    public ScanChargeBean() {
+        analysisItems = new ArrayList<MS2NameValuePair>();
     }
 
     /**
@@ -61,7 +62,7 @@ public class ScanCharge implements MS2ScanCharge {
         buf.append("\t");
         buf.append(mass.stripTrailingZeros());
         buf.append("\n");
-        for (MS2Field item: analysisItems) {
+        for (MS2NameValuePair item: analysisItems) {
             buf.append("D\t");
             buf.append(item.getName());
             if (item.getValue() != null) {
@@ -75,7 +76,11 @@ public class ScanCharge implements MS2ScanCharge {
     }
 
     @Override
-    public List<MS2Field> getChargeDependentAnalysisList() {
+    public List<MS2NameValuePair> getChargeDependentAnalysisList() {
         return analysisItems;
+    }
+    
+    public void setChargeDependentAnalysisList(List<MS2NameValuePair> analysisItems) {
+        this.analysisItems = analysisItems;
     }
 }

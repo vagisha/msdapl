@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb;
 
 public class MS2ScanChargeDAOImplTest extends MS2BaseDAOtestCase {
 
@@ -27,7 +26,7 @@ public class MS2ScanChargeDAOImplTest extends MS2BaseDAOtestCase {
         chargeDao.save(sc11, 1);
         
         // read it back
-        List<MS2ScanChargeDb> sclist1 = chargeDao.loadScanChargesForScan(1);
+        List<MS2ScanCharge> sclist1 = chargeDao.loadScanChargesForScan(1);
         assertEquals(1, sclist1.size());
         
         // make sure NO charge dependent data was saved 
@@ -40,9 +39,9 @@ public class MS2ScanChargeDAOImplTest extends MS2BaseDAOtestCase {
         // read it back
         sclist1 = chargeDao.loadScanChargesForScan(1);
         assertEquals(2, sclist1.size());
-        Collections.sort(sclist1, new Comparator<MS2ScanChargeDb>() {
-            public int compare(MS2ScanChargeDb o1, MS2ScanChargeDb o2) {
-                return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
+        Collections.sort(sclist1, new Comparator<MS2ScanCharge>() {
+            public int compare(MS2ScanCharge o1, MS2ScanCharge o2) {
+                return new Integer(o1.getCharge()).compareTo(new Integer(o2.getCharge()));
             }});
         
         // make sure charge dependent data was saved (this will be for the second object in the list)
@@ -59,7 +58,7 @@ public class MS2ScanChargeDAOImplTest extends MS2BaseDAOtestCase {
         
     }
     
-    private void compare(MS2ScanCharge input, MS2ScanChargeDb output) {
+    private void compare(MS2ScanCharge input, MS2ScanCharge output) {
         assertEquals(input.getCharge(), output.getCharge());
         assertEquals(input.getMass().doubleValue(), output.getMass().doubleValue());
         assertEquals(input.getChargeDependentAnalysisList().size(), output.getChargeDependentAnalysisList().size());

@@ -3,23 +3,18 @@ package org.yeastrc.ms.service.ms2file;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
-import org.yeastrc.ms.domain.run.ms2file.MS2HeaderDb;
+import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
+import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
-import org.yeastrc.ms.domain.run.ms2file.MS2RunDb;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanChargeDb;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanDb;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 import org.yeastrc.ms.parser.ms2File.MS2Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
-import org.yeastrc.ms.parser.ms2File.ScanCharge;
 import org.yeastrc.ms.util.PeakConverterString;
 
 public class DbToMs2FileConverter {
@@ -31,8 +26,8 @@ public class DbToMs2FileConverter {
         try {
             outFile = new BufferedWriter(new FileWriter(outputFile));
 
-            MsRunDAO<MS2Run, MS2RunDb> runDao = DAOFactory.instance().getMS2FileRunDAO();
-            MS2RunDb run = runDao.loadRun(dbRunId);
+            MS2RunDAO runDao = DAOFactory.instance().getMS2FileRunDAO();
+            MS2Run run = runDao.loadRun(dbRunId);
             if (run == null) {
                 System.err.println("No run found with id: "+dbRunId);
                 return;
@@ -40,11 +35,11 @@ public class DbToMs2FileConverter {
             printMs2Header(run);
             outFile.write("\n");
 
-            MsScanDAO<MS2Scan, MS2ScanDb> scanDao = DAOFactory.instance().getMS2FileScanDAO();
+            MS2ScanDAO scanDao = DAOFactory.instance().getMS2FileScanDAO();
             List<Integer> scanIds = scanDao.loadScanIdsForRun(dbRunId);
 
             for (Integer scanId: scanIds) {
-                MS2ScanDb scan = scanDao.load(scanId);
+                MS2Scan scan = scanDao.load(scanId);
                 printMs2Scan(scan);
                 outFile.write("\n");
             }
@@ -58,25 +53,25 @@ public class DbToMs2FileConverter {
         
     }
     
-    private void printMs2Scan(MS2ScanDb scan) throws IOException {
+    private void printMs2Scan(MS2Scan scan) throws IOException {
        Scan ms2scan = new Scan();
        ms2scan.setStartScan(scan.getStartScanNum());
        ms2scan.setEndScan(scan.getEndScanNum());
        ms2scan.setPrecursorMz(scan.getPrecursorMz().toString());
        
        // add predicted charge states for the scan
-       for (MS2ScanChargeDb scanCharge: scan.getScanChargeList()) {
-           ScanCharge sc = new ScanCharge();
+       for (MS2ScanCharge scanCharge: scan.getScanChargeList()) {
+           ScanChargeBean sc = new ScanChargeBean();
            sc.setCharge(scanCharge.getCharge());
            sc.setMass(scanCharge.getMass());
-           for (MS2Field dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
+           for (MS2NameValuePair dAnalysis: scanCharge.getChargeDependentAnalysisList()) {
                sc.addAnalysisItem(dAnalysis.getName(), dAnalysis.getValue());
            }
            ms2scan.addChargeState(sc);
        }
        
        // add charge independent analysis
-       for (MS2Field item: scan.getChargeIndependentAnalysisList()) {
+       for (MS2NameValuePair item: scan.getChargeIndependentAnalysisList()) {
             ms2scan.addAnalysisItem(item.getName(), item.getValue());
        }
        
@@ -90,15 +85,11 @@ public class DbToMs2FileConverter {
        outFile.write(ms2scan.toString());
     }
 
-    private void printMs2Header(MS2RunDb run) throws IOException {
+    private void printMs2Header(MS2Run run) throws IOException {
         MS2Header ms2Header = new MS2Header();
-        List<MS2HeaderDb> headerList = run.getHeaderList();
-        Collections.sort(headerList, new Comparator<MS2HeaderDb>() {
-            public int compare(MS2HeaderDb o1, MS2HeaderDb o2) {
-                return new Integer(o1.getId()).compareTo(new Integer(o2.getId()));
-            }});
+        List<MS2NameValuePair> headerList = run.getHeaderList();
         
-        for (MS2HeaderDb header: headerList) {
+        for (MS2NameValuePair header: headerList) {
             ms2Header.addHeaderItem(header.getName(), header.getValue());
         }
         outFile.write(ms2Header.toString());

@@ -12,15 +12,15 @@ import java.util.List;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.RunFileFormat;
-import org.yeastrc.ms.domain.run.ms2file.MS2Field;
-import org.yeastrc.ms.domain.run.ms2file.MS2Run;
+import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 
 /**
  * 
  */
-public class MS2Header implements MS2Run {
+public class MS2Header implements MS2RunIn {
 
-    private List<MS2Field> headerList;
+    private List<MS2NameValuePair> headerList;
     private String fileName;
     private String sha1Sum;
     private String creationDate;
@@ -34,7 +34,7 @@ public class MS2Header implements MS2Run {
     private StringBuilder comment;
     
     public MS2Header() {
-        headerList = new ArrayList<MS2Field>();
+        headerList = new ArrayList<MS2NameValuePair>();
         comment = new StringBuilder();
     }
     
@@ -147,7 +147,7 @@ public class MS2Header implements MS2Run {
         return comment.deleteCharAt(comment.length() -1).toString(); // delete last semi-colon
     }
     
-    public List<MS2Field> getHeaderList() {
+    public List<MS2NameValuePair> getHeaderList() {
         return headerList;
     }
 
@@ -167,7 +167,7 @@ public class MS2Header implements MS2Run {
     public String toString() {
         
         StringBuilder buf = new StringBuilder();
-        for (MS2Field headerItem: headerList) {
+        for (MS2NameValuePair headerItem: headerList) {
             if (headerItem == null)
                 continue;
             buf.append("H\t");

@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.run.MsScanDb;
 
 public class MsScanDAOImplTest extends BaseDAOTestCase {
 
@@ -23,9 +23,9 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testSaveLoadDelete() {
-        MsScan scan = makeMsScan(2, 1, DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
+        MsScanIn scan = makeMsScan(2, 1, DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         int scanId = scanDao.save(scan, 99, 230); // runId = 99; precursorScanId = 230;
-        MsScanDb scanDb = scanDao.load(scanId);
+        MsScan scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
         // clean up
         scanDao.delete(scanId);
@@ -35,7 +35,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
 
 
     public void testInvalidValues() {
-        MsScan scan = makeMsScan(2, 1, DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
+        MsScanIn scan = makeMsScan(2, 1, DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         try {
             scanDao.save(scan, 0, 1); // runId = 0; precursorScanId  1;
             fail("RunId cannot be 0");
@@ -44,9 +44,9 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testSaveScanWithNoPrecursorScanId() {
-        MsScan scan = makeMsScan(2, 1,DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
+        MsScanIn scan = makeMsScan(2, 1,DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         int scanId = scanDao.save(scan, 99); // runID = 99
-        MsScanDb scanDb = scanDao.load(scanId);
+        MsScan scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
         // clean up
         scanDao.delete(scanId);
@@ -76,10 +76,10 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
     
     public void testSaveLoadPeakData() {
-        MsScan scan = makeMsScanWithPeakData(2, 1,DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
+        MsScanIn scan = makeMsScanWithPeakData(2, 1,DataConversionType.CENTROID); // scanNumber = 2; precursorScanNum = 1;
         
         int scanId = scanDao.save(scan, 1, 1); // runId = 1; precursorScanId = 1;
-        MsScanDb scanDb = scanDao.load(scanId);
+        MsScan scanDb = scanDao.load(scanId);
         checkScan(scan, scanDb);
         // clean up
         scanDao.delete(scanId);
@@ -88,7 +88,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
 
     public void testDataConversionTypeForScan() {
-        MsScan scan = makeMsScan(35, 53, null);
+        MsScanIn scan = makeMsScan(35, 53, null);
         try {
             scanDao.save(scan, 56);
         }
@@ -96,7 +96,7 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
         
         scan = makeMsScan(35, 53, DataConversionType.CENTROID);
         int id = scanDao.save(scan, 56);
-        MsScanDb scan_db = scanDao.load(id);
+        MsScan scan_db = scanDao.load(id);
         checkScan(scan, scan_db);
         
         scan = makeMsScan(36, 35, DataConversionType.NON_CENTROID);
@@ -117,17 +117,17 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
     }
     
     public void testPeakCount() {
-        MsScan scan = makeMsScanWithPeakData(35, 53, DataConversionType.CENTROID);
+        MsScanIn scan = makeMsScanWithPeakData(35, 53, DataConversionType.CENTROID);
         assertTrue(scan.getPeakCount() > 0);
         int scanId = scanDao.save(scan, 27);
-        MsScanDb scan_db = scanDao.load(scanId);
+        MsScan scan_db = scanDao.load(scanId);
         checkScan(scan, scan_db);
         assertEquals(scan.getPeakCount(), scan_db.getPeakCount());
         scanDao.delete(scanId);
         assertNull(scanDao.load(scanId));
     }
     
-    public static class MsScanTest implements MsScan {
+    public static class MsScanTest implements MsScanIn {
 
         private int startScanNum;
         private BigDecimal retentionTime;

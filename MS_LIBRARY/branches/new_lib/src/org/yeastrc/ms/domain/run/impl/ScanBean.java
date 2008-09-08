@@ -9,12 +9,12 @@ package org.yeastrc.ms.domain.run.impl;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.run.DataConversionType;
-import org.yeastrc.ms.domain.run.MsScanDb;
+import org.yeastrc.ms.domain.run.MsScan;
 
 /**
  * 
  */
-public class MsScanDbImpl implements MsScanDb {
+public class ScanBean implements MsScan {
 
     private int runId;  // id (database) of the run this scan belongs to
     
@@ -37,7 +37,7 @@ public class MsScanDbImpl implements MsScanDb {
     
     private String peakString;
     
-    public MsScanDbImpl() {
+    public ScanBean() {
         //peaks = new ArrayList<double[]>();
     }
 

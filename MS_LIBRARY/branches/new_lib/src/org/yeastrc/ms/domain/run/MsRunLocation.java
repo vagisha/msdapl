@@ -1,23 +1,30 @@
 /**
- * MsRunLocation.java
+ * MsRunLocationDb.java
  * @author Vagisha Sharma
  * Aug 15, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.domain.run;
 
+import java.sql.Date;
+
+
 /**
  * 
  */
-public interface MsRunLocation {
-
+public interface MsRunLocation extends MsRunLocationIn {
     /**
-     * @return the serverAddress
+     * @return the database id for the location
      */
-    public abstract String getServerAddress();
-
+    public abstract int getId();
+    
     /**
-     * @return the serverDirectory
+     * @return the database id for the run.
      */
-    public abstract String getServerDirectory();
+    public abstract int getRunId();
+    
+    /**
+     * @return the createDate
+     */
+    public abstract Date getCreateDate();
 }

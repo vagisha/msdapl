@@ -8,12 +8,12 @@ package org.yeastrc.ms.domain.run.impl;
 
 import java.sql.Date;
 
-import org.yeastrc.ms.domain.run.MsRunLocationDb;
+import org.yeastrc.ms.domain.run.MsRunLocation;
 
 /**
  * 
  */
-public class MsRunLocationDbImpl implements MsRunLocationDb {
+public class RunLocationBean implements MsRunLocation {
 
     private int id;                 // database id for this location
     private int runId;              // database id for the locations's run
