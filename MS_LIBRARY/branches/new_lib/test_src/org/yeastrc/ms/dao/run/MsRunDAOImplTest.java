@@ -223,12 +223,9 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertEquals(remoteDir, locDb.getServerDirectory());
         assertEquals(runId, locDb.getRunId());
         
-        List<MsRunLocation> matchingLocs = runDao.loadMatchingRunLocations(runId, server, remoteDir);
-        assertEquals(1, matchingLocs.size());
-        locDb = matchingLocs.get(0);
-        assertEquals(server, locDb.getServerAddress());
-        assertEquals(remoteDir, locDb.getServerDirectory());
-        assertEquals(runId, locDb.getRunId());
+        int matchingLocs = runDao.loadMatchingRunLocations(runId, server, remoteDir);
+        assertEquals(1, matchingLocs);
+        
         
         // save another location for the run
         runDao.saveRunLocation(server, "/my/server/directory/2", runId);
@@ -239,14 +236,10 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         assertNotSame(locDbList.get(0).getServerDirectory(), locDbList.get(1).getServerDirectory());
         
         matchingLocs = runDao.loadMatchingRunLocations(runId, server, "/my/server/directory/2");
-        assertEquals(1, matchingLocs.size());
-        locDb = matchingLocs.get(0);
-        assertEquals(server, locDb.getServerAddress());
-        assertEquals("/my/server/directory/2", locDb.getServerDirectory());
-        assertEquals(runId, locDb.getRunId());
+        assertEquals(1, matchingLocs);
         
         // try to find a matching location that does not exist
-        assertEquals(0, runDao.loadMatchingRunLocations(runId, server, "directory").size());
+        assertEquals(0, runDao.loadMatchingRunLocations(runId, server, "directory"));
         
         runDao.delete(runId);
         assertEquals(0, runDao.loadLocationsForRun(runId).size());

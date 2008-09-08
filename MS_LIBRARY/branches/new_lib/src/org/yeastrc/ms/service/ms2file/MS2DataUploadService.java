@@ -20,7 +20,6 @@ import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
-import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
@@ -140,10 +139,18 @@ public class MS2DataUploadService {
         // If a run with the same file name and SHA-1 hash code already exists in the 
         // database we will not upload it
         String sha1Sum = calculateSha1Sum(filePath);
-        int runId = getRunIdForFile(filePath, serverAddress, serverDirectory, sha1Sum);
-        if (runId > 0)
+        String fileName = new File(filePath).getName();
+        int runId = getMatchingRunId(fileName, sha1Sum);
+        if (runId > 0) {
+            // If this run was uploaded from a different location, upload the location
+            saveRunLocation(serverAddress, serverDirectory, runId);
+            log.info("Run with name: "+fileName+" and sha1Sum: "+sha1Sum+
+                    " found in the database; runID: "+runId);
+            log.info("END MS2 FILE UPLOAD: "+fileName);
             return runId;
+        }
         
+        // this is a new file so we will upload it.
         Ms2FileReader ms2Provider = new Ms2FileReader();
         try {
             ms2Provider.open(filePath, sha1Sum);
@@ -167,26 +174,14 @@ public class MS2DataUploadService {
         }
     }
 
-    private int getRunIdForFile(String filePath, String serverAddress, String serverDirectory, String sha1Sum) throws UploadException {
-    
-        String fileName = new File(filePath).getName();
-        
-        int runId = getMatchingRunId(fileName, sha1Sum);
-        
-        // If run is already in the database return the runId of the existing run
-        if (runId > 0)  {
-            MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
-            // first save the original location (on remote server) of the MS2 file if the location is not in the database already.
-            List<MsRunLocation> runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
-            if (runLocs.size() == 0) {
-                runDao.saveRunLocation(serverAddress, serverDirectory, runId);
-            }
-            log.info("Run with name: "+fileName+" and sha1Sum: "+sha1Sum+
-                    " found in the database; runID: "+runId);
-            log.info("END MS2 FILE UPLOAD: "+fileName);
-            return runId;
+    private void saveRunLocation(String serverAddress, String serverDirectory, int runId) {
+        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
+        // Save the original location (on remote server) of the MS2 file, if the location is not in the database already.
+        int runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
+        if (runLocs == 0) {
+            runDao.saveRunLocation(serverAddress, serverDirectory, runId);
         }
-        return 0;
+        
     }
     
     private String calculateSha1Sum(String filePath) throws UploadException {

@@ -29,8 +29,8 @@
     	SELECT * FROM msRunLocation WHERE runID=#runId#
     </select>
     
-     <select id="selectMatchingLocations" resultMap="msRunLocationResult" parameterClass="MsRunLocationIn">
-    	SELECT * FROM msRunLocation 
+     <select id="selectMatchingLocations" resultClass="Integer" parameterClass="MsRunLocationIn">
+    	SELECT count(*) FROM msRunLocation 
     	WHERE runID=#runId#
     	AND serverAddress=#serverAddress#
     	AND serverDirectory=#serverDirectory#

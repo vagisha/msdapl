@@ -85,13 +85,13 @@ public interface GenericRunDAO <I extends MsRunIn, O extends MsRun> {
     public abstract List<MsRunLocation> loadLocationsForRun(int runId);
     
     /**
-     * Returns locations with the given runId, serverAddress and serverDirectory.
+     * Returns the number of locations with the given runId, serverAddress and serverDirectory.
      * @param runId
      * @param serverAddress
      * @param serverDirectory
      * @return
      */
-    public abstract List<MsRunLocation> loadMatchingRunLocations(int runId, String serverAddress, String serverDirectory);
+    public abstract int loadMatchingRunLocations(int runId, String serverAddress, String serverDirectory);
     
     /**
      * Deletes the run with the given id. Enzyme information and scans are also deleted

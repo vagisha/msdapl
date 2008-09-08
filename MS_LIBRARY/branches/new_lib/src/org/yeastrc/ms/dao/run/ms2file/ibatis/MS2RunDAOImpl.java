@@ -79,7 +79,7 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     }
 
     @Override
-    public List<MsRunLocation> loadMatchingRunLocations(int runId,
+    public int loadMatchingRunLocations(int runId,
             String serverAddress, String serverDirectory) {
         return msRunDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
     }

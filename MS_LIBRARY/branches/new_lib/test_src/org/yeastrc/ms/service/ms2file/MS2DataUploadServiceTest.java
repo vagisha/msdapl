@@ -124,34 +124,34 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(2, locs.size());
     }
     
-    public void testUploadRuns2() {
-        String dir = "test_resources/validSequestData_dir";
-        MsDataUploader uploader = new MsDataUploader();
-        java.util.Date experimentDate = new java.util.Date();
-        
-        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("Data is valid");
-        }
-        assertEquals(0, uploader.getUploadExceptionList().size());
-        
-        // make sure all the data got uploaded
-        try {
-            checkRun("1.ms2", Sha1SumCalculator.instance().sha1SumFor(new File(dir+File.separator+"1.ms2")));
-            checkRun("2.ms2", Sha1SumCalculator.instance().sha1SumFor(new File(dir+File.separator+"2.ms2")));
-        }
-        catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            fail("There should be no exception in sha1sum calculation");
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            fail("There should be no exception in sha1sum calculation");
-        }
-    }
+//    public void testUploadRuns2() {
+//        String dir = "test_resources/validSequestData_dir";
+//        MsDataUploader uploader = new MsDataUploader();
+//        java.util.Date experimentDate = new java.util.Date();
+//        
+//        try {
+//            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
+//        }
+//        catch (UploadException e) {
+//            e.printStackTrace();
+//            fail("Data is valid");
+//        }
+//        assertEquals(0, uploader.getUploadExceptionList().size());
+//        
+//        // make sure all the data got uploaded
+//        try {
+//            checkRun("1.ms2", Sha1SumCalculator.instance().sha1SumFor(new File(dir+File.separator+"1.ms2")));
+//            checkRun("2.ms2", Sha1SumCalculator.instance().sha1SumFor(new File(dir+File.separator+"2.ms2")));
+//        }
+//        catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//            fail("There should be no exception in sha1sum calculation");
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//            fail("There should be no exception in sha1sum calculation");
+//        }
+//    }
     
     private int checkRun(String runFileName, String sha1sum) {
         List<Integer> runIds = runDao.loadRunIdsForFileName(runFileName);
@@ -201,11 +201,9 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals("remoteDirectory", locs.get(0).getServerDirectory());
         assertEquals(runId, locs.get(0).getRunId());
         // testting the other method: should really be in test class for runDao
-        List<MsRunLocation> locs2 = runDao.loadMatchingRunLocations(runId, "remoteServer", "remoteDirectory");
-        assertEquals(1, locs2.size());
-        assertEquals("remoteServer", locs2.get(0).getServerAddress());
-        assertEquals("remoteDirectory", locs2.get(0).getServerDirectory());
-        assertEquals(runId, locs2.get(0).getRunId());
+        int locs2 = runDao.loadMatchingRunLocations(runId, "remoteServer", "remoteDirectory");
+        assertEquals(1, locs2);
+       
         
         // check values in MS2FileHeaders table
         MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();

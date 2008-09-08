@@ -101,10 +101,13 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
     }
 
     @Override
-    public List<MsRunLocation> loadMatchingRunLocations(final int runId,
+    public int loadMatchingRunLocations(final int runId,
             final String serverAddress, final String serverDirectory) {
         MsRunLocationWrap loc = new MsRunLocationWrap(serverAddress, serverDirectory, runId);
-        return queryForList("MsRunLocation.selectMatchingLocations", loc);
+        Integer count = (Integer) queryForObject("MsRunLocation.selectMatchingLocations", loc);
+        if (count == null)
+            return 0;
+        return count;
     }
 
     @Override
