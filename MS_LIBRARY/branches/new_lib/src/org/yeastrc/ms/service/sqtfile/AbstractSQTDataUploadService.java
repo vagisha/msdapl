@@ -357,17 +357,20 @@ public abstract class AbstractSQTDataUploadService {
                     else {
 //                        System.out.println("UNMATCHED_2: "+match.getAccession());
                         // last ditch attempt -- accession string might be truncated at both ends; match peptide and accession LIKE %accession%
-                        matchingIds = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession2(databaseId, match.getAccession(), peptide);
-                        
-                        if (matchingIds.size() == 1)
-                            proteinId = matchingIds.get(0);
+                        /*
+                         * This last check takes too long for files where all the results are truncated at the beginning.  
+                         */
+//                        matchingIds = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession2(databaseId, match.getAccession(), peptide);
+//                        
+//                        if (matchingIds.size() == 1)
+//                            proteinId = matchingIds.get(0);
 
                         // give up!
-                        else {
+//                        else {
                             UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
                             ex.setErrorMessage("No matching protein found for databaseId: "+databaseId+" and accession: "+match.getAccession());
                             throw ex;
-                        }
+//                        }
                     }
                 }
             }
