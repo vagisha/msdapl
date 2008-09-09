@@ -6,16 +6,15 @@
  */
 package org.yeastrc.ms.dao.search.prolucid.ibatis;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
+import org.yeastrc.ms.domain.search.prolucid.impl.ProlucidResultDataWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -57,7 +56,7 @@ ProlucidSearchResultDAO {
         int resultId = resultDao.save(searchId, searchDbName, searchResult, runSearchId, scanId);
 
         // now save the ProLuCID specific information
-        ProlucidResultDataSqlMapParam resultDb = new ProlucidResultDataSqlMapParam(resultId, searchResult.getProlucidResultData());
+        ProlucidResultDataWrap resultDb = new ProlucidResultDataWrap(searchResult.getProlucidResultData(), resultId);
         save("ProlucidResult.insert", resultDb);
         return resultId;
     }
@@ -69,23 +68,23 @@ ProlucidSearchResultDAO {
         int resultId = resultDao.saveResultOnly(searchResult, runSearchId, scanId);
 
         // now save the ProLuCID specific information
-        ProlucidResultDataSqlMapParam resultDb = new ProlucidResultDataSqlMapParam(resultId, searchResult.getProlucidResultData());
+        ProlucidResultDataWrap resultDb = new ProlucidResultDataWrap(searchResult.getProlucidResultData(), resultId);
         save("ProlucidResult.insert", resultDb);
 
         return resultId;
     }
 
-    // resultID, 
-    // spRank,
-    // XCorrRank,
-    // sp,
-    // binomialProbability,
-    // XCorr,
-    // ZScore 
-    // deltaCN, 
-    // calculatedMass,
-    // matchingIons,
-    // predictedIons)
+    /**
+     * resultID, 
+        primaryScoreRank,
+        secondaryScoreRank,
+        primaryScore,
+        secondaryScore,
+        deltaCN, 
+        calculatedMass,
+        matchingIons,
+        predictedIons
+     */
     @Override
     public void saveAllProlucidResultData(
             List<ProlucidResultDataWId> resultDataList) {
@@ -96,17 +95,13 @@ ProlucidSearchResultDAO {
             values.append(",(");
             values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
-            values.append(data.getSpRank() == -1 ? "NULL" : data.getSpRank());
+            values.append(data.getPrimaryScoreRank() == -1 ? "NULL" : data.getPrimaryScoreRank());
             values.append(",");
-            values.append(data.getxCorrRank()== -1 ? "NULL" : data.getxCorrRank());
+            values.append(data.getSecondaryScoreRank()== -1 ? "NULL" : data.getSecondaryScoreRank());
             values.append(",");
-            values.append(data.getSp());
+            values.append(data.getPrimaryScore());
             values.append(",");
-            values.append(data.getBinomialProbability());
-            values.append(",");
-            values.append(data.getxCorr());
-            values.append(",");
-            values.append(data.getZscore());
+            values.append(data.getSecondaryScore());
             values.append(",");
             values.append(data.getDeltaCN());
             values.append(",");
@@ -119,67 +114,11 @@ ProlucidSearchResultDAO {
         }
         values.deleteCharAt(0);
 
-        System.out.println(values.toString());
         save("ProlucidResult.insertAll", values.toString());
     }
 
     @Override
     public void delete(int resultId) {
         resultDao.delete(resultId);
-    }
-
-    public static final class ProlucidResultDataSqlMapParam implements ProlucidResultDataWId {
-
-        private int resultId;
-        private ProlucidResultData result;
-
-        public ProlucidResultDataSqlMapParam(int resultId, ProlucidResultData result) {
-            this.resultId = resultId;
-            this.result = result;
-        }
-
-        public int getResultId() {
-            return resultId;
-        }
-
-        public BigDecimal getDeltaCN() {
-            return result.getDeltaCN();
-        }
-
-        public BigDecimal getSp() {
-            return result.getSp();
-        }
-
-        public int getSpRank() {
-            return result.getSpRank();
-        }
-
-        public BigDecimal getxCorr() {
-            return result.getxCorr();
-        }
-
-        public int getxCorrRank() {
-            return result.getxCorrRank();
-        }
-
-        public BigDecimal getCalculatedMass() {
-            return result.getCalculatedMass();
-        }
-
-        public int getMatchingIons() {
-            return result.getMatchingIons();
-        }
-
-        public int getPredictedIons() {
-            return result.getPredictedIons();
-        }
-
-        public Double getBinomialProbability() {
-            return result.getBinomialProbability();
-        }
-
-        public Double getZscore() {
-            return result.getZscore();
-        }
     }
 }

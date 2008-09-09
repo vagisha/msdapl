@@ -15,43 +15,33 @@ public interface ProlucidResultData {
 
     // RANKS
     /**
-     * @return the xCorrRank
+     * @return the primaryScoreRank
      */
-    public abstract int getxCorrRank();
+    public abstract int getPrimaryScoreRank();
     
     /**
-     * @return the spRank
+     * @return the secondaryScoreRank
      */
-    public abstract int getSpRank();
+    public abstract int getSecondaryScoreRank();
     
     
     // SCORES
     /**
-     * @return the sp
+     * @return the primaryScore
      */
-    public abstract BigDecimal getSp();
+    public abstract Double getPrimaryScore();
     
     /**
-     * @return the binomial probability
+     * @return the secondaryScore
      */
-    public abstract Double getBinomialProbability();
+    public abstract Double getSecondaryScore();
     
-    /**
-     * @return the xCorr
-     */
-    public abstract BigDecimal getxCorr();
     
     /**
      * @return the deltaCN
      */
     public abstract BigDecimal getDeltaCN();
     
-    /**
-     * @return the z-score
-     */
-    public abstract Double getZscore();
-
-   
     
     public abstract BigDecimal getCalculatedMass();
 

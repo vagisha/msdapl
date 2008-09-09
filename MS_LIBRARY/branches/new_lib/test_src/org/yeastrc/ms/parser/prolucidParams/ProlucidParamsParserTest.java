@@ -264,36 +264,4 @@ public class ProlucidParamsParserTest extends TestCase {
         assertEquals('*', dynaTermMods.get(1).getModificationSymbol());
         assertEquals(200.0, dynaTermMods.get(1).getModificationMass().doubleValue());
     }
-
-    public void testGetScoreTypes() {
-        // format 1 (old format)
-        try {
-            parser.parseParamsFile("remote.server", format1file);
-        }
-        catch (DataProviderException e) {
-            e.printStackTrace();
-            fail("Valid file");
-        }
-        assertNotNull(parser.getSpColumnScore());
-        assertEquals(Score.SP, parser.getSpColumnScore());
-        assertNotNull(parser.getXcorrColumnScore());
-        assertEquals(Score.XCORR, parser.getXcorrColumnScore());
-        assertNotNull(parser.getDeltaCNColumnScore());
-        assertEquals(Score.DELTA_CN, parser.getDeltaCNColumnScore());
-        
-        // format 2 (new format)
-        try {
-            parser.parseParamsFile("remote.server", format2file);
-        }
-        catch (DataProviderException e) {
-            e.printStackTrace();
-            fail("Valid file");
-        }
-        assertNotNull(parser.getSpColumnScore());
-        assertEquals(Score.BIN_PROB, parser.getSpColumnScore());
-        assertNotNull(parser.getXcorrColumnScore());
-        assertEquals(Score.XCORR, parser.getXcorrColumnScore());
-        assertNotNull(parser.getDeltaCNColumnScore());
-        assertEquals(Score.DELTA_CN, parser.getDeltaCNColumnScore());
-    }
 }

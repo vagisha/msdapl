@@ -36,10 +36,6 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
 
     private List<ProlucidParamIn> parentParams; // normally we should have only one parent (the <parameter> element)
 
-    private Score xcorrColumnScore;
-    private Score spColumnScore;
-    private Score deltaCNColumnScore;
-
     private MsSearchDatabaseIn database;
     private MsEnzymeIn enzyme;
     private List<MsResidueModificationIn> staticResidueModifications;
@@ -47,6 +43,11 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
     private List<MsResidueModificationIn> dynamicResidueModifications;
     private List<MsTerminalModificationIn> dynamicTerminalModifications;
 
+    private boolean foundPrimaryScoreType = false;
+    private boolean foundSecondaryScoreType = false;
+    private boolean foundAdditionalEstimate = false;
+    private boolean foundconfidenceType = false;
+    
     public List<ProlucidParamIn> getParentParamElement() {
         return parentParams;
     }
@@ -79,18 +80,6 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return SearchProgram.PROLUCID;
     }
     
-    public Score getXcorrColumnScore() {
-        return xcorrColumnScore;
-    }
-    
-    public Score getSpColumnScore() {
-        return spColumnScore;
-    }
-
-    public Score getDeltaCNColumnScore() {
-        return deltaCNColumnScore;
-    }
-    
     public List<ProlucidParamIn> getParamList() {
         return this.parentParams;
     }
@@ -110,9 +99,6 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         dynamicTerminalModifications.clear();
         this.database = null;
         this.enzyme = null;
-        this.xcorrColumnScore = Score.XCORR;
-        this.spColumnScore = Score.SP;
-        this.deltaCNColumnScore = Score.DELTA_CN;
     }
 
     public ProlucidParamsParser() {
@@ -146,13 +132,16 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
             throw new DataProviderException("Error reading file: ", e);
         }
         
-        // make sure the three score types are different
-        if (spColumnScore == xcorrColumnScore)
-            throw new DataProviderException("Score types for Sp and XCorr columns cannot be the same: "+spColumnScore);
-        if (spColumnScore == deltaCNColumnScore)
-            throw new DataProviderException("Score types for Sp and DeltaCN columns cannot be the same: "+spColumnScore);
-        if (xcorrColumnScore == deltaCNColumnScore)
-            throw new DataProviderException("Score types for the XCorr and DeltaCN columns cannot be the same: "+xcorrColumnScore);
+        // make sure we found a database
+        if (this.database == null)
+            throw new DataProviderException("No database element found in ProLuCID's search.xml");
+        
+        // make sure we got our score types
+        if ((foundPrimaryScoreType && foundSecondaryScoreType) ||
+            (foundAdditionalEstimate && foundconfidenceType))
+            return;
+        else
+            throw new DataProviderException("Could not determine primary and secondary score types from ProLuCID's search.xml");
     }
 
     private void parseDocument(Document doc) throws DataProviderException {
@@ -163,7 +152,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
             if (pn != null)
                 this.parentParams.add(pn);
         }
-        printParams();
+        //printParams();
     }
 
     private void printParams() {
@@ -228,151 +217,14 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         else if (node.getParamElementName().equalsIgnoreCase("modifications"))
             parseModificationInfo(node);
         else if (node.getParamElementName().equalsIgnoreCase("primary_score_type"))
-            parsePrimaryScoreTypeFormat2(node);
+            foundPrimaryScoreType = true;
         else if (node.getParamElementName().equalsIgnoreCase("secondary_score_type"))
-            parseSecondaryScoreTypeFormat2(node);
+            foundSecondaryScoreType = true;
         else if (node.getParamElementName().equalsIgnoreCase("additional_estimate"))
-            parsePrimaryScoreTypeFormat1(node);
+            foundAdditionalEstimate = true;
         else if (node.getParamElementName().equalsIgnoreCase("confidence"))
-            parseSecondaryScoreTypeFormat1(node);
+            foundconfidenceType = true;
     }
-
-    /**
-     * <!--ADDITIONAL_ESTIMATE 
-     *      0 - default Binomial Probability 
-     *      1 - XCORRR
-     *  -->
-     * @param node
-     * @throws DataProviderException 
-     */
-    private void parsePrimaryScoreTypeFormat1(ProlucidParamNode node) throws DataProviderException {
-        String val = node.getParamElementValue();
-        if (val == null)
-            throw new DataProviderException("Value of additional_estimate cannot be null");
-        int ival = 0;
-        try {ival = Integer.parseInt(val);}
-        catch(NumberFormatException e) {
-            throw new DataProviderException("Invalid value for additional_estimate: "+val+". Allowed values: 0,1"); 
-        }
-        switch(ival) {
-            case 0:
-                xcorrColumnScore = Score.BIN_PROB;
-                break;
-            case 1:
-                xcorrColumnScore = Score.XCORR;
-                break;
-            default:
-                throw new DataProviderException("Invalid value for additional_estimate: "+val+". Allowed values: 0,1"); 
-        }
-    }
-
-    
-    /**
-     * From the annotated search.xml (http://bart.scripps.edu/wiki/index.php/ProLuCID)
-     * <!--Primary score type
-     *      0 - default Binomial Probability This is not pep-prob probability score (by Rovshan), but similar. In Sequest, Sp score is the preliminary score. In Prolucid, the binomial probability score is the preliminary score.
-     *      1 - XCorr
-     *  -->
-     *  FROM DANIEL COCIORVA
-     *  - XCorr column will contain the "primary_score_type" (which is usually XCorr, but not always)
-     *  - DeltCN column will contain DeltCN, which is derived from the primary score. Its value is always between 0 and 1, regardless on which primary score type it is based. So you needn't mess with this one.
-     *  - Sp column will contain the "secondary_score_type" (which is usually ZScore, but not always).
-     * @param node
-     * @throws DataProviderException
-     */
-    private void parsePrimaryScoreTypeFormat2(ProlucidParamNode node) throws DataProviderException {
-        String val = node.getParamElementValue();
-        if (val == null)
-            throw new DataProviderException("Value of primary_score_type cannot be null");
-        int ival = 0;
-        try {ival = Integer.parseInt(val);}
-        catch(NumberFormatException e) {
-            throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1"); 
-        }
-        switch(ival) {
-            case 0:
-                xcorrColumnScore = Score.BIN_PROB;
-                break;
-            case 1:
-                xcorrColumnScore = Score.XCORR;
-                break;
-            default:
-                throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1"); 
-        }
-    }
-    
-    
-    /**
-     * <!--CONFIDENCE
-     *      0 - deltaCn 
-     *      1 - T Score 
-     * -->
-     * NOTE: Assuming "T Score" is the same as "Z score"
-     * @param node
-     * @throws DataProviderException
-     */
-    private void parseSecondaryScoreTypeFormat1(ProlucidParamNode node) throws DataProviderException {
-        String val = node.getParamElementValue();
-        if (val == null)
-            throw new DataProviderException("Value of confidence cannot be null");
-        int ival = 0;
-        try {ival = Integer.parseInt(val);}
-        catch(NumberFormatException e) {
-            throw new DataProviderException("Invalid value for confidence: "+val+". Allowed values: 0,1"); 
-        }
-        switch(ival) {
-            case 0:
-                deltaCNColumnScore = Score.DELTA_CN;
-                break;
-            case 1:
-                deltaCNColumnScore = Score.ZSCORE;
-                break;
-            default:
-                throw new DataProviderException("Invalid value for confidence: "+val+". Allowed values: 0,1"); 
-        }
-    }
-    
-    
-    /**
-     * From the annotated search.xml (http://bart.scripps.edu/wiki/index.php/ProLuCID)
-     * <!--Secondary score type
-     *      0 - Binomial Probability
-     *      1 - XCorr
-     *      2  Zscore Zscore is Prolucid's answer to Sequest's delCN. delCN =(XCorr of the top hit - XCorr of the second hit)/XCorr of the top hit.
-     *      Zscore = (XCorr of the top hit - average XCorr of the 2nd , 3rd, and 500th hits)/standard deviation of the XCorr's of the 2nd , 3rd, and 500th hits. A Zscore of 5 means that the top hit is 5 STD away from the average. A good Zscore cutoff is 4.5, and 5 is even better.
-     *  -->
-     *  
-     *  FROM DANIEL COCIORVA
-     *  - XCorr column will contain the "primary_score_type" (which is usually XCorr, but not always)
-     *  - DeltCN column will contain DeltCN, which is derived from the primary score. Its value is always between 0 and 1, regardless on which primary score type it is based. So you needn't mess with this one.
-     *  - Sp column will contain the "secondary_score_type" (which is usually ZScore, but not always).
-     * @param node
-     * @throws DataProviderException
-     */
-    private void parseSecondaryScoreTypeFormat2(ProlucidParamNode node) throws DataProviderException {
-        String val = node.getParamElementValue();
-        if (val == null)
-            throw new DataProviderException("Value of secondary_score_type cannot be null");
-        int ival = 0;
-        try {ival = Integer.parseInt(val);}
-        catch(NumberFormatException e) {
-            throw new DataProviderException("Invalid value for secondary_score_type: "+val+". Allowed values: 0,1,2"); 
-        }
-        switch(ival) {
-            case 0:
-                spColumnScore = Score.BIN_PROB;
-                break;
-            case 1:
-                spColumnScore = Score.XCORR;
-                break;
-            case 2:
-                spColumnScore = Score.ZSCORE;
-                break;
-            default:
-                throw new DataProviderException("Invalid value for primary_score_type: "+val+". Allowed values: 0,1,2"); 
-        }
-    }
-
 
     private void parseDatabaseInfo(ProlucidParamIn node) throws DataProviderException {
         String dbPath = null;

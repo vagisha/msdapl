@@ -20,14 +20,12 @@ public class ProlucidResultDataBean implements ProlucidResultData {
     private int matchingIons = -1;
     private int predictedIons = -1;
     
-    private BigDecimal sp;
-    private Double binomialProbability;
-    private BigDecimal xcorr;
-    private Double zscore;
+    private Double primaryScore;
+    private Double secondaryScore;
     private BigDecimal deltaCN;
     
-    private int spRank = -1;
-    private int xcorrRank = -1;
+    private int secondaryRank = -1;
+    private int primaryRank = -1;
     
     
     @Override
@@ -48,34 +46,24 @@ public class ProlucidResultDataBean implements ProlucidResultData {
     
     // RANKS  
     @Override
-    public int getxCorrRank() {
-        return xcorrRank;
+    public int getPrimaryScoreRank() {
+        return primaryRank;
     }
     
     @Override
-    public int getSpRank() {
-        return spRank;
+    public int getSecondaryScoreRank() {
+        return secondaryRank;
     }
     
     // SCORES
     @Override
-    public BigDecimal getSp() {
-        return sp;
-    }
-    
-    @Override
-    public Double getBinomialProbability() {
-        return binomialProbability;
-    }
-    
-    @Override
-    public BigDecimal getxCorr() {
-        return xcorr;
+    public Double getPrimaryScore() {
+        return primaryScore;
     }
 
     @Override
-    public Double getZscore() {
-        return zscore;
+    public Double getSecondaryScore() {
+        return secondaryScore;
     }
     
     @Override
@@ -96,32 +84,23 @@ public class ProlucidResultDataBean implements ProlucidResultData {
         this.predictedIons = predictedIons;
     }
 
-    public void setSp(BigDecimal sp) {
-        this.sp = sp;
+    public void setPrimaryScore(Double primaryScore) {
+        this.primaryScore = primaryScore;
     }
 
-    public void setBinomialProbability(Double binomialProbability) {
-        this.binomialProbability = binomialProbability;
-    }
-
-    public void setXcorr(BigDecimal xcorr) {
-        this.xcorr = xcorr;
-    }
-
-    public void setZscore(Double zscore) {
-        this.zscore = zscore;
+    public void setSecondaryScore(Double secondaryScore) {
+        this.secondaryScore = secondaryScore;
     }
 
     public void setDeltaCN(BigDecimal deltaCN) {
         this.deltaCN = deltaCN;
     }
 
-    public void setSpRank(int spRank) {
-        this.spRank = spRank;
+    public void setSecondaryScoreRank(int secondaryRank) {
+        this.secondaryRank = secondaryRank;
     }
 
-    public void setXcorrRank(int xcorrRank) {
-        this.xcorrRank = xcorrRank;
+    public void setPrimaryScoreRank(int primaryRank) {
+        this.primaryRank = primaryRank;
     }
-
 }

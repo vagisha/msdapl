@@ -9,11 +9,12 @@ package org.yeastrc.ms.domain.search.prolucid.impl;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
 
 /**
  * 
  */
-public class ProlucidResultDataWrap implements ProlucidResultData {
+public class ProlucidResultDataWrap implements ProlucidResultDataWId {
 
     private int resultId;
     private ProlucidResultData data;
@@ -28,8 +29,8 @@ public class ProlucidResultDataWrap implements ProlucidResultData {
     }
 
     @Override
-    public Double getBinomialProbability() {
-        return data.getBinomialProbability();
+    public Double getPrimaryScore() {
+        return data.getPrimaryScore();
     }
 
     @Override
@@ -53,27 +54,17 @@ public class ProlucidResultDataWrap implements ProlucidResultData {
     }
 
     @Override
-    public BigDecimal getSp() {
-        return data.getSp();
+    public int getSecondaryScoreRank() {
+        return data.getSecondaryScoreRank();
     }
 
     @Override
-    public int getSpRank() {
-        return data.getSpRank();
+    public Double getSecondaryScore() {
+        return data.getSecondaryScore();
     }
 
     @Override
-    public Double getZscore() {
-        return data.getZscore();
-    }
-
-    @Override
-    public BigDecimal getxCorr() {
-        return data.getxCorr();
-    }
-
-    @Override
-    public int getxCorrRank() {
-        return data.getxCorrRank();
+    public int getPrimaryScoreRank() {
+        return data.getPrimaryScoreRank();
     }
 }

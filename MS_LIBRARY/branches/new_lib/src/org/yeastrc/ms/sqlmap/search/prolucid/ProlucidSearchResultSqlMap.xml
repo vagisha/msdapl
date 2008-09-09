@@ -9,12 +9,10 @@
 	
 	
 	<resultMap class="ProlucidResultOut" id="prolucidResultResult" extends="MsSearchResult.msSearchResult">
-		<result property="spRank" column="spRank" nullValue="-1"/>
-		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
-		<result property="sp" column="sp" />
-		<result property="binomialProbability" column="binomialProbability" />
-		<result property="xCorr" column="XCorr"/>
-		<result property="zscore" column="ZScore"/>
+		<result property="primaryScoreRank" column="primaryRank" nullValue="-1"/>
+		<result property="secondaryScoreRank" column="secondaryRank" nullValue="-1"/>
+		<result property="primaryScore" column="primaryScore" />
+		<result property="secondaryScore" column="secondaryScore" />
 		<result property="deltaCN" column="deltaCN"/>
 		<result property="calculatedMass" column="calculatedMass" />
 		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
@@ -22,13 +20,11 @@
 	</resultMap>
 	
 	<parameterMap class="ProlucidResultDataIn" id="prolucidResultDataParam">
-		<parameter property="resultId" jdbcType="INTEGER" nullValue="-1"/>
-		<parameter property="spRank" jdbcType="INTEGER" nullValue="-1" />
-		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="-1"/>
-		<parameter property="sp" jdbcType="DECIMAL" />
-		<parameter property="binomialProbability" jdbcType="DOUBLE"/>
-		<parameter property="xCorr" jdbcType="DECIMAL"/>
-		<parameter property="zscore" jdbcType="DOUBLE"/>
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="primaryScoreRank" jdbcType="INTEGER" nullValue="-1" />
+		<parameter property="secondaryScoreRank" jdbcType="INTEGER" nullValue="-1"/>
+		<parameter property="primaryScore" jdbcType="DECIMAL" />
+		<parameter property="secondaryScore" jdbcType="DOUBLE"/>
 		<parameter property="deltaCN" jdbcType="DECIMAL"/>
 		<parameter property="calculatedMass" jdbcType="DECIMAL" />
 		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="-1"/>
@@ -45,28 +41,24 @@
     <insert id="insert" parameterMap="prolucidResultDataParam">
     	INSERT INTO ProLuCIDSearchResult 
     	(resultID, 
-    	spRank,
-    	XCorrRank,
-    	sp,
-    	binomialProbability,
-    	XCorr,
-    	ZScore, 
+    	primaryScoreRank,
+    	secondaryScoreRank,
+    	primaryScore,
+    	secondaryScore,
     	deltaCN, 
     	calculatedMass,
     	matchingIons,
     	predictedIons) 
-    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
     	INSERT INTO ProLuCIDSearchResult
     	(resultID, 
-    	spRank,
-    	XCorrRank,
-    	sp,
-    	binomialProbability,
-    	XCorr,
-    	ZScore,
+    	primaryScoreRank,
+    	secondaryScoreRank,
+    	primaryScore,
+    	secondaryScore,
     	deltaCN, 
     	calculatedMass,
     	matchingIons,

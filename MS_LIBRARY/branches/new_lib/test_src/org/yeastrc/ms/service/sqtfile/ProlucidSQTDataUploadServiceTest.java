@@ -3,6 +3,7 @@ package org.yeastrc.ms.service.sqtfile;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
+import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
 
@@ -18,32 +19,48 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         super.tearDown();
     }
 
-    public void testUploadSqtFile() {
-        String dir = "test_resources/ProlucidTest_dir/new_format/prim_binprob_sec_binprob";
-        MsDataUploader uploader = new MsDataUploader();
-        java.util.Date experimentDate = new java.util.Date();
+    public void testUploadValidProlucidData() throws DataProviderException {
+//        String dir = "test_resources/validProlucidData_dir1";
+        String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
         
-        int searchId = 0;
+        MsDataUploader uploader = new MsDataUploader();
         try {
-            searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
-            assertNotSame(0, searchId);
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new java.util.Date());
         }
         catch (UploadException e) {
             e.printStackTrace();
             fail("Data is valid");
         }
         assertEquals(0, uploader.getUploadExceptionList().size());
-        
-        // make sure all the data got uploaded
-        int runId1 = getRunId("1.ms2");
-        int runId2 = getRunId("2.ms2");
-        
-        checkSearch(searchId, experimentDate);
     }
-
-    private void checkSearch(int searchId, java.util.Date experimentDate) {
-        
-    }
+    
+    
+//    public void testUploadSqtFile() {
+//        String dir = "test_resources/ProlucidTest_dir/new_format/prim_binprob_sec_binprob";
+//        MsDataUploader uploader = new MsDataUploader();
+//        java.util.Date experimentDate = new java.util.Date();
+//        
+//        int searchId = 0;
+//        try {
+//            searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
+//            assertNotSame(0, searchId);
+//        }
+//        catch (UploadException e) {
+//            e.printStackTrace();
+//            fail("Data is valid");
+//        }
+//        assertEquals(0, uploader.getUploadExceptionList().size());
+//        
+//        // make sure all the data got uploaded
+//        int runId1 = getRunId("1.ms2");
+//        int runId2 = getRunId("2.ms2");
+//        
+//        checkSearch(searchId, experimentDate);
+//    }
+//
+//    private void checkSearch(int searchId, java.util.Date experimentDate) {
+//        
+//    }
     
     private int getRunId(String runFileName) {
         List<Integer> runIds = runDao.loadRunIdsForFileName(runFileName);

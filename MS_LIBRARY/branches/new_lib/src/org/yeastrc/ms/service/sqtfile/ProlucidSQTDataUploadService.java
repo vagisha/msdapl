@@ -7,7 +7,6 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +26,9 @@ import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
+import org.yeastrc.ms.domain.search.prolucid.impl.ProlucidResultDataWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser;
-import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.Score;
 import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidSQTFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -41,14 +40,11 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
 
 private static final String PROLUCID_PARAMS_FILE = "search.xml";
     
-    List<ProlucidResultDataWId> prolucidResultDataList; // prolucid scores
+    List<ProlucidResultDataWId> prolucidResultDataList; // cached prolucid search result data
     
     private MsSearchDatabaseIn db = null;
     private List<MsResidueModificationIn> dynaResidueMods;
     private List<MsTerminalModificationIn> dynaTermMods;
-    private Score spColScore;
-    private Score xcorrColScore;
-    private Score deltaCnColScore;
     
     
     public ProlucidSQTDataUploadService() {
@@ -63,9 +59,6 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         dynaResidueMods.clear();
         dynaTermMods.clear();
         db = null;
-        spColScore = null;
-        xcorrColScore = null;
-        deltaCnColScore = null;
     }
     
     // resetCaches() is called by reset() in the superclass.
@@ -92,13 +85,6 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         db = parser.getSearchDatabase();
         dynaResidueMods = parser.getDynamicResidueMods();
         dynaTermMods = parser.getDynamicTerminalMods();
-        // what is the score type in the sp column
-        spColScore = parser.getSpColumnScore();
-        // what is the score type in the xcorr column
-        xcorrColScore = parser.getXcorrColumnScore();
-        // what is the score type in the deltaCN column
-        deltaCnColScore = parser.getDeltaCNColumnScore();
-        
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
@@ -144,7 +130,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         ProlucidSQTFileReader provider = new ProlucidSQTFileReader();
         
         try {
-            provider.open(filePath, spColScore, xcorrColScore, deltaCnColScore);
+            provider.open(filePath);
             provider.setDynamicResidueMods(dynaResidueMods);
             provider.setDynamicTerminalMods(dynaTermMods);
         }
@@ -270,7 +256,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             uploadProlucidResultBuffer();
         }
         // add the Prolucid specific information for this result to the cache
-        ResultData resultDataDb = new ResultData(resultId, resultData);
+        ProlucidResultDataWrap resultDataDb = new ProlucidResultDataWrap(resultData, resultId);
         prolucidResultDataList.add(resultDataDb);
     }
     
@@ -284,60 +270,6 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         super.flush();
         if (prolucidResultDataList.size() > 0) {
             uploadProlucidResultBuffer();
-        }
-    }
-    
-    static final class ResultData implements ProlucidResultDataWId {
-        
-        private final ProlucidResultData data;
-        private final int resultId;
-        public ResultData(int resultId, ProlucidResultData data) {
-            this.data = data;
-            this.resultId = resultId;
-        }
-        @Override
-        public int getResultId() {
-            return resultId;
-        }
-        @Override
-        public BigDecimal getCalculatedMass() {
-            return data.getCalculatedMass();
-        }
-        @Override
-        public BigDecimal getDeltaCN() {
-            return data.getDeltaCN();
-        }
-        @Override
-        public int getMatchingIons() {
-            return data.getMatchingIons();
-        }
-        @Override
-        public int getPredictedIons() {
-            return data.getPredictedIons();
-        }
-        @Override
-        public BigDecimal getSp() {
-            return data.getSp();
-        }
-        @Override
-        public int getSpRank() {
-            return data.getSpRank();
-        }
-        @Override
-        public BigDecimal getxCorr() {
-            return data.getxCorr();
-        }
-        @Override
-        public int getxCorrRank() {
-            return data.getxCorrRank();
-        }
-        @Override
-        public Double getBinomialProbability() {
-            return data.getBinomialProbability();
-        }
-        @Override
-        public Double getZscore() {
-            return data.getZscore();
         }
     }
 }

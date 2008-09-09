@@ -56,21 +56,6 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         assertEquals(0, expId);
     }
     
-    
-    public void testUploadProlucidData() throws DataProviderException {
-        String dir = "test_resources/validProlucidData_dir1";
-        
-        MsDataUploader uploader = new MsDataUploader();
-        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new java.util.Date());
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("Data is valid");
-        }
-        assertEquals(0, uploader.getUploadExceptionList().size());
-    }
-    
     public void testUploadInvalidMS2_S() {
         String dir = "test_resources/invalid_ms2_S_dir";
         try {

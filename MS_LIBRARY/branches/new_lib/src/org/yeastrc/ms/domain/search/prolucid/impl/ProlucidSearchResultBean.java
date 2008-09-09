@@ -24,17 +24,17 @@ public class ProlucidSearchResultBean extends SearchResultBean implements Proluc
     }
     
     /**
-     * @param xcorrRank the xCorrRank to set
+     * @param primaryRank the primaryRank to set
      */
-    public void setxCorrRank(int xcorrRank) {
-        prolucidData.setXcorrRank(xcorrRank);
+    public void setPrimaryScoreRank(int primaryRank) {
+        prolucidData.setPrimaryScoreRank(primaryRank);
     }
    
     /**
-     * @param spRank the spRank to set
+     * @param secondaryRank the secondaryRank to set
      */
-    public void setSpRank(int spRank) {
-        prolucidData.setSpRank(spRank);
+    public void setSecondaryScoreRank(int secondaryRank) {
+        prolucidData.setSecondaryScoreRank(secondaryRank);
     }
     
     /**
@@ -45,25 +45,14 @@ public class ProlucidSearchResultBean extends SearchResultBean implements Proluc
     }
     
     /**
-     * @param xcorr the xCorr to set
+     * @param primaryScore the primaryScore to set
      */
-    public void setxCorr(BigDecimal xcorr) {
-        prolucidData.setXcorr(xcorr);
-    }
-    
-    /**
-     * @param sp the sp to set
-     */
-    public void setSp(BigDecimal sp) {
-        prolucidData.setSp(sp);
-    }
-    
-    public void setBinomialProbability(Double binomialProbability) {
-        prolucidData.setBinomialProbability(binomialProbability);
+    public void setPrimaryScore(Double primaryScore) {
+        prolucidData.setPrimaryScore(primaryScore);
     }
    
-    public void setZscore(Double zscore) {
-        prolucidData.setZscore(zscore);
+    public void setSecondaryScore(Double secondaryScore) {
+        prolucidData.setSecondaryScore(secondaryScore);
     }
     
     public void setCalculatedMass(BigDecimal calculatedMass) {
