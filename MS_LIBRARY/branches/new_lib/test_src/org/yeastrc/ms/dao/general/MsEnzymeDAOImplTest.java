@@ -33,12 +33,12 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
 
     public void testLoadEnzymeStringIntStringString() {
         // load an enzyme we know exists in the database
-        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.NTERM, "KR", "P");
+        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.CTERM, "KR", "P");
         assertEquals(1, enzymes.size());
         MsEnzyme enzyme = enzymes.get(0);
         assertNotNull(enzyme);
         assertEquals("trypsin".toUpperCase(), enzyme.getName().toUpperCase());
-        assertEquals(Sense.NTERM, enzyme.getSense());
+        assertEquals(Sense.CTERM, enzyme.getSense());
         assertEquals("KR", enzyme.getCut());
         assertEquals("P", enzyme.getNocut());
         
@@ -49,7 +49,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
     
     public void testSaveEnzymeForRunCheckName() {
         // load an enzyme we know exists in the database
-        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.NTERM, "KR", "P");
+        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.CTERM, "KR", "P");
         assertEquals(1, enzymes.size());
         MsEnzyme oEnzyme = enzymes.get(0);
         int enzyme_db_id = oEnzyme.getId();
@@ -103,7 +103,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
     
     public void testSaveEnzymeForSearchCheckName() {
         // load an enzyme we know exists in the database
-        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.NTERM, "KR", "P");
+        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.CTERM, "KR", "P");
         assertEquals(1, enzymes.size());
         MsEnzyme oEnzyme = enzymes.get(0);
         int enzyme_db_id = oEnzyme.getId();

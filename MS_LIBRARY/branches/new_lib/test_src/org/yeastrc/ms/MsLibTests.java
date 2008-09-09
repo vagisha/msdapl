@@ -15,6 +15,7 @@ import org.yeastrc.ms.service.MsDataUploaderTest;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadServiceTest;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadServiceTest;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadServiceTest;
+import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadServiceTest2;
 import org.yeastrc.ms.util.DTASelectFileNameParseTest;
 import org.yeastrc.ms.util.PeakStringBuilderTest;
 import org.yeastrc.ms.util.PeakUtilsTest;
@@ -51,6 +52,7 @@ public class MsLibTests {
         // upload classes
         suite.addTestSuite(MS2DataUploadServiceTest.class);
         suite.addTestSuite(SequestSQTDataUploadServiceTest.class);
+        suite.addTestSuite(SequestSQTDataUploadServiceTest2.class);
         suite.addTestSuite(ProlucidSQTDataUploadServiceTest.class);
         suite.addTestSuite(MsDataUploaderTest.class);
         

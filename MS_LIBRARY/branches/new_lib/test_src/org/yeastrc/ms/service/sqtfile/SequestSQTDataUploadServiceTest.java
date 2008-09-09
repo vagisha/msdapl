@@ -94,7 +94,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         List<MsEnzyme> enzymes = search.getEnzymeList();
         assertEquals(1, enzymes.size());
         assertEquals("Elastase/Tryp/Chymo", enzymes.get(0).getName());
-        assertEquals(Sense.NTERM, enzymes.get(0).getSense());
+        assertEquals(Sense.CTERM, enzymes.get(0).getSense());
         assertEquals("ALIVKRWFY", enzymes.get(0).getCut());
         assertEquals("P", enzymes.get(0).getNocut());
         

@@ -76,7 +76,7 @@ public class SequestParamsParserTest extends TestCase {
         enzyme = parser.matchEnzyme(m, "0");
         assertNotNull(enzyme);
         assertEquals("No_Enzyme", enzyme.getName());
-        assertEquals(Sense.CTERM, enzyme.getSense());
+        assertEquals(Sense.NTERM, enzyme.getSense());
         assertEquals("-", enzyme.getCut());
         assertEquals("-", enzyme.getNocut());
         assertNull(enzyme.getDescription());
@@ -89,7 +89,7 @@ public class SequestParamsParserTest extends TestCase {
         enzyme = parser.matchEnzyme(m, "11");
         assertNotNull(enzyme);
         assertEquals("Cymotryp/Modified", enzyme.getName());
-        assertEquals(Sense.NTERM, enzyme.getSense());
+        assertEquals(Sense.CTERM, enzyme.getSense());
         assertEquals("FWYL", enzyme.getCut());
         assertEquals("PKR", enzyme.getNocut());
         assertNull(enzyme.getDescription());
@@ -218,7 +218,7 @@ public class SequestParamsParserTest extends TestCase {
             assertNotNull(enzyme);
             assertEquals("No_Enzyme", enzyme.getName());
             assertNull(enzyme.getDescription());
-            assertEquals(Sense.CTERM, enzyme.getSense());
+            assertEquals(Sense.NTERM, enzyme.getSense());
             assertEquals("-", enzyme.getCut());
             assertEquals("-", enzyme.getNocut());
 
