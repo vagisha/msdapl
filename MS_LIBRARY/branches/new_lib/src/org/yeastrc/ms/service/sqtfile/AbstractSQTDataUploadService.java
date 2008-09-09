@@ -214,6 +214,7 @@ public abstract class AbstractSQTDataUploadService {
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage(), ex);
                 deleteSearch(searchId);
+                numSearchesUploaded = 0;
                 return 0;
             }
             resetCaches();
@@ -226,6 +227,7 @@ public abstract class AbstractSQTDataUploadService {
                 ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
                 log.error(ex.getMessage(), ex);
                 deleteSearch(searchId);
+                numSearchesUploaded = 0;
                 return 0;
             }
         }
@@ -237,6 +239,7 @@ public abstract class AbstractSQTDataUploadService {
             ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
             log.error(ex.getMessage(), ex);
             deleteSearch(searchId);
+            numSearchesUploaded = 0;
             return 0;
         }
         
@@ -340,22 +343,31 @@ public abstract class AbstractSQTDataUploadService {
         for (MsSearchResultProteinIn match: result.getProteinMatchList()) {
             int proteinId = NrSeqLookupUtil.getProteinId(databaseId, match.getAccession());
             if (proteinId == 0) {
-                // try again
-                List<Integer> matchingIds = NrSeqLookupUtil.getProteinIdsLikeAccession(databaseId, match.getAccession());
+                // try again -- accession string might be truncated at the right end
+                List<Integer> matchingIds = NrSeqLookupUtil.getProteinIdsPartialAccession(databaseId, match.getAccession());
                 if (matchingIds.size() == 1)
                     proteinId = matchingIds.get(0);
                 else {
-                    // last ditch attempt
-                    matchingIds = NrSeqLookupUtil.getProteinIdsForPeptide(databaseId, match.getAccession(), peptide);
+//                    System.out.println("UNMATCHED_1: "+match.getAccession());
+                    // once more -- try to match the peptide sequence this time and accession LIKE accession%
+                    matchingIds = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession(databaseId, match.getAccession(), peptide);
                     
                     if (matchingIds.size() == 1)
                         proteinId = matchingIds.get(0);
-                    
-                    // can't do anymore
                     else {
-                        UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
-                        ex.setErrorMessage("No matching protein found for databaseId: "+databaseId+" and accession: "+match.getAccession());
-                        throw ex;
+//                        System.out.println("UNMATCHED_2: "+match.getAccession());
+                        // last ditch attempt -- accession string might be truncated at both ends; match peptide and accession LIKE %accession%
+                        matchingIds = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession2(databaseId, match.getAccession(), peptide);
+                        
+                        if (matchingIds.size() == 1)
+                            proteinId = matchingIds.get(0);
+
+                        // give up!
+                        else {
+                            UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
+                            ex.setErrorMessage("No matching protein found for databaseId: "+databaseId+" and accession: "+match.getAccession());
+                            throw ex;
+                        }
                     }
                 }
             }

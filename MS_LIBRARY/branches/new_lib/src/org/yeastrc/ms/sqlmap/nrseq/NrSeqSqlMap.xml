@@ -36,21 +36,21 @@
         AND accessionString = #accession#
     </select>
     
-    <select id="selectProteinIdForDbId" resultClass="Integer" parameterClass="java.util.Map"> 
+    <select id="selectProteinIdForDbIdPartialAcc" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT proteinID
         FROM tblProteinDatabase 
         WHERE databaseID = #dbId#
         AND accessionString LIKE #accession#
     </select>
     
-    <select id="selectProteinIdForDbIdAndPeptide" resultClass="Integer" parameterClass="java.util.Map"> 
+    <select id="selectProteinIdForDbIdAndPeptideAndPartialAcc" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT pr.id
         FROM tblProteinSequence as seq, tblProtein as pr, tblProteinDatabase as pd 
         WHERE pd.databaseID = #dbId#
         AND pd.accessionString LIKE #accession#
         AND seq.sequence LIKE #sequence#
         AND seq.id = pr.sequenceID
-        AND pr.id = pd.databaseID
+        AND pr.id = pd.proteinID
     </select>
     
 </sqlMap>
