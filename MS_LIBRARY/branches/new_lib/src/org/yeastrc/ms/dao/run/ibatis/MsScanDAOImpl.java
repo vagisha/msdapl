@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.dao.run.ibatis;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.util.PeakStringBuilder;
-import org.yeastrc.ms.util.PeakUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
