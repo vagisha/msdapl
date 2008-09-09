@@ -64,7 +64,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         }
         catch (UploadException e1) {
             assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
-            String msg = "Invalid 'Z' line.\n\tLINE NUMBER: 37\n\tLINE: Z\t1\t1372.55laksdjflkasf;a";
+            String msg = "Invalid 'S' line. Expected 4 fields.\n\tLINE NUMBER: 43";
             System.out.println(e1.getMessage());
             assertTrue(e1.getMessage().contains(msg));
         }
