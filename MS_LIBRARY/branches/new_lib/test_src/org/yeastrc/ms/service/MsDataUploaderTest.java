@@ -22,6 +22,29 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         super.tearDown();
     }
    
+    public void testUploadNoResultsForScan() {
+        String dir = "test_resources/invalidSQT_noResultsForScan_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        }
+        catch(UploadException e) {
+            fail("Invalid scan+charge in 1.sqt (it does not have any M or L lines; but we don't care");
+        }
+    }
+    
+    public void testUploadNoProteinsForResult() {
+        String dir = "test_resources/invalidSQT_noProteinsForResult_dir";
+        try {
+            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+            // will not fail since the exception will not be propagated all the way up
+        }
+        catch(UploadException e) {
+            fail("ms2 ddata is valid and no unsupported sqt files found");
+        }
+        assertEquals(1, uploader.getUploadExceptionList().size());
+        assertTrue(uploader.getUploadWarnings().contains("Invalid 'M' line.  No locus matches found"));
+    }
+    
     public void testUploadDataToDbInvalidDirectory() {
         String dir = "dummy/directory";
         try {uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date()); fail("Directory "+dir+" does not exist");}
@@ -359,6 +382,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         assertNull(searchDao.loadSearch(1));
     }
 
+        
 //    public void testDeleteExperiment() {
 //        String exp1Dir = "test_resources/deleteExperiment_dir/one"; //has ONE ms2, sqt pair
 //        String exp2Dir = "test_resources/deleteExperiment_dir/two"; //has TWO ms2, sqt pair (one of them is the same as above)

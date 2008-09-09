@@ -92,6 +92,8 @@ public class SequestSQTFileReader extends SQTFileReader {
                 break;
             advanceLine();
         }
+        if (result.getProteinMatchList().size() == 0)
+            throw new DataProviderException(currentLineNum-1, "Invalid 'M' line.  No locus matches found." , null);
         return result;
     }
 
