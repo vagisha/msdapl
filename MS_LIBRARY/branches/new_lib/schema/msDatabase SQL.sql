@@ -298,20 +298,18 @@ CREATE TABLE ProLuCIDSearchResult (
    resultID INT UNSIGNED NOT NULL PRIMARY KEY,
    primaryScoreRank INT UNSIGNED NOT NULL,
    secondaryScoreRank INT UNSIGNED NOT NULL,
-   deltaCN DECIMAL(10,5),  NOT NULL,
-   primaryScore DOUBLE, NOT NULL,
-   secondaryScore DOUBLE NOT NULL,
+   deltaCN DECIMAL(10,5)  NOT NULL,
+   primaryScore DOUBLE  NOT NULL,
+   secondaryScore DOUBLE  NOT NULL,
    calculatedMass DECIMAL(18,9),
    matchingIons INT UNSIGNED,
    predictedIons INT UNSIGNED
 );
-ALTER TABLE ProLuCIDSearchResult ADD INDEX(XCorrRank);
-ALTER TABLE ProLuCIDSearchResult ADD INDEX(spRank);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(primaryScoreRank);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScoreRank);;
 ALTER TABLE ProLuCIDSearchResult ADD INDEX(deltaCN);
-ALTER TABLE ProLuCIDSearchResult ADD INDEX(ZScore);
-ALTER TABLE ProLuCIDSearchResult ADD INDEX(XCorr);
-ALTER TABLE ProLuCIDSearchResult ADD INDEX(binomialProbability);
-ALTER TABLE ProLuCIDSearchResult ADD INDEX(sp);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(primaryScore);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScore);
 
 
 # TRIGGERS TO ENSURE CASCADING DELETES
