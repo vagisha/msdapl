@@ -197,20 +197,21 @@ public abstract class AbstractSQTDataUploadService {
         }
         
         // get the id of the search database used (will be used to look up protein ids later)
-        MsSearchDatabaseIn db = getSearchDatabase();
-        String searchDbName = null;
-        if (db != null) {
-            searchDbName = getSearchDatabase().getDatabaseFileName();
-            sequenceDatabaseId = NrSeqLookupUtil.getDatabaseId(searchDbName);
-        }
-        if (sequenceDatabaseId == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
-            ex.setErrorMessage("No database ID found for: "+searchDbName);
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage()+"\n\t!!!DELETING SEARCH...", ex);
-            deleteSearch(searchId);
-            return 0;
-        }
+//        sequenceDatabaseId = getSearchDatabaseId(getSearchDatabase());
+//        MsSearchDatabaseIn db = getSearchDatabase();
+//        String searchDbName = null;
+//        if (db != null) {
+//            searchDbName = getSearchDatabase().getDatabaseFileName();
+//            sequenceDatabaseId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+//        }
+//        if (sequenceDatabaseId == 0) {
+//            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
+//            ex.setErrorMessage("No database ID found for: "+searchDbName);
+//            uploadExceptionList.add(ex);
+//            log.error(ex.getMessage()+"\n\t!!!DELETING SEARCH...", ex);
+//            deleteSearch(searchId);
+//            return 0;
+//        }
         
         // initialize the Modification lookup map; will be used when uploading modifications for search results
         dynaModLookup = new DynamicModLookupUtil(searchId);
@@ -264,6 +265,22 @@ public abstract class AbstractSQTDataUploadService {
         }
         
         return searchId;
+    }
+    
+    // get the id of the search database used (will be used to look up protein ids later)
+    int getSearchDatabaseId(MsSearchDatabaseIn db) throws UploadException {
+        String searchDbName = null;
+        int dbId = 0;
+        if (db != null) {
+            searchDbName = getSearchDatabase().getDatabaseFileName();
+            dbId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+        }
+        if (dbId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
+            ex.setErrorMessage("No database ID found for: "+searchDbName);
+            throw ex;
+        }
+        return dbId;
     }
     
     // RUN SEARCH

@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.zip.GZIPOutputStream;
+
+import org.yeastrc.ms.domain.run.MsScanIn;
 
 import org.yeastrc.ms2.utils.Compresser;
 import org.yeastrc.ms2.utils.Decompresser;
@@ -22,7 +25,6 @@ import org.yeastrc.ms2.utils.Decompresser;
 public class PeakUtils {
 
     private PeakUtils() {}
-    
     
     public static byte[] compressPeakStringGZIP(String peakString) throws IOException {
         

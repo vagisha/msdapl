@@ -25,7 +25,10 @@
 						column="originalFileType" 
 						typeHandler="FileFormatTypeHandler">
 			<subMap value="SQT_NSEQ" resultMap="sqtSearchResult" />	
-			<subMap value="SQT_SEQ" resultMap="sqtSearchResult" />						
+			<subMap value="SQT_SEQ" resultMap="sqtSearchResult" />
+			<subMap value="SQT_PLUCID" resultMap="sqtSearchResult" />
+			<subMap value="QT_PPROBE" resultMap="sqtSearchResult" />
+							
 		</discriminator>
 	</resultMap>
 	

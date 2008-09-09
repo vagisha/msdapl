@@ -153,8 +153,6 @@ public class MsDataUploader {
                     SearchFileFormat.SQT_PLUCID != myType) {
                 UploadException ex = new UploadException(ERROR_CODE.UNSUPPORTED_SQT);
                 ex.setFile(sqtFile);
-                uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
                 throw ex;
             }
 
@@ -162,8 +160,6 @@ public class MsDataUploader {
             if (myType != sqtType) {
                 UploadException ex = new UploadException(ERROR_CODE.MULTIPLE_SQT_TYPES);
                 ex.setErrorMessage("Found SQT files of types: "+sqtType.getFormatType()+", "+myType.getFormatType());
-                uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
                 throw ex;
             }
         }
@@ -235,7 +231,10 @@ public class MsDataUploader {
         try {
             sqtType = getSqtType(fileDirectory, filenames);
         }
-        catch (UploadException e) {
+        catch (UploadException ex) {
+            ex.appendErrorMessage("\n\tSEARCH WILL NOT BE UPLOADED.");
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
             return 0; // don't go forward if there was a problem getting the sqt file type.
         }
         
@@ -248,8 +247,9 @@ public class MsDataUploader {
         }
         else {
             UploadException ex = new UploadException(ERROR_CODE.UNKNOWN_PARAMS);
+            ex.appendErrorMessage("\n\tSEARCH WILL NOT BE UPLOADED.");
             uploadExceptionList.add(ex);
-            log.error(ex.getMessage()+"\n\tSEARCH WILL NOT BE UPLOADED.", ex);
+            log.error(ex.getMessage(), ex);
             return 0;
         }
     }

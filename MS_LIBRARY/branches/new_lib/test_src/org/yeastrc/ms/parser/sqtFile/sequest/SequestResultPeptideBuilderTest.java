@@ -231,20 +231,36 @@ public class SequestResultPeptideBuilderTest extends TestCase {
     public void testBuild2() {
         List<Mod> dynaMods = new ArrayList<Mod>(0);
         
-        String seq = "L.Gi|62822520|gb|AAY15068.1|SGVSIVNAVTYEPTVAGRPNAV.H";
-        String dotLessUpperCase = null;
+        String seq = "L.GI|62822520|gb|AAY15068.1|SGVSIVNAVTYEPTVAGRPNAV.H";
+        String dotLess = null;
         try {
-            dotLessUpperCase = SequestResultPeptideBuilder.removeDots(seq).toUpperCase();
+            dotLess = SequestResultPeptideBuilder.removeDots(seq);
         }
         catch (SQTParseException e1) {
             fail("Valid sequence for removeDots method");
         }
         
         try{builder.build(seq, dynaMods); fail("Invalid sequence");}
-        catch(SQTParseException e) {assertEquals("No matching modification found: I|; sequence: "+dotLessUpperCase, e.getMessage());}
+        catch(SQTParseException e) {assertEquals("No matching modification found: I|; sequence: "+dotLess, e.getMessage());}
     }
     
     public void testBuild3() {
+        List<Mod> dynaMods = new ArrayList<Mod>(0);
+        
+        String seq = "L.Gi|62822520|gb|AAY15068.1|SGVSIVNAVTYEPTVAGRPNAV.H";
+        String dotLess = null;
+        try {
+            dotLess = SequestResultPeptideBuilder.removeDots(seq);
+        }
+        catch (SQTParseException e1) {
+            fail("Valid sequence for removeDots method");
+        }
+        
+        try{builder.build(seq, dynaMods); fail("Invalid sequence");}
+        catch(SQTParseException e) {assertEquals("No matching modification found: Gi; sequence: "+dotLess, e.getMessage());}
+    }
+    
+    public void testBuild4() {
         List<Mod> dynaMods = new ArrayList<Mod>(4);
         dynaMods.add(new Mod('S', '*', "80.0"));
         String seq = "A.*SCDS*.Z";
@@ -263,6 +279,17 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         assertEquals(x, y);
     }
     
+    public void testBuildInvalidCharacter() {
+        List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(0);
+        String seq = "I.QKLpRSFEAFSMPG.S";
+        try {
+            builder.build(seq, resMods);
+            fail("Invalid character 'p' n sequence");
+        }
+        catch (SQTParseException e) {
+//            e.printStackTrace();
+        }
+    }
     
     public void testBuildResidueWithTwoPossibleMods() {
         List<Mod> dynaMods = new ArrayList<Mod>(4);

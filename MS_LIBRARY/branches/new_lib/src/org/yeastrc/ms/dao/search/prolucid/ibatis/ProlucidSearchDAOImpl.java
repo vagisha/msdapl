@@ -83,6 +83,7 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
         
         public ProlucidParamSqlMapParam(int searchId, int parentId, ProlucidParamIn param) {
             this.searchId = searchId;
+            this.parentId = parentId;
             this.elName = param.getParamElementName();
             this.elValue = param.getParamElementValue();
         }

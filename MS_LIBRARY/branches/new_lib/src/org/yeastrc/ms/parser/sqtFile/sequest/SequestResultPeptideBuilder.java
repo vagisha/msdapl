@@ -43,7 +43,7 @@ public final class SequestResultPeptideBuilder {
         
         if (resultSequence.length() < 5)
             throw new SQTParseException("sequence appears to be invalid: "+resultSequence);
-        resultSequence = resultSequence.toUpperCase();
+//        resultSequence = resultSequence.toUpperCase();
         final char preResidue = getPreResidue(resultSequence);
         final char postResidue = getPostResidue(resultSequence);
         String dotless = removeDots(resultSequence);

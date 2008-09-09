@@ -139,13 +139,14 @@ public class ScanBean implements MsScan {
         this.peakCount = peakCount;
     }
     
-    public void setPeakData(byte[] peaks) {
-        try {
-            peakString = PeakUtils.decompressPeaksGZIP(peaks);
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Error decompressing peak data", e);
-        }
+    public void setPeakData(String peaks) {
+        this.peakString = peaks;
+//        try {
+//            peakString = PeakUtils.decompressPeaksGZIP(peaks);
+//        }
+//        catch (IOException e) {
+//            throw new RuntimeException("Error decompressing peak data", e);
+//        }
     }
 
     @Override

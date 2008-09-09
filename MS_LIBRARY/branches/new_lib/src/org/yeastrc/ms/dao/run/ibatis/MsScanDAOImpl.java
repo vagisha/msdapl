@@ -17,11 +17,10 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.run.DataConversionType;
-import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.util.PeakStringBuilder;
 import org.yeastrc.ms.util.PeakUtils;
-import org.yeastrc.ms2.utils.Compresser;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -153,18 +152,18 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
      */
     public static class MsScanDataSqlMapParam {
         private int scanId;
-        private byte[] peakData;
+        private String peakData;
         public MsScanDataSqlMapParam(int scanId, MsScanIn scan) {
             this.scanId = scanId;
-            this.peakData = getPeakData(scan);
+            this.peakData = getPeakDataString(scan);
         }
         public int getScanId() {
             return scanId;
         }
-        public byte[] getPeakData() {
+        public String getPeakData() {
             return peakData;
         }
-        private byte[] getPeakData(MsScanIn scan) {
+        private String getPeakDataString(MsScanIn scan) {
             Iterator<String[]> peakIterator = scan.peakIterator();
             String[] peak = null;
             PeakStringBuilder builder = new PeakStringBuilder();
@@ -172,12 +171,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
                 peak = peakIterator.next();
                 builder.addPeak(peak[0], peak[1]);
             }
-            try {
-                return PeakUtils.compressPeakStringGZIP(builder.getPeaksAsString());
-            }
-            catch (IOException e) {
-                throw new RuntimeException("Error compressing peaks!", e);
-            }
+            return builder.getPeaksAsString();
         }
     }
   

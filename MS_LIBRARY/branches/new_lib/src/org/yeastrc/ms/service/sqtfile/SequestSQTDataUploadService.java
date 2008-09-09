@@ -89,6 +89,9 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         dynaResidueMods = parser.getDynamicResidueMods();
         dynaTermMods = parser.getDynamicTerminalMods();
         
+        // get the id of the search database used (will be used to look up protein ids later)
+        sequenceDatabaseId = getSearchDatabaseId(parser.getSearchDatabase());
+        
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
             SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();

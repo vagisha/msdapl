@@ -496,6 +496,18 @@ public class ProlucidResultPeptideBuilderTest extends TestCase {
         assertEquals(x, y);
     }
     
+    public void testBuildInvalidCharacter() {
+        List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(0);
+        String seq = "I.QKLpRSFEAFSMPG.S";
+        try {
+            builder.build(seq, resMods, null);
+            fail("Invalid character 'p' n sequence");
+        }
+        catch (SQTParseException e) {
+//            e.printStackTrace();
+        }
+    }
+    
     public void testBuildOneCharTwoMods() {
         List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(5);
         resMods.add(makeResidueModification('S', new BigDecimal("80.0")));
