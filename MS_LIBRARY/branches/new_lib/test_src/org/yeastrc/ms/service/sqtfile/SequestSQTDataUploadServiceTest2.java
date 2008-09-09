@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -12,8 +11,8 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
-import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
@@ -31,11 +30,10 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.sequest.SequestResultData;
+import org.yeastrc.ms.domain.search.sequest.SequestSearch;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
@@ -43,12 +41,12 @@ import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
 
-public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
+public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
 
-    private static final ProlucidSearchDAO psearchDao = DAOFactory.instance().getProlucidSearchDAO();
+    private static final SequestSearchDAO ssearchDao = DAOFactory.instance().getSequestSearchDAO();
     private static final SQTRunSearchDAO sqtRunSearchDao = DAOFactory.instance().getSqtRunSearchDAO();
     private static final SQTSearchScanDAO sqtScanDao = DAOFactory.instance().getSqtSpectrumDAO();
-    private static final ProlucidSearchResultDAO presDao = DAOFactory.instance().getProlucidResultDAO();
+    private static final SequestSearchResultDAO sresDao = DAOFactory.instance().getSequestResultDAO();
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -61,7 +59,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
     }
 
     public void testUploadValidProlucidData2() throws DataProviderException {
-        String dir = "test_resources/validProlucidData_dir2";
+        String dir = "test_resources/validSequestData_dir2";
 //      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
@@ -79,26 +77,6 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         checkUploadedSearch(searchId, searchDate, dir);
     }
     
-    public void testUploadValidProlucidData1() throws DataProviderException {
-        String dir = "test_resources/validProlucidData_dir1";
-//      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
-
-        MsDataUploader uploader = new MsDataUploader();
-        int searchId = 0;
-        java.util.Date searchDate = new java.util.Date();
-        try {
-            searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("Data is valid");
-        }
-        assertEquals(0, uploader.getUploadExceptionList().size());
-        assertNotSame(0, searchId);
-        checkUploadedSearch(searchId, searchDate, dir);
-    }
-    
-
     private void checkUploadedSearch(int searchId, java.util.Date searchDate, String dir) {
 
         // make sure all the data got uploaded
@@ -167,12 +145,12 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 
     private void checkSearchResults2(int runSearchId, int runId) {
 
-        List<Integer> ids = presDao.loadResultIdsForRunSearch(runSearchId);
+        List<Integer> ids = sresDao.loadResultIdsForRunSearch(runSearchId);
         assertEquals(13, ids.size());
         Collections.sort(ids);
         // S       00023   00023   3       22      shamu048        866.46000       1892.2  56.4    4716510
-        // M         1       4      866.96470123      0.00000  1.1529   3.137   9     14          L.(156.1011)S(79.9876)DMSASRI(123.4567).T   U
-        ProlucidSearchResult res = presDao.load(ids.get(0));
+        // M         1       4      866.96470123      0.00000  1.1529   3.137   9     14          L.S*DMSASRI.T   U
+        SequestSearchResult res = sresDao.load(ids.get(0));
         assertEquals(getScanId(runId, 23), res.getScanId());
         assertEquals(3, res.getCharge());
         assertEquals("SDMSASRI", res.getResultPeptide().getPeptideSequence());
@@ -184,29 +162,20 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         List<MsResultResidueMod> resultMods = peptide.getResultDynamicResidueModifications();
         assertEquals(1, resultMods.size());
         assertEquals(0, resultMods.get(0).getModifiedPosition());
-        assertEquals('p', resultMods.get(0).getModificationSymbol());
+        assertEquals('*', resultMods.get(0).getModificationSymbol());
         assertEquals('S', resultMods.get(0).getModifiedResidue());
         assertEquals(79.9876, resultMods.get(0).getModificationMass().doubleValue());
         // check the terminal modifications for this result
         List<MsResultTerminalMod> termMods = peptide.getResultDynamicTerminalModifications();
-        assertEquals(2, termMods.size());
-        Collections.sort(termMods, new TerminalModComparator<MsResultTerminalMod>());
-        MsResultTerminalMod tmod = termMods.get(0);
-        assertEquals(Terminal.CTERM, tmod.getModifiedTerminal());
-        assertEquals(123.4567, tmod.getModificationMass().doubleValue());
-        assertEquals('y', tmod.getModificationSymbol());
-        tmod = termMods.get(1);
-        assertEquals(Terminal.NTERM, tmod.getModifiedTerminal());
-        assertEquals(156.1011, tmod.getModificationMass().doubleValue());
-        assertEquals('*', tmod.getModificationSymbol());
-        // check the ProLuCID specific results
-        ProlucidResultData data = res.getProlucidResultData();
-        assertEquals(1, data.getPrimaryScoreRank());
-        assertEquals(4, data.getSecondaryScoreRank());
+        assertEquals(0, termMods.size());
+        // check the Sequest specific results
+        SequestResultData data = res.getSequestResultData();
+        assertEquals(1, data.getxCorrRank());
+        assertEquals(4, data.getSpRank());
         assertEquals(866.96470123, data.getCalculatedMass().doubleValue());
         assertEquals(0.0, data.getDeltaCN().doubleValue());
-        assertEquals(1.1529, data.getPrimaryScore());
-        assertEquals(3.137, data.getSecondaryScore());
+        assertEquals(1.1529, data.getxCorr().doubleValue());
+        assertEquals(3.137, data.getSp().doubleValue());
         assertEquals(9, data.getMatchingIons());
         assertEquals(14, data.getPredictedIons());
         // check the protein matches for this result
@@ -223,9 +192,8 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(209, pr.getProteinId());
 
 
-
-        //  M         2     200      865.91874      0.0311   1.117    2.953   8     16        T.(79.9876)(156.1011)SGTS(79.9876)SAS(79.9876)LR.K    V
-        res = presDao.load(ids.get(1));
+        //  M         2     200      865.91874      0.0311   1.117    2.953   8     16        T.S*GTS*SAS*LR.K    V
+        res = sresDao.load(ids.get(1));
         assertEquals(getScanId(runId, 23), res.getScanId());
         assertEquals(3, res.getCharge());
         assertEquals("SGTSSASLR", res.getResultPeptide().getPeptideSequence());
@@ -239,40 +207,36 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(3, resultMods.size());
         MsResultResidueMod rmod = resultMods.get(0);
         assertEquals(0, rmod.getModifiedPosition());
-        assertEquals('p', rmod.getModificationSymbol());
+        assertEquals('*', rmod.getModificationSymbol());
         assertEquals('S', rmod.getModifiedResidue());
         assertEquals(79.9876, rmod.getModificationMass().doubleValue());
         rmod = resultMods.get(1);
         assertEquals(3, rmod.getModifiedPosition());
-        assertEquals('p', rmod.getModificationSymbol());
+        assertEquals('*', rmod.getModificationSymbol());
         assertEquals('S', rmod.getModifiedResidue());
         assertEquals(79.9876, rmod.getModificationMass().doubleValue());
         rmod = resultMods.get(2);
         assertEquals(6, rmod.getModifiedPosition());
-        assertEquals('p', rmod.getModificationSymbol());
+        assertEquals('*', rmod.getModificationSymbol());
         assertEquals('S', rmod.getModifiedResidue());
         assertEquals(79.9876, rmod.getModificationMass().doubleValue());
         // check the terminal modifications for this result
         termMods = peptide.getResultDynamicTerminalModifications();
-        assertEquals(1, termMods.size());
-        tmod = termMods.get(0);
-        assertEquals(Terminal.NTERM, tmod.getModifiedTerminal());
-        assertEquals(156.1011, tmod.getModificationMass().doubleValue());
-        assertEquals('*', tmod.getModificationSymbol());
-        // check the ProLuCID specific results
-        data = res.getProlucidResultData();
-        assertEquals(2, data.getPrimaryScoreRank());
-        assertEquals(200, data.getSecondaryScoreRank());
+        assertEquals(0, termMods.size());
+        // check the Sequest specific results
+        data = res.getSequestResultData();
+        assertEquals(2, data.getxCorrRank());
+        assertEquals(200, data.getSpRank());
         assertEquals(865.91874, data.getCalculatedMass().doubleValue());
         assertEquals(0.0311, data.getDeltaCN().doubleValue());
-        assertEquals(1.117, data.getPrimaryScore());
-        assertEquals(2.953, data.getSecondaryScore());
+        assertEquals(1.117, data.getxCorr().doubleValue());
+        assertEquals(2.953, data.getSp().doubleValue());
         assertEquals(8, data.getMatchingIons());
         assertEquals(16, data.getPredictedIons());
 
 
-        // M         4      22      866.99266      0.0989   1.0388   2.551   8     14               A.SG(-99.9)IY(79.9876)ASRL.S   N
-        res = presDao.load(ids.get(3));
+        // M         4      22      866.99266      0.0989   1.0388   2.551   8     14               A.SG#IY*ASRL.S   N
+        res = sresDao.load(ids.get(3));
         assertEquals(getScanId(runId, 23), res.getScanId());
         assertEquals(3, res.getCharge());
         assertEquals("SGIYASRL", res.getResultPeptide().getPeptideSequence());
@@ -291,20 +255,20 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(-99.9, resultMods.get(0).getModificationMass().doubleValue());
         rmod = resultMods.get(1);
         assertEquals(3, rmod.getModifiedPosition());
-        assertEquals('p', rmod.getModificationSymbol());
+        assertEquals('*', rmod.getModificationSymbol());
         assertEquals('Y', rmod.getModifiedResidue());
         assertEquals(79.9876, rmod.getModificationMass().doubleValue());
         // check the terminal modifications for this result
         termMods = peptide.getResultDynamicTerminalModifications();
         assertEquals(0, termMods.size());
         // check the ProLuCID specific results
-        data = res.getProlucidResultData();
-        assertEquals(4, data.getPrimaryScoreRank());
-        assertEquals(22, data.getSecondaryScoreRank());
+        data = res.getSequestResultData();
+        assertEquals(4, data.getxCorrRank());
+        assertEquals(22, data.getSpRank());
         assertEquals(866.99266, data.getCalculatedMass().doubleValue());
         assertEquals(0.0989, data.getDeltaCN().doubleValue());
-        assertEquals(1.0388, data.getPrimaryScore());
-        assertEquals(2.551, data.getSecondaryScore());
+        assertEquals(1.0388, data.getxCorr().doubleValue());
+        assertEquals(2.551, data.getSp().doubleValue());
         assertEquals(8, data.getMatchingIons());
         assertEquals(14, data.getPredictedIons());
         // check the protein matches for this result
@@ -317,9 +281,9 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         
         
         // 60 S       00026   00026   1       23      shamu048        817.33000       2044.4  69.6    5697304
-        // 61 M         1      22      816.80570      0.00000  1.5492   3.795  11     24                  D.AGGGAGGGGAGAG(123.4567)(-99.9).Q  M
+        // 61 M         1      22      816.80570      0.00000  1.5492   3.795  11     24                  D.AGGGAGGGGAGAG#.Q  M
         // 62 L       gi|3090887|gb|AAC15421.1|
-        res = presDao.load(ids.get(10));
+        res = sresDao.load(ids.get(10));
         assertNotSame(0, res.getScanId());
         assertEquals(getScanId(runId, 26), res.getScanId());
         assertEquals(1, res.getCharge());
@@ -338,19 +302,15 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(-99.9, resultMods.get(0).getModificationMass().doubleValue());
         // check the terminal modifications for this result
         termMods = peptide.getResultDynamicTerminalModifications();
-        assertEquals(1, termMods.size());
-        tmod = termMods.get(0);
-        assertEquals(Terminal.CTERM, tmod.getModifiedTerminal());
-        assertEquals(123.4567, tmod.getModificationMass().doubleValue());
-        assertEquals('y', tmod.getModificationSymbol());
-        // check the ProLuCID specific results
-        data = res.getProlucidResultData();
-        assertEquals(1, data.getPrimaryScoreRank());
-        assertEquals(22, data.getSecondaryScoreRank());
+        assertEquals(0, termMods.size());
+        // check the Sequest specific results
+        data = res.getSequestResultData();
+        assertEquals(1, data.getxCorrRank());
+        assertEquals(22, data.getSpRank());
         assertEquals(816.80570, data.getCalculatedMass().doubleValue());
         assertEquals(0.0, data.getDeltaCN().doubleValue());
-        assertEquals(1.5492, data.getPrimaryScore());
-        assertEquals(3.795, data.getSecondaryScore());
+        assertEquals(1.5492, data.getxCorr().doubleValue());
+        assertEquals(3.795, data.getSp().doubleValue());
         assertEquals(11, data.getMatchingIons());
         assertEquals(24, data.getPredictedIons());
         // check the protein matches for this result
@@ -372,10 +332,10 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         SQTRunSearch runSearch = sqtRunSearchDao.loadRunSearch(runSearchId);
         assertEquals(runId, runSearch.getRunId());
         assertEquals(searchId, runSearch.getSearchId());
-        assertEquals(SearchFileFormat.SQT_PLUCID, runSearch.getSearchFileFormat());
+        assertEquals(SearchFileFormat.SQT_SEQ, runSearch.getSearchFileFormat());
         assertEquals("2008-01-29", runSearch.getSearchDate().toString());
         assertEquals(167, runSearch.getSearchDuration());
-        assertEquals(SearchProgram.PROLUCID, runSearch.getSearchProgram());
+        assertEquals(SearchProgram.SEQUEST, runSearch.getSearchProgram());
 
         // check headers
         checkRunSearchHeaders2(runSearch);
@@ -389,11 +349,11 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
     }
 
     private void checkSearch(int searchId, java.util.Date experimentDate, String dir) {
-        ProlucidSearch search = psearchDao.loadSearch(searchId);
+        SequestSearch search = ssearchDao.loadSearch(searchId);
 //      assertEquals(experimentDate, search.getSearchDate());
         assertEquals("remoteServer", search.getServerAddress());
         assertEquals("remoteDirectory", search.getServerDirectory());
-        assertEquals(SearchProgram.PROLUCID, search.getSearchProgram());
+        assertEquals(SearchProgram.SEQUEST, search.getSearchProgram());
         assertEquals("3.0", search.getSearchProgramVersion());
 
         // check the database
@@ -415,53 +375,26 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         checkDynamicTerminalMods(search);
         
         // check the parameters
-        try {
-            this.checkUploadedParams(search, dir);
-        }
-        catch (IOException e) {
-            fail("Error checking uploaded params");
-        }
+//        try {
+//            this.checkUploadedParams(search, dir);
+//        }
+//        catch (IOException e) {
+//            fail("Error checking uploaded params");
+//        }
 
     }
 
-    private void checkUploadedParams(ProlucidSearch search, String dir) throws IOException {
-        List<ProlucidParam> params = search.getProlucidParams();
-        Collections.sort(params, new Comparator<ProlucidParam>(){
-            public int compare(ProlucidParam o1, ProlucidParam o2) {
-                return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
-            }});
-        ProlucidParamNode root = new ProlucidParamNode();
-        root.elName = params.get(0).getParamElementName();
-        root.elValue = params.get(0).getParamElementValue();
-        root.id = params.get(0).getId();
+    private void checkUploadedParams(SequestSearch search, String dir) throws IOException {
+        List<SequestParam> params = search.getSequestParams();
         
-        assertEquals(0, params.get(0).getParentParamElementId());
-        List<ProlucidParamNode> nodes = new ArrayList<ProlucidParamNode>(params.size());
-        nodes.add(root);
-        for (int i = 1; i < params.size(); i++) {
-            ProlucidParam p = params.get(i);
-            boolean found = false;
-            for (ProlucidParamNode parents: nodes) {
-                if (parents.id == p.getParentParamElementId()) {
-                    found = true;
-                    ProlucidParamNode nn = new ProlucidParamNode();
-                    nn.elName = p.getParamElementName();
-                    nn.elValue = p.getParamElementValue();
-                    nn.id = p.getId();
-                    nodes.add(nn);
-                    parents.addChildParamElement(nn);
-                    break;
-                }
-            }
-            if (!found)
-                System.out.println("should always find a parent!!");
-        }
         StringBuilder fromDb = new StringBuilder();
-        printParam(root, 0, fromDb);
+        for (SequestParam p: params) {
+            fromDb.append("\n"+p.getParamName()+"\t"+p.getParamValue());
+        }
         fromDb.deleteCharAt(0);
         
         // read the file from directory to compare against
-        String origFile = dir+File.separator+"search.xml.fortest";
+        String origFile = dir+File.separator+"sequest.params.fortest";
         StringBuilder buf = new StringBuilder();
         BufferedReader r = null;
         r = new BufferedReader(new FileReader(origFile));
@@ -483,65 +416,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(fromDb.toString(), buf.toString());
     }
   
-    private void printParam(ProlucidParamIn param, int indent, StringBuilder buf) {
-        String tab = "";
-//        for (int i = 0; i < indent; i++) {
-//            tab += "\t";
-//        }
-//        System.out.print(tab+"\n<"+param.getParamElementName()+">");
-        buf.append(tab+"\n<"+param.getParamElementName()+">");
-        if (param.getParamElementValue() != null) {
-//            System.out.print(param.getParamElementValue());
-            buf.append(param.getParamElementValue());
-        }
-//        System.out.println("");
-
-        List<ProlucidParamIn> childNodes = param.getChildParamElements();
-        for (ProlucidParamIn child: childNodes) {
-            printParam(child, indent+1, buf);
-        }
-        if (param.getParamElementValue() == null) {
-//            System.out.println("");
-            buf.append("\n");
-        }
-//        System.out.print(tab+"</"+param.getParamElementName()+">");
-        buf.append(tab+"</"+param.getParamElementName()+">");
-    }
-    
-    private static final class ProlucidParamNode implements ProlucidParamIn {
-
-        int id;
-        private String elName;
-        private String elValue;
-        private List<ProlucidParamIn> childElList = new ArrayList<ProlucidParamIn>();
-
-        @Override
-        public String getParamElementName() {
-            return elName;
-        }
-        @Override
-        public String getParamElementValue() {
-            return elValue;
-        }
-        @Override
-        public List<ProlucidParamIn> getChildParamElements() {
-            return childElList;
-        }
-
-        public void addChildParamElement(ProlucidParamIn param) {
-            childElList.add(param);
-        }
-
-        public String toString() {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Name: "+elName);
-            buf.append("\n");
-            buf.append("Value: "+elValue);
-            return buf.toString();
-        }
-    }
-    
-    private void checkSearchDatabase(ProlucidSearch search) {
+    private void checkSearchDatabase(SequestSearch search) {
         List<MsSearchDatabase> dbs = search.getSearchDatabases();
         assertEquals(1, dbs.size());
         MsSearchDatabase db = dbs.get(0);
@@ -551,18 +426,18 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals("mouse-contam.fasta", db.getDatabaseFileName());
     }
 
-    private void checkEnzyme(ProlucidSearch search) {
+    private void checkEnzyme(SequestSearch search) {
         List<MsEnzyme> enzymes = search.getEnzymeList();
         assertEquals(1, enzymes.size());
         MsEnzyme en = enzymes.get(0);
-        assertEquals("trypsin", en.getName());
+        assertEquals("Trypsin", en.getName());
         assertEquals(Sense.CTERM, en.getSense());
-        assertEquals("RK", en.getCut());
-        assertEquals(null, en.getNocut());
+        assertEquals("KR", en.getCut());
+        assertEquals("P", en.getNocut());
         assertEquals(null, en.getDescription());
     }
 
-    private void checkStaticResidueMods(ProlucidSearch search) {
+    private void checkStaticResidueMods(SequestSearch search) {
         List<MsResidueModification> mods = search.getStaticResidueMods();
         assertEquals(1, mods.size());
 
@@ -572,7 +447,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(57.02146, mod.getModificationMass().doubleValue());
     }
 
-    private void checkDynamicResidueMods(ProlucidSearch search) {
+    private void checkDynamicResidueMods(SequestSearch search) {
         List<MsResidueModification> mods = search.getDynamicResidueMods();
         assertEquals(6, mods.size());
         Collections.sort(mods, new ResidueModComparator<MsResidueModification>());
@@ -587,11 +462,11 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(-99.9, mod.getModificationMass().doubleValue());
         mod = mods.get(i++);
         assertEquals('S', mod.getModifiedResidue());
-        assertEquals('p', mod.getModificationSymbol());
+        assertEquals('*', mod.getModificationSymbol());
         assertEquals(79.9876, mod.getModificationMass().doubleValue());
         mod = mods.get(i++);
         assertEquals('T', mod.getModifiedResidue());
-        assertEquals('p', mod.getModificationSymbol());
+        assertEquals('*', mod.getModificationSymbol());
         assertEquals(79.9876, mod.getModificationMass().doubleValue());
         mod = mods.get(i++);
         assertEquals('V', mod.getModifiedResidue());
@@ -599,11 +474,11 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(-99.9, mod.getModificationMass().doubleValue());
         mod = mods.get(i++);
         assertEquals('Y', mod.getModifiedResidue());
-        assertEquals('p', mod.getModificationSymbol());
+        assertEquals('*', mod.getModificationSymbol());
         assertEquals(79.9876, mod.getModificationMass().doubleValue());
     }
 
-    private void checkStaticTerminalMods(ProlucidSearch search) {
+    private void checkStaticTerminalMods(SequestSearch search) {
         List<MsTerminalModification> mods = search.getStaticTerminalMods();
         assertEquals(2, mods.size());
         Collections.sort(mods, new TerminalModComparator<MsTerminalModification>());
@@ -619,20 +494,9 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(987.654, mod.getModificationMass().doubleValue());
     }
 
-    private void checkDynamicTerminalMods(ProlucidSearch search) {
+    private void checkDynamicTerminalMods(SequestSearch search) {
         List<MsTerminalModification> mods = search.getDynamicTerminalMods();
-        assertEquals(2, mods.size());
-        Collections.sort(mods, new TerminalModComparator<MsTerminalModification>());
-        int i = 0; 
-        MsTerminalModification mod = mods.get(i++);
-        assertEquals(Terminal.CTERM, mod.getModifiedTerminal());
-        assertEquals('y', mod.getModificationSymbol());
-        assertEquals(123.4567, mod.getModificationMass().doubleValue());
-
-        mod = mods.get(i++);
-        assertEquals(Terminal.NTERM, mod.getModifiedTerminal());
-        assertEquals('*', mod.getModificationSymbol());
-        assertEquals(156.1011, mod.getModificationMass().doubleValue());
+        assertEquals(0, mods.size());
     }
 
     private class ResidueModComparator <T extends MsResidueModificationIn> implements Comparator<T> {

@@ -113,11 +113,11 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
           uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
       }
       catch (UploadException e1) {
-         fail("Valid ms2 files in directory");
+          assertEquals(ERROR_CODE.UNSUPPORTED_SQT, e1.getErrorCode());
       }
       List<UploadException> exceptionList = uploader.getUploadExceptionList();
       assertEquals(1, exceptionList.size());
-      String warnings = "WARNING: Unsupported sqt file found"+
+      String warnings = "ERROR: Unsupported sqt file found"+
                           "\n\tFile: test_resources/invalid_sqt_dir/percolator.sqt"+
                           "\n\t\n\tSEARCH WILL NOT BE UPLOADED.";
       
