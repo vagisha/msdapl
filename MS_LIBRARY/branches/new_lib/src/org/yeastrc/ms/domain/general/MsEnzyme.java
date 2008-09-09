@@ -14,7 +14,7 @@ public interface MsEnzyme extends MsEnzymeIn {
 
     public static enum Sense {
         
-        CTERM((short)0), NTERM((short)1), UNKNOWN((short)-1);
+        CTERM((short)1), NTERM((short)0), UNKNOWN((short)-1);
     
         private short shortVal;
         private Sense(short shortVal) {
@@ -25,8 +25,8 @@ public interface MsEnzyme extends MsEnzymeIn {
         }
         public static Sense instance(short shortVal) {
             switch (shortVal) {
-                case 0: return CTERM;
-                case 1: return NTERM;
+                case 0: return NTERM;
+                case 1: return CTERM;
                 default: return UNKNOWN;
             }
         }

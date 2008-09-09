@@ -190,7 +190,6 @@ public class MsDataUploader {
             runIdMap = uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
         }
         catch (UploadException e) {
-            uploadExceptionList.add(e);
             e.appendErrorMessage("!!!\n\tERROR UPLOADING MS2 DATA. SEARCH WILL NOT BE UPLOADED\n!!!");
             log.error(e.getMessage(), e);
             numRunsUploaded = 0;
@@ -204,7 +203,6 @@ public class MsDataUploader {
         try {sqtType = getSqtType(fileDirectory, filenames);}
         catch(UploadException ex) {
             ex.appendErrorMessage("\n\tSEARCH WILL NOT BE UPLOADED.");
-            uploadExceptionList.add(ex);
             log.error(ex.getMessage(), ex);
             throw ex;
         }
