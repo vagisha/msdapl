@@ -191,27 +191,11 @@ public abstract class AbstractSQTDataUploadService {
             searchId = uploadSearchParameters(fileDirectory, remoteServer, remoteDirectory, searchDate);
         }
         catch (UploadException e) {
+            e.appendErrorMessage("\n\t!!!SEARCH WILL NOT BE UPLOADED\n");
             uploadExceptionList.add(e);
-            log.error(e.getMessage()+"\n\t!!!SEARCH WILL NOT BE UPLOADED", e);
+            log.error(e.getMessage(), e);
             return 0;
         }
-        
-        // get the id of the search database used (will be used to look up protein ids later)
-//        sequenceDatabaseId = getSearchDatabaseId(getSearchDatabase());
-//        MsSearchDatabaseIn db = getSearchDatabase();
-//        String searchDbName = null;
-//        if (db != null) {
-//            searchDbName = getSearchDatabase().getDatabaseFileName();
-//            sequenceDatabaseId = NrSeqLookupUtil.getDatabaseId(searchDbName);
-//        }
-//        if (sequenceDatabaseId == 0) {
-//            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
-//            ex.setErrorMessage("No database ID found for: "+searchDbName);
-//            uploadExceptionList.add(ex);
-//            log.error(ex.getMessage()+"\n\t!!!DELETING SEARCH...", ex);
-//            deleteSearch(searchId);
-//            return 0;
-//        }
         
         // initialize the Modification lookup map; will be used when uploading modifications for search results
         dynaModLookup = new DynamicModLookupUtil(searchId);
@@ -226,8 +210,9 @@ public abstract class AbstractSQTDataUploadService {
             Integer runId = runIdMap.get(file); 
             if (runId == null) {
                 UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SQT);
+                ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage()+"\n\tDELETING SEARCH...", ex);
+                log.error(ex.getMessage(), ex);
                 deleteSearch(searchId);
                 return 0;
             }
@@ -238,7 +223,8 @@ public abstract class AbstractSQTDataUploadService {
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage()+"\n\t!!!DELETING SEARCH...", ex);
+                ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
+                log.error(ex.getMessage(), ex);
                 deleteSearch(searchId);
                 return 0;
             }
@@ -248,9 +234,10 @@ public abstract class AbstractSQTDataUploadService {
         if (numSearchesUploaded == 0) {
             UploadException ex = new UploadException(ERROR_CODE.NO_RUN_SEARCHES_UPLOADED);
             uploadExceptionList.add(ex);
-            log.error(ex.getMessage()+"\n\tDELETING SEARCH", ex);
+            ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
+            log.error(ex.getMessage(), ex);
             deleteSearch(searchId);
-            searchId = 0;
+            return 0;
         }
         
         // Update the "analysisProgramVersion" in the msSearch table

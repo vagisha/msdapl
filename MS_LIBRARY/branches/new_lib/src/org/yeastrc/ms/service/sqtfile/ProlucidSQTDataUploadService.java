@@ -150,8 +150,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
-            String msg = ex.getErrorMessage() == null ? "" : ex.getErrorMessage();
-            ex.setErrorMessage(msg+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
+            ex.appendErrorMessage("\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
             throw ex;
         }
         catch (RuntimeException e) { // most likely due to SQL exception

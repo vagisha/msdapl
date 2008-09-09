@@ -152,8 +152,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
-            String msg = ex.getErrorMessage() == null ? "" : ex.getErrorMessage();
-            ex.setErrorMessage(msg+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
+            ex.appendErrorMessage("\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
             throw ex;
         }
         catch (RuntimeException e) { // most likely due to SQL exception
