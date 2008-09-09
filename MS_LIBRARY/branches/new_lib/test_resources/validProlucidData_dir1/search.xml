@@ -104,7 +104,7 @@
 
     	    <c_term>
                 <symbol>x</symbol>
-                <mass_shift>10.0</mass_shift>
+                <mass_shift>-10.0</mass_shift>
                 <is_static_mod>true</is_static_mod>
             </c_term>
 
@@ -123,8 +123,8 @@
             <diff_mods>
                 <!-- may loop -->
                 <diff_mod>
-                    <symbol>*</symbol>
-                    <mass_shift>80.0</mass_shift>
+                    <symbol>phosporylation</symbol>
+                    <mass_shift>79.9876</mass_shift>
                     <residues>
                         <residue>T</residue>
                         <residue>S</residue>
