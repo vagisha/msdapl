@@ -8,6 +8,7 @@ import org.yeastrc.ms.dao.general.MsEnzymeDAO.EnzymeProperties;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.general.impl.Enzyme;
 
 public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
 
@@ -47,6 +48,28 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
         assertEquals(0, enzymes.size());
     }
     
+    public void testSaveEnzymeCheckAllProps() {
+        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.CTERM, "KR", "P");
+        assertEquals(1, enzymes.size());
+        MsEnzyme oEnzyme = enzymes.get(0);
+        int enzyme_db_id = oEnzyme.getId();
+        
+        Enzyme enz = new Enzyme();
+        enz.setName("trypsin");
+        enz.setCut("KR");
+        enz.setNocut("P");
+        enz.setSense(Sense.CTERM);
+        int id = enzymeDao.saveEnzyme(enz);
+        // this is the same as an enzyme we already have; id returned should be the same
+        assertEquals(id, enzyme_db_id);
+        
+        // change one of the properties and save again.
+        enz.setNocut(null);
+        id = enzymeDao.saveEnzyme(enz);
+        assertNotSame(enzyme_db_id, id);
+       
+    }
+    
     public void testSaveEnzymeForRunCheckName() {
         // load an enzyme we know exists in the database
         List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.CTERM, "KR", "P");
@@ -81,7 +104,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
 
         // try to create another link for this enzyme to another runId. 
         // This time specify the parameters that will be used to look for 
-        // a matching run in the database;
+        // a matching enzyme in the database;
         iEnzyme = makeDigestionEnzyme("Dummy", null, null, null);
         EnzymeProperties[] properties = new EnzymeProperties[]{EnzymeProperties.NAME};
         int enzymeId_3 = enzymeDao.saveEnzymeforRun(iEnzyme, runId2, Arrays.asList(properties));
@@ -103,7 +126,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
     
     public void testSaveEnzymeForSearchCheckName() {
         // load an enzyme we know exists in the database
-        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("trypsin", Sense.CTERM, "KR", "P");
+        List<MsEnzyme> enzymes = enzymeDao.loadEnzymes("TRYPSIN", Sense.CTERM, "KR", "P");
         assertEquals(1, enzymes.size());
         MsEnzyme oEnzyme = enzymes.get(0);
         int enzyme_db_id = oEnzyme.getId();
@@ -135,7 +158,7 @@ public class MsEnzymeDAOImplTest extends BaseDAOTestCase {
 
         // try to create another link for this enzyme to another searchId. 
         // This time specify the parameters that will be used to look for 
-        // a matching run in the database;
+        // a matching enzyme in the database;
         iEnzyme = makeDigestionEnzyme("Dummy", null, null, null);
         EnzymeProperties[] properties = new EnzymeProperties[]{EnzymeProperties.NAME};
         int enzymeId_3 = enzymeDao.saveEnzymeforSearch(iEnzyme, searchId2, Arrays.asList(properties));

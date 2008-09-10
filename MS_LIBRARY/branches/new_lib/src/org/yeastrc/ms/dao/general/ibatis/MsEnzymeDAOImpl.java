@@ -47,22 +47,16 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
 
     public List<MsEnzyme> loadEnzymes(String name, Sense sense, String cut,
             String nocut) {
-        Map<String, Object> map = makeParamMap(name, sense, cut, nocut);
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("name", name);
+        map.put("sense", getSenseForDb(sense));
+        map.put("cut", cut);
+        map.put("nocut", nocut);
         return loadEnzymes(map);
     }
 
-    private Map<String, Object> makeParamMap(String name, Sense sense,
-            String cut, String nocut) {
-        Map<String, Object> map = new HashMap<String, Object>(4);
-        if (name != null)   map.put("name", name);
-        if (sense != null)  map.put("sense", getSenseForDb(sense));
-        if (cut != null)    map.put("cut", cut);
-        if (nocut != null)  map.put("nocut", nocut);
-        return map;
-    }
-
     private Short getSenseForDb(Sense sense) {
-        if (sense == Sense.UNKNOWN) return null;
+        if (sense == null || sense == Sense.UNKNOWN) return null;
         return (sense.getShortVal());
     }
     
@@ -78,20 +72,17 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
     
     public int saveEnzyme(MsEnzymeIn enzyme, List<EnzymeProperties> params) {
         
-        String name = null,  cut = null,  nocut = null;
-        Sense sense = null;
+        Map<String, Object> properties = new HashMap<String, Object>(params.size());
         for (EnzymeProperties param: params) {
             if (param == EnzymeProperties.NAME)
-                name = enzyme.getName();
+                properties.put("name", enzyme.getName());
             else if (param == EnzymeProperties.SENSE)
-                sense = enzyme.getSense();
+                properties.put("sense",getSenseForDb(enzyme.getSense()));
             else if (param == EnzymeProperties.CUT)
-                cut = enzyme.getCut();
+                properties.put("cut",enzyme.getCut());
             else if (param == EnzymeProperties.NOTCUT)
-                nocut = enzyme.getNocut();
+                properties.put("nocut",enzyme.getNocut());
         }
-        
-        Map<String, Object> properties = makeParamMap(name, sense, cut, nocut);
         
         List<MsEnzyme> enzymesFromDb = loadEnzymes(properties);
         // if we found an enzyme return its database id

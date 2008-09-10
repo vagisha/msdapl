@@ -30,7 +30,7 @@
     </select> 
     
     <select id="selectEnzymeByName" resultMap="msEnzymeResult" parameterClass="String"> 
-        SELECT * FROM msDigestionEnzyme WHERE UPPER(name) = UPPER(#name#)
+        SELECT * FROM msDigestionEnzyme WHERE name = #name#
     </select> 
     
     <select id="selectEnzymes" resultMap="msEnzymeResult" parameterClass="java.util.Map"> 
