@@ -28,7 +28,7 @@
     </select>
     
     <select id="selectForScanAndCharge" resultMap="scanChargeResult" parameterClass="java.util.Map">
-    	SELECT * FROM MS2FileScanCharge WHERE scanId = #id# AND charge = #charge#
+    	SELECT * FROM MS2FileScanCharge WHERE scanID = #id# AND charge = #charge#
     </select>
     
     

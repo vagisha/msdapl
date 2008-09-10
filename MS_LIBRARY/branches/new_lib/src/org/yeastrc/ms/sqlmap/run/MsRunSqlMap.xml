@@ -82,7 +82,7 @@
     
     
     <insert id="insert" parameterMap="msRunParam">
-    	INSERT INTO MsRun ( filename, 
+    	INSERT INTO msRun ( filename, 
     						sha1Sum,
     						creationTime, 
     						extractor, 
@@ -101,7 +101,7 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM MsRun WHERE id=#id#		    
+		DELETE FROM msRun WHERE id=#id#		    
     </delete>
     
 </sqlMap>

@@ -90,7 +90,7 @@
     
     
     <insert id="insert" parameterMap="msEnzymeParam">
-    	INSERT INTO MsDigestionEnzyme (name, 
+    	INSERT INTO msDigestionEnzyme (name, 
     						sense, 
     						cut,
     						nocut, 
@@ -102,13 +102,13 @@
     </insert>
     
     <insert id="insertRunEnzyme" parameterClass="java.util.Map">
-    	INSERT INTO MsRunEnzyme (runID, 
+    	INSERT INTO msRunEnzyme (runID, 
     						enzymeID) 
     	VALUES (#runID#, #enzymeID#)
     </insert>
     
     <insert id="insertSearchEnzyme" parameterClass="java.util.Map">
-    	INSERT INTO MsSearchEnzyme (searchID, 
+    	INSERT INTO msSearchEnzyme (searchID, 
     						enzymeID) 
     	VALUES (#searchID#, #enzymeID#)
     </insert>

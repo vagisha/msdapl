@@ -67,7 +67,7 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM ProLuCIDearchResult WHERE resultID=#id#
+		DELETE FROM ProLuCIDSearchResult WHERE resultID=#id#
     </delete>
     
 </sqlMap>

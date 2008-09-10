@@ -31,7 +31,7 @@
     </insert>
     
      <delete id="deleteByScanId" parameterClass="Integer">
-		DELETE FROM MS2FileChargeIndependentAnalysis WHERE scanId=#scanId#		    
+		DELETE FROM MS2FileChargeIndependentAnalysis WHERE scanID=#scanId#		    
     </delete>
     
     

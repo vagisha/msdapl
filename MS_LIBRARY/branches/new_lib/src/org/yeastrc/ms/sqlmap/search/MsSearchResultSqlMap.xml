@@ -65,7 +65,7 @@
     <insert id="insert" parameterMap="msSearchResultParam">
     	INSERT INTO msRunSearchResult (
     	runSearchID,
-    	scanId,
+    	scanID,
     	charge,
     	peptide,
     	preResidue,
