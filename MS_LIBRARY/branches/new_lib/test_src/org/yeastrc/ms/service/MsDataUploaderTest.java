@@ -41,8 +41,8 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         catch(UploadException e) {
             fail("ms2 ddata is valid and no unsupported sqt files found");
         }
-        assertEquals(1, uploader.getUploadExceptionList().size());
-        assertTrue(uploader.getUploadWarnings().contains("Invalid 'M' line.  No locus matches found"));
+        assertEquals(0, uploader.getUploadExceptionList().size());
+//        assertTrue(uploader.getUploadWarnings().contains("Invalid 'M' line.  No locus matches found"));
     }
     
     public void testUploadDataToDbInvalidDirectory() {
