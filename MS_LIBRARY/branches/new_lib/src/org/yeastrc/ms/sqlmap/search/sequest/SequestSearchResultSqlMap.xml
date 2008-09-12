@@ -70,10 +70,6 @@
     	VALUES $values$
     </insert>
     
-    <select id="selectSearchParamValue" resultClass="String" parameterClass="java.util.Map">
-    	SELECT value from SQTParams where searchID=#searchID# AND param=#paramName#
-    </select>
-    
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM SQTSearchResult WHERE resultID=#id#
     </delete>

@@ -104,7 +104,7 @@ public class MsSearchResultProteinDAOImplTest extends BaseDAOTestCase {
     
     private static final class MsProteinMatchComparator implements Comparator<MsSearchResultProtein> {
         public int compare(MsSearchResultProtein o1, MsSearchResultProtein o2) {
-            return new Integer(o1.getAccession()).compareTo(new Integer(o2.getAccession()));
+            return o1.getAccession().compareTo(o2.getAccession());
         }
     }
    

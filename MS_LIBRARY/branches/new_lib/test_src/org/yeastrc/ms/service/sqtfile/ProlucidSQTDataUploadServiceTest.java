@@ -216,10 +216,10 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(2, prList.size());
         MsSearchResultProtein pr = prList.get(0);
         assertEquals(ids.get(0).intValue(), pr.getResultId());
-        assertEquals(208, pr.getAccession());
+        assertEquals("Reverse_gi|21618336|ref|NP_659006.1|", pr.getAccession());
         pr = prList.get(1);
         assertEquals(ids.get(0).intValue(), pr.getResultId());
-        assertEquals(209, pr.getAccession());
+        assertEquals("Reverse_gi|927415|emb|CAA55359.1|", pr.getAccession());
 
 
 
@@ -358,7 +358,6 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, prList.size());
         pr = prList.get(0);
         assertEquals(ids.get(10).intValue(), pr.getResultId());
-        assertEquals(302, pr.getAccession());
         assertEquals("gi|3090887|gb|AAC15421.1|", pr.getAccession());
     }
 
@@ -654,7 +653,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 
     private class MatchProteinComparator implements Comparator<MsSearchResultProtein> {
         public int compare(MsSearchResultProtein o1, MsSearchResultProtein o2) {
-            return Integer.valueOf(o1.getAccession()).compareTo(Integer.valueOf(o2.getAccession()));
+            return o1.getAccession().compareTo(o2.getAccession());
         }
     }
 

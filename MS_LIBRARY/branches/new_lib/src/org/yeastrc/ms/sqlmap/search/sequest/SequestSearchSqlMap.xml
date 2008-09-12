@@ -32,6 +32,10 @@
     	SELECT * FROM SQTParams WHERE searchID = #id#
     </select>
     
+    <select id="selectSearchParamValue" resultClass="String" parameterClass="java.util.Map">
+    	SELECT value from SQTParams where searchID=#searchID# AND param=#paramName#
+    </select>
+    
     <insert id="insertParams" parameterMap="sequestParamParam">
     	INSERT INTO SQTParams (
     	searchID,

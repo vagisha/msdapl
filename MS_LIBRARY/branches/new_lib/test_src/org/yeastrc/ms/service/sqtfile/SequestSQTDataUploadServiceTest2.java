@@ -57,9 +57,8 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         super.tearDown();
     }
 
-    public void testUploadValidProlucidData2() throws DataProviderException {
+    public void testUploadValidSequestData2() throws DataProviderException {
         String dir = "test_resources/validSequestData_dir2";
-//      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
         int searchId = 0;
@@ -185,10 +184,10 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         assertEquals(2, prList.size());
         MsSearchResultProtein pr = prList.get(0);
         assertEquals(ids.get(0).intValue(), pr.getResultId());
-        assertEquals(208, pr.getAccession());
+        assertEquals("Reverse_gi|21618336|ref|NP_659006.1|", pr.getAccession());
         pr = prList.get(1);
         assertEquals(ids.get(0).intValue(), pr.getResultId());
-        assertEquals(209, pr.getAccession());
+        assertEquals("Reverse_gi|927415|emb|CAA55359.1|", pr.getAccession());
 
 
         //  M         2     200      865.91874      0.0311   1.117    2.953   8     16        T.S*GTS*SAS*LR.K    V
@@ -318,7 +317,6 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         assertEquals(1, prList.size());
         pr = prList.get(0);
         assertEquals(ids.get(10).intValue(), pr.getResultId());
-        assertEquals(302, pr.getAccession());
         assertEquals("gi|3090887|gb|AAC15421.1|", pr.getAccession());
     }
 
@@ -518,7 +516,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
 
     private class MatchProteinComparator implements Comparator<MsSearchResultProtein> {
         public int compare(MsSearchResultProtein o1, MsSearchResultProtein o2) {
-            return Integer.valueOf(o1.getAccession()).compareTo(Integer.valueOf(o2.getAccession()));
+            return o1.getAccession().compareTo(o2.getAccession());
         }
     }
 

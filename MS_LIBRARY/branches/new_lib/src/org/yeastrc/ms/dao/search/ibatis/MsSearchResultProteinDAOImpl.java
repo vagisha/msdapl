@@ -45,7 +45,10 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
             values.append(",(");
             values.append(match.getResultId() == 0 ? "NULL" : match.getResultId());
             values.append(",");
+            boolean hasAcc = match.getAccession() != null;
+            if (hasAcc) values.append("\"");
             values.append(match.getAccession());
+            if (hasAcc) values.append("\"");
             values.append(")");
         }
         values.deleteCharAt(0);
