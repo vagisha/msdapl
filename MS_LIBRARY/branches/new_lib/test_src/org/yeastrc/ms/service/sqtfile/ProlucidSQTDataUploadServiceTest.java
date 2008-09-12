@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
@@ -217,10 +216,10 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(2, prList.size());
         MsSearchResultProtein pr = prList.get(0);
         assertEquals(ids.get(0).intValue(), pr.getResultId());
-        assertEquals(208, pr.getProteinId());
+        assertEquals(208, pr.getAccession());
         pr = prList.get(1);
         assertEquals(ids.get(0).intValue(), pr.getResultId());
-        assertEquals(209, pr.getProteinId());
+        assertEquals(209, pr.getAccession());
 
 
 
@@ -313,7 +312,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, prList.size());
         pr = prList.get(0);
         assertEquals(ids.get(3).intValue(), pr.getResultId());
-        assertEquals("gi|113427084|ref|XP_001128380.1|", NrSeqLookupUtil.getProteinAccession(3, pr.getProteinId()));
+        assertEquals("gi|113427084|ref|XP_001128380.1|", pr.getAccession());
         
         
         // 60 S       00026   00026   1       23      shamu048        817.33000       2044.4  69.6    5697304
@@ -359,8 +358,8 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, prList.size());
         pr = prList.get(0);
         assertEquals(ids.get(10).intValue(), pr.getResultId());
-        assertEquals(302, pr.getProteinId());
-        assertEquals("gi|3090887|gb|AAC15421.1|", NrSeqLookupUtil.getProteinAccession(3, pr.getProteinId()));
+        assertEquals(302, pr.getAccession());
+        assertEquals("gi|3090887|gb|AAC15421.1|", pr.getAccession());
     }
 
     private int getScanId(int runId, int scanNumber) {
@@ -655,7 +654,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 
     private class MatchProteinComparator implements Comparator<MsSearchResultProtein> {
         public int compare(MsSearchResultProtein o1, MsSearchResultProtein o2) {
-            return Integer.valueOf(o1.getProteinId()).compareTo(Integer.valueOf(o2.getProteinId()));
+            return Integer.valueOf(o1.getAccession()).compareTo(Integer.valueOf(o2.getAccession()));
         }
     }
 

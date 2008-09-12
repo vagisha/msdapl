@@ -18,7 +18,7 @@ public interface MsSearchResultProtein {
     public abstract int getResultId();
     
     /**
-     * @return database id of the protein (from the NR_SEQ database).
+     * @return accession string
      */
-    public abstract int getProteinId();
+    public abstract String getAccession();
 }

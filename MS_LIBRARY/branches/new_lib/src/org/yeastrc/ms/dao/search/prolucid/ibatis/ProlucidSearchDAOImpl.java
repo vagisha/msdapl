@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.dao.search.prolucid.ibatis;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
@@ -57,6 +60,30 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
         for (ProlucidParamIn child: param.getChildParamElements()) {
             insertProlucidParam(child, paramId, searchId);
         }
+    }
+    
+    @Override
+    public MassType getFragmentMassType(int searchId) {
+        String val = getSearchParamValue(searchId, "fragment", "isotopes");
+        if (val.equals("avg"))        return MassType.AVG;
+        else if (val.equals("mono"))   return MassType.MONO;
+        return null; // we don't recognize this value
+    }
+
+    @Override
+    public MassType getParentMassType(int searchId) {
+        String val = getSearchParamValue(searchId, "precursor", "isotopes");
+        if (val.equals("avg"))        return MassType.AVG;
+        else if (val.equals("mono"))   return MassType.MONO;
+        return null; // we don't recognize this value
+    }
+    
+    private String getSearchParamValue(int searchId, String paramName, String parentParamName) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("searchId", searchId);
+        map.put("paramName", paramName);
+        map.put("parentParamName", parentParamName);
+        return (String) queryForObject("SequestSearch.selectSearchParamValue", map);
     }
     
     @Override

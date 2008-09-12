@@ -35,6 +35,13 @@
     	SELECT * FROM ProLuCIDParams WHERE searchID = #id#
     </select>
     
+    <select id="selectSearchParamValue" resultClass="String", parameterClass="java.util.Map">
+    	SELECT value FROM ProLuCIDParams 
+    	WHERE searchID=#searchId  
+    	AND elementName=#paramName# 
+    	AND parentID = (select id from ProLuCIDParams where searchID=#searchId# AND elementName=#parentParamName#)
+    </select>
+    
     <insert id="insertParams" parameterMap="prolucidParamParam">
     	INSERT INTO ProLuCIDParams (
     	searchID,

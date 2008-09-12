@@ -12,13 +12,13 @@ import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 public class SearchResultProteinBean implements MsSearchResultProtein {
 
     private int resultId;
-    private int proteinId; // database id of the protein (from NR_SEQ database)
+    private String accession;
     
     public SearchResultProteinBean() {}
     
-    public SearchResultProteinBean(int resultId, int proteinId) {
+    public SearchResultProteinBean(int resultId, String accession) {
         this.resultId = resultId;
-        this.proteinId = proteinId;
+        this.accession = accession;
     }
     
     public int getResultId() {
@@ -31,24 +31,11 @@ public class SearchResultProteinBean implements MsSearchResultProtein {
         this.resultId = resultId;
     }
    
-    public int getProteinId() {
-        return proteinId;
+    public String getAccession() {
+        return accession;
     }
     
-    public void setProteinId(int id) {
-        this.proteinId = id;
-    }
-    
-    public boolean equals(Object obj) {
-        if (obj == this)   return true;
-        if (!(obj instanceof SearchResultProteinBean)) return false;
-        
-        SearchResultProteinBean that = (SearchResultProteinBean) obj;
-        return (this.proteinId == that.getProteinId() && 
-                this.resultId == that.getResultId());
-    }
-    
-    public int hashCode(){
-        return (resultId+""+proteinId).hashCode();
+    public void setAccession(String accession) {
+        this.accession = accession;
     }
 }

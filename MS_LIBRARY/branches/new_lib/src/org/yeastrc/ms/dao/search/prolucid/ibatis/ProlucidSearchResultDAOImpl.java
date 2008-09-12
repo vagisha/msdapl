@@ -50,10 +50,9 @@ ProlucidSearchResultDAO {
 
 
     @Override
-    public int save(int searchId, String searchDbName, ProlucidSearchResultIn searchResult,
-            int runSearchId, int scanId) {
+    public int save(int searchId, ProlucidSearchResultIn searchResult, int runSearchId, int scanId) {
         // first save the base result
-        int resultId = resultDao.save(searchId, searchDbName, searchResult, runSearchId, scanId);
+        int resultId = resultDao.save(searchId, searchResult, runSearchId, scanId);
 
         // now save the ProLuCID specific information
         ProlucidResultDataWrap resultDb = new ProlucidResultDataWrap(searchResult.getProlucidResultData(), resultId);

@@ -32,7 +32,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         // we have not yet set any of the SQT file specific values. Saving the 
         // result at this point should fail
         try {
-            sequestResDao.save(97, "dummy_db", result, 45, 32); // searchId = 97; runSearchId = 45; scanId = 32
+            sequestResDao.save(97, result, 45, 32); // searchId = 97; runSearchId = 45; scanId = 32
             fail("Was able to save SQTSearchResult with null values!");
         }
         catch (RuntimeException e){
@@ -46,7 +46,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         result.setDeltaCN(new BigDecimal("0.001"));
         result.setMatchingIons(200);
         
-        int resultId = sequestResDao.save(97, "dummy_db", result, 45, 32); // searchId = 97; searchResultId = 45; scanId = 32
+        int resultId = sequestResDao.save(97, result, 45, 32); // searchId = 97; searchResultId = 45; scanId = 32
         
         // make sure everything got saved
         assertNotNull(resultDao.load(resultId));

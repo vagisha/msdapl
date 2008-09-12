@@ -8,33 +8,27 @@
 	
 	<resultMap class="MsResultProteinOut" id="msResultProteinResult">
 		<result property="resultId" column="resultID" nullValue="0"/>
-		<result property="proteinId" column="proteinID" nullValue="0"/>
+		<result property="accession" column="accession"/>
 	</resultMap>
 	
 	<parameterMap class="MsResultProteinIn" id="msResultProteinParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="proteinId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="accession" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
     <select id="selectResultProteins" resultMap="msResultProteinResult" parameterClass="Integer">
     	SELECT * FROM msProteinMatch WHERE resultID= #id#
     </select>
     
-    <select id="selectResultProteinCount" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT count(*) FROM msProteinMatch 
-    	WHERE resultID= #resultId#
-    	AND proteinID = #proteinId#
-    </select>
-    
     <insert id="insert" parameterMap="msResultProteinParam">
     	INSERT INTO msProteinMatch (
     	resultID,
-    	proteinID)
+    	accession)
     	VALUES (?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
-    	INSERT INTO msProteinMatch (resultID, proteinID) VALUES $values$
+    	INSERT INTO msProteinMatch (resultID, accession) VALUES $values$
     </insert>
     
     <delete id="deleteForResultId" parameterClass="Integer">

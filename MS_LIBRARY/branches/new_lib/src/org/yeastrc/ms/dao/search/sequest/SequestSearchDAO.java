@@ -15,4 +15,19 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
  */
 public interface SequestSearchDAO extends GenericSearchDAO <SequestSearchIn, SequestSearch>{
 
+    public abstract String getSearchParamValue(int searchId, String paramName);
+    
+    /**
+     * Returns the parent mass type (Average or Monoisotopic) used for the search
+     * @param searchId
+     * @return
+     */
+    public abstract MassType getParentMassType(int searchId);
+    
+    /**
+     * Returns the fragment mass type (Average or Monoisotopic) used for the search
+     * @param searchId
+     * @return
+     */
+    public abstract MassType getFragmentMassType(int searchId);
 }

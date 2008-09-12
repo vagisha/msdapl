@@ -31,13 +31,12 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
      * the msDynamicModResult table
      * 
      * @param searchId
-     * @param searchDbName
      * @param searchResult
      * @param runSearchId
      * @param scanId
      * @return id (in msPeptideSearchResult) for this search result
      */
-    public abstract int save(int searchId, String searchDbName, I searchResult, int runSearchId, int scanId);
+    public abstract int save(int searchId, I searchResult, int runSearchId, int scanId);
 
     /**
      * Saves the search result in the msPeptideSearchResult table. 

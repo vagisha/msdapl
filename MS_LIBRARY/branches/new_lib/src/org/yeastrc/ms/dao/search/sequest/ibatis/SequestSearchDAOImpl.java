@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.dao.search.sequest.ibatis;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
@@ -50,6 +53,30 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
     }
     
     @Override
+    public MassType getFragmentMassType(int searchId) {
+        String val = getSearchParamValue(searchId, "mass_type_fragment");
+        if (val.equals("0"))        return MassType.AVG;
+        else if (val.equals("1"))   return MassType.MONO;
+        return null; // we don't recognize this value
+    }
+
+    @Override
+    public MassType getParentMassType(int searchId) {
+        String val = getSearchParamValue(searchId, "mass_type_parent");
+        if (val.equals("0"))        return MassType.AVG;
+        else if (val.equals("1"))   return MassType.MONO;
+        return null; // we don't recognize this value
+    }
+    
+    @Override
+    public String getSearchParamValue(int searchId, String paramName) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("searchId", searchId);
+        map.put("paramName", paramName);
+        return (String) queryForObject("SequestSearch.selectSearchParamValue", map);
+    }
+    
+    @Override
     public int updateSearchProgramVersion(int searchId,
             String versionStr) {
         return searchDao.updateSearchProgramVersion(searchId, versionStr);
@@ -88,4 +115,5 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
             return param.getParamValue();
         }
     }
+   
 }

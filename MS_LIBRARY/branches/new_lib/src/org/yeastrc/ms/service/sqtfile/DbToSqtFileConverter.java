@@ -138,7 +138,7 @@ public class DbToSqtFileConverter {
             
             List<MsSearchResultProtein> proteins = getProteinsForResultId(resultId);
             for (MsSearchResultProtein pr: proteins) {
-                peptResult.addMatchingLocus(NrSeqLookupUtil.getProteinAccession(searchDatabaseId, pr.getProteinId()), null);
+                peptResult.addMatchingLocus(pr.getAccession(), null);
             }
             currScan.addPeptideResult(peptResult);
         }

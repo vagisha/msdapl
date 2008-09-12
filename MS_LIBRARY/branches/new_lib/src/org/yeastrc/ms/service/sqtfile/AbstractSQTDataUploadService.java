@@ -3,7 +3,7 @@ package org.yeastrc.ms.service.sqtfile;
 import java.io.File;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +53,7 @@ public abstract class AbstractSQTDataUploadService {
     static final int BUF_SIZE = 1000;
 
     // these are the things we will cache and do bulk-inserts
-    LinkedHashSet<MsSearchResultProtein> proteinMatchSet;
+    List<MsSearchResultProtein> proteinMatchList;
     List<MsResultResidueModIds> resultResidueModList;
     List<MsResultTerminalModIds> resultTerminalModList;
 
@@ -72,7 +72,7 @@ public abstract class AbstractSQTDataUploadService {
     int sequenceDatabaseId; // nrseq database id
     
     public AbstractSQTDataUploadService() {
-        this.proteinMatchSet = new LinkedHashSet<MsSearchResultProtein>(BUF_SIZE);
+        this.proteinMatchList = new ArrayList<MsSearchResultProtein>(BUF_SIZE);
         this.resultResidueModList = new ArrayList<MsResultResidueModIds>(BUF_SIZE);
         this.resultTerminalModList = new ArrayList<MsResultTerminalModIds>(BUF_SIZE);
         this.uploadExceptionList = new ArrayList<UploadException>();
@@ -98,7 +98,7 @@ public abstract class AbstractSQTDataUploadService {
     // called before uploading each sqt file and in the reset() method.
     void resetCaches() {
         
-        proteinMatchSet.clear();
+        proteinMatchList.clear();
         resultResidueModList.clear();
         resultTerminalModList.clear();
 
@@ -336,59 +336,26 @@ public abstract class AbstractSQTDataUploadService {
     final void uploadProteinMatches(MsSearchResultIn result, final String peptide, final int resultId, int databaseId)
         throws UploadException {
         // upload the protein matches if the cache has enough entries
-        if (proteinMatchSet.size() >= BUF_SIZE) {
+        if (proteinMatchList.size() >= BUF_SIZE) {
             uploadProteinMatchBuffer();
         }
         // add the protein matches for this result to the cache
+        Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
         for (MsSearchResultProteinIn match: result.getProteinMatchList()) {
-            int proteinId = NrSeqLookupUtil.getProteinId(databaseId, match.getAccession());
-            if (proteinId == 0) {
-                // try again -- accession string might be truncated at the right end
-                List<Integer> matchingIds = NrSeqLookupUtil.getProteinIdsPartialAccession(databaseId, match.getAccession());
-                if (matchingIds.size() == 1)
-                    proteinId = matchingIds.get(0);
-                else {
-//                    System.out.println("UNMATCHED_1: "+match.getAccession());
-                    // once more -- try to match the peptide sequence this time and accession LIKE accession%
-                    matchingIds = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession(databaseId, match.getAccession(), peptide);
-                    
-                    if (matchingIds.size() == 1)
-                        proteinId = matchingIds.get(0);
-                    else {
-//                        System.out.println("UNMATCHED_2: "+match.getAccession());
-                        // last ditch attempt -- accession string might be truncated at both ends; match peptide and accession LIKE %accession%
-                        /*
-                         * This last check takes too long for files where all the results are truncated at the beginning.  
-                         */
-//                        matchingIds = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession2(databaseId, match.getAccession(), peptide);
-//                        
-//                        if (matchingIds.size() == 1)
-//                            proteinId = matchingIds.get(0);
-
-                        // give up!
-//                        else {
-                            UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
-                            ex.setErrorMessage("No matching protein found for databaseId: "+databaseId+" and accession: "+match.getAccession());
-                            throw ex;
-//                        }
-                    }
-                }
-            }
-            
-            // NOTE: we are using a Set for the proteinMatches.  ONLY UNIQUE ENTRIES WILL BE ADDED.
-            SearchResultProteinBean prMatch = new SearchResultProteinBean();
-            prMatch.setProteinId(proteinId);
-            prMatch.setResultId(resultId);
-            proteinMatchSet.add(prMatch);
+            // only UNIQUE accession strings for this result will be added.
+            if (accSet.contains(match.getAccession()))
+                continue;
+            accSet.add(match.getAccession());
+            proteinMatchList.add(new SearchResultProteinBean(resultId, match.getAccession()));
         }
     }
     
     private void uploadProteinMatchBuffer() {
         MsSearchResultProteinDAO matchDao = daoFactory.getMsProteinMatchDAO();
-        List<MsSearchResultProtein> list = new ArrayList<MsSearchResultProtein>(proteinMatchSet.size());
-        list.addAll(proteinMatchSet);
+        List<MsSearchResultProtein> list = new ArrayList<MsSearchResultProtein>(proteinMatchList.size());
+        list.addAll(proteinMatchList);
         matchDao.saveAll(list);
-        proteinMatchSet.clear();
+        proteinMatchList.clear();
     }
 
     // RESIDUE DYNAMIC MODIFICATION
@@ -454,7 +421,7 @@ public abstract class AbstractSQTDataUploadService {
     }
 
     void flush() {
-        if (proteinMatchSet.size() > 0) {
+        if (proteinMatchList.size() > 0) {
             uploadProteinMatchBuffer();
         }
         if (resultResidueModList.size() > 0) {

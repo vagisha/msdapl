@@ -15,4 +15,17 @@ import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchIn;
  */
 public interface ProlucidSearchDAO extends GenericSearchDAO<ProlucidSearchIn, ProlucidSearch> {
 
+    /**
+     * Returns the parent mass type (Average or Monoisotopic) used for the search
+     * @param searchId
+     * @return
+     */
+    public abstract MassType getParentMassType(int searchId);
+    
+    /**
+     * Returns the fragment mass type (Average or Monoisotopic) used for the search
+     * @param searchId
+     * @return
+     */
+    public abstract MassType getFragmentMassType(int searchId);
 }

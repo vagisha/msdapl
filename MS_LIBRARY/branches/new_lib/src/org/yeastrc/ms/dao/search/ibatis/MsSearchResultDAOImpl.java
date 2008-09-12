@@ -54,13 +54,13 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForRunSearchScanCharge", map);
     }
     
-    public int save(int searchId, String searchDbName, MsSearchResultIn searchResult, int runSearchId, int scanId) {
+    public int save(int searchId, MsSearchResultIn searchResult, int runSearchId, int scanId) {
         
         int resultId = saveResultOnly(searchResult, runSearchId, scanId);
         
         // save any protein matches
         for(MsSearchResultProteinIn protein: searchResult.getProteinMatchList()) {
-            matchDao.save(protein, searchDbName, resultId);
+            matchDao.save(protein, resultId);
         }
         
         // save any dynamic (residue and terminal) modifications for this result

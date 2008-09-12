@@ -15,6 +15,8 @@ import org.yeastrc.ms.domain.search.SearchProgram;
  */
 public interface GenericSearchDAO <I extends MsSearchIn, O extends MsSearch> {
 
+    public static enum MassType {AVG, MONO};
+    
     public abstract O loadSearch(int searchId);
     
     /**

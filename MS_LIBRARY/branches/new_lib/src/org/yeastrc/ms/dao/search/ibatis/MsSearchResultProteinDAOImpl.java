@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
@@ -34,33 +32,8 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
         return queryForList("MsResultProtein.selectResultProteins", resultId);
     }
     
-    @Override
-    public boolean resultProteinExists(int resultId, int proteinId) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("resultId", resultId);
-        map.put("proteinId", proteinId);
-        
-        Integer count = (Integer) queryForObject("MsResultProtein.selectResultProteinCount", map);
-        if (count == null || count == 0)
-            return false;
-        return true;
-    }
-    
-    /**
-     * @throws NrSeqLookupException if no matching id was found for the protein.
-     */
-    public void save(MsSearchResultProteinIn resultProtein, String sequenceDbName, int resultId) {
-        int proteinId = NrSeqLookupUtil.getProteinId(sequenceDbName, resultProtein.getAccession());
-        if (proteinId == 0)
-            throw new NrSeqLookupException(sequenceDbName, resultProtein.getAccession());
-        save("MsResultProtein.insert", new SearchResultProteinBean(resultId, proteinId));
-    }
-    
-    public void save(MsSearchResultProteinIn resultProtein, int sequenceDbId, int resultId) {
-        int proteinId = NrSeqLookupUtil.getProteinId(sequenceDbId, resultProtein.getAccession());
-        if (proteinId == 0)
-            throw new NrSeqLookupException(sequenceDbId, resultProtein.getAccession());
-        save("MsResultProtein.insert", new SearchResultProteinBean(resultId, proteinId));
+    public void save(MsSearchResultProteinIn resultProtein, int resultId) {
+        save("MsResultProtein.insert", new SearchResultProteinBean(resultId, resultProtein.getAccession()));
     }
     
     @Override
@@ -72,7 +45,7 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
             values.append(",(");
             values.append(match.getResultId() == 0 ? "NULL" : match.getResultId());
             values.append(",");
-            values.append(match.getProteinId() == 0 ? "NULL" : match.getProteinId());
+            values.append(match.getAccession());
             values.append(")");
         }
         values.deleteCharAt(0);

@@ -180,11 +180,11 @@ ALTER TABLE msRunSearchResult ADD INDEX(peptide);
 # DO I WANT ALL THESE INDICES?
 
 CREATE TABLE msProteinMatch (
-   resultID INT UNSIGNED NOT NULL,
-   proteinID INT UNSIGNED NOT NULL
+    resultID INT UNSIGNED NOT NULL,
+    accession VARCHAR(255) NOT NULL
 );
-ALTER TABLE msProteinMatch ADD PRIMARY KEY(resultID, proteinID);
-ALTER TABLE msProteinMatch ADD INDEX(proteinID);
+ALTER TABLE msProteinMatch ADD PRIMARY KEY(resultID, accession);
+ALTER TABLE msProteinMatch ADD INDEX(accession);
 
 
 CREATE TABLE SQTSpectrumData (
