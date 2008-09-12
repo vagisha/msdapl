@@ -182,7 +182,9 @@ ALTER TABLE msRunSearchResult ADD INDEX(peptide);
 CREATE TABLE msProteinMatch (
     resultID INT UNSIGNED NOT NULL,
     accession VARCHAR(255) NOT NULL
-);
+)
+PARTITION BY KEY(resultID)
+PARTITIONS 100;
 ALTER TABLE msProteinMatch ADD PRIMARY KEY(resultID, accession);
 ALTER TABLE msProteinMatch ADD INDEX(accession);
 
@@ -306,7 +308,7 @@ CREATE TABLE ProLuCIDSearchResult (
    predictedIons INT UNSIGNED
 );
 ALTER TABLE ProLuCIDSearchResult ADD INDEX(primaryScoreRank);
-ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScoreRank);;
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScoreRank);
 ALTER TABLE ProLuCIDSearchResult ADD INDEX(deltaCN);
 ALTER TABLE ProLuCIDSearchResult ADD INDEX(primaryScore);
 ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScore);
