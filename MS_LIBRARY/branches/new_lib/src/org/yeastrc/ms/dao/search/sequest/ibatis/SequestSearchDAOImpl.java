@@ -55,6 +55,7 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
     @Override
     public MassType getFragmentMassType(int searchId) {
         String val = getSearchParamValue(searchId, "mass_type_fragment");
+        if (val == null)            return null;
         if (val.equals("0"))        return MassType.AVG;
         else if (val.equals("1"))   return MassType.MONO;
         return null; // we don't recognize this value
@@ -63,6 +64,7 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
     @Override
     public MassType getParentMassType(int searchId) {
         String val = getSearchParamValue(searchId, "mass_type_parent");
+        if (val == null)            return null;
         if (val.equals("0"))        return MassType.AVG;
         else if (val.equals("1"))   return MassType.MONO;
         return null; // we don't recognize this value

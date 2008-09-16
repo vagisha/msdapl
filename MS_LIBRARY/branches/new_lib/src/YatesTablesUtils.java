@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms2.data.DTAPeptide;
+import org.yeastrc.ms2.data.DTAPeptideLoader;
+import org.yeastrc.ms2.data.DTAPeptideSaver;
 
 
 public class YatesTablesUtils {
@@ -92,6 +95,96 @@ public class YatesTablesUtils {
         }
     }
 
+    public static List<Integer> getYatesResultPeptideIds(int yatesRunId) {
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet rs = null;
+        
+        try {
+            connect = getConnection();
+            // get a list of runIds from tblYatesCycles
+            String sql = "select pep.id from tblYatesRun as run, tblYatesRunResult as res, tblYatesResultPeptide as pep where run.id = "+
+                            yatesRunId+
+                            " and run.id = res.runID and res.id =  pep.resultID";
+
+            statement = connect.createStatement();
+            rs = statement.executeQuery(sql);
+            List<Integer> idList = new ArrayList<Integer>();
+            while(rs.next()) {
+                idList.add(rs.getInt("id"));
+            }
+            return idList;
+        }
+        catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<Integer>(0);
+        }
+        catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<Integer>(0);
+        }
+        finally {
+            try {
+                rs.close();
+                statement.close();
+                connect.close();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } 
+    }
+    
+    public static DTAPeptide loadDTAPeptide(int id) throws Exception {
+        Connection connect = null;
+        
+        try {
+            connect = getConnection();
+            return DTAPeptideLoader.getInstance().load(id, connect);
+            
+        }
+        catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        finally {
+            try {
+                connect.close();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } 
+    }
+    
+    public static void updateDTAPeptide(DTAPeptide peptide) throws Exception {
+        Connection connect = null;
+        
+        try {
+            connect = getConnection();
+            DTAPeptideSaver.getInstance().update(peptide, connect);
+            
+        }
+        catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+        }
+        catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        finally {
+            try {
+                connect.close();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } 
+    }
+    
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName( "com.mysql.jdbc.Driver" );
         String URL = "jdbc:mysql://localhost/yrc";

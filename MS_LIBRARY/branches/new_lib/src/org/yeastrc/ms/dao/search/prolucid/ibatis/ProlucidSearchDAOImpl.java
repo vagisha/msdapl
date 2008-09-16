@@ -65,7 +65,8 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
     @Override
     public MassType getFragmentMassType(int searchId) {
         String val = getSearchParamValue(searchId, "fragment", "isotopes");
-        if (val.equals("avg"))        return MassType.AVG;
+        if (val == null)                return null;
+        if (val.equals("avg"))          return MassType.AVG;
         else if (val.equals("mono"))   return MassType.MONO;
         return null; // we don't recognize this value
     }
@@ -73,7 +74,8 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
     @Override
     public MassType getParentMassType(int searchId) {
         String val = getSearchParamValue(searchId, "precursor", "isotopes");
-        if (val.equals("avg"))        return MassType.AVG;
+        if (val == null)                return null;
+        if (val.equals("avg"))          return MassType.AVG;
         else if (val.equals("mono"))   return MassType.MONO;
         return null; // we don't recognize this value
     }

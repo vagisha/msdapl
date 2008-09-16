@@ -33,7 +33,7 @@
     </select>
     
     <select id="selectSearchParamValue" resultClass="String" parameterClass="java.util.Map">
-    	SELECT value from SQTParams where searchID=#searchID# AND param=#paramName#
+    	SELECT value from SQTParams where searchID=#searchId# AND param=#paramName#
     </select>
     
     <insert id="insertParams" parameterMap="sequestParamParam">
