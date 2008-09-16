@@ -240,6 +240,10 @@ public class YatesPeptide implements IData {
 			this.pI = rs.getDouble("pI");
 			this.confPercent = rs.getDouble("confPercent");
 			this.ZScore = rs.getDouble("ZScore");
+			Integer searchIdI = rs.getInt("searchID");
+			this.searchId = searchIdI == null ? 0 : searchIdI;
+			Integer scanIdI = rs.getInt("scanID");
+			this.scanId = scanIdI == null ? 0 : scanIdI;
 			
 			// Close up shop
 			rs.close(); rs = null;
@@ -335,6 +339,8 @@ public class YatesPeptide implements IData {
 	// Instance variables
 	private int id;
 	private int resultID;
+	private int searchId;
+    private int scanId;
 	private boolean unique;
 	private String filename;
 	private double XCorr;
@@ -446,6 +452,7 @@ public class YatesPeptide implements IData {
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	/**
 	 * @return Returns the ionProportion.
 	 */
@@ -603,5 +610,21 @@ public class YatesPeptide implements IData {
 	 */
 	public void setZScore(double score) {
 		ZScore = score;
+	}
+	
+	public int getSearchId() {
+	    return this.searchId;
+	}
+	
+	public void setSearchId(int searchId) {
+	    this.searchId = searchId;
+	}
+	
+	public int getScanId() {
+	    return this.scanId;
+	}
+	
+	public void setScanId(int scanId) {
+	    this.scanId = scanId;
 	}
 }
