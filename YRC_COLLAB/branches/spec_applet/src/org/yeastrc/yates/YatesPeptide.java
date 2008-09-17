@@ -627,4 +627,8 @@ public class YatesPeptide implements IData {
 	public void setScanId(int scanId) {
 	    this.scanId = scanId;
 	}
+	
+	public boolean getIsSpectraAvailable() {
+	    return scanId != 0 && searchId != 0;
+	}
 }

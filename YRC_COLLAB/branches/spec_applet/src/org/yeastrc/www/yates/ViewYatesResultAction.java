@@ -110,6 +110,14 @@ public class ViewYatesResultAction extends Action {
 		// Set this project in the request, as a bean to be displayed on the view
 		request.setAttribute("result", yr);
 		
+		// THIS IS TEMPORARY -- BEGIN
+		// We are still dealing with legacy data in tblYatesCycle etc table. 
+		// The "Spectra" link will be visible if the hasYatesCycle attribute is set.
+		if (YatesCycleFactory.getInstance().hasCyclesForRun(yr.getRunID())) 
+		    request.setAttribute("hasYatesCycles", true);
+		// THIS IS TEMPORARY -- END
+		
+		
 		return mapping.findForward("Success");
 	}
 
