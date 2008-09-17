@@ -1,4 +1,5 @@
-<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+
+<%@page import="java.net.URL"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -56,6 +57,7 @@
      View Peptide List</html:link></TD>
   </yrcwww:colorrow>
 
+
  <yrcwww:colorrow scheme="ms">
   <td>Sequence:</td>
   <td><bean:write name="peptide" property="HTMLSequence" filter="false"/></td>
@@ -72,7 +74,13 @@
 
  <TR>
   <TD colspan="8" ALIGN="center">
-   <applet code="SpectrumApplet.class" CODEBASE="https://www.yeastrc.org/classes/DTASelect1.9/" width=970 height=500>
+  <% String baseUrl = new URL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath()).toString(); %>
+   <applet 
+   		code="ed.SpectrumViewerApp.SpectrumApplet.class"
+   		archive="SpectrumApplet.jar" 
+   		CODEBASE="<%=baseUrl %>/applets" 
+   		width=970 
+   		height=500>
     <logic:iterate name="params" id="param" scope="request">
      <bean:write name="param" filter="false" />
     </logic:iterate>

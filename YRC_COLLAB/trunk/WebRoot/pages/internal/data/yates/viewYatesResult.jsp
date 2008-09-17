@@ -130,8 +130,16 @@
 	<logic:iterate id="peptide" name="result" property="peptides">
 		<yrcwww:colorrow scheme="ms">
 			<TD>
- 			 <html:link href="/yrc/viewSpectra.do" paramId="id" paramName="peptide" paramProperty="id">
- 			  Spectra</html:link>
+			 <logic:equal name="peptide" property="isSpectraAvailable" value="true">
+			 	<html:link href="/yrc/viewSpectra.do" paramId="id" paramName="peptide" paramProperty="id">
+ 			  	Spectra</html:link>
+			 </logic:equal>
+			 <logic:notEqual name="peptide" property="isSpectraAvailable" value="true">
+			 	<logic:present name="hasYatesCycles">
+			 		<html:link href="/yrc/viewSpectra.do" paramId="id" paramName="peptide" paramProperty="id">
+ 			  		Spectra</html:link>
+			 	</logic:present>
+			 </logic:notEqual>
  			</TD>
 			<!--<TD><bean:write name="peptide" property="unique"/></TD>-->
 			<TD><bean:write name="peptide" property="XCorr"/></TD>
