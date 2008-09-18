@@ -12,8 +12,10 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.domain.general.impl.MsExperimentBean;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -29,16 +31,16 @@ public class MsDataUploader {
     private int numRunsUploaded = 0;
     private int numSearchesToUpload = 0;
     private int numSearchesUploaded = 0;
+    private int uploadedSearchId;
     
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
-    private List<Integer> uploadedRunIds = new ArrayList<Integer>();
     
     private static final Pattern fileNamePattern = Pattern.compile("(\\S+)\\.(\\d+)\\.(\\d+)\\.(\\d{1})");
     
     private void resetUploader() {
         uploadExceptionList.clear();
-        uploadedRunIds.clear();
+        uploadedSearchId = 0;
         numRunsToUpload = 0;
         numRunsUploaded = 0;
         numSearchesToUpload = 0;
@@ -57,8 +59,8 @@ public class MsDataUploader {
         return buf.toString();
     }
     
-    public List<Integer> getUploadedRunIds() {
-        return this.uploadedRunIds;
+    public int getUploadedSearchId() {
+        return this.uploadedSearchId;
     }
     
     /**
@@ -191,27 +193,17 @@ public class MsDataUploader {
     private int uploadRunAndSearchFilesToDb(String fileDirectory, Set<String> filenames, 
             String serverAddress, String serverDirectory, Date searchDate) throws UploadException   {
         
+        // create an experiment first
+        int experimentId = saveExperiment(serverAddress);
+        
         // upload the runs first. This could throw an upload exception
         Map<String, Integer> runIdMap;
         try {
             runIdMap = uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
-            // make a list of the runIds uploaded (or already existing in the database) 
-            // as part of this experiment upload.
-            for (String filename: runIdMap.keySet()) {
-                Integer runId = runIdMap.get(filename);
-                if (runId == null) { // should never happen
-                    log.error("RunId for file: "+filename+" cannot be null");
-                }
-                else if (uploadedRunIds.contains(runId)) { // should never happen
-                    log.error("Duplicate runId found for file: "+filename);
-                }
-                else {
-                    uploadedRunIds.add(runId);
-                }
-            }
         }
         catch (UploadException e) {
-            e.appendErrorMessage("!!!\n\tERROR UPLOADING MS2 DATA. SEARCH WILL NOT BE UPLOADED\n!!!");
+            // delete the entry in the experiment table
+            e.appendErrorMessage("!!!\n\tERROR UPLOADING MS2 DATA. EXPERIMENT WILL NOT BE UPLOADED\n!!!");
             log.error(e.getMessage(), e);
             numRunsUploaded = 0;
             throw e;
@@ -230,16 +222,32 @@ public class MsDataUploader {
         
         // now upload the searches. No exception will be thrown if the upload fails
         try {
-            return uploadSearches(fileDirectory, filenames, serverAddress,
+            this.uploadedSearchId =  uploadSearches(fileDirectory, filenames, serverAddress,
                         serverDirectory, searchDate, runIdMap, sqtType);
         }
         // We should have caught all exceptions in the SQT upload classes but just in case anything slipped through...
         catch(RuntimeException e) {
             log.error("!!!ERROR UPLOADING SEARCH (RuntimeException)!!!", e);
-            return 0;
         }
+        
+        return experimentId;
     }
 
+    
+    private int saveExperiment(String serverAddress) throws UploadException {
+        MsExperimentDAO experimentDao = DAOFactory.instance().getExperimentDAO();
+        MsExperimentBean experiment = new MsExperimentBean();
+        experiment.setServerAddress(serverAddress);
+        experiment.setUploadDate(new java.sql.Date(new Date().getTime()));
+        try { return experimentDao.saveExperiment(experiment);}
+        catch(RuntimeException e) {
+            UploadException ex = new UploadException(ERROR_CODE.CREATE_EXPT_ERROR);
+            ex.appendErrorMessage("!!!\n\tERROR CREATING EXPERIMENT. EXPERIMENT WILL NOT BE UPLOADED\n!!!");
+            ex.setErrorMessage(e.getMessage());
+            throw ex;
+        }
+    }
+    
     /**
      * Returns a mapping of filenames to runIDs
      * @param fileDirectory

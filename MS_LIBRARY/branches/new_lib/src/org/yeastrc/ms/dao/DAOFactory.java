@@ -5,7 +5,9 @@ import java.io.Reader;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
+import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl;
+import org.yeastrc.ms.dao.general.ibatis.MsExperimentDAOImpl;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl;
@@ -80,6 +82,9 @@ public class DAOFactory {
     
     private static DAOFactory instance = new DAOFactory();
     
+    // DAO for Experiment
+    private MsExperimentDAO experimentDAO;
+    
     // DAOs for enzyme related objects
     private MsEnzymeDAO enzymeDAO;
     
@@ -118,6 +123,9 @@ public class DAOFactory {
     
     
     private DAOFactory() {
+        
+        // Experiment related
+        experimentDAO  = new MsExperimentDAOImpl(sqlMap);
         
         // Enzyme related
         enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
@@ -160,6 +168,14 @@ public class DAOFactory {
     public static DAOFactory instance() {
         return instance;
     }
+    
+    //-------------------------------------------------------------------------------------------
+    // EXPERIMENT related
+    //-------------------------------------------------------------------------------------------
+    public MsExperimentDAO getExperimentDAO() {
+        return experimentDAO;
+    }
+    
     
     //-------------------------------------------------------------------------------------------
     // ENZYME related

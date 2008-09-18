@@ -11,8 +11,8 @@
 	
 	<resultMap class="MsSearchOut" id="msSearchResult">
 		<result property="id" column="id" />
+		<result property="experimentId" column="experimentId" />
 		<result property="searchDate" column="expDate" />
-		<result property="serverAddress" column="serverAddress" />
 		<result property="serverDirectory" column="serverDirectory" />
 		<result property="searchProgram" column="analysisProgramName" 
 				typeHandler="ProgramTypeHandler"/>
@@ -39,8 +39,8 @@
 	</resultMap>
 	
 	<parameterMap class="MsSearchIn" id="msSearchParam">
+		<parameter property="experimentId" />
 		<parameter property="searchDate" />
-		<parameter property="serverAddress" />
 		<parameter property="serverDirectory"  />
 		<parameter property="searchProgram" typeHandler="ProgramTypeHandler"/>
 		<parameter property="searchProgramVersion"/>
@@ -54,8 +54,8 @@
     
     <insert id="insert" parameterMap="msSearchParam">
     	INSERT INTO msSearch (
+    	experimentId
     	expDate,
-    	serverAddress,
     	serverDirectory,
     	analysisProgramName,
     	analysisProgramVersion)

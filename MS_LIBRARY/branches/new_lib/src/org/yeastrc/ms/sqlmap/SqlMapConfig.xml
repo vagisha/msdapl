@@ -31,6 +31,7 @@
 	
 	<!--  General sqlmaps -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/general/MsEnzymeSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/general/MsExperimentSqlMap.xml"/>
 	<!-- <sqlMap resource="org/yeastrc/ms/sqlmap/DeletionSqlMap.xml"/> -->
 	
 	

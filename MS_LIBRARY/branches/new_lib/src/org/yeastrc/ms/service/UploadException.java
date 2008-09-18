@@ -20,6 +20,9 @@ public class UploadException extends Exception {
         DIRECTORY_NOT_FOUND     ("Directory not found.", ERROR),
         EMPTY_DIRECTORY         ("No files found to upload.", ERROR),
         MISSING_MS2             ("Missing required ms2 files.", ERROR),
+        
+        CREATE_EXPT_ERROR       ("Error creating experiment.", ERROR),
+        
         READ_ERROR_MS2          ("Error reading MS2 file", ERROR),
         INVALID_MS2_SCAN        ("Invalid MS2 scan", ERROR),
         SHA1SUM_CALC_ERROR      ("Error calculating sha1sum", ERROR),

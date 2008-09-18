@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsExperiment"> 
+
+	<typeAlias alias="MsExperiment" type="org.yeastrc.ms.domain.general.impl.MsExperimentBean" />
+	
+	<resultMap class="MsExperiment" id="msExperimentResult">
+		<result property="id" column="id" />
+		<result property="uploadDate" column="uploadDate" />
+		<result property="serverAddress" column="serverAddress" />
+		<result property="lastUpdate" column="lastUpdate" />
+	</resultMap>
+	
+	<parameterMap class="MsExperiment" id="msExperimentParam">
+		<parameter property="serverAddress" jdbcType="VARCHAR"/>
+		<parameter property="uploadDate" jdbcType="DATE"/>
+	</parameterMap>
+	
+    
+    <select id="selectExperiment" resultMap="msExperimentResult" parameterClass="Integer">
+    	SELECT * FROM msExperiment WHERE id = #id#
+    </select>
+    
+    <select id="selectRunIdsForExperiment" resultClass="Integer" parameterClass="Integer">
+    	SELECT runID FROM msExperimentRun WHERE experimentID = #experimentId#
+    </select>
+    
+    <select id="selectExperimentIdsForRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT experimentID FROM msExperimentRun WHERE runID = #runId#
+    </select>
+    
+    <insert id="insertExperiment" parameterMap="msExperimentParam">
+    	INSERT INTO msExperiment (uploadDate, serverAddress) VALUES (?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <insert id="insertExperimentRun" parameterClass="java.util.Map">
+    	INSERT INTO msExperimentRun (experimentID, runID) VALUES (#experimentId#, #runId#)
+    </insert>
+    
+</sqlMap>

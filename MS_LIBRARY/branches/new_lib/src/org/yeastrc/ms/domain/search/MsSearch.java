@@ -22,6 +22,11 @@ public interface MsSearch extends MsSearchBase {
     public abstract int getId();
     
     /**
+     * @return database id of the experiment to which this search belongs.
+     */
+    public abstract int getExperimentId();
+    
+    /**
      * @return the date this search was uploaded
      */
     public abstract Date getUploadDate();
