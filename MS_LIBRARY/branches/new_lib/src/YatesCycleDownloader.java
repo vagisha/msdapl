@@ -83,6 +83,10 @@ public class YatesCycleDownloader {
         
     }
     
+    public static void downloadFileFromYatesServer(String srcFilePath, String destFilePath) {
+        
+    }
+    
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName( "com.mysql.jdbc.Driver" );
         String URL = "jdbc:mysql://localhost/yrc";

@@ -11,6 +11,8 @@ public class Sha1SumCalculator {
 
     private static final Sha1SumCalculator instance = new Sha1SumCalculator();
     
+    private static char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    
     private Sha1SumCalculator() {}
     
     public static Sha1SumCalculator instance() {
@@ -25,14 +27,12 @@ public class Sha1SumCalculator {
 
     public String sha1SumFor(InputStream inStr) throws NoSuchAlgorithmException, IOException {
         
-        MessageDigest digest;
-        digest = MessageDigest.getInstance("SHA-1");
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
         digest.reset();
         
         try {
             byte[] buffer = new byte[1024];
-            int bytesRead;
-            bytesRead = inStr.read(buffer);
+            int bytesRead = inStr.read(buffer);
             while (bytesRead > 0) {
                 digest.update(buffer, 0, bytesRead);
                 bytesRead = inStr.read(buffer);
@@ -45,13 +45,15 @@ public class Sha1SumCalculator {
             }
         }
         byte[] digested = digest.digest();
-        return hexStringFor(digested);
+        return bytesToHexString(digested);
     }
     
-    public String hexStringFor(byte[] bytes) {
+    public static String bytesToHexString(byte[] bytes) {
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
-            buf.append(Integer.toHexString(0xFF & bytes[i]));
+            int highBits = (bytes[i] & 0x000000f0) >> 4;
+            int lowBits  =  bytes[i] & 0x0000000f;
+            buf.append(hexChars[highBits]+""+hexChars[lowBits]);
         }
         return buf.toString();
     }

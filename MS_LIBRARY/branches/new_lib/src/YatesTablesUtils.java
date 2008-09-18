@@ -1,4 +1,5 @@
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,7 +29,7 @@ public class YatesTablesUtils {
         // String sql = "SELECT distinct runID FROM tblYatesCycles ORDER BY runID DESC limit 10";
         String sql = "SELECT distinct runID FROM tblYatesCycles "+queryQualifier;
         try {
-            connect = getConnection();
+            connect = getYRCConnection();
             statement = connect.createStatement();
             rs = statement.executeQuery(sql);
             List<Integer> yatesRunIds = new ArrayList<Integer>();
@@ -64,7 +65,7 @@ public class YatesTablesUtils {
         ResultSet rs = null;
         
         try {
-            connect = getConnection();
+            connect = getYRCConnection();
             // get a list of runIds from tblYatesCycles
             String sql = "SELECT runID, cycleID, cycleFileName FROM tblYatesCycles where runID="+runId;
             statement = connect.createStatement();
@@ -101,7 +102,7 @@ public class YatesTablesUtils {
         ResultSet rs = null;
         
         try {
-            connect = getConnection();
+            connect = getYRCConnection();
             // get a list of runIds from tblYatesCycles
             String sql = "select pep.id from tblYatesRun as run, tblYatesRunResult as res, tblYatesResultPeptide as pep where run.id = "+
                             yatesRunId+
@@ -139,7 +140,7 @@ public class YatesTablesUtils {
         Connection connect = null;
         
         try {
-            connect = getConnection();
+            connect = getYRCConnection();
             return DTAPeptideLoader.getInstance().load(id, connect);
             
         }
@@ -165,7 +166,7 @@ public class YatesTablesUtils {
         Connection connect = null;
         
         try {
-            connect = getConnection();
+            connect = getYRCConnection();
             DTAPeptideSaver.getInstance().update(peptide, connect);
             
         }
@@ -185,7 +186,58 @@ public class YatesTablesUtils {
         } 
     }
     
-    public static Connection getConnection() throws ClassNotFoundException, SQLException {
+    public static List<Job> getAllJobs() {
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet rs = null;
+        
+        try {
+            connect = getJobQueueConnection();
+            // get a list of runIds from tblYatesCycles
+            String sql = "select j.id, j.submitDate, j.lastUpdate, msj.groupID, msj.serverDirectory "+
+                         "from tblJobs as j, tblMSJobs as msj where j.id = msj.jobID "+
+                         "ORDER BY j.id DESC";
+            statement = connect.createStatement();
+            rs = statement.executeQuery(sql);
+            List<Job> jobs = new ArrayList<Job>();
+            while(rs.next()) {
+                Job job = new Job();
+                job.jobId = rs.getInt("id");
+                job.groupId = rs.getInt("groupID");
+                job.submitDate = rs.getDate("submitDate");
+                job.lastChangedDate = rs.getDate("lastUpdate");
+                job.dataDir = rs.getString("serverDirectory");
+                jobs.add(job);
+            }
+            return jobs;
+        }
+        catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<Job>(0);
+        }
+        catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return new ArrayList<Job>(0);
+        }
+        finally {
+            try {
+                rs.close();
+                statement.close();
+                connect.close();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public static Connection getJobQueueConnection() throws ClassNotFoundException, SQLException {
+        Class.forName( "com.mysql.jdbc.Driver" );
+        String URL = "jdbc:mysql://localhost/YRC_JOB_QUEUE";
+        return DriverManager.getConnection( URL, "root", "");
+    }
+    
+    public static Connection getYRCConnection() throws ClassNotFoundException, SQLException {
         Class.forName( "com.mysql.jdbc.Driver" );
         String URL = "jdbc:mysql://localhost/yrc";
         return DriverManager.getConnection( URL, "root", "");
@@ -201,5 +253,30 @@ public class YatesTablesUtils {
             this.cycleId = cycleId;
             this.cycleName = cycleName;
         }
+    }
+    
+    public static final class Job {
+        private int jobId;
+        private int groupId;
+        private Date submitDate;
+        private Date lastChangedDate;
+        private String dataDir;
+        
+        public int getJobId() {
+            return jobId;
+        }
+        public int getGroupId() {
+            return groupId;
+        }
+        public Date getSubmitDate() {
+            return submitDate;
+        }
+        public Date getLastChangedDate() {
+            return lastChangedDate;
+        }
+        public String getDataDir() {
+            return dataDir;
+        }
+        
     }
 }

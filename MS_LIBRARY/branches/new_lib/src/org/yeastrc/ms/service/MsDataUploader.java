@@ -32,10 +32,13 @@ public class MsDataUploader {
     
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
+    private List<Integer> uploadedRunIds = new ArrayList<Integer>();
+    
     private static final Pattern fileNamePattern = Pattern.compile("(\\S+)\\.(\\d+)\\.(\\d+)\\.(\\d{1})");
     
     private void resetUploader() {
         uploadExceptionList.clear();
+        uploadedRunIds.clear();
         numRunsToUpload = 0;
         numRunsUploaded = 0;
         numSearchesToUpload = 0;
@@ -52,6 +55,10 @@ public class MsDataUploader {
             buf.append(e.getMessage()+"\n");
         }
         return buf.toString();
+    }
+    
+    public List<Integer> getUploadedRunIds() {
+        return this.uploadedRunIds;
     }
     
     /**
@@ -188,6 +195,20 @@ public class MsDataUploader {
         Map<String, Integer> runIdMap;
         try {
             runIdMap = uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
+            // make a list of the runIds uploaded (or already existing in the database) 
+            // as part of this experiment upload.
+            for (String filename: runIdMap.keySet()) {
+                Integer runId = runIdMap.get(filename);
+                if (runId == null) { // should never happen
+                    log.error("RunId for file: "+filename+" cannot be null");
+                }
+                else if (uploadedRunIds.contains(runId)) { // should never happen
+                    log.error("Duplicate runId found for file: "+filename);
+                }
+                else {
+                    uploadedRunIds.add(runId);
+                }
+            }
         }
         catch (UploadException e) {
             e.appendErrorMessage("!!!\n\tERROR UPLOADING MS2 DATA. SEARCH WILL NOT BE UPLOADED\n!!!");
