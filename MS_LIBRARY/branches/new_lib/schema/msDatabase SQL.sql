@@ -426,6 +426,7 @@ CREATE TRIGGER msRun_bdelete BEFORE DELETE ON msRun
    DELETE FROM msRunEnzyme WHERE runID = OLD.id;
    DELETE FROM MS2FileHeader WHERE runID = OLD.id;
    DELETE FROM msRunLocation WHERE runID = OLD.id;
+   DELETE FROM msExperimentRun WHERE runID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -443,6 +444,16 @@ CREATE TRIGGER msSearch_bdelete BEFORE DELETE ON msSearch
    DELETE FROM msSearchTerminalStaticMod WHERE searchID = OLD.id;
    DELETE FROM msSearchDynamicMod WHERE searchID = OLD.id;
    DELETE FROM msSearchTerminalDynamicMod WHERE searchID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
+ FOR EACH ROW
+ BEGIN
+   DELETE FROM msSearch WHERE experimentID = OLD.id;
+   DELETE FROM msExperimentRun WHERE experimentID = OLD.id;
  END;
 |
 DELIMITER ;
