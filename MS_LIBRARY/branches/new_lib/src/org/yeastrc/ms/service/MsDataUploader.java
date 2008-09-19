@@ -436,6 +436,7 @@ public class MsDataUploader {
     private void deleteExperiment(int experimentId) {
         MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
         exptDao.deleteExperiment(experimentId);
+        this.uploadedExptId = 0;
     }
     
     public static int getScanIdFor(String runFileScanString, int searchId) {
