@@ -122,7 +122,8 @@ public class MsDataUploader {
         MsExperiment expt = exptDao.loadExperiment(experimentId);
         if (expt == null) {
             UploadException ex = new UploadException(ERROR_CODE.EXPT_NOT_FOUND);
-            ex.appendErrorMessage("Experiment ID: "+experimentId+" does not exist in the database");
+            ex.appendErrorMessage("Experiment ID: "+experimentId+" does not exist in the database.");
+            ex.appendErrorMessage("!!!EXPERIMENT WILL NOT BE UPLOADED!!!");
             uploadExceptionList.add(ex);
             log.error(ex.getMessage(), ex);
             throw ex;
@@ -285,9 +286,11 @@ public class MsDataUploader {
         }
         catch (UploadException e) {
             // delete the entry in the experiment table
+            deleteExperiment(this.uploadedExptId);
+            
             e.appendErrorMessage("!!!\n\tERROR UPLOADING MS2 DATA. EXPERIMENT WILL NOT BE UPLOADED\n!!!");
             log.error(e.getMessage(), e);
-            numRunsUploaded = 0;
+//            numRunsUploaded = 0;
             throw e;
         }
         
@@ -430,6 +433,10 @@ public class MsDataUploader {
         return filenames;
     }
     
+    private void deleteExperiment(int experimentId) {
+        MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
+        exptDao.deleteExperiment(experimentId);
+    }
     
     public static int getScanIdFor(String runFileScanString, int searchId) {
         // parse the filename to get the filename, scan number and charge

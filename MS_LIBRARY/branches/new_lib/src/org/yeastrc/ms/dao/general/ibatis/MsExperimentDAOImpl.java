@@ -69,4 +69,9 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
             return 0;
         return cnt;
     }
+
+    @Override
+    public void deleteExperiment(int experimentId) {
+        delete("MsExperiment.deleteExperiment", experimentId);
+    }
 }

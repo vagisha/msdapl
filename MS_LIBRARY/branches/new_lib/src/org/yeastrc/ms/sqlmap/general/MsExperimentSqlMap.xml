@@ -52,4 +52,8 @@
     	INSERT INTO msExperimentRun (experimentID, runID) VALUES (#experimentId#, #runId#)
     </insert>
     
+    <delete id="deleteExperiment" parameterClass="Integer">
+    	DELETE from msExperiment WHERE id=#id#
+    </delete>
+    
 </sqlMap>

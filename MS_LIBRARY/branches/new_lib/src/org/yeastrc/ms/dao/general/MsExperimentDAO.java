@@ -28,4 +28,6 @@ public interface MsExperimentDAO {
     public abstract int getMatchingExptRunCount(int experimentId, int runId);
     
     public abstract void updateLastUpdateDate(int experimentId);
+    
+    public abstract void deleteExperiment(int experimentId);
 }
