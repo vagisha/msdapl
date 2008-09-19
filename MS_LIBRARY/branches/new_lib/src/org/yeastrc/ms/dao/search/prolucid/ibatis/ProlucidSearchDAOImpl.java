@@ -7,6 +7,7 @@
 package org.yeastrc.ms.dao.search.prolucid.ibatis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -37,9 +38,9 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
         return (ProlucidSearch) queryForObject("ProlucidSearch.select", searchId);
     }
     
-    public int saveSearch(ProlucidSearchIn search, int sequenceDatabaseId) {
+    public int saveSearch(ProlucidSearchIn search, int experimentId, int sequenceDatabaseId) {
         
-        int searchId = searchDao.saveSearch(search, sequenceDatabaseId);
+        int searchId = searchDao.saveSearch(search, experimentId, sequenceDatabaseId);
         // save ProLuCID search parameters
         try {
             for (ProlucidParamIn param: search.getProlucidParams()) {
@@ -60,6 +61,11 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
         for (ProlucidParamIn child: param.getChildParamElements()) {
             insertProlucidParam(child, paramId, searchId);
         }
+    }
+    
+    @Override
+    public List<Integer> getSearchIdsForExperiment(int experimentId) {
+        return searchDao.getSearchIdsForExperiment(experimentId);
     }
     
     @Override

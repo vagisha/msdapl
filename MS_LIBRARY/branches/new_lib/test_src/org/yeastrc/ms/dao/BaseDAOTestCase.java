@@ -22,6 +22,7 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
+import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.MsRunDAOImplTest.MsRunTest;
@@ -74,6 +75,7 @@ import org.yeastrc.ms.util.PeakConverterString;
  */
 public class BaseDAOTestCase extends TestCase {
 
+    protected MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
     protected MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
     protected MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
 

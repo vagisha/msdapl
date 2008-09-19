@@ -24,4 +24,8 @@ public interface MsExperimentDAO {
     public abstract int saveExperiment(MsExperiment experiment);
     
     public abstract void saveExperimentRun(int experimentId, int runId);
+    
+    public abstract int getMatchingExptRunCount(int experimentId, int runId);
+    
+    public abstract void updateLastUpdateDate(int experimentId);
 }

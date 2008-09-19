@@ -10,13 +10,11 @@
 		<result property="id" column="id" />
 		<result property="runId" column="runID" nullValue="0"/>
 		<result property="createDate" column="createDate" />
-		<result property="serverAddress" column="serverAddress" />
 		<result property="serverDirectory" column="serverDirectory" />
 	</resultMap>
 	
 	<parameterMap class="MsRunLocationIn" id="msRunLocationParam">
 		<parameter property="runId" jdbcType="INTEGER" nullValue="0" />
-		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverDirectory" jdbcType="VARCHAR"/>
 	</parameterMap>
 	
@@ -32,12 +30,11 @@
      <select id="selectMatchingLocations" resultClass="Integer" parameterClass="MsRunLocationIn">
     	SELECT count(*) FROM msRunLocation 
     	WHERE runID=#runId#
-    	AND serverAddress=#serverAddress#
     	AND serverDirectory=#serverDirectory#
     </select>
     
     <insert id="insert" parameterMap="msRunLocationParam">
-    	INSERT INTO msRunLocation (runID, serverAddress, serverDirectory) VALUES (?,?,?)
+    	INSERT INTO msRunLocation (runID, serverDirectory) VALUES (?,?)
     </insert>
     
 </sqlMap>

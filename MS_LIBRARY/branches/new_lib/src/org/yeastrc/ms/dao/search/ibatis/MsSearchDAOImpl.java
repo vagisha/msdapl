@@ -55,9 +55,9 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
         return (MsSearch) queryForObject("MsSearch.select", searchId);
     }
     
-    public int saveSearch(MsSearchIn search, int sequenceDatabaseId) {
+    public int saveSearch(MsSearchIn search, int experimentId, int sequenceDatabaseId) {
         
-        final int searchId = saveAndReturnId("MsSearch.insert", search);
+        final int searchId = saveAndReturnId("MsSearch.insert", new MsSearchWrap(search, experimentId));
         
         try {
             // save any database information associated with the search 
@@ -113,6 +113,11 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
         map.put("searchId", searchId);
         map.put("analysisProgram", program);
         return update("MsSearch.updateAnalysisProgram", map);
+    }
+    
+    @Override
+    public List<Integer> getSearchIdsForExperiment(int experimentId) {
+        return queryForList("MsSearch.selectSearchIdsForExperiment", experimentId);
     }
     
     public void deleteSearch(int searchId) {

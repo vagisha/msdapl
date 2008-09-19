@@ -50,7 +50,23 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("experimentId", experimentId);
         map.put("runId", runId);
-        
-        save("MsExperiment.insertExperimentRun", map);
+        // if an entry for this experimentId and runId already exists don't 
+        // upload another one
+        if (getMatchingExptRunCount(experimentId, runId) == 0)
+            save("MsExperiment.insertExperimentRun", map);
+    }
+    
+    public void updateLastUpdateDate(int experimentId) {
+       update("MsExperiment.updateLastUpdate", experimentId); 
+    }
+    
+    public int getMatchingExptRunCount(int experimentId, int runId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("experimentId", experimentId);
+        map.put("runId", runId);
+        Integer cnt = (Integer) queryForObject("MsExperiment.getExperimentRunCount", map);
+        if (cnt == null)
+            return 0;
+        return cnt;
     }
 }

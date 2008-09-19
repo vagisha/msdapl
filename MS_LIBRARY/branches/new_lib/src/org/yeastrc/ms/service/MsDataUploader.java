@@ -15,7 +15,9 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.domain.general.impl.MsExperimentBean;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.general.MsExperiment;
+import org.yeastrc.ms.domain.general.impl.ExperimentBean;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -32,6 +34,10 @@ public class MsDataUploader {
     private int numSearchesToUpload = 0;
     private int numSearchesUploaded = 0;
     private int uploadedSearchId;
+    private int uploadedExptId;
+    private String remoteServer;
+    private String remoteDirectory;
+    private String uploadDirectory;
     
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
@@ -45,6 +51,10 @@ public class MsDataUploader {
         numRunsUploaded = 0;
         numSearchesToUpload = 0;
         numSearchesUploaded = 0;
+        uploadedExptId = 0;
+        remoteServer = null;
+        remoteDirectory = null;
+        uploadDirectory = null;
     }
     
     public List<UploadException> getUploadExceptionList() {
@@ -73,52 +83,23 @@ public class MsDataUploader {
     public int uploadExperimentToDb(String remoteServer, String remoteDirectory, String fileDirectory, Date searchDate) throws UploadException {
 
         resetUploader();
+        this.remoteServer = remoteServer;
+        this.remoteDirectory = remoteDirectory;
+        this.uploadDirectory = fileDirectory;
         
-        log.info("BEGIN EXPERIMENT UPLOAD"+
-                "\n\tRemote server: "+remoteServer+
-                "\n\tRemote directory: "+remoteDirectory+
-                "\n\tDirectory: "+fileDirectory+
-                "\n\tTime: "+(new Date().toString()));
+        logBeginExperimentUpload();
         long start = System.currentTimeMillis();
         
         // ----- BEFORE BEGINNING UPLOAD MAKE THE FOLLOWING CHECKS -----
-        // (1). Make sure upload directory exists
-        if (!(new File(fileDirectory).exists())) {
-            UploadException ex = new UploadException(ERROR_CODE.DIRECTORY_NOT_FOUND);
-            ex.setDirectory(fileDirectory);
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            throw ex;
-        }
-        
-        // get the file names
-        Set<String> filenames = getFileNamePrefixes(fileDirectory);
-        
-        // (2). If we didn't find any files print warning and return.
-        if (filenames.size() == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.EMPTY_DIRECTORY);
-            ex.setDirectory(fileDirectory);
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            throw ex;
-        }
-        
-        // (3). make sure .ms2 files are present
-        String missingFile = missingMs2File(fileDirectory, filenames);
-        if (missingFile != null) {
-            UploadException ex = new UploadException(ERROR_CODE.MISSING_MS2);
-            ex.setErrorMessage("Missing file: "+missingFile);
-            ex.setDirectory(fileDirectory);
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            throw ex;
-        }
+        Set<String> filenames = getFileNamesAndDoPreUploadChecks();
         
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
-        int searchId = 0;
+        // first create an entry in the msExperiment table
+        this.uploadedExptId = saveExperiment();
+        
         try {
-            searchId = uploadRunAndSearchFilesToDb(fileDirectory, filenames, remoteServer, remoteDirectory, searchDate);
+            uploadRunAndSearchFilesToDb(filenames,searchDate);
         }
         catch (UploadException e) { // this should only result from ms2 file upload
                                     // or if unsupported sqt files were found.
@@ -130,17 +111,125 @@ public class MsDataUploader {
         }
         
         long end = System.currentTimeMillis();
+        logEndExperimentUpload(start, end);
+        
+        return uploadedExptId;
+    }
+    
+    public void uploadExperimentToDb(int experimentId, String fileDirectory, Date searchDate) throws UploadException {
+        resetUploader();
+        MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
+        MsExperiment expt = exptDao.loadExperiment(experimentId);
+        if (expt == null) {
+            UploadException ex = new UploadException(ERROR_CODE.EXPT_NOT_FOUND);
+            ex.appendErrorMessage("Experiment ID: "+experimentId+" does not exist in the database");
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
+        this.remoteServer = expt.getServerAddress();
+        this.remoteDirectory = expt.getServerDirectory();
+        this.uploadDirectory = fileDirectory;
+        this.uploadedExptId = experimentId;
+        
+        logBeginExperimentUpload();
+        long start = System.currentTimeMillis();
+        
+        // ----- BEFORE BEGINNING UPLOAD MAKE THE FOLLOWING CHECKS -----
+        Set<String> filenames = getFileNamesAndDoPreUploadChecks();
+        
+        // ----- UPDATE THE LAST UPDATE DATE FOR THE EXPERIMENT
+        updateLastUpdateDate(experimentId);
+        
+        // ----- DELETE ANY OLD SEARCHES UPLOADED FOR THIS EXPERIMENT
+        deleteOldSearchesForExperiment(experimentId);
+        
+        // ----- NOW WE CAN BEGIN THE UPLOAD -----
+        try {
+            uploadRunAndSearchFilesToDb(filenames,searchDate);
+        }
+        catch (UploadException e) { // this should only result from ms2 file upload
+                                    // or if unsupported sqt files were found.
+            uploadExceptionList.add(e);
+            log.error(e.getMessage(), e);
+            log.error("ABORTING EXPERIMENT UPLOAD!!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            numRunsUploaded = 0;
+            throw e;
+        }
+        
+        long end = System.currentTimeMillis();
+        logEndExperimentUpload(start, end);
+    }
+
+    private void updateLastUpdateDate(int experimentId) {
+        MsExperimentDAO experimentDao = DAOFactory.instance().getMsExperimentDAO();
+        experimentDao.updateLastUpdateDate(experimentId);
+        
+    }
+
+    private void deleteOldSearchesForExperiment(int experimentId) {
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        List<Integer> searchIds = searchDao.getSearchIdsForExperiment(experimentId);
+        for (Integer id: searchIds) {
+            if (id != null)
+                searchDao.deleteSearch(id);
+        }
+    }
+
+    private void logEndExperimentUpload(long start, long end) {
         log.info("END EXPERIMENT UPLOAD: "+((end - start)/(1000L))+"seconds"+
                 "\n\tTime: "+(new Date().toString())+
+                "\n\tExperiment ID: "+uploadedExptId+
                 "\n\t#Runs in Directory: "+numRunsToUpload+"; #Uploaded: "+numRunsUploaded+
-                "\n\tSEARCH ID: "+searchId+
+                "\n\tSEARCH ID: "+this.uploadedSearchId+
                 "\n\t#Searches in Directory: "+numSearchesToUpload+"; #Uploaded: "+numSearchesUploaded+
                 "\n\tRemote server: "+remoteServer+
                 "\n\tRemote directory: "+remoteDirectory+
-                "\n\tUpload Directory: "+fileDirectory+
+                "\n\tUpload Directory: "+uploadDirectory+
                 "\n\n");
+    }
+
+    private void logBeginExperimentUpload() {
+        log.info("BEGIN EXPERIMENT UPLOAD"+
+                "\n\tRemote server: "+remoteServer+
+                "\n\tRemote directory: "+remoteDirectory+
+                "\n\tDirectory: "+uploadDirectory+
+                "\n\tTime: "+(new Date().toString()));
+    }
+
+    private Set<String> getFileNamesAndDoPreUploadChecks() throws UploadException {
+        // (1). Make sure upload directory exists
+        if (!(new File(uploadDirectory).exists())) {
+            UploadException ex = new UploadException(ERROR_CODE.DIRECTORY_NOT_FOUND);
+            ex.setDirectory(uploadDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
         
-        return searchId;
+        // get the file names
+        Set<String> filenames = getFileNamePrefixes(uploadDirectory);
+        
+        // (2). If we didn't find any files print warning and return.
+        if (filenames.size() == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.EMPTY_DIRECTORY);
+            ex.setDirectory(uploadDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
+        
+        // (3). make sure .ms2 files are present
+        String missingFile = missingMs2File(uploadDirectory, filenames);
+        if (missingFile != null) {
+            UploadException ex = new UploadException(ERROR_CODE.MISSING_MS2);
+            ex.setErrorMessage("Missing file: "+missingFile);
+            ex.setDirectory(uploadDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
+        return filenames;
     }
 
    
@@ -181,25 +270,18 @@ public class MsDataUploader {
     }
     
     /**
-     * If the runs were already in the database, the runs are not uploaded again, 
-     * @param fileDirectory
+     * If the runs were already in the database, the runs are not uploaded again,
      * @param filenames
-     * @param serverAddress
-     * @param serverDirectory
-     * @param sqtType
-     * @return searchId
+     * @return searchDate
      * @throws UploadException
      */
-    private int uploadRunAndSearchFilesToDb(String fileDirectory, Set<String> filenames, 
-            String serverAddress, String serverDirectory, Date searchDate) throws UploadException   {
-        
-        // create an experiment first
-        int experimentId = saveExperiment(serverAddress);
+    private void uploadRunAndSearchFilesToDb(Set<String> filenames, Date searchDate) throws UploadException   {
+       
         
         // upload the runs first. This could throw an upload exception
         Map<String, Integer> runIdMap;
         try {
-            runIdMap = uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
+            runIdMap = uploadRuns(filenames);
         }
         catch (UploadException e) {
             // delete the entry in the experiment table
@@ -213,7 +295,7 @@ public class MsDataUploader {
         // make sure there are no unsupported .sqt files. This method may throw an UploadException. 
         // We will propagate this exception
         SearchFileFormat sqtType = null;
-        try {sqtType = getSqtType(fileDirectory, filenames);}
+        try {sqtType = getSqtType(uploadDirectory, filenames);}
         catch(UploadException ex) {
             ex.appendErrorMessage("\n\tSEARCH WILL NOT BE UPLOADED.");
             log.error(ex.getMessage(), ex);
@@ -222,22 +304,20 @@ public class MsDataUploader {
         
         // now upload the searches. No exception will be thrown if the upload fails
         try {
-            this.uploadedSearchId =  uploadSearches(fileDirectory, filenames, serverAddress,
-                        serverDirectory, searchDate, runIdMap, sqtType);
+            this.uploadedSearchId =  uploadSearches(filenames, searchDate, runIdMap, sqtType);
         }
         // We should have caught all exceptions in the SQT upload classes but just in case anything slipped through...
         catch(RuntimeException e) {
             log.error("!!!ERROR UPLOADING SEARCH (RuntimeException)!!!", e);
         }
-        
-        return experimentId;
     }
 
     
-    private int saveExperiment(String serverAddress) throws UploadException {
-        MsExperimentDAO experimentDao = DAOFactory.instance().getExperimentDAO();
-        MsExperimentBean experiment = new MsExperimentBean();
-        experiment.setServerAddress(serverAddress);
+    private int saveExperiment() throws UploadException {
+        MsExperimentDAO experimentDao = DAOFactory.instance().getMsExperimentDAO();
+        ExperimentBean experiment = new ExperimentBean();
+        experiment.setServerAddress(remoteServer);
+        experiment.setServerDirectory(remoteDirectory);
         experiment.setUploadDate(new java.sql.Date(new Date().getTime()));
         try { return experimentDao.saveExperiment(experiment);}
         catch(RuntimeException e) {
@@ -257,9 +337,9 @@ public class MsDataUploader {
      * @return
      * @throws UploadException
      */
-    private Map<String, Integer> uploadRuns(String fileDirectory, Set<String> filenames, String serverAddress, String serverDirectory) throws UploadException {
+    private Map<String, Integer> uploadRuns(Set<String> filenames) throws UploadException {
         MS2DataUploadService uploadService = new MS2DataUploadService();
-        Map<String, Integer> runMapIds = uploadService.uploadRuns(fileDirectory, filenames, serverAddress, serverDirectory);
+        Map<String, Integer> runMapIds = uploadService.uploadRuns(uploadedExptId, uploadDirectory, filenames, remoteDirectory);
         this.numRunsToUpload = uploadService.getNumRunsToUpload();
         this.numRunsUploaded = uploadService.getNumRunsUploaded();
         this.uploadExceptionList.addAll(uploadService.getUploadExceptionList());
@@ -267,25 +347,20 @@ public class MsDataUploader {
     }
 
     /**
-     * @param fileDirectory
      * @param filenames
-     * @param serverAddress
-     * @param serverDirectory
      * @param searchDate
      * @param runIdMap
-     * @return searchId
      * @param sqtType
      */
-    private int uploadSearches(String fileDirectory, Set<String> filenames,
-            String serverAddress, String serverDirectory, Date searchDate,
+    private int uploadSearches(Set<String> filenames,Date searchDate,
             Map<String, Integer> runIdMap, SearchFileFormat sqtType) {
         
         // upload the search
         if (sqtType == SearchFileFormat.SQT_SEQ || sqtType == SearchFileFormat.SQT_NSEQ) {
-            return uploadSequestSearch(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
+            return uploadSequestSearch(filenames, runIdMap, searchDate);
         }
         else if (sqtType == SearchFileFormat.SQT_PLUCID) {
-            return uploadProlucidSearch(fileDirectory, filenames, serverAddress, serverDirectory, runIdMap, searchDate);
+            return uploadProlucidSearch(filenames, runIdMap, searchDate);
         }
         else {
             log.error("Unknow SQT type");
@@ -294,13 +369,12 @@ public class MsDataUploader {
     }
     
     // upload sequest sqt files
-    private int uploadSequestSearch(String fileDirectory,
-            Set<String> filenames, final String serverAddress,
-            final String serverDirectory, Map<String, Integer> runIdMap,
-            final Date searchDate) {
+    private int uploadSequestSearch(Set<String> filenames, Map<String, Integer> runIdMap, final Date searchDate) {
         
         SequestSQTDataUploadService service = new SequestSQTDataUploadService();
-        int searchId = service.uploadSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
+        int searchId = service.uploadSearch(uploadedExptId, uploadDirectory, filenames, runIdMap, 
+                                        remoteServer, remoteDirectory, 
+                                        new java.sql.Date(searchDate.getTime()));
         this.uploadExceptionList.addAll(service.getUploadExceptionList());
         this.numSearchesToUpload = service.getNumSearchesToUpload();
         this.numSearchesUploaded = service.getNumSearchesUploaded();
@@ -308,12 +382,11 @@ public class MsDataUploader {
     }
 
     // upload prolucid sqt files
-    private int uploadProlucidSearch(String fileDirectory,
-            Set<String> filenames, String serverAddress,
-            String serverDirectory, Map<String, Integer> runIdMap,
-            Date searchDate) {
+    private int uploadProlucidSearch(Set<String> filenames, Map<String, Integer> runIdMap,Date searchDate) {
         ProlucidSQTDataUploadService service = new ProlucidSQTDataUploadService();
-        int searchId = service.uploadSearch(fileDirectory, filenames, runIdMap, serverAddress, serverDirectory, new java.sql.Date(searchDate.getTime()));
+        int searchId = service.uploadSearch(uploadedExptId, uploadDirectory, filenames, runIdMap, 
+                                    remoteServer, remoteDirectory, 
+                                    new java.sql.Date(searchDate.getTime()));
         this.uploadExceptionList.addAll(service.getUploadExceptionList());
         this.numSearchesToUpload = service.getNumSearchesToUpload();
         this.numSearchesUploaded = service.getNumSearchesUploaded();

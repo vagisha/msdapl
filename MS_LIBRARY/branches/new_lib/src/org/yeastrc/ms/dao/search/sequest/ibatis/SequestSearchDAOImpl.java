@@ -7,6 +7,7 @@
 package org.yeastrc.ms.dao.search.sequest.ibatis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -35,9 +36,9 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
         return (SequestSearch) queryForObject("SequestSearch.select", searchId);
     }
     
-    public int saveSearch(SequestSearchIn search, int sequenceDatabaseId) {
+    public int saveSearch(SequestSearchIn search, int experimentId, int sequenceDatabaseId) {
         
-        int searchId = searchDao.saveSearch(search, sequenceDatabaseId);
+        int searchId = searchDao.saveSearch(search, experimentId, sequenceDatabaseId);
         
         // save sequest search parameters
         try {
@@ -50,6 +51,11 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
            throw e;
         }
         return searchId;
+    }
+    
+    @Override
+    public List<Integer> getSearchIdsForExperiment(int experimentId) {
+        return searchDao.getSearchIdsForExperiment(experimentId);
     }
     
     @Override

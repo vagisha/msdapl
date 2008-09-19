@@ -7,18 +7,20 @@
 package org.yeastrc.ms.domain.general.impl;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import org.yeastrc.ms.domain.general.MsExperiment;
 
 /**
  * 
  */
-public class MsExperimentBean implements MsExperiment {
+public class ExperimentBean implements MsExperiment {
 
     private int id;
     private String serverAddress;
+    private String serverDirectory;
     private Date uploadDate;
-    private Date lastUpdateDate;
+    private Timestamp lastUpdateDate;
     
     
     public void setId(int id) {
@@ -28,12 +30,16 @@ public class MsExperimentBean implements MsExperiment {
     public void setServerAddress(String serverAddress) {
         this.serverAddress = serverAddress;
     }
+    
+    public void setServerDirectory(String serverDirectory) {
+        this.serverDirectory = serverDirectory;
+    }
 
     public void setUploadDate(Date uploadDate) {
         this.uploadDate = uploadDate;
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
+    public void setLastUpdateDate(Timestamp lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 
@@ -43,7 +49,7 @@ public class MsExperimentBean implements MsExperiment {
     }
 
     @Override
-    public Date getLastUpdateDate() {
+    public Timestamp getLastUpdateDate() {
         return lastUpdateDate;
     }
 
@@ -52,6 +58,11 @@ public class MsExperimentBean implements MsExperiment {
         return serverAddress;
     }
 
+    @Override
+    public String getServerDirectory() {
+        return serverDirectory;
+    }
+    
     @Override
     public Date getUploadDate() {
         return uploadDate;

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
-import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.run.MsRunIn;
+import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.run.MsRun;
+import org.yeastrc.ms.domain.run.MsRunIn;
 import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 
@@ -26,7 +26,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     public void testSaveLoadAndDelete() {
         MsRunIn run = createDefaultRun();
-        int runId = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        int runId = runDao.saveRun(run, "remoteDirectory");
         MsRun runDb = runDao.loadRun(runId);
         checkRun(run, runDb);
         runDao.delete(runId);
@@ -35,17 +35,17 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     public void testSaveAndLoadRunFileFormats() {
         MsRunIn run = createRunForFormat(RunFileFormat.MS2);
-        int id1 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        int id1 = runDao.saveRun(run, "remoteDirectory");
         MsRun runDb = runDao.loadRun(id1);
         assertEquals(RunFileFormat.MS2, runDb.getRunFileFormat());
         
         run = createRunForFormat(RunFileFormat.UNKNOWN);
-        int id2 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        int id2 = runDao.saveRun(run, "remoteDirectory");
         runDb = runDao.loadRun(id2);
         assertEquals(RunFileFormat.UNKNOWN, runDb.getRunFileFormat());
         
         run = createRunForFormat(null);
-        int id3 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        int id3 = runDao.saveRun(run, "remoteDirectory");
         runDb = runDao.loadRun(id3);
         assertEquals(RunFileFormat.UNKNOWN, runDb.getRunFileFormat());
         
@@ -59,9 +59,9 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     public void testLoadRunsForFileNameAndSha1Sum() {
         MsRunIn run = createDefaultRun();
-        int id1 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        int id1 = runDao.saveRun(run, "remoteDirectory");
         run = createDefaultRun();
-        int id2 = runDao.saveRun(run, "remoteServer", "remoteDirectory");
+        int id2 = runDao.saveRun(run, "remoteDirectory");
         
         List<Integer> runs = runDao.loadRunIdsForFileNameAndSha1Sum(run.getFileName(), run.getSha1Sum());
         assertEquals(2, runs.size());
@@ -74,7 +74,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
     
     public void testSaveAndLoadRunWithNoEnzymes() {
         // create a run and save it
-        int runId = runDao.saveRun(createDefaultRun(), "remoteServer", "remoteDirectory");
+        int runId = runDao.saveRun(createDefaultRun(), "remoteDirectory");
         
         // read back the run
         MsRun dbRun = runDao.loadRun(runId);
@@ -101,7 +101,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         MsRunIn run1 = createRunWEnzymeInfo(enzymeList1);
         
         // save the run
-        int runId_1 = runDao.saveRun(run1, "remoteServer", "remoteDirectory");
+        int runId_1 = runDao.saveRun(run1, "remoteDirectory");
         
         // now read back the run and make sure it has the enzyme information
         MsRun runFromDb_1 = runDao.loadRun(runId_1);
@@ -115,7 +115,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         MsRunIn run2 = createRunWEnzymeInfo(enzymeList2);
         
         // save the run
-        int runId_2 = runDao.saveRun(run2, "remoteServer", "remoteDirectory");
+        int runId_2 = runDao.saveRun(run2, "remoteDirectory");
         
         // now read back the run and make sure it has the enzyme information
         MsRun runFromDb_2 = runDao.loadRun(runId_2);
@@ -148,7 +148,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         enzymeList1.add(enzyme1);
         enzymeList1.add(enzyme2);
         MsRunIn run1 = createRunWEnzymeInfo(enzymeList1);
-        int runId_1 = runDao.saveRun(run1, "remoteServer", "remoteDirectory");
+        int runId_1 = runDao.saveRun(run1, "remoteDirectory");
         
         // now read back the run and make sure it has the enzyme information
         MsRun runFromDb_1 = runDao.loadRun(runId_1);
@@ -161,7 +161,7 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         List <MsEnzymeIn> enzymeList2 = new ArrayList<MsEnzymeIn>(1);
         enzymeList2.add(enzyme3);
         MsRunIn run2 = createRunWEnzymeInfo(enzymeList2);
-        int runId_2 = runDao.saveRun(run2, "remoteServer", "remoteDirectory");
+        int runId_2 = runDao.saveRun(run2, "remoteDirectory");
         
         // now read back the run and make sure it has the enzyme information
         MsRun runFromDb_2 = runDao.loadRun(runId_2);
@@ -214,32 +214,30 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         String server = "my.host";
         String remoteDir = "/my/server/directory";
         
-        int runId = runDao.saveRun(run1, server, remoteDir);
+        int runId = runDao.saveRun(run1, remoteDir);
         List<MsRunLocation> locDbList = runDao.loadLocationsForRun(runId);
         assertEquals(1, locDbList.size());
         
         MsRunLocation locDb = locDbList.get(0);
-        assertEquals(server, locDb.getServerAddress());
         assertEquals(remoteDir, locDb.getServerDirectory());
         assertEquals(runId, locDb.getRunId());
         
-        int matchingLocs = runDao.loadMatchingRunLocations(runId, server, remoteDir);
+        int matchingLocs = runDao.loadMatchingRunLocations(runId, remoteDir);
         assertEquals(1, matchingLocs);
         
         
         // save another location for the run
-        runDao.saveRunLocation(server, "/my/server/directory/2", runId);
+        runDao.saveRunLocation("/my/server/directory/2", runId);
         locDbList = runDao.loadLocationsForRun(runId);
         assertEquals(2, locDbList.size());
         assertEquals(locDbList.get(0).getRunId(), locDbList.get(1).getRunId());
-        assertEquals(locDbList.get(0).getServerAddress(), locDbList.get(1).getServerAddress());
         assertNotSame(locDbList.get(0).getServerDirectory(), locDbList.get(1).getServerDirectory());
         
-        matchingLocs = runDao.loadMatchingRunLocations(runId, server, "/my/server/directory/2");
+        matchingLocs = runDao.loadMatchingRunLocations(runId, "/my/server/directory/2");
         assertEquals(1, matchingLocs);
         
         // try to find a matching location that does not exist
-        assertEquals(0, runDao.loadMatchingRunLocations(runId, server, "directory"));
+        assertEquals(0, runDao.loadMatchingRunLocations(runId, "directory"));
         
         runDao.delete(runId);
         assertEquals(0, runDao.loadLocationsForRun(runId).size());

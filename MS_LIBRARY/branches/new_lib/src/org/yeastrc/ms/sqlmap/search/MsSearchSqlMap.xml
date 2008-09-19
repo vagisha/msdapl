@@ -4,7 +4,7 @@
 <sqlMap namespace="MsSearch"> 
 
     <typeAlias alias="MsSearchOut" type="org.yeastrc.ms.domain.search.impl.SearchBean"/>
-    <typeAlias alias="MsSearchIn" type="org.yeastrc.ms.domain.search.MsSearchIn"/>
+    <typeAlias alias="MsSearchIn" type="org.yeastrc.ms.dao.search.ibatis.MsSearchWrap"/>
 	
 	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>
 	<typeAlias alias="ProgramTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl$SearchProgramTypeHandler"/>
@@ -51,10 +51,13 @@
     	SELECT * FROM msSearch WHERE id = #id#
     </select>
     
+    <select id="selectSearchIdsForExperiment" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msSearch WHERE experimentID = #experimentId#
+    </select>
     
     <insert id="insert" parameterMap="msSearchParam">
     	INSERT INTO msSearch (
-    	experimentId
+    	experimentId,
     	expDate,
     	serverDirectory,
     	analysisProgramName,

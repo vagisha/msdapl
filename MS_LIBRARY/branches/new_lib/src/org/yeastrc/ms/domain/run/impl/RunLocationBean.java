@@ -17,7 +17,6 @@ public class RunLocationBean implements MsRunLocation {
 
     private int id;                 // database id for this location
     private int runId;              // database id for the locations's run
-    private String serverAddress;    // server hosting this location
     private String serverDirectory; 
     private Date createDate;
     
@@ -37,15 +36,6 @@ public class RunLocationBean implements MsRunLocation {
     
     public void setRunId(int runId) {
         this.runId = runId;
-    }
-
-    @Override
-    public String getServerAddress() {
-        return serverAddress;
-    }
-    
-    public void setServerAddress(String serverAddress) {
-        this.serverAddress = serverAddress;
     }
 
     @Override

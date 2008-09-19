@@ -24,13 +24,14 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
 
     public void testOperationsOnSequestSearch () {
         
+        int experimentId = 67;
         // no saved search exists right now
         assertNull(sequestSearchDao.loadSearch(1));
         
         // save a search (don't add any extra information)
         SequestSearchIn search_1 = makeSequestSearch(false, false, false);
         assertEquals(0, search_1.getSearchDatabases().size());
-        int searchId_1 = sequestSearchDao.saveSearch(search_1, 987); // proteinDatabaseId = 987
+        int searchId_1 = sequestSearchDao.saveSearch(search_1, experimentId, 987); // proteinDatabaseId = 987
         
         // load using our specialized SequestSearchDAO
         SequestSearch search_1_db = sequestSearchDao.loadSearch(searchId_1);
@@ -46,7 +47,7 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
         
         // save another search (add extra information)
         SequestSearchIn search_2 = makeSequestSearch(true, true, true);
-        int searchId_2 = sequestSearchDao.saveSearch(search_2, 789); // proteinDatabaseId = 789
+        int searchId_2 = sequestSearchDao.saveSearch(search_2, experimentId, 789); // proteinDatabaseId = 789
         
         // load the search and check values
         SequestSearch search_2_db = sequestSearchDao.loadSearch(searchId_2);

@@ -4,7 +4,7 @@
  * Sep 7, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.impl;
+package org.yeastrc.ms.dao.search.ibatis;
 
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;

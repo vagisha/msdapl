@@ -6,7 +6,7 @@
 	
 	<typeAlias alias="MsSearchResultOut" type="org.yeastrc.ms.domain.search.impl.SearchResultBean" />
 	<typeAlias alias="MsSearchResultPeptideOut" type="org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean" />
-	<typeAlias alias="MsSearchResultIn" type="org.yeastrc.ms.domain.search.impl.MsSearchResultWrap" />
+	<typeAlias alias="MsSearchResultIn" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultWrap" />
 	
 	<typeAlias alias="VStatusHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl$ValidationStatusTypeHandler" />
 	

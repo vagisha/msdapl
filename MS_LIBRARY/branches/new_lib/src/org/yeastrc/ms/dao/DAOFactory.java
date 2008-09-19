@@ -172,7 +172,7 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // EXPERIMENT related
     //-------------------------------------------------------------------------------------------
-    public MsExperimentDAO getExperimentDAO() {
+    public MsExperimentDAO getMsExperimentDAO() {
         return experimentDAO;
     }
     

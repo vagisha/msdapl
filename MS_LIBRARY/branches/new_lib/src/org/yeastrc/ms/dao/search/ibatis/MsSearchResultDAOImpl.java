@@ -17,7 +17,6 @@ import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
-import org.yeastrc.ms.domain.search.impl.MsSearchResultWrap;
 import org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

@@ -46,10 +46,10 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         MsDataUploader uploader = new MsDataUploader();
         java.util.Date experimentDate = new java.util.Date();
         
-        int searchId = 0;
+        int experimentId = 0;
         try {
-            searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
-            assertNotSame(0, searchId);
+            experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
+            assertNotSame(0, experimentId);
         }
         catch (UploadException e) {
             e.printStackTrace();
@@ -61,10 +61,10 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         int runId1 = getRunId("1.ms2");
         int runId2 = getRunId("2.ms2");
         
-        checkSearch(searchId, experimentDate);
+        checkSearch(uploader.getUploadedSearchId(), experimentDate);
         
 //        checkFirstRunSearch(searchId, runId1);
-        checkSecondRunSearch(searchId, runId2);
+        checkSecondRunSearch(uploader.getUploadedSearchId(), runId2);
         
     }
     
@@ -74,7 +74,6 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertNotNull(search);
         assertNull(searchDao.loadSearch(24));
         
-        assertEquals("remoteServer", search.getServerAddress());
         assertEquals("remoteDirectory", search.getServerDirectory());
         assertEquals(SearchProgram.SEQUEST, search.getSearchProgram());
         assertEquals("3.0", search.getSearchProgramVersion());

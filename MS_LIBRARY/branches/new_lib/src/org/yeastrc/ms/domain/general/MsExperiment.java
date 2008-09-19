@@ -7,6 +7,7 @@
 package org.yeastrc.ms.domain.general;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * 
@@ -17,7 +18,9 @@ public interface MsExperiment {
     
     public abstract String getServerAddress();
     
+    public abstract String getServerDirectory();
+    
     public abstract Date getUploadDate();
     
-    public abstract Date getLastUpdateDate();
+    public abstract Timestamp getLastUpdateDate();
 }

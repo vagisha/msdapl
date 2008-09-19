@@ -79,7 +79,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     }
     
     @Override
-    int uploadSearchParameters(String paramFileDirectory, String remoteServer, String remoteDirectory,
+    int uploadSearchParameters(int experimentId, String paramFileDirectory, 
+            String remoteServer, String remoteDirectory,
             Date searchDate) throws UploadException {
         
         SequestParamsParser parser = parseSequestParams(paramFileDirectory, remoteServer);
@@ -95,7 +96,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
             SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
-            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate), sequenceDatabaseId);
+            return searchDAO.saveSearch(makeSearchObject(parser, remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
@@ -212,7 +213,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     }
 
     
-    private SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
+    private SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteDirectory, final Date searchDate) {
         return new SequestSearchIn() {
             @Override
             public List<SequestParam> getSequestParams() {return parser.getParamList();}
@@ -238,7 +239,6 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in sequest.params
             public Date getSearchDate() {return searchDate;}
-            public String getServerAddress() {return remoteServer;}
             public String getServerDirectory() {return remoteDirectory;}
         };
     }

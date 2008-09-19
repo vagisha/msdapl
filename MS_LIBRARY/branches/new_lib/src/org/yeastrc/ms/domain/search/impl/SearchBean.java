@@ -21,6 +21,7 @@ import org.yeastrc.ms.domain.search.SearchProgram;
 public class SearchBean implements MsSearch {
 
     private int id;
+    private int experimentId;
     private Date uploadDate;
     private Date searchDate;
     private String serverAddress;
@@ -60,6 +61,15 @@ public class SearchBean implements MsSearch {
     public void setId(int id) {
         this.id = id;
     }
+    
+    public int getExperimentId() {
+        return this.experimentId;
+    }
+    
+    public void setExperimentId(int experimentId) {
+        this.experimentId = experimentId;
+    }
+    
     /**
      * @return the serverAddress
      */

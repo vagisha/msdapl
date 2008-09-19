@@ -36,13 +36,13 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
         this.enzymeDao = enzymeDao;
     }
 
-    public int saveRun(MsRunIn run, String serverAddress, String serverDirectory) {
+    public int saveRun(MsRunIn run, String serverDirectory) {
         
         int runId = saveAndReturnId("MsRun.insert", run);
         
         try {
             // save location information for the original file
-            saveRunLocation(serverAddress, serverDirectory, runId);
+            saveRunLocation(serverDirectory, runId);
         
             // save the enzyme information
             List<MsEnzymeIn> enzymes = run.getEnzymeList();
@@ -58,9 +58,9 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
     }
 
     @Override
-    public void saveRunLocation(final String serverAddress, final String serverDirectory,
+    public void saveRunLocation(final String serverDirectory,
             final int runId) {
-        save("MsRunLocation.insert", new MsRunLocationWrap(serverAddress, serverDirectory, runId));
+        save("MsRunLocation.insert", new MsRunLocationWrap(serverDirectory, runId));
             
     }
     
@@ -99,9 +99,8 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
     }
 
     @Override
-    public int loadMatchingRunLocations(final int runId,
-            final String serverAddress, final String serverDirectory) {
-        MsRunLocationWrap loc = new MsRunLocationWrap(serverAddress, serverDirectory, runId);
+    public int loadMatchingRunLocations(final int runId, final String serverDirectory) {
+        MsRunLocationWrap loc = new MsRunLocationWrap(serverDirectory, runId);
         Integer count = (Integer) queryForObject("MsRunLocation.selectMatchingLocations", loc);
         if (count == null)
             return 0;

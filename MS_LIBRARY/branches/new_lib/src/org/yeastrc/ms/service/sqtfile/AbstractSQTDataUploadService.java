@@ -161,7 +161,8 @@ public abstract class AbstractSQTDataUploadService {
     
     //--------------------------------------------------------------------------------------------------
     // To be implemented by subclasses
-    abstract int uploadSearchParameters(String paramFileDirectory, String remoteServer, String remoteDirectory, Date searchDate) throws UploadException;
+    abstract int uploadSearchParameters(int experimentId, String paramFileDirectory, 
+            String remoteServer, String remoteDirectory, Date searchDate) throws UploadException;
     
     // NOTE: this method should be called AFTER uploadSearchParameters.
     abstract MsSearchDatabaseIn getSearchDatabase();
@@ -179,7 +180,9 @@ public abstract class AbstractSQTDataUploadService {
      * @param remoteDirectory 
      * @param searchDate 
      */
-    public int uploadSearch(String fileDirectory, Set<String> fileNames, Map<String,Integer> runIdMap, String remoteServer, String remoteDirectory, Date searchDate) {
+    public int uploadSearch(int experimentId, String fileDirectory, Set<String> fileNames,
+            Map<String,Integer> runIdMap, 
+            String remoteServer, String remoteDirectory, Date searchDate) {
 
         reset();// reset all caches etc.
         
@@ -188,7 +191,8 @@ public abstract class AbstractSQTDataUploadService {
         
         // parse and upload the search parameters
         try {
-            searchId = uploadSearchParameters(fileDirectory, remoteServer, remoteDirectory, searchDate);
+            searchId = uploadSearchParameters(experimentId, fileDirectory, 
+                    remoteServer, remoteDirectory, searchDate);
         }
         catch (UploadException e) {
             e.appendErrorMessage("\n\t!!!SEARCH WILL NOT BE UPLOADED\n");

@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
@@ -106,12 +107,11 @@ public class MS2DataUploadService {
      * Uploaded the ms2 files in the directory to the database.  Returns a mapping of uploaded filenames to database runIds. 
      * @param fileDirectory
      * @param filenames
-     * @param serverAddress
      * @param serverDirectory
      * @return
      * @throws UploadException
      */
-    public Map<String, Integer> uploadRuns(String fileDirectory, Set<String> filenames, String serverAddress, String serverDirectory) throws UploadException {
+    public Map<String, Integer> uploadRuns(int experimentId, String fileDirectory, Set<String> filenames, String serverDirectory) throws UploadException {
         
         reset(); // reset all caches etc. 
         
@@ -121,7 +121,9 @@ public class MS2DataUploadService {
         for (String filename: filenames) {
             int runId = 0;
             try {
-                runId = uploadMS2Run(fileDirectory+File.separator+filename+".ms2", serverAddress, serverDirectory);
+                runId = uploadMS2Run(experimentId, fileDirectory+File.separator+filename+".ms2", serverDirectory);
+                // link experiment and run
+                linkExperimentAndRun(experimentId, runId);
                 numRunsUploaded++;
             }
             catch (UploadException e) {
@@ -133,7 +135,7 @@ public class MS2DataUploadService {
         return runIdMap;
     }
     
-    private int uploadMS2Run(String filePath, String serverAddress, String serverDirectory) throws UploadException {
+    private int uploadMS2Run(int experimentId, String filePath, String serverDirectory) throws UploadException {
         
         // first check if the file in already in the database. If it is, return its database id
         // If a run with the same file name and SHA-1 hash code already exists in the 
@@ -143,7 +145,7 @@ public class MS2DataUploadService {
         int runId = getMatchingRunId(fileName, sha1Sum);
         if (runId > 0) {
             // If this run was uploaded from a different location, upload the location
-            saveRunLocation(serverAddress, serverDirectory, runId);
+            saveRunLocation(serverDirectory, runId);
             log.info("Run with name: "+fileName+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
             log.info("END MS2 FILE UPLOAD: "+fileName);
@@ -154,7 +156,7 @@ public class MS2DataUploadService {
         Ms2FileReader ms2Provider = new Ms2FileReader();
         try {
             ms2Provider.open(filePath, sha1Sum);
-            runId = uploadMS2Run(ms2Provider, serverAddress, serverDirectory);
+            runId = uploadMS2Run(ms2Provider, serverDirectory);
             return runId;
         }
         catch (DataProviderException e) {
@@ -174,14 +176,20 @@ public class MS2DataUploadService {
         }
     }
 
-    private void saveRunLocation(String serverAddress, String serverDirectory, int runId) {
+    private void saveRunLocation(String serverDirectory, int runId) {
         MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         // Save the original location (on remote server) of the MS2 file, if the location is not in the database already.
-        int runLocs = runDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
+        int runLocs = runDao.loadMatchingRunLocations(runId, serverDirectory);
         if (runLocs == 0) {
-            runDao.saveRunLocation(serverAddress, serverDirectory, runId);
+            runDao.saveRunLocation(serverDirectory, runId);
         }
-        
+    }
+    
+    private void linkExperimentAndRun(int experimentId, int runId) {
+        MsExperimentDAO exptDao = daoFactory.getMsExperimentDAO();
+        // an entry will be made in the msExperimentRun table only if 
+        // it does not already exists. 
+        exptDao.saveExperimentRun(experimentId, runId);
     }
     
     private String calculateSha1Sum(String filePath) throws UploadException {
@@ -215,8 +223,7 @@ public class MS2DataUploadService {
      * @return
      * @throws UploadException 
      */
-    private int uploadMS2Run(MS2RunDataProvider provider,
-            final String serverAddress, final String serverDirectory) throws UploadException  {
+    private int uploadMS2Run(MS2RunDataProvider provider, final String serverDirectory) throws UploadException  {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName());
         long startTime = System.currentTimeMillis();
@@ -237,7 +244,7 @@ public class MS2DataUploadService {
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
-        int runId = runDao.saveRun(header, serverAddress, serverDirectory);
+        int runId = runDao.saveRun(header, serverDirectory);
         lastUploadedRunId = runId;
         log.info("Uploaded top-level run information with runId: "+runId);
 

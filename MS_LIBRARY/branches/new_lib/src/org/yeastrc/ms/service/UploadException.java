@@ -17,6 +17,7 @@ public class UploadException extends Exception {
     private static int ERROR = 1;
     
     public static enum ERROR_CODE {
+        EXPT_NOT_FOUND          ("Experiment not found in the database", ERROR),
         DIRECTORY_NOT_FOUND     ("Directory not found.", ERROR),
         EMPTY_DIRECTORY         ("No files found to upload.", ERROR),
         MISSING_MS2             ("Missing required ms2 files.", ERROR),

@@ -76,7 +76,8 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     }
     
     @Override
-    int uploadSearchParameters(String paramFileDirectory, String remoteServer, String remoteDirectory,
+    int uploadSearchParameters(int experimentId, String paramFileDirectory, 
+            String remoteServer, String remoteDirectory,
             Date searchDate) throws UploadException {
         
         // parse the parameter file 
@@ -92,7 +93,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
             ProlucidSearchDAO searchDAO = DAOFactory.instance().getProlucidSearchDAO();
-            return searchDAO.saveSearch(makeSearchObject(parser, remoteServer, remoteDirectory, searchDate), sequenceDatabaseId);
+            return searchDAO.saveSearch(makeSearchObject(parser, remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
@@ -213,7 +214,8 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     }
 
     
-    private ProlucidSearchIn makeSearchObject(final ProlucidParamsParser parser, final String remoteServer, final String remoteDirectory, final Date searchDate) {
+    private ProlucidSearchIn makeSearchObject(final ProlucidParamsParser parser, 
+                    final String remoteDirectory, final Date searchDate) {
         return new ProlucidSearchIn() {
             @Override
             public List<ProlucidParamIn> getProlucidParams() {return parser.getParamList();}
@@ -239,7 +241,6 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in search.xml
             public Date getSearchDate() {return searchDate;}
-            public String getServerAddress() {return remoteServer;}
             public String getServerDirectory() {return remoteDirectory;}
         };
     }

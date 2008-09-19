@@ -53,11 +53,6 @@ public interface MsSearchIn extends MsSearchBase {
 interface MsSearchBase {
     
     /**
-     * @return the serverAddress
-     */
-    public abstract String getServerAddress();
-
-    /**
      * @return the serverDirectory
      */
     public abstract String getServerDirectory();

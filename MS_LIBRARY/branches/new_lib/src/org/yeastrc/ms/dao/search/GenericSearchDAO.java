@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.dao.search;
 
+import java.util.List;
+
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
@@ -26,10 +28,19 @@ public interface GenericSearchDAO <I extends MsSearchIn, O extends MsSearch> {
      * 4. any terminal (static and dynamic) modifications
      * 5. any associated enzyme information for the search.
      * @param search
+     * @param experimentId
      * @param sequenceDatabaseId -- id from nrseq's tblDatabase table
      * @return database id of the search
      */
-    public abstract int saveSearch(I search, int sequenceDatabaseId);
+    public abstract int saveSearch(I search, int experimentId, int sequenceDatabaseId);
+    
+    
+    /**
+     * Returns a list of searchIds that belong to the given experiment
+     * @param experimentId
+     * @return
+     */
+    public abstract List<Integer> getSearchIdsForExperiment(int experimentId);
     
     /**
      * Updates the value of the analysisProgramVersion in msSearch table

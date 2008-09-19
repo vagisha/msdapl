@@ -11,8 +11,8 @@ import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
-import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2Run;
+import org.yeastrc.ms.domain.run.ms2file.MS2RunIn;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -32,10 +32,10 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     /**
      * Saves the run along with MS2 file specific information
      */
-    public int saveRun(MS2RunIn run, String serverAddress, String serverDirectory) {
+    public int saveRun(MS2RunIn run, String serverDirectory) {
 
         // save the run and location
-        int runId = msRunDao.saveRun(run, serverAddress, serverDirectory);
+        int runId = msRunDao.saveRun(run, serverDirectory);
         try {
             MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
             for (MS2NameValuePair header: run.getHeaderList()) {
@@ -50,9 +50,8 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     }
 
     @Override
-    public void saveRunLocation(String serverAddress, String serverDirectory,
-            int runId) {
-        msRunDao.saveRunLocation(serverAddress, serverDirectory, runId);
+    public void saveRunLocation(String serverDirectory, int runId) {
+        msRunDao.saveRunLocation(serverDirectory, runId);
     }
     
     public MS2Run loadRun(int runId) {
@@ -79,9 +78,8 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     }
 
     @Override
-    public int loadMatchingRunLocations(int runId,
-            String serverAddress, String serverDirectory) {
-        return msRunDao.loadMatchingRunLocations(runId, serverAddress, serverDirectory);
+    public int loadMatchingRunLocations(int runId, String serverDirectory) {
+        return msRunDao.loadMatchingRunLocations(runId, serverDirectory);
     }
     
     @Override

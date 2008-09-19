@@ -12,11 +12,6 @@ package org.yeastrc.ms.domain.run;
 public interface MsRunLocationIn {
 
     /**
-     * @return the serverAddress
-     */
-    public abstract String getServerAddress();
-
-    /**
      * @return the serverDirectory
      */
     public abstract String getServerDirectory();

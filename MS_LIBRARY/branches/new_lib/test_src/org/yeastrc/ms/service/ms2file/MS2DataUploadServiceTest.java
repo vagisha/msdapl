@@ -1,8 +1,5 @@
 package org.yeastrc.ms.service.ms2file;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -13,6 +10,7 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
+import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsRunLocation;
 import org.yeastrc.ms.domain.run.RunFileFormat;
@@ -21,7 +19,6 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.service.MsDataUploader;
 import org.yeastrc.ms.service.UploadException;
-import org.yeastrc.ms.util.Sha1SumCalculator;
 
 public class MS2DataUploadServiceTest extends BaseDAOTestCase {
 
@@ -36,15 +33,20 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
 
     public void testUploadRuns1() {
         String dir = "test_resources/validSequestData_dir";
+        
+        // -------------------------------------------------------------------------------------------
+        // UPLOAD 1
         MsDataUploader uploader = new MsDataUploader();
+        int experimentId1 = 0;
         try {
-            uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
+            experimentId1 = uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
         }
         catch (UploadException e) {
             e.printStackTrace();
             fail("directory has valid data");
         }
         
+        assertTrue(experimentId1 > 0);
         List<Integer> runIds = runDao.loadRunIdsForFileName("1.ms2");
         assertEquals(1, runIds.size());
         int runId1 = runIds.get(0);
@@ -55,28 +57,37 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         int runId2 = runIds.get(0);
         assertNotSame(0, runId2);
         
+        // make sure there in an entry in the msExperimentRun table for the two runs;
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId1, runId1));
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId1, runId2));
+        
         // make sure there is only one run location for runId1
         // check values from msRunLocation table
         List<MsRunLocation> locs = runDao.loadLocationsForRun(runId1);
         assertEquals(1, locs.size());
-        assertEquals("remote.server", locs.get(0).getServerAddress());
         assertEquals("remote/directory", locs.get(0).getServerDirectory());
         assertEquals(runId1, locs.get(0).getRunId());
         
         locs = runDao.loadLocationsForRun(runId2);
         assertEquals(1, locs.size());
-        assertEquals("remote.server", locs.get(0).getServerAddress());
         assertEquals("remote/directory", locs.get(0).getServerDirectory());
         assertEquals(runId2, locs.get(0).getRunId());
         
+        // -------------------------------------------------------------------------------------------
+        // UPLOAD 2
         // upload with different values for serverAddress and serverDirectory
+        int experimentId2 = 0;
         try {
-            uploader.uploadExperimentToDb("remote.server.again", "remote/directory/2", dir, new Date());
+            experimentId2 = uploader.uploadExperimentToDb("remote.server.again", "remote/directory/2", dir, new Date());
         }
         catch (UploadException e) {
             e.printStackTrace();
             fail("directory has valid data");
         }
+        assertTrue(experimentId2 > 0);
+        // make sure there in an entry in the msExperimentRun table for the two runs;
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId1));
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId2));
         
         // the runs will not be uploaded again but we should have two locations for the each run
         locs = runDao.loadLocationsForRun(runId1);
@@ -85,10 +96,8 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
                 return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
             }});
         assertEquals(2, locs.size());
-        assertEquals("remote.server", locs.get(0).getServerAddress());
         assertEquals("remote/directory", locs.get(0).getServerDirectory());
         assertEquals(runId1, locs.get(0).getRunId());
-        assertEquals("remote.server.again", locs.get(1).getServerAddress());
         assertEquals("remote/directory/2", locs.get(1).getServerDirectory());
         assertEquals(runId1, locs.get(1).getRunId());
         
@@ -98,23 +107,29 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
                 return Integer.valueOf(o1.getId()).compareTo(Integer.valueOf(o2.getId()));
             }});
         assertEquals(2, locs.size());
-        assertEquals("remote.server", locs.get(0).getServerAddress());
         assertEquals("remote/directory", locs.get(0).getServerDirectory());
         assertEquals(runId2, locs.get(0).getRunId());
-        assertEquals("remote.server.again", locs.get(1).getServerAddress());
         assertEquals("remote/directory/2", locs.get(1).getServerDirectory());
         assertEquals(runId2, locs.get(1).getRunId());
         
         
+        // -------------------------------------------------------------------------------------------
+        // UPLOAD 3
         // upload again but this time use the same values for serverAddress and serverDirectory
         // as the first upload
+        int experimentId3 = 0;
         try {
-            uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
+            experimentId3 = uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
         }
         catch (UploadException e) {
             e.printStackTrace();
             fail("directory has valid data");
         }
+        assertTrue(experimentId3 > 0);
+        // make sure there in an entry in the msExperimentRun table for the two runs;
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId3, runId1));
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId3, runId2));
+        
         // no additional entries should be created 
         assertEquals(1, runDao.loadRunIdsForFileName("1.ms2").size());
         assertEquals(1, runDao.loadRunIdsForFileName("2.ms2").size());
@@ -122,6 +137,45 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(2, locs.size());
         locs = runDao.loadLocationsForRun(runId2);
         assertEquals(2, locs.size());
+        
+        // -------------------------------------------------------------------------------------------
+        //UPLOAD 4 upload again. This time use an existing experimentId
+        try {
+            Thread.currentThread().sleep(3*1000);
+        }
+        catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
+        List<Integer> searchIds = searchDao.getSearchIdsForExperiment(experimentId2);
+        int oldSearchId = searchIds.get(0);
+        assertEquals(1, searchIds.size());
+        assertEquals(2, runSearchDao.loadRunSearchIdsForSearch(oldSearchId).size());
+        try {
+            uploader.uploadExperimentToDb(experimentId2, dir, new Date());
+        }
+        catch(UploadException e) {
+            e.printStackTrace();
+            fail("directory has valid data");
+        }
+        // make sure the lastUpdate date is > the upload date
+        MsExperiment expt = exptDao.loadExperiment(experimentId2);
+        assertEquals("remote.server.again", expt.getServerAddress());
+        assertEquals("remote/directory/2", expt.getServerDirectory());
+        System.out.println(expt.getLastUpdateDate());
+        System.out.println(expt.getUploadDate());
+        assertTrue(expt.getLastUpdateDate().getTime() >  expt.getUploadDate().getTime());
+        
+        // the runs should not have been reloaded and we should not have any new entries
+        // in the msExperimentRun table
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId1));
+        assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId2));
+        // any old searches for the experiment should have been deleted; we should still 
+        // have the same number of search as before
+        searchIds = searchDao.getSearchIdsForExperiment(experimentId2);
+        int newSearchId = searchIds.get(0);
+        assertEquals(1, searchIds.size());
+        assertTrue(oldSearchId != newSearchId);
+        assertEquals(2, runSearchDao.loadRunSearchIdsForSearch(newSearchId).size());
     }
     
 //    public void testUploadRuns2() {
@@ -197,11 +251,10 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // check values from msRunLocation table
         List<MsRunLocation> locs = runDao.loadLocationsForRun(runId);
         assertEquals(1, locs.size());
-        assertEquals("remoteServer", locs.get(0).getServerAddress());
         assertEquals("remoteDirectory", locs.get(0).getServerDirectory());
         assertEquals(runId, locs.get(0).getRunId());
         // testting the other method: should really be in test class for runDao
-        int locs2 = runDao.loadMatchingRunLocations(runId, "remoteServer", "remoteDirectory");
+        int locs2 = runDao.loadMatchingRunLocations(runId, "remoteDirectory");
         assertEquals(1, locs2);
        
         

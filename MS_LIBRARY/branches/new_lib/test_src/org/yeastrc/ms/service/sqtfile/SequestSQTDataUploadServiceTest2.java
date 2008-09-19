@@ -61,18 +61,18 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         String dir = "test_resources/validSequestData_dir2";
 
         MsDataUploader uploader = new MsDataUploader();
-        int searchId = 0;
+        int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
         try {
-            searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
+            experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
         }
         catch (UploadException e) {
             e.printStackTrace();
             fail("Data is valid");
         }
         assertEquals(0, uploader.getUploadExceptionList().size());
-        assertNotSame(0, searchId);
-        checkUploadedSearch(searchId, searchDate, dir);
+        assertNotSame(0, experimentId);
+        checkUploadedSearch(uploader.getUploadedSearchId(), searchDate, dir);
     }
     
     private void checkUploadedSearch(int searchId, java.util.Date searchDate, String dir) {
@@ -348,7 +348,6 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
     private void checkSearch(int searchId, java.util.Date experimentDate, String dir) {
         SequestSearch search = ssearchDao.loadSearch(searchId);
 //      assertEquals(experimentDate, search.getSearchDate());
-        assertEquals("remoteServer", search.getServerAddress());
         assertEquals("remoteDirectory", search.getServerDirectory());
         assertEquals(SearchProgram.SEQUEST, search.getSearchProgram());
         assertEquals("3.0", search.getSearchProgramVersion());

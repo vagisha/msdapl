@@ -64,18 +64,18 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 //      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
-        int searchId = 0;
+        int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
         try {
-            searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
+            experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
         }
         catch (UploadException e) {
             e.printStackTrace();
             fail("Data is valid");
         }
         assertEquals(0, uploader.getUploadExceptionList().size());
-        assertNotSame(0, searchId);
-        checkUploadedSearch(searchId, searchDate, dir);
+        assertNotSame(0, experimentId);
+        checkUploadedSearch(uploader.getUploadedSearchId(), searchDate, dir);
     }
     
     public void testUploadValidProlucidData1() throws DataProviderException {
@@ -83,18 +83,18 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 //      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
-        int searchId = 0;
+        int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
         try {
-            searchId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
+            experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
         }
         catch (UploadException e) {
             e.printStackTrace();
             fail("Data is valid");
         }
         assertEquals(0, uploader.getUploadExceptionList().size());
-        assertNotSame(0, searchId);
-        checkUploadedSearch(searchId, searchDate, dir);
+        assertNotSame(0, experimentId);
+        checkUploadedSearch(uploader.getUploadedSearchId(), searchDate, dir);
     }
     
 
@@ -389,7 +389,6 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
     private void checkSearch(int searchId, java.util.Date experimentDate, String dir) {
         ProlucidSearch search = psearchDao.loadSearch(searchId);
 //      assertEquals(experimentDate, search.getSearchDate());
-        assertEquals("remoteServer", search.getServerAddress());
         assertEquals("remoteDirectory", search.getServerDirectory());
         assertEquals(SearchProgram.PROLUCID, search.getSearchProgram());
         assertEquals("3.0", search.getSearchProgramVersion());

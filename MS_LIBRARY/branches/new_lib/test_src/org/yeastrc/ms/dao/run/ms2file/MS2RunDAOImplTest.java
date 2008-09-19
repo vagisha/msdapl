@@ -31,7 +31,7 @@ public class MS2RunDAOImplTest extends MS2BaseDAOtestCase {
         assertTrue(run.getEnzymeList().size() == 3);
         
         
-        int runId = ms2RunDao.saveRun(run, "remoteServer", "remoteDirectory"); // save the run
+        int runId = ms2RunDao.saveRun(run, "remoteDirectory"); // save the run
         
         saveScansForRun(runId, 20); // add scans for this run
         

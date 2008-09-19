@@ -8,7 +8,6 @@ package org.yeastrc.ms.dao.search;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 
 /**
