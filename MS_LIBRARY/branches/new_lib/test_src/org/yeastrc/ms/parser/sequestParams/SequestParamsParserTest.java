@@ -200,7 +200,28 @@ public class SequestParamsParserTest extends TestCase {
         assertEquals('*', dynaResidueMods.get(5).getModificationSymbol());
         assertEquals(80.0, dynaResidueMods.get(5).getModificationMass().doubleValue());
         
+        modString = "0.0 X 0.0 X 42.04695 RK";
+        try {
+            parser.parseDynamicResidueMods(modString);
+        }
+        catch (DataProviderException e) {
+            fail("Valid dynamic mod string");
+            e.printStackTrace();
+        }
+        dynaResidueMods = parser.getDynamicResidueMods();
+        assertEquals(2, dynaResidueMods.size());
         
+        Collections.sort(dynaResidueMods, new Comparator<MsResidueModificationIn>() {
+            public int compare(MsResidueModificationIn o1,
+                    MsResidueModificationIn o2) {
+                return Character.valueOf(o1.getModifiedResidue()).compareTo(Character.valueOf(o2.getModifiedResidue()));
+            }});
+        assertEquals('K', dynaResidueMods.get(0).getModifiedResidue());
+        assertEquals('@', dynaResidueMods.get(0).getModificationSymbol());
+        assertEquals(42.04695, dynaResidueMods.get(0).getModificationMass().doubleValue());
+        assertEquals('R', dynaResidueMods.get(1).getModifiedResidue());
+        assertEquals('@', dynaResidueMods.get(1).getModificationSymbol());
+        assertEquals(42.04695, dynaResidueMods.get(1).getModificationMass().doubleValue());
     }
 
     public void testParseParamsFile() {

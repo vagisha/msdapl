@@ -148,7 +148,7 @@ public class MS2DataUploadService {
             saveRunLocation(serverDirectory, runId);
             log.info("Run with name: "+fileName+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
-            log.info("END MS2 FILE UPLOAD: "+fileName);
+            log.info("END MS2 FILE UPLOAD: "+fileName+"\n");
             return runId;
         }
         
@@ -283,7 +283,7 @@ public class MS2DataUploadService {
         
         // if no scans were uploaded for this run throw an exception
         if (uploaded == 0) {
-            log.error("END MS2 FILE UPLOAD: !!!No scans were uploaded for file: "+provider.getFileName()+"("+runId+")");
+            log.error("END MS2 FILE UPLOAD: !!!No scans were uploaded for file: "+provider.getFileName()+"("+runId+")"+"\n");
             UploadException ex = new UploadException(ERROR_CODE.INVALID_MS2_SCAN);
             ex.setErrorMessage("No scans were uploaded for runID: "+runId);
         }
@@ -292,7 +292,7 @@ public class MS2DataUploadService {
         
         long endTime = System.currentTimeMillis();
         log.info("Uploaded "+uploaded+" out of "+all+" scans for runId: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds");
-        log.info("END MS2 FILE UPLOAD: "+provider.getFileName());
+        log.info("END MS2 FILE UPLOAD: "+provider.getFileName()+"\n");
         return runId;
     }
 

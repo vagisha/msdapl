@@ -278,9 +278,11 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             throw new DataProviderException(currentLineNum, "Error parsing dynamic residue modification string", currentLine);
         }
 
-        int modCharIdx = 0;
+        int modCharIdx = -1;
         for (int i = 0; i < tokens.length; i+=2) {
-
+            
+            modCharIdx++;
+            
             BigDecimal mass = null;
             try {mass = new BigDecimal((tokens[i]));}
             catch(NumberFormatException e) {throw new DataProviderException(currentLineNum, "Error parsing modification mass: "+tokens[i], currentLine, e);}
@@ -306,7 +308,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
                 mod.setModificationSymbol(modSymbols[modCharIdx]);
                 dynamicResidueModifications.add(mod);
             }
-            modCharIdx++;
+//            modCharIdx++;
         }
     }
 
