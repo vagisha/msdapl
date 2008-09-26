@@ -76,7 +76,8 @@ public class ProjectPhosphoStatsAction extends Action {
 		
 		// this is where we are going to store all that we find out!
 		Map<NRProtein, Map<Integer, Set<String>>> proteinPhosSites = new HashMap<NRProtein, Map<Integer, Set<String>>>();
-
+		Map<NRProtein, Map<Integer, Set<Integer>>> proteinPhosRuns = new HashMap<NRProtein, Map<Integer, Set<Integer>>>();
+		
 		// loop through all runs for this project
 		//for ( YatesRun run : runs ) {
 		Iterator<YatesRun> iter = runs.iterator();
@@ -121,12 +122,19 @@ public class ProjectPhosphoStatsAction extends Action {
 						
 						if( !proteinPhosSites.containsKey( hitProtein ) )
 							proteinPhosSites.put( hitProtein, new HashMap<Integer, Set<String>>() );
+
+						if( !proteinPhosRuns.containsKey( hitProtein ) )
+							proteinPhosRuns.put( hitProtein, new HashMap<Integer, Set<Integer>>() );
 						
 						if( !proteinPhosSites.get( hitProtein ).containsKey( pLocation ) )
 							proteinPhosSites.get( hitProtein ).put( pLocation, new HashSet<String>() );
+
+						if( !proteinPhosRuns.get( hitProtein ).containsKey( pLocation ) )
+							proteinPhosRuns.get( hitProtein ).put( pLocation, new HashSet<Integer>() );
 						
 						// add this peptide sequence to the set of peptides used to identify this phosphorylation location in this protein
 						proteinPhosSites.get( hitProtein ).get( pLocation ).add( peptide.getPeptide().getSequenceString() );
+						proteinPhosRuns.get( hitProtein ).get( pLocation ).add( run.getId() );
 						
 						pIndex = pep.indexOf( "*", pIndex + 1 );
 						counter++;
@@ -150,7 +158,9 @@ public class ProjectPhosphoStatsAction extends Action {
 				
 				int count = proteinPhosSites.get( protein ).get( site ).size();
 
-				output.append( protein.getListing() + "\t" + site + "\t" + count + "\n" );
+				output.append( protein.getListing() + "\t" + site + "\t" + count + "\t" );
+				output.append( org.apache.commons.lang.StringUtils.join( proteinPhosRuns.get( protein ).get( site ).iterator(), "," ) );
+				output.append( "\n" );
 			}
 		}
 		
