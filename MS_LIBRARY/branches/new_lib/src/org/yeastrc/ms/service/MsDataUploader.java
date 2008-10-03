@@ -73,6 +73,10 @@ public class MsDataUploader {
         return this.uploadedSearchId;
     }
     
+    public int getUploadedExperimentId() {
+        return this.uploadedExptId;
+    }
+    
     /**
      * @param remoteServer
      * @param remoteDirectory
