@@ -101,6 +101,7 @@ public class MsDataUploader {
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
         // first create an entry in the msExperiment table
         this.uploadedExptId = saveExperiment();
+        log.info("\n\nAdded entry for experiment ID: "+uploadedExptId+"\n\n");
         
         try {
             uploadRunAndSearchFilesToDb(filenames,searchDate);
