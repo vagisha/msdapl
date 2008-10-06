@@ -107,12 +107,25 @@ public class MsDataUploader {
             uploadRunAndSearchFilesToDb(filenames,searchDate);
         }
         catch (UploadException e) { // this should only result from ms2 file upload
-                                    // or if unsupported sqt files were found.
+                                    // or if unsupported or multiple types of sqt files were found.
+                                    // In either case, we will delete the experiment
+                                    // The raw data (MS2 files) will not be deleted
             uploadExceptionList.add(e);
             log.error(e.getMessage(), e);
-            log.error("ABORTING EXPERIMENT UPLOAD!!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-            numRunsUploaded = 0;
+            // delete the entry in the experiment table
+            deleteExperiment();
+            log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+//            numRunsUploaded = 0;
             throw e;
+        }
+        
+        // if the last exception was because no matching search nrseq database was found, we will 
+        // delete the experiment.  The raw data (MS2 files) will not be deleted
+        UploadException lastException = this.uploadExceptionList.get(uploadExceptionList.size() -1);
+        if (lastException.getErrorCode() == ERROR_CODE.SEARCHDB_NOT_FOUND) {
+            // delete the entry in the experiment table
+            deleteExperiment();
+            log.error("\n\t!!!EXPERIMENT WILL NOT BE UPLOADED!!!\n\tTime: "+(new Date()).toString()+"\n\n");
         }
         
         long end = System.currentTimeMillis();
@@ -155,14 +168,26 @@ public class MsDataUploader {
             uploadRunAndSearchFilesToDb(filenames,searchDate);
         }
         catch (UploadException e) { // this should only result from ms2 file upload
-                                    // or if unsupported sqt files were found.
+            // or if unsupported sqt files were found.
+            // In either case, we will delete the experiment
+            // The raw data (MS2 files) will not be deleted
             uploadExceptionList.add(e);
             log.error(e.getMessage(), e);
-            log.error("ABORTING EXPERIMENT UPLOAD!!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-            numRunsUploaded = 0;
+            // delete the entry in the experiment table
+            deleteExperiment();
+            log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            // numRunsUploaded = 0;
             throw e;
         }
-        
+
+        // if the last exception was because no matching search nrseq database was found, we will 
+        // delete the experiment.  The raw data (MS2 files) will not be deleted
+        UploadException lastException = this.uploadExceptionList.get(uploadExceptionList.size() -1);
+        if (lastException.getErrorCode() == ERROR_CODE.SEARCHDB_NOT_FOUND) {
+            // delete the entry in the experiment table
+            deleteExperiment();
+            log.error("\n\t!!!EXPERIMENT WILL NOT BE UPLOADED!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+        }
         long end = System.currentTimeMillis();
         logEndExperimentUpload(start, end);
     }
@@ -290,13 +315,16 @@ public class MsDataUploader {
             runIdMap = uploadRuns(filenames);
         }
         catch (UploadException e) {
-            // delete the entry in the experiment table
-            deleteExperiment(this.uploadedExptId);
-            
-            e.appendErrorMessage("!!!\n\tERROR UPLOADING MS2 DATA. EXPERIMENT WILL NOT BE UPLOADED\n!!!");
+            e.appendErrorMessage("\n\tERROR UPLOADING MS2 DATA. EXPERIMENT WILL NOT BE UPLOADED\n");
             log.error(e.getMessage(), e);
 //            numRunsUploaded = 0;
             throw e;
+        }
+
+        // check if we have any sqt files.
+        if (!haveSqtFiles(uploadDirectory, filenames)) {
+            log.warn("\n\tNO SQT FILES FOUND TO UPLOAD. SEARCH WILL NOT BE UPLOADED\n");
+            return;
         }
         
         // determine the type of sqt files we have
@@ -321,6 +349,16 @@ public class MsDataUploader {
     }
 
     
+    private boolean haveSqtFiles(String fileDirectory, Set<String> filenames) {
+        
+        for (String file: filenames) {
+            String sqtFile = fileDirectory+File.separator+file+".sqt";
+            if (new File(sqtFile).exists())
+                return true;
+        }
+        return false;
+    }
+
     private int saveExperiment() throws UploadException {
         MsExperimentDAO experimentDao = DAOFactory.instance().getMsExperimentDAO();
         ExperimentBean experiment = new ExperimentBean();
@@ -438,10 +476,11 @@ public class MsDataUploader {
         return filenames;
     }
     
-    private void deleteExperiment(int experimentId) {
-        MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
-        exptDao.deleteExperiment(experimentId);
+    private void deleteExperiment() {
+        log.error("\n\tDELETING EXPERIMENT: "+uploadedExptId);
         this.uploadedExptId = 0;
+        MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
+        exptDao.deleteExperiment(uploadedExptId);
     }
     
     public static int getScanIdFor(String runFileScanString, int searchId) {

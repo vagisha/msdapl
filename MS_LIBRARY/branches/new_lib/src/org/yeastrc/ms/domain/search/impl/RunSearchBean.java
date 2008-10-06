@@ -20,7 +20,7 @@ public class RunSearchBean implements MsRunSearch {
     
     private SearchFileFormat originalFileType;
     private Date searchDate;
-    private int searchDuration; // number of minutes for the search
+    private int searchDuration = -1; // number of minutes for the search
     private Date uploadDate;
     
     

@@ -19,7 +19,7 @@
 				javaType="FileFormatType" jdbcType="VARCHAR"
 				typeHandler="FileFormatTypeHandler"/>
 		<result property="searchDate" column="searchDate" />
-		<result property="searchDuration" column="searchDuration" nullValue="0"/>
+		<result property="searchDuration" column="searchDuration" nullValue="-1"/>
 		<result property="uploadDate" column="uploadDate" />
 		<discriminator javaType="FileFormatType" jdbcType="VARCHAR" 
 						column="originalFileType" 
@@ -48,7 +48,7 @@
 					typeHandler="FileFormatTypeHandler"
 		/>
 		<parameter property="searchDate" jdbcType="DATE" />
-		<parameter property="searchDuration" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="searchDuration" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
     <select id="select" resultMap="msRunSearchResult" parameterClass="Integer">
