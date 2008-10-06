@@ -121,11 +121,13 @@ public class MsDataUploader {
         
         // if the last exception was because no matching search nrseq database was found, we will 
         // delete the experiment.  The raw data (MS2 files) will not be deleted
-        UploadException lastException = this.uploadExceptionList.get(uploadExceptionList.size() -1);
-        if (lastException.getErrorCode() == ERROR_CODE.SEARCHDB_NOT_FOUND) {
-            // delete the entry in the experiment table
-            deleteExperiment();
-            log.error("\n\t!!!EXPERIMENT WILL NOT BE UPLOADED!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+        if (uploadExceptionList.size() > 0) {
+            UploadException lastException = this.uploadExceptionList.get(uploadExceptionList.size() -1);
+            if (lastException.getErrorCode() == ERROR_CODE.SEARCHDB_NOT_FOUND) {
+                // delete the entry in the experiment table
+                deleteExperiment();
+                log.error("\n\t!!!EXPERIMENT WILL NOT BE UPLOADED!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            }
         }
         
         long end = System.currentTimeMillis();
@@ -182,11 +184,13 @@ public class MsDataUploader {
 
         // if the last exception was because no matching search nrseq database was found, we will 
         // delete the experiment.  The raw data (MS2 files) will not be deleted
-        UploadException lastException = this.uploadExceptionList.get(uploadExceptionList.size() -1);
-        if (lastException.getErrorCode() == ERROR_CODE.SEARCHDB_NOT_FOUND) {
-            // delete the entry in the experiment table
-            deleteExperiment();
-            log.error("\n\t!!!EXPERIMENT WILL NOT BE UPLOADED!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+        if (uploadExceptionList.size() > 0) {
+            UploadException lastException = this.uploadExceptionList.get(uploadExceptionList.size() -1);
+            if (lastException.getErrorCode() == ERROR_CODE.SEARCHDB_NOT_FOUND) {
+                // delete the entry in the experiment table
+                deleteExperiment();
+                log.error("\n\t!!!EXPERIMENT WILL NOT BE UPLOADED!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            }
         }
         long end = System.currentTimeMillis();
         logEndExperimentUpload(start, end);
