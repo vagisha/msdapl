@@ -24,8 +24,8 @@ public class GraphCollapser <L extends Node, R extends Node>{
         collapsibleNodesL = new HashMap<String, List<L>>(graph.getLeftNodes().size());
         collapsibleNodesR = new HashMap<String, List<R>>(graph.getRightNodes().size());
         sortNodes(graph);
-        System.out.println(collapsibleNodesL);
-        System.out.println(collapsibleNodesR);
+//        System.out.println(collapsibleNodesL);
+//        System.out.println(collapsibleNodesR);
         collapseNodes(graph);
     }
 

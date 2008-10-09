@@ -42,8 +42,8 @@ public final class ProteinNode extends Node {
 final class ProteinNodeCombiner implements NodeCombiner<ProteinNode> {
 
     @Override
-    public ProteinNode combineNodes(ProteinNode... nodes) throws InvalidNodeException {
-        List<ProteinHit> hits = new ArrayList<ProteinHit>(nodes.length);
+    public ProteinNode combineNodes(List<ProteinNode> nodes) throws InvalidNodeException {
+        List<ProteinHit> hits = new ArrayList<ProteinHit>(nodes.size());
         for (ProteinNode node: nodes)
             hits.addAll(Arrays.asList(node.getProteinHits()));
         ProteinHit[] hitArray = new ProteinHit[hits.size()];

@@ -43,8 +43,8 @@ public final class PeptideNode extends Node {
 final class PeptideNodeCombiner implements NodeCombiner<PeptideNode> {
 
     @Override
-    public PeptideNode combineNodes(PeptideNode... nodes) throws InvalidNodeException {
-        List<PeptideHit> hits = new ArrayList<PeptideHit>(nodes.length);
+    public PeptideNode combineNodes(List<PeptideNode>nodes) throws InvalidNodeException {
+        List<PeptideHit> hits = new ArrayList<PeptideHit>(nodes.size());
         for (PeptideNode node: nodes)
             hits.addAll(Arrays.asList(node.getPeptideHits()));
         PeptideHit[] hitArray = new PeptideHit[hits.size()];

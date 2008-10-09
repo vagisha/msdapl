@@ -21,8 +21,8 @@ public class TestApp {
     public static void main(String[] args) throws InvalidNodeException {
         NodeCombiner<Node> nodeCombiner = new NodeCombiner<Node>(){
             @Override
-            public Node combineNodes(Node... nodes) throws InvalidNodeException {
-                if (nodes.length == 0) {
+            public Node combineNodes(List <Node> nodes) throws InvalidNodeException {
+                if (nodes.size() == 0) {
                     throw new InvalidNodeException("");
                 }
                 StringBuilder buf = new StringBuilder();

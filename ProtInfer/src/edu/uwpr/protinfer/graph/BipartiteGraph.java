@@ -145,8 +145,7 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
     public void collapseLeftNodes(List<L> nodes) throws InvalidNodeException {
         if (nodes.size() < 2)
             return;
-        L[] nodeArr = (L[]) new Node[nodes.size()];
-        L newNode = lcombiner.combineNodes(nodes.toArray(nodeArr));
+        L newNode = lcombiner.combineNodes(nodes);
         L oldNode = nodes.get(0);
         // make a copy and iterate over it to avoid ConcurrentModificationException
         List<R> adjNodes = new ArrayList<R>(l2rEdges.get(oldNode.getLabel()));
@@ -162,8 +161,7 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
     public void collapseRightNodes(List<R> nodes) throws InvalidNodeException {
         if (nodes.size() < 2)
             return;
-        R[] nodeArr = (R[]) new Node[nodes.size()];
-        R newNode = rcombiner.combineNodes(nodes.toArray(nodeArr));
+        R newNode = rcombiner.combineNodes(nodes);
         R oldNode = nodes.get(0);
         // make a copy and iterate over it to avoid ConcurrentModificationException
         List<L> adjNodes = new ArrayList<L>(r2lEdges.get(oldNode.getLabel()));

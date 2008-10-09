@@ -6,10 +6,12 @@
  */
 package edu.uwpr.protinfer.graph;
 
+import java.util.List;
+
 /**
  * 
  */
 public interface NodeCombiner <T extends Node>{
 
-    public abstract T combineNodes(T... nodes) throws InvalidNodeException;
+    public abstract T combineNodes(List<T> nodes) throws InvalidNodeException;
 }
