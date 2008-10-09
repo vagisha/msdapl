@@ -8,10 +8,33 @@ package edu.uwpr.protinfer;
 
 import java.util.List;
 
+import edu.uwpr.protinfer.graph.BipartiteGraph;
+import edu.uwpr.protinfer.graph.ConnectedComponentFinder;
+import edu.uwpr.protinfer.graph.GraphCollapser;
+import edu.uwpr.protinfer.graph.GreedySetCover;
+import edu.uwpr.protinfer.graph.InvalidNodeException;
+import edu.uwpr.protinfer.graph.Node;
+import edu.uwpr.protinfer.graph.NodeCombiner;
+
 public class TestApp {
 
-    public static void main(String[] args) {
-        BipartiteGraph graph = new BipartiteGraph();
+    public static void main(String[] args) throws InvalidNodeException {
+        NodeCombiner<Node> nodeCombiner = new NodeCombiner<Node>(){
+            @Override
+            public Node combineNodes(Node... nodes) throws InvalidNodeException {
+                if (nodes.length == 0) {
+                    throw new InvalidNodeException("");
+                }
+                StringBuilder buf = new StringBuilder();
+                for (Node n: nodes) {
+                    buf.append("_"+n.getLabel());
+                }
+                buf.deleteCharAt(0);
+                Node newNode = new Node(buf.toString());
+               return newNode;
+            }};
+            
+        BipartiteGraph<Node, Node> graph = new BipartiteGraph<Node, Node>(nodeCombiner, nodeCombiner);
         String[] leftLabels = new String[] {"A", "B", "C", "D", "E"};
         String[] rightLabels = new String[] {"1", "2", "3", "4", "5", "6"};
         
@@ -43,25 +66,21 @@ public class TestApp {
         
         graph.printGraph();
         
-        ConnectedComponentFinder compFinder = new ConnectedComponentFinder(graph);
-        int count = 0;
-        while(compFinder.hasComponent()) {
-            Graph component = compFinder.getNextComponent();
-            if (component == null) {
-                System.out.println("Null component found!");
-                break;
-            }
-            printComponent(component);
-            count++;
-        }
-        System.out.println("Number of components found: "+count);
-        
-        GraphCollapser collapser = new GraphCollapser();
+        // collapse the graph
+        GraphCollapser<Node, Node> collapser = new GraphCollapser<Node, Node>();
         collapser.collapseGraph(graph);
+        
         System.out.println("AFTER COLLAPSING");
         graph.printGraph();
         
-        GreedySetCover setCoverFinder = new GreedySetCover();
+        // get connected components;
+        ConnectedComponentFinder compFinder = new ConnectedComponentFinder();
+        int components = compFinder.findAllConnectedComponents(graph);
+        System.out.println("Found "+components+" connected components");
+        compFinder.printConnectedComponents(graph);
+        
+        // get the set cover
+        GreedySetCover<Node, Node> setCoverFinder = new GreedySetCover<Node, Node>();
         List<Node> setCover = setCoverFinder.getGreedySetCover(graph);
         printSetCover(setCover);
     }
@@ -71,13 +90,5 @@ public class TestApp {
         for (Node n: setCover)
             buf.append(n.getLabel()+", ");
         System.out.println("SET COVER: "+buf.toString());
-    }
-
-    private static void printComponent(Graph component) {
-        List<Node> nodes = component.getNodes();
-        StringBuilder buf = new StringBuilder();
-        for (Node node: nodes)
-            buf.append(node.getLabel()+", ");
-        System.out.println(buf.toString());
     }
 }
