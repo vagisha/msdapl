@@ -101,11 +101,14 @@ public class ParsimonyAnalyzer {
                     PeptideHit peptideHit = new PeptideHit(peptide.getPeptideSequence(), ""+peptideCount);
                     peptideCount++;
                     for (MsSearchResultProteinIn prot: proteins) {
+                        if (prot.getAccession().startsWith("Reverse"))
+                            continue;
                         ProteinHit protHit = new ProteinHit(prot.getAccession(), ""+proteinCount);
                         proteinCount++;
                         peptideHit.addProteinHit(protHit);
                     }
-                    pars.addPeptideHit(peptideHit);
+                    if (peptideHit.getMatchProteinCount() > 0)
+                        pars.addPeptideHit(peptideHit);
                 }
 //                if (peptideCount >  100)
 //                    break;

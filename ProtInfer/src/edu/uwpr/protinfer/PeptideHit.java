@@ -36,4 +36,8 @@ public class PeptideHit {
     public List<ProteinHit> getProteinList() {
         return proteins;
     }
+    
+    public int getMatchProteinCount() {
+        return proteins.size();
+    }
 }
