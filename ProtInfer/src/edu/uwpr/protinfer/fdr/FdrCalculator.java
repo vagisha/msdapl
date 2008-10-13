@@ -14,9 +14,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 
-import edu.uwpr.protinfer.ProteinNode;
 import edu.uwpr.protinfer.fdr.PeptideSequenceMatch.PsmComparator;
-import edu.uwpr.protinfer.graph.InvalidNodeException;
 
 public class FdrCalculator {
 
