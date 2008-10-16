@@ -5,14 +5,26 @@ import java.util.Comparator;
 public class PeptideSequenceMatch {
 
     private double score;
+    private int scanNumber;
+    private int charge;
     private double fdr = 1.0;
     
-    public void setMatchScore(double score) {
+    public void setMatchScore(int scanNumber, int charge, double score) {
+        this.scanNumber = scanNumber;
+        this.charge = charge;
         this.score = score;
     }
     
     public double getMatchScore() {
         return this.score;
+    }
+    
+    public int getMatchCharge() {
+        return charge;
+    }
+    
+    public int getScanNumber() {
+        return scanNumber;
     }
     
     public void setFdr(double fdr) {
@@ -31,6 +43,6 @@ public class PeptideSequenceMatch {
     }
     
     public String toString() {
-        return "Score: "+score+"; FDR: "+fdr;
+        return "Scan: "+scanNumber+"; charge: "+charge+"; score: "+score+"; FDR: "+fdr;
     }
 }

@@ -1,7 +1,10 @@
 package edu.uwpr.protinfer.pepxml;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 
@@ -40,7 +43,7 @@ public class PepxmlFileReader {
         catch (XMLStreamException e) {}
     }
     
-    public boolean hasNextSearchScan() throws DataProviderException  {
+    public boolean hasNextScanSearchResult() throws DataProviderException  {
         if (reader == null)
             return false;
         try {
@@ -82,6 +85,8 @@ public class PepxmlFileReader {
                 int evtType = reader.next();
                 if (evtType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("spectrum_query"))
                     break;
+                if (evtType != XMLStreamReader.START_ELEMENT)
+                    continue;
                 if (evtType == XMLStreamReader.START_ELEMENT) {
                     if (reader.getLocalName().equalsIgnoreCase("search_hit")) {
                         if (hit != null)
@@ -124,10 +129,10 @@ public class PepxmlFileReader {
                             hit.setSpRank(Integer.parseInt(scoreVal));
                     }
                 }
-                // add the last one
-                if (hit != null)
-                    scanResult.addSearchHit(hit);
             }
+            // add the last one
+            if (hit != null)
+                scanResult.addSearchHit(hit);
         }
         catch (NumberFormatException e) {
             throw new DataProviderException("Error parsing number in file: "+filePath, e);
@@ -138,17 +143,33 @@ public class PepxmlFileReader {
         return scanResult;
     }
     
-    public static void main(String[] args) throws DataProviderException {
-        String filePath = "/Users/silmaril/WORK/UW/ProteinAssembly/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.pep.xml";
+    public static void main(String[] args) throws DataProviderException, IOException {
+        String filePath = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.pep.xml";
+        String outFileF = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.fwd";
+        String outFileR = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.rev";
         PepxmlFileReader reader = new PepxmlFileReader();
         reader.open(filePath);
         int scanCount = 0;
-        while(reader.hasNextSearchScan()) {
+        BufferedWriter writerF = new BufferedWriter(new FileWriter(outFileF));
+        BufferedWriter writerR = new BufferedWriter(new FileWriter(outFileR));
+        while(reader.hasNextScanSearchResult()) {
             ScanSearchResult scanResult = reader.getNextSearchScan();
-            System.out.println(scanResult.getSpectrumString());
+            for (SearchHit hit: scanResult.getSearchHits()) {
+                if (hit.getMatchProteinAccession().startsWith("rev_")) {
+                    writerR.write(scanResult.getStartScan()+"\t"+scanResult.getAssumedCharge()+"\t"+hit.getXcorr().doubleValue()+"\n");
+                }
+                else
+                    writerF.write(scanResult.getStartScan()+"\t"+scanResult.getAssumedCharge()+"\t"+hit.getXcorr().doubleValue()+"\n");
+            }
+            System.out.println(scanResult.getSpectrumString()+": #hits: "+scanResult.getSearchHits().size());
             scanCount++;
         }
         reader.close();
+        if (writerF != null)
+            writerF.close();
+        if (writerR != null)
+            writerR.close();
+        
         System.out.println("Number of spectrum_query elements: "+scanCount);
     }
 }
