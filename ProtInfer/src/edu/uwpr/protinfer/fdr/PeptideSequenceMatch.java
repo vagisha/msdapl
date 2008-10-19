@@ -28,6 +28,9 @@ public class PeptideSequenceMatch {
     }
     
     public void setFdr(double fdr) {
+        if (this.fdr < 1.0) {
+            System.out.println("FDR already set!!! "+fdr+"\n\t"+toString());
+        }
         this.fdr = fdr;
     }
     

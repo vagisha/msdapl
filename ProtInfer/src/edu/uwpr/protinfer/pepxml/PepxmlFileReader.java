@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -104,7 +105,7 @@ public class PepxmlFileReader {
                             else if (attrib.equalsIgnoreCase("peptide_next_aa"))
                                 hit.setPostResidue(Character.valueOf(val.charAt(0)));
                             else if (attrib.equalsIgnoreCase("protein"))
-                                hit.setMatchProteinAccession(val);
+                                hit.addProteinHit(new ProteinHit(val));
                             else if (attrib.equalsIgnoreCase("num_tot_proteins"))
                                 hit.setNumMatchingProteins(Integer.parseInt(val));
                             else if (attrib.equalsIgnoreCase("num_matched_ions"))
@@ -116,6 +117,15 @@ public class PepxmlFileReader {
                         }
                     }
 
+                    else if (reader.getLocalName().equalsIgnoreCase("alternative_protein")) {
+                        for (int i = 0; i < reader.getAttributeCount(); i++) {
+                            String attrib = reader.getAttributeLocalName(i);
+                            String val = reader.getAttributeValue(i);
+                            if (attrib.equalsIgnoreCase("protein"))
+                                hit.addProteinHit(new ProteinHit(val));
+                        }
+                    }
+                    
                     else if (reader.getLocalName().equalsIgnoreCase("search_score")) {
                         String scoreType = reader.getAttributeValue(null, "name");
                         String scoreVal = reader.getAttributeValue(null, "value");
@@ -144,33 +154,72 @@ public class PepxmlFileReader {
     }
     
     public static void main(String[] args) throws DataProviderException, IOException {
-        String filePath = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.pep.xml";
-        String outFileF = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.fwd";
-        String outFileR = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.rev";
+        String filePath = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_04.pep.xml";
         PepxmlFileReader reader = new PepxmlFileReader();
         reader.open(filePath);
         int scanCount = 0;
-        BufferedWriter writerF = new BufferedWriter(new FileWriter(outFileF));
-        BufferedWriter writerR = new BufferedWriter(new FileWriter(outFileR));
+        int targetHitcount = 0;
+        int decoyHitCount = 0;
+        int ambiHitCount = 0;
+        
         while(reader.hasNextScanSearchResult()) {
             ScanSearchResult scanResult = reader.getNextSearchScan();
+            if (scanResult.getSearchHits().size() != 1)
+                System.out.println("Scan has "+scanResult.getSearchHits().size()+" hits!!!");
             for (SearchHit hit: scanResult.getSearchHits()) {
-                if (hit.getMatchProteinAccession().startsWith("rev_")) {
-                    writerR.write(scanResult.getStartScan()+"\t"+scanResult.getAssumedCharge()+"\t"+hit.getXcorr().doubleValue()+"\n");
+                List<ProteinHit> proteins = hit.getProteinHits();
+//                if (proteins.size() != 1)
+//                    System.out.println("Hit "+scanResult.getSpectrumString()+" has "+proteins.size()+" matching proteins");
+                boolean target = false;
+                boolean decoy = false;
+                for (ProteinHit prot: proteins) {
+                    if (prot.getAccession().startsWith("rev_"))
+                        decoy = true;
+                    else
+                        target = true;
                 }
-                else
-                    writerF.write(scanResult.getStartScan()+"\t"+scanResult.getAssumedCharge()+"\t"+hit.getXcorr().doubleValue()+"\n");
+                if (target && !decoy)   targetHitcount++;
+                if (decoy && !target)   decoyHitCount++;
+                if (decoy && target)    ambiHitCount++;
             }
-            System.out.println(scanResult.getSpectrumString()+": #hits: "+scanResult.getSearchHits().size());
+            
+//            System.out.println(scanResult.getSpectrumString()+": #hits: "+scanResult.getSearchHits().size());
             scanCount++;
         }
         reader.close();
-        if (writerF != null)
-            writerF.close();
-        if (writerR != null)
-            writerR.close();
         
         System.out.println("Number of spectrum_query elements: "+scanCount);
+        System.out.println("Target Hits: "+targetHitcount+"; Decoy Hits: "+decoyHitCount+"; Ambig. Hits: "+ambiHitCount);
     }
+    
+//    public static void main(String[] args) throws DataProviderException, IOException {
+//        String filePath = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.pep.xml";
+//        String outFileF = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.fwd";
+//        String outFileR = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.rev";
+//        PepxmlFileReader reader = new PepxmlFileReader();
+//        reader.open(filePath);
+//        int scanCount = 0;
+//        BufferedWriter writerF = new BufferedWriter(new FileWriter(outFileF));
+//        BufferedWriter writerR = new BufferedWriter(new FileWriter(outFileR));
+//        while(reader.hasNextScanSearchResult()) {
+//            ScanSearchResult scanResult = reader.getNextSearchScan();
+//            for (SearchHit hit: scanResult.getSearchHits()) {
+//                if (hit.getProteinHits().get(0).getAccession().startsWith("rev_")) {
+//                    writerR.write(scanResult.getStartScan()+"\t"+scanResult.getAssumedCharge()+"\t"+hit.getXcorr().doubleValue()+"\n");
+//                }
+//                else
+//                    writerF.write(scanResult.getStartScan()+"\t"+scanResult.getAssumedCharge()+"\t"+hit.getXcorr().doubleValue()+"\n");
+//            }
+//            System.out.println(scanResult.getSpectrumString()+": #hits: "+scanResult.getSearchHits().size());
+//            scanCount++;
+//        }
+//        reader.close();
+//        if (writerF != null)
+//            writerF.close();
+//        if (writerR != null)
+//            writerR.close();
+//        
+//        System.out.println("Number of spectrum_query elements: "+scanCount);
+//    }
 }
 

@@ -1,6 +1,8 @@
 package edu.uwpr.protinfer.pepxml;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchHit {
 
@@ -10,7 +12,7 @@ public class SearchHit {
     private int numPredictedIons;
     private int numMatchedIons;
     private BigDecimal calcNeutralMass;
-    private String matchProteinAccession;
+//    private String matchProteinAccession;
     private int numMatchingProteins;
     
     private BigDecimal xcorr;
@@ -19,7 +21,11 @@ public class SearchHit {
     private int spRank;
     private int xcorrRank;
     
-    public SearchHit() {}
+    private List<ProteinHit> proteinHits;
+    
+    public SearchHit() {
+        proteinHits = new ArrayList<ProteinHit>();
+    }
 
     /**
      * @return the peptide
@@ -105,20 +111,22 @@ public class SearchHit {
         this.calcNeutralMass = calcNeutralMass;
     }
 
-    /**
-     * @return the matchProteinAccession
-     */
-    public String getMatchProteinAccession() {
-        return matchProteinAccession;
+    public void addProteinHit(ProteinHit protein) {
+        this.proteinHits.add(protein);
     }
-
-    /**
-     * @param matchProteinAccession the matchProteinAccession to set
-     */
-    public void setMatchProteinAccession(String matchProteinAccession) {
-        this.matchProteinAccession = matchProteinAccession;
+    
+    public List<ProteinHit> getProteinHits() {
+        return proteinHits;
     }
-
+    
+    public ProteinHit getFirstProteinHit() {
+        return proteinHits.get(0);
+    }
+    
+    public boolean hasUniqueProteinHit() {
+        return proteinHits.size() == 1;
+    }
+    
     /**
      * @return the xcorr
      */
