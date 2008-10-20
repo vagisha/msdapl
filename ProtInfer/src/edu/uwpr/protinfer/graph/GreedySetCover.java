@@ -19,7 +19,11 @@ public class GreedySetCover <L extends Node, R extends Node> {
     
     public GreedySetCover() {}
     
-    public List<L> getGreedySetCover(IBipartiteGraph<L, R> graph) {
+    public List<L> getGreedySetCover(BipartiteGraph<L, R> graph) {
+        
+        graph.backupEdges();
+        graph.backupRightNodes();
+        
         List<L> leftNodes = graph.getLeftNodes();
         PriorityQueue<L> queue = new PriorityQueue<L>(leftNodes.size(), new NodeComparator<L, R>(graph));
         for (L node: leftNodes) 
@@ -51,6 +55,9 @@ public class GreedySetCover <L extends Node, R extends Node> {
             // node with max outgoing edges is again at the top.
             queue.remove();
         }
+        
+        graph.restoreEdges();
+        graph.restoreRightEdges();
         return setCover;
     }
     
@@ -64,8 +71,8 @@ public class GreedySetCover <L extends Node, R extends Node> {
         
         @Override
         public int compare(L node1, L node2) {
-            int node1Adj = graph.getAdjacentNodes(node1).size();
-            int node2Adj = graph.getAdjacentNodes(node2).size();
+            int node1Adj = graph.getAdjacentNodesL(node1).size();
+            int node2Adj = graph.getAdjacentNodesL(node2).size();
             
             if (node1Adj > node2Adj)
                 return -1;

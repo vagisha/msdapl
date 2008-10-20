@@ -6,27 +6,31 @@ import java.util.List;
 public class PeptideHit {
 
     private final String peptide;
-    private final String label;
+    private final int id;
     private List<ProteinHit> proteins;
     
-    public PeptideHit(String peptide, String label) {
+    public PeptideHit(String peptide, int id) {
         this.peptide = peptide;
-        this.label = label;
+        this.id = id;
         proteins = new ArrayList<ProteinHit>();
     }
     
-    public PeptideHit(String peptide, String label, List<ProteinHit> proteins) {
-        this(peptide, label);
+    public PeptideHit(String peptide, int id, List<ProteinHit> proteins) {
+        this(peptide, id);
         if (proteins != null)
             this.proteins = proteins;
     }
     
-    public String getPeptide() {
+    public String getPeptideSeq() {
         return peptide;
     }
     
     public String getLabel() {
-        return label;
+        return String.valueOf(id);
+    }
+    
+    public int getId() {
+        return id;
     }
     
     public void addProteinHit(ProteinHit hit) {
@@ -39,5 +43,14 @@ public class PeptideHit {
     
     public int getMatchProteinCount() {
         return proteins.size();
+    }
+    
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append(peptide+"; id "+id+"\n");
+        for(ProteinHit protHit: proteins) {
+            buf.append(protHit+"\n");
+        }
+        return buf.toString();
     }
 }

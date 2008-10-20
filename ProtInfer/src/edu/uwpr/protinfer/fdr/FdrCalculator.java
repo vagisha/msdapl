@@ -1,21 +1,23 @@
 package edu.uwpr.protinfer.fdr;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 
+import edu.uwpr.protinfer.PeptideHit;
+import edu.uwpr.protinfer.Protein;
+import edu.uwpr.protinfer.ProteinHit;
 import edu.uwpr.protinfer.fdr.PeptideSequenceMatch.PsmComparator;
-import edu.uwpr.protinfer.pepxml.PepxmlFileReader;
+import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
 import edu.uwpr.protinfer.pepxml.SearchHit;
 
@@ -32,6 +34,10 @@ public class FdrCalculator {
         this.psmComparator = psmComparator;
     }
 
+    public void setDecoyRatio(double decoyRatio) {
+        this.decoyRatio = decoyRatio;
+    }
+    
     public void addForwardPsm(PeptideSequenceMatch psm) {
         forwardMatchList.add(psm);
     }
@@ -40,56 +46,82 @@ public class FdrCalculator {
         reverseMatchList.add(psm);
     }
 
-    public List<PeptideSequenceMatch> calculateFdr(double thresholdFdr, double decoyRatio) {
+    public List<PeptideSequenceMatch> calculateFdr(double thresholdFdr, boolean separateChargeStates) {
         
-        this.decoyRatio = decoyRatio;
-        for (int i = 1; i <= 3; i++)
-            calculateFdr(thresholdFdr, i);
+        System.out.println("Calculating FDR for "+forwardMatchList.size()+" PSMs");
         
-//        // sort the matches
-//        Collections.sort(forwardMatchList, Collections.reverseOrder(psmComparator));
-//        Collections.sort(reverseMatchList, Collections.reverseOrder(psmComparator));
-//        System.out.println("Max score for forward list: "+forwardMatchList.get(0).getMatchScore());
-//        System.out.println("Max score for reverse list: "+reverseMatchList.get(0).getMatchScore());
-//
-//        int lastReverseIndex = 0;
-//        int lastForwardIndex = 0;
-//
-//        PeptideSequenceMatch reversePsm = null;
-//        // calculate fdr at each score
-//        for (PeptideSequenceMatch psm: forwardMatchList) {
-//            lastForwardIndex++;
-//            // get the number of pms in the reverseMatchList that have a score >= the score of this psm
-//            for (; lastReverseIndex < reverseMatchList.size(); lastReverseIndex++) {
-//                reversePsm = reverseMatchList.get(lastReverseIndex);
-//                if (psmComparator.compare(psm, reversePsm) == 1)
-//                    break;
-//            }
-//            double fdr = (double)(2 * lastReverseIndex) / (double)(lastReverseIndex + lastForwardIndex);
-//            if (fdr > thresholdFdr)
-//                break;
-//
-//            psm.setFdr(fdr);
-//        }
+        if (!separateChargeStates) {
+            List<PeptideSequenceMatch> acceptedPsms = calculateFdr(forwardMatchList, reverseMatchList, thresholdFdr);
+            System.out.println("# Accepted PSMs (target) at fdr "+thresholdFdr+" -- "+acceptedPsms.size());
+            return acceptedPsms;
+        }
         
-        Collections.sort(forwardMatchList, Collections.reverseOrder(psmComparator));
-        return forwardMatchList;
+        else {
+            List<PeptideSequenceMatch> acceptedPsms = new ArrayList<PeptideSequenceMatch>();
+            Collections.sort(forwardMatchList, new PsmChargeComparator()); // sort by charge
+            Collections.sort(reverseMatchList, new PsmChargeComparator()); // sort by charge
+            int currentChg = 1;
+            List<PeptideSequenceMatch> forwardList = new ArrayList<PeptideSequenceMatch>();
+            List<PeptideSequenceMatch> reverseList = new ArrayList<PeptideSequenceMatch>();
+            int fidx = 0;
+            int ridx = 0;
+            while(true) {
+                int nextChg = currentChg;
+                for (; fidx < forwardMatchList.size(); fidx++) {
+                    PeptideSequenceMatch psm = forwardMatchList.get(fidx);
+                    if (psm.getMatchCharge() != currentChg) {
+                        nextChg = psm.getMatchCharge();
+                        break;
+                    }
+                    else {
+                        forwardList.add(psm);
+                    }
+                }
+                for (; ridx < reverseMatchList.size(); ridx++) {
+                    PeptideSequenceMatch psm = reverseMatchList.get(ridx);
+                    if (psm.getMatchCharge() != currentChg) {
+                        break;
+                    }
+                    else
+                        reverseList.add(psm);
+                }
+                System.out.println("Calculating FDR for +"+currentChg+" PSMs");
+                List<PeptideSequenceMatch> acceptedChgPsms = calculateFdr(forwardList, reverseList, thresholdFdr);
+                System.out.println("# Accepted PSMs (target) at charge +"+currentChg+" and fdr "+thresholdFdr+" -- "+acceptedChgPsms.size());
+                if (acceptedChgPsms != null && acceptedChgPsms.size() > 0)
+                    acceptedPsms.addAll(acceptedChgPsms);
+                
+                // have we seen all the forward sequence matches? 
+                if (fidx >= forwardMatchList.size())
+                    break;
+                
+                currentChg = nextChg;
+                forwardList.clear();
+                reverseList.clear();
+            }
+            System.out.println("# Accepted PSMs (target) at fdr "+thresholdFdr+" -- "+acceptedPsms.size());
+            return acceptedPsms;
+        }
     }
 
-    private List<PeptideSequenceMatch> calculateFdr(double thresholdFdr, int charge) {
-       List<PeptideSequenceMatch> forwardList = new ArrayList<PeptideSequenceMatch>();
-       List<PeptideSequenceMatch> reverseList = new ArrayList<PeptideSequenceMatch>();
-       for (PeptideSequenceMatch psm: forwardMatchList) {
-           if (psm.getMatchCharge() == charge)
-               forwardList.add(psm);
-       }
-       for (PeptideSequenceMatch psm: reverseMatchList) {
-           if (psm.getMatchCharge() == charge)
-               reverseList.add(psm);
-       }
-       if (forwardList.size() == 0) {
-           System.out.println("0 PSMs accepted at charge: +"+charge);
+    private static final class PsmChargeComparator implements Comparator<PeptideSequenceMatch> {
+
+        public int compare(PeptideSequenceMatch o1, PeptideSequenceMatch o2) {
+            return Integer.valueOf(o1.getMatchCharge()).compareTo(Integer.valueOf(o2.getMatchCharge()));
+        }
+    }
+    
+    private List<PeptideSequenceMatch> calculateFdr(List<PeptideSequenceMatch> forwardList, List<PeptideSequenceMatch> reverseList, double thresholdFdr) {
+       System.out.println("Forward PSM count: "+forwardList.size()+"; Reverse PSM count: "+reverseList.size());
+       
+        if (forwardList.size() == 0) {
            return new ArrayList<PeptideSequenceMatch>(0);
+       }
+       
+       if (reverseList.size() == 0) {
+           for (PeptideSequenceMatch psm: forwardList)
+               psm.setFdr(0.0);
+           return forwardList;
        }
        
        Collections.sort(forwardList, Collections.reverseOrder(psmComparator));
@@ -97,12 +129,13 @@ public class FdrCalculator {
        System.out.println("\tMax score for forward list: "+forwardList.get(0).getMatchScore()+"; #HITS: "+forwardList.size());
        System.out.println("\tMax score for reverse list: "+reverseList.get(0).getMatchScore()+"; #HITS: "+reverseList.size());
        
+       
        int lastReverseIndex = 0;
        int lastForwardIndex = 0;
 
        PeptideSequenceMatch reversePsm = null;
        // calculate fdr at each score
-       List<PeptideSequenceMatch> acceptedPsms = new ArrayList<PeptideSequenceMatch>();
+       
        for (PeptideSequenceMatch psm: forwardList) {
            lastForwardIndex++;
            // get the number of pms in the reverseMatchList that have a score >= the score of this psm
@@ -113,12 +146,13 @@ public class FdrCalculator {
            }
 //           double fdr = (double)(2 * lastReverseIndex) / (double)(lastReverseIndex + lastForwardIndex);
            double fdr = Math.min(1.0, (double)(lastReverseIndex*(1+decoyRatio)) / (double)(lastReverseIndex + lastForwardIndex));
-           if (fdr > thresholdFdr)
-               break;
            psm.setFdr(fdr);
-           acceptedPsms.add(psm);
        }
-       System.out.println("Number accepted at charge: +"+charge+": "+acceptedPsms.size());
+       List<PeptideSequenceMatch> acceptedPsms = new ArrayList<PeptideSequenceMatch>();
+       for (PeptideSequenceMatch psm: forwardList) {
+           if (psm.getFdr() <= thresholdFdr)
+               acceptedPsms.add(psm);
+       }
        return acceptedPsms;
     }
     
@@ -126,31 +160,37 @@ public class FdrCalculator {
     public static void main(String[] args) {
 
 //        String file = "TEST_DATA/large/PARC_depleted_b1_02.sqt";
-        String file = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.pep.xml";
-        parsePepxmlFile(file);
+//        String file = "TEST_DATA/for_vagisha/18mix/JE102306_102306_18Mix4_Tube1_01.pep.xml";
+        String dir = "TEST_DATA/for_vagisha/18mix";
+        String file = "interact.pep.xml";
+        parseInteractPepxmlFile(dir, file);
     }
     
-    private static void parsePepxmlFile(String file) {
-        PepxmlFileReader reader = new PepxmlFileReader();
-        FdrCalculator fdrCalc = new FdrCalculator(new PsmComparator());
-        int peptideCount = 0;
-        int forwardCount = 0;
-        int reverseCount = 0;
+    private static void parseInteractPepxmlFile(String dir, String fileName) {
+        InteractPepXmlFileReader reader = new InteractPepXmlFileReader();
+        
         try {
-            reader.open(file);
+            reader.open(dir+File.separator+fileName);
             ScanSearchResult scan = null;
             int scanCount = 0;
             int hitCount = 0;
-            while(reader.hasNextScanSearchResult()) {
-                scanCount++;
-                scan = reader.getNextSearchScan();
-//              System.out.println("Scan: "+scan.getStartScan()+"; #hits: "+scan.getSearchHits().size());
-                for (SearchHit hit: scan.getSearchHits()) {
-                    hitCount++;
-                    PeptideSequenceMatch psm = new PeptideSequenceMatch();
-                    psm.setMatchScore(scan.getStartScan(), scan.getAssumedCharge(), hit.getXcorr().doubleValue());
-
-                    String acc = hit.getFirstProteinHit().getAccession();
+            while(reader.hasNextRunSummary()) {
+                String runName = reader.getRunName();
+                System.out.println("Summary for file: "+runName);
+                FdrCalculator fdrCalc = new FdrCalculator(new PsmComparator());
+                int peptideCount = 0;
+                int forwardCount = 0;
+                int reverseCount = 0;
+                while(reader.hasNextScanSearchResult()) {
+                    scanCount++;
+                    scan = reader.getNextSearchScan();
+//                  System.out.println("Scan: "+scan.getStartScan()+"; #hits: "+scan.getSearchHits().size());
+                    for (SearchHit hit: scan.getSearchHits()) {
+                        hitCount++;
+                        peptideCount++;
+                    }
+                    PeptideSequenceMatch psm = new PeptideSequenceMatch(scan, scan.getStartScan(), scan.getAssumedCharge());
+                    String acc = scan.getTopHit().getFirstProteinHit().getAccession();
                     if (acc.startsWith("rev_")) {
                         fdrCalc.addReversePsm(psm);
                         reverseCount++;
@@ -159,55 +199,36 @@ public class FdrCalculator {
                         fdrCalc.addForwardPsm(psm);
                         forwardCount++;
                     }
-                    peptideCount++;
+
                 }
-//              if (peptideCount >  100)
-//              break;
+                System.out.println("Number of scans: "+scanCount+"; hitCount: "+hitCount);
+                System.out.println("Finished reading file: forward matches: "+forwardCount+"; reverse matches: "+reverseCount);
+//                fdrCalc.setDecoyRatio(0.00043935);
+                fdrCalc.setDecoyRatio(1.0);
+                List<PeptideSequenceMatch> acceptedPsms = fdrCalc.calculateFdr(0.25, true);
+                Map<String, PeptideHit> peptideHits = new HashMap<String, PeptideHit>();
+                Map<String, Protein> proteinHits = new HashMap<String, Protein>();
+                
+                for (PeptideSequenceMatch psm: acceptedPsms) {
+                    SearchHit hit = psm.getScanSearchResult().getTopHit();
+                    PeptideHit pHit = hit.getPeptide();
+                    peptideHits.put(pHit.getPeptideSeq(), pHit);
+                    for (ProteinHit prHit: pHit.getProteinList()) {
+                        proteinHits.put(prHit.getAccession(), prHit.getProtein());
+                    }
+                }
+                System.out.println("Number of peptides found: "+peptideHits.size());
+                System.out.println("Number of proteins found: "+proteinHits.size());
+                System.out.println("\n\n");
+                
+                printAcceptedPsms(dir+File.separator+new File(runName).getName(), acceptedPsms);
             }
             reader.close();
-            System.out.println("Number of scans: "+scanCount+"; hitCount: "+hitCount);
-            System.out.println("Finished reading file: #peptide: "+peptideCount+"; forward matches: "+forwardCount+"; reverse matches: "+reverseCount);
-            
-            List<PeptideSequenceMatch> sortedPsms = fdrCalc.calculateFdr(0.25, 0.00043935);
-            List<PeptideSequenceMatch> acceptedPsms = new ArrayList<PeptideSequenceMatch>();
-            for (PeptideSequenceMatch psm: sortedPsms) {
-                double fdr = round(psm.getFdr(), 2);
-                if (fdr > 0.25)
-                    break;
-                if (fdr <= 0.25) {
-                    acceptedPsms.add(psm);
-                }
-            }
-            System.out.println("Total psm's: "+sortedPsms.size());
-            System.out.println("Number of hits above fdr threshold of 0.25: "+acceptedPsms.size());
-//            int chg1Cnt = 0;
-//            int chg2Cnt = 0;
-//            int chg3Cnt = 0;
-//            for (PeptideSequenceMatch psm: acceptedPsms) {
-//                if (psm.getMatchCharge() == 1)
-//                    chg1Cnt++;
-//                else if (psm.getMatchCharge() == 2)
-//                    chg2Cnt++;
-//                else if (psm.getMatchCharge() == 3)
-//                    chg3Cnt++;
-//            }
-//            
-//            System.out.println("# Accepted at +1: "+chg1Cnt);
-//            System.out.println("# Accepted at +2: "+chg2Cnt);
-//            System.out.println("# Accepted at +3: "+chg3Cnt);
-            
-            // sort the results by scan number and print them
-//            Collections.sort(sortedPsms, new Comparator<PeptideSequenceMatch>() {
-//                public int compare(PeptideSequenceMatch o1,
-//                        PeptideSequenceMatch o2) {
-//                    return Integer.valueOf(o1.getScanNumber()).compareTo(Integer.valueOf(o2.getScanNumber()));
-//                }});
-//            
-//            for (PeptideSequenceMatch psm: sortedPsms) {
-//                System.out.println(psm);
-//            }
         }
         catch (DataProviderException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
         finally {
@@ -216,70 +237,24 @@ public class FdrCalculator {
         }
     }
     
+    private static void printAcceptedPsms(String runName,
+            List<PeptideSequenceMatch> acceptedPsms) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
+        for (PeptideSequenceMatch psm: acceptedPsms) {
+            writer.write(psm.getScanNumber()+"\t"+psm.getMatchCharge()+"\t"+psm.getMatchScore()+"\t"+psm.getFdr());
+            PeptideHit hit = psm.getScanSearchResult().getTopHit().getPeptide();
+            writer.write("\t"+hit.getPeptideSeq());
+            StringBuilder buf = new StringBuilder();
+            for (ProteinHit p: hit.getProteinList()) {
+                buf.append(","+p.getAccession());
+            }
+            buf.deleteCharAt(0);
+            writer.write("\t"+buf.toString()+"\n");
+        }
+        writer.close();
+    }
+
     private static double round(double value, int decimalPlaces) {
         return (Math.round((value*Math.pow(10, decimalPlaces))))/(Math.pow(10, decimalPlaces));
     }
-    
-//    private static void parseSQTFile(String file) {
-//        
-//        FdrCalculator fdrCalc = new FdrCalculator(new PsmComparator());
-//        SequestSQTFileReader reader = new SequestSQTFileReader();
-//        int peptideCount = 0;
-//        int forwardCount = 0;
-//        int reverseCount = 0;
-//        try {
-//            reader.open(file, false);
-//            reader.getSearchHeader();
-//            SequestSearchScan scan = null;
-//            while(reader.hasNextSearchScan()) {
-//                scan = reader.getNextSearchScan();
-////              System.out.println("Scan: "+scan.getScanNumber());
-//                Set<String> accessions = new HashSet<String>();
-//                for (SequestSearchResultIn result: scan.getScanResults()) {
-//                    PeptideSequenceMatch psm = new PeptideSequenceMatch();
-//                    psm.setMatchScore(result.getScanNumber(), result.getCharge(), result.getSequestResultData().getxCorr().doubleValue());
-//                    
-//                    List<MsSearchResultProteinIn> proteinList = result.getProteinMatchList();
-//                    for (MsSearchResultProteinIn prot: proteinList)
-//                        accessions.add(prot.getAccession());
-//                    
-//                    SequestResultData scores = result.getSequestResultData();
-//                    for (String acc: accessions) {
-//                        if (acc.startsWith("Reverse")) {
-//                            fdrCalc.addReversePsm(psm);
-//                            reverseCount++;
-//                        }
-//                        else {
-//                            fdrCalc.addForwardPsm(psm);
-//                            forwardCount++;
-//                        }
-//                    }
-//                    peptideCount++;
-//                }
-////              if (peptideCount >  100)
-////              break;
-//            }
-//            reader.close();
-//            System.out.println("Finished reading file: #peptide: "+peptideCount+"; forward matches: "+forwardCount+"; reverse matches: "+reverseCount);
-//            
-//            List<PeptideSequenceMatch> sortedPsms = fdrCalc.calculateFdr(0.05);
-//            int cnt = 0;
-//            for (PeptideSequenceMatch psm: sortedPsms) {
-//                System.out.println(psm);
-//                if (psm.getFdr() == 1.0)
-//                    break;
-//                cnt++;
-//            }
-//            System.out.println("Number of hits above fdr threshold of 0.05: "+cnt);
-//            
-//            
-//        }
-//        catch (DataProviderException e) {
-//            e.printStackTrace();
-//        }
-//        finally {
-//            if (reader != null)
-//                reader.close();
-//        }
-//    }
 }

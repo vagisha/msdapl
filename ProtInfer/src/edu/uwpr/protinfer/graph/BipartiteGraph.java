@@ -8,8 +8,10 @@ package edu.uwpr.protinfer.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class BipartiteGraph <L extends Node, R extends Node> implements IBipartiteGraph<L, R> {
@@ -17,8 +19,13 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
     private Map<String, L> leftNodes;
     private Map<String, R> rightNodes;
     
-    private Map<String, List<R>> l2rEdges; // String is label of L node
-    private Map<String, List<L>> r2lEdges; // String is label of R node
+    private Map<String, Set<R>> l2rEdges; // String is label of L node
+    private Map<String, Set<L>> r2lEdges; // String is label of R node
+    
+    // GreedySetCover will delete nodes and edge, but first it will make a call to backup edges
+    private Map<String, Set<R>> l2rEdgesBkp; // backup; 
+    private Map<String, Set<L>> r2lEdgesBkp; // backup;
+    private Map<String, R> rightNodesBkp; // backup;
     
     private final NodeCombiner<L> lcombiner;
     private final NodeCombiner<R> rcombiner;
@@ -26,10 +33,44 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
     public BipartiteGraph (NodeCombiner<L> lcombiner, NodeCombiner<R> rcombiner) {
         leftNodes = new HashMap<String, L>();
         rightNodes = new HashMap<String, R>();
-        l2rEdges = new HashMap<String, List<R>>();
-        r2lEdges = new HashMap<String, List<L>>();
+        l2rEdges = new HashMap<String, Set<R>>();
+        r2lEdges = new HashMap<String, Set<L>>();
         this.lcombiner = lcombiner;
         this.rcombiner = rcombiner;
+    }
+    
+    public void backupEdges() {
+        l2rEdgesBkp = new HashMap<String, Set<R>>(l2rEdges.size());
+        for (String key: l2rEdges.keySet())  {
+            Set<R> edgesTo = new HashSet<R>(l2rEdges.get(key));
+            edgesTo.addAll(l2rEdges.get(key));
+            l2rEdgesBkp.put(key, edgesTo);
+        }
+        
+        r2lEdgesBkp = new HashMap<String, Set<L>>(r2lEdges.size());
+        for (String key: r2lEdges.keySet()) {
+            Set<L> edgesTo = new HashSet<L>(r2lEdges.get(key));
+            edgesTo.addAll(r2lEdges.get(key));
+            r2lEdgesBkp.put(key, edgesTo);
+        }
+    }
+    
+    public void restoreEdges() {
+        l2rEdges.clear(); 
+        l2rEdges = l2rEdgesBkp;
+        r2lEdges.clear();
+        r2lEdges = r2lEdgesBkp;
+    }
+    
+    
+    public void backupRightNodes() {
+        rightNodesBkp= new HashMap<String, R>(rightNodes.size());
+        for (String key: rightNodes.keySet())
+            rightNodesBkp.put(key, rightNodes.get(key));
+    }
+    
+    public void restoreRightEdges() {
+        rightNodes = rightNodesBkp;
     }
     
     public void addEdge(L from, R to) {
@@ -37,16 +78,16 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
         R r = addRightNode(to);
         
         // add edge going from L to R
-        List<R> l2r_e = l2rEdges.get(l.getLabel());
+        Set<R> l2r_e = l2rEdges.get(l.getLabel());
         if (l2r_e == null)
-            l2r_e = new ArrayList<R>();
+            l2r_e = new HashSet<R>();
         l2r_e.add(r);
         l2rEdges.put(l.getLabel(), l2r_e);
         
         // add edge going from R to L
-        List<L> r2l_e = r2lEdges.get(r.getLabel());
+        Set<L> r2l_e = r2lEdges.get(r.getLabel());
         if (r2l_e == null)
-            r2l_e = new ArrayList<L>();
+            r2l_e = new HashSet<L>();
         r2l_e.add(l);
         r2lEdges.put(r.getLabel(), r2l_e);
     }
@@ -77,7 +118,7 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
     }
     
     private void removeEdgesWithR(R node) {
-        List<L> adjNodes = r2lEdges.get(node.getLabel());
+        Set<L> adjNodes = r2lEdges.get(node.getLabel());
         for (L adj: adjNodes) {
             l2rEdges.get(adj.getLabel()).remove(node);
         }
@@ -85,7 +126,7 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
     }
     
     private void removeEdgesWithL(L node) {
-        List<R> adjNodes = l2rEdges.get(node.getLabel());
+        Set<R> adjNodes = l2rEdges.get(node.getLabel());
         for (R adj: adjNodes) {
             r2lEdges.get(adj.getLabel()).remove(node);
         }
@@ -133,7 +174,7 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
         System.out.println("Right Nodes: "+rightNodes.size());
         for (L n: leftNodes.values()) {
             System.out.print(n.getLabel()+" --> ");
-            List<R> adjNodes = getAdjacentNodesL(n);
+            Set<R> adjNodes = getAdjacentNodesL(n);
             for (R adj: adjNodes) 
                 System.out.print(adj.getLabel()+", ");
             System.out.println();
@@ -174,24 +215,24 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
     }
 
     @Override
-    public List<R> getAdjacentNodesL(L node) {
+    public Set<R> getAdjacentNodesL(L node) {
         return l2rEdges.get(node.getLabel());
     }
 
     @Override
-    public List<L> getAdjacentNodesR(R node) {
+    public Set<L> getAdjacentNodesR(R node) {
         return r2lEdges.get(node.getLabel());
     }
 
     @Override
-    public List<Node> getAdjacentNodes(Node node) {
+    public Set<Node> getAdjacentNodes(Node node) {
         L ln = leftNodes.get(node.getLabel());
         if (ln != null)
-            return (List<Node>) getAdjacentNodesL(ln);
+            return (Set<Node>) getAdjacentNodesL(ln);
         
         R rn = rightNodes.get(node.getLabel());
         if (rn != null)
-            return (List<Node>) getAdjacentNodesR(rn);
+            return (Set<Node>) getAdjacentNodesR(rn);
         
         System.out.println("Node not found in graph: "+node.getLabel());
         return null;
@@ -199,7 +240,7 @@ public class BipartiteGraph <L extends Node, R extends Node> implements IBiparti
 
     @Override
     public String getNodeSignature(Node node) {
-        List<Node> adjNodes = getAdjacentNodes(node);
+        Set<Node> adjNodes = getAdjacentNodes(node);
         StringBuilder buf = new StringBuilder();
         for (Node n: adjNodes) {
             buf.append(","+n.getLabel());

@@ -1,19 +1,17 @@
 package edu.uwpr.protinfer.pepxml;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
+
+import edu.uwpr.protinfer.PeptideHit;
+import edu.uwpr.protinfer.ProteinHit;
 
 public class SearchHit {
 
-    private String peptide;
-    private char preResidue;
-    private char postResidue;
+    private PeptideHit peptide;
     private int numPredictedIons;
     private int numMatchedIons;
     private BigDecimal calcNeutralMass;
-//    private String matchProteinAccession;
-    private int numMatchingProteins;
     
     private BigDecimal xcorr;
     private BigDecimal deltaCn;
@@ -21,52 +19,19 @@ public class SearchHit {
     private int spRank;
     private int xcorrRank;
     
-    private List<ProteinHit> proteinHits;
     
-    public SearchHit() {
-        proteinHits = new ArrayList<ProteinHit>();
-    }
-
     /**
      * @return the peptide
      */
-    public String getPeptide() {
+    public PeptideHit getPeptide() {
         return peptide;
     }
 
     /**
      * @param peptide the peptide to set
      */
-    public void setPeptide(String peptide) {
+    public void setPeptide(PeptideHit peptide) {
         this.peptide = peptide;
-    }
-
-    /**
-     * @return the preResidue
-     */
-    public char getPreResidue() {
-        return preResidue;
-    }
-
-    /**
-     * @param preResidue the preResidue to set
-     */
-    public void setPreResidue(char preResidue) {
-        this.preResidue = preResidue;
-    }
-
-    /**
-     * @return the postResidue
-     */
-    public char getPostResidue() {
-        return postResidue;
-    }
-
-    /**
-     * @param postResidue the postResidue to set
-     */
-    public void setPostResidue(char postResidue) {
-        this.postResidue = postResidue;
     }
 
     /**
@@ -111,20 +76,16 @@ public class SearchHit {
         this.calcNeutralMass = calcNeutralMass;
     }
 
-    public void addProteinHit(ProteinHit protein) {
-        this.proteinHits.add(protein);
-    }
-    
     public List<ProteinHit> getProteinHits() {
-        return proteinHits;
+        return peptide.getProteinList();
     }
     
     public ProteinHit getFirstProteinHit() {
-        return proteinHits.get(0);
+        return getProteinHits().get(0);
     }
     
     public boolean hasUniqueProteinHit() {
-        return proteinHits.size() == 1;
+        return getProteinHits().size() == 1;
     }
     
     /**
@@ -195,19 +156,5 @@ public class SearchHit {
      */
     public void setXcorrRank(int xcorrRank) {
         this.xcorrRank = xcorrRank;
-    }
-
-    /**
-     * @return the numMatchingProteins
-     */
-    public int getNumMatchingProteins() {
-        return numMatchingProteins;
-    }
-
-    /**
-     * @param numMatchingProteins the numMatchingProteins to set
-     */
-    public void setNumMatchingProteins(int numMatchingProteins) {
-        this.numMatchingProteins = numMatchingProteins;
     }
 }

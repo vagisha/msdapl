@@ -8,6 +8,7 @@
 package edu.uwpr.protinfer.graph;
 
 import java.util.List;
+import java.util.Set;
 
 
 public interface IBipartiteGraph <L extends Node, R extends Node>{
@@ -26,11 +27,11 @@ public interface IBipartiteGraph <L extends Node, R extends Node>{
     
     public abstract List<R> getRightNodes();
     
-    public abstract List<Node> getAdjacentNodes(Node node);
+    public abstract Set<Node> getAdjacentNodes(Node node);
     
-    public abstract List<L> getAdjacentNodesR(R node);
+    public abstract Set<L> getAdjacentNodesR(R node);
     
-    public abstract List<R> getAdjacentNodesL(L node);
+    public abstract Set<R> getAdjacentNodesL(L node);
     
     public abstract void collapseLeftNodes(List<L> nodes) throws InvalidNodeException;
     

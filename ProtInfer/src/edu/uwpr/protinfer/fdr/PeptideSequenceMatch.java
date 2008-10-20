@@ -2,17 +2,21 @@ package edu.uwpr.protinfer.fdr;
 
 import java.util.Comparator;
 
+import edu.uwpr.protinfer.pepxml.ScanSearchResult;
+
 public class PeptideSequenceMatch {
 
     private double score;
     private int scanNumber;
     private int charge;
     private double fdr = 1.0;
+    private ScanSearchResult scanResult;
     
-    public void setMatchScore(int scanNumber, int charge, double score) {
-        this.scanNumber = scanNumber;
+    public PeptideSequenceMatch(ScanSearchResult scanResult, int scanNumber, int charge) {
+        this.scanResult = scanResult;
         this.charge = charge;
-        this.score = score;
+        this.scanNumber = scanNumber;
+        this.score = scanResult.getTopHit().getXcorr().doubleValue();
     }
     
     public double getMatchScore() {
@@ -25,6 +29,10 @@ public class PeptideSequenceMatch {
     
     public int getScanNumber() {
         return scanNumber;
+    }
+    
+    public ScanSearchResult getScanSearchResult() {
+        return scanResult;
     }
     
     public void setFdr(double fdr) {

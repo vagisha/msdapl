@@ -15,27 +15,31 @@ import edu.uwpr.protinfer.graph.Node;
 import edu.uwpr.protinfer.graph.NodeCombiner;
 
 public final class ProteinNode extends Node {
-    private ProteinHit[] hits;
+    private Protein[] hits;
     
-    public ProteinNode(ProteinHit... hits) throws InvalidNodeException {
+    public ProteinNode(Protein... hits) throws InvalidNodeException {
         super("");
         if (hits.length == 0)
             throw new InvalidNodeException("Cannot create a ProteinNode with 0 ProteinHits");
         StringBuilder buf = new StringBuilder();
-        for (ProteinHit hit: hits) 
+        for (Protein hit: hits) 
             buf.append("_"+hit.getLabel());
         buf.deleteCharAt(0);
         setLabel(buf.toString());
         this.hits = hits;
     }
     
-    public ProteinHit[] getProteinHits() {
+    public Protein[] getProteinHits() {
         return hits;
     }
 
     @Override
     public String getLongLabel() {
-        return getLabel();
+        StringBuilder buf = new StringBuilder();
+        for (Protein hit: hits) 
+            buf.append("_"+hit.getAccession());
+        buf.deleteCharAt(0);
+        return buf.toString();
     }
 }
 
@@ -43,10 +47,10 @@ final class ProteinNodeCombiner implements NodeCombiner<ProteinNode> {
 
     @Override
     public ProteinNode combineNodes(List<ProteinNode> nodes) throws InvalidNodeException {
-        List<ProteinHit> hits = new ArrayList<ProteinHit>(nodes.size());
+        List<Protein> hits = new ArrayList<Protein>(nodes.size());
         for (ProteinNode node: nodes)
             hits.addAll(Arrays.asList(node.getProteinHits()));
-        ProteinHit[] hitArray = new ProteinHit[hits.size()];
+        Protein[] hitArray = new Protein[hits.size()];
         return new ProteinNode(hits.toArray(hitArray));
     }
 }

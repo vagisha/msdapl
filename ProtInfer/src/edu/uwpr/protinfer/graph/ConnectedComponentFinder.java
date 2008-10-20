@@ -10,10 +10,8 @@ package edu.uwpr.protinfer.graph;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
-
-import edu.uwpr.protinfer.PeptideNode;
-import edu.uwpr.protinfer.ProteinNode;
 
 
 public class ConnectedComponentFinder {
@@ -57,7 +55,7 @@ public class ConnectedComponentFinder {
                 System.out.println("COMPONENT: "+currComponent);
             }
             System.out.print(node.getLabel()+" --> ");
-            List<Node> adjNodes = graph.getAdjacentNodes(node);
+            Set<Node> adjNodes = graph.getAdjacentNodes(node);
             for (Node pn: adjNodes) {
                 System.out.print(pn.getLabel()+", ");
             }
@@ -73,7 +71,7 @@ public class ConnectedComponentFinder {
         
         while (!stack.isEmpty()) {
             Node node = stack.pop();
-            List<Node> adjNodes = graph.getAdjacentNodes(node);
+            Set<Node> adjNodes = graph.getAdjacentNodes(node);
             for (Node child: adjNodes) {
                 if (isNodeVisited(child))
                     continue;

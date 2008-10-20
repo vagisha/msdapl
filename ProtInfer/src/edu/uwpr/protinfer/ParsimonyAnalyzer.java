@@ -1,22 +1,27 @@
 package edu.uwpr.protinfer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 
+import edu.uwpr.protinfer.fdr.FdrCalculator;
+import edu.uwpr.protinfer.fdr.PeptideSequenceMatch;
+import edu.uwpr.protinfer.fdr.PeptideSequenceMatch.PsmComparator;
 import edu.uwpr.protinfer.graph.BipartiteGraph;
 import edu.uwpr.protinfer.graph.ConnectedComponentFinder;
 import edu.uwpr.protinfer.graph.GraphCollapser;
 import edu.uwpr.protinfer.graph.GreedySetCover;
 import edu.uwpr.protinfer.graph.InvalidNodeException;
 import edu.uwpr.protinfer.graph.Node;
+import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
+import edu.uwpr.protinfer.pepxml.ScanSearchResult;
+import edu.uwpr.protinfer.pepxml.SearchHit;
 
 public class ParsimonyAnalyzer {
 
@@ -34,13 +39,14 @@ public class ParsimonyAnalyzer {
         
         List<ProteinHit> proteins = hit.getProteinList();
         for (ProteinHit prot: proteins) {
-            graph.addEdge(new ProteinNode(new ProteinHit[]{prot}), peptide);
+            graph.addEdge(new ProteinNode(new Protein[]{prot.getProtein()}), peptide);
         }
     }
     
     public List<ProteinNode> getMinimalProteinList() throws InvalidNodeException {
         
-        System.out.println("Beginning parsimony analysis");
+        System.out.println("Beginning parsimony analysis on graph with "+graph.getLeftNodes().size()+" left nodes and "+
+                graph.getRightNodes().size()+" right nodes");
         // collapse the graph
         System.out.println("Collapsing graph");
         GraphCollapser<ProteinNode, PeptideNode> collapser = new GraphCollapser<ProteinNode, PeptideNode>();
@@ -52,74 +58,91 @@ public class ParsimonyAnalyzer {
         List<ProteinNode> setCover = coverFinder.getGreedySetCover(graph);
         
         // find components in this graph and print them
-    //        System.out.println("Getting connected components");
-    //        ConnectedComponentFinder connCompFinder = new ConnectedComponentFinder();
-    //        connCompFinder.findAllConnectedComponents(graph);
-    //        List<Node> allNodes = graph.getAllNodes();
-    //        Collections.sort(allNodes, new Comparator<Node>() {
-    //            @Override
-    //            public int compare(Node o1, Node o2) {
-    //                return new Integer(o1.getComponentIndex()).compareTo(new Integer(o2.getComponentIndex()));
-    //            }});
-    //        int currComponent = -1;
-    //        for (Node node: allNodes) {
-    //            int idx = node.getComponentIndex();
-    //            if (idx != currComponent) {
-    //                currComponent = idx;
-    //                System.out.println("COMPONENT: "+currComponent);
-    //            }
-    //            if (node instanceof ProteinNode) {
-    //                System.out.print(node.getLabel()+" --> ");
-    //                List<PeptideNode> adjNodes = graph.getAdjacentNodesL((ProteinNode) node);
-    //                for (PeptideNode pn: adjNodes) {
-    //                    System.out.print(pn.getLabel()+", ");
-    //                }
-    //                System.out.println();
-    //            }
-    //        }
+        System.out.println("Getting connected components");
+        ConnectedComponentFinder connCompFinder = new ConnectedComponentFinder();
+        int componentCount = connCompFinder.findAllConnectedComponents(graph);
+        System.out.println("Found "+componentCount+" connected components");
+        Collections.sort(setCover, new Comparator<Node>() {
+            public int compare(Node o1, Node o2) {
+                return new Integer(o1.getComponentIndex()).compareTo(new Integer(o2.getComponentIndex()));
+            }});
+        
+        int currComponent = -1;
+        for (ProteinNode node: setCover) {
+            int idx = node.getComponentIndex();
+            if (idx != currComponent) {
+              currComponent = idx;
+              System.out.println("COMPONENT: "+currComponent);
+            }
+            System.out.print("\t"+node.getLongLabel()+"("+node.getLabel()+") --> ");
+            Set<PeptideNode> adjNodes = graph.getAdjacentNodesL((ProteinNode) node);
+            for (PeptideNode pn: adjNodes) {
+                System.out.print(pn.getLongLabel('\n')+"\n\n");
+            }
+            System.out.println();
+        }
+        
+//        List<Node> allNodes = graph.getAllNodes();
+//        Collections.sort(allNodes, new Comparator<Node>() {
+//            @Override
+//            public int compare(Node o1, Node o2) {
+//                return new Integer(o1.getComponentIndex()).compareTo(new Integer(o2.getComponentIndex()));
+//            }});
+//        int currComponent = -1;
+//        for (Node node: allNodes) {
+//            int idx = node.getComponentIndex();
+//            if (idx != currComponent) {
+//                currComponent = idx;
+//                System.out.println("COMPONENT: "+currComponent);
+//            }
+//            if (node instanceof ProteinNode) {
+//                System.out.print("\t"+node.getLongLabel()+" --> ");
+//                Set<PeptideNode> adjNodes = graph.getAdjacentNodesL((ProteinNode) node);
+//                System.out.println("Found "+adjNodes.size()+" adjacent nodes; "+graph.getAdjacentNodes(node).size());
+//                for (PeptideNode pn: adjNodes) {
+//                    System.out.print(pn.getLabel()+", ");
+//                }
+//                System.out.println();
+//            }
+//        }
         return setCover;
     }
     
     public static void main(String[] args) {
         
-        ParsimonyAnalyzer pars = new ParsimonyAnalyzer();
+        String filePath = "TEST_DATA/for_vagisha/18mix/interact.pep.xml";
         
-        String file = "TEST_DATA/large/PARC_depleted_b1_02.sqt";
-        SequestSQTFileReader reader = new SequestSQTFileReader();
-        int peptideCount = 0;
-        int proteinCount = 0;
+        InteractPepXmlFileReader reader = new InteractPepXmlFileReader();
+        List<PeptideSequenceMatch> allAcceptedPsms = new ArrayList<PeptideSequenceMatch>();
         try {
-            reader.open(file, false);
-            reader.getSearchHeader();
-            SequestSearchScan scan = null;
-            while(reader.hasNextSearchScan()) {
-                scan = reader.getNextSearchScan();
-//                System.out.println("Scan: "+scan.getScanNumber());
-                for (SequestSearchResultIn result: scan.getScanResults()) {
-                    MsSearchResultPeptide peptide = result.getResultPeptide();
-                    List<MsSearchResultProteinIn> proteins = result.getProteinMatchList();
-                    PeptideHit peptideHit = new PeptideHit(peptide.getPeptideSequence(), ""+peptideCount);
-                    peptideCount++;
-                    for (MsSearchResultProteinIn prot: proteins) {
-                        if (prot.getAccession().startsWith("Reverse"))
-                            continue;
-                        ProteinHit protHit = new ProteinHit(prot.getAccession(), ""+proteinCount);
-                        proteinCount++;
-                        peptideHit.addProteinHit(protHit);
+            reader.open(filePath);
+            ScanSearchResult scan = null;
+            while(reader.hasNextRunSummary()) {
+                
+                FdrCalculator fdrCalc = new FdrCalculator(new PsmComparator());
+                
+                while(reader.hasNextScanSearchResult()) {
+                    scan = reader.getNextSearchScan();
+                    PeptideSequenceMatch psm = new PeptideSequenceMatch(scan, scan.getStartScan(), scan.getAssumedCharge());
+                    String acc = scan.getTopHit().getFirstProteinHit().getAccession();
+                    if (acc.startsWith("rev_")) {
+                        fdrCalc.addReversePsm(psm);
                     }
-                    if (peptideHit.getMatchProteinCount() > 0)
-                        pars.addPeptideHit(peptideHit);
+                    else {
+                        fdrCalc.addForwardPsm(psm);
+                    }
                 }
-//                if (peptideCount >  100)
-//                    break;
+                
+                fdrCalc.setDecoyRatio(1.0);
+                List<PeptideSequenceMatch> acceptedPsms = fdrCalc.calculateFdr(0.05, true);
+                allAcceptedPsms.addAll(acceptedPsms);
             }
             reader.close();
-            System.out.println("Finished reading file: #peptide: "+peptideCount+"; #proteins: "+proteinCount);
+            System.out.println("Finished reading file: # accepted hits: "+allAcceptedPsms.size()+
+                    "; #peptide: "+reader.getPeptideHits().size()+
+                    "; #proteins: "+reader.getProteinHits().size());
         }
         catch (DataProviderException e) {
-            e.printStackTrace();
-        }
-        catch (InvalidNodeException e) {
             e.printStackTrace();
         }
         finally {
@@ -127,13 +150,30 @@ public class ParsimonyAnalyzer {
                 reader.close();
         }
         
+        ParsimonyAnalyzer pars = new ParsimonyAnalyzer();
+        Map<String, Integer> peptides = new HashMap<String, Integer>();
+        Map<String , Protein> proteins = new HashMap<String, Protein>();
+        for (PeptideSequenceMatch psm: allAcceptedPsms) {
+            SearchHit topHit = psm.getScanSearchResult().getTopHit();
+            PeptideHit peptide = topHit.getPeptide();
+            peptides.put(peptide.getPeptideSeq(), 1);
+            for (ProteinHit ph: peptide.getProteinList())
+                proteins.put(ph.getAccession(), ph.getProtein());
+            try {
+                pars.addPeptideHit(psm.getScanSearchResult().getTopHit().getPeptide());
+            }
+            catch (InvalidNodeException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("\n\npeptides: "+peptides.size()+"; proteins: "+proteins.size()+"\n");
+        
         try {
             List<ProteinNode> minimalProt = pars.getMinimalProteinList();
-            System.out.println("#proteins (via parsimony): "+minimalProt.size());
+            System.out.println("\n#proteins (via parsimony): "+minimalProt.size());
         }
         catch (InvalidNodeException e) {
             e.printStackTrace();
         }
-        
     }
 }

@@ -36,7 +36,19 @@ public final class PeptideNode extends Node {
 
     @Override
     public String getLongLabel() {
-        return getLabel();
+        StringBuilder buf = new StringBuilder();
+        for (PeptideHit hit: hits) 
+            buf.append("_"+hit.getPeptideSeq());
+        buf.deleteCharAt(0);
+        return buf.toString();
+    }
+    
+    public String getLongLabel(char separator) {
+        StringBuilder buf = new StringBuilder();
+        for (PeptideHit hit: hits) 
+            buf.append(separator+hit.getPeptideSeq());
+        buf.deleteCharAt(0);
+        return buf.toString();
     }
 }
 

@@ -12,6 +12,7 @@ public class ScanSearchResult {
     private BigDecimal precursorNeutralMass;
     private int assumedCharge;
     private float retentionTime;
+    private boolean isDecoy = false;
     
     private List<SearchHit> searchHits;
     
@@ -19,8 +20,20 @@ public class ScanSearchResult {
         searchHits = new ArrayList<SearchHit>();
     }
 
+    public boolean isDecoy() {
+        return isDecoy;
+    }
+    
+    public void setIsDecoy(boolean isDecoy) {
+        this.isDecoy = isDecoy;
+    }
+    
     public List<SearchHit> getSearchHits() {
         return searchHits;
+    }
+    
+    public SearchHit getTopHit() {
+        return searchHits.get(0);
     }
     
     public void addSearchHit(SearchHit hit) {
