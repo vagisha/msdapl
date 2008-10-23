@@ -8,13 +8,13 @@ package edu.uwpr.protinfer;
 
 import java.util.List;
 
-import edu.uwpr.protinfer.graph.BipartiteGraph;
-import edu.uwpr.protinfer.graph.ConnectedComponentFinder;
-import edu.uwpr.protinfer.graph.GraphCollapser;
-import edu.uwpr.protinfer.graph.GreedySetCover;
-import edu.uwpr.protinfer.graph.InvalidNodeException;
-import edu.uwpr.protinfer.graph.Node;
-import edu.uwpr.protinfer.graph.NodeCombiner;
+import edu.uwpr.protinfer.assemble.idpicker.algo.ConnectedComponentFinder;
+import edu.uwpr.protinfer.assemble.idpicker.algo.GraphCollapser;
+import edu.uwpr.protinfer.assemble.idpicker.algo.GreedySetCover;
+import edu.uwpr.protinfer.assemble.idpicker.graph.BipartiteGraph;
+import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
+import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
+import edu.uwpr.protinfer.assemble.idpicker.graph.NodeCombiner;
 
 public class TestApp {
 

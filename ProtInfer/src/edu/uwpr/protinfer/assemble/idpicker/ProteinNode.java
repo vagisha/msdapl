@@ -4,15 +4,16 @@
  * Oct 8, 2008
  * @version 1.0
  */
-package edu.uwpr.protinfer;
+package edu.uwpr.protinfer.assemble.idpicker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.uwpr.protinfer.graph.InvalidNodeException;
-import edu.uwpr.protinfer.graph.Node;
-import edu.uwpr.protinfer.graph.NodeCombiner;
+import edu.uwpr.protinfer.Protein;
+import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
+import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
+import edu.uwpr.protinfer.assemble.idpicker.graph.NodeCombiner;
 
 public final class ProteinNode extends Node {
     private Protein[] hits;

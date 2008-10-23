@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.fdr;
+package edu.uwpr.protinfer.assemble.idpicker;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -19,10 +19,11 @@ import javax.xml.stream.XMLStreamReader;
 import org.yeastrc.ms.parser.DataProviderException;
 
 import edu.uwpr.protinfer.PeptideHit;
+import edu.uwpr.protinfer.PeptideSequenceMatch;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
-import edu.uwpr.protinfer.pepxml.SearchHit;
+import edu.uwpr.protinfer.pepxml.SequestSearchHit;
 
 public class IdPickerXmlParser {
 
@@ -126,7 +127,7 @@ public class IdPickerXmlParser {
                 return false; // this is a hit to the decoy database;
         }
         
-        SearchHit srchHit = new SearchHit();
+        SequestSearchHit srchHit = new SequestSearchHit();
         srchHit.setXcorr(new BigDecimal("1.0"));
         srchHit.setPeptide(pHit);
         ScanSearchResult scanResult = new ScanSearchResult();
@@ -279,7 +280,7 @@ public class IdPickerXmlParser {
             List<PeptideSequenceMatch> acceptedPsms) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
         for (PeptideSequenceMatch psm: acceptedPsms) {
-            writer.write(psm.getScanNumber()+"\t"+psm.getMatchCharge()+"\t"+psm.getMatchScore()+"\t"+psm.getFdr());
+            writer.write(psm.getScanNumber()+"\t"+psm.getCharge()+"\t"+psm.getScore()+"\t"+psm.getFdr());
             PeptideHit hit = psm.getScanSearchResult().getTopHit().getPeptide();
             writer.write("\t"+hit.getPeptideSeq());
             StringBuilder buf = new StringBuilder();

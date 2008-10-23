@@ -5,13 +5,17 @@
  * @version 1.0
  */
 
-package edu.uwpr.protinfer.graph;
+package edu.uwpr.protinfer.assemble.idpicker.algo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import edu.uwpr.protinfer.assemble.idpicker.graph.IBipartiteGraph;
+import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
+import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
 
 public class GraphCollapser <L extends Node, R extends Node>{
 

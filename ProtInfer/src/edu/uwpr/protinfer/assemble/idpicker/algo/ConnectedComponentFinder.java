@@ -5,13 +5,16 @@
  * @version 1.0
  */
 
-package edu.uwpr.protinfer.graph;
+package edu.uwpr.protinfer.assemble.idpicker.algo;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+
+import edu.uwpr.protinfer.assemble.idpicker.graph.IBipartiteGraph;
+import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
 
 
 public class ConnectedComponentFinder {

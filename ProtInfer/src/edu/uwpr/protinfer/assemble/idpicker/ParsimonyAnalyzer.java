@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer;
+package edu.uwpr.protinfer.assemble.idpicker;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,18 +10,21 @@ import java.util.Set;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.fdr.FdrCalculator;
-import edu.uwpr.protinfer.fdr.PeptideSequenceMatch;
-import edu.uwpr.protinfer.fdr.PeptideSequenceMatch.PsmComparator;
-import edu.uwpr.protinfer.graph.BipartiteGraph;
-import edu.uwpr.protinfer.graph.ConnectedComponentFinder;
-import edu.uwpr.protinfer.graph.GraphCollapser;
-import edu.uwpr.protinfer.graph.GreedySetCover;
-import edu.uwpr.protinfer.graph.InvalidNodeException;
-import edu.uwpr.protinfer.graph.Node;
+import edu.uwpr.protinfer.PeptideHit;
+import edu.uwpr.protinfer.PeptideSequenceMatch;
+import edu.uwpr.protinfer.Protein;
+import edu.uwpr.protinfer.ProteinHit;
+import edu.uwpr.protinfer.PeptideSequenceMatch.PsmComparator;
+import edu.uwpr.protinfer.assemble.idpicker.algo.ConnectedComponentFinder;
+import edu.uwpr.protinfer.assemble.idpicker.algo.GraphCollapser;
+import edu.uwpr.protinfer.assemble.idpicker.algo.GreedySetCover;
+import edu.uwpr.protinfer.assemble.idpicker.graph.BipartiteGraph;
+import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
+import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
+import edu.uwpr.protinfer.filter.idpicker.FdrCalculator;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
-import edu.uwpr.protinfer.pepxml.SearchHit;
+import edu.uwpr.protinfer.pepxml.SequestSearchHit;
 
 public class ParsimonyAnalyzer {
 
@@ -52,7 +55,7 @@ public class ParsimonyAnalyzer {
         GraphCollapser<ProteinNode, PeptideNode> collapser = new GraphCollapser<ProteinNode, PeptideNode>();
         collapser.collapseGraph(graph);
         
-        // find the greedy set cover
+        // find the greedy set cover    
         System.out.println("Computing set cover");
         GreedySetCover<ProteinNode, PeptideNode> coverFinder = new GreedySetCover<ProteinNode, PeptideNode>();
         List<ProteinNode> setCover = coverFinder.getGreedySetCover(graph);
@@ -81,30 +84,6 @@ public class ParsimonyAnalyzer {
             }
             System.out.println();
         }
-        
-//        List<Node> allNodes = graph.getAllNodes();
-//        Collections.sort(allNodes, new Comparator<Node>() {
-//            @Override
-//            public int compare(Node o1, Node o2) {
-//                return new Integer(o1.getComponentIndex()).compareTo(new Integer(o2.getComponentIndex()));
-//            }});
-//        int currComponent = -1;
-//        for (Node node: allNodes) {
-//            int idx = node.getComponentIndex();
-//            if (idx != currComponent) {
-//                currComponent = idx;
-//                System.out.println("COMPONENT: "+currComponent);
-//            }
-//            if (node instanceof ProteinNode) {
-//                System.out.print("\t"+node.getLongLabel()+" --> ");
-//                Set<PeptideNode> adjNodes = graph.getAdjacentNodesL((ProteinNode) node);
-//                System.out.println("Found "+adjNodes.size()+" adjacent nodes; "+graph.getAdjacentNodes(node).size());
-//                for (PeptideNode pn: adjNodes) {
-//                    System.out.print(pn.getLabel()+", ");
-//                }
-//                System.out.println();
-//            }
-//        }
         return setCover;
     }
     
@@ -154,7 +133,7 @@ public class ParsimonyAnalyzer {
         Map<String, Integer> peptides = new HashMap<String, Integer>();
         Map<String , Protein> proteins = new HashMap<String, Protein>();
         for (PeptideSequenceMatch psm: allAcceptedPsms) {
-            SearchHit topHit = psm.getScanSearchResult().getTopHit();
+            SequestSearchHit topHit = psm.getScanSearchResult().getTopHit();
             PeptideHit peptide = topHit.getPeptide();
             peptides.put(peptide.getPeptideSeq(), 1);
             for (ProteinHit ph: peptide.getProteinList())

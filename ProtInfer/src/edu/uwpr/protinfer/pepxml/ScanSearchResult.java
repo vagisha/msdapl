@@ -14,10 +14,10 @@ public class ScanSearchResult {
     private float retentionTime;
     private boolean isDecoy = false;
     
-    private List<SearchHit> searchHits;
+    private List<SequestSearchHit> searchHits;
     
     public ScanSearchResult() {
-        searchHits = new ArrayList<SearchHit>();
+        searchHits = new ArrayList<SequestSearchHit>();
     }
 
     public boolean isDecoy() {
@@ -28,15 +28,15 @@ public class ScanSearchResult {
         this.isDecoy = isDecoy;
     }
     
-    public List<SearchHit> getSearchHits() {
+    public List<SequestSearchHit> getSearchHits() {
         return searchHits;
     }
     
-    public SearchHit getTopHit() {
+    public SequestSearchHit getTopHit() {
         return searchHits.get(0);
     }
     
-    public void addSearchHit(SearchHit hit) {
+    public void addSearchHit(SequestSearchHit hit) {
         searchHits.add(hit);
     }
     

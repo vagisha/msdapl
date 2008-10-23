@@ -20,14 +20,6 @@ public class ProteinHit {
         return protein.getAccession();
     }
     
-    public String getLabel() {
-        return String.valueOf(protein.getId());
-    }
-    
-    public int getId() {
-        return protein.getId();
-    }
-    
     /**
      * @return the preResidue
      */

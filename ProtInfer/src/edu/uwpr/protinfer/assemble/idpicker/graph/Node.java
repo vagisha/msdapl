@@ -4,7 +4,7 @@
  * Oct 3, 2008
  * @version 1.0
  */
-package edu.uwpr.protinfer.graph;
+package edu.uwpr.protinfer.assemble.idpicker.graph;
 
 
 public class Node {

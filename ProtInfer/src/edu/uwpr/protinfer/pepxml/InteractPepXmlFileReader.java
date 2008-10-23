@@ -77,7 +77,7 @@ public class InteractPepXmlFileReader extends PepxmlFileReader{
                 ScanSearchResult scanResult = reader.getNextSearchScan();
                 if (scanResult.getSearchHits().size() != 1)
                     System.out.println("Scan has "+scanResult.getSearchHits().size()+" hits!!!");
-                for (SearchHit hit: scanResult.getSearchHits()) {
+                for (SequestSearchHit hit: scanResult.getSearchHits()) {
                     List<ProteinHit> proteins = hit.getProteinHits();
 //                  if (proteins.size() != 1)
 //                  System.out.println("Hit "+scanResult.getSpectrumString()+" has "+proteins.size()+" matching proteins");

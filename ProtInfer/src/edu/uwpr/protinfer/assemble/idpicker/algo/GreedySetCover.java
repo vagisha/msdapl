@@ -4,12 +4,16 @@
  * Oct 6, 2008
  * @version 1.0
  */
-package edu.uwpr.protinfer.graph;
+package edu.uwpr.protinfer.assemble.idpicker.algo;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
+
+import edu.uwpr.protinfer.assemble.idpicker.graph.BipartiteGraph;
+import edu.uwpr.protinfer.assemble.idpicker.graph.IBipartiteGraph;
+import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
 
 
 /**

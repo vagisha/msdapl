@@ -3,7 +3,12 @@ package edu.uwpr.protinfer;
 public class Protein {
 
     private final String accession;
-    int id;
+    private int id; // could be a database id
+    private boolean isDecoy = false;
+    
+    public Protein(String accession) {
+        this.accession = accession;
+    }
     
     public Protein(String accession, int id) {
         this.accession = accession;
@@ -14,15 +19,19 @@ public class Protein {
         return accession;
     }
     
-    public String getLabel() {
-        return String.valueOf(id);
-    }
-    
     public int getId() {
         return id;
     }
     
+    public void setDecoy() {
+        this.isDecoy = true;
+    }
+    
+    public boolean isDecoy() {
+        return isDecoy;
+    }
+    
     public String toString() {
-        return id+"\t"+accession;
+        return accession+"\tID:"+id;
     }
 }

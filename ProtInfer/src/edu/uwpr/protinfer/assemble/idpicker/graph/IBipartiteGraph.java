@@ -5,10 +5,11 @@
  * @version 1.0
  */
 
-package edu.uwpr.protinfer.graph;
+package edu.uwpr.protinfer.assemble.idpicker.graph;
 
 import java.util.List;
 import java.util.Set;
+
 
 
 public interface IBipartiteGraph <L extends Node, R extends Node>{

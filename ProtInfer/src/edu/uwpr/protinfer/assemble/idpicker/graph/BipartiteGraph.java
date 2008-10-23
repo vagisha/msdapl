@@ -4,7 +4,7 @@
  * Oct 3, 2008
  * @version 1.0
  */
-package edu.uwpr.protinfer.graph;
+package edu.uwpr.protinfer.assemble.idpicker.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 
 public class BipartiteGraph <L extends Node, R extends Node> implements IBipartiteGraph<L, R> {

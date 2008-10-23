@@ -6,7 +6,7 @@ import java.util.List;
 import edu.uwpr.protinfer.PeptideHit;
 import edu.uwpr.protinfer.ProteinHit;
 
-public class SearchHit {
+public class SequestSearchHit {
 
     private PeptideHit peptide;
     private int numPredictedIons;

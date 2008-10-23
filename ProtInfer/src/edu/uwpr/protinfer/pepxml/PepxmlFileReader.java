@@ -135,15 +135,15 @@ public class PepxmlFileReader {
             if (evtType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("spectrum_query"))
                 break;
             if (evtType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_hit")) {
-                SearchHit hit = readSearchHit(scanResult.getStartScan());
+                SequestSearchHit hit = readSearchHit(scanResult.getStartScan());
                 scanResult.addSearchHit(hit);
             }
         }  
     }
     
-    private SearchHit readSearchHit(int scanNumber) throws XMLStreamException, DataProviderException {
+    private SequestSearchHit readSearchHit(int scanNumber) throws XMLStreamException, DataProviderException {
         
-        SearchHit hit = new SearchHit();
+        SequestSearchHit hit = new SequestSearchHit();
         String peptideSeq = null;
         List<ProteinHit> proteinAccList = new ArrayList<ProteinHit>();
         int numMatchingProteins = -1;
@@ -271,7 +271,7 @@ public class PepxmlFileReader {
             ScanSearchResult scanResult = reader.getNextSearchScan();
             if (scanResult.getSearchHits().size() != 1)
                 System.out.println("Scan has "+scanResult.getSearchHits().size()+" hits!!!");
-            for (SearchHit hit: scanResult.getSearchHits()) {
+            for (SequestSearchHit hit: scanResult.getSearchHits()) {
                 List<ProteinHit> proteins = hit.getProteinHits();
 //                if (proteins.size() != 1)
 //                    System.out.println("Hit "+scanResult.getSpectrumString()+" has "+proteins.size()+" matching proteins");

@@ -4,9 +4,10 @@
  * Oct 8, 2008
  * @version 1.0
  */
-package edu.uwpr.protinfer.graph;
+package edu.uwpr.protinfer.assemble.idpicker.graph;
 
 import java.util.List;
+
 
 /**
  * 

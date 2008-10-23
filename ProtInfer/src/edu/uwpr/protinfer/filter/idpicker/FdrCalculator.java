@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.fdr;
+package edu.uwpr.protinfer.filter.idpicker;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,12 +14,13 @@ import java.util.Map;
 import org.yeastrc.ms.parser.DataProviderException;
 
 import edu.uwpr.protinfer.PeptideHit;
+import edu.uwpr.protinfer.PeptideSequenceMatch;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
-import edu.uwpr.protinfer.fdr.PeptideSequenceMatch.PsmComparator;
+import edu.uwpr.protinfer.PeptideSequenceMatch.PsmComparator;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
-import edu.uwpr.protinfer.pepxml.SearchHit;
+import edu.uwpr.protinfer.pepxml.SequestSearchHit;
 
 public class FdrCalculator {
 
@@ -69,8 +70,8 @@ public class FdrCalculator {
                 int nextChg = currentChg;
                 for (; fidx < forwardMatchList.size(); fidx++) {
                     PeptideSequenceMatch psm = forwardMatchList.get(fidx);
-                    if (psm.getMatchCharge() != currentChg) {
-                        nextChg = psm.getMatchCharge();
+                    if (psm.getCharge() != currentChg) {
+                        nextChg = psm.getCharge();
                         break;
                     }
                     else {
@@ -79,7 +80,7 @@ public class FdrCalculator {
                 }
                 for (; ridx < reverseMatchList.size(); ridx++) {
                     PeptideSequenceMatch psm = reverseMatchList.get(ridx);
-                    if (psm.getMatchCharge() != currentChg) {
+                    if (psm.getCharge() != currentChg) {
                         break;
                     }
                     else
@@ -107,7 +108,7 @@ public class FdrCalculator {
     private static final class PsmChargeComparator implements Comparator<PeptideSequenceMatch> {
 
         public int compare(PeptideSequenceMatch o1, PeptideSequenceMatch o2) {
-            return Integer.valueOf(o1.getMatchCharge()).compareTo(Integer.valueOf(o2.getMatchCharge()));
+            return Integer.valueOf(o1.getCharge()).compareTo(Integer.valueOf(o2.getCharge()));
         }
     }
     
@@ -126,8 +127,8 @@ public class FdrCalculator {
        
        Collections.sort(forwardList, Collections.reverseOrder(psmComparator));
        Collections.sort(reverseList, Collections.reverseOrder(psmComparator));
-       System.out.println("\tMax score for forward list: "+forwardList.get(0).getMatchScore()+"; #HITS: "+forwardList.size());
-       System.out.println("\tMax score for reverse list: "+reverseList.get(0).getMatchScore()+"; #HITS: "+reverseList.size());
+       System.out.println("\tMax score for forward list: "+forwardList.get(0).getScore()+"; #HITS: "+forwardList.size());
+       System.out.println("\tMax score for reverse list: "+reverseList.get(0).getScore()+"; #HITS: "+reverseList.size());
        
        
        int lastReverseIndex = 0;
@@ -185,7 +186,7 @@ public class FdrCalculator {
                     scanCount++;
                     scan = reader.getNextSearchScan();
 //                  System.out.println("Scan: "+scan.getStartScan()+"; #hits: "+scan.getSearchHits().size());
-                    for (SearchHit hit: scan.getSearchHits()) {
+                    for (SequestSearchHit hit: scan.getSearchHits()) {
                         hitCount++;
                         peptideCount++;
                     }
@@ -210,7 +211,7 @@ public class FdrCalculator {
                 Map<String, Protein> proteinHits = new HashMap<String, Protein>();
                 
                 for (PeptideSequenceMatch psm: acceptedPsms) {
-                    SearchHit hit = psm.getScanSearchResult().getTopHit();
+                    SequestSearchHit hit = psm.getScanSearchResult().getTopHit();
                     PeptideHit pHit = hit.getPeptide();
                     peptideHits.put(pHit.getPeptideSeq(), pHit);
                     for (ProteinHit prHit: pHit.getProteinList()) {
@@ -241,7 +242,7 @@ public class FdrCalculator {
             List<PeptideSequenceMatch> acceptedPsms) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
         for (PeptideSequenceMatch psm: acceptedPsms) {
-            writer.write(psm.getScanNumber()+"\t"+psm.getMatchCharge()+"\t"+psm.getMatchScore()+"\t"+psm.getFdr());
+            writer.write(psm.getScanNumber()+"\t"+psm.getCharge()+"\t"+psm.getScore()+"\t"+psm.getFdr());
             PeptideHit hit = psm.getScanSearchResult().getTopHit().getPeptide();
             writer.write("\t"+hit.getPeptideSeq());
             StringBuilder buf = new StringBuilder();
