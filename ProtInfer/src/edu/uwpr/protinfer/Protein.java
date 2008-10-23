@@ -6,10 +6,10 @@ public class Protein {
     private int id; // could be a database id
     private boolean isDecoy = false;
     
-    public Protein(String accession) {
-        this.accession = accession;
-    }
-    
+    /**
+     * @param accession
+     * @param id unique id for this protein
+     */
     public Protein(String accession, int id) {
         this.accession = accession;
         this.id = id;

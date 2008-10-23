@@ -24,11 +24,11 @@ public class PeptideEvidence {
     }
     
     /**
-     * Returns the sequence of the peptide with modifications. E.g. PEP(80.0)TIDE
+     * Returns the sequence of the peptide without modifications;
      * @return
      */
     public String getPeptideSeq() {
-        return peptide.getPeptideSeq();
+        return peptide.getSequence();
     }
     
     /**
