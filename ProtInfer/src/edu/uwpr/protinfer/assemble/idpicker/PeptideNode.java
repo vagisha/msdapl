@@ -25,7 +25,7 @@ public final class PeptideNode extends Node {
             throw new InvalidNodeException("Cannot create a PeptideNode with 0 PeptideHits");
         StringBuilder buf = new StringBuilder();
         for (PeptideHit hit: hits) 
-            buf.append("_"+hit.getLabel());
+            buf.append("_"+hit.getUnmodifiedSequence());
         buf.deleteCharAt(0);
         setLabel(buf.toString());
         this.hits = hits;

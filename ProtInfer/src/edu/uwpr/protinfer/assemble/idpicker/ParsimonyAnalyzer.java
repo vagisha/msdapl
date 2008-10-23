@@ -14,6 +14,8 @@ import edu.uwpr.protinfer.PeptideHit;
 import edu.uwpr.protinfer.PeptideSequenceMatch;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
+import edu.uwpr.protinfer.SearchHit;
+import edu.uwpr.protinfer.SearchSource;
 import edu.uwpr.protinfer.PeptideSequenceMatch.PsmComparator;
 import edu.uwpr.protinfer.assemble.idpicker.algo.ConnectedComponentFinder;
 import edu.uwpr.protinfer.assemble.idpicker.algo.GraphCollapser;
@@ -22,6 +24,7 @@ import edu.uwpr.protinfer.assemble.idpicker.graph.BipartiteGraph;
 import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
 import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
 import edu.uwpr.protinfer.filter.idpicker.FdrCalculator;
+import edu.uwpr.protinfer.filter.idpicker.FdrFilter;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
 import edu.uwpr.protinfer.pepxml.SequestSearchHit;
@@ -92,29 +95,39 @@ public class ParsimonyAnalyzer {
         String filePath = "TEST_DATA/for_vagisha/18mix/interact.pep.xml";
         
         InteractPepXmlFileReader reader = new InteractPepXmlFileReader();
+        List<SearchHit> allHits = new ArrayList<SearchHit>();
         List<PeptideSequenceMatch> allAcceptedPsms = new ArrayList<PeptideSequenceMatch>();
+        int sourceId = 0;
+        
         try {
             reader.open(filePath);
             ScanSearchResult scan = null;
             while(reader.hasNextRunSummary()) {
                 
-                FdrCalculator fdrCalc = new FdrCalculator(new PsmComparator());
+                String sourceName = reader.getRunName();
+                SearchSource source = new SearchSource(sourceName, sourceId++);
                 
                 while(reader.hasNextScanSearchResult()) {
                     scan = reader.getNextSearchScan();
-                    PeptideSequenceMatch psm = new PeptideSequenceMatch(scan, scan.getStartScan(), scan.getAssumedCharge());
-                    String acc = scan.getTopHit().getFirstProteinHit().getAccession();
-                    if (acc.startsWith("rev_")) {
-                        fdrCalc.addReversePsm(psm);
+                    SequestSearchHit seqHit = scan.getTopHit();
+                    PeptideHit pept = seqHit.getPeptide();
+                    for (ProteinHit prot: pept.getProteinList()) {
+                        if (prot.getAccession().startsWith("rev_"))
+                            prot.getProtein().setDecoy();
                     }
-                    else {
-                        fdrCalc.addForwardPsm(psm);
-                    }
+                    
+                    SearchHit hit = new SearchHit(source, scan.getStartScan(), scan.getAssumedCharge(), 
+                            seqHit.getXcorr().doubleValue(), 
+                            pept);
+                    allHits.add(hit);
                 }
                 
+                FdrFilter fdrCalc = new FdrFilter();
                 fdrCalc.setDecoyRatio(1.0);
-                List<PeptideSequenceMatch> acceptedPsms = fdrCalc.calculateFdr(0.05, true);
-                allAcceptedPsms.addAll(acceptedPsms);
+                fdrCalc.separateChargeStates();
+                fdrCalc.setThresholdFdr(0.25);
+                fdrCalc.filterSearchHits(allHits, comparator);
+                
             }
             reader.close();
             System.out.println("Finished reading file: # accepted hits: "+allAcceptedPsms.size()+

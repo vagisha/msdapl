@@ -24,7 +24,7 @@ public final class ProteinNode extends Node {
             throw new InvalidNodeException("Cannot create a ProteinNode with 0 ProteinHits");
         StringBuilder buf = new StringBuilder();
         for (Protein hit: hits) 
-            buf.append("_"+hit.getLabel());
+            buf.append("_"+hit.getAccession());
         buf.deleteCharAt(0);
         setLabel(buf.toString());
         this.hits = hits;

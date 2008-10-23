@@ -18,29 +18,29 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
+import edu.uwpr.protinfer.FilterScore;
 import edu.uwpr.protinfer.PeptideHit;
-import edu.uwpr.protinfer.PeptideSequenceMatch;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
-import edu.uwpr.protinfer.pepxml.ScanSearchResult;
-import edu.uwpr.protinfer.pepxml.SequestSearchHit;
+import edu.uwpr.protinfer.SearchHit;
+import edu.uwpr.protinfer.SearchSource;
 
 public class IdPickerXmlParser {
 
     private Map<Integer, Protein> proteinList;
     private Map<Integer, PeptideHit> peptideHits;
-    private List<PeptideSequenceMatch> psmList;
+    private List<SearchHit> searchHits;
     XMLStreamReader reader = null;
 
     
     public IdPickerXmlParser() {
         proteinList = new HashMap<Integer, Protein>();
         peptideHits = new HashMap<Integer, PeptideHit>();
-        psmList = new ArrayList<PeptideSequenceMatch>();
+        searchHits = new ArrayList<SearchHit>();
     }
     
-    public List<PeptideSequenceMatch> getAcceptedPsms() {
-        return psmList;
+    public List<SearchHit> getAcceptedHits() {
+        return searchHits;
     }
     
     public void readXml(String filePath) throws DataProviderException {  
@@ -92,6 +92,8 @@ public class IdPickerXmlParser {
         int charge = -1;
         int peptideId = -1;
         double fdr = -1.0;
+        SearchSource source = new SearchSource("idpicker.xml", 1);
+        
         for (int i = 0; i < reader.getAttributeCount(); i++) {
             if (reader.getAttributeLocalName(i).equalsIgnoreCase("scan")) {
                 scan = Integer.parseInt(reader.getAttributeValue(i));
@@ -126,18 +128,9 @@ public class IdPickerXmlParser {
             if (prHit.getAccession().startsWith("rev_"))
                 return false; // this is a hit to the decoy database;
         }
-        
-        SequestSearchHit srchHit = new SequestSearchHit();
-        srchHit.setXcorr(new BigDecimal("1.0"));
-        srchHit.setPeptide(pHit);
-        ScanSearchResult scanResult = new ScanSearchResult();
-        scanResult.addSearchHit(srchHit);
-        scanResult.setStartScan(scan);
-        scanResult.setEndScan(scan);
-        scanResult.setAssumedCharge(charge);
-        PeptideSequenceMatch psm = new PeptideSequenceMatch(scanResult, scan, charge);
-        psm.setFdr(fdr);
-        psmList.add(psm);
+        SearchHit hit = new SearchHit(source, scan, charge, 0.0, pHit);
+        hit.getPeptideSequenceMatch().setFilterScore(new FilterScore("fdr", fdr, true));
+        searchHits.add(hit);
         return true; // this is a hit to the target database;
     }
     
@@ -151,12 +144,13 @@ public class IdPickerXmlParser {
         }
         
         PeptideHit hit = null;
+        int lastId = -1;
         while (reader.hasNext()) {
             int evtType = reader.next();
             if (isEndPeptideIndex(evtType))
                 break;
             if (isEndPeptide(evtType)) {
-                peptideHits.put(hit.getId(), hit);
+                peptideHits.put(lastId, hit);
                 continue;
             }
             if (isStartPeptide(evtType)) {
@@ -170,7 +164,8 @@ public class IdPickerXmlParser {
                         sequence = reader.getAttributeValue(i);
                     }
                 }
-                hit = new PeptideHit(sequence, id);
+                hit = new PeptideHit(sequence);
+                lastId = id;
             }
             else if (isStartLocus(evtType)) {
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
@@ -269,22 +264,22 @@ public class IdPickerXmlParser {
         parser.readXml(filePath);
         parser.close();
         try {
-            printAcceptedPsms("TEST_DATA/for_vagisha/18mix/idpicker/interact", parser.getAcceptedPsms());
+            printAcceptedHits("TEST_DATA/for_vagisha/18mix/idpicker/interact", parser.getAcceptedHits());
         }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
     
-    private static void printAcceptedPsms(String runName,
-            List<PeptideSequenceMatch> acceptedPsms) throws IOException {
+    private static void printAcceptedHits(String runName,
+            List<SearchHit> acceptedHits) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
-        for (PeptideSequenceMatch psm: acceptedPsms) {
-            writer.write(psm.getScanNumber()+"\t"+psm.getCharge()+"\t"+psm.getScore()+"\t"+psm.getFdr());
-            PeptideHit hit = psm.getScanSearchResult().getTopHit().getPeptide();
-            writer.write("\t"+hit.getPeptideSeq());
+        for (SearchHit hit: acceptedHits) {
+            writer.write(hit.getScanNumber()+"\t"+hit.getCharge()+"\t"+hit.getScore()
+                    +"\t"+hit.getPeptideSequenceMatch().getFilterScore().getScore());
+            writer.write("\t"+hit.getPeptideHit().getPeptideSeq());
             StringBuilder buf = new StringBuilder();
-            for (ProteinHit p: hit.getProteinList()) {
+            for (ProteinHit p: hit.getPeptideHit().getProteinList()) {
                 buf.append(","+p.getAccession());
             }
             buf.deleteCharAt(0);

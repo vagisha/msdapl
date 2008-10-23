@@ -221,7 +221,8 @@ public class PepxmlFileReader {
         PeptideHit peptideHit = peptideHits.get(peptideSeq);
         if (peptideHit == null) {
             // if not create a new PeptideHit
-            peptideHit = new PeptideHit(peptideSeq, peptideHitId++);
+            peptideHit = new PeptideHit(peptideSeq);
+            peptideHitId++;
             // add the protein hits
             for (ProteinHit ph: proteinAccList) {
                 Protein prot = proteinList.get(ph.getAccession());
