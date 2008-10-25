@@ -3,24 +3,28 @@ package edu.uwpr.protinfer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PeptideEvidence {
+public class PeptideEvidence <T extends SpectrumMatch>{
     
     private Peptide peptide;
-    private List<PeptideSequenceMatch> psmList;
+    private List<T> psmList;
     
     public PeptideEvidence(Peptide peptide) {
         this.peptide = peptide;
-        psmList = new ArrayList<PeptideSequenceMatch>();
+        psmList = new ArrayList<T>();
     }
     
-    public PeptideEvidence(Peptide peptide, List<PeptideSequenceMatch> psmList) {
+    public PeptideEvidence(Peptide peptide, List<T> psmList) {
         this(peptide);
         if (psmList != null)
             this.psmList = psmList;
     }
     
-    public void addPeptideSequenceMatch(PeptideSequenceMatch psm) {
+    public void addSpectrumMatch(T psm) {
         psmList.add(psm);
+    }
+    
+    public List<T> getSequenceMatchList() {
+        return psmList;
     }
     
     /**
@@ -31,14 +35,6 @@ public class PeptideEvidence {
         return peptide.getSequence();
     }
     
-    /**
-     * Returns the unmodified sequence of the peptide
-     * @return
-     */
-    public String getUnmodifiedSequence() {
-        return peptide.getUnmodifiedSequence();
-    }
-    
     public int getMatchSpectraCount() {
         return psmList.size();
     }
@@ -46,7 +42,7 @@ public class PeptideEvidence {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(peptide.toString()+"\n");
-        for(PeptideSequenceMatch psm: psmList) {
+        for(T psm: psmList) {
             buf.append("\t"+psm.toString()+"\n");
         }
         return buf.toString();

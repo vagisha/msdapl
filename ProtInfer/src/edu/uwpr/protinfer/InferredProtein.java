@@ -3,7 +3,7 @@ package edu.uwpr.protinfer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InferredProtein {
+public class InferredProtein <T extends SpectrumMatch> {
 
     private boolean accepted;
     private double score;

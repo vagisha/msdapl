@@ -23,6 +23,10 @@ public class ModifiedPeptide {
             this.modifications = modifications;
     }
     
+    public Peptide getPeptide() {
+        return peptide;
+    }
+    
     public void addModification(PeptideModification modification) {
         modifications.add(modification);
     }

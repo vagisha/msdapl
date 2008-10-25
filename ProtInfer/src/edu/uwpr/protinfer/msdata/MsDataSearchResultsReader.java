@@ -23,16 +23,16 @@ import edu.uwpr.protinfer.PeptideHit;
 import edu.uwpr.protinfer.PeptideModification;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
-import edu.uwpr.protinfer.SearchHit;
+import edu.uwpr.protinfer.SequestHit;
 import edu.uwpr.protinfer.SearchSource;
 
 public class MsDataSearchResultsReader {
 
-    public List<SearchHit> getHitsForExperiment(int experimentId) {
+    public List<SequestHit> getHitsForExperiment(int experimentId) {
         return null;
     }
     
-    public List<SearchHit> getHitsForRunSearch(int runSearchId) {
+    public List<SequestHit> getHitsForRunSearch(int runSearchId) {
         MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
         MsRunSearch runSearch = runSearchDao.loadRunSearch(runSearchId);
         String fileName = getRunFileName(runSearch.getRunId());
@@ -50,10 +50,10 @@ public class MsDataSearchResultsReader {
             return null;
     }
     
-    private List<SearchHit> loadHitsForSequestSearch(int runSearchId, SearchSource source) {
+    private List<SequestHit> loadHitsForSequestSearch(int runSearchId, SearchSource source) {
         SequestSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
         List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(runSearchId);
-        List<SearchHit> searchHits = new ArrayList<SearchHit>(resultIds.size());
+        List<SequestHit> searchHits = new ArrayList<SequestHit>(resultIds.size());
         for (Integer resultId: resultIds) {
             SequestSearchResult result = resultDao.load(resultId);
             
@@ -83,7 +83,7 @@ public class MsDataSearchResultsReader {
                 peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
             }
             
-            SearchHit hit = new SearchHit(source, scanNumber, charge, xcorr, peptHit);
+            SequestHit hit = new SequestHit(source, scanNumber, charge, xcorr, peptHit);
             hit.setHitId(resultId);
             hit.setScanId(scanId);
             searchHits.add(hit);
@@ -91,7 +91,7 @@ public class MsDataSearchResultsReader {
         return searchHits;
     }
     
-    private List<SearchHit> loadHitsForProlucidSearch(int runSearchId, SearchSource source) {
+    private List<SequestHit> loadHitsForProlucidSearch(int runSearchId, SearchSource source) {
         // TODO to be implemented
         return null; 
     }
@@ -116,7 +116,7 @@ public class MsDataSearchResultsReader {
         MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
         long start = System.currentTimeMillis();
         System.out.println("Start: "+new Date(start).toString());
-        List<SearchHit> searchHits = reader.getHitsForRunSearch(runSearchId);
+        List<SequestHit> searchHits = reader.getHitsForRunSearch(runSearchId);
         long end = System.currentTimeMillis();
         System.out.println(("End: "+new Date(end).toString()));
         

@@ -19,6 +19,22 @@ public class PeptideHit {
             this.proteins = proteins;
     }
     
+    public ModifiedPeptide getModifiedPeptide() {
+        return peptide;
+    }
+    
+    public Peptide getPeptide() {
+        return peptide.getPeptide();
+    }
+    
+    public String getPeptideSequence() {
+        return peptide.getPeptideSeq();
+    }
+    
+    public String getUnmodifiedSequence() {
+        return peptide.getUnmodifiedSequence();
+    }
+    
     public void addProteinHit(ProteinHit hit) {
         this.proteins.add(hit);
     }

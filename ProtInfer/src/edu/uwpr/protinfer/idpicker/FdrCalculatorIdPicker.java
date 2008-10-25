@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.filter.idpicker;
+package edu.uwpr.protinfer.idpicker;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,23 +7,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.IDDatatypeValidator;
-
-import edu.uwpr.protinfer.PeptideHit;
-import edu.uwpr.protinfer.PeptideSequenceMatch;
-import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
-import edu.uwpr.protinfer.PeptideSequenceMatch.PsmComparator;
-import edu.uwpr.protinfer.filter.FilterCriteria;
-import edu.uwpr.protinfer.filter.Filterable;
+import edu.uwpr.protinfer.filter.Filter;
+import edu.uwpr.protinfer.filter.FilterException;
 import edu.uwpr.protinfer.filter.fdr.FdrCalculator;
-import edu.uwpr.protinfer.filter.fdr.FdrCandidate;
+import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
+import edu.uwpr.protinfer.filter.fdr.FdrFilterCriteria;
 import edu.uwpr.protinfer.filter.fdr.FdrFilterable;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
@@ -77,8 +70,8 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
                     
                     candidatesWithCharge.clear();
                     currentChg = candidate.getCharge();
-                    candidatesWithCharge.add(candidate);
                 }
+                candidatesWithCharge.add(candidate);
             }
             if (candidatesWithCharge.size() > 0)
                 super.calculateFdr(candidatesWithCharge, comparator);
@@ -147,42 +140,64 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
                     }
                 }
                 
+                System.out.println("Number of scans: "+scanCount+"; hitCount: "+hitCount);
+                System.out.println("Target matches: "+forwardCount+"; Decoy matches: "+reverseCount);
+                
                 FdrCalculatorIdPicker<SpectrumHit> fdrCalc = new FdrCalculatorIdPicker<SpectrumHit>();
                 fdrCalc.separateChargeStates(true);
+//                fdrCalc.setDecoyRatio(0.00043935);
+                fdrCalc.setDecoyRatio(1.0);
                 fdrCalc.calculateFdr(hits, new Comparator<SpectrumHit>() {
                     @Override
                     public int compare(SpectrumHit o1, SpectrumHit o2) {
                         return Double.valueOf(o1.getScore()).compareTo(o2.getScore());
                     }});
                 
-                System.out.println("Number of scans: "+scanCount+"; hitCount: "+hitCount);
-                System.out.println("Finished reading file: forward matches: "+forwardCount+"; reverse matches: "+reverseCount);
-//                fdrCalc.setDecoyRatio(0.00043935);
-                fdrCalc.setDecoyRatio(1.0);
-                List<PeptideSequenceMatch> acceptedPsms = fdrCalc.calculateFdr(0.25, true);
-                Map<String, PeptideHit> peptideHits = new HashMap<String, PeptideHit>();
-                Map<String, Protein> proteinHits = new HashMap<String, Protein>();
                 
-                for (PeptideSequenceMatch psm: acceptedPsms) {
-                    SequestSearchHit hit = psm.getScanSearchResult().getTopHit();
-                    PeptideHit pHit = hit.getPeptide();
-                    peptideHits.put(pHit.getPeptideSeq(), pHit);
-                    for (ProteinHit prHit: pHit.getProteinList()) {
-                        proteinHits.put(prHit.getAccession(), prHit.getProtein());
-                    }
+                List<SpectrumHit> targetHits = new ArrayList<SpectrumHit>();
+                for(SpectrumHit hit: hits) {
+                    if (hit.isTarget())
+                        targetHits.add(hit);
                 }
-                System.out.println("Number of peptides found: "+peptideHits.size());
-                System.out.println("Number of proteins found: "+proteinHits.size());
-                System.out.println("\n\n");
+                    
+                FdrFilterCriteria filterCriteria = new FdrFilterCriteria(0.25);
+                List<SpectrumHit> acceptedHits = Filter.filter(targetHits, filterCriteria);
                 
-                printAcceptedPsms(dir+File.separator+new File(runName).getName(), acceptedPsms);
+                System.out.println("# Accepted hits: "+acceptedHits.size()+" out of "+hits.size()+" total hits");
+                Collections.sort(acceptedHits, new Comparator<SpectrumHit>() {
+
+                    public int compare(SpectrumHit o1, SpectrumHit o2) {
+                       return Integer.valueOf(o1.getCharge()).compareTo(o2.getCharge());
+                    }});
+                int lastCharge = 1;
+                int acceptedCount = 0;
+                for (SpectrumHit hit: acceptedHits) {
+                    if (hit.getCharge() != lastCharge) {
+                        System.out.println("# hits accepted for charge +"+lastCharge+" "+acceptedCount);
+                        lastCharge = hit.getCharge();
+                        acceptedCount = 0;
+                    }
+                    acceptedCount++;
+                }
+                System.out.println("# hits accepted for charge +"+lastCharge+" "+acceptedCount);
+//                printAcceptedPsms(dir+File.separator+new File(runName).getName(), acceptedHits);
+                
+                break;
             }
             reader.close();
         }
         catch (DataProviderException e) {
             e.printStackTrace();
         }
-        catch (IOException e) {
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        catch (FdrCalculatorException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (FilterException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         finally {
@@ -191,19 +206,18 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
         }
     }
     
-    private static void printAcceptedPsms(String runName,
-            List<PeptideSequenceMatch> acceptedPsms) throws IOException {
+    private static void printAcceptedPsms(String runName, List<SpectrumHit> acceptedHits) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
-        for (PeptideSequenceMatch psm: acceptedPsms) {
-            writer.write(psm.getScanNumber()+"\t"+psm.getCharge()+"\t"+psm.getScore()+"\t"+psm.getFdr());
-            PeptideHit hit = psm.getScanSearchResult().getTopHit().getPeptide();
-            writer.write("\t"+hit.getPeptideSeq());
-            StringBuilder buf = new StringBuilder();
-            for (ProteinHit p: hit.getProteinList()) {
-                buf.append(","+p.getAccession());
-            }
-            buf.deleteCharAt(0);
-            writer.write("\t"+buf.toString()+"\n");
+        for (SpectrumHit hit: acceptedHits) {
+            writer.write(hit.getScan()+"\t"+hit.getCharge()+"\t"+hit.getScore()+"\t"+hit.getFdr()+"\n");
+//            PeptideHit hit = hit.getScanSearchResult().getTopHit().getPeptide();
+//            writer.write("\t"+hit.getPeptideSeq());
+//            StringBuilder buf = new StringBuilder();
+//            for (ProteinHit p: hit.getProteinList()) {
+//                buf.append(","+p.getAccession());
+//            }
+//            buf.deleteCharAt(0);
+//            writer.write("\t"+buf.toString()+"\n");
         }
         writer.close();
     }
@@ -222,7 +236,7 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
         private boolean isTarget;
         private boolean isAccepted = false;
         
-        public SpectrumHit(int scan, int charge, double xcorr, boolean isDecoy, boolean isTarget) {
+        public SpectrumHit(int scan, int charge, double xcorr, boolean isTarget, boolean isDecoy) {
             this.scan = scan;
             this.charge = charge;
             this.xcorr = xcorr;
@@ -264,23 +278,13 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
         }
 
         @Override
-        public void applyFilter(FilterCriteria<? extends Filterable> filterCriteria) {
-            filterCriteria.filter(filterable);
-        }
-
-        @Override
         public boolean isAccepted() {
             return isAccepted;
         }
 
         @Override
-        public void setAccepted() {
-            this.isAccepted = true;
-        }
-
-        @Override
-        public void setNotAccepted() {
-            this.isAccepted = false;
+        public void setAccepted(boolean accepted) {
+            this.isAccepted = accepted;
         }
     }
 }

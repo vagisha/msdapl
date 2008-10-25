@@ -16,6 +16,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
+import edu.uwpr.protinfer.ModifiedPeptide;
+import edu.uwpr.protinfer.Peptide;
 import edu.uwpr.protinfer.PeptideHit;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
@@ -221,8 +223,8 @@ public class PepxmlFileReader {
         PeptideHit peptideHit = peptideHits.get(peptideSeq);
         if (peptideHit == null) {
             // if not create a new PeptideHit
-            peptideHit = new PeptideHit(peptideSeq);
-            peptideHitId++;
+            ModifiedPeptide peptide = new ModifiedPeptide(new Peptide(peptideSeq, peptideHitId++));
+            peptideHit = new PeptideHit(peptide);
             // add the protein hits
             for (ProteinHit ph: proteinAccList) {
                 Protein prot = proteinList.get(ph.getAccession());

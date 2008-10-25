@@ -11,20 +11,20 @@ import java.util.Set;
 import org.yeastrc.ms.parser.DataProviderException;
 
 import edu.uwpr.protinfer.PeptideHit;
-import edu.uwpr.protinfer.PeptideSequenceMatch;
+import edu.uwpr.protinfer.SequestSpectrumMatch;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
-import edu.uwpr.protinfer.SearchHit;
+import edu.uwpr.protinfer.SequestHit;
 import edu.uwpr.protinfer.SearchSource;
-import edu.uwpr.protinfer.PeptideSequenceMatch.PsmComparator;
+import edu.uwpr.protinfer.SequestSpectrumMatch.PsmComparator;
 import edu.uwpr.protinfer.assemble.idpicker.algo.ConnectedComponentFinder;
 import edu.uwpr.protinfer.assemble.idpicker.algo.GraphCollapser;
 import edu.uwpr.protinfer.assemble.idpicker.algo.GreedySetCover;
 import edu.uwpr.protinfer.assemble.idpicker.graph.BipartiteGraph;
 import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
 import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
-import edu.uwpr.protinfer.filter.idpicker.FdrCalculatorIdPicker;
 import edu.uwpr.protinfer.filter.idpicker.FdrFilter;
+import edu.uwpr.protinfer.idpicker.FdrCalculatorIdPicker;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
 import edu.uwpr.protinfer.pepxml.SequestSearchHit;
@@ -95,8 +95,8 @@ public class ParsimonyAnalyzer {
         String filePath = "TEST_DATA/for_vagisha/18mix/interact.pep.xml";
         
         InteractPepXmlFileReader reader = new InteractPepXmlFileReader();
-        List<SearchHit> allHits = new ArrayList<SearchHit>();
-        List<PeptideSequenceMatch> allAcceptedPsms = new ArrayList<PeptideSequenceMatch>();
+        List<SequestHit> allHits = new ArrayList<SequestHit>();
+        List<SequestSpectrumMatch> allAcceptedPsms = new ArrayList<SequestSpectrumMatch>();
         int sourceId = 0;
         
         try {
@@ -116,7 +116,7 @@ public class ParsimonyAnalyzer {
                             prot.getProtein().setDecoy();
                     }
                     
-                    SearchHit hit = new SearchHit(source, scan.getStartScan(), scan.getAssumedCharge(), 
+                    SequestHit hit = new SequestHit(source, scan.getStartScan(), scan.getAssumedCharge(), 
                             seqHit.getXcorr().doubleValue(), 
                             pept);
                     allHits.add(hit);
@@ -145,7 +145,7 @@ public class ParsimonyAnalyzer {
         ParsimonyAnalyzer pars = new ParsimonyAnalyzer();
         Map<String, Integer> peptides = new HashMap<String, Integer>();
         Map<String , Protein> proteins = new HashMap<String, Protein>();
-        for (PeptideSequenceMatch psm: allAcceptedPsms) {
+        for (SequestSpectrumMatch psm: allAcceptedPsms) {
             SequestSearchHit topHit = psm.getScanSearchResult().getTopHit();
             PeptideHit peptide = topHit.getPeptide();
             peptides.put(peptide.getPeptideSeq(), 1);

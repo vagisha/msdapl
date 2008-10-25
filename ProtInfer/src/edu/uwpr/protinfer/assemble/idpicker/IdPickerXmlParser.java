@@ -22,24 +22,24 @@ import edu.uwpr.protinfer.FilterScore;
 import edu.uwpr.protinfer.PeptideHit;
 import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.ProteinHit;
-import edu.uwpr.protinfer.SearchHit;
+import edu.uwpr.protinfer.SequestHit;
 import edu.uwpr.protinfer.SearchSource;
 
 public class IdPickerXmlParser {
 
     private Map<Integer, Protein> proteinList;
     private Map<Integer, PeptideHit> peptideHits;
-    private List<SearchHit> searchHits;
+    private List<SequestHit> searchHits;
     XMLStreamReader reader = null;
 
     
     public IdPickerXmlParser() {
         proteinList = new HashMap<Integer, Protein>();
         peptideHits = new HashMap<Integer, PeptideHit>();
-        searchHits = new ArrayList<SearchHit>();
+        searchHits = new ArrayList<SequestHit>();
     }
     
-    public List<SearchHit> getAcceptedHits() {
+    public List<SequestHit> getAcceptedHits() {
         return searchHits;
     }
     
@@ -128,8 +128,8 @@ public class IdPickerXmlParser {
             if (prHit.getAccession().startsWith("rev_"))
                 return false; // this is a hit to the decoy database;
         }
-        SearchHit hit = new SearchHit(source, scan, charge, 0.0, pHit);
-        hit.getPeptideSequenceMatch().setFilterScore(new FilterScore("fdr", fdr, true));
+        SequestHit hit = new SequestHit(source, scan, charge, 0.0, pHit);
+        hit.getSpectrumMatch().setFilterScore(new FilterScore("fdr", fdr, true));
         searchHits.add(hit);
         return true; // this is a hit to the target database;
     }
@@ -272,11 +272,11 @@ public class IdPickerXmlParser {
     }
     
     private static void printAcceptedHits(String runName,
-            List<SearchHit> acceptedHits) throws IOException {
+            List<SequestHit> acceptedHits) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
-        for (SearchHit hit: acceptedHits) {
+        for (SequestHit hit: acceptedHits) {
             writer.write(hit.getScanNumber()+"\t"+hit.getCharge()+"\t"+hit.getScore()
-                    +"\t"+hit.getPeptideSequenceMatch().getFilterScore().getScore());
+                    +"\t"+hit.getSpectrumMatch().getFilterScore().getScore());
             writer.write("\t"+hit.getPeptideHit().getPeptideSeq());
             StringBuilder buf = new StringBuilder();
             for (ProteinHit p: hit.getPeptideHit().getProteinList()) {

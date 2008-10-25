@@ -16,10 +16,10 @@ public class FdrFilterCriteria implements FilterCriteria <FdrFilterable> {
     @Override
     public boolean filter(FdrFilterable filterable) {
         if (filterable.getFdr() <= thresholdFdr) {
-            filterable.setAccepted();
+            filterable.setAccepted(true);
             return true;
         } 
-        filterable.setNotAccepted();
+        filterable.setAccepted(false);
         return false;
     }
 }

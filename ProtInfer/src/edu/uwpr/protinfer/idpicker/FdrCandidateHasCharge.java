@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.filter.idpicker;
+package edu.uwpr.protinfer.idpicker;
 
 import edu.uwpr.protinfer.filter.fdr.FdrCandidate;
 

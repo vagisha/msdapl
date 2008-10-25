@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.filter.idpicker;
+package edu.uwpr.protinfer.filter.fdr;
 
 public class FdrCalculatorException extends Exception {
 
