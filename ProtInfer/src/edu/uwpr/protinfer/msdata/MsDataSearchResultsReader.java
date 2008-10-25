@@ -19,12 +19,12 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 
-import edu.uwpr.protinfer.PeptideHit;
-import edu.uwpr.protinfer.PeptideModification;
-import edu.uwpr.protinfer.Protein;
-import edu.uwpr.protinfer.ProteinHit;
 import edu.uwpr.protinfer.SequestHit;
-import edu.uwpr.protinfer.SearchSource;
+import edu.uwpr.protinfer.infer.PeptideHit;
+import edu.uwpr.protinfer.infer.PeptideModification;
+import edu.uwpr.protinfer.infer.Protein;
+import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.infer.SearchSource;
 
 public class MsDataSearchResultsReader {
 

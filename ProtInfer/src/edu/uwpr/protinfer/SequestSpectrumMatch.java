@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import edu.uwpr.protinfer.filter.fdr.FdrFilterable;
 import edu.uwpr.protinfer.idpicker.FdrCandidateHasCharge;
+import edu.uwpr.protinfer.infer.SearchSource;
+import edu.uwpr.protinfer.infer.SpectrumMatch;
 
 public class SequestSpectrumMatch implements SpectrumMatch, FdrFilterable, FdrCandidateHasCharge {
 

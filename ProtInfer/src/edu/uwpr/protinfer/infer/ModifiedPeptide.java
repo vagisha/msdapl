@@ -1,9 +1,10 @@
-package edu.uwpr.protinfer;
+package edu.uwpr.protinfer.infer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 
 public class ModifiedPeptide {
 
@@ -49,9 +50,9 @@ public class ModifiedPeptide {
             sortModifications();
             String sequence = peptide.getSequence();
             for (PeptideModification mod: modifications) {
-                seq.append(sequence.subSequence(lastIdx, mod.getPosition()+1)); // get sequence up to an including the modified position.
+                seq.append(sequence.subSequence(lastIdx, mod.getModifiedIndex()+1)); // get sequence up to an including the modified position.
                 seq.append("("+mod.getMassShift()+")");
-                lastIdx = mod.getPosition()+1;
+                lastIdx = mod.getModifiedIndex()+1;
             }
             if (lastIdx < sequence.length())
                 seq.append(sequence.subSequence(lastIdx, sequence.length()));
@@ -67,7 +68,7 @@ public class ModifiedPeptide {
     private void sortModifications() {
         Collections.sort(modifications, new Comparator<PeptideModification>(){
             public int compare(PeptideModification o1, PeptideModification o2) {
-                return Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition()));
+                return Integer.valueOf(o1.getModifiedIndex()).compareTo(Integer.valueOf(o2.getModifiedIndex()));
             }});
     }
     

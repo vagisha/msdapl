@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.uwpr.protinfer.Protein;
 import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
 import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
 import edu.uwpr.protinfer.assemble.idpicker.graph.NodeCombiner;
+import edu.uwpr.protinfer.infer.Protein;
 
 public final class ProteinNode extends Node {
     private Protein[] hits;

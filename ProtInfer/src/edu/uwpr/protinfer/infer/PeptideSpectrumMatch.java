@@ -1,4 +1,5 @@
-package edu.uwpr.protinfer;
+package edu.uwpr.protinfer.infer;
+
 
 public interface PeptideSpectrumMatch <T extends SpectrumMatch> {
 

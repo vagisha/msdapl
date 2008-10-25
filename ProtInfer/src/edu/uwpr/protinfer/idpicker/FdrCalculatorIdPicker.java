@@ -11,13 +11,13 @@ import java.util.List;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.ProteinHit;
 import edu.uwpr.protinfer.filter.Filter;
 import edu.uwpr.protinfer.filter.FilterException;
 import edu.uwpr.protinfer.filter.fdr.FdrCalculator;
 import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
 import edu.uwpr.protinfer.filter.fdr.FdrFilterCriteria;
 import edu.uwpr.protinfer.filter.fdr.FdrFilterable;
+import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
 import edu.uwpr.protinfer.pepxml.SequestSearchHit;

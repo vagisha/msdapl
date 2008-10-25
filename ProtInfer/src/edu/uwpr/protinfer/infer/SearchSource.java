@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer;
+package edu.uwpr.protinfer.infer;
 
 public class SearchSource {
 

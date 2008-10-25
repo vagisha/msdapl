@@ -1,7 +1,8 @@
-package edu.uwpr.protinfer;
+package edu.uwpr.protinfer.infer;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class PeptideHit {
 

@@ -10,12 +10,8 @@ import java.util.Set;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.PeptideHit;
 import edu.uwpr.protinfer.SequestSpectrumMatch;
-import edu.uwpr.protinfer.Protein;
-import edu.uwpr.protinfer.ProteinHit;
 import edu.uwpr.protinfer.SequestHit;
-import edu.uwpr.protinfer.SearchSource;
 import edu.uwpr.protinfer.SequestSpectrumMatch.PsmComparator;
 import edu.uwpr.protinfer.assemble.idpicker.algo.ConnectedComponentFinder;
 import edu.uwpr.protinfer.assemble.idpicker.algo.GraphCollapser;
@@ -25,6 +21,10 @@ import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
 import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
 import edu.uwpr.protinfer.filter.idpicker.FdrFilter;
 import edu.uwpr.protinfer.idpicker.FdrCalculatorIdPicker;
+import edu.uwpr.protinfer.infer.PeptideHit;
+import edu.uwpr.protinfer.infer.Protein;
+import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.infer.SearchSource;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
 import edu.uwpr.protinfer.pepxml.SequestSearchHit;

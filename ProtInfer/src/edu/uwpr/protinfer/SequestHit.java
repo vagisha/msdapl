@@ -2,6 +2,11 @@ package edu.uwpr.protinfer;
 
 import java.math.BigDecimal;
 
+import edu.uwpr.protinfer.infer.PeptideHit;
+import edu.uwpr.protinfer.infer.PeptideSpectrumMatch;
+import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.infer.SearchSource;
+
 
 public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch >{
 

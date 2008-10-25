@@ -3,8 +3,8 @@ package edu.uwpr.protinfer.pepxml;
 import java.math.BigDecimal;
 import java.util.List;
 
-import edu.uwpr.protinfer.PeptideHit;
-import edu.uwpr.protinfer.ProteinHit;
+import edu.uwpr.protinfer.infer.PeptideHit;
+import edu.uwpr.protinfer.infer.ProteinHit;
 
 public class SequestSearchHit {
 

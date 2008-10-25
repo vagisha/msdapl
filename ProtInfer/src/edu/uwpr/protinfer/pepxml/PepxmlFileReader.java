@@ -16,11 +16,11 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.ModifiedPeptide;
-import edu.uwpr.protinfer.Peptide;
-import edu.uwpr.protinfer.PeptideHit;
-import edu.uwpr.protinfer.Protein;
-import edu.uwpr.protinfer.ProteinHit;
+import edu.uwpr.protinfer.infer.ModifiedPeptide;
+import edu.uwpr.protinfer.infer.Peptide;
+import edu.uwpr.protinfer.infer.PeptideHit;
+import edu.uwpr.protinfer.infer.Protein;
+import edu.uwpr.protinfer.infer.ProteinHit;
 
 public class PepxmlFileReader {
 

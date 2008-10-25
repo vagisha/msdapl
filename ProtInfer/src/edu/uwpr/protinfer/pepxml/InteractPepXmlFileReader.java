@@ -8,7 +8,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.ProteinHit;
+import edu.uwpr.protinfer.infer.ProteinHit;
 
 public class InteractPepXmlFileReader extends PepxmlFileReader{
 
