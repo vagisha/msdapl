@@ -23,7 +23,7 @@ import edu.uwpr.protinfer.assemble.idpicker.algo.GreedySetCover;
 import edu.uwpr.protinfer.assemble.idpicker.graph.BipartiteGraph;
 import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
 import edu.uwpr.protinfer.assemble.idpicker.graph.Node;
-import edu.uwpr.protinfer.filter.idpicker.FdrCalculator;
+import edu.uwpr.protinfer.filter.idpicker.FdrCalculatorIdPicker;
 import edu.uwpr.protinfer.filter.idpicker.FdrFilter;
 import edu.uwpr.protinfer.pepxml.InteractPepXmlFileReader;
 import edu.uwpr.protinfer.pepxml.ScanSearchResult;
