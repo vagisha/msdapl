@@ -26,12 +26,15 @@ public class PepxmlFileReader {
 
     String filePath;
     XMLStreamReader reader = null;
+    String decoyPrefix = null;
     private Map<String, PeptideHit> peptideHits;
     private Map<String, Protein> proteinList;
     private int peptideHitId = 0;
     private int proteinHitId = 0;
     
-    public void open(String filePath) throws DataProviderException {
+    public void open(String filePath, String decoyPrefix) throws DataProviderException {
+        
+        this.decoyPrefix = decoyPrefix;
         
         initMaps();
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -51,6 +54,7 @@ public class PepxmlFileReader {
     }
     
     private void initMaps() {
+        
         peptideHitId = 0;
         proteinHitId = 0;
         if (peptideHits != null)
@@ -230,6 +234,9 @@ public class PepxmlFileReader {
                 Protein prot = proteinList.get(ph.getAccession());
                 if (prot == null) {
                     prot = new Protein(ph.getAccession(), proteinHitId++);
+                    // is this a decoy protein
+                    if (decoyPrefix != null && prot.getAccession().startsWith(decoyPrefix))
+                        prot.setDecoy();
                     proteinList.put(ph.getAccession(), prot);
                 }
                 peptideHit.addProteinHit(new ProteinHit(prot, ph.getPreResidue(), ph.getPostResidue()));
@@ -264,7 +271,7 @@ public class PepxmlFileReader {
     public static void main(String[] args) throws DataProviderException, IOException {
         String filePath = "TEST_DATA/for_vagisha/18mix/interact.pep.xml";
         PepxmlFileReader reader = new PepxmlFileReader();
-        reader.open(filePath);
+        reader.open(filePath, "rev_");
         int scanCount = 0;
         int targetHitcount = 0;
         int decoyHitCount = 0;
@@ -281,7 +288,7 @@ public class PepxmlFileReader {
                 boolean target = false;
                 boolean decoy = false;
                 for (ProteinHit prot: proteins) {
-                    if (prot.getAccession().startsWith("rev_"))
+                    if (prot.getProtein().isDecoy())
                         decoy = true;
                     else
                         target = true;

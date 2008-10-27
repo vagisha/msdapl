@@ -36,7 +36,7 @@ public class ModifiedPeptide {
      * Returns the sequence of the peptide with modifications. E.g. PEP(80.0)TIDE
      * @return
      */
-    public String getPeptideSeq() {
+    public String getModifiedSequence() {
         
         if (modifiedPeptide != null)
             return modifiedPeptide;
@@ -61,10 +61,6 @@ public class ModifiedPeptide {
         return modifiedPeptide;
     }
     
-    /**
-     * Returns the unmodified sequence of the peptide
-     * @return
-     */
     private void sortModifications() {
         Collections.sort(modifications, new Comparator<PeptideModification>(){
             public int compare(PeptideModification o1, PeptideModification o2) {
@@ -72,11 +68,15 @@ public class ModifiedPeptide {
             }});
     }
     
+    /**
+     * Returns the unmodified sequence of the peptide
+     * @return
+     */
     public String getUnmodifiedSequence() {
         return peptide.getSequence();
     }
     
     public String toString() {
-        return getPeptideSeq();
+        return getModifiedSequence();
     }
 }

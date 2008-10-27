@@ -45,7 +45,6 @@ public class InteractPepXmlFileReader extends PepxmlFileReader{
                 
                 int evtId = reader.next();
                 if (evtId == XMLStreamReader.END_ELEMENT) {
-//                    System.out.println(reader.getLocalName());
                     if (reader.getLocalName().equals("msms_run_summary"))  {
                         return false;
                     }
@@ -64,7 +63,7 @@ public class InteractPepXmlFileReader extends PepxmlFileReader{
     public static void main(String[] args) throws DataProviderException, IOException {
         String filePath = "TEST_DATA/for_vagisha/18mix/interact.pep.xml";
         InteractPepXmlFileReader reader = new InteractPepXmlFileReader();
-        reader.open(filePath);
+        reader.open(filePath, "rev_");
         
         
         while(reader.hasNextRunSummary()) {
@@ -84,7 +83,7 @@ public class InteractPepXmlFileReader extends PepxmlFileReader{
                     boolean target = false;
                     boolean decoy = false;
                     for (ProteinHit prot: proteins) {
-                        if (prot.getAccession().startsWith("rev_"))
+                        if (prot.getProtein().isDecoy())
                             decoy = true;
                         else
                             target = true;

@@ -1,21 +1,15 @@
 package edu.uwpr.protinfer.pepxml;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
@@ -25,15 +19,21 @@ public class PeptideCountTester {
 
     public static void main(String[] args) throws DataProviderException, IOException {
         
-        String dir = "TEST_DATA/for_vagisha/human";
-        String fastaDb = "ipi.HUMAN.fasta.20080402.for_rev";
-        String filePath = dir+File.separator+"interact.pep.xml";
+        String dir = "TEST_DATA/for_vagisha/human/top10hits";
+        String fastaDb = "TEST_DATA/for_vagisha/human/ipi.HUMAN.fasta.20080402.for_rev";
+//        String filePath = dir+File.separator+"interact.pep.xml";
+        String filePath = dir+File.separator+"interact-human.pep.xml";
         
         InteractPepXmlFileReader reader = new InteractPepXmlFileReader();
-        reader.open(filePath);
+        reader.open(filePath, "rev_");
 
 
         Set<String> peptidesFound = new HashSet<String>();
+        // read in the fasta file
+        System.out.println("Reading fasta file");
+        Map<String, String> fastaProteins = FastaFileReader.readFastaProteins(fastaDb );
+        System.out.println("Number of proteins in fasta file: "+fastaProteins.size());
+        
         
         while(reader.hasNextRunSummary()) {
             String runName = new File(reader.getRunName()).getName();
@@ -46,18 +46,30 @@ public class PeptideCountTester {
             Map<String, ProteinInfo> fwdProtCoverage = new HashMap<String, ProteinInfo>();
             Map<String, ProteinInfo> revProtCoverage = new HashMap<String, ProteinInfo>();
             
-            
+            int numHits = 0;
             while(reader.hasNextScanSearchResult()) {
+                
                 ScanSearchResult scanResult = reader.getNextSearchScan();
-                if (scanResult.getSearchHits().size() != 1)
-                    System.out.println("Scan has "+scanResult.getSearchHits().size()+" hits!!!");
-                for (SequestSearchHit hit: scanResult.getSearchHits()) {
+                
+                List<SequestSearchHit> topDecoyAndTargetHits = getTopSearchHits(scanResult);
+                numHits += topDecoyAndTargetHits.size();
+                
+                if (topDecoyAndTargetHits.size() == 2) {
+                    boolean foundTarget = !topDecoyAndTargetHits.get(0).isDecoyHit() || !topDecoyAndTargetHits.get(1).isDecoyHit();
+                    boolean foundDecoy = topDecoyAndTargetHits.get(0).isDecoyHit() || topDecoyAndTargetHits.get(1).isDecoyHit();
+                    if (!foundTarget || !foundDecoy ) {
+                        System.out.println("Did not find both target and decoy");
+                    }
+                }
+                
+                for (SequestSearchHit hit: topDecoyAndTargetHits) {
                     
                     List<ProteinHit> proteins = hit.getProteinHits();
                     boolean target = false;
                     boolean decoy = false;
                     for (ProteinHit prot: proteins) {
-                        if (prot.getAccession().startsWith("rev_")) {
+                        
+                        if (prot.getProtein().isDecoy()) {
                             decoy = true;
                             // have we seen this protein before? 
                             ProteinInfo pinfo = revProtCoverage.get(prot.getAccession());
@@ -65,7 +77,7 @@ public class PeptideCountTester {
                                 pinfo = new ProteinInfo();
                             }
                             pinfo.spectrumCount++;
-                            pinfo.peptides.add(hit.getPeptide().getPeptideSequence());
+                            pinfo.peptides.add(hit.getPeptide().getUnmodifiedSequence());
                             revProtCoverage.put(prot.getAccession(), pinfo);
                         }
                         else {
@@ -77,11 +89,11 @@ public class PeptideCountTester {
                                 pinfo = new ProteinInfo();
                             }
                             pinfo.spectrumCount++;
-                            pinfo.peptides.add(hit.getPeptide().getPeptideSequence());
+                            pinfo.peptides.add(hit.getPeptide().getUnmodifiedSequence());
                             fwdProtCoverage.put(prot.getAccession(), pinfo);
                         }
                     }
-                    peptidesFound.add(hit.getPeptide().getPeptideSequence());
+                    peptidesFound.add(hit.getPeptide().getUnmodifiedSequence());
                     
                     if (target && !decoy)   targetHitcount++;
                     if (decoy && !target)   decoyHitCount++;
@@ -90,10 +102,11 @@ public class PeptideCountTester {
                 scanCount++;
             }
             
-            calculateProteinCoverage(fastaDb, fwdProtCoverage);
-            calculateProteinCoverage(fastaDb, revProtCoverage);
+            calculateProteinCoverage(fastaProteins, fwdProtCoverage);
+            calculateProteinCoverage(fastaProteins, revProtCoverage);
             
             System.out.println("\tNumber of spectrum_query elements: "+scanCount);
+            System.out.println("\tNumber of total hits: "+numHits);
             System.out.println("\tTarget Hits: "+targetHitcount+"; Decoy Hits: "+decoyHitCount+"; Ambig. Hits: "+ambiHitCount);
             System.out.println("\tNumber of peptides found: "+reader.getPeptideHits().size());
             System.out.println("\tNumber of proteins found: "+reader.getProteinHits().size());
@@ -101,57 +114,47 @@ public class PeptideCountTester {
             System.out.println("Number of proteins identified FWD: "+fwdProtCoverage.size());
             System.out.println("Number of proteins identified REV: "+revProtCoverage.size());
             
-            printStats(dir+File.separator+runName+"_F_.stats.txt", fwdProtCoverage);
-            printStats(dir+File.separator+runName+"_R_.stats.txt", revProtCoverage);
+            printStats(dir+File.separator+runName+"_F.stats.txt", fwdProtCoverage);
+            printStats(dir+File.separator+runName+"_R.stats.txt", revProtCoverage);
         }
         
         reader.close();
     }
 
-    private static void calculateProteinCoverage(String fastaFile, Map<String, ProteinInfo> protCoverage) {
+    private static List<SequestSearchHit> getTopSearchHits(ScanSearchResult scanResult) {
+        // find the top target and decoy hits.
+        List<SequestSearchHit> twoHits = new ArrayList<SequestSearchHit>(2);
+        boolean foundTargetHit = false;
+        boolean foundDecoyHit = false;
         
-        Pattern pattern = Pattern.compile(">(\\S+)\\s+.*");
-        
-        // read in the fasta file
-        Map<String, String> proteins = readFastaFile(fastaFile, pattern);
-        System.out.println("Number of proteins in fasta file: "+proteins.size());
+        for (SequestSearchHit hit: scanResult.getSearchHits()) {
+            if (hit.isDecoyHit()) {
+                if(!foundDecoyHit) {
+                    twoHits.add(hit);
+                    foundDecoyHit = true;
+                }
+            }
+            else if (!foundTargetHit) {
+                twoHits.add(hit);
+                foundTargetHit = true;
+            }
+             
+            if (foundTargetHit && foundDecoyHit)
+                break;
+        }
+        return twoHits;
+    }
+    
+    private static void calculateProteinCoverage(Map<String, String> fastaProteins, Map<String, ProteinInfo> protCoverage) {
         
         for (String accession: protCoverage.keySet()) {
             
             Set<String> peptides = protCoverage.get(accession).peptides;
+            List<String> peptList = new ArrayList<String>(peptides.size());
+            peptList.addAll(peptides);
+            int coveredLength = StringUtils.getCoveredSequenceLength(fastaProteins.get(accession), peptList);
             
-            List<Coordinates> coords = new ArrayList<Coordinates>(peptides.size());
-            for (String peptide: peptides) {
-                int nextStart = 0;
-                int idx;
-                while((idx = accession.indexOf(peptide, nextStart)) >= 0) {
-                    nextStart = idx+peptide.length();
-                    coords.add(new Coordinates(idx, nextStart - 1));
-                }
-            }
-            
-            Collections.sort(coords, new Comparator<Coordinates>(){
-                public int compare(Coordinates o1, Coordinates o2) {
-                    return Integer.valueOf(o1.start).compareTo(Integer.valueOf(o2.start));
-                }});
-            
-            int coveredLength = 0;
-            Coordinates lastCoord = null;
-            for (Coordinates coord: coords) {
-                if (lastCoord == null) {
-                    lastCoord = coord;
-                    continue;
-                }
-                if (lastCoord.overlap(coord)) {
-                    lastCoord.end = Math.max(lastCoord.end, coord.end);
-                }
-                else {
-                    coveredLength += lastCoord.length();
-                    lastCoord = coord;
-                }
-            }
-            
-            String protein = proteins.get(accession);
+            String protein = fastaProteins.get(accession);
             ProteinInfo pinfo = protCoverage.get(accession);
             pinfo.sequenceLen = protein.length();
             pinfo.lenCovered = coveredLength;
@@ -159,74 +162,10 @@ public class PeptideCountTester {
     }
     
     
-
-    private static final class Coordinates {
-        private int start;
-        private int end;
-        public Coordinates(int start, int end) {
-            this.start = start;
-            this.end = end;
-        }
-        
-        public boolean overlap(Coordinates coord) {
-            if (this.start < coord.start) {
-                return coord.start <= this.end;
-            }
-            else {
-                return this.start <= coord.end;
-            }
-        }
-        
-        public int length() {
-            return end - start + 1;
-        }
-    }
-    
-    private static Map<String, String> readFastaFile(String fastaFile,
-            Pattern pattern) {
-        Map<String, String> proteins = new HashMap<String, String>();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(fastaFile));
-            String line = reader.readLine();
-            StringBuilder protein = new StringBuilder();
-            String accession = null;
-            while(line != null) {
-                if (line.startsWith(">")) {
-                    if (accession != null) {
-                        proteins.put(accession, protein.toString());
-                        protein = new StringBuilder();
-                    }
-                    else {
-                        Matcher matcher = pattern.matcher(line);
-                        if (matcher.matches()) {
-                            accession = matcher.group(1);
-                        }
-                        if (accession == null) {
-                            System.out.println("Accession cannot be null");
-                            System.exit(1);
-                        }
-                    }
-                }
-                else if (line.trim().length() != 0) {
-                    protein.append(line.trim());
-                }
-                line = reader.readLine();
-            }
-            // put the last one in
-            proteins.put(accession, protein.toString());
-            reader.close();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return proteins;
-    }
-    
     private static void printStats(String file, Map<String, ProteinInfo> protCoverage) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write("Accession\tHitCount\tPeptideCount\tCoverage\n");
+            writer.write("Accession\tHitCount\tPeptideCount\tProteinLength\tCoverage\n");
             for (String key: protCoverage.keySet()) {
                 ProteinInfo pinfo = protCoverage.get(key);
                 writer.write(key+"\t"+pinfo.peptides.size()+"\t"+pinfo.spectrumCount+"\t"+pinfo.sequenceLen+"\t"+pinfo.lenCovered+"\n");

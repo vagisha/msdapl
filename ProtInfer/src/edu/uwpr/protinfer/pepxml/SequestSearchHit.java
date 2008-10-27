@@ -157,4 +157,8 @@ public class SequestSearchHit {
     public void setXcorrRank(int xcorrRank) {
         this.xcorrRank = xcorrRank;
     }
+    
+    public boolean isDecoyHit() {
+       return this.peptide.isDecoyPeptide();
+    }
 }

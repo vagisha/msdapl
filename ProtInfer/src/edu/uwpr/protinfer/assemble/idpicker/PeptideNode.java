@@ -39,7 +39,7 @@ public final class PeptideNode extends Node {
     public String getLongLabel() {
         StringBuilder buf = new StringBuilder();
         for (PeptideHit hit: hits) 
-            buf.append("_"+hit.getPeptideSeq());
+            buf.append("_"+hit.getModifiedSequence());
         buf.deleteCharAt(0);
         return buf.toString();
     }
@@ -47,7 +47,7 @@ public final class PeptideNode extends Node {
     public String getLongLabel(char separator) {
         StringBuilder buf = new StringBuilder();
         for (PeptideHit hit: hits) 
-            buf.append(separator+hit.getPeptideSeq());
+            buf.append(separator+hit.getModifiedSequence());
         buf.deleteCharAt(0);
         return buf.toString();
     }

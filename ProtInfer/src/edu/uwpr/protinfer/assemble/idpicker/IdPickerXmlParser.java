@@ -277,7 +277,7 @@ public class IdPickerXmlParser {
         for (SequestHit hit: acceptedHits) {
             writer.write(hit.getScanNumber()+"\t"+hit.getCharge()+"\t"+hit.getScore()
                     +"\t"+hit.getSpectrumMatch().getFilterScore().getScore());
-            writer.write("\t"+hit.getPeptideHit().getPeptideSeq());
+            writer.write("\t"+hit.getPeptideHit().getModifiedSequence());
             StringBuilder buf = new StringBuilder();
             for (ProteinHit p: hit.getPeptideHit().getProteinList()) {
                 buf.append(","+p.getAccession());

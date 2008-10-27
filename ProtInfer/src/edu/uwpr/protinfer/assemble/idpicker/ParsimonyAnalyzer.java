@@ -148,7 +148,7 @@ public class ParsimonyAnalyzer {
         for (SequestSpectrumMatch psm: allAcceptedPsms) {
             SequestSearchHit topHit = psm.getScanSearchResult().getTopHit();
             PeptideHit peptide = topHit.getPeptide();
-            peptides.put(peptide.getPeptideSeq(), 1);
+            peptides.put(peptide.getModifiedSequence(), 1);
             for (ProteinHit ph: peptide.getProteinList())
                 proteins.put(ph.getAccession(), ph.getProtein());
             try {

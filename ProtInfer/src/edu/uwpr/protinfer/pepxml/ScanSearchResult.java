@@ -32,6 +32,10 @@ public class ScanSearchResult {
         return searchHits;
     }
     
+    public void setSearchHits(List<SequestSearchHit> hits) {
+        this.searchHits = hits;
+    }
+    
     public SequestSearchHit getTopHit() {
         return searchHits.get(0);
     }

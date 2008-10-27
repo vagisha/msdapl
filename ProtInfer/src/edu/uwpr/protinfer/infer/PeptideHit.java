@@ -28,8 +28,8 @@ public class PeptideHit {
         return peptide.getPeptide();
     }
     
-    public String getPeptideSequence() {
-        return peptide.getPeptideSeq();
+    public String getModifiedSequence() {
+        return peptide.getModifiedSequence();
     }
     
     public String getUnmodifiedSequence() {
@@ -48,9 +48,17 @@ public class PeptideHit {
         return proteins.size();
     }
     
+    public boolean isDecoyPeptide() {
+        for (ProteinHit protHit: getProteinList()) {
+            if (!protHit.getProtein().isDecoy())
+                return false;
+        }
+        return true;
+    }
+    
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(peptide.getPeptideSeq()+"\n");
+        buf.append(peptide.getModifiedSequence()+"\n");
         for(ProteinHit protHit: proteins) {
             buf.append("\t"+protHit+"\n");
         }

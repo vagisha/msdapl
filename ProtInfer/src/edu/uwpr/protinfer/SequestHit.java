@@ -18,7 +18,7 @@ public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch >{
     
     public SequestHit(SearchSource source, int scanNumber, int charge, PeptideHit peptide) {
         this.peptide = peptide;
-        spectrumMatch = new SequestSpectrumMatch(source, scanNumber, charge, peptide.getPeptideSequence());
+        spectrumMatch = new SequestSpectrumMatch(source, scanNumber, charge, peptide.getModifiedSequence());
     }
     
     public void setXcorr(BigDecimal xcorr) {
@@ -107,7 +107,7 @@ public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch >{
 
     @Override
     public String getPeptideSequence() {
-        return peptide.getPeptideSequence();
+        return peptide.getModifiedSequence();
     }
 
     @Override
