@@ -1,7 +1,7 @@
 package edu.uwpr.protinfer.infer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class InferredProtein <T extends SpectrumMatch> {
@@ -12,21 +12,29 @@ public class InferredProtein <T extends SpectrumMatch> {
     
     private Protein protein;
     
-    private List<PeptideEvidence> peptideEvList;
+    private Map<String, PeptideEvidence<T>> peptideEvList;
     
     public InferredProtein(Protein protein) {
         this.protein = protein;
-        peptideEvList = new ArrayList<PeptideEvidence>();
+        peptideEvList = new HashMap<String, PeptideEvidence<T>>();
     }
     
-    public InferredProtein(Protein protein, List<PeptideEvidence> peptideEvList) {
-        this(protein);
-        if (peptideEvList != null)
-            this.peptideEvList = peptideEvList;
+    public void addPeptideEvidence(PeptideEvidence<T> peptideEv) {
+        if (peptideEvList.containsKey(peptideEv.getPeptideSeq())) {
+            PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getPeptideSeq());
+            evidence.addSpectrumMatchList(evidence.getSpectrumMatchList());
+        }
+        else {
+            this.peptideEvList.put(peptideEv.getPeptideSeq(), peptideEv);
+        }
     }
     
-    public void addPeptideEvidence(PeptideEvidence peptideEv) {
-        this.peptideEvList.add(peptideEv);
+    public PeptideEvidence<T> getPeptideEvidence(Peptide peptide) {
+        return peptideEvList.get(peptide.getSequence());
+    }
+    
+    public PeptideEvidence<T> getPeptideEvidence(String peptideSequence) {
+        return peptideEvList.get(peptideSequence);
     }
     
     public Protein getProtein() {

@@ -65,7 +65,7 @@ public class PeptideCountTester {
                                 pinfo = new ProteinInfo();
                             }
                             pinfo.spectrumCount++;
-                            pinfo.peptides.add(hit.getPeptide().getPeptideSeq());
+                            pinfo.peptides.add(hit.getPeptide().getPeptideSequence());
                             revProtCoverage.put(prot.getAccession(), pinfo);
                         }
                         else {
@@ -77,11 +77,11 @@ public class PeptideCountTester {
                                 pinfo = new ProteinInfo();
                             }
                             pinfo.spectrumCount++;
-                            pinfo.peptides.add(hit.getPeptide().getPeptideSeq());
+                            pinfo.peptides.add(hit.getPeptide().getPeptideSequence());
                             fwdProtCoverage.put(prot.getAccession(), pinfo);
                         }
                     }
-                    peptidesFound.add(hit.getPeptide().getPeptideSeq());
+                    peptidesFound.add(hit.getPeptide().getPeptideSequence());
                     
                     if (target && !decoy)   targetHitcount++;
                     if (decoy && !target)   decoyHitCount++;
