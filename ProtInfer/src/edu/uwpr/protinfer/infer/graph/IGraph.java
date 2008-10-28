@@ -18,7 +18,7 @@ public interface IGraph {
 
     public abstract void combineVertices(Vertex v1, Vertex v2)
             throws InvalidVertexException;
-
+    
     public abstract boolean removeVertex(Vertex v);
 
 }

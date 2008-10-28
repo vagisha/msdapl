@@ -6,63 +6,93 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.uwpr.protinfer.assemble.idpicker.graph.IBipartiteGraph;
 import edu.uwpr.protinfer.assemble.idpicker.graph.InvalidNodeException;
 
 public class GraphCollapser {
 
-    private Map<String, List<L>> collapsibleNodesL;
-    private Map<String, List<R>> collapsibleNodesR;
+    private Map<String, List<Vertex>> leftVertexMap;
+    private Map<String, List<Vertex>> rightVertexMap;
+    private BipartiteGraph graph;
     
     public GraphCollapser() {}
     
-    public void collapseGraph(IBipartiteGraph<L, R> graph) throws InvalidNodeException {
-        collapsibleNodesL = new HashMap<String, List<L>>(graph.getLeftNodes().size());
-        collapsibleNodesR = new HashMap<String, List<R>>(graph.getRightNodes().size());
-        sortNodes(graph);
-//        System.out.println(collapsibleNodesL);
-//        System.out.println(collapsibleNodesR);
-        collapseNodes(graph);
+    public void collapseGraph(BipartiteGraph graph) throws InvalidNodeException {
+        this.graph = graph;
+        leftVertexMap = new HashMap<String, List<Vertex>>(graph.getLeftVertices().size());
+        rightVertexMap = new HashMap<String, List<Vertex>>(graph.getRightVertices().size());
+        orderVerticesByAdjacentMembers();
+        collapseVertices();
     }
 
-    private void sortNodes(IBipartiteGraph<L, R> graph) {
-        List<L> nodesL = graph.getLeftNodes();
-        for (L node: nodesL) {
-            String nodeSign = graph.getNodeSignature(node);
-            if (collapsibleNodesL.containsKey(nodeSign)) {
-                collapsibleNodesL.get(nodeSign).add(node);
+    private void orderVerticesByAdjacentMembers() {
+        List<Vertex> nodesL = graph.getLeftVertices();
+        for (Vertex vertex: nodesL) {
+            String adjSign = getVertexSignature(vertex, graph);
+            if (leftVertexMap.containsKey(adjSign)) {
+                leftVertexMap.get(adjSign).add(vertex);
             }
             else {
-                List<L> cnodes = new ArrayList<L>();
-                cnodes.add(node);
-                collapsibleNodesL.put(nodeSign, cnodes);
+                List<Vertex> vertices = new ArrayList<Vertex>();
+                vertices.add(vertex);
+                leftVertexMap.put(adjSign, vertices);
             }
         }
         
-        List<R> nodesR = graph.getRightNodes();
-        for (R node: nodesR) {
-            String nodeSign = graph.getNodeSignature(node);
-            if (collapsibleNodesR.containsKey(nodeSign)) {
-                collapsibleNodesR.get(nodeSign).add(node);
+        List<Vertex> nodesR = graph.getRightVertices();
+        for (Vertex vertex: nodesR) {
+            String nodeSign = getVertexSignature(vertex, graph);
+            if (rightVertexMap.containsKey(nodeSign)) {
+                rightVertexMap.get(nodeSign).add(vertex);
             }
             else {
-                List<R> cnodes = new ArrayList<R>();
-                cnodes.add(node);
-                collapsibleNodesR.put(nodeSign, cnodes);
+                List<Vertex> vertices = new ArrayList<Vertex>();
+                vertices.add(vertex);
+                rightVertexMap.put(nodeSign, vertices);
             }
         }
     }
     
-    private void collapseNodes(IBipartiteGraph<L, R> graph) throws InvalidNodeException {
+    private String getVertexSignature(Vertex v, IGraph graph) {
+        StringBuilder buf = new StringBuilder();
+        for (Vertex adj: graph.getAdjacentVertices(v)) {
+            buf.append(adj.getLabel());
+        }
+        return buf.toString();
+    }
+    
+    private void collapseVertices() throws InvalidNodeException {
         // replace each collapsed node with a single node
-        Set<String> keys = collapsibleNodesL.keySet();
+        Set<String> keys = leftVertexMap.keySet();
         for (String key: keys) {
-            graph.collapseLeftNodes(collapsibleNodesL.get(key));
+            List<Vertex> toCombine = leftVertexMap.get(key);
+            if (toCombine.size() > 1) {
+                Vertex newVertex = toCombine.get(0).combineWith(toCombine.subList(1, toCombine.size()));
+                for(Vertex v: toCombine) 
+                    graph.removeLeftVertex(v);
+                
+                graph.addLeftVertex(newVertex);
+                List<Vertex> adjV = graph.getAdjacentVertices(toCombine.get(0));
+                for(Vertex adj: adjV) {
+                    graph.addEdge(newVertex, adj);
+                }
+                
+            }
         }
         
-        keys = collapsibleNodesR.keySet();
+        keys = rightVertexMap.keySet();
         for (String key: keys) {
-            graph.collapseRightNodes(collapsibleNodesR.get(key));
+            List<Vertex> toCombine = rightVertexMap.get(key);
+            if (toCombine.size() > 1) {
+                Vertex newVertex = toCombine.get(0).combineWith(toCombine.subList(1, toCombine.size()));
+                for(Vertex v: toCombine) 
+                    graph.removeRightVertex(v);
+                
+                graph.addRightVertex(newVertex);
+                List<Vertex> adjV = graph.getAdjacentVertices(toCombine.get(0));
+                for(Vertex adj: adjV) {
+                    graph.addEdge(newVertex, adj);
+                }
+            }
         }
     }
 }

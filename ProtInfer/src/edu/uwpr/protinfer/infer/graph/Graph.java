@@ -1,8 +1,6 @@
 package edu.uwpr.protinfer.infer.graph;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,20 +10,18 @@ import java.util.Set;
 public class Graph implements IGraph {
 
     private Map<String, Vertex> vertices;
-    private Map<String, List<Vertex>> adjList;
-    private Set<Edge> edges;
+    private Map<String, Set<Vertex>> adjList;
     
     public Graph() {
         vertices = new HashMap<String, Vertex>();
-        adjList = new HashMap<String, List<Vertex>>();
-        edges = new HashSet<Edge>();
+        adjList = new HashMap<String, Set<Vertex>>();
     }
     
     public Vertex addVertex(Vertex vertex) {
         Vertex v = vertices.get(vertex.getLabel());
         if (v != null)
             return v;
-        vertices.put(vertex.getLabel(), v);
+        vertices.put(vertex.getLabel(), vertex);
         return vertex;
     }
     
@@ -33,34 +29,35 @@ public class Graph implements IGraph {
        v1 = addVertex(v1);
        v2 = addVertex(v2);
        
-       if (edges.contains(new Edge(v1, v2)))
-           return;
-       
-       edges.add(new Edge(v1, v2));
        addGraphEdge(v1, v2);
        addGraphEdge(v2, v1);
        
     }
     
     private void addGraphEdge(Vertex from, Vertex to) {
-        List<Vertex> adjVertices = adjList.get(from.getLabel());
+        Set<Vertex> adjVertices = adjList.get(from.getLabel());
         if (adjVertices == null) {
-            adjVertices = new ArrayList<Vertex>();
+            adjVertices = new HashSet<Vertex>();
             adjList.put(from.getLabel(), adjVertices);
         }
         adjVertices.add(to);
     }
     
     public int getEdgeCount() {
-        return edges.size();
+        int count = 0;
+        for (Set<Vertex> adjV: adjList.values())
+            count += adjV.size();
+        return count/2;
     }
     
     public List<Vertex> getAdjacentVertices(Vertex vertex) {
-        return adjList.get(vertex.getLabel());
+        List<Vertex> list = new ArrayList<Vertex>(adjList.get(vertex.getLabel()).size());
+        list.addAll(adjList.get(vertex.getLabel()));
+        return list;
     }
     
     public boolean containsEdge(Vertex v1, Vertex v2) {
-        return edges.contains(new Edge(v1, v2));
+        return adjList.get(v1.getLabel()).contains(v2);
     }
     
     public List<Vertex> getVertices() {
@@ -80,7 +77,7 @@ public class Graph implements IGraph {
         }
         
         Vertex v_combined = v1_o.combineWith(v2_o);
-        List<Vertex> adjV = getCommonAdjVertices(v1_o, v2_o);
+        Set<Vertex> adjV = getCommonAdjVertices(v1_o, v2_o);
         
         for (Vertex av: adjV) {
             addEdge(v_combined, av);
@@ -90,6 +87,16 @@ public class Graph implements IGraph {
         removeVertex(v2_o);
     }
     
+    private Set<Vertex> getCommonAdjVertices(Vertex v1, Vertex v2) {
+        Set<Vertex> adj1 = adjList.get(v1.getLabel());
+        Set<Vertex> adj2 = adjList.get(v2.getLabel());
+        
+        Set<Vertex> allAdj = new HashSet<Vertex>(adj1.size() + adj2.size());
+        allAdj.addAll(adj1);
+        allAdj.addAll(adj2);
+        return allAdj;
+    }
+    
     /**
      * Removes the vertex and all adges containing this vertex
      * Returns false if the graph does not contain the vertex
@@ -97,37 +104,12 @@ public class Graph implements IGraph {
     public boolean removeVertex(Vertex v) {
         if (!vertices.containsKey(v.getLabel()))
             return false;
-        List<Vertex> adj = adjList.get(v.getLabel());
+        Set<Vertex> adj = adjList.get(v.getLabel());
         for(Vertex av: adj) {
-            edges.remove(new Edge(v, av));
+            adjList.get(av.getLabel()).remove(v);
         }
         adjList.remove(v.getLabel());
         vertices.remove(v);
         return true;
-    }
-    
-    private List<Vertex> getCommonAdjVertices(Vertex v1, Vertex v2) {
-        List<Vertex> adj1 = adjList.get(v1.getLabel());
-        List<Vertex> adj2 = adjList.get(v2.getLabel());
-        
-        List<Vertex> allAdj = new ArrayList<Vertex>(adj1.size() + adj2.size());
-        allAdj.addAll(adj1);
-        allAdj.addAll(adj2);
-        
-        Collections.sort(allAdj, new Comparator<Vertex>() {
-            @Override
-            public int compare(Vertex o1, Vertex o2) {
-                return o1.getLabel().compareTo(o2.getLabel());
-            }});
-        List<Vertex> combinedAdj = new ArrayList<Vertex>(allAdj.size());
-        String lastLabel = null;
-        
-        for (Vertex v: allAdj) {
-            if (v.getLabel().equals(lastLabel))
-                continue;
-            lastLabel = v.getLabel();
-            combinedAdj.add(v);
-        }
-        return combinedAdj;
     }
 }

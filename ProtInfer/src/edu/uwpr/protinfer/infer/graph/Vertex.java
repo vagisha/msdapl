@@ -1,5 +1,7 @@
 package edu.uwpr.protinfer.infer.graph;
 
+import java.util.List;
+
 public interface Vertex {
 
     public String getLabel();
@@ -13,4 +15,6 @@ public interface Vertex {
     public void setVisited(boolean visited);
     
     public Vertex combineWith(Vertex v);
+    
+    public Vertex combineWith(List<Vertex> vertices);
 }
