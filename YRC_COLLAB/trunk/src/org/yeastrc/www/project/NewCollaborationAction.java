@@ -48,6 +48,9 @@ public class NewCollaborationAction extends Action {
 		Collection researchers = Projects.getAllResearchers();
 		session.setAttribute("researchers", researchers);
 
+		// remove any project, if it exists in the session.  Could have been placed in the session by EditProjectAction
+        request.getSession().removeAttribute("project");
+        
 		// Go!
 		return mapping.findForward("Success");
 

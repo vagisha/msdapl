@@ -69,6 +69,7 @@
 	<form-bean name="Y2HCommentsForm" type="org.yeastrc.www.y2h.Y2HCommentsForm"/>
 	<form-bean name="microscopyCommentsForm" type="org.yeastrc.www.microscopy.MicroscopyCommentsForm"/>
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
+	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
     </form-beans>
 
 
@@ -1017,6 +1018,41 @@
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="true"/>
 	</action>
 
+
+	<!-- ================================================================================== -->
+	<!-- Actions related to grants -->
+	<!-- ================================================================================== -->
+	<action 
+		path="/viewGrants"
+		type="org.yeastrc.www.project.ViewGrantsAction"
+	>
+		<forward name="Success" path="/pages/internal/project/viewGrants.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/project/viewGrants.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/saveGrant"
+		type="org.yeastrc.www.project.SaveGrantAction"
+		name="editGrantForm"
+		input="/pages/internal/project/editGrant.jsp"
+		scope="request"
+		validate="true"
+	>
+		<forward name="ListGrants" path="/viewGrants.do" redirect="true" />
+		<forward name="SavedGrant" path="/pages/internal/project/savedGrant.jsp" redirect="false" />
+		<forward name="Failure" path="/viewGrantForm.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/editGrant"
+		type="org.yeastrc.www.project.EditGrantAction"
+	>
+		<forward name="Success" path="/pages/internal/project/editGrant.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/project/editGrant.jsp" redirect="false" />
+	</action>
+	
+	<!-- ================================================================================== -->
+	
     </action-mappings>
 
 

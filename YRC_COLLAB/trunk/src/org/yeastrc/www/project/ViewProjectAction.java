@@ -21,6 +21,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 
+import org.yeastrc.grant.Grant;
+import org.yeastrc.grant.GrantRecord;
 import org.yeastrc.microscopy.ExperimentBaitComparator;
 import org.yeastrc.microscopy.ExperimentSearcher;
 
@@ -102,6 +104,10 @@ public class ViewProjectAction extends Action {
 
 		// Set this project in the request, as a bean to be displayed on the view
 		request.setAttribute("project", project);
+		
+		// get the grants for this project and set them in the request
+		List<Grant> grants = GrantRecord.getInstance().getGrantsForProject(project.getID());
+		request.setAttribute("grants", grants);
 		
 		// Check for experiment data for this project
 		if (project.getShortType().equals(Projects.COLLABORATION) || project.getShortType().equals(Projects.TECHNOLOGY)) {

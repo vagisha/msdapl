@@ -7,11 +7,10 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:empty name="project">
-  <logic:forward name="editProject" />
-</logic:empty>
- 
-<jsp:useBean id="project" class="org.yeastrc.project.Dissemination" scope="request"/>
+<logic:notPresent name="editDisseminationForm">
+	<logic:forward name="editProject" />
+</logic:notPresent>
+
 
 <%@ include file="/includes/header.jsp" %>
 
@@ -21,12 +20,12 @@
 
  <CENTER>
   <html:form action="saveDissemination" method="post">
-  <html:hidden name="project" property="ID"/>
+  <html:hidden name="editDisseminationForm" property="ID"/>
   <TABLE CELLPADDING="no" CELLSPACING="0" border="0">
   
    <TR>
     <TD WIDTH="25%" VALIGN="top"><B>Submit Date:</B></TD>
-    <TD WIDTH="75%" VALIGN="top"><B><bean:write name="project" property="submitDate"/></B></TD>
+    <TD WIDTH="75%" VALIGN="top"><B><bean:write name="editDisseminationForm" property="submitDate"/></B></TD>
    </TR>
 
    <TR>
@@ -143,12 +142,16 @@
   </TABLE>
 
  <P>
- <html:image src="/yrc/images/buttons/project-save.gif" value="save" property="action"/>
-
- <html:link href="/yrc/viewProject.do" paramId="ID" paramName="project" paramProperty="ID">
- <html:img src="/yrc/images/buttons/project-cancel.gif" width="200" height="33" border="0"/></html:link>
+  <html:submit value="Save Changes" styleClass="button" />
+ <input type="button" class="button" onclick="javascript:onCancel(<bean:write name="editDisseminationForm" property="ID"/>);" value="Cancel"/>
 
   </html:form>
+
+<script type="text/javascript">
+	function onCancel(projectID) {
+		document.location = "/yrc/viewProject.do?ID="+projectID;
+	}
+</script>
 
   </CENTER>
 

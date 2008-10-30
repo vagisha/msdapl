@@ -18,6 +18,8 @@
  <P align="center"><B>Your collaboration was successfully requested.</B>
 </logic:present>
 
+<script type="text/javascript" src="/yrc/js/grants.js" ></script>
+
 <yrcwww:contentbox title="Create a New Collaboration" centered="true" width="750" scheme="search">
 
 <P>To request a new collaboration with the YRC, please fill out the form below.
@@ -86,7 +88,7 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
     </TD>
    </TR>
 
-	<tr><td colspan="2"><hr width="75%"></td></tr>
+	<tr><td colspan="2"><hr width="85%"></td></tr>
 
    <TR>
     <TD WIDTH="25%" VALIGN="top">Collaborating with:</TD>
@@ -131,56 +133,14 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
     <TD WIDTH="75%" VALIGN="top"><html:textarea property="comments" rows="5" cols="50"/></TD>
    </TR>
 
-	<tr><td colspan="2"><hr width="75%"></td></tr>
+	<tr><td colspan="2"><hr width="85%"></td></tr>
 
-	<tr>
-		<td colspan="2" align="left"><p><b>The following funding information is used by us when filing our annual report
-										with NCRR and NIH, and is used to derive summary statistics only.</b><br><br>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Funding Sources:<br>
-     <font style="font-size:8pt;color:red;">For <b>this</b> project only.<br><br></TD>
-    <TD WIDTH="75%" VALIGN="top">
-    	<NOBR><html:multibox property="fundingTypes" value="FEDERAL"/>U.S. Federal</NOBR>
-    	<NOBR><html:multibox property="fundingTypes" value="FOUNDATION"/>Foundation</NOBR>
-    	<NOBR><html:multibox property="fundingTypes" value="INDUSTRY"/>Industry</NOBR>
-    	<NOBR><html:multibox property="fundingTypes" value="PROFASSOC"/>Prof. Assoc.</NOBR>
-    	<NOBR><html:multibox property="fundingTypes" value="LOCGOV"/>Local Gov.</NOBR>
-    	<NOBR><html:multibox property="fundingTypes" value="OTHER"/>Other <font style="font-size:8pt;">(includes non-US gov't)</font></NOBR>
-    </TD>
-   </TR>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Federal Funding Sources:<br>
-     <font style="font-size:8pt;color:red;">Only for <b>U.S.</b> Federal funding.<br><br></TD>
-    <TD WIDTH="75%" VALIGN="top">
-    	<NOBR><html:multibox property="federalFundingTypes" value="NASA"/>NASA</NOBR>
-    	<NOBR><html:multibox property="federalFundingTypes" value="NIH"/>NIH</NOBR>
-    	<NOBR><html:multibox property="federalFundingTypes" value="NSF"/>NSF</NOBR>
-    	<NOBR><html:multibox property="federalFundingTypes" value="DOE"/>DOE</NOBR>
-    	<NOBR><html:multibox property="federalFundingTypes" value="DOD"/>DOD</NOBR>
-    	<NOBR><html:multibox property="federalFundingTypes" value="NIST"/>NIST</NOBR>
-    	<NOBR><html:multibox property="federalFundingTypes" value="DVA"/>DVA</NOBR>
-    	<NOBR><html:multibox property="federalFundingTypes" value="OTHER"/>Other</NOBR>
-    </TD>
-   </TR>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Grant number:<br><font style="font-size:8pt;color:red;">(Only for federal funding)</font></TD>
-    <TD WIDTH="75%" VALIGN="top"><html:text property="grantNumber" size="20" maxlength="255"/></TD>
-   </TR>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Annual Funds:<br><font style="font-size:8pt;color:red;"></font></TD>
-    <TD WIDTH="75%" VALIGN="top"><html:text property="grantAmount" size="10" maxlength="255"/></TD>
-   </TR>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Funding source name:<br><font style="font-size:8pt;color:red;">(If NOT U.S. federal)</font></TD>
-    <TD WIDTH="75%" VALIGN="top"><html:text property="foundationName" size="60" maxlength="80"/></TD>
-   </TR>
-   
-	<tr><td colspan="2"><hr width="75%"></td></tr>
+	<!-- ===================================================================================== -->
+	<!--  List grants here -->
+	<%@ include file="grantListForm.jsp" %>
+	<!-- ===================================================================================== -->
+	
+	<tr><td colspan="2"><hr width="85%"></td></tr>
 
    <TR>
     <TD COLSPAN="2">
@@ -193,7 +153,7 @@ Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researc
   </TABLE>
 
  <P><NOBR>
- <html:submit value="Request/Save Collaboration"/>
+ <html:submit value="Request/Save Collaboration" styleClass="button"/>
  </NOBR>
  
   </html:form>

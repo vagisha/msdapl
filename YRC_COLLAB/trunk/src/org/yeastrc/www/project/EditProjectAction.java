@@ -9,6 +9,7 @@
 package org.yeastrc.www.project;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.grant.Grant;
+import org.yeastrc.grant.GrantRecord;
 import org.yeastrc.project.Dissemination;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
@@ -40,6 +43,7 @@ public class EditProjectAction extends Action {
 	throws Exception {
 		// Get the projectID they're after
 		int projectID;
+		
 		
 		// User making this request
 		User user = UserUtils.getUser(request);
@@ -94,9 +98,9 @@ public class EditProjectAction extends Action {
 		}
 
 
-		// Set this project in the request, as a bean to be displayed on the view
-		request.setAttribute("project", project);
-
+		// get the grants for this project
+		List<Grant> grants = GrantRecord.getInstance().getGrantsForProject(project.getID());
+		
 		// Where do you want to go from here?
 		String forwardStr = "";
 
@@ -112,14 +116,16 @@ public class EditProjectAction extends Action {
 			
 			String[] groups = project.getGroupsArray();
 			((EditCollaborationForm)(newForm)).setGroups(groups);
-
-			newForm.setFundingTypes(project.getFundingTypesArray());
-			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
-			newForm.setGrantAmount( project.getGrantAmount() );
-			newForm.setGrantNumber( project.getGrantNumber() );
-			newForm.setFoundationName( project.getFoundationName() );
 			
+			newForm.setGrantList(grants);
 			
+			// Set this project in the session. Needed to display any old grant information
+			// We have to set it in the session and not the request so that it is available 
+			// if the user omits some required information on the form and is redirected back 
+			// to the form. 
+	        // This should be removed in the saveCollaborationAction and newCollaborationAction classes
+			if (project.getFundingTypes() != null || !project.getFundingTypes().equalsIgnoreCase("None"))
+                request.getSession().setAttribute("project", project);
 		}
 
 
@@ -149,12 +155,15 @@ public class EditProjectAction extends Action {
 			String[] groups = project.getGroupsArray();
 			((EditTechnologyForm)(newForm)).setGroups(groups);
 
-			newForm.setFundingTypes(project.getFundingTypesArray());
-			newForm.setFederalFundingTypes(project.getFederalFundingTypesArray());
-			newForm.setGrantAmount( project.getGrantAmount() );
-			newForm.setGrantNumber( project.getGrantNumber() );
-			newForm.setFoundationName( project.getFoundationName() );
+			newForm.setGrantList(grants);
 			
+			// Set this project in the session. Needed to display any old grant information
+            // We have to set it in the session and not the request so that it is available 
+            // if the user omits some required information on the form and is redirected back 
+            // to the form. 
+            // This should be removed in the saveTechnologyAction and newCollaborationAction classes
+			if (project.getFundingTypes() != null || !project.getFundingTypes().equalsIgnoreCase("None"))
+			    request.getSession().setAttribute("project", project);
 		
 		}
 		
@@ -194,6 +203,9 @@ public class EditProjectAction extends Action {
 		//newForm.setAxisI(project.getAxisI());
 		//newForm.setAxisII(project.getAxisII());
 
+		newForm.setID(project.getID());
+		newForm.setSubmitDate(project.getSubmitDate());
+		
 		// Set the Researchers
 		Researcher res = project.getPI();
 		if (res != null) newForm.setPI(res.getID());
@@ -210,7 +222,7 @@ public class EditProjectAction extends Action {
 
 		// Set up a Collection of all the Researchers to use in the form as a pull-down menu for researchers
 		Collection researchers = Projects.getAllResearchers();
-		request.setAttribute("researchers", researchers);
+		request.getSession().setAttribute("researchers", researchers);
 
 
 		// Go!

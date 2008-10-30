@@ -8,12 +8,25 @@
 
 package org.yeastrc.www.project;
 
-import javax.servlet.http.*;
-import org.apache.struts.action.*;
+import java.util.List;
 
-import org.yeastrc.project.*;
-import org.yeastrc.www.user.*;
-import org.yeastrc.data.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.grant.Grant;
+import org.yeastrc.grant.ProjectGrantRecord;
+import org.yeastrc.project.ProjectFactory;
+import org.yeastrc.project.Researcher;
+import org.yeastrc.project.Technology;
+import org.yeastrc.www.user.User;
+import org.yeastrc.www.user.UserUtils;
 
 /**
  * Controller class for saving a project.
@@ -34,8 +47,6 @@ public class SaveTechnologyAction extends Action {
 		int researcherC = 0;
 		int researcherD = 0;
 		String[] groups = null;
-		String[] fundingTypes = null;
-		String[] federalFundingTypes = null;
 		String projectAbstract = null;
 		String publicAbstract = null;
 		String progress = null;
@@ -45,9 +56,6 @@ public class SaveTechnologyAction extends Action {
 		float bta = (float)0.0;
 		String axisI = null;
 		String axisII = null;
-		String grantNumber = null;
-		String grantAmount = null;
-		String foundationName = null;
 		
 		// User making this request
 		User user = UserUtils.getUser(request);
@@ -110,8 +118,6 @@ public class SaveTechnologyAction extends Action {
 		researcherC = ((EditTechnologyForm)(form)).getResearcherC();
 		researcherD = ((EditTechnologyForm)(form)).getResearcherD();
 		groups = ((EditTechnologyForm)(form)).getGroups();
-		fundingTypes = ((EditTechnologyForm)(form)).getFundingTypes();
-		federalFundingTypes = ((EditTechnologyForm)(form)).getFederalFundingTypes();
 		projectAbstract = ((EditTechnologyForm)(form)).getAbstract();
 		publicAbstract = ((EditTechnologyForm)(form)).getPublicAbstract();
 		//keywords = ((EditTechnologyForm)(form)).getKeywords();
@@ -121,9 +127,6 @@ public class SaveTechnologyAction extends Action {
 		bta = ((EditTechnologyForm)(form)).getBTA();
 		axisI = ((EditTechnologyForm)(form)).getAxisI();
 		axisII = ((EditTechnologyForm)(form)).getAxisII();
-		foundationName = ((EditTechnologyForm)(form)).getFoundationName();
-		grantNumber = ((EditTechnologyForm)(form)).getGrantNumber();
-		grantAmount = ((EditTechnologyForm)(form)).getGrantAmount();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
@@ -168,27 +171,6 @@ public class SaveTechnologyAction extends Action {
 			return mapping.findForward("Failure");
 		}
 
-		// Set up the funding types
-		project.clearFundingTypes();
-		
-		if (fundingTypes != null) {
-			if (fundingTypes.length > 0) {
-				for (int i = 0; i < fundingTypes.length; i++) {
-					project.setFundingType(fundingTypes[i]);
-				}
-			}
-		}
-		
-		// Set up the federal funding types
-		project.clearFederalFundingTypes();
-		
-		if (federalFundingTypes != null) {
-			if (federalFundingTypes.length > 0) {
-				for (int i = 0; i < federalFundingTypes.length; i++) {
-					project.setFederalFundingType(federalFundingTypes[i]);
-				}
-			}
-		}
 
 		// Set up the groups
 		project.clearGroups();
@@ -222,13 +204,17 @@ public class SaveTechnologyAction extends Action {
 		project.setPublications(publications);
 		project.setComments(comments);
 		project.setBTA(bta);
-		project.setGrantAmount( grantAmount );
-		project.setGrantNumber( grantNumber );
-		project.setFoundationName( foundationName );
 		
 		// Save the project
 		project.save();
 
+		// save the project grants
+		List<Grant> grants = ((EditTechnologyForm)(form)).getGrantList();
+		ProjectGrantRecord.getInstance().saveProjectGrants(project.getID(), grants);
+		
+		// remove the project, if it exists in the session
+        request.getSession().removeAttribute("project");
+		
 		// Go!
 		return mapping.findForward("viewProject");
 

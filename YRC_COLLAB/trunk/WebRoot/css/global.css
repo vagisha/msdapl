@@ -103,6 +103,13 @@ TR.search_A {
 TR.search_B {
 	background-color: #D8DBFE;
 }
+DIV.search .button {
+	background-color:#000960;
+	color:#E8EAFF;
+	font-size:10pt;
+	font-weight:bold;
+	margin-top:20px;	
+}
 
 
 
@@ -170,6 +177,13 @@ TR.project_A {
 }
 TR.project_B {
 	background-color: #eee2ff;
+}
+DIV.project .button {
+	background-color:#1d0047;
+	color:#e5d3ff;
+	font-size:10pt;
+	font-weight:bold;
+	margin-top:20px;	
 }
 INPUT.project_button {
 	background-color:#1d0047;

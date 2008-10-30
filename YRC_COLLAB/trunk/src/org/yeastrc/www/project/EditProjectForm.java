@@ -9,8 +9,13 @@
 
 package org.yeastrc.www.project;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.*;
+import org.yeastrc.grant.Grant;
 
 /**
  * @author Michael Riffle <mriffle@u.washington.edu>
@@ -43,18 +48,6 @@ public class EditProjectForm extends ActionForm {
 	
 	/** Set the public abstract */
 	public void setPublicAbstract(String arg) { this.publicAbstract = arg; }
-
-	/** Set the funding types */
-	public void setFundingTypes(String[] arg) {
-		if (arg != null)
-			this.fundingTypes = arg;
-	}
-
-	/** Set the federal funding types */
-	public void setFederalFundingTypes(String[] arg) {
-		if (arg != null)
-			this.federalFundingTypes = arg;
-	}
 
 	/** Set the progress */
 	public void setProgress(String arg) { this.progress = arg; }
@@ -100,12 +93,6 @@ public class EditProjectForm extends ActionForm {
 	/** Get the public abstract */
 	public String getPublicAbstract() { return this.publicAbstract; }
 
-	/** Get the funding types */
-	public String[] getFundingTypes() { return this.fundingTypes; }
-
-	/** Get the federal funding types */
-	public String[] getFederalFundingTypes() { return this.federalFundingTypes; }
-
 	/** Get the progress */
 	public String getProgress() { return this.progress; }
 
@@ -139,50 +126,11 @@ public class EditProjectForm extends ActionForm {
 	/** Get the Researcher D ID */
 	public int getResearcherD() { return this.researcherD; }
 
-	
 
-	/**
-	 * @return Returns the foundationName.
-	 */
-	public String getFoundationName() {
-		return foundationName;
-	}
-	/**
-	 * @param foundationName The foundationName to set.
-	 */
-	public void setFoundationName(String foundationName) {
-		this.foundationName = foundationName;
-	}
-	/**
-	 * @return Returns the grantAmount.
-	 */
-	public String getGrantAmount() {
-		return grantAmount;
-	}
-	/**
-	 * @param grantAmount The grantAmount to set.
-	 */
-	public void setGrantAmount(String grantAmount) {
-		this.grantAmount = grantAmount;
-	}
-	/**
-	 * @return Returns the grantNumber.
-	 */
-	public String getGrantNumber() {
-		return grantNumber;
-	}
-	/**
-	 * @param grantNumber The grantNumber to set.
-	 */
-	public void setGrantNumber(String grantNumber) {
-		this.grantNumber = grantNumber;
-	}
 	// The form variables we'll be tracking
 	private String title = null;
 	private String projectAbstract = null;
 	private String publicAbstract = null;
-	private String[] fundingTypes = new String[0];
-	private String[] federalFundingTypes = new String[0];
 	private String progress = null;
 	private String keywords = null;
 	private String comments = null;
@@ -196,8 +144,51 @@ public class EditProjectForm extends ActionForm {
 	private int researcherC = 0;
 	private int researcherD = 0;
 
-	private String foundationName = null;
-	private String grantNumber = null;
-	private String grantAmount = null;
+	private List<Grant> grants = new ArrayList<Grant>();
 	
+	private int ID = 0;
+	
+	private Date submitDate = null;
+	
+	public Grant getGrant(int index) {
+		while(index >= grants.size())
+			grants.add(new Grant());
+		return grants.get(index);
+	}
+	
+	public List <Grant> getGrantList() {
+		List<Grant> validGrants = new ArrayList<Grant>();
+		for (Grant grant: grants)
+			if (grant != null && grant.getID() > 0)
+				validGrants.add(grant);
+		return validGrants;
+	}
+	
+	public void setGrantList(List <Grant> grants) {
+		this.grants = grants;
+	}
+	
+	public int validGrantCount() {
+		int i = 0;
+		for (Grant grant: grants) {
+			if (grant != null && grant.getID() > 0)	i++;
+		}
+		return i;
+	}
+	
+	public int getID() {
+		return ID;
+	}
+	
+	public void setID(int ID) {
+		this.ID = ID;
+	}
+	
+	public Date getSubmitDate() {
+		return submitDate;
+	}
+	
+	public void setSubmitDate(Date date) {
+		this.submitDate = date;
+	}
 }

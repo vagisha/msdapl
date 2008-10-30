@@ -7,12 +7,10 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:empty name="project">
-  <logic:forward name="editProject" />
-</logic:empty>
+<logic:notPresent name="editTrainingForm">
+	<logic:forward name="editProject" />
+</logic:notPresent>
  
-<jsp:useBean id="project" class="org.yeastrc.project.Training" scope="request"/>
-
 <%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
@@ -20,7 +18,7 @@
 <SCRIPT LANGUAGE="javascript">
 	function openAXISWindow(type) {
 	 var AXISI_WIN, AXISII_WIN;
-	 var doc = "/yrc/AXIS.do?ID=<bean:write name="project" property="ID"/>&type=" + type;
+	 var doc = "/yrc/AXIS.do?ID=<bean:write name="editTrainingForm" property="ID"/>&type=" + type;
 
 	 if(type == "I") {
 		AXISI_WIN = window.open(doc, "AXISI_WIN",
@@ -36,18 +34,18 @@
 
  <CENTER>
   <html:form action="saveTraining" method="post">
-  <html:hidden name="project" property="ID"/>
-  <!--<html:hidden name="project" property="title"/>-->
+  <html:hidden name="editTrainingForm" property="ID"/>
+  <!--<html:hidden name="editTrainingForm" property="title"/>-->
 
   <yrcwww:notmember group="any">
-   <html:hidden name="project" property="BTA"/>
+   <html:hidden name="editTrainingForm" property="BTA"/>
   </yrcwww:notmember>
 
   <TABLE CELLPADDING="no" CELLSPACING="0" border="0">
   
    <TR>
     <TD WIDTH="25%" VALIGN="top"><B>Submit Date:</B></TD>
-    <TD WIDTH="75%" VALIGN="top"><B><bean:write name="project" property="submitDate"/></B></TD>
+    <TD WIDTH="75%" VALIGN="top"><B><bean:write name="editTrainingForm" property="submitDate"/></B></TD>
    </TR>
 
    <TR>
@@ -161,12 +159,16 @@
   </TABLE>
 
  <P>
- <html:image src="/yrc/images/buttons/project-save.gif" value="save" property="action"/>
-
- <html:link href="/yrc/viewProject.do" paramId="ID" paramName="project" paramProperty="ID">
- <html:img src="/yrc/images/buttons/project-cancel.gif" width="200" height="33" border="0"/></html:link>
+   <html:submit value="Save Changes" styleClass="button" />
+  <input type="button" class="button" onclick="javascript:onCancel(<bean:write name="editTrainingForm" property="ID"/>);" value="Cancel"/>
 
   </html:form>
+
+<script type="text/javascript">
+	function onCancel(projectID) {
+		document.location = "/yrc/viewProject.do?ID="+projectID;
+	}
+</script>
 
   </CENTER>
 
