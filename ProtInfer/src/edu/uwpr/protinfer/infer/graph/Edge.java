@@ -2,19 +2,19 @@ package edu.uwpr.protinfer.infer.graph;
 
 public class Edge {
 
-    private Vertex v1;
-    private Vertex v2;
+    private IVertex v1;
+    private IVertex v2;
     
-    public Edge(Vertex v1, Vertex v2) {
+    public Edge(IVertex v1, IVertex v2) {
         this.v1 = v1;
         this.v2 = v2;
     }
     
-    public Vertex getVertex1() {
+    public IVertex getVertex1() {
         return v1;
     }
     
-    public Vertex getVertex2() {
+    public IVertex getVertex2() {
         return v2;
     }
     
@@ -33,7 +33,7 @@ public class Edge {
        return v1.getLabel().hashCode() + v2.getLabel().hashCode(); 
     }
     
-    private boolean same(Vertex v1, Vertex v2) {
+    private boolean same(IVertex v1, IVertex v2) {
         return v1.getLabel().equals(v2.getLabel());
     }
 }

@@ -7,40 +7,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BipartiteGraph implements IGraph {
+public class BipartiteGraph <L extends IVertex<L>, R extends IVertex<R>> implements IGraph {
     
-    private Map<String, Vertex> verticesL;
-    private Map<String, Vertex> verticesR;
+    private Map<String, L> verticesL;
+    private Map<String, R> verticesR;
     
-    private Map<String, Set<Vertex>> adjList;
+    private Map<String, Set<R>> adjListL;
+    private Map<String, Set<L>> adjListR;
     
     
     public BipartiteGraph() {
-        verticesL = new HashMap<String, Vertex>();
-        verticesR = new HashMap<String, Vertex>();
-        adjList = new HashMap<String, Set<Vertex>>();
+        verticesL = new HashMap<String, L>();
+        verticesR = new HashMap<String, R>();
+        adjListL = new HashMap<String, Set<R>>();
+        adjListR = new HashMap<String, Set<L>>();
+    }
+    
+    public List<IVertex<?>> getAllVertices() {
+        List<IVertex<?>> all = new ArrayList<IVertex<?>>(verticesL.size() + verticesR.size());
+        all.addAll(verticesL.values());
+        all.addAll(verticesR.values());
+        return all;
+    }
+    
+    public List<L> getLeftVertices() {
+        List<L> vList = new ArrayList<L>(verticesL.size());
+        vList.addAll(verticesL.values());
+        return vList;
+    }
+    
+    public List<R> getRightVertices() {
+        List<R> vList = new ArrayList<R>(verticesR.size());
+        vList.addAll(verticesR.values());
+        return vList;
     }
     
     /**
-     * Adds a vertex to "left" set of vertices of the bipartite graph.
-     */
-    public Vertex addVertex(Vertex vertex) {
-        return addLeftVertex(vertex);
-    }
-    
-    /**
-     * If a vertex with the same label is already in the set of "left" edges
+     * If a vertex with the same label is already in the set of "left" vertices
      * it is returned, otherwise the given vertex is added and returned. 
-     * If the vertex could not be added (e.g. if it is already part of the 
-     * set of "right" edges) the return value is null.
      * @param vertex
      * @return
+     * @throws InvalidVertexException if the vertex with the same label is part of 
+     * the set of "right" vertices.
      */
-    public Vertex addLeftVertex(Vertex vertex) {
-        // don't add if this vertex is already in the set of "right" vertices
-        if (verticesR.get(vertex.getLabel()) != null)
-            return null;
-        Vertex v = verticesL.get(vertex.getLabel());
+    L addLeftVertex(L vertex) throws InvalidVertexException {
+         // don't add if this vertex is already in the set of "right" vertices
+        if (verticesR.get(vertex.getLabel()) == vertex)
+            throw new InvalidVertexException("Vertex "+vertex.getLabel()+" exists in the other set.");
+        L v = verticesL.get(vertex.getLabel());
         if (v != null)
             return v;
         verticesL.put(vertex.getLabel(), vertex);
@@ -48,17 +62,18 @@ public class BipartiteGraph implements IGraph {
     }
     
     /**
-     * If a vertex with the same label is already in the set of "right" edges
+     * If a vertex with the same label is already in the set of "right" vertices
      * it is returned, otherwise the given vertex is added and returned. 
-     * If the vertex could not be added (e.g. if it is already part of the 
-     * set of "left" edges) the return value is null.
      * @param vertex
      * @return
+     * @throws InvalidVertexException if the vertex with the same label is part of 
+     * the set of "left" vertices.
      */
-    public Vertex addRightVertex(Vertex vertex) {
-        if(verticesL.get(vertex.getLabel()) != null)
-            return null;
-        Vertex v = verticesR.get(vertex.getLabel());
+    R addRightVertex(R vertex) throws InvalidVertexException {
+        // don't add if this vertex is already in the set of "right" vertices
+        if(verticesL.get(vertex.getLabel()) == vertex)
+            throw new InvalidVertexException("Vertex "+vertex.getLabel()+" exists in the other set.");
+        R v = verticesR.get(vertex.getLabel());
         if (v != null)
             return v;
         verticesR.put(vertex.getLabel(), vertex);
@@ -71,143 +86,175 @@ public class BipartiteGraph implements IGraph {
      * If either v1 or v2 could not be added to the set of vertices, 
      * the edge is not added.
      * An edge is added between v1 and v2 it is does not already exist.
+     * @throws InvalidVertexException 
      */
-    public void addEdge(Vertex v1, Vertex v2) {
+    public boolean addEdge(L v1, R v2) throws InvalidVertexException {
        v1 = addLeftVertex(v1);
        v2 = addRightVertex(v2);
        
        if (v1 == null || v2 == null)
-           return;
-       addGraphEdge(v1, v2);
-       addGraphEdge(v2, v1);
+           return false;
+       addGraphEdgeL2R(v1, v2);
+       addGraphEdgeR2L(v2, v1);
+       return true;
     }
     
-    private void addGraphEdge(Vertex from, Vertex to) {
-        Set<Vertex> adjVertices = adjList.get(from.getLabel());
+    private void addGraphEdgeL2R(L from, R to) {
+        Set<R> adjVertices = adjListL.get(from.getLabel());
         if (adjVertices == null) {
-            adjVertices = new HashSet<Vertex>();
-            adjList.put(from.getLabel(), adjVertices);
+            adjVertices = new HashSet<R>();
+            adjListL.put(from.getLabel(), adjVertices);
+        }
+        adjVertices.add(to);
+    }
+    
+    private void addGraphEdgeR2L(R from, L to) {
+        Set<L> adjVertices = adjListR.get(from.getLabel());
+        if (adjVertices == null) {
+            adjVertices = new HashSet<L>();
+            adjListR.put(from.getLabel(), adjVertices);
         }
         adjVertices.add(to);
     }
     
     public int getEdgeCount() {
         int count = 0;
-        for (Set<Vertex> adjV: adjList.values())
+        for (Set<R> adjV: adjListL.values())
             count += adjV.size();
-        return count/2;
+        return count;
     }
     
-    public List<Vertex> getAdjacentVertices(Vertex vertex) {
-        List<Vertex> list = new ArrayList<Vertex>(adjList.get(vertex.getLabel()).size());
-        list.addAll(adjList.get(vertex.getLabel()));
+    /**
+     * Returns a list of vertices adjacent to a vertex in the "left" set of vertices.
+     * @param vertex
+     * @return
+     */
+    public List<R> getAdjacentVerticesL(L vertex) {
+        if (adjListL.get(vertex.getLabel()) == null)
+            return new ArrayList<R>(0);
+        List<R> list = new ArrayList<R>(adjListL.get(vertex.getLabel()).size());
+        list.addAll(adjListL.get(vertex.getLabel()));
         return list;
     }
     
-    public boolean containsEdge(Vertex v1, Vertex v2) {
-        return adjList.get(v1.getLabel()).contains(v2);
+    public Set<R> getAdjacentSetL(L vertex) {
+        if (adjListL.get(vertex.getLabel()) == null)
+            return new HashSet<R>(0);
+        return adjListL.get(vertex.getLabel());
     }
     
-    public List<Vertex> getVertices() {
-        List<Vertex> vList = new ArrayList<Vertex>(verticesL.size());
-        vList.addAll(verticesL.values());
-        vList.addAll(verticesR.values());
-        return vList;
+    public List<L> getAdjacentVerticesR(R vertex) {
+        if (adjListR.get(vertex.getLabel()) == null)
+            return new ArrayList<L>(0);
+        List<L> list = new ArrayList<L>(adjListR.get(vertex.getLabel()).size());
+        list.addAll(adjListR.get(vertex.getLabel()));
+        return list;
     }
     
-    public List<Vertex> getLeftVertices() {
-        List<Vertex> vList = new ArrayList<Vertex>(verticesL.size());
-        vList.addAll(verticesL.values());
-        return vList;
+    public Set<L> getAdjacentSetR(R vertex) {
+        if (adjListR.get(vertex.getLabel()) == null)
+            return new HashSet<L>(0);
+        return adjListR.get(vertex.getLabel());
     }
     
-    public List<Vertex> getRightVertices() {
-        List<Vertex> vList = new ArrayList<Vertex>(verticesL.size());
-        vList.addAll(verticesR.values());
-        return vList;
-    }
-
-    public void combineVertices(Vertex v1, Vertex v2) throws InvalidVertexException {
-        combineLeftVertices(v1, v2);
+    public List<IVertex<?>> getAdjacentVertices(IVertex<?> vertex) {
+        if (verticesL.get(vertex.getLabel()) == vertex) 
+            return (List<IVertex<?>>) getAdjacentVerticesL((L) vertex);
+        else if (verticesR.get(vertex.getLabel()) == vertex)
+            return (List<IVertex<?>>) getAdjacentVerticesR((R) vertex);
+        return null;
     }
     
-    public void combineLeftVertices(Vertex v1, Vertex v2) throws InvalidVertexException {
-        Vertex v1_o = verticesL.get(v1.getLabel());
+    public boolean containsEdge(L v1, R v2) {
+        if (adjListL.containsKey(v1.getLabel())) {
+            return adjListL.get(v1.getLabel()).contains(v2);
+        }
+        return false;
+    }
+    
+    public boolean removeLeftVertex(L v) {
+        if (!verticesL.containsKey(v.getLabel()))
+            return false;
+        L toRemove = verticesL.get(v.getLabel());
+        Set<R> adj = adjListL.get(v.getLabel());
+        for(R av: adj) {
+            adjListR.get(av.getLabel()).remove(toRemove);
+        }
+        adjListL.remove(v.getLabel());
+        verticesL.remove(v.getLabel());
+        return true;
+    }
+    
+    public boolean removeRightVertex(R v) {
+        if (!verticesR.containsKey(v.getLabel()))
+            return false;
+        R toRemove = verticesR.get(v.getLabel());
+        Set<L> adj = adjListR.get(v.getLabel());
+        for(L av: adj) {
+            adjListL.get(av.getLabel()).remove(toRemove);
+        }
+        adjListR.remove(v.getLabel());
+        verticesR.remove(v.getLabel());
+        return true;
+    }
+    
+    public L combineLeftVertices(L v1, L v2) throws InvalidVertexException {
+        L v1_o = verticesL.get(v1.getLabel());
         if (v1_o == null) {
             throw new InvalidVertexException("Vertex "+v1.getLabel()+" not found in graph");
         }
-        Vertex v2_o = verticesL.get(v2.getLabel());
+        L v2_o = verticesL.get(v2.getLabel());
         if (v2_o == null) {
             throw new InvalidVertexException("Vertex "+v2.getLabel()+" not found in graph");
         }
-       combineGraphVertices(v1_o, v2_o);
-    }
-    
-    public void combineRightVertices(Vertex v1, Vertex v2) throws InvalidVertexException {
-        Vertex v1_o = verticesL.get(v1.getLabel());
-        if (v1_o == null) {
-            throw new InvalidVertexException("Vertex "+v1.getLabel()+" not found in graph");
-        }
-        Vertex v2_o = verticesL.get(v2.getLabel());
-        if (v2_o == null) {
-            throw new InvalidVertexException("Vertex "+v2.getLabel()+" not found in graph");
-        }
-        combineGraphVertices(v1_o, v2_o);
-    }
-    
-    private void combineGraphVertices(Vertex v1_o, Vertex v2_o) {
-        Vertex v_combined = v1_o.combineWith(v2_o);
-        Set<Vertex> adjV = getCommonAdjVertices(v1_o, v2_o);
         
-        for (Vertex av: adjV) {
+        L v_combined = v1_o.combineWith(v2_o);
+        Set<R> adjV = getCommonAdjVerticesL(v1_o, v2_o);
+        for (R av: adjV) {
             addEdge(v_combined, av);
         }
-        removeVertex(v1_o);
-        removeVertex(v2_o);
+        removeLeftVertex(v1_o);
+        removeLeftVertex(v2_o);
+        return v_combined;
     }
     
-    private Set<Vertex> getCommonAdjVertices(Vertex v1, Vertex v2) {
-        Set<Vertex> adj1 = adjList.get(v1.getLabel());
-        Set<Vertex> adj2 = adjList.get(v2.getLabel());
+    public R combineRightVertices(R v1, R v2) throws InvalidVertexException {
+        R v1_o = verticesR.get(v1.getLabel());
+        if (v1_o == null) {
+            throw new InvalidVertexException("Vertex "+v1.getLabel()+" not found in graph");
+        }
+        R v2_o = verticesR.get(v2.getLabel());
+        if (v2_o == null) {
+            throw new InvalidVertexException("Vertex "+v2.getLabel()+" not found in graph");
+        }
         
-        Set<Vertex> allAdj = new HashSet<Vertex>(adj1.size() + adj2.size());
+        R v_combined = v1_o.combineWith(v2_o);
+        Set<L> adjV = getCommonAdjVerticesR(v1_o, v2_o);
+        for (L av: adjV) {
+            addEdge(av, v_combined);
+        }
+        removeRightVertex(v1_o);
+        removeRightVertex(v2_o);
+        return v_combined;
+    }
+    
+    private Set<R> getCommonAdjVerticesL(L v1, L v2) {
+        Set<R> adj1 = adjListL.get(v1.getLabel());
+        Set<R> adj2 = adjListL.get(v2.getLabel());
+        
+        Set<R> allAdj = new HashSet<R>(adj1.size() + adj2.size());
         allAdj.addAll(adj1);
         allAdj.addAll(adj2);
         return allAdj;
     }
     
-    /**
-     * Removes the vertex and all adges containing this vertex
-     * Returns false if the graph does not contain the vertex
-     */
-    public boolean removeVertex(Vertex v) {
-        if (removeLeftVertex(v) || !removeRightVertex(v))
-            return true;
-        else
-            return false;
-    }
-    
-    public boolean removeLeftVertex(Vertex v) {
-        if (!verticesL.containsKey(v.getLabel()))
-            return false;
-        Set<Vertex> adj = adjList.get(v.getLabel());
-        for(Vertex av: adj) {
-            adjList.get(av.getLabel()).remove(v);
-        }
-        adjList.remove(v.getLabel());
-        verticesL.remove(v);
-        return true;
-    }
-    
-    public boolean removeRightVertex(Vertex v) {
-        if (!verticesR.containsKey(v.getLabel()))
-            return false;
-        Set<Vertex> adj = adjList.get(v.getLabel());
-        for(Vertex av: adj) {
-            adjList.get(av.getLabel()).remove(v);
-        }
-        adjList.remove(v.getLabel());
-        verticesR.remove(v);
-        return true;
+    private Set<L> getCommonAdjVerticesR(R v1, R v2) {
+        Set<L> adj1 = adjListR.get(v1.getLabel());
+        Set<L> adj2 = adjListR.get(v2.getLabel());
+        
+        Set<L> allAdj = new HashSet<L>(adj1.size() + adj2.size());
+        allAdj.addAll(adj1);
+        allAdj.addAll(adj2);
+        return allAdj;
     }
 }

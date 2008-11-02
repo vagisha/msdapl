@@ -1,10 +1,12 @@
 package edu.uwpr.protinfer.infer;
 
-import edu.uwpr.protinfer.infer.graph.Graph;
+import java.util.List;
+
+import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
 
 public class GraphBuilder {
 
-    public Graph buildGraph() {
+    public <T extends SpectrumMatch> BipartiteGraph buildGraph(List<InferredProtein<T>> inferredProteins) {
         return null;
     }
 }
