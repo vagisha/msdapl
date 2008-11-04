@@ -70,6 +70,7 @@
 	<form-bean name="microscopyCommentsForm" type="org.yeastrc.www.microscopy.MicroscopyCommentsForm"/>
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
+	<form-bean name="proteinInferenceForm" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
     </form-beans>
 
 
@@ -1049,6 +1050,31 @@
 	>
 		<forward name="Success" path="/pages/internal/project/editGrant.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/project/editGrant.jsp" redirect="false" />
+	</action>
+	
+	<!-- ================================================================================== -->
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to protein inference -->
+	<!-- ================================================================================== -->
+	<action 
+		path="/newProteinInference"
+		type="org.yeastrc.www.proteinfer.NewProteinInferenceAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinInferenceForm.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/doProteinInference"
+		type="org.yeastrc.www.proteinfer.DoProteinInferenceAction"
+		name="proteinInferenceForm"
+		input="/pages/internal/proteinfer/proteinInferenceForm.jsp"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="true" />
+		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
 	</action>
 	
 	<!-- ================================================================================== -->
