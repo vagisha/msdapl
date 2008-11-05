@@ -2,9 +2,9 @@ package edu.uwpr.protinfer.filter.fdr;
 
 public interface FdrCandidate  {
 
-    public abstract boolean isTarget();
+    public abstract boolean isTargetMatch();
     
-    public abstract boolean isDecoy();
+    public abstract boolean isDecoyMatch();
     
     public abstract void setFdr(double fdr);
     

@@ -2,13 +2,15 @@ package edu.uwpr.protinfer;
 
 import java.math.BigDecimal;
 
+import edu.uwpr.protinfer.filter.fdr.FdrFilterable;
+import edu.uwpr.protinfer.idpicker.FdrCandidateHasCharge;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.PeptideSpectrumMatch;
 import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.infer.SearchSource;
 
 
-public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch >{
+public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch>, FdrFilterable, FdrCandidateHasCharge {
 
     private SequestSpectrumMatch spectrumMatch;
     private PeptideHit peptide;
@@ -103,6 +105,26 @@ public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch >{
             else
                 isTargetHit = true;
         }
+    }
+
+    @Override
+    public double getFdr() {
+        return spectrumMatch.getFdr();
+    }
+
+    @Override
+    public void setFdr(double fdr) {
+        spectrumMatch.setFdr(fdr);
+    }
+    
+    @Override
+    public boolean isAccepted() {
+        return spectrumMatch.isAccepted();
+    }
+
+    @Override
+    public void setAccepted(boolean accepted) {
+        spectrumMatch.setAccepted(accepted);
     }
 
     @Override

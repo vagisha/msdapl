@@ -10,9 +10,12 @@ import edu.uwpr.protinfer.infer.SpectrumMatch;
 public class ProteinInferrerIdPicker implements ProteinInferrer {
 
     @Override
-    public <T extends SpectrumMatch> List<InferredProtein<T>> inferProteins( List<PeptideSpectrumMatch<T>> psmList) {
-        
+    public <T extends PeptideSpectrumMatch<S>, S extends SpectrumMatch> List<InferredProtein<S>> inferProteins(
+            List<T> psmList) {
+        // TODO Auto-generated method stub
         return null;
     }
+
+    
 
 }

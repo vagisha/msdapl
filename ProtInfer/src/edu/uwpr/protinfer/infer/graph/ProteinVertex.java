@@ -13,7 +13,11 @@ public class ProteinVertex extends Vertex<ProteinVertex> {
         super(String.valueOf(protein.getId()));
         proteins = new ArrayList<Protein>();
         proteins.add(protein);
-        
+    }
+    
+    public void setAccepted(boolean isAccepted) {
+        for(Protein prot: proteins)
+            prot.setAccepted(isAccepted);
     }
     
     private ProteinVertex(List<Protein> proteins) {
@@ -27,6 +31,12 @@ public class ProteinVertex extends Vertex<ProteinVertex> {
     
     public List<Protein> getProteins() {
         return proteins;
+    }
+    
+    public void setComponentIndex(int index) {
+        super.setComponentIndex(index);
+        for(Protein prot: proteins)
+            prot.setProteinGroupId(index);
     }
     
     @Override

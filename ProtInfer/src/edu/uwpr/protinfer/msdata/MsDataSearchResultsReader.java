@@ -2,16 +2,17 @@ package edu.uwpr.protinfer.msdata;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
-import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
@@ -20,17 +21,21 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 
 import edu.uwpr.protinfer.SequestHit;
+import edu.uwpr.protinfer.infer.ModifiedPeptide;
+import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
-import edu.uwpr.protinfer.infer.PeptideModification;
+import edu.uwpr.protinfer.infer.PeptideSpectrumMatch;
 import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.infer.SearchSource;
+import edu.uwpr.protinfer.infer.SpectrumMatch;
 
 public class MsDataSearchResultsReader {
 
-    public List<SequestHit> getHitsForExperiment(int experimentId) {
-        return null;
-    }
+    private Map<String, Peptide> peptideIds = new HashMap<String, Peptide>();
+    private Map<String, Protein> proteinIds = new HashMap<String, Protein>();
+    private int lastPeptideId = 0;
+    private int lastProteinId = 0;
     
     public List<SequestHit> getHitsForRunSearch(int runSearchId) {
         MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
@@ -64,33 +69,63 @@ public class MsDataSearchResultsReader {
             int scanId = result.getScanId();
             int charge = result.getCharge();
             int scanNumber = getScanNumber(scanId);
-            double xcorr = scores.getxCorr().doubleValue();
             
             // get the peptide
-            MsSearchResultPeptide msPeptide = result.getResultPeptide();
-            PeptideHit peptHit = new PeptideHit(msPeptide.getPeptideSequence());
+            PeptideHit peptHit = getPeptideHit(result.getResultPeptide());
             
-            // get the modifications for the peptide
-            List<MsResultResidueMod> residueMods = msPeptide.getResultDynamicResidueModifications();
-            for (MsResultResidueMod mod: residueMods) {
-                peptHit.addModification(new PeptideModification(mod.getModifiedPosition(), mod.getModificationMass()));
-            }
+//          // get the proteins
+//            List<MsSearchResultProtein> msProteinList = result.getProteinMatchList();
+//            for (MsSearchResultProtein protein: msProteinList) {
+//                Protein prot = new Protein(protein.getAccession(), 0); // don't have the nrseq database id here
+//                peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+//            }
             
-            // get the proteins
-            List<MsSearchResultProtein> msProteinList = result.getProteinMatchList();
-            for (MsSearchResultProtein protein: msProteinList) {
-                Protein prot = new Protein(protein.getAccession(), 0); // don't have the nrseq database id here
-                peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
-            }
-            
-            SequestHit hit = new SequestHit(source, scanNumber, charge, xcorr, peptHit);
+            SequestHit hit = new SequestHit(source, scanNumber, charge, peptHit);
             hit.setHitId(resultId);
             hit.setScanId(scanId);
+            hit.setXcorr(scores.getxCorr());
+            hit.setDeltaCn(scores.getDeltaCN());
+            
             searchHits.add(hit);
         }
         return searchHits;
     }
     
+    public void loadProteinsForHits(List<? extends PeptideSpectrumMatch<? extends SpectrumMatch>> hits) {
+        MsSearchResultProteinDAO protDao = DAOFactory.instance().getMsProteinMatchDAO();
+        for(PeptideSpectrumMatch<? extends SpectrumMatch> match: hits) {
+            int resultId = match.getSpectrumMatch().getHitId();
+            List<MsSearchResultProtein> proteins = protDao.loadResultProteins(resultId);
+            PeptideHit peptHit = match.getPeptideHit();
+            for (MsSearchResultProtein msProt: proteins) {
+                Protein prot = proteinIds.get(msProt.getAccession());
+                if (prot == null) {
+                    prot = new Protein(msProt.getAccession(), lastProteinId++);
+                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+                }
+            }
+        }
+    }
+    
+    private PeptideHit getPeptideHit(MsSearchResultPeptide resultPeptide) {
+        String sequence = resultPeptide.getPeptideSequence();
+        Peptide peptide = peptideIds.get(sequence);
+        if (peptide == null) {
+            peptideIds.put(sequence, new Peptide(sequence, lastPeptideId++));
+        }
+        
+        // At this point we are not adding any modifications or protein matches
+        ModifiedPeptide modPeptide = new ModifiedPeptide(peptide);
+        
+        // get the modifications for the peptide
+//        List<MsResultResidueMod> residueMods = resultPeptide.getResultDynamicResidueModifications();
+//        for (MsResultResidueMod mod: residueMods) {
+//            modPeptide.addModification(new PeptideModification(mod.getModifiedPosition(), mod.getModificationMass()));
+//        }
+        
+        return new PeptideHit(modPeptide);
+    }
+
     private List<SequestHit> loadHitsForProlucidSearch(int runSearchId, SearchSource source) {
         // TODO to be implemented
         return null; 
@@ -98,11 +133,7 @@ public class MsDataSearchResultsReader {
     
     private String getRunFileName(int runId) {
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-        MsRun run = runDao.loadRun(runId);
-        String fileName = run.getFileName();
-        int idx = fileName.lastIndexOf('.');
-        fileName = fileName.substring(0, idx);
-        return fileName;
+        return runDao.loadFilenameNoExtForRun(runId);
     }
     
     private int getScanNumber(int scanId) {

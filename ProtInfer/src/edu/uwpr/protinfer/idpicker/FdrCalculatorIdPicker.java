@@ -46,7 +46,7 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
 
     @Override
     protected boolean considerCandidate(T candidate) {
-        return !(candidate.isDecoy() && candidate.isTarget());
+        return !(candidate.isDecoyMatch() && candidate.isTargetMatch());
     }
     
     public void calculateFdr(List<T> candidates, Comparator<T> comparator) {
@@ -95,7 +95,7 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
         InteractPepXmlFileReader reader = new InteractPepXmlFileReader();
         
         try {
-            reader.open(dir+File.separator+fileName);
+            reader.open(dir+File.separator+fileName, "rev_");
             ScanSearchResult scan = null;
             int scanCount = 0;
             int hitCount = 0;
@@ -156,7 +156,7 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
                 
                 List<SpectrumHit> targetHits = new ArrayList<SpectrumHit>();
                 for(SpectrumHit hit: hits) {
-                    if (hit.isTarget())
+                    if (hit.isTargetMatch())
                         targetHits.add(hit);
                 }
                     
@@ -263,12 +263,12 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
         }
 
         @Override
-        public boolean isDecoy() {
+        public boolean isDecoyMatch() {
             return isDecoy;
         }
 
         @Override
-        public boolean isTarget() {
+        public boolean isTargetMatch() {
             return isTarget;
         }
 

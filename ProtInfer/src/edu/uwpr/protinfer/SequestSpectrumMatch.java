@@ -7,7 +7,7 @@ import edu.uwpr.protinfer.idpicker.FdrCandidateHasCharge;
 import edu.uwpr.protinfer.infer.SearchSource;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
 
-public class SequestSpectrumMatch implements SpectrumMatch, FdrFilterable, FdrCandidateHasCharge {
+public class SequestSpectrumMatch implements SpectrumMatch {
 
     private SearchSource source;
     private int scanNumber;
@@ -81,38 +81,23 @@ public class SequestSpectrumMatch implements SpectrumMatch, FdrFilterable, FdrCa
             +"; xcorr: "+"; deltaCN: "+deltaCn+"; fdr: "+fdr+"; accepted: "+accepted;
     }
 
-    @Override
     public double getFdr() {
         return fdr;
     }
 
-    @Override
+    public void setFdr(double fdr) {
+        this.fdr = fdr;
+    }
+    
     public boolean isAccepted() {
         return accepted;
     }
 
-    @Override
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
     }
 
-    @Override
     public String getPeptideSequence() {
         return this.peptideSequence;
-    }
-
-    @Override
-    public boolean isDecoy() {
-        return false;
-    }
-
-    @Override
-    public boolean isTarget() {
-        return false;
-    }
-
-    @Override
-    public void setFdr(double fdr) {
-        this.fdr = fdr;
     }
 }

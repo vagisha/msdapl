@@ -5,6 +5,8 @@ public class Protein {
     private final String accession;
     private int id; // could be a database id
     private boolean isDecoy = false;
+    private boolean isAccepted = false;
+    private int proteinGroupId;
     
     /**
      * @param accession
@@ -29,6 +31,22 @@ public class Protein {
     
     public boolean isDecoy() {
         return isDecoy;
+    }
+    
+    public boolean isAccepted() {
+        return isAccepted;
+    }
+
+    public void setAccepted(boolean isAccepted) {
+        this.isAccepted = isAccepted;
+    }
+    
+    public void setProteinGroupId(int proteinGroupId) {
+        this.proteinGroupId = proteinGroupId;
+    }
+
+    public int getProteinGroupId() {
+        return proteinGroupId;
     }
     
     public String toString() {

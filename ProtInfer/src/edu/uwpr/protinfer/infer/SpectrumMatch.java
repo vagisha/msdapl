@@ -2,6 +2,10 @@ package edu.uwpr.protinfer.infer;
 
 public interface SpectrumMatch {
 
+    public abstract int getHitId();
+    
+    public abstract int getScanId();
+    
     public abstract int getScanNumber();
     
     public abstract int getCharge();
@@ -11,4 +15,5 @@ public interface SpectrumMatch {
      * @return
      */
     public abstract String getPeptideSequence();
+    
 }

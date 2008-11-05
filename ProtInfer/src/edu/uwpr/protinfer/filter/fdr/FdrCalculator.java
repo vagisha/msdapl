@@ -25,7 +25,7 @@ public abstract class FdrCalculator <T extends FdrCandidate> {
             if (considerCandidate(candidate)) { // will we consider this candidate for FDR calculation?
                                                 // e.g we may not want to use candidates that are both target and decoy.
                 myCandidateList.add(candidate); 
-                if (candidate.isTarget())
+                if (candidate.isTargetMatch())
                     targetCount++;
                 else 
                     decoyCount++;
@@ -51,11 +51,11 @@ public abstract class FdrCalculator <T extends FdrCandidate> {
         decoyCount = 0;
         int count = 0;
         for (T candidate: myCandidateList) {
-            if (candidate.isTarget())
+            if (candidate.isTargetMatch())
                 targetCount++;
             else
                 decoyCount++;
-            if (candidate.isTarget()) {
+            if (candidate.isTargetMatch()) {
                 double fdr = calculateFdr(targetCount, decoyCount);
                 if (fdr <=  0.25)
                     count++;

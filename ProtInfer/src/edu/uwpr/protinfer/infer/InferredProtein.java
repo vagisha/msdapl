@@ -1,6 +1,8 @@
 package edu.uwpr.protinfer.infer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -8,7 +10,6 @@ public class InferredProtein <T extends SpectrumMatch> {
 
     private boolean accepted;
     private double score;
-    private int proteinGroupId;
     
     private Protein protein;
     
@@ -37,6 +38,12 @@ public class InferredProtein <T extends SpectrumMatch> {
         return peptideEvList.get(peptideSequence);
     }
     
+    public List<PeptideEvidence<T>> getPeptides() {
+        List<PeptideEvidence<T>> list = new ArrayList<PeptideEvidence<T>>(peptideEvList.size());
+        list.addAll(peptideEvList.values());
+        return list;
+    }
+    
     public Protein getProtein() {
         return protein;
     }
@@ -62,10 +69,6 @@ public class InferredProtein <T extends SpectrumMatch> {
     }
 
     public int getProteinGroupId() {
-        return proteinGroupId;
-    }
-
-    public void setProteinGroupId(int proteinGroupId) {
-        this.proteinGroupId = proteinGroupId;
+        return protein.getProteinGroupId();
     }
 }

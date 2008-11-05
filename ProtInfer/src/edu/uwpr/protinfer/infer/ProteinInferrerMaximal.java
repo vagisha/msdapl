@@ -8,24 +8,25 @@ import java.util.Map;
 public class ProteinInferrerMaximal implements ProteinInferrer {
 
     @Override
-    public <T extends SpectrumMatch> List<InferredProtein<T>> inferProteins(List<PeptideSpectrumMatch<T>> psmList) {
+    public <T extends PeptideSpectrumMatch<S>, S extends SpectrumMatch> 
+        List<InferredProtein<S>> inferProteins(List<T> psmList) {
         
-        Map<String, InferredProtein<T>> proteinMap = new HashMap<String, InferredProtein<T>>();
+        Map<String, InferredProtein<S>> proteinMap = new HashMap<String, InferredProtein<S>>();
         
         
         // for each peptide sequence match
-        for (PeptideSpectrumMatch<T> psm: psmList) {
+        for (T psm: psmList) {
             
             // for each protein match to the peptide
             List<ProteinHit> protHitList = psm.getPeptideHit().getProteinList();
             for (ProteinHit protHit: protHitList) {
                 
-                InferredProtein<T> inferredProtein = proteinMap.get(protHit.getAccession());
+                InferredProtein<S> inferredProtein = proteinMap.get(protHit.getAccession());
                 
                 // if we have not seen this protein add a new InferredProtein to the proteinMat
                 if (inferredProtein == null) {
-                    inferredProtein = new InferredProtein<T>(protHit.getProtein());
-                    PeptideEvidence<T> evidence = new PeptideEvidence<T>(psm.getPeptideHit().getPeptide());
+                    inferredProtein = new InferredProtein<S>(protHit.getProtein());
+                    PeptideEvidence<S> evidence = new PeptideEvidence<S>(psm.getPeptideHit().getPeptide());
                     evidence.addSpectrumMatch(psm.getSpectrumMatch());
                     proteinMap.put(protHit.getAccession(), inferredProtein);
                 }
@@ -33,9 +34,9 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
                 // if we also saw this peptide before, add a SpectrumMatch to the PeptideEvidence
                 // otherwise add a new PeptideEvidence to the InferredProtein
                 else {
-                    PeptideEvidence<T> evidence = inferredProtein.getPeptideEvidence(psm.getPeptideSequence());
+                    PeptideEvidence<S> evidence = inferredProtein.getPeptideEvidence(psm.getPeptideSequence());
                     if (evidence == null) {
-                        evidence = new PeptideEvidence<T>(psm.getPeptideHit().getPeptide());
+                        evidence = new PeptideEvidence<S>(psm.getPeptideHit().getPeptide());
                         inferredProtein.addPeptideEvidence(evidence);
                     }
                     evidence.addSpectrumMatch(psm.getSpectrumMatch());
@@ -43,7 +44,7 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
             }
         }
         
-        List<InferredProtein<T>> inferredProteins = new ArrayList<InferredProtein<T>>();
+        List<InferredProtein<S>> inferredProteins = new ArrayList<InferredProtein<S>>();
         inferredProteins.addAll(proteinMap.values());
         return inferredProteins;
     }
