@@ -80,6 +80,9 @@
     	SELECT id from msRun where filename=#filename#
     </select>
     
+    <select id="selectFileNameForRunId" resultClass="String" parameterClass="Integer">
+    	SELECT filename from msRun where id=#runId#
+    </select>
     
     <insert id="insert" parameterMap="msRunParam">
     	INSERT INTO msRun ( filename, 

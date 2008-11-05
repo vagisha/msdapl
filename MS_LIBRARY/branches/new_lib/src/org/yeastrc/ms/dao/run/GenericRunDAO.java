@@ -107,4 +107,20 @@ public interface GenericRunDAO <I extends MsRunIn, O extends MsRun> {
      * @throws Exception if a run with the given id is not found in the database
      */
     public abstract RunFileFormat getRunFileFormat(int runId) throws Exception;
+    
+    /**
+     * Returns the filename for the run
+     * @param runId
+     * @return
+     */
+    public abstract String loadFilenameForRun(int runId);
+    
+    /**
+     * Returns the filename for the run (If there is an extension, it is removed). 
+     * e.g. If the filename is yeast_001.ms2, this method will return yeast_001
+     * @param runId
+     * @return
+     */
+    public abstract String loadFilenameNoExtForRun(int runId);
+    
 }

@@ -99,4 +99,14 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     public void delete(int runId) {
         msRunDao.delete(runId);
     }
+
+    @Override
+    public String loadFilenameForRun(int runId) {
+        return msRunDao.loadFilenameForRun(runId);
+    }
+
+    @Override
+    public String loadFilenameNoExtForRun(int runId) {
+        return msRunDao.loadFilenameNoExtForRun(runId);
+    }
 }
