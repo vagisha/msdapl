@@ -7,6 +7,7 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,22 +67,38 @@ public class DoProteinInferenceAction extends Action {
         // get the search hits
         MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
         for (RunSearch runSearch: searchSummary.getRunSearchList()) {
+            Date start = new Date();
             List<SequestHit> hits = reader.getHitsForRunSearch(runSearch.getRunSearchId());
+            Date end = new Date();
+            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # hits: "+hits.size()+"; Time: "+getTime(start, end));
             // filter the search hits
+            start = new Date();
             List<SequestHit> filteredHits = filterHits(hits, params);
+            end = new Date();
+            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+hits.size()+"; Time: "+getTime(start, end));
             allFilteredHits.addAll(filteredHits);
         }
         
+        log.info("Total Filtered Hits: "+allFilteredHits);
         // get the proteins matching the filtered proteins
-        reader.loadProteinsForHits(allFilteredHits);
+//        reader.loadProteinsForHits(allFilteredHits);
         
         // infer the protein list
+        Date start = new Date();
         List<InferredProtein<SequestSpectrumMatch>> proteins = inferProteinList(allFilteredHits, params);
+        Date end = new Date();
+        log.info("# of Inferred Proteins: "+proteins.size());
         
         request.setAttribute("inferredProteins", proteins);
         
         // Go!
         return mapping.findForward("Success");
+    }
+    
+    private float getTime(Date start, Date end) {
+        long time = end.getTime() - start.getTime();
+        float seconds = (float)time / (100.0f * 60.0f);
+        return seconds;
     }
 
     private List<InferredProtein<SequestSpectrumMatch>> inferProteinList(
