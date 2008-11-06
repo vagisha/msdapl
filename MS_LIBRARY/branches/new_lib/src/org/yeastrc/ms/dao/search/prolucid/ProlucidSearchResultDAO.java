@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.search.GenericSearchResultDAO;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 
 /**
  * 
@@ -21,4 +21,6 @@ public interface ProlucidSearchResultDAO extends GenericSearchResultDAO<Prolucid
     public abstract void saveAllProlucidResultData(List<ProlucidResultDataWId> resultDataList);
     
     public abstract List<Integer> loadTopResultIdsForRunSearch(int runSearchId);
+    
+    public abstract List<ProlucidSearchResult> loadTopResultsForRunSearchN(int runSearchId);
 }

@@ -47,6 +47,11 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
     
     @Override
+    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
+        return queryForList("SequestResult.selectTopResultsForRunSearchN", runSearchId);
+    }
+    
+    @Override
     public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge) {
         return resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
     }

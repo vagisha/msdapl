@@ -1,9 +1,12 @@
 package org.yeastrc.ms.dao.search.sequest;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.yeastrc.ms.dao.search.MsSearchResultDAOImplTest.MsSearchResultTest;
 import org.yeastrc.ms.dao.search.sqtfile.SQTBaseDAOTestCase;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
@@ -27,7 +30,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(res);
         
         // insert one result in to the table
-        SequestSearchResultTest result = makeSequestResult(3, "PEPTIDE"); // charge = 3;
+        SequestSearchResultTest result = makeSequestResult(3, "PEPTIDE", false); // charge = 3;
         
         // we have not yet set any of the SQT file specific values. Saving the 
         // result at this point should fail
@@ -63,6 +66,59 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sequestResDao.load(resultId));
     }
     
+    public final void testLoadTopResultsForRunSearchN() {
+        super.resetDatabase();
+        // insert some result in to the table
+        SequestSearchResultTest result1 = makeSequestResult(3, "PEPTIDEA", true); // charge = 3;
+        result1.setXCorrRank(1);
+        result1.setXCorr(new BigDecimal("0.50"));
+        result1.setSpRank(1);
+        result1.setSp(new BigDecimal("123.5"));
+        result1.setDeltaCN(new BigDecimal("0.001"));
+        result1.setMatchingIons(200);
+        
+        SequestSearchResultTest result2 = makeSequestResult(3, "PEPTIDEB", true); // charge = 3;
+        result2.setXCorrRank(2);
+        result2.setXCorr(new BigDecimal("0.10"));
+        result2.setSpRank(3);
+        result2.setSp(new BigDecimal("123.5"));
+        result2.setDeltaCN(new BigDecimal("0.001"));
+        result2.setMatchingIons(200);
+        
+        SequestSearchResultTest result3 = makeSequestResult(3, "PEPTIDEC", true); // charge = 3;
+        result3.setXCorrRank(1);
+        result3.setXCorr(new BigDecimal("0.10"));
+        result3.setSpRank(1);
+        result3.setSp(new BigDecimal("123.5"));
+        result3.setDeltaCN(new BigDecimal("0.001"));
+        result3.setMatchingIons(200);
+        
+        int resultId1 = sequestResDao.save(97, result1, 45, 32); // searchId = 97; runSearchId = 45; scanId = 32
+        int resultId2 = sequestResDao.save(97, result2, 45, 32);
+        int resultId3 = sequestResDao.save(97, result3, 45, 32);
+        
+        // We put 3 results in but the following queries should give us 2 results only
+        // because result2 has XCorrRank > 1
+        List<Integer> resultIds= sequestResDao.loadTopResultIdsForRunSearch(45);
+        assertEquals(2, resultIds.size());
+        List<SequestSearchResult> resultList = sequestResDao.loadTopResultsForRunSearchN(45);
+        assertEquals(2, resultList.size());
+        
+        SequestSearchResult res = resultList.get(0);
+        assertEquals(3, res.getProteinMatchList().size());
+        checkSearchResult(result1, res);
+        res = resultList.get(1);
+        assertEquals(3, res.getProteinMatchList().size());
+        checkSearchResult(result3, res);
+        
+        // delete the results;
+        sequestResDao.delete(resultId1);
+        sequestResDao.delete(resultId2);
+        sequestResDao.delete(resultId3);
+        
+        assertEquals(0, sequestResDao.loadTopResultIdsForRunSearch(45).size());
+    }
+    
     private void checkSearchResult(SequestSearchResultIn input, SequestSearchResult output) {
         super.checkSearchResult(input, output);
         
@@ -80,15 +136,24 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(iData.getPredictedIons(), oData.getPredictedIons());
     }
     
-    private SequestSearchResultTest makeSequestResult(int charge,String peptide) {
+    private SequestSearchResultTest makeSequestResult(int charge,String peptide, boolean addProteins) {
         SequestSearchResultTest result = new SequestSearchResultTest();
         result.setCharge(charge);
         SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
         resultPeptide.setPeptideSequence(peptide);
         result.setResultPeptide(resultPeptide);
+        
+        if (addProteins) {
+            List<MsSearchResultProteinIn> proteins = new ArrayList<MsSearchResultProteinIn>();
+            proteins.add(super.makeResultProtein("accession_1", null));
+            proteins.add(super.makeResultProtein("accession_2", null));
+            proteins.add(super.makeResultProtein("accession_3", null));
+            result.setProteinMatchList(proteins);
+        }
 
         return result;
     }
+    
     public static final class SequestSearchResultTest extends MsSearchResultTest implements SequestSearchResultIn {
 
         private BigDecimal deltaCN;

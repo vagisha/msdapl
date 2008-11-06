@@ -12,4 +12,6 @@ public interface SequestSearchResultDAO extends GenericSearchResultDAO<SequestSe
     public abstract void saveAllSequestResultData(List<SequestResultDataWId> dataList);
     
     public abstract List<Integer> loadTopResultIdsForRunSearch(int runSearchId);
+    
+    public abstract List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId);
 }
