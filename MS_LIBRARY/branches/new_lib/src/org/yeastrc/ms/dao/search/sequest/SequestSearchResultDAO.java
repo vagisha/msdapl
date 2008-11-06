@@ -10,4 +10,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 public interface SequestSearchResultDAO extends GenericSearchResultDAO<SequestSearchResultIn, SequestSearchResult> {
 
     public abstract void saveAllSequestResultData(List<SequestResultDataWId> dataList);
+    
+    public abstract List<Integer> loadTopResultIdsForRunSearch(int runSearchId);
 }

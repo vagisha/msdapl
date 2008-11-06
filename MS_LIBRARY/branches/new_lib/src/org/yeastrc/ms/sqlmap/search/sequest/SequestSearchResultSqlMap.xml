@@ -40,6 +40,13 @@
 		AND msRunSearchResult.id = #id#
 	</select>
     
+    <select id="selectTopResultIdsForRunSearch" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msRunSearchResult as res, SQTSearchResult sres
+    	WHERE res.id = sres.resultID 
+    	AND sres.XCorrRank=1  
+    	AND runSearchID = #id#
+    </select>
+    
     <insert id="insert" parameterMap="sequestResultDataParam">
     	INSERT INTO SQTSearchResult 
     	(resultID, 

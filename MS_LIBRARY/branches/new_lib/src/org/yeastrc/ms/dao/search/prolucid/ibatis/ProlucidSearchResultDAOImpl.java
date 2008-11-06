@@ -43,6 +43,11 @@ ProlucidSearchResultDAO {
     }
 
     @Override
+    public List<Integer> loadTopResultIdsForRunSearch(int runSearchId) {
+        return queryForList("ProlucidResult.selectTopResultIdsForRunSearch", runSearchId);
+    }
+    
+    @Override
     public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId,
             int scanId, int charge) {
         return resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);

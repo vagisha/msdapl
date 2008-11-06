@@ -19,4 +19,6 @@ import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 public interface ProlucidSearchResultDAO extends GenericSearchResultDAO<ProlucidSearchResultIn, ProlucidSearchResult>  {
 
     public abstract void saveAllProlucidResultData(List<ProlucidResultDataWId> resultDataList);
+    
+    public abstract List<Integer> loadTopResultIdsForRunSearch(int runSearchId);
 }
