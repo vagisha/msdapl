@@ -6,12 +6,14 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class ModifiedPeptide {
+public class ModifiedPeptide    {
 
     private final Peptide peptide;
     
     private String modifiedPeptide;
     private List<PeptideModification> modifications;
+    
+    private int modifiedPeptideId;
     
     public ModifiedPeptide(Peptide peptide) {
         this.peptide = peptide;
@@ -26,6 +28,18 @@ public class ModifiedPeptide {
     
     public Peptide getPeptide() {
         return peptide;
+    }
+    
+    public int getPeptideId() {
+        return peptide.getId();
+    }
+    
+    public int getModifiedPeptideId() {
+        return modifiedPeptideId;
+    }
+    
+    public void setModifiedPeptideId(int id) {
+        this.modifiedPeptideId = id;
     }
     
     public void addModification(PeptideModification modification) {

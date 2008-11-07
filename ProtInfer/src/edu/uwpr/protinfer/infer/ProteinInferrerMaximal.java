@@ -23,7 +23,7 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
                 
                 InferredProtein<S> inferredProtein = proteinMap.get(protHit.getAccession());
                 
-                // if we have not seen this protein add a new InferredProtein to the proteinMat
+                // if we have not seen this protein add a new InferredProtein to the proteinMap
                 if (inferredProtein == null) {
                     inferredProtein = new InferredProtein<S>(protHit.getProtein());
                     PeptideEvidence<S> evidence = new PeptideEvidence<S>(psm.getPeptideHit().getPeptide());

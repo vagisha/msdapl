@@ -2,9 +2,7 @@ package edu.uwpr.protinfer.msdata;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -21,7 +19,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 
 import edu.uwpr.protinfer.SequestHit;
-import edu.uwpr.protinfer.infer.ModifiedPeptide;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
@@ -32,12 +29,8 @@ public class MsDataSearchResultsReader {
 
     private static final Logger log = Logger.getLogger(MsDataSearchResultsReader.class);
     
-    private Map<String, Peptide> peptideIds = new HashMap<String, Peptide>();
-    private Map<String, Protein> proteinIds = new HashMap<String, Protein>();
-    private int lastPeptideId = 0;
-    private int lastProteinId = 0;
     
-    public List<SequestHit> getHitsForRunSearch(int runSearchId) {
+    public List<SequestHit> getHitsForRunSearch(int runSearchId, String decoyPrefix) {
         log.info("Reading hits for runSearchId: "+runSearchId);
         
         MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
@@ -48,7 +41,7 @@ public class MsDataSearchResultsReader {
         
         SearchFileFormat format = runSearch.getSearchFileFormat();
         if (format == SearchFileFormat.SQT_NSEQ || format == SearchFileFormat.SQT_SEQ) {
-            return loadHitsForSequestSearch(runSearchId, source);
+            return loadHitsForSequestSearch(runSearchId, source, decoyPrefix);
         }
         else if (format == SearchFileFormat.SQT_PLUCID) {
             return loadHitsForProlucidSearch(runSearchId, source);
@@ -57,21 +50,21 @@ public class MsDataSearchResultsReader {
             return null;
     }
     
-    private List<SequestHit> loadHitsForSequestSearch(int runSearchId, SearchSource source) {
+    private List<SequestHit> loadHitsForSequestSearch(int runSearchId, SearchSource source, String decoyPrefix) {
         SequestSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
-        List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(runSearchId);
-        log.info("Total hits for "+runSearchId+": "+resultIds.size());
-        List<SequestHit> searchHits = new ArrayList<SequestHit>(resultIds.size());
-        for (Integer resultId: resultIds) {
-            SequestSearchResult result = resultDao.load(resultId);
+        Date start = new Date();
+        List<SequestSearchResult> resultList = resultDao.loadTopResultsForRunSearchN(runSearchId);
+        log.info("Total top hits for "+runSearchId+": "+resultList.size());
+        Date end = new Date();
+        log.info("Time: "+((end.getTime() - start.getTime())/(1000.0f)));
+        start = new Date();
+        List<SequestHit> searchHits = new ArrayList<SequestHit>(resultList.size());
+        for (SequestSearchResult result: resultList) {
             
             SequestResultData scores = result.getSequestResultData();
             int xcorrRank = scores.getxCorrRank();
             if (xcorrRank != 1)
                 continue; // we want only top hits
-            int scanId = result.getScanId();
-            int charge = result.getCharge();
-            int scanNumber = getScanNumber(scanId);
             
             // get the peptide
             PeptideHit peptHit = getPeptideHit(result.getResultPeptide());
@@ -79,48 +72,32 @@ public class MsDataSearchResultsReader {
             // get the proteins
             List<MsSearchResultProtein> msProteinList = result.getProteinMatchList();
             for (MsSearchResultProtein protein: msProteinList) {
-                Protein prot = new Protein(protein.getAccession(), 0); // don't have the nrseq database id here
+                Protein prot = new Protein(protein.getAccession(), -1);
+                if (prot.getAccession().startsWith(decoyPrefix))
+                    prot.setDecoy();
                 peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
             }
             
-            SequestHit hit = new SequestHit(source, scanNumber, charge, peptHit);
-            hit.setHitId(resultId);
-            hit.setScanId(scanId);
+//            int scanNumber = getScanNumber(scanId); THIS IS TIME CONSUMING
+            SequestHit hit = new SequestHit(source, -1, result.getCharge(), peptHit);
+            hit.setHitId(result.getId());
+            hit.setScanId(result.getScanId());
             hit.setXcorr(scores.getxCorr());
             hit.setDeltaCn(scores.getDeltaCN());
             
             searchHits.add(hit);
         }
+        end = new Date();
         log.info("Total rank 1 hits: "+searchHits.size());
+        log.info("Time: "+((end.getTime() - start.getTime())/(1000.0f)));
         return searchHits;
     }
     
-//    public void loadProteinsForHits(List<? extends PeptideSpectrumMatch<? extends SpectrumMatch>> hits) {
-//        MsSearchResultProteinDAO protDao = DAOFactory.instance().getMsProteinMatchDAO();
-//        for(PeptideSpectrumMatch<? extends SpectrumMatch> match: hits) {
-//            int resultId = match.getSpectrumMatch().getHitId();
-//            List<MsSearchResultProtein> proteins = protDao.loadResultProteins(resultId);
-//            PeptideHit peptHit = match.getPeptideHit();
-//            for (MsSearchResultProtein msProt: proteins) {
-//                Protein prot = proteinIds.get(msProt.getAccession());
-//                if (prot == null) {
-//                    prot = new Protein(msProt.getAccession(), lastProteinId++);
-//                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
-//                }
-//            }
-//        }
-//    }
-    
     private PeptideHit getPeptideHit(MsSearchResultPeptide resultPeptide) {
         String sequence = resultPeptide.getPeptideSequence();
-        Peptide peptide = peptideIds.get(sequence);
-        if (peptide == null) {
-            peptide = new Peptide(sequence, lastPeptideId++);
-            peptideIds.put(sequence, peptide);
-        }
+        Peptide peptide = new Peptide(sequence, -1);
         
         // At this point we are not adding any modifications or protein matches
-        ModifiedPeptide modPeptide = new ModifiedPeptide(peptide);
         
         // get the modifications for the peptide
 //        List<MsResultResidueMod> residueMods = resultPeptide.getResultDynamicResidueModifications();
@@ -128,7 +105,7 @@ public class MsDataSearchResultsReader {
 //            modPeptide.addModification(new PeptideModification(mod.getModifiedPosition(), mod.getModificationMass()));
 //        }
         
-        return new PeptideHit(modPeptide);
+        return new PeptideHit(peptide);
     }
 
     private List<SequestHit> loadHitsForProlucidSearch(int runSearchId, SearchSource source) {
@@ -152,7 +129,7 @@ public class MsDataSearchResultsReader {
         MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
         long start = System.currentTimeMillis();
         System.out.println("Start: "+new Date(start).toString());
-        List<SequestHit> searchHits = reader.getHitsForRunSearch(runSearchId);
+        List<SequestHit> searchHits = reader.getHitsForRunSearch(runSearchId, "Reverse_");
         long end = System.currentTimeMillis();
         System.out.println(("End: "+new Date(end).toString()));
         

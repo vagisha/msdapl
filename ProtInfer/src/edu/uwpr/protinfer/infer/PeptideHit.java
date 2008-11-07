@@ -6,26 +6,22 @@ import java.util.List;
 
 public class PeptideHit {
 
-    private ModifiedPeptide peptide;
+    private Peptide peptide;
     private List<ProteinHit> proteins;
     
-    public PeptideHit(ModifiedPeptide peptide) {
+    public PeptideHit(Peptide peptide) {
         this.peptide = peptide;
         proteins = new ArrayList<ProteinHit>();
     }
     
-    public PeptideHit(ModifiedPeptide peptide, List<ProteinHit> proteins) {
+    public PeptideHit(Peptide peptide, List<ProteinHit> proteins) {
         this(peptide);
         if (proteins != null)
             this.proteins = proteins;
     }
     
-    public ModifiedPeptide getModifiedPeptide() {
-        return peptide;
-    }
-    
     public Peptide getPeptide() {
-        return peptide.getPeptide();
+        return peptide;
     }
     
     public String getModifiedSequence() {
@@ -33,7 +29,7 @@ public class PeptideHit {
     }
     
     public String getUnmodifiedSequence() {
-        return peptide.getUnmodifiedSequence();
+        return peptide.getSequence();
     }
     
     public void addProteinHit(ProteinHit hit) {

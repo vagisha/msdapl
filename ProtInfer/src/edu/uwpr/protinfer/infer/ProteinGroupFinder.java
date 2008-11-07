@@ -38,6 +38,18 @@ public class ProteinGroupFinder {
             // TODO Auto-generated method stub
             return 0;
         }
+
+        @Override
+        public int getHitId() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public int getScanId() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
         
     }
 }

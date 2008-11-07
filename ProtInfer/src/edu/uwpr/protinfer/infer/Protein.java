@@ -25,6 +25,10 @@ public class Protein {
         return id;
     }
     
+    public void setId(int id) {
+        this.id = id;
+    }
+    
     public void setDecoy() {
         this.isDecoy = true;
     }
