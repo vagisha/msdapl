@@ -40,7 +40,7 @@ public class IDPickerExecutor {
     private static Logger log = Logger.getLogger(IDPickerExecutor.class);
     
     public  List<SequestHit> filterSearchHits(List<SequestHit> searchHits, IDPickerParams params) 
-    throws FdrCalculatorException, FilterException {
+            throws FdrCalculatorException, FilterException {
 
         FdrCalculatorIdPicker<SequestHit> calculator = new FdrCalculatorIdPicker<SequestHit>();
         calculator.separateChargeStates(true);
@@ -77,6 +77,10 @@ public class IDPickerExecutor {
 
         ProteinInferrerMaximal inferrer = new ProteinInferrerMaximal();
         List<InferredProtein<S>> allProteins = inferrer.inferProteins(searchHits);
+        
+        if (params.getMinDistinctPeptides() > 1) {
+            allProteins = filterProteins(allProteins, params.getMinDistinctPeptides());
+        }
         
         if (!params.getDoParsimonyAnalysis()) {
             return allProteins;
@@ -115,5 +119,17 @@ public class IDPickerExecutor {
             }
             return inferredProteins;
         }
+    }
+    
+    public <T extends PeptideSpectrumMatch<S>, S extends SpectrumMatch> 
+        List<InferredProtein<S>> filterProteins(List<InferredProtein<S>> allProteins, int minDistinctPeptides) {
+        
+        List<InferredProtein<S>> filteredProteins = new ArrayList<InferredProtein<S>>(allProteins.size());
+        for(InferredProtein<S> prot: allProteins) {
+           if (prot.getPeptides().size() < minDistinctPeptides)
+               continue;
+           filteredProteins.add(prot);
+        }
+        return filteredProteins;
     }
 }

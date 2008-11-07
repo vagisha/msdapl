@@ -1073,7 +1073,7 @@
 		scope="request"
 		validate="true"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="true" />
+		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
 	</action>
 	

@@ -7,7 +7,14 @@ public class IDPickerParams {
     private float decoyRatio = 1.0f;
     private int minDistinctPeptides = 2;
     private boolean doParsimonyAnalysis = true;
+    private String revDatabasePrefix = "Reverse_";
     
+    public String getDecoyPrefix() {
+        return revDatabasePrefix;
+    }
+    public void setRevDatabasePrefix(String revDatabasePrefix) {
+        this.revDatabasePrefix = revDatabasePrefix;
+    }
     public float getMaxAbsoluteFdr() {
         return maxAbsoluteFdr;
     }

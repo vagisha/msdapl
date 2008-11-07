@@ -26,9 +26,9 @@
   <TABLE CELLPADDING="no" CELLSPACING="0">
   
    <tr>
-    <td WIDTH="25%" VALIGN="top"><B>Search ID:</B></td>
+    <td WIDTH="25%" VALIGN="top"><B>Select Input Files:</B></td>
     <td WIDTH="75%" VALIGN="top">
-    	<html:text name="proteinInferenceForm" property="searchSummary.msSearchId" />
+    	<html:hidden name="proteinInferenceForm" property="searchSummary.msSearchId" />
     </td>
    </tr>
 
@@ -38,8 +38,9 @@
    				<html:checkbox name="runSearch" property="isSelected" value="true" indexed="true"/>
    			</td>
    			<td>
-   				<html:text name="runSearch" property="runSearchId" indexed="true" />
-   				<html:text name="runSearch" property="runName" indexed="true" />
+   				<html:hidden name="runSearch" property="runSearchId" indexed="true" />
+   				<html:hidden name="runSearch" property="runName" indexed="true" />
+   				<bean:write  name="runSearch" property="runName" />
    			</td>
    		</tr>
    </logic:iterate>
@@ -63,6 +64,11 @@
    <tr>
     <td WIDTH="25%" VALIGN="top">Decoy Ratio:</td>
     <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.decoyRatio" /></td>
+   </tr>
+   
+   <tr>
+    <td WIDTH="25%" VALIGN="top">Decoy Prefix:</td>
+    <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.decoyPrefix" /></td>
    </tr>
 
    <tr>

@@ -56,7 +56,34 @@ public class SearchSummary {
         private int runSearchId;
         private String runName;
         private boolean selected = false;
+        private int totalDecoyHits;
+        private int totalTargetHits;
+        private int filteredTargetHits;
         
+        public int getTotalDecoyHits() {
+            return totalDecoyHits;
+        }
+        
+        public int getTotalTargetHits() {
+            return totalTargetHits;
+        }
+
+        public void setTotalTargetHits(int totalHits) {
+            this.totalTargetHits = totalHits;
+        }
+        
+        public void setTotalDecoyHits(int totalHits) {
+            this.totalDecoyHits = totalHits;
+        }
+
+        public int getFilteredTargetHits() {
+            return filteredTargetHits;
+        }
+
+        public void setFilteredTargetHits(int filteredHits) {
+            this.filteredTargetHits = filteredHits;
+        }
+
         public RunSearch() {}
         
         public RunSearch(int runSearchId, String runName) {
