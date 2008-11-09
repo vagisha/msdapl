@@ -59,6 +59,11 @@ public class DoProteinInferenceAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
+        
+        if (request.getSession().getAttribute("inferredProteins") != null) {
+            return mapping.findForward("Success");
+        }
+        
         // User making this request
         User user = UserUtils.getUser(request);
         if (user == null) {
@@ -128,9 +133,9 @@ public class DoProteinInferenceAction extends Action {
         Date e = new Date();
         log.info("Total time: "+getTime(s, e));
         
-        request.setAttribute("inferredProteins", proteins);
-        request.setAttribute("searchSummary", searchSummary);
-        request.setAttribute("params", params);
+        request.getSession().setAttribute("inferredProteins", proteins);
+        request.getSession().setAttribute("searchSummary", searchSummary);
+        request.getSession().setAttribute("params", params);
         
         // Go!
         return mapping.findForward("Success");
