@@ -11,9 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.proteinfer.IDPickerParams;
-import org.yeastrc.proteinfer.SearchSummary;
-import org.yeastrc.proteinfer.SearchSummary.RunSearch;
+
+import edu.uwpr.protinfer.idpicker.IDPickerParams;
+import edu.uwpr.protinfer.idpicker.SearchSummary;
+import edu.uwpr.protinfer.idpicker.SearchSummary.RunSearch;
 
 /**
  * 

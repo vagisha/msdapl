@@ -20,15 +20,13 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.proteinfer.IDPickerParams;
-import org.yeastrc.proteinfer.SearchSummary;
-import org.yeastrc.proteinfer.SearchSummary.RunSearch;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+
+import edu.uwpr.protinfer.idpicker.IDPickerParams;
+import edu.uwpr.protinfer.idpicker.SearchSummary;
+import edu.uwpr.protinfer.idpicker.SearchSummary.RunSearch;
 
 /**
  * 

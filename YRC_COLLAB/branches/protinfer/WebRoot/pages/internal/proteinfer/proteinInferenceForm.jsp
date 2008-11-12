@@ -15,16 +15,14 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="Protein Inference" centered="true" width="750">
+<yrcwww:contentbox title="IDPicker" centered="true" width="750" scheme="ms">
 
  <CENTER>
   <html:form action="doProteinInference" method="post" styleId="form1">
   <bean:define name="proteinInferenceForm" property="idPickerParams" id="idPickerParam"></bean:define>
   <bean:define name="proteinInferenceForm" property="searchSummary" id="searchSummary"></bean:define>
     
-  <yrcwww:contentbox title="Input Files" centered="true" width="700">
-  <TABLE CELLPADDING="no" CELLSPACING="0">
-  
+  <TABLE CELLPADDING="no" CELLSPACING="0" width="75%">
    <tr>
     <td WIDTH="25%" VALIGN="top"><B>Select Input Files:</B></td>
     <td WIDTH="75%" VALIGN="top">
@@ -44,13 +42,12 @@
    			</td>
    		</tr>
    </logic:iterate>
-   
   </TABLE>
-  </yrcwww:contentbox>
 
-  <yrcwww:contentbox title="IDPicker Parameters" centered="true" width="700">
-  <TABLE CELLPADDING="no" CELLSPACING="0">
+  <br>
   
+  <TABLE CELLPADDING="no" CELLSPACING="0" width="75%">
+  	<tr><td WIDTH="25%" VALIGN="top" colspan="2"><B>IDPicker Parameters:</B></td></tr>
    <tr>
     <td WIDTH="25%" VALIGN="top">Max. Absolute FDR:</td>
     <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.maxAbsoluteFdr" /></td>
@@ -82,14 +79,17 @@
    </tr>
    
   </TABLE>
-  </yrcwww:contentbox>
+  <br>
   
- <P><NOBR>
- <html:submit value="Run Protein Inference" styleClass="button" />
+ <NOBR>
+ <html:submit value="Run IDPicker" styleClass="button" />
  <input type="button" class="button" onclick="javascript:onCancel(<bean:write name="searchSummary" property="msSearchId"/>);" value="Cancel"/>
  </NOBR>
  
-  </html:form>
+ 
+</html:form>
+</CENTER>
+</yrcwww:contentbox>
 
 <script type="text/javascript">
 	function onCancel(projectID) {
@@ -97,8 +97,5 @@
 	}
 </script>
 
- </CENTER>
-
-</yrcwww:contentbox>
 
 <%@ include file="/includes/footer.jsp" %>
