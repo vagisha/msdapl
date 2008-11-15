@@ -14,6 +14,8 @@ public class Peptide {
     private List<PeptideModification> modifications;
     
     private int id;
+    private int peptideGroupId;
+    
     
     /**
      * @param sequence
@@ -37,8 +39,18 @@ public class Peptide {
         this.id = id;
     }
     
+    public int getPeptideGroupId() {
+        return peptideGroupId;
+    }
+
+    public void setPeptideGroupId(int peptideGroupId) {
+        this.peptideGroupId = peptideGroupId;
+    }
+    
     public void addModification(PeptideModification modification) {
         modifications.add(modification);
+        // if the modified sequence has been initialized, set it to null
+        modifiedSequence = null;
     }
     
     /**
@@ -59,7 +71,7 @@ public class Peptide {
             sortModifications();
             for (PeptideModification mod: modifications) {
                 seq.append(sequence.subSequence(lastIdx, mod.getModifiedIndex()+1)); // get sequence up to an including the modified position.
-                seq.append("("+mod.getMassShift()+")");
+                seq.append("["+Math.round(mod.getMassShift().doubleValue())+"]");
                 lastIdx = mod.getModifiedIndex()+1;
             }
             if (lastIdx < sequence.length())

@@ -9,6 +9,7 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsRunSearch;
@@ -51,26 +52,42 @@ public class MsDataSearchResultsReader {
     }
     
     private List<SequestHit> loadHitsForSequestSearch(int runSearchId, SearchSource source, String decoyPrefix) {
+        
         SequestSearchResultDAO resultDao = DAOFactory.instance().getSequestResultDAO();
+        MsSearchResultProteinDAO protDao = DAOFactory.instance().getMsProteinMatchDAO();
+        
+        try {
+            Class.forName( "com.mysql.jdbc.Driver" );
+        }
+        catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        log.info("Loading top hits...");
+        Date s = new Date();
         Date start = new Date();
         List<SequestSearchResult> resultList = resultDao.loadTopResultsForRunSearchN(runSearchId);
         log.info("Total top hits for "+runSearchId+": "+resultList.size());
         Date end = new Date();
         log.info("Time: "+((end.getTime() - start.getTime())/(1000.0f)));
+        
         start = new Date();
         List<SequestHit> searchHits = new ArrayList<SequestHit>(resultList.size());
         for (SequestSearchResult result: resultList) {
             
             SequestResultData scores = result.getSequestResultData();
             int xcorrRank = scores.getxCorrRank();
-            if (xcorrRank != 1)
-                continue; // we want only top hits
+//            if (xcorrRank != 1)
+//                continue; // we want only top hits
             
             // get the peptide
             PeptideHit peptHit = getPeptideHit(result.getResultPeptide());
             
             // get the proteins
-            List<MsSearchResultProtein> msProteinList = result.getProteinMatchList();
+//            List<MsSearchResultProtein> msProteinList = result.getProteinMatchList();
+            // need to load results separately
+            List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(result.getId());
+           
             for (MsSearchResultProtein protein: msProteinList) {
                 Protein prot = new Protein(protein.getAccession(), -1);
                 if (prot.getAccession().startsWith(decoyPrefix))
@@ -88,8 +105,10 @@ public class MsDataSearchResultsReader {
             searchHits.add(hit);
         }
         end = new Date();
+        
         log.info("Total rank 1 hits: "+searchHits.size());
-        log.info("Time: "+((end.getTime() - start.getTime())/(1000.0f)));
+        log.info("Time: "+((float)(end.getTime() - start.getTime())/(1000.0f)));
+        log.info("Total time: "+((float)(end.getTime() - s.getTime())/(1000.0f)));
         return searchHits;
     }
     
@@ -125,14 +144,17 @@ public class MsDataSearchResultsReader {
     }
     
     public static void main(String[] args) {
-        int runSearchId = 118;
+        int runSearchId = 10;
         MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
-        long start = System.currentTimeMillis();
-        System.out.println("Start: "+new Date(start).toString());
-        List<SequestHit> searchHits = reader.getHitsForRunSearch(runSearchId, "Reverse_");
-        long end = System.currentTimeMillis();
-        System.out.println(("End: "+new Date(end).toString()));
+        for (int i = 0; i < 10; i++) {
+            long start = System.currentTimeMillis();
+            System.out.println("Start: "+new Date(start).toString());
+            List<SequestHit> searchHits = reader.getHitsForRunSearch(runSearchId, "Reverse_");
+            long end = System.currentTimeMillis();
+            System.out.println(("End: "+new Date(end).toString()));
+            System.out.println("Number of hits found: "+searchHits.size());
+        }
         
-        System.out.println("Number of hits found: "+searchHits.size());
+        
     }
 }

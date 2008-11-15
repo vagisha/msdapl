@@ -4,8 +4,12 @@ package edu.uwpr.protinfer.infer;
 public class ProteinHit {
 
     private Protein protein;
-    private char preResidue; 
-    private char postResidue;
+    private char preResidue = '\u0000'; 
+    private char postResidue = '\u0000';
+    
+    public ProteinHit(Protein protein) {
+        this.protein = protein;
+    }
     
     public ProteinHit(Protein protein, char preResidue, char postResidue) {
         this.protein = protein;

@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class InferredProtein <T extends SpectrumMatch> {
 
-    private boolean accepted;
     private double score;
     
     private Protein protein;
@@ -21,21 +20,46 @@ public class InferredProtein <T extends SpectrumMatch> {
     }
     
     public void addPeptideEvidence(PeptideEvidence<T> peptideEv) {
-        if (peptideEvList.containsKey(peptideEv.getPeptideSeq())) {
-            PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getPeptideSeq());
+        PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getModifiedPeptideSeq());
+        if (evidence != null) {
             evidence.addSpectrumMatchList(evidence.getSpectrumMatchList());
         }
         else {
-            this.peptideEvList.put(peptideEv.getPeptideSeq(), peptideEv);
+            this.peptideEvList.put(peptideEv.getModifiedPeptideSeq(), peptideEv);
         }
     }
     
     public PeptideEvidence<T> getPeptideEvidence(Peptide peptide) {
-        return peptideEvList.get(peptide.getSequence());
+        return peptideEvList.get(peptide.getModifiedSequence());
     }
     
-    public PeptideEvidence<T> getPeptideEvidence(String peptideSequence) {
-        return peptideEvList.get(peptideSequence);
+    public int getPeptideEvidenceCount() {
+        return peptideEvList.size();
+    }
+    
+    public int getUniquePeptideEvidenceCount() {
+        int cnt = 0;
+        for(PeptideEvidence<T> pev: peptideEvList.values()) {
+            if(pev.getProteinMatchCount() == 1)
+                cnt++;
+        }
+        return cnt;
+    }
+    
+    public int getSpectralEvidenceCount() {
+        int count = 0;
+        for(PeptideEvidence<T> ev: peptideEvList.values()) {
+            count += ev.getSpectrumMatchCount();
+        }
+        return count;
+    }
+    
+    /**
+     * @param modifiedPeptideSequence -- modified sequence
+     * @return
+     */
+    public PeptideEvidence<T> getPeptideEvidence(String modifiedPeptideSequence) {
+        return peptideEvList.get(modifiedPeptideSequence);
     }
     
     public List<PeptideEvidence<T>> getPeptides() {
@@ -48,16 +72,16 @@ public class InferredProtein <T extends SpectrumMatch> {
         return protein;
     }
     
+    public int getProteinId() {
+        return protein.getId();
+    }
+    
     public String getAccession() {
         return protein.getAccession();
     }
 
-    public boolean isAccepted() {
-        return accepted;
-    }
-
-    public void setAccepted(boolean accepted) {
-        this.accepted = accepted;
+    public boolean getIsAccepted() {
+        return protein.isAccepted();
     }
 
     public double getScore() {
@@ -70,5 +94,9 @@ public class InferredProtein <T extends SpectrumMatch> {
 
     public int getProteinGroupId() {
         return protein.getProteinGroupId();
+    }
+    
+    public int getProteinClusterId() {
+        return protein.getProteinClusterId();
     }
 }

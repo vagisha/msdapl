@@ -33,10 +33,18 @@ public class ProteinVertex extends Vertex<ProteinVertex> {
         return proteins;
     }
     
+    public String getProteinStringLabel() {
+        StringBuilder buf = new StringBuilder();
+        for(Protein protein: proteins) 
+            buf.append(protein.getAccession()+"_");
+        buf.deleteCharAt(buf.length() - 1);
+        return buf.toString();
+    }
+    
     public void setComponentIndex(int index) {
         super.setComponentIndex(index);
         for(Protein prot: proteins)
-            prot.setProteinGroupId(index);
+            prot.setProteinClusterId(index);
     }
     
     @Override

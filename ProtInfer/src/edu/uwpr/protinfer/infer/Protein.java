@@ -6,6 +6,7 @@ public class Protein {
     private int id; // could be a database id
     private boolean isDecoy = false;
     private boolean isAccepted = false;
+    private int proteinClusterId;
     private int proteinGroupId;
     
     /**
@@ -45,12 +46,20 @@ public class Protein {
         this.isAccepted = isAccepted;
     }
     
-    public void setProteinGroupId(int proteinGroupId) {
-        this.proteinGroupId = proteinGroupId;
+    public void setProteinClusterId(int proteinClusterId) {
+        this.proteinClusterId = proteinClusterId;
     }
 
+    public int getProteinClusterId() {
+        return proteinClusterId;
+    }
+    
     public int getProteinGroupId() {
         return proteinGroupId;
+    }
+
+    public void setProteinGroupId(int proteinGroupId) {
+        this.proteinGroupId = proteinGroupId;
     }
     
     public String toString() {

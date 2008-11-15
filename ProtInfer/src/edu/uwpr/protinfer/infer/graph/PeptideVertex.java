@@ -29,6 +29,14 @@ public class PeptideVertex extends Vertex<PeptideVertex> {
         return peptides;
     }
     
+    public String getPeptideStringLabel() {
+        StringBuilder buf = new StringBuilder();
+        for(Peptide peptide: peptides) 
+            buf.append(peptide.getModifiedSequence()+"_");
+        buf.deleteCharAt(buf.length() - 1);
+        return buf.toString();
+    }
+    
     @Override
     public PeptideVertex combineWith(PeptideVertex v) {
         List<Peptide> allPeptides = new ArrayList<Peptide>(peptides.size() + v.getPeptides().size());

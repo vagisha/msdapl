@@ -7,7 +7,15 @@ public class IDPickerParams {
     private float decoyRatio = 1.0f;
     private int minDistinctPeptides = 2;
     private boolean doParsimonyAnalysis = true;
+    private String decoyPrefix = "";
     
+    
+    public String getDecoyPrefix() {
+        return decoyPrefix;
+    }
+    public void setDecoyPrefix(String decoyPrefix) {
+        this.decoyPrefix = decoyPrefix;
+    }
     public float getMaxAbsoluteFdr() {
         return maxAbsoluteFdr;
     }

@@ -28,7 +28,7 @@ public class PeptideHit {
         return peptide.getModifiedSequence();
     }
     
-    public String getUnmodifiedSequence() {
+    public String getSequence() {
         return peptide.getSequence();
     }
     

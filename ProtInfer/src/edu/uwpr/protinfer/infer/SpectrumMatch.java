@@ -11,7 +11,7 @@ public interface SpectrumMatch {
     public abstract int getCharge();
     
     /**
-     * Returns the sequence of the peptide for the spectrum match.  Sequence includes any modifications.
+     * Returns the sequence of the peptide for the spectrum match.
      * @return
      */
     public abstract String getPeptideSequence();

@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.assemble.idpicker;
+package edu.uwpr.protinfer.idpicker;
 
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -18,8 +18,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.FilterScore;
 import edu.uwpr.protinfer.SequestHit;
+import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.infer.ProteinHit;
@@ -128,8 +128,8 @@ public class IdPickerXmlParser {
             if (prHit.getAccession().startsWith("rev_"))
                 return false; // this is a hit to the decoy database;
         }
-        SequestHit hit = new SequestHit(source, scan, charge, 0.0, pHit);
-        hit.getSpectrumMatch().setFilterScore(new FilterScore("fdr", fdr, true));
+        SequestHit hit = new SequestHit(source, scan, charge, pHit);
+        hit.getSpectrumMatch().setFdr(fdr);
         searchHits.add(hit);
         return true; // this is a hit to the target database;
     }
@@ -164,7 +164,7 @@ public class IdPickerXmlParser {
                         sequence = reader.getAttributeValue(i);
                     }
                 }
-                hit = new PeptideHit(sequence);
+                hit = new PeptideHit(new Peptide(sequence, id));
                 lastId = id;
             }
             else if (isStartLocus(evtType)) {
@@ -275,8 +275,8 @@ public class IdPickerXmlParser {
             List<SequestHit> acceptedHits) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
         for (SequestHit hit: acceptedHits) {
-            writer.write(hit.getScanNumber()+"\t"+hit.getCharge()+"\t"+hit.getScore()
-                    +"\t"+hit.getSpectrumMatch().getFilterScore().getScore());
+            writer.write(hit.getScanNumber()+"\t"+hit.getCharge()+"\t"+hit.getXcorr()
+                    +"\t"+hit.getSpectrumMatch().getFdr());
             writer.write("\t"+hit.getPeptideHit().getModifiedSequence());
             StringBuilder buf = new StringBuilder();
             for (ProteinHit p: hit.getPeptideHit().getProteinList()) {

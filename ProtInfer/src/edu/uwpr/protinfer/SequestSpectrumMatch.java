@@ -2,8 +2,6 @@ package edu.uwpr.protinfer;
 
 import java.math.BigDecimal;
 
-import edu.uwpr.protinfer.filter.fdr.FdrFilterable;
-import edu.uwpr.protinfer.idpicker.FdrCandidateHasCharge;
 import edu.uwpr.protinfer.infer.SearchSource;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
 
@@ -35,12 +33,20 @@ public class SequestSpectrumMatch implements SpectrumMatch {
         return this.xcorr;
     }
     
+    public double getXcorrRounded() {
+        return round(xcorr.doubleValue());
+    }
+    
     public void setXcorr(BigDecimal xcorr) {
         this.xcorr = xcorr;
     }
     
     public BigDecimal getDeltaCn() {
         return deltaCn;
+    }
+    
+    public double getDeltaCnRounded() {
+        return round(deltaCn.doubleValue());
     }
 
     public void setDeltaCn(BigDecimal deltaCn) {
@@ -84,6 +90,10 @@ public class SequestSpectrumMatch implements SpectrumMatch {
     public double getFdr() {
         return fdr;
     }
+    
+    public double getFdrRounded() {
+        return round(fdr);
+    }
 
     public void setFdr(double fdr) {
         this.fdr = fdr;
@@ -99,5 +109,9 @@ public class SequestSpectrumMatch implements SpectrumMatch {
 
     public String getPeptideSequence() {
         return this.peptideSequence;
+    }
+    
+    private double round(double toRound) {
+        return Math.round((toRound*10000.0))/(10000.0);
     }
 }

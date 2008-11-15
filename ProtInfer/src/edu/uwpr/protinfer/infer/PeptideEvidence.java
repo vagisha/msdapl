@@ -8,6 +8,8 @@ public class PeptideEvidence <T extends SpectrumMatch>{
     
     private Peptide peptide;
     private List<T> spectrumMatchList;
+    private int numProteinMatch = 0;
+    private double bestFdr = 1.0;
     
     public PeptideEvidence(Peptide peptide) {
         this.peptide = peptide;
@@ -32,6 +34,10 @@ public class PeptideEvidence <T extends SpectrumMatch>{
         return spectrumMatchList;
     }
     
+    public int getSpectrumMatchCount() {
+        return spectrumMatchList.size();
+    }
+    
     /**
      * Returns the sequence of the peptide without modifications;
      * @return
@@ -40,12 +46,33 @@ public class PeptideEvidence <T extends SpectrumMatch>{
         return peptide.getSequence();
     }
     
+    /**
+     * Returns the sequence of the peptide WITH modifications;
+     * @return
+     */
+    public String getModifiedPeptideSeq() {
+        return peptide.getSequence();
+    }
+    
     public Peptide getPeptide() {
         return peptide;
     }
     
-    public int getMatchSpectraCount() {
-        return spectrumMatchList.size();
+    public int getProteinMatchCount() {
+        return this.numProteinMatch;
+    }
+    
+    public void setProteinMatchCount(int count) {
+        this.numProteinMatch = count;
+    }
+    
+    public double getBestFdr() {
+        return bestFdr;
+    }
+    
+    public void setBestFdr(double fdr) {
+        fdr = Math.round((fdr*100.0))/100.0;
+        this.bestFdr = fdr;
     }
     
     public String toString() {

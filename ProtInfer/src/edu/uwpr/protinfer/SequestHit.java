@@ -128,7 +128,7 @@ public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch>, F
     }
 
     @Override
-    public String getPeptideSequence() {
+    public String getModifiedPeptideSequence() {
         return peptide.getModifiedSequence();
     }
 
