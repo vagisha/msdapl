@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinferPeptide"> 
+
+	<typeAlias alias="ProteinferPeptide" type="edu.uwpr.protinfer.database.dto.ProteinferPeptide"/>
+	
+	<resultMap class="ProteinferPeptide" id="pinferPeptideResult">
+		<result property="id" column="id" />
+		<result property="proteinferId" column="pinferID" nullValue="0"/>
+		<result property="groupId" column="groupID" nullValue="0"/>
+		<result property="sequence" column="sequence"/>
+		<result property="spectrumMatchList" 
+				select="ProteinferSpectrumMatch.selectMatchesForPeptide"
+				column="id"/>
+	</resultMap>
+	
+	<parameterMap class="ProteinferPeptide" id="pinferPeptideParam">
+		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="sequence" jdbcType="VARCHAR" />
+	</parameterMap>
+	
+	<select id="select" resultMap="pinferPeptideResult" parameterClass="Integer">
+    	SELECT * FROM ProteinferPeptide WHERE id=#id#
+    </select>
+    
+    <select id="selectPeptideIdsForProtein" resultClass="Integer" parameterClass="Integer">
+    	SELECT pinferPeptideID FROM ProteinferPeptideProteinMatch WHERE pinferProteinID = #id#
+    </select>
+    
+    <select id="selectPeptidesForProtein" resultMap="pinferPeptideResult" parameterClass="Integer">
+    	SELECT p.id, p.pinferID, p.groupID, p.sequence 
+    	FROM  ProteinferPeptide as p, ProteinferPeptideProteinMatch as protMatch 
+    	WHERE p.id = protMatch.pinferPeptideID
+    	AND protMatch.pinferProteinID = #id#
+    </select>
+    
+    <select id="selectPeptideIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM ProteinferPeptide WHERE pinferID=#id#
+    </select>
+    
+    <select id="selectPeptidesForProteinferRun" resultMap="pinferPeptideResult" parameterClass="Integer">
+    	SELECT * FROM ProteinferPeptide WHERE pinferID=#id#
+    </select>
+    
+    <select id="getMatchingPeptideId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM ProteinferPeptide WHERE pinferID=#pinferId# AND sequence=#sequence#
+    </select>
+    
+    <insert id="insert" parameterMap="pinferPeptideParam">
+    	INSERT INTO ProteinferPeptide (
+    	pinferID,
+    	groupID,
+    	sequence) 
+    	VALUES (?,?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <insert id="insertPeptideProteinMatch" parameterClass="java.util.Map">
+    	INSERT INTO ProteinferPeptideProteinMatch (
+    	pinferProteinID,
+    	pinferPeptideID) 
+    	VALUES (#pinferProteinId#, #pinferPeptideId#)
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM ProteinferPeptide WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

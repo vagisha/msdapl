@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinferRun"> 
+
+	<typeAlias alias="ProteinferRun" type="edu.uwpr.protinfer.database.dto.ProteinferRun"/>
+	
+	<typeAlias alias="ProteinferStatusTypeHandler" 
+				type="edu.uwpr.protinfer.database.dao.ProteinferRunDAO$ProteinferStatusTypeHandler"/>
+		
+	<resultMap class="ProteinferRun" id="pinferRunResult">
+		<result property="id" column="id" />
+		<result property="status" column="status" typeHandler="ProteinferStatusTypeHandler"/>
+		<result property="dateCreated" column="accession" />
+		<result property="dateCompleted" column="dateCompleted"/>
+		<result property="filters" 
+				select="ProteinferFilter.selectFiltersForRun"
+				column="id"/>
+		<result property="runSearchIds" 
+				select="ProteinferInput.selectRunSearchIds"
+				column="id"/>
+	</resultMap>
+	
+	<parameterMap class="ProteinferRun" id="pinferRunParam">
+		<parameter property="status" jdbcType="CHAR" typeHandler="ProteinferStatusTypeHandler"/>
+	</parameterMap>
+	
+	<select id="select" resultMap="pinferRunResult" parameterClass="Integer">
+    	SELECT * FROM ProteinferRun WHERE id=#id#
+    </select>
+    
+    <select id="selectPinferIdsForRunSearchIds" resultClass="Integer" parameterClass="String">
+    	SELECT DISTINCT pinferID FROM ProteinferInpput WHERE runSearchID in $runSearchIds$
+    </select>
+    
+    <update id="updateStatus" parameterClass="java.util.Map">
+    	UPDATE ProteinferRun SET status=#status# where id=#pinferId#
+    </update>
+    
+    <update id="updateDateCompleted" parameterClass="java.util.Map">
+    	UPDATE ProteinferRun SET dateCompleted=#dateCompleted# where id=#pinferId#
+    </update>
+    
+    <insert id="insert" parameterMap="pinferRunParam">
+    	INSERT INTO ProteinferRun (
+    	status)
+    	VALUES (?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM ProteinferRun WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

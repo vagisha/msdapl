@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinferInput"> 
+
+    <select id="selectRunSearchIds" resultClass="Integer" parameterClass="Integer">
+    	SELECT runSearchID FROM ProteinferInput WHERE pinferID = #id#
+    </select>
+    
+    <insert id="saveProteinferInputIds" parameterClass="String">
+    	INSERT INTO ProteinferInput (
+    	pinferID,
+    	runSearchID)
+    	VALUES $values$
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM ProteinferInput WHERE pinferID=#id#		    
+    </delete>
+    
+</sqlMap>

@@ -16,4 +16,7 @@ public interface SpectrumMatch {
      */
     public abstract String getPeptideSequence();
     
+    public abstract double getFdr();
+    
+    public abstract boolean isAccepted();
 }

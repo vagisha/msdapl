@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinferFilter"> 
+
+	<typeAlias alias="ProteinferFilter" type="edu.uwpr.protinfer.database.dto.ProteinferFilter"/>
+	
+	<resultMap class="ProteinferFilter" id="pinferFilterResult">
+		<result property="id" column="id" />
+		<result property="proteinferId" column="pinferID" nullValue="0"/>
+		<result property="filterName" column="filterName"/>
+		<result property="filterValue" column="value"/>
+	</resultMap>
+	
+	<parameterMap class="ProteinferFilter" id="pinferFilterParam">
+		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="filterName" jdbcType="VARCHAR" />
+		<parameter property="filterValue" jdbcType="VARCHAR" />
+	</parameterMap>
+	
+    <select id="selectFiltersForRun" resultMap="pinferFilterResult" parameterClass="Integer">
+    	SELECT * FROM ProteinferFilter WHERE pinferID = #id#
+    </select>
+    
+    <insert id="insert" parameterMap="pinferFilterParam">
+    	INSERT INTO ProteinferFilter (
+    	pinferID,
+    	filterName,
+    	value) 
+    	VALUES (?,?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM ProteinferFilter WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>
