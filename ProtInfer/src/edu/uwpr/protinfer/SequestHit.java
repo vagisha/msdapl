@@ -59,6 +59,10 @@ public class SequestHit implements PeptideSpectrumMatch<SequestSpectrumMatch>, F
         spectrumMatch.setScanId(scanId);
     }
 
+    public void setScanNumber(int scanNumber) {
+        spectrumMatch.setScanNumber(scanNumber);
+    }
+    
     public int getHitId() {
         return spectrumMatch.getHitId();
     }

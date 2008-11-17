@@ -51,7 +51,7 @@ public class PeptideEvidence <T extends SpectrumMatch>{
      * @return
      */
     public String getModifiedPeptideSeq() {
-        return peptide.getSequence();
+        return peptide.getModifiedSequence();
     }
     
     public Peptide getPeptide() {

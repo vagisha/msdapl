@@ -21,10 +21,7 @@ public class InferredProtein <T extends SpectrumMatch> {
     
     public void addPeptideEvidence(PeptideEvidence<T> peptideEv) {
         PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getModifiedPeptideSeq());
-        if (evidence != null) {
-            evidence.addSpectrumMatchList(evidence.getSpectrumMatchList());
-        }
-        else {
+        if (evidence == null) {
             this.peptideEvList.put(peptideEv.getModifiedPeptideSeq(), peptideEv);
         }
     }

@@ -81,6 +81,10 @@ public class Peptide {
         return modifiedSequence;
     }
     
+    public int getModificationCount() {
+        return this.modifications.size();
+    }
+    
     private void sortModifications() {
         Collections.sort(modifications, new Comparator<PeptideModification>(){
             public int compare(PeptideModification o1, PeptideModification o2) {

@@ -61,6 +61,10 @@ public class SequestSpectrumMatch implements SpectrumMatch {
         return scanNumber;
     }
     
+    public void setScanNumber(int scanNumber) {
+        this.scanNumber = scanNumber;
+    }
+    
     public SearchSource getSearchSource() {
         return source;
     }

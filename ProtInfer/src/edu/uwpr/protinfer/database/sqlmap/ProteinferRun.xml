@@ -30,7 +30,7 @@
     </select>
     
     <select id="selectPinferIdsForRunSearchIds" resultClass="Integer" parameterClass="String">
-    	SELECT DISTINCT pinferID FROM ProteinferInpput WHERE runSearchID in $runSearchIds$
+    	SELECT DISTINCT pinferID FROM ProteinferInput WHERE runSearchID in $runSearchIds$
     </select>
     
     <update id="updateStatus" parameterClass="java.util.Map">

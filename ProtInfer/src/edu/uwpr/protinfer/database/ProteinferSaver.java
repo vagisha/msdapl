@@ -16,6 +16,7 @@ import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.SearchSummary;
+import edu.uwpr.protinfer.idpicker.SearchSummary.RunSearch;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
@@ -48,8 +49,8 @@ public class ProteinferSaver {
         
         // save the input runSearchIDs
         List<Integer> runSearchIdList = new ArrayList<Integer>();
-        runSearchIdList.add(10);
-        runSearchIdList.add(20);
+        for(RunSearch rs: searchSummary.getRunSearchList())
+            runSearchIdList.add(rs.getRunSearchId());
         inputDao.saveProteinferInput(pinferId, runSearchIdList);
         
         // save the results
@@ -79,19 +80,16 @@ public class ProteinferSaver {
                 if(pinferPeptideId == 0) {
                     ProteinferPeptide peptide = new ProteinferPeptide(pinferId, pev.getPeptide().getPeptideGroupId(), pev.getModifiedPeptideSeq());
                     pinferPeptideId = peptDao.saveProteinferPeptide(pinferProteinId, peptide);
+                    
+                    // save all the spectrum matches for the peptide
+                    for(SpectrumMatch psm: pev.getSpectrumMatchList()) {
+                        ProteinferSpectrumMatch match = new ProteinferSpectrumMatch(pinferPeptideId, psm.getHitId(), psm.getFdr());
+                        specDao.saveSpectrumMatch(match);
+                    }
                 }
                 // link the protein and peptide
                 peptDao.saveProteinferPeptideProteinMatch(pinferProteinId, pinferPeptideId);
-                
-                // save all the spectrum matches for the peptide
-                List<ProteinferSpectrumMatch> spectrumMatchList = new ArrayList<ProteinferSpectrumMatch>();
-                for(SpectrumMatch psm: pev.getSpectrumMatchList()) {
-                    ProteinferSpectrumMatch match = new ProteinferSpectrumMatch(pinferPeptideId, psm.getHitId(), psm.getFdr());
-                    spectrumMatchList.add(match);
-                }
-                specDao.saveSpectrumMatches(spectrumMatchList);
             }
         }
-        
     }
 }
