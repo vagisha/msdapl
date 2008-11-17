@@ -1,3 +1,15 @@
+<%@page import="edu.uwpr.protinfer.infer.InferredProtein"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.Collections"%>
+<%@page import="java.util.Comparator"%>
+<%@page import="java.util.Map"%>
+<%@page import="edu.uwpr.protinfer.infer.PeptideEvidence"%>
+<%@page import="java.util.HashSet"%>
+<%@page import="java.util.Set"%>
+<%@page import="edu.uwpr.protinfer.idpicker.InferredProteinGroup"%>
+<%@page import="edu.uwpr.protinfer.idpicker.InferredPeptideGroup"%>
+<%@page import="edu.uwpr.protinfer.SequestSpectrumMatch"%>
+
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -7,6 +19,25 @@
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js" ></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.tabs.js"></script>
 <link rel="stylesheet" href="/yrc/js/jquery.ui-1.6rc2/themes/flora/flora.tabs.css" type="text/css" >
+
+<%
+	List<InferredProtein> inferredProteins = (List<InferredProtein>)request.getSession().getAttribute("inferredProteins");
+    Collections.sort(inferredProteins, new Comparator<InferredProtein>() {
+    	public int compare(InferredProtein p1, InferredProtein p2) {
+       		return Integer.valueOf(p1.getProteinClusterId()).compareTo(p2.getProteinClusterId());
+       	}
+ 	});
+    int maxCluster = inferredProteins.get(inferredProteins.size() - 1).getProteinClusterId();
+    
+    System.out.println("Max Clusters: "+maxCluster);
+    
+    Map<Integer, InferredProteinGroup<SequestSpectrumMatch>> protGroupList = 
+    		(Map<Integer, InferredProteinGroup<SequestSpectrumMatch>>)request.getSession().getAttribute("protGroupList");
+    Map<Integer, InferredPeptideGroup<SequestSpectrumMatch>> peptGroupList = 
+    	   	(Map<Integer, InferredPeptideGroup<SequestSpectrumMatch>>)request.getSession().getAttribute("peptGroupList");
+    Map<Integer, Set<Integer>> proteinClusterIds = 
+    		(Map<Integer, Set<Integer>>)request.getSession().getAttribute("proteinClusterIds");
+%>
 
 
 <script>
@@ -25,22 +56,38 @@
   	$(".grp_table  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
   });
   
-  $(document).ready(function() {
-  	$(".ajaxbutton").click(function() {
-  		var $button = $(this);
-  		var accession = $(this).attr("id");
-  		alert("Sending request for accession "+accession);
-  		var html = $.ajax({
-  			url: "proteinDetails.do?accession="+accession,
-  			async: false
- 		}).responseText;
- 		
- 		alert("Got response: "+html+" "+$button);
- 		//$(button).attr("disabled", "disabled");
- 		$(".protsequence").html(html);
- 		//$(button).next("div").html(html);
-  	});
-  });
+  
+  function toggleProteinSequence (nrseqid, peptides) {
+  		var button = $("#protseqbutton_"+nrseqid);
+  		
+  		if(button.text() == "View Protein Sequence") {
+  			if($("#protsequence_"+nrseqid).html().length == 0) {
+  				alert("Sending request for: "+nrseqid+"; peptides: "+peptides);
+  				var html = $.ajax({
+  					url: "proteinSequence.do?nrseqid="+nrseqid+"&peptides="+peptides,
+  					async: false
+ 				}).responseText;
+ 				//alert("Got response: "+html);
+ 				html = "<pre>"+html+"</pre>";
+ 				$("#protsequence_"+nrseqid).html(html);
+ 			}
+ 			button.text("Hide Protein Sequence");
+ 			$("#protsequence_"+nrseqid).show();
+ 		}
+ 		else {
+ 			button.text("View Protein Sequence");
+ 			$("#protsequence_"+nrseqid).hide();
+ 		}
+  }
+  
+  function viewSpectrum (scanId, hitId) {
+  		alert("View spectrum for "+scanId+"; hit: "+hitId);
+  		var winHeight = 500
+		var winWidth = 970;
+		var doc = "/yrc/viewSpectrum.do?scanID="+scanId+"&runSearchResultID="+hitId;
+		//alert(doc);
+		window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
+  }
   
   function showProteinCluster(proteinClusterIdx) {
   
@@ -53,7 +100,6 @@
   }
   
   function showProteinDetails(proteinId) {
-  	$(".protsequence").html("");
   	// first hide all divs 
   	$(".protdetail_prot").hide();
   	// show the relevant one
@@ -458,11 +504,22 @@
 				<br><b><font size="2px" color="black">Protein: <%=prot.getAccession() %></font></b><br><br>
 				
 				<!-- Placeholder for where the protein sequence will be displayed via an ajax call -->
-				<button class="ajaxbutton" id="<%=prot.getAccession()%>">Protein Sequence</button>
+				<%
+					StringBuilder peptides = new StringBuilder();
+					List<PeptideEvidence> pevList = prot.getPeptides();
+					for(PeptideEvidence pev: pevList) {
+						peptides.append(","+pev.getPeptideSeq());
+					}
+					if(peptides.length() > 0)
+						peptides.deleteCharAt(0);
+				 %>
+				<button onclick="toggleProteinSequence(<%=prot.getProteinId() %>, '<%=peptides.toString() %>')"
+						id="protseqbutton_<%=prot.getProteinId() %>">View Protein Sequence</button>
 				<br>
-				<div class="protsequence">
+				<table  align="center" width="90%">
+					<tr><td style="background-color: #D4FECA;" id="protsequence_<%=prot.getProteinId() %>"></td></tr>
+				</table>
 					
-				</div>
 				<br><br>
 				<table width="95%" >
 				<tr>
@@ -472,7 +529,7 @@
 					<th width="10%"><b><font size="2pt">Best FDR</font></b></th>
 					<th width="10%"><b><font size="2pt">Unique</b></th>
 				</tr>
-				<%	List<PeptideEvidence> pevList = prot.getPeptides();
+				<%	//List<PeptideEvidence> pevList = prot.getPeptides();
 					for(PeptideEvidence pev: pevList) { %>
 					<tr>
 					<td><%=pev.getPeptide().getPeptideGroupId() %></td>
@@ -487,24 +544,24 @@
 					<table align="center" width="70%" 
 						   style="border: 1px dashed gray; border-spacing: 4px; margin-top: 6px; margin-bottom: 6px;" >
 						<tr>
-							<td>Scan Number</td>
-							<td>Assumed Charge</td>
-							<td>XCorr</td>
-							<td>DeltaCN</td>
-							<td>FDR</td>
-							<td>Spectrum</td>
+							<td style="text-decoration: underline;">Scan Number</td>
+							<td style="text-decoration: underline;">Assumed Charge</td>
+							<td style="text-decoration: underline;">XCorr</td>
+							<td style="text-decoration: underline;">DeltaCN</td>
+							<td style="text-decoration: underline;">FDR</td>
+							<td style="text-decoration: underline;">Spectrum</td>
 						</tr>
 						<%
 							List<SequestSpectrumMatch> psmList = pev.getSpectrumMatchList();
 							for (SequestSpectrumMatch psm: psmList) { 
 						%>
 							<tr>
-							<td><%=psm.getScanId() %></td>
+							<td><%=psm.getScanNumber() %></td>
 							<td><%=psm.getCharge() %></td>
 							<td><%=psm.getXcorrRounded() %></td>
 							<td><%=psm.getDeltaCnRounded() %></td>
 							<td><%=psm.getFdrRounded() %></td>
-							<td>View</td>
+							<td><span style="text-decoration: underline; cursor: pointer;" onclick="viewSpectrum(<%=psm.getScanId() %>, <%=psm.getHitId() %>)">View</span></td>
 							</tr>
 						<%} %>
 					</table>

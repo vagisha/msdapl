@@ -1073,9 +1073,33 @@
 		scope="request"
 		validate="true"
 	>
+		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult2.jsp" redirect="false" />
+		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/viewProteinInferenceResult"
+		type="org.yeastrc.www.proteinfer.ViewProteinInferenceResultAction"
+	>
 		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
 	</action>
+	
+	<action 
+		path="/proteinSequence"
+		type="org.yeastrc.www.proteinfer.ProteinSequenceAjaxAction"
+	>
+	</action>
+	
+	<action 
+		path="/viewSpectrum"
+		type="org.yeastrc.www.proteinfer.ViewSpectrumAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/viewSpectrum.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewSpectrum.jsp" redirect="false" />
+		
+	</action>
+	
 	
 	<!-- ================================================================================== -->
 	

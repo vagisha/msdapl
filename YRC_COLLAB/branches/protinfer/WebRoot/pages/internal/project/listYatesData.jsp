@@ -1,5 +1,11 @@
-<logic:notEmpty name="yatesdata" scope="request">
 
+<%@page import="java.util.Map"%>
+<%@page import="java.util.List"%><logic:notEmpty name="yatesdata" scope="request">
+
+	<%
+		Map<Integer, Integer> yatesRunToMsSearchMap = (Map<Integer, Integer>)request.getAttribute("yatesRunToMsSearchMap");
+		Map<Integer, List<Integer>> yatesRunToProteinferRunMap = (Map<Integer, List<Integer>>)request.getAttribute("yatesRunToProteinferRunMap");
+	 %>
 	<!-- WE HAVE YEAST TWO-HYBRID DATA FOR THIS PROJECT -->
 	<p><yrcwww:contentbox title="Mass Spectrometry Data" centered="true" width="750" scheme="ms">
 
@@ -17,7 +23,25 @@
 	 <logic:iterate id="run" name="yatesdata">
 
 	  <yrcwww:colorrow scheme="ms">
-	   <TD valign="top" width="20%"><html:link href="/yrc/viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">View Run</html:link></TD>
+	   <TD valign="top" width="20%">
+	   	<html:link href="/yrc/viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">View Run</html:link>
+	   	
+	   	<bean:define name="run" property="id" id="runId" />
+	   	<%	Integer searchId = yatesRunToMsSearchMap.get(runId);
+	   		if(searchId != null && searchId > 0) {%>
+	   		<div style="font-size:8pt;padding-top: 5px;">
+	   		
+	   		<%
+	   			List<Integer> proteinferIds = yatesRunToProteinferRunMap.get(searchId); 
+	   			for(Integer pinferId: proteinferIds) {%>
+	   				<a href="/yrc/viewProteinInferenceResult.do?inferId=<%=pinferId %>">IDPicker Result <%=pinferId %></a>
+	   				<br>
+	   			<%} %>
+	   		<b><a href="/yrc/newProteinInference.do?searchId=<%=searchId %>">[Run IDPicker]</a></b>
+	   		</div>
+	   	<%} %>
+	   	
+	  </TD>
 	   <TD valign="top" width="20%"><bean:write name="run" property="runDate"/></TD>
 	   <TD valign="top" width="20%"><NOBR>
 	   

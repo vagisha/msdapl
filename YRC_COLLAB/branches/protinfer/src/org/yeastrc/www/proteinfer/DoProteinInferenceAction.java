@@ -7,7 +7,6 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,17 +24,22 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsRunDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
-import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.SequestHit;
 import edu.uwpr.protinfer.SequestSpectrumMatch;
+import edu.uwpr.protinfer.database.ProteinferSaver;
 import edu.uwpr.protinfer.filter.FilterException;
 import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
 import edu.uwpr.protinfer.idpicker.IDPickerExecutor;
@@ -49,6 +53,7 @@ import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.PeptideModification;
+import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.msdata.MsDataSearchResultsReader;
 
@@ -83,7 +88,7 @@ public class DoProteinInferenceAction extends Action {
         SearchSummary searchSummary = prinferForm.getSearchSummary();
         IDPickerParams params = prinferForm.getIdPickerParams();
         
-        Date s = new Date();
+        long s = System.currentTimeMillis();
         List<SequestHit> allFilteredHits = new ArrayList<SequestHit>();
         // get the search hits
         MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
@@ -92,7 +97,7 @@ public class DoProteinInferenceAction extends Action {
         for (RunSearch runSearch: searchSummary.getRunSearchList()) {
             if (!runSearch.getIsSelected())
                 continue;
-            Date start = new Date();
+            long start = System.currentTimeMillis();
             List<SequestHit> hits = reader.getHitsForRunSearch(runSearch.getRunSearchId(), params.getDecoyPrefix());
             
             int targetCount = 0;
@@ -110,10 +115,10 @@ public class DoProteinInferenceAction extends Action {
             runSearch.setTotalDecoyHits(decoyCount);
             runSearch.setTotalTargetHits(targetCount);
             
-            Date end = new Date();
+            long end = System.currentTimeMillis();
             log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # hits: "+hits.size()+"; Time: "+getTime(start, end));
             // filter the search hits
-            start = new Date();
+            start = System.currentTimeMillis();
             List<SequestHit> filteredHits = null;
             try {
                 filteredHits = filterHits(hits, params);
@@ -125,9 +130,15 @@ public class DoProteinInferenceAction extends Action {
                 e.printStackTrace();
             }
             runSearch.setFilteredTargetHits(filteredHits.size());
-            end = new Date();
+            end = System.currentTimeMillis();
             log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+filteredHits.size()+"; Time: "+getTime(start, end));
             allFilteredHits.addAll(filteredHits);
+            
+            // get the nrseq protein ids
+            start = System.currentTimeMillis();
+            getNrseqIds(filteredHits, runSearch.getRunSearchId());
+            end = System.currentTimeMillis();
+            log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
         }
         
         // # of proteins before any filtering
@@ -135,20 +146,26 @@ public class DoProteinInferenceAction extends Action {
         
         log.info("Total Filtered Hits: "+allFilteredHits.size());
         
-        getModifiedSequenceForPeptides(searchSummary.getMsSearchId(), allFilteredHits);
+        getModifiedSequenceForPeptides(allFilteredHits);
         
         assginIdsToProteinsAndPeptides(allFilteredHits);
         
+        getScanNumbersForHits(allFilteredHits);
+        
         // infer the protein list
-        Date start = new Date();
+        long start = System.currentTimeMillis();
         List<InferredProtein<SequestSpectrumMatch>> proteins = inferProteinList(allFilteredHits, searchSummary, params);
-        Date end = new Date();
+        long end = System.currentTimeMillis();
         log.info("# of Inferred Proteins: "+proteins.size()+". Time: "+getTime(start, end));
+        
+        // assign best fdr values
+        assignBestFdrValues(proteins);
         
         
         // Group proteins and peptides
         Map<Integer, InferredProteinGroup<SequestSpectrumMatch>> protGroupList = new HashMap<Integer, InferredProteinGroup<SequestSpectrumMatch>>();
         Map<Integer, InferredPeptideGroup<SequestSpectrumMatch>> peptGroupList = new HashMap<Integer, InferredPeptideGroup<SequestSpectrumMatch>>();
+        Map<Integer, Set<Integer>> proteinClusterIds = new HashMap<Integer, Set<Integer>>();
         
         Map<String, PeptideEvidence<SequestSpectrumMatch>> uniquePeptides = new HashMap<String, PeptideEvidence<SequestSpectrumMatch>>();
         
@@ -158,6 +175,14 @@ public class DoProteinInferenceAction extends Action {
                 protGroup = new InferredProteinGroup<SequestSpectrumMatch>(prot.getProteinGroupId());
                 protGroupList.put(prot.getProteinGroupId(), protGroup);
             }
+            
+            // cluster
+            Set<Integer> clusterGroups = proteinClusterIds.get(prot.getProteinClusterId());
+            if(clusterGroups == null) {
+                clusterGroups = new HashSet<Integer>();
+                proteinClusterIds.put(prot.getProteinClusterId(), clusterGroups);
+            }
+            clusterGroups.add(prot.getProteinGroupId());
             
             protGroup.addInferredProtein(prot);
             
@@ -183,12 +208,13 @@ public class DoProteinInferenceAction extends Action {
         }
         
         
-        Date e = new Date();
+        long e = System.currentTimeMillis();
         log.info("Total time: "+getTime(s, e));
         
         request.getSession().setAttribute("inferredProteins", proteins);
         request.getSession().setAttribute("protGroupList", protGroupList);
         request.getSession().setAttribute("peptGroupList", peptGroupList);
+        request.getSession().setAttribute("proteinClusterIds", proteinClusterIds);
         request.getSession().setAttribute("searchSummary", searchSummary);
         request.getSession().setAttribute("params", params);
         
@@ -196,8 +222,31 @@ public class DoProteinInferenceAction extends Action {
         return mapping.findForward("Success");
     }
     
-    private static float getTime(Date start, Date end) {
-        long time = end.getTime() - start.getTime();
+    private void getScanNumbersForHits(List<SequestHit> allFilteredHits) {
+        DAOFactory fact = DAOFactory.instance();
+        MsScanDAO scanDao = fact.getMsScanDAO();
+        for(SequestHit hit: allFilteredHits) {
+            int scanId = hit.getScanId();
+            MsScan scan = scanDao.load(scanId);
+            hit.setScanNumber(scan.getStartScanNum());
+        }
+    }
+
+    private static void assignBestFdrValues(List<InferredProtein<SequestSpectrumMatch>> proteins) {
+        
+        for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
+            for(PeptideEvidence<SequestSpectrumMatch> pev: prot.getPeptides()) {
+                double bestFdr = Double.MAX_VALUE;
+                for(SequestSpectrumMatch psm: pev.getSpectrumMatchList()) {
+                    bestFdr = Math.min(bestFdr, psm.getFdr());
+                }
+                pev.setBestFdr(bestFdr);
+            }
+        }
+    }
+
+    private static float getTime(long start, long end) {
+        long time = end - start;
         float seconds = (float)time / (1000.0f);
         return seconds;
     }
@@ -219,22 +268,22 @@ public class DoProteinInferenceAction extends Action {
         IDPickerParams params = new IDPickerParams();
         params.setDecoyRatio(1.0f);
         params.setDoParsimonyAnalysis(true);
-        params.setMaxAbsoluteFdr(0.25f);
-        params.setMaxRelativeFdr(0.25f);
+        params.setMaxAbsoluteFdr(0.05f);
+        params.setMaxRelativeFdr(0.05f);
         params.setMinDistinctPeptides(2);
         params.setDecoyPrefix("Reverse_");
         
-        Date s = new Date();
+        long s = System.currentTimeMillis();
         List<SequestHit> allFilteredHits = new ArrayList<SequestHit>();
         // get the search hits
         MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
         for (RunSearch runSearch: searchSummary.getRunSearchList()) {
-            Date start = new Date();
+            long start = System.currentTimeMillis();
             List<SequestHit> hits = reader.getHitsForRunSearch(runSearch.getRunSearchId(), params.getDecoyPrefix());
-            Date end = new Date();
+            long end = System.currentTimeMillis();
             log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # hits: "+hits.size()+"; Time: "+getTime(start, end));
             // filter the search hits
-            start = new Date();
+            start = System.currentTimeMillis();
             List<SequestHit> filteredHits = null;
             try {
                 filteredHits = filterHits(hits, params);
@@ -245,35 +294,102 @@ public class DoProteinInferenceAction extends Action {
             catch (FilterException e) {
                 e.printStackTrace();
             }
-            end = new Date();
+            end = System.currentTimeMillis();
             log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+filteredHits.size()+"; Time: "+getTime(start, end));
             allFilteredHits.addAll(filteredHits);
             
+            // get the nrseq protein ids
+            start = System.currentTimeMillis();
+            getNrseqIds(filteredHits, runSearch.getRunSearchId());
+            end = System.currentTimeMillis();
+            log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
         }
         
         log.info("Total Filtered Hits: "+allFilteredHits.size());
         
-        getModifiedSequenceForPeptides(searchSummary.getMsSearchId(), allFilteredHits);
+        getModifiedSequenceForPeptides(allFilteredHits);
         
         assginIdsToProteinsAndPeptides(allFilteredHits);
         
         
         // infer the protein list
-        Date start = new Date();
+        long start = System.currentTimeMillis();
         List<InferredProtein<SequestSpectrumMatch>> proteins = inferProteinList(allFilteredHits, searchSummary, params);
-        Date end = new Date();
+        long end = System.currentTimeMillis();
         log.info("# of Inferred Proteins: "+proteins.size()+". Time: "+getTime(start, end));
-        Date e = new Date();
+        
+
+        // save the results
+        start = System.currentTimeMillis();
+        ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
+        end = System.currentTimeMillis();
+        log.info("Saved results in: "+getTime(start, end));
+        
+        long e = System.currentTimeMillis();
         log.info("Total time: "+getTime(s, e));
         
     }
     
+   
+
+    private static void getNrseqIds(List<SequestHit> hits, int runSearchId) {
+        DAOFactory fact = DAOFactory.instance();
+        MsRunSearchDAO runSearchDao = fact.getMsRunSearchDAO();
+        MsSearchDatabaseDAO dbDao = fact.getMsSequenceDatabaseDAO();
+        
+        MsRunSearch runSearch = runSearchDao.loadRunSearch(runSearchId);
+        if(runSearch == null) {
+            log.error("Could not load runSearch with id: "+runSearchId);
+            return;
+        }
+        List<MsSearchDatabase> searchDbs = dbDao.loadSearchDatabases(runSearch.getSearchId());
+        if(searchDbs.size() != 1) {
+            log.warn("No search database found for searchID: "+runSearch.getSearchId());
+            return;
+        }
+        int nrseqDbId = searchDbs.get(0).getSequenceDatabaseId();
+        String dbname = searchDbs.get(0).getDatabaseFileName();
+        
+        Map<String, Integer> nrseqIdMap = new HashMap<String, Integer>();
+       
+        for(SequestHit hit: hits) {
+           PeptideHit phit = hit.getPeptideHit();
+//           if(phit.isDecoyPeptide())
+//               continue;
+           for(ProteinHit prHit: phit.getProteinList()) {
+               Protein pr = prHit.getProtein();
+               Integer id = nrseqIdMap.get(pr.getAccession());
+               if(id == null) {
+                   id = NrSeqLookupUtil.getProteinId(nrseqDbId, pr.getAccession());
+                   if(id == 0) {
+                       List<Integer> ids = NrSeqLookupUtil.getProteinIdsLikeAccesion(dbname, pr.getAccession());
+                       if(ids.size() != 1) {
+                           ids = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession(nrseqDbId, pr.getAccession(),
+                                   phit.getPeptide().getSequence());
+                           if(ids.size() != 1) {
+                               log.error("Could not find nrseq id for protein: "+pr.getAccession()+
+                                           "; database: "+nrseqDbId+"; dbname: "+dbname);
+                           }
+                           else {
+                               id = ids.get(0);
+                           }
+                       }
+                       else {
+                           id = ids.get(0);
+                       }
+                   }
+               }
+               pr.setId(id);
+           }
+        }
+    }
+
     private static void assginIdsToProteinsAndPeptides(List<SequestHit> allFilteredHits) {
         
         Map<String, Integer> peptideIds = new HashMap<String, Integer>(allFilteredHits.size());
         Map<String, Integer> proteinIds = new HashMap<String, Integer>(allFilteredHits.size());
-        int lastProtId = 0;
-        int lastPeptId = 0;
+        int lastProtId = 1;
+        int lastPeptId = 1;
         for(SequestHit hit: allFilteredHits) {
             Peptide pept = hit.getPeptideHit().getPeptide();
             Integer id = peptideIds.get(pept.getModifiedSequence());
@@ -284,29 +400,21 @@ public class DoProteinInferenceAction extends Action {
             }
             pept.setId(id);
             
-            for(ProteinHit prot: hit.getPeptideHit().getProteinList()) {
-                Integer protId = proteinIds.get(prot.getAccession());
-                if (protId == null) {
-                    protId = lastProtId;
-                    proteinIds.put(prot.getAccession(), protId);
-                    lastProtId++;
-                }
-                prot.getProtein().setId(protId);
-            }
+//            for(ProteinHit prot: hit.getPeptideHit().getProteinList()) {
+//                Integer protId = proteinIds.get(prot.getAccession());
+//                if (protId == null) {
+//                    protId = lastProtId;
+//                    proteinIds.put(prot.getAccession(), protId);
+//                    lastProtId++;
+//                }
+//                prot.getProtein().setId(protId);
+//            }
         }
     }
 
-    private static void getModifiedSequenceForPeptides(int searchId, List<SequestHit> allFilteredHits) {
+    private static void getModifiedSequenceForPeptides(List<SequestHit> allFilteredHits) {
         
         MsSearchModificationDAO modDao = DAOFactory.instance().getMsSearchModDAO();
-        
-        // load the modifications for this search
-        List<MsResidueModification> dynaMods = modDao.loadDynamicResidueModsForSearch(searchId);
-        // create a map for easy lookup
-        Map<Integer, MsResidueModification> modMap = new HashMap<Integer, MsResidueModification>(dynaMods.size());
-        for(MsResidueModification mod: dynaMods) {
-            modMap.put(mod.getId(), mod);
-        }
         
         for (SequestHit hit: allFilteredHits) {
             List<MsResultResidueMod> resMods = modDao.loadDynamicResidueModsForResult(hit.getHitId());
@@ -314,6 +422,9 @@ public class DoProteinInferenceAction extends Action {
             for(MsResultResidueMod mod: resMods) {
                 pept.addModification(new PeptideModification(mod.getModifiedPosition(), mod.getModificationMass()));
             }
+//            if(resMods.size() > 0) {
+//                System.out.println(pept.getModifiedSequence()+" "+hit.getHitId()+" "+hit.getFdr());
+//            }
         }
     }
 
