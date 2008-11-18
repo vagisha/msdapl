@@ -9,7 +9,9 @@
 package org.yeastrc.www.project;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,22 +22,20 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-
 import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.GrantRecord;
 import org.yeastrc.microscopy.ExperimentBaitComparator;
 import org.yeastrc.microscopy.ExperimentSearcher;
-
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
-
+import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
 import org.yeastrc.y2h.Y2HScreenSearcher;
-
+import org.yeastrc.yates.YatesRun;
+import org.yeastrc.yates.YatesRunMsSearchLinker;
 import org.yeastrc.yates.YatesRunSearcher;
 
 /**
@@ -122,7 +122,27 @@ public class ViewProjectAction extends Action {
 			yrs.setProjectID(project.getID());
 			yrs.setMostRecent( true );
 			
-			request.setAttribute("yatesdata", yrs.search());
+			List<YatesRun> yatesRuns = yrs.search();
+			request.setAttribute("yatesdata", yatesRuns);
+			
+			// Associate yatesRunIds with msData searchIds where possible AND
+			// Associate yatesRunIds with already saved Protein Inference Runs
+			Map<Integer, Integer> yatesRunToMsSearchMap = new HashMap<Integer, Integer>(yatesRuns.size());
+			Map<Integer, List<Integer>> yatesRunToProteinferRunMap = new HashMap<Integer, List<Integer>>();
+			for(YatesRun run: yatesRuns) {
+			    int runId = run.getId();
+			    int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
+			    
+			    yatesRunToMsSearchMap.put(runId, searchId);
+			    if(searchId > 0) {
+			        List<Integer> proteinferRunIds = ProteinferRunSearcher.getProteinferRunIdsForMsSearch(searchId);
+			        yatesRunToProteinferRunMap.put(searchId, proteinferRunIds);
+			    }
+			}
+			request.setAttribute("yatesRunToMsSearchMap", yatesRunToMsSearchMap);
+			request.setAttribute("yatesRunToProteinferRunMap", yatesRunToProteinferRunMap);
+			
+			
 			
 			ExperimentSearcher es = ExperimentSearcher.getInstance();
 			es.setProjectID(project.getID());

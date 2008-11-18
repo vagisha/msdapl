@@ -123,54 +123,61 @@
   
   function highlightProteinAndPeptides() {
   	var proteinGroupId = arguments[0];
-  	if(proteinGroupId == lastSelectedProteinGroupId)
-  		return;
+  	var peptGrpIds = arguments[1].split(",");
+  	var uniqPeptGrpIds = arguments[2].split(",");
+  	//alert(proteinGroupId+" AND "+peptGrpIds+" AND "+uniqPeptGrpIds);
+  	
+  	if(proteinGroupId == lastSelectedProteinGroupId) {
+  		removeProteinAndPeptideHighlights();
+  	}
+  	else {
   		
-  	// deselect any last selected cell
-  	$(".peptev_"+lastSelectedProteinGroupId).each(function(){
-  		this.style.background = "";
-  	});
-  	
-  	// select the one the user wants to select
-  	$(".peptev_"+proteinGroupId).each(function(){
-  		this.style.background = "#FFFF00";
-  	});
-  	
-  	// deselect any last selected PROTEIN group cells
-  	if(lastSelectedProteinGroupId != -1) {
-  		$(".protGrp_"+lastSelectedProteinGroupId).each(function() {
-  			this.style.background = "";
-  		});
-  	}
-  	
-  	// now select the PROTEIN group cells we want
-  	$(".protGrp_"+proteinGroupId).each(function() {
-  		this.style.background = "#FFFF00";
-  	});
-  	
-  	// deselect any last selected PEPTIDE group cells
-  	if(lastSelectedPeptGrpIds.length > 0) {
-  		for(var i = 0; i < lastSelectedPeptGrpIds.length; i++) {
-  			$(".peptGrp_"+lastSelectedPeptGrpIds[i]).each(function() {
-  			this.style.background = "";
-  		});
+	  	// deselect any last selected cell
+	  	removeProteinAndPeptideHighlights();
+	  	
+	  	// select the PROTEIN group cells the user wants to select
+	  	$("#protGrp_"+proteinGroupId).css("background-color","#FFFF00");
+	  	
+	  	
+	  	// now select the PEPTIDE group cells we want AND the PROTEIN-PEPTIDE association cells
+  		lastSelectedPeptGrpIds = [];
+  		var j = 0;
+  		// peptide groups NOT unique to protein
+  		for(var i = 0; i < peptGrpIds.length; i++) {
+  			$("#peptGrp_"+peptGrpIds[i]).css("background-color","#FFFF00");
+  			$("#peptEvFor_"+proteinGroupId+"_"+peptGrpIds[i]).css("background-color","#FFFF00");
+  			lastSelectedPeptGrpIds[j] = peptGrpIds[i];
+  			j++;
   		}
+  		// peptide groups UNIQUE to protein
+  		for(var i = 0; i < uniqPeptGrpIds.length; i++) {
+  			$("#peptGrp_"+uniqPeptGrpIds[i]).css("background-color","#00FFFF");
+  			$("#peptEvFor_"+proteinGroupId+"_"+uniqPeptGrpIds[i]).css("background-color","#00FFFF");
+  			lastSelectedPeptGrpIds[j] = uniqPeptGrpIds[i];
+  			j++;
+  		}
+  		lastSelectedProteinGroupId = proteinGroupId;
   	}
-  	
-  	// now select the PEPTIDE group cells we want
-  	lastSelectedPeptGrpIds = new Array(arguments.length);
-  	var j = 0;
-  	for(var i = 1; i < arguments.length; i++) {
-  		$(".peptGrp_"+arguments[i]).each(function() {
-  			this.style.background = "#FFFF00";
-  		});
-  		lastSelectedPeptGrpIds[j] = arguments[i];
-  		j++;
-  	}
-  	
-  	lastSelectedProteinGroupId = proteinGroupId;
   }
-  
+  	
+  	function removeProteinAndPeptideHighlights() {
+  		
+  		if(lastSelectedPeptGrpIds != -1) {
+	  		// deselect any last selected protein group cells.
+	  		$("#protGrp_"+lastSelectedProteinGroupId).css("background-color","");
+	  		
+	  		// deselect any last selected peptide group cells AND protein-peptide association cells
+	  		if(lastSelectedPeptGrpIds.length > 0) {
+		  		for(var i = 0; i < lastSelectedPeptGrpIds.length; i++) {
+		  			$("#peptGrp_"+lastSelectedPeptGrpIds[i]).css("background-color","");
+		  			$("#peptEvFor_"+lastSelectedProteinGroupId+"_"+lastSelectedPeptGrpIds[i]).css("background-color","");
+		  		}
+		  	}
+		  	lastSelectedProteinGroupId = -1;
+		  	lastSelectedPeptGrpIds = [];
+	  	}
+  	}
+  	
 
   function toggleProteinList() {
   	var $mydiv = $(".proteins");
@@ -393,26 +400,33 @@
           					</tr>
 	          				<% for(Integer protGrpId: clusterProteinGroupIds) { 
 	          					InferredProteinGroup prGrp = protGroupList.get(protGrpId);
-	          					String argsToHighlightFunction = ""+protGrpId;
+	          					String protGrpIdStr = ""+protGrpId;
+	          					String peptGrpIdStr = "";
+	          					String uniquePeptGrpIdStr = "";
 	          					int numUniquePeptidesForProteinGrp = 0;
 	          					List<Integer> peptGrpIds = prGrp.getMatchingPeptideGroupIds();
 	          					for(Integer pepGrpId: peptGrpIds) {
 	          					
-	          						argsToHighlightFunction+= ","+pepGrpId;
-	          						
 	          						InferredPeptideGroup peptGrp = peptGroupList.get(pepGrpId);
 	          						if(peptGrp.isUniqueToProtein()) {
           								numUniquePeptidesForProteinGrp += peptGrp.getPeptideEvidenceListList().size();
+          								uniquePeptGrpIdStr += ","+peptGrp.getGroupId();
+          							}
+          							else {
+          								peptGrpIdStr += ","+pepGrpId;
           							}
 	          					}
+	          					
+	          					if(uniquePeptGrpIdStr.length() > 0) uniquePeptGrpIdStr = uniquePeptGrpIdStr.substring(1); // remove the first comma
+	          					if(peptGrpIdStr.length() > 0) peptGrpIdStr = peptGrpIdStr.substring(1); // remove first comma
 	          				%>
-	          					<tr>
+	          					<tr id="protGrp_<%=protGrpId%>">
 	          					<td valign="middle" class="protGrp_<%=protGrpId%>">
-	          						<span onclick="highlightProteinAndPeptides(<%=argsToHighlightFunction %>)" 
+	          						<span onclick="highlightProteinAndPeptides('<%=protGrpId %>', '<%=peptGrpIdStr %>', '<%=uniquePeptGrpIdStr %>')" 
 						      	 	style="cursor:pointer;text-decoration:underline"><%=protGrpId %></span>
 						      	 </td>
 						      	 
-						      	<td class="protGrp_<%=protGrpId%>">
+						      	<td>
 	          					<% 	List<InferredProtein> grpPrList = prGrp.getInferredProteinList();
 	          						for(InferredProtein pr: grpPrList) { %>
 									<%if(pr.getProtein().isAccepted()) { %><b><%} %>
@@ -423,8 +437,8 @@
 									<%if(pr.getProtein().isAccepted()) { %></b><%} %> 
 	          					<%} %>
 	          					</td>
-	          					<td class="protGrp_<%=protGrpId%>"><%=grpPrList.get(0).getPeptideEvidenceCount() %>(<%=numUniquePeptidesForProteinGrp %>)</td>
-								<td class="protGrp_<%=protGrpId%>"><%=grpPrList.get(0).getSpectralEvidenceCount() %></td>
+	          					<td><%=grpPrList.get(0).getPeptideEvidenceCount() %>(<%=numUniquePeptidesForProteinGrp %>)</td>
+								<td><%=grpPrList.get(0).getSpectralEvidenceCount() %></td>
 								</tr>
 							<%} %>
 	          			</table>
@@ -449,11 +463,11 @@
        			 					for(PeptideEvidence pep: pepEvList) {%>
        			 				<tr>
        			 					<%if(first) {first = false; %>
-       			 					<td rowspan="<%=pepEvList.size()%>" class="peptGrp_<%=grpId%>"><%=grpId %></td>
+       			 					<td rowspan="<%=pepEvList.size()%>" id="peptGrp_<%=grpId%>"><%=grpId %></td>
        			 				 	<%}%>
-       			 					<td class="peptGrp_<%=grpId%>"><%=pep.getPeptide().getModifiedSequence() %></td>
-       			 					<td class="peptGrp_<%=grpId%>"><%=pep.getSpectrumMatchCount() %></td>
-       			 					<td class="peptGrp_<%=grpId%>"><%=pep.getBestFdr() %></td>
+       			 					<td><%=pep.getPeptide().getModifiedSequence() %></td>
+       			 					<td><%=pep.getSpectrumMatchCount() %></td>
+       			 					<td><%=pep.getBestFdr() %></td>
        			 					</tr>
        			 				<%} %>
          			 		<%} %>
@@ -478,7 +492,7 @@
 	          							 	InferredProteinGroup prGrp = protGroupList.get(prGrpId);
 	          							 	List<Integer> protPeptGrpIds = prGrp.getMatchingPeptideGroupIds();
 	          							 %>
-	          								<td class="peptev_<%=prGrp.getGroupId()%>">
+	          								<td id="peptEvFor_<%=prGrp.getGroupId()%>_<%=pepGrpId%>">
 	          								<%if(protPeptGrpIds.contains(pepGrpId)) { %>
 	          									x
 	          								<%} else {%>&nbsp;<%} %>

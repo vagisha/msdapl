@@ -1092,6 +1092,18 @@
 	</action>
 	
 	<action 
+		path="/proteinCluster"
+		type="org.yeastrc.www.proteinfer.ProteinClusterAjaxAction"
+	>
+	</action>
+	
+	<action 
+		path="/proteinDetails"
+		type="org.yeastrc.www.proteinfer.ProteinDetailsAjaxAction"
+	>
+	</action>
+	
+	<action 
 		path="/viewSpectrum"
 		type="org.yeastrc.www.proteinfer.ViewSpectrumAction"
 	>

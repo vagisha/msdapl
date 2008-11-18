@@ -1,5 +1,7 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,6 +14,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+
+import edu.uwpr.protinfer.database.dto.ProteinferProtein;
+import edu.uwpr.protinfer.idpicker.IDPickerParams;
+import edu.uwpr.protinfer.idpicker.SearchSummary;
 
 public class ViewProteinInferenceResultAction extends Action {
 
@@ -42,13 +48,22 @@ public class ViewProteinInferenceResultAction extends Action {
         
         long s = System.currentTimeMillis();
         
-        
-        
+        // get the ProteinferRun
+        IDPickerParams params = ProteinferLoader.getIDPickerParams(pinferId);
+        request.setAttribute("params", params);
+        SearchSummary summary = ProteinferLoader.getIDPickerInputSummary(pinferId);
+        request.setAttribute("searchSummary", summary);
+        List<ProteinferProtein> inferredProteins = ProteinferLoader.getProteinferProteins(pinferId);
+        request.setAttribute("inferredProteins", inferredProteins);
+        int maxClusterId = 0;
+        for(ProteinferProtein prot: inferredProteins)
+            maxClusterId = Math.max(maxClusterId, prot.getClusterId());
+        request.setAttribute("clusterCount", maxClusterId);
+        request.setAttribute("pinferId", pinferId);
+
         
         long e = System.currentTimeMillis();
         log.info("Total time: "+getTime(s, e));
-        
-        
         
         // Go!
         return mapping.findForward("Success");

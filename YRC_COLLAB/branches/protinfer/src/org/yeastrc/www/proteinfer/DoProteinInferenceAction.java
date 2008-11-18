@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.proteinfer;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,8 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.nr_seq.NRProtein;
+import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -56,6 +59,7 @@ import edu.uwpr.protinfer.infer.PeptideModification;
 import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.msdata.MsDataSearchResultsReader;
+import edu.uwpr.protinfer.util.StringUtils;
 
 /**
  * 
@@ -136,7 +140,7 @@ public class DoProteinInferenceAction extends Action {
             
             // get the nrseq protein ids
             start = System.currentTimeMillis();
-            getNrseqIds(filteredHits, runSearch.getRunSearchId());
+            getNrseqIdsAndAccessions(filteredHits, runSearch.getRunSearchId());
             end = System.currentTimeMillis();
             log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
         }
@@ -160,6 +164,18 @@ public class DoProteinInferenceAction extends Action {
         
         // assign best fdr values
         assignBestFdrValues(proteins);
+        
+        // calculate protein sequence coverage
+        start = System.currentTimeMillis();
+        calculateProteinSequenceCoverage(proteins);
+        end = System.currentTimeMillis();
+        log.info("Calculated protein sequence coverage in: "+getTime(start, end));
+        
+        // save the results
+//        start = System.currentTimeMillis();
+//        ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
+//        end = System.currentTimeMillis();
+//        log.info("Saved results in: "+getTime(start, end));
         
         
         // Group proteins and peptides
@@ -264,7 +280,7 @@ public class DoProteinInferenceAction extends Action {
     }
     
     public static void main(String[] args) {
-        SearchSummary searchSummary = getSearchSummary(4);
+        SearchSummary searchSummary = getSearchSummary(6);
         IDPickerParams params = new IDPickerParams();
         params.setDecoyRatio(1.0f);
         params.setDoParsimonyAnalysis(true);
@@ -300,7 +316,7 @@ public class DoProteinInferenceAction extends Action {
             
             // get the nrseq protein ids
             start = System.currentTimeMillis();
-            getNrseqIds(filteredHits, runSearch.getRunSearchId());
+            getNrseqIdsAndAccessions(filteredHits, runSearch.getRunSearchId());
             end = System.currentTimeMillis();
             log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
         }
@@ -319,6 +335,12 @@ public class DoProteinInferenceAction extends Action {
         log.info("# of Inferred Proteins: "+proteins.size()+". Time: "+getTime(start, end));
         
 
+        // calculate protein sequence coverage
+        start = System.currentTimeMillis();
+        calculateProteinSequenceCoverage(proteins);
+        end = System.currentTimeMillis();
+        log.info("Calculated protein sequence coverage in: "+getTime(start, end));
+        
         // save the results
         start = System.currentTimeMillis();
         ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
@@ -332,7 +354,35 @@ public class DoProteinInferenceAction extends Action {
     
    
 
-    private static void getNrseqIds(List<SequestHit> hits, int runSearchId) {
+    private static void calculateProteinSequenceCoverage(List<InferredProtein<SequestSpectrumMatch>> proteins) {
+        
+        for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
+            int nrseqId = prot.getProteinId();
+            NRProteinFactory nrpf = NRProteinFactory.getInstance();
+            NRProtein protein = null;
+            try {
+                protein = (NRProtein)(nrpf.getProtein(nrseqId));
+            }
+            catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+                
+            String parentSequence = protein.getPeptide().getSequenceString();
+            List<String> peptides = new ArrayList<String>();
+            for(PeptideEvidence<SequestSpectrumMatch> pev: prot.getPeptides()) {
+                peptides.add(pev.getPeptideSeq());
+            }
+            int lengthCovered = StringUtils.getCoveredSequenceLength(parentSequence, peptides);
+            float percCovered = ((float)lengthCovered/(float)parentSequence.length()) * 100.0f;
+            //percCovered = (float) ((Math.round(percCovered*100.0))/100.0);
+            prot.setPercentCoverage(percCovered);
+        }
+    }
+
+    private static void getNrseqIdsAndAccessions(List<SequestHit> hits, int runSearchId) {
         DAOFactory fact = DAOFactory.instance();
         MsRunSearchDAO runSearchDao = fact.getMsRunSearchDAO();
         MsSearchDatabaseDAO dbDao = fact.getMsSequenceDatabaseDAO();
@@ -380,6 +430,8 @@ public class DoProteinInferenceAction extends Action {
                    }
                }
                pr.setId(id);
+               String realAccession = NrSeqLookupUtil.getProteinAccession(nrseqDbId, id);
+               pr.setAccession(realAccession);
            }
         }
     }
