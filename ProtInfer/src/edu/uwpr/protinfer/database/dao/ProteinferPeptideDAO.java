@@ -20,21 +20,11 @@ public class ProteinferPeptideDAO extends BaseSqlMapDAO {
         return super.saveAndReturnId(sqlMapNameSpace+".insert", peptide);
     }
     
-    public void saveProteinferPeptideProteinMatch(int pinferProteinId, int pinferPeptideId) {
+    public void saveProteinferPeptideProteinMatch(int nrseqProteinId, int pinferPeptideId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("pinferProteinId", pinferProteinId);
+        map.put("nrseqProteinId", nrseqProteinId);
         map.put("pinferPeptideId", pinferPeptideId);
         super.save(sqlMapNameSpace+".insertPeptideProteinMatch", map);
-    }
-    
-    public int getMatchingProteinferPeptideId(int pinferId, String sequence) {
-        Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put("pinferId", pinferId);
-        map.put("sequence", sequence);
-        Integer id = (Integer) super.queryForObject(sqlMapNameSpace+".getMatchingPeptideId", map);
-        if(id == null)
-            return 0;
-        return id;
     }
     
     public List<Integer> getProteinferPeptideIdsForProtein(int pinferProteinId) {

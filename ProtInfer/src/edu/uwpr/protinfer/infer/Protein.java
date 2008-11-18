@@ -2,7 +2,7 @@ package edu.uwpr.protinfer.infer;
 
 public class Protein {
 
-    private final String accession;
+    private String accession;
     private int id; // could be a database id
     private boolean isDecoy = false;
     private boolean isAccepted = false;
@@ -20,6 +20,10 @@ public class Protein {
     
     public String getAccession() {
         return accession;
+    }
+    
+    public void setAccession(String accession) {
+        this.accession = accession;
     }
     
     public int getId() {

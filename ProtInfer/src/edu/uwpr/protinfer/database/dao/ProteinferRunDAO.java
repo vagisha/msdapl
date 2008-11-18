@@ -32,7 +32,7 @@ public class ProteinferRunDAO extends BaseSqlMapDAO {
     public void setProteinferStatus(int proteinferId, ProteinferStatus status) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("pinferId", proteinferId);
-        map.put("status", status.getStatusChar());
+        map.put("status", String.valueOf(status.getStatusChar()));
         super.update(sqlMapNameSpace+".updateStatus", map);
     }
     
@@ -41,6 +41,13 @@ public class ProteinferRunDAO extends BaseSqlMapDAO {
         map.put("pinferId", proteinferId);
         map.put("dateCompleted", date);
         super.update(sqlMapNameSpace+".updateDateCompleted", map);
+    }
+    
+    public void setProteinferUnfilteredProteinCount(int proteinferId, int proteinCount) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", proteinferId);
+        map.put("proteinCount", proteinCount);
+        super.update(sqlMapNameSpace+".updateUnfilteredProteinCount", map);
     }
     
     public ProteinferRun getProteinferRun(int proteinferId) {

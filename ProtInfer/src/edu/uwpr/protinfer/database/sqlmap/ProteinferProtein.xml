@@ -9,10 +9,9 @@
 				type="edu.uwpr.protinfer.database.dao.ProteinferProteinDAO$UserValidationTypeHandler"/>
 		
 	<resultMap class="ProteinferProtein" id="pinferProteinResult" >
-		<result property="id" column="id" />
 		<result property="proteinferId" column="pinferID" nullValue="0"/>
-		<result property="accession" column="accession" />
 		<result property="nrseqProteinId" column="nrseqProteinID" nullValue="0"/>
+		<result property="accession" column="accession" />
 		<result property="coverage" column="coverage" />
 		<result property="clusterId" column="clusterID" nullValue="0"/>
 		<result property="isParsimonious" column="isParsimonious" />
@@ -22,13 +21,13 @@
 				typeHandler="UserValidationTypeHandler"/>
 		<result property="peptides" 
 				select="ProteinferPeptide.selectPeptidesForProtein"
-				column="id"/>
+				column="nrseqProteinID"/>
 	</resultMap>
 	
 	<parameterMap class="ProteinferProtein" id="pinferProteinParam">
 		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="accession" jdbcType="VARCHAR" />
 		<parameter property="nrseqProteinId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="accession" jdbcType="VARCHAR" />
 		<parameter property="coverage" jdbcType="DOUBLE" />
 		<parameter property="isParsimonious" jdbcType="BIT" />
 		<parameter property="clusterId" jdbcType="INTEGER" nullValue="0"/>
@@ -37,16 +36,28 @@
 		<parameter property="userValidation" jdbcType="CHAR" typeHandler="UserValidationTypeHandler"/>
 	</parameterMap>
 	
-	<select id="select" resultMap="pinferProteinResult" parameterClass="Integer">
-    	SELECT * FROM ProteinferProtein WHERE id=#id#
+	<select id="select" resultMap="pinferProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM ProteinferProtein WHERE nrseqProteinID=#nrseqProtId# AND pinferID=#pinferId#
     </select>
     
     <select id="selectProteinIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT id FROM ProteinferProtein WHERE pinferID = #id#
+    	SELECT nrseqProteinID FROM ProteinferProtein WHERE pinferID = #id#
     </select>
     
     <select id="selectProteinsForProteinferRun" resultMap="pinferProteinResult" parameterClass="Integer">
     	SELECT * FROM ProteinferProtein WHERE pinferID = #id#
+    </select>
+    
+    <select id="selectProteinsForProteinferRunCluster" resultMap="pinferProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM ProteinferProtein WHERE pinferID = #pinferId# AND clusterID = #clusterId#
+    </select>
+    
+    <select id="selectProteinCountForProteinferRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM ProteinferProtein WHERE pinferID = #id#
+    </select>
+    
+    <select id="selectParsimProteinCountForProteinferRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM ProteinferProtein WHERE pinferID = #id# AND isParsimonious = 1
     </select>
     
     <update id="updateUserAnnotation" parameterClass="java.util.Map">
@@ -60,8 +71,8 @@
     <insert id="insert" parameterMap="pinferProteinParam">
     	INSERT INTO ProteinferProtein (
     	pinferID,
-    	accession,
     	nrseqProteinID,
+    	accession,
     	coverage,
     	isParsimonious,
     	clusterID,
@@ -69,9 +80,6 @@
     	userAnnotation,
     	userValidation) 
     	VALUES (?,?,?,?,?,?,?,?,?)
-    	<selectKey resultClass="int">
-      		select last_insert_id() as id
-    	</selectKey>
     </insert>
     
     <delete id="delete" parameterClass="Integer">

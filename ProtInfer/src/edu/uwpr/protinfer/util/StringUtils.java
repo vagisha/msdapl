@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.pepxml;
+package edu.uwpr.protinfer.util;
 
 import java.util.ArrayList;
 import java.util.Collections;

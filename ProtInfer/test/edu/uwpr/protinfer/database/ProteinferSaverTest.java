@@ -51,6 +51,8 @@ public class ProteinferSaverTest extends TestCase {
         
         IDPickerExecutor executor = new IDPickerExecutor();
         List<InferredProtein<SequestSpectrumMatch>> proteins = executor.inferProteins(searchHits, summary, params);
+        for(InferredProtein<SequestSpectrumMatch> prot: proteins) 
+            prot.setPercentCoverage((float) Math.random());
         
         ProteinferSaver.saveProteinInferenceResults(summary, params, proteins);
     }

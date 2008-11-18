@@ -10,8 +10,10 @@ public class ProteinferRun {
     private Date dateCompleted;
     private ProteinferStatus status;
     
+    private int unfilteredProteins;
+    
     private List<ProteinferFilter> filters;
-    private List<Integer> runSearchIds;
+    private List<ProteinferInput> inputSummaryList;
     
     public int getId() {
         return id;
@@ -51,10 +53,17 @@ public class ProteinferRun {
         this.filters = filter;
     }
     
-    public List<Integer> getRunSearchIds() {
-        return runSearchIds;
+    public List<ProteinferInput> getInputSummaryList() {
+        return inputSummaryList;
     }
-    public void setRunSearchIds(List<Integer> runSearchIds) {
-        this.runSearchIds = runSearchIds;
+    public void setInputSummaryList(List<ProteinferInput> inputList) {
+        this.inputSummaryList = inputList;
+    }
+    
+    public int getUnfilteredProteins() {
+        return unfilteredProteins;
+    }
+    public void setUnfilteredProteins(int unfilteredProteins) {
+        this.unfilteredProteins = unfilteredProteins;
     }
 }

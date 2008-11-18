@@ -1,5 +1,6 @@
 package edu.uwpr.protinfer.database.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProteinferPeptide {
@@ -10,8 +11,13 @@ public class ProteinferPeptide {
     private String sequence;
     
     private List<ProteinferSpectrumMatch> spectrumMatchList;
+    
+    private List<Integer> matchingProteinIds;
 
-    public ProteinferPeptide() {}
+    public ProteinferPeptide() {
+        spectrumMatchList = new ArrayList<ProteinferSpectrumMatch>();
+        matchingProteinIds = new ArrayList<Integer>();
+    }
     
     public ProteinferPeptide(int proteinferId, int peptideGroupId, String sequence) {
         this.pinferId = proteinferId;
@@ -57,5 +63,29 @@ public class ProteinferPeptide {
 
     public void setProteinferId(int pinferId) {
         this.pinferId = pinferId;
+    }
+    
+    public List<Integer> getMatchingProteinIds() {
+        return matchingProteinIds;
+    }
+
+    public void setMatchingProteinIds(List<Integer> matchingProteinIds) {
+        this.matchingProteinIds = matchingProteinIds;
+    }
+    
+    public boolean isUniqueToProtein() {
+        return matchingProteinIds.size() == 1;
+    }
+    
+    public int getSpectralCount() {
+        return spectrumMatchList.size();
+    }
+   
+    public float getBestFdr() {
+        float best = Float.MAX_VALUE;
+        for(ProteinferSpectrumMatch psm: spectrumMatchList) {
+            best = (float) Math.min(best, psm.getFdr());
+        }
+        return (float) (Math.round(best*100.0) / 100.0);
     }
 }

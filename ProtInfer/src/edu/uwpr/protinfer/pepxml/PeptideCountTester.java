@@ -14,6 +14,7 @@ import java.util.Set;
 import org.yeastrc.ms.parser.DataProviderException;
 
 import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.util.StringUtils;
 
 public class PeptideCountTester {
 

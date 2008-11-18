@@ -22,8 +22,8 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO {
         super(sqlMap);
     }
 
-    public int saveProteinferProtein(ProteinferProtein protein) {
-        return super.saveAndReturnId(sqlMapNameSpace+".insert", protein);
+    public void saveProteinferProtein(ProteinferProtein protein) {
+        super.save(sqlMapNameSpace+".insert", protein);
     }
     
     public void updateUserAnnotation(int pinferProteinId, String annotation) {
@@ -40,8 +40,12 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO {
         super.update(sqlMapNameSpace+".updateUserValidation", map);
     }
     
-    public ProteinferProtein getProteinferProtein(int pinferProteinId) {
-        return (ProteinferProtein) super.queryForObject(sqlMapNameSpace+".select", pinferProteinId);
+    public ProteinferProtein getProteinferProtein(int pinferId, int nrseqProtId) {
+        
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        map.put("nrseqProtId", nrseqProtId);
+        return (ProteinferProtein) super.queryForObject(sqlMapNameSpace+".select", map);
     }
     
     public List<Integer> getProteinferProteinIds(int proteinferId) {
@@ -50,6 +54,22 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO {
     
     public List<ProteinferProtein> getProteinferProteins(int proteinferId) {
         return queryForList(sqlMapNameSpace+".selectProteinsForProteinferRun", proteinferId);
+    }
+    
+    public List<ProteinferProtein> getProteinferClusterProteins(int pinferId,int clusterId) {
+        
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        map.put("clusterId", clusterId);
+        return queryForList(sqlMapNameSpace+".selectProteinsForProteinferRunCluster", map);
+    }
+    
+    public int getFilteredProteinCount(int proteinferId) {
+       return (Integer) queryForObject(sqlMapNameSpace+".selectProteinCountForProteinferRun", proteinferId); 
+    }
+    
+    public int getFilteredParsimoniousProteinCount(int proteinferId) {
+        return (Integer) queryForObject(sqlMapNameSpace+".selectParsimProteinCountForProteinferRun", proteinferId); 
     }
     
     public void delete(int pinferProteinId) {
@@ -80,7 +100,7 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO {
         
         private ProteinUserValidation stringToUserValidation(String validationStr) {
             if (validationStr == null)
-                throw new IllegalArgumentException("String representing ProteinUserValidation cannot be null");
+                return null;
             if (validationStr.length() != 1)
                 throw new IllegalArgumentException("Cannot convert "+validationStr+" to ProteinUserValidation");
             ProteinUserValidation userValidation = ProteinUserValidation.getStatusForChar(Character.valueOf(validationStr.charAt(0)));

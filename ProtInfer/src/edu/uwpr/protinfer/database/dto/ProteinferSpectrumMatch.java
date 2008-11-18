@@ -30,6 +30,10 @@ public class ProteinferSpectrumMatch {
         return fdr;
     }
     
+    public double getFdrRounded() {
+        return Math.round(fdr * 1000.0) / 1000.0;
+    }
+    
     public void setFdr(double fdr) {
         this.fdr = fdr;
     }

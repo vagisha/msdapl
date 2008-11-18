@@ -3,14 +3,45 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="ProteinferInput"> 
 
-    <select id="selectRunSearchIds" resultClass="Integer" parameterClass="Integer">
-    	SELECT runSearchID FROM ProteinferInput WHERE pinferID = #id#
+	<typeAlias alias="ProteinferInput" type="edu.uwpr.protinfer.database.dto.ProteinferInput"/>
+	
+	<resultMap class="ProteinferInput" id="pinferInputResult">
+		<result property="proteinferId" column="pinferID" nullValue="0"/>
+		<result property="runSearchId" column="runSearchID" nullValue="0"/>
+		<result property="numTargetHits" column="targetHits" nullValue="-1"/>
+		<result property="numDecoyHits" column="decoyHits" nullValue="-1"/>
+		<result property="numFilteredTargetHits" column="filteredTargetHits" nullValue="-1"/>
+	</resultMap>
+	
+	<parameterMap class="ProteinferInput" id="pinferInputParam">
+		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="numTargetHits" jdbcType="INTEGER" nullValue="-1" />
+		<parameter property="numDecoyHits" jdbcType="INTEGER" nullValue="-1" />
+		<parameter property="numFilteredTargetHits" jdbcType="INTEGER" nullValue="-1" />
+	</parameterMap>
+	
+    <select id="selectProteinferInput" resultMap="pinferInputResult" parameterClass="Integer">
+    	SELECT * FROM ProteinferInput WHERE pinferID = #id#
     </select>
     
-    <insert id="saveProteinferInputIds" parameterClass="String">
+    <insert id="saveProteinferInput" parameterMap="pinferInputParam">
     	INSERT INTO ProteinferInput (
     	pinferID,
-    	runSearchID)
+    	runSearchID,
+    	targetHits,
+    	decoyHits,
+    	filteredTargetHits)
+    	VALUES (?,?,?,?,?)
+    </insert>
+    
+    <insert id="saveProteinferInputList" parameterClass="String">
+    	INSERT INTO ProteinferInput (
+    	pinferID,
+    	runSearchID,
+    	targetHits,
+    	decoyHits,
+    	filteredTargetHits)
     	VALUES $values$
     </insert>
     

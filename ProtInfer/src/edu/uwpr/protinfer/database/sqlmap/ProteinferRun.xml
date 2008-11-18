@@ -11,13 +11,14 @@
 	<resultMap class="ProteinferRun" id="pinferRunResult">
 		<result property="id" column="id" />
 		<result property="status" column="status" typeHandler="ProteinferStatusTypeHandler"/>
-		<result property="dateCreated" column="accession" />
+		<result property="dateCreated" column="dateCreated" />
 		<result property="dateCompleted" column="dateCompleted"/>
+		<result property="unfilteredProteins" column="unfilteredProteinCount"/>
 		<result property="filters" 
 				select="ProteinferFilter.selectFiltersForRun"
 				column="id"/>
-		<result property="runSearchIds" 
-				select="ProteinferInput.selectRunSearchIds"
+		<result property="inputSummaryList" 
+				select="ProteinferInput.selectProteinferInput"
 				column="id"/>
 	</resultMap>
 	
@@ -39,6 +40,10 @@
     
     <update id="updateDateCompleted" parameterClass="java.util.Map">
     	UPDATE ProteinferRun SET dateCompleted=#dateCompleted# where id=#pinferId#
+    </update>
+    
+    <update id="updateUnfilteredProteinCount" parameterClass="java.util.Map">
+    	UPDATE ProteinferRun SET unfilteredProteinCount=#proteinCount# where id=#pinferId#
     </update>
     
     <insert id="insert" parameterMap="pinferRunParam">

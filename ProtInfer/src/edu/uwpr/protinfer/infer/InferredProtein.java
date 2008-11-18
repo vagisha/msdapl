@@ -14,6 +14,8 @@ public class InferredProtein <T extends SpectrumMatch> {
     
     private Map<String, PeptideEvidence<T>> peptideEvList;
     
+    private float percentCoverage;
+    
     public InferredProtein(Protein protein) {
         this.protein = protein;
         peptideEvList = new HashMap<String, PeptideEvidence<T>>();
@@ -95,5 +97,13 @@ public class InferredProtein <T extends SpectrumMatch> {
     
     public int getProteinClusterId() {
         return protein.getProteinClusterId();
+    }
+    
+    public float getPercentCoverage() {
+        return percentCoverage;
+    }
+
+    public void setPercentCoverage(float percentCoverage) {
+        this.percentCoverage = percentCoverage;
     }
 }

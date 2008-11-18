@@ -130,6 +130,7 @@ public class IDPickerExecutor {
             
             ProteinInferrerMaximal inferrer = new ProteinInferrerMaximal();
             List<InferredProtein<S>> allProteins = inferrer.inferProteins(searchHits);
+            
             // the # of proteins after fdr filtering and before min.peptide filtering
             summary.setFilteredProteinsFdr(allProteins.size());
             
@@ -143,6 +144,7 @@ public class IDPickerExecutor {
                         iterator.remove();
                 }
             }
+            
             // the # of proteins before parsimony analysis and after min.peptide filtering
             summary.setFilteredProteinsMinPeptCount(allProteins.size());
             

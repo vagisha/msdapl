@@ -4,12 +4,10 @@ import java.util.List;
 
 public class ProteinferProtein {
 
-    private int id;
     private int pinferId;
     private int clusterId;
     private int groupId;
     private int nrseqProteinId;
-    private String accession;
     private double coverage;
     private boolean isParsimonious;
     
@@ -18,13 +16,10 @@ public class ProteinferProtein {
     
     private List<ProteinferPeptide> peptides;
     
+    private String accession = "";
+    private String description = "";
     
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
+    
     
     public int getProteinferId() {
         return pinferId;
@@ -47,6 +42,20 @@ public class ProteinferProtein {
         this.groupId = groupId;
     }
     
+    public String getAccession() {
+        return accession;
+    }
+    public void setAccession(String accession) {
+        this.accession = accession;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
     public int getNrseqProteinId() {
         return nrseqProteinId;
     }
@@ -55,7 +64,7 @@ public class ProteinferProtein {
     }
     
     public double getCoverage() {
-        return coverage;
+        return Math.round(coverage*100.0) / 100.0;
     }
     public void setCoverage(double coverage) {
         this.coverage = coverage;
@@ -82,17 +91,37 @@ public class ProteinferProtein {
         this.peptides = peptides;
     }
     
-    public String getAccession() {
-        return accession;
-    }
-    public void setAccession(String accession) {
-        this.accession = accession;
-    }
-    
     public boolean getIsParsimonious() {
         return this.isParsimonious;
     }
     public void setIsParsimonious(boolean isParsimonious) {
         this.isParsimonious = isParsimonious;
+    }
+    
+    public int getPeptideCount() {
+        return peptides.size();
+    }
+    
+    public int getUniquePeptideCount() {
+        int cnt = 0;
+        for(ProteinferPeptide peptide: peptides)
+            if(peptide.isUniqueToProtein())
+                cnt += peptide.getSpectralCount();
+        return cnt;
+    }
+    
+    public int getSpectralCount() {
+        int cnt = 0;
+        for(ProteinferPeptide peptide: peptides)
+            cnt += peptide.getSpectralCount();
+        return cnt;
+    }
+    
+    public boolean matchesPeptideGroup(int peptideGrpId) {
+        for(ProteinferPeptide pept: peptides) {
+            if(pept.getGroupId() == peptideGrpId)
+                return true;
+        }
+        return false;
     }
 }
