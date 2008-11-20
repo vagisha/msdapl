@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -58,12 +59,12 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
      * @param accession
      * @return
      */
-    public static int getProteinId(String databaseName, String accession){
+    public static int getDbProteinId(String databaseName, String accession){
         Map<String, String> map = new HashMap<String, String>(2);
         map.put("dbName", databaseName);
         map.put("accession", accession);
         Integer id = null;
-        String statementName = "NrSeq.selectProteinIdForDbNameExactMatch";
+        String statementName = "NrSeq.selectDbProteinIdForDbNameExactMatch";
         try {
             id = (Integer) sqlMap.queryForObject(statementName, map);
         }
@@ -76,17 +77,31 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         return id;
     }
     
+    public static NrDbProtein getDbProtein(String databaseName, String accession){
+        Map<String, String> map = new HashMap<String, String>(2);
+        map.put("dbName", databaseName);
+        map.put("accession", accession);
+        String statementName = "NrSeq.selectDbProteinForDbNameExactMatch";
+        try {
+            return (NrDbProtein) sqlMap.queryForObject(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     /**
      * 
      * @param databaseName
      * @param accession
      * @return
      */
-    public static List<Integer> getProteinIdsLikeAccesion(String databaseName, String accession) {
+    public static List<Integer> getDbProteinIdsLikeAccesion(String databaseName, String accession) {
         Map<String, String> map = new HashMap<String, String>(2);
         map.put("dbName", databaseName);
         map.put("accession", accession+"%");
-        String statementName = "NrSeq.selectProteinIdForDbName";
+        String statementName = "NrSeq.selectDbProteinIdForDbName";
         try {
             return sqlMap.queryForList(statementName, map);
         }
@@ -102,12 +117,12 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
      * @param accession
      * @return
      */
-    public static int getProteinId(int databaseId, String accession) {
+    public static int getDbProteinId(int databaseId, String accession) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("dbId", databaseId);
         map.put("accession", accession);
         Integer id = null;
-        String statementName = "NrSeq.selectProteinIdForDbIdExactMatch";
+        String statementName = "NrSeq.selectDbProteinIdForDbIdExactMatch";
         try {
             id = (Integer) sqlMap.queryForObject(statementName, map);
         }
@@ -120,17 +135,31 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         return id;
     }
     
+    public static NrDbProtein getDbProtein(int databaseId, String accession) {
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("dbId", databaseId);
+        map.put("accession", accession);
+        String statementName = "NrSeq.selectDbProteinForDbIdExactMatch";
+        try {
+            return  (NrDbProtein) sqlMap.queryForObject(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     /**
      * 
      * @param databaseId
      * @param accession
      * @return
      */
-    public static List<Integer> getProteinIdsPartialAccession(int databaseId, String accession) {
+    public static List<Integer> getDbProteinIdsPartialAccession(int databaseId, String accession) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("dbId", databaseId);
         map.put("accession", accession+"%");
-        String statementName = "NrSeq.selectProteinIdForDbIdPartialAcc";
+        String statementName = "NrSeq.selectDbProteinIdForDbIdPartialAcc";
         try {
             return sqlMap.queryForList(statementName, map);
         }
@@ -146,12 +175,12 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
      * @param accession
      * @return
      */
-    public static List<Integer> getProteinIdsForPeptidePartialAccession(int databaseId, String accession, String peptide) {
+    public static List<Integer> getDbProteinIdsForPeptidePartialAccession(int databaseId, String accession, String peptide) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("dbId", databaseId);
         map.put("accession", accession+"%");
         map.put("sequence", "%"+peptide+"%");
-        String statementName = "NrSeq.selectProteinIdForDbIdAndPeptideAndPartialAcc";
+        String statementName = "NrSeq.selectDbProteinIdForDbIdAndPeptideAndPartialAcc";
         try {
             return sqlMap.queryForList(statementName, map);
         }
@@ -167,12 +196,12 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
      * @param accession
      * @return
      */
-    public static List<Integer> getProteinIdsForPeptidePartialAccession2(int databaseId, String accession, String peptide) {
+    public static List<Integer> getDbProteinIdsForPeptidePartialAccession2(int databaseId, String accession, String peptide) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("dbId", databaseId);
         map.put("accession", "%"+accession+"%");
         map.put("sequence", "%"+peptide+"%");
-        String statementName = "NrSeq.selectProteinIdForDbIdAndPeptideAndPartialAcc";
+        String statementName = "NrSeq.selectDbProteinIdForDbIdAndPeptideAndPartialAcc";
         try {
             return sqlMap.queryForList(statementName, map);
         }
@@ -219,6 +248,20 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
             if (acc == null)
                 throw new NrSeqLookupException(searchDatabaseId, proteinId);
             return acc;
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
+    public static NrDbProtein getDbProtein(int dbProtId) {
+        String statementName = "NrSeq.selectDbProtein";
+        try {
+            NrDbProtein dbProt = (NrDbProtein) sqlMap.queryForObject(statementName, dbProtId);
+            if (dbProt == null)
+                throw new NrSeqLookupException(dbProtId);
+            return dbProt;
         }
         catch (SQLException e) {
             log.error("Failed to execute select statement: ", e);

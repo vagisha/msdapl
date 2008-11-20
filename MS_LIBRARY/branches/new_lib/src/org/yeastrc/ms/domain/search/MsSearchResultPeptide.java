@@ -29,6 +29,8 @@ public interface MsSearchResultPeptide {
     
     public abstract String getPeptideSequence();
     
+    public abstract String getModifiedPeptideSequence();
+    
     public abstract char getPreResidue();
     
     public abstract char getPostResidue();

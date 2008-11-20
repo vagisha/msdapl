@@ -2,6 +2,7 @@ package org.yeastrc.ms.dao.util;
 
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 
 import junit.framework.TestCase;
 
@@ -19,20 +20,57 @@ public class NrSeqLookupUtilTest extends TestCase {
         String databaseName = "database";
         String accession = "accession_string_1";
         
-        assertEquals(25, NrSeqLookupUtil.getProteinId(databaseName, accession));
+        assertEquals(1, NrSeqLookupUtil.getDbProteinId(databaseName, accession));
+        NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(1);
+        assertEquals(25, dbProt.getProteinId());
+        assertEquals(1, dbProt.getDatabaseId());
+        assertEquals("accession_string_1", dbProt.getAccessionString());
+        assertNull(dbProt.getDescription());
         
         databaseName = "dummy";
-        int id = NrSeqLookupUtil.getProteinId(databaseName, accession);
+        int id = NrSeqLookupUtil.getDbProteinId(databaseName, accession);
         assertEquals(0, id);
         
         
         databaseName = "database2";
-        id = NrSeqLookupUtil.getProteinId(databaseName, accession);
+        id = NrSeqLookupUtil.getDbProteinId(databaseName, accession);
         assertEquals(0, id);
         
         accession = "accession_string_4";
-        assertEquals(28, NrSeqLookupUtil.getProteinId(databaseName, accession));
+        assertEquals(2, NrSeqLookupUtil.getDbProteinId(databaseName, accession));
+        dbProt = NrSeqLookupUtil.getDbProtein(2);
+        assertEquals(28, dbProt.getProteinId());
+        assertEquals(2, dbProt.getDatabaseId());
+        assertEquals("accession_string_4", dbProt.getAccessionString());
+        assertNull(dbProt.getDescription());
     }
+    
+    public void testGetProtein() {
+        String databaseName = "database";
+        String accession = "accession_string_1";
+        
+        NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(databaseName, accession);
+        assertEquals(25, dbProt.getProteinId());
+        assertEquals(1, dbProt.getDatabaseId());
+        assertEquals("accession_string_1", dbProt.getAccessionString());
+        assertNull(dbProt.getDescription());
+        
+        databaseName = "dummy";
+        dbProt = NrSeqLookupUtil.getDbProtein(databaseName, accession);
+        assertNull(dbProt);
+        
+        
+        databaseName = "database2"; 
+        int databaseId = NrSeqLookupUtil.getDatabaseId(databaseName);
+        assertEquals(2, databaseId);
+        accession = "accession_string_4";
+        dbProt = NrSeqLookupUtil.getDbProtein(databaseId, accession);
+        assertEquals(28, dbProt.getProteinId());
+        assertEquals(2, dbProt.getDatabaseId());
+        assertEquals("accession_string_4", dbProt.getAccessionString());
+        assertNull(dbProt.getDescription());
+    }
+    
     
     public void testGetDatabaseId() {
         String database = "database";

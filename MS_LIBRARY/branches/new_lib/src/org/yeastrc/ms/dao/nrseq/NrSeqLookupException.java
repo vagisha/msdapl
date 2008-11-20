@@ -23,6 +23,10 @@ public class NrSeqLookupException extends RuntimeException {
         super("No database found with name: "+dbName);
     }
     
+    public NrSeqLookupException(int dbProtId) {
+        super("No entry found with dbProtid: "+dbProtId);
+    }
+    
     public NrSeqLookupException(int databaseId, int proteinId) {
         super("No entry found with databaseId: "+databaseId+" and proteinId: "+proteinId);
     }

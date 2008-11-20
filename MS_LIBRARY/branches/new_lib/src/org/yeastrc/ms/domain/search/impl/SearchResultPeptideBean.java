@@ -1,6 +1,8 @@
 package org.yeastrc.ms.domain.search.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsModification;
@@ -12,6 +14,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
 
     
     private char[] sequence;
+    private String modifiedSequence;
     private char preResidue = MsModification.EMPTY_CHAR;
     private char postResidue = MsModification.EMPTY_CHAR;
     
@@ -74,6 +77,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     
     public void setDynamicResidueModifications(List<MsResultResidueMod> dynaMods) {
         this.dynaResidueMods = dynaMods;
+        this.modifiedSequence = null;
     }
     
     //-----------------------------------------------------------------------------------------
@@ -85,5 +89,52 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     
     public void setDynamicTerminalModifications(List<MsResultTerminalMod> termDynaMods) {
         this.dynaTerminalMods = termDynaMods;
+        this.modifiedSequence = null;
+    }
+    
+    /**
+     * Returns the sequence of the peptide with modifications. E.g. PEP*TIDE
+     * @return
+     */
+    public String getModifiedPeptideSequence() {
+        
+        if (modifiedSequence != null)
+            return modifiedSequence;
+        
+        if (dynaResidueMods.size() == 0) {
+            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
+        }
+        else {
+            String origseq = String.valueOf(sequence);
+            int lastIdx = 0;
+            StringBuilder seq = new StringBuilder();
+            sortDynaResidueModifications();
+            for (MsResultResidueMod mod: dynaResidueMods) {
+                seq.append(origseq.subSequence(lastIdx, mod.getModifiedPosition()+1)); // get sequence up to an including the modified position.
+                char modSymbol = mod.getModificationSymbol();
+                if(modSymbol == '\u0000') {
+                    seq.append("("+Math.round(mod.getModificationMass().doubleValue())+")");
+                }
+                else {
+                    seq.append(modSymbol);
+                }
+                
+                lastIdx = mod.getModifiedPosition()+1;
+            }
+            if (lastIdx < origseq.length())
+                seq.append(origseq.subSequence(lastIdx, origseq.length()));
+            
+            modifiedSequence = seq.toString();
+            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
+        }
+        
+        return modifiedSequence;
+    }
+    
+    private void sortDynaResidueModifications() {
+        Collections.sort(dynaResidueMods, new Comparator<MsResultResidueMod>(){
+            public int compare(MsResultResidueMod o1, MsResultResidueMod o2) {
+                return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
+            }});
     }
 }
