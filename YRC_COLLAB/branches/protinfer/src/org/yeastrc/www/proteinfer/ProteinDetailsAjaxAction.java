@@ -37,10 +37,13 @@ public class ProteinDetailsAjaxAction extends Action {
         // User making this request
         User user = UserUtils.getUser(request);
         if (user == null) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("username", new ActionMessage("error.login.notloggedin"));
-            saveErrors( request, errors );
-            return mapping.findForward("authenticate");
+            response.getWriter().write("You are not logged in!");
+            response.setStatus(HttpServletResponse.SC_SEE_OTHER); // Status code (303) indicating that the response to the request can be found under a different URI.
+            return null;
+//            ActionErrors errors = new ActionErrors();
+//            errors.add("username", new ActionMessage("error.login.notloggedin"));
+//            saveErrors( request, errors );
+//            return mapping.findForward("authenticate");
         }
 
         int pinferId = 0;

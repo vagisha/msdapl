@@ -8,11 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.user.User;
@@ -30,10 +28,13 @@ public class ProteinSequenceAjaxAction extends Action {
         // User making this request
         User user = UserUtils.getUser(request);
         if (user == null) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("username", new ActionMessage("error.login.notloggedin"));
-            saveErrors( request, errors );
-            return mapping.findForward("authenticate");
+            response.getWriter().write("You are not logged in!");
+            response.setStatus(HttpServletResponse.SC_SEE_OTHER); // Status code (303) indicating that the response to the request can be found under a different URI.
+            return null;
+//            ActionErrors errors = new ActionErrors();
+//            errors.add("username", new ActionMessage("error.login.notloggedin"));
+//            saveErrors( request, errors );
+//            return mapping.findForward("authenticate");
         }
 
         int nrseqid = 0;
@@ -55,7 +56,7 @@ public class ProteinSequenceAjaxAction extends Action {
         String html = getHtmlForProtein(nrseqid, peptides);
         // Go!
         response.setContentType("text/html");
-        response.getWriter().write(html);
+        response.getWriter().write("<pre>"+html+"</pre>");
         return null;
     }
 

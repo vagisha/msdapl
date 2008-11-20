@@ -5,32 +5,85 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<script src="http://code.jquery.com/jquery-latest.js"></script>
-<script type="text/javascript" src="http://dev.jquery.com/view/tags/ui/latest/ui/ui.core.js"></script>
-<script type="text/javascript" src="http://dev.jquery.com/view/tags/ui/latest/ui/ui.tabs.js"></script>
-<link rel="stylesheet" href="/yrc/js/jquery.ui-1.6rc2/themes/flora/flora.tabs.css" type="text/css" >
+<script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
+<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js" ></script>
+<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.tabs.js"></script>
+<script type="text/javascript" src="/yrc/js/jquery.history.js"></script>
+<link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
 <%
 	int clusterCount = (Integer)request.getAttribute("clusterCount");
 	int pinferId = (Integer)request.getAttribute("pinferId");
 	List<ProteinferProtein> inferredProteins = (List<ProteinferProtein>)request.getAttribute("inferredProteins");
 %>
 <script>
+
+
+  // set up the tabs and select the first tab
   $(document).ready(function(){
     $("#results > ul").tabs().tabs('select', 0);
   });
 
+
+// FOR HISTORY
+function callback(hash)
+{
+    // do stuff that loads page content based on hash variable
+    if(hash) {
+    	$("#load").text(hash + ".html");
+		var $tabs = $("#results").tabs();
+		var tabidx;
+		if(hash == 'protlist')
+			tabidx = 0;
+		else if (hash == 'protclusters')
+			tabidx = 1;
+		else if (hash == 'protdetails')
+			tabidx = 2;
+		else if (hash == 'input')
+			tabidx = 3;  
+  		$tabs.tabs('select', tabidx);
+	} else {
+		var $tabs = $("#results").tabs();
+		$tabs.tabs('select', 0);
+	}
+}
+// FOR HISTORY
+$(document).ready(function() {
+    $.history.init(callback);
+    $("a[@rel='history']").click(function(){
+    	var hash = this.href;
+		hash = hash.replace(/^.*#/, '');
+        $.history.load(hash);
+        return false;
+    });
+});
+
+
+  // stripe the proteins table
   $(document).ready(function() {
   	$(".stripe_table th").addClass("ms_A");
   	$(".stripe_table tr:even").addClass("ms_A");
   });
   
-  $(document).ready(function() {
-  	$(".grp_table").css('border', '1px dashed gray').css('border-spacing', '2px');
-  	$(".grp_table  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-  	$(".grp_table  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
+  // ajax defaults
+  $.ajaxSetup({
+  	type: 'POST',
+  	timeout: 5000,
+  	dataType: 'html',
+  	error: function(xhr) {
+  				var statusCode = xhr.status;
+		  		// status code returned if user is not logged in
+		  		// reloading this page will redirect to the login page
+		  		if(statusCode == 303)
+ 					window.location.reload();
+ 				
+ 				// otherwise just display an alert
+ 				else {
+ 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText);
+ 				}
+  			}
   });
   
-  
+  // View the protein sequence
   function toggleProteinSequence (nrseqid, peptides) {
   
   		//alert("protein id: "+nrseqid+" peptides: "+peptides);
@@ -38,14 +91,11 @@
   		
   		if(button.text() == "View Protein Sequence") {
   			if($("#protsequence_"+nrseqid).html().length == 0) {
+  			
   				//alert("Sending request for: "+nrseqid+"; peptides: "+peptides);
-  				var html = $.ajax({
-  					url: "proteinSequence.do?nrseqid="+nrseqid+"&peptides="+peptides,
-  					async: false
- 				}).responseText;
- 				//alert("Got response: "+html);
- 				html = "<pre>"+html+"</pre>";
- 				$("#protsequence_"+nrseqid).html(html);
+  				// load data in the appropriate div
+  				$("#protsequence_"+nrseqid).load("proteinSequence.do",   						// url
+  								                 {'nrseqid': nrseqid, 'peptides': peptides}); 	// data
  			}
  			button.text("Hide Protein Sequence");
  			$("#protsequence_"+nrseqid).show();
@@ -70,23 +120,18 @@
   	// first hide all divs 
   	$(".protdetail_prot").hide();
   	
-  	// get data from the server and put it in the appropriate div
-  	var html = $.ajax({
-  				url: "proteinDetails.do?pinferId="+<%=pinferId%>+"&nrseqProtId="+proteinId,
-  				async: false
- 				}).responseText;
- 	//alert("Got response: "+html);
- 	
-  	// show the relevant one
-  	$("#protein_"+proteinId).html(html);
-  	
-  	// stripe the table
-  	$("#protdetailstbl_"+proteinId+" th").addClass("ms_A");
-  	$("#protdetailstbl_"+proteinId+" tr:even").addClass("ms_A");
-  	
-  	$("#protein_"+proteinId).show();
-  	var $tabs = $("#results").tabs();
-  	$tabs.tabs('select', 2);
+  	// load content in the appropriate div
+  	$("#protein_"+proteinId).load("proteinDetails.do",   									// url
+  								  {'pinferId': <%=pinferId%>, 'nrseqProtId': proteinId}, 	// data
+  								  function(responseText, status, xhr) {						// callback
+  								  		// stripe the table
+  										$("#protdetailstbl_"+proteinId+" th").addClass("ms_A");
+  										$("#protdetailstbl_"+proteinId+" tr:even").addClass("ms_A");
+  										$(this).show();
+  										var $tabs = $("#results").tabs();
+  										$("#protdetailslink").click(); // so that history works
+  										//$tabs.tabs('select', 2);
+  								  });	
   }
   
   
@@ -96,42 +141,39 @@
   	selectProteinCluster();
   	
   	var $tabs = $("#results").tabs();
-  	$tabs.tabs('select', 1);
+  	$("#protclusterslink").click();
+  	//$tabs.tabs('select', 1);
   	return false;
   }
   
   
   function selectProteinCluster() {
   
-  	var selected = $("#clusterlist")[0].selectedIndex;
-  	var clusterId = selected+1;
+  	var clusterId = $("#clusterlist")[0].selectedIndex + 1;
   	
+  	// hide all other first
   	for(var i = 1; i <= <%=clusterCount%>; i++) {
   		$("#protcluster_"+i).hide();
   	}
   	// get data from the server and put it in the appropriate div
-  	var html = $.ajax({
-  					url: "proteinCluster.do?pinferId="+<%=pinferId%>+"&clusterId="+clusterId,
-  					async: false
- 				}).responseText;
- 	//alert("Got response: "+html);
- 	
- 	$("#protcluster_"+clusterId).html(html);
- 	
- 	$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
-  	$("#assoctable_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-  	$("#assoctable_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
-  	
-  	$("#prot_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
-  	$("#prot_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-  	$("#prot_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
-  	
-  	$("#pept_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
-  	$("#pept_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-  	$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
-  	
-  	// now display the div
-  	$("#protcluster_"+(selected+1)).show();
+  	$("#protcluster_"+clusterId).load("proteinCluster.do",   								// url
+  								  	  {'pinferId': <%=pinferId%>, 'clusterId': clusterId}, 	// data
+  								      function(responseText, status, request) {				// callback
+	  								  		
+	  								  		$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
+	  										$("#assoctable_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+										  	$("#assoctable_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
+										  	
+										  	$("#prot_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
+										  	$("#prot_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+										  	$("#prot_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
+										  	
+										  	$("#pept_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
+										  	$("#pept_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
+										  	$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
+	  										
+	  										$(this).show();
+  								  });	
   }
   
   
@@ -287,6 +329,7 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <CENTER>
+
 <yrcwww:contentbox title="IDPicker Results" centered="true" width="850" scheme="ms">
 
 	<table align="center" cellpadding="4">
@@ -347,10 +390,10 @@
   
   <div id="results" class="flora">
       <ul>
-          <li><a href="#protlist"><span>Protein List</span></a></li>
-          <li><a href="#protclusters"><span>Protein Clusters</span></a></li>
-          <li><a href="#protdetails"><span>Protein Details</span></a></li>
-          <li><a href="#input"><span>Input Summary</span></a></li>
+          <li><a href="#protlist" rel="history" id="protlistlink"><span>Protein List</span></a></li>
+          <li><a href="#protclusters" rel="history" id="protclusterslink"><span>Protein Clusters</span></a></li>
+          <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
+          <li><a href="#input" rel="history" id="inputlink"><span>Input Summary</span></a></li>
       </ul>
       
       <!-- PROTEIN LIST -->
