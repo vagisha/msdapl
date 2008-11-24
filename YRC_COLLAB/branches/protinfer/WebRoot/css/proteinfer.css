@@ -1,10 +1,15 @@
-TH.ms_A {
-	background-color: #D4FECA;
+DIV.pinfer_header {
+    color: #50A029;
 }
+/*background-color: #a0df82;*/
 
-TH.ms_hover {
+TH.ms_A {
 	background-color: #a0df82;
     color: #FFFFFF;
+}
+ /* background-color: #D4FECA; */
+TH.ms_hover {
+	color: #3D902A;
     cursor: pointer;
 }
 

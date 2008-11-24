@@ -1,6 +1,7 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +16,9 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
+import edu.uwpr.protinfer.SequestSpectrumMatch;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
+import edu.uwpr.protinfer.database.dto.ProteinferProteinGroup;
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.SearchSummary;
 
@@ -53,11 +56,21 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("params", params);
         SearchSummary summary = ProteinferLoader.getIDPickerInputSummary(pinferId);
         request.setAttribute("searchSummary", summary);
-        List<ProteinferProtein> inferredProteins = ProteinferLoader.getProteinferProteins(pinferId);
-        request.setAttribute("inferredProteins", inferredProteins);
+//        List<ProteinferProtein> inferredProteins = ProteinferLoader.getProteinferProteins(pinferId);
+//        request.setAttribute("inferredProteins", inferredProteins);
+        List<ProteinferProteinGroup> proteinGroups = ProteinferLoader.getProteinferProteinGroups(pinferId);
+        request.setAttribute("proteinGroups", proteinGroups);
+        
+        Map<Integer, SequestSpectrumMatch> bestPsmMap = ProteinferLoader.getBestSpectrumMatches(proteinGroups);
+        request.setAttribute("psmList", bestPsmMap);
+        
         int maxClusterId = 0;
-        for(ProteinferProtein prot: inferredProteins)
-            maxClusterId = Math.max(maxClusterId, prot.getClusterId());
+        for(ProteinferProteinGroup protGrp: proteinGroups) {
+            for(ProteinferProtein prot: protGrp.getProteins()) {
+                maxClusterId = Math.max(maxClusterId, prot.getClusterId());
+            }
+        }
+        
         request.setAttribute("clusterCount", maxClusterId);
         request.setAttribute("pinferId", pinferId);
 

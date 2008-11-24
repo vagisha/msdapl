@@ -31,6 +31,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
@@ -172,10 +173,10 @@ public class DoProteinInferenceAction extends Action {
         log.info("Calculated protein sequence coverage in: "+getTime(start, end));
         
         // save the results
-//        start = System.currentTimeMillis();
-//        ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
-//        end = System.currentTimeMillis();
-//        log.info("Saved results in: "+getTime(start, end));
+        start = System.currentTimeMillis();
+        ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
+        end = System.currentTimeMillis();
+        log.info("Saved results in: "+getTime(start, end));
         
         
         // Group proteins and peptides
@@ -358,10 +359,11 @@ public class DoProteinInferenceAction extends Action {
         
         for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
             int nrseqId = prot.getProteinId();
+            NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(nrseqId);
             NRProteinFactory nrpf = NRProteinFactory.getInstance();
             NRProtein protein = null;
             try {
-                protein = (NRProtein)(nrpf.getProtein(nrseqId));
+                protein = (NRProtein)(nrpf.getProtein(dbProt.getProteinId()));
             }
             catch (IllegalArgumentException e) {
                 e.printStackTrace();
@@ -400,7 +402,7 @@ public class DoProteinInferenceAction extends Action {
         int nrseqDbId = searchDbs.get(0).getSequenceDatabaseId();
         String dbname = searchDbs.get(0).getDatabaseFileName();
         
-        Map<String, Integer> nrseqIdMap = new HashMap<String, Integer>();
+        Map<String, NrDbProtein> nrseqIdMap = new HashMap<String, NrDbProtein>();
        
         for(SequestHit hit: hits) {
            PeptideHit phit = hit.getPeptideHit();
@@ -408,30 +410,33 @@ public class DoProteinInferenceAction extends Action {
 //               continue;
            for(ProteinHit prHit: phit.getProteinList()) {
                Protein pr = prHit.getProtein();
-               Integer id = nrseqIdMap.get(pr.getAccession());
-               if(id == null) {
-                   id = NrSeqLookupUtil.getProteinId(nrseqDbId, pr.getAccession());
-                   if(id == 0) {
-                       List<Integer> ids = NrSeqLookupUtil.getProteinIdsLikeAccesion(dbname, pr.getAccession());
+               NrDbProtein nrDbProt = nrseqIdMap.get(pr.getAccession());
+               if(nrDbProt == null) {
+                   nrDbProt  = NrSeqLookupUtil.getDbProtein(nrseqDbId, pr.getAccession());
+                   if(nrDbProt == null) {
+                       List<Integer> ids = NrSeqLookupUtil.getDbProteinIdsLikeAccesion(dbname, pr.getAccession());
                        if(ids.size() != 1) {
-                           ids = NrSeqLookupUtil.getProteinIdsForPeptidePartialAccession(nrseqDbId, pr.getAccession(),
+                           ids = NrSeqLookupUtil.getDbProteinIdsForPeptidePartialAccession(nrseqDbId, pr.getAccession(),
                                    phit.getPeptide().getSequence());
                            if(ids.size() != 1) {
                                log.error("Could not find nrseq id for protein: "+pr.getAccession()+
                                            "; database: "+nrseqDbId+"; dbname: "+dbname);
                            }
                            else {
-                               id = ids.get(0);
+                               nrDbProt = NrSeqLookupUtil.getDbProtein(ids.get(0));
+                               nrseqIdMap.put(pr.getAccession(), nrDbProt);
                            }
                        }
                        else {
-                           id = ids.get(0);
+                           nrDbProt = NrSeqLookupUtil.getDbProtein(ids.get(0));
+                           nrseqIdMap.put(pr.getAccession(), nrDbProt);
                        }
                    }
+                   else
+                       nrseqIdMap.put(pr.getAccession(), nrDbProt);
                }
-               pr.setId(id);
-               String realAccession = NrSeqLookupUtil.getProteinAccession(nrseqDbId, id);
-               pr.setAccession(realAccession);
+               pr.setId(nrDbProt.getId());
+               pr.setAccession(nrDbProt.getAccessionString());
            }
         }
     }

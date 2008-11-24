@@ -13,16 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.database.dao.DAOFactory;
 import edu.uwpr.protinfer.database.dao.ProteinferProteinDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferCluster;
 import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 
@@ -70,11 +69,16 @@ public class ProteinClusterAjaxAction extends Action{
 
         System.out.println("Got request for clusterId: "+clusterId+" of protein inference run: "+pinferId);
 
-        String html = getClusterHtml(pinferId, clusterId);
+        request.setAttribute("pinferId", pinferId);
+        request.setAttribute("clusterId", clusterId);
+        ProteinferCluster cluster = ProteinferLoader.getProteinferCluster(pinferId, clusterId);
+        request.setAttribute("cluster", cluster);
+        
+//        String html = getClusterHtml(pinferId, clusterId);
         // Go!
-        response.setContentType("text/html");
-        response.getWriter().write(html);
-        return null;
+//        response.setContentType("text/html");
+//        response.getWriter().write(html);
+        return mapping.findForward("Success");
     }
 
     private String getClusterHtml(int pinferId, int clusterId) {

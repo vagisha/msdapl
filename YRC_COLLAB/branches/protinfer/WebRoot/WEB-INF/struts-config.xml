@@ -1095,12 +1095,21 @@
 		path="/proteinCluster"
 		type="org.yeastrc.www.proteinfer.ProteinClusterAjaxAction"
 	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinCluster.jsp" redirect="false" />
 	</action>
 	
 	<action 
 		path="/proteinDetails"
 		type="org.yeastrc.www.proteinfer.ProteinDetailsAjaxAction"
 	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinDetails.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/psmMatches"
+		type="org.yeastrc.www.proteinfer.PeptideSequenceMatchesAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/psmMatches.jsp" redirect="false" />
 	</action>
 	
 	<action 

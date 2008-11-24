@@ -2,28 +2,29 @@ package org.yeastrc.www.proteinfer;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
+import edu.uwpr.protinfer.SequestSpectrumMatch;
 import edu.uwpr.protinfer.database.dao.DAOFactory;
 import edu.uwpr.protinfer.database.dao.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
+import edu.uwpr.protinfer.infer.InferredProtein;
 
 public class ProteinDetailsAjaxAction extends Action {
 
@@ -68,11 +69,31 @@ public class ProteinDetailsAjaxAction extends Action {
 
         System.out.println("Got request for nrseq protein ID: "+nrseqProtId+" of protein inference run: "+pinferId);
 
-        String html = getProteinDetailsHtml(pinferId, nrseqProtId);
+        InferredProtein<SequestSpectrumMatch> iProt = ProteinferLoader.getInferredProtein(pinferId, nrseqProtId);
+        request.setAttribute("inferredProtein", iProt);
+        List<ProteinferProtein> groupProteins = ProteinferLoader.getGroupProteins(pinferId, iProt.getProteinGroupId());
+        if(groupProteins.size() == 1)
+            groupProteins.clear();
+        else {
+            Iterator<ProteinferProtein> protIter = groupProteins.iterator();
+            while(protIter.hasNext()) {
+                ProteinferProtein prot = protIter.next();
+                if(prot.getNrseqProteinId() == iProt.getProteinId()) {
+                    protIter.remove();
+                    break;
+                }
+            }
+        }
+        request.setAttribute("groupProteins", groupProteins);
+        request.setAttribute("nrseqProtId", nrseqProtId);
+        request.setAttribute("pinferId", pinferId);
+        
+        
+        //String html = getProteinDetailsHtml(pinferId, nrseqProtId);
         // Go!
-        response.setContentType("text/html");
-        response.getWriter().write(html);
-        return null;
+        //response.setContentType("text/html");
+        //response.getWriter().write(html);
+        return mapping.findForward("Success");
     }
 
     private String getProteinDetailsHtml(int pinferId, int nrseqProtId) {
@@ -81,22 +102,31 @@ public class ProteinDetailsAjaxAction extends Action {
         
         StringBuilder buf = new StringBuilder();
         
-        buf.append("<button onclick=\"toggleProteinSequence("+nrseqProtId+", '"+getPeptidesForProtein(protein)+"')\""+
-                        " id=\"protseqbutton_"+nrseqProtId+"\">View Protein Sequence</button><br>\n");
+        buf.append("<div style=\"padding:5px; color: black;\" ><b>"+protein.getAccession()+"</b>\n");
+        buf.append("<span style=\"text-decoration: underline; cursor: pointer; font-size: 8pt; color: red;\""+
+                "onclick=\"toggleProteinSequence("+nrseqProtId+", '"+getPeptidesForProtein(protein)+"')\""+
+                " id=\"protseqbutton_"+nrseqProtId+"\""+
+                ">"
+                +"[View Sequence]</span>");
+        buf.append("</div><br>\n");
+        
+        buf.append(otherProteinsInGroup(protein));
         
         buf.append("<table  align=\"center\" width=\"90%\">"+
                     "\n\t<tr><td style=\"background-color: #D4FECA;\" id=\"protsequence_"+nrseqProtId+"\"></td></tr>"+
                     "\n</table>\n");
         
         buf.append("<br><br>\n");
-        buf.append("<table width=\"95%\" id=\"protdetailstbl_"+nrseqProtId+"\">\n");
-        buf.append("<tr>\n");
+        buf.append("<table width=\"95%\" id=\"protdetailstbl_"+nrseqProtId+"\" class=\"stripe_table\">\n");
+        buf.append("<thead>\n");
+        buf.append("<tr class=\"main\">\n");
         buf.append("<th width=\"10%\" align=\"left\"><b><font size=\"2pt\">Group ID</font></b></th>\n");
         buf.append("<th align=\"left\"><b><font size=\"2pt\">Sequence</font></b></th>\n");
         buf.append("<th width=\"10%\" align=\"left\"><b><font size=\"2pt\"># Spectra</font></b></th>\n");
         buf.append("<th width=\"10%\" align=\"left\"><b><font size=\"2pt\">Best FDR</font></b></th>\n");
         buf.append("<th width=\"10%\" align=\"left\"><b><font size=\"2pt\">Unique</b></th>\n");
         buf.append("</tr>\n");
+        buf.append("</thead>\n");
         
         List<ProteinferPeptide> peptList = protein.getPeptides();
         Collections.sort(peptList, new Comparator<ProteinferPeptide>() {
@@ -104,6 +134,7 @@ public class ProteinDetailsAjaxAction extends Action {
                 return Integer.valueOf(o1.getGroupId()).compareTo(o2.getGroupId());
             }});
         
+        buf.append("<tbody>\n");
         for(ProteinferPeptide pept: peptList) {
             buf.append("<tr>\n");
             buf.append("<td>"+pept.getGroupId()+"</td>\n");
@@ -115,12 +146,18 @@ public class ProteinDetailsAjaxAction extends Action {
             
             buf.append(spectrumMatchesForPeptide(pept));
         }
-        
+        buf.append("</tbody>\n");
         buf.append("</table>\n");
         return buf.toString();
     }
     
     
+    private String otherProteinsInGroup(ProteinferProtein protein) {
+        StringBuilder buf = new StringBuilder();
+        
+        return buf.toString();
+    }
+
     private Object spectrumMatchesForPeptide(ProteinferPeptide pept) {
         StringBuilder buf = new StringBuilder();
         

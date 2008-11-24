@@ -2,6 +2,7 @@ package org.yeastrc.www.proteinfer;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.user.User;
@@ -37,23 +40,36 @@ public class ProteinSequenceAjaxAction extends Action {
 //            return mapping.findForward("authenticate");
         }
 
-        int nrseqid = 0;
-        try {nrseqid = Integer.parseInt(request.getParameter("nrseqid"));}
+        int pinferId = 0;
+        try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
         catch(NumberFormatException e) {}
 
-        if(nrseqid == 0) {
+        if(pinferId == 0) {
             response.setContentType("text/html");
-            response.getWriter().write("<b>Invalid protein ID: "+nrseqid+"</b>");
+            response.getWriter().write("<b>Invalid Protein Inference ID: "+pinferId+"</b>");
+            return null;
+        }
+        
+        int nrseqProtId = 0;
+        try {nrseqProtId = Integer.parseInt(request.getParameter("nrseqid"));}
+        catch(NumberFormatException e) {}
+
+        if(nrseqProtId == 0) {
+            response.setContentType("text/html");
+            response.getWriter().write("<b>Invalid protein ID: "+nrseqProtId+"</b>");
             return null;
         }
 
-        String peptideList = request.getParameter("peptides");
-        String[] peptides = peptideList.split(",");
+//        String peptideList = request.getParameter("peptides");
+//        String[] peptides = peptideList.split(",");
+        List<String> peptideList = ProteinferLoader.getUnmodifiedPeptidesForProtein(pinferId, nrseqProtId);
+        String[] peptides = new String[peptideList.size()];
+        peptides = peptideList.toArray(peptides);
 
-        System.out.println("Got request for accession: "+nrseqid);
+        System.out.println("Got request for accession: "+nrseqProtId);
         System.out.println("Peptides are: "+peptideList);
 
-        String html = getHtmlForProtein(nrseqid, peptides);
+        String html = getHtmlForProtein(nrseqProtId, peptides);
         // Go!
         response.setContentType("text/html");
         response.getWriter().write("<pre>"+html+"</pre>");
@@ -62,10 +78,14 @@ public class ProteinSequenceAjaxAction extends Action {
 
     private String getHtmlForProtein(int nrseqid, String[] peptides) {
         
+        NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(nrseqid);
+        if(dbProt == null) {
+            return "<b>Could not find protein with ID: "+nrseqid+"</b>";
+        }
         NRProteinFactory nrpf = NRProteinFactory.getInstance();
         NRProtein protein = null;
         try {
-            protein = (NRProtein)(nrpf.getProtein(nrseqid));
+            protein = (NRProtein)(nrpf.getProtein(dbProt.getProteinId()));
         }
         catch (IllegalArgumentException e) {
             e.printStackTrace();

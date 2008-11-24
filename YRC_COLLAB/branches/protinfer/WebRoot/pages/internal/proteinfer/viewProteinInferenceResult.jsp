@@ -27,22 +27,21 @@
 // FOR HISTORY
 function callback(hash)
 {
+	var $tabs = $("#results").tabs();
     // do stuff that loads page content based on hash variable
     if(hash) {
     	$("#load").text(hash + ".html");
 		var $tabs = $("#results").tabs();
-		var tabidx;
+		
 		if(hash == 'protlist')
-			tabidx = 0;
+			$tabs.tabs('select', 0);
 		else if (hash == 'protclusters')
-			tabidx = 1;
+			$tabs.tabs('select', 1);
 		else if (hash == 'protdetails')
-			tabidx = 2;
+			$tabs.tabs('select', 2);
 		else if (hash == 'input')
-			tabidx = 3;  
-  		$tabs.tabs('select', tabidx);
+			$tabs.tabs('select', 3);
 	} else {
-		var $tabs = $("#results").tabs();
 		$tabs.tabs('select', 0);
 	}
 }
@@ -58,16 +57,16 @@ $(document).ready(function() {
 });
 
 
-  // stripe the proteins table
+  // stripe the proteins table and the input list table
   $(document).ready(function() {
   	$(".stripe_table th").addClass("ms_A");
-  	$(".stripe_table tr:even").addClass("ms_A");
+  	$(".stripe_table tbody > tr:odd").addClass("ms_A");
   });
   
   // ajax defaults
   $.ajaxSetup({
   	type: 'POST',
-  	timeout: 5000,
+  	timeout: 10000,
   	dataType: 'html',
   	error: function(xhr) {
   				var statusCode = xhr.status;
@@ -84,25 +83,25 @@ $(document).ready(function() {
   });
   
   // View the protein sequence
-  function toggleProteinSequence (nrseqid, peptides) {
+  function toggleProteinSequence (nrseqid, pinferId) {
   
-  		//alert("protein id: "+nrseqid+" peptides: "+peptides);
+  		//alert("protein id: "+nrseqid+" pinferId: "+pinferId);
   		var button = $("#protseqbutton_"+nrseqid);
   		
-  		if(button.text() == "View Protein Sequence") {
+  		if(button.text() == "[View Sequence]") {
+  			//alert("View");
   			if($("#protsequence_"+nrseqid).html().length == 0) {
-  			
-  				//alert("Sending request for: "+nrseqid+"; peptides: "+peptides);
+  				//alert("Getting...");
   				// load data in the appropriate div
   				$("#protsequence_"+nrseqid).load("proteinSequence.do",   						// url
-  								                 {'nrseqid': nrseqid, 'peptides': peptides}); 	// data
+  								                 {'nrseqid': nrseqid, 'pinferId': pinferId}); 	// data
  			}
- 			button.text("Hide Protein Sequence");
- 			$("#protsequence_"+nrseqid).show();
+ 			button.text("[Hide Sequence]");
+ 			$("#protseqtbl_"+nrseqid).show();
  		}
  		else {
- 			button.text("View Protein Sequence");
- 			$("#protsequence_"+nrseqid).hide();
+ 			button.text("[View Sequence]");
+ 			$("#protseqtbl_"+nrseqid).hide();
  		}
   }
   
@@ -126,7 +125,7 @@ $(document).ready(function() {
   								  function(responseText, status, xhr) {						// callback
   								  		// stripe the table
   										$("#protdetailstbl_"+proteinId+" th").addClass("ms_A");
-  										$("#protdetailstbl_"+proteinId+" tr:even").addClass("ms_A");
+  										$("#protdetailstbl_"+proteinId+" tbody tr.main").addClass("ms_A");
   										$(this).show();
   										var $tabs = $("#results").tabs();
   										$("#protdetailslink").click(); // so that history works
@@ -177,6 +176,24 @@ $(document).ready(function() {
   }
   
   
+  function showSpectrumMatches(runSearchId, runName) {
+  		$(".input_psm").hide();
+  		$("#psm_"+runSearchId).show();
+  		
+  		if($("#psm_"+runSearchId).html().length == 0) {
+  			$("#psm_"+runSearchId).html("<b>Loading Peptide Spectrum Matches for: "+runName+"...</b>");
+  			$("#psm_"+runSearchId).load("psmMatches.do", //url
+  									{'pinferId': <%=pinferId%>, 'runSearchId': runSearchId},
+  									function(responseText, status, xhr) {						// callback
+  								  		// stripe the table
+  										$("#psmtbl_"+runSearchId+" th").addClass("ms_A");
+  										$("#psmtbl_"+runSearchId+" tr:even").addClass("ms_A");
+  										makeSortable($("#psmtbl_"+runSearchId));
+  										$(this).show();
+  								  });
+  		}
+  }
+  
   
   var lastSelectedProteinGroupId = -1;
   var lastSelectedPeptGrpIds = new Array(0);
@@ -204,14 +221,14 @@ $(document).ready(function() {
   		var j = 0;
   		// peptide groups NOT unique to protein
   		for(var i = 0; i < peptGrpIds.length; i++) {
-  			$("#peptGrp_"+peptGrpIds[i]).css("background-color","#FFFF00");
+  			$(".peptGrp_"+peptGrpIds[i]).each(function() {$(this).css("background-color","#FFFF00");});
   			$("#peptEvFor_"+proteinGroupId+"_"+peptGrpIds[i]).css("background-color","#FFFF00");
   			lastSelectedPeptGrpIds[j] = peptGrpIds[i];
   			j++;
   		}
   		// peptide groups UNIQUE to protein
   		for(var i = 0; i < uniqPeptGrpIds.length; i++) {
-  			$("#peptGrp_"+uniqPeptGrpIds[i]).css("background-color","#00FFFF");
+  			$(".peptGrp_"+uniqPeptGrpIds[i]).each(function() {$(this).css("background-color","#00FFFF");});
   			$("#peptEvFor_"+proteinGroupId+"_"+uniqPeptGrpIds[i]).css("background-color","#00FFFF");
   			lastSelectedPeptGrpIds[j] = uniqPeptGrpIds[i];
   			j++;
@@ -229,7 +246,9 @@ $(document).ready(function() {
 	  		// deselect any last selected peptide group cells AND protein-peptide association cells
 	  		if(lastSelectedPeptGrpIds.length > 0) {
 		  		for(var i = 0; i < lastSelectedPeptGrpIds.length; i++) {
-		  			$("#peptGrp_"+lastSelectedPeptGrpIds[i]).css("background-color","");
+		  			$(".peptGrp_"+lastSelectedPeptGrpIds[i]).each(function() {
+		  				$(this).css("background-color","");
+		  				});
 		  			$("#peptEvFor_"+lastSelectedProteinGroupId+"_"+lastSelectedPeptGrpIds[i]).css("background-color","");
 		  		}
 		  	}
@@ -251,9 +270,16 @@ $(document).ready(function() {
   $(document).ready(function() {
   
    	$('table.sortable').each(function() {
-
     	var $table = $(this);
-    	$('th', $table).each(function(column) {
+    	makeSortable($table);
+  	});
+  });
+  
+  
+  function makeSortable(table) {
+  	
+  	var $table = table;
+  	$('th', $table).each(function(column) {
     		
     		if ($(this).is('.sort-alpha') || $(this).is('.sort-int') 
     			|| $(this).is('.sort-int-special') || $(this).is('.sort-float') ) {
@@ -264,8 +290,16 @@ $(document).ready(function() {
         			function() {$(this).removeClass('ms_hover');}).click(function() {
 
 						// remove row striping
-						$(".stripe_table tr:even").removeClass("ms_A");
+						if($table.is('.stripe_table')) {
+							$("tbody > tr:odd", $table).removeClass("ms_A");
+						}
 						
+						// sorting direction
+						var newDirection = 1;
+          				if ($(this).is('.sorted-asc')) {
+            				newDirection = -1;
+          				}
+          				
           				var rows = $table.find('tbody > tr').get();
           				
           				if ($header.is('.sort-alpha')) {
@@ -296,8 +330,8 @@ $(document).ready(function() {
 						}
 
           				rows.sort(function(a, b) {
-            				if (a.sortKey < b.sortKey) return -1;
-  							if (a.sortKey > b.sortKey) return 1;
+            				if (a.sortKey < b.sortKey) return -newDirection;
+  							if (a.sortKey > b.sortKey) return newDirection;
   							return 0;
           				});
 
@@ -306,13 +340,20 @@ $(document).ready(function() {
             				row.sortKey = null;
           				});
           				
+          				var $sortHead = $table.find('th').filter(':nth-child(' + (column + 1) + ')');
+
+			          	if (newDirection == 1) {$sortHead.addClass('sorted-asc'); $sortHead.removeClass('sorted-desc');} 
+			          	else {$sortHead.addClass('sorted-desc'); $sortHead.removeClass('sorted-asc');}
+          
           				// add row striping back
-          				$(".stripe_table tr:even").addClass("ms_A");
+          				if($table.is('.stripe_table')) {
+							$("tbody > tr:odd", $table).addClass("ms_A");
+          				}
         			});
 			}
       	});
-  	});
-  });
+  	}
+  	
 </script>
 
 
@@ -330,7 +371,7 @@ $(document).ready(function() {
 
 <CENTER>
 
-<yrcwww:contentbox title="IDPicker Results" centered="true" width="850" scheme="ms">
+<yrcwww:contentbox title="IDPicker Results" centered="true" width="900" scheme="ms">
 
 	<table align="center" cellpadding="4">
 	<tr><td>
@@ -400,18 +441,24 @@ $(document).ready(function() {
 	<div id="protlist">
       	<table cellpadding="4" cellspacing="2" align="center" width="95%" class="sortable stripe_table">
 			<logic:notEmpty name="inferredProteins">
+				<thead>
 				<tr>
+				<th class="sort-alpha"><b><font size="2pt">&nbsp;</font></b></th>
 				<th class="sort-alpha"><b><font size="2pt">Protein</font></b></th>
-				<th class="sort-float"><b><font size="2pt">Coverage(%)</font></b></th>
-				<th class="sort-int-special"><b><font size="2pt"># Peptides<br>(Unique)</font></b></th>
-				<th class="sort-int"><b><font size="2pt"># Spectra</font></b></th>
-				<th class="sort-int"><b><font size="2pt">Protein Cluster</font></b></th>
-				<th class="sort-int"><b><font size="2pt">Protein Group</font></b></th>
-				
+				<th class="sort-alpha"><b><font size="2pt">Description</font></b></th>
+				<th class="sort-float" width="3%"><b><font size="2pt">Coverage (%)</font></b></th>
+				<th class="sort-int" width="3%"><b><font size="2pt"># Peptides</font></b></th>
+				<th class="sort-int" width="3%"><b><font size="2pt"># Uniq. Peptides</font></b></th>
+				<th class="sort-int" width="3%"><b><font size="2pt"># Spectra</font></b></th>
+				<th class="sort-int" width="3%"><b><font size="2pt">Protein Cluster</font></b></th>
+				<th class="sort-int" width="3%"><b><font size="2pt">Protein Group</font></b></th>
 				</tr>
+				</thead>
 			</logic:notEmpty>
+			<tbody>
 			<logic:iterate name="inferredProteins" id="protein">
 				<tr>
+				<td>*</td>
 				<td>
 					<logic:equal name="protein" property="isParsimonious" value="true"><b></logic:equal>
 					<logic:equal name="protein" property="isParsimonious" value="false"><font color="#888888"></logic:equal>
@@ -421,9 +468,12 @@ $(document).ready(function() {
 					</span>
 					<logic:equal name="protein" property="isParsimonious" value="false"></font></logic:equal>
 					<logic:equal name="protein" property="isParsimonious" value="true"></b></logic:equal>
+					
 				</td>
+				<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 				<td><bean:write name="protein" property="coverage"/></td>
-				<td><bean:write name="protein" property="peptideCount"/>(<bean:write name="protein" property="uniquePeptideCount"/>)</td>
+				<td><bean:write name="protein" property="peptideCount"/></td>
+				<td><bean:write name="protein" property="uniquePeptideCount"/></td>
 				<td><bean:write name="protein" property="spectralCount"/></td>
 				<td><span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
 						  onclick="showProteinCluster(<bean:write name="protein" property="clusterId"/>)">
@@ -432,6 +482,7 @@ $(document).ready(function() {
 				<td><bean:write name="protein" property="groupId"/></td>
 				</tr>
 			</logic:iterate>
+			</tbody>
 		</table>
       </div>
       
@@ -464,18 +515,25 @@ $(document).ready(function() {
       <div id="input">
 		<table cellpadding="4" cellspacing="2" align="center" width="90%" class="sortable stripe_table">
 		<logic:notEmpty name="searchSummary" property="runSearchList">
+		<thead>
 		<tr>
 		<th class="sort-alpha" align="left"><b><font size="2pt">File Name</font></b></th>
 		<th class="sort-int" align="left"><b><font size="2pt">Decoy Hits</font></b></th>
 		<th class="sort-int" align="left"><b><font size="2pt">Target Hits</font></b></th>
 		<th class="sort-int" align="left"><b><font size="2pt">Filtered Target Hits</font></b></th>
 		</tr>
+		</thead>
 		</logic:notEmpty>
-		
+		<tbody>
 	  	<logic:iterate name="searchSummary" property="runSearchList" id="runSearch">
 	  		<logic:equal name="runSearch" property="isSelected" value="true">
 	  			<tr>
-	  				<td><bean:write name="runSearch" property="runName" /></td>
+	  				<td>
+	  					<span style="text-decoration: underline; cursor: pointer;"
+	  								onclick="showSpectrumMatches(<bean:write name="runSearch" property="runSearchId" />, '<bean:write name="runSearch" property="runName" />')">
+	  					<bean:write name="runSearch" property="runName" />
+	  					</span>
+	  				</td>
 	  				<td><bean:write name="runSearch" property="totalDecoyHits" /></td>
 	  				<td><bean:write name="runSearch" property="totalTargetHits" /></td>
 	  				<td><bean:write name="runSearch" property="filteredTargetHits" /></td>
@@ -488,7 +546,14 @@ $(document).ready(function() {
 	  		<td><b><bean:write name="searchSummary" property="totalTargetHits" /></b></td>
 	  		<td><b><bean:write name="searchSummary" property="filteredTargetHits" /></b></td>
 	  	</tr>
+	  	</tbody>
  		</table>
+		<br><br>
+		<logic:iterate name="searchSummary" property="runSearchList" id="runSearch">
+		<logic:equal name="runSearch" property="isSelected" value="true">
+			<div id="psm_<bean:write name="runSearch" property="runSearchId" />" style="display: none;" class="input_psm"></div>
+	  	</logic:equal>
+	  	</logic:iterate>
 	</div>
 
 </yrcwww:contentbox>
