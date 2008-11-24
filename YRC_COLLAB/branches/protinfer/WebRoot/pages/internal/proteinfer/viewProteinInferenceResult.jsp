@@ -1,6 +1,5 @@
 
-<%@page import="java.util.List"%>
-<%@page import="edu.uwpr.protinfer.database.dto.ProteinferProtein"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -8,15 +7,34 @@
 <script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js" ></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.tabs.js"></script>
+<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.slider.js"></script>
 <script type="text/javascript" src="/yrc/js/jquery.history.js"></script>
 <link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
 <%
 	int clusterCount = (Integer)request.getAttribute("clusterCount");
 	int pinferId = (Integer)request.getAttribute("pinferId");
-	List<ProteinferProtein> inferredProteins = (List<ProteinferProtein>)request.getAttribute("inferredProteins");
+	
 %>
 <script>
 
+// ajax defaults
+  $.ajaxSetup({
+  	type: 'POST',
+  	timeout: 10000,
+  	dataType: 'html',
+  	error: function(xhr) {
+  				var statusCode = xhr.status;
+		  		// status code returned if user is not logged in
+		  		// reloading this page will redirect to the login page
+		  		if(statusCode == 303)
+ 					window.location.reload();
+ 				
+ 				// otherwise just display an alert
+ 				else {
+ 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText);
+ 				}
+  			}
+  });
 
   // set up the tabs and select the first tab
   $(document).ready(function(){
@@ -56,31 +74,100 @@ $(document).ready(function() {
     });
 });
 
-
+	
+  function setupProteinListTable() {
+  	$("#protlisttable tbody tr.protgrp_row").addClass("ms_A");
+  	$("#protlisttable > thead > tr > th").addClass("ms_A");
+  	$(".showpept").click(function() {
+  	
+  		var id = this.id;
+  		if($(this).text() == "Show Peptides") {
+  			$(this).text("Hide Peptides");
+  			$("#peptforprot_"+id).show();
+  		}
+  		else {
+  			$(this).text("Show Peptides");
+  			$("#peptforprot_"+id).hide();
+  		}
+  			
+  	});
+  	makeProteinListSortable($("#protlisttable"));
+  }
+  
   // stripe the proteins table and the input list table
   $(document).ready(function() {
   	$(".stripe_table th").addClass("ms_A");
   	$(".stripe_table tbody > tr:odd").addClass("ms_A");
+  	
+  	setupProteinListTable();
+  	
+  	$("#coverage").slider({
+  		min: 0, 
+        max: 100, 
+        stop: function(e, ui) { 
+        	$("#coverage_val").text(Math.round(ui.value));
+        }, 
+        slide: function(e, ui) { 
+            $("#coverage_val").text(Math.round(ui.value));
+        } 
+  	});
+  	$("#peptcnt").slider({
+  		min: <%= (Integer)request.getAttribute("minPeptides")%>, 
+        max: <%= (Integer)request.getAttribute("maxPeptides")%>, 
+        startValue: <%= (Integer)request.getAttribute("minPeptides")%>,
+        stop: function(e, ui) { 
+        	$("#peptcnt_val").text(Math.round(ui.value));
+        }, 
+        slide: function(e, ui) { 
+            $("#peptcnt_val").text(Math.round(ui.value));
+        } 
+  	});
+  	$("#uniqpeptcnt").slider({
+  		min: 0, 
+        max: <%= (Integer)request.getAttribute("maxUniqPeptides")%>, 
+        stop: function(e, ui) { 
+        	$("#uniqpeptcnt_val").text(Math.round(ui.value));
+        }, 
+        slide: function(e, ui) { 
+            $("#uniqpeptcnt_val").text(Math.round(ui.value));
+        } 
+  	});
+  	$("#spectracnt").slider({
+  		min: 1, 
+        max: <%= (Integer)request.getAttribute("maxSpectra")%>, 
+        stop: function(e, ui) { 
+        	$("#spectracnt_val").text(Math.round(ui.value));
+        }, 
+        slide: function(e, ui) { 
+            $("#spectracnt_val").text(Math.round(ui.value));
+        } 
+  	});
+  	
+  	
+  	// add a click handler to the filter button
+  	$("#filterbutton").click(function() {
+  		var cov = $("#coverage_val").text();
+  		var pepCnt = $("#peptcnt_val").text();
+  		var uniqPeptCnt = $("#uniqpeptcnt_val").text();
+  		var specCnt = $("#spectracnt_val").text();
+  		
+  		$("#proteinlist_table").text("");
+  		
+  		$("#proteinlist_table").load("filterProteinferResults.do", 			//url
+  									{'pinferId': <%=pinferId%>, 	// data
+  									 'coverage': cov,
+  									 'peptideCnt': pepCnt,
+  									 'uniqPeptideCnt': uniqPeptCnt,
+  									 'spectraCnt': specCnt
+  									 },
+  									function(responseText, status, xhr) {		// callback
+  										setupProteinListTable();
+  								    });
+  		//alert("Filter on -- cov: "+cov+"; peptCnt: "+pepCnt+"; uniqPeptCnt: "+uniqPeptCnt+"; specCnt: "+specCnt);
+  	});
   });
   
-  // ajax defaults
-  $.ajaxSetup({
-  	type: 'POST',
-  	timeout: 10000,
-  	dataType: 'html',
-  	error: function(xhr) {
-  				var statusCode = xhr.status;
-		  		// status code returned if user is not logged in
-		  		// reloading this page will redirect to the login page
-		  		if(statusCode == 303)
- 					window.location.reload();
- 				
- 				// otherwise just display an alert
- 				else {
- 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText);
- 				}
-  			}
-  });
+  
   
   // View the protein sequence
   function toggleProteinSequence (nrseqid, pinferId) {
@@ -354,6 +441,79 @@ $(document).ready(function() {
       	});
   	}
   	
+  function makeProteinListSortable(table) {
+  	
+  	var $table = table;
+  	$('th', $table).each(function(column) {
+    		
+    		if ($(this).is('.sort-int') || $(this).is('.sort-float') ) {
+    		
+    			var $header = $(this);
+        		$(this).addClass('clickable').hover(
+        			function() {$(this).addClass('ms_hover');} , 
+        			function() {$(this).removeClass('ms_hover');}).click(function() {
+
+						$('th', $table).each(function(){$(this).removeClass('ms_selected_header');});
+						$header.addClass('ms_selected_header');
+						
+						// sorting direction
+						var newDirection = 1;
+          				if ($(this).is('.sorted-asc')) {
+            				newDirection = -1;
+          				}
+          				
+          				var rows = $table.find('tbody > tr.sorting_row').get();
+          				
+						if ($header.is('.sort-int')) {
+          					$.each(rows, function(index, row) {
+  								var key = parseInt($(row).children('td').eq(column).text());
+								row.sortKey = isNaN(key) ? 0 : key;
+							});
+						}
+						
+						if ($header.is('.sort-float')) {
+          					$.each(rows, function(index, row) {
+  								var key = parseFloat($(row).children('td').eq(column).text());
+								row.sortKey = isNaN(key) ? 0 : key;
+							});
+						}
+          				rows.sort(function(a, b) {
+            				if (a.sortKey < b.sortKey) return -newDirection;
+  							if (a.sortKey > b.sortKey) return newDirection;
+  							return 0;
+          				});
+
+						var found = 0;
+          				$.each(rows, function(index, row) {
+          					var $row = $(this);
+          					var myrows = [];
+            				//$table.children('tbody').append($row);
+            				myrows[0] = $row;
+            				var $nextrow = $row.next();
+            				var idx = 1;
+            				while($nextrow.is('.linked_row')) {
+            					myrows[idx] = $nextrow;
+            					$nextrow = $nextrow.next();
+            					idx++;
+            					found++;
+            				}
+            				
+            				for(var x = 0; x < myrows.length; x++) {
+            					$table.children('tbody').append(myrows[x]);
+            				}
+            				row.sortKey = null;
+          				});
+          				
+          				var $sortHead = $table.find('th').filter(':nth-child(' + (column + 1) + ')');
+
+			          	if (newDirection == 1) {$sortHead.addClass('sorted-asc'); $sortHead.removeClass('sorted-desc');} 
+			          	else {$sortHead.addClass('sorted-desc'); $sortHead.removeClass('sorted-asc');}
+          				
+        			});
+			}
+      	});
+  	}
+  	
 </script>
 
 
@@ -371,59 +531,35 @@ $(document).ready(function() {
 
 <CENTER>
 
-<yrcwww:contentbox title="IDPicker Results" centered="true" width="900" scheme="ms">
+<yrcwww:contentbox title="IDPicker Results" centered="true" width="1000" scheme="ms">
 
 	<table align="center" cellpadding="4">
 	<tr><td>
 	<table cellpadding="2" align="center" style="font-family: Trebuchet MS,Trebuchet,Verdana,Helvetica,Arial,sans-serif;font-size:12px; border: 1px solid gray; border-spacing: 2px">
-  	<tr class="ms_A"><td colspan="2" align="center"><b>Parameters</b></td></tr>
+  	<tr class="ms_A"><td colspan="4" align="center"><b>Parameters</b></td></tr>
   	<tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">Max. FDR</td>
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;color: #3D902A;">Max. Abs. FDR</td>
     <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="params" property="maxAbsoluteFdr" /></td>
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;color: #3D902A;">Max. Rel. FDR</td>
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="params" property="maxRelativeFdr" /></td>
    </tr>
    <tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">Decoy Ratio</td>
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;color: #3D902A;">Decoy Prefix</td>
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="params" property="decoyPrefix" /></td>
+    
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;color: #3D902A;">Decoy Ratio</td>
     <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="params" property="decoyRatio" /></td>
    </tr>
    <tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">Decoy Prefix</td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="params" property="decoyPrefix" /></td>
-   </tr>
-   <tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">Min. Distinct Peptides</td>
+   	<td VALIGN="top" style="border: 1px #CCCCCC dotted;color: #3D902A;">Min. Distinct Peptides</td>
     <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="params" property="minDistinctPeptides" /></td>
+   
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;color: #3D902A;">Parsimony Analysis</td>
+    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">
+    	<logic:equal name="params" property="doParsimonyAnalysis"value="true">Yes</logic:equal>
+    	<logic:equal name="params" property="doParsimonyAnalysis"value="false">No</logic:equal>
+    </td>
    </tr>
-   <tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">Parsimony Analysis</td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="params" property="doParsimonyAnalysis" /></td>
-   </tr>
-  </table>
-  </td>
-  <td>
-  
-  	<table cellpadding="2" align="center" style="font-family: Trebuchet MS,Trebuchet,Verdana,Helvetica,Arial,sans-serif;font-size:12px; border: 1px solid gray; border-spacing: 3px">
-  	<tr class="ms_A"><td colspan="3" align="center"><b>Summary</b></td></tr>
-  	<tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">&nbsp</td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><b>Total</b></td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><b>Filtered</b></td>
-   </tr>
-   <tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><b>Proteins</b></td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="searchSummary" property="allProteins" /></td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="searchSummary" property="filteredProteinsParsimony" /></td>
-   </tr>
-   <tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><b>Peptides</b></td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">-</td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;">-</td>
-   </tr>
-   <tr>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><b>Spectrum<br>Matches</b></td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="searchSummary" property="totalTargetHits" /></td>
-    <td VALIGN="top" style="border: 1px #CCCCCC dotted;"><bean:write name="searchSummary" property="filteredTargetHits" /></td>
-   </tr>
-
   </table>
   </td>
   </tr>
@@ -436,56 +572,63 @@ $(document).ready(function() {
           <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
           <li><a href="#input" rel="history" id="inputlink"><span>Input Summary</span></a></li>
       </ul>
+    
       
-      <!-- PROTEIN LIST -->
+    <!-- PROTEIN LIST -->
+    
+    
 	<div id="protlist">
-      	<table cellpadding="4" cellspacing="2" align="center" width="95%" class="sortable stripe_table">
-			<logic:notEmpty name="inferredProteins">
-				<thead>
-				<tr>
-				<th class="sort-alpha"><b><font size="2pt">&nbsp;</font></b></th>
-				<th class="sort-alpha"><b><font size="2pt">Protein</font></b></th>
-				<th class="sort-alpha"><b><font size="2pt">Description</font></b></th>
-				<th class="sort-float" width="3%"><b><font size="2pt">Coverage (%)</font></b></th>
-				<th class="sort-int" width="3%"><b><font size="2pt"># Peptides</font></b></th>
-				<th class="sort-int" width="3%"><b><font size="2pt"># Uniq. Peptides</font></b></th>
-				<th class="sort-int" width="3%"><b><font size="2pt"># Spectra</font></b></th>
-				<th class="sort-int" width="3%"><b><font size="2pt">Protein Cluster</font></b></th>
-				<th class="sort-int" width="3%"><b><font size="2pt">Protein Group</font></b></th>
-				</tr>
-				</thead>
-			</logic:notEmpty>
-			<tbody>
-			<logic:iterate name="inferredProteins" id="protein">
-				<tr>
-				<td>*</td>
-				<td>
-					<logic:equal name="protein" property="isParsimonious" value="true"><b></logic:equal>
-					<logic:equal name="protein" property="isParsimonious" value="false"><font color="#888888"></logic:equal>
-					<span onclick="showProteinDetails(<bean:write name="protein" property="nrseqProteinId" />)" 
-							style="text-decoration: underline; cursor: pointer">
-					<bean:write name="protein" property="accession" />
-					</span>
-					<logic:equal name="protein" property="isParsimonious" value="false"></font></logic:equal>
-					<logic:equal name="protein" property="isParsimonious" value="true"></b></logic:equal>
-					
-				</td>
-				<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
-				<td><bean:write name="protein" property="coverage"/></td>
-				<td><bean:write name="protein" property="peptideCount"/></td>
-				<td><bean:write name="protein" property="uniquePeptideCount"/></td>
-				<td><bean:write name="protein" property="spectralCount"/></td>
-				<td><span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
-						  onclick="showProteinCluster(<bean:write name="protein" property="clusterId"/>)">
-						<bean:write name="protein" property="clusterId"/>
-					</span></td>
-				<td><bean:write name="protein" property="groupId"/></td>
-				</tr>
-			</logic:iterate>
-			</tbody>
-		</table>
-      </div>
-      
+	
+	<div>
+    <table align="center" cellpadding="0" cellspacing="0">
+    <tr>
+    	<td>Coverage(%): </td>
+    	<td>
+    	<div id='coverage' class='ui-slider-1' style="margin:10px;">
+			<div class='ui-slider-handle'></div>	
+		</div>
+    	</td>
+    	<td align="center"><div id="coverage_val" style="background-color: #A0DF82; color:white;padding:5px; margin:2px;">0</div></td>
+    	<td>Spectrum Count: </td>
+    	<td>
+    	<div id='spectracnt' class='ui-slider-1' style="margin:10px;">
+			<div class='ui-slider-handle'></div>	
+		</div>
+    	</td>
+    	<td align="center"><div id="spectracnt_val" style="background-color: #A0DF82; color:white;padding:5px; margin:2px;">1</div></td>
+    </tr>
+    <tr>	
+    	<td>Total Peptides: </td>
+    	<td>
+    	<div id='peptcnt' class='ui-slider-1' style="margin:10px;">
+			<div class='ui-slider-handle'></div>	
+		</div>
+    	</td>
+    	<td align="center">
+    	<div id="peptcnt_val" style="background-color: #A0DF82; color:white;padding:5px; margin:2px;"><bean:write name="minPeptides" /></div>
+    	</td>
+    	
+    	<td>Unique Peptides: </td>
+    	<td>
+    	<div id='uniqpeptcnt' class='ui-slider-1' style="margin:10px;">
+			<div class='ui-slider-handle'></div>	
+		</div>
+    	</td>
+    	<td align="center"><div id="uniqpeptcnt_val" style="background-color: #A0DF82; color:white;padding:5px; margin:2px;">0</div></td>
+    </tr>
+    <tr>
+    	<td colspan="6" align="center"><button class="button" id="filterbutton">Filter</button></td>
+    </tr>
+    </table>
+    </div>
+    <br>
+    
+    <div id="proteinlist_table">
+		<%@ include file="proteinlist.jsp" %>
+    </div>
+    </div>
+    
+    
       <!-- PROTEIN CLUSTER -->
       <div id="protclusters"><font color="black">
           	<b>Select Protein Cluster: </b>
@@ -506,13 +649,29 @@ $(document).ready(function() {
       <!-- PROTEIN DETAILS -->
       <div id="protdetails">
       		<!-- create a placeholder div for each protein -->
-          	<%for(ProteinferProtein nrseqProt: inferredProteins) { %>
-          		<div id="protein_<%=nrseqProt.getNrseqProteinId() %>" style="display: none;" class="protdetail_prot"></div>
-          	<%} %>
+      		<logic:iterate name="proteinGroups" id="proteinGroup">
+      			<logic:iterate name="proteinGroup" property="proteins" id="protein">
+      				<div id="protein_<bean:write name="protein" property="nrseqProteinId" />" style="display: none;" class="protdetail_prot"></div>
+      			</logic:iterate>
+      		</logic:iterate>
       </div>
       
       <!-- INPUT SUMMARY -->
       <div id="input">
+      
+      
+      	<table cellpadding="2" align="center" style="font-family: Trebuchet MS,Trebuchet,Verdana,Helvetica,Arial,sans-serif;font-size:12px; border: 1px solid gray; border-spacing: 3px">
+	  		<tr class="ms_A">
+	  		<th align="center" style="font-size: 10pt;"><b>Total Proteins</b></td>
+	  		<th align="center" style="font-size: 10pt;"><b>Filtered Proteins</b></td>
+	  		</tr>
+	  		<tr>
+	    	<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;"><bean:write name="searchSummary" property="allProteins" /></td>
+	   		<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;"><bean:write name="searchSummary" property="filteredProteinsParsimony" /></td>
+	   		</tr>
+		</table>
+      	<br><br>
+      
 		<table cellpadding="4" cellspacing="2" align="center" width="90%" class="sortable stripe_table">
 		<logic:notEmpty name="searchSummary" property="runSearchList">
 		<thead>

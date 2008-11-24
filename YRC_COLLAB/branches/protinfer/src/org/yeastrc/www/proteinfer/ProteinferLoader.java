@@ -12,6 +12,7 @@ import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.search.MsRunSearch;
@@ -50,7 +51,8 @@ public class ProteinferLoader {
     private static final MsScanDAO scanDao = msDataDaoFactory.getMsScanDAO();
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
     private static final MsRunDAO runDao = msDataDaoFactory.getMsRunDAO();
-    private static final SequestSearchResultDAO resDao = msDataDaoFactory.getSequestResultDAO();
+    private static final SequestSearchResultDAO seqResDao = msDataDaoFactory.getSequestResultDAO();
+    private static final MsSearchResultDAO resDao = msDataDaoFactory.getMsSearchResultDAO();
     private static final ProteinferSpectrumMatchDAO specDao = pinferDaoFactory.getProteinferSpectrumMatchDao();
     private static final ProteinferPeptideDAO peptDao = pinferDaoFactory.getProteinferPeptideDao();
     private static final ProteinferProteinDAO protDao = pinferDaoFactory.getProteinferProteinDao();
@@ -127,14 +129,32 @@ public class ProteinferLoader {
     
     public static List<ProteinferProteinGroup> getProteinferProteinGroups(int pinferId) {
         List<ProteinferProteinGroup> proteinGrps = protDao.getProteinferProteinGroups(pinferId);
-        // set the description for the proteins.  This requires querying the 
-        // NRSEQ database
+        
+        Map<Integer, String> peptSeqMap = new HashMap<Integer, String>();
+        
         for(ProteinferProteinGroup protGrp: proteinGrps) {
             for(ProteinferProtein prot: protGrp.getProteins()) {
-                //prot.getPeptides();
                 //prot.getUniquePeptideCount();
+                // set the description for the proteins.  This requires querying the 
+                // NRSEQ database
                 NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(prot.getNrseqProteinId());
                 prot.setDescription(dbProt.getDescription());
+            }
+            
+            // set the modified sequence for each peptide in the group
+            List<ProteinferPeptideGroup> peptGrps = protGrp.getMatchingPeptideGroups();
+            for(ProteinferPeptideGroup peptGrp: peptGrps) {
+                for(ProteinferPeptide pept: peptGrp.getPeptides()) {
+                    String seq = peptSeqMap.get(pept.getId());
+                    if(seq == null) {
+                        seq = getModifiedSequenceForPeptide(pept);
+                    }
+                    pept.setSequence(seq);
+
+                    // get the best peptide spectrum match and set its scanID
+                    MsSearchResult res = getMsSearchResult(pept.getBestSpectrumMatch());
+                    pept.getBestSpectrumMatch().setScanId(res.getScanId());
+                }
             }
         }
         return proteinGrps;
@@ -152,7 +172,7 @@ public class ProteinferLoader {
     public static String getModifiedSequenceForPeptide(ProteinferPeptide peptide) {
         // get the first hit
         ProteinferSpectrumMatch psm = peptide.getSpectrumMatchList().get(0);
-        MsSearchResult res = resDao.load(psm.getMsRunSearchResultId());
+        MsSearchResult res = seqResDao.load(psm.getMsRunSearchResultId());
         String seq = res.getResultPeptide().getModifiedPeptideSequence();
         int f = seq.indexOf('.');
         int l = seq.lastIndexOf('.');
@@ -164,7 +184,7 @@ public class ProteinferLoader {
     public static String getUnModifiedSequenceForPeptide(ProteinferPeptide peptide) {
         // get the first hit
         ProteinferSpectrumMatch psm = peptide.getSpectrumMatchList().get(0);
-        MsSearchResult res = resDao.load(psm.getMsRunSearchResultId());
+        MsSearchResult res = seqResDao.load(psm.getMsRunSearchResultId());
         String seq = res.getResultPeptide().getPeptideSequence();
         int f = seq.indexOf('.');
         int l = seq.lastIndexOf('.');
@@ -230,7 +250,7 @@ public class ProteinferLoader {
         // get the filename
         String filename = runDao.loadFilenameNoExtForRun(rsDao.loadRunSearch(runSearchId).getRunId());
         
-        List<Integer> resultIds = resDao.loadTopResultIdsForRunSearch(runSearchId);
+        List<Integer> resultIds = seqResDao.loadTopResultIdsForRunSearch(runSearchId);
         
         List<Integer> resultIdsForRunSearch = specDao.getSpectrumMatchIdsForProteinferRun(pinferId);
         Collections.sort(resultIdsForRunSearch);
@@ -258,8 +278,12 @@ public class ProteinferLoader {
         return seqMatchList;
     }
     
+    private static MsSearchResult getMsSearchResult(ProteinferSpectrumMatch psm) {
+        return resDao.load(psm.getMsRunSearchResultId());
+    }
+    
     private static SequestSpectrumMatch getSequestSearchResult(ProteinferSpectrumMatch psm, SearchSource source) {
-        SequestSearchResult seqRes = resDao.load(psm.getMsRunSearchResultId());
+        SequestSearchResult seqRes = seqResDao.load(psm.getMsRunSearchResultId());
         SequestResultData data = seqRes.getSequestResultData();
         int scanNumber = scanDao.load(seqRes.getScanId()).getStartScanNum();
         String modiSeq = seqRes.getResultPeptide().getModifiedPeptideSequence();

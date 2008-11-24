@@ -1121,6 +1121,15 @@
 		
 	</action>
 	
+	<action 
+		path="/filterProteinferResults"
+		type="org.yeastrc.www.proteinfer.FilterProteinferResultsAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinlist.jsp" redirect="false" />
+		
+	</action>
+	
+	
 	
 	<!-- ================================================================================== -->
 	

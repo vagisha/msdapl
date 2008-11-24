@@ -61,16 +61,28 @@ public class ViewProteinInferenceResultAction extends Action {
         List<ProteinferProteinGroup> proteinGroups = ProteinferLoader.getProteinferProteinGroups(pinferId);
         request.setAttribute("proteinGroups", proteinGroups);
         
-        Map<Integer, SequestSpectrumMatch> bestPsmMap = ProteinferLoader.getBestSpectrumMatches(proteinGroups);
-        request.setAttribute("psmList", bestPsmMap);
+//        Map<Integer, SequestSpectrumMatch> bestPsmMap = ProteinferLoader.getBestSpectrumMatches(proteinGroups);
+//        request.setAttribute("psmMap", bestPsmMap);
         
         int maxClusterId = 0;
+        int maxPeptides = 0;
+        int minPeptides = params.getMinDistinctPeptides();
+        int maxUniqPeptides = 0;
+        int maxSpectra = 0;
+        
         for(ProteinferProteinGroup protGrp: proteinGroups) {
             for(ProteinferProtein prot: protGrp.getProteins()) {
                 maxClusterId = Math.max(maxClusterId, prot.getClusterId());
             }
+            maxPeptides = Math.max(maxPeptides, protGrp.getMatchingPeptideCount());
+            maxUniqPeptides = Math.max(maxUniqPeptides, protGrp.getUniqMatchingPeptideCount());
+            maxSpectra = Math.max(maxSpectra, protGrp.getSpectrumCount());
         }
         
+        request.setAttribute("minPeptides", minPeptides);
+        request.setAttribute("maxPeptides", maxPeptides);
+        request.setAttribute("maxUniqPeptides", maxUniqPeptides);
+        request.setAttribute("maxSpectra", maxSpectra);
         request.setAttribute("clusterCount", maxClusterId);
         request.setAttribute("pinferId", pinferId);
 
