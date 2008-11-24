@@ -88,4 +88,17 @@ public class ProteinferPeptide {
         }
         return (float) (Math.round(best*100.0) / 100.0);
     }
+    
+    public ProteinferSpectrumMatch getBestSpectrumMatch() {
+        ProteinferSpectrumMatch bestPsm = null;
+        for(ProteinferSpectrumMatch psm: spectrumMatchList) {
+            if(bestPsm == null) {
+                bestPsm = psm;
+            }
+            else {
+                bestPsm = bestPsm.getFdr() < psm.getFdr() ? bestPsm : psm;
+            }
+        }
+        return bestPsm;
+    }
 }

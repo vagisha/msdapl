@@ -52,6 +52,14 @@ public class ProteinferProtein {
     public String getDescription() {
         return description;
     }
+    public String getShortDescription() {
+        if(description.length() > 50) {
+            return description.substring(0, 50)+" ...";
+        }
+        else
+            return description;
+    }
+    
     public void setDescription(String description) {
         this.description = description;
     }
@@ -106,7 +114,7 @@ public class ProteinferProtein {
         int cnt = 0;
         for(ProteinferPeptide peptide: peptides)
             if(peptide.isUniqueToProtein())
-                cnt += peptide.getSpectralCount();
+                cnt++;
         return cnt;
     }
     

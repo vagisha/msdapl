@@ -3,6 +3,7 @@ package edu.uwpr.protinfer.infer;
 public class Protein {
 
     private String accession;
+    private String description = "";
     private int id; // could be a database id
     private boolean isDecoy = false;
     private boolean isAccepted = false;
@@ -68,5 +69,14 @@ public class Protein {
     
     public String toString() {
         return accession+"\tID:"+id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        if(description != null)
+            this.description = description;
     }
 }

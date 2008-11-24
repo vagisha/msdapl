@@ -17,8 +17,24 @@
 		<parameter property="fdr" jdbcType="DOUBLE" />
 	</parameterMap>
 	
+	<select id="selectMatchforMsResult" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT * FROM ProteinferSpectrumMatch WHERE msRunSearchResultID = #id#
+    </select>
+    
     <select id="selectMatchesForPeptide" resultMap="pinferSMatchResult" parameterClass="Integer">
     	SELECT * FROM ProteinferSpectrumMatch WHERE pinferPeptideID = #id#
+    </select>
+    
+    <select id="selectMatchesForPinferId" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT * FROM ProteinferSpectrumMatch as psm, ProteinferPeptide as pep
+    	WHERE pep.id = psm.pinferPeptideID 
+    	AND pep.pinferId= #id#
+    </select>
+    
+    <select id="selectMatchIdsForPinferId" resultClass="Integer" parameterClass="Integer">
+    	SELECT psm.msRunSearchResultID FROM ProteinferSpectrumMatch as psm, ProteinferPeptide as pep
+    	WHERE pep.id = psm.pinferPeptideID 
+    	AND pep.pinferId= #id#
     </select>
     
     <insert id="insert" parameterMap="pinferSMatchParam">

@@ -52,6 +52,23 @@
     	SELECT * FROM ProteinferProtein WHERE pinferID = #pinferId# AND clusterID = #clusterId#
     </select>
     
+    <select id="selectProteinsForProteinferRunGroup" resultMap="pinferProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM ProteinferProtein WHERE pinferID = #pinferId# AND groupID = #groupId#
+    </select>
+    
+    <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT pept.groupID 
+    	FROM ProteinferPeptide as pept, ProteinferProtein as prot , ProteinferPeptideProteinMatch as m
+    	WHERE prot.pinferID=#pinferId# AND prot.groupID=#groupId#
+    	AND pept.pinferID=#pinferId#
+    	AND prot.nrseqProteinID = m.nrseqProteinID
+    	AND pept.id = m.pinferPeptideID
+    </select>
+    
+    <select id="selectProtGrpIdsForClusterId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT groupID FROM ProteinferProtein WHERE pinferID = #pinferId# AND clusterID = #clusterId#
+    </select>
+    
     <select id="selectProteinCountForProteinferRun" resultClass="Integer" parameterClass="Integer">
     	SELECT count(*) FROM ProteinferProtein WHERE pinferID = #id#
     </select>

@@ -7,6 +7,7 @@ import java.util.Map;
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
+import edu.uwpr.protinfer.database.dto.ProteinferPeptideGroup;
 
 public class ProteinferPeptideDAO extends BaseSqlMapDAO {
 
@@ -45,6 +46,29 @@ public class ProteinferPeptideDAO extends BaseSqlMapDAO {
     
     public ProteinferPeptide getProteinferPeptide(int pinferPeptideId) {
         return (ProteinferPeptide) super.queryForObject(sqlMapNameSpace+".select", pinferPeptideId);
+    }
+    
+    public List<ProteinferPeptide> getGroupProteinferPeptides(int pinferId, int groupId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        map.put("groupId", groupId);
+        return super.queryForList(sqlMapNameSpace+".selectPeptidesForProteinferRunGroup", map);
+    }
+    
+    private List<Integer> getMatchingProtGroupIds(int pinferId, int groupId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        map.put("groupId", groupId);
+        return super.queryForList(sqlMapNameSpace+".selectProtGrpIdsForPeptGrpId", map);
+    }
+    
+    public ProteinferPeptideGroup getProteinferPeptideGroup(int pinferId, int groupId) {
+        List<ProteinferPeptide> grpPeptides = getGroupProteinferPeptides(pinferId, groupId);
+        ProteinferPeptideGroup group = new ProteinferPeptideGroup(groupId);
+        group.setPeptides(grpPeptides);
+        List<Integer> matchingProtGrpIds = getMatchingProtGroupIds(pinferId, groupId);
+        group.setMatchingProteinGroupIds(matchingProtGrpIds);
+        return group;
     }
     
     public void deleteProteinferPeptide(int id) {

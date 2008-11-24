@@ -106,4 +106,12 @@ public class InferredProtein <T extends SpectrumMatch> {
     public void setPercentCoverage(float percentCoverage) {
         this.percentCoverage = percentCoverage;
     }
+    
+    public String getDescription() {
+        return protein.getDescription();
+    }
+
+    public void setDescription(String description) {
+       protein.setDescription(description);
+    }
 }

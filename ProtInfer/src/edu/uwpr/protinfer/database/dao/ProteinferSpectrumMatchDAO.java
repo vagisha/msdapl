@@ -37,4 +37,16 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO {
     public List<ProteinferSpectrumMatch> getSpectrumMatchForPeptide(int pinferPeptideId) {
         return super.queryForList(sqlMapNameSpace+".selectMatchesForPeptide", pinferPeptideId);
     }
+    
+    public List<ProteinferSpectrumMatch> getSpectrumMatchForProteinferRun(int pinferId) {
+        return super.queryForList(sqlMapNameSpace+".selectMatchesForPinferId", pinferId);
+    }
+    
+    public List<Integer> getSpectrumMatchIdsForProteinferRun(int pinferId) {
+        return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferId", pinferId);
+    }
+    
+    public ProteinferSpectrumMatch getSpectrumMatchForMsResult(int runSearchResultId) {
+        return (ProteinferSpectrumMatch) super.queryForObject(sqlMapNameSpace+".selectMatchforMsResult", runSearchResultId);
+    }
 }

@@ -66,6 +66,10 @@ public class PeptideEvidence <T extends SpectrumMatch>{
         this.numProteinMatch = count;
     }
     
+    public boolean isUniqueToProtein() {
+        return numProteinMatch == 1;
+    }
+    
     public double getBestFdr() {
         return bestFdr;
     }

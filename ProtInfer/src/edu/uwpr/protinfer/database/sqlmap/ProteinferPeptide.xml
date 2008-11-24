@@ -49,6 +49,19 @@
     	SELECT * FROM ProteinferPeptide WHERE pinferID=#id#
     </select>
     
+    <select id="selectPeptidesForProteinferRunGroup" resultMap="pinferPeptideResult" parameterClass="java.util.Map">
+    	SELECT * FROM ProteinferPeptide WHERE pinferID=#pinferId# AND groupID=#groupId#
+    </select>
+    
+    <select id="selectProtGrpIdsForPeptGrpId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT prot.groupID 
+    	FROM ProteinferPeptide as pept, ProteinferProtein as prot , ProteinferPeptideProteinMatch as m
+    	WHERE pept.pinferID=#pinferId# AND pept.groupID=#groupId#
+    	AND prot.pinferID=#pinferId#
+    	AND prot.nrseqProteinID = m.nrseqProteinID
+    	AND pept.id = m.pinferPeptideID
+    </select>
+   
     <insert id="insert" parameterMap="pinferPeptideParam">
     	INSERT INTO ProteinferPeptide (
     	pinferID,
