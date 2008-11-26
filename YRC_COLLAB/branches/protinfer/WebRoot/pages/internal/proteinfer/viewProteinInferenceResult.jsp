@@ -8,6 +8,9 @@
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js" ></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.tabs.js"></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.slider.js"></script>
+<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.dialog.js"></script>
+<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.draggable.js"></script>
+<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.resizable.js"></script>
 <script type="text/javascript" src="/yrc/js/jquery.history.js"></script>
 <link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
 <%
@@ -91,7 +94,44 @@ $(document).ready(function() {
   		}
   			
   	});
+  	
   	makeProteinListSortable($("#protlisttable"));
+  	
+  	$("#showallpeptlink").click(function() {
+  		if($(this).text() == "Show All Peptides") {
+  			$(this).text("Hide All Peptides");
+  			$(".peptlist").show();
+  			$(".showpept").each(function(){
+  				$(this).text("Hide Peptides");
+  			});
+  		}
+  		else {
+  			$(this).text("Show All Peptides");
+  			$(".peptlist").hide();
+  			$(".showpept").each(function(){
+  				$(this).text("Show Peptides");
+  			});
+  		}
+  	});
+  	
+  	$(".editprotannot").click(function(){
+  		var nrseqid = this.id;
+  		$("#dialog_"+nrseqid).dialog({ 
+    	modal: true, 
+    	overlay: { 
+        opacity: 0.5, 
+        background: "black",
+        buttons: { 
+        	"Ok": function() { 
+            	alert("Ok"); 
+        	}, 
+        	"Cancel": function() { 
+            	$(this).dialog("close"); 
+        	} 
+    	  } 
+    	} 
+    });
+	});
   }
   
   // stripe the proteins table and the input list table
@@ -258,10 +298,30 @@ $(document).ready(function() {
 										  	$("#pept_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
 										  	$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
 	  										
+	  										$(".protgrplist").click(function(){
+	  											if($("#prot_grp_table_"+clusterId).is(':visible'))
+	  												$("#prot_grp_table_"+clusterId).hide();
+	  											else
+	  												$("#prot_grp_table_"+clusterId).show();
+	  										});
+	  										
+	  										$(".peptgrplist").click(function(){
+	  											if($("#pept_grp_table_"+clusterId).is(':visible'))
+	  												$("#pept_grp_table_"+clusterId).hide();
+	  											else
+	  												$("#pept_grp_table_"+clusterId).show();
+	  										});
+	  										
 	  										$(this).show();
   								  });	
   }
   
+  function toggleDivVisibility(mydiv) {
+  	if($(mydiv).is(':visible'))
+  		$(mydiv).hide();
+  	else
+  		$(mydiv).show();
+  }
   
   function showSpectrumMatches(runSearchId, runName) {
   		$(".input_psm").hide();
@@ -343,16 +403,6 @@ $(document).ready(function() {
 		  	lastSelectedPeptGrpIds = [];
 	  	}
   	}
-  	
-
-  function toggleProteinList() {
-  	var $mydiv = $(".proteins");
-  	if($mydiv.is(':visible'))
-  		$mydiv.hide();
-  	else
-  		$mydiv.show();
-  }
-  
 
   $(document).ready(function() {
   
@@ -376,6 +426,10 @@ $(document).ready(function() {
         			function() {$(this).addClass('ms_hover');} , 
         			function() {$(this).removeClass('ms_hover');}).click(function() {
 
+						// the header for the column used for sorting is highlighted
+						$('th', $table).each(function(){$(this).removeClass('ms_selected_header');});
+						$header.addClass('ms_selected_header');
+						
 						// remove row striping
 						if($table.is('.stripe_table')) {
 							$("tbody > tr:odd", $table).removeClass("ms_A");
@@ -453,6 +507,7 @@ $(document).ready(function() {
         			function() {$(this).addClass('ms_hover');} , 
         			function() {$(this).removeClass('ms_hover');}).click(function() {
 
+						// the header for the column used for sorting is highlighted
 						$('th', $table).each(function(){$(this).removeClass('ms_selected_header');});
 						$header.addClass('ms_selected_header');
 						

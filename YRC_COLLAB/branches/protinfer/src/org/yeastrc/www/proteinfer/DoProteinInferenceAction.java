@@ -8,6 +8,8 @@ package org.yeastrc.www.proteinfer;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -99,11 +101,13 @@ public class DoProteinInferenceAction extends Action {
         MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
         
         Set<String> allProteins = new HashSet<String>();
+        List<SequestHit> allHits = new ArrayList<SequestHit>();
         for (RunSearch runSearch: searchSummary.getRunSearchList()) {
             if (!runSearch.getIsSelected())
                 continue;
             long start = System.currentTimeMillis();
             List<SequestHit> hits = reader.getHitsForRunSearch(runSearch.getRunSearchId(), params.getDecoyPrefix());
+            allHits.addAll(hits);
             
             int targetCount = 0;
             int decoyCount = 0;
@@ -122,29 +126,83 @@ public class DoProteinInferenceAction extends Action {
             
             long end = System.currentTimeMillis();
             log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # hits: "+hits.size()+"; Time: "+getTime(start, end));
-            // filter the search hits
-            start = System.currentTimeMillis();
-            List<SequestHit> filteredHits = null;
-            try {
-                filteredHits = filterHits(hits, params);
-            }
-            catch (FdrCalculatorException e) {
-                e.printStackTrace();
-            }
-            catch (FilterException e) {
-                e.printStackTrace();
-            }
-            runSearch.setFilteredTargetHits(filteredHits.size());
-            end = System.currentTimeMillis();
-            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+filteredHits.size()+"; Time: "+getTime(start, end));
-            allFilteredHits.addAll(filteredHits);
+//            // filter the search hits
+//            start = System.currentTimeMillis();
+//            List<SequestHit> filteredHits = null;
+//            try {
+//                filteredHits = filterHits(hits, params);
+//            }
+//            catch (FdrCalculatorException e) {
+//                e.printStackTrace();
+//            }
+//            catch (FilterException e) {
+//                e.printStackTrace();
+//            }
+//            runSearch.setFilteredTargetHits(filteredHits.size());
+//            end = System.currentTimeMillis();
+//            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+filteredHits.size()+"; Time: "+getTime(start, end));
+//            allFilteredHits.addAll(filteredHits);
             
             // get the nrseq protein ids
-            start = System.currentTimeMillis();
-            getNrseqIdsAndAccessions(filteredHits, runSearch.getRunSearchId());
-            end = System.currentTimeMillis();
-            log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
+//            start = System.currentTimeMillis();
+//            getNrseqIdsAndAccessions(hits, runSearch.getRunSearchId());
+//            end = System.currentTimeMillis();
+//            log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
         }
+        
+        // do fdr calculation on ALL hits 
+        // filter the search hits
+        long start = System.currentTimeMillis();
+        try {
+            allFilteredHits = filterHits(allHits, params);
+        }
+        catch (FdrCalculatorException e) {
+            e.printStackTrace();
+        }
+        catch (FilterException e) {
+            e.printStackTrace();
+        }
+        
+        // count the number of filtered hits for each input file
+        for (RunSearch runSearch: searchSummary.getRunSearchList()) {
+            if (!runSearch.getIsSelected())
+                continue;
+            int filteredCnt = 0;
+            for(SequestHit hit: allFilteredHits) {
+                if(hit.getSearchSource().getId() == runSearch.getRunSearchId())
+                    filteredCnt++;
+            }
+            runSearch.setFilteredTargetHits(filteredCnt);
+        }
+        
+        long end = System.currentTimeMillis();
+        log.info("# Filterted hits: "+allFilteredHits.size()+"; Time: "+getTime(start, end));
+        
+        // get the nrseq protein ids
+        start = System.currentTimeMillis();
+        List<SequestHit> runSearchHits = new ArrayList<SequestHit>();
+        Collections.sort(allFilteredHits, new Comparator<SequestHit>() {
+            public int compare(SequestHit o1, SequestHit o2) {
+                return Integer.valueOf(o1.getSearchSource().getId()).compareTo(o2.getSearchSource().getId());
+            }});
+        int lastRunSearchId = -1;
+        for(SequestHit hit: allFilteredHits) {
+            if(hit.getSearchSource().getId() != lastRunSearchId) {
+                if(runSearchHits.size() > 0) {
+                    getNrseqIdsAndAccessions(runSearchHits, lastRunSearchId);
+                }
+                runSearchHits.clear();
+                lastRunSearchId = hit.getSearchSource().getId();
+            }
+            runSearchHits.add(hit);
+        }
+        if(runSearchHits.size() > 0) {
+            getNrseqIdsAndAccessions(runSearchHits, lastRunSearchId);
+        }
+        end = System.currentTimeMillis();
+        log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
+        
+        
         
         // # of proteins before any filtering
         searchSummary.setAllProteins(allProteins.size());
@@ -158,9 +216,9 @@ public class DoProteinInferenceAction extends Action {
         getScanNumbersForHits(allFilteredHits);
         
         // infer the protein list
-        long start = System.currentTimeMillis();
+        start = System.currentTimeMillis();
         List<InferredProtein<SequestSpectrumMatch>> proteins = inferProteinList(allFilteredHits, searchSummary, params);
-        long end = System.currentTimeMillis();
+        end = System.currentTimeMillis();
         log.info("# of Inferred Proteins: "+proteins.size()+". Time: "+getTime(start, end));
         
         // assign best fdr values

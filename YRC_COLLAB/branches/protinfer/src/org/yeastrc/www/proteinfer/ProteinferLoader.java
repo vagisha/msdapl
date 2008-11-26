@@ -172,6 +172,10 @@ public class ProteinferLoader {
     public static String getModifiedSequenceForPeptide(ProteinferPeptide peptide) {
         // get the first hit
         ProteinferSpectrumMatch psm = peptide.getSpectrumMatchList().get(0);
+        return getModifiedSequenceForSpectrumMatch(psm);
+    }
+    
+    public static String getModifiedSequenceForSpectrumMatch(ProteinferSpectrumMatch psm) {
         MsSearchResult res = seqResDao.load(psm.getMsRunSearchResultId());
         String seq = res.getResultPeptide().getModifiedPeptideSequence();
         int f = seq.indexOf('.');
@@ -264,7 +268,13 @@ public class ProteinferLoader {
         
         List<ProteinferSpectrumMatch> psmList = new ArrayList<ProteinferSpectrumMatch>(resultIdsForPinferAndRunSearch.size());
         for(Integer id: resultIdsForPinferAndRunSearch) {
-            psmList.add(specDao.getSpectrumMatchForMsResult(id));
+            ProteinferSpectrumMatch psm = specDao.getSpectrumMatchForMsResult(pinferId, id);
+            if(psm == null) {
+                System.out.println("No match found for pinferId: "+pinferId+" and msRunSearchResultId: "+id);
+            }
+            else {
+                psmList.add(psm);
+            }
         }
         
         List<SequestSpectrumMatch> seqMatchList = new ArrayList<SequestSpectrumMatch>(psmList.size());
@@ -286,7 +296,8 @@ public class ProteinferLoader {
         SequestSearchResult seqRes = seqResDao.load(psm.getMsRunSearchResultId());
         SequestResultData data = seqRes.getSequestResultData();
         int scanNumber = scanDao.load(seqRes.getScanId()).getStartScanNum();
-        String modiSeq = seqRes.getResultPeptide().getModifiedPeptideSequence();
+        String modiSeq = getModifiedSequenceForSpectrumMatch(psm);
+//        String modiSeq = seqRes.getResultPeptide().getModifiedPeptideSequence();
         
         SequestSpectrumMatch seqM = new SequestSpectrumMatch(source, scanNumber, seqRes.getCharge(), modiSeq);
         seqM.setFdr(psm.getFdrRounded());

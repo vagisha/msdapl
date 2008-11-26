@@ -5,7 +5,7 @@
 
 <!-- PROTEINS TABLE -->
 <br>
-<div style="background-color: #3D902A; color: #EBFFE6; padding: 2px; cursor: pointer" onclick="toggleProteinList()">
+<div style="background-color: #3D902A; color: #EBFFE6; padding: 2px; cursor: pointer" class="protgrplist">
  <b>Proteins in  Cluster <bean:write name="clusterId" /></b>
 </div>
 <br>
@@ -47,7 +47,7 @@
 <br>
 
 <!-- PEPTIDES TABLE -->
-<div style="background-color: #3D902A; color: #EBFFE6; padding: 2px"><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
+<div style="background-color: #3D902A; color: #EBFFE6; padding: 2px; cursor: pointer;" class="peptgrplist" ><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
 <table cellpadding="4" cellspacing="2" align="center" width="90%" id="pept_grp_table_<bean:write name="clusterId" />">
         
         <tr>

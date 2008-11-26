@@ -39,7 +39,7 @@
 
 <!--  placeholder for protein sequence -->
 <table  align="center" width="90%" id="protseqtbl_<bean:write name="inferredProtein" property="proteinId"/>" style="display: none;"">
-	<tr><td style="background-color: #D4FECA;" id="protsequence_<bean:write name="inferredProtein" property="proteinId"/>" ></td></tr>
+	<tr><td style="background-color: #D4FECA;padding-left: 130px;" id="protsequence_<bean:write name="inferredProtein" property="proteinId"/>" ></td></tr>
 </table>
 
 <br><br>

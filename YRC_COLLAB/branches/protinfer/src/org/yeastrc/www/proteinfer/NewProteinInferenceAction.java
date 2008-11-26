@@ -89,9 +89,10 @@ public class NewProteinInferenceAction extends Action {
             int idx = filename.lastIndexOf('.');
             if (idx != -1)
                 filename = filename.substring(0, idx);
-            search.addRunSearch(new RunSearch(id, filename));
+            RunSearch rs = new RunSearch(id, filename);
+            rs.setIsSelected(true);
+            search.addRunSearch(rs);
         }
-        
         return search;
     }
 }

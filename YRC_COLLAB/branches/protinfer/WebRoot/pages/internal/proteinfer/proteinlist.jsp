@@ -2,6 +2,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+<div id="showallpeptlink" style="text-decoration: underline; cursor: pointer; color: #3D902A; padding-left: 5px;">Show All Peptides</div>
 <table cellpadding="4" cellspacing="2" align="center" width="99%"  id="protlisttable">
 	<logic:notEmpty name="proteinGroups">
 		<thead>
@@ -33,7 +34,9 @@
 			<tr class="protgrp_row linked_row">
 		<%} %>
 		
-		<td>*</td>
+		<td><span id="<bean:write name="protein" property="nrseqProteinId" />" class="editprotannot"
+			style="text-decoration: underline; cursor: pointer">Edit</span>
+			<div id="dialog_<bean:write name="protein" property="nrseqProteinId" />" class="flora">jQuery UI Dialog</div></td>
 		<td>
 			<logic:equal name="protein" property="isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="isParsimonious" value="false"><font color="#888888"></logic:equal>
@@ -69,21 +72,21 @@
 		
 		<!-- List the peptides and the best match for each peptide -->
 		<tr class="pept_row linked_row">
-			<td valign="top" colspan="2">
+			<td valign="top" colspan="2"><nobr>
 				<span class="showpept" 
 					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #3D902A;" 
 					  id="<bean:write name="proteinGroup" property="groupId" />"
-					  ><nobr>Show Peptides</nobr></span></td>
+					  >Show Peptides</span></nobr></td>
 			<td colspan="7">
 				<table align="center" width="90%"
         			style="border: 1px dashed gray; border-spacing: 4px; margin-top: 6px; margin-bottom: 6px;display: none;" 
-        			class="sortable"
+        			class="sortable peptlist"
         			id="peptforprot_<bean:write name="proteinGroup" property="groupId" />">
         			<thead><tr>
 			        <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Peptide</th>
 			        <th style="text-decoration: underline;font-size: 10pt;" class="sort-int" align="left"># Spectra</th>
-			        <th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">Best FDR</th>
 			        <th style="text-decoration: underline;font-size: 10pt;" align="left">Unique</th>
+			        <th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">Best FDR</th>
 			        <th style="text-decoration: underline;font-size: 10pt;" align="left">Spectrum</th>
 			        </tr></thead>
 			        <tbody>
@@ -93,11 +96,11 @@
 			        	<tr>
 			        		<td><bean:write name="peptide" property="sequence" /></td>
 			        		<td><bean:write name="peptide" property="spectralCount" /></td>
-			        		<td><bean:write name="psm" property="fdrRounded" /></td>
 			        		<td>
 			        			<logic:equal name="peptideGroup" property="uniqueToProteinGroup" value="true">Yes</logic:equal>
 			        			<logic:notEqual name="peptideGroup" property="uniqueToProteinGroup" value="true">No</logic:notEqual>
 			        		</td>
+			        		<td><bean:write name="psm" property="fdrRounded" /></td>
 			        		<td><span style="text-decoration: underline; cursor: pointer;" 
 			  					onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="msRunSearchResultId" />)" >
 								View

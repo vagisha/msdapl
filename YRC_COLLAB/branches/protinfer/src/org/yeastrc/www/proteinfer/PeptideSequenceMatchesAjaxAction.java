@@ -60,6 +60,13 @@ public class PeptideSequenceMatchesAjaxAction extends Action {
         long s = System.currentTimeMillis();
         List<SequestSpectrumMatch> psmList = ProteinferLoader.getSpectrummatchesForRunSearch(pinferId, runSearchId);
         long e = System.currentTimeMillis();
+        
+        if(psmList.size() == 0) {
+            System.out.println("No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId);
+            response.setContentType("text/html");
+            response.getWriter().write("<b>"+"No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId+"</b>");
+            return null;
+        }
         System.out.println("Time: "+((e-s)/1000.0)+" seconds");
         request.setAttribute("psmList", psmList);
         request.setAttribute("runSearchId", runSearchId);
