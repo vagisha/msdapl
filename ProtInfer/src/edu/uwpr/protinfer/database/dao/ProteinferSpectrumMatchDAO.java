@@ -1,6 +1,8 @@
 package edu.uwpr.protinfer.database.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -46,7 +48,10 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO {
         return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferId", pinferId);
     }
     
-    public ProteinferSpectrumMatch getSpectrumMatchForMsResult(int runSearchResultId) {
-        return (ProteinferSpectrumMatch) super.queryForObject(sqlMapNameSpace+".selectMatchforMsResult", runSearchResultId);
+    public ProteinferSpectrumMatch getSpectrumMatchForMsResult(int pinferId, int runSearchResultId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        map.put("msRunSearchResultId", runSearchResultId);
+        return (ProteinferSpectrumMatch) super.queryForObject(sqlMapNameSpace+".selectMatchforMsResult", map);
     }
 }

@@ -53,8 +53,8 @@ public class ProteinferProtein {
         return description;
     }
     public String getShortDescription() {
-        if(description.length() > 50) {
-            return description.substring(0, 50)+" ...";
+        if(description.length() > 40) {
+            return description.substring(0, 40)+" ...";
         }
         else
             return description;

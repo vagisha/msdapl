@@ -5,7 +5,9 @@ public class ProteinferSpectrumMatch {
     private int proteinferPeptideId;
     private double fdr = -1;
     private int msRunSearchResultId;
+    private int scanId;
     
+
     public ProteinferSpectrumMatch() {}
     
     public ProteinferSpectrumMatch(int pinferPeptideId, int msRunSearchResultId) {
@@ -46,4 +48,11 @@ public class ProteinferSpectrumMatch {
         this.msRunSearchResultId = msRunSearchResultId;
     }
     
+    public int getScanId() {
+        return scanId;
+    }
+
+    public void setScanId(int scanId) {
+        this.scanId = scanId;
+    }
 }
