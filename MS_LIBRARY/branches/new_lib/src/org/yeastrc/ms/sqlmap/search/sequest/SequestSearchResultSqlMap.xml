@@ -20,7 +20,7 @@
 		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
 	</resultMap>
 	
-	<resultMap class="SequestResultOut" id="sequestResultResultN" groupBy="id">
+	<resultMap class="SequestResultOut" id="sequestResultWProteinResultN" groupBy="id">
 		<result property="id" column="id" />
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="scanId" column="scanID" nullValue="0"/>
@@ -30,6 +30,24 @@
 		<result property="proteinMatchList" 
 				resultMap="MsResultProtein.msResultProteinResult" 
 				column="id"/>
+		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
+		<result property="spRank" column="spRank" nullValue="-1"/>
+		<result property="deltaCN" column="deltaCN"/>
+		<result property="xCorr" column="XCorr"/>
+		<result property="sp" column="sp"/>
+		<result property="evalue" column="evalue"/>
+		<result property="calculatedMass" column="calculatedMass" />
+		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
+		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
+	</resultMap>
+	
+	<resultMap class="SequestResultOut" id="sequestResultResultN" groupBy="id">
+		<result property="id" column="id" />
+		<result property="runSearchId" column="runSearchID" nullValue="0"/>
+		<result property="scanId" column="scanID" nullValue="0"/>
+		<result property="charge" column="charge" nullValue="0"/>
+		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
+		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
 		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
 		<result property="spRank" column="spRank" nullValue="-1"/>
 		<result property="deltaCN" column="deltaCN"/>
@@ -68,10 +86,18 @@
     	AND runSearchID = #id#
     </select>
     
-    <select id="selectTopResultsForRunSearchN" resultMap="sequestResultResultN" parameterClass="Integer">
+    <select id="selectTopResultsWProteinsForRunSearchN" resultMap="sequestResultWProteinResultN" parameterClass="Integer">
     	SELECT * FROM msRunSearchResult as res, SQTSearchResult sres, msProteinMatch as pr
     	WHERE res.id = sres.resultID 
     	AND res.id = pr.resultID
+    	AND sres.XCorrRank=1  
+    	AND runSearchID = #id#
+    	ORDER BY res.id
+    </select>
+    
+    <select id="selectTopResultsForRunSearchN" resultMap="sequestResultResultN" parameterClass="Integer">
+    	SELECT * FROM msRunSearchResult as res, SQTSearchResult sres
+    	WHERE res.id = sres.resultID 
     	AND sres.XCorrRank=1  
     	AND runSearchID = #id#
     	ORDER BY res.id

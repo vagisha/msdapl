@@ -7,15 +7,23 @@
 package org.yeastrc.ms.dao.search.sequest.ibatis;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -47,9 +55,86 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
     
     @Override
-    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
-        return queryForList("SequestResult.selectTopResultsForRunSearchN", runSearchId);
+    public List<SequestSearchResult> loadTopResultsWProteinsForRunSearchN(int runSearchId) {
+        return queryForList("SequestResult.selectTopResultsWProteinsForRunSearchN", runSearchId);
     }
+    
+//    @Override
+//    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
+//        return queryForList("SequestResult.selectTopResultsForRunSearchN", runSearchId);
+//    }
+    
+    
+    
+    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            conn = super.getConnection();
+            String sql = "SELECT * from msRunSearchResult as res, SQTSearchResult as sres WHERE"+
+                         " res.id = sres.resultID AND sres.XCorrRank = 1 AND res.runSearchID = ?";
+            stmt = conn.prepareStatement( sql );
+            stmt.setInt( 1, runSearchId );
+            rs = stmt.executeQuery();
+            
+            List<SequestSearchResult> resultList = new ArrayList<SequestSearchResult>();
+            
+            while ( rs.next() ) {
+            
+                SequestSearchResultBean result = new SequestSearchResultBean();
+                result.setId(rs.getInt("id"));
+                result.setRunSearchId(rs.getInt("runSearchID"));
+                result.setScanId(rs.getInt("scanID"));
+                result.setCharge(rs.getInt("charge"));
+                SearchResultPeptideBean peptide = new SearchResultPeptideBean();
+                peptide.setPeptideSequence(rs.getString("peptide"));
+                peptide.setPreResidue(rs.getString("preResidue").charAt(0));
+                peptide.setPostResidue(rs.getString("postResidue").charAt(0));
+                result.setResultPeptide(peptide);
+                result.setValidationStatus(ValidationStatus.instance(rs.getString("validationStatus").charAt(0)));
+                result.setSp(rs.getBigDecimal("sp"));
+                result.setSpRank(rs.getInt("spRank"));
+                result.setxCorr(rs.getBigDecimal("XCorr"));
+                result.setxCorrRank(rs.getInt("XCorrRank"));
+                result.setDeltaCN(rs.getBigDecimal("deltaCN"));
+                result.setEvalue(rs.getDouble("evalue"));
+                result.setCalculatedMass(rs.getBigDecimal("calculatedMass"));
+                result.setMatchingIons(rs.getInt("matchingIons"));
+                result.setPredictedIons(rs.getInt("predictedIons"));
+                
+                resultList.add(result);
+            
+            }
+            rs.close(); rs = null;
+            stmt.close(); stmt = null;
+            conn.close(); conn = null;
+            
+            return resultList;
+            
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+        return null;
+    }
+    
     
     @Override
     public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge) {

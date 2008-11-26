@@ -14,6 +14,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +59,7 @@ import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
@@ -192,6 +195,10 @@ public class BaseDAOTestCase extends TestCase {
     }
 
     protected void checkSearchResult(MsSearchResultIn input, MsSearchResult output) {
+        checkSearchResult(input, output, true);
+    }
+    
+    protected void checkSearchResult(MsSearchResultIn input, MsSearchResult output, boolean checkProteins) {
         assertEquals(input.getCharge(), output.getCharge());
         if (input.getValidationStatus() == null)
             assertEquals(ValidationStatus.UNKNOWN, output.getValidationStatus());
@@ -201,7 +208,26 @@ public class BaseDAOTestCase extends TestCase {
         assertNull(input.getValidationStatus());
         // make sure the scan number in input matches scan number of scan with scanId in output
 //        assertEquals(input.getScanNumber(), scanDao.load(output.getScanId()).getStartScanNum());
-        assertEquals(input.getProteinMatchList().size(), output.getProteinMatchList().size());
+        if(checkProteins) {
+            assertEquals(input.getProteinMatchList().size(), output.getProteinMatchList().size());
+            List<MsSearchResultProteinIn> proteinsIn = input.getProteinMatchList();
+            List<MsSearchResultProtein> proteinsOut = output.getProteinMatchList();
+            Collections.sort(proteinsIn, new Comparator<MsSearchResultProteinIn>() {
+                public int compare(MsSearchResultProteinIn o1,
+                        MsSearchResultProteinIn o2) {
+                    return o1.getAccession().compareTo(o2.getAccession());
+                }});
+            
+            Collections.sort(proteinsOut, new Comparator<MsSearchResultProtein>() {
+                public int compare(MsSearchResultProtein o1,
+                        MsSearchResultProtein o2) {
+                    return o1.getAccession().compareTo(o2.getAccession());
+                }});
+            
+            for(int i = 0; i < proteinsIn.size(); i++) {
+                assertEquals(proteinsIn.get(i).getAccession(), proteinsOut.get(i).getAccession());
+            }
+        }
         checkResultPeptide(input.getResultPeptide(), output.getResultPeptide());
     }
     

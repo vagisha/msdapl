@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.ibatis;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -144,5 +145,9 @@ public class BaseSqlMapDAO {
             log.error("Failed to execute update statement: "+statementName, e);
             throw new RuntimeException("Failed to execute update statement: "+statementName, e);
         }
+    }
+    
+    public Connection getConnection() throws SQLException {
+        return sqlMap.getDataSource().getConnection();
     }
 }

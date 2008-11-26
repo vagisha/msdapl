@@ -25,6 +25,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
 
     public void testOperationsOnSqtSearchResult() {
         
+        super.resetDatabase();
         // try to get the result for a result id that does not exist in the table
         SequestSearchResult res = sequestResDao.load(1);
         assertNull(res);
@@ -57,7 +58,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(sqtResult_db.getRunSearchId(), 45);
         assertEquals(sqtResult_db.getScanId(), 32);
         assertEquals(resultId, sqtResult_db.getId());
-        checkSearchResult(result, sqtResult_db);
+        checkSearchResult(result, sqtResult_db, true);
         
         // delete the result
         sequestResDao.delete(resultId);
@@ -66,9 +67,62 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(sequestResDao.load(resultId));
     }
     
-    public final void testLoadTopResultsForRunSearchN() {
+    public final void testLoadTopResultsWProteinsForRunSearchN() {
         super.resetDatabase();
         // insert some result in to the table
+        SequestSearchResultTest result1 = makeSequestResult(3, "PEPTIDEA", true); // charge = 3;
+        result1.setXCorrRank(1);
+        result1.setXCorr(new BigDecimal("0.50"));
+        result1.setSpRank(1);
+        result1.setSp(new BigDecimal("123.5"));
+        result1.setDeltaCN(new BigDecimal("0.001"));
+        result1.setMatchingIons(200);
+        
+        SequestSearchResultTest result2 = makeSequestResult(3, "PEPTIDEB", true); // charge = 3;
+        result2.setXCorrRank(2);
+        result2.setXCorr(new BigDecimal("0.10"));
+        result2.setSpRank(3);
+        result2.setSp(new BigDecimal("123.5"));
+        result2.setDeltaCN(new BigDecimal("0.001"));
+        result2.setMatchingIons(200);
+        
+        SequestSearchResultTest result3 = makeSequestResult(3, "PEPTIDEC", true); // charge = 3;
+        result3.setXCorrRank(1);
+        result3.setXCorr(new BigDecimal("0.10"));
+        result3.setSpRank(1);
+        result3.setSp(new BigDecimal("123.5"));
+        result3.setDeltaCN(new BigDecimal("0.001"));
+        result3.setMatchingIons(200);
+        
+        int resultId1 = sequestResDao.save(97, result1, 45, 32); // searchId = 97; runSearchId = 45; scanId = 32
+        int resultId2 = sequestResDao.save(97, result2, 45, 32);
+        int resultId3 = sequestResDao.save(97, result3, 45, 32);
+        
+        // We put 3 results in but the following queries should give us 2 results only
+        // because result2 has XCorrRank > 1
+        List<Integer> resultIds= sequestResDao.loadTopResultIdsForRunSearch(45);
+        assertEquals(2, resultIds.size());
+        List<SequestSearchResult> resultList = sequestResDao.loadTopResultsWProteinsForRunSearchN(45);
+        assertEquals(2, resultList.size());
+        
+        SequestSearchResult res = resultList.get(0);
+        assertEquals(3, res.getProteinMatchList().size());
+        checkSearchResult(result1, res, true);
+        res = resultList.get(1);
+        assertEquals(3, res.getProteinMatchList().size());
+        checkSearchResult(result3, res, true);
+        
+        // delete the results;
+        sequestResDao.delete(resultId1);
+        sequestResDao.delete(resultId2);
+        sequestResDao.delete(resultId3);
+        
+        assertEquals(0, sequestResDao.loadTopResultIdsForRunSearch(45).size());
+    }
+    
+    public final void testLoadTopResultsForRunSearchN() {
+        super.resetDatabase();
+        // insert some results in to the table.
         SequestSearchResultTest result1 = makeSequestResult(3, "PEPTIDEA", true); // charge = 3;
         result1.setXCorrRank(1);
         result1.setXCorr(new BigDecimal("0.50"));
@@ -105,11 +159,11 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(2, resultList.size());
         
         SequestSearchResult res = resultList.get(0);
-        assertEquals(3, res.getProteinMatchList().size());
-        checkSearchResult(result1, res);
+        assertEquals(0, res.getProteinMatchList().size());
+        checkSearchResult(result1, res, false);
         res = resultList.get(1);
-        assertEquals(3, res.getProteinMatchList().size());
-        checkSearchResult(result3, res);
+        assertEquals(0, res.getProteinMatchList().size());
+        checkSearchResult(result3, res, false);
         
         // delete the results;
         sequestResDao.delete(resultId1);
@@ -119,8 +173,8 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(0, sequestResDao.loadTopResultIdsForRunSearch(45).size());
     }
     
-    private void checkSearchResult(SequestSearchResultIn input, SequestSearchResult output) {
-        super.checkSearchResult(input, output);
+    private void checkSearchResult(SequestSearchResultIn input, SequestSearchResult output, boolean checkProteins) {
+        super.checkSearchResult(input, output, checkProteins);
         
         SequestResultData iData = input.getSequestResultData();
         SequestResultData oData = output.getSequestResultData();
