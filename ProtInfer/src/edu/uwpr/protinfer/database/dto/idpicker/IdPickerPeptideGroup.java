@@ -1,17 +1,17 @@
-package edu.uwpr.protinfer.database.dto;
+package edu.uwpr.protinfer.database.dto.idpicker;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProteinferPeptideGroup {
+public class IdPickerPeptideGroup {
 
     private final int groupId;
-    private List<ProteinferPeptide> peptides;
+    private List<IdPickerPeptide> peptides;
     private List<Integer> matchingProteinGroupIds;
     
-    public ProteinferPeptideGroup(int groupId) {
+    public IdPickerPeptideGroup(int groupId) {
         this.groupId = groupId;
-        peptides = new ArrayList<ProteinferPeptide>();
+        peptides = new ArrayList<IdPickerPeptide>();
         matchingProteinGroupIds = new ArrayList<Integer>();
     }
     
@@ -19,12 +19,12 @@ public class ProteinferPeptideGroup {
         return groupId;
     }
     
-    public void setPeptides(List<ProteinferPeptide> peptides) {
+    public void setPeptides(List<IdPickerPeptide> peptides) {
         if(peptides != null)
             this.peptides = peptides;
     }
     
-    public List<ProteinferPeptide> getPeptides() {
+    public List<IdPickerPeptide> getPeptides() {
         return this.peptides;
     }
     
@@ -50,7 +50,7 @@ public class ProteinferPeptideGroup {
     
     public int getSpectrumCount() {
         int cnt = 0;
-        for(ProteinferPeptide pept: peptides) {
+        for(IdPickerPeptide pept: peptides) {
             cnt += pept.getSpectralCount();
         }
         return cnt;

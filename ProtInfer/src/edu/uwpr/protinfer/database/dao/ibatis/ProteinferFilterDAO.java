@@ -1,6 +1,8 @@
-package edu.uwpr.protinfer.database.dao;
+package edu.uwpr.protinfer.database.dao.ibatis;
 
 import java.util.List;
+
+import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

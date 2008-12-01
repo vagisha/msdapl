@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer;
+package edu.uwpr.protinfer.database.dto;
 
 public enum ProteinInferenceProgram {
 
@@ -10,7 +10,9 @@ public enum ProteinInferenceProgram {
                                  new ProgramParam("decoyRatio", "Decoy Ratio", "Ratio of target proteins to decoy proteins in the database"),
                                  new ProgramParam("decoyPrefix", "Decoy Prefix", "Prefix used to identify decoy protein accessions"),
                                  new ProgramParam("minDistinctPept", "Min. Distinct Peptides", null),
-                                 new ProgramParam("parsimonyAnalysis", "Parsimony Analysis", "This parameter controls whether the final protein list is filtered by the minimum covering set, i.e. the minimum set of proteins that is necessary to describe all identified peptides")}); 
+                                 new ProgramParam("parsimonyAnalysis", "Parsimony Analysis", "This parameter controls whether the final protein list is filtered by the minimum covering set, i.e. the minimum set of proteins that is necessary to describe all identified peptides")}),
+    
+    NONE("NONE", null, null);
     
     private String name;
     private String description;
@@ -42,8 +44,8 @@ public enum ProteinInferenceProgram {
     public static ProteinInferenceProgram getProgramForName(String name) {
         if(name.equalsIgnoreCase("IDPicker"))
             return IDPICKER;
-        else
-            return null;
+        else 
+            return NONE;
     }
     
     

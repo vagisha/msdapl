@@ -1,99 +1,156 @@
-DROP DATABASE IF EXISTS proteinfer;
-CREATE DATABASE proteinfer;
-USE proteinfer;
+DROP DATABASE IF EXISTS proteinfer_test;
+CREATE DATABASE proteinfer_test;
+USE proteinfer_test;
 
-
-CREATE TABLE ProteinferRun (
+CREATE TABLE proteinferRun (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	status CHAR(1),
+	status CHAR(1) NOT NULL,
+	program VARCHAR(255) NOT NULL,
 	dateCreated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	dateCompleted TIMESTAMP,
-	unfilteredProteinCount INT UNSIGNED
+	dateCompleted DATETIME,
+	comments TEXT
 );
 
-CREATE TABLE ProteinferInput (
+CREATE TABLE IDPickerRunSummary (
+	pinferID INT UNSIGNED NOT NULL PRIMARY KEY,
+	numUnfilteredProteins INT UNSIGNED,
+	numUnfilteredPeptides INT UNSIGNED
+);
+
+CREATE TABLE proteinferInput (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pinferID INT UNSIGNED NOT NULL,
-    runSearchID INT UNSIGNED NOT NULL,
-    targetHits INT UNSIGNED,
-    decoyHits INT UNSIGNED,
-    filteredTargetHits INT UNSIGNED
+    runSearchID INT UNSIGNED NOT NULL
 );
-ALTER TABLE ProteinferInput ADD PRIMARY KEY (pinferID, runSearchID);
+ALTER TABLE proteinferInput ADD INDEX (pinferID);
+ALTER TABLE proteinferInput ADD INDEX (runSearchID);
 
-CREATE TABLE ProteinferFilter (
+CREATE TABLE IDPickerInputSummary (
+	pinferInputID INT UNSIGNED NOT NULL PRIMARY KEY,
+	numTargetHits INT UNSIGNED,
+    numDecoyHits INT UNSIGNED,
+    numFilteredTargetHits INT UNSIGNED
+);
+
+CREATE TABLE proteinferFilter (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pinferID INT UNSIGNED NOT NULL,
     filterName VARCHAR(255) NOT NULL,
-   	value VARCHAR(255)
+   	filterValue VARCHAR(255)
 );
-ALTER TABLE  ProteinferFilter ADD INDEX (pinferID);
+ALTER TABLE  proteinferFilter ADD INDEX (pinferID);
 
-CREATE TABLE ProteinferProtein (
-	nrseqProteinID INT UNSIGNED NOT NULL,
+CREATE TABLE proteinferProtein (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	nrseqDbProteinID INT UNSIGNED NOT NULL,
 	pinferID INT UNSIGNED NOT NULL,
-	accession VARCHAR(255)  NOT NULL,
     coverage DOUBLE UNSIGNED,
-    clusterID INT UNSIGNED NOT NULL,
-    groupID INT UNSIGNED NOT NULL,
-    isParsimonious BIT NOT NULL DEFAULT 0,
     userAnnotation TEXT,
     userValidation CHAR(1)
 );
-ALTER TABLE  ProteinferProtein ADD PRIMARY KEY(nrseqProteinID, pinferID);
-ALTER TABLE  ProteinferProtein ADD INDEX (pinferID);
+ALTER TABLE  proteinferProtein ADD INDEX (pinferID);
 
-
-CREATE TABLE ProteinferPeptide (
-	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	pinferID INT UNSIGNED NOT NULL,
-    groupID INT UNSIGNED NOT NULL
+CREATE TABLE IDPickerProtein (
+	pinferProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
+	clusterID INT UNSIGNED NOT NULL,
+    groupID INT UNSIGNED NOT NULL,
+    isParsimonious TINYINT NOT NULL DEFAULT 0
 );
 
-CREATE TABLE ProteinferPeptideProteinMatch (
-    nrseqProteinID INT UNSIGNED NOT NULL,
+
+CREATE TABLE proteinferPeptide (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	pinferID INT UNSIGNED NOT NULL
+);
+
+CREATE TABLE IDPickerPeptide (
+	pinferPeptideID INT UNSIGNED NOT NULL PRIMARY KEY,
+	groupID INT UNSIGNED NOT NULL
+);
+
+
+CREATE TABLE proteinferPeptideProteinMatch (
+    pinferProteinID INT UNSIGNED NOT NULL,
     pinferPeptideID INT UNSIGNED NOT NULL
 );
-ALTER TABLE ProteinferPeptideProteinMatch ADD PRIMARY KEY (nrseqProteinID, pinferPeptideID);
+ALTER TABLE proteinferPeptideProteinMatch ADD PRIMARY KEY (pinferProteinID, pinferPeptideID);
 
-CREATE TABLE ProteinferSpectrumMatch (
+
+CREATE TABLE IDPickerGroupAssociation (
+	pinferID INT UNSIGNED NOT NULL,
+	idpickerProteinGroupID INT UNSIGNED NOT NULL,
+	idpickerPeptideGroupID INT UNSIGNED NOT NULL
+);
+ALTER TABLE IDPickerGroupAssociation ADD INDEX(pinferID);
+
+
+CREATE TABLE proteinferSpectrumMatch (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     msRunSearchResultID INT UNSIGNED NOT NULL,
     pinferPeptideID INT UNSIGNED NOT NULL,
-    fdr DOUBLE UNSIGNED
+    rank INT UNSIGNED NOT NULL
 );
-ALTER TABLE  ProteinferSpectrumMatch ADD INDEX (msRunSearchResultID);
+ALTER TABLE  proteinferSpectrumMatch ADD INDEX (msRunSearchResultID);
+
+CREATE TABLE IDPickerSpectrumMatch (
+	pinferSpectrumMatchID INT UNSIGNED NOT NULL PRIMARY KEY,
+	fdr DOUBLE UNSIGNED
+);
 
 
 
 # TRIGGERS TO ENSURE CASCADING DELETES
 
 DELIMITER |
-CREATE TRIGGER ProteinferPeptide_bdelete BEFORE DELETE ON ProteinferPeptide
+CREATE TRIGGER proteinferSpectrumMatch_bdelete BEFORE DELETE ON proteinferSpectrumMatch
  FOR EACH ROW
  BEGIN
-   DELETE FROM ProteinferSpectrumMatch WHERE pinferPeptideID = OLD.id;
-   DELETE FROM ProteinferPeptideProteinMatch WHERE pinferPeptideID = OLD.id;
+   DELETE FROM IDPickerSpectrumMatch WHERE pinferSpectrumMatchID = OLD.id;
  END;
 |
 DELIMITER ;
 
 DELIMITER |
-CREATE TRIGGER ProteinferProtein_bdelete BEFORE DELETE ON ProteinferProtein
+CREATE TRIGGER proteinferPeptide_bdelete BEFORE DELETE ON proteinferPeptide
  FOR EACH ROW
  BEGIN
-   DELETE FROM ProteinferPeptideProteinMatch WHERE pinferProteinID = OLD.nrseqProteinID;
+   DELETE FROM proteinferSpectrumMatch WHERE pinferPeptideID = OLD.id;
+   DELETE FROM IDPickerPeptide WHERE pinferPeptideID = OLD.id;
+   DELETE FROM proteinferPeptideProteinMatch WHERE pinferPeptideID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER proteinferProtein_bdelete BEFORE DELETE ON proteinferProtein
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM IDPickerProtein WHERE pinferProteinID = OLD.id;
+   	DELETE FROM proteinferPeptideProteinMatch WHERE pinferProteinID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER proteinferInput_bdelete BEFORE DELETE ON proteinferInput
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM IDPickerInputSummary WHERE pinferInputID = OLD.id;
  END;
 |
 DELIMITER ;
 
 
 DELIMITER |
-CREATE TRIGGER ProteinferRun_bdelete BEFORE DELETE ON ProteinferRun
+CREATE TRIGGER proteinferRun_bdelete BEFORE DELETE ON proteinferRun
  FOR EACH ROW
  BEGIN
-   DELETE FROM ProteinferFilter WHERE pinferID = OLD.id;
-   DELETE FROM ProteinferInput WHERE pinferID = OLD.id;
-   DELETE FROM ProteinferProtein WHERE pinferID = OLD.id;
-   DELETE FROM ProteinferPeptide WHERE pinferID = OLD.id;
+ 	DELETE FROM IDPickerRunSummary WHERE pinferID = OLD.id;
+  	DELETE FROM proteinferFilter WHERE pinferID = OLD.id;
+   	DELETE FROM proteinferInput WHERE pinferID = OLD.id;
+  	DELETE FROM proteinferProtein WHERE pinferID = OLD.id;
+   	DELETE FROM proteinferPeptide WHERE pinferID = OLD.id;
+   	DELETE FROM IDPickerGroupAssociation WHERE pinferID = OLD.id;
  END;
 |
 DELIMITER ;

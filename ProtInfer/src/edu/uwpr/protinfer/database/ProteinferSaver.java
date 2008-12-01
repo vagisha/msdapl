@@ -6,13 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.uwpr.protinfer.database.dao.DAOFactory;
-import edu.uwpr.protinfer.database.dao.ProteinferFilterDAO;
-import edu.uwpr.protinfer.database.dao.ProteinferInputDAO;
-import edu.uwpr.protinfer.database.dao.ProteinferPeptideDAO;
-import edu.uwpr.protinfer.database.dao.ProteinferProteinDAO;
-import edu.uwpr.protinfer.database.dao.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dao.ProteinferSpectrumMatchDAO;
+import edu.uwpr.protinfer.database.dao.GenericProteinferPeptideDAO;
+import edu.uwpr.protinfer.database.dao.GenericProteinferProteinDAO;
+import edu.uwpr.protinfer.database.dao.GenericProteinferRun;
+import edu.uwpr.protinfer.database.dao.GenericProteinferSpectrumMatchDAO;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferFilterDAO;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
+import edu.uwpr.protinfer.database.dto.BaseProteinferPeptide;
+import edu.uwpr.protinfer.database.dto.BaseProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinferFilter;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
@@ -33,8 +35,8 @@ public class ProteinferSaver {
     public static <T extends SpectrumMatch> void saveProteinInferenceResults(SearchSummary searchSummary, IDPickerParams params, 
             List<InferredProtein<T>> proteins) {
         
-        DAOFactory fact = DAOFactory.instance();
-        ProteinferRunDAO runDao = fact.getProteinferRunDao();
+        ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
+        GenericProteinferRun runDao = fact.getProteinferRunDao();
         ProteinferFilterDAO filterDao = fact.getProteinferFilterDao();
         ProteinferInputDAO inputDao = fact.getProteinferInputDao();
         
@@ -69,18 +71,18 @@ public class ProteinferSaver {
         inputDao.saveProteinferInputList(inputList);
         
         // save the results
-        ProteinferSpectrumMatchDAO specDao = fact.getProteinferSpectrumMatchDao();
-        ProteinferPeptideDAO peptDao = fact.getProteinferPeptideDao();
-        ProteinferProteinDAO protDao = fact.getProteinferProteinDao();
+        GenericProteinferSpectrumMatchDAO specDao = fact.getProteinferSpectrumMatchDao();
+        GenericProteinferPeptideDAO peptDao = fact.getProteinferPeptideDao();
+        GenericProteinferProteinDAO protDao = fact.getProteinferProteinDao();
         Map<String, Integer> dbPeptideIds = new HashMap<String, Integer>();
         
         for(InferredProtein<T> prot: proteins) {
             
             // save the protein
-            ProteinferProtein protein = new ProteinferProtein();
+            BaseProteinferProtein<T> protein = new ProteinferProtein();
             protein.setClusterId(prot.getProteinClusterId());
             protein.setGroupId(prot.getProteinGroupId());
-            protein.setNrseqProteinId(prot.getProteinId());
+            protein.setNrseqDbProteinId(prot.getProteinId());
             protein.setAccession(prot.getAccession());
             protein.setCoverage(prot.getPercentCoverage());
             protein.setProteinferId(pinferId);
@@ -94,7 +96,7 @@ public class ProteinferSaver {
                 // save the peptide and get the Id
                 Integer pinferPeptideId = dbPeptideIds.get(pev.getModifiedPeptideSeq());
                 if(pinferPeptideId == null) {
-                    ProteinferPeptide peptide = new ProteinferPeptide(pinferId, pev.getPeptide().getPeptideGroupId(), pev.getModifiedPeptideSeq());
+                    BaseProteinferPeptide<T> peptide = new ProteinferPeptide(pinferId, pev.getPeptide().getPeptideGroupId(), pev.getModifiedPeptideSeq());
                     pinferPeptideId = peptDao.saveProteinferPeptide(prot.getProteinId(), peptide);
                     
                     dbPeptideIds.put(pev.getModifiedPeptideSeq(), pinferPeptideId);

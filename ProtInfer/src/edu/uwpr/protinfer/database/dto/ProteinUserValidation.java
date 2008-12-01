@@ -2,7 +2,7 @@ package edu.uwpr.protinfer.database.dto;
 
 public enum ProteinUserValidation {
 
-    UNVALIDATED('U'), ACCEPTED('A'), REJECTED('R');
+    UNVALIDATED('U'), ACCEPTED('A'), REJECTED('R'), NOT_SURE('N');
     
     private char statusChar;
     
@@ -18,6 +18,8 @@ public enum ProteinUserValidation {
                 return ACCEPTED;
             case 'R':
                 return REJECTED;
+            case 'N':
+                return NOT_SURE;
             default:
                 return null;
         }

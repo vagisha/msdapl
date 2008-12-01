@@ -1,21 +1,24 @@
-package edu.uwpr.protinfer.database.dao;
+package edu.uwpr.protinfer.database.dao.ibatis;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
 import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
+import edu.uwpr.protinfer.database.dao.GenericProteinferRun;
+import edu.uwpr.protinfer.database.dto.BaseProteinferRun;
+import edu.uwpr.protinfer.database.dto.ProteinInferenceProgram;
+import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
 import edu.uwpr.protinfer.database.dto.ProteinferStatus;
 
-public class ProteinferRunDAO extends BaseSqlMapDAO {
+public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinferRun<ProteinferInput, ProteinferRun> {
 
     private static final String sqlMapNameSpace = "ProteinferRun";
     
@@ -23,31 +26,19 @@ public class ProteinferRunDAO extends BaseSqlMapDAO {
         super(sqlMap);
     }
 
-    public int saveNewProteinferRun() { 
+    public int saveNewProteinferRun(ProteinInferenceProgram program) { 
         ProteinferRun run = new ProteinferRun();
         run.setStatus(ProteinferStatus.PENDING);
+        run.setProgram(program);
+        return save(run);
+    }
+    
+    public int save(BaseProteinferRun<?> run) { 
         return super.saveAndReturnId(sqlMapNameSpace+".insert", run);
     }
     
-    public void setProteinferStatus(int proteinferId, ProteinferStatus status) {
-        Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put("pinferId", proteinferId);
-        map.put("status", String.valueOf(status.getStatusChar()));
-        super.update(sqlMapNameSpace+".updateStatus", map);
-    }
-    
-    public void setProteinferCompletionDate(int proteinferId, Date date) {
-        Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put("pinferId", proteinferId);
-        map.put("dateCompleted", date);
-        super.update(sqlMapNameSpace+".updateDateCompleted", map);
-    }
-    
-    public void setProteinferUnfilteredProteinCount(int proteinferId, int proteinCount) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("pinferId", proteinferId);
-        map.put("proteinCount", proteinCount);
-        super.update(sqlMapNameSpace+".updateUnfilteredProteinCount", map);
+    public void update(BaseProteinferRun<?> run) {
+        super.update(sqlMapNameSpace+".update", run);
     }
     
     public ProteinferRun getProteinferRun(int proteinferId) {
@@ -104,6 +95,38 @@ public class ProteinferRunDAO extends BaseSqlMapDAO {
             if (status == null)
                 throw new IllegalArgumentException("Invalid ProteinferStatus value: "+statusStr);
             return status;
+        }
+    }
+    
+    /**
+     * Type handler for converting between ProteinferStatus and SQL's CHAR type.
+     */
+    public static final class ProteinferProgramTypeHandler implements TypeHandlerCallback {
+
+        public Object getResult(ResultGetter getter) throws SQLException {
+            return stringToProteinferProgram(getter.getString());
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            ProteinInferenceProgram program = (ProteinInferenceProgram) parameter;
+            if (program == null)
+                setter.setNull(java.sql.Types.VARCHAR);
+            else
+                setter.setString(program.getName());
+        }
+
+        public Object valueOf(String s) {
+            return stringToProteinferProgram(s);
+        }
+        
+        private ProteinInferenceProgram stringToProteinferProgram(String programStr) {
+            if (programStr == null)
+                throw new IllegalArgumentException("String representing ProteinInferenceProgram cannot be null");
+            ProteinInferenceProgram program = ProteinInferenceProgram.getProgramForName(programStr);
+            if (program == null)
+                throw new IllegalArgumentException("Invalid ProteinInferenceProgram value: "+programStr);
+            return program;
         }
     }
 }

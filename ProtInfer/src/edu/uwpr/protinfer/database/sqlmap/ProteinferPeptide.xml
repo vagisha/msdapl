@@ -4,83 +4,64 @@
 <sqlMap namespace="ProteinferPeptide"> 
 
 	<typeAlias alias="ProteinferPeptide" type="edu.uwpr.protinfer.database.dto.ProteinferPeptide"/>
+	<typeAlias alias="BaseProteinferPeptide" type="edu.uwpr.protinfer.database.dto.BaseProteinferPeptide"/>
 	
-	<resultMap class="ProteinferPeptide" id="pinferPeptideResult">
+	<resultMap class="BaseProteinferPeptide" id="pinferPeptideBaseResult">
 		<result property="id" column="id" />
 		<result property="proteinferId" column="pinferID" nullValue="0"/>
-		<result property="groupId" column="groupID" nullValue="0"/>
-		<result property="spectrumMatchList" 
-				select="ProteinferSpectrumMatch.selectMatchesForPeptide"
-				column="id"/>
 		<result property="matchingProteinIds" 
 				select="ProteinferPeptide.selectProteinIdsForPeptide"
 				column="id"/>
 	</resultMap>
 	
-	<parameterMap class="ProteinferPeptide" id="pinferPeptideParam">
+	<resultMap class="ProteinferPeptide" id="pinferPeptideResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
+		<result property="spectrumMatchList" 
+				select="ProteinferSpectrumMatch.selectMatchesForPeptide"
+				column="id"/>
+	</resultMap>
+	
+	<parameterMap class="BaseProteinferPeptide" id="pinferPeptideParam">
 		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
 	<select id="select" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT * FROM ProteinferPeptide WHERE id=#id#
+    	SELECT * FROM proteinferPeptide WHERE id=#id#
     </select>
     
     <select id="selectPeptideIdsForProtein" resultClass="Integer" parameterClass="Integer">
-    	SELECT pinferPeptideID FROM ProteinferPeptideProteinMatch WHERE nrseqProteinID = #id#
+    	SELECT pinferPeptideID FROM proteinferPeptideProteinMatch WHERE pinferProteinID = #id#
     </select>
     
     <select id="selectPeptidesForProtein" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT p.id, p.pinferID, p.groupID
-    	FROM  ProteinferPeptide as p, ProteinferPeptideProteinMatch as protMatch 
+    	SELECT p.id, p.pinferID
+    	FROM  proteinferPeptide as p, proteinferPeptideProteinMatch as protMatch 
     	WHERE p.id = protMatch.pinferPeptideID
-    	AND protMatch.nrseqProteinID = #id#
+    	AND protMatch.pinferProteinID = #id#
     </select>
     
     <select id="selectProteinIdsForPeptide" resultClass="Integer" parameterClass="Integer">
-    	SELECT nrseqProteinID FROM ProteinferPeptideProteinMatch WHERE pinferPeptideID=#id#
+    	SELECT pinferProteinID FROM proteinferPeptideProteinMatch WHERE pinferPeptideID=#id#
     </select>
     
     <select id="selectPeptideIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT id FROM ProteinferPeptide WHERE pinferID=#id#
+    	SELECT id FROM proteinferPeptide WHERE pinferID=#id#
     </select>
     
     <select id="selectPeptidesForProteinferRun" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT * FROM ProteinferPeptide WHERE pinferID=#id#
-    </select>
-    
-    <select id="selectPeptidesForProteinferRunGroup" resultMap="pinferPeptideResult" parameterClass="java.util.Map">
-    	SELECT * FROM ProteinferPeptide WHERE pinferID=#pinferId# AND groupID=#groupId#
-    </select>
-    
-    <select id="selectProtGrpIdsForPeptGrpId" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT DISTINCT prot.groupID 
-    	FROM ProteinferPeptide as pept, ProteinferProtein as prot , ProteinferPeptideProteinMatch as m
-    	WHERE pept.pinferID=#pinferId# AND pept.groupID=#groupId#
-    	AND prot.pinferID=#pinferId#
-    	AND prot.nrseqProteinID = m.nrseqProteinID
-    	AND pept.id = m.pinferPeptideID
+    	SELECT * FROM proteinferPeptide WHERE pinferID=#id#
     </select>
    
     <insert id="insert" parameterMap="pinferPeptideParam">
-    	INSERT INTO ProteinferPeptide (
-    	pinferID,
-    	groupID) 
-    	VALUES (?,?)
+    	INSERT INTO proteinferPeptide (
+    	pinferID) 
+    	VALUES (?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>
     
-    <insert id="insertPeptideProteinMatch" parameterClass="java.util.Map">
-    	INSERT INTO ProteinferPeptideProteinMatch (
-    	nrseqProteinID,
-    	pinferPeptideID) 
-    	VALUES (#nrseqProteinId#, #pinferPeptideId#)
-    </insert>
-    
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM ProteinferPeptide WHERE id=#id#		    
+		DELETE FROM proteinferPeptide WHERE id=#id#		    
     </delete>
     
 </sqlMap>

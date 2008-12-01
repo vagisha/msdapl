@@ -9,7 +9,7 @@
 		<result property="id" column="id" />
 		<result property="proteinferId" column="pinferID" nullValue="0"/>
 		<result property="filterName" column="filterName"/>
-		<result property="filterValue" column="value"/>
+		<result property="filterValue" column="filterValue"/>
 	</resultMap>
 	
 	<parameterMap class="ProteinferFilter" id="pinferFilterParam">
@@ -19,14 +19,14 @@
 	</parameterMap>
 	
     <select id="selectFiltersForRun" resultMap="pinferFilterResult" parameterClass="Integer">
-    	SELECT * FROM ProteinferFilter WHERE pinferID = #id#
+    	SELECT * FROM proteinferFilter WHERE pinferID = #id#
     </select>
     
     <insert id="insert" parameterMap="pinferFilterParam">
-    	INSERT INTO ProteinferFilter (
+    	INSERT INTO proteinferFilter (
     	pinferID,
     	filterName,
-    	value) 
+    	filterValue) 
     	VALUES (?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
@@ -34,7 +34,7 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM ProteinferFilter WHERE id=#id#		    
+		DELETE FROM proteinferFilter WHERE id=#id#		    
     </delete>
     
 </sqlMap>

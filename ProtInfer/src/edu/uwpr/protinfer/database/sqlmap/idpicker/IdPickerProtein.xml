@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="IdPickerProtein"> 
+
+	<typeAlias alias="IdPickerProtein" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein" />
+	
+	<resultMap class="IdPickerProtein" id="idpickerProteinResult" extends="ProteinferProtein.pinferBaseProteinResult">
+		<result property="clusterId" column="clusterID" nullValue="0"/>
+		<result property="isParsimonious" column="isParsimonious" />
+		<result property="groupId" column="groupID" nullValue="0"/>
+		<result property="peptides" 
+				select="IdPickerPeptide.selectPeptidesForProtein"
+				column="id"/>
+	</resultMap>
+	
+	<parameterMap class="IdPickerProtein" id="idpickerProteinParam">
+		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="isParsimonious" jdbcType="TINYINT" />
+		<parameter property="clusterId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
+	</parameterMap>
+	
+	<select id="select" resultMap="idpickerProteinResult" parameterClass="Integer">
+    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.pinferProteinID
+    	AND prot.id=#id#
+    </select>
+    
+    <select id="selectProteinsForProteinferRun" resultMap="idpickerProteinResult" parameterClass="Integer">
+    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.pinferProteinID
+    	AND prot.pinferID = #id#
+    </select>
+    
+    <select id="selectProteinsForCluster" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.pinferProteinID
+    	AND prot.pinferID = #pinferId#
+    	AND idpProt.clusterID = #clusterId#
+    </select>
+    
+    <select id="selectProteinsForGroup" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.pinferProteinID
+    	AND prot.pinferID = #pinferId#
+    	AND idpProt.groupID = #groupId#
+    </select>
+    
+    <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT idpickerPeptideGroupID FROM IDPickerGroupAssociation
+    	WHERE pinferID=#pinferId#
+    	AND idpickerProteinGroupID=#groupId#
+    </select>
+    
+    <select id="selectProtGrpIdsForClusterId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT idpProt.groupID 
+    	FROM IDPickerProtein as idpProt, proteinferProtein as prot
+    	WHERE prot.pinferID = #pinferId# 
+    	AND idpProt.clusterID = #clusterId#
+    	AND prot.id = idpProt.pinferProteinID
+    </select>
+    
+    
+    <select id="selectParsimProteinCountForProteinferRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM proteinferProtein as prot, IDPickerProtein as idpProt 
+    	WHERE prot.pinferID = #id# 
+    	AND prot.id = idpProt.pinferProteinID
+    	AND idpProt.isParsimonious = 1
+    </select>
+    
+    <select id="checkGroupAssociation" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(*) FROM IDPickerGroupAssociation
+    	WHERE pinferID=#pinferId#
+    	AND idpickerProteinGroupID=#protGrpId#
+    	AND idpickerPeptideGroupID=#peptGrpId#
+    </select>
+    
+    <insert id="insertGroupAssociation" parameterClass="java.util.Map">
+    	INSERT INTO IDPickerGroupAssociation (
+    	pinferID,
+    	idpickerProteinGroupID,
+    	idpickerPeptideGroupID)
+    	values(#pinferId#, #protGrpId#, #peptGrpId#)
+    </insert>
+    
+    <insert id="insert" parameterMap="idpickerProteinParam">
+    	INSERT INTO IDPickerProtein (
+    	pinferProteinID,
+    	isParsimonious,
+    	clusterID,
+    	groupID) 
+    	VALUES (?,?,?,?)
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM ProteinferProtein WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

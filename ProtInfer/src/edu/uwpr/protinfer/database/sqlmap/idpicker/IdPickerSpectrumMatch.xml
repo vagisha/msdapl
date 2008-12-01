@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="IdPickerSpectrumMatch"> 
+
+	<typeAlias alias="IdPickerSpectrumMatch" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+	
+	<resultMap class="IdPickerSpectrumMatch" id="idpickerSMatchResult" extends="ProteinferSpectrumMatch.pinferSMatchResult">
+		<result property="fdr"  column="fdr" nullValue="-1.0"/>
+	</resultMap>
+	
+	<parameterMap class="IdPickerSpectrumMatch" id="idpickerSMatchParam">
+		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="fdr" jdbcType="DOUBLE" nullValue="-1.0"/>
+	</parameterMap>
+	
+    <select id="selectSpectrumMatch" resultMap="idpickerSMatchResult" parameterClass="Integer">
+    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, proteinferSpectrumMatch as psm
+    	WHERE psm.id = #id#
+    	AND psm.id = idpPsm.pinferSpectrumMatchID
+    </select>
+    
+    <select id="selectMatchesForPeptide" resultMap="idpickerSMatchResult" parameterClass="Integer">
+    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, proteinferSpectrumMatch as psm
+    	WHERE psm.pinferPeptideID = #id#
+    	AND psm.id = idpPsm.pinferSpectrumMatchID
+    </select>
+    
+    <insert id="insert" parameterMap="idpickerSMatchParam">
+    	INSERT INTO IDPickerSpectrumMatch (
+    	pinferSpectrumMatchID,
+    	fdr) 
+    	VALUES (?,?)
+    </insert>
+    
+</sqlMap>

@@ -4,7 +4,7 @@
 
 <sqlMapConfig>
 
-	<properties resource="msDataDB.properties" />
+	<properties resource="msDataDBTest.properties" />
 	
 	<settings 
 		useStatementNamespaces="true"
@@ -36,12 +36,18 @@
     	</dataSource>
 	</transactionManager>
 	
-	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferInput.xml"/>
-	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IDPickerInputSummary.xml"/>
-	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferFilter.xml"/>
-	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferRun.xml"/>
+	
 	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferSpectrumMatch.xml"/>
 	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferPeptide.xml"/>
 	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferProtein.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferFilter.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferInput.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferRun.xml"/>
+	
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerSpectrumMatch.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerPeptide.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerProtein.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerInputSummary.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerRunSummary.xml"/>
 	
 </sqlMapConfig>	

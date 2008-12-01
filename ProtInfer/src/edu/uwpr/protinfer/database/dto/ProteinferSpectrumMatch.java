@@ -2,10 +2,10 @@ package edu.uwpr.protinfer.database.dto;
 
 public class ProteinferSpectrumMatch {
 
+    private int id;
     private int proteinferPeptideId;
-    private double fdr = -1;
     private int msRunSearchResultId;
-    private int scanId;
+    private int rank;
     
 
     public ProteinferSpectrumMatch() {}
@@ -13,11 +13,6 @@ public class ProteinferSpectrumMatch {
     public ProteinferSpectrumMatch(int pinferPeptideId, int msRunSearchResultId) {
         this.proteinferPeptideId = pinferPeptideId;
         this.msRunSearchResultId = msRunSearchResultId;
-    }
-    
-    public ProteinferSpectrumMatch(int pinferPeptideId, int msRunSearchResultId, double fdr) {
-        this(pinferPeptideId, msRunSearchResultId);
-        this.fdr = fdr;
     }
     
     public int getProteinferPeptideId() {
@@ -28,18 +23,6 @@ public class ProteinferSpectrumMatch {
         this.proteinferPeptideId = pinferPeptideId;
     }
     
-    public double getFdr() {
-        return fdr;
-    }
-    
-    public double getFdrRounded() {
-        return Math.round(fdr * 1000.0) / 1000.0;
-    }
-    
-    public void setFdr(double fdr) {
-        this.fdr = fdr;
-    }
-    
     public int getMsRunSearchResultId() {
         return msRunSearchResultId;
     }
@@ -48,11 +31,20 @@ public class ProteinferSpectrumMatch {
         this.msRunSearchResultId = msRunSearchResultId;
     }
     
-    public int getScanId() {
-        return scanId;
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public int getRank() {
+        return rank;
     }
 
-    public void setScanId(int scanId) {
-        this.scanId = scanId;
+    public void setRank(int rank) {
+        this.rank = rank;
     }
+
 }

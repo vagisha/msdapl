@@ -1,34 +1,34 @@
-package edu.uwpr.protinfer.database.dto;
+package edu.uwpr.protinfer.database.dto.idpicker;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProteinferProteinGroup {
+public class IdPickerProteinGroup {
 
     private final int groupId;
-    private List<ProteinferProtein> proteins;
-    private List<ProteinferPeptideGroup> matchingPeptideGroups;
+    private List<IdPickerProtein> proteins;
+    private List<IdPickerPeptideGroup> matchingPeptideGroups;
     
-    public ProteinferProteinGroup(int groupId) {
+    public IdPickerProteinGroup(int groupId) {
         this.groupId = groupId;
-        proteins = new ArrayList<ProteinferProtein>();
-        matchingPeptideGroups = new ArrayList<ProteinferPeptideGroup>();
+        proteins = new ArrayList<IdPickerProtein>();
+        matchingPeptideGroups = new ArrayList<IdPickerPeptideGroup>();
     }
     
     public int getGroupId() {
         return groupId;
     }
     
-    public void setProteins(List<ProteinferProtein> proteins) {
+    public void setProteins(List<IdPickerProtein> proteins) {
         if(proteins != null)
             this.proteins = proteins;
     }
     
-    public void addProtein(ProteinferProtein protein) {
+    public void addProtein(IdPickerProtein protein) {
         this.proteins.add(protein);
     }
     
-    public List<ProteinferProtein> getProteins() {
+    public List<IdPickerProtein> getProteins() {
         return this.proteins;
     }
     
@@ -36,28 +36,28 @@ public class ProteinferProteinGroup {
         return proteins.size();
     }
     
-    public List<ProteinferPeptideGroup> getMatchingPeptideGroups() {
+    public List<IdPickerPeptideGroup> getMatchingPeptideGroups() {
         return matchingPeptideGroups;
     }
     
     public List<Integer> getMatchingPeptideGroupIds() {
         List<Integer> ids = new ArrayList<Integer>(matchingPeptideGroups.size());
-        for(ProteinferPeptideGroup grp: matchingPeptideGroups)
+        for(IdPickerPeptideGroup grp: matchingPeptideGroups)
             ids.add(grp.getGroupId());
         return ids;
     }
     
-    public void setMatchingPeptideGroups(List<ProteinferPeptideGroup> peptGrps) {
+    public void setMatchingPeptideGroups(List<IdPickerPeptideGroup> peptGrps) {
         this.matchingPeptideGroups = peptGrps;
     }
     
-    public void addMatchingPeptideGroup(ProteinferPeptideGroup peptGrp) {
+    public void addMatchingPeptideGroup(IdPickerPeptideGroup peptGrp) {
         this.matchingPeptideGroups.add(peptGrp);
     }
     
     public int getMatchingPeptideCount() {
         int cnt = 0;
-        for(ProteinferPeptideGroup grp: matchingPeptideGroups) {
+        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
             cnt += grp.getPeptideCount();
         }
         return cnt;
@@ -65,7 +65,7 @@ public class ProteinferProteinGroup {
     
     public int getUniqMatchingPeptideCount() {
         int cnt = 0;
-        for(ProteinferPeptideGroup grp: matchingPeptideGroups) {
+        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
             if(grp.isUniqueToProteinGroup()) {
                 cnt += grp.getPeptideCount();
             }
@@ -75,7 +75,7 @@ public class ProteinferProteinGroup {
     
     public int getSpectrumCount() {
         int cnt = 0;
-        for(ProteinferPeptideGroup grp: matchingPeptideGroups) {
+        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
             cnt += grp.getSpectrumCount();
         }
         return cnt;
@@ -83,7 +83,7 @@ public class ProteinferProteinGroup {
     
     public String getNonUniqMatchingPeptideGroupIdsString() {
         StringBuilder buf = new StringBuilder();
-        for(ProteinferPeptideGroup grp: matchingPeptideGroups) {
+        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
             if(!grp.isUniqueToProteinGroup())
                 buf.append(","+grp.getGroupId());
         }
@@ -93,7 +93,7 @@ public class ProteinferProteinGroup {
     
     public String getUniqMatchingPeptideGroupIdsString() {
         StringBuilder buf = new StringBuilder();
-        for(ProteinferPeptideGroup grp: matchingPeptideGroups) {
+        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
             if(grp.isUniqueToProteinGroup())
                 buf.append(","+grp.getGroupId());
         }

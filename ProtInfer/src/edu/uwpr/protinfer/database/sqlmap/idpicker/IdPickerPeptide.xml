@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="IdPickerPeptide"> 
+
+	<typeAlias alias="IdPickerPeptide" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide"/>
+	
+	<resultMap class="IdPickerPeptide" id="idpickerPeptideResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
+		<result property="groupId" column="groupID" nullValue="0" />
+		<result property="spectrumMatchList" 
+				select="IdPickerSpectrumMatch.selectMatchesForPeptide"
+				column="id"/>
+	</resultMap>
+	
+	<parameterMap class="IdPickerPeptide" id="idpickerPeptideParam">
+		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
+	</parameterMap>
+	
+	<select id="select" resultMap="idpickerPeptideResult" parameterClass="Integer">
+    	SELECT * FROM proteinferPeptide as pep, IDPickerPeptide as idpPep
+    	WHERE pep.id=#id#
+    	AND pep.id = idpPep.pinferPeptideID
+    </select>
+    
+    <select id="selectPeptidesForProtein" resultMap="idpickerPeptideResult" parameterClass="Integer">
+    	SELECT p.id, p.pinferID, idpPep.groupID
+    	FROM  proteinferPeptide as p, proteinferPeptideProteinMatch as protMatch, IDPickerPeptide as idpPep
+    	WHERE p.id = protMatch.pinferPeptideID
+    	AND protMatch.pinferProteinID = #id#
+    	AND p.id = idpPep.pinferPeptideID
+    </select>
+    
+    <select id="selectPeptidesForProteinferRun" resultMap="idpickerPeptideResult" parameterClass="Integer">
+    	SELECT * FROM proteinferPeptide as pep, IDPickerPeptide as idpPep
+    	WHERE pinferID=#id#
+    	AND pep.id = idpPep.pinferPeptideID
+    </select>
+    
+    <select id="selectPeptidesForGroup" resultMap="idpickerPeptideResult" parameterClass="java.util.Map">
+    	SELECT * FROM proteinferPeptide as pep, IDPickerPeptide as idpPep
+    	WHERE pep.pinferID=#pinferId# 
+    	AND pep.id = idpPep.pinferPeptideID
+    	AND idpPep.groupID=#groupId#
+    </select>
+    
+    <select id="selectProtGrpIdsForPeptGrpId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT idpickerProteinGroupID FROM IDPickerGroupAssociation
+    	WHERE pinferID=#pinferId#
+    	AND idpickerPeptideGroupID=#groupId#
+    </select>
+   
+    <insert id="insert" parameterMap="idpickerPeptideParam">
+    	INSERT INTO IDPickerPeptide (
+    	pinferPeptideID,
+    	groupID) 
+    	VALUES (?,?)
+    </insert>
+    
+    <insert id="insertGroupAssociation" parameterClass="java.util.Map">
+    	INSERT INTO IDPickerGroupAssociation (
+    	pinferID,
+    	idpickerProteinGroupID,
+    	idpickerPeptideGroupID) 
+    	VALUES (#protGrpId#, #peptGrpId#)
+    </insert>
+    
+</sqlMap>
