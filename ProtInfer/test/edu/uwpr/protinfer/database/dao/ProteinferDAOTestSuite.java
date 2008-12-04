@@ -1,32 +1,42 @@
 package edu.uwpr.protinfer.database.dao;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAOTest;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerSpectrumMatchDAOTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class ProteinferDAOTestSuite {
 
-    private static Runtime runtime = Runtime.getRuntime();
-    
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for edu.uwpr.protinfer.database.dao");
         //$JUnit-BEGIN$
-        resetDatabase();
         suite.addTestSuite(ProteinferSpectrumMatchDAOTest.class);
+        suite.addTestSuite(IdPickerSpectrumMatchDAOTest.class);
+        
 //        suite.addTestSuite(ProteinferProteinDAOTest.class);
         //$JUnit-END$
         return suite;
     }
     
-    private static void resetDatabase() {
-        String cmd = "/bin/sh /Users/silmaril/WORK/UW/PROT_INFER/test/resetDatabase.sh";
+    public static void resetDatabase() {
+        System.out.println("Resetting database");
+        String script = "test/resetDatabase.sh";
         try {
-            Process process = runtime.exec(cmd);
-            process.waitFor();
-            System.out.println("reset database: exit status"+process.exitValue());
+            Process proc = Runtime.getRuntime().exec("sh "+script);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+            String line = reader.readLine();
+            while(line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            reader.close();
+            proc.waitFor();
+            System.out.println("Exit code: "+proc.exitValue());
         }
         catch (IOException e) {
             e.printStackTrace();

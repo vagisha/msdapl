@@ -16,9 +16,6 @@
 		<result property="program" column="program" typeHandler="ProteinferProgramTypeHandler"/>
 		<result property="comments" column="comments" />
 		<result property="date" column="dateRun" />
-		<result property="filters" 
-				select="ProteinferFilter.selectFiltersForRun"
-				column="id"/>
 	</resultMap>
 		
 	<resultMap class="ProteinferRun" id="pinferRunResult" extends="ProteinferRun.pinferRunBaseResult">
@@ -38,7 +35,7 @@
     </select>
     
     <select id="selectPinferIdsForRunSearchIds" resultClass="Integer" parameterClass="String">
-    	SELECT DISTINCT pinferID FROM msProteinInferInput WHERE runSearchID in $runSearchIds$
+    	SELECT DISTINCT piRunID FROM msProteinInferInput WHERE runSearchID in $runSearchIds$
     </select>
     
     <insert id="insert" parameterMap="pinferRunParam">

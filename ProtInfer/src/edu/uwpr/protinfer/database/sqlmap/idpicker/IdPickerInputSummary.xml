@@ -19,7 +19,7 @@
 	</parameterMap>
 	
     <select id="selectProteinferInput" resultMap="idpickerInputResult" parameterClass="Integer">
-    	SELECT * FROM proteinferInput as i, IDPickerInputSummary as idp 
+    	SELECT * FROM msProteinInferInput as i, IDPickerInputSummary as idp 
     	WHERE i.id = idp.piInputID
     	AND i.piRunID = #id#
     </select>

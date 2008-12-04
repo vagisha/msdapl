@@ -9,12 +9,12 @@ import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferFilterDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferPeptideDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerFilterDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerInputDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerPeptideDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
@@ -49,7 +49,7 @@ public class ProteinferDAOFactory {
     private static ProteinferDAOFactory instance = new ProteinferDAOFactory();
     
     private ProteinferRunDAO pinferRunDao;
-    private ProteinferFilterDAO pinferFilterDao;
+    private IdPickerFilterDAO pinferFilterDao;
     private ProteinferInputDAO pinferInputDao;
     private ProteinferPeptideDAO peptideDao;
     private ProteinferProteinDAO proteinDao;
@@ -66,7 +66,7 @@ public class ProteinferDAOFactory {
     private ProteinferDAOFactory() {
         
        pinferRunDao = new ProteinferRunDAO(sqlMap);
-       pinferFilterDao = new ProteinferFilterDAO(sqlMap);
+       pinferFilterDao = new IdPickerFilterDAO(sqlMap);
        pinferInputDao = new ProteinferInputDAO(sqlMap);
        spectrumMatchDao = new ProteinferSpectrumMatchDAO(sqlMap);
        peptideDao = new ProteinferPeptideDAO(sqlMap, spectrumMatchDao);
@@ -108,7 +108,7 @@ public class ProteinferDAOFactory {
         return pinferRunDao;
     }
 
-    public ProteinferFilterDAO getProteinferFilterDao() {
+    public IdPickerFilterDAO getProteinferFilterDao() {
         return pinferFilterDao;
     }
 

@@ -15,20 +15,20 @@
 	</parameterMap>
 	
     <select id="selectSpectrumMatch" resultMap="idpickerSMatchResult" parameterClass="Integer">
-    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, proteinferSpectrumMatch as psm
+    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, msProteinInferSpectrumMatch as psm
     	WHERE psm.id = #id#
-    	AND psm.id = idpPsm.pinferSpectrumMatchID
+    	AND psm.id = idpPsm.piSpectrumMatchID
     </select>
     
     <select id="selectMatchesForPeptide" resultMap="idpickerSMatchResult" parameterClass="Integer">
-    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, proteinferSpectrumMatch as psm
-    	WHERE psm.pinferPeptideID = #id#
-    	AND psm.id = idpPsm.pinferSpectrumMatchID
+    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, msProteinInferSpectrumMatch as psm
+    	WHERE psm.piPeptideID = #id#
+    	AND psm.id = idpPsm.piSpectrumMatchID
     </select>
     
     <insert id="insert" parameterMap="idpickerSMatchParam">
     	INSERT INTO IDPickerSpectrumMatch (
-    	pinferSpectrumMatchID,
+    	piSpectrumMatchID,
     	fdr) 
     	VALUES (?,?)
     </insert>

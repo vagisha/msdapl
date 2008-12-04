@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.database.dao.ibatis;
+package edu.uwpr.protinfer.database.dao.idpicker.ibatis;
 
 import java.util.List;
 
@@ -9,11 +9,11 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
 
 
-public class ProteinferFilterDAO extends BaseSqlMapDAO {
+public class IdPickerFilterDAO extends BaseSqlMapDAO {
 
-    private static final String sqlMapNameSpace = "ProteinferFilter";
+    private static final String sqlMapNameSpace = "IdPickerFilter";
     
-    public ProteinferFilterDAO(SqlMapClient sqlMap) {
+    public IdPickerFilterDAO(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 

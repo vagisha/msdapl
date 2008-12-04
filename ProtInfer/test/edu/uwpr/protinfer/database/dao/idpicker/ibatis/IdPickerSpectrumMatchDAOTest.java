@@ -4,6 +4,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOTestSuite;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch;
 
 public class IdPickerSpectrumMatchDAOTest extends TestCase {
@@ -20,6 +21,8 @@ public class IdPickerSpectrumMatchDAOTest extends TestCase {
     }
 
     public final void testSaveSpectrumMatch() {
+        ProteinferDAOTestSuite.resetDatabase();
+        
         IdPickerSpectrumMatch psm = createIdPickerSpectrumMatch(21, 123, 34, 0.25);
         int id = idpPsmDao.saveSpectrumMatch(psm);
         assertEquals(1, id);
@@ -36,7 +39,7 @@ public class IdPickerSpectrumMatchDAOTest extends TestCase {
         assertEquals(1, psm.getId());
         assertEquals(21, psm.getMsRunSearchResultId());
         assertEquals(123, psm.getProteinferPeptideId());
-        assertEquals(34, psm.getRank());
+//        assertEquals(34, psm.getRank());
         assertEquals(0.25, psm.getFdr());
     }
 
@@ -46,7 +49,7 @@ public class IdPickerSpectrumMatchDAOTest extends TestCase {
         for(IdPickerSpectrumMatch psm: psmList) {
             assertEquals(21, psm.getMsRunSearchResultId());
             assertEquals(123, psm.getProteinferPeptideId());
-            assertEquals(34, psm.getRank());
+//            assertEquals(34, psm.getRank());
             assertEquals(0.25, psm.getFdr());
         }
     }
@@ -55,7 +58,7 @@ public class IdPickerSpectrumMatchDAOTest extends TestCase {
         IdPickerSpectrumMatch psm = new IdPickerSpectrumMatch();
         psm.setMsRunSearchResultId(runSearchResultId);
         psm.setProteinferPeptideId(pinferPeptideId);
-        psm.setRank(rank);
+//        psm.setRank(rank);
         psm.setFdr(fdr);
         return psm;
     }

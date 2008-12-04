@@ -9,6 +9,9 @@
 		<result property="inputSummaryList" 
 				select="IdPickerInputSummary.selectProteinferInput"
 				column="id"/>
+		<result property="filters" 
+				select="IdPickerFilter.selectFiltersForRun"
+				column="id"/>
 		<result property="numUnfilteredProteins" column="numUnfilteredProteins" nullValue="-1" />
 		<result property="numUnfilteredPeptides" column="numUnfilteredPeptides" nullValue="-1" />
 	</resultMap>
@@ -21,14 +24,14 @@
 	</parameterMap>
 	
 	<select id="select" resultMap="idpickerRunResult" parameterClass="Integer">
-    	SELECT * FROM proteinferRun as run, IDPickerRunSummary as idpRun
+    	SELECT * FROM msProteinInferRun as run, IDPickerRunSummary as idpRun
     	WHERE run.id=#id#
-    	AND run.id = idpRun.pinferID
+    	AND run.id = idpRun.piRunID
     </select>
     
     <insert id="insert" parameterMap="idpickerRunParam">
     	INSERT INTO IDPickerRunSummary (
-    	pinferID,
+    	piRunID,
     	numUnfilteredProteins,
     	numUnfilteredPeptides)
     	VALUES (?,?,?)

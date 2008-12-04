@@ -46,16 +46,6 @@ public class IdPickerProteinDAO extends BaseSqlMapDAO
         int proteinId = save(protein);
         protein.setId(proteinId);
         save(sqlMapNameSpace+".insert", protein); // save entry in the IDPicker table
-        for(IdPickerPeptide peptide: protein.getPeptides()) {
-            int peptideId = peptide.getId();
-            // save only if it has not been saved before
-            if(peptideId == 0) {
-                peptideId = idpPeptDao.saveIdPickerPeptide(peptide);
-            }
-            protDao.saveProteinferProteinPeptideMatch(proteinId, peptideId);
-            // save an entry in the IDPicker group association table if one does not already exist
-            saveProteinPeptideGroupAssociation(protein.getProteinferId(), protein.getGroupId(), peptide.getGroupId());
-        }
         return proteinId;
     }
     
@@ -115,9 +105,9 @@ public class IdPickerProteinDAO extends BaseSqlMapDAO
     }
     
     public IdPickerProteinGroup getIdPickerProteinGroup(int pinferId, int groupId) {
-        List<IdPickerProtein> grpPeptides = getProteinferGroupProteins(pinferId, groupId);
+        List<IdPickerProtein> grpProteins = getProteinferGroupProteins(pinferId, groupId);
         IdPickerProteinGroup group = new IdPickerProteinGroup(groupId);
-        group.setProteins(grpPeptides);
+        group.setProteins(grpProteins);
         List<Integer> matchingPeptGrpIds = getMatchingPeptGroupIds(pinferId, groupId);
         for(Integer peptGrpId: matchingPeptGrpIds) {
             IdPickerPeptideGroup peptGrp = idpPeptDao.getIdPickerPeptideGroup(pinferId, peptGrpId);

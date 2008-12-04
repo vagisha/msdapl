@@ -11,8 +11,8 @@ import edu.uwpr.protinfer.database.dao.GenericProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dao.GenericProteinferRun;
 import edu.uwpr.protinfer.database.dao.GenericProteinferSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferFilterDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerFilterDAO;
 import edu.uwpr.protinfer.database.dto.BaseProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.BaseProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
@@ -37,7 +37,7 @@ public class ProteinferSaver {
         
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
         GenericProteinferRun runDao = fact.getProteinferRunDao();
-        ProteinferFilterDAO filterDao = fact.getProteinferFilterDao();
+        IdPickerFilterDAO filterDao = fact.getProteinferFilterDao();
         ProteinferInputDAO inputDao = fact.getProteinferInputDao();
         
         int pinferId = runDao.saveNewProteinferRun();
