@@ -14,7 +14,7 @@ public interface GenericProteinferProteinDAO<
 
     public abstract int save(BaseProteinferProtein<?,?> protein);
 
-    public abstract void saveProteinferPeptideProteinMatch(int pinferProteinId, int pinferPeptideId);
+    public abstract void saveProteinferProteinPeptideMatch(int pinferProteinId, int pinferPeptideId);
     
     public abstract void updateUserAnnotation(int pinferProteinId, String annotation);
 

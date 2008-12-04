@@ -28,7 +28,7 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
 
     public int saveNewProteinferRun(ProteinInferenceProgram program) { 
         ProteinferRun run = new ProteinferRun();
-        run.setStatus(ProteinferStatus.PENDING);
+//        run.setStatus(ProteinferStatus.PENDING);
         run.setProgram(program);
         return save(run);
     }

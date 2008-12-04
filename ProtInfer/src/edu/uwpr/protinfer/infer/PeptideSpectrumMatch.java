@@ -1,25 +1,21 @@
 package edu.uwpr.protinfer.infer;
 
 
-public interface PeptideSpectrumMatch <T extends SpectrumMatch> {
+public interface PeptideSpectrumMatch <T extends SpectrumMatch>{
 
-    public abstract PeptideHit getPeptideHit();
+    public abstract int getHitId();
     
-    public abstract T getSpectrumMatch();
-    
-    public abstract SearchSource getSearchSource();
-    
-    public abstract int getScanNumber();
+    public abstract int getScanId();
     
     public abstract int getCharge();
     
+    public abstract T getSpectrumMatch();
+    
     /**
-     * Return the sequence of the peptide with modifications
+     * Returns the sequence of the peptide for the spectrum match.
      * @return
      */
-    public abstract String getModifiedPeptideSequence();
-
-    public abstract boolean isDecoyMatch();
+    public abstract String getPeptideSequence();
     
-    public abstract boolean isTargetMatch();
+    public abstract PeptideHit getPeptideHit();
 }

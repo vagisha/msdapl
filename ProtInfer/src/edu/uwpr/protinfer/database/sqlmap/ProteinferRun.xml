@@ -13,11 +13,9 @@
 	
 	<resultMap class="BaseProteinferRun" id="pinferRunBaseResult">
 		<result property="id" column="id" />
-		<result property="status" column="status" typeHandler="ProteinferStatusTypeHandler"/>
 		<result property="program" column="program" typeHandler="ProteinferProgramTypeHandler"/>
 		<result property="comments" column="comments" />
-		<result property="dateCreated" column="dateCreated" />
-		<result property="dateCompleted" column="dateCompleted" />
+		<result property="date" column="dateRun" />
 		<result property="filters" 
 				select="ProteinferFilter.selectFiltersForRun"
 				column="id"/>
@@ -31,43 +29,40 @@
 	
 	
 	<parameterMap class="BaseProteinferRun" id="pinferRunParam">
-		<parameter property="status" jdbcType="CHAR" typeHandler="ProteinferStatusTypeHandler"/>
 		<parameter property="program" jdbcType="VARCHAR" typeHandler="ProteinferProgramTypeHandler"/>
 		<parameter property="comments" jdbcType="TEXT" />
 	</parameterMap>
 	
 	<select id="select" resultMap="pinferRunResult" parameterClass="Integer">
-    	SELECT * FROM proteinferRun WHERE id=#id#
+    	SELECT * FROM msProteinInferRun WHERE id=#id#
     </select>
     
     <select id="selectPinferIdsForRunSearchIds" resultClass="Integer" parameterClass="String">
-    	SELECT DISTINCT pinferID FROM proteinferInput WHERE runSearchID in $runSearchIds$
+    	SELECT DISTINCT pinferID FROM msProteinInferInput WHERE runSearchID in $runSearchIds$
     </select>
     
     <insert id="insert" parameterMap="pinferRunParam">
-    	INSERT INTO proteinferRun (
-    	status,
+    	INSERT INTO msProteinInferRun (
     	program,
     	comments)
-    	VALUES(?,?,?)
+    	VALUES(?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>
     
     <update id="update" parameterClass="BaseProteinferRun">
-    	UPDATE proteinferRun 
-    	SET status = #statusString#,
-    	program = #programString#,
+    	UPDATE msProteinInferRun 
+    	SET program = #programString#,
     	comments = #comments#
-    	<isNotNull property="dateCompleted">
-    		, dateCompleted = #dateCompleted#
+    	<isNotNull property="date">
+    		, dateRun = #date#
     	</isNotNull>
     	WHERE id = #id#
     </update>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM proteinferRun WHERE id=#id#		    
+		DELETE FROM msProteinInferRun WHERE id=#id#		    
     </delete>
     
 </sqlMap>

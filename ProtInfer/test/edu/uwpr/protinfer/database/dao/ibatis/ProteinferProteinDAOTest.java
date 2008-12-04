@@ -45,7 +45,7 @@ public class ProteinferProteinDAOTest extends TestCase {
         ProteinferProtein protein = protDao.getProtein(2);
         assertEquals(2, protein.getId());
         assertEquals(456, protein.getProteinferId());
-        assertEquals(124, protein.getNrseqDbProteinId());
+        assertEquals(124, protein.getNrseqProteinId());
         assertEquals(20.0, protein.getCoverage());
         assertEquals(3, protein.getPeptideCount());
         assertEquals(6, protein.getSpectralCount());
@@ -71,7 +71,7 @@ public class ProteinferProteinDAOTest extends TestCase {
     public final void testSaveProteinferProtein2() {
         ProteinferProtein protein = new ProteinferProtein();
         protein.setCoverage(50.0);
-        protein.setNrseqDbProteinId(66);
+        protein.setNrseqProteinId(66);
         protein.setProteinferId(789);
         protein.setUserAnnotation("Not Annotated");
         protein.setUserValidation(ProteinUserValidation.REJECTED);
@@ -140,7 +140,7 @@ public class ProteinferProteinDAOTest extends TestCase {
     public static final ProteinferProtein createProteinferProtein(int pinferId, int nrseqId, double coverage, int numPept) {
         ProteinferProtein protein = new ProteinferProtein();
         protein.setProteinferId(pinferId);
-        protein.setNrseqDbProteinId(nrseqId);
+        protein.setNrseqProteinId(nrseqId);
         protein.setCoverage(coverage);
         
         List<ProteinferPeptide> peptList = new ArrayList<ProteinferPeptide>(numPept);

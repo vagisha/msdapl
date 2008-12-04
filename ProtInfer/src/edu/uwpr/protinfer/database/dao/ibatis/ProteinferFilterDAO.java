@@ -6,7 +6,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-import edu.uwpr.protinfer.database.dto.ProteinferFilter;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
 
 
 public class ProteinferFilterDAO extends BaseSqlMapDAO {
@@ -17,11 +17,11 @@ public class ProteinferFilterDAO extends BaseSqlMapDAO {
         super(sqlMap);
     }
 
-    public int saveProteinferFilter(ProteinferFilter filter) {
+    public int saveProteinferFilter(IdPickerFilter filter) {
         return super.saveAndReturnId(sqlMapNameSpace+".insert", filter);
     }
     
-    public List<ProteinferFilter> getFiltersForProteinferRun(int pinferId) {
+    public List<IdPickerFilter> getFiltersForProteinferRun(int pinferId) {
         return super.queryForList(sqlMapNameSpace+".selectFiltersForRun", pinferId);
     }
     

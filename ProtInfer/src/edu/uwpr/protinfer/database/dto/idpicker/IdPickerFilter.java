@@ -1,20 +1,20 @@
-package edu.uwpr.protinfer.database.dto;
+package edu.uwpr.protinfer.database.dto.idpicker;
 
-public class ProteinferFilter {
+public class IdPickerFilter {
 
     private int id;
     private int pinferId;
     private String filterName;
     private String filterValue;
     
-    public ProteinferFilter() {}
+    public IdPickerFilter() {}
     
-    public ProteinferFilter(String filterName, String filterValue){
+    public IdPickerFilter(String filterName, String filterValue){
         this.filterName = filterName;
         this.filterValue = filterValue;
     }
     
-    public ProteinferFilter (String filterName, String filterValue, int pinferId) {
+    public IdPickerFilter (String filterName, String filterValue, int pinferId) {
         this(filterName, filterValue);
         this.pinferId = pinferId;
     }

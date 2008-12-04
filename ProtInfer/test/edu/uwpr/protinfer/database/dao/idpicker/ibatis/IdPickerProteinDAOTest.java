@@ -60,7 +60,7 @@ public class IdPickerProteinDAOTest extends TestCase {
         IdPickerProtein protein = protDao.getProtein(2);
         assertEquals(2, protein.getId());
         assertEquals(456, protein.getProteinferId());
-        assertEquals(124, protein.getNrseqDbProteinId());
+        assertEquals(124, protein.getNrseqProteinId());
         assertEquals(20.0, protein.getCoverage());
         assertEquals(3, protein.getPeptideCount());
         assertEquals(6, protein.getSpectralCount());
@@ -110,7 +110,7 @@ public class IdPickerProteinDAOTest extends TestCase {
     public final void testSaveProtein2() {
         IdPickerProtein protein = new IdPickerProtein();
         protein.setCoverage(50.0);
-        protein.setNrseqDbProteinId(66);
+        protein.setNrseqProteinId(66);
         protein.setProteinferId(789);
         protein.setUserAnnotation("Not Annotated");
         protein.setUserValidation(ProteinUserValidation.REJECTED);
@@ -167,7 +167,7 @@ public class IdPickerProteinDAOTest extends TestCase {
             int clusterId, int groupId, boolean parsim, int numPept) {
         IdPickerProtein protein = new IdPickerProtein();
         protein.setProteinferId(pinferId);
-        protein.setNrseqDbProteinId(nrseqId);
+        protein.setNrseqProteinId(nrseqId);
         protein.setCoverage(coverage);
         protein.setClusterId(clusterId);
         protein.setGroupId(groupId);

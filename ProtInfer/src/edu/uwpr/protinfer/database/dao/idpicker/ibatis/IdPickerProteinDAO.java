@@ -52,7 +52,7 @@ public class IdPickerProteinDAO extends BaseSqlMapDAO
             if(peptideId == 0) {
                 peptideId = idpPeptDao.saveIdPickerPeptide(peptide);
             }
-            protDao.saveProteinferPeptideProteinMatch(proteinId, peptideId);
+            protDao.saveProteinferProteinPeptideMatch(proteinId, peptideId);
             // save an entry in the IDPicker group association table if one does not already exist
             saveProteinPeptideGroupAssociation(protein.getProteinferId(), protein.getGroupId(), peptide.getGroupId());
         }
@@ -230,8 +230,8 @@ public class IdPickerProteinDAO extends BaseSqlMapDAO
         protDao.updateUserValidation(pinferProteinId, validation);
     }
     
-    public void saveProteinferPeptideProteinMatch(int pinferProteinId,
+    public void saveProteinferProteinPeptideMatch(int pinferProteinId,
             int pinferPeptideId) {
-       protDao.saveProteinferPeptideProteinMatch(pinferProteinId, pinferPeptideId);
+       protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);
     }
 }

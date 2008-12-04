@@ -43,12 +43,12 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements
             if(peptideId == 0) {
                 peptideId = peptDao.saveProteinferPeptide(peptide);
             }
-            saveProteinferPeptideProteinMatch(proteinId, peptideId);
+            saveProteinferProteinPeptideMatch(proteinId, peptideId);
         }
         return proteinId;
     }
     
-    public void saveProteinferPeptideProteinMatch(int pinferProteinId, int pinferPeptideId) {
+    public void saveProteinferProteinPeptideMatch(int pinferProteinId, int pinferPeptideId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferProteinId", pinferProteinId);
         map.put("pinferPeptideId", pinferPeptideId);

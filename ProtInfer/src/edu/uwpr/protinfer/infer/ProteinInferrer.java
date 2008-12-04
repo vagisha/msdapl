@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface ProteinInferrer {
 
-    public <T extends PeptideSpectrumMatch<S>, S extends SpectrumMatch> List<InferredProtein<S>> inferProteins(List<T> psmList);
+    public <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> List<InferredProtein<S>> inferProteins(List<T> psmList);
 }

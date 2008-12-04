@@ -20,13 +20,13 @@
 	
     <select id="selectProteinferInput" resultMap="idpickerInputResult" parameterClass="Integer">
     	SELECT * FROM proteinferInput as i, IDPickerInputSummary as idp 
-    	WHERE i.id = idp.pinferInputID
-    	AND i.pinferID = #id#
+    	WHERE i.id = idp.piInputID
+    	AND i.piRunID = #id#
     </select>
     
     <insert id="saveProteinferInput" parameterMap="idpickerInputParam">
     	INSERT INTO IDPickerInputSummary (
-    	pinferInputID,
+    	piInputID,
     	numTargetHits,
     	numDecoyHits,
     	numFilteredTargetHits)
@@ -35,15 +35,11 @@
     
     <insert id="saveProteinferInputList" parameterClass="String">
     	INSERT INTO IDPickerInputSummary (
-    	pinferInputID,
+    	piInputID,
     	numTargetHits,
     	numDecoyHits,
     	numFilteredTargetHits)
     	VALUES $values$
     </insert>
-    
-    <delete id="delete" parameterClass="Integer">
-		DELETE FROM ProteinferInput WHERE pinferID=#id#		    
-    </delete>
     
 </sqlMap>

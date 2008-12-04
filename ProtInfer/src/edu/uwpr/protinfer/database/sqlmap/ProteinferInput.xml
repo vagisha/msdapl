@@ -7,7 +7,7 @@
 	
 	<resultMap class="ProteinferInput" id="pinferInputResult">
 		<result property="id" column="id" nullValue="0"/>
-		<result property="proteinferId" column="pinferID" nullValue="0"/>
+		<result property="proteinferId" column="piRunID" nullValue="0"/>
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 	</resultMap>
 	
@@ -17,12 +17,12 @@
 	</parameterMap>
 	
     <select id="selectProteinferInput" resultMap="pinferInputResult" parameterClass="Integer">
-    	SELECT * FROM proteinferInput WHERE pinferID = #id#
+    	SELECT * FROM msProteinInferInput WHERE piRunID = #id#
     </select>
     
     <insert id="saveProteinferInput" parameterMap="pinferInputParam">
-    	INSERT INTO proteinferInput (
-    	pinferID,
+    	INSERT INTO msProteinInferInput (
+    	piRunID,
     	runSearchID)
     	VALUES (?,?)
     	<selectKey resultClass="int">
@@ -31,7 +31,7 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM ProteinferInput WHERE pinferID=#id#		    
+		DELETE FROM ProteinferInput WHERE piRunID=#id#		    
     </delete>
     
 </sqlMap>

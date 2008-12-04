@@ -35,7 +35,7 @@ public class ProteinferSpectrumMatchDAOTest extends TestCase {
         assertEquals(1, psm.getId());
         assertEquals(21, psm.getMsRunSearchResultId());
         assertEquals(123, psm.getProteinferPeptideId());
-        assertEquals(34, psm.getRank());
+        //assertEquals(34, psm.getRank());
     }
     
     public final void testGetSpectrumMatchesForPeptide() {
@@ -44,7 +44,7 @@ public class ProteinferSpectrumMatchDAOTest extends TestCase {
         for(ProteinferSpectrumMatch psm: psmList) {
             assertEquals(21, psm.getMsRunSearchResultId());
             assertEquals(123, psm.getProteinferPeptideId());
-            assertEquals(34, psm.getRank());
+            //assertEquals(34, psm.getRank());
         }
     }
     
@@ -52,7 +52,7 @@ public class ProteinferSpectrumMatchDAOTest extends TestCase {
         ProteinferSpectrumMatch psm = new ProteinferSpectrumMatch();
         psm.setMsRunSearchResultId(runSearchResultId);
         psm.setProteinferPeptideId(pinferPeptideId);
-        psm.setRank(rank);
+        //psm.setRank(rank);
         return psm;
     }
 }

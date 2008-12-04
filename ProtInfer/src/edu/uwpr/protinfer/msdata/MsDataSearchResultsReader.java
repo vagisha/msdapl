@@ -29,7 +29,7 @@ import edu.uwpr.protinfer.infer.SearchSource;
 public class MsDataSearchResultsReader {
 
     private static final Logger log = Logger.getLogger(MsDataSearchResultsReader.class);
-    
+
     
     public List<SequestHit> getHitsForRunSearch(int runSearchId, String decoyPrefix) {
         log.info("Reading hits for runSearchId: "+runSearchId);

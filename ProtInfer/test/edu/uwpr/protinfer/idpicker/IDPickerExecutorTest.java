@@ -3,11 +3,11 @@ package edu.uwpr.protinfer.idpicker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
-import edu.uwpr.protinfer.SequestHit;
-import edu.uwpr.protinfer.SequestSpectrumMatch;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
@@ -37,64 +37,162 @@ public class IDPickerExecutorTest extends TestCase {
         params.setMaxAbsoluteFdr(0.05f);
         params.setMaxRelativeFdr(0.05f);
         
-        List<SequestHit> searchHits = makeSequestHits();
-        SearchSummary summary = new SearchSummary();
+        List<PeptideSpectrumMatchIDP> searchHits = makeSequestHits();
         
         IDPickerExecutor executor = new IDPickerExecutor();
-        List<InferredProtein<SequestSpectrumMatch>> proteins = executor.inferProteins(searchHits, summary, params);
+        List<InferredProtein<SpectrumMatchIDP>> proteins = executor.inferProteins(searchHits, params);
         
-        assertEquals(6, proteins.size());
+        assertEquals(9, proteins.size());
         int parsimonious = 0;
-        for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
+        for(InferredProtein<SpectrumMatchIDP> prot: proteins) {
             if(prot.getIsAccepted())    parsimonious++;
         }
         assertEquals(5, parsimonious);
         
-        Collections.sort(proteins, new Comparator<InferredProtein<SequestSpectrumMatch>>() {
-            public int compare(InferredProtein<SequestSpectrumMatch> o1,
-                    InferredProtein<SequestSpectrumMatch> o2) {
+        Collections.sort(proteins, new Comparator<InferredProtein<SpectrumMatchIDP>>() {
+            public int compare(InferredProtein<SpectrumMatchIDP> o1,
+                    InferredProtein<SpectrumMatchIDP> o2) {
                 return Integer.valueOf(o1.getProtein().getId()).compareTo(o2.getProtein().getId());
             }});
         
         int minCluster = Integer.MAX_VALUE;
         int maxCluster = 0;
-        for (InferredProtein<SequestSpectrumMatch> prot: proteins) {
+        for (InferredProtein<SpectrumMatchIDP> prot: proteins) {
             minCluster = Math.min(minCluster, prot.getProteinClusterId());
             maxCluster = Math.max(maxCluster, prot.getProteinClusterId());
             System.out.println(prot.getAccession()+"; cluster: "+prot.getProteinClusterId()+"; group: "+prot.getProteinGroupId());
         }
         
-        InferredProtein<SequestSpectrumMatch> prot = proteins.get(0);
+        // create a map for the proteins
+        Map<String, InferredProtein<SpectrumMatchIDP>>  map = new HashMap<String, InferredProtein<SpectrumMatchIDP>>();
+        for (InferredProtein<SpectrumMatchIDP> prot: proteins) {
+           map.put(prot.getAccession(), prot);
+        }
+        
+        // CHECK THE CLUSTERS
+        // proteins 1, 2, 5, and 8 should be in the same cluster
+        int clusterId1 = map.get("protein_1").getProteinClusterId();
+        assertTrue(clusterId1 > 0);
+        assertEquals(clusterId1, map.get("protein_2").getProteinClusterId());
+        assertEquals(clusterId1, map.get("protein_5").getProteinClusterId());
+        assertEquals(clusterId1, map.get("protein_8").getProteinClusterId());
+
+        // proteins 3, 4, 6, and 9 should be in the same cluster
+        int clusterId2 = map.get("protein_3").getProteinClusterId();
+        assertTrue(clusterId2 > 0);
+        assertNotSame(clusterId1, clusterId2);
+        assertEquals(clusterId2, map.get("protein_4").getProteinClusterId());
+        assertEquals(clusterId2, map.get("protein_6").getProteinClusterId());
+        assertEquals(clusterId2, map.get("protein_9").getProteinClusterId());
+
+        // protein 7 should be in a cluster by itself
+        int clusterId3 = map.get("protein_7").getProteinClusterId();
+        assertTrue(clusterId3 > 0);
+        assertNotSame(clusterId1, clusterId3);
+        assertNotSame(clusterId2, clusterId3);
+
+        // CHECK THE PROTEIN GROUPS
+        // protein_1
+        int groupId1 = map.get("protein_1").getProteinGroupId();
+        assertTrue(groupId1 > 0);
+        
+        // protein_2, protein_8
+        int groupId2 = map.get("protein_2").getProteinGroupId();
+        assertTrue(groupId2 > 0);
+        assertNotSame(groupId2, groupId1);
+        assertEquals(groupId2, map.get("protein_8").getProteinGroupId());
+        
+        // protein_5
+        int groupId3 = map.get("protein_5").getProteinGroupId();
+        assertTrue(groupId3 > 0);
+        assertNotSame(groupId3, groupId1);
+        assertNotSame(groupId3, groupId2);
+        
+        // protein_3
+        int groupId4 = map.get("protein_3").getProteinGroupId();
+        assertTrue(groupId4 > 0);
+        assertNotSame(groupId4, groupId1);
+        assertNotSame(groupId4, groupId2);
+        assertNotSame(groupId4, groupId3);
+
+        // protein_4, protein_9
+        int groupId5 = map.get("protein_4").getProteinGroupId();
+        assertTrue(groupId5 > 0);
+        assertNotSame(groupId5, groupId1);
+        assertNotSame(groupId5, groupId2);
+        assertNotSame(groupId5, groupId3);
+        assertNotSame(groupId5, groupId4);
+        assertEquals(groupId5, map.get("protein_9").getProteinGroupId());
+
+        // protein_6
+        int groupId6 = map.get("protein_6").getProteinGroupId();
+        assertTrue(groupId6 > 0);
+        assertNotSame(groupId6, groupId1);
+        assertNotSame(groupId6, groupId2);
+        assertNotSame(groupId6, groupId3);
+        assertNotSame(groupId6, groupId4);
+        assertNotSame(groupId6, groupId5);
+        
+        // protein_7
+        int groupId7 = map.get("protein_7").getProteinGroupId();
+        assertTrue(groupId7 > 0);
+        assertNotSame(groupId7, groupId1);
+        assertNotSame(groupId7, groupId2);
+        assertNotSame(groupId7, groupId3);
+        assertNotSame(groupId7, groupId4);
+        assertNotSame(groupId7, groupId5);
+        assertNotSame(groupId7, groupId6);
+
+        
+        InferredProtein<SpectrumMatchIDP> prot = map.get("protein_1");
         assertEquals(1, prot.getProtein().getId());
         assertEquals("protein_1", prot.getAccession());
         assertEquals(5, prot.getPeptides().size());
         assertTrue(prot.getIsAccepted());
         
-        prot = proteins.get(1);
+        prot = map.get("protein_2");
+        assertEquals(2, prot.getProtein().getId());
+        assertEquals("protein_2", prot.getAccession());
+        assertEquals(1, prot.getPeptides().size());
+        assertFalse(prot.getIsAccepted());
+        
+        prot = map.get("protein_3");
+        assertEquals(3, prot.getProtein().getId());
+        assertEquals("protein_3", prot.getAccession());
+        assertEquals(1, prot.getPeptides().size());
+        assertTrue(prot.getIsAccepted());
+        
+        prot = map.get("protein_4");
         assertEquals(4, prot.getProtein().getId());
         assertEquals("protein_4", prot.getAccession());
         assertEquals(2, prot.getPeptides().size());
         assertTrue(prot.getIsAccepted());
         
-        prot = proteins.get(2);
+        prot = map.get("protein_5");
         assertEquals(5, prot.getProtein().getId());
         assertEquals("protein_5", prot.getAccession());
         assertEquals(2, prot.getPeptides().size());
         assertFalse(prot.getIsAccepted());
         
-        prot = proteins.get(3);
+        prot = map.get("protein_6");
         assertEquals(6, prot.getProtein().getId());
         assertEquals("protein_6", prot.getAccession());
         assertEquals(2, prot.getPeptides().size());
-        assertTrue(prot.getIsAccepted());
+        assertFalse(prot.getIsAccepted());
         
-        prot = proteins.get(4);
+        prot = map.get("protein_7");
         assertEquals(7, prot.getProtein().getId());
         assertEquals("protein_7", prot.getAccession());
         assertEquals(2, prot.getPeptides().size());
         assertTrue(prot.getIsAccepted());
         
-        prot = proteins.get(5);
+        prot = map.get("protein_8");
+        assertEquals(8, prot.getProtein().getId());
+        assertEquals("protein_8", prot.getAccession());
+        assertEquals(1, prot.getPeptides().size());
+        assertFalse(prot.getIsAccepted());
+        
+        prot = map.get("protein_9");
         assertEquals(9, prot.getProtein().getId());
         assertEquals("protein_9", prot.getAccession());
         assertEquals(2, prot.getPeptides().size());
@@ -104,8 +202,8 @@ public class IDPickerExecutorTest extends TestCase {
         assertEquals(3, maxCluster);
     }
     
-    private List<SequestHit> makeSequestHits() {
-        List<SequestHit> hits = new ArrayList<SequestHit>();
+    private List<PeptideSpectrumMatchIDP> makeSequestHits() {
+        List<PeptideSpectrumMatchIDP> hits = new ArrayList<PeptideSpectrumMatchIDP>();
         SearchSource source = new SearchSource("test");
         
         Protein[] proteins = new Protein[10];
@@ -148,19 +246,33 @@ public class IDPickerExecutorTest extends TestCase {
         return hits;
     }
     
-    private void addSearchHits(int peptideId, List<SequestHit> hits, SearchSource source, int scanId, Protein[] proteins) {
+    private void addSearchHits(int peptideId, List<PeptideSpectrumMatchIDP> hits, SearchSource source, int scanId, Protein[] proteins) {
         Peptide p = new Peptide("peptide_"+peptideId, peptideId);
         PeptideHit peptHit = new PeptideHit(p);
         for(Protein prot: proteins) {
             peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
         }
-        SequestHit h1 = new SequestHit(source, scanId++, 2, peptHit);
+        PeptideSpectrumMatchIDPImpl h1 = new PeptideSpectrumMatchIDPImpl(); //(source, scanId++, 2, peptHit);
+        SpectrumMatchIDPImpl sm = new SpectrumMatchIDPImpl();
+        sm.setScanId(scanId++);
+        sm.setCharge(2);
+        sm.setSourceId(source.getId());
+        h1.setPeptide(peptHit);
+        h1.setSpectrumMatchMatch(sm);
+        
         hits.add(h1);
         peptHit = new PeptideHit(p);
         for(Protein prot: proteins) {
             peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
         }
-        SequestHit h2 = new SequestHit(source, scanId, 3, peptHit);
+//        SequestHit h2 = new SequestHit(source, scanId, 3, peptHit);
+        PeptideSpectrumMatchIDPImpl h2 = new PeptideSpectrumMatchIDPImpl(); //(source, scanId++, 2, peptHit);
+        sm = new SpectrumMatchIDPImpl();
+        sm.setScanId(scanId++);
+        sm.setCharge(2);
+        sm.setSourceId(source.getId());
+        h2.setPeptide(peptHit);
+        h2.setSpectrumMatchMatch(sm);
         hits.add(h2);
     }
 

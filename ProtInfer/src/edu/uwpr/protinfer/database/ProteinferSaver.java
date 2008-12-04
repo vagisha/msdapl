@@ -15,15 +15,15 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferFilterDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
 import edu.uwpr.protinfer.database.dto.BaseProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.BaseProteinferProtein;
-import edu.uwpr.protinfer.database.dto.ProteinferFilter;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 import edu.uwpr.protinfer.database.dto.ProteinferStatus;
-import edu.uwpr.protinfer.idpicker.IDPickerParams;
-import edu.uwpr.protinfer.idpicker.SearchSummary;
-import edu.uwpr.protinfer.idpicker.SearchSummary.RunSearch;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
+import edu.uwpr.protinfer.idpicker.IdPickerParams;
+import edu.uwpr.protinfer.idpicker.IdPickerSummary;
+import edu.uwpr.protinfer.idpicker.IdPickerSummary.RunSearchSummary;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
@@ -32,7 +32,7 @@ public class ProteinferSaver {
 
     private ProteinferSaver(){}
     
-    public static <T extends SpectrumMatch> void saveProteinInferenceResults(SearchSummary searchSummary, IDPickerParams params, 
+    public static <T extends SpectrumMatch> void saveProteinInferenceResults(IdPickerSummary searchSummary, IdPickerParams params, 
             List<InferredProtein<T>> proteins) {
         
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
@@ -42,24 +42,24 @@ public class ProteinferSaver {
         
         int pinferId = runDao.saveNewProteinferRun();
         runDao.setProteinferStatus(pinferId, ProteinferStatus.COMPLETE);
-        runDao.setProteinferUnfilteredProteinCount(pinferId, searchSummary.getAllProteins());
+        runDao.setProteinferUnfilteredProteinCount(pinferId, searchSummary.getNumTotalProteins());
         runDao.setProteinferCompletionDate(pinferId, new Date(System.currentTimeMillis()));
         
         // save the filters
-        ProteinferFilter filter = new ProteinferFilter("decoyRatio", String.valueOf(params.getDecoyRatio()), pinferId);
+        IdPickerFilter filter = new IdPickerFilter("decoyRatio", String.valueOf(params.getDecoyRatio()), pinferId);
         filterDao.saveProteinferFilter(filter);
-        filter = new ProteinferFilter("decoyPrefix", params.getDecoyPrefix(), pinferId);
+        filter = new IdPickerFilter("decoyPrefix", params.getDecoyPrefix(), pinferId);
         filterDao.saveProteinferFilter(filter);
-        filter = new ProteinferFilter("parsimonyAnalysis", String.valueOf(params.getDoParsimonyAnalysis()), pinferId);
+        filter = new IdPickerFilter("parsimonyAnalysis", String.valueOf(params.getDoParsimonyAnalysis()), pinferId);
         filterDao.saveProteinferFilter(filter);
-        filter = new ProteinferFilter("maxAbsFDR", String.valueOf(params.getMaxAbsoluteFdr()), pinferId);
+        filter = new IdPickerFilter("maxAbsFDR", String.valueOf(params.getMaxAbsoluteFdr()), pinferId);
         filterDao.saveProteinferFilter(filter);
-        filter = new ProteinferFilter("maxRelativeFDR", String.valueOf(params.getMaxRelativeFdr()), pinferId);
+        filter = new IdPickerFilter("maxRelativeFDR", String.valueOf(params.getMaxRelativeFdr()), pinferId);
         filterDao.saveProteinferFilter(filter);
         
         // save the input runSearchIDs
         List<ProteinferInput> inputList = new ArrayList<ProteinferInput>();
-        for(RunSearch rs: searchSummary.getRunSearchList()) {
+        for(RunSearchSummary rs: searchSummary.getRunSearchList()) {
             ProteinferInput input = new ProteinferInput();
             input.setProteinferId(pinferId);
             input.setRunSearchId(rs.getRunSearchId());
@@ -68,7 +68,7 @@ public class ProteinferSaver {
             input.setNumFilteredTargetHits(rs.getFilteredTargetHits());
             inputList.add(input);
         }
-        inputDao.saveProteinferInputList(inputList);
+        inputDao.saveIdPickerInputList(inputList);
         
         // save the results
         GenericProteinferSpectrumMatchDAO specDao = fact.getProteinferSpectrumMatchDao();
@@ -82,7 +82,7 @@ public class ProteinferSaver {
             BaseProteinferProtein<T> protein = new ProteinferProtein();
             protein.setClusterId(prot.getProteinClusterId());
             protein.setGroupId(prot.getProteinGroupId());
-            protein.setNrseqDbProteinId(prot.getProteinId());
+            protein.setNrseqProteinId(prot.getProteinId());
             protein.setAccession(prot.getAccession());
             protein.setCoverage(prot.getPercentCoverage());
             protein.setProteinferId(pinferId);
@@ -108,7 +108,7 @@ public class ProteinferSaver {
                     }
                 }
                 // link the protein and peptide
-                peptDao.saveProteinferPeptideProteinMatch(prot.getProteinId(), pinferPeptideId);
+                peptDao.saveProteinferProteinPeptideMatch(prot.getProteinId(), pinferPeptideId);
             }
         }
     }

@@ -8,45 +8,54 @@
 	<resultMap class="ProteinferSpectrumMatch" id="pinferSMatchResult">
 		<result property="id" column="id" nullValue="0"/>
 		<result property="msRunSearchResultId" column="msRunSearchResultID" nullValue="0"/>
-		<result property="proteinferPeptideId" column="pinferPeptideID" nullValue="0"/>
-		<result property="rank" column="rank" nullValue="0"/>
+		<result property="proteinferPeptideId" column="piPeptideID" nullValue="0"/>
 	</resultMap>
 	
 	<parameterMap class="ProteinferSpectrumMatch" id="pinferSMatchParam">
 		<parameter property="msRunSearchResultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="proteinferPeptideId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="rank" jdbcType="INTEGER" nullValue="0" />
 	</parameterMap>
 	
     <select id="selectSpectrumMatch" resultMap="pinferSMatchResult" parameterClass="Integer">
-    	SELECT * FROM proteinferSpectrumMatch WHERE id = #id#
+    	SELECT * FROM msProteinInferSpectrumMatch WHERE id = #id#
     </select>
     
     <select id="selectMatchesForPeptide" resultMap="pinferSMatchResult" parameterClass="Integer">
-    	SELECT * FROM proteinferSpectrumMatch WHERE pinferPeptideID = #id#
+    	SELECT * FROM msProteinInferSpectrumMatch WHERE piPeptideID = #id#
     </select>
     
     <select id="selectMatchIdsForPinferId" resultClass="Integer" parameterClass="Integer">
-    	SELECT psm.msRunSearchResultID FROM proteinferSpectrumMatch as psm, proteinferPeptide as pep
-    	WHERE pep.id = psm.pinferPeptideID 
-    	AND pep.pinferId= #id#
+    	SELECT psm.msRunSearchResultID 
+    	FROM msProteinInferSpectrumMatch AS psm, 
+    	msProteinInferPeptide AS pep
+    	msProteinInferProteinPeptideMatch AS match,
+    	msProteinInferProtein AS prot
+    	WHERE prot.piRunID=#id#
+    	AND prot.id = match.piProteinID
+    	AND match.pepID = pep.id
+    	AND pep.id = psm.piPeptideID
     </select>
     
     <select id="selectMatchesForPinferIdAndRunSearch" resultMap="pinferSMatchResult" parameterClass="java.util.Map">
-    	SELECT * FROM proteinferSpectrumMatch as psm, proteinferPeptide as pept, msRunSearchResult as msRes
-    	WHERE pept.pinferID=#pinferId#
-    	AND pept.id = psm.pinferPeptideID
-    	AND psm.msRunSearchResultID = #msRunSearchResultId#
-    	AND psm.msRunSearchResultID = msRes.id
-    	AND msRes.runSearchID = #runSearchId#
+    	SELECT * 
+    	FROM msProteinInferSpectrumMatch AS psm, 
+    	msProteinInferPeptide AS pept, 
+    	msProteinInferProtein as prot,
+    	msProteinInferProteinPeptideMatch as match,
+    	msProteinInferInput as input
+    	WHERE input.runSearchID=#runSearchId#
+    	AND input.piRunID=#id#
+    	AND input.piRunID=prot.piRunID
+    	AND prot.id = match.piProteinID
+    	AND match.pepID = pep.id
+    	AND pep.id = psm.piPeptideID
     </select>
     
     <insert id="insert" parameterMap="pinferSMatchParam">
-    	INSERT INTO proteinferSpectrumMatch (
+    	INSERT INTO msProteinInferSpectrumMatch (
     	msRunSearchResultID,
-    	pinferPeptideID,
-    	rank) 
-    	VALUES (?,?,?)
+    	piPeptideID) 
+    	VALUES (?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

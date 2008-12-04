@@ -7,7 +7,7 @@ public class BaseProteinferProtein<S extends ProteinferSpectrumMatch, T extends 
 
     private int id;
     private int pinferId;
-    private int nrseqDbProteinId;
+    private int nrseqProteinId;
     private double coverage;
     private String userAnnotation;
     private ProteinUserValidation userValidation;
@@ -34,12 +34,12 @@ public class BaseProteinferProtein<S extends ProteinferSpectrumMatch, T extends 
         this.pinferId = pinferId;
     }
 
-    public int getNrseqDbProteinId() {
-        return nrseqDbProteinId;
+    public int getNrseqProteinId() {
+        return nrseqProteinId;
     }
 
-    public void setNrseqDbProteinId(int nrseqProteinId) {
-        this.nrseqDbProteinId = nrseqProteinId;
+    public void setNrseqProteinId(int nrseqProteinId) {
+        this.nrseqProteinId = nrseqProteinId;
     }
 
     public double getCoverage() {

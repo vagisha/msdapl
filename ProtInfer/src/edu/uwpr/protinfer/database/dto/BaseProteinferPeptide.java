@@ -3,10 +3,10 @@ package edu.uwpr.protinfer.database.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
+public abstract class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
 
     private int id;
-    private int pinferId;
+    private String sequence;
     private List<T> spectrumMatchList;
     private List<Integer> matchingProteinIds;
 
@@ -15,11 +15,6 @@ public class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
         matchingProteinIds = new ArrayList<Integer>();
     }
 
-    public BaseProteinferPeptide(int proteinferId) {
-        this();
-        this.pinferId = proteinferId;
-    }
-    
     public int getId() {
         return id;
     }
@@ -36,12 +31,12 @@ public class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
         this.spectrumMatchList = spectrumMatchList;
     }
 
-    public int getProteinferId() {
-        return pinferId;
+    public String getSequence() {
+        return sequence;
     }
 
-    public void setProteinferId(int pinferId) {
-        this.pinferId = pinferId;
+    public void setSequence(String sequence) {
+        this.sequence = sequence;
     }
 
     public List<Integer> getMatchingProteinIds() {
@@ -60,17 +55,17 @@ public class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
         return spectrumMatchList.size();
     }
 
-    public ProteinferSpectrumMatch getBestSpectrumMatch() {
-        ProteinferSpectrumMatch bestPsm = null;
-        for(ProteinferSpectrumMatch psm: spectrumMatchList) {
-            if(bestPsm == null) {
-                bestPsm = psm;
-            }
-            else {
-                bestPsm = bestPsm.getRank() < psm.getRank() ? bestPsm : psm;
-            }
-        }
-        return bestPsm;
-    }
+    public abstract T getBestSpectrumMatch();
+//        ProteinferSpectrumMatch bestPsm = null;
+//        for(ProteinferSpectrumMatch psm: spectrumMatchList) {
+//            if(bestPsm == null) {
+//                bestPsm = psm;
+//            }
+//            else {
+//                bestPsm = bestPsm.getRank() < psm.getRank() ? bestPsm : psm;
+//            }
+//        }
+//        return bestPsm;
+//    }
 
 }

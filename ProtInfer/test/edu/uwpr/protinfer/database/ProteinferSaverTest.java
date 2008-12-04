@@ -8,9 +8,9 @@ import junit.framework.TestCase;
 import edu.uwpr.protinfer.SequestHit;
 import edu.uwpr.protinfer.SequestSpectrumMatch;
 import edu.uwpr.protinfer.idpicker.IDPickerExecutor;
-import edu.uwpr.protinfer.idpicker.IDPickerParams;
-import edu.uwpr.protinfer.idpicker.SearchSummary;
-import edu.uwpr.protinfer.idpicker.SearchSummary.RunSearch;
+import edu.uwpr.protinfer.idpicker.IdPickerParams;
+import edu.uwpr.protinfer.idpicker.IdPickerSummary;
+import edu.uwpr.protinfer.idpicker.IdPickerSummary.RunSearchSummary;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
@@ -29,7 +29,7 @@ public class ProteinferSaverTest extends TestCase {
     }
 
     public final void testProtinferDatabaseOperations() {
-        IDPickerParams params = new IDPickerParams();
+        IdPickerParams params = new IdPickerParams();
         params.setDecoyRatio(1.0f);
         params.setDecoyPrefix("Reverse_");
         params.setDoParsimonyAnalysis(true);
@@ -38,12 +38,12 @@ public class ProteinferSaverTest extends TestCase {
         
         List<SequestHit> searchHits = makeSequestHits();
         
-        SearchSummary summary = new SearchSummary();
-        RunSearch s1 = new RunSearch();
+        IdPickerSummary summary = new IdPickerSummary();
+        RunSearchSummary s1 = new RunSearchSummary();
         s1.setRunName("runSearch_1");
         s1.setRunSearchId(10);
         summary.addRunSearch(s1);
-        RunSearch s2 = new RunSearch();
+        RunSearchSummary s2 = new RunSearchSummary();
         s2.setRunName("runSearch_2");
         s2.setRunSearchId(20);
         summary.addRunSearch(s2);

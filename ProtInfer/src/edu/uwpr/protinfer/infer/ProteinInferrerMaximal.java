@@ -9,7 +9,7 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
 
     
     @Override
-    public <T extends PeptideSpectrumMatch<S>, S extends SpectrumMatch> 
+    public <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
         List<InferredProtein<S>> inferProteins(List<T> psmList) {
         
         Map<String, InferredProtein<S>> proteinMap = new HashMap<String, InferredProtein<S>>();

@@ -4,14 +4,14 @@ import edu.uwpr.protinfer.database.dto.BaseProteinferPeptide;
 
 public class IdPickerPeptide extends BaseProteinferPeptide<IdPickerSpectrumMatch> {
 
-    private int groupId;
+    private int groupId = -1;
     
     public IdPickerPeptide() {
         super();
     }
     
-    public IdPickerPeptide(int pinferId, int peptideGroupId) {
-        super(pinferId);
+    public IdPickerPeptide(int peptideGroupId) {
+        super();
         this.groupId = peptideGroupId;
     }
     
@@ -29,5 +29,18 @@ public class IdPickerPeptide extends BaseProteinferPeptide<IdPickerSpectrumMatch
             best = (float) Math.min(best, psm.getFdr());
         }
         return (float) (Math.round(best*100.0) / 100.0);
+    }
+    
+    public IdPickerSpectrumMatch getBestSpectrumMatch() {
+        IdPickerSpectrumMatch bestPsm = null;
+        for(IdPickerSpectrumMatch psm: this.getSpectrumMatchList()) {
+            if(bestPsm == null) {
+                bestPsm = psm;
+            }
+            else {
+                bestPsm = bestPsm.getFdr() < psm.getFdr() ? bestPsm : psm;
+            }
+        }
+        return bestPsm;
     }
 }

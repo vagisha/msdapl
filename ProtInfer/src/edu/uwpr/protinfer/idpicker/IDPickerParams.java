@@ -5,7 +5,7 @@ public class IDPickerParams {
     private float maxAbsoluteFdr = 0.05f;
     private float maxRelativeFdr = 0.05f;
     private float decoyRatio = 1.0f;
-    private int minDistinctPeptides = 2;
+//    private int minDistinctPeptides = 1;
     private boolean doParsimonyAnalysis = true;
     private String decoyPrefix = "";
     
@@ -34,12 +34,12 @@ public class IDPickerParams {
     public void setDecoyRatio(float decoyRatio) {
         this.decoyRatio = decoyRatio;
     }
-    public int getMinDistinctPeptides() {
-        return minDistinctPeptides;
-    }
-    public void setMinDistinctPeptides(int minDistinctPeptides) {
-        this.minDistinctPeptides = minDistinctPeptides;
-    }
+//    public int getMinDistinctPeptides() {
+//        return minDistinctPeptides;
+//    }
+//    public void setMinDistinctPeptides(int minDistinctPeptides) {
+//        this.minDistinctPeptides = minDistinctPeptides;
+//    }
     public boolean getDoParsimonyAnalysis() {
         return doParsimonyAnalysis;
     }

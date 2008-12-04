@@ -18,50 +18,51 @@
 	</parameterMap>
 	
 	<select id="select" resultMap="idpickerPeptideResult" parameterClass="Integer">
-    	SELECT * FROM proteinferPeptide as pep, IDPickerPeptide as idpPep
+    	SELECT * FROM msProteinInferPeptide as pep, IDPickerPeptide as idpPep
     	WHERE pep.id=#id#
-    	AND pep.id = idpPep.pinferPeptideID
+    	AND pep.id = idpPep.piPeptideID
     </select>
     
     <select id="selectPeptidesForProtein" resultMap="idpickerPeptideResult" parameterClass="Integer">
-    	SELECT p.id, p.pinferID, idpPep.groupID
-    	FROM  proteinferPeptide as p, proteinferPeptideProteinMatch as protMatch, IDPickerPeptide as idpPep
-    	WHERE p.id = protMatch.pinferPeptideID
-    	AND protMatch.pinferProteinID = #id#
-    	AND p.id = idpPep.pinferPeptideID
+    	SELECT p.id, p.piRunID, idpPep.groupID
+    	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch, IDPickerPeptide as idpPep
+    	WHERE p.id = protMatch.piPeptideID
+    	AND protMatch.piPeptideID = #id#
+    	AND p.id = idpPep.piPeptideID
     </select>
     
     <select id="selectPeptidesForProteinferRun" resultMap="idpickerPeptideResult" parameterClass="Integer">
-    	SELECT * FROM proteinferPeptide as pep, IDPickerPeptide as idpPep
-    	WHERE pinferID=#id#
-    	AND pep.id = idpPep.pinferPeptideID
+    	SELECT * FROM msProteinInferPeptide as pep, IDPickerPeptide as idpPep
+    	WHERE piRunID=#id#
+    	AND pep.id = idpPep.piPeptideID
     </select>
     
     <select id="selectPeptidesForGroup" resultMap="idpickerPeptideResult" parameterClass="java.util.Map">
-    	SELECT * FROM proteinferPeptide as pep, IDPickerPeptide as idpPep
-    	WHERE pep.pinferID=#pinferId# 
-    	AND pep.id = idpPep.pinferPeptideID
+    	SELECT * 
+    	FROM msProteinInferPeptide as pep, IDPickerPeptide as idpPep
+    	WHERE pep.piRunID=#pinferId# 
+    	AND pep.id = idpPep.piPeptideID
     	AND idpPep.groupID=#groupId#
     </select>
     
     <select id="selectProtGrpIdsForPeptGrpId" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT idpickerProteinGroupID FROM IDPickerGroupAssociation
-    	WHERE pinferID=#pinferId#
-    	AND idpickerPeptideGroupID=#groupId#
+    	WHERE piRunID=#pinferId#
+    	AND peptideGroupID=#groupId#
     </select>
    
     <insert id="insert" parameterMap="idpickerPeptideParam">
     	INSERT INTO IDPickerPeptide (
-    	pinferPeptideID,
+    	piPeptideID,
     	groupID) 
     	VALUES (?,?)
     </insert>
     
     <insert id="insertGroupAssociation" parameterClass="java.util.Map">
     	INSERT INTO IDPickerGroupAssociation (
-    	pinferID,
-    	idpickerProteinGroupID,
-    	idpickerPeptideGroupID) 
+    	piRunID,
+    	proteinGroupID,
+    	peptideGroupID) 
     	VALUES (#protGrpId#, #peptGrpId#)
     </insert>
     

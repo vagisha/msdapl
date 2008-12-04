@@ -15,7 +15,7 @@ public class IdPickerInputDAO extends ProteinferInputDAO {
         super(sqlMap);
     }
 
-    public void saveProteinferInputList(List<IdPickerInputSummary> inputList) {
+    public void saveIdPickerInputList(List<IdPickerInputSummary> inputList) {
         if(inputList.size() == 0)
             return;
         StringBuilder buf = new StringBuilder();

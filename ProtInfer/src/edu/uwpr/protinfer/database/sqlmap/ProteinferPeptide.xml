@@ -8,7 +8,7 @@
 	
 	<resultMap class="BaseProteinferPeptide" id="pinferPeptideBaseResult">
 		<result property="id" column="id" />
-		<result property="proteinferId" column="pinferID" nullValue="0"/>
+		<result property="sequence" column="sequence" />
 		<result property="matchingProteinIds" 
 				select="ProteinferPeptide.selectProteinIdsForPeptide"
 				column="id"/>
@@ -21,39 +21,45 @@
 	</resultMap>
 	
 	<parameterMap class="BaseProteinferPeptide" id="pinferPeptideParam">
-		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="sequence" jdbcType="VARCHAR" />
 	</parameterMap>
 	
 	<select id="select" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT * FROM proteinferPeptide WHERE id=#id#
+    	SELECT * FROM msProteinInferPeptide WHERE id=#id#
     </select>
     
     <select id="selectPeptideIdsForProtein" resultClass="Integer" parameterClass="Integer">
-    	SELECT pinferPeptideID FROM proteinferPeptideProteinMatch WHERE pinferProteinID = #id#
+    	SELECT piPeptideID FROM msProteinInferProteinPeptideMatch WHERE piProteinID = #id#
     </select>
     
     <select id="selectPeptidesForProtein" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT p.id, p.pinferID
-    	FROM  proteinferPeptide as p, proteinferPeptideProteinMatch as protMatch 
-    	WHERE p.id = protMatch.pinferPeptideID
-    	AND protMatch.pinferProteinID = #id#
+    	SELECT p.id, p.sequence
+    	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch 
+    	WHERE p.id = protMatch.piPeptideID
+    	AND protMatch.piProteinID = #id#
     </select>
     
     <select id="selectProteinIdsForPeptide" resultClass="Integer" parameterClass="Integer">
-    	SELECT pinferProteinID FROM proteinferPeptideProteinMatch WHERE pinferPeptideID=#id#
+    	SELECT piProteinID FROM msProteinInferProteinPeptideMatch WHERE piPeptideID=#id#
     </select>
     
     <select id="selectPeptideIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT id FROM proteinferPeptide WHERE pinferID=#id#
+    	SELECT piPeptideID FROM msProteinInferProtein as prot, msProteinInferProteinPeptideMatch as match
+    	WHERE prot.piRunID=#id#
+    	AND prot.id = match.piProteinID
     </select>
     
     <select id="selectPeptidesForProteinferRun" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT * FROM proteinferPeptide WHERE pinferID=#id#
+    	SELECT pep.id, pep.sequence 
+    	FROM msProteinInferPeptide as pep, msProteinInferProtein as prot, msProteinInferProteinPeptideMatch as match
+    	WHERE prot.piRunID=#id#
+    	AND prot.id = match.piProteinID
+    	AND pep.id = match.piPeptideID
     </select>
    
     <insert id="insert" parameterMap="pinferPeptideParam">
-    	INSERT INTO proteinferPeptide (
-    	pinferID) 
+    	INSERT INTO msProteinInferPeptide (
+    	sequence) 
     	VALUES (?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
@@ -61,7 +67,7 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM proteinferPeptide WHERE id=#id#		    
+		DELETE FROM msProteinInferPeptide WHERE id=#id#		    
     </delete>
     
 </sqlMap>

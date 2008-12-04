@@ -4,8 +4,8 @@ import edu.uwpr.protinfer.database.dto.BaseProteinferProtein;
 
 public class IdPickerProtein extends BaseProteinferProtein<IdPickerSpectrumMatch, IdPickerPeptide> {
 
-    private int clusterId;
-    private int groupId;
+    private int clusterId = -1;
+    private int groupId = -1;
     private boolean isParsimonious;
     
     public IdPickerProtein() {
