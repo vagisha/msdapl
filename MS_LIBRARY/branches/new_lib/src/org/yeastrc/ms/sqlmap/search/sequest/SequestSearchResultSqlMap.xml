@@ -86,20 +86,12 @@
     	AND runSearchID = #id#
     </select>
     
-    <select id="selectTopResultsWProteinsForRunSearchN" resultMap="sequestResultWProteinResultN" parameterClass="Integer">
-    	SELECT * FROM msRunSearchResult as res, SQTSearchResult sres, msProteinMatch as pr
-    	WHERE res.id = sres.resultID 
-    	AND res.id = pr.resultID
-    	AND sres.XCorrRank=1  
-    	AND runSearchID = #id#
-    	ORDER BY res.id
-    </select>
-    
     <select id="selectTopResultsForRunSearchN" resultMap="sequestResultResultN" parameterClass="Integer">
     	SELECT * FROM msRunSearchResult as res, SQTSearchResult sres
     	WHERE res.id = sres.resultID 
     	AND sres.XCorrRank=1  
     	AND runSearchID = #id#
+    	GROUP BY res.scanID, res.charge
     	ORDER BY res.id
     </select>
     

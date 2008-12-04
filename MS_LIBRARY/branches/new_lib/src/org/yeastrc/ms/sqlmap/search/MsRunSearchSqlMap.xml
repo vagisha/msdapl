@@ -71,6 +71,12 @@
     	SELECT id FROM msRunSearch WHERE runID = #runId# AND searchID=#searchId#
     </select>
     
+    <select id="selectFileNameForRunSearchId" resultClass="String" parameterClass="Integer">
+    	SELECT filename FROM msRunSearch AS rs, msRun AS run
+    	WHERE rs.runID = run.id
+    	AND rs.id=$id#
+    </select>
+    
     <insert id="insert" parameterMap="msRunSearchParam">
     	INSERT INTO msRunSearch (
     	searchID,

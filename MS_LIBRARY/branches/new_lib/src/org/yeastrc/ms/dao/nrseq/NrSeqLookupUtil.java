@@ -92,26 +92,6 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
     }
     
     /**
-     * 
-     * @param databaseName
-     * @param accession
-     * @return
-     */
-    public static List<Integer> getDbProteinIdsLikeAccesion(String databaseName, String accession) {
-        Map<String, String> map = new HashMap<String, String>(2);
-        map.put("dbName", databaseName);
-        map.put("accession", accession+"%");
-        String statementName = "NrSeq.selectDbProteinIdForDbName";
-        try {
-            return sqlMap.queryForList(statementName, map);
-        }
-        catch (SQLException e) {
-            log.error("Failed to execute select statement: ", e);
-            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
-        }
-    }
-    
-    /**
      * Returns a match that matches the given accession exactly.
      * @param databaseId
      * @param accession

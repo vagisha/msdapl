@@ -22,5 +22,10 @@ public interface ProlucidSearchResultDAO extends GenericSearchResultDAO<Prolucid
     
     public abstract List<Integer> loadTopResultIdsForRunSearch(int runSearchId);
     
+    /**
+     * Returns the search results without any associated proteins. 
+     * @param runSearchId
+     * @return
+     */
     public abstract List<ProlucidSearchResult> loadTopResultsForRunSearchN(int runSearchId);
 }

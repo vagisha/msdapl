@@ -6,15 +6,22 @@
  */
 package org.yeastrc.ms.dao.search.prolucid.ibatis;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
+import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.impl.ProlucidResultDataWrap;
+import org.yeastrc.ms.domain.search.prolucid.impl.ProlucidSearchResultBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -47,9 +54,82 @@ ProlucidSearchResultDAO {
         return queryForList("ProlucidResult.selectTopResultIdsForRunSearch", runSearchId);
     }
     
-    @Override
+//    @Override
+//    public List<ProlucidSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
+//        return queryForList("ProlucidResult.selectTopResultsForRunSearchN", runSearchId);
+//    }
+    
+    /**
+     * Returns the top hits (XCorr rank = 1) for a search. If multiple rank=1 hits
+     * are found for a scan + charge combination return only one. 
+     */
     public List<ProlucidSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
-        return queryForList("ProlucidResult.selectTopResultsForRunSearchN", runSearchId);
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            conn = super.getConnection();
+            String sql = "SELECT * from msRunSearchResult as res, ProLuCIDSearchResult as pres WHERE"+
+                         " res.id = pres.resultID AND pres.primaryScoreRank=1 AND res.runSearchID = ?"+
+                         " GROUP BY res.scanID, res.charge ORDER BY res.id";
+            stmt = conn.prepareStatement( sql );
+            stmt.setInt( 1, runSearchId );
+            rs = stmt.executeQuery();
+            
+            List<ProlucidSearchResult> resultList = new ArrayList<ProlucidSearchResult>();
+            
+            while ( rs.next() ) {
+            
+                ProlucidSearchResultBean result = new ProlucidSearchResultBean();
+                result.setId(rs.getInt("id"));
+                result.setRunSearchId(rs.getInt("runSearchID"));
+                result.setScanId(rs.getInt("scanID"));
+                result.setCharge(rs.getInt("charge"));
+                SearchResultPeptideBean peptide = new SearchResultPeptideBean();
+                peptide.setPeptideSequence(rs.getString("peptide"));
+                peptide.setPreResidue(rs.getString("preResidue").charAt(0));
+                peptide.setPostResidue(rs.getString("postResidue").charAt(0));
+                result.setResultPeptide(peptide);
+                result.setValidationStatus(ValidationStatus.instance(rs.getString("validationStatus").charAt(0)));
+                result.setPrimaryScore(rs.getDouble("primaryScore"));
+                result.setPrimaryScoreRank(rs.getInt("primaryScoreRank"));
+                result.setSecondaryScore(rs.getDouble("secondaryScore"));
+                result.setSecondaryScoreRank(rs.getInt("secondaryScoreRank"));
+                result.setDeltaCN(rs.getBigDecimal("deltaCN"));
+                result.setCalculatedMass(rs.getBigDecimal("calculatedMass"));
+                result.setMatchingIons(rs.getInt("matchingIons"));
+                result.setPredictedIons(rs.getInt("predictedIons"));
+                
+                resultList.add(result);
+            
+            }
+            rs.close(); rs = null;
+            stmt.close(); stmt = null;
+            conn.close(); conn = null;
+            
+            return resultList;
+            
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+        return null;
     }
     
     @Override

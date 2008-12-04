@@ -54,6 +54,17 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
         return 0;
     }
     
+    @Override
+    public String loadFilenameForRunSearch(int runSearchId) {
+        String filename = (String)queryForObject("MsRunSearch.selectFileNameForRunSearchId", runSearchId);
+        if(filename == null)
+            return null;
+        int idx = filename.lastIndexOf('.');
+        if (idx != -1)
+            filename = filename.substring(0, idx);
+        return filename;
+    }
+    
     public int saveRunSearch(MsRunSearch search) {
         return saveAndReturnId("MsRunSearch.insert", search);
     }

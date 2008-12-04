@@ -8,7 +8,6 @@ package org.yeastrc.ms.dao.search.sequest.ibatis;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -54,11 +53,6 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         return queryForList("SequestResult.selectTopResultIdsForRunSearch", runSearchId);
     }
     
-    @Override
-    public List<SequestSearchResult> loadTopResultsWProteinsForRunSearchN(int runSearchId) {
-        return queryForList("SequestResult.selectTopResultsWProteinsForRunSearchN", runSearchId);
-    }
-    
 //    @Override
 //    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
 //        return queryForList("SequestResult.selectTopResultsForRunSearchN", runSearchId);
@@ -66,6 +60,10 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     
     
     
+    /**
+     * Returns the top hits (XCorr rank = 1) for a search. If multiple rank=1 hits
+     * are found for a scan + charge combination return only one. 
+     */
     public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
         
         Connection conn = null;
@@ -76,7 +74,8 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             
             conn = super.getConnection();
             String sql = "SELECT * from msRunSearchResult as res, SQTSearchResult as sres WHERE"+
-                         " res.id = sres.resultID AND sres.XCorrRank = 1 AND res.runSearchID = ?";
+                         " res.id = sres.resultID AND sres.XCorrRank = 1 AND res.runSearchID = ?"+
+                         " GROUP BY res.scanID, res.charge ORDER BY res.id";
             stmt = conn.prepareStatement( sql );
             stmt.setInt( 1, runSearchId );
             rs = stmt.executeQuery();

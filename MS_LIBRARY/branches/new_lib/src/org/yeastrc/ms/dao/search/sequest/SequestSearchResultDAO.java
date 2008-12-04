@@ -14,13 +14,6 @@ public interface SequestSearchResultDAO extends GenericSearchResultDAO<SequestSe
     public abstract List<Integer> loadTopResultIdsForRunSearch(int runSearchId);
     
     /**
-     * Returns the search result along with its associated proteins.
-     * @param runSearchId
-     * @return
-     */
-    public abstract List<SequestSearchResult> loadTopResultsWProteinsForRunSearchN(int runSearchId);
-    
-    /**
      * Returns the search results without any associated proteins. 
      * @param runSearchId
      * @return
