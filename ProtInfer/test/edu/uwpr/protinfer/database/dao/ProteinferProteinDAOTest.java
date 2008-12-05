@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import junit.framework.TestCase;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerCluster;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideGroup;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinGroup;
@@ -23,7 +24,7 @@ public class ProteinferProteinDAOTest extends TestCase {
         int pinferId = 1;
         int clusterId = 17;
         
-        GenericProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
         IdPickerCluster cluster = protDao.getProteinferCluster(pinferId, clusterId);
         assertEquals(17, cluster.getClusterId());
         assertEquals(1, cluster.getProteinferId());

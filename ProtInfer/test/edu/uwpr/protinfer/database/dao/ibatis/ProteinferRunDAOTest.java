@@ -4,9 +4,9 @@ import java.sql.Date;
 
 import junit.framework.TestCase;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOTestSuite;
 import edu.uwpr.protinfer.database.dto.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
-import edu.uwpr.protinfer.database.dto.ProteinferStatus;
 
 public class ProteinferRunDAOTest extends TestCase {
 
@@ -22,6 +22,8 @@ public class ProteinferRunDAOTest extends TestCase {
     }
 
     public final void testSaveNewProteinferRun() {
+        ProteinferDAOTestSuite.resetDatabase();
+        
         int id = runDao.saveNewProteinferRun(ProteinInferenceProgram.IDPICKER);
         assertEquals(1, id);
         
@@ -32,7 +34,7 @@ public class ProteinferRunDAOTest extends TestCase {
     public final void testSaveBaseProteinferRunOfQ() {
         ProteinferRun run = new ProteinferRun();
         run.setComments("some comments");
-        run.setStatus(ProteinferStatus.PENDING);
+//        run.setStatus(ProteinferStatus.PENDING);
         run.setProgram(ProteinInferenceProgram.IDPICKER);
         
         int id = runDao.save(run);
@@ -42,24 +44,24 @@ public class ProteinferRunDAOTest extends TestCase {
     public final void testGetProteinferRun() {
         ProteinferRun run = runDao.getProteinferRun(3);
         assertEquals(3, run.getId());
-        assertEquals(ProteinferStatus.PENDING, run.getStatus());
+//        assertEquals(ProteinferStatus.PENDING, run.getStatus());
         assertEquals(ProteinInferenceProgram.IDPICKER, run.getProgram());
         assertEquals("some comments", run.getComments());
-        assertNull(run.getDateCompleted());
-        assertNotNull(run.getDateCreated());
+//        assertNull(run.getDateCompleted());
+        assertNull(run.getDate());
     }
     
     public final void testUpdateBaseProteinferRunOfQ() {
         ProteinferRun run = runDao.getProteinferRun(3);
-        assertNull(run.getDateCompleted());
-        assertEquals(ProteinferStatus.PENDING, run.getStatus());
-        run.setStatus(ProteinferStatus.COMPLETE);
-        run.setDateCompleted(new Date(System.currentTimeMillis()));
+        assertNull(run.getDate());
+//        assertEquals(ProteinferStatus.PENDING, run.getStatus());
+//        run.setStatus(ProteinferStatus.COMPLETE);
+        run.setDate(new Date(System.currentTimeMillis()));
         
         runDao.update(run);
         run = runDao.getProteinferRun(3);
-        assertNotNull(run.getDateCompleted());
-        assertEquals(ProteinferStatus.COMPLETE, run.getStatus());
+        assertNotNull(run.getDate());
+//        assertEquals(ProteinferStatus.COMPLETE, run.getStatus());
     }
 
     public final void testGetProteinferIdsForRunSearches() {

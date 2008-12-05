@@ -24,31 +24,33 @@
     </select>
     
     <select id="selectPeptidesForProtein" resultMap="idpickerPeptideResult" parameterClass="Integer">
-    	SELECT p.id, p.piRunID, idpPep.groupID
+    	SELECT p.id, p.sequence, idpPep.groupID
     	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch, IDPickerPeptide as idpPep
     	WHERE p.id = protMatch.piPeptideID
-    	AND protMatch.piPeptideID = #id#
+    	AND protMatch.piProteinID = #id#
     	AND p.id = idpPep.piPeptideID
     </select>
     
     <select id="selectPeptidesForProteinferRun" resultMap="idpickerPeptideResult" parameterClass="Integer">
-    	SELECT * 
+    	SELECT pep.*, idpPep.* 
     	FROM msProteinInferProtein prot, msProteinInferPeptide as pep, 
-    	     msProteinInferProteinPeptideMatch as match, IDPickerPeptide as idpPep
+    	     msProteinInferProteinPeptideMatch as mtch, IDPickerPeptide as idpPep
     	WHERE prot.piRunID=#id#
-    	AND prot.id = match.piProteinID
-    	AND match.piPeptideID = pep.id
+    	AND prot.id = mtch.piProteinID
+    	AND mtch.piPeptideID = pep.id
+    	AND prot.id = mtch.piProteinID
     	AND pep.id = idpPep.piPeptideID
     </select>
     
     <select id="selectPeptidesForGroup" resultMap="idpickerPeptideResult" parameterClass="java.util.Map">
-    	SELECT * 
+    	SELECT pep.*, idpPep.* 
     	FROM msProteinInferProtein prot, msProteinInferPeptide as pep, 
-    	     msProteinInferProteinPeptideMatch as match, IDPickerPeptide as idpPep
-    	WHERE prot.piRunID=#id#
+    	     msProteinInferProteinPeptideMatch as mtch, IDPickerPeptide as idpPep
+    	WHERE prot.piRunID=#pinferId#
     	AND idpPep.groupID=#groupId#
-    	AND prot.id = match.piProteinID
-    	AND match.piPeptideID = pep.id
+    	AND prot.id = mtch.piProteinID
+    	AND mtch.piPeptideID = pep.id
+    	AND prot.id = mtch.piProteinID
     	AND pep.id = idpPep.piPeptideID
     </select>
     

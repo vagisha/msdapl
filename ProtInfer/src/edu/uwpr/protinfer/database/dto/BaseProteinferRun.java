@@ -26,14 +26,6 @@ public class BaseProteinferRun<T extends ProteinferInput> {
         this.id = id;
     }
 
-    public Date getDateCreated() {
-        return date;
-    }
-
-    public void setDateCreated(Date date) {
-        this.date = date;
-    }
-
     public Date getDate() {
         return date;
     }

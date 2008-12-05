@@ -7,6 +7,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOTestSuite;
 import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch;
@@ -18,6 +19,7 @@ public class IdPickerPeptideDAOTest extends TestCase {
     
     protected void setUp() throws Exception {
         super.setUp();
+        ProteinferDAOTestSuite.resetDatabase();
     }
 
     protected void tearDown() throws Exception {
@@ -25,6 +27,10 @@ public class IdPickerPeptideDAOTest extends TestCase {
     }
 
     public final void testSaveIdPickerPeptide() {
+        savePeptides();
+    }
+    
+    private final void savePeptides() {
         int id = peptDao.saveIdPickerPeptide(createIdPickerPeptide(456, 654, 3));
         assertEquals(1, id);
         
@@ -36,54 +42,66 @@ public class IdPickerPeptideDAOTest extends TestCase {
     }
 
     public final void testGetPeptide() {
+        
+        savePeptides();
+        
         IdPickerPeptide peptide = peptDao.getPeptide(2);
-        assertEquals(456, peptide.getProteinferId());
+//        assertEquals(456, peptide.getProteinferId());
         assertEquals(654, peptide.getGroupId());
         assertEquals(2, peptide.getId());
         assertEquals(4, peptide.getSpectralCount());
         assertEquals(4, peptide.getSpectrumMatchList().size());
         
         ProteinferSpectrumMatch bestPsm = peptide.getBestSpectrumMatch();
-        assertEquals(1, bestPsm.getRank());
+//        assertEquals(1, bestPsm.getRank());
         
         List<IdPickerSpectrumMatch> psmList = peptide.getSpectrumMatchList();
         assertTrue(spectrumMatchesCorrect(2, psmList));
     }
     
-    public final void testGetPeptideIdsForProteinferRun() {
-        List<Integer> peptList = peptDao.getPeptideIdsForProteinferRun(456);
-        assertEquals(3, peptList.size());
-    }
+//    public final void testGetPeptideIdsForProteinferRun() {
+//        
+//        savePeptides();
+//        
+//        List<Integer> peptList = peptDao.getPeptideIdsForProteinferRun(456);
+//        assertEquals(3, peptList.size());
+//    }
+//    
+//    public final void testGetPeptidesForProteinferRun() {
+//        
+//        savePeptides();
+//        
+//        List<IdPickerPeptide> peptList = peptDao.getPeptidesForProteinferRun(456);
+//        assertEquals(3, peptList.size());
+//        Collections.sort(peptList, new Comparator<IdPickerPeptide> (){
+//            public int compare(IdPickerPeptide o1, IdPickerPeptide o2) {
+//                return Integer.valueOf(o1.getId()).compareTo(o2.getId());
+//            }});
+//        assertEquals(3, peptList.get(0).getSpectralCount());
+//        spectrumMatchesCorrect(1, peptList.get(0).getSpectrumMatchList());
+//        assertEquals(4, peptList.get(1).getSpectralCount());
+//        spectrumMatchesCorrect(2, peptList.get(1).getSpectrumMatchList());
+//        assertEquals(2, peptList.get(2).getSpectralCount());
+//        spectrumMatchesCorrect(3, peptList.get(2).getSpectrumMatchList());
+//    }
     
-    public final void testGetPeptidesForProteinferRun() {
-        List<IdPickerPeptide> peptList = peptDao.getPeptidesForProteinferRun(456);
-        assertEquals(3, peptList.size());
-        Collections.sort(peptList, new Comparator<IdPickerPeptide> (){
-            public int compare(IdPickerPeptide o1, IdPickerPeptide o2) {
-                return Integer.valueOf(o1.getId()).compareTo(o2.getId());
-            }});
-        assertEquals(3, peptList.get(0).getSpectralCount());
-        spectrumMatchesCorrect(1, peptList.get(0).getSpectrumMatchList());
-        assertEquals(4, peptList.get(1).getSpectralCount());
-        spectrumMatchesCorrect(2, peptList.get(1).getSpectrumMatchList());
-        assertEquals(2, peptList.get(2).getSpectralCount());
-        spectrumMatchesCorrect(3, peptList.get(2).getSpectrumMatchList());
-    }
-    
-    public final void testGetIdPickerGroupPeptides() {
-        List<IdPickerPeptide> peptList = peptDao.getIdPickerGroupPeptides(456, 654);
-        assertEquals(3, peptList.size());
-        Collections.sort(peptList, new Comparator<IdPickerPeptide> (){
-            public int compare(IdPickerPeptide o1, IdPickerPeptide o2) {
-                return Integer.valueOf(o1.getId()).compareTo(o2.getId());
-            }});
-        assertEquals(3, peptList.get(0).getSpectralCount());
-        spectrumMatchesCorrect(1, peptList.get(0).getSpectrumMatchList());
-        assertEquals(4, peptList.get(1).getSpectralCount());
-        spectrumMatchesCorrect(2, peptList.get(1).getSpectrumMatchList());
-        assertEquals(2, peptList.get(2).getSpectralCount());
-        spectrumMatchesCorrect(3, peptList.get(2).getSpectrumMatchList());
-    }
+//    public final void testGetIdPickerGroupPeptides() {
+//        
+//        savePeptides();
+//        
+//        List<IdPickerPeptide> peptList = peptDao.getIdPickerGroupPeptides(456, 654);
+//        assertEquals(3, peptList.size());
+//        Collections.sort(peptList, new Comparator<IdPickerPeptide> (){
+//            public int compare(IdPickerPeptide o1, IdPickerPeptide o2) {
+//                return Integer.valueOf(o1.getId()).compareTo(o2.getId());
+//            }});
+//        assertEquals(3, peptList.get(0).getSpectralCount());
+//        spectrumMatchesCorrect(1, peptList.get(0).getSpectrumMatchList());
+//        assertEquals(4, peptList.get(1).getSpectralCount());
+//        spectrumMatchesCorrect(2, peptList.get(1).getSpectrumMatchList());
+//        assertEquals(2, peptList.get(2).getSpectralCount());
+//        spectrumMatchesCorrect(3, peptList.get(2).getSpectrumMatchList());
+//    }
 
     public final void testGetIdPickerPeptideGroup() {
         fail("Not yet implemented"); // TODO
@@ -103,16 +121,16 @@ public class IdPickerPeptideDAOTest extends TestCase {
         Collections.sort(psmList, new Comparator<IdPickerSpectrumMatch>() {
             public int compare(IdPickerSpectrumMatch o1,
                     IdPickerSpectrumMatch o2) {
-                return Integer.valueOf(o1.getRank()).compareTo(o2.getRank());
+                return Double.valueOf(o1.getFdr()).compareTo(o2.getFdr());
             }});
         
         int i = 1;
         for(IdPickerSpectrumMatch psm: psmList) {
             int runSearchResultId = 22 + i;
-            int rank = 0 + i;
+//            int rank = 0 + i;
             double fdr = (double)i/10.0;
             assertEquals(runSearchResultId, psm.getMsRunSearchResultId());
-            assertEquals(rank, psm.getRank());
+//            assertEquals(rank, psm.getRank());
             assertEquals(pinferProteinId, psm.getProteinferPeptideId());
             assertEquals(fdr, psm.getFdr());
             i++;
@@ -122,8 +140,9 @@ public class IdPickerPeptideDAOTest extends TestCase {
     
     public static final IdPickerPeptide createIdPickerPeptide(int pinferId, int groupId, int numPsm) {
         IdPickerPeptide peptide = new IdPickerPeptide();
-        peptide.setProteinferId(pinferId);
+//        peptide.setProteinferId(pinferId);
         peptide.setGroupId(groupId);
+        peptide.setSequence("PEPTIDE");
         List<IdPickerSpectrumMatch> psmList = new ArrayList<IdPickerSpectrumMatch>();
         for (int i = 1; i <= numPsm; i++) {
             int runSearchResultId = 22 + i;

@@ -61,7 +61,7 @@ public class ProteinferProteinDAOTest extends TestCase {
         assertEquals(3, peptList.size());
         int i = 1;
         for(ProteinferPeptide pept: peptList) {
-            assertEquals(456, pept.getProteinferId());
+//            assertEquals(456, pept.getProteinferId());
             assertEquals(i, pept.getSpectralCount());
             i++;
             assertEquals(1, pept.getMatchingProteinIds().size());
@@ -79,7 +79,7 @@ public class ProteinferProteinDAOTest extends TestCase {
         List<ProteinferPeptide> peptList = new ArrayList<ProteinferPeptide>(2);
         // add a new peptide
         ProteinferPeptide p1 = new ProteinferPeptide();
-        p1.setProteinferId(789);
+//        p1.setProteinferId(789);
         peptList.add(p1);
         
         // add an existing peptide

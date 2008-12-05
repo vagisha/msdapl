@@ -44,17 +44,18 @@
     </select>
     
     <select id="selectPeptideIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT piPeptideID FROM msProteinInferProtein as prot, msProteinInferProteinPeptideMatch as match
+    	SELECT mtch.piPeptideID
+    	FROM msProteinInferProtein AS prot, msProteinInferProteinPeptideMatch AS mtch
     	WHERE prot.piRunID=#id#
-    	AND prot.id = match.piProteinID
+    	AND prot.id = mtch.piProteinID
     </select>
     
     <select id="selectPeptidesForProteinferRun" resultMap="pinferPeptideResult" parameterClass="Integer">
     	SELECT pep.id, pep.sequence 
-    	FROM msProteinInferPeptide as pep, msProteinInferProtein as prot, msProteinInferProteinPeptideMatch as match
+    	FROM msProteinInferPeptide as pep, msProteinInferProtein as prot, msProteinInferProteinPeptideMatch as mtch
     	WHERE prot.piRunID=#id#
-    	AND prot.id = match.piProteinID
-    	AND pep.id = match.piPeptideID
+    	AND prot.id = mtch.piProteinID
+    	AND pep.id = mtch.piPeptideID
     </select>
    
     <insert id="insert" parameterMap="pinferPeptideParam">

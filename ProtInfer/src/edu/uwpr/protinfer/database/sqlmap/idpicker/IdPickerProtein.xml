@@ -22,71 +22,71 @@
 	</parameterMap>
 	
 	<select id="select" resultMap="idpickerProteinResult" parameterClass="Integer">
-    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
-    	WHERE prot.id = idpProt.pinferProteinID
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
     	AND prot.id=#id#
     </select>
     
     <select id="selectProteinsForProteinferRun" resultMap="idpickerProteinResult" parameterClass="Integer">
-    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
-    	WHERE prot.id = idpProt.pinferProteinID
-    	AND prot.pinferID = #id#
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #id#
     </select>
     
     <select id="selectProteinsForCluster" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
-    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
-    	WHERE prot.id = idpProt.pinferProteinID
-    	AND prot.pinferID = #pinferId#
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
     	AND idpProt.clusterID = #clusterId#
     </select>
     
     <select id="selectProteinsForGroup" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
-    	SELECT * FROM proteinferProtein as prot, IDPickerProtein as idpProt
-    	WHERE prot.id = idpProt.pinferProteinID
-    	AND prot.pinferID = #pinferId#
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
     	AND idpProt.groupID = #groupId#
     </select>
     
     <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT idpickerPeptideGroupID FROM IDPickerGroupAssociation
-    	WHERE pinferID=#pinferId#
-    	AND idpickerProteinGroupID=#groupId#
+    	SELECT peptideGroupID FROM IDPickerGroupAssociation
+    	WHERE piRunID=#pinferId#
+    	AND proteinGroupID=#groupId#
     </select>
     
     <select id="selectProtGrpIdsForClusterId" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT DISTINCT idpProt.groupID 
-    	FROM IDPickerProtein as idpProt, proteinferProtein as prot
-    	WHERE prot.pinferID = #pinferId# 
+    	FROM IDPickerProtein as idpProt, msProteinInferProtein as prot
+    	WHERE prot.piRunID = #pinferId# 
     	AND idpProt.clusterID = #clusterId#
-    	AND prot.id = idpProt.pinferProteinID
+    	AND prot.id = idpProt.piProteinID
     </select>
     
     
     <select id="selectParsimProteinCountForProteinferRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT count(*) FROM proteinferProtein as prot, IDPickerProtein as idpProt 
-    	WHERE prot.pinferID = #id# 
-    	AND prot.id = idpProt.pinferProteinID
+    	SELECT count(*) FROM msProteinInferProtein as prot, IDPickerProtein as idpProt 
+    	WHERE prot.piRunID = #id# 
+    	AND prot.id = idpProt.piProteinID
     	AND idpProt.isParsimonious = 1
     </select>
     
     <select id="checkGroupAssociation" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT count(*) FROM IDPickerGroupAssociation
-    	WHERE pinferID=#pinferId#
-    	AND idpickerProteinGroupID=#protGrpId#
-    	AND idpickerPeptideGroupID=#peptGrpId#
+    	WHERE piRunID=#pinferId#
+    	AND proteinGroupID=#protGrpId#
+    	AND peptideGroupID=#peptGrpId#
     </select>
     
     <insert id="insertGroupAssociation" parameterClass="java.util.Map">
     	INSERT INTO IDPickerGroupAssociation (
-    	pinferID,
-    	idpickerProteinGroupID,
-    	idpickerPeptideGroupID)
+    	piRunID,
+    	proteinGroupID,
+    	peptideGroupID)
     	values(#pinferId#, #protGrpId#, #peptGrpId#)
     </insert>
     
     <insert id="insert" parameterMap="idpickerProteinParam">
     	INSERT INTO IDPickerProtein (
-    	pinferProteinID,
+    	piProteinID,
     	isParsimonious,
     	clusterID,
     	groupID) 
@@ -94,7 +94,7 @@
     </insert>
     
     <delete id="delete" parameterClass="Integer">
-		DELETE FROM ProteinferProtein WHERE id=#id#		    
+		DELETE FROM msProteinInferProtein WHERE id=#id#		    
     </delete>
     
 </sqlMap>

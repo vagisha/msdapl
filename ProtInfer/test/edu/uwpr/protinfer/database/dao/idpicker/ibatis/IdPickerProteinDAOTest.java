@@ -7,7 +7,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOTestSuite;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerCluster;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
@@ -17,7 +17,7 @@ public class IdPickerProteinDAOTest extends TestCase {
 
     private static final ProteinferDAOFactory factory = ProteinferDAOFactory.testInstance();
     private static final IdPickerProteinDAO protDao = factory.getIdPickerProteinDao();
-//    private static final IdPickerPeptideDAO peptDao = factory.getIdPickerPeptideDao();
+    private static final IdPickerPeptideDAO peptDao = factory.getIdPickerPeptideDao();
     
     protected void setUp() throws Exception {
         super.setUp();
@@ -28,17 +28,43 @@ public class IdPickerProteinDAOTest extends TestCase {
     }
 
     public final void testSaveIdPickerProtein() {
-        int id = protDao.saveIdPickerProtein(createIdPickerProtein(456, 123, 10.0, 12, 21, true, 2)); // clusterID 12; groupID 21
+        ProteinferDAOTestSuite.resetDatabase();
+        
+        IdPickerProtein p1 = createIdPickerProtein(456, 123, 10.0, 12, 21, true, 2); // clusterID 12; groupID 21
+        int id = protDao.saveIdPickerProtein(p1);
         assertEquals(1, id);
+        for(IdPickerPeptide peptide: p1.getPeptides()) {
+            int peptId = peptDao.saveIdPickerPeptide(peptide);
+            protDao.saveProteinferProteinPeptideMatch(id, peptId);
+            protDao.saveProteinPeptideGroupAssociation(456, p1.getGroupId(), peptide.getGroupId());
+        }
         
-        id = protDao.saveIdPickerProtein(createIdPickerProtein(456, 124, 20.0, 12, 21, true, 3)); // clusterID 12; groupID 21
+        IdPickerProtein p2 = createIdPickerProtein(456, 124, 20.0, 12, 21, true, 3); // clusterID 12; groupID 21
+        id = protDao.saveIdPickerProtein(p2);
         assertEquals(2, id);
+        for(IdPickerPeptide peptide: p2.getPeptides()) {
+            int peptId = peptDao.saveIdPickerPeptide(peptide);
+            protDao.saveProteinferProteinPeptideMatch(id, peptId);
+            protDao.saveProteinPeptideGroupAssociation(456, p2.getGroupId(), peptide.getGroupId());
+        }
         
-        id = protDao.saveIdPickerProtein(createIdPickerProtein(456, 125, 30.0, 12, 22, false, 4)); // clusterID 12; groupID 22
+        IdPickerProtein p3 = createIdPickerProtein(456, 125, 30.0, 12, 22, false, 4); // clusterID 12; groupID 22
+        id = protDao.saveIdPickerProtein(p3); 
         assertEquals(3, id);
+        for(IdPickerPeptide peptide: p3.getPeptides()) {
+            int peptId = peptDao.saveIdPickerPeptide(peptide);
+            protDao.saveProteinferProteinPeptideMatch(id, peptId);
+            protDao.saveProteinPeptideGroupAssociation(456, p3.getGroupId(), peptide.getGroupId());
+        }
         
-        id = protDao.saveIdPickerProtein(createIdPickerProtein(456, 125, 30.0, 13, 23, true, 4)); // clusterID 13; groupID 23
+        IdPickerProtein p4 = createIdPickerProtein(456, 125, 30.0, 13, 23, true, 4);// clusterID 13; groupID 23
+        id = protDao.saveIdPickerProtein(p4); 
         assertEquals(4, id);
+        for(IdPickerPeptide peptide: p4.getPeptides()) {
+            int peptId = peptDao.saveIdPickerPeptide(peptide);
+            protDao.saveProteinferProteinPeptideMatch(id, peptId);
+            protDao.saveProteinPeptideGroupAssociation(456, p4.getGroupId(), peptide.getGroupId());
+        }
     }
 
     public final void testGetIdPickerClusterProteins() {
@@ -79,7 +105,7 @@ public class IdPickerProteinDAOTest extends TestCase {
         assertEquals(3, peptList.size());
         int i = 1;
         for(IdPickerPeptide pept: peptList) {
-            assertEquals(456, pept.getProteinferId());
+//            assertEquals(456, pept.getProteinferId());
             assertEquals(i, pept.getSpectralCount());
             i++;
             assertEquals(1, pept.getMatchingProteinIds().size());
@@ -105,47 +131,6 @@ public class IdPickerProteinDAOTest extends TestCase {
         i++;
         assertEquals(13, protList.get(i).getClusterId());
         assertEquals(23, protList.get(i).getGroupId());
-    }
-
-    public final void testSaveProtein2() {
-        IdPickerProtein protein = new IdPickerProtein();
-        protein.setCoverage(50.0);
-        protein.setNrseqProteinId(66);
-        protein.setProteinferId(789);
-        protein.setUserAnnotation("Not Annotated");
-        protein.setUserValidation(ProteinUserValidation.REJECTED);
-        protein.setClusterId(13);
-        protein.setGroupId(23);
-        protein.setIsParsimonious(true);
-        
-        // get the other protein that is in the same group
-        IdPickerProtein p = protDao.getProtein(4);
-        // set the peptides for our new protein. Since these peptides are already in the db
-        // new entries should not be created
-        List<IdPickerPeptide> oldPeptList = p.getPeptides();
-        assertTrue(oldPeptList.size() > 0);
-        Collections.sort(oldPeptList, new Comparator<IdPickerPeptide>() {
-            public int compare(IdPickerPeptide o1, IdPickerPeptide o2) {
-                return Integer.valueOf(o1.getId()).compareTo(o2.getId());
-            }});
-        protein.setPeptides(oldPeptList);
-        
-        
-        int id = protDao.saveIdPickerProtein(protein);
-        assertEquals(5, id);
-        
-        IdPickerProtein prot = protDao.getProtein(5);
-        List<IdPickerPeptide> plist = prot.getPeptides();
-        assertEquals(oldPeptList.size(), plist.size());
-        Collections.sort(plist, new Comparator<IdPickerPeptide>() {
-            public int compare(IdPickerPeptide o1, IdPickerPeptide o2) {
-                return Integer.valueOf(o1.getId()).compareTo(o2.getId());
-            }});
-        
-        for(int i = 0; i < oldPeptList.size(); i++) {
-            assertEquals(oldPeptList.get(i).getId(), plist.get(i).getId());
-            assertEquals(2, plist.get(i).getMatchingProteinIds().size());
-        }
     }
 
     public final void testGetIdPickerProteinGroup() {
