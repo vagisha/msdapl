@@ -90,10 +90,16 @@ ProlucidSearchResultDAO {
                 result.setCharge(rs.getInt("charge"));
                 SearchResultPeptideBean peptide = new SearchResultPeptideBean();
                 peptide.setPeptideSequence(rs.getString("peptide"));
-                peptide.setPreResidue(rs.getString("preResidue").charAt(0));
-                peptide.setPostResidue(rs.getString("postResidue").charAt(0));
+                String preRes = rs.getString("preResidue");
+                if(preRes != null)
+                    peptide.setPreResidue(preRes.charAt(0));
+                String postRes = rs.getString("postResidue");
+                if(postRes != null)
+                    peptide.setPostResidue(postRes.charAt(0));
                 result.setResultPeptide(peptide);
-                result.setValidationStatus(ValidationStatus.instance(rs.getString("validationStatus").charAt(0)));
+                String vStatus = rs.getString("validationStatus");
+                if(vStatus != null)
+                    result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));
                 result.setPrimaryScore(rs.getDouble("primaryScore"));
                 result.setPrimaryScoreRank(rs.getInt("primaryScoreRank"));
                 result.setSecondaryScore(rs.getDouble("secondaryScore"));

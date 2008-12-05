@@ -91,16 +91,23 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
                 result.setCharge(rs.getInt("charge"));
                 SearchResultPeptideBean peptide = new SearchResultPeptideBean();
                 peptide.setPeptideSequence(rs.getString("peptide"));
-                peptide.setPreResidue(rs.getString("preResidue").charAt(0));
-                peptide.setPostResidue(rs.getString("postResidue").charAt(0));
+                String preRes = rs.getString("preResidue");
+                if(preRes != null)
+                    peptide.setPreResidue(preRes.charAt(0));
+                String postRes = rs.getString("postResidue");
+                if(postRes != null)
+                    peptide.setPostResidue(postRes.charAt(0));
                 result.setResultPeptide(peptide);
-                result.setValidationStatus(ValidationStatus.instance(rs.getString("validationStatus").charAt(0)));
+                String vStatus = rs.getString("validationStatus");
+                if(vStatus != null)
+                    result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));
                 result.setSp(rs.getBigDecimal("sp"));
                 result.setSpRank(rs.getInt("spRank"));
                 result.setxCorr(rs.getBigDecimal("XCorr"));
                 result.setxCorrRank(rs.getInt("XCorrRank"));
                 result.setDeltaCN(rs.getBigDecimal("deltaCN"));
-                result.setEvalue(rs.getDouble("evalue"));
+                if(rs.getObject("evalue") != null)
+                    result.setEvalue(rs.getDouble("evalue"));
                 result.setCalculatedMass(rs.getBigDecimal("calculatedMass"));
                 result.setMatchingIons(rs.getInt("matchingIons"));
                 result.setPredictedIons(rs.getInt("predictedIons"));
@@ -113,7 +120,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             conn.close(); conn = null;
             
             return resultList;
-            
+          
         }
         catch (Exception e) {
             e.printStackTrace();
