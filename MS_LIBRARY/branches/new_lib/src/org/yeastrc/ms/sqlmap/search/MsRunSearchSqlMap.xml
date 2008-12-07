@@ -77,6 +77,12 @@
     	AND rs.id=#id#
     </select>
     
+    <select id="selectSearchProgram" resultClass="String" parameterClass="Integer">
+    	SELECT s.analysisProgramName 
+    	FROM msSearch AS s, msRunSearch AS rs 
+    	WHERE rs.id=#id# AND rs.searchID= s.id
+    </select>
+    
     <insert id="insert" parameterMap="msRunSearchParam">
     	INSERT INTO msRunSearch (
     	searchID,

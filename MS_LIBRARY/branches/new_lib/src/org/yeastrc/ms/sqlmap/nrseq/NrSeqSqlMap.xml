@@ -85,5 +85,11 @@
         WHERE id = #id#
     </select>
     
+    <select id="selectProteinSequence" resultClass="String" parameterClass="Integer">
+    	SELECT seq.sequence 
+    	FROM tblProtein AS prot 
+    	INNER JOIN tblProteinSequence AS seq ON prot.sequenceID = seq.id 
+    	WHERE prot.id = #id#
+    </select>
     
 </sqlMap>

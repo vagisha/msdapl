@@ -12,6 +12,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTHeaderDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTHeaderItemWrap;
@@ -54,6 +55,11 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
     @Override
     public String loadFilenameForRunSearch(int runSearchId) {
         return runSearchDao.loadFilenameForRunSearch(runSearchId);
+    }
+    
+    @Override
+    public SearchProgram loadSearchProgramForRunSearch(int runSearchId) {
+        return runSearchDao.loadSearchProgramForRunSearch(runSearchId);
     }
     
     /**

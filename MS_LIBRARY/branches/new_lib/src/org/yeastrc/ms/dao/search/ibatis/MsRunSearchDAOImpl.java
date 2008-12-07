@@ -15,6 +15,7 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -65,6 +66,12 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
         return filename;
     }
     
+    @Override
+    public SearchProgram loadSearchProgramForRunSearch(int runSearchId) {
+        String progName = (String) queryForObject("MsRunSearch.selectSearchProgram", runSearchId);
+        return SearchProgram.instance(progName);
+    }
+    
     public int saveRunSearch(MsRunSearch search) {
         return saveAndReturnId("MsRunSearch.insert", search);
     }
@@ -99,6 +106,6 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
             return SearchFileFormat.instance(s);
         }
     }
-    
+
     //---------------------------------------------------------------------------------------
 }

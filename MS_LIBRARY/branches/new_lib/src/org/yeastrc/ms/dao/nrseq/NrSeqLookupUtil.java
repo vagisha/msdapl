@@ -248,4 +248,15 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
         }
     }
+    
+    public static String getProteinSequence(int proteinId) {
+        String statementName = "NrSeq.selectProteinSequence";
+        try {
+            return (String) sqlMap.queryForObject(statementName, proteinId);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
 }
