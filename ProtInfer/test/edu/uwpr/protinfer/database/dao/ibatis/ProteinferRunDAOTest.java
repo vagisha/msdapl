@@ -3,9 +3,9 @@ package edu.uwpr.protinfer.database.dao.ibatis;
 import java.sql.Date;
 
 import junit.framework.TestCase;
+import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOTestSuite;
-import edu.uwpr.protinfer.database.dto.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 public class ProteinferRunDAOTest extends TestCase {

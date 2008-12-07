@@ -19,6 +19,12 @@ public class IdPickerProteinGroup {
         return groupId;
     }
     
+    public int getClusterId() {
+        if(proteins.size() > 0)
+            return proteins.get(0).getClusterId();
+        else
+            return 0;
+    }
     public void setProteins(List<IdPickerProtein> proteins) {
         if(proteins != null)
             this.proteins = proteins;

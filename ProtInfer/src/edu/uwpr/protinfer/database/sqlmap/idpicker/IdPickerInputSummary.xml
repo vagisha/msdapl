@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
-<sqlMap namespace="IdPickerInputSummary"> 
+<sqlMap namespace="IdPickerInput"> 
 
 	<typeAlias alias="IdPickerInputSummary" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary"/>
 	
@@ -18,13 +18,28 @@
 		<parameter property="numFilteredTargetHits" jdbcType="INTEGER" nullValue="-1" />
 	</parameterMap>
 	
-    <select id="selectProteinferInput" resultMap="idpickerInputResult" parameterClass="Integer">
-    	SELECT * FROM msProteinInferInput as i, IDPickerInputSummary as idp 
-    	WHERE i.id = idp.piInputID
-    	AND i.piRunID = #id#
+    <select id="selectIdPickerInputList" resultMap="idpickerInputResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferInput as i 
+    	LEFT JOIN (IDPickerInputSummary as idp) ON i.id = idp.piInputID
+    	WHERE i.piRunID = #id#
     </select>
     
-    <insert id="saveProteinferInput" parameterMap="idpickerInputParam">
+    <update id="updateIdPickerInput" parameterMap="idpickerInputParam">
+    	UPDATE IDPickerInputSummary
+    	SET piInputID = #id#
+    	<isNotEqual property="numTargetHits" compareValue="-1">
+    		, numTargetHits = #numTargetHits#
+    	</isNotEqual>
+    	<isNotEqual property="numDecoyHits" compareValue="-1">
+    		, numDecoyHits = #numDecoyHits#
+    	</isNotEqual>
+    	<isNotEqual property="numFilteredTargetHits" compareValue="-1">
+    		, numFilteredTargetHits = #numFilteredTargetHits#
+    	</isNotEqual>
+    	WHERE piInputID=#id#
+    </update>
+    
+    <insert id="saveIdPickerInput" parameterMap="idpickerInputParam">
     	INSERT INTO IDPickerInputSummary (
     	piInputID,
     	numTargetHits,
@@ -33,7 +48,7 @@
     	VALUES (?,?,?,?)
     </insert>
     
-    <insert id="saveProteinferInputList" parameterClass="String">
+    <insert id="saveIdPickerInputList" parameterClass="String">
     	INSERT INTO IDPickerInputSummary (
     	piInputID,
     	numTargetHits,

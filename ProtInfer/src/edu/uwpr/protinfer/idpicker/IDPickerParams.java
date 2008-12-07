@@ -8,8 +8,15 @@ public class IDPickerParams {
 //    private int minDistinctPeptides = 1;
     private boolean doParsimonyAnalysis = true;
     private String decoyPrefix = "";
+    private boolean useIdPickerFDRFormula = true;
     
     
+    public boolean useIdPickerFDRFormula() {
+        return useIdPickerFDRFormula;
+    }
+    public void setUseIdPickerFDRFormula(boolean useIdPickerFDRFormula) {
+        this.useIdPickerFDRFormula = useIdPickerFDRFormula;
+    }
     public String getDecoyPrefix() {
         return decoyPrefix;
     }

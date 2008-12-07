@@ -7,7 +7,7 @@
 		
 	<resultMap class="IdPickerRun" id="idpickerRunResult" extends="ProteinferRun.pinferRunBaseResult">
 		<result property="inputSummaryList" 
-				select="IdPickerInputSummary.selectProteinferInput"
+				select="IdPickerInput.selectIdPickerInputList"
 				column="id"/>
 		<result property="filters" 
 				select="IdPickerFilter.selectFiltersForRun"
@@ -24,9 +24,9 @@
 	</parameterMap>
 	
 	<select id="select" resultMap="idpickerRunResult" parameterClass="Integer">
-    	SELECT * FROM msProteinInferRun as run, IDPickerRunSummary as idpRun
+    	SELECT * FROM msProteinInferRun as run
+    	LEFT JOIN (IDPickerRunSummary as idpRun) ON run.id = idpRun.piRunID
     	WHERE run.id=#id#
-    	AND run.id = idpRun.piRunID
     </select>
     
     <insert id="insert" parameterMap="idpickerRunParam">

@@ -44,7 +44,7 @@ public class IdPickerResultSaver {
         // update the run summary
         runDao.saveIdPickerRunSummary(idpRun); // this will save entries in the IDPickerRunSummary table only
         
-        // update the summary for each input
+        // save the summary for each input
         inputDao.saveIdPickerInputList(idpRun.getInputSummaryList());
         
         // save the inferred proteins, associated peptides and spectrum matches
@@ -91,6 +91,8 @@ public class IdPickerResultSaver {
                     }
                     idpPept.setSpectrumMatchList(idpPsmList);
                     pinferPeptideId = peptDao.saveIdPickerPeptide(idpPept); // this will save the spectrum matches also
+                    // add to our map
+                    idpPeptideIds.put(peptide.getSequence(), pinferPeptideId);
                 }
                 // link the protein and peptide
                 protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);

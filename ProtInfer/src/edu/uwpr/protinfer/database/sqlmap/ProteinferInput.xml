@@ -16,8 +16,12 @@
 		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>
 	
-    <select id="selectProteinferInput" resultMap="pinferInputResult" parameterClass="Integer">
+    <select id="selectProteinferInputList" resultMap="pinferInputResult" parameterClass="Integer">
     	SELECT * FROM msProteinInferInput WHERE piRunID = #id#
+    </select>
+    
+    <select id="selectRunSearchIds" resultClass="Integer" parameterClass="Integer">
+    	SELECT runSearchID FROM msProteinInferInput WHERE piRunID = #id#
     </select>
     
     <insert id="saveProteinferInput" parameterMap="pinferInputParam">

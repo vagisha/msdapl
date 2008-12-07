@@ -29,21 +29,21 @@ public class ProteinferDAOFactory {
     private static SqlMapClient sqlMap;
     
     static {
-//        Reader reader = null;
-//        String ibatisConfigFile = "edu/uwpr/protinfer/database/sqlmap/ProteinferSqlMapConfig.xml";
-//        try {
-//            reader = Resources.getResourceAsReader(ibatisConfigFile);
-//            sqlMap = SqlMapClientBuilder.buildSqlMapClient(reader);
-//        }
-//        catch (IOException e) {
-//            log.error("Error reading Ibatis config xml: "+ibatisConfigFile, e);
-//            throw new RuntimeException("Error reading Ibatis config xml: "+ibatisConfigFile, e);
-//        }
-//        catch (Exception e) {
-//            log.error("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
-//            throw new RuntimeException("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
-//        }
-//        System.out.println("Loaded Ibatis SQL map config: "+ibatisConfigFile);
+        Reader reader = null;
+        String ibatisConfigFile = "edu/uwpr/protinfer/database/sqlmap/ProteinferSqlMapConfig.xml";
+        try {
+            reader = Resources.getResourceAsReader(ibatisConfigFile);
+            sqlMap = SqlMapClientBuilder.buildSqlMapClient(reader);
+        }
+        catch (IOException e) {
+            log.error("Error reading Ibatis config xml: "+ibatisConfigFile, e);
+            throw new RuntimeException("Error reading Ibatis config xml: "+ibatisConfigFile, e);
+        }
+        catch (Exception e) {
+            log.error("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
+            throw new RuntimeException("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
+        }
+        System.out.println("Loaded Ibatis SQL map config: "+ibatisConfigFile);
     }
     
     private static ProteinferDAOFactory instance = new ProteinferDAOFactory();
@@ -77,7 +77,7 @@ public class ProteinferDAOFactory {
        idpSpectrumMatchDao = new IdPickerSpectrumMatchDAO(sqlMap, spectrumMatchDao);
        idpPeptideDao = new IdPickerPeptideDAO(sqlMap, peptideDao, idpSpectrumMatchDao);
        idpProteinDao = new IdPickerProteinDAO(sqlMap, proteinDao, idpPeptideDao);
-       idpInputDao = new IdPickerInputDAO(sqlMap);
+       idpInputDao = new IdPickerInputDAO(sqlMap, pinferInputDao);
        idpRunDao = new IdPickerRunDAO(sqlMap, pinferRunDao);
     }
     

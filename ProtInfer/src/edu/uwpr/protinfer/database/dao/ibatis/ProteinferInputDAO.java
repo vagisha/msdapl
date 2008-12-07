@@ -6,9 +6,10 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
+import edu.uwpr.protinfer.database.dao.GenericProteinferInputDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 
-public class ProteinferInputDAO extends BaseSqlMapDAO {
+public class ProteinferInputDAO extends BaseSqlMapDAO implements GenericProteinferInputDAO<ProteinferInput>{
 
     private static final String sqlMapNameSpace = "ProteinferInput";
     
@@ -16,12 +17,16 @@ public class ProteinferInputDAO extends BaseSqlMapDAO {
         super(sqlMap);
     }
     
-    public <T extends ProteinferInput> void saveProteinferInput(T input) {
-        super.save(sqlMapNameSpace+".saveProteinferInput", input);
+    public List<ProteinferInput> getProteinferInputList(int pinferId) {
+        return queryForList(sqlMapNameSpace+".selectProteinferInputList", pinferId);
     }
     
     public List<Integer> getRunSearchIdsForProteinferRun(int pinferId) {
-        return super.queryForList(sqlMapNameSpace+".selectProteinferInput", pinferId);
+        return super.queryForList(sqlMapNameSpace+".selectRunSearchIds", pinferId);
+    }
+    
+    public int saveProteinferInput(ProteinferInput input) {
+        return saveAndReturnId(sqlMapNameSpace+".saveProteinferInput", input);
     }
     
     public void deleteProteinferInput(int pinferId) {

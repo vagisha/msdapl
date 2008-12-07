@@ -1,4 +1,4 @@
-package edu.uwpr.protinfer.database;
+package edu.uwpr.protinfer;
 
 import java.sql.Date;
 import java.util.ArrayList;

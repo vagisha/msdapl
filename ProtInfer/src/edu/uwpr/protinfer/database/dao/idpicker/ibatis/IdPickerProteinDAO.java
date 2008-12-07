@@ -85,7 +85,7 @@ public class IdPickerProteinDAO extends BaseSqlMapDAO
         return queryForList(sqlMapNameSpace+".selectProteinsForCluster", map);
     }
     
-    public List<IdPickerProtein> getProteinferGroupProteins(int pinferId,int groupId) {
+    public List<IdPickerProtein> getIdPickerGroupProteins(int pinferId,int groupId) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
@@ -105,7 +105,7 @@ public class IdPickerProteinDAO extends BaseSqlMapDAO
     }
     
     public IdPickerProteinGroup getIdPickerProteinGroup(int pinferId, int groupId) {
-        List<IdPickerProtein> grpProteins = getProteinferGroupProteins(pinferId, groupId);
+        List<IdPickerProtein> grpProteins = getIdPickerGroupProteins(pinferId, groupId);
         IdPickerProteinGroup group = new IdPickerProteinGroup(groupId);
         group.setProteins(grpProteins);
         List<Integer> matchingPeptGrpIds = getMatchingPeptGroupIds(pinferId, groupId);

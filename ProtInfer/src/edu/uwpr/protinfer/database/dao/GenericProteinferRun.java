@@ -2,8 +2,8 @@ package edu.uwpr.protinfer.database.dao;
 
 import java.util.List;
 
+import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dto.BaseProteinferRun;
-import edu.uwpr.protinfer.database.dto.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 
 public interface GenericProteinferRun <S extends ProteinferInput, T extends BaseProteinferRun<S>>{

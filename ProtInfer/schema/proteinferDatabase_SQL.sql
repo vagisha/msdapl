@@ -155,7 +155,6 @@ CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
   	DELETE FROM IDPickerFilter WHERE piRunID = OLD.id;
    	DELETE FROM msProteinInferInput WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferProtein WHERE piRunID = OLD.id;
-   	DELETE FROM msProteinInferPeptide WHERE piRunID = OLD.id;
    	DELETE FROM IDPickerGroupAssociation WHERE piRunID = OLD.id;
  END;
 |

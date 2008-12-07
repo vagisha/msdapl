@@ -20,7 +20,7 @@
 		
 	<resultMap class="ProteinferRun" id="pinferRunResult" extends="ProteinferRun.pinferRunBaseResult">
 		<result property="inputSummaryList" 
-				select="ProteinferInput.selectProteinferInput"
+				select="ProteinferInput.selectProteinferInputList"
 				column="id"/>
 	</resultMap>
 	

@@ -6,10 +6,10 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
+import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.GenericProteinferRun;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dto.BaseProteinferRun;
-import edu.uwpr.protinfer.database.dto.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
@@ -26,7 +26,7 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
 
     @Override
     public IdPickerRun getProteinferRun(int proteinferId) {
-        return (IdPickerRun) super.queryForObject(sqlMapNameSpace+".select", proteinferId);
+        return (IdPickerRun) queryForObject(sqlMapNameSpace+".select", proteinferId);
     }
     
     @Override

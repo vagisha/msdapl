@@ -64,10 +64,10 @@ public class IdPickerPeptideDAO extends BaseSqlMapDAO implements GenericProteinf
         return super.queryForList(sqlMapNameSpace+".selectPeptidesForGroup", map);
     }
     
-    private List<Integer> getMatchingProtGroupIds(int pinferId, int groupId) {
+    public List<Integer> getMatchingProtGroupIds(int pinferId, int peptideGroupId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
-        map.put("groupId", groupId);
+        map.put("groupId", peptideGroupId);
         return super.queryForList(sqlMapNameSpace+".selectProtGrpIdsForPeptGrpId", map);
     }
     

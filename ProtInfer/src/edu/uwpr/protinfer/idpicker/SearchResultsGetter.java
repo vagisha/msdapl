@@ -9,7 +9,7 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
@@ -33,14 +33,14 @@ public class SearchResultsGetter {
     }
     
     public List<PeptideSpectrumMatchIDP> getHitsForRunSearch(int runSearchId, String decoyPrefix,
-            SearchFileFormat format) {
+            SearchProgram program) {
         
-        log.info("Reading hits for runSearchId: "+runSearchId+"; Program: "+format.getFormatType());
+        log.info("Reading hits for runSearchId: "+runSearchId+"; Program: "+program.displayName());
         
-        if (format == SearchFileFormat.SQT_NSEQ || format == SearchFileFormat.SQT_SEQ) {
+        if (program == SearchProgram.SEQUEST || program == SearchProgram.EE_NORM_SEQUEST) {
             return loadHitsForSequestSearch(runSearchId, decoyPrefix);
         }
-        else if (format == SearchFileFormat.SQT_PLUCID) {
+        else if (program == SearchProgram.PROLUCID) {
             return loadHitsForProlucidSearch(runSearchId, decoyPrefix);
         }
         else
@@ -67,6 +67,9 @@ public class SearchResultsGetter {
         log.info("\tTime: "+timeElapsed(s,e));
         
        
+        // make a list of peptide spectrum matches and read the matching proteins from the database
+        s = System.currentTimeMillis();
+        
         List<PeptideSpectrumMatchIDP> psmList = new ArrayList<PeptideSpectrumMatchIDP>(resultList.size());
         for (SequestSearchResult result: resultList) {
             
@@ -77,10 +80,7 @@ public class SearchResultsGetter {
             PeptideHit peptHit = new PeptideHit(peptide);
             
             // read the matching proteins from the database now
-            s = System.currentTimeMillis();
             List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(result.getId());
-            e = System.currentTimeMillis();
-            log.info("\tTime to get matching proteins: "+timeElapsed(s, e));
            
             for (MsSearchResultProtein protein: msProteinList) {
                 Protein prot = new Protein(protein.getAccession(), -1);
@@ -103,6 +103,8 @@ public class SearchResultsGetter {
             
             psmList.add(psm);
         }
+        e = System.currentTimeMillis();
+        log.info("\tTime to get matching proteins and create list of spectrum matches: "+timeElapsed(s, e));
         e = System.currentTimeMillis();
         log.info("Total time: "+timeElapsed(start, e));
         return psmList;

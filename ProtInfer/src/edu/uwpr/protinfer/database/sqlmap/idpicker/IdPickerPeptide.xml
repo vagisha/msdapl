@@ -38,8 +38,8 @@
     	WHERE prot.piRunID=#id#
     	AND prot.id = mtch.piProteinID
     	AND mtch.piPeptideID = pep.id
-    	AND prot.id = mtch.piProteinID
     	AND pep.id = idpPep.piPeptideID
+    	GROUP BY piPeptideID
     </select>
     
     <select id="selectPeptidesForGroup" resultMap="idpickerPeptideResult" parameterClass="java.util.Map">
@@ -47,11 +47,11 @@
     	FROM msProteinInferProtein prot, msProteinInferPeptide as pep, 
     	     msProteinInferProteinPeptideMatch as mtch, IDPickerPeptide as idpPep
     	WHERE prot.piRunID=#pinferId#
-    	AND idpPep.groupID=#groupId#
     	AND prot.id = mtch.piProteinID
     	AND mtch.piPeptideID = pep.id
-    	AND prot.id = mtch.piProteinID
     	AND pep.id = idpPep.piPeptideID
+    	AND idpPep.groupID=#groupId#
+    	GROUP BY piPeptideID
     </select>
     
     <select id="selectProtGrpIdsForPeptGrpId" resultClass="Integer" parameterClass="java.util.Map">

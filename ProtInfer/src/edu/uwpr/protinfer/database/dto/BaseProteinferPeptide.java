@@ -31,6 +31,10 @@ public abstract class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
         this.spectrumMatchList = spectrumMatchList;
     }
 
+    public void addSpectrumMatch(T spectrumMatch) {
+        spectrumMatchList.add(spectrumMatch);
+    }
+    
     public String getSequence() {
         return sequence;
     }

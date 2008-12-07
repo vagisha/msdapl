@@ -1,9 +1,9 @@
 package edu.uwpr.protinfer.database.dao.idpicker.ibatis;
 
 import junit.framework.TestCase;
+import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOTestSuite;
-import edu.uwpr.protinfer.database.dto.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
 public class IdPickerRunDAOTest extends TestCase {

@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import edu.uwpr.protinfer.filter.fdr.FdrCalculator;
 import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
 
@@ -12,7 +14,9 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
 
     private double decoyRatio = 1.0;
     private boolean separateChargeStates = false;
+    private boolean useIdpickerFdr = true;
     
+    private static final Logger log = Logger.getLogger(FdrCalculatorIdPicker.class);
 
     public void setDecoyRatio(double decoyRatio) throws FdrCalculatorException {
         if (decoyRatio <= 0.0 || decoyRatio > 1.0)
@@ -23,11 +27,18 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
     public void separateChargeStates(boolean separate) {
         separateChargeStates = separate;
     }
+    
+    public void setUseIdPickerFdr(boolean useIdPickerFdr) {
+        this.useIdpickerFdr = useIdPickerFdr;
+    }
 
     @Override
     protected double calculateFdr(int targetCount, int decoyCount) {
 //        double fdr = (double)(2 * decoyCount) / (double)(decoyCount + targetCount);
-        return Math.min(1.0, (double)(decoyCount*(1+decoyRatio)) / (double)(decoyCount + targetCount));
+        if(useIdpickerFdr)
+            return Math.min(1.0, (double)(decoyCount*(1+decoyRatio)) / (double)(decoyCount + targetCount));
+        else 
+            return Math.min(1.0, (double)(decoyCount) / (double)(targetCount));
     }
 
     @Override
@@ -51,16 +62,20 @@ public class FdrCalculatorIdPicker <T extends FdrCandidateHasCharge> extends Fdr
             int currentChg = 1;
             for (T candidate: candidates) {
                 if (candidate.getCharge() != currentChg) {
-                    if (candidatesWithCharge.size() > 0)
+                    if (candidatesWithCharge.size() > 0) {
+                        log.info("Calculating FDR for candidates with charge: +"+currentChg);
                         super.calculateFdr(candidatesWithCharge, comparator);
+                    }
                     
                     candidatesWithCharge.clear();
                     currentChg = candidate.getCharge();
                 }
                 candidatesWithCharge.add(candidate);
             }
-            if (candidatesWithCharge.size() > 0)
+            if (candidatesWithCharge.size() > 0) {
+                log.info("Calculating FDR for candidates with charge: +"+currentChg);
                 super.calculateFdr(candidatesWithCharge, comparator);
+            }
         }
     }
 }

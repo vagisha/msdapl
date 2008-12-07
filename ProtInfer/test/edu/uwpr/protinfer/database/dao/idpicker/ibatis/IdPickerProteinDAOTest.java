@@ -73,9 +73,9 @@ public class IdPickerProteinDAOTest extends TestCase {
     }
     
     public final void testGetGroupProteins() {
-        assertEquals(2, protDao.getProteinferGroupProteins(456, 21).size());
-        assertEquals(1, protDao.getProteinferGroupProteins(456, 22).size());
-        assertEquals(1, protDao.getProteinferGroupProteins(456, 23).size());
+        assertEquals(2, protDao.getIdPickerGroupProteins(456, 21).size());
+        assertEquals(1, protDao.getIdPickerGroupProteins(456, 22).size());
+        assertEquals(1, protDao.getIdPickerGroupProteins(456, 23).size());
     }
     
     public final void testGetFilteredParsimoniousProteinCount() {

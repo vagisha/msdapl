@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uwpr.protinfer.ProteinInferenceProgram;
+
 
 public class BaseProteinferRun<T extends ProteinferInput> {
 
