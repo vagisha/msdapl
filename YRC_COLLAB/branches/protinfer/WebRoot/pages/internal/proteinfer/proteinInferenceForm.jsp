@@ -3,6 +3,60 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+
+<script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
+<script type="text/javascript">
+
+	function tooltip() {
+		/* CONFIG */		
+		xOffset = 10;
+		yOffset = 20;		
+		// these 2 variable determine popup's distance from the cursor
+		// you might want to adjust to get the right result		
+		/* END CONFIG */		
+		$(".tooltip").hover(function(e){
+			this.t = this.title;
+			this.title = "";									  
+			$("body").append("<p id='tooltip'>"+ this.t +"</p>");
+			$("#tooltip")
+				.css("top",(e.pageY - xOffset) + "px")
+				.css("left",(e.pageX + yOffset) + "px")
+				.fadeIn("fast");		
+    		},
+			function(){
+				this.title = this.t;		
+				$("#tooltip").remove();
+    	});	
+		$(".tooltip").mousemove(function(e){
+			$("#tooltip")
+				.css("top",(e.pageY - xOffset) + "px")
+				.css("left",(e.pageX + yOffset) + "px");
+		});	
+	}
+	
+	// starting the script on page load
+	$(document).ready(function(){
+		tooltip();
+	});
+</script>
+
+<style>
+p{
+	clear:both;
+	margin:0;
+	padding:.5em 0;
+}
+#tooltip{
+	position:absolute;
+	border:1px solid #333;
+	background:#f7f5d1;
+	padding:2px 5px;
+	color:#333;
+	display:none;
+}
+</style>
+
+
 <yrcwww:notauthenticated>
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
@@ -15,77 +69,101 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="IDPicker" centered="true" width="750" scheme="ms">
+<yrcwww:contentbox title="IDPicker*" centered="true" width="750" scheme="ms">
 
  <CENTER>
   <html:form action="doProteinInference" method="post" styleId="form1">
-  <bean:define name="proteinInferenceForm" property="idPickerParams" id="idPickerParam"></bean:define>
+  <html:hidden name="proteinInferenceForm" property="projectId" />
+  
   <bean:define name="proteinInferenceForm" property="searchSummary" id="searchSummary"></bean:define>
     
-  <TABLE CELLPADDING="no" CELLSPACING="0" width="75%">
-   <tr>
-    <td WIDTH="25%" VALIGN="top"><B>Select Input Files:</B></td>
-    <td WIDTH="75%" VALIGN="top">
-    	<html:hidden name="proteinInferenceForm" property="searchSummary.msSearchId" />
+  <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
+  	<yrcwww:colorrow scheme="ms">
+  		<td WIDTH="20%" VALIGN="top"><b>Search Program: </b></td>
+  		<td WIDTH="20%" VALIGN="top"><bean:write name="searchSummary" property="program" /></td>
+  	</yrcwww:colorrow>
+  	<yrcwww:colorrow scheme="ms">
+  		<td WIDTH="20%" VALIGN="top"><b>Search Database: </b></td>
+  		<td WIDTH="25%" VALIGN="top"><bean:write name="searchSummary" property="searchDatabase" /></td>
+  	</yrcwww:colorrow>
+   <yrcwww:colorrow scheme="ms">
+    <td VALIGN="top" colspan="2">
+    <B>Select Input Files:</B>
+    <html:hidden name="proteinInferenceForm" property="searchSummary.searchId" />
     </td>
-   </tr>
+   </yrcwww:colorrow>
 
-   <logic:iterate name="proteinInferenceForm" property="searchSummary.runSearchList" id="runSearch">
-   		<tr>
-   			<td WIDTH="25%" VALIGN="top"> 
-   				<html:checkbox name="runSearch" property="isSelected" value="true" indexed="true"/>
-   			</td>
-   			<td>
-   				<html:hidden name="runSearch" property="runSearchId" indexed="true" />
-   				<html:hidden name="runSearch" property="runName" indexed="true" />
-   				<bean:write  name="runSearch" property="runName" />
-   			</td>
-   		</tr>
+	<logic:iterate name="proteinInferenceForm" property="searchSummary.files" id="runSearch">
+		<yrcwww:colorrow scheme="ms" repeat="true">
+		<td WIDTH="20%" VALIGN="top"> 
+			<html:checkbox name="runSearch" property="isSelected" value="true" indexed="true"/>
+		</td>
+		<td>
+			<html:hidden name="runSearch" property="runSearchId" indexed="true" />
+			<html:hidden name="runSearch" property="runName" indexed="true" />
+			<bean:write  name="runSearch" property="runName" />
+		</td>
+		</yrcwww:colorrow>
+		</logic:iterate>
+   
+   
+   <bean:define name="proteinInferenceForm" property="programParams" id="programParams"></bean:define>
+   
+    <yrcwww:colorrow scheme="ms">
+    <td WIDTH="20%" VALIGN="top">
+  		<B><bean:write name="programParams" property="programName" /> Parameters:</B>
+  		<html:hidden name="proteinInferenceForm" property="programParams.programName" />
+  	</td>
+  	</yrcwww:colorrow>
+  	
+  	<logic:iterate name="proteinInferenceForm" property="programParams.paramList" id="param">
+    <yrcwww:colorrow scheme="ms" repeat="true">
+    
+    <td WIDTH="20%" VALIGN="top">
+    	<span class="tooltip" title="<bean:write name="param" property="tooltip" />" style="cursor: pointer;">
+    		<bean:write name="param" property="displayName" />
+    	</span>
+    	<logic:present name="param" property="notes">
+    		<br>
+    		<span style="color: red; font-size: 8pt;"><bean:write name="param" property="notes" /></span>
+    	</logic:present>
+    </td>
+    
+    <td WIDTH="20%" VALIGN="top">
+    	<html:hidden name="param" property="name" indexed="true" />
+    	<logic:equal name="param" property="type" value="text">
+    		<html:text name="param" property="value" indexed="true" />
+    	</logic:equal>
+    	<logic:equal name="param" property="type" value="checkbox">
+    		<html:checkbox name="param" property="value" value="true" indexed="true" />
+    	</logic:equal>
+    	<logic:equal name="param" property="type" value="radio">
+    		<bean:define name="param" type="org.yeastrc.www.proteinfer.ProgramParameters.Param" id="progParam"/>
+    		<!-- cannot use nested logic:iterate with indexed properties -->
+    		<%for(String option: progParam.getOptions()) { %>
+    			<html:radio name="param" property="value" value="<%=option%>" indexed="true"><%=option%></html:radio>
+    		<%} %>
+    	</logic:equal>
+    </td>
+    
+   	</yrcwww:colorrow>
    </logic:iterate>
+   
+   <yrcwww:colorrow scheme="ms">
+   <td colspan="2" align="center">
+   	<NOBR>
+ 		<html:submit value="Run IDPicker" styleClass="button" />
+ 		<input type="button" class="button" onclick="javascript:onCancel(<bean:write name="projectId" />);" value="Cancel"/>
+ 	</NOBR>
+ 	<div style="font-size: 8pt;margin-top: 3px;">
+ 	<i>*Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
+ 	<br>
+	Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
+ 	</div>
+   </td>
+   </yrcwww:colorrow>
   </TABLE>
 
-  <br>
-  
-  <TABLE CELLPADDING="no" CELLSPACING="0" width="75%">
-  	<tr><td WIDTH="25%" VALIGN="top" colspan="2"><B>IDPicker Parameters:</B></td></tr>
-   <tr>
-    <td WIDTH="25%" VALIGN="top">Max. Absolute FDR:</td>
-    <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.maxAbsoluteFdr" /></td>
-   </tr>
-   
-   <tr>
-    <td WIDTH="25%" VALIGN="top">Max. Relative FDR:</td>
-    <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.maxRelativeFdr" /></td>
-   </tr>
-   
-   <tr>
-    <td WIDTH="25%" VALIGN="top">Decoy Ratio:</td>
-    <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.decoyRatio" /></td>
-   </tr>
-   
-   <tr>
-    <td WIDTH="25%" VALIGN="top">Decoy Prefix:</td>
-    <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.decoyPrefix" /></td>
-   </tr>
-
-   <tr>
-    <td WIDTH="25%" VALIGN="top">Min. Distinct Peptides:</td>
-    <td WIDTH="25%" VALIGN="top"><html:text name="proteinInferenceForm" property="idPickerParams.minDistinctPeptides" /></td>
-   </tr>
-   
-   <tr>
-    <td WIDTH="25%" VALIGN="top">Parsimony Analysis:</td>
-    <td WIDTH="25%" VALIGN="top"><html:checkbox name="proteinInferenceForm" property="idPickerParams.doParsimonyAnalysis" value="true" /></td>
-   </tr>
-   
-  </TABLE>
-  <br>
-  
- <NOBR>
- <html:submit value="Run IDPicker" styleClass="button" />
- <input type="button" class="button" onclick="javascript:onCancel(<bean:write name="searchSummary" property="msSearchId"/>);" value="Cancel"/>
- </NOBR>
- 
  
 </html:form>
 </CENTER>

@@ -1073,7 +1073,7 @@
 		scope="request"
 		validate="true"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult2.jsp" redirect="false" />
+		<forward name="Success" path="/viewProject.do" redirect="true" />
 		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
 	</action>
 	
@@ -1081,8 +1081,15 @@
 		path="/viewProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.ViewProteinInferenceResultAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult3.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/getProteinPeptides"
+		type="org.yeastrc.www.proteinfer.ProteinPeptidesAjaxAction"
+	>
+	<forward name="Success" path="/pages/internal/proteinfer/proteinPeptides.jsp" redirect="false" />
 	</action>
 	
 	<action 

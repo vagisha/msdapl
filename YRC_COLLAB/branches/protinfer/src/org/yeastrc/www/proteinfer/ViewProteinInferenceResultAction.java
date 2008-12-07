@@ -1,7 +1,10 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,14 +16,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
-import edu.uwpr.protinfer.SequestSpectrumMatch;
-import edu.uwpr.protinfer.database.dto.ProteinferProtein;
-import edu.uwpr.protinfer.database.dto.ProteinferProteinGroup;
-import edu.uwpr.protinfer.idpicker.IDPickerParams;
-import edu.uwpr.protinfer.idpicker.SearchSummary;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 
 public class ViewProteinInferenceResultAction extends Action {
 
@@ -51,40 +51,51 @@ public class ViewProteinInferenceResultAction extends Action {
         
         long s = System.currentTimeMillis();
         
-        // get the ProteinferRun
-        IDPickerParams params = ProteinferLoader.getIDPickerParams(pinferId);
-        request.setAttribute("params", params);
-        SearchSummary summary = ProteinferLoader.getIDPickerInputSummary(pinferId);
-        request.setAttribute("searchSummary", summary);
-//        List<ProteinferProtein> inferredProteins = ProteinferLoader.getProteinferProteins(pinferId);
-//        request.setAttribute("inferredProteins", inferredProteins);
-        List<ProteinferProteinGroup> proteinGroups = ProteinferLoader.getProteinferProteinGroups(pinferId);
-        request.setAttribute("proteinGroups", proteinGroups);
         
-//        Map<Integer, SequestSpectrumMatch> bestPsmMap = ProteinferLoader.getBestSpectrumMatches(proteinGroups);
-//        request.setAttribute("psmMap", bestPsmMap);
-        
-        int maxClusterId = 0;
-        int maxPeptides = 0;
-        int minPeptides = params.getMinDistinctPeptides();
-        int maxUniqPeptides = 0;
-        int maxSpectra = 0;
-        
-        for(ProteinferProteinGroup protGrp: proteinGroups) {
-            for(ProteinferProtein prot: protGrp.getProteins()) {
-                maxClusterId = Math.max(maxClusterId, prot.getClusterId());
-            }
-            maxPeptides = Math.max(maxPeptides, protGrp.getMatchingPeptideCount());
-            maxUniqPeptides = Math.max(maxUniqPeptides, protGrp.getUniqMatchingPeptideCount());
-            maxSpectra = Math.max(maxSpectra, protGrp.getSpectrumCount());
-        }
-        
-        request.setAttribute("minPeptides", minPeptides);
-        request.setAttribute("maxPeptides", maxPeptides);
-        request.setAttribute("maxUniqPeptides", maxUniqPeptides);
-        request.setAttribute("maxSpectra", maxSpectra);
-        request.setAttribute("clusterCount", maxClusterId);
         request.setAttribute("pinferId", pinferId);
+        
+        // get the IdPickerRun
+        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
+//        IdPickerRunDAO runDao = factory.getIdPickerRunDao();
+//        IdPickerRun run = runDao.getProteinferRun(pinferId);
+//        
+//        request.setAttribute("params", run.getFilters());
+//        
+//        IdPickerSummary summary = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
+//        request.setAttribute("searchSummary", summary);
+        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinferProteinGroups(pinferId);
+        request.setAttribute("proteinGroups", proteinGroups);
+
+        Set<Integer> clusterIds = new HashSet<Integer>();
+        for(WIdPickerProteinGroup protGrp: proteinGroups) {
+            clusterIds.add(protGrp.getClusterId());
+        }
+        List<Integer> clusterIdList = new ArrayList<Integer>(clusterIds);
+        Collections.sort(clusterIdList);
+        request.setAttribute("clusterIds", clusterIdList);
+        
+        
+//        int maxClusterId = 0;
+//        int maxPeptides = 0;
+//        int minPeptides = params.getMinDistinctPeptides();
+//        int maxUniqPeptides = 0;
+//        int maxSpectra = 0;
+//        
+//        for(IdPickerProteinGroup protGrp: proteinGroups) {
+//            for(BaseProteinferProtein<T> prot: protGrp.getProteins()) {
+//                maxClusterId = Math.max(maxClusterId, prot.getClusterId());
+//            }
+//            maxPeptides = Math.max(maxPeptides, protGrp.getMatchingPeptideCount());
+//            maxUniqPeptides = Math.max(maxUniqPeptides, protGrp.getUniqMatchingPeptideCount());
+//            maxSpectra = Math.max(maxSpectra, protGrp.getSpectrumCount());
+//        }
+//        
+//        request.setAttribute("minPeptides", minPeptides);
+//        request.setAttribute("maxPeptides", maxPeptides);
+//        request.setAttribute("maxUniqPeptides", maxUniqPeptides);
+//        request.setAttribute("maxSpectra", maxSpectra);
+//        request.setAttribute("clusterCount", maxClusterId);
+//        
 
         
         long e = System.currentTimeMillis();

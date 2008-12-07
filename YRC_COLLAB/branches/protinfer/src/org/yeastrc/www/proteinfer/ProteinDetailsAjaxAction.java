@@ -1,7 +1,5 @@
 package org.yeastrc.www.proteinfer;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,19 +10,18 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideIonWSpectra;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
-import edu.uwpr.protinfer.SequestSpectrumMatch;
-import edu.uwpr.protinfer.database.dao.DAOFactory;
-import edu.uwpr.protinfer.database.dao.ProteinferProteinDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
-import edu.uwpr.protinfer.database.dto.ProteinferProtein;
-import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
-import edu.uwpr.protinfer.infer.InferredProtein;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 public class ProteinDetailsAjaxAction extends Action {
 
@@ -41,10 +38,6 @@ public class ProteinDetailsAjaxAction extends Action {
             response.getWriter().write("You are not logged in!");
             response.setStatus(HttpServletResponse.SC_SEE_OTHER); // Status code (303) indicating that the response to the request can be found under a different URI.
             return null;
-//            ActionErrors errors = new ActionErrors();
-//            errors.add("username", new ActionMessage("error.login.notloggedin"));
-//            saveErrors( request, errors );
-//            return mapping.findForward("authenticate");
         }
 
         int pinferId = 0;
@@ -57,35 +50,69 @@ public class ProteinDetailsAjaxAction extends Action {
             return null;
         }
 
-        int nrseqProtId = 0;
-        try {nrseqProtId = Integer.parseInt(request.getParameter("nrseqProtId"));}
+        int pinferProtId = 0;
+        try {pinferProtId = Integer.parseInt(request.getParameter("pinferProtId"));}
         catch(NumberFormatException e) {}
 
-        if(nrseqProtId == 0) {
+        if(pinferProtId == 0) {
             response.setContentType("text/html");
-            response.getWriter().write("<b>Invalid Protein Cluster ID: "+nrseqProtId+"</b>");
+            response.getWriter().write("<b>Invalid protein inference protein ID: "+pinferProtId+"</b>");
             return null;
         }
 
-        System.out.println("Got request for nrseq protein ID: "+nrseqProtId+" of protein inference run: "+pinferId);
+        System.out.println("Got request for protien inference protein ID: "+pinferProtId+" of protein inference run: "+pinferId);
 
-        InferredProtein<SequestSpectrumMatch> iProt = ProteinferLoader.getInferredProtein(pinferId, nrseqProtId);
-        request.setAttribute("inferredProtein", iProt);
-        List<ProteinferProtein> groupProteins = ProteinferLoader.getGroupProteins(pinferId, iProt.getProteinGroupId());
+
+        
+        // get the protein 
+        WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId);
+        request.setAttribute("protein", iProt);
+        
+        // get other proteins in this group
+        List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, iProt.getProtein().getGroupId());
         if(groupProteins.size() == 1)
             groupProteins.clear();
         else {
-            Iterator<ProteinferProtein> protIter = groupProteins.iterator();
+            Iterator<WIdPickerProtein> protIter = groupProteins.iterator();
             while(protIter.hasNext()) {
-                ProteinferProtein prot = protIter.next();
-                if(prot.getNrseqProteinId() == iProt.getProteinId()) {
+                WIdPickerProtein prot = protIter.next();
+                if(prot.getProtein().getId() == iProt.getProtein().getId()) {
                     protIter.remove();
                     break;
                 }
             }
         }
         request.setAttribute("groupProteins", groupProteins);
-        request.setAttribute("nrseqProtId", nrseqProtId);
+        
+        // We will return all the filtered search hits for each peptide ion
+        // First we need to find out the search program used (Sequest, ProLuCID etc. ) so 
+        // that we can query the appropriate tables. 
+        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
+        ProteinferRun run = factory.getProteinferRunDao().getProteinferRun(pinferId);
+        int runSearchId = run.getInputSummaryList().get(0).getRunSearchId();
+        DAOFactory msDaoFactory = DAOFactory.instance();
+        MsRunSearch runSearch = msDaoFactory.getMsRunSearchDAO().loadRunSearch(runSearchId);
+        SearchFileFormat searchType = runSearch.getSearchFileFormat();
+        
+        
+        if(searchType == SearchFileFormat.SQT_NSEQ || searchType == SearchFileFormat.SQT_SEQ) {
+            // load sequest results
+            request.setAttribute("searchProgram", "sequest");
+            List<WIdPickerPeptideIonWSpectra<SequestSearchResult>> psmList = 
+                    IdPickerResultsLoader.getPeptideIonsWithSequestResults(iProt.getProtein().getId());
+            request.setAttribute("ionList", psmList);
+        }
+        
+        else if (searchType == SearchFileFormat.SQT_PLUCID) {
+            // load ProLuCID results
+            request.setAttribute("searchProgram", "prolucid");
+            List<WIdPickerPeptideIonWSpectra<ProlucidSearchResult>> psmList = 
+                    IdPickerResultsLoader.getPeptideIonsWithProlucidResults(iProt.getProtein().getId());
+            request.setAttribute("ionList", psmList);
+        }
+        
+        
+        request.setAttribute("pinferProtId", pinferProtId);
         request.setAttribute("pinferId", pinferId);
         
         return mapping.findForward("Success");

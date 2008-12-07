@@ -18,15 +18,17 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.www.proteinfer.MsSearchSummary.RunSearchFile;
+import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
-import edu.uwpr.protinfer.idpicker.IDPickerParams;
-import edu.uwpr.protinfer.idpicker.SearchSummary;
-import edu.uwpr.protinfer.idpicker.SearchSummary.RunSearch;
+import edu.uwpr.protinfer.ProteinInferenceProgram;
 
 /**
  * 
@@ -61,38 +63,100 @@ public class NewProteinInferenceAction extends Action {
             return mapping.findForward("Failure");
         }
         
+        int projectId = -1;
+        if (request.getParameter("projectId") != null) {
+            try {projectId = Integer.parseInt(request.getParameter("projectId"));}
+            catch(NumberFormatException e) {projectId = -1;}
+        }
+        
+        if (projectId == -1) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.projectId", projectId));
+            saveErrors( request, errors );
+            return mapping.findForward("Failure");
+        }
+        request.setAttribute("projectId", projectId);
+        
         // Create our ActionForm
         ProteinInferenceForm newForm = new ProteinInferenceForm();
         request.setAttribute("proteinInferenceForm", newForm);
         
-        newForm.setIdPickerParams(new IDPickerParams());
-        newForm.setSearchSummary(getSearchSummary(searchId));
+        newForm.setProjectId(projectId);
+        MsSearchSummary searchSummary = getSearchSummary(searchId);
+        newForm.setSearchSummary(searchSummary);
+        
+        // we will be using IDPicker -- set the IDPicker parameters
+        ProgramParameters params = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
+        setProgramDetails(params, searchSummary.getProgram());
+        newForm.setProgramParams(params);
+        
 
         // Go!
         return mapping.findForward("Success");
 
     }
     
-    private SearchSummary getSearchSummary(int searchId) {
+    private void setProgramDetails(ProgramParameters params, String searchProgram) {
+        if(searchProgram.equals(SearchProgram.SEQUEST.displayName()) || 
+           searchProgram.equals(SearchProgram.EE_NORM_SEQUEST.displayName())) {
+            for(Param p: params.getParamList()) {
+                if(p.getName().equalsIgnoreCase("maxAbsFDR")) {
+                    p.setNotes("For Score: XCorr");
+                }
+                else if (p.getName().equalsIgnoreCase("maxRelFDR")) {
+                    p.setNotes("For Score: DeltaCN");
+                }
+                else if(p.getName().equalsIgnoreCase("decoyRatio")) {
+                    p.setNotes("Decoy Ratio will not be used if using R/F for FDR calculation");
+                }
+            }
+        }
+        else if(searchProgram.equals(SearchProgram.PROLUCID.displayName())) {
+            for(Param p: params.getParamList()) {
+                if(p.getName().equalsIgnoreCase("maxAbsFDR")) {
+                    p.setNotes("For Score: Primary Score"); // TODO what was the primary score used 
+                    // for this Prolucid search?
+                }
+                else if (p.getName().equalsIgnoreCase("maxRelFDR")) {
+                    p.setNotes("For Score: DeltaCN");
+                }
+                else if(p.getName().equalsIgnoreCase("decoyRatio")) {
+                    p.setNotes("Decoy Ratio will not be used if using R/F for FDR calculation");
+                }
+            }
+        }
+    }
+
+    private MsSearchSummary getSearchSummary(int searchId) {
         DAOFactory daoFactory = DAOFactory.instance();
         
-        SearchSummary search = new SearchSummary(searchId);
+        MsSearchSummary searchSummary = new MsSearchSummary();
+        
+        // get the name of the search program
+        MsSearchDAO searchDao = daoFactory.getMsSearchDAO();
+        MsSearch search = searchDao.loadSearch(searchId);
+        searchSummary.setProgram(search.getSearchProgram().displayName());
+        
+        // get the name(s) of the search databases.
+        StringBuilder databases = new StringBuilder();
+        for(MsSearchDatabase db: search.getSearchDatabases()) {
+            databases.append(", ");
+            databases.append(db.getDatabaseFileName());
+        }
+        if(databases.length() > 0)  databases.deleteCharAt(0);
+        searchSummary.setSearchDatabase(databases.toString());
+        
+        
         
         MsRunSearchDAO runSearchDao = daoFactory.getMsRunSearchDAO();
         List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
         
-        MsRunDAO runDao = daoFactory.getMsRunDAO();
         for (int id: runSearchIds) {
-            MsRunSearch runSearch = runSearchDao.loadRunSearch(id);
-            int runId = runSearch.getRunId();
-            String filename = runDao.loadFilenameNoExtForRun(runId);
-            int idx = filename.lastIndexOf('.');
-            if (idx != -1)
-                filename = filename.substring(0, idx);
-            RunSearch rs = new RunSearch(id, filename);
+            String filename = runSearchDao.loadFilenameForRunSearch(id);
+            RunSearchFile rs = new RunSearchFile(id, filename);
             rs.setIsSelected(true);
-            search.addRunSearch(rs);
+            searchSummary.addRunSearch(rs);
         }
-        return search;
+        return searchSummary;
     }
 }

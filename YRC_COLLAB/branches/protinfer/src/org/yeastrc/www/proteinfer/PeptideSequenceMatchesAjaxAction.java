@@ -58,7 +58,7 @@ public class PeptideSequenceMatchesAjaxAction extends Action {
         System.out.println("Got request for run search ID: "+runSearchId+" of protein inference run: "+pinferId);
 
         long s = System.currentTimeMillis();
-        List<SequestSpectrumMatch> psmList = ProteinferLoader.getSpectrummatchesForRunSearch(pinferId, runSearchId);
+        List<SequestSpectrumMatch> psmList = IdPickerResultsLoader.getSpectrummatchesForRunSearch(pinferId, runSearchId);
         long e = System.currentTimeMillis();
         
         if(psmList.size() == 0) {

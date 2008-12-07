@@ -8,13 +8,9 @@ package org.yeastrc.www.proteinfer;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,12 +25,10 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
-import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
@@ -45,15 +39,8 @@ import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.SequestHit;
 import edu.uwpr.protinfer.SequestSpectrumMatch;
-import edu.uwpr.protinfer.database.ProteinferSaver;
-import edu.uwpr.protinfer.filter.FilterException;
-import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
-import edu.uwpr.protinfer.idpicker.IDPickerExecutor;
-import edu.uwpr.protinfer.idpicker.IDPickerParams;
-import edu.uwpr.protinfer.idpicker.InferredPeptideGroup;
-import edu.uwpr.protinfer.idpicker.InferredProteinGroup;
-import edu.uwpr.protinfer.idpicker.SearchSummary;
-import edu.uwpr.protinfer.idpicker.SearchSummary.RunSearch;
+import edu.uwpr.protinfer.idpicker.IdPickerSummary;
+import edu.uwpr.protinfer.idpicker.IdPickerSummary.RunSearchSummary;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
@@ -61,7 +48,6 @@ import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.PeptideModification;
 import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.infer.ProteinHit;
-import edu.uwpr.protinfer.msdata.MsDataSearchResultsReader;
 import edu.uwpr.protinfer.util.StringUtils;
 
 /**
@@ -92,233 +78,241 @@ public class DoProteinInferenceAction extends Action {
         }
 
         ProteinInferenceForm prinferForm = (ProteinInferenceForm) form;
-        SearchSummary searchSummary = prinferForm.getSearchSummary();
-        IDPickerParams params = prinferForm.getIdPickerParams();
+        MsSearchSummary searchSummary = prinferForm.getSearchSummary();
+        ProgramParameters params = prinferForm.getProgramParams();
         
-        long s = System.currentTimeMillis();
-        List<SequestHit> allFilteredHits = new ArrayList<SequestHit>();
-        // get the search hits
-        MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
-        
-        Set<String> allProteins = new HashSet<String>();
-        List<SequestHit> allHits = new ArrayList<SequestHit>();
-        for (RunSearch runSearch: searchSummary.getRunSearchList()) {
-            if (!runSearch.getIsSelected())
-                continue;
-            long start = System.currentTimeMillis();
-            List<SequestHit> hits = reader.getHitsForRunSearch(runSearch.getRunSearchId(), params.getDecoyPrefix());
-            allHits.addAll(hits);
-            
-            int targetCount = 0;
-            int decoyCount = 0;
-            for(SequestHit hit: hits) {
-                if (hit.isDecoyMatch())
-                    decoyCount++;
-                else if (hit.isTargetMatch())
-                    targetCount++;
-                PeptideHit phit = hit.getPeptideHit();
-                for(ProteinHit pr: phit.getProteinList()) {
-                   allProteins.add(pr.getAccession());
-                }
-            }
-            runSearch.setTotalDecoyHits(decoyCount);
-            runSearch.setTotalTargetHits(targetCount);
-            
-            long end = System.currentTimeMillis();
-            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # hits: "+hits.size()+"; Time: "+getTime(start, end));
-//            // filter the search hits
-//            start = System.currentTimeMillis();
-//            List<SequestHit> filteredHits = null;
-//            try {
-//                filteredHits = filterHits(hits, params);
-//            }
-//            catch (FdrCalculatorException e) {
-//                e.printStackTrace();
-//            }
-//            catch (FilterException e) {
-//                e.printStackTrace();
-//            }
-//            runSearch.setFilteredTargetHits(filteredHits.size());
-//            end = System.currentTimeMillis();
-//            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+filteredHits.size()+"; Time: "+getTime(start, end));
-//            allFilteredHits.addAll(filteredHits);
-            
-            // get the nrseq protein ids
-//            start = System.currentTimeMillis();
-//            getNrseqIdsAndAccessions(hits, runSearch.getRunSearchId());
-//            end = System.currentTimeMillis();
-//            log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
-        }
-        
-        // do fdr calculation on ALL hits 
-        // filter the search hits
-        long start = System.currentTimeMillis();
-        try {
-            allFilteredHits = filterHits(allHits, params);
-        }
-        catch (FdrCalculatorException e) {
-            e.printStackTrace();
-        }
-        catch (FilterException e) {
-            e.printStackTrace();
-        }
-        
-        // count the number of filtered hits for each input file
-        for (RunSearch runSearch: searchSummary.getRunSearchList()) {
-            if (!runSearch.getIsSelected())
-                continue;
-            int filteredCnt = 0;
-            for(SequestHit hit: allFilteredHits) {
-                if(hit.getSearchSource().getId() == runSearch.getRunSearchId())
-                    filteredCnt++;
-            }
-            runSearch.setFilteredTargetHits(filteredCnt);
-        }
-        
-        long end = System.currentTimeMillis();
-        log.info("# Filterted hits: "+allFilteredHits.size()+"; Time: "+getTime(start, end));
-        
-        // get the nrseq protein ids
-        start = System.currentTimeMillis();
-        List<SequestHit> runSearchHits = new ArrayList<SequestHit>();
-        Collections.sort(allFilteredHits, new Comparator<SequestHit>() {
-            public int compare(SequestHit o1, SequestHit o2) {
-                return Integer.valueOf(o1.getSearchSource().getId()).compareTo(o2.getSearchSource().getId());
-            }});
-        int lastRunSearchId = -1;
-        for(SequestHit hit: allFilteredHits) {
-            if(hit.getSearchSource().getId() != lastRunSearchId) {
-                if(runSearchHits.size() > 0) {
-                    getNrseqIdsAndAccessions(runSearchHits, lastRunSearchId);
-                }
-                runSearchHits.clear();
-                lastRunSearchId = hit.getSearchSource().getId();
-            }
-            runSearchHits.add(hit);
-        }
-        if(runSearchHits.size() > 0) {
-            getNrseqIdsAndAccessions(runSearchHits, lastRunSearchId);
-        }
-        end = System.currentTimeMillis();
-        log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
-        
-        
-        
-        // # of proteins before any filtering
-        searchSummary.setAllProteins(allProteins.size());
-        
-        log.info("Total Filtered Hits: "+allFilteredHits.size());
-        
-        getModifiedSequenceForPeptides(allFilteredHits);
-        
-        assginIdsToProteinsAndPeptides(allFilteredHits);
-        
-        getScanNumbersForHits(allFilteredHits);
-        
-        // infer the protein list
-        start = System.currentTimeMillis();
-        List<InferredProtein<SequestSpectrumMatch>> proteins = inferProteinList(allFilteredHits, searchSummary, params);
-        end = System.currentTimeMillis();
-        log.info("# of Inferred Proteins: "+proteins.size()+". Time: "+getTime(start, end));
-        
-        // assign best fdr values
-        assignBestFdrValues(proteins);
-        
-        // calculate protein sequence coverage
-        start = System.currentTimeMillis();
-        calculateProteinSequenceCoverage(proteins);
-        end = System.currentTimeMillis();
-        log.info("Calculated protein sequence coverage in: "+getTime(start, end));
-        
-        // save the results
-        start = System.currentTimeMillis();
-        ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
-        end = System.currentTimeMillis();
-        log.info("Saved results in: "+getTime(start, end));
-        
-        
-        // Group proteins and peptides
-        Map<Integer, InferredProteinGroup<SequestSpectrumMatch>> protGroupList = new HashMap<Integer, InferredProteinGroup<SequestSpectrumMatch>>();
-        Map<Integer, InferredPeptideGroup<SequestSpectrumMatch>> peptGroupList = new HashMap<Integer, InferredPeptideGroup<SequestSpectrumMatch>>();
-        Map<Integer, Set<Integer>> proteinClusterIds = new HashMap<Integer, Set<Integer>>();
-        
-        Map<String, PeptideEvidence<SequestSpectrumMatch>> uniquePeptides = new HashMap<String, PeptideEvidence<SequestSpectrumMatch>>();
-        
-        for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
-            InferredProteinGroup<SequestSpectrumMatch> protGroup = protGroupList.get(prot.getProteinGroupId());
-            if (protGroup == null) {
-                protGroup = new InferredProteinGroup<SequestSpectrumMatch>(prot.getProteinGroupId());
-                protGroupList.put(prot.getProteinGroupId(), protGroup);
-            }
-            
-            // cluster
-            Set<Integer> clusterGroups = proteinClusterIds.get(prot.getProteinClusterId());
-            if(clusterGroups == null) {
-                clusterGroups = new HashSet<Integer>();
-                proteinClusterIds.put(prot.getProteinClusterId(), clusterGroups);
-            }
-            clusterGroups.add(prot.getProteinGroupId());
-            
-            protGroup.addInferredProtein(prot);
-            
-            for(PeptideEvidence<SequestSpectrumMatch> pev: prot.getPeptides()) {
-                
-                protGroup.addMatchingPeptideGroupId(pev.getPeptide().getPeptideGroupId());
-                
-                if(uniquePeptides.containsKey(pev.getPeptide().getModifiedSequence())) {
-                    InferredPeptideGroup<SequestSpectrumMatch> peptGroup = peptGroupList.get(pev.getPeptide().getPeptideGroupId());
-                    peptGroup.addMatchingProteinGroupId(prot.getProteinGroupId());
-                }
-                else {
-                    uniquePeptides.put(pev.getPeptide().getModifiedSequence(), pev);
-                    InferredPeptideGroup<SequestSpectrumMatch> peptGroup = peptGroupList.get(pev.getPeptide().getPeptideGroupId());
-                    if(peptGroup == null) {
-                        peptGroup = new InferredPeptideGroup<SequestSpectrumMatch>(pev.getPeptide().getPeptideGroupId());
-                        peptGroupList.put(pev.getPeptide().getPeptideGroupId(), peptGroup);
-                    }
-                    peptGroup.addPeptideEvidence(pev);
-                    peptGroup.addMatchingProteinGroupId(prot.getProteinGroupId());
-                }
-            }
-        }
-        
-        
-        long e = System.currentTimeMillis();
-        log.info("Total time: "+getTime(s, e));
-        
-        request.getSession().setAttribute("inferredProteins", proteins);
-        request.getSession().setAttribute("protGroupList", protGroupList);
-        request.getSession().setAttribute("peptGroupList", peptGroupList);
-        request.getSession().setAttribute("proteinClusterIds", proteinClusterIds);
-        request.getSession().setAttribute("searchSummary", searchSummary);
-        request.getSession().setAttribute("params", params);
+        // TODO validate the parameters (should be done in form?)
+        ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), searchSummary, params);
         
         // Go!
-        return mapping.findForward("Success");
+        ActionForward success = mapping.findForward( "Success" ) ;
+        success = new ActionForward( success.getPath() + "?ID="+prinferForm.getProjectId(), success.getRedirect() ) ;
+        return success;
+        
+        
+//        long s = System.currentTimeMillis();
+//        List<SequestHit> allFilteredHits = new ArrayList<SequestHit>();
+//        // get the search hits
+//        MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
+//        
+////        Set<String> allProteins = new HashSet<String>();
+//        List<SequestHit> allHits = new ArrayList<SequestHit>();
+//        for (RunSearchSummary runSearch: searchSummary.getRunSearchList()) {
+//            if (!runSearch.getIsSelected())
+//                continue;
+//            long start = System.currentTimeMillis();
+//            List<SequestHit> hits = reader.getHitsForRunSearch(runSearch.getRunSearchId(), params.getDecoyPrefix());
+//            allHits.addAll(hits);
+//            
+//            int targetCount = 0;
+//            int decoyCount = 0;
+//            for(SequestHit hit: hits) {
+//                if (hit.isDecoyMatch())
+//                    decoyCount++;
+//                else if (hit.isTargetMatch())
+//                    targetCount++;
+//                PeptideHit phit = hit.getPeptideHit();
+//                for(ProteinHit pr: phit.getProteinList()) {
+//                   allProteins.add(pr.getAccession());
+//                }
+//            }
+//            runSearch.setTotalDecoyHits(decoyCount);
+//            runSearch.setTotalTargetHits(targetCount);
+//            
+//            long end = System.currentTimeMillis();
+//            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # hits: "+hits.size()+"; Time: "+getTime(start, end));
+////            // filter the search hits
+////            start = System.currentTimeMillis();
+////            List<SequestHit> filteredHits = null;
+////            try {
+////                filteredHits = filterHits(hits, params);
+////            }
+////            catch (FdrCalculatorException e) {
+////                e.printStackTrace();
+////            }
+////            catch (FilterException e) {
+////                e.printStackTrace();
+////            }
+////            runSearch.setFilteredTargetHits(filteredHits.size());
+////            end = System.currentTimeMillis();
+////            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+filteredHits.size()+"; Time: "+getTime(start, end));
+////            allFilteredHits.addAll(filteredHits);
+//            
+//            // get the nrseq protein ids
+////            start = System.currentTimeMillis();
+////            getNrseqIdsAndAccessions(hits, runSearch.getRunSearchId());
+////            end = System.currentTimeMillis();
+////            log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
+//        }
+//        
+//        // do fdr calculation on ALL hits 
+//        // filter the search hits
+//        long start = System.currentTimeMillis();
+//        try {
+//            allFilteredHits = filterHits(allHits, params);
+//        }
+//        catch (FdrCalculatorException e) {
+//            e.printStackTrace();
+//        }
+//        catch (FilterException e) {
+//            e.printStackTrace();
+//        }
+//        
+//        // count the number of filtered hits for each input file
+//        for (RunSearchSummary runSearch: searchSummary.getRunSearchList()) {
+//            if (!runSearch.getIsSelected())
+//                continue;
+//            int filteredCnt = 0;
+//            for(SequestHit hit: allFilteredHits) {
+//                if(hit.getSearchSource().getId() == runSearch.getRunSearchId())
+//                    filteredCnt++;
+//            }
+//            runSearch.setFilteredTargetHits(filteredCnt);
+//        }
+//        
+//        long end = System.currentTimeMillis();
+//        log.info("# Filterted hits: "+allFilteredHits.size()+"; Time: "+getTime(start, end));
+//        
+//        // get the nrseq protein ids
+//        start = System.currentTimeMillis();
+//        List<SequestHit> runSearchHits = new ArrayList<SequestHit>();
+//        Collections.sort(allFilteredHits, new Comparator<SequestHit>() {
+//            public int compare(SequestHit o1, SequestHit o2) {
+//                return Integer.valueOf(o1.getSearchSource().getId()).compareTo(o2.getSearchSource().getId());
+//            }});
+//        int lastRunSearchId = -1;
+//        for(SequestHit hit: allFilteredHits) {
+//            if(hit.getSearchSource().getId() != lastRunSearchId) {
+//                if(runSearchHits.size() > 0) {
+//                    getNrseqIdsAndAccessions(runSearchHits, lastRunSearchId);
+//                }
+//                runSearchHits.clear();
+//                lastRunSearchId = hit.getSearchSource().getId();
+//            }
+//            runSearchHits.add(hit);
+//        }
+//        if(runSearchHits.size() > 0) {
+//            getNrseqIdsAndAccessions(runSearchHits, lastRunSearchId);
+//        }
+//        end = System.currentTimeMillis();
+//        log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
+//        
+//        
+//        
+//        // # of proteins before any filtering
+//        searchSummary.setNumTotalProteins(allProteins.size());
+//        
+//        log.info("Total Filtered Hits: "+allFilteredHits.size());
+//        
+//        getModifiedSequenceForPeptides(allFilteredHits);
+//        
+//        assginIdsToProteinsAndPeptides(allFilteredHits);
+//        
+//        getScanNumbersForHits(allFilteredHits);
+//        
+//        // infer the protein list
+//        start = System.currentTimeMillis();
+//        List<InferredProtein<SequestSpectrumMatch>> proteins = inferProteinList(allFilteredHits, searchSummary, params);
+//        end = System.currentTimeMillis();
+//        log.info("# of Inferred Proteins: "+proteins.size()+". Time: "+getTime(start, end));
+//        
+//        // assign best fdr values
+//        assignBestFdrValues(proteins);
+//        
+//        // calculate protein sequence coverage
+//        start = System.currentTimeMillis();
+//        calculateProteinSequenceCoverage(proteins);
+//        end = System.currentTimeMillis();
+//        log.info("Calculated protein sequence coverage in: "+getTime(start, end));
+//        
+//        // save the results
+//        start = System.currentTimeMillis();
+//        ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
+//        end = System.currentTimeMillis();
+//        log.info("Saved results in: "+getTime(start, end));
+//        
+//        
+//        // Group proteins and peptides
+//        Map<Integer, InferredProteinGroup<SequestSpectrumMatch>> protGroupList = new HashMap<Integer, InferredProteinGroup<SequestSpectrumMatch>>();
+//        Map<Integer, InferredPeptideGroup<SequestSpectrumMatch>> peptGroupList = new HashMap<Integer, InferredPeptideGroup<SequestSpectrumMatch>>();
+//        Map<Integer, Set<Integer>> proteinClusterIds = new HashMap<Integer, Set<Integer>>();
+//        
+//        Map<String, PeptideEvidence<SequestSpectrumMatch>> uniquePeptides = new HashMap<String, PeptideEvidence<SequestSpectrumMatch>>();
+//        
+//        for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
+//            InferredProteinGroup<SequestSpectrumMatch> protGroup = protGroupList.get(prot.getProteinGroupId());
+//            if (protGroup == null) {
+//                protGroup = new InferredProteinGroup<SequestSpectrumMatch>(prot.getProteinGroupId());
+//                protGroupList.put(prot.getProteinGroupId(), protGroup);
+//            }
+//            
+//            // cluster
+//            Set<Integer> clusterGroups = proteinClusterIds.get(prot.getProteinClusterId());
+//            if(clusterGroups == null) {
+//                clusterGroups = new HashSet<Integer>();
+//                proteinClusterIds.put(prot.getProteinClusterId(), clusterGroups);
+//            }
+//            clusterGroups.add(prot.getProteinGroupId());
+//            
+//            protGroup.addInferredProtein(prot);
+//            
+//            for(PeptideEvidence<SequestSpectrumMatch> pev: prot.getPeptides()) {
+//                
+//                protGroup.addMatchingPeptideGroupId(pev.getPeptide().getPeptideGroupId());
+//                
+//                if(uniquePeptides.containsKey(pev.getPeptide().getModifiedSequence())) {
+//                    InferredPeptideGroup<SequestSpectrumMatch> peptGroup = peptGroupList.get(pev.getPeptide().getPeptideGroupId());
+//                    peptGroup.addMatchingProteinGroupId(prot.getProteinGroupId());
+//                }
+//                else {
+//                    uniquePeptides.put(pev.getPeptide().getModifiedSequence(), pev);
+//                    InferredPeptideGroup<SequestSpectrumMatch> peptGroup = peptGroupList.get(pev.getPeptide().getPeptideGroupId());
+//                    if(peptGroup == null) {
+//                        peptGroup = new InferredPeptideGroup<SequestSpectrumMatch>(pev.getPeptide().getPeptideGroupId());
+//                        peptGroupList.put(pev.getPeptide().getPeptideGroupId(), peptGroup);
+//                    }
+//                    peptGroup.addPeptideEvidence(pev);
+//                    peptGroup.addMatchingProteinGroupId(prot.getProteinGroupId());
+//                }
+//            }
+//        }
+//        
+//        
+//        long e = System.currentTimeMillis();
+//        log.info("Total time: "+getTime(s, e));
+//        
+//        request.getSession().setAttribute("inferredProteins", proteins);
+//        request.getSession().setAttribute("protGroupList", protGroupList);
+//        request.getSession().setAttribute("peptGroupList", peptGroupList);
+//        request.getSession().setAttribute("proteinClusterIds", proteinClusterIds);
+//        request.getSession().setAttribute("searchSummary", searchSummary);
+//        request.getSession().setAttribute("params", params);
+        
+        
     }
     
-    private void getScanNumbersForHits(List<SequestHit> allFilteredHits) {
-        DAOFactory fact = DAOFactory.instance();
-        MsScanDAO scanDao = fact.getMsScanDAO();
-        for(SequestHit hit: allFilteredHits) {
-            int scanId = hit.getScanId();
-            MsScan scan = scanDao.load(scanId);
-            hit.setScanNumber(scan.getStartScanNum());
-        }
-    }
-
-    private static void assignBestFdrValues(List<InferredProtein<SequestSpectrumMatch>> proteins) {
-        
-        for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
-            for(PeptideEvidence<SequestSpectrumMatch> pev: prot.getPeptides()) {
-                double bestFdr = Double.MAX_VALUE;
-                for(SequestSpectrumMatch psm: pev.getSpectrumMatchList()) {
-                    bestFdr = Math.min(bestFdr, psm.getFdr());
-                }
-                pev.setBestFdr(bestFdr);
-            }
-        }
-    }
+//    private void getScanNumbersForHits(List<SequestHit> allFilteredHits) {
+//        DAOFactory fact = DAOFactory.instance();
+//        MsScanDAO scanDao = fact.getMsScanDAO();
+//        for(SequestHit hit: allFilteredHits) {
+//            int scanId = hit.getScanId();
+//            MsScan scan = scanDao.load(scanId);
+//            hit.setScanNumber(scan.getStartScanNum());
+//        }
+//    }
+//
+//    private static void assignBestFdrValues(List<InferredProtein<SequestSpectrumMatch>> proteins) {
+//        
+//        for(InferredProtein<SequestSpectrumMatch> prot: proteins) {
+//            for(PeptideEvidence<SequestSpectrumMatch> pev: prot.getPeptides()) {
+//                double bestFdr = Double.MAX_VALUE;
+//                for(SequestSpectrumMatch psm: pev.getSpectrumMatchList()) {
+//                    bestFdr = Math.min(bestFdr, psm.getFdr());
+//                }
+//                pev.setBestFdr(bestFdr);
+//            }
+//        }
+//    }
 
     private static float getTime(long start, long end) {
         long time = end - start;
@@ -326,91 +320,6 @@ public class DoProteinInferenceAction extends Action {
         return seconds;
     }
 
-    private static List<InferredProtein<SequestSpectrumMatch>> inferProteinList(
-            List<SequestHit> filteredHits, SearchSummary summary, IDPickerParams params) {
-        IDPickerExecutor executor = new IDPickerExecutor();
-        return executor.inferProteins(filteredHits, summary, params);
-    }
-
-    private static List<SequestHit> filterHits(List<SequestHit> hits, IDPickerParams params) 
-        throws FdrCalculatorException, FilterException {
-        IDPickerExecutor executor = new IDPickerExecutor();
-        return executor.filterSearchHits(hits, params);
-    }
-    
-    public static void main(String[] args) {
-        SearchSummary searchSummary = getSearchSummary(6);
-        IDPickerParams params = new IDPickerParams();
-        params.setDecoyRatio(1.0f);
-        params.setDoParsimonyAnalysis(true);
-        params.setMaxAbsoluteFdr(0.05f);
-        params.setMaxRelativeFdr(0.05f);
-        params.setMinDistinctPeptides(2);
-        params.setDecoyPrefix("Reverse_");
-        
-        long s = System.currentTimeMillis();
-        List<SequestHit> allFilteredHits = new ArrayList<SequestHit>();
-        // get the search hits
-        MsDataSearchResultsReader reader = new MsDataSearchResultsReader();
-        for (RunSearch runSearch: searchSummary.getRunSearchList()) {
-            long start = System.currentTimeMillis();
-            List<SequestHit> hits = reader.getHitsForRunSearch(runSearch.getRunSearchId(), params.getDecoyPrefix());
-            long end = System.currentTimeMillis();
-            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # hits: "+hits.size()+"; Time: "+getTime(start, end));
-            // filter the search hits
-            start = System.currentTimeMillis();
-            List<SequestHit> filteredHits = null;
-            try {
-                filteredHits = filterHits(hits, params);
-            }
-            catch (FdrCalculatorException e) {
-                e.printStackTrace();
-            }
-            catch (FilterException e) {
-                e.printStackTrace();
-            }
-            end = System.currentTimeMillis();
-            log.info("File: "+runSearch.getRunName()+"; ID: "+runSearch.getRunSearchId()+"; # Filterted hits: "+filteredHits.size()+"; Time: "+getTime(start, end));
-            allFilteredHits.addAll(filteredHits);
-            
-            // get the nrseq protein ids
-            start = System.currentTimeMillis();
-            getNrseqIdsAndAccessions(filteredHits, runSearch.getRunSearchId());
-            end = System.currentTimeMillis();
-            log.info("Assigned NR_SEQ ids in: "+getTime(start, end));
-        }
-        
-        log.info("Total Filtered Hits: "+allFilteredHits.size());
-        
-        getModifiedSequenceForPeptides(allFilteredHits);
-        
-        assginIdsToProteinsAndPeptides(allFilteredHits);
-        
-        
-        // infer the protein list
-        long start = System.currentTimeMillis();
-        List<InferredProtein<SequestSpectrumMatch>> proteins = inferProteinList(allFilteredHits, searchSummary, params);
-        long end = System.currentTimeMillis();
-        log.info("# of Inferred Proteins: "+proteins.size()+". Time: "+getTime(start, end));
-        
-
-        // calculate protein sequence coverage
-        start = System.currentTimeMillis();
-        calculateProteinSequenceCoverage(proteins);
-        end = System.currentTimeMillis();
-        log.info("Calculated protein sequence coverage in: "+getTime(start, end));
-        
-        // save the results
-        start = System.currentTimeMillis();
-        ProteinferSaver.saveProteinInferenceResults(searchSummary, params, proteins);
-        end = System.currentTimeMillis();
-        log.info("Saved results in: "+getTime(start, end));
-        
-        long e = System.currentTimeMillis();
-        log.info("Total time: "+getTime(s, e));
-        
-    }
-    
    
 
     private static void calculateProteinSequenceCoverage(List<InferredProtein<SequestSpectrumMatch>> proteins) {
@@ -472,7 +381,7 @@ public class DoProteinInferenceAction extends Action {
                if(nrDbProt == null) {
                    nrDbProt  = NrSeqLookupUtil.getDbProtein(nrseqDbId, pr.getAccession());
                    if(nrDbProt == null) {
-                       List<Integer> ids = NrSeqLookupUtil.getDbProteinIdsLikeAccesion(dbname, pr.getAccession());
+                       List<Integer> ids = NrSeqLookupUtil.getDbProteinIdsPartialAccession(nrseqDbId, pr.getAccession());
                        if(ids.size() != 1) {
                            ids = NrSeqLookupUtil.getDbProteinIdsForPeptidePartialAccession(nrseqDbId, pr.getAccession(),
                                    phit.getPeptide().getSequence());
@@ -543,10 +452,10 @@ public class DoProteinInferenceAction extends Action {
         }
     }
 
-    private static SearchSummary getSearchSummary(int searchId) {
+    private static IdPickerSummary getSearchSummary(int searchId) {
         DAOFactory daoFactory = DAOFactory.instance();
         
-        SearchSummary search = new SearchSummary(searchId);
+        IdPickerSummary search = new IdPickerSummary();
         
         MsRunSearchDAO runSearchDao = daoFactory.getMsRunSearchDAO();
         List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
@@ -559,7 +468,7 @@ public class DoProteinInferenceAction extends Action {
             int idx = filename.lastIndexOf('.');
             if (idx != -1)
                 filename = filename.substring(0, idx);
-            search.addRunSearch(new RunSearch(id, filename));
+            search.addRunSearch(new RunSearchSummary(id, filename));
         }
         
         return search;

@@ -1,5 +1,5 @@
 
-<%@page import="edu.uwpr.protinfer.database.dto.ProteinferCluster"%><%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@page import="edu.uwpr.protinfer.database.dto.idpicker.IdPickerCluster"%><%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
@@ -84,7 +84,9 @@
        </logic:iterate>
     </tr>
 
-	<% ProteinferCluster cluster = (ProteinferCluster)request.getAttribute("cluster"); %>
+	<%
+	    IdPickerCluster cluster = (IdPickerCluster)request.getAttribute("cluster");
+	%>
 	<logic:iterate name="cluster" property="peptideGroups" id="peptGrp" type="edu.uwpr.protinfer.database.dto.ProteinferPeptideGroup">
     <tr>
        	<th><b><font size="2pt"><bean:write name="peptGrp" property="groupId" /></font></b></th>

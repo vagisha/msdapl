@@ -13,8 +13,9 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
+import edu.uwpr.protinfer.database.dto.BaseProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
-import edu.uwpr.protinfer.database.dto.ProteinferProteinGroup;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinGroup;
 
 public class FilterProteinferResultsAjaxAction extends Action {
 
@@ -95,12 +96,12 @@ public class FilterProteinferResultsAjaxAction extends Action {
                             "\n\tSpectra Count: "+spectraCnt+
                             "\n\tCoverage: "+coverage);
 
-        List<ProteinferProteinGroup> proteinGroups = ProteinferLoader.getProteinferProteinGroups(pinferId);
+        List<IdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinferProteinGroups(pinferId);
         
         // filter
-        Iterator<ProteinferProteinGroup> iter = proteinGroups.iterator();
+        Iterator<IdPickerProteinGroup> iter = proteinGroups.iterator();
         while(iter.hasNext()) {
-            ProteinferProteinGroup grp = iter.next();
+            IdPickerProteinGroup grp = iter.next();
             if(grp.getMatchingPeptideCount() < peptideCnt) {
                 iter.remove();
                 continue;
@@ -116,7 +117,7 @@ public class FilterProteinferResultsAjaxAction extends Action {
             
             Iterator<ProteinferProtein> protIter = grp.getProteins().iterator();
             while(protIter.hasNext()) {
-                ProteinferProtein prot = protIter.next();
+                BaseProteinferProtein<T> prot = protIter.next();
                 if(prot.getCoverage() < coverage) {
                     protIter.remove();
                 }

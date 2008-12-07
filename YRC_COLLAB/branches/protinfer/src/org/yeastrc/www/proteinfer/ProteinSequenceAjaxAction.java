@@ -1,9 +1,12 @@
 package org.yeastrc.www.proteinfer;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,12 +15,15 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
 
 public class ProteinSequenceAjaxAction extends Action {
 
@@ -40,52 +46,39 @@ public class ProteinSequenceAjaxAction extends Action {
 //            return mapping.findForward("authenticate");
         }
 
-        int pinferId = 0;
-        try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
+        int pinferProteinId = 0;
+        try {pinferProteinId = Integer.parseInt(request.getParameter("pinferProteinId"));}
         catch(NumberFormatException e) {}
 
-        if(pinferId == 0) {
+        if(pinferProteinId == 0) {
             response.setContentType("text/html");
-            response.getWriter().write("<b>Invalid Protein Inference ID: "+pinferId+"</b>");
+            response.getWriter().write("<b>Invalid protein inference protein ID: "+pinferProteinId+"</b>");
             return null;
+        }
+
+        IdPickerProteinDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
+        IdPickerProtein protein = protDao.getProtein(pinferProteinId);
+        List<IdPickerPeptide> peptides = protein.getPeptides();
+        Set<String> sequences = new HashSet<String>(peptides.size());
+        for(IdPickerPeptide peptide: peptides) {
+            sequences.add(peptide.getSequence());
         }
         
-        int nrseqProtId = 0;
-        try {nrseqProtId = Integer.parseInt(request.getParameter("nrseqid"));}
-        catch(NumberFormatException e) {}
+        System.out.println("Got request for protein inference protein id: "+pinferProteinId);
 
-        if(nrseqProtId == 0) {
-            response.setContentType("text/html");
-            response.getWriter().write("<b>Invalid protein ID: "+nrseqProtId+"</b>");
-            return null;
-        }
-
-//        String peptideList = request.getParameter("peptides");
-//        String[] peptides = peptideList.split(",");
-        List<String> peptideList = ProteinferLoader.getUnmodifiedPeptidesForProtein(pinferId, nrseqProtId);
-        String[] peptides = new String[peptideList.size()];
-        peptides = peptideList.toArray(peptides);
-
-        System.out.println("Got request for accession: "+nrseqProtId);
-        System.out.println("Peptides are: "+peptideList);
-
-        String html = getHtmlForProtein(nrseqProtId, peptides);
+        String html = getHtmlForProtein(protein.getNrseqProteinId(), new ArrayList<String>(sequences));
         // Go!
         response.setContentType("text/html");
         response.getWriter().write("<pre>"+html+"</pre>");
         return null;
     }
 
-    private String getHtmlForProtein(int nrseqid, String[] peptides) {
+    private String getHtmlForProtein(int nrseqid, List<String> peptides) {
         
-        NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(nrseqid);
-        if(dbProt == null) {
-            return "<b>Could not find protein with ID: "+nrseqid+"</b>";
-        }
         NRProteinFactory nrpf = NRProteinFactory.getInstance();
         NRProtein protein = null;
         try {
-            protein = (NRProtein)(nrpf.getProtein(dbProt.getProteinId()));
+            protein = (NRProtein)(nrpf.getProtein(nrseqid));
         }
         catch (IllegalArgumentException e) {
             e.printStackTrace();
