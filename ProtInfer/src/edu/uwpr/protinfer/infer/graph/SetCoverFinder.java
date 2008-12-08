@@ -1,6 +1,8 @@
 package edu.uwpr.protinfer.infer.graph;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,12 +18,26 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
     // For quick lookup of CoverVertices.
     private Map<String, CoverVertex<L,R>> qVerticesMap= new HashMap<String, CoverVertex<L,R>> ();
     
-    // Array of adjacency counts. 
+    // Array of adjacency counts. adjCounts[5] will contain a list of vertices with adjacency count = 5
     private List<String>[] adjCounts;
     
     private void initSetCoverFinder(BipartiteGraph<L, R> graph) {
         int maxAdjCount = initMaps(graph);
+        initUniqAdjacencyCounts();
         initAdjacencyCountArray(maxAdjCount);
+    }
+
+    private void initUniqAdjacencyCounts() {
+        for(CoverVertex<L,R> qv: qVerticesMap.values()) {
+            Set<String> adjR = qv.getAdjRLabels();
+            int uniqCount = 0;
+            for(String r: adjR) {
+                if(rToLMap.get(r).size() == 1) {
+                    uniqCount++;
+                }
+            }
+            qv.setUniqAdjacentcount(uniqCount);
+        }
     }
     
     private int initMaps(BipartiteGraph<L, R> graph) {
@@ -76,7 +92,9 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
             if (qvWithAdjCount == null || qvWithAdjCount.size() == 0)
                 continue;
             
-            String lLabel = qvWithAdjCount.get(0);
+            // This is where we resolve ties.
+            String lLabel = getBestVertex(qvWithAdjCount);
+//            String lLabel = qvWithAdjCount.get(0);
             qvWithAdjCount.remove(0);
             
             // add this to the set cover
@@ -101,16 +119,53 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
         return setCover;
     }
     
+    // the purpose is to sort the vertices for a particular adjacency count
+    // such that the vertex with the maximum number of unique nodes is at the 
+    // top of the list
+    // For example: adjCounts[5].get(0) should return the vertex with the maximum
+    // number of unique nodes among all vertices with adjacency count of 5
+    private String getBestVertex(List<String> qvWithAdjCount) {
+        
+        Collections.sort(qvWithAdjCount, new Comparator<String>() {
+            
+            // NOTE: we are sorting in reverse order. 
+            public int compare(String vlabel1, String vlabel2) {
+                CoverVertex<L, R> qv1 = qVerticesMap.get(vlabel1);
+                CoverVertex<L, R> qv2 = qVerticesMap.get(vlabel2);
+                // first look at the unique adjacent count
+                if(qv1.origUniqAdjCount > qv2.getAdjacentCount())
+                    return -1;
+                if(qv1.origUniqAdjCount < qv2.getAdjacentCount())
+                    return 1;
+                
+                // now look at the number of vertices that were
+                // adjacent to this vertex when the graph was initialized
+                if(qv1.origAdjCount > qv2.origAdjCount)
+                    return -1;
+                if(qv1.origAdjCount < qv2.origAdjCount)
+                    return 1;
+                return 0;
+            }});
+        return qvWithAdjCount.get(0);
+    }
+
+
     private void removeAdjacentVertx(CoverVertex<L,R> qv, String adjLabel) {
         int oldAdjCount = qv.getAdjacentCount();
         qv.removeAdjLabel(adjLabel);
+        
+        // adjacency count has changed, remove it from the original bin
         this.adjCounts[oldAdjCount].remove(qv.getVertex().getLabel());
+        
         // if no adjacent vertices are left, remove this vertex
         if (qv.getAdjacentCount() == 0) {
             qVerticesMap.remove(qv.getVertex().getLabel());
             return;
         }
+        
+        // put this in the appropriate adjacency count bin
         List<String> adjList = this.adjCounts[qv.getAdjacentCount()];
+        // the bin might not exist yet, we my need to create a new one.
         if (adjList == null) {
             adjList = new ArrayList<String>();
             adjCounts[qv.getAdjacentCount()] = adjList;
@@ -122,6 +177,8 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
         
         private final L vertex;
         private Set<String> adjRLabels;
+        private int origUniqAdjCount = 0;
+        private int origAdjCount = 0;
         
         public CoverVertex(L vertex, BipartiteGraph<L, R> graph) {
             this.vertex = vertex;
@@ -129,10 +186,26 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
             adjRLabels = new HashSet<String>(adjR.size());
             for (R adj: adjR) 
                 adjRLabels.add(adj.getLabel());
+            origAdjCount = getAdjacentCount();
         }
         
         public int getAdjacentCount() {
             return adjRLabels.size();
+        }
+        
+        // returns the number of vertices that were uniquely adjacent to this vertex
+        // when the graph was built
+        public int getUniqAdjacentcount() {
+            return origUniqAdjCount;
+        }
+        
+        public void setUniqAdjacentcount(int count) {
+            this.origUniqAdjCount = count;
+        }
+        
+        // returns the number of vertices that were adjacent to this vertex when the graph was built
+        public int getOrigAdjCount() {
+            return origAdjCount;
         }
         
         public void removeAdjLabel(String label) {
@@ -146,5 +219,6 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
         public L getVertex() {
             return vertex;
         }
+        
     }
 }
