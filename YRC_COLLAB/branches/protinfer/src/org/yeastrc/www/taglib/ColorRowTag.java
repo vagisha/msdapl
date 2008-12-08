@@ -11,10 +11,17 @@ public final class ColorRowTag extends TagSupport {
 
 	// Declare + initialize scheme w/ our default scheme
 	private String scheme = null;
+	
+	// Flag to determine if the previous row color should be repeated.
+    private boolean repeat = false;
 
 	// Set the scheme (color scheme) to use for this content box area
 	public void setScheme(String val) {
 		this.scheme = val;
+	}
+	
+	public void setRepeat(boolean repeat) {
+	    this.repeat = repeat;
 	}
 
 	public int doStartTag() throws JspException {
@@ -49,10 +56,22 @@ public final class ColorRowTag extends TagSupport {
 			
 			writ.print("<TR CLASS=\"" + scheme + "_");
 			
-			if (toggler.getToggle())
-				writ.print("A");
-			else
-				writ.print("B");
+			if (toggler.getToggle()) {
+			    if(repeat) {
+			        writ.print("B");
+			        toggler.getToggle();
+			    }
+			    else
+			        writ.print("A");
+			}
+			else {
+			    if(repeat) {
+			        writ.print("A");
+			        toggler.getToggle();
+			    }
+			    else
+			        writ.print("B");
+			}
 						
 			writ.print("\">");
 

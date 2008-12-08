@@ -29,6 +29,7 @@ import org.yeastrc.microscopy.ExperimentSearcher;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
+import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -128,19 +129,20 @@ public class ViewProjectAction extends Action {
 			// Associate yatesRunIds with msData searchIds where possible AND
 			// Associate yatesRunIds with already saved Protein Inference Runs
 			Map<Integer, Integer> yatesRunToMsSearchMap = new HashMap<Integer, Integer>(yatesRuns.size());
-			Map<Integer, List<Integer>> yatesRunToProteinferRunMap = new HashMap<Integer, List<Integer>>();
+			Map<Integer, List<ProteinferJob>> yatesRunToProteinferRunMap = new HashMap<Integer, List<ProteinferJob>>();
 			for(YatesRun run: yatesRuns) {
 			    int runId = run.getId();
 			    int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
 			    
 			    yatesRunToMsSearchMap.put(runId, searchId);
 			    if(searchId > 0) {
-			        List<Integer> proteinferRunIds = ProteinferRunSearcher.getProteinferRunIdsForMsSearch(searchId);
+			        List<ProteinferJob> proteinferRunIds = ProteinferRunSearcher.getProteinferRunIdsForMsSearch(searchId);
 			        yatesRunToProteinferRunMap.put(searchId, proteinferRunIds);
 			    }
 			}
 			request.setAttribute("yatesRunToMsSearchMap", yatesRunToMsSearchMap);
 			request.setAttribute("yatesRunToProteinferRunMap", yatesRunToProteinferRunMap);
+			request.setAttribute("projectId", projectID);
 			
 			
 			
