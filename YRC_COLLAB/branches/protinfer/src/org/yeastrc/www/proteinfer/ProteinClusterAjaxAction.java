@@ -7,10 +7,9 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerCluster;
 
 public class ProteinClusterAjaxAction extends Action{
 
@@ -58,7 +57,7 @@ public class ProteinClusterAjaxAction extends Action{
 
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("clusterId", clusterId);
-        IdPickerCluster cluster = IdPickerResultsLoader.getProteinferCluster(pinferId, clusterId);
+        WIdPickerCluster cluster = IdPickerResultsLoader.getProteinferCluster(pinferId, clusterId);
         request.setAttribute("cluster", cluster);
         
         return mapping.findForward("Success");

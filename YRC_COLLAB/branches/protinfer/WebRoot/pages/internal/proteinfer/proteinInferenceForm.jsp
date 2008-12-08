@@ -4,65 +4,15 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 
-<script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
-<script type="text/javascript">
-
-	function tooltip() {
-		/* CONFIG */		
-		xOffset = 10;
-		yOffset = 20;		
-		// these 2 variable determine popup's distance from the cursor
-		// you might want to adjust to get the right result		
-		/* END CONFIG */		
-		$(".tooltip").hover(function(e){
-			this.t = this.title;
-			this.title = "";									  
-			$("body").append("<p id='tooltip'>"+ this.t +"</p>");
-			$("#tooltip")
-				.css("top",(e.pageY - xOffset) + "px")
-				.css("left",(e.pageX + yOffset) + "px")
-				.fadeIn("fast");		
-    		},
-			function(){
-				this.title = this.t;		
-				$("#tooltip").remove();
-    	});	
-		$(".tooltip").mousemove(function(e){
-			$("#tooltip")
-				.css("top",(e.pageY - xOffset) + "px")
-				.css("left",(e.pageX + yOffset) + "px");
-		});	
-	}
-	
-	// starting the script on page load
-	$(document).ready(function(){
-		tooltip();
-	});
-</script>
-
-<style>
-p{
-	clear:both;
-	margin:0;
-	padding:.5em 0;
-}
-#tooltip{
-	position:absolute;
-	border:1px solid #333;
-	background:#f7f5d1;
-	padding:2px 5px;
-	color:#333;
-	display:none;
-}
-</style>
-
+<link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
+<script src="/yrc/js/tooltip.js"></script>
 
 <yrcwww:notauthenticated>
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
 <logic:notPresent name="proteinInferenceForm">
-	<logic:forward name="editProject" />
+	<logic:forward  name="newProteinInference" />
 </logic:notPresent>
  
 <%@ include file="/includes/header.jsp" %>

@@ -71,6 +71,7 @@
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
 	<form-bean name="proteinInferenceForm" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
+	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
     </form-beans>
 
 
@@ -124,6 +125,8 @@
 	<forward name="listUploadJobs" path="/listUploadJobs.do" />
 	<forward name="viewUploadJob" path="/viewUploadJob.do" />
 	<forward name="editResearcher" path="/editResearcher.do" />
+	<forward name="newProteinInference" path="/newProteinInference.do" />
+	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
 
     </global-forwards>
 
@@ -1080,9 +1083,12 @@
 	<action 
 		path="/viewProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.ViewProteinInferenceResultAction"
+		name="proteinInferFilterForm"
+		scope="request"
+		validate="true"
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult3.jsp" redirect="false" />
-		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult3.jsp" redirect="false" />
 	</action>
 	
 	<action 

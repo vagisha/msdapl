@@ -4,36 +4,38 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.run.MsRunDAO;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.nr_seq.NRProtein;
-import org.yeastrc.nr_seq.NRProteinFactory;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptide;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideIon;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideIonWSpectra;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
 
+import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerInputDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerPeptideDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerCluster;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideGroup;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideIon;
@@ -47,86 +49,34 @@ public class IdPickerResultsLoader {
     private static final org.yeastrc.ms.dao.DAOFactory msDataDaoFactory = org.yeastrc.ms.dao.DAOFactory.instance();
     private static final MsScanDAO scanDao = msDataDaoFactory.getMsScanDAO();
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
-    private static final MsRunDAO runDao = msDataDaoFactory.getMsRunDAO();
     private static final SequestSearchResultDAO seqResDao = msDataDaoFactory.getSequestResultDAO();
     private static final ProlucidSearchResultDAO plcResDao = msDataDaoFactory.getProlucidResultDAO();
-    private static final MsSearchResultDAO resDao = msDataDaoFactory.getMsSearchResultDAO();
+//    private static final MsSearchResultDAO resDao = msDataDaoFactory.getMsSearchResultDAO();
     
     private static final IdPickerSpectrumMatchDAO specDao = pinferDaoFactory.getIdPickerSpectrumMatchDao();
     private static final IdPickerPeptideDAO peptDao = pinferDaoFactory.getIdPickerPeptideDao();
     private static final IdPickerProteinDAO protDao = pinferDaoFactory.getIdPickerProteinDao();
-    private static final IdPickerRunDAO pinferRunDao = pinferDaoFactory.getIdPickerRunDao();
+    private static final IdPickerInputDAO inputDao = pinferDaoFactory.getIdPickerInputDao();
+//    private static final IdPickerRunDAO pinferRunDao = pinferDaoFactory.getIdPickerRunDao();
     
-    private static final Logger log = Logger.getLogger(IdPickerResultsLoader.class);
+//    private static final Logger log = Logger.getLogger(IdPickerResultsLoader.class);
     
     private IdPickerResultsLoader(){}
     
-//    public static IdPickerParams getIDPickerParams(int pinferId) {
-//        IdPickerParams params = new IdPickerParams();
-//        
-//        BaseProteinferRun<T> inferRun = pinferRunDao.getProteinferRun(pinferId);
-//        List<IdPickerFilter> filters = inferRun.getFilters();
-//        for(IdPickerFilter filter: filters) {
-//            if(filter.getFilterName().equalsIgnoreCase("decoyRatio"))
-//                params.setDecoyRatio(Float.parseFloat(filter.getFilterValue()));
-//            else if (filter.getFilterName().equalsIgnoreCase("decoyPrefix"))
-//                params.setDecoyPrefix(filter.getFilterValue());
-//            else if (filter.getFilterName().equalsIgnoreCase("parsimonyAnalysis"))
-//                params.setDoParsimonyAnalysis(Boolean.parseBoolean(filter.getFilterValue()));
-//            else if (filter.getFilterName().equalsIgnoreCase("maxAbsFDR"))
-//                params.setMaxAbsoluteFdr(Float.parseFloat(filter.getFilterValue()));
-//            else if (filter.getFilterName().equalsIgnoreCase("maxRelativeFDR"))
-//                params.setMaxRelativeFdr(Float.parseFloat(filter.getFilterValue()));
-//                
-//        }
-//        return params;
-//    }
     
-//    public static IdPickerSummary getIDPickerInputSummary(int pinferId) {
-//        
-//        IdPickerSummary summary = new IdPickerSummary();
-//        
-//        GenericProteinferRun inferRunDao = pinferDaoFactory.getProteinferRunDao();
-//        BaseProteinferRun<T> inferRun = inferRunDao.getProteinferRun(pinferId);
-//        
-//        summary.setNumTotalProteins(inferRun.getUnfilteredProteins());
-//        
-//        GenericProteinferProteinDAO protDao = pinferDaoFactory.getProteinferProteinDao();
-//        summary.setFilteredProteinsMinPeptCount(protDao.getFilteredProteinCount(pinferId));
-//        summary.setNumFilteredProteinsParsimony(protDao.getFilteredParsimoniousProteinCount(pinferId));
-//        
-//        
-//        List<ProteinferInput> inputList = inferRun.getInputSummaryList();
-//        MsRunSearchDAO runSearchDao = msDataDaoFactory.getMsRunSearchDAO();
-//        MsRunDAO runDao = msDataDaoFactory.getMsRunDAO();
-//        
-//        for(ProteinferInput input: inputList) {
-//            MsRunSearch runSearch = runSearchDao.loadRunSearch(input.getRunSearchId());
-//            String filename = runDao.loadFilenameNoExtForRun(runSearch.getRunId());
-//            RunSearchSummary rs = new RunSearchSummary();
-//            rs.setRunSearchId(input.getRunSearchId());
-//            rs.setRunName(filename);
-//            rs.setTotalTargetHits(input.getNumTargetHits());
-//            rs.setTotalDecoyHits(input.getNumDecoyHits());
-//            rs.setFilteredTargetHits(input.getNumFilteredTargetHits());
-//            rs.setIsSelected(true);
-//            summary.addRunSearch(rs);
-//        }
-//        return summary;
-//    }
-    
-//    public static List<ProteinferProtein> getProteinferProteins(int pinferId) {
-//        List<ProteinferProtein> proteins = protDao.getProteins(pinferId);
-//        // set the description for the proteins.  This requires querying the 
-//        // NRSEQ database
-//        for(BaseProteinferProtein<T> prot: proteins) {
-//            prot.getPeptides();
-//            prot.getUniquePeptideCount();
-//            NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(prot.getNrseqProteinId());
-//            prot.setDescription(dbProt.getDescription());
-//        }
-//        return proteins;
-//    }
+    public static List<WIdPickerInputSummary> getIDPickerInputSummary(int pinferId) {
+        
+        List<IdPickerInputSummary> inputSummary = inputDao.getProteinferInputList(pinferId);
+        List<WIdPickerInputSummary> wInputList = new ArrayList<WIdPickerInputSummary>(inputSummary.size());
+        
+        for(IdPickerInputSummary input: inputSummary) {
+            String filename = rsDao.loadFilenameForRunSearch(input.getRunSearchId());
+            WIdPickerInputSummary winput = new WIdPickerInputSummary(input);
+            winput.setFileName(filename);
+            wInputList.add(winput);
+        }
+        return wInputList;
+    }
     
     public static WIdPickerProtein getIdPickerProtein(int pinferId, int pinferProteinId) {
         IdPickerProtein protein = protDao.getProtein(pinferProteinId);
@@ -138,16 +88,21 @@ public class IdPickerResultsLoader {
     }
 
     private static void assignProteinAccessionDescription(WIdPickerProtein wProt) {
-        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-        NRProtein nrseqProt = null;
-        try {
-            nrseqProt = (NRProtein)(nrpf.getProtein(wProt.getProtein().getNrseqProteinId()));
-            wProt.setAccession(nrseqProt.getListing());
-            wProt.setDescription(nrseqProt.getDescription());
-        }
-        catch (Exception e) {
-            log.error("Exception getting nrseq protein for protein Id: "+wProt.getProtein().getNrseqProteinId(), e);
-        }
+        
+        NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(wProt.getProtein().getNrseqProteinId());
+        wProt.setAccession(nrDbProt.getAccessionString());
+        wProt.setDescription(nrDbProt.getDescription());
+        
+//        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+//        NRProtein nrseqProt = null;
+//        try {
+//            nrseqProt = (NRProtein)(nrpf.getProtein(wProt.getProtein().getNrseqProteinId()));
+//            wProt.setAccession(nrseqProt.getListing());
+//            wProt.setDescription(nrseqProt.getDescription());
+//        }
+//        catch (Exception e) {
+//            log.error("Exception getting nrseq protein for protein Id: "+wProt.getProtein().getNrseqProteinId(), e);
+//        }
     }
     
     public static List<WIdPickerProtein> getGroupProteins(int pinferId, int groupId) {
@@ -225,6 +180,44 @@ public class IdPickerResultsLoader {
         return new ArrayList<WIdPickerPeptideIon>(ionMap.values());
     }
     
+    public static List<IdPickerPeptideIon> getIonsForPeptide(IdPickerPeptide peptide, PeptideDefinition peptideDef) {
+        
+        Map<String, IdPickerPeptideIon> ionMap = new HashMap<String, IdPickerPeptideIon>();
+        List<IdPickerSpectrumMatch> psmList = peptide.getSpectrumMatchList();
+
+        // for each spectrum match
+        for(IdPickerSpectrumMatch psm: psmList) {
+            // get the underlying search result 
+            MsSearchResult res = seqResDao.load(psm.getMsRunSearchResultId());
+            int charge = res.getCharge();
+            
+            String ionseq = null;
+            if(peptideDef.isUseMods()) {
+                ionseq = res.getResultPeptide().getModifiedPeptideSequence();
+            }
+            else {
+                ionseq = res.getResultPeptide().getPeptideSequence();
+            }
+            ionseq = removeTerminalResidues(ionseq);
+
+            // separate by ion type(based on given peptide definition)
+            String ionKey = ionseq;
+            if(peptideDef.isUseCharge()) {
+                ionKey = ionKey+"_chg"+charge;
+            }
+            IdPickerPeptideIon ion = ionMap.get(ionKey);
+            if(ion == null) {
+                ion = new IdPickerPeptideIon();
+                ion.setCharge(charge);
+                ion.setGroupId(peptide.getGroupId());
+                ion.setSequence(ionseq);
+                ionMap.put(ionKey, ion);
+            }
+            ion.addSpectrumMatch(psm);
+        }
+        return new ArrayList<IdPickerPeptideIon>(ionMap.values());
+    }
+    
     public static <T extends MsSearchResult> List<WIdPickerPeptideIonWSpectra<T>> 
             getIonsForWPeptide(WIdPickerPeptide peptide, SearchProgram program) {
         
@@ -248,6 +241,8 @@ public class IdPickerResultsLoader {
             int charge = res.getCharge();
             String modifiedSeq = res.getResultPeptide().getModifiedPeptideSequence();
             modifiedSeq = removeTerminalResidues(modifiedSeq);
+            int scanNum = scanDao.load(res.getScanId()).getStartScanNum();
+            
 
             // separate by ion type(charge + modifications)
             String ionKey = modifiedSeq+"_chg"+charge;
@@ -258,12 +253,15 @@ public class IdPickerResultsLoader {
                 ion.setGroupId(peptide.getPeptide().getGroupId());
                 ion.setSequence(modifiedSeq);
                 wion = new WIdPickerPeptideIonWSpectra<T>(ion);
-                wion.setScanId(res.getScanId());
-                wion.setIsUniqueToProteinGroup(peptide.getIsUniqueToProteinGroup());
+                wion.setIdUniqueToProteinGroup(peptide.getIsUniqueToProteinGroup());
                 ionMap.put(ionKey, wion);
             }
-            wion.getIon().addSpectrumMatch(psm);
-            wion.addMsSearchResult((T) res);
+            WIdPickerSpectrumMatch<T> wpsm = new WIdPickerSpectrumMatch<T>();
+            wpsm.setScanNumber(scanNum);
+            wpsm.setIdPickerSpectrumMatch(psm);
+            wpsm.setSpectrumMatch((T) res);
+           
+            wion.addMsSearchResult(wpsm);
         }
         return new ArrayList<WIdPickerPeptideIonWSpectra<T>>(ionMap.values());
     }
@@ -299,7 +297,7 @@ public class IdPickerResultsLoader {
         return wIons;
     }
     
-    public static List<WIdPickerProteinGroup> getProteinferProteinGroups(int pinferId) {
+    public static List<WIdPickerProteinGroup> getProteinferProteinGroups(int pinferId, PeptideDefinition peptideDef) {
         
         List<IdPickerProteinGroup> proteinGrps = protDao.getIdPickerProteinGroups(pinferId);
         
@@ -315,8 +313,31 @@ public class IdPickerResultsLoader {
                 // NRSEQ database
                 assignProteinAccessionDescription(wProt);
             }
+            
+            satisfyPeptideDefinition(wProtGrp, protGrp, peptideDef);
         }
         return wProtGrps;
+    }
+    
+    private static void satisfyPeptideDefinition(WIdPickerProteinGroup wGroup, 
+            IdPickerProteinGroup group, PeptideDefinition peptideDef) {
+        // if we are using sequence only to define unique peptides don't do anything
+        if(!peptideDef.isUseCharge() && !peptideDef.isUseMods())
+            return;
+        
+        // update the peptide count and unique peptide counts based on the peptide definition
+        int numPeptides = 0;
+        int numUniqPeptides = 0;
+        for(IdPickerPeptideGroup peptideGrp: group.getMatchingPeptideGroups()) {
+            for(IdPickerPeptide peptide: peptideGrp.getPeptides()) {
+                List<IdPickerPeptideIon> ions = getIonsForPeptide(peptide, peptideDef);
+                numPeptides += ions.size();
+                if(peptideGrp.isUniqueToProteinGroup())
+                    numUniqPeptides += ions.size();
+            }
+        }
+        wGroup.setMatchingPeptideCount(numPeptides);
+        wGroup.setUniqMatchingPeptideCount(numUniqPeptides);
     }
     
     public static String getModifiedSequenceForSpectrumMatch(ProteinferSpectrumMatch psm) {
@@ -334,128 +355,62 @@ public class IdPickerResultsLoader {
     }
 
 
+    public static WIdPickerCluster getProteinferCluster(int pinferId, int clusterId) {
+        IdPickerCluster cluster = protDao.getIdPickerCluster(pinferId, clusterId);
+        WIdPickerCluster wCluster = new WIdPickerCluster(pinferId, clusterId);
+        wCluster.setPeptideGroups(cluster.getPeptideGroups());
+        
+        // set the accession and description for the proteins in this cluster
+        List<WIdPickerProteinGroup> wProtGrps = new ArrayList<WIdPickerProteinGroup>(cluster.getProteinGroups().size());
+        for(IdPickerProteinGroup protGrp: cluster.getProteinGroups()) {
+            
+            WIdPickerProteinGroup wProtGrp = new WIdPickerProteinGroup(protGrp);
+            wProtGrps.add(wProtGrp);
+            
+            for(WIdPickerProtein wProt: wProtGrp.getProteins()) {
+                // set the description for the proteins.  This requires querying the 
+                // NRSEQ database
+                assignProteinAccessionDescription(wProt);
+            }
+            
+        }
+        wCluster.setProteinGroups(wProtGrps);
+        return wCluster;
+    }
     
-//    public static InferredProtein<SequestSpectrumMatch> getInferredProtein(int pinferId, int nrseqProtId) {
-//        
-//        BaseProteinferProtein<T> pProt = protDao.getProteinferProtein(pinferId, nrseqProtId);
-//        Protein prot = new Protein(pProt.getAccession(), pProt.getNrseqProteinId());
-//        prot.setAccepted(pProt.getIsParsimonious());
-//        prot.setProteinClusterId(pProt.getClusterId());
-//        prot.setProteinGroupId(pProt.getGroupId());
-//        InferredProtein<SequestSpectrumMatch> iProt = new InferredProtein<SequestSpectrumMatch>(prot);
-//        iProt.setPercentCoverage((float) pProt.getCoverage());
-//        
-//        
-//        // add the peptide evidences
-//        for(BaseProteinferPeptide<T> pPept: pProt.getPeptides()) {
-//            
-//            Peptide pept = new Peptide(getModifiedSequenceForPeptide(pPept), pPept.getId());
-//            pept.setPeptideGroupId(pPept.getGroupId());
-//            
-//            PeptideEvidence<SequestSpectrumMatch> pev = new PeptideEvidence<SequestSpectrumMatch>(pept);
-//            pev.setBestFdr(pPept.getBestFdr());
-//            pev.setProteinMatchCount(pPept.getMatchingProteinIds().size());
-//            
-//            for(ProteinferSpectrumMatch psm: pPept.getSpectrumMatchList()) {
-//                SequestSpectrumMatch ssm = getSequestSearchResult(psm, null); // SearchSource = null
-//                pev.addSpectrumMatch(ssm);
-//            }
-//            
-//            // get the description for this protein
-//            NrDbProtein dbProt = NrSeqLookupUtil.getDbProtein(pProt.getNrseqProteinId());
-//            iProt.setDescription(dbProt.getDescription());
-//            
-//            iProt.addPeptideEvidence(pev);
-//        }
-//        return iProt;
-//    }
+    public static List<WIdPickerSpectrumMatch<SequestSearchResult>> getSequestSpectrumMmatchesForRunSearch(int pinferId, int runSearchId) {
+        
+        List<Integer> psmIdList = specDao.getSpectrumMatchIdsForPinferRunAndRunSearch(pinferId, runSearchId);
+        List<WIdPickerSpectrumMatch<SequestSearchResult>> wIdpPsmList = new ArrayList<WIdPickerSpectrumMatch<SequestSearchResult>>(psmIdList.size());
+        for(Integer psmId: psmIdList) {
+            IdPickerSpectrumMatch idpPsm = specDao.getSpectrumMatch(psmId);
+            SequestSearchResult seqPsm = seqResDao.load(idpPsm.getMsRunSearchResultId());
+            MsScan scan = scanDao.load(seqPsm.getScanId());
+            WIdPickerSpectrumMatch<SequestSearchResult> widpPsm = new WIdPickerSpectrumMatch<SequestSearchResult>();
+            widpPsm.setIdPickerSpectrumMatch(idpPsm);
+            widpPsm.setScanNumber(scan.getStartScanNum());
+            widpPsm.setSpectrumMatch(seqPsm);
+            wIdpPsmList.add(widpPsm);
+        }
+        return wIdpPsmList;
+    }
     
-//    public static List<ProteinferProtein> getGroupProteins(int pinferId, int groupId) {
-//        return protDao.getProteinferGroupProteins(pinferId, groupId);
-//    }
-//    
-//    public static IdPickerCluster getProteinferCluster(int pinferId, int clusterId) {
-//        IdPickerCluster cluster = protDao.getProteinferCluster(pinferId, clusterId);
-//        // set the sequence on each of the peptides in this cluster
-//        List<IdPickerPeptideGroup> peptGrps = cluster.getPeptideGroups();
-//        for(IdPickerPeptideGroup grp: peptGrps) {
-//            List<ProteinferPeptide> peptList = grp.getPeptides();
-//            for(BaseProteinferPeptide<T> pept: peptList) {
-//                pept.setSequence(getModifiedSequenceForPeptide(pept));
-//            }
-//        }
-//        return cluster;
-//    }
+    public static List<WIdPickerSpectrumMatch<ProlucidSearchResult>> getProlucidSpectrumMmatchesForRunSearch(int pinferId, int runSearchId) {
+        
+        List<Integer> psmIdList = specDao.getSpectrumMatchIdsForPinferRunAndRunSearch(pinferId, runSearchId);
+        List<WIdPickerSpectrumMatch<ProlucidSearchResult>> wIdpPsmList = new ArrayList<WIdPickerSpectrumMatch<ProlucidSearchResult>>(psmIdList.size());
+        
+        for(Integer psmId: psmIdList) {
+            IdPickerSpectrumMatch idpPsm = specDao.getSpectrumMatch(psmId);
+            ProlucidSearchResult seqPsm = plcResDao.load(idpPsm.getMsRunSearchResultId());
+            MsScan scan = scanDao.load(seqPsm.getScanId());
+            WIdPickerSpectrumMatch<ProlucidSearchResult> widpPsm = new WIdPickerSpectrumMatch<ProlucidSearchResult>();
+            widpPsm.setIdPickerSpectrumMatch(idpPsm);
+            widpPsm.setScanNumber(scan.getStartScanNum());
+            widpPsm.setSpectrumMatch(seqPsm);
+            wIdpPsmList.add(widpPsm);
+        }
+        return wIdpPsmList;
+    }
     
-//    public static List<SequestSpectrumMatch> getSpectrummatchesForRunSearch(int pinferId, int runSearchId) {
-//        
-//        // get the filename
-//        String filename = runDao.loadFilenameNoExtForRun(rsDao.loadRunSearch(runSearchId).getRunId());
-//        
-//        List<Integer> resultIds = seqResDao.loadTopResultIdsForRunSearch(runSearchId);
-//        
-//        List<Integer> resultIdsForRunSearch = specDao.getSpectrumMatchIdsForPinferRun(pinferId);
-//        Collections.sort(resultIdsForRunSearch);
-//        
-//        List<Integer> resultIdsForPinferAndRunSearch = new ArrayList<Integer>();
-//        for(Integer id: resultIds) {
-//            int idx = Collections.binarySearch(resultIdsForRunSearch, id);
-//            if (idx >= 0)
-//                resultIdsForPinferAndRunSearch.add(id);
-//        }
-//        
-//        List<ProteinferSpectrumMatch> psmList = new ArrayList<ProteinferSpectrumMatch>(resultIdsForPinferAndRunSearch.size());
-//        for(Integer id: resultIdsForPinferAndRunSearch) {
-//            ProteinferSpectrumMatch psm = specDao.getSpectrumMatchForMsResult(pinferId, id);
-//            if(psm == null) {
-//                System.out.println("No match found for pinferId: "+pinferId+" and msRunSearchResultId: "+id);
-//            }
-//            else {
-//                psmList.add(psm);
-//            }
-//        }
-//        
-//        List<SequestSpectrumMatch> seqMatchList = new ArrayList<SequestSpectrumMatch>(psmList.size());
-//        SearchSource source = new SearchSource(filename, runSearchId);
-//        
-//        
-//        for(ProteinferSpectrumMatch psm: psmList) {
-//            seqMatchList.add(getSequestSearchResult(psm, source));
-//        }
-//        
-//        return seqMatchList;
-//    }
-    
-    
-//    private static SequestSpectrumMatch getSequestSearchResult(ProteinferSpectrumMatch psm, SearchSource source) {
-//        SequestSearchResult seqRes = seqResDao.load(psm.getMsRunSearchResultId());
-//        SequestResultData data = seqRes.getSequestResultData();
-//        int scanNumber = scanDao.load(seqRes.getScanId()).getStartScanNum();
-//        String modiSeq = getModifiedSequenceForSpectrumMatch(psm);
-////        String modiSeq = seqRes.getResultPeptide().getModifiedPeptideSequence();
-//        
-//        SequestSpectrumMatch seqM = new SequestSpectrumMatch(source, scanNumber, seqRes.getCharge(), modiSeq);
-//        seqM.setFdr(psm.getFdrRounded());
-//        seqM.setXcorr(data.getxCorr());
-//        seqM.setDeltaCn(data.getDeltaCN());
-//        seqM.setHitId(psm.getMsRunSearchResultId());
-//        seqM.setScanId(seqRes.getScanId());
-//        return seqM;
-//    }
-//
-//    public static Map<Integer, SequestSpectrumMatch> getBestSpectrumMatches(List<IdPickerProteinGroup> proteinGroups) {
-//        Map<Integer, SequestSpectrumMatch> psmMap = new HashMap<Integer, SequestSpectrumMatch>();
-//        for(IdPickerProteinGroup grp: proteinGroups) {
-//            for(IdPickerPeptideGroup peptGrp: grp.getMatchingPeptideGroups()) {
-//                for(BaseProteinferPeptide<T> pept: peptGrp.getPeptides()) {
-//                    ProteinferSpectrumMatch bestPsm = pept.getBestSpectrumMatch();
-//                    if(psmMap.get(bestPsm.getMsRunSearchResultId()) == null) {
-//                        SequestSpectrumMatch ssm = getSequestSearchResult(bestPsm, null);
-//                        psmMap.put(bestPsm.getMsRunSearchResultId(), ssm);
-//                    }
-//                }
-//            }
-//        }
-//        return psmMap;
-//    }
 }

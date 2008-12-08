@@ -17,6 +17,20 @@ TH.ms_selected_header {
 	color: #3D902A;
 }
 
+/* FOR TOOLTIPS */
+p.tooltip {
+	clear:both;
+	margin:0;
+	padding:.5em 0;
+}
+#tooltip{
+	position:absolute;
+	border:1px solid #333;
+	background:#f7f5d1;
+	padding:2px 5px;
+	color:#333;
+	display:none;
+}
 
 /* COPIED FROM JQUERY UI's ui.all.css */
 /*slider*/

@@ -7,20 +7,54 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideIon;
 
-public class WIdPickerPeptideIonWSpectra <T extends MsSearchResult> extends WIdPickerPeptideIon {
+public class WIdPickerPeptideIonWSpectra <T extends MsSearchResult> {
 
-    private List<T> psmList;
+    private String sequence;
+    private int charge;
+    private double bestFdr;
+    private boolean uniqueToProteinGrp = false;
+    
+    private List<WIdPickerSpectrumMatch<T>> psmList;
     
     public WIdPickerPeptideIonWSpectra(IdPickerPeptideIon ion) {
-        super(ion);
-        psmList = new ArrayList<T>();
+        this.sequence = ion.getSequence();
+        this.charge = ion.getCharge();
+        psmList = new ArrayList<WIdPickerSpectrumMatch<T>>();
     }
     
-    public void addMsSearchResult(T result) {
+    public void addMsSearchResult(WIdPickerSpectrumMatch<T> result) {
         psmList.add(result);
     }
     
-    public List<T> getPsmList() {
+    public List<WIdPickerSpectrumMatch<T>> getPsmList() {
         return psmList;
+    }
+    
+    public String getSequence() {
+        return sequence;
+    }
+    
+    public int getCharge() {
+        return charge;
+    }
+    
+    public double getBestFdr() {
+        double best = Double.MAX_VALUE;
+        for(WIdPickerSpectrumMatch<T> psm: psmList) {
+            best = Math.min(best, psm.getFdr());
+        }
+        return best;
+    }
+    
+    public boolean isUniqueToProteinGroup() {
+        return uniqueToProteinGrp;
+    }
+    
+    public void setIdUniqueToProteinGroup(boolean unique) {
+        this.uniqueToProteinGrp = unique;
+    }
+    
+    public int getSpectralCount() {
+        return psmList.size();
     }
 }

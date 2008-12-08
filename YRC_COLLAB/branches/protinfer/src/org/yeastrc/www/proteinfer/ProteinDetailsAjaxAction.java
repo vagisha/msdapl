@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideIonWSpectra;
@@ -91,11 +92,10 @@ public class ProteinDetailsAjaxAction extends Action {
         ProteinferRun run = factory.getProteinferRunDao().getProteinferRun(pinferId);
         int runSearchId = run.getInputSummaryList().get(0).getRunSearchId();
         DAOFactory msDaoFactory = DAOFactory.instance();
-        MsRunSearch runSearch = msDaoFactory.getMsRunSearchDAO().loadRunSearch(runSearchId);
-        SearchFileFormat searchType = runSearch.getSearchFileFormat();
+        SearchProgram searchProgram = msDaoFactory.getMsRunSearchDAO().loadSearchProgramForRunSearch(runSearchId);
         
         
-        if(searchType == SearchFileFormat.SQT_NSEQ || searchType == SearchFileFormat.SQT_SEQ) {
+        if(searchProgram == SearchProgram.SEQUEST || searchProgram == SearchProgram.EE_NORM_SEQUEST) {
             // load sequest results
             request.setAttribute("searchProgram", "sequest");
             List<WIdPickerPeptideIonWSpectra<SequestSearchResult>> psmList = 
@@ -103,7 +103,7 @@ public class ProteinDetailsAjaxAction extends Action {
             request.setAttribute("ionList", psmList);
         }
         
-        else if (searchType == SearchFileFormat.SQT_PLUCID) {
+        else if (searchProgram == SearchProgram.PROLUCID) {
             // load ProLuCID results
             request.setAttribute("searchProgram", "prolucid");
             List<WIdPickerPeptideIonWSpectra<ProlucidSearchResult>> psmList = 

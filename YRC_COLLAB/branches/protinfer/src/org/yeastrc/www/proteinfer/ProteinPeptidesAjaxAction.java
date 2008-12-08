@@ -13,8 +13,6 @@ import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideIon;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerCluster;
-
 public class ProteinPeptidesAjaxAction extends Action {
 
     public ActionForward execute( ActionMapping mapping,
@@ -51,11 +49,21 @@ public class ProteinPeptidesAjaxAction extends Action {
             response.getWriter().write("<b>Invalid Protein Inference Protein ID: "+proteinGroupId+"</b>");
             return null;
         }
+        
+        // protein ID is optional. This is sent by a request that requires the
+        // peptides table sent in the response to have the proteinId as part of its html id.
+        int proteinId = 0;
+        try {proteinId = Integer.parseInt(request.getParameter("proteinId"));}
+        catch(NumberFormatException e) {}
 
-        System.out.println("Got request for protein group Id: "+proteinGroupId+" of protein inference run: "+pinferId);
+        System.out.println("Got request for protein group Id: "+proteinId+" of protein inference run: "+pinferId+
+                "(protein Id: "+proteinId+")");
 
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("proteinGroupId", proteinGroupId);
+        if(proteinId != 0) {
+            request.setAttribute("proteinId", proteinId); // this is needed so that the peptides table has the right html id.
+        }
         
         List<WIdPickerPeptideIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
         request.setAttribute("proteinPeptides", ionList);

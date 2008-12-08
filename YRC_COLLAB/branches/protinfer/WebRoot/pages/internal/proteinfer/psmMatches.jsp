@@ -18,23 +18,46 @@
 	<th class="sort-alpha" style="font-size: 10pt; font-weight: bold;">Peptide</th>
 	<th class="sort-int" style="font-size: 10pt; font-weight: bold;">Scan Number</th>
 	<th class="sort-int" style="font-size: 10pt; font-weight: bold;">Charge</th>
-	<th class="sort-float" style="font-size: 10pt; font-weight: bold;">XCorr</th>
+	<logic:equal name="searchProgram" value="sequest">
+		<th style="text-decoration: underline;font-size: 10pt;font-weight: bold;" class="sort-float" >XCorr</th>
+	</logic:equal>
+	<logic:equal name="searchProgram" value="prolucid">
+		<th style="text-decoration: underline;font-size: 10pt;font-weight: bold;" class="sort-float" >primaryScore</th>
+	</logic:equal>
 	<th class="sort-float" style="font-size: 10pt; font-weight: bold;">DeltaCN</th>
 	<th class="sort-float" style="font-size: 10pt; font-weight: bold;">FDR</th>
 	<th style="font-size: 10pt; font-weight: bold;">View</th>
 </tr>
 </thead>
 <tbody>
+
 <logic:iterate name="psmList" id="psm">
+
+<logic:equal name="searchProgram" value="sequest">
+     <bean:define name="psm" property="spectrumMatch" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult" id="sequestPsm"></bean:define>
+</logic:equal>
+<logic:equal name="searchProgram" value="prolucid">
+ 	<bean:define name="psm" property="spectrumMatch" type="org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult" id="prolucidPsm"></bean:define>
+</logic:equal>	
+
 	<tr>
-	<td><bean:write name="psm" property="peptideSequence" /></td>
+	<td><bean:write name="psm" property="modifiedSequence" /></td>
 	<td><bean:write name="psm" property="scanNumber" /></td>
-	<td><bean:write name="psm" property="charge" /></td>
-	<td><bean:write name="psm" property="xcorrRounded" /></td>
-	<td><bean:write name="psm" property="deltaCnRounded" /></td>
-	<td><bean:write name="psm" property="fdrRounded" /></td>
+	
+	<logic:equal name="searchProgram" value="sequest">
+		<td><bean:write name="sequestPsm" property="charge" /></td>
+		<td><bean:write name="sequestPsm" property="sequestResultData.xCorr" /></td>
+		<td><bean:write name="sequestPsm" property="sequestResultData.deltaCN" /></td>
+	</logic:equal>
+	<logic:equal name="searchProgram" value="prolucid">
+		<td><bean:write name="prolucidPsm" property="charge" /></td>
+		<td><bean:write name="prolucidPsm" property="prolucidResultData.primaryScore" /></td>
+		<td><bean:write name="prolucidPsm" property="prolucidResultData.deltaCN" /></td>
+	</logic:equal>
+	
+	<td><bean:write name="psm" property="fdr" /></td>
 	<td><span style="text-decoration: underline; cursor: pointer;" 
-			  onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="hitId" />)" >
+			  onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="searchResultId" />)" >
 		View
 		</span></td>
 	</tr>

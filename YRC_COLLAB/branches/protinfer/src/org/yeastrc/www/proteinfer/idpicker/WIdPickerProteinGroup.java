@@ -3,6 +3,7 @@ package org.yeastrc.www.proteinfer.idpicker;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideGroup;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinGroup;
 
@@ -14,6 +15,8 @@ public class WIdPickerProteinGroup {
     private int matchingPeptideCount;
     private int uniqMatchingPeptideCount;
     private int spectrumCount;
+    private String nonUniqMatchingPeptideGroupIdsString;
+    private String uniqMatchingPeptideGroupIdsString;
     
     public WIdPickerProteinGroup(IdPickerProteinGroup protGrp) {
         
@@ -26,6 +29,8 @@ public class WIdPickerProteinGroup {
         this.matchingPeptideCount = protGrp.getMatchingPeptideCount();
         this.uniqMatchingPeptideCount = protGrp.getUniqMatchingPeptideCount();
         this.spectrumCount = protGrp.getSpectrumCount();
+        this.uniqMatchingPeptideGroupIdsString = protGrp.getUniqMatchingPeptideGroupIdsString();
+        this.nonUniqMatchingPeptideGroupIdsString = protGrp.getNonUniqMatchingPeptideGroupIdsString();
     }
     
     public int getGroupId() {
@@ -44,8 +49,16 @@ public class WIdPickerProteinGroup {
         return matchingPeptideCount;
     }
     
+    public void setMatchingPeptideCount(int count) {
+        this.matchingPeptideCount = count;
+    }
+    
     public int getUniqMatchingPeptideCount() {
         return uniqMatchingPeptideCount;
+    }
+    
+    public void setUniqMatchingPeptideCount(int count) {
+        this.uniqMatchingPeptideCount = count;
     }
     
     public int getSpectrumCount() {
@@ -55,5 +68,12 @@ public class WIdPickerProteinGroup {
     public List<WIdPickerProtein> getProteins() {
         return proteins;
     }
-   
+    
+    public String getNonUniqMatchingPeptideGroupIdsString() {
+       return this.nonUniqMatchingPeptideGroupIdsString;
+    }
+    
+    public String getUniqMatchingPeptideGroupIdsString() {
+       return this.uniqMatchingPeptideGroupIdsString;
+    }
 }
