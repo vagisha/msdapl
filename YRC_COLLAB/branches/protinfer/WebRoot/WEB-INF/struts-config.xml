@@ -1087,8 +1087,8 @@
 		scope="request"
 		validate="true"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult3.jsp" redirect="false" />
-		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult3.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 	</action>
 	
 	<action 
