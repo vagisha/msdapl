@@ -40,6 +40,14 @@
         AND db.id = pr.databaseID
     </select>
     
+    <select id="selectDbProteinForDbIdProteinId" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND proteinID = #proteinId#
+    </select>
+    
+    
     <select id="selectDbProteinIdForDbName" resultClass="Integer" parameterClass="java.util.Map"> 
         SELECT pr.id
         FROM tblDatabase as db, tblProteinDatabase as pr 
@@ -90,6 +98,16 @@
     	FROM tblProtein AS prot 
     	INNER JOIN tblProteinSequence AS seq ON prot.sequenceID = seq.id 
     	WHERE prot.id = #id#
+    </select>
+    
+    <select id="selectProteinSequenceForNrDbProt" resultClass="String" parameterClass="Integer">
+    	SELECT seq.sequence 
+    	FROM tblProteinSequence as seq,
+    	tblProtein AS prot, 
+    	tblProteinDatabase AS dbProt
+    	WHERE seq.id = prot.sequenceID
+    	AND prot.id = dbProt.proteinID
+    	AND dbProt.id = #id#
     </select>
     
 </sqlMap>

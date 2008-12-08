@@ -129,6 +129,20 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+    public static NrDbProtein getDbProtein(int databaseId, int proteinId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("dbId", databaseId);
+        map.put("proteinId", proteinId);
+        String statementName = "NrSeq.selectDbProteinForDbIdProteinId";
+        try {
+            return  (NrDbProtein) sqlMap.queryForObject(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     /**
      * 
      * @param databaseId
@@ -253,6 +267,17 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         String statementName = "NrSeq.selectProteinSequence";
         try {
             return (String) sqlMap.queryForObject(statementName, proteinId);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
+    public static String getProteinSequenceForNrSeqDbProtId(int nrDbProtId) {
+        String statementName = "NrSeq.selectProteinSequenceForNrDbProt";
+        try {
+            return (String) sqlMap.queryForObject(statementName, nrDbProtId);
         }
         catch (SQLException e) {
             log.error("Failed to execute select statement: ", e);
