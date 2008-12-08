@@ -8,7 +8,6 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 import edu.uwpr.protinfer.database.dao.GenericProteinferSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch;
 
 public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericProteinferSpectrumMatchDAO<IdPickerSpectrumMatch> {
@@ -40,8 +39,8 @@ public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericPr
         return psmDao.getSpectrumMatchIdsForPinferRun(pinferId);
     }
 
-    public List<ProteinferSpectrumMatch> getSpectrumMatchesForPinferRunAndRunSearch(
-            int pinferId, int runSearchId) {
-        return psmDao.getSpectrumMatchesForPinferRunAndRunSearch(pinferId, runSearchId);
+    public List<Integer> getSpectrumMatchIdsForPinferRunAndRunSearch(int pinferId, int runSearchId) {
+        return psmDao.getSpectrumMatchIdsForPinferRunAndRunSearch(pinferId, runSearchId);
     }
+    
 }

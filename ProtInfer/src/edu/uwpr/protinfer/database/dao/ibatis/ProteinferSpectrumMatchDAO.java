@@ -35,10 +35,10 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements Generic
         return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferId", pinferId);
     }
     
-    public List<ProteinferSpectrumMatch> getSpectrumMatchesForPinferRunAndRunSearch(int pinferId, int runSearchId) {
+    public List<Integer> getSpectrumMatchIdsForPinferRunAndRunSearch(int pinferId, int runSearchId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
         map.put("runSearchId", runSearchId);
-        return super.queryForList(sqlMapNameSpace+".selectMatchesForPinferIdAndRunSearch", map);
+        return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferIdRunSearchId", map);
     }
 }

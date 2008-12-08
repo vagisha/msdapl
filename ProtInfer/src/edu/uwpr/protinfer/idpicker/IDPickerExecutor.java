@@ -112,7 +112,8 @@ public class IDPickerExecutor {
             int nrseqProteinId = prot.getProteinId();
             String proteinSeq = null;
             try {
-                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
+                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
+//                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
             }
             catch (Exception e) {
                 log.error("Exception getting nrseq protein for proteinId: "+nrseqProteinId, e);
@@ -224,7 +225,8 @@ public class IDPickerExecutor {
                    else
                        nrseqIdMap.put(pr.getAccession(), nrDbProt);
                }
-               pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+               pr.setId(nrDbProt.getId());
+//               pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
                pr.setAccession(nrDbProt.getAccessionString()); // this will set the correct accession; 
                                                                // SQT files sometimes have truncated accessions
            }
@@ -454,7 +456,7 @@ public class IDPickerExecutor {
     public static void main(String[] args) {
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.getProteinferRun(4);
+        IdPickerRun run = runDao.getProteinferRun(1);
         System.out.println("Number of files: "+run.getInputSummaryList().size());
         System.out.println("Number of filters: "+run.getFilters().size());
         

@@ -1,7 +1,8 @@
-DROP DATABASE IF EXISTS proteinfer_test;
-CREATE DATABASE proteinfer_test;
-USE proteinfer_test;
+#DROP DATABASE IF EXISTS proteinfer_test;
+#CREATE DATABASE proteinfer_test;
+#USE proteinfer_test;
 
+DROP TABLE IF EXISTS msProteinInferRun;
 CREATE TABLE msProteinInferRun (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	program VARCHAR(255) NOT NULL,
@@ -9,12 +10,9 @@ CREATE TABLE msProteinInferRun (
 	comments TEXT(10)
 );
 
-CREATE TABLE IDPickerRunSummary (
-	piRunID INT UNSIGNED NOT NULL PRIMARY KEY,
-	numUnfilteredProteins INT UNSIGNED,
-	numUnfilteredPeptides INT UNSIGNED
-);
 
+
+DROP TABLE IF EXISTS msProteinInferInput;
 CREATE TABLE msProteinInferInput (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     piRunID INT UNSIGNED NOT NULL,
@@ -23,21 +21,9 @@ CREATE TABLE msProteinInferInput (
 ALTER TABLE msProteinInferInput ADD INDEX (piRunID);
 ALTER TABLE msProteinInferInput ADD INDEX (runSearchID);
 
-CREATE TABLE IDPickerInputSummary (
-	piInputID INT UNSIGNED NOT NULL PRIMARY KEY,
-	numTargetHits INT UNSIGNED,
-    numDecoyHits INT UNSIGNED,
-    numFilteredTargetHits INT UNSIGNED
-);
 
-CREATE TABLE IDPickerFilter (
-	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    piRunID INT UNSIGNED NOT NULL,
-    filterName VARCHAR(255) NOT NULL,
-   	filterValue VARCHAR(255)
-);
-ALTER TABLE  IDPickerFilter ADD INDEX (piRunID);
 
+DROP TABLE IF EXISTS msProteinInferProtein;
 CREATE TABLE msProteinInferProtein (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	nrseqProteinID INT UNSIGNED NOT NULL,
@@ -49,31 +35,27 @@ CREATE TABLE msProteinInferProtein (
 ALTER TABLE  msProteinInferProtein ADD INDEX (piRunID);
 ALTER TABLE  msProteinInferProtein ADD INDEX (nrseqProteinID);
 
-CREATE TABLE IDPickerProtein (
-	piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
-	clusterID INT UNSIGNED NOT NULL,
-    groupID INT UNSIGNED NOT NULL,
-    isParsimonious TINYINT NOT NULL DEFAULT 0
-);
 
 
+DROP TABLE IF EXISTS msProteinInferPeptide;
 CREATE TABLE msProteinInferPeptide (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	sequence VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IDPickerPeptide (
-	piPeptideID INT UNSIGNED NOT NULL PRIMARY KEY,
-	groupID INT UNSIGNED NOT NULL
-);
 
-#CREATE TABLE proteinferIon(
+
+# DROP TABLE IF EXISTS msProteinInferIon;
+#CREATE TABLE msProteinInferIon(
 #	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-#	pinferPeptideID INT UNSIGNED NOT NULL,
+#	pieptideID INT UNSIGNED NOT NULL,
 #	charge INT UNSIGNED NOT NULL,
-#  	modificationStateID INT UNSIGNED NOT NULL
+#  modificationStateID INT UNSIGNED NOT NULL
 #);
 
+
+
+DROP TABLE IF EXISTS msProteinInferProteinPeptideMatch;
 CREATE TABLE msProteinInferProteinPeptideMatch (
     piProteinID INT UNSIGNED NOT NULL,
     piPeptideID INT UNSIGNED NOT NULL
@@ -81,14 +63,8 @@ CREATE TABLE msProteinInferProteinPeptideMatch (
 ALTER TABLE msProteinInferProteinPeptideMatch ADD PRIMARY KEY (piProteinID, piPeptideID);
 
 
-CREATE TABLE IDPickerGroupAssociation (
-	piRunID INT UNSIGNED NOT NULL,
-	proteinGroupID INT UNSIGNED NOT NULL,
-	peptideGroupID INT UNSIGNED NOT NULL
-);
-ALTER TABLE IDPickerGroupAssociation ADD INDEX(piRunID);
 
-
+DROP TABLE IF EXISTS msProteinInferSpectrumMatch;
 CREATE TABLE msProteinInferSpectrumMatch (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     msRunSearchResultID INT UNSIGNED NOT NULL,
@@ -98,14 +74,79 @@ ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (msRunSearchResultID);
 ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piPeptideID);
 
 
+
+#####################################################################
+# IDPicker Tables
+#####################################################################
+DROP TABLE IF EXISTS IDPickerRunSummary;
+CREATE TABLE IDPickerRunSummary (
+	piRunID INT UNSIGNED NOT NULL PRIMARY KEY,
+	numUnfilteredProteins INT UNSIGNED,
+	numUnfilteredPeptides INT UNSIGNED
+);
+
+
+
+DROP TABLE IF EXISTS IDPickerInputSummary;
+CREATE TABLE IDPickerInputSummary (
+	piInputID INT UNSIGNED NOT NULL PRIMARY KEY,
+	numTargetHits INT UNSIGNED,
+    numDecoyHits INT UNSIGNED,
+    numFilteredTargetHits INT UNSIGNED
+);
+
+
+
+DROP TABLE IF EXISTS IDPickerFilter;
+CREATE TABLE IDPickerFilter (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    piRunID INT UNSIGNED NOT NULL,
+    filterName VARCHAR(255) NOT NULL,
+   	filterValue VARCHAR(255)
+);
+ALTER TABLE  IDPickerFilter ADD INDEX (piRunID);
+
+
+
+DROP TABLE IF EXISTS IDPickerProtein;
+CREATE TABLE IDPickerProtein (
+	piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
+	clusterID INT UNSIGNED NOT NULL,
+    groupID INT UNSIGNED NOT NULL,
+    isParsimonious TINYINT NOT NULL DEFAULT 0
+);
+ALTER TABLE IDPickerProtein ADD INDEX(clusterID);
+ALTER TABLE IDPickerProtein ADD INDEX(groupID);
+
+
+
+DROP TABLE IF EXISTS IDPickerPeptide;
+CREATE TABLE IDPickerPeptide (
+	piPeptideID INT UNSIGNED NOT NULL PRIMARY KEY,
+	groupID INT UNSIGNED NOT NULL
+);
+ALTER TABLE IDPickerPeptide ADD INDEX(groupID);
+
+
+DROP TABLE IF EXISTS IDPickerGroupAssociation;
+CREATE TABLE IDPickerGroupAssociation (
+	piRunID INT UNSIGNED NOT NULL,
+	proteinGroupID INT UNSIGNED NOT NULL,
+	peptideGroupID INT UNSIGNED NOT NULL
+);
+ALTER TABLE IDPickerGroupAssociation ADD PRIMARY KEY(piRunID, proteinGroupID, peptideGroupID);
+
+
+DROP TABLE IF EXISTS IDPickerSpectrumMatch;
 CREATE TABLE IDPickerSpectrumMatch (
 	piSpectrumMatchID INT UNSIGNED NOT NULL PRIMARY KEY,
 	fdr DOUBLE UNSIGNED
 );
 
 
-
+#####################################################################
 # TRIGGERS TO ENSURE CASCADING DELETES
+#####################################################################
 
 DELIMITER |
 CREATE TRIGGER msProteinInferSpectrumMatch_bdelete BEFORE DELETE ON msProteinInferSpectrumMatch
@@ -122,7 +163,15 @@ CREATE TRIGGER msProteinInferPeptide_bdelete BEFORE DELETE ON msProteinInferPept
  BEGIN
    DELETE FROM msProteinInferSpectrumMatch WHERE piPeptideID = OLD.id;
    DELETE FROM IDPickerPeptide WHERE piPeptideID = OLD.id;
-   DELETE FROM msProteinInferProteinPeptideMatch WHERE piPeptideID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msProteinInferProteinPeptideMatch_bdelete BEFORE DELETE ON msProteinInferProteinPeptideMatch
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM msProteinInferPeptide WHERE id = OLD.piPeptideID;
  END;
 |
 DELIMITER ;

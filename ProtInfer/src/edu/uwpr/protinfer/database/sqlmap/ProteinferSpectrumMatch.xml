@@ -24,31 +24,31 @@
     	SELECT * FROM msProteinInferSpectrumMatch WHERE piPeptideID = #id#
     </select>
     
-    <select id="selectMatchIdsForPinferId" resultClass="Integer" parameterClass="Integer">
-    	SELECT psm.msRunSearchResultID 
-    	FROM msProteinInferSpectrumMatch AS psm, 
-    	msProteinInferPeptide AS pep
-    	msProteinInferProteinPeptideMatch AS match,
-    	msProteinInferProtein AS prot
-    	WHERE prot.piRunID=#id#
-    	AND prot.id = match.piProteinID
-    	AND match.pepID = pep.id
-    	AND pep.id = psm.piPeptideID
-    </select>
-    
-    <select id="selectMatchesForPinferIdAndRunSearch" resultMap="pinferSMatchResult" parameterClass="java.util.Map">
-    	SELECT * 
+    <select id="selectMatchIdsForPinferId" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT DISTINCT psm.id 
     	FROM msProteinInferSpectrumMatch AS psm, 
     	msProteinInferPeptide AS pept, 
     	msProteinInferProtein as prot,
-    	msProteinInferProteinPeptideMatch as match,
-    	msProteinInferInput as input
-    	WHERE input.runSearchID=#runSearchId#
-    	AND input.piRunID=#id#
-    	AND input.piRunID=prot.piRunID
-    	AND prot.id = match.piProteinID
-    	AND match.pepID = pep.id
-    	AND pep.id = psm.piPeptideID
+    	msProteinInferProteinPeptideMatch as mtch
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = mtch.piProteinID
+    	AND mtch.piPeptideID = pept.id
+    	AND pept.id = psm.piPeptideID
+    </select>
+    
+    <select id="selectMatchIdsForPinferIdRunSearchId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT psm.id 
+    	FROM msProteinInferSpectrumMatch AS psm,
+    	msRunSearchResult AS msRes, 
+    	msProteinInferPeptide AS pept, 
+    	msProteinInferProtein as prot,
+    	msProteinInferProteinPeptideMatch as mtch
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = mtch.piProteinID
+    	AND mtch.piPeptideID = pept.id
+    	AND pept.id = psm.piPeptideID
+    	AND msRes.id = psm.msRunSearchResultID
+    	AND msRes.runSearchID = #runSearchId#
     </select>
     
     <insert id="insert" parameterMap="pinferSMatchParam">

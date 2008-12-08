@@ -1,6 +1,8 @@
 package edu.uwpr.protinfer.database.dto.idpicker;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import edu.uwpr.protinfer.database.dto.BaseProteinferRun;
@@ -34,6 +36,14 @@ public class IdPickerRun extends BaseProteinferRun<IdPickerInputSummary> {
         return filters;
     }
 
+    public List<IdPickerFilter> getSortedFilters() {
+        Collections.sort(filters, new Comparator<IdPickerFilter>(){
+            public int compare(IdPickerFilter o1, IdPickerFilter o2) {
+                return o1.getFilterName().compareTo(o2.getFilterName());
+            }});
+        return filters;
+    }
+    
     public void setFilters(List<IdPickerFilter> filter) {
         this.filters = filter;
     }

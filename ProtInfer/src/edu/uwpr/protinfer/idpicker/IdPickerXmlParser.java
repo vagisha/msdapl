@@ -1,10 +1,7 @@
 package edu.uwpr.protinfer.idpicker;
 
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,9 +13,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.SequestHit;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
@@ -29,17 +26,17 @@ public class IdPickerXmlParser {
 
     private Map<Integer, Protein> proteinList;
     private Map<Integer, PeptideHit> peptideHits;
-    private List<SequestHit> searchHits;
+    private List<SequestSearchResult> searchHits;
     XMLStreamReader reader = null;
 
     
     public IdPickerXmlParser() {
         proteinList = new HashMap<Integer, Protein>();
         peptideHits = new HashMap<Integer, PeptideHit>();
-        searchHits = new ArrayList<SequestHit>();
+        searchHits = new ArrayList<SequestSearchResult>();
     }
     
-    public List<SequestHit> getAcceptedHits() {
+    public List<SequestSearchResult> getAcceptedHits() {
         return searchHits;
     }
     
@@ -128,9 +125,9 @@ public class IdPickerXmlParser {
             if (prHit.getAccession().startsWith("rev_"))
                 return false; // this is a hit to the decoy database;
         }
-        SequestHit hit = new SequestHit(source, scan, charge, pHit);
-        hit.getSpectrumMatch().setFdr(fdr);
-        searchHits.add(hit);
+//        SequestSearchResultBean hit = new SequestSearchResultBean(source, scan, charge, pHit);
+//        hit.getSpectrumMatch().setFdr(fdr);
+//        searchHits.add(hit);
         return true; // this is a hit to the target database;
     }
     
@@ -263,28 +260,28 @@ public class IdPickerXmlParser {
         IdPickerXmlParser parser = new IdPickerXmlParser();
         parser.readXml(filePath);
         parser.close();
-        try {
-            printAcceptedHits("TEST_DATA/for_vagisha/18mix/idpicker/interact", parser.getAcceptedHits());
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            printAcceptedHits("TEST_DATA/for_vagisha/18mix/idpicker/interact", parser.getAcceptedHits());
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
     
-    private static void printAcceptedHits(String runName,
-            List<SequestHit> acceptedHits) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
-        for (SequestHit hit: acceptedHits) {
-            writer.write(hit.getScanNumber()+"\t"+hit.getCharge()+"\t"+hit.getXcorr()
-                    +"\t"+hit.getSpectrumMatch().getFdr());
-            writer.write("\t"+hit.getPeptideHit().getModifiedSequence());
-            StringBuilder buf = new StringBuilder();
-            for (ProteinHit p: hit.getPeptideHit().getProteinList()) {
-                buf.append(","+p.getAccession());
-            }
-            buf.deleteCharAt(0);
-            writer.write("\t"+buf.toString()+"\n");
-        }
-        writer.close();
-    }
+//    private static void printAcceptedHits(String runName,
+//            List<SequestHit> acceptedHits) throws IOException {
+//        BufferedWriter writer = new BufferedWriter(new FileWriter(runName+".psm"));
+//        for (SequestHit hit: acceptedHits) {
+//            writer.write(hit.getScanNumber()+"\t"+hit.getCharge()+"\t"+hit.getXcorr()
+//                    +"\t"+hit.getSpectrumMatch().getFdr());
+//            writer.write("\t"+hit.getPeptideHit().getModifiedSequence());
+//            StringBuilder buf = new StringBuilder();
+//            for (ProteinHit p: hit.getPeptideHit().getProteinList()) {
+//                buf.append(","+p.getAccession());
+//            }
+//            buf.deleteCharAt(0);
+//            writer.write("\t"+buf.toString()+"\n");
+//        }
+//        writer.close();
+//    }
 }
