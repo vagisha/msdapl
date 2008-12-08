@@ -112,8 +112,8 @@ public class IDPickerExecutor {
             int nrseqProteinId = prot.getProteinId();
             String proteinSeq = null;
             try {
-                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
-//                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
+//                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
+                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
             }
             catch (Exception e) {
                 log.error("Exception getting nrseq protein for proteinId: "+nrseqProteinId, e);
@@ -225,8 +225,8 @@ public class IDPickerExecutor {
                    else
                        nrseqIdMap.put(pr.getAccession(), nrDbProt);
                }
-               pr.setId(nrDbProt.getId());
-//               pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+//               pr.setId(nrDbProt.getId());
+               pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
                pr.setAccession(nrDbProt.getAccessionString()); // this will set the correct accession; 
                                                                // SQT files sometimes have truncated accessions
            }
