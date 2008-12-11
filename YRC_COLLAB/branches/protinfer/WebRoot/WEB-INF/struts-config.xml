@@ -1118,6 +1118,18 @@
 		<forward name="Success" path="/pages/internal/proteinfer/proteinDetails.jsp" redirect="false" />
 	</action>
 	
+	<action
+		path="/saveProteinAnnotation"
+		type="org.yeastrc.www.proteinfer.SaveProteinAnnotationAjaxAction"
+	>
+	</action>
+	
+	<action
+		path="/deleteProteinAnnotation"
+		type="org.yeastrc.www.proteinfer.DeleteProteinAnnotationAjaxAction"
+	>
+	</action>
+	
 	<action 
 		path="/psmMatches"
 		type="org.yeastrc.www.proteinfer.PeptideSequenceMatchesAjaxAction"

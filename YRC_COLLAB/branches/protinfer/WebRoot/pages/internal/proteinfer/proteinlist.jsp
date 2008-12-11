@@ -34,21 +34,39 @@
 </div>
 
 
+
+<!-- Protein Annotation Dialog -->
+<div id="prot_annot_dialog" class="flora" title="Annotate Protein">
+	<input type="hidden" id="prot_id" value="" />
+	Protein: <b><span id="prot_name"></span></b><br>
+	<input type="radio" name="annotate" value="Accept" id="prot_accept" checked="checked"/>
+	Accept	
+	<input type="radio" name="annotate" value="Reject" id="prot_reject"/>
+	Reject
+	<input type="radio" name="annotate" value="Not Sure" id="prot_notsure" />
+	Not Sure
+	<br>
+	<textarea name="comments" rows="4" cols="45" id="prot_comments"></textarea>
+</div>
+
+			
+
 <table cellpadding="4" cellspacing="2" align="center" width="99%"  id="protlisttable">
 
 	<logic:notEmpty name="proteinGroups">
 		<thead>
 		<tr>
 		<th class="sort-int" width="1%"><b><font size="2pt">Protein Group</font></b></th>
-		<th class="sort-alpha" width="1%"><b><font size="2pt">&nbsp;</font></b></th>
 		
 		<!-- Make Protein and Description columsn sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="proteinInferFilterForm" property="joinGroupProteins" value="true">
+			<th width="1%"><b><font size="2pt">&nbsp;</font></b></th>
 			<th><b><font size="2pt">Protein</font></b></th>
 			<th><b><font size="2pt">Description</font></b></th>
 		</logic:equal>
 		
 		<logic:equal name="proteinInferFilterForm" property="joinGroupProteins" value="false">
+			<th class="sort-alpha-annot" width="1%"><b><font size="2pt">&nbsp;</font></b></th>
 			<th class="sort-alpha"><b><font size="2pt">Protein</font></b></th>
 			<th class="sort-alpha"><b><font size="2pt">Description</font></b></th>
 		</logic:equal>
@@ -78,10 +96,47 @@
 				<bean:write name="proteinGroup" property="groupId" />
 			</td>
 		
-			<td><span id="<bean:write name="protein" property="protein.id" />" class="editprotannot"
-				style="text-decoration: underline; cursor: pointer">Edit</span>
-				<div id="dialog_<bean:write name="protein" property="protein.id" />" class="flora">*</div></td>
 			<td>
+			<span id="<bean:write name="protein" property="protein.id" />"
+				title="<bean:write name="protein" property="accession" />" 
+				class="editprotannot"
+				style="text-decoration: underline; cursor: pointer" >
+				
+				<!-- Are there user entered comments for this protein -->
+				<logic:present name="protein" property="protein.userAnnotation">
+					<span id="annot_comment_<bean:write name="protein" property="protein.id" />" style="display: none;">
+						<bean:write name="protein" property="protein.userAnnotation" />
+					</span>
+				</logic:present>
+				<logic:notPresent name="protein" property="protein.userAnnotation">
+					<span id="annot_comment_<bean:write name="protein" property="protein.id" />" style="display: none;"></span>
+				</logic:notPresent>
+				
+				<!-- User entered validation -->
+				<logic:present name="protein" property="protein.userValidation">
+					<span 
+					class="prot_annot_<bean:write name="protein" property="protein.userValidation.statusChar" />"
+					id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
+					<span 
+					class="sort_key"
+					style="display: none;"
+					id="annot_validation_text_<bean:write name="protein" property="protein.id" />"><bean:write name="protein" property="protein.userValidation.statusChar" /></span>
+				</logic:present>
+				
+				<logic:notPresent name="protein" property="protein.userValidation">
+					<span 
+					class="prot_annot_U"
+					id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
+					<span 
+					class="sort_key"
+					style="display: none;"
+					id="annot_validation_text_<bean:write name="protein" property="protein.id" />">U</span>
+				</logic:notPresent>
+					
+			</span>
+			</td>
+			
+			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
@@ -149,9 +204,46 @@
 			<tr class="protgrp_row linked_row">
 		<%} %>
 		
-		<td><span id="<bean:write name="protein" property="protein.id" />" class="editprotannot"
-			style="text-decoration: underline; cursor: pointer">Edit</span>
-			<div id="dialog_<bean:write name="protein" property="protein.id" />" class="flora">*</div></td>
+		<td>
+		<span id="<bean:write name="protein" property="protein.id" />"
+				title="<bean:write name="protein" property="accession" />" 
+				class="editprotannot"
+				style="text-decoration: underline; cursor: pointer" >
+				
+			<!-- Are there user entered comments for this protein -->
+			<logic:present name="protein" property="protein.userAnnotation">
+				<span id="annot_comment_<bean:write name="protein" property="protein.id" />" style="display: none;">
+					<bean:write name="protein" property="protein.userAnnotation" />
+				</span>
+			</logic:present>
+			<logic:notPresent name="protein" property="protein.userAnnotation">
+				<span id="annot_comment_<bean:write name="protein" property="protein.id" />" style="display: none;"></span>
+			</logic:notPresent>
+			
+			<!-- User entered validation -->
+			<logic:present name="protein" property="protein.userValidation">
+				<span 
+				class="prot_annot_<bean:write name="protein" property="protein.userValidation.statusChar" />"
+				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
+				<span 
+				class="sort_key"
+				style="display: none;"
+				id="annot_validation_text_<bean:write name="protein" property="protein.id" />"><bean:write name="protein" property="protein.userValidation.statusChar" /></span>
+			</logic:present>
+			
+			<logic:notPresent name="protein" property="protein.userValidation">
+				<span 
+				class="prot_annot_U"
+				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
+				<span 
+				class="sort_key"
+				style="display: none;"
+				id="annot_validation_text_<bean:write name="protein" property="protein.id" />">U</span>
+			</logic:notPresent>
+					
+		</span>
+		</td>
+		
 		<td>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>

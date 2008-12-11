@@ -32,6 +32,39 @@ p.tooltip {
 	display:none;
 }
 
+.prot_annot_U {
+	display:block;
+	border: 1px solid gray;
+	width: 10px;
+	height: 10px;	
+}
+
+.prot_annot_A {
+	display:block;
+	border: 1px solid gray;
+	background: green;
+	width: 10px;
+	height: 10px;	
+}
+
+.prot_annot_R {
+	display:block;
+	border: 1px solid gray;
+	background: red;
+	width: 10px;
+	height: 10px;	
+}
+
+.prot_annot_N {
+	display:block;
+	border: 1px solid gray;
+	background: yellow;
+	width: 10px;
+	height: 10px;	
+}
+
+
+
 /* COPIED FROM JQUERY UI's ui.all.css */
 /*slider*/
 .ui-slider { width: 200px; height: 23px; position: relative; background-repeat: no-repeat; background-position: center center; }
@@ -163,7 +196,7 @@ p.tooltip {
 .flora .ui-dialog .ui-dialog-titlebar,
 .flora.ui-dialog .ui-dialog-titlebar {
 	border-bottom: 1px solid #d8d2aa;
-	background: #ff9900 url(i/dialog-title.gif) repeat-x;
+	background: #3D902A ;
 	padding: 0px;
 	height: 28px;
 	_height: 29px;
@@ -183,7 +216,7 @@ p.tooltip {
 .flora.ui-dialog .ui-dialog-titlebar-close {
 	width: 16px;
 	height: 16px;
-	background: url(i/dialog-titlebar-close.png) no-repeat;
+	background: url(../images/proteinfer/dialog-titlebar-close.png) no-repeat;
 	position:absolute;
 	top: 6px;
 	right: 7px;
@@ -197,7 +230,7 @@ p.tooltip {
 
 .flora .ui-dialog .ui-dialog-titlebar-close-hover,
 .flora.ui-dialog .ui-dialog-titlebar-close-hover {
-	background: url(i/dialog-titlebar-close-hover.png) no-repeat;
+	background: url(../images/proteinfer/dialog-titlebar-close-hover.png) no-repeat;
 }
 
 .flora .ui-dialog .ui-dialog-title,

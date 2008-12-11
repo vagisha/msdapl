@@ -1,21 +1,23 @@
-/*
- * Tooltip script 
- * powered by jQuery (http://www.jquery.com)
- * 
- * written by Alen Grakalic (http://cssglobe.com)
- * 
- * for more info visit http://cssglobe.com/post/1695/easiest-tooltip-and-image-preview-using-jquery
- *
- */
+//
+// Tooltip script 
+// powered by jQuery (http://www.jquery.com)
+// 
+// written by Alen Grakalic (http://cssglobe.com)
+// 
+// for more info visit http://cssglobe.com/post/1695/easiest-tooltip-and-image-preview-using-jquery
+//
+//
+
+//starting the script on page load
 
 
-function tooltip() {
-	/* CONFIG */		
+this.tooltip = function() {
+	//CONFIG		
 	var xOffset = 10;
 	var yOffset = 20;		
 	// these 2 variable determine popup's distance from the cursor
 	// you might want to adjust to get the right result		
-	/* END CONFIG */		
+	//END CONFIG		
 	$(".tooltip").hover(function(e){
 		this.t = this.title;
 		this.title = "";									  
@@ -30,9 +32,4 @@ function tooltip() {
 		$("#tooltip").css("top",(e.pageY - xOffset) + "px").css("left",(e.pageX + yOffset) + "px");
 	});	
 }
-
-// starting the script on page load
-$(document).ready(function(){
-	tooltip();
-});
 

@@ -6,9 +6,9 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js" ></script>
+<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js"></script><script type="text/javascript" src="/yrc/js/jquery-impromptu.1.6.js"></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.tabs.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.slider.js"></script>
+
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.dialog.js"></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.draggable.js"></script>
 <script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.resizable.js"></script>
@@ -173,23 +173,119 @@ $(document).ready(function() {
   		}
   	});
   	
-  	$(".editprotannot").click(function(){
-  		var nrseqid = this.id;
-  		$("#dialog_"+nrseqid).dialog({ 
-    	modal: true, 
+    $("#prot_annot_dialog").dialog({
+    	autoOpen: false,
+    	modal: true,
+    	width: 400,
+    	height: 200,
     	overlay: { 
-        opacity: 0.5, 
-        background: "black",
-        buttons: { 
-        	"Ok": function() { 
-            	alert("Ok"); 
-        	}, 
-        	"Cancel": function() { 
-            	$(this).dialog("close"); 
-        	} 
-    	  } 
-    	} 
+        	opacity: 0.5, 
+        	background: "black" 
+    	},
+    	buttons: {
+    		"Save": 		function() {
+    			
+    			var accept = $("#prot_accept").attr("checked");
+    			var reject = $("#prot_reject").attr("checked");
+    			var notsure = $("#prot_notsure").attr("checked");
+    			var protid = $("#prot_id").val();
+    			var comments = $("#prot_comments").val();
+    			var validation = "U";
+    			if(accept)	validation = 'A';
+    			if(reject)	validation = 'R';
+    			if(notsure) validation = 'N';
+    			
+    			// send a request to update the annotation for this protein
+    			$.post("saveProteinAnnotation.do",
+    					{'pinferProtId': protid,
+    					 'comments': comments,
+    					 'validation': validation
+    					},
+    					function(data) {
+    						if(data == "OK") {
+    							if(comments != null && comments.length > 0) {
+									$("#annot_comment_"+protid).text(comments);
+									$("#annot_validation_style_"+protid).addClass('prot_annot_U');
+								}
+
+				    			if(accept) {
+				    				$("#annot_validation_style_"+protid).removeClass();
+				    				$("#annot_validation_style_"+protid).addClass('prot_annot_A');
+				    			}
+								else if (reject) {
+									$("#annot_validation_style_"+protid).removeClass();
+									$("#annot_validation_style_"+protid).addClass('prot_annot_R');
+								}
+								else if (notsure) {
+									$("#annot_validation_style_"+protid).removeClass();
+									$("#annot_validation_style_"+protid).addClass('prot_annot_N');
+								}
+					
+								$("#annot_validation_text_"+protid).text(validation);
+    						}
+    						else {
+    							alert("Error saving protein annotation.\n"+data);
+    						}
+    					});
+    			
+    			$(this).dialog("close");
+    			
+    		},
+    		"Delete": function() {
+    			var protid = $("#prot_id").val();
+    			$.post("deleteProteinAnnotation.do",
+    					{'pinferProtId': protid},
+    					function(data) {
+    						if(data == "OK") {
+    							$("#annot_comment_"+protid).text();
+    							$("#annot_validation_text_"+protid).text('U');
+								$("#annot_validation_style_"+protid).removeClass();
+								$("#annot_validation_style_"+protid).addClass('prot_annot_U');
+    						}
+    						else {
+    							alert("Error deleting protein annotation.\n"+data);
+    						}
+    			});
+    			$(this).dialog("close");
+    		},
+    		"Cancel": 	function() {$(this).dialog("close");}
+    	}
     });
+  	
+  	$(".editprotannot").click(function(e){
+  		
+  		var protid = this.id;
+  		var protname = this.title;
+  		// set the values for the protein that the user is editing
+  		$("#prot_id").val(protid);
+  		$("#prot_name").text(protname);
+  		
+  		// reset the dialog
+  		var comment = $("#annot_comment_"+protid).text();
+  		var validation = $("#annot_validation_text_"+protid).text();
+  		
+  		if(comment != null)
+  			$("#prot_comments").val(comment);
+  		else
+  			$("#prot_comments").val("");
+  			
+  		$("#prot_accept").attr("checked", "");
+  		$("#prot_reject").attr("checked", "");
+  		$("#prot_notsure").attr("checked", "");
+  		
+  		if(validation == "A" || validation == "U")	
+  			$("#prot_accept").attr("checked", "checked");
+  		
+  		else if(validation == "R")
+  			$("#prot_reject").attr("checked", "checked");
+  			
+  		else if(validation == "N") 
+  			$("#prot_notsure").attr("checked", "checked");
+  		
+  		
+  		// show the dialog
+  		$("#prot_annot_dialog").dialog('open');
+  		
 	});
   }
   
@@ -199,48 +295,6 @@ $(document).ready(function() {
   	$(".stripe_table tbody > tr:odd").addClass("ms_A");
   	
   	setupProteinListTable();
-  	
-  	$("#coverage").slider({
-  		min: 0, 
-        max: 100, 
-        stop: function(e, ui) { 
-        	$("#coverage_val").text(Math.round(ui.value));
-        }, 
-        slide: function(e, ui) { 
-            $("#coverage_val").text(Math.round(ui.value));
-        } 
-  	});
-  	$("#peptcnt").slider({
-  		min: <%= (Integer)request.getAttribute("minPeptides")%>, 
-        max: <%= (Integer)request.getAttribute("maxPeptides")%>, 
-        startValue: <%= (Integer)request.getAttribute("minPeptides")%>,
-        stop: function(e, ui) { 
-        	$("#peptcnt_val").text(Math.round(ui.value));
-        }, 
-        slide: function(e, ui) { 
-            $("#peptcnt_val").text(Math.round(ui.value));
-        } 
-  	});
-  	$("#uniqpeptcnt").slider({
-  		min: 0, 
-        max: <%= (Integer)request.getAttribute("maxUniqPeptides")%>, 
-        stop: function(e, ui) { 
-        	$("#uniqpeptcnt_val").text(Math.round(ui.value));
-        }, 
-        slide: function(e, ui) { 
-            $("#uniqpeptcnt_val").text(Math.round(ui.value));
-        } 
-  	});
-  	$("#spectracnt").slider({
-  		min: 1, 
-        max: <%= (Integer)request.getAttribute("maxSpectra")%>, 
-        stop: function(e, ui) { 
-        	$("#spectracnt_val").text(Math.round(ui.value));
-        }, 
-        slide: function(e, ui) { 
-            $("#spectracnt_val").text(Math.round(ui.value));
-        } 
-  	});
   	
   	
   	// add a click handler to the filter button
@@ -564,7 +618,8 @@ $(document).ready(function() {
   	var $table = table;
   	$('th', $table).each(function(column) {
     		
-    		if ($(this).is('.sort-alpha') || $(this).is('.sort-int') || $(this).is('.sort-float') ) {
+    		if ($(this).is('.sort-alpha') || $(this).is('.sort-int') || $(this).is('.sort-float') 
+    						|| $(this).is('.sort-alpha-annot')) {
     		
     			var $header = $(this);
         		$(this).addClass('clickable').hover(
@@ -586,6 +641,13 @@ $(document).ready(function() {
           				if ($header.is('.sort-alpha')) {
           					$.each(rows, function(index, row) {
   								row.sortKey = $(row).children('td').eq(column).text().toUpperCase();
+							});
+						}
+						
+						if ($header.is('.sort-alpha-annot')) {
+          					$.each(rows, function(index, row) {
+          						var $cell = $(row).children('td').eq(column);
+  								row.sortKey = $(".sort_key", $cell).text().toUpperCase();
 							});
 						}
 						
@@ -650,8 +712,14 @@ $(document).ready(function() {
 
 <CENTER>
 
-<yrcwww:contentbox title="IDPicker Results" centered="true" width="1000" scheme="ms">
+<yrcwww:contentbox title="IDPicker* Results" centered="true" width="1000" scheme="ms">
 
+
+<div style="font-size: 8pt;margin-top: 3px;" align="center">
+ 	<i>*Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
+ 	<br>
+	Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
+</div>
   
   <div id="results" class="flora">
       <ul>
@@ -707,6 +775,7 @@ $(document).ready(function() {
       	<%@ include file="inputSummary.jsp" %>
 	  </div>
 
+ 	
 </yrcwww:contentbox>
 </CENTER>
 

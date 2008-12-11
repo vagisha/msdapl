@@ -9,6 +9,7 @@
 </div>
 </center>
 
+<center>
 <table  cellpadding="4" cellspacing="2"
 		align="center" width="90%" id="psmtbl_<bean:write name="runSearchId"/>"
 		style="border: 1px dashed gray; border-spacing: 2px; margin-top: 0px; margin-bottom: 6px;"
@@ -19,10 +20,10 @@
 	<th class="sort-int" style="font-size: 10pt; font-weight: bold;">Scan Number</th>
 	<th class="sort-int" style="font-size: 10pt; font-weight: bold;">Charge</th>
 	<logic:equal name="searchProgram" value="sequest">
-		<th style="text-decoration: underline;font-size: 10pt;font-weight: bold;" class="sort-float" >XCorr</th>
+		<th style="font-size: 10pt;font-weight: bold;" class="sort-float" >XCorr</th>
 	</logic:equal>
 	<logic:equal name="searchProgram" value="prolucid">
-		<th style="text-decoration: underline;font-size: 10pt;font-weight: bold;" class="sort-float" >primaryScore</th>
+		<th style="font-size: 10pt;font-weight: bold;" class="sort-float" >primaryScore</th>
 	</logic:equal>
 	<th class="sort-float" style="font-size: 10pt; font-weight: bold;">DeltaCN</th>
 	<th class="sort-float" style="font-size: 10pt; font-weight: bold;">FDR</th>
@@ -64,3 +65,4 @@
 </logic:iterate>
 </tbody>
 </table>
+</center>

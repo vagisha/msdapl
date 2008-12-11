@@ -5,7 +5,11 @@
 
 
 <link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
+<script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
 <script src="/yrc/js/tooltip.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){tooltip();});
+</script>
 
 <yrcwww:notauthenticated>
  <logic:forward name="authenticate" />
@@ -18,6 +22,8 @@
 <%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
+
+
 
 <yrcwww:contentbox title="IDPicker*" centered="true" width="750" scheme="ms">
 
