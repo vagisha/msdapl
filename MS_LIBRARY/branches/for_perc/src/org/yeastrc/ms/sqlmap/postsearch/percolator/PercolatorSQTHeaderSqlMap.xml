@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="PercolatorSqtHeader"> 
+
+
+	<typeAlias alias="PercSqtHeaderOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.HeaderItemBean"/>
+	<typeAlias alias="PercSqtHeaderIn" type="org.yeastrc.ms.domain.postsearch.percolator.impl.PercolatorSQTHeaderWrap"/>
+	
+	
+	<resultMap class="PercSqtHeaderOut" id="headerResult">
+		<result property="name" column="header"/>
+		<result property="value" column="value"/>
+	</resultMap>
+	
+	<parameterMap class="PercSqtHeaderIn" id="headerParam">
+		<parameter property="percolatorOutputId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="name" jdbcType="VARCHAR"/>
+		<parameter property="value" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+    
+    <select id="selectHeadersForPercOutput" resultMap="headerResult" parameterClass="Integer">
+		SELECT * FROM PercolatorSQTHeader WHERE percOutputID = #id# ORDER BY id
+	</select>
+	
+    
+    <insert id="insertHeader" parameterMap="headerParam">
+    	INSERT INTO PercolatorSQTHeader (percOutputID, header, value) 
+    	VALUES (?,?,?)
+    </insert>
+    
+    
+    <delete id="deleteHeadersForPercOutput" parameterClass="Integer">
+		DELETE FROM PercolatorSQTHeader WHERE percOutputID=#id#
+    </delete>
+    
+</sqlMap>

@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.domain.search;
 
-import java.sql.Date;
 import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
@@ -50,26 +49,3 @@ public interface MsSearchIn extends MsSearchBase {
    
 }
 
-interface MsSearchBase {
-    
-    /**
-     * @return the serverDirectory
-     */
-    public abstract String getServerDirectory();
-
-    /**
-     * @return the searchDate
-     */
-    public abstract Date getSearchDate();
-    
-    /**
-     * @return the analysisProgramName
-     */
-    public abstract SearchProgram getSearchProgram();
-
-    /**
-     * @return the analysisProgramVersion
-     */
-    public abstract String getSearchProgramVersion();
-
-}
