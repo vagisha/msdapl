@@ -14,7 +14,7 @@ import org.yeastrc.ms.domain.search.impl.SearchResultBean;
  */
 public class PercolatorResultBean extends SearchResultBean implements PercolatorResult{
 
-    private int percoaltorOutputId;
+    private int analysisId;
     private double discriminantScore = -1.0;
     private double pep = -1.0;
     private double qvalue = -1.0;
@@ -30,11 +30,11 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
 
     @Override
     public int getSearchAnalysisId() {
-        return percoaltorOutputId;
+        return analysisId;
     }
     
-    public void setPercolatorRunSearchId(int percolatorRunSearchId) {
-        this.percoaltorOutputId = percolatorRunSearchId;
+    public void setSearchAnalysisId(int analysisId) {
+        this.analysisId = analysisId;
     }
 
     @Override
