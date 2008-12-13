@@ -29,7 +29,7 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
     }
 
     @Override
-    public int getPercolatorOutputId() {
+    public int getSearchAnalysisId() {
         return percoaltorOutputId;
     }
     

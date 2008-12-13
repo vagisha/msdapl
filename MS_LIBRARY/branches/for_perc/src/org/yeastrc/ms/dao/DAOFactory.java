@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.analysis.MsPostSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.ibatis.MsPostSearchAnalysisDAOImpl;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorOutputDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImpl;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorSQTHeaderDAO;
-import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorOutputDAOImpl;
+import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorResultDAOImpl;
-import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorSQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl;
@@ -130,11 +128,10 @@ public class DAOFactory {
     private ProlucidSearchDAO prolucidSearchDAO;
     
     // DAOs related to post search analysis
-    private MsPostSearchAnalysisDAO analysisDAO;
+    private MsSearchAnalysisDAO analysisDAO;
     
     // DAOs related to Percolator post search analysis
-    private PercolatorOutputDAO percOutputDAO;
-    private PercolatorSQTHeaderDAO percSQTHeaderDAO;
+    private PercolatorParamsDAO percSQTHeaderDAO;
     private PercolatorResultDAO percResultDAO;
     
     
@@ -180,11 +177,10 @@ public class DAOFactory {
         prolucidSearchDAO = new ProlucidSearchDAOImpl(sqlMap, searchDAO);
         
         // post search analysis related
-        analysisDAO = new MsPostSearchAnalysisDAOImpl(sqlMap);
+        analysisDAO = new MsSearchAnalysisDAOImpl(sqlMap);
         
         // Percolator post search analysis related 
-        percOutputDAO = new PercolatorOutputDAOImpl(sqlMap);
-        percSQTHeaderDAO = new PercolatorSQTHeaderDAOImpl(sqlMap);
+        percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
         percResultDAO = new PercolatorResultDAOImpl(sqlMap);
         
     }
@@ -313,18 +309,14 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // Post serach analysis related
     //-------------------------------------------------------------------------------------------
-    public MsPostSearchAnalysisDAO getPostSearchAnalysisDAO() {
+    public MsSearchAnalysisDAO getPostSearchAnalysisDAO() {
         return analysisDAO;
     }
     
     //-------------------------------------------------------------------------------------------
     // Percolator related
     //-------------------------------------------------------------------------------------------
-    public PercolatorOutputDAO getPercolatorOutputDAO() {
-        return percOutputDAO;
-    }
-    
-    public PercolatorSQTHeaderDAO getPercoltorSQTHeaderDAO() {
+    public PercolatorParamsDAO getPercoltorSQTHeaderDAO() {
         return percSQTHeaderDAO;
     }
     

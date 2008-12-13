@@ -4,25 +4,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.ms.dao.analysis.MsPostSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-public class MsPostSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsPostSearchAnalysisDAO {
+public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAnalysisDAO {
 
     private static final String namespace = "MsPostSearchAnalysis";
     
     
-    public MsPostSearchAnalysisDAOImpl(SqlMapClient sqlMap) {
+    public MsSearchAnalysisDAOImpl(SqlMapClient sqlMap) {
         super(sqlMap);
     }
 
     @Override
-    public MsPostSearchAnalysis load(int analysisId) {
-        return (MsPostSearchAnalysis) queryForObject(namespace+".select", analysisId);
+    public MsSearchAnalysis load(int analysisId) {
+        return (MsSearchAnalysis) queryForObject(namespace+".select", analysisId);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MsPostSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsPost
     }
     
     @Override
-    public int save(MsPostSearchAnalysis analysis) {
+    public int save(MsSearchAnalysis analysis) {
         return saveAndReturnId(namespace+".insert", analysis);
     }
 

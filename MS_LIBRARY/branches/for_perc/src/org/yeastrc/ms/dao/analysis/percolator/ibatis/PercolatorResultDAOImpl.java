@@ -25,11 +25,6 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public List<Integer> loadResultIdsForPercolatorOutput(int percOutputId) {
-        return queryForList(namespace+".selectResultIdsForPercolatorOutput", percOutputId);
-    }
-
-    @Override
     public List<Integer> loadResultIdsWithPepThreshold(int percOutputId, double pep) {
         Map<String, Number> map = new HashMap<String, Number>(2);
         map.put("percOutputId", percOutputId);
@@ -64,7 +59,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             values.append(",(");
             values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
-            values.append(data.getPercolatorOutputId() == 0 ? "NULL" : data.getPercolatorOutputId());
+            values.append(data.getSearchAnalysisId() == 0 ? "NULL" : data.getSearchAnalysisId());
             values.append(",");
             double qvalue = data.getQvalue();
             values.append(qvalue == -1.0 ? "NULL" : qvalue);

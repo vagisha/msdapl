@@ -6,18 +6,18 @@
  */
 package org.yeastrc.ms.dao.analysis.ibatis;
 
-import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysisIn;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysisIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 /**
  * NOTE: This class is used internally by MsPostSearchAnalysisDAOImpl.
  */
-public class MsPostSearchAnalysisWrap {
+public class MsSearchAnalysisWrap {
 
     private int searchId;
-    private MsPostSearchAnalysisIn analysis;
+    private MsSearchAnalysisIn analysis;
     
-    public MsPostSearchAnalysisWrap(int searchId, MsPostSearchAnalysisIn analysis) {
+    public MsSearchAnalysisWrap(int searchId, MsSearchAnalysisIn analysis) {
         this.searchId = searchId;
         this.analysis = analysis;
     }
@@ -32,9 +32,5 @@ public class MsPostSearchAnalysisWrap {
 
     public int getSearchId() {
         return searchId;
-    }
-
-    public String getServerDirectory() {
-        return analysis.getServerDirectory();
     }
 }

@@ -13,7 +13,7 @@ import org.yeastrc.ms.domain.search.SearchProgram;
 /**
  * 
  */
-public interface MsPostSearchAnalysis {
+public interface MsSearchAnalysis {
 
     /**
      * @return the database id for this Percolator Analysis
@@ -31,12 +31,6 @@ public interface MsPostSearchAnalysis {
      */
     public abstract Date getUploadDate();
     
-    
-    /**
-     * @return the serverDirectory
-     */
-    public abstract String getServerDirectory();
-
     
     /**
      * @return the analysisProgramName

@@ -2,14 +2,14 @@ package org.yeastrc.ms.dao.analysis;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
-public interface MsPostSearchAnalysisDAO {
+public interface MsSearchAnalysisDAO {
 
-    public abstract int save(MsPostSearchAnalysis analysis);
+    public abstract int save(MsSearchAnalysis analysis);
     
-    public abstract MsPostSearchAnalysis load(int analysisId);
+    public abstract MsSearchAnalysis load(int analysisId);
     
     public abstract List<Integer> getAnalysisIdsForSearch(int searchId);
     

@@ -14,14 +14,14 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.analysis.MsPostSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorOutputDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorSQTHeaderDAO;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.domain.analysis.impl.PostSearchAnalysisBean;
+import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultIn;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorSearchScan;
@@ -127,7 +127,7 @@ public class PercolatorSQTDataUploadService {
 
     public static void updateProgramVersion(int analysisId, String programVersion) {
         try {
-            MsPostSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+            MsSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
             analysisDao.updateAnalysisProgramVersion(analysisId, programVersion);
         }
         catch(RuntimeException e) {
@@ -223,8 +223,8 @@ public class PercolatorSQTDataUploadService {
     }
 
     private int saveTopLevelAnalysis(int searchId, String remoteDirectory) throws UploadException {
-        MsPostSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
-        PostSearchAnalysisBean analysis = new PostSearchAnalysisBean();
+        MsSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+        SearchAnalysisBean analysis = new SearchAnalysisBean();
         analysis.setSearchId(searchId);
         analysis.setServerDirectory(remoteDirectory);
         analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
@@ -369,9 +369,9 @@ public class PercolatorSQTDataUploadService {
         int percOutputId = percOutputDao.save(output);
         
         // save all the headers
-        PercolatorSQTHeaderDAO headerDao = daoFactory.getPercoltorSQTHeaderDAO();
+        PercolatorParamsDAO headerDao = daoFactory.getPercoltorSQTHeaderDAO();
         for(SQTHeaderItem header: search.getHeaders()) {
-            headerDao.saveSQTHeader(header, percOutputId);
+            headerDao.saveParam(header, percOutputId);
         }
         
         return percOutputId;
@@ -454,7 +454,7 @@ public class PercolatorSQTDataUploadService {
     public static void deleteAnalysis(int analysisId) {
         if (analysisId == 0)
             return;
-        MsPostSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+        MsSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
         analysisDao.delete(analysisId);
     }
     

@@ -2,15 +2,14 @@ package org.yeastrc.ms.domain.analysis.impl;
 
 import java.sql.Date;
 
-import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
-public class PostSearchAnalysisBean implements MsPostSearchAnalysis {
+public class SearchAnalysisBean implements MsSearchAnalysis {
 
     private int id;
     private int searchId;
     private Date uploadDate;
-    private String serverDirectory;
     private SearchProgram analysisProgram;
     private String analysisProgramVersion;
     
@@ -35,19 +34,6 @@ public class PostSearchAnalysisBean implements MsPostSearchAnalysis {
         this.searchId = searchId;
     }
     
-    /**
-     * @return the serverDirectory
-     */
-    public String getServerDirectory() {
-        return serverDirectory;
-    }
-    /**
-     * @param directory the serverDirectory to set
-     */
-    public void setServerDirectory(String directory) {
-        this.serverDirectory = directory;
-    }
-
     public SearchProgram getAnalysisProgram() {
         return analysisProgram;
     }

@@ -12,12 +12,7 @@ import org.yeastrc.ms.domain.search.SearchProgram;
 /**
  * 
  */
-public interface MsPostSearchAnalysisIn {
-
-    /**
-     * @return the serverDirectory
-     */
-    public abstract String getServerDirectory();
+public interface MsSearchAnalysisIn {
 
     /**
      * @return the analysisProgramName
