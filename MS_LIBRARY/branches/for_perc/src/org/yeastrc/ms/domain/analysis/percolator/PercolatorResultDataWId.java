@@ -1,25 +1,15 @@
-/**
- * PercolatorResult.java
- * @author Vagisha Sharma
- * Dec 10, 2008
- * @version 1.0
- */
-package org.yeastrc.ms.domain.postsearch.percolator;
+package org.yeastrc.ms.domain.analysis.percolator;
 
-import org.yeastrc.ms.domain.search.MsSearchResult;
+public interface PercolatorResultDataWId {
 
-/**
- * 
- */
-public interface PercolatorResult extends MsSearchResult {
-
-    
     public abstract int getPercolatorOutputId();
+    
+    public abstract int getResultId();
     
     /**
      * @return the qvalue
      */
-    public abstract double qetQvalue();
+    public abstract double getQvalue();
     
     /**
      * @return the posterior error probability or -1.0 if there was no posterior probability 

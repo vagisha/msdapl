@@ -1,10 +1,10 @@
-package org.yeastrc.ms.dao.postsearch.percolator.ibatis;
+package org.yeastrc.ms.dao.analysis.percolator.ibatis;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorOutputDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.postsearch.percolator.PercolatorOutputDAO;
-import org.yeastrc.ms.domain.postsearch.percolator.PercolatorOutput;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorOutput;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

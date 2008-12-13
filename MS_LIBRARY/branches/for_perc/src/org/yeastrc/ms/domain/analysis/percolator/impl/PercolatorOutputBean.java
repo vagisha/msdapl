@@ -4,9 +4,9 @@
  * Dec 11, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.postsearch.percolator.impl;
+package org.yeastrc.ms.domain.analysis.percolator.impl;
 
-import org.yeastrc.ms.domain.postsearch.percolator.PercolatorOutput;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorOutput;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 
 /**

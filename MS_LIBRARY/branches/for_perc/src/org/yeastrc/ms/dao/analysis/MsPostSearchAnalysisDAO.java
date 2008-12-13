@@ -1,8 +1,8 @@
-package org.yeastrc.ms.dao.postsearch;
+package org.yeastrc.ms.dao.analysis;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.postsearch.MsPostSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysis;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 public interface MsPostSearchAnalysisDAO {

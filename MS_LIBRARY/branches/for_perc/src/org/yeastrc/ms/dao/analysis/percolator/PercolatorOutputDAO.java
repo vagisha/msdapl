@@ -1,8 +1,8 @@
-package org.yeastrc.ms.dao.postsearch.percolator;
+package org.yeastrc.ms.dao.analysis.percolator;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.postsearch.percolator.PercolatorOutput;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorOutput;
 
 public interface PercolatorOutputDAO {
 

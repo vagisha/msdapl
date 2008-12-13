@@ -4,7 +4,7 @@
  * Dec 10, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.postsearch.percolator;
+package org.yeastrc.ms.domain.analysis.percolator;
 
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 

@@ -1,8 +1,8 @@
-package org.yeastrc.ms.domain.postsearch.impl;
+package org.yeastrc.ms.domain.analysis.impl;
 
 import java.sql.Date;
 
-import org.yeastrc.ms.domain.postsearch.MsPostSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysis;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 public class PostSearchAnalysisBean implements MsPostSearchAnalysis {

@@ -1,12 +1,12 @@
-package org.yeastrc.ms.dao.postsearch.ibatis;
+package org.yeastrc.ms.dao.analysis.ibatis;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.analysis.MsPostSearchAnalysisDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.postsearch.MsPostSearchAnalysisDAO;
-import org.yeastrc.ms.domain.postsearch.MsPostSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysis;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

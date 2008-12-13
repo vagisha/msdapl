@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain.postsearch.percolator;
+package org.yeastrc.ms.domain.analysis.percolator;
 
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 

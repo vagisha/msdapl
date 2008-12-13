@@ -1,6 +1,6 @@
-package org.yeastrc.ms.domain.postsearch.percolator.impl;
+package org.yeastrc.ms.domain.analysis.percolator.impl;
 
-import org.yeastrc.ms.domain.postsearch.percolator.PercolatorResultDataWId;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
 
 public class PercolatorResultDataBean implements PercolatorResultDataWId {
 

@@ -1,4 +1,4 @@
-package org.yeastrc.ms.dao.postsearch.percolator;
+package org.yeastrc.ms.dao.analysis.percolator;
 
 import java.util.List;
 

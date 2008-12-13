@@ -4,7 +4,7 @@
  * Dec 10, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.domain.postsearch;
+package org.yeastrc.ms.domain.analysis;
 
 import java.sql.Date;
 

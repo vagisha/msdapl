@@ -1,13 +1,13 @@
-package org.yeastrc.ms.dao.postsearch.percolator.ibatis;
+package org.yeastrc.ms.dao.analysis.percolator.ibatis;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.postsearch.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.domain.postsearch.percolator.PercolatorResult;
-import org.yeastrc.ms.domain.postsearch.percolator.PercolatorResultDataWId;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

@@ -1,9 +1,9 @@
-package org.yeastrc.ms.dao.postsearch.percolator.ibatis;
+package org.yeastrc.ms.dao.analysis.percolator.ibatis;
 
 import java.util.List;
 
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorSQTHeaderDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.postsearch.percolator.PercolatorSQTHeaderDAO;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 
 import com.ibatis.sqlmap.client.SqlMapClient;

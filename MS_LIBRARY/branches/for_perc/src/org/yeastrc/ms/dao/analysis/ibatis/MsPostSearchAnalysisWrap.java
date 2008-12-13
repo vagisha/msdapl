@@ -4,9 +4,9 @@
  * Dec 11, 2008
  * @version 1.0
  */
-package org.yeastrc.ms.dao.postsearch.ibatis;
+package org.yeastrc.ms.dao.analysis.ibatis;
 
-import org.yeastrc.ms.domain.postsearch.MsPostSearchAnalysisIn;
+import org.yeastrc.ms.domain.analysis.MsPostSearchAnalysisIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 /**
