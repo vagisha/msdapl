@@ -7,58 +7,39 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.dao.postsearch.MsPostSearchAnalysisDAO;
+import org.yeastrc.ms.dao.postsearch.percolator.PercolatorOutputDAO;
+import org.yeastrc.ms.dao.postsearch.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.postsearch.percolator.PercolatorSQTHeaderDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
-import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
-import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.postsearch.impl.PostSearchAnalysisBean;
 import org.yeastrc.ms.domain.postsearch.percolator.PercolatorResultDataWId;
+import org.yeastrc.ms.domain.postsearch.percolator.PercolatorResultIn;
+import org.yeastrc.ms.domain.postsearch.percolator.PercolatorSearchScan;
+import org.yeastrc.ms.domain.postsearch.percolator.impl.PercolatorOutputBean;
+import org.yeastrc.ms.domain.postsearch.percolator.impl.PercolatorResultDataBean;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsResultResidueMod;
-import org.yeastrc.ms.domain.search.MsResultResidueModIds;
-import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
-import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
-import org.yeastrc.ms.domain.search.MsSearchResultIn;
-import org.yeastrc.ms.domain.search.MsSearchResultProtein;
-import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
-import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
-import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
-import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
-import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchWrap;
-import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
-import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
+import org.yeastrc.ms.parser.sqtFile.percolator.PercolatorSQTFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
@@ -68,16 +49,15 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 public class PercolatorSQTDataUploadService {
     
     
-    static final Logger log = Logger.getLogger(PercolatorSQTDataUploadService.class);
+    private static final Logger log = Logger.getLogger(PercolatorSQTDataUploadService.class);
 
-    static final DAOFactory daoFactory = DAOFactory.instance();
+    private static final DAOFactory daoFactory = DAOFactory.instance();
+    private static final MsSearchResultDAO resultDao = daoFactory.getMsSearchResultDAO();
 
-    private DynamicModLookupUtil dynaModLookup;
+    private static final int BUF_SIZE = 1000;
 
-    static final int BUF_SIZE = 1000;
-
-    private List<MsResidueModificationIn> dynaResidueMods;
-    private List<MsTerminalModificationIn> dynaTermMods;
+    private List<? extends MsResidueModificationIn> dynaResidueMods;
+    private List<? extends MsTerminalModificationIn> dynaTermMods;
     
     // these are the things we will cache and do bulk-inserts
     private List<PercolatorResultDataWId> percolatorResultDataList; // percolator scores
@@ -85,17 +65,16 @@ public class PercolatorSQTDataUploadService {
 
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
 
-    private int numSearchesToUpload = 0;
-    private int numSearchesUploaded = 0;
+    private int numAnalysisToUpload = 0;
+    private int numAnalysisUploaded = 0;
     
     // This is information we will get from the SQT files and then update the entries in the msPostSearchAnalysis
     private String programVersion = "uninit";
 
-    int lastUploadedRunSearchId;
-    int searchId;
+    int lastUploadedPercOutputId;
+    private int analysisId;
     
-    public PercolatorSQTDataUploadService(int searchId) {
-        this.searchId = searchId;
+    public PercolatorSQTDataUploadService() {
         this.uploadExceptionList = new ArrayList<UploadException>();
         this.percolatorResultDataList = new ArrayList<PercolatorResultDataWId>(BUF_SIZE);
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
@@ -104,11 +83,10 @@ public class PercolatorSQTDataUploadService {
     
     void reset() {
 
-        // RESET THE DYNAMIC MOD LOOKUP UTILITY
-        dynaModLookup = null;
-
-        numSearchesToUpload = 0;
-        numSearchesUploaded = 0;
+        analysisId = 0;
+        
+        numAnalysisToUpload = 0;
+        numAnalysisUploaded = 0;
 
         resetCaches();
 
@@ -122,35 +100,23 @@ public class PercolatorSQTDataUploadService {
     // called before uploading each sqt file and in the reset() method.
     void resetCaches() {
         percolatorResultDataList.clear();
-        lastUploadedRunSearchId = 0;
+        lastUploadedPercOutputId = 0;
     }
 
     public final List<UploadException> getUploadExceptionList() {
         return this.uploadExceptionList;
     }
 
-    public final int getNumSearchesToUpload() {
-        return numSearchesToUpload;
+    public final int getNumAnalysisToUpload() {
+        return numAnalysisToUpload;
     }
 
-    public final int getNumSearchesUploaded() {
-        return numSearchesUploaded;
+    public final int getNumAnalysisUploaded() {
+        return numAnalysisUploaded;
     }
 
-    static int getScanId(int runId, int scanNumber)
-            throws UploadException {
 
-        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
-        int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
-        if (scanId == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN);
-            ex.setErrorMessage("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
-            throw ex;
-        }
-        return scanId;
-    }
-
-    static int getNumFilesToUpload(String fileDirectory, Set<String> fileNames) {
+    public static int getNumFilesToUpload(String fileDirectory, Set<String> fileNames) {
         int num = 0;
         for (String file: fileNames) {
             if ((new File(fileDirectory+File.separator+file+".sqt")).exists())
@@ -159,33 +125,16 @@ public class PercolatorSQTDataUploadService {
         return num;
     }
 
-    static void updateProgramVersion(int searchId, String programVersion) {
+    public static void updateProgramVersion(int analysisId, String programVersion) {
         try {
-            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-            searchDao.updateSearchProgramVersion(searchId, programVersion);
+            MsPostSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+            analysisDao.updateAnalysisProgramVersion(analysisId, programVersion);
         }
         catch(RuntimeException e) {
-            log.warn("Error updating program version for searchID: "+searchId, e);
+            log.warn("Error updating program version for analysisID: "+analysisId, e);
         }
     }
 
-    static void updateProgram(int searchId, SearchProgram program) {
-        try {
-            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-            searchDao.updateSearchProgram(searchId, program);
-        }
-        catch(RuntimeException e) {
-            log.warn("Error updating search program for searchID: "+searchId, e);
-        }
-    }
-    
-    //--------------------------------------------------------------------------------------------------
-    // To be implemented by subclasses
-    abstract SearchProgram getSearchProgram();
-    
-    abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
-    //--------------------------------------------------------------------------------------------------
-    
     /**
      * @param fileDirectory 
      * @param fileNames names of sqt files (without the .sqt extension)
@@ -194,18 +143,27 @@ public class PercolatorSQTDataUploadService {
      * @param remoteDirectory 
      * @param searchDate 
      */
-    public int uploadSearch(int experimentId, String fileDirectory, Set<String> fileNames,
-            Map<String,Integer> runIdMap, 
-            String remoteServer, String remoteDirectory, Date searchDate) {
+    public int uploadPostSearchAnalysis(int searchId, String fileDirectory, Set<String> fileNames,
+            Map<String,Integer> runSearchIdMap, String remoteDirectory) {
 
         reset();// reset all caches etc.
         
         // get the number of sqt file in the directory
-        this.numSearchesToUpload = getNumFilesToUpload(fileDirectory, fileNames);
+        this.numAnalysisToUpload = getNumFilesToUpload(fileDirectory, fileNames);
         
+        // get the modifications used for this search. Will be used for parsing the peptide sequence
+        getSearchModifications(searchId);
         
-        // initialize the Modification lookup map; will be used when parsing the peptides
-        dynaModLookup = new DynamicModLookupUtil(searchId);
+        // create a new entry in the msPostSearchAnalysis table
+        try {
+            analysisId = saveTopLevelAnalysis(searchId, remoteDirectory);
+        }
+        catch (UploadException e) {
+            e.appendErrorMessage("\n\t!!!PERCOLATOR ANALYSIS WILL NOT BE UPLOADED\n");
+            uploadExceptionList.add(e);
+            log.error(e.getMessage(), e);
+            return 0;
+        }
         
         
         // now upload the individual sqt files
@@ -214,39 +172,39 @@ public class PercolatorSQTDataUploadService {
             // if the file does not exist skip over to the next
             if (!(new File(filePath).exists()))
                 continue;
-            Integer runId = runIdMap.get(file); 
-            if (runId == null) {
-                UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SQT);
-                ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
+            Integer runSearchId = runSearchIdMap.get(file); 
+            if (runSearchId == null) {
+                UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_SQT);
+                ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage(), ex);
-                deleteSearch(searchId);
-                numSearchesUploaded = 0;
+                deleteAnalysis(searchId);
+                numAnalysisUploaded = 0;
                 return 0;
             }
             resetCaches();
             try {
-                uploadSqtFile(filePath, runId);
-                numSearchesUploaded++;
+                uploadSqtFile(filePath, runSearchId);
+                numAnalysisUploaded++;
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
-                ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
+                ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
                 log.error(ex.getMessage(), ex);
-                deleteSearch(searchId);
-                numSearchesUploaded = 0;
+                deleteAnalysis(searchId);
+                numAnalysisUploaded = 0;
                 return 0;
             }
         }
         
         // if no sqt files were uploaded delete the top level search
-        if (numSearchesUploaded == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.NO_RUN_SEARCHES_UPLOADED);
+        if (numAnalysisUploaded == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.NO_PERC_ANALYSIS_UPLOADED);
             uploadExceptionList.add(ex);
-            ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
+            ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
             log.error(ex.getMessage(), ex);
-            deleteSearch(searchId);
-            numSearchesUploaded = 0;
+            deleteAnalysis(searchId);
+            numAnalysisUploaded = 0;
             return 0;
         }
         
@@ -255,33 +213,132 @@ public class PercolatorSQTDataUploadService {
             updateProgramVersion(searchId, programVersion);
         }
         
-        // if search program from sqt files is not the same as the defalt program returned by the uploader, update it in the msSearch table
-        // For now we do this only for SEQUEST and EE-normalized SEQUEST
-        if (getSearchProgram() == SearchProgram.SEQUEST && this.programFromSqt == SearchProgram.EE_NORM_SEQUEST) {
-            updateProgram(searchId, programFromSqt);
-        }
-        
-        return searchId;
+        return analysisId;
     }
     
-    // get the id of the search database used (will be used to look up protein ids later)
-    int getSearchDatabaseId(MsSearchDatabaseIn db) throws UploadException {
-        String searchDbName = null;
-        int dbId = 0;
-        if (db != null) {
-            searchDbName = getSearchDatabase().getDatabaseFileName();
-            dbId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+    private void getSearchModifications(int searchId) {
+       MsSearch search = daoFactory.getMsSearchDAO().loadSearch(searchId);
+       this.dynaResidueMods = search.getDynamicResidueMods();
+       this.dynaTermMods = search.getDynamicTerminalMods();
+    }
+
+    private int saveTopLevelAnalysis(int searchId, String remoteDirectory) throws UploadException {
+        MsPostSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+        PostSearchAnalysisBean analysis = new PostSearchAnalysisBean();
+        analysis.setSearchId(searchId);
+        analysis.setServerDirectory(remoteDirectory);
+        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        try {
+            return analysisDao.save(analysis);
         }
-        if (dbId == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);
-            ex.setErrorMessage("No database ID found for: "+searchDbName);
+        catch(RuntimeException e) {
+            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
+            ex.setErrorMessage(e.getMessage());
             throw ex;
         }
-        return dbId;
     }
     
-    // RUN SEARCH
-    final int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int searchId)
+    private void uploadSqtFile(String filePath, int runSearchId) throws UploadException {
+        
+        log.info("BEGIN PERCOLATOR SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_SEARCH_ID: "+runSearchId);
+        lastUploadedPercOutputId = 0;
+        
+        long startTime = System.currentTimeMillis();
+        PercolatorSQTFileReader provider = new PercolatorSQTFileReader();
+        
+        try {
+            provider.open(filePath);
+            provider.setDynamicResidueMods(this.dynaResidueMods);
+            provider.setDynamicTerminalMods(this.dynaTermMods);
+        }
+        catch (DataProviderException e) {
+            provider.close();
+            UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_SQT, e);
+            ex.setFile(filePath);
+            ex.setErrorMessage(e.getMessage()+"\n\t!!!PERCOLATOR SQT FILE WILL NOT BE UPLOADED!!!");
+            throw ex;
+        }
+        
+        try {
+            uploadPercolatorSqtFile(provider, runSearchId);
+        }
+        catch (UploadException ex) {
+            ex.setFile(filePath);
+            ex.appendErrorMessage("\n\t!!!PERCOLATOR SQT FILE WILL NOT BE UPLOADED!!!");
+            throw ex;
+        }
+        catch (RuntimeException e) { // most likely due to SQL exception
+            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
+            ex.setFile(filePath);
+            ex.setErrorMessage(e.getMessage()+"\n\t!!!PERCOLATOR SQT FILE WILL NOT BE UPLOADED!!!");
+            throw ex;
+        }
+        finally {provider.close();}
+        
+        long endTime = System.currentTimeMillis();
+        
+        log.info("END PERCOLATOR SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_SEARCH_ID: "+runSearchId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
+        
+    }
+    
+    // parse and upload a sqt file
+    private void uploadPercolatorSqtFile(PercolatorSQTFileReader provider, int runSearchId) throws UploadException {
+        
+        try {
+            lastUploadedPercOutputId = uploadPercolatorHeader(provider, runSearchId, analysisId);
+            log.info("Uploaded top-level info for Percolator sqt file. percOutputId: "+lastUploadedPercOutputId);
+        }
+        catch(DataProviderException e) {
+            UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER, e);
+            ex.setErrorMessage(e.getMessage());
+            throw ex;
+        }
+
+        // get the runID. Will be needed later to get the scan number
+        int runId = getRunIdForRunSearch(runSearchId);
+        if(runId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SQT);
+            ex.setErrorMessage("No runID found for runSearchID: "+runSearchId);
+            throw ex;
+        }
+        
+        // upload the search results for each scan + charge combination
+        int numResults = 0;
+        while (provider.hasNextSearchScan()) {
+            PercolatorSearchScan scan = null;
+            try {
+                scan = provider.getNextSearchScan();
+            }
+            catch (DataProviderException e) {
+                UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_SCAN);
+                ex.setErrorMessage(e.getMessage());
+                throw ex;
+            }
+            
+            // save all the search results for this scan
+            for (PercolatorResultIn result: scan.getScanResults()) {
+                uploadSearchResult(result, lastUploadedPercOutputId, runSearchId, runId);
+                numResults++;
+            }
+        }
+        flush(); // save any cached data
+        log.info("Uploaded Percolator SQT file: "+provider.getFileName()+", with "+numResults+
+                " results. (percOutputId: "+lastUploadedPercOutputId+")");
+                
+    }
+    
+    private int getRunIdForRunSearch(int runSearchId) {
+        MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
+        MsRunSearch rs = rsDao.loadRunSearch(runSearchId);
+        if(rs != null)
+            return rs.getRunId();
+        else
+            return 0;
+    }
+    
+
+    // PERCOLATOR SQT HEADER
+    private final int uploadPercolatorHeader(SQTSearchDataProvider provider, int runSearchId, int percId)
         throws DataProviderException {
 
         SQTRunSearchIn search = provider.getSearchHeader();
@@ -296,353 +353,109 @@ public class PercolatorSQTDataUploadService {
             // make sure the SQTGeneratorVersion value is same in all sqt headers
             if (programVersion == null) {
                 if (header.getSearchEngineVersion() != null)
-                    throw new DataProviderException("Value of SQTGeneratorVersion is not nulllthe same in all SQT files.");
+                    throw new DataProviderException("Value of Percolator version is not the same in all SQT files.");
             }
             else if (!programVersion.equals(header.getSearchEngineVersion())) {
-                throw new DataProviderException("Value of SQTGeneratorVersion is not the same in all SQT files.");
-            }
-            
-            // SEARCH PROGRAM IN THE SQT FILE
-            if (programFromSqt == null)
-                this.programFromSqt = header.getSearchProgram();
-            
-            // make sure program is same in all sqt headers
-            if (programFromSqt == null || programFromSqt == SearchProgram.UNKNOWN || programFromSqt != header.getSearchProgram()) {
-                throw new DataProviderException("Value of SQTGenerator is missing or not the same in all SQT files.");
+                throw new DataProviderException("Value of Percolator version is not the same in all SQT files.");
             }
             
         }
-        // save the run search and return the database id
-        SQTRunSearchDAO runSearchDao = daoFactory.getSqtRunSearchDAO();
-        return runSearchDao.saveRunSearch(new SQTRunSearchWrap(search, searchId, runId));
-    }
-
-    final void uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) {
-        SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
-    }
-
-    final int uploadBaseSearchResult(MsSearchResultIn result, int runSearchId, int scanId) throws UploadException {
+        // save the percolator and return the database id
+        PercolatorOutputDAO percOutputDao = daoFactory.getPercolatorOutputDAO();
+        PercolatorOutputBean output = new PercolatorOutputBean();
+        output.setPercolatorId(percId);
+        output.setRunSearchId(runSearchId);
+        output.setAnalysisFileFormat(SearchFileFormat.SQT_PERC);
+        int percOutputId = percOutputDao.save(output);
         
-        MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
-        int resultId = resultDao.saveResultOnly(result, runSearchId, scanId); // uploads data to the msRunSearchResult table ONLY
+        // save all the headers
+        PercolatorSQTHeaderDAO headerDao = daoFactory.getPercoltorSQTHeaderDAO();
+        for(SQTHeaderItem header: search.getHeaders()) {
+            headerDao.saveSQTHeader(header, percOutputId);
+        }
         
-        // upload the protein matches
-        uploadProteinMatches(result, result.getResultPeptide().getPeptideSequence(), resultId, sequenceDatabaseId);
+        return percOutputId;
+    }
+
+    private void uploadSearchResult(PercolatorResultIn result, int percOutputId, int runSearchId, int runId) throws UploadException {
         
-        // upload dynamic mods for this result
-        uploadResultResidueMods(result, resultId, runSearchId);
-        
-        // no dynamic terminal mods for sequest
-        uploadResultTerminalMods(result, resultId, searchId);
-        
-        return resultId;
-    }
-
-    // PROTEIN MATCHES
-    final void uploadProteinMatches(MsSearchResultIn result, final String peptide, final int resultId, int databaseId)
-        throws UploadException {
-        // upload the protein matches if the cache has enough entries
-        if (proteinMatchList.size() >= BUF_SIZE) {
-            uploadProteinMatchBuffer();
-        }
-        // add the protein matches for this result to the cache
-        Set<String> accSet = new HashSet<String>(result.getProteinMatchList().size());
-        for (MsSearchResultProteinIn match: result.getProteinMatchList()) {
-            // only UNIQUE accession strings for this result will be added.
-            if (accSet.contains(match.getAccession()))
-                continue;
-            accSet.add(match.getAccession());
-            proteinMatchList.add(new SearchResultProteinBean(resultId, match.getAccession()));
-        }
-    }
-    
-    private void uploadProteinMatchBuffer() {
-        MsSearchResultProteinDAO matchDao = daoFactory.getMsProteinMatchDAO();
-        List<MsSearchResultProtein> list = new ArrayList<MsSearchResultProtein>(proteinMatchList.size());
-        list.addAll(proteinMatchList);
-        matchDao.saveAll(list);
-        proteinMatchList.clear();
-    }
-
-    // RESIDUE DYNAMIC MODIFICATION
-    void uploadResultResidueMods(MsSearchResultIn result, int resultId, int searchId) throws UploadException {
-        // upload the result dynamic residue modifications if the cache has enough entries
-        if (resultResidueModList.size() >= BUF_SIZE) {
-            uploadResultResidueModBuffer();
-        }
-        // add the dynamic residue modifications for this result to the cache
-        for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
-            if (mod == null)
-                continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
-                    mod.getModifiedResidue(), mod.getModificationMass()); 
-            if (modId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-                ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
-                        searchId+
-                        "; modResidue: "+mod.getModifiedResidue()+
-                        "; modMass: "+mod.getModificationMass().doubleValue());
-                throw ex;
-            }
-            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modId, mod.getModifiedPosition());
-            resultResidueModList.add(resultMod);
-        }
-    }
-
-    private void uploadResultResidueModBuffer() {
-        MsSearchModificationDAO modDao = daoFactory.getMsSearchModDAO();
-        modDao.saveAllDynamicResidueModsForResult(resultResidueModList);
-        resultResidueModList.clear();
-    }
-    
-    // TERMINAL DYNAMIC MODIFICATION
-    void uploadResultTerminalMods(MsSearchResultIn result, int resultId, int searchId) throws UploadException {
-        // upload the result dynamic terminal modifications if the cache has enough entries
-        if (resultTerminalModList.size() >= BUF_SIZE) {
-            uploadResultTerminalModBuffer();
-        }
-        // add the dynamic terminal modifications for this result to the cache
-        for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
-            if (mod == null)
-                continue;
-            int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
-                    mod.getModifiedTerminal(), mod.getModificationMass()); 
-            if (modId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
-                ex.setErrorMessage("No matching dynamic terminal modification found for: searchId: "+
-                        searchId+
-                        "; modTerminal: "+mod.getModifiedTerminal()+
-                        "; modMass: "+mod.getModificationMass().doubleValue());
-                throw ex;
-            }
-            ResultTerminalModIds resultMod = new ResultTerminalModIds(resultId, modId);
-            resultTerminalModList.add(resultMod);
-        }
-    }
-
-    private void uploadResultTerminalModBuffer() {
-        MsSearchModificationDAO modDao = daoFactory.getMsSearchModDAO();
-        modDao.saveAllDynamicTerminalModsForResult(resultTerminalModList);
-        resultTerminalModList.clear();
-    }
-
-    void flush() {
-        if (proteinMatchList.size() > 0) {
-            uploadProteinMatchBuffer();
-        }
-        if (resultResidueModList.size() > 0) {
-            uploadResultResidueModBuffer();
-        }
-        if (resultTerminalModList.size() > 0) {
-            uploadResultTerminalModBuffer();
-        }
-    }
-
-    final void deleteLastUploadedRunSearch() {
-        if (lastUploadedRunSearchId == 0)
-            return;
-        MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
-        runSearchDao.deleteRunSearch(lastUploadedRunSearchId);
-    }
-
-    public static void deleteSearch(int searchId) {
-        if (searchId == 0)
-            return;
-        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-        searchDao.deleteSearch(searchId);
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // these are the things we will cache and do bulk-inserts
-    
-    
-
-    SearchProgram getSearchProgram() {
-        return SearchProgram.PERCOLATOR;
-    }
-    
-    @Override
-    int uploadSearchParameters(int experimentId, String paramFileDirectory, 
-            String remoteServer, String remoteDirectory,
-            Date searchDate) throws UploadException {
-        
-       throw new UnsupportedOperationException("PercolatorSQTDataUploadService does not support uploadSearchParameters()");
-    }
-    
-    @Override
-    void uploadSqtFile(String filePath, int runId) throws UploadException {
-        
-        log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
-        lastUploadedRunSearchId = 0;
-        long startTime = System.currentTimeMillis();
-        SequestSQTFileReader provider = new SequestSQTFileReader();
-        
+        // get a matching search result for the Percolator result
+        int scanId = getScanId(runId, result.getScanNumber());
+        MsSearchResult searchResult = null;
         try {
-            provider.open(filePath, usesEvalue);
-            provider.setDynamicResidueMods(this.dynaResidueMods);
+        resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
+                    result.getCharge(), 
+                    result.getResultPeptide().getPeptideSequence());
         }
-        catch (DataProviderException e) {
-            provider.close();
-            UploadException ex = new UploadException(ERROR_CODE.READ_ERROR_SQT, e);
-            ex.setFile(filePath);
-            ex.setErrorMessage(e.getMessage()+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
-            throw ex;
-        }
-        
-        try {
-            uploadSequestSqtFile(provider, searchId, runId, sequenceDatabaseId);
-        }
-        catch (UploadException ex) {
-            ex.setFile(filePath);
-            ex.appendErrorMessage("\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
-            throw ex;
-        }
-        catch (RuntimeException e) { // most likely due to SQL exception
-            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
-            ex.setFile(filePath);
-            ex.setErrorMessage(e.getMessage()+"\n\t!!!SQT FILE WILL NOT BE UPLOADED!!!");
-            throw ex;
-        }
-        finally {provider.close();}
-        
-        long endTime = System.currentTimeMillis();
-        
-        log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
-        
-    }
-    
-    // parse and upload a sqt file
-    private void uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
-        
-        try {
-            lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
-            log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
-        }
-        catch(DataProviderException e) {
-            UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER, e);
+        catch(RuntimeException e) {
+            UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_RESULT, e);
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
-
-        // upload the search results for each scan + charge combination
-        int numResults = 0;
-        while (provider.hasNextSearchScan()) {
-            SequestSearchScan scan = null;
-            try {
-                scan = provider.getNextSearchScan();
-            }
-            catch (DataProviderException e) {
-                UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_SCAN);
-                ex.setErrorMessage(e.getMessage());
-                throw ex;
-            }
-            
-            int scanId = getScanId(runId, scan.getScanNumber());
-            // save spectrum data
-            uploadSearchScan(scan, lastUploadedRunSearchId, scanId); 
-
-            // save all the search results for this scan
-            for (SequestSearchResultIn result: scan.getScanResults()) {
-                uploadSearchResult(result, lastUploadedRunSearchId, scanId);
-                numResults++;
-            }
+        if(searchResult == null) {
+            UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_RESULT);
+            ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
+                    " scanId: "+scanId+"; charge: "+result.getCharge()+
+                    "; peptide: "+result.getResultPeptide().getPeptideSequence());
+            throw ex;
         }
-        flush(); // save any cached data
-        log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
-                " results. (runSearchId: "+lastUploadedRunSearchId+")");
-                
+        
+        // upload the Percolator specific information for this result.
+        uploadPercolatorResultData(result, percOutputId, searchResult.getId());
     }
 
-    
-    private SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteDirectory, final Date searchDate) {
-        return new SequestSearchIn() {
-            @Override
-            public List<SequestParam> getSequestParams() {return parser.getParamList();}
-            @Override
-            public List<MsResidueModificationIn> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
-            @Override
-            public List<MsTerminalModificationIn> getDynamicTerminalMods() {return parser.getDynamicTerminalMods();}
-            @Override
-            public List<MsEnzymeIn> getEnzymeList() {
-                if (parser.isEnzymeUsedForSearch())
-                    return Arrays.asList(new MsEnzymeIn[]{parser.getSearchEnzyme()});
-                else 
-                    return new ArrayList<MsEnzymeIn>(0);
-            }
-            @Override
-            public List<MsSearchDatabaseIn> getSearchDatabases() {return Arrays.asList(new MsSearchDatabaseIn[]{parser.getSearchDatabase()});}
-            @Override
-            public List<MsResidueModificationIn> getStaticResidueMods() {return parser.getStaticResidueMods();}
-            @Override
-            public List<MsTerminalModificationIn> getStaticTerminalMods() {return parser.getStaticTerminalMods();}
-            @Override
-            public SearchProgram getSearchProgram() {return parser.getSearchProgram();}
-            @Override
-            public String getSearchProgramVersion() {return null;} // we don't have this information in sequest.params
-            public Date getSearchDate() {return searchDate;}
-            public String getServerDirectory() {return remoteDirectory;}
-        };
-    }
-    
-    void uploadSearchResult(SequestSearchResultIn result, int runSearchId, int scanId) throws UploadException {
-        
-        int resultId = super.uploadBaseSearchResult(result, runSearchId, scanId);
-        
-        // upload the SQT sequest specific information for this result.
-        uploadSequestResultData(result.getSequestResultData(), resultId);
-    }
-
-    private void uploadSequestResultData(SequestResultData resultData, int resultId) {
-        // upload the Sequest specific result information if the cache has enough entries
+    private void uploadPercolatorResultData(PercolatorResultIn resultData, int percOutputId, int resultId) {
+        // upload the Percolator specific result information if the cache has enough entries
         if (percolatorResultDataList.size() >= BUF_SIZE) {
-            uploadSequestResultBuffer();
+            uploadPercolatorResultBuffer();
         }
-        // add the Sequest specific information for this result to the cache
-        ResultData resultDataDb = new ResultData(resultId, resultData);
-        percolatorResultDataList.add(resultDataDb);
+        // add the Percolator specific information for this result to the cache
+        PercolatorResultDataBean res = new PercolatorResultDataBean();
+        res.setPercolatorOutputId(percOutputId);
+        res.setResultId(resultId);
+        res.setDiscriminantScore(resultData.getDiscriminantScore());
+        res.setPosteriorErrorProbability(resultData.getPosteriorErrorProbability());
+        res.setQvalue(resultData.getQvalue());
+        percolatorResultDataList.add(res);
     }
     
-    private void uploadSequestResultBuffer() {
-        SequestSearchResultDAO sqtResultDao = daoFactory.getSequestResultDAO();
-        sqtResultDao.saveAllSequestResultData(percolatorResultDataList);
+    private void uploadPercolatorResultBuffer() {
+        PercolatorResultDAO percResultDao = daoFactory.getPercolatorResultDAO();
+        percResultDao.saveAllPercolatorResultData(percolatorResultDataList);
         percolatorResultDataList.clear();
     }
     
-    void flush() {
-        super.flush();
+    private void flush() {
         if (percolatorResultDataList.size() > 0) {
-            uploadSequestResultBuffer();
+            uploadPercolatorResultBuffer();
         }
+    }
+    
+
+//    final void deleteLastUploadedAnalysis() {
+//        if (lastUploadedPercOutputId == 0)
+//            return;
+//        PercolatorOutputDAO outputDao = daoFactory.getPercolatorOutputDAO();
+//        outputDao.delete(lastUploadedPercOutputId);
+//    }
+
+    static int getScanId(int runId, int scanNumber) throws UploadException {
+
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
+        if (scanId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN);
+            ex.setErrorMessage("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
+            throw ex;
+        }
+        return scanId;
+    }
+    
+    public static void deleteAnalysis(int analysisId) {
+        if (analysisId == 0)
+            return;
+        MsPostSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+        analysisDao.delete(analysisId);
     }
     
 }

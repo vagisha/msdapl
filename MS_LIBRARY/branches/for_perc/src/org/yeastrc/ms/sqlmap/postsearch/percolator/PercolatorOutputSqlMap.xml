@@ -4,7 +4,7 @@
 <sqlMap namespace="PercolatorOutput"> 
 
     <typeAlias alias="PercolatorOutputOut" type="org.yeastrc.ms.domain.postsearch.percolator.impl.PercolatorOutputBean"/>
-    <typeAlias alias="PercolatorOutputIn" type="org.yeastrc.ms.dao.postsearch.percolator.ibatis.PercolatorOutputWrap"/>
+    <typeAlias alias="PercolatorOutputIn" type="org.yeastrc.ms.domain.postsearch.percolator.PercolatorOutput"/>
 	
 	<typeAlias alias="FileFormatType" type="org.yeastrc.ms.domain.search.SearchFileFormat"/>
 	<typeAlias alias="FileFormatTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsRunSearchDAOImpl$SearchFileFormatTypeHandler"/>
@@ -46,5 +46,9 @@
       		select last_insert_id() as id
     	</selectKey>
     </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM PercolatorOutput WHERE id=#id#		    
+    </delete>
     
 </sqlMap>

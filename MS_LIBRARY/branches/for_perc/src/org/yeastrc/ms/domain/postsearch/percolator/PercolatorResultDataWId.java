@@ -9,7 +9,7 @@ public interface PercolatorResultDataWId {
     /**
      * @return the qvalue
      */
-    public abstract double qetQvalue();
+    public abstract double getQvalue();
     
     /**
      * @return the posterior error probability or -1.0 if there was no posterior probability 

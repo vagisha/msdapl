@@ -18,8 +18,8 @@ import org.yeastrc.ms.parser.SQTSearchDataProvider;
 public abstract class SQTFileReader extends AbstractReader 
     implements SQTSearchDataProvider  {
 
-    private List<MsResidueModificationIn> searchDynamicResidueMods;
-    private List<MsTerminalModificationIn> searchDynamicTerminalMods;
+    private List<? extends MsResidueModificationIn> searchDynamicResidueMods;
+    private List<? extends MsTerminalModificationIn> searchDynamicTerminalMods;
     
 
     private static final Logger log = Logger.getLogger(SQTFileReader.class);
@@ -84,22 +84,22 @@ public abstract class SQTFileReader extends AbstractReader
         searchDynamicTerminalMods = new ArrayList<MsTerminalModificationIn>();
     }
     
-    public void setDynamicResidueMods(List<MsResidueModificationIn> dynaResidueMods) {
+    public void setDynamicResidueMods(List<? extends MsResidueModificationIn> dynaResidueMods) {
         if (dynaResidueMods != null)
             this.searchDynamicResidueMods = dynaResidueMods;
     }
     
     protected List<MsResidueModificationIn> getDynamicResidueMods() {
-        return this.searchDynamicResidueMods;
+        return (List<MsResidueModificationIn>) this.searchDynamicResidueMods;
     }
     
-    public void setDynamicTerminalMods(List<MsTerminalModificationIn> dynaTerminalMods) {
+    public void setDynamicTerminalMods(List<? extends MsTerminalModificationIn> dynaTerminalMods) {
         if (dynaTerminalMods != null)
             this.searchDynamicTerminalMods = dynaTerminalMods;
     }
     
     protected List<MsTerminalModificationIn> getDynamicTerminalMods() {
-        return this.searchDynamicTerminalMods;
+        return (List<MsTerminalModificationIn>) this.searchDynamicTerminalMods;
     }
     
     public SQTHeader getSearchHeader()  throws DataProviderException {

@@ -55,6 +55,14 @@
     	SELECT id FROM msRunSearchResult WHERE runSearchID = #id#
     </select>
     
+    <select id="selectResultForRunSearchScanChargePeptide" resultMap="msSearchResult" parameterClass="java.util.Map">
+    	SELECT * FROM msRunSearchResult 
+    	WHERE runSearchID = #runSearchId# 
+    	AND scanID = #scanId#
+    	AND charge = #charge#
+    	AND peptide = #peptide#
+    </select>
+    
     <select id="selectResultIdsForRunSearchScanCharge" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msRunSearchResult 
     	WHERE runSearchID = #runSearchId# 

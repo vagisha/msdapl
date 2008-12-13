@@ -5,7 +5,7 @@
 
 
 	<typeAlias alias="PercSqtHeaderOut" type="org.yeastrc.ms.domain.search.sqtfile.impl.HeaderItemBean"/>
-	<typeAlias alias="PercSqtHeaderIn" type="org.yeastrc.ms.domain.postsearch.percolator.impl.PercolatorSQTHeaderWrap"/>
+	<typeAlias alias="PercSqtHeaderIn" type="org.yeastrc.ms.dao.postsearch.percolator.ibatis.PercolatorSQTHeaderWrap"/>
 	
 	
 	<resultMap class="PercSqtHeaderOut" id="headerResult">

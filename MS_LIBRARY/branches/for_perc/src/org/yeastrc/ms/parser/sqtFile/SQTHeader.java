@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.SearchProgram;
@@ -143,19 +145,12 @@ public class SQTHeader implements SQTRunSearchIn {
             buf.deleteCharAt(buf.length() -1);
         return buf.toString();
     }
-    
-
-    /**
-     * @return the sqtGenerator
-     */
-    public String getSearchEngineName() {
-        return sqtGenerator;
-    }
 
     /**
      * @return the sqtGeneratorVersion
      */
     public String getSearchEngineVersion() {
+        getSearchFileFormat(); // this will determine the version if this is a PercolatorSQT;
         return sqtGeneratorVersion;
     }
     
@@ -173,6 +168,7 @@ public class SQTHeader implements SQTRunSearchIn {
         for(SQTHeaderItem f: headerItems) {
             if (f.getName().equalsIgnoreCase(SearchProgram.PERCOLATOR.displayName())) {
                 sqtType = SearchFileFormat.SQT_PERC;
+                this.sqtGeneratorVersion = parsePercolatorVersion(f.getValue());
                 return sqtType;
             }
         }
@@ -190,6 +186,16 @@ public class SQTHeader implements SQTRunSearchIn {
             sqtType = SearchFileFormat.UNKNOWN;
         }
         return sqtType;
+    }
+
+    String parsePercolatorVersion(String value) {
+        // Example: Percolator v 1.07, Build Date Aug 27 2008 10:06:10
+        Pattern pattern = Pattern.compile("v\\s+(\\d+\\.\\d+)\\s*,.*"); 
+        Matcher matcher = pattern.matcher(value);
+        if(matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     @Override

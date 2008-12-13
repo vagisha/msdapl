@@ -4,7 +4,7 @@
 <sqlMap namespace="MsPostSearchAnalysis"> 
 
     <typeAlias alias="MsSearchAnalysisOut" type="org.yeastrc.ms.domain.postsearch.impl.PostSearchAnalysisBean"/>
-    <typeAlias alias="MsSearchAnalysisIn" type="org.yeastrc.ms.dao.postsearch.ibatis.MsPostSearchAnalysisWrap"/>
+    <typeAlias alias="MsSearchAnalysisIn" type="org.yeastrc.ms.domain.postsearch.impl.PostSearchAnalysisBean"/>
 	
 	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>
 	<typeAlias alias="ProgramTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl$SearchProgramTypeHandler"/>
@@ -47,9 +47,6 @@
     	</selectKey>
     </insert>
     
-    <delete id="delete" parameterClass="Integer">
-		DELETE FROM msPostSearchAnalysis WHERE id=#id#		    
-    </delete>
     
     <update id="updateAnalysisProgramVersion" parameterClass="java.util.Map">
     	UPDATE msPostSearchAnalysis
@@ -67,5 +64,9 @@
     	SET analysisProgramName=#analysisProgram#
     	WHERE id=#searchId#
     </update>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM msPostSearchAnalysis WHERE id=#id#		    
+    </delete>
     
 </sqlMap>

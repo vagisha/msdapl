@@ -166,5 +166,12 @@ public class HeaderTest extends TestCase {
         assertEquals("Precursor/Fragment", parsed[0]);
         assertEquals("Ion Isotopes AVG/MONO", parsed[1]);
     }
+    
+    public void testParsePercolatorVersion() {
+        String versionStr = "v 1.07, Build Date Aug 27 2008 10:06:10";
+        SQTHeader header = new SQTHeader();
+        String version = header.parsePercolatorVersion(versionStr);
+        assertEquals("1.07", version);
+    }
 
 }

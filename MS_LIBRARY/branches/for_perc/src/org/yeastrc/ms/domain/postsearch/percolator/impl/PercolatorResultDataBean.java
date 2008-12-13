@@ -32,7 +32,7 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
     }
 
     @Override
-    public double qetQvalue() {
+    public double getQvalue() {
         return qvalue;
     }
 

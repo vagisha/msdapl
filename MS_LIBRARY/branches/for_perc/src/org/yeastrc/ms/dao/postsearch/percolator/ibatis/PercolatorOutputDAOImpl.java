@@ -5,7 +5,6 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.postsearch.percolator.PercolatorOutputDAO;
 import org.yeastrc.ms.domain.postsearch.percolator.PercolatorOutput;
-import org.yeastrc.ms.domain.postsearch.percolator.PercolatorOutputIn;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -28,8 +27,12 @@ public class PercolatorOutputDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public int save(PercolatorOutputIn percOutput, int percId, int runSearchId) {
-        PercolatorOutputWrap wrap = new PercolatorOutputWrap(percOutput, percId, runSearchId);
-        return saveAndReturnId(namespace+".insert", wrap);
+    public int save(PercolatorOutput percOutput) {
+        return saveAndReturnId(namespace+".insert", percOutput);
+    }
+
+    @Override
+    public void delete(int percOutputId) {
+        delete(namespace+".delete", percOutputId);
     }
 }

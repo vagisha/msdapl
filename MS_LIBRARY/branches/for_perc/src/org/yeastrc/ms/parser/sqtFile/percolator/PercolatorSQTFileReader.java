@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.postsearch.percolator.PercolatorResultIn;
+import org.yeastrc.ms.domain.postsearch.percolator.PercolatorSearchScan;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -158,7 +159,7 @@ public class PercolatorSQTFileReader extends SQTFileReader {
         return result;
     }
 
-    private static final class PercSearchScan implements SQTSearchScanIn {
+    private static final class PercSearchScan implements PercolatorSearchScan {
 
         private SQTSearchScanIn scan;
         private List<PercolatorResultIn> resultList;

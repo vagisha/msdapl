@@ -15,6 +15,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
+import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
@@ -44,6 +45,12 @@ ProlucidSearchResultDAO {
         return (ProlucidSearchResult) queryForObject("ProlucidResult.select", resultId);
     }
 
+    @Override
+    public MsSearchResult loadResultForSearchScanChargePeptide(int runSearchId,
+            int scanId, int charge, String peptide) {
+        return resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, charge, peptide);
+    }
+    
     @Override
     public List<Integer> loadResultIdsForRunSearch(int runSearchId) {
         return resultDao.loadResultIdsForRunSearch(runSearchId);

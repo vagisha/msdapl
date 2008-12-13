@@ -8,7 +8,7 @@ public interface PercolatorSQTHeaderDAO {
 
     public abstract List<SQTHeaderItem> loadSQTHeadersForPercolatorOutput(int percOutputId);
 
-    public abstract void saveSQTHeader(SQTHeaderItem headerItem);
+    public abstract void saveSQTHeader(SQTHeaderItem headerItem, int percOutputId);
 
     public abstract void deleteSQTHeadersForPercolatorOutput(int percOutputId);
     

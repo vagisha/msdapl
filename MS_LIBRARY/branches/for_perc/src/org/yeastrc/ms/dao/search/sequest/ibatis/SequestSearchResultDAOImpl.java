@@ -16,6 +16,7 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
@@ -41,6 +42,12 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     
     public SequestSearchResult load(int resultId) {
         return (SequestSearchResult) queryForObject("SequestResult.select", resultId);
+    }
+    
+    @Override
+    public MsSearchResult loadResultForSearchScanChargePeptide(int runSearchId,
+            int scanId, int charge, String peptide) {
+        return resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, charge, peptide);
     }
     
     @Override

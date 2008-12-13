@@ -14,6 +14,12 @@ public interface PercolatorResultDAO {
     public abstract List<Integer> loadResultIdsForPercolatorOutput(int percOutputId);
     
     
+    public abstract List<Integer> loadResultIdsWithQvalueThreshold(int percOutputId, double qvalue);
+    
+    
+    public abstract List<Integer> loadResultIdsWithPepThreshold(int percOutputId, double pep);
+    
+    
     public abstract List<Integer> loadResultIdsForRunSearch(int runSearchId);
     
     

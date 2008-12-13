@@ -27,8 +27,9 @@ public class PercolatorSQTHeaderDAOImpl extends BaseSqlMapDAO implements Percola
     }
 
     @Override
-    public void saveSQTHeader(SQTHeaderItem headerItem) {
-        save(namespace+".insertHeader",headerItem);
+    public void saveSQTHeader(SQTHeaderItem headerItem, int percOutputId) {
+        PercolatorSQTHeaderWrap wrap = new PercolatorSQTHeaderWrap(headerItem, percOutputId);
+        save(namespace+".insertHeader",wrap);
     }
 
 }

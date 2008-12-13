@@ -1,4 +1,4 @@
-package org.yeastrc.ms.domain.postsearch.percolator.impl;
+package org.yeastrc.ms.dao.postsearch.percolator.ibatis;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 

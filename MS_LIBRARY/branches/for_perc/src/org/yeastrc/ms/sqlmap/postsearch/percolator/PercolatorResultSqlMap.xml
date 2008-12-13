@@ -4,81 +4,88 @@
 <sqlMap namespace="PercolatorResult"> 
 
 	
-	<typeAlias alias="PercolatorResultOut" type="org.yeastrc.ms.domain.search.impl.SearchResultBean" />
-	<typeAlias alias="MsSearchResultPeptideOut" type="org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean" />
-	<typeAlias alias="MsSearchResultIn" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultWrap" />
-	
-	<typeAlias alias="VStatusHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl$ValidationStatusTypeHandler" />
+	<typeAlias alias="PercolatorResultOut" type="org.yeastrc.ms.domain.postsearch.percolator.impl.PercolatorResultBean" />
+	<typeAlias alias="PercolatorResultIn" type="org.yeastrc.ms.domain.postsearch.percolator.PercolatorResultDataWId" />
 	
 	
-	<resultMap class="MsSearchResultPeptideOut" id="msSearchResultPeptideResult">
-		<result property="peptideSequence" column="peptide" />
-		<result property="preResidue" column="preResidue" typeHandler="CharTypeHandler" />
-		<result property="postResidue" column="postResidue" typeHandler="CharTypeHandler" />
-		<result property="dynamicResidueModifications"
-				select="MsSearchMod.selectDynamicResidueModsForResult"
-				column="id" />
-		<result property="dynamicTerminalModifications"
-				select="MsSearchMod.selectDynamicTerminalModsForResult"
-				column="id" />
+	<resultMap class="PercolatorResultOut" id="percolatorResultResult" extends="MsSearchResult.msSearchResult">
+		<result property="percoaltorOutputId" column="percOutputID" nullValue="0"/>
+		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
+		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
+		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
 	</resultMap>
 	
-	<resultMap class="MsSearchResultOut" id="msSearchResult">
+	<resultMap class="PercolatorResultOut" id="percolatorResultResultN" groupBy="id">
 		<result property="id" column="id" />
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="scanId" column="scanID" nullValue="0"/>
 		<result property="charge" column="charge" nullValue="0"/>
 		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
 		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
-		<result property="proteinMatchList" 
-				select="MsResultProtein.selectResultProteins" 
-				column="id"/>
+		<result property="percoaltorOutputId" column="percOutputID" nullValue="0"/>
+		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
+		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
+		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
 	</resultMap>
 	
-	
-	<parameterMap class="MsSearchResultIn" id="msSearchResultParam">
-		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="charge" jdbcType="TINYINT" nullValue="0"/>
-		<parameter property="peptideSequence" jdbcType="VARCHAR"/>
-		<parameter property="preResidueString" jdbcType="CHAR" nullValue=""/>
-		<parameter property="postResidueString" jdbcType="CHAR" nullValue=""/>
-		<parameter property="validationStatus" jdbcType="CHAR" typeHandler="VStatusHandler"/>
+	<parameterMap class="PercolatorResultIn" id="percolatorResultParam">
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="percoaltorOutputId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="qvalue" jdbcType="DOUBLE" nullValue="-1.0"/>
+		<parameter property="posteriorErrorProbability" jdbcType="DOUBLE" nullValue="-1.0"/>
+		<parameter property="discriminantScore" jdbcType="DOUBLE" nullValue="-1.0"/>
 	</parameterMap>
 	
 	
-    <select id="select" resultMap="msSearchResult" parameterClass="Integer">
-    	SELECT * FROM msRunSearchResult WHERE id = #id#
+    <select id="select" resultMap="percolatorResultResult" parameterClass="Integer">
+		SELECT * FROM msRunSearchResult, PercolatorResult 
+		WHERE PercolatorResult.resultID = msRunSearchResult.id
+		AND msRunSearchResult.id = #id#
+	</select>
+    
+    <select id="selectResultIdsForPercolatorOutput" resultClass="Integer" parameterClass="Integer">
+    	SELECT resultID FROM PercolatorResult
+    	WHERE percOutputID = #percOutputId# 
     </select>
     
-     <select id="selectResultIdsForRunSearch" resultClass="Integer" parameterClass="Integer">
-    	SELECT id FROM msRunSearchResult WHERE runSearchID = #id#
+    <select id="selectResultIdsForRunSearch" resultClass="Integer" parameterClass="Integer">
+    	SELECT pres.resultID 
+    	FROM PercolatorResult AS pres, msRunSearchResult as res
+    	WHERE pres.resultID = res.resultID
+    	AND res.runSearchID = #runSearchId#
     </select>
     
-    <select id="selectResultIdsForRunSearchScanCharge" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msRunSearchResult 
-    	WHERE runSearchID = #runSearchId# 
-    	AND scanID = #scanId#
-    	AND charge = #charge#
+    <select id="selectResultIdsWQvalThreshold" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT resultID FROM PercolatorResult
+    	WHERE percOutputID = #percOutputId# 
+    	AND qvalue <= #qvalue#
     </select>
     
-    <insert id="insert" parameterMap="msSearchResultParam">
-    	INSERT INTO msRunSearchResult (
-    	runSearchID,
-    	scanID,
-    	charge,
-    	peptide,
-    	preResidue,
-    	postResidue,
-    	validationStatus) 
-    	VALUES (?,?,?,?,?,?,?)
-    	<selectKey resultClass="int" >
-      		select last_insert_id() as id
-    	</selectKey>
+    <select id="selectResultIdsWPepThreshold" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT resultID FROM PercolatorResult
+    	WHERE percOutputID = #percOutputId# 
+    	AND pep <= #pep#
+    </select>
+    
+    
+    <insert id="insert" parameterMap="percolatorResultParam">
+    	INSERT INTO PercolatorResult 
+    	(resultID, 
+    	percOutputID,
+    	qvalue,
+    	pep,
+    	discriminantScore) 
+    	VALUES (?,?,?,?,?)
     </insert>
     
-    <delete id="delete" parameterClass="Integer">
-		DELETE FROM msRunSearchResult WHERE id=#id#		    
-    </delete>
+    <insert id="insertAll" parameterClass="String">
+    	INSERT INTO PercolatorResult 
+    	(resultID, 
+    	percOutputID,
+    	qvalue,
+    	pep,
+    	discriminantScore) 
+    	VALUES $values$
+    </insert>
     
 </sqlMap>

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.postsearch.MsPostSearchAnalysisDAO;
 import org.yeastrc.ms.domain.postsearch.MsPostSearchAnalysis;
-import org.yeastrc.ms.domain.postsearch.MsPostSearchAnalysisIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -32,9 +31,8 @@ public class MsPostSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsPost
     }
     
     @Override
-    public int save(MsPostSearchAnalysisIn analysis, int searchId) {
-        MsPostSearchAnalysisWrap wrap = new MsPostSearchAnalysisWrap(searchId, analysis);
-        return saveAndReturnId(namespace+".insert", wrap);
+    public int save(MsPostSearchAnalysis analysis) {
+        return saveAndReturnId(namespace+".insert", analysis);
     }
 
     @Override
