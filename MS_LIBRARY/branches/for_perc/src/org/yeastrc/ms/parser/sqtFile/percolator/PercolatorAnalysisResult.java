@@ -15,7 +15,7 @@ import org.yeastrc.ms.parser.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidResultPeptideBuilder;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 
-public class PercolatorResult extends SQTSearchResult implements PercolatorResultIn {
+public class PercolatorAnalysisResult extends SQTSearchResult implements PercolatorResultIn {
 
     private MsSearchResultPeptide resultPeptide = null;
     
@@ -36,7 +36,7 @@ public class PercolatorResult extends SQTSearchResult implements PercolatorResul
     private SearchProgram searchProgram;
     
     
-    public PercolatorResult(List<MsResidueModificationIn> searchDynaResidueMods, List<MsTerminalModificationIn> searchDynaTermMods,
+    public PercolatorAnalysisResult(List<MsResidueModificationIn> searchDynaResidueMods, List<MsTerminalModificationIn> searchDynaTermMods,
             SearchProgram searchProgram) {
         super();
         if (searchDynaResidueMods != null)

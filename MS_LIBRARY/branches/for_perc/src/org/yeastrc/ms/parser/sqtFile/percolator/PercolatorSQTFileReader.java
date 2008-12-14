@@ -81,7 +81,7 @@ public class PercolatorSQTFileReader extends SQTFileReader {
      */
     private PercolatorResultIn parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
 
-        PercolatorResult result = parsePeptideResult(currentLine, scanNumber, charge);
+        PercolatorAnalysisResult result = parsePeptideResult(currentLine, scanNumber, charge);
 
         advanceLine();
 
@@ -118,14 +118,14 @@ public class PercolatorSQTFileReader extends SQTFileReader {
      *                         there was an error parsing numbers in the line OR
      *                         there was an error parsing the peptide sequence in this 'M' line.
      */
-    PercolatorResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
+    PercolatorAnalysisResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
 
         String[] tokens = line.split("\\s+");
         if (tokens.length != 11) {
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-        PercolatorResult result = new PercolatorResult(getDynamicResidueMods(), getDynamicTerminalMods(), searchProgram);
+        PercolatorAnalysisResult result = new PercolatorAnalysisResult(getDynamicResidueMods(), getDynamicTerminalMods(), searchProgram);
         try {
             result.setxCorrRank(Integer.parseInt(tokens[1]));
             result.setSpRank(Integer.parseInt(tokens[2]));
@@ -198,14 +198,6 @@ public class PercolatorSQTFileReader extends SQTFileReader {
         public BigDecimal getTotalIntensity() {
             return scan.getTotalIntensity();
         }
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
     }
 
 }
