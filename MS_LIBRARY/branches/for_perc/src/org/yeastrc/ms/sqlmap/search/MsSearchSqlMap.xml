@@ -79,14 +79,14 @@
     </update>
     
     <parameterMap class="java.util.Map" id="updateProgParam">
+    	<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
 		<parameter property="searchId"  />
-		<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
 	</parameterMap>
 	
     <update id="updateAnalysisProgram" parameterMap="updateProgParam">
     	UPDATE msSearch
-    	SET analysisProgram=#analysisProgram#
-    	WHERE id=#searchId#
+    	SET analysisProgramName=?
+    	WHERE id=?
     </update>
     
 </sqlMap>

@@ -2,7 +2,7 @@ package org.yeastrc.ms.dao.analysis.percolator.ibatis;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorParam;
 
-public class PercolatorParamWrap {
+class PercolatorParamWrap {
 
     private int analysisId;
     private PercolatorParam param;

@@ -67,7 +67,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         assertNull(resultDao.load(runSearchId_1));
         
         // insert a search result with NO extra information
-        MsSearchResultIn result1 = makeSearchResult(searchId_1, runSearchId_1, 3, "PEPTIDE1", false);
+        MsSearchResultIn result1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", false);
         int resultId_1 = resultDao.save(searchId_1, result1,  runSearchId_1, 123);// scanId = 123
         
         // read it back
@@ -79,7 +79,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
        
         
         // save another result this time save protein matches
-        MsSearchResultTest result2 = (MsSearchResultTest)makeSearchResult(searchId_1, runSearchId_1, 3, "PEPTIDE2", false);
+        MsSearchResultTest result2 = (MsSearchResultTest)makeSearchResult(searchId_1, 3, "PEPTIDE2", false);
         addProteinMatches(result2);
         int resultId_2 = resultDao.save(searchId_1, result2, runSearchId_1, 123); // scanId = 123
         
@@ -93,7 +93,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         // save another result this time save dynamic mods
         // this time use runSearchId_2
-        MsSearchResultIn result3 = makeSearchResult(searchId_1, runSearchId_2, 3, "PEPTIDE3", true);
+        MsSearchResultIn result3 = makeSearchResult(searchId_1, 3, "PEPTIDE3", true);
         int resultId_3 = resultDao.save(searchId_1, result3,  runSearchId_2, 321);
         
         // read it back

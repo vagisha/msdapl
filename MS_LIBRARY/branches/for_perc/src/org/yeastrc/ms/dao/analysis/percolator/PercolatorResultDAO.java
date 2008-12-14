@@ -20,7 +20,10 @@ public interface PercolatorResultDAO {
     public abstract List<Integer> loadResultIdsForRunSearch(int runSearchId);
     
     
-    public abstract int save(PercolatorResultDataWId data);
+    public abstract List<Integer> loadResultIdsForPercolatorAnalysis(int analysisId);
+    
+    
+    public abstract void save(PercolatorResultDataWId data);
     
     
     public abstract void saveAllPercolatorResultData(List<PercolatorResultDataWId> dataList);

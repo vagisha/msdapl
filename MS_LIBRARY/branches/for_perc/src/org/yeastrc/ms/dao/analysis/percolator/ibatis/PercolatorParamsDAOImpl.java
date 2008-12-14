@@ -24,7 +24,7 @@ public class PercolatorParamsDAOImpl extends BaseSqlMapDAO implements Percolator
     @Override
     public void saveParam(PercolatorParam param, int analysisId) {
         PercolatorParamWrap wrap = new PercolatorParamWrap(param, analysisId);
-        save(namespace+".insertHeader",wrap);
+        save(namespace+".insertParam",wrap);
     }
 
 }

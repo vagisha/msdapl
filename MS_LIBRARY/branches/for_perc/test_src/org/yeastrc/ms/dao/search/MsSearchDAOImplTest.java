@@ -7,8 +7,9 @@ import java.util.List;
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchIn;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
+import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchProgram;
 
@@ -52,6 +53,10 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(2, enzymeDao.loadEnzymesForSearch(searchId_2).size());
         checkSearch(search_2, searchDao.loadSearch(searchId_2));
         
+        
+        searchDao.updateSearchProgram(searchId_2, SearchProgram.PROLUCID);
+        MsSearch fromDb = searchDao.loadSearch(searchId_2);
+        assertEquals(SearchProgram.PROLUCID, fromDb.getSearchProgram());
         
         // delete the searches
         searchDao.deleteSearch(searchId_1);

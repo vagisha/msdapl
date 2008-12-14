@@ -13,7 +13,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAnalysisDAO {
 
-    private static final String namespace = "MsPostSearchAnalysis";
+    private static final String namespace = "MsSearchAnalysis";
     
     
     public MsSearchAnalysisDAOImpl(SqlMapClient sqlMap) {
@@ -36,10 +36,10 @@ public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAn
     }
 
     @Override
-    public int updateAnalysisProgram(int analysis, SearchProgram program) {
+    public int updateAnalysisProgram(int analysisId, SearchProgram program) {
         Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put("analysisId", analysis);
         map.put("analysisProgram", program);
+        map.put("analysisId", analysisId);
         return update(namespace+".updateAnalysisProgram", map);
     }
 

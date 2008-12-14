@@ -25,17 +25,17 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public List<Integer> loadResultIdsWithPepThreshold(int percOutputId, double pep) {
+    public List<Integer> loadResultIdsWithPepThreshold(int analysisId, double pep) {
         Map<String, Number> map = new HashMap<String, Number>(2);
-        map.put("percOutputId", percOutputId);
+        map.put("analysisId", analysisId);
         map.put("pep", pep);
         return queryForList(namespace+".selectResultIdsWPepThreshold", map);
     }
 
     @Override
-    public List<Integer> loadResultIdsWithQvalueThreshold(int percOutputId, double qvalue) {
+    public List<Integer> loadResultIdsWithQvalueThreshold(int analysisId, double qvalue) {
         Map<String, Number> map = new HashMap<String, Number>(2);
-        map.put("percOutputId", percOutputId);
+        map.put("analysisId", analysisId);
         map.put("qvalue", qvalue);
         return queryForList(namespace+".selectResultIdsWQvalThreshold", map);
     }
@@ -46,8 +46,13 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public int save(PercolatorResultDataWId data) {
-        return saveAndReturnId(namespace+".insert", data);
+    public List<Integer> loadResultIdsForPercolatorAnalysis(int analysisId) {
+        return queryForList(namespace+".selectResultIdsForAnalysis", analysisId);
+    }
+    
+    @Override
+    public void save(PercolatorResultDataWId data) {
+        save(namespace+".insert", data);
     }
 
     @Override
@@ -74,4 +79,5 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         values.deleteCharAt(0);
         save(namespace+".insertAll", values.toString());
     }
+   
 }

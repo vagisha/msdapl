@@ -47,7 +47,7 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
     }
 
     @Override
-    public double qetQvalue() {
+    public double getQvalue() {
         return qvalue;
     }
     

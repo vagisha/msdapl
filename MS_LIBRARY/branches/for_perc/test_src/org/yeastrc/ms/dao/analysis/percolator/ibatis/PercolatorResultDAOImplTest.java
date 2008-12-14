@@ -1,0 +1,247 @@
+package org.yeastrc.ms.dao.analysis.percolator.ibatis;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.yeastrc.ms.dao.BaseDAOTestCase;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
+import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorResultDataBean;
+import org.yeastrc.ms.domain.search.MsSearchIn;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
+
+public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
+
+    private static final PercolatorResultDAO percResDao = DAOFactory.instance().getPercolatorResultDAO();
+    
+    protected void setUp() throws Exception {
+        super.setUp();
+        BaseDAOTestCase.resetDatabase();
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
+
+    public final void testSavePercolatorResultDataWId() {
+        PercolatorResultDataBean data = new PercolatorResultDataBean();
+        data.setResultId(12);
+        data.setSearchAnalysisId(21);
+        data.setPosteriorErrorProbability(0.23);
+        data.setQvalue(0.01);
+        try {
+            percResDao.save(data);
+        }
+        catch(Exception e) {
+            fail("Error saving valid percolator result");
+        }
+    }
+
+    public final void testSaveAllPercolatorResultData() {
+        
+        List<PercolatorResultDataWId> dataList = new ArrayList<PercolatorResultDataWId>(3);
+        for(int i = 1; i < 4; i++) {
+            PercolatorResultDataBean data = new PercolatorResultDataBean();
+            data.setResultId(i);
+            data.setSearchAnalysisId(21);
+            data.setPosteriorErrorProbability(0.1*i);
+            data.setQvalue(0.01*i);
+            dataList.add(data);
+        }
+        try {
+            percResDao.saveAllPercolatorResultData(dataList);
+        }
+        catch(Exception e) {
+            fail("Error saving valid percolator result list");
+        }
+    }
+    
+    public final void testLoadResultIdsWithPepThreshold() {
+
+        List<PercolatorResultDataWId> dataList = new ArrayList<PercolatorResultDataWId>(3);
+        for(int i = 1; i < 4; i++) {
+            PercolatorResultDataBean data = new PercolatorResultDataBean();
+            data.setResultId(i);
+            data.setSearchAnalysisId(21);
+            data.setPosteriorErrorProbability(0.1*i);
+            data.setQvalue(0.01*i);
+            dataList.add(data);
+        }
+        percResDao.saveAllPercolatorResultData(dataList);
+        List<Integer> ids = percResDao.loadResultIdsWithPepThreshold(21, 0.25);
+        assertEquals(2, ids.size());
+        
+    }
+
+    public final void testLoadResultIdsWithQvalueThreshold() {
+        List<PercolatorResultDataWId> dataList = new ArrayList<PercolatorResultDataWId>(3);
+        for(int i = 1; i < 4; i++) {
+            PercolatorResultDataBean data = new PercolatorResultDataBean();
+            data.setResultId(i);
+            data.setSearchAnalysisId(21);
+            data.setPosteriorErrorProbability(0.1*i);
+            data.setQvalue(0.01*i);
+            dataList.add(data);
+        }
+        percResDao.saveAllPercolatorResultData(dataList);
+        List<Integer> ids = percResDao.loadResultIdsWithQvalueThreshold(21, 0.019);
+        assertEquals(1, ids.size());
+    }
+    
+    public final void testLoad() {
+        
+        // save a search
+        MsSearchIn search = super.makeSearch(true, false, false, true);
+        int searchId = searchDao.saveSearch(search, 2, 56);
+        
+        // save a couple of search results
+        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", false);
+        int resultId1 = resultDao.save(searchId, result1, 12, 999);
+        
+        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", false);
+        int resultId2 = resultDao.save(searchId, result2, 13, 1999);
+        
+        // save percolator results for each search result
+        PercolatorResultDataBean pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId1);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.01);
+        pres1.setPosteriorErrorProbability(0.25);
+        percResDao.save(pres1);
+        
+        pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId2);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.05);
+        pres1.setDiscriminantScore(0.50);
+        percResDao.save(pres1);
+        
+        // load the percolator results
+        PercolatorResult fromDb = percResDao.load(resultId1);
+        assertNotNull(fromDb);
+        assertEquals(3, fromDb.getCharge());
+        assertEquals(999, fromDb.getScanId());
+        assertEquals("PEPTIDE", fromDb.getResultPeptide().getPeptideSequence());
+        assertEquals(12, fromDb.getRunSearchId());
+        assertEquals(resultId1, fromDb.getId());
+        assertEquals(0, fromDb.getResultPeptide().getPostResidue());
+        assertEquals(0, fromDb.getResultPeptide().getPreResidue());
+        assertEquals(21, fromDb.getSearchAnalysisId());
+        assertEquals(0.25, fromDb.getPosteriorErrorProbability());
+        assertEquals(0.01, fromDb.getQvalue());
+        assertEquals(-1.0, fromDb.getDiscriminantScore());
+        
+        fromDb = percResDao.load(resultId2);
+        assertNotNull(fromDb);
+        assertEquals(2, fromDb.getCharge());
+        assertEquals(1999, fromDb.getScanId());
+        assertEquals("EDITPEP", fromDb.getResultPeptide().getPeptideSequence());
+        assertEquals(13, fromDb.getRunSearchId());
+        assertEquals(resultId2, fromDb.getId());
+        assertEquals(0, fromDb.getResultPeptide().getPostResidue());
+        assertEquals(0, fromDb.getResultPeptide().getPreResidue());
+        assertEquals(21, fromDb.getSearchAnalysisId());
+        assertEquals(-1.0, fromDb.getPosteriorErrorProbability());
+        assertEquals(0.05, fromDb.getQvalue());
+        assertEquals(0.50, fromDb.getDiscriminantScore());
+    }
+
+
+    public final void testLoadResultIdsForRunSearch() {
+        
+        // save a search
+        MsSearchIn search = super.makeSearch(true, false, false, true);
+        int searchId = searchDao.saveSearch(search, 2, 56);
+        
+        // save some of search results
+        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", false);
+        int resultId1 = resultDao.save(searchId, result1, 12, 999);
+        
+        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", false);
+        int resultId2 = resultDao.save(searchId, result2, 13, 1999);
+        
+        MsSearchResultIn result3 = super.makeSearchResult(searchId, 3, "PEPTIDE2", false);
+        int resultId3 = resultDao.save(searchId, result3, 13, 2000);
+        
+        // save percolator results for each search result
+        PercolatorResultDataBean pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId1);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.01);
+        pres1.setPosteriorErrorProbability(0.25);
+        percResDao.save(pres1);
+        
+        pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId2);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.05);
+        pres1.setDiscriminantScore(0.50);
+        percResDao.save(pres1);
+        
+        pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId3);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.03);
+        pres1.setDiscriminantScore(0.30);
+        percResDao.save(pres1);
+        
+        List<Integer> resultIds = percResDao.loadResultIdsForRunSearch(13);
+        assertEquals(2, resultIds.size());
+        
+        Collections.sort(resultIds);
+        assertEquals(Integer.valueOf(resultId2), resultIds.get(0));
+        assertEquals(Integer.valueOf(resultId3), resultIds.get(1));
+    }
+
+    
+    public final void testLoadResultIdsForPrecolatorAnalysis() {
+        
+        // save a search
+        MsSearchIn search = super.makeSearch(true, false, false, true);
+        int searchId = searchDao.saveSearch(search, 2, 56);
+        
+        // save some of search results
+        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", false);
+        int resultId1 = resultDao.save(searchId, result1, 12, 999);
+        
+        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", false);
+        int resultId2 = resultDao.save(searchId, result2, 13, 1999);
+        
+        MsSearchResultIn result3 = super.makeSearchResult(searchId, 3, "PEPTIDE2", false);
+        int resultId3 = resultDao.save(searchId, result3, 13, 2000);
+        
+        // save percolator results for each search result
+        PercolatorResultDataBean pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId1);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.01);
+        pres1.setPosteriorErrorProbability(0.25);
+        percResDao.save(pres1);
+        
+        pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId2);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.05);
+        pres1.setDiscriminantScore(0.50);
+        percResDao.save(pres1);
+        
+        pres1 = new PercolatorResultDataBean();
+        pres1.setResultId(resultId3);
+        pres1.setSearchAnalysisId(21);
+        pres1.setQvalue(0.03);
+        pres1.setDiscriminantScore(0.30);
+        percResDao.save(pres1);
+        
+        List<Integer> resultIds = percResDao.loadResultIdsForPercolatorAnalysis(21);
+        assertEquals(3, resultIds.size());
+        
+        Collections.sort(resultIds);
+        assertEquals(Integer.valueOf(resultId1), resultIds.get(0));
+        assertEquals(Integer.valueOf(resultId2), resultIds.get(1));
+        assertEquals(Integer.valueOf(resultId3), resultIds.get(2));
+    }
+
+}

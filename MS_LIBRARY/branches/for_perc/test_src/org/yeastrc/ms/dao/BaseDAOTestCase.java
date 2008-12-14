@@ -155,7 +155,7 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH RESULT
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchResultIn makeSearchResult(int searchId, int runSearchId, int charge,String peptide, boolean addDynaResMod) {
+    protected MsSearchResultIn makeSearchResult(int searchId, int charge,String peptide, boolean addDynaResMod) {
 
         //!!------------ RESET the dynamic mod lookup table --------------------------------
 //        DynamicModLookupUtil.instance().reset();

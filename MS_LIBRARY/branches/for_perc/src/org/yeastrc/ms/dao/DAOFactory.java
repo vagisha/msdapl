@@ -309,14 +309,14 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // Post serach analysis related
     //-------------------------------------------------------------------------------------------
-    public MsSearchAnalysisDAO getPostSearchAnalysisDAO() {
+    public MsSearchAnalysisDAO getSearchAnalysisDAO() {
         return analysisDAO;
     }
     
     //-------------------------------------------------------------------------------------------
     // Percolator related
     //-------------------------------------------------------------------------------------------
-    public PercolatorParamsDAO getPercoltorSQTHeaderDAO() {
+    public PercolatorParamsDAO getPercoltorParamsDAO() {
         return percSQTHeaderDAO;
     }
     

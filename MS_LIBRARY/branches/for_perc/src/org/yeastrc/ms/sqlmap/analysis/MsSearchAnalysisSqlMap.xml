@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsSearchAnalysis"> 
+
+    <typeAlias alias="MsSearchAnalysisOut" type="org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean"/>
+    <typeAlias alias="MsSearchAnalysisIn" type="org.yeastrc.ms.domain.analysis.MsSearchAnalysis"/>
+	
+	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>
+	<typeAlias alias="ProgramTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl$SearchProgramTypeHandler"/>
+	
+	<resultMap class="MsSearchAnalysisOut" id="msAnalysisResult">
+		<result property="id" column="id" />
+		<result property="searchId" column="searchID" />
+		<result property="analysisProgram" column="programName" 
+				typeHandler="ProgramTypeHandler"/>
+		<result property="analysisProgramVersion" column="programVersion" />
+		<result property="uploadDate" column="uploadDate" />
+	</resultMap>
+	
+	<parameterMap class="MsSearchAnalysisIn" id="msAnalysisParam">
+		<parameter property="searchId" />
+		<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
+		<parameter property="analysisProgramVersion"/>
+	</parameterMap>
+	
+	
+    <select id="select" resultMap="msAnalysisResult" parameterClass="Integer">
+    	SELECT * FROM msSearchAnalysis WHERE id = #id#
+    </select>
+    
+    <select id="selectAnalysisIdsForSearch" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msSearchAnalysis WHERE searchID = #searchId#
+    </select>
+    
+    <insert id="insert" parameterMap="msAnalysisParam">
+    	INSERT INTO msSearchAnalysis (
+    	searchID,
+    	programName,
+    	programVersion)
+    	VALUES (?,?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    
+    <update id="updateAnalysisProgramVersion" parameterClass="java.util.Map">
+    	UPDATE msSearchAnalysis
+    	SET programVersion=#analysisProgramVersion#
+    	WHERE id=#analysisId#
+    </update>
+    
+    <parameterMap class="java.util.Map" id="updateAnalysisProgParam">
+    	<parameter property="analysisProgram" typeHandler="ProgramTypeHandler"/>
+		<parameter property="analysisId"  />
+	</parameterMap>
+	
+    <update id="updateAnalysisProgram" parameterMap="updateAnalysisProgParam">
+    	UPDATE msSearchAnalysis
+    	SET programName=?
+    	WHERE id=?
+    </update>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM msSearchAnalysis WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>

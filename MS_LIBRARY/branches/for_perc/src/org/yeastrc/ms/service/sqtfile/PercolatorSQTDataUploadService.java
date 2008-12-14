@@ -127,7 +127,7 @@ public class PercolatorSQTDataUploadService {
 
     public static void updateProgramVersion(int analysisId, String programVersion) {
         try {
-            MsSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+            MsSearchAnalysisDAO analysisDao = daoFactory.getSearchAnalysisDAO();
             analysisDao.updateAnalysisProgramVersion(analysisId, programVersion);
         }
         catch(RuntimeException e) {
@@ -223,7 +223,7 @@ public class PercolatorSQTDataUploadService {
     }
 
     private int saveTopLevelAnalysis(int searchId, String remoteDirectory) throws UploadException {
-        MsSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+        MsSearchAnalysisDAO analysisDao = daoFactory.getSearchAnalysisDAO();
         SearchAnalysisBean analysis = new SearchAnalysisBean();
         analysis.setSearchId(searchId);
         analysis.setServerDirectory(remoteDirectory);
@@ -369,7 +369,7 @@ public class PercolatorSQTDataUploadService {
         int percOutputId = percOutputDao.save(output);
         
         // save all the headers
-        PercolatorParamsDAO headerDao = daoFactory.getPercoltorSQTHeaderDAO();
+        PercolatorParamsDAO headerDao = daoFactory.getPercoltorParamsDAO();
         for(SQTHeaderItem header: search.getHeaders()) {
             headerDao.saveParam(header, percOutputId);
         }
@@ -411,7 +411,7 @@ public class PercolatorSQTDataUploadService {
         }
         // add the Percolator specific information for this result to the cache
         PercolatorResultDataBean res = new PercolatorResultDataBean();
-        res.setPercolatorOutputId(percOutputId);
+        res.setSearchAnalysisId(percOutputId);
         res.setResultId(resultId);
         res.setDiscriminantScore(resultData.getDiscriminantScore());
         res.setPosteriorErrorProbability(resultData.getPosteriorErrorProbability());
@@ -454,7 +454,7 @@ public class PercolatorSQTDataUploadService {
     public static void deleteAnalysis(int analysisId) {
         if (analysisId == 0)
             return;
-        MsSearchAnalysisDAO analysisDao = daoFactory.getPostSearchAnalysisDAO();
+        MsSearchAnalysisDAO analysisDao = daoFactory.getSearchAnalysisDAO();
         analysisDao.delete(analysisId);
     }
     

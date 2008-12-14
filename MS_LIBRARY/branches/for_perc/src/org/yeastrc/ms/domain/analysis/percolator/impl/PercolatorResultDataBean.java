@@ -52,7 +52,7 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
         this.resultId = resultId;
     }
     
-    public void setPercolatorOutputId(int outputId) {
-        this.analysisId = outputId;
+    public void setSearchAnalysisId(int analysisId) {
+        this.analysisId = analysisId;
     }
 }

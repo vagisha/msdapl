@@ -81,4 +81,11 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/prolucid/ProlucidSearchSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/prolucid/ProlucidSearchResultSqlMap.xml"/>
 	
+	<!-- Related to post search analysis -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/MsSearchAnalysisSqlMap.xml"/>
+	
+	<!-- Related to Percolator  -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorParamsSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorResultSqlMap.xml"/>
+	
 </sqlMapConfig>	

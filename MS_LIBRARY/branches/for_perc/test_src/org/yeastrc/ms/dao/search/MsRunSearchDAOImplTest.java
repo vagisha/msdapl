@@ -78,8 +78,8 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(87, runSearchDb_2.getSearchId());
 
         // add results for the searches
-        MsSearchResultIn r1 = makeSearchResult(searchId_1, runSearchId_2, 3, "PEPTIDE1", true); // charge = 3
-        MsSearchResultIn r2 = makeSearchResult(searchId_1, runSearchId_2, 3, "PEPTIDE1", true); // charge = 3;
+        MsSearchResultIn r1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", true); // charge = 3
+        MsSearchResultIn r2 = makeSearchResult(searchId_1, 3, "PEPTIDE1", true); // charge = 3;
         int r1_id = resultDao.save(searchId_1, r1, runSearchId_2, 2);
         int r2_id = resultDao.save(searchId_1, r2, runSearchId_2, 3);
         assertEquals(2, resultDao.loadResultIdsForRunSearch(runSearchId_2).size());

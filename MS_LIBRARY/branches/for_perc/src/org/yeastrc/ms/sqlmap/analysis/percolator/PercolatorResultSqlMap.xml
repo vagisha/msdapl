@@ -4,14 +4,14 @@
 <sqlMap namespace="PercolatorResult"> 
 
 	
-	<typeAlias alias="PercolatorResultOut" type="org.yeastrc.ms.domain.postsearch.percolator.impl.PercolatorResultBean" />
-	<typeAlias alias="PercolatorResultIn" type="org.yeastrc.ms.domain.postsearch.percolator.PercolatorResultDataWId" />
+	<typeAlias alias="PercolatorResultOut" type="org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorResultBean" />
+	<typeAlias alias="PercolatorResultIn" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId" />
 	
 	
 	<resultMap class="PercolatorResultOut" id="percolatorResultResult" extends="MsSearchResult.msSearchResult">
-		<result property="percoaltorOutputId" column="percOutputID" nullValue="0"/>
-		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
-		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
+		<result property="searchAnalysisId" column="searchAnalysisID" nullValue="0"/>
+		<result property="qvalue" column="qValue" nullValue="-1.0"/>
+		<result property="posteriorErrorProbability" column="PEP" nullValue="-1.0"/>
 		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
 	</resultMap>
 	
@@ -22,15 +22,15 @@
 		<result property="charge" column="charge" nullValue="0"/>
 		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
 		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
-		<result property="percoaltorOutputId" column="percOutputID" nullValue="0"/>
-		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
-		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
+		<result property="searchAnalysisId" column="searchAnalysisID" nullValue="0"/>
+		<result property="qvalue" column="qValue" nullValue="-1.0"/>
+		<result property="posteriorErrorProbability" column="PEP" nullValue="-1.0"/>
 		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
 	</resultMap>
 	
 	<parameterMap class="PercolatorResultIn" id="percolatorResultParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0" />
-		<parameter property="percoaltorOutputId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="searchAnalysisId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="qvalue" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="posteriorErrorProbability" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="discriminantScore" jdbcType="DOUBLE" nullValue="-1.0"/>
@@ -43,37 +43,41 @@
 		AND msRunSearchResult.id = #id#
 	</select>
     
-    <select id="selectResultIdsForPercolatorOutput" resultClass="Integer" parameterClass="Integer">
+    <select id="selectResultIdsForPercolatorAnalysis" resultClass="Integer" parameterClass="Integer">
     	SELECT resultID FROM PercolatorResult
-    	WHERE percOutputID = #percOutputId# 
+    	WHERE searchAnalysisID = #analysisId# 
     </select>
     
     <select id="selectResultIdsForRunSearch" resultClass="Integer" parameterClass="Integer">
     	SELECT pres.resultID 
-    	FROM PercolatorResult AS pres, msRunSearchResult as res
-    	WHERE pres.resultID = res.resultID
+    	FROM PercolatorResult AS pres, msRunSearchResult AS res
+    	WHERE pres.resultID = res.id
     	AND res.runSearchID = #runSearchId#
+    </select>
+    
+    <select id="selectResultIdsForAnalysis" resultClass="Integer" parameterClass="Integer">
+    	SELECT resultID FROM PercolatorResult WHERE searchAnalysisID = #analysisId#
     </select>
     
     <select id="selectResultIdsWQvalThreshold" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT resultID FROM PercolatorResult
-    	WHERE percOutputID = #percOutputId# 
-    	AND qvalue <= #qvalue#
+    	WHERE searchAnalysisID = #analysisId#  
+    	AND qValue &lt;= #qvalue#
     </select>
     
     <select id="selectResultIdsWPepThreshold" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT resultID FROM PercolatorResult
-    	WHERE percOutputID = #percOutputId# 
-    	AND pep <= #pep#
+    	WHERE searchAnalysisID = #analysisId# 
+    	AND PEP &lt;= #pep#
     </select>
     
     
     <insert id="insert" parameterMap="percolatorResultParam">
     	INSERT INTO PercolatorResult 
     	(resultID, 
-    	percOutputID,
-    	qvalue,
-    	pep,
+    	searchAnalysisID,
+    	qValue,
+    	PEP,
     	discriminantScore) 
     	VALUES (?,?,?,?,?)
     </insert>
@@ -81,9 +85,9 @@
     <insert id="insertAll" parameterClass="String">
     	INSERT INTO PercolatorResult 
     	(resultID, 
-    	percOutputID,
-    	qvalue,
-    	pep,
+    	searchAnalysisID,
+    	qValue,
+    	PEP,
     	discriminantScore) 
     	VALUES $values$
     </insert>
