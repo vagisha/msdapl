@@ -5,7 +5,7 @@ public class ProteinferSpectrumMatch {
     private int id;
     private int proteinferPeptideId;
     private int msRunSearchResultId;
-//    private int rank;
+    private int rank;
     
 
     public ProteinferSpectrumMatch() {}
@@ -39,12 +39,12 @@ public class ProteinferSpectrumMatch {
         this.id = id;
     }
     
-//    public int getRank() {
-//        return rank;
-//    }
-//
-//    public void setRank(int rank) {
-//        this.rank = rank;
-//    }
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
 
 }

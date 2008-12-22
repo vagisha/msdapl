@@ -2,8 +2,10 @@ package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -81,7 +83,19 @@ public class IdPickerResultSaver {
                     IdPickerPeptide idpPept = new IdPickerPeptide();
                     idpPept.setGroupId(peptide.getPeptideGroupId());
                     idpPept.setSequence(peptide.getSequence());
+                    pinferPeptideId = peptDao.saveIdPickerPeptide(idpPept);
+                    // add to our map
+                    idpPeptideIds.put(peptide.getSequence(), pinferPeptideId);
                     
+                    
+                    // save all the ions (sequence + mod_state + charge) form the peptide
+                    Set<String> ionSet = new HashSet<String>();
+                    
+                    // save the spectrum matches for this peptide
+                    for(IdPickerSpectrumMatch psm: peptide.getSpectrumMatchList()) {
+                        psm.setProteinferPeptideId(id);
+                        idpPsmDao.saveSpectrumMatch(psm);
+                    }
                     List<IdPickerSpectrumMatch> idpPsmList = new ArrayList<IdPickerSpectrumMatch>(pev.getSpectrumMatchCount());
                     for(SpectrumMatchIDP psm: pev.getSpectrumMatchList()) {
                         IdPickerSpectrumMatch idpPsm = new IdPickerSpectrumMatch();
@@ -91,8 +105,7 @@ public class IdPickerResultSaver {
                     }
                     idpPept.setSpectrumMatchList(idpPsmList);
                     pinferPeptideId = peptDao.saveIdPickerPeptide(idpPept); // this will save the spectrum matches also
-                    // add to our map
-                    idpPeptideIds.put(peptide.getSequence(), pinferPeptideId);
+                    
                 }
                 // link the protein and peptide
                 protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);

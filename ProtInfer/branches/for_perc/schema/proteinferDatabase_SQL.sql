@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS msProteinInferRun;
 CREATE TABLE msProteinInferRun (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	program VARCHAR(255) NOT NULL,
+	inputType VARCHAR(255) NOT NULL,
 	dateRun DATETIME,
 	comments TEXT(10)
 );
@@ -16,10 +17,10 @@ DROP TABLE IF EXISTS msProteinInferInput;
 CREATE TABLE msProteinInferInput (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     piRunID INT UNSIGNED NOT NULL,
-    runSearchID INT UNSIGNED NOT NULL
+    inputID INT UNSIGNED NOT NULL
 );
 ALTER TABLE msProteinInferInput ADD INDEX (piRunID);
-ALTER TABLE msProteinInferInput ADD INDEX (runSearchID);
+ALTER TABLE msProteinInferInput ADD INDEX (inputID);
 
 
 
@@ -40,18 +41,24 @@ ALTER TABLE  msProteinInferProtein ADD INDEX (nrseqProteinID);
 DROP TABLE IF EXISTS msProteinInferPeptide;
 CREATE TABLE msProteinInferPeptide (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piRunID INT UNSIGNED NOT NULL,
 	sequence VARCHAR(255) NOT NULL
 );
+ALTER TABLE  msProteinInferPeptide ADD INDEX (piRunID);
 
 
 
-# DROP TABLE IF EXISTS msProteinInferIon;
-#CREATE TABLE msProteinInferIon(
-#	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-#	pieptideID INT UNSIGNED NOT NULL,
-#	charge INT UNSIGNED NOT NULL,
-#  modificationStateID INT UNSIGNED NOT NULL
-#);
+DROP TABLE IF EXISTS msProteinInferIon;
+CREATE TABLE msProteinInferIon(
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piPeptideID INT UNSIGNED NOT NULL,
+	charge INT UNSIGNED NOT NULL,
+	modificationStateID INT UNSIGNED NOT NULL,
+	sequence VARCHAR(255) NOT NULL
+);
+ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID);
+ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID, charge);
+ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID, modificationStateID);
 
 
 
@@ -67,11 +74,12 @@ ALTER TABLE msProteinInferProteinPeptideMatch ADD PRIMARY KEY (piProteinID, piPe
 DROP TABLE IF EXISTS msProteinInferSpectrumMatch;
 CREATE TABLE msProteinInferSpectrumMatch (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piIonID INT UNSIGNED NOT NULL,
     msRunSearchResultID INT UNSIGNED NOT NULL,
-    piPeptideID INT UNSIGNED NOT NULL
+    rank INT UNSIGNED
 );
 ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (msRunSearchResultID);
-ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piPeptideID);
+ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piIonID);
 
 
 
@@ -120,6 +128,23 @@ ALTER TABLE IDPickerProtein ADD INDEX(groupID);
 
 
 
+DROP TABLE IF EXISTS IDPickerProteinGroup;
+CREATE TABLE IDPickerProteinGroup (
+	piRunID INT UNSIGNED NOT NULL,
+	groupID INT UNSIGNED NOT NULL,
+	numPeptides_S INT UNSIGNED NOT NULL,
+	numUniqPeptides_S INT UNSIGNED NOT NULL,
+	numPeptides_SM INT UNSIGNED NOT NULL,
+	numUniqPeptides_SM INT UNSIGNED NOT NULL,
+	numPeptides_SC INT UNSIGNED NOT NULL,
+	numUniqPeptides_SC INT UNSIGNED NOT NULL,
+	numPeptides_SMC INT UNSIGNED NOT NULL,
+	numUniqPeptides_SMC INT UNSIGNED NOT NULL
+);
+ALTER TABLE IDPickerProteinGroup ADD PRIMARY KEY(piRunID,  groupID);
+
+
+
 DROP TABLE IF EXISTS IDPickerPeptide;
 CREATE TABLE IDPickerPeptide (
 	piPeptideID INT UNSIGNED NOT NULL PRIMARY KEY,
@@ -158,23 +183,25 @@ CREATE TRIGGER msProteinInferSpectrumMatch_bdelete BEFORE DELETE ON msProteinInf
 DELIMITER ;
 
 DELIMITER |
-CREATE TRIGGER msProteinInferPeptide_bdelete BEFORE DELETE ON msProteinInferPeptide
+CREATE TRIGGER msProteinInferIon_bdelete BEFORE DELETE ON msProteinInferIon
  FOR EACH ROW
  BEGIN
-   DELETE FROM msProteinInferSpectrumMatch WHERE piPeptideID = OLD.id;
-   DELETE FROM IDPickerPeptide WHERE piPeptideID = OLD.id;
+   DELETE FROM msProteinInferSpectrumMatch WHERE piIonID = OLD.id;
  END;
 |
 DELIMITER ;
 
 DELIMITER |
-CREATE TRIGGER msProteinInferProteinPeptideMatch_bdelete BEFORE DELETE ON msProteinInferProteinPeptideMatch
+CREATE TRIGGER msProteinInferPeptide_bdelete BEFORE DELETE ON msProteinInferPeptide
  FOR EACH ROW
  BEGIN
- 	DELETE FROM msProteinInferPeptide WHERE id = OLD.piPeptideID;
+   DELETE FROM msProteinInferIon WHERE piPeptideID = OLD.id;
+   DELETE FROM IDPickerPeptide WHERE piPeptideID = OLD.id;
+   DELETE FROM msProteinInferProteinPeptideMatch WHERE piPeptideID = OLD.id;
  END;
 |
 DELIMITER ;
+
 
 DELIMITER |
 CREATE TRIGGER msProteinInferProtein_bdelete BEFORE DELETE ON msProteinInferProtein
@@ -204,6 +231,7 @@ CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
   	DELETE FROM IDPickerFilter WHERE piRunID = OLD.id;
    	DELETE FROM msProteinInferInput WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferProtein WHERE piRunID = OLD.id;
+  	DELETE FROM msProteinInferPeptide WHERE piRunID = OLD.id;
    	DELETE FROM IDPickerGroupAssociation WHERE piRunID = OLD.id;
  END;
 |

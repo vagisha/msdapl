@@ -4,7 +4,7 @@ public class ProteinferInput {
 
     private int id;
     private int pinferId;
-    private int runSearchId;
+    private int inputId;
     
     public int getId() {
         return id;
@@ -21,10 +21,10 @@ public class ProteinferInput {
         this.pinferId = pinferId;
     }
     
-    public int getRunSearchId() {
-        return runSearchId;
+    public int getInputId() {
+        return inputId;
     }
-    public void setRunSearchId(int runSearchId) {
-        this.runSearchId = runSearchId;
+    public void setInputId(int inputId) {
+        this.inputId = inputId;
     }
 }

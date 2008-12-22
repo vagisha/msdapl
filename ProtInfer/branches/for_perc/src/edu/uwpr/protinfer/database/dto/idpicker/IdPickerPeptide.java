@@ -1,44 +1,33 @@
 package edu.uwpr.protinfer.database.dto.idpicker;
 
-import edu.uwpr.protinfer.database.dto.BaseProteinferPeptide;
 
-public class IdPickerPeptide extends BaseProteinferPeptide<IdPickerSpectrumMatch> {
+public class IdPickerPeptide extends BaseIdPickerPeptide<IdPickerSpectrumMatch, IdPickerIon> {
 
-    private int groupId = -1;
     
     public IdPickerPeptide() {
         super();
     }
     
     public IdPickerPeptide(int peptideGroupId) {
-        super();
-        this.groupId = peptideGroupId;
+        super(peptideGroupId);
     }
     
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-    
-    public float getBestFdr() {
-        float best = Float.MAX_VALUE;
-        for(IdPickerSpectrumMatch psm: this.getSpectrumMatchList()) {
-            best = (float) Math.min(best, psm.getFdr());
+    public double getBestFdr() {
+        double best = Float.MAX_VALUE;
+        for(IdPickerIon ion: this.getIonList()) {
+            best = ion.getBestFdr();
         }
-        return (float) (Math.round(best*100.0) / 100.0);
+        return (Math.round(best*100.0) / 100.0);
     }
     
     public IdPickerSpectrumMatch getBestSpectrumMatch() {
         IdPickerSpectrumMatch bestPsm = null;
-        for(IdPickerSpectrumMatch psm: this.getSpectrumMatchList()) {
+        for(IdPickerIon ion: this.getIonList()) {
             if(bestPsm == null) {
-                bestPsm = psm;
+                bestPsm = ion.getBestSpectrumMatch();
             }
             else {
-                bestPsm = bestPsm.getFdr() < psm.getFdr() ? bestPsm : psm;
+                bestPsm = bestPsm.getFdr() < ion.getBestFdr() ? bestPsm : ion.getBestSpectrumMatch();
             }
         }
         return bestPsm;

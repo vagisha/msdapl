@@ -5,14 +5,20 @@ import java.util.List;
 
 public class IdPickerPeptideGroup {
 
+    private final int pinferId;
     private final int groupId;
     private List<IdPickerPeptide> peptides;
     private List<Integer> matchingProteinGroupIds;
     
-    public IdPickerPeptideGroup(int groupId) {
+    public IdPickerPeptideGroup(int pinferId, int groupId) {
+        this.pinferId = pinferId;
         this.groupId = groupId;
         peptides = new ArrayList<IdPickerPeptide>();
         matchingProteinGroupIds = new ArrayList<Integer>();
+    }
+    
+    public int getProteinferId() {
+        return pinferId;
     }
     
     public int getGroupId() {
@@ -46,13 +52,5 @@ public class IdPickerPeptideGroup {
     
     public boolean isUniqueToProteinGroup() {
         return matchingProteinGroupIds.size() == 1;
-    }
-    
-    public int getSpectrumCount() {
-        int cnt = 0;
-        for(IdPickerPeptide pept: peptides) {
-            cnt += pept.getSpectralCount();
-        }
-        return cnt;
     }
 }

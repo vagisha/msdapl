@@ -36,12 +36,6 @@ public class IdPickerPeptideDAO extends BaseSqlMapDAO implements GenericProteinf
         int id = save(peptide);
         peptide.setId(id);
         save(sqlMapNameSpace+".insert", peptide);
-        
-        // save the spectrum matches for this peptide
-        for(IdPickerSpectrumMatch psm: peptide.getSpectrumMatchList()) {
-            psm.setProteinferPeptideId(id);
-            idpPsmDao.saveSpectrumMatch(psm);
-        }
         return id;
     }
     

@@ -36,11 +36,11 @@ public class ProteinferSaverTest extends TestCase {
         IdPickerSummary summary = new IdPickerSummary();
         RunSearchSummary s1 = new RunSearchSummary();
         s1.setRunName("runSearch_1");
-        s1.setRunSearchId(10);
+        s1.setInputId(10);
         summary.addRunSearch(s1);
         RunSearchSummary s2 = new RunSearchSummary();
         s2.setRunName("runSearch_2");
-        s2.setRunSearchId(20);
+        s2.setInputId(20);
         summary.addRunSearch(s2);
         
         

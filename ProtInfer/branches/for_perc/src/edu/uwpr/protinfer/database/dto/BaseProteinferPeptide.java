@@ -3,15 +3,16 @@ package edu.uwpr.protinfer.database.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
+public abstract class BaseProteinferPeptide<S extends ProteinferSpectrumMatch, T extends BaseProteinferIon<S>> {
 
     private int id;
+    private int pinferId;
     private String sequence;
-    private List<T> spectrumMatchList;
+    private List<T> ionList;
     private List<Integer> matchingProteinIds;
 
     public BaseProteinferPeptide() {
-        spectrumMatchList = new ArrayList<T>();
+        ionList = new ArrayList<T>();
         matchingProteinIds = new ArrayList<Integer>();
     }
 
@@ -22,17 +23,25 @@ public abstract class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
     public void setId(int id) {
         this.id = id;
     }
-
-    public List<T> getSpectrumMatchList() {
-        return spectrumMatchList;
+    
+    public int getProteinferId() {
+        return pinferId;
     }
 
-    public void setSpectrumMatchList(List<T> spectrumMatchList) {
-        this.spectrumMatchList = spectrumMatchList;
+    public void setProteinferId(int pinferId) {
+        this.pinferId = pinferId;
     }
 
-    public void addSpectrumMatch(T spectrumMatch) {
-        spectrumMatchList.add(spectrumMatch);
+    public List<T> getIonList() {
+        return ionList;
+    }
+
+    public void setIonList(List<T> spectrumMatchList) {
+        this.ionList = spectrumMatchList;
+    }
+
+    public void addIon(T ion) {
+        ionList.add(ion);
     }
     
     public String getSequence() {
@@ -56,20 +65,11 @@ public abstract class BaseProteinferPeptide<T extends ProteinferSpectrumMatch> {
     }
 
     public int getSpectralCount() {
-        return spectrumMatchList.size();
+        int count = 0;
+        for(T ion: ionList) {
+            count += ion.getSpectralCount();
+        }
+        return count;
     }
-
-    public abstract T getBestSpectrumMatch();
-//        ProteinferSpectrumMatch bestPsm = null;
-//        for(ProteinferSpectrumMatch psm: spectrumMatchList) {
-//            if(bestPsm == null) {
-//                bestPsm = psm;
-//            }
-//            else {
-//                bestPsm = bestPsm.getRank() < psm.getRank() ? bestPsm : psm;
-//            }
-//        }
-//        return bestPsm;
-//    }
 
 }

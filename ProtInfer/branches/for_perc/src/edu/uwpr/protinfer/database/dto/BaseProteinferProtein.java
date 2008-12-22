@@ -3,7 +3,9 @@ package edu.uwpr.protinfer.database.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseProteinferProtein<S extends ProteinferSpectrumMatch, T extends BaseProteinferPeptide<S>> {
+public class BaseProteinferProtein<S extends ProteinferSpectrumMatch, 
+                                    I extends BaseProteinferIon<S>, 
+                                    T extends BaseProteinferPeptide<S, I>> {
 
     private int id;
     private int pinferId;
@@ -80,7 +82,7 @@ public class BaseProteinferProtein<S extends ProteinferSpectrumMatch, T extends 
 
     public int getUniquePeptideCount() {
         int cnt = 0;
-        for(BaseProteinferPeptide<S> peptide: peptides)
+        for(T peptide: peptides)
             if(peptide.isUniqueToProtein())
                 cnt++;
         return cnt;
@@ -88,7 +90,7 @@ public class BaseProteinferProtein<S extends ProteinferSpectrumMatch, T extends 
 
     public int getSpectralCount() {
         int cnt = 0;
-        for(BaseProteinferPeptide<S> peptide: peptides)
+        for(T peptide: peptides)
             cnt += peptide.getSpectralCount();
         return cnt;
     }

@@ -247,7 +247,7 @@ public class IDPickerExecutor {
         
         for(IdPickerInputSummary input: idpInputList) {
             
-            int runSearchId = input.getRunSearchId();
+            int runSearchId = input.getInputId();
             List<PeptideSpectrumMatchIDP> psms = resGetter.getHitsForRunSearch(runSearchId, params.getDecoyPrefix(), program);
             allPsms.addAll(psms);
             
@@ -276,7 +276,7 @@ public class IDPickerExecutor {
 
     private SearchProgram getSearchProgram(IdPickerInputSummary idpInput) {
         MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
-        int runSearchId = idpInput.getRunSearchId();
+        int runSearchId = idpInput.getInputId();
         return runSearchDao.loadSearchProgramForRunSearch(runSearchId);
     }
     

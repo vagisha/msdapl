@@ -50,7 +50,7 @@ public class IdPickerRun extends BaseProteinferRun<IdPickerInputSummary> {
     
     public IdPickerInputSummary getInputSummaryForRunSearch(int runSearchId) {
         for(IdPickerInputSummary input: this.getInputSummaryList()) {
-            if(input.getRunSearchId() == runSearchId) {
+            if(input.getInputId() == runSearchId) {
                 return input;
             }
         }

@@ -5,16 +5,36 @@ import java.util.List;
 
 public class IdPickerProteinGroup {
 
+    private final int pinferId;
     private final int groupId;
     private List<IdPickerProtein> proteins;
-    private List<IdPickerPeptideGroup> matchingPeptideGroups;
     
-    public IdPickerProteinGroup(int groupId) {
+    private int numPeptides_S;
+    private int numUniquePeptides_S;
+    private int numPeptides_SM;
+    private int numUniquePeptides_SM;
+    private int numPeptides_SC;
+    private int numUniquePeptides_SC;
+    private int numPeptides_SCM;
+    private int numUniquePeptides_SCM;
+    
+    private List<Integer> peptideGroupIds;
+    private List<Integer> uniqPeptideGroupIds;
+    
+    private int spectrumCount;
+    
+    public IdPickerProteinGroup(int pinferId, int groupId) {
+        this.pinferId = pinferId;
         this.groupId = groupId;
         proteins = new ArrayList<IdPickerProtein>();
-        matchingPeptideGroups = new ArrayList<IdPickerPeptideGroup>();
+        peptideGroupIds = new ArrayList<Integer>();
+        uniqPeptideGroupIds = new ArrayList<Integer>();
     }
     
+    public int getProteinferId() {
+        return pinferId;
+    }
+
     public int getGroupId() {
         return groupId;
     }
@@ -42,56 +62,59 @@ public class IdPickerProteinGroup {
         return proteins.size();
     }
     
-    public List<IdPickerPeptideGroup> getMatchingPeptideGroups() {
-        return matchingPeptideGroups;
-    }
-    
     public List<Integer> getMatchingPeptideGroupIds() {
-        List<Integer> ids = new ArrayList<Integer>(matchingPeptideGroups.size());
-        for(IdPickerPeptideGroup grp: matchingPeptideGroups)
-            ids.add(grp.getGroupId());
-        return ids;
+        return this.peptideGroupIds;
     }
     
-    public void setMatchingPeptideGroups(List<IdPickerPeptideGroup> peptGrps) {
-        this.matchingPeptideGroups = peptGrps;
+    public void setMatchingPeptideGroupIds(List<Integer> peptGrpIds) {
+        this.peptideGroupIds = peptGrpIds;
     }
     
-    public void addMatchingPeptideGroup(IdPickerPeptideGroup peptGrp) {
-        this.matchingPeptideGroups.add(peptGrp);
+    public int getPeptide_SCount() {
+        return numPeptides_S;
     }
     
-    public int getMatchingPeptideCount() {
-        int cnt = 0;
-        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
-            cnt += grp.getPeptideCount();
-        }
-        return cnt;
+    public int getUniquePeptide_SCount() {
+        return numUniquePeptides_S;
     }
     
-    public int getUniqMatchingPeptideCount() {
-        int cnt = 0;
-        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
-            if(grp.isUniqueToProteinGroup()) {
-                cnt += grp.getPeptideCount();
-            }
-        }
-        return cnt;
+    public int getPeptide_SMCount() {
+        return numPeptides_SM;
+    }
+    
+    public int getUniquePeptide_SMCount() {
+        return numUniquePeptides_SM;
+    }
+    
+    public int getPeptide_SCCount() {
+        return numPeptides_SC;
+    }
+    
+    public int getUniquePeptide_SCCount() {
+        return numUniquePeptides_SC;
+    }
+    
+    public int getPeptide_SCMCount() {
+        return numPeptides_SCM;
+    }
+    
+    public int getUniquePeptide_SCMCount() {
+        return numUniquePeptides_SCM;
     }
     
     public int getSpectrumCount() {
-        int cnt = 0;
-        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
-            cnt += grp.getSpectrumCount();
-        }
-        return cnt;
+       return spectrumCount;
+    }
+    
+    public void setSpectrumCount(int count) {
+        this.spectrumCount = count;
     }
     
     public String getNonUniqMatchingPeptideGroupIdsString() {
         StringBuilder buf = new StringBuilder();
-        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
-            if(!grp.isUniqueToProteinGroup())
-                buf.append(","+grp.getGroupId());
+        for(Integer grpId: peptideGroupIds) {
+            if(!uniqPeptideGroupIds.contains(grpId))
+                buf.append(","+grpId);
         }
         if(buf.length() > 0)    buf.deleteCharAt(0);
         return buf.toString();
@@ -99,9 +122,8 @@ public class IdPickerProteinGroup {
     
     public String getUniqMatchingPeptideGroupIdsString() {
         StringBuilder buf = new StringBuilder();
-        for(IdPickerPeptideGroup grp: matchingPeptideGroups) {
-            if(grp.isUniqueToProteinGroup())
-                buf.append(","+grp.getGroupId());
+        for(Integer grpId: uniqPeptideGroupIds) {
+            buf.append(","+grpId);
         }
         if(buf.length() > 0)    buf.deleteCharAt(0);
         return buf.toString();

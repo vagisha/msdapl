@@ -13,9 +13,13 @@ public class BaseProteinferRun<T extends ProteinferInput> {
     private Date date;
 //    private ProteinferStatus status;
     private ProteinInferenceProgram program;
+    private String inputType;
     private String comments;
     private List<T> inputSummaryList;
 
+    public static final String SEARCH = "SEARCH";
+    public static final String ANALYSIS = "ANALYSIS";
+    
     public BaseProteinferRun() {
         inputSummaryList = new ArrayList<T>();
     }
@@ -72,6 +76,14 @@ public class BaseProteinferRun<T extends ProteinferInput> {
         this.program = program;
     }
 
+    public String getInputType() {
+        return inputType;
+    }
+    
+    public void setInputType(String inputType) {
+        this.inputType = inputType;
+    }
+    
     public String getComments() {
         return comments;
     }
