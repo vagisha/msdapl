@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinferSpectrumMatch"> 
+
+	<typeAlias alias="ProteinferSpectrumMatch" type="edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch"/>
+	
+	<resultMap class="ProteinferSpectrumMatch" id="pinferSMatchResult">
+		<result property="id" column="id" nullValue="0"/>
+		<result property="msRunSearchResultId" column="msRunSearchResultID" nullValue="0"/>
+		<result property="proteinferPeptideId" column="piPeptideID" nullValue="0"/>
+	</resultMap>
+	
+	<parameterMap class="ProteinferSpectrumMatch" id="pinferSMatchParam">
+		<parameter property="msRunSearchResultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="proteinferPeptideId" jdbcType="INTEGER" nullValue="0"/>
+	</parameterMap>
+	
+    <select id="selectSpectrumMatch" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferSpectrumMatch WHERE id = #id#
+    </select>
+    
+    <select id="selectMatchesForPeptide" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferSpectrumMatch WHERE piPeptideID = #id#
+    </select>
+    
+    <select id="selectMatchIdsForPinferId" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT DISTINCT psm.id 
+    	FROM msProteinInferSpectrumMatch AS psm, 
+    	msProteinInferPeptide AS pept, 
+    	msProteinInferProtein as prot,
+    	msProteinInferProteinPeptideMatch as mtch
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = mtch.piProteinID
+    	AND mtch.piPeptideID = pept.id
+    	AND pept.id = psm.piPeptideID
+    </select>
+    
+    <select id="selectMatchIdsForPinferIdRunSearchId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT psm.id 
+    	FROM msProteinInferSpectrumMatch AS psm,
+    	msRunSearchResult AS msRes, 
+    	msProteinInferPeptide AS pept, 
+    	msProteinInferProtein as prot,
+    	msProteinInferProteinPeptideMatch as mtch
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = mtch.piProteinID
+    	AND mtch.piPeptideID = pept.id
+    	AND pept.id = psm.piPeptideID
+    	AND msRes.id = psm.msRunSearchResultID
+    	AND msRes.runSearchID = #runSearchId#
+    </select>
+    
+    <insert id="insert" parameterMap="pinferSMatchParam">
+    	INSERT INTO msProteinInferSpectrumMatch (
+    	msRunSearchResultID,
+    	piPeptideID) 
+    	VALUES (?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+</sqlMap>

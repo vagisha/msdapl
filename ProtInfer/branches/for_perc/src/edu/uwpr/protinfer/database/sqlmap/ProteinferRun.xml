@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinferRun"> 
+
+	<typeAlias alias="ProteinferRun" type="edu.uwpr.protinfer.database.dto.ProteinferRun"/>
+	<typeAlias alias="BaseProteinferRun" type="edu.uwpr.protinfer.database.dto.BaseProteinferRun"/>
+	
+	<typeAlias alias="ProteinferStatusTypeHandler" 
+				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO$ProteinferStatusTypeHandler"/>
+	<typeAlias alias="ProteinferProgramTypeHandler" 
+				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO$ProteinferProgramTypeHandler"/>
+	
+	<resultMap class="BaseProteinferRun" id="pinferRunBaseResult">
+		<result property="id" column="id" />
+		<result property="program" column="program" typeHandler="ProteinferProgramTypeHandler"/>
+		<result property="comments" column="comments" />
+		<result property="date" column="dateRun" />
+	</resultMap>
+		
+	<resultMap class="ProteinferRun" id="pinferRunResult" extends="ProteinferRun.pinferRunBaseResult">
+		<result property="inputSummaryList" 
+				select="ProteinferInput.selectProteinferInputList"
+				column="id"/>
+	</resultMap>
+	
+	
+	<parameterMap class="BaseProteinferRun" id="pinferRunParam">
+		<parameter property="program" jdbcType="VARCHAR" typeHandler="ProteinferProgramTypeHandler"/>
+		<parameter property="comments" jdbcType="TEXT" />
+	</parameterMap>
+	
+	<select id="select" resultMap="pinferRunResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferRun WHERE id=#id#
+    </select>
+    
+    <select id="selectPinferIdsForRunSearchIds" resultClass="Integer" parameterClass="String">
+    	SELECT DISTINCT piRunID FROM msProteinInferInput WHERE runSearchID in $runSearchIds$
+    </select>
+    
+    <insert id="insert" parameterMap="pinferRunParam">
+    	INSERT INTO msProteinInferRun (
+    	program,
+    	comments)
+    	VALUES(?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <update id="update" parameterClass="BaseProteinferRun">
+    	UPDATE msProteinInferRun 
+    	SET program = #programString#,
+    	comments = #comments#
+    	<isNotNull property="date">
+    		, dateRun = #date#
+    	</isNotNull>
+    	WHERE id = #id#
+    </update>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM msProteinInferRun WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>
