@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="IdPickerRun"> 
+
+	<typeAlias alias="IdPickerRun" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun"/>
+		
+	<resultMap class="IdPickerRun" id="idpickerRunResult" extends="ProteinferRun.pinferRunBaseResult">
+		<result property="inputSummaryList" 
+				select="IdPickerInput.selectIdPickerInputList"
+				column="id"/>
+		<result property="filters" 
+				select="IdPickerFilter.selectFiltersForRun"
+				column="id"/>
+		<result property="numUnfilteredProteins" column="numUnfilteredProteins" nullValue="-1" />
+		<result property="numUnfilteredPeptides" column="numUnfilteredPeptides" nullValue="-1" />
+	</resultMap>
+	
+	
+	<parameterMap class="IdPickerRun" id="idpickerRunParam">
+		<parameter property="id" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="numUnfilteredProteins" jdbcType="INTEGER" nullValue="-1" />
+		<parameter property="numUnfilteredPeptides" jdbcType="INTEGER" nullValue="-1" />
+	</parameterMap>
+	
+	<select id="select" resultMap="idpickerRunResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferRun as run
+    	LEFT JOIN (IDPickerRunSummary as idpRun) ON run.id = idpRun.piRunID
+    	WHERE run.id=#id#
+    </select>
+    
+    <insert id="insert" parameterMap="idpickerRunParam">
+    	INSERT INTO IDPickerRunSummary (
+    	piRunID,
+    	numUnfilteredProteins,
+    	numUnfilteredPeptides)
+    	VALUES (?,?,?)
+    </insert>
+    
+</sqlMap>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="IdPickerFilter"> 
+
+	<typeAlias alias="IdPickerFilter" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter"/>
+	
+	<resultMap class="IdPickerFilter" id="idpFilterResult">
+		<result property="id" column="id" />
+		<result property="proteinferId" column="piRunID" nullValue="0"/>
+		<result property="filterName" column="filterName"/>
+		<result property="filterValue" column="filterValue"/>
+	</resultMap>
+	
+	<parameterMap class="IdPickerFilter" id="idpFilterParam">
+		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="filterName" jdbcType="VARCHAR" />
+		<parameter property="filterValue" jdbcType="VARCHAR" />
+	</parameterMap>
+	
+    <select id="selectFiltersForRun" resultMap="idpFilterResult" parameterClass="Integer">
+    	SELECT * FROM IDPickerFilter WHERE piRunID = #id#
+    </select>
+    
+    <insert id="insert" parameterMap="idpFilterParam">
+    	INSERT INTO IDPickerFilter (
+    	piRunID,
+    	filterName,
+    	filterValue) 
+    	VALUES (?,?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM IDPickerFilter WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>
