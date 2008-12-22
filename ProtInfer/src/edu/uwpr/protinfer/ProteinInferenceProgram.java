@@ -31,23 +31,41 @@ public enum ProteinInferenceProgram {
                                  new ProgramParam(TYPE.BOOLEAN, 
                                                  "parsimonyAnalysis", "Parsimony Analysis", 
                                                  "true", null,
-                                                 "This parameter controls whether the final protein list is filtered by the minimum covering set, i.e. the minimum set of proteins that is necessary to describe all identified peptides")}),
+                                                 "This parameter controls whether the final protein list is filtered by the minimum covering set, i.e. the minimum set of proteins that is necessary to describe all identified peptides")
+                             }
+            ),
     
-    NONE("NONE", null, null);
+   
+                                                 
+     IDPICKER_PERC("IDPicker (for Percolator)",
+                   "This version uses the greedy set cover algorithm to infer a parsimonious list of proteins",
+                   new ProgramParam[]{
+                     new ProgramParam(TYPE.DOUBLE, 
+                           "qval_percolator", "Qvalue Threshold", 
+                           "0.05", null,
+                           "Qvalue threshold for filtering search hits"),
+                           new ProgramParam(TYPE.DOUBLE, 
+                           "pep_percolator", "PEP Threshold", 
+                           "0.05", null,
+                           "Posterior Error Probability threshold for filtering search hits") 
+                   }
+         ),
+                   
+     NONE("NONE", null, null);
     
-    private String name;
+    private String displayName;
     private String description;
     private ProgramParam[] params;
     
     
-    private ProteinInferenceProgram(String name, String description, ProgramParam[] params) {
-        this.name = name;
+    private ProteinInferenceProgram(String displayName, String description, ProgramParam[] params) {
+        this.displayName = displayName;
         this.description = description;
         this.params = params;
     }
     
-    public String getName(){
-        return name;
+    public String getDisplayName(){
+        return displayName;
     }
     
     public String getDescription() {
@@ -63,8 +81,10 @@ public enum ProteinInferenceProgram {
     
     
     public static ProteinInferenceProgram getProgramForName(String name) {
-        if("IDPicker".equalsIgnoreCase(name))
+        if("IDPICKER".equalsIgnoreCase(name))
             return IDPICKER;
+        else if ("IDPICKER_PERC".equalsIgnoreCase(name))
+            return IDPICKER_PERC;
         else 
             return NONE;
     }

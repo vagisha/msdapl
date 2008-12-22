@@ -113,7 +113,7 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
             if (program == null)
                 setter.setNull(java.sql.Types.VARCHAR);
             else
-                setter.setString(program.getName());
+                setter.setString(program.name());
         }
 
         public Object valueOf(String s) {

@@ -31,6 +31,18 @@
     	AND p.id = idpPep.piPeptideID
     </select>
     
+    <select id="selectPeptideIdsForProteinGroup" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT ipept.piPeptideID 
+    	FROM IDPickerProtein AS iprot, msProteinInferProtein AS prot, 
+    	msProteinInferProteinPeptideMatch AS m, IDPickerPeptide AS ipept 
+    	WHERE iprot.piProteinID= prot.id 
+    	AND prot.id = m.piProteinID 
+    	AND m.piPeptideID = ipept.piPeptideID 
+    	AND iprot.groupID=#proteinGroupId#
+    	AND prot.piRunID=#pinferId#;
+    </select>
+    
+    
     <select id="selectPeptidesForProteinferRun" resultMap="idpickerPeptideResult" parameterClass="Integer">
     	SELECT pep.*, idpPep.* 
     	FROM msProteinInferProtein prot, msProteinInferPeptide as pep, 

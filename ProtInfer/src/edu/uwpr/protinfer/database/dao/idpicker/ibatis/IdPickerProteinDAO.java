@@ -22,6 +22,7 @@ import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideGroup;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinGroup;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinGroupSummary;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch;
 
 public class IdPickerProteinDAO extends BaseSqlMapDAO 
@@ -102,6 +103,17 @@ public class IdPickerProteinDAO extends BaseSqlMapDAO
     
     public int getFilteredParsimoniousProteinCount(int proteinferId) {
         return (Integer) queryForObject(sqlMapNameSpace+".selectParsimProteinCountForProteinferRun", proteinferId); 
+    }
+    
+    public IdPickerProteinGroupSummary getIdPickerProteinGroupSummary(int pinferId, int proteinGroupId) {
+        List<IdPickerProtein> grpProteins = getIdPickerGroupProteins(pinferId, proteinGroupId);
+        IdPickerProteinGroupSummary summary = new IdPickerProteinGroupSummary(proteinGroupId);
+        if(grpProteins.size() == 0) 
+            return summary;
+        summary.setProteins(grpProteins);
+        int numPeptides = idpPeptDao.getPeptideIdsForProteinferProtein(grpProteins.get(0).getId()).size();
+        idpPeptDao.getP
+        
     }
     
     public IdPickerProteinGroup getIdPickerProteinGroup(int pinferId, int groupId) {

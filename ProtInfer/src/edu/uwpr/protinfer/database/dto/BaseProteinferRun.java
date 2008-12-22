@@ -65,7 +65,7 @@ public class BaseProteinferRun<T extends ProteinferInput> {
     }
 
     public String getProgramString() {
-        return program.getName();
+        return program.name();
     }
     
     public void setProgram(ProteinInferenceProgram program) {

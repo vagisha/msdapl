@@ -25,17 +25,17 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
 
     private static final Logger log = Logger.getLogger(ProteinInferrerIdPicker.class);
     
-    private IDPickerParams params;
+    private boolean doParsimonyAnalysis = true;
 
-    public ProteinInferrerIdPicker(IDPickerParams params) {
-        this.params = params;
+    public ProteinInferrerIdPicker(boolean doParosimonyAnalysis) {
+        this.doParsimonyAnalysis = doParosimonyAnalysis;
     }
     
     @Override
     public <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> List<InferredProtein<S>> inferProteins(List<T> psms) {
 
-        if (!params.getDoParsimonyAnalysis()) {
-            return inferAllProteins(psms, params);
+        if (!doParsimonyAnalysis) {
+            return inferAllProteins(psms);
         }
         else {
 
@@ -106,7 +106,7 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
     }
 
     private <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
-    List<InferredProtein<S>> inferAllProteins(List<T> searchHits, IDPickerParams params) {
+    List<InferredProtein<S>> inferAllProteins(List<T> searchHits) {
 
         long s = System.currentTimeMillis();
 

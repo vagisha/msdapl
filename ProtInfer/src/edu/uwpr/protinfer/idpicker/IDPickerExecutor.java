@@ -445,7 +445,7 @@ public class IDPickerExecutor {
     public <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
         List<InferredProtein<S>> inferProteins(List<T> psms, IDPickerParams params) {
         
-        ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker(params);
+        ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker(params.getDoParsimonyAnalysis());
         return inferrer.inferProteins(psms);
     }
     

@@ -5,13 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import edu.uwpr.protinfer.ProteinferSaver;
-import edu.uwpr.protinfer.SequestHit;
-import edu.uwpr.protinfer.SequestSpectrumMatch;
 import edu.uwpr.protinfer.idpicker.IDPickerExecutor;
-import edu.uwpr.protinfer.idpicker.IdPickerParams;
-import edu.uwpr.protinfer.idpicker.IdPickerSummary;
-import edu.uwpr.protinfer.idpicker.IdPickerSummary.RunSearchSummary;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;

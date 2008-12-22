@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import junit.framework.TestCase;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
 import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
-import junit.framework.TestCase;
 
 public class ProteinferProteinDAOTest extends TestCase {
 
