@@ -1154,31 +1154,7 @@
 		
 	</action>
 	
-	<!-- THESE ARE TEMPORARY FOR GENN's PROJECT -->
-	<action 
-		path="/viewAllSearches"
-		type="org.yeastrc.www.proteinfer.maccoss.MacCossSearchList"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/maccoss/viewSearches.jsp" redirect="false" />
-	</action>
 	
-	<action 
-		path="/newPercolatorProtInfer"
-		type="org.yeastrc.www.proteinfer.maccoss.NewPercolatorProteinInference"
-	>
-		<forward name="Success" path="/pages/internal/proteinfer/maccoss/percolatorProtInferForm.jsp" redirect="false" />
-	</action>
-	
-	<action 
-		path="/doPercolatorProtInfer"
-		type="org.yeastrc.www.proteinfer.maccoss.DoPercolatorProteinInference"
-		name="proteinInferenceForm"
-		input="/pages/internal/proteinfer/maccoss/percolatorProtInferForm.jsp"
-		scope="request"
-		validate="true"
-	>
-		<forward name="Success" path="/viewAllSearches.do" redirect="true" />
-	</action>
 	
 	<!-- ================================================================================== -->
 	

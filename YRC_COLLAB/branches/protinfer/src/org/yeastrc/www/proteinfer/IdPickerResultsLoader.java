@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.SearchProgram;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.nr_seq.NRProtein;
+import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptide;
@@ -90,20 +90,20 @@ public class IdPickerResultsLoader {
 
     private static void assignProteinAccessionDescription(WIdPickerProtein wProt) {
         
-        NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(wProt.getProtein().getNrseqProteinId());
-        wProt.setAccession(nrDbProt.getAccessionString());
-        wProt.setDescription(nrDbProt.getDescription());
+//        NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(wProt.getProtein().getNrseqProteinId());
+//        wProt.setAccession(nrDbProt.getAccessionString());
+//        wProt.setDescription(nrDbProt.getDescription());
         
-//        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-//        NRProtein nrseqProt = null;
-//        try {
-//            nrseqProt = (NRProtein)(nrpf.getProtein(wProt.getProtein().getNrseqProteinId()));
-//            wProt.setAccession(nrseqProt.getListing());
-//            wProt.setDescription(nrseqProt.getDescription());
-//        }
-//        catch (Exception e) {
-//            log.error("Exception getting nrseq protein for protein Id: "+wProt.getProtein().getNrseqProteinId(), e);
-//        }
+        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+        NRProtein nrseqProt = null;
+        try {
+            nrseqProt = (NRProtein)(nrpf.getProtein(wProt.getProtein().getNrseqProteinId()));
+            wProt.setAccession(nrseqProt.getListing());
+            wProt.setDescription(nrseqProt.getDescription());
+        }
+        catch (Exception e) {
+            log.error("Exception getting nrseq protein for protein Id: "+wProt.getProtein().getNrseqProteinId(), e);
+        }
     }
     
     public static List<WIdPickerProtein> getGroupProteins(int pinferId, int groupId) {
