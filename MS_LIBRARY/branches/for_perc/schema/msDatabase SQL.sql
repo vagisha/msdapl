@@ -344,6 +344,14 @@ CREATE TABLE msSearchAnalysis (
 );
 ALTER TABLE msSearchAnalysis ADD INDEX(searchID);
 
+CREATE TABLE msRunSearchAnalysis (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		searchAnalysisID INT UNSIGNED NOT NULL,
+		runSearchID INT UNSIGNED NOT NULL,
+	   	originalFileType VARCHAR(10) NOT NULL
+);
+ALTER TABLE msRunSearchAnalysis ADD INDEX(searchAnalysisID);
+ALTER TABLE msRunSearchAnalysis ADD INDEX(runSearchID);
 
 
 CREATE TABLE PercolatorParams (
@@ -355,15 +363,14 @@ CREATE TABLE PercolatorParams (
 ALTER TABLE PercolatorParams ADD INDEX(searchAnalysisID, param);
 
 
-
 CREATE TABLE PercolatorResult (
 		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
-		searchAnalysisID INT UNSIGNED NOT NULL,
+		runSearchAnalysisID INT UNSIGNED NOT NULL,
 		qvalue DOUBLE UNSIGNED NOT NULL,
 		pep DOUBLE UNSIGNED,
 		discriminantScore DOUBLE UNSIGNED
 );
-ALTER TABLE PercolatorResult ADD INDEX(searchAnalysisID);
+ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
 
 
 
@@ -371,17 +378,32 @@ ALTER TABLE PercolatorResult ADD INDEX(searchAnalysisID);
 # TRIGGERS TO ENSURE CASCADING DELETES
 #######################################################################################
 
+
+#######################################################################################
+# Percolator tables
+#######################################################################################
 DELIMITER |
 CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
  FOR EACH ROW
  BEGIN
-   DELETE FROM PercolatorResult WHERE searchAnalysisID = OLD.id;
+   	DELETE FROM PercolatorParams WHERE searchAnalysisID = OLD.id;
+	DELETE FROM msRunSearchAnalysis WHERE searchAnalysisID = OLD.id;
  END;
 |
 DELIMITER ;
 
+DELIMITER |
+CREATE TRIGGER msRunSearchAnalysis_bdelete BEFORE DELETE ON msRunSearchAnalysis
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM PercolatorResult WHERE runSearchAnalysisID = OLD.id;
+ END;
+|
+DELIMITER ;
 
 #######################################################################################
+
+
 
 DELIMITER |
 CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
@@ -431,6 +453,7 @@ CREATE TRIGGER msRunSearch_bdelete BEFORE DELETE ON msRunSearch
    DELETE FROM msRunSearchResult WHERE runSearchID = OLD.id;
    DELETE FROM SQTSpectrumData WHERE runSearchID = OLD.id;
    DELETE FROM SQTFileHeader WHERE runSearchID = OLD.id;
+   DELETE FROM msRunSearchAnalysis WHERE runSearchID = OLD.id;
  END;
 |
 DELIMITER ;
