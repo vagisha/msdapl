@@ -3,12 +3,13 @@ package org.yeastrc.www.proteinfer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.grant.Grant;
-
 public class MsSearchSummary {
 
     private int searchId;
-    private String program;
+    private String searchProgram;
+    private String searchProgramVersion;
+    private String analysisProgram;
+    private String analysisProgramVersion;
     private String searchDatabase;
     private List<RunSearchFile> files;
     
@@ -43,12 +44,36 @@ public class MsSearchSummary {
         files.add(runSearch);
     }
     
-    public String getProgram() {
-        return program;
+    public String getSearchProgram() {
+        return searchProgram;
     }
 
-    public void setProgram(String program) {
-        this.program = program;
+    public void setSearchProgram(String searchProgram) {
+        this.searchProgram = searchProgram;
+    }
+    
+    public String getSearchProgramVersion() {
+        return searchProgramVersion;
+    }
+
+    public void setSearchProgramVersion(String searchProgramVersion) {
+        this.searchProgramVersion = searchProgramVersion;
+    }
+
+    public String getAnalysisProgram() {
+        return analysisProgram;
+    }
+
+    public void setAnalysisProgram(String analysisProgram) {
+        this.analysisProgram = analysisProgram;
+    }
+
+    public String getAnalysisProgramVersion() {
+        return analysisProgramVersion;
+    }
+
+    public void setAnalysisProgramVersion(String analysisProgramVersion) {
+        this.analysisProgramVersion = analysisProgramVersion;
     }
 
     public String getSearchDatabase() {

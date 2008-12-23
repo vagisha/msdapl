@@ -33,10 +33,6 @@ public class DoProteinInferenceAction extends Action {
     throws Exception {
         
         
-        if (request.getSession().getAttribute("inferredProteins") != null) {
-            return mapping.findForward("Success");
-        }
-        
         // User making this request
         User user = UserUtils.getUser(request);
         if (user == null) {

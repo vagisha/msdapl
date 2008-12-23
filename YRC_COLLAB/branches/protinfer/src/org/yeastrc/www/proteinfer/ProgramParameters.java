@@ -10,6 +10,7 @@ import edu.uwpr.protinfer.ProteinInferenceProgram.ProgramParam.TYPE;
 public class ProgramParameters {
 
     private String programName;
+    private String progDisplayName;
     private List<Param> paramList;
     
     public ProgramParameters() {
@@ -17,7 +18,8 @@ public class ProgramParameters {
     }
     
     public ProgramParameters(ProteinInferenceProgram program) {
-        this.programName = program.getName();
+        this.programName = program.name();
+        this.progDisplayName = program.getDisplayName();
         this.paramList = new ArrayList<Param>(program.getProgramParams().length);
         for(ProgramParam p: program.getProgramParams())
             this.addParam(new Param(p));
@@ -29,6 +31,13 @@ public class ProgramParameters {
         this.programName = programName;
     }
 
+    public String getProgramDisplayName() {
+        return progDisplayName;
+    }
+    public void setProgramDisplayName(String progDisplayName) {
+        this.progDisplayName = progDisplayName;
+    }
+    
     public List<Param> getParamList() {
         return paramList;
     }

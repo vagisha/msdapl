@@ -87,7 +87,7 @@ public class NewProteinInferenceAction extends Action {
         
         // we will be using IDPicker -- set the IDPicker parameters
         ProgramParameters params = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
-        setProgramDetails(params, searchSummary.getProgram());
+        setProgramDetails(params, searchSummary.getSearchProgram());
         newForm.setProgramParams(params);
         
 
@@ -131,11 +131,13 @@ public class NewProteinInferenceAction extends Action {
         DAOFactory daoFactory = DAOFactory.instance();
         
         MsSearchSummary searchSummary = new MsSearchSummary();
+        searchSummary.setSearchId(searchId);
         
         // get the name of the search program
         MsSearchDAO searchDao = daoFactory.getMsSearchDAO();
         MsSearch search = searchDao.loadSearch(searchId);
-        searchSummary.setProgram(search.getSearchProgram().displayName());
+        searchSummary.setSearchProgram(search.getSearchProgram().displayName());
+        searchSummary.setSearchProgramVersion(search.getSearchProgramVersion());
         
         // get the name(s) of the search databases.
         StringBuilder databases = new StringBuilder();

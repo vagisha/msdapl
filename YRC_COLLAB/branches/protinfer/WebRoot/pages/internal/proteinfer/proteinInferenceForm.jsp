@@ -36,7 +36,10 @@
   <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
   	<yrcwww:colorrow scheme="ms">
   		<td WIDTH="20%" VALIGN="top"><b>Search Program: </b></td>
-  		<td WIDTH="20%" VALIGN="top"><bean:write name="searchSummary" property="program" /></td>
+  		<td WIDTH="20%" VALIGN="top">
+  			<bean:write name="searchSummary" property="searchProgram" />&nbsp;
+  			<bean:write name="searchSummary" property="searchProgramVersion" />
+  		</td>
   	</yrcwww:colorrow>
   	<yrcwww:colorrow scheme="ms">
   		<td WIDTH="20%" VALIGN="top"><b>Search Database: </b></td>
