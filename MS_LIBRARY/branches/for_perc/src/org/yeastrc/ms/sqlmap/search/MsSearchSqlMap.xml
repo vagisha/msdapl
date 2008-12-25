@@ -11,7 +11,7 @@
 	
 	<resultMap class="MsSearchOut" id="msSearchResult">
 		<result property="id" column="id" />
-		<result property="experimentId" column="experimentId" />
+		<result property="experimentId" column="experimentID" />
 		<result property="searchDate" column="expDate" />
 		<result property="serverDirectory" column="serverDirectory" />
 		<result property="searchProgram" column="analysisProgramName" 

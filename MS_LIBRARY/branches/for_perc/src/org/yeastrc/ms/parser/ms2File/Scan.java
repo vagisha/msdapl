@@ -49,9 +49,9 @@ public class Scan implements MS2ScanIn {
         peakList = new ArrayList<String[]>();
     }
 
-    public boolean isValid() {
-        return peakList.size() > 0 && chargeStates.size() > 0;
-    }
+//    public boolean isValid() {
+//        return peakList.size() > 0 && chargeStates.size() > 0;
+//    }
 
     @Override
     public List<MS2NameValuePair> getChargeIndependentAnalysisList() {

@@ -106,10 +106,11 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
                 break; // done parsing this scan!
             }
         }
-        if (!scan.isValid()) {
-            throw new DataProviderException(currentLineNum-1, 
+        if (!(scan.getPeakCount() > 0) || !(scan.getScanChargeList().size() > 0)) {
+            DataProviderException e = new DataProviderException(currentLineNum-1, 
                     "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: "+scan.getStartScanNum(), 
                     currentLine);
+            log.warn(e.getMessage()); // warn the user but keep going.
         }
         scan.setDataConversionType(this.dataConversionType);
         return scan;

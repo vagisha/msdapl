@@ -11,9 +11,13 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
@@ -321,5 +325,34 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         public int getxCorrRank() {
             return data.getxCorrRank();
         }
+    }
+    
+    public static void main(String[] args) {
+        int experimentID = 1;
+        
+        String dir = "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/sequest";
+        Set<String> fileNames = new HashSet<String>();
+        String[] files = new File(dir).list();
+        for(String file: files) {
+            if(!(file.endsWith(".sqt")))
+                continue;
+            int idx = file.lastIndexOf(".");
+            file = file.substring(0, idx);
+            fileNames.add(file);
+        }
+        Map<String, Integer> runIdMap = new HashMap<String, Integer>(fileNames.size());
+        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
+        for(String filename: fileNames) {
+            List<Integer> runIds = runDao.loadRunIdsForFileName(filename+".ms2");
+            if(runIds.size() > 1) {
+                System.out.println("More than one runIDs found for filename: "+filename);
+                System.exit(1);
+            }
+            runIdMap.put(filename, runIds.get(0));
+        }
+        
+        // $JAVA_HOME/bin/java -classpath .:bin/:lib/'*' org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService
+        SequestSQTDataUploadService uploader = new SequestSQTDataUploadService();
+        uploader.uploadSearch(experimentID, dir, fileNames, runIdMap, "local", dir, new Date(new java.util.Date().getTime()));
     }
 }
