@@ -58,4 +58,11 @@
 		DELETE FROM SQTSpectrumData WHERE runSearchID=#id#
     </delete>
     
+    <delete id="delete" parameterClass="java.util.Map">
+		DELETE FROM SQTSpectrumData 
+		WHERE runSearchID = #runSearchId#
+		AND scanID = #scanId#
+		AND charge = #charge#
+    </delete>
+    
 </sqlMap>

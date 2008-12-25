@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
@@ -201,13 +203,14 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             }
             
             int scanId = getScanId(runId, scan.getScanNumber());
+            
             // save spectrum data
-            uploadSearchScan(scan, lastUploadedRunSearchId, scanId); 
-
-            // save all the search results for this scan
-            for (SequestSearchResultIn result: scan.getScanResults()) {
-                uploadSearchResult(result, lastUploadedRunSearchId, scanId);
-                numResults++;
+            if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
+                // save all the search results for this scan
+                for (SequestSearchResultIn result: scan.getScanResults()) {
+                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                    numResults++;
+                }
             }
         }
         flush(); // save any cached data
@@ -216,6 +219,15 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                 
     }
 
+    @Override
+    void removeCacheForResultIds(List<Integer> resultIds) {
+        Iterator<SequestResultDataWId> iter = sequestResultDataList.iterator();
+        while(iter.hasNext()) {
+            SequestResultDataWId data = iter.next();
+            if(resultIds.contains(data.getResultId()))
+                iter.remove();
+        }
+    }
     
     private SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteDirectory, final Date searchDate) {
         return new SequestSearchIn() {
@@ -355,4 +367,5 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         SequestSQTDataUploadService uploader = new SequestSQTDataUploadService();
         uploader.uploadSearch(experimentID, dir, fileNames, runIdMap, "local", dir, new Date(new java.util.Date().getTime()));
     }
+
 }

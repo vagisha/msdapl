@@ -8,6 +8,8 @@ public interface SQTSearchScanDAO {
     
     public abstract void save(SQTSearchScan scanData);
 
+    public abstract void delete(int runSearchId, int scanId, int charge);
+    
     public abstract void deleteForRunSearch(int runSearchId);
 
 }

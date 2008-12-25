@@ -223,4 +223,9 @@ ProlucidSearchResultDAO {
     public void delete(int resultId) {
         resultDao.delete(resultId);
     }
+    
+    @Override
+    public void deleteResults(int runSearchId, int scanId, int charge) {
+        resultDao.deleteResults(runSearchId, scanId, charge);
+    }
 }

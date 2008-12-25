@@ -10,6 +10,7 @@ import java.io.File;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
@@ -198,21 +199,31 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             
             int scanId = getScanId(runId, scan.getScanNumber());
             // save spectrum data
-            uploadSearchScan(scan, lastUploadedRunSearchId, scanId); 
-
-            // save all the search results for this scan
-            for (ProlucidSearchResultIn result: scan.getScanResults()) {
-                uploadSearchResult(result, lastUploadedRunSearchId, scanId);
-                numResults++;
-                numProteins += result.getProteinMatchList().size();
+            if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
+                // save all the search results for this scan
+                for (ProlucidSearchResultIn result: scan.getScanResults()) {
+                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                    numResults++;
+                    numProteins += result.getProteinMatchList().size();
+                }
             }
         }
+        
         flush(); // save any cached data
         log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
                 " results, "+numProteins+" protein matches. (runSearchId: "+lastUploadedRunSearchId+")");
                 
     }
 
+    @Override
+    void removeCacheForResultIds(List<Integer> resultIds) {
+        Iterator<ProlucidResultDataWId> iter = prolucidResultDataList.iterator();
+        while(iter.hasNext()) {
+            ProlucidResultDataWId data = iter.next();
+            if(resultIds.contains(data.getResultId()))
+                iter.remove();
+        }
+    }
     
     private ProlucidSearchIn makeSearchObject(final ProlucidParamsParser parser, 
                     final String remoteDirectory, final Date searchDate) {

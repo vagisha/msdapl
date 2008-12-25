@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,7 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
@@ -33,6 +35,7 @@ import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
 import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
 import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchWrap;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanWrap;
@@ -51,6 +54,8 @@ public abstract class AbstractSQTDataUploadService {
     private DynamicModLookupUtil dynaModLookup;
 
     static final int BUF_SIZE = 1000;
+    
+    private static final double HYDROGEN = 1.00794;
 
     // these are the things we will cache and do bulk-inserts
     List<MsSearchResultProtein> proteinMatchList;
@@ -170,6 +175,8 @@ public abstract class AbstractSQTDataUploadService {
     abstract SearchProgram getSearchProgram();
     
     abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
+    
+    abstract void removeCacheForResultIds(List<Integer> resultIds);
     //--------------------------------------------------------------------------------------------------
     
     /**
@@ -314,11 +321,94 @@ public abstract class AbstractSQTDataUploadService {
         return runSearchDao.saveRunSearch(new SQTRunSearchWrap(search, searchId, runId));
     }
 
-    final void uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) {
+    /**
+     * 
+     * @param scan
+     * @param runSearchId
+     * @param scanId
+     * @return true if the search scan got uploaded, false otherwise
+     */
+    final boolean uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) {
         SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
+        MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
+        
+        // NOTE: Added some changes to deal with duplicate results in MacCoss lab data
+        int charge = scan.getCharge();
+        SQTSearchScan oldScan = spectrumDataDao.load(runSearchId, scanId, charge);
+        if(oldScan == null) {
+            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
+            return true;
+        }
+        
+        log.info("Found duplicate result for runSearchId: "+runSearchId+", scanID: "+scanId+" and charge: "+charge);
+        // If we already have results with with the same scanID and charge we will 
+        // keep the "better" results.
+        
+        // First check if both results are the same. If they are don't upload this one.
+        if(oldScan.getObservedMass().doubleValue() == scan.getObservedMass().doubleValue()) {
+            log.info("\tResults are the same. Keeping the old one...");
+            return false;
+        }
+        
+        // To determine which is a better result, look at the observedMass for the 
+        // old searchScan and the new searchScan.  Keep the one where the observedMass
+        // is closer to the preMZ of the scan
+        MsScan msScan = DAOFactory.instance().getMsScanDAO().load(scanId);
+        double premz = msScan.getPrecursorMz().doubleValue();
+        log.info("\tPrecursor M/Z: "+premz+"; old mass: "+oldScan.getObservedMass()+"; new mass: "+scan.getObservedMass());
+        double peptideMH = (premz - HYDROGEN) * charge + HYDROGEN;
+        double oldDiff = Math.abs(peptideMH - oldScan.getObservedMass().doubleValue());
+        double newDiff = Math.abs(peptideMH - scan.getObservedMass().doubleValue());
+        if(newDiff < oldDiff) {
+            // first delete old results
+            spectrumDataDao.delete(runSearchId, scanId, charge);
+            List<Integer> resultIdsToDelete = resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
+            resultDao.deleteResults(runSearchId, scanId, charge);
+            
+            // If there are cahced entries for this resultIds, remove them
+            removeCachedResultIds(resultIdsToDelete);
+            
+            // save the new result
+            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
+            log.info("\tNEW result is better");
+            return true;
+        }
+        else {
+            log.info("\tOLD result was better");
+            return false;
+        }
     }
 
+    // If there is cached data for the following result Ids remove it
+    private void removeCachedResultIds(List<Integer> resultIds) {
+        
+        log.info("\tRemoving cached entries for "+resultIds.size()+" resultIds");
+        Iterator<MsSearchResultProtein> iter = proteinMatchList.iterator();
+        while(iter.hasNext()) {
+            MsSearchResultProtein prot = iter.next();
+            if(resultIds.contains(prot.getResultId()))
+                iter.remove();
+        }
+        
+        Iterator<MsResultResidueModIds> rmodIter = resultResidueModList.iterator();
+        while(rmodIter.hasNext()) {
+            MsResultResidueModIds mod = rmodIter.next();
+            if(resultIds.contains(mod.getResultId()))
+                iter.remove();
+        }
+        
+        Iterator<MsResultTerminalModIds> tmodIter = resultTerminalModList.iterator();
+        while(tmodIter.hasNext()) {
+            MsResultTerminalModIds mod = tmodIter.next();
+            if(resultIds.contains(mod.getResultId()))
+                iter.remove();
+        }
+        
+        // subclasses should also clear any cached data with these resultIds
+        removeCacheForResultIds(resultIds);
+    }
+    
+    
     final int uploadBaseSearchResult(MsSearchResultIn result, int runSearchId, int scanId) throws UploadException {
         
         MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();

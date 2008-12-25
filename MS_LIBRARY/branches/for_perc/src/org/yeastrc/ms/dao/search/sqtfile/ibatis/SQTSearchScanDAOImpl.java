@@ -40,4 +40,13 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
     public void deleteForRunSearch(int runSearchId) {
         delete("SqtSpectrum.deleteForRunSearch", runSearchId);
     }
+
+    @Override
+    public void delete(int runSearchId, int scanId, int charge) {
+        Map<String, Integer> map = new HashMap<String, Integer>(3);
+        map.put("runSearchId", runSearchId);
+        map.put("scanId", scanId);
+        map.put("charge", charge);
+        delete("SqtSpectrum.delete", map);
+    }
 }
