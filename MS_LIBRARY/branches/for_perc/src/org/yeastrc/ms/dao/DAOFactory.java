@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.ibatis.MsRunSearchAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
@@ -129,6 +131,7 @@ public class DAOFactory {
     
     // DAOs related to post search analysis
     private MsSearchAnalysisDAO analysisDAO;
+    private MsRunSearchAnalysisDAO rsAnalysisDAO;
     
     // DAOs related to Percolator post search analysis
     private PercolatorParamsDAO percSQTHeaderDAO;
@@ -178,6 +181,7 @@ public class DAOFactory {
         
         // post search analysis related
         analysisDAO = new MsSearchAnalysisDAOImpl(sqlMap);
+        rsAnalysisDAO = new MsRunSearchAnalysisDAOImpl(sqlMap);
         
         // Percolator post search analysis related 
         percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
@@ -307,10 +311,14 @@ public class DAOFactory {
     }
     
     //-------------------------------------------------------------------------------------------
-    // Post serach analysis related
+    // Post search analysis related
     //-------------------------------------------------------------------------------------------
     public MsSearchAnalysisDAO getSearchAnalysisDAO() {
         return analysisDAO;
+    }
+    
+    public MsRunSearchAnalysisDAO getRunSearchAnalysisDAO(){
+        return rsAnalysisDAO;
     }
     
     //-------------------------------------------------------------------------------------------

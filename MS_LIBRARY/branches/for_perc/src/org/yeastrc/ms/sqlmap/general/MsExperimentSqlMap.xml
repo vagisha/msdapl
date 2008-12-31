@@ -23,6 +23,10 @@
     	SELECT * FROM msExperiment WHERE id = #id#
     </select>
     
+    <select id="selectAllExperimentIds" resultClass="Integer">
+    	SELECT id FROM msExperiment ORDER BY id
+    </select>
+    
     <select id="selectRunIdsForExperiment" resultClass="Integer" parameterClass="Integer">
     	SELECT runID FROM msExperimentRun WHERE experimentID = #experimentId#
     </select>

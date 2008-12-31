@@ -14,7 +14,7 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 public interface PercolatorResult extends MsSearchResult {
 
     
-    public abstract int getSearchAnalysisId();
+    public abstract int getRunSearchAnalysisId();
     
     /**
      * @return the qvalue

@@ -54,7 +54,8 @@ public class UploadException extends Exception {
         // For Percolator uploads
         NO_RUNSEARCHID_FOR_SQT  ("No runSearchID found for Percolator sqt file", WARN),
         NO_PERC_ANALYSIS_UPLOADED("No Percolator analysis files were uploaded", ERROR),
-        NOT_MATCHING_SEARCH_RESULT("A matching search result was not found for the Percolator result", WARN),
+        NOT_MATCHING_SEARCH_RESULT("No matching search result was found for the Percolator result", WARN),
+        NOT_MATCHING_SEARCH_SCAN("No matching search scan was found for the Percolator search scan", WARN),
         
         // General
         RUNTIME_SQT_ERROR       ("Runtime exception.", WARN)

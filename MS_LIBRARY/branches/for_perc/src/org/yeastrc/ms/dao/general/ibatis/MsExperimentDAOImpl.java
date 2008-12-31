@@ -26,6 +26,11 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     }
 
     @Override
+    public List<Integer> getAllExperimentIds() {
+        return queryForList("MsExperiment.selectAllExperimentIds");
+    }
+    
+    @Override
     public List<Integer> getExperimentIdsForRun(int runId) {
         return queryForList("MsExperiment.selectExperimentIdsForRun", runId);
     }

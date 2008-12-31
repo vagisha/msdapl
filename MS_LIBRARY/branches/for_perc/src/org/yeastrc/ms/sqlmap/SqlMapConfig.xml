@@ -83,6 +83,7 @@
 	
 	<!-- Related to post search analysis -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/MsSearchAnalysisSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/MsRunSearchAnalysisSqlMap.xml"/>
 	
 	<!-- Related to Percolator  -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorParamsSqlMap.xml"/>

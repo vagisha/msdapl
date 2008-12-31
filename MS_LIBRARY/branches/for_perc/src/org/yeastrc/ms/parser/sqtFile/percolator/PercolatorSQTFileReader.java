@@ -9,15 +9,19 @@ package org.yeastrc.ms.parser.sqtFile.percolator;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultIn;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorSearchScan;
 import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
+import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
@@ -32,20 +36,48 @@ public class PercolatorSQTFileReader extends SQTFileReader {
         super();
     }
 
-    public void open(String filePath, float percolatorVersion, SearchProgram searchProgram) throws DataProviderException{
+    public void open(String filePath, SearchProgram searchProgram) throws DataProviderException{
         super.open(filePath);
-        this.percolatorVersion = percolatorVersion;
         this.searchProgram = searchProgram;
     }
 
-    public void open(String fileName, Reader input, float percolatorVersion, SearchProgram searchProgram) throws DataProviderException  {
+    public void open(String fileName, Reader input, SearchProgram searchProgram) throws DataProviderException  {
         super.open(fileName, input);
-        this.percolatorVersion = percolatorVersion;
         this.searchProgram = searchProgram;
     }
 
     public void init() {
         super.init();
+    }
+    
+    public SQTHeader getSearchHeader()  throws DataProviderException {
+
+        SQTHeader header = super.getSearchHeader();
+        // Grab the percolator version out of the header section.
+        try {
+            percolatorVersion = Float.parseFloat(header.getSearchEngineVersion());
+        }
+        catch(NumberFormatException e) {
+            throw new DataProviderException("Error parsing Percolator version: "+header.getSearchEngineVersion());
+        }
+        return header;
+    }
+    
+    public static Map<String, String> getPercolatorParams(SQTHeader header) {
+        Map<String, String> params = new HashMap<String, String>();
+        for(SQTHeaderItem hi: header.getHeaders()) {
+            if(hi.getName().equalsIgnoreCase("Hyperparameters")) {
+                // Hyperparameters fdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+                String val = hi.getValue();
+                val.replaceAll("\\s", ""); // remove spaces
+                String[] tokens = val.split(",");
+                for(String token: tokens) {
+                    String[] pstr = token.split("=");
+                    params.put(pstr[0], pstr[1]);
+                }
+            }
+        }
+        return params;
     }
     
     /**
@@ -85,6 +117,7 @@ public class PercolatorSQTFileReader extends SQTFileReader {
 
         advanceLine();
 
+        boolean isPlaceholder = false;
         while (currentLine != null) {
             if (isLocusLine(currentLine)) {
                 DbLocus locus = null;
@@ -93,8 +126,8 @@ public class PercolatorSQTFileReader extends SQTFileReader {
                 // NOTE: IGNORE ALL 'M' LINES FOLLOWED BY THE FOLLOWING 'L' LINE
                 // L       Placeholder satisfying DTASelect
                 // This is not a valid result and we will return null
-                if(locus.getAccession().startsWith("Placeholder satisfying DTASelect"))
-                    return null;
+                if(locus.getAccession().startsWith("Placeholder"))
+                    isPlaceholder = true;
                 
                 if (locus != null)
                     result.addMatchingLocus(locus);
@@ -105,6 +138,7 @@ public class PercolatorSQTFileReader extends SQTFileReader {
         }
 //        if (result.getProteinMatchList().size() == 0)
 //            throw new DataProviderException(currentLineNum-1, "Invalid 'M' line.  No locus matches found." , null);
+        if(isPlaceholder) result = null;
         return result;
     }
 
@@ -132,11 +166,13 @@ public class PercolatorSQTFileReader extends SQTFileReader {
             result.setMass(new BigDecimal(tokens[3]));
             result.setDeltaCN(new BigDecimal(tokens[4]));
             
-            if(percolatorVersion >= 1.07)
-                result.setPosteriorErrorProbability(Double.parseDouble(tokens[5]));
-            else
+            if(percolatorVersion >= 1.07) {
+                result.setPosteriorErrorProbability( 1 - Double.parseDouble(tokens[5])); // column has 1 - PEP
+            }
+            else {
                 result.setDiscriminantScore(Double.parseDouble(tokens[5]));
-            result.setQvalue(Double.parseDouble(tokens[6]));
+            }
+            result.setQvalue(-Double.parseDouble(tokens[6])); // column has (minus)qvalue
             result.setNumMatchingIons(Integer.parseInt(tokens[7]));
             result.setNumPredictedIons(Integer.parseInt(tokens[8]));
         }
@@ -198,6 +234,29 @@ public class PercolatorSQTFileReader extends SQTFileReader {
         public BigDecimal getTotalIntensity() {
             return scan.getTotalIntensity();
         }
+        
+        public String toString() {
+            StringBuilder buf = new StringBuilder();
+            buf.append("S\t"+getScanNumber()+"\t");
+            buf.append(getCharge()+"\t");
+            buf.append(getObservedMass()+"\n");
+            for(PercolatorResultIn result: resultList) {
+                buf.append(result.toString()+"\n");
+            }
+            return buf.toString();
+        }
     }
 
+    public static void main(String[] args) throws DataProviderException {
+        String file = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/13NOV08-DIA-700-760-01.sqt";
+        
+        PercolatorSQTFileReader reader = new PercolatorSQTFileReader();
+        reader.open(file, SearchProgram.SEQUEST);
+        SQTHeader header = reader.getSearchHeader();
+        System.out.println(header.toString());
+        while(reader.hasNextSearchScan()) {
+            PercSearchScan scan = reader.getNextSearchScan();
+            System.out.println(scan);
+        }
+    }
 }

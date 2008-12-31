@@ -17,6 +17,8 @@ public interface MsExperimentDAO {
 
     public MsExperiment loadExperiment(int experimentId);
     
+    public List<Integer> getAllExperimentIds();
+    
     public List<Integer> getRunIdsForExperiment(int experimentId);
     
     public List<Integer> getExperimentIdsForRun(int runId);

@@ -5,7 +5,7 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
 public class PercolatorResultDataBean implements PercolatorResultDataWId {
 
     private int resultId;
-    private int analysisId;
+    private int runSearchAnalysisId;
     private double qvalue = -1.0;
     private double discriminantScore = -1.0;
     private double pep = -1.0;
@@ -17,8 +17,8 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
     }
 
     @Override
-    public int getSearchAnalysisId() {
-        return analysisId;
+    public int getRunSearchAnalysisId() {
+        return runSearchAnalysisId;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class PercolatorResultDataBean implements PercolatorResultDataWId {
         this.resultId = resultId;
     }
     
-    public void setSearchAnalysisId(int analysisId) {
-        this.analysisId = analysisId;
+    public void setRunSearchAnalysisId(int analysisId) {
+        this.runSearchAnalysisId = analysisId;
     }
 }

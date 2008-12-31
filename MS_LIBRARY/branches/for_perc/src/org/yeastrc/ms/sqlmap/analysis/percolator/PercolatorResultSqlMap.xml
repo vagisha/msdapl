@@ -9,7 +9,7 @@
 	
 	
 	<resultMap class="PercolatorResultOut" id="percolatorResultResult" extends="MsSearchResult.msSearchResult">
-		<result property="searchAnalysisId" column="searchAnalysisID" nullValue="0"/>
+		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
 		<result property="qvalue" column="qValue" nullValue="-1.0"/>
 		<result property="posteriorErrorProbability" column="PEP" nullValue="-1.0"/>
 		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
@@ -22,7 +22,7 @@
 		<result property="charge" column="charge" nullValue="0"/>
 		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
 		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
-		<result property="searchAnalysisId" column="searchAnalysisID" nullValue="0"/>
+		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
 		<result property="qvalue" column="qValue" nullValue="-1.0"/>
 		<result property="posteriorErrorProbability" column="PEP" nullValue="-1.0"/>
 		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
@@ -30,7 +30,7 @@
 	
 	<parameterMap class="PercolatorResultIn" id="percolatorResultParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0" />
-		<parameter property="searchAnalysisId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="runSearchAnalysisId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="qvalue" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="posteriorErrorProbability" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="discriminantScore" jdbcType="DOUBLE" nullValue="-1.0"/>
@@ -56,18 +56,21 @@
     </select>
     
     <select id="selectResultIdsForAnalysis" resultClass="Integer" parameterClass="Integer">
-    	SELECT resultID FROM PercolatorResult WHERE searchAnalysisID = #analysisId#
+    	SELECT pres.resultID 
+    	FROM PercolatorResult AS pres, msRunSearchAnalysis as rsa 
+    	WHERE pres.runSearchAnalysisID = rsa.id AND
+    	rsa.searchAnalysisID = #analysisId# 
     </select>
     
     <select id="selectResultIdsWQvalThreshold" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT resultID FROM PercolatorResult
-    	WHERE searchAnalysisID = #analysisId#  
+    	WHERE runSearchAnalysisID = #rsAnalysisId#  
     	AND qValue &lt;= #qvalue#
     </select>
     
     <select id="selectResultIdsWPepThreshold" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT resultID FROM PercolatorResult
-    	WHERE searchAnalysisID = #analysisId# 
+    	WHERE runSearchAnalysisID = #rsAnalysisId# 
     	AND PEP &lt;= #pep#
     </select>
     
@@ -75,7 +78,7 @@
     <insert id="insert" parameterMap="percolatorResultParam">
     	INSERT INTO PercolatorResult 
     	(resultID, 
-    	searchAnalysisID,
+    	runSearchAnalysisID,
     	qValue,
     	PEP,
     	discriminantScore) 
@@ -85,7 +88,7 @@
     <insert id="insertAll" parameterClass="String">
     	INSERT INTO PercolatorResult 
     	(resultID, 
-    	searchAnalysisID,
+    	runSearchAnalysisID,
     	qValue,
     	PEP,
     	discriminantScore) 

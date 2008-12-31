@@ -2,7 +2,7 @@ package org.yeastrc.ms.domain.analysis.percolator;
 
 public interface PercolatorResultDataWId {
 
-    public abstract int getSearchAnalysisId();
+    public abstract int getRunSearchAnalysisId();
     
     public abstract int getResultId();
     
