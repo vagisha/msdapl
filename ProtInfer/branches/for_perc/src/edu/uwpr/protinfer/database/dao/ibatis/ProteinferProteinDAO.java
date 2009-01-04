@@ -13,39 +13,20 @@ import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 import edu.uwpr.protinfer.database.dao.GenericProteinferProteinDAO;
-import edu.uwpr.protinfer.database.dto.BaseProteinferProtein;
+import edu.uwpr.protinfer.database.dto.GenericProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
-import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
-import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 
-public class ProteinferProteinDAO extends BaseSqlMapDAO implements 
-    GenericProteinferProteinDAO<ProteinferSpectrumMatch, ProteinferPeptide, ProteinferProtein> {
+public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProteinferProteinDAO<ProteinferProtein> {
 
     private static final String sqlMapNameSpace = "ProteinferProtein";
 
-    private ProteinferPeptideDAO peptDao;
-    
-    public ProteinferProteinDAO(SqlMapClient sqlMap, ProteinferPeptideDAO peptDao) {
+    public ProteinferProteinDAO(SqlMapClient sqlMap) {
         super(sqlMap);
-        this.peptDao = peptDao;
     }
 
-    public int save(BaseProteinferProtein<?, ?> protein) {
+    public int save(GenericProteinferProtein<?> protein) {
         return saveAndReturnId(sqlMapNameSpace+".insert", protein);
-    }
-    
-    public int saveProteinferProtein(ProteinferProtein protein) {
-        int proteinId = save(protein);
-        for(ProteinferPeptide peptide: protein.getPeptides()) {
-            int peptideId = peptide.getId();
-            // save only if it has not been saved before
-            if(peptideId == 0) {
-                peptideId = peptDao.saveProteinferPeptide(peptide);
-            }
-            saveProteinferProteinPeptideMatch(proteinId, peptideId);
-        }
-        return proteinId;
     }
     
     public void saveProteinferProteinPeptideMatch(int pinferProteinId, int pinferPeptideId) {
@@ -69,7 +50,7 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements
         super.update(sqlMapNameSpace+".updateUserValidation", map);
     }
     
-    public ProteinferProtein getProtein(int pinferProteinId) {
+    public ProteinferProtein loadProtein(int pinferProteinId) {
         return (ProteinferProtein) super.queryForObject(sqlMapNameSpace+".select", pinferProteinId);
     }
     
@@ -77,7 +58,7 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements
         return queryForList(sqlMapNameSpace+".selectProteinIdsForProteinferRun", proteinferId);
     }
     
-    public List<ProteinferProtein> getProteins(int proteinferId) {
+    public List<ProteinferProtein> loadProteins(int proteinferId) {
         return queryForList(sqlMapNameSpace+".selectProteinsForProteinferRun", proteinferId);
     }
     

@@ -4,11 +4,19 @@
 <sqlMap namespace="IdPickerPeptide"> 
 
 	<typeAlias alias="IdPickerPeptide" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide"/>
+	<typeAlias alias="IdPickerPeptideBase" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideBase"/>
 	
 	<resultMap class="IdPickerPeptide" id="idpickerPeptideResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
 		<result property="groupId" column="groupID" nullValue="0" />
-		<result property="spectrumMatchList" 
-				select="IdPickerSpectrumMatch.selectMatchesForPeptide"
+		<result property="ionList" 
+				select="IdPickerIon.selectIonsForPeptide"
+				column="id"/>
+	</resultMap>
+	
+	<resultMap class="IdPickerPeptideBase" id="idpickerPeptideBaseResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
+		<result property="groupId" column="groupID" nullValue="0" />
+		<result property="ionList" 
+				select="ProteinferIon.selectIonsForPeptide"
 				column="id"/>
 	</resultMap>
 	
@@ -23,6 +31,12 @@
     	AND pep.id = idpPep.piPeptideID
     </select>
     
+    <select id="selectBasePeptide" resultMap="idpickerPeptideBaseResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferPeptide as pep, IDPickerPeptide as idpPep
+    	WHERE pep.id=#id#
+    	AND pep.id = idpPep.piPeptideID
+    </select>
+    
     <select id="selectPeptidesForProtein" resultMap="idpickerPeptideResult" parameterClass="Integer">
     	SELECT p.id, p.sequence, idpPep.groupID
     	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch, IDPickerPeptide as idpPep
@@ -31,39 +45,28 @@
     	AND p.id = idpPep.piPeptideID
     </select>
     
-    <select id="selectPeptideIdsForProteinGroup" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT DISTINCT ipept.piPeptideID 
-    	FROM IDPickerProtein AS iprot, msProteinInferProtein AS prot, 
-    	msProteinInferProteinPeptideMatch AS m, IDPickerPeptide AS ipept 
-    	WHERE iprot.piProteinID= prot.id 
-    	AND prot.id = m.piProteinID 
-    	AND m.piPeptideID = ipept.piPeptideID 
-    	AND iprot.groupID=#proteinGroupId#
-    	AND prot.piRunID=#pinferId#;
-    </select>
-    
-    
-    <select id="selectPeptidesForProteinferRun" resultMap="idpickerPeptideResult" parameterClass="Integer">
-    	SELECT pep.*, idpPep.* 
-    	FROM msProteinInferProtein prot, msProteinInferPeptide as pep, 
-    	     msProteinInferProteinPeptideMatch as mtch, IDPickerPeptide as idpPep
-    	WHERE prot.piRunID=#id#
-    	AND prot.id = mtch.piProteinID
-    	AND mtch.piPeptideID = pep.id
-    	AND pep.id = idpPep.piPeptideID
-    	GROUP BY piPeptideID
+    <select id="selectBasePeptidesForProtein" resultMap="idpickerPeptideResult" parameterClass="Integer">
+    	SELECT p.id, p.sequence, idpPep.groupID
+    	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch, IDPickerPeptide as idpPep
+    	WHERE p.id = protMatch.piPeptideID
+    	AND protMatch.piProteinID = #id#
+    	AND p.id = idpPep.piPeptideID
     </select>
     
     <select id="selectPeptidesForGroup" resultMap="idpickerPeptideResult" parameterClass="java.util.Map">
-    	SELECT pep.*, idpPep.* 
-    	FROM msProteinInferProtein prot, msProteinInferPeptide as pep, 
-    	     msProteinInferProteinPeptideMatch as mtch, IDPickerPeptide as idpPep
-    	WHERE prot.piRunID=#pinferId#
-    	AND prot.id = mtch.piProteinID
-    	AND mtch.piPeptideID = pep.id
-    	AND pep.id = idpPep.piPeptideID
+    	SELECT pept.*, idpPep.* 
+    	FROM msProteinInferPeptide as pept, IDPickerPeptide as idpPep
+    	WHERE pept.piRunID=#pinferId#
+    	AND pept.id = idpPep.piPeptideID
     	AND idpPep.groupID=#groupId#
-    	GROUP BY piPeptideID
+    </select>
+    
+    <select id="selectBasePeptidesForGroup" resultMap="idpickerPeptideResult" parameterClass="java.util.Map">
+    	SELECT pept.*, idpPep.* 
+    	FROM msProteinInferPeptide as pept, IDPickerPeptide as idpPep
+    	WHERE pept.piRunID=#pinferId#
+    	AND pept.id = idpPep.piPeptideID
+    	AND idpPep.groupID=#groupId#
     </select>
     
     <select id="selectProtGrpIdsForPeptGrpId" resultClass="Integer" parameterClass="java.util.Map">

@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.uwpr.protinfer.database.dto.BaseProteinferRun;
+import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
 
-public class IdPickerRun extends BaseProteinferRun<IdPickerInputSummary> {
+public class IdPickerRun extends GenericProteinferRun<IdPickerInput> {
 
     private int numUnfilteredProteins = -1;
     private int numUnfilteredPeptides = -1;
@@ -48,8 +48,8 @@ public class IdPickerRun extends BaseProteinferRun<IdPickerInputSummary> {
         this.filters = filter;
     }
     
-    public IdPickerInputSummary getInputSummaryForRunSearch(int runSearchId) {
-        for(IdPickerInputSummary input: this.getInputSummaryList()) {
+    public IdPickerInput getInputSummaryForRunSearch(int runSearchId) {
+        for(IdPickerInput input: this.getInputList()) {
             if(input.getInputId() == runSearchId) {
                 return input;
             }

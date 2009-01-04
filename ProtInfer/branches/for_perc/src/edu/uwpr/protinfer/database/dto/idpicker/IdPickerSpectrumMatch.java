@@ -4,7 +4,7 @@ import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 
 public class IdPickerSpectrumMatch extends ProteinferSpectrumMatch {
 
-    private double fdr = -1;
+    private double fdr = -1.0;
     
     public IdPickerSpectrumMatch() {
         super();

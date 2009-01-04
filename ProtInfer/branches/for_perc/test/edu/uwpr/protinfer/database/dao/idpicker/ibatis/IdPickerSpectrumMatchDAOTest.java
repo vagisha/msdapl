@@ -35,20 +35,20 @@ public class IdPickerSpectrumMatchDAOTest extends TestCase {
     }
 
     public final void testGetSpectrumMatch() {
-        IdPickerSpectrumMatch psm = idpPsmDao.getSpectrumMatch(1); // we inserted this in the test above
+        IdPickerSpectrumMatch psm = idpPsmDao.loadSpectrumMatch(1); // we inserted this in the test above
         assertEquals(1, psm.getId());
         assertEquals(21, psm.getMsRunSearchResultId());
-        assertEquals(123, psm.getProteinferPeptideId());
+        assertEquals(123, psm.getProteinferIonId());
 //        assertEquals(34, psm.getRank());
         assertEquals(0.25, psm.getFdr());
     }
 
     public final void testGetSpectrumMatchesForPeptide() {
-        List<IdPickerSpectrumMatch> psmList = idpPsmDao.getSpectrumMatchesForPeptide(123);
+        List<IdPickerSpectrumMatch> psmList = idpPsmDao.loadSpectrumMatchesForPeptide(123);
         assertEquals(3, psmList.size());
         for(IdPickerSpectrumMatch psm: psmList) {
             assertEquals(21, psm.getMsRunSearchResultId());
-            assertEquals(123, psm.getProteinferPeptideId());
+            assertEquals(123, psm.getProteinferIonId());
 //            assertEquals(34, psm.getRank());
             assertEquals(0.25, psm.getFdr());
         }
@@ -57,7 +57,7 @@ public class IdPickerSpectrumMatchDAOTest extends TestCase {
     public static final IdPickerSpectrumMatch createIdPickerSpectrumMatch(int runSearchResultId, int pinferPeptideId, int rank, double fdr) {
         IdPickerSpectrumMatch psm = new IdPickerSpectrumMatch();
         psm.setMsRunSearchResultId(runSearchResultId);
-        psm.setProteinferPeptideId(pinferPeptideId);
+        psm.setProteinferIonId(pinferPeptideId);
 //        psm.setRank(rank);
         psm.setFdr(fdr);
         return psm;

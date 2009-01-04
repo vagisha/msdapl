@@ -17,11 +17,11 @@ public class ProteinferInputDAO extends BaseSqlMapDAO implements GenericProteinf
         super(sqlMap);
     }
     
-    public List<ProteinferInput> getProteinferInputList(int pinferId) {
+    public List<ProteinferInput> loadProteinferInputList(int pinferId) {
         return queryForList(sqlMapNameSpace+".selectProteinferInputList", pinferId);
     }
     
-    public List<Integer> getRunSearchIdsForProteinferRun(int pinferId) {
+    public List<Integer> loadInputIdsForProteinferRun(int pinferId) {
         return super.queryForList(sqlMapNameSpace+".selectRunSearchIds", pinferId);
     }
     

@@ -1,8 +1,7 @@
 package edu.uwpr.protinfer.database.dto.idpicker;
 
 
-public class IdPickerProtein extends BaseIdPickerProtein<IdPickerSpectrumMatch, IdPickerIon, IdPickerPeptide> {
-
+public class IdPickerProtein extends GenericIdPickerProtein<IdPickerPeptide> {
 
     public IdPickerProtein() {
         super();

@@ -7,39 +7,28 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 import edu.uwpr.protinfer.database.dao.GenericProteinferPeptideDAO;
-import edu.uwpr.protinfer.database.dto.BaseProteinferPeptide;
+import edu.uwpr.protinfer.database.dto.GenericProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
-import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 
-public class ProteinferPeptideDAO extends BaseSqlMapDAO implements GenericProteinferPeptideDAO<ProteinferSpectrumMatch, ProteinferPeptide> {
+public class ProteinferPeptideDAO extends BaseSqlMapDAO implements 
+                    GenericProteinferPeptideDAO<ProteinferPeptide> {
 
     private static final String sqlMapNameSpace = "ProteinferPeptide";
     
-    private final ProteinferSpectrumMatchDAO psmDao;
     
-    public ProteinferPeptideDAO(SqlMapClient sqlMap, ProteinferSpectrumMatchDAO psmDao) {
+    public ProteinferPeptideDAO(SqlMapClient sqlMap) {
         super(sqlMap);
-        this.psmDao = psmDao;
     }
 
-    public int save(BaseProteinferPeptide<?> peptide) {
+    public int save(GenericProteinferPeptide<?,?> peptide) {
         return super.saveAndReturnId(sqlMapNameSpace+".insert", peptide);
-    }
-    
-    public int saveProteinferPeptide(ProteinferPeptide peptide) {
-        int id = save(peptide);
-        for(ProteinferSpectrumMatch psm: peptide.getSpectrumMatchList()) {
-            psm.setProteinferPeptideId(id);
-            psmDao.saveSpectrumMatch(psm);
-        }
-        return id;
     }
     
     public List<Integer> getPeptideIdsForProteinferProtein(int pinferProteinId) {
         return super.queryForList(sqlMapNameSpace+".selectPeptideIdsForProtein", pinferProteinId);
     }
     
-    public List<ProteinferPeptide> getPeptidesForProteinferProtein(int pinferProteinId) {
+    public List<ProteinferPeptide> loadPeptidesForProteinferProtein(int pinferProteinId) {
         return super.queryForList(sqlMapNameSpace+".selectPeptidesForProtein", pinferProteinId);
     }
     
@@ -47,15 +36,15 @@ public class ProteinferPeptideDAO extends BaseSqlMapDAO implements GenericProtei
         return super.queryForList(sqlMapNameSpace+".selectPeptideIdsForProteinferRun", proteinferId);
     }
     
-    public List<ProteinferPeptide> getPeptidesForProteinferRun(int proteinferId) {
+    public List<ProteinferPeptide> loadPeptidesForProteinferRun(int proteinferId) {
         return super.queryForList(sqlMapNameSpace+".selectPeptidesForProteinferRun", proteinferId);
     }
     
-    public ProteinferPeptide getPeptide(int pinferPeptideId) {
+    public ProteinferPeptide load(int pinferPeptideId) {
         return (ProteinferPeptide) super.queryForObject(sqlMapNameSpace+".select", pinferPeptideId);
     }
     
-    public void deleteProteinferPeptide(int id) {
+    public void delete(int id) {
         super.delete(sqlMapNameSpace+".delete", id);
     }
 }

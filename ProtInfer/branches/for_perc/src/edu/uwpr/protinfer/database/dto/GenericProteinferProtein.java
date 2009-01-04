@@ -1,11 +1,20 @@
+/**
+ * GenericProteinInferProtein.java
+ * @author Vagisha Sharma
+ * Dec 30, 2008
+ * @version 1.0
+ */
 package edu.uwpr.protinfer.database.dto;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseProteinferProtein<S extends ProteinferSpectrumMatch, 
-                                    I extends BaseProteinferIon<S>, 
-                                    T extends BaseProteinferPeptide<S, I>> {
+import edu.uwpr.protinfer.PeptideDefinition;
+
+/**
+ * 
+ */
+public class GenericProteinferProtein <T extends GenericProteinferPeptide<?,?>>{
 
     private int id;
     private int pinferId;
@@ -13,13 +22,20 @@ public class BaseProteinferProtein<S extends ProteinferSpectrumMatch,
     private double coverage;
     private String userAnnotation;
     private ProteinUserValidation userValidation;
-    private List<T> peptides;
-
     
-    public BaseProteinferProtein() {
-        peptides = new ArrayList<T>();
+    private List<T> peptideList;
+    
+    private PeptideDefinition peptideDefinition;
+    
+    public GenericProteinferProtein() {
+        peptideList = new ArrayList<T>();
+        peptideDefinition = new PeptideDefinition(false, false);
     }
 
+    public void setPeptideDefinition(PeptideDefinition peptideDefinition) {
+        this.peptideDefinition = peptideDefinition;
+    }
+    
     public int getId() {
         return id;
     }
@@ -69,30 +85,41 @@ public class BaseProteinferProtein<S extends ProteinferSpectrumMatch,
     }
 
     public List<T> getPeptides() {
-        return peptides;
+        return peptideList;
     }
 
-    public void setPeptides(List<T> peptides) {
-        this.peptides = peptides;
+    public void setPeptides(List<T> peptideList) {
+        this.peptideList = peptideList;
     }
-
+    
     public int getPeptideCount() {
-        return peptides.size();
+        // peptide is uniquely defined by its sequence
+        if(!peptideDefinition.isUseCharge() && !peptideDefinition.isUseMods()) 
+            return peptideList.size();
+        
+        else {
+            int cnt = 0;
+            for(T peptide: peptideList)
+                cnt += peptide.getNumDistinctPeptides(peptideDefinition);
+            return cnt;
+        }
     }
-
+    
     public int getUniquePeptideCount() {
+        
+        int uniqCnt = 0;
+        for(T peptide: peptideList) {
+            if(!peptide.isUniqueToProtein())
+                continue;
+            uniqCnt += peptide.getNumDistinctPeptides(peptideDefinition);
+        }
+        return uniqCnt;
+    }
+    
+    public int getSpectrumCount() {
         int cnt = 0;
-        for(T peptide: peptides)
-            if(peptide.isUniqueToProtein())
-                cnt++;
+        for(T peptide: peptideList)
+            cnt += peptide.getSpectrumCount();
         return cnt;
     }
-
-    public int getSpectralCount() {
-        int cnt = 0;
-        for(T peptide: peptides)
-            cnt += peptide.getSpectralCount();
-        return cnt;
-    }
-
 }

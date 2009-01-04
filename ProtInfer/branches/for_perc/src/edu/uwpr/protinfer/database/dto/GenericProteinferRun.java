@@ -4,23 +4,23 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.Program;
+
 import edu.uwpr.protinfer.ProteinInferenceProgram;
 
 
-public class BaseProteinferRun<T extends ProteinferInput> {
+public class GenericProteinferRun<T extends ProteinferInput> {
 
     private int id;
     private Date date;
 //    private ProteinferStatus status;
     private ProteinInferenceProgram program;
-    private String inputType;
+    private Program inputGenerator;
     private String comments;
     private List<T> inputSummaryList;
 
-    public static final String SEARCH = "SEARCH";
-    public static final String ANALYSIS = "ANALYSIS";
     
-    public BaseProteinferRun() {
+    public GenericProteinferRun() {
         inputSummaryList = new ArrayList<T>();
     }
 
@@ -56,7 +56,7 @@ public class BaseProteinferRun<T extends ProteinferInput> {
 //        this.status = status;
 //    }
 
-    public List<T> getInputSummaryList() {
+    public List<T> getInputList() {
         return inputSummaryList;
     }
 
@@ -76,12 +76,16 @@ public class BaseProteinferRun<T extends ProteinferInput> {
         this.program = program;
     }
 
-    public String getInputType() {
-        return inputType;
+    public Program getInputGenerator() {
+        return inputGenerator;
     }
     
-    public void setInputType(String inputType) {
-        this.inputType = inputType;
+    public String getInputGeneratorString() {
+        return inputGenerator.name();
+    }
+    
+    public void setInputGenerator(Program inputGenerator) {
+        this.inputGenerator = inputGenerator;
     }
     
     public String getComments() {

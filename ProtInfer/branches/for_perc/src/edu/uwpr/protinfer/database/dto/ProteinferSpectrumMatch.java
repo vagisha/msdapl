@@ -3,24 +3,24 @@ package edu.uwpr.protinfer.database.dto;
 public class ProteinferSpectrumMatch {
 
     private int id;
-    private int proteinferPeptideId;
+    private int pinferIonId;
     private int msRunSearchResultId;
-    private int rank;
+    private int rank; // rank of this spectrum match for the peptide (not the ion).
     
 
     public ProteinferSpectrumMatch() {}
     
-    public ProteinferSpectrumMatch(int pinferPeptideId, int msRunSearchResultId) {
-        this.proteinferPeptideId = pinferPeptideId;
+    public ProteinferSpectrumMatch(int pinferIonId, int msRunSearchResultId) {
+        this.pinferIonId = pinferIonId;
         this.msRunSearchResultId = msRunSearchResultId;
     }
     
-    public int getProteinferPeptideId() {
-        return proteinferPeptideId;
+    public int getProteinferIonId() {
+        return pinferIonId;
     }
     
-    public void setProteinferPeptideId(int pinferPeptideId) {
-        this.proteinferPeptideId = pinferPeptideId;
+    public void setProteinferIonId(int pinferIonId) {
+        this.pinferIonId = pinferIonId;
     }
     
     public int getMsRunSearchResultId() {

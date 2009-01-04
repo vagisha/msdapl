@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="IdPickerInput"> 
 
-	<typeAlias alias="IdPickerInputSummary" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary"/>
+	<typeAlias alias="IdPickerInputSummary" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput"/>
 	
 	<resultMap class="IdPickerInputSummary" id="idpickerInputResult" extends="ProteinferInput.pinferInputResult">
 		<result property="numTargetHits" column="numTargetHits" nullValue="-1"/>

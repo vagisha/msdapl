@@ -68,14 +68,14 @@ public class IdPickerProteinDAOTest extends TestCase {
     }
 
     public final void testGetIdPickerClusterProteins() {
-        assertEquals(3, protDao.getIdPickerClusterProteins(456, 12).size());
-        assertEquals(1, protDao.getIdPickerClusterProteins(456, 13).size());
+        assertEquals(3, protDao.loadIdPickerClusterProteins(456, 12).size());
+        assertEquals(1, protDao.loadIdPickerClusterProteins(456, 13).size());
     }
     
     public final void testGetGroupProteins() {
-        assertEquals(2, protDao.getIdPickerGroupProteins(456, 21).size());
-        assertEquals(1, protDao.getIdPickerGroupProteins(456, 22).size());
-        assertEquals(1, protDao.getIdPickerGroupProteins(456, 23).size());
+        assertEquals(2, protDao.loadIdPickerGroupProteins(456, 21).size());
+        assertEquals(1, protDao.loadIdPickerGroupProteins(456, 22).size());
+        assertEquals(1, protDao.loadIdPickerGroupProteins(456, 23).size());
     }
     
     public final void testGetFilteredParsimoniousProteinCount() {
@@ -83,7 +83,7 @@ public class IdPickerProteinDAOTest extends TestCase {
     }
     
     public final void testGetProtein() {
-        IdPickerProtein protein = protDao.getProtein(2);
+        IdPickerProtein protein = protDao.loadProtein(2);
         assertEquals(2, protein.getId());
         assertEquals(456, protein.getProteinferId());
         assertEquals(124, protein.getNrseqProteinId());
@@ -113,7 +113,7 @@ public class IdPickerProteinDAOTest extends TestCase {
     }
 
     public final void testGetProteins() {
-        List<IdPickerProtein> protList = protDao.getProteins(456);
+        List<IdPickerProtein> protList = protDao.loadProteins(456);
         assertEquals(4, protList.size());
         Collections.sort(protList, new Comparator<IdPickerProtein>() {
             public int compare(IdPickerProtein o1, IdPickerProtein o2) {

@@ -7,13 +7,13 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 import edu.uwpr.protinfer.ProteinInferenceProgram;
-import edu.uwpr.protinfer.database.dao.GenericProteinferRun;
+import edu.uwpr.protinfer.database.dao.GenericProteinferRunDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dto.BaseProteinferRun;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary;
+import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
-public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRun<IdPickerInputSummary, IdPickerRun> {
+public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRunDAO<IdPickerInput, IdPickerRun> {
 
     private static final String sqlMapNameSpace = "IdPickerRun";
     
@@ -25,7 +25,7 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     }
 
     @Override
-    public IdPickerRun getProteinferRun(int proteinferId) {
+    public IdPickerRun loadProteinferRun(int proteinferId) {
         return (IdPickerRun) queryForObject(sqlMapNameSpace+".select", proteinferId);
     }
     
@@ -35,12 +35,12 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     }
 
     @Override
-    public List<Integer> getProteinferIdsForRunSearches(List<Integer> runSearchIds) {
-        return runDao.getProteinferIdsForRunSearches(runSearchIds);
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> runSearchIds) {
+        return runDao.loadProteinferIdsForInputIds(runSearchIds);
     }
 
     @Override
-    public int save(BaseProteinferRun<?> run) {
+    public int save(GenericProteinferRun<?> run) {
         return runDao.save(run);
     }
 
@@ -53,12 +53,7 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     }
     
     @Override
-    public int saveNewProteinferRun(ProteinInferenceProgram program) {
-        return runDao.saveNewProteinferRun(program);
-    }
-
-    @Override
-    public void update(BaseProteinferRun<?> run) {
+    public void update(GenericProteinferRun<?> run) {
         runDao.update(run);
     }
 }

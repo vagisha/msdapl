@@ -48,13 +48,7 @@ public class PeptideSpectrumMatchIDPImpl implements PeptideSpectrumMatchIDP {
         this.peptide = peptide;
     }
 
-
-    public SpectrumMatchIDPImpl getSpecMatch() {
-        return specMatch;
-    }
-
-
-    public void setSpectrumMatchMatch(SpectrumMatchIDPImpl specMatch) {
+    public void setSpectrumMatch(SpectrumMatchIDPImpl specMatch) {
         this.specMatch = specMatch;
     }
     
@@ -103,5 +97,4 @@ public class PeptideSpectrumMatchIDPImpl implements PeptideSpectrumMatchIDP {
     public void setAccepted(boolean accepted) {
         specMatch.setAccepted(accepted);
     }
-
 }

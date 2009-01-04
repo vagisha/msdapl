@@ -1,5 +1,7 @@
 package edu.uwpr.protinfer.database.dao.idpicker.ibatis;
 
+import org.yeastrc.ms.domain.search.Program;
+
 import junit.framework.TestCase;
 import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
@@ -26,6 +28,7 @@ public class IdPickerRunDAOTest extends TestCase {
         run.setComments("some comments");
 //        run.setStatus(ProteinferStatus.RUNNING);
         run.setProgram(ProteinInferenceProgram.IDPICKER);
+        run.setInputGenerator(Program.PROLUCID);
         run.setNumUnfilteredProteins(2005);
         run.setNumUnfilteredPeptides(3110);
         
@@ -34,7 +37,7 @@ public class IdPickerRunDAOTest extends TestCase {
         run.setId(id);
         runDao.saveIdPickerRunSummary(run);
         
-        run = runDao.getProteinferRun(1);
+        run = runDao.loadProteinferRun(1);
         assertNotNull(run);
         assertEquals(2005, run.getNumUnfilteredProteins());
         assertEquals(3110, run.getNumUnfilteredPeptides());

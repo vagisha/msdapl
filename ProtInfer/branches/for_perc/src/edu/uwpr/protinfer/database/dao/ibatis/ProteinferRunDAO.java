@@ -12,13 +12,13 @@ import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
 import edu.uwpr.protinfer.ProteinInferenceProgram;
-import edu.uwpr.protinfer.database.dao.GenericProteinferRun;
-import edu.uwpr.protinfer.database.dto.BaseProteinferRun;
+import edu.uwpr.protinfer.database.dao.GenericProteinferRunDAO;
+import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
 import edu.uwpr.protinfer.database.dto.ProteinferStatus;
 
-public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinferRun<ProteinferInput, ProteinferRun> {
+public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinferRunDAO<ProteinferInput, ProteinferRun> {
 
     private static final String sqlMapNameSpace = "ProteinferRun";
     
@@ -26,38 +26,32 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         super(sqlMap);
     }
 
-    public int saveNewProteinferRun(ProteinInferenceProgram program) { 
-        ProteinferRun run = new ProteinferRun();
-//        run.setStatus(ProteinferStatus.PENDING);
-        run.setProgram(program);
-        return save(run);
-    }
-    
-    public int save(BaseProteinferRun<?> run) { 
+    @Override
+    public int save(GenericProteinferRun<?> run) {
         return super.saveAndReturnId(sqlMapNameSpace+".insert", run);
     }
     
-    public void update(BaseProteinferRun<?> run) {
+    public void update(GenericProteinferRun<?> run) {
         super.update(sqlMapNameSpace+".update", run);
     }
     
-    public ProteinferRun getProteinferRun(int proteinferId) {
+    public ProteinferRun loadProteinferRun(int proteinferId) {
         return (ProteinferRun) super.queryForObject(sqlMapNameSpace+".select", proteinferId);
     }
     
-    public List<Integer> getProteinferIdsForRunSearches(List<Integer> runSearchIds) {
-        if(runSearchIds.size() == 0) 
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds) {
+        if(inputIds.size() == 0) 
             return new ArrayList<Integer>(0);
         
         StringBuilder buf = new StringBuilder();
         buf.append("(");
-        for(Integer id: runSearchIds) {
+        for(Integer id: inputIds) {
             buf.append(id+",");
         }
         buf.deleteCharAt(buf.length() - 1);
         buf.append(")");
         
-        return super.queryForList(sqlMapNameSpace+".selectPinferIdsForRunSearchIds", buf.toString());
+        return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIds", buf.toString());
     }
     
     public void delete(int pinferId) {

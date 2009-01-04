@@ -4,13 +4,23 @@
 <sqlMap namespace="IdPickerProtein"> 
 
 	<typeAlias alias="IdPickerProtein" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein" />
+	<typeAlias alias="IdPickerProteinBase" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase" />
 	
-	<resultMap class="IdPickerProtein" id="idpickerProteinResult" extends="ProteinferProtein.pinferBaseProteinResult">
+	<resultMap class="IdPickerProteinBase" id="baseResult" extends="ProteinferProtein.pinferBaseProteinResult">
 		<result property="clusterId" column="clusterID" nullValue="0"/>
 		<result property="isParsimonious" column="isParsimonious" />
 		<result property="groupId" column="groupID" nullValue="0"/>
+	</resultMap>
+	
+	<resultMap class="IdPickerProtein" id="idpickerProteinResult" extends="IdPickerProtein.baseResult">
 		<result property="peptides" 
 				select="IdPickerPeptide.selectPeptidesForProtein"
+				column="id"/>
+	</resultMap>
+	
+	<resultMap class="IdPickerProteinBase" id="idpickerBaseProteinResult" extends="IdPickerProtein.baseResult">
+		<result property="peptides" 
+				select="IdPickerPeptide.selectBasePeptidesForProtein"
 				column="id"/>
 	</resultMap>
 	
@@ -27,11 +37,27 @@
     	AND prot.id=#id#
     </select>
     
+    <select id="selectBaseProtein" resultMap="idpickerBaseProteinResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.id=#id#
+    </select>
+    
+    
+    
     <select id="selectProteinsForProteinferRun" resultMap="idpickerProteinResult" parameterClass="Integer">
     	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
     	WHERE prot.id = idpProt.piProteinID
     	AND prot.piRunID = #id#
     </select>
+    
+    <select id="selectBaseProteinsForProteinferRun" resultMap="idpickerBaseProteinResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #id#
+    </select>
+    
+    
     
     <select id="selectProteinsForCluster" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
     	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
@@ -40,12 +66,30 @@
     	AND idpProt.clusterID = #clusterId#
     </select>
     
+    <select id="selectBaseProteinsForCluster" resultMap="idpickerBaseProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
+    	AND idpProt.clusterID = #clusterId#
+    </select>
+    
+    
+    
     <select id="selectProteinsForGroup" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
     	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
     	WHERE prot.id = idpProt.piProteinID
     	AND prot.piRunID = #pinferId#
     	AND idpProt.groupID = #groupId#
     </select>
+    
+    <select id="selectBaseProteinsForGroup" resultMap="idpickerBaseProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
+    	AND idpProt.groupID = #groupId#
+    </select>
+    
+    
     
     <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT peptideGroupID FROM IDPickerGroupAssociation

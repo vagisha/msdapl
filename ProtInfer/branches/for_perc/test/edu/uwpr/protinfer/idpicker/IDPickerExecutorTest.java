@@ -258,7 +258,7 @@ public class IDPickerExecutorTest extends TestCase {
         sm.setCharge(2);
         sm.setSourceId(source.getId());
         h1.setPeptide(peptHit);
-        h1.setSpectrumMatchMatch(sm);
+        h1.setSpectrumMatch(sm);
         
         hits.add(h1);
         peptHit = new PeptideHit(p);
@@ -272,7 +272,7 @@ public class IDPickerExecutorTest extends TestCase {
         sm.setCharge(2);
         sm.setSourceId(source.getId());
         h2.setPeptide(peptHit);
-        h2.setSpectrumMatchMatch(sm);
+        h2.setSpectrumMatch(sm);
         hits.add(h2);
     }
 

@@ -2,7 +2,7 @@ package edu.uwpr.protinfer.database.dto.idpicker;
 
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 
-public class IdPickerInputSummary extends ProteinferInput {
+public class IdPickerInput extends ProteinferInput {
 
     private int numTargetHits = -1;
     private int numDecoyHits = -1;

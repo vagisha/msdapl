@@ -4,16 +4,20 @@
 <sqlMap namespace="ProteinferRun"> 
 
 	<typeAlias alias="ProteinferRun" type="edu.uwpr.protinfer.database.dto.ProteinferRun"/>
-	<typeAlias alias="BaseProteinferRun" type="edu.uwpr.protinfer.database.dto.BaseProteinferRun"/>
+	<typeAlias alias="GenericProteinferRun" type="edu.uwpr.protinfer.database.dto.GenericProteinferRun"/>
 	
 	<typeAlias alias="ProteinferStatusTypeHandler" 
 				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO$ProteinferStatusTypeHandler"/>
 	<typeAlias alias="ProteinferProgramTypeHandler" 
 				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO$ProteinferProgramTypeHandler"/>
 	
-	<resultMap class="BaseProteinferRun" id="pinferRunBaseResult">
+	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>
+	<typeAlias alias="ProgramTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl$SearchProgramTypeHandler"/>
+	
+	<resultMap class="GenericProteinferRun" id="pinferRunBaseResult">
 		<result property="id" column="id" />
 		<result property="program" column="program" typeHandler="ProteinferProgramTypeHandler"/>
+		<result property="inputGenerator" column="inputGenerator" typeHandler="ProgramTypeHandler"/>
 		<result property="comments" column="comments" />
 		<result property="date" column="dateRun" />
 	</resultMap>
@@ -25,8 +29,9 @@
 	</resultMap>
 	
 	
-	<parameterMap class="BaseProteinferRun" id="pinferRunParam">
+	<parameterMap class="GenericProteinferRun" id="pinferRunParam">
 		<parameter property="program" jdbcType="VARCHAR" typeHandler="ProteinferProgramTypeHandler"/>
+		<parameter property="inputGenerator" jdbcType="VARCHAR" typeHandler="ProgramTypeHandler"/>
 		<parameter property="comments" jdbcType="TEXT" />
 	</parameterMap>
 	
@@ -34,23 +39,25 @@
     	SELECT * FROM msProteinInferRun WHERE id=#id#
     </select>
     
-    <select id="selectPinferIdsForRunSearchIds" resultClass="Integer" parameterClass="String">
-    	SELECT DISTINCT piRunID FROM msProteinInferInput WHERE runSearchID in $runSearchIds$
+    <select id="selectPinferIdsForInputIds" resultClass="Integer" parameterClass="String">
+    	SELECT DISTINCT piRunID FROM msProteinInferInput WHERE inputID in $inputIds$
     </select>
     
     <insert id="insert" parameterMap="pinferRunParam">
     	INSERT INTO msProteinInferRun (
     	program,
+    	inputGenerator,
     	comments)
-    	VALUES(?,?)
+    	VALUES(?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
     </insert>
     
-    <update id="update" parameterClass="BaseProteinferRun">
+    <update id="update" parameterClass="GenericProteinferRun">
     	UPDATE msProteinInferRun 
     	SET program = #programString#,
+    	inputGenerator = #inputGeneratorString#,
     	comments = #comments#
     	<isNotNull property="date">
     		, dateRun = #date#

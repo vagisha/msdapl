@@ -27,11 +27,21 @@ public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericPr
         return id;
     }
     
-    public IdPickerSpectrumMatch getSpectrumMatch(int psmId) {
+    public IdPickerSpectrumMatch loadSpectrumMatch(int psmId) {
         return (IdPickerSpectrumMatch) queryForObject(sqlMapNameSpace+".selectSpectrumMatch", psmId);
     }
     
-    public List<IdPickerSpectrumMatch> getSpectrumMatchesForPeptide(int pinferPeptideId) {
+    @Override
+    public List<IdPickerSpectrumMatch> loadSpectrumMatchesForIon(int pinferIonId) {
+        return super.queryForList(sqlMapNameSpace+".selectMatchesForIon", pinferIonId);
+    }
+    
+    @Override
+    public IdPickerSpectrumMatch loadBestSpectrumMatchForIon(int pinferIonId) {
+        return (IdPickerSpectrumMatch) queryForObject(sqlMapNameSpace+".selectBestMatchForIon", pinferIonId);
+    }
+    
+    public List<IdPickerSpectrumMatch> loadSpectrumMatchesForPeptide(int pinferPeptideId) {
         return super.queryForList(sqlMapNameSpace+".selectMatchesForPeptide", pinferPeptideId);
     }
 
@@ -39,8 +49,8 @@ public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericPr
         return psmDao.getSpectrumMatchIdsForPinferRun(pinferId);
     }
 
-    public List<Integer> getSpectrumMatchIdsForPinferRunAndRunSearch(int pinferId, int runSearchId) {
-        return psmDao.getSpectrumMatchIdsForPinferRunAndRunSearch(pinferId, runSearchId);
+    @Override
+    public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
+        return psmDao.getSpectrumMatchIdsForPinferRunInput(pinferId, inputId);
     }
-    
 }

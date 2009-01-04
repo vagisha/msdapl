@@ -42,7 +42,7 @@ public class ProteinferProteinDAOTest extends TestCase {
     }
     
     public final void testGetProteinferProtein() {
-        ProteinferProtein protein = protDao.getProtein(2);
+        ProteinferProtein protein = protDao.loadProtein(2);
         assertEquals(2, protein.getId());
         assertEquals(456, protein.getProteinferId());
         assertEquals(124, protein.getNrseqProteinId());
@@ -83,17 +83,17 @@ public class ProteinferProteinDAOTest extends TestCase {
         peptList.add(p1);
         
         // add an existing peptide
-        ProteinferPeptide p2 = peptDao.getPeptide(3);
+        ProteinferPeptide p2 = peptDao.load(3);
         protein.setPeptides(peptList);
         peptList.add(p2);
         
         int id = protDao.saveProteinferProtein(protein);
         assertEquals(4, id);
         
-        p2 = peptDao.getPeptide(3);
+        p2 = peptDao.load(3);
         assertEquals(2, p2.getMatchingProteinIds().size());
         
-        ProteinferProtein prot = protDao.getProtein(4);
+        ProteinferProtein prot = protDao.loadProtein(4);
         List<ProteinferPeptide> plist = prot.getPeptides();
         assertEquals(2, plist.size());
         Collections.sort(plist, new Comparator<ProteinferPeptide>() {
@@ -105,24 +105,24 @@ public class ProteinferProteinDAOTest extends TestCase {
     }
     
     public final void testUpdateUserAnnotation() {
-        ProteinferProtein prot = protDao.getProtein(2);
+        ProteinferProtein prot = protDao.loadProtein(2);
         assertNull(prot.getUserAnnotation());
         protDao.updateUserAnnotation(2, "Annotation 1");
-        prot = protDao.getProtein(2);
+        prot = protDao.loadProtein(2);
         assertEquals("Annotation 1", prot.getUserAnnotation());
         protDao.updateUserAnnotation(2, "Annotation 2");
-        prot = protDao.getProtein(2);
+        prot = protDao.loadProtein(2);
         assertEquals("Annotation 2", prot.getUserAnnotation());
     }
 
     public final void testUpdateUserValidation() {
-        ProteinferProtein prot = protDao.getProtein(3);
+        ProteinferProtein prot = protDao.loadProtein(3);
         assertNull(prot.getUserValidation());
         protDao.updateUserValidation(3, ProteinUserValidation.NOT_SURE);
-        prot = protDao.getProtein(3);
+        prot = protDao.loadProtein(3);
         assertEquals(ProteinUserValidation.NOT_SURE, prot.getUserValidation());
         protDao.updateUserValidation(3, ProteinUserValidation.ACCEPTED);
-        prot = protDao.getProtein(3);
+        prot = protDao.loadProtein(3);
         assertEquals(ProteinUserValidation.ACCEPTED, prot.getUserValidation());
     }
     
@@ -131,7 +131,7 @@ public class ProteinferProteinDAOTest extends TestCase {
     }
     
     public final void testGetProteinferProteins() {
-        assertEquals(3, protDao.getProteins(456).size());
+        assertEquals(3, protDao.loadProteins(456).size());
     }
     
     

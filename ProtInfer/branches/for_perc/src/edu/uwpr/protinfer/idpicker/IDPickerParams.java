@@ -1,5 +1,10 @@
 package edu.uwpr.protinfer.idpicker;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
+
 public class IDPickerParams {
 
     private float maxAbsoluteFdr = 0.05f;
@@ -7,8 +12,11 @@ public class IDPickerParams {
     private float decoyRatio = 1.0f;
 //    private int minDistinctPeptides = 1;
     private boolean doParsimonyAnalysis = true;
+    private boolean doFdrCalculation = true;
     private String decoyPrefix = "";
     private boolean useIdPickerFDRFormula = true;
+    
+    List<IdPickerFilter> moreFilters = new ArrayList<IdPickerFilter>();
     
     
     public boolean useIdPickerFDRFormula() {
@@ -54,5 +62,18 @@ public class IDPickerParams {
         this.doParsimonyAnalysis = doParsimonyAnalysis;
     }
     
+    public boolean getDoFdrCalculation() {
+        return doFdrCalculation;
+    }
+    public void setDoFdrCalculation(boolean doFdrCalculation) {
+        this.doFdrCalculation = doFdrCalculation;
+    }
+    
+    public List<IdPickerFilter> getMoreFilters() {
+        return moreFilters;
+    }
+    public void addMoreFilters(List<IdPickerFilter> moreFilters) {
+        this.moreFilters = moreFilters;
+    }
     
 }

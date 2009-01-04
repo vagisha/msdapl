@@ -9,6 +9,7 @@ public class SpectrumMatchIDPImpl implements SpectrumMatchIDP {
     private int scanId;
     private double fdr = 1.0;
     private boolean accepted;
+    private int rank;
     
     public void setCharge(int charge) {
         this.charge = charge;
@@ -61,6 +62,15 @@ public class SpectrumMatchIDPImpl implements SpectrumMatchIDP {
     @Override
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
+    }
+    
+    @Override
+    public int getRank() {
+        return rank;
+    }
+    
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
 }

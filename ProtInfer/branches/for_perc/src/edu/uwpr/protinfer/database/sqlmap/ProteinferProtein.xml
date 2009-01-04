@@ -4,7 +4,7 @@
 <sqlMap namespace="ProteinferProtein"> 
 
 	<typeAlias alias="ProteinferProtein" type="edu.uwpr.protinfer.database.dto.ProteinferProtein" />
-	<typeAlias alias="BaseProteinferProtein" type="edu.uwpr.protinfer.database.dto.BaseProteinferProtein" />
+	<typeAlias alias="BaseProteinferProtein" type="edu.uwpr.protinfer.database.dto.GenericProteinferProtein" />
 	
 	<typeAlias alias="UserValidationTypeHandler" 
 				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO$UserValidationTypeHandler"/>

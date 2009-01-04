@@ -21,9 +21,26 @@
     </select>
     
     <select id="selectMatchesForPeptide" resultMap="idpickerSMatchResult" parameterClass="Integer">
-    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, msProteinInferSpectrumMatch as psm
-    	WHERE psm.piPeptideID = #id#
+    	SELECT idpPsm.*, psm.* 
+    	FROM IDPickerSpectrumMatch AS idpPsm, 
+    	msProteinInferSpectrumMatch AS psm,
+    	msProteinInferIon AS ion
+    	WHERE ion.piPeptideID = #id#
+    	AND ion.id = psm.piIonID
     	AND psm.id = idpPsm.piSpectrumMatchID
+    </select>
+    
+    <select id="selectMatchesForIon" resultMap="idpickerSMatchResult" parameterClass="Integer">
+    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, msProteinInferSpectrumMatch as psm
+    	WHERE psm.piIonID = #id#
+    	AND psm.id = idpPsm.piSpectrumMatchID
+    </select>
+    
+    <select id="selectBestMatchForIon" resultMap="idpickerSMatchResult" parameterClass="Integer">
+    	SELECT * FROM IDPickerSpectrumMatch as idpPsm, msProteinInferSpectrumMatch as psm
+    	WHERE psm.piIonID = #id#
+    	AND psm.id = idpPsm.piSpectrumMatchID
+    	AND psm.rank = (SELECT min(rank) FROM msProteinInferSpectrumMatch WHERE piIonID = #id#)
     </select>
     
     <insert id="insert" parameterMap="idpickerSMatchParam">

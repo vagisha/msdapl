@@ -9,4 +9,6 @@ public interface SpectrumMatch {
     public abstract int getScanId();
     
     public abstract int getCharge();
+    
+    public abstract int getRank();
 }

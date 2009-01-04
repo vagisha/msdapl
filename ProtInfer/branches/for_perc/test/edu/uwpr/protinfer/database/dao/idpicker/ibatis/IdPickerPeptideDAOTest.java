@@ -45,7 +45,7 @@ public class IdPickerPeptideDAOTest extends TestCase {
         
         savePeptides();
         
-        IdPickerPeptide peptide = peptDao.getPeptide(2);
+        IdPickerPeptide peptide = peptDao.load(2);
 //        assertEquals(456, peptide.getProteinferId());
         assertEquals(654, peptide.getGroupId());
         assertEquals(2, peptide.getId());
@@ -131,7 +131,7 @@ public class IdPickerPeptideDAOTest extends TestCase {
             double fdr = (double)i/10.0;
             assertEquals(runSearchResultId, psm.getMsRunSearchResultId());
 //            assertEquals(rank, psm.getRank());
-            assertEquals(pinferProteinId, psm.getProteinferPeptideId());
+            assertEquals(pinferProteinId, psm.getProteinferIonId());
             assertEquals(fdr, psm.getFdr());
             i++;
         }

@@ -8,54 +8,84 @@
 	<resultMap class="ProteinferSpectrumMatch" id="pinferSMatchResult">
 		<result property="id" column="id" nullValue="0"/>
 		<result property="msRunSearchResultId" column="msRunSearchResultID" nullValue="0"/>
-		<result property="proteinferPeptideId" column="piPeptideID" nullValue="0"/>
+		<result property="proteinferIonId" column="piIonID" nullValue="0"/>
+		<result property="rank" column="rank"/>
 	</resultMap>
 	
 	<parameterMap class="ProteinferSpectrumMatch" id="pinferSMatchParam">
 		<parameter property="msRunSearchResultId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="proteinferPeptideId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="proteinferIonId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="rank" jdbcType="INTEGER"/>
 	</parameterMap>
 	
-    <select id="selectSpectrumMatch" resultMap="pinferSMatchResult" parameterClass="Integer">
+    <select id="select" resultMap="pinferSMatchResult" parameterClass="Integer">
     	SELECT * FROM msProteinInferSpectrumMatch WHERE id = #id#
     </select>
     
+    <select id="selectSpectrumCountForIon" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM msProteinInferSpectrumMatch WHERE piIonID = #id#
+    </select>
+    
+    <select id="selectMatchesForIon" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferSpectrumMatch WHERE piIonID = #id#
+    </select>
+    
+    <select id="selectBestMatchForIon" resultMap="pinferSMatchResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferSpectrumMatch 
+    	WHERE piIonID = #id#
+    	AND rank = (SELECT min(rank) FROM msProteinInferSpectrumMatch WHERE piIonID = #id#)
+    </select>
+    
     <select id="selectMatchesForPeptide" resultMap="pinferSMatchResult" parameterClass="Integer">
-    	SELECT * FROM msProteinInferSpectrumMatch WHERE piPeptideID = #id#
+    	SELECT * FROM msProteinInferSpectrumMatch AS psm, msProteinInferIon as ion
+    	WHERE psm.ionID = ion.id
+    	AND ion.piPeptideID = #id#
     </select>
     
     <select id="selectMatchIdsForPinferId" resultMap="pinferSMatchResult" parameterClass="Integer">
-    	SELECT DISTINCT psm.id 
-    	FROM msProteinInferSpectrumMatch AS psm, 
-    	msProteinInferPeptide AS pept, 
-    	msProteinInferProtein as prot,
-    	msProteinInferProteinPeptideMatch as mtch
-    	WHERE prot.piRunID=#pinferId#
-    	AND prot.id = mtch.piProteinID
-    	AND mtch.piPeptideID = pept.id
-    	AND pept.id = psm.piPeptideID
+    	SELECT psm.id 
+    	FROM msProteinInferSpectrumMatch AS psm,
+    	msProteinInferIon AS ion, 
+    	msProteinInferPeptide AS pept 
+    	WHERE pept.piRunID=#pinferId#
+    	AND pept.id = ion.piPeptideID
+    	AND ion.id = psm.piIonID
     </select>
     
-    <select id="selectMatchIdsForPinferIdRunSearchId" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT DISTINCT psm.id 
+    <select id="selectMatchIdsForPinferSearchInput" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT psm.id 
     	FROM msProteinInferSpectrumMatch AS psm,
     	msRunSearchResult AS msRes, 
     	msProteinInferPeptide AS pept, 
-    	msProteinInferProtein as prot,
-    	msProteinInferProteinPeptideMatch as mtch
-    	WHERE prot.piRunID=#pinferId#
-    	AND prot.id = mtch.piProteinID
-    	AND mtch.piPeptideID = pept.id
-    	AND pept.id = psm.piPeptideID
-    	AND msRes.id = psm.msRunSearchResultID
+    	msProteinInferIon AS ion
+    	WHERE pept.piRunID=#pinferId#
+    	AND pept.id = ion.piPeptideID
+    	AND ion.id = psm.piIonID
+    	AND psm.msRunSearchResultID = msRes.id
     	AND msRes.runSearchID = #runSearchId#
+    </select>
+    
+    <select id="selectMatchIdsForPinferAnalysisInput" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT psm.id 
+    	FROM msProteinInferSpectrumMatch AS psm,
+    	msRunSearchResult AS msRes, 
+    	msRunSearchAnalysis AS msa
+    	msProteinInferPeptide AS pept, 
+    	msProteinInferIon AS ion
+    	WHERE pept.piRunID=#pinferId#
+    	AND pept.id = ion.piPeptideID
+    	AND ion.id = psm.piIonID
+    	AND psm.msRunSearchResultID = msRes.id
+    	AND msRes.runSearchID = msa.runSearchID
+    	AND msa.id = #analysisId#
     </select>
     
     <insert id="insert" parameterMap="pinferSMatchParam">
     	INSERT INTO msProteinInferSpectrumMatch (
     	msRunSearchResultID,
-    	piPeptideID) 
-    	VALUES (?,?)
+    	piIonID,
+    	rank) 
+    	VALUES (?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

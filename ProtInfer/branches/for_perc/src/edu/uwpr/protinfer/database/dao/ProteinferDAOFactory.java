@@ -10,13 +10,17 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferIonDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferPeptideDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerFilterDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerInputDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerIonDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerPeptideBaseDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerPeptideDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerSpectrumMatchDAO;
@@ -28,23 +32,24 @@ public class ProteinferDAOFactory {
     // initialize the SqlMapClient
     private static SqlMapClient sqlMap;
     
-    static {
-        Reader reader = null;
-        String ibatisConfigFile = "edu/uwpr/protinfer/database/sqlmap/ProteinferSqlMapConfig.xml";
-        try {
-            reader = Resources.getResourceAsReader(ibatisConfigFile);
-            sqlMap = SqlMapClientBuilder.buildSqlMapClient(reader);
-        }
-        catch (IOException e) {
-            log.error("Error reading Ibatis config xml: "+ibatisConfigFile, e);
-            throw new RuntimeException("Error reading Ibatis config xml: "+ibatisConfigFile, e);
-        }
-        catch (Exception e) {
-            log.error("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
-            throw new RuntimeException("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
-        }
-        System.out.println("Loaded Ibatis SQL map config: "+ibatisConfigFile);
-    }
+//    static {
+//        Reader reader = null;
+//        String ibatisConfigFile = "edu/uwpr/protinfer/database/sqlmap/ProteinferSqlMapConfig.xml";
+//        
+//        try {
+//            reader = Resources.getResourceAsReader(ibatisConfigFile);
+//            sqlMap = SqlMapClientBuilder.buildSqlMapClient(reader);
+//        }
+//        catch (IOException e) {
+//            log.error("Error reading Ibatis config xml: "+ibatisConfigFile, e);
+//            throw new RuntimeException("Error reading Ibatis config xml: "+ibatisConfigFile, e);
+//        }
+//        catch (Exception e) {
+//            log.error("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
+//            throw new RuntimeException("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
+//        }
+//        System.out.println("Loaded Ibatis SQL map config: "+ibatisConfigFile);
+//    }
     
     private static ProteinferDAOFactory instance = new ProteinferDAOFactory();
     
@@ -53,12 +58,16 @@ public class ProteinferDAOFactory {
     private ProteinferInputDAO pinferInputDao;
     private ProteinferPeptideDAO peptideDao;
     private ProteinferProteinDAO proteinDao;
+    private ProteinferIonDAO ionDao;
     private ProteinferSpectrumMatchDAO spectrumMatchDao;
     
     // IDPicker related
     private IdPickerSpectrumMatchDAO idpSpectrumMatchDao;
+    private IdPickerIonDAO idpIonDao;
     private IdPickerPeptideDAO idpPeptideDao;
+    private IdPickerPeptideBaseDAO idpPeptideBaseDao;
     private IdPickerProteinDAO idpProteinDao;
+    private IdPickerProteinBaseDAO idpProteinBaseDao;
     private IdPickerInputDAO idpInputDao;
     private IdPickerRunDAO idpRunDao;
     
@@ -68,15 +77,19 @@ public class ProteinferDAOFactory {
        pinferRunDao = new ProteinferRunDAO(sqlMap);
        pinferFilterDao = new IdPickerFilterDAO(sqlMap);
        pinferInputDao = new ProteinferInputDAO(sqlMap);
-       spectrumMatchDao = new ProteinferSpectrumMatchDAO(sqlMap);
-       peptideDao = new ProteinferPeptideDAO(sqlMap, spectrumMatchDao);
-       proteinDao = new ProteinferProteinDAO(sqlMap, peptideDao);
+       spectrumMatchDao = new ProteinferSpectrumMatchDAO(sqlMap, pinferRunDao);
+       ionDao = new ProteinferIonDAO(sqlMap);
+       peptideDao = new ProteinferPeptideDAO(sqlMap);
+       proteinDao = new ProteinferProteinDAO(sqlMap);
        
        
        // IDPicker related
        idpSpectrumMatchDao = new IdPickerSpectrumMatchDAO(sqlMap, spectrumMatchDao);
-       idpPeptideDao = new IdPickerPeptideDAO(sqlMap, peptideDao, idpSpectrumMatchDao);
-       idpProteinDao = new IdPickerProteinDAO(sqlMap, proteinDao, idpPeptideDao);
+       idpIonDao = new IdPickerIonDAO(sqlMap, ionDao);
+       idpPeptideDao = new IdPickerPeptideDAO(sqlMap, peptideDao);
+       idpPeptideBaseDao = new IdPickerPeptideBaseDAO(sqlMap, peptideDao);
+       idpProteinDao = new IdPickerProteinDAO(sqlMap, proteinDao);
+       idpProteinBaseDao = new IdPickerProteinBaseDAO(sqlMap, proteinDao);
        idpInputDao = new IdPickerInputDAO(sqlMap, pinferInputDao);
        idpRunDao = new IdPickerRunDAO(sqlMap, pinferRunDao);
     }
@@ -104,6 +117,9 @@ public class ProteinferDAOFactory {
         return new ProteinferDAOFactory();
     }
     
+    //---------------------------------------------------------------------
+    // Protein Inference run related
+    //---------------------------------------------------------------------
     public ProteinferRunDAO getProteinferRunDao() {
         return pinferRunDao;
     }
@@ -115,20 +131,38 @@ public class ProteinferDAOFactory {
     public ProteinferInputDAO getProteinferInputDao() {
         return pinferInputDao;
     }
+    
+    public ProteinferProteinDAO getProteinferProteinDao() {
+        return proteinDao;
+    }
 
     public ProteinferPeptideDAO getProteinferPeptideDao() {
         return peptideDao;
     }
-
-    public ProteinferProteinDAO getProteinferProteinDao() {
-        return proteinDao;
+        
+    public ProteinferIonDAO getProteinferIonDao() {
+        return ionDao;
     }
     
     public ProteinferSpectrumMatchDAO getProteinferSpectrumMatchDao() {
         return spectrumMatchDao;
     }
     
+    //---------------------------------------------------------------------
     // IDPicker related
+    //---------------------------------------------------------------------
+    public IdPickerSpectrumMatchDAO getIdPickerSpectrumMatchDao() {
+        return idpSpectrumMatchDao;
+    }
+    
+    public IdPickerIonDAO getIdPickerIonDao() {
+        return idpIonDao;
+    }
+    
+    public IdPickerPeptideBaseDAO getIdPickerPeptideBaseDao() {
+        return idpPeptideBaseDao;
+    }
+    
     public IdPickerPeptideDAO getIdPickerPeptideDao() {
         return idpPeptideDao;
     }
@@ -137,8 +171,8 @@ public class ProteinferDAOFactory {
         return idpProteinDao;
     }
     
-    public IdPickerSpectrumMatchDAO getIdPickerSpectrumMatchDao() {
-        return idpSpectrumMatchDao;
+    public IdPickerProteinBaseDAO getIdPickerProteinBaseDao() {
+        return idpProteinBaseDao;
     }
     
     public IdPickerInputDAO getIdPickerInputDao() {

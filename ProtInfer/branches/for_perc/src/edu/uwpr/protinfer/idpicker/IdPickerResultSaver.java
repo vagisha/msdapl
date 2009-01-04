@@ -2,25 +2,33 @@ package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.domain.search.MsSearchResult;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferIonDAO;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerInputDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerPeptideDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerPeptideBaseDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerSpectrumMatchDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferIon;
+import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideBase;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
+import edu.uwpr.protinfer.infer.SpectrumMatch;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 public class IdPickerResultSaver {
 
@@ -28,8 +36,13 @@ public class IdPickerResultSaver {
     private static final ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
     private static final IdPickerRunDAO runDao = factory.getIdPickerRunDao();
     private static final IdPickerInputDAO inputDao = factory.getIdPickerInputDao();
-    private static final IdPickerProteinDAO protDao = factory.getIdPickerProteinDao();
-    private static final IdPickerPeptideDAO peptDao = factory.getIdPickerPeptideDao();
+    private static final IdPickerProteinBaseDAO protDao = factory.getIdPickerProteinBaseDao();
+    private static final IdPickerPeptideBaseDAO peptDao = factory.getIdPickerPeptideBaseDao();
+    private static final ProteinferIonDAO ionDao = factory.getProteinferIonDao();
+    private static final ProteinferSpectrumMatchDAO psmDao = factory.getProteinferSpectrumMatchDao();
+    private static final IdPickerSpectrumMatchDAO idpPsmDao = factory.getIdPickerSpectrumMatchDao();
+    
+    private static final MsSearchResultDAO resDao = DAOFactory.instance().getMsSearchResultDAO();
     
     private static final IdPickerResultSaver instance = new IdPickerResultSaver();
     
@@ -39,7 +52,11 @@ public class IdPickerResultSaver {
         return instance;
     }
     
-    public void saveIdPickerResults(IdPickerRun idpRun, List<InferredProtein<SpectrumMatchIDP>> proteins) {
+    public void saveIdPickerResultsNoFDR(IdPickerRun idpRun, List<InferredProtein<SpectrumMatch>> proteins) {
+        
+    }
+    
+    public <T extends SpectrumMatch> void saveResults(IdPickerRun idpRun, List<InferredProtein<T>> proteins) {
         
         long s = System.currentTimeMillis();
         
@@ -47,25 +64,25 @@ public class IdPickerResultSaver {
         runDao.saveIdPickerRunSummary(idpRun); // this will save entries in the IDPickerRunSummary table only
         
         // save the summary for each input
-        inputDao.saveIdPickerInputList(idpRun.getInputSummaryList());
+        inputDao.saveIdPickerInputList(idpRun.getInputList());
         
         // save the inferred proteins, associated peptides and spectrum matches
         saveInferredProteins(idpRun.getId(), proteins);
         
         
         long e = System.currentTimeMillis();
-        log.info("SAVED IDPickerResults in: "+timeElapsed(s,e));
+        log.info("SAVED IDPickerResults in: "+TimeUtils.timeElapsedSeconds(s,e));
     }
     
-    private void saveInferredProteins(int pinferId, List<InferredProtein<SpectrumMatchIDP>> proteins) {
+    private <T extends SpectrumMatch> void saveInferredProteins(int pinferId, List<InferredProtein<T>> proteins) {
         
         // map of peptide sequence and pinferPeptideIDs
         Map<String, Integer> idpPeptideIds = new HashMap<String, Integer>();
         
-        for(InferredProtein<SpectrumMatchIDP> protein: proteins) {
+        for(InferredProtein<T> protein: proteins) {
             
             // save the protein
-            IdPickerProtein idpProt = new IdPickerProtein();
+            IdPickerProteinBase idpProt = new IdPickerProteinBase();
             idpProt.setProteinferId(pinferId);
             idpProt.setNrseqProteinId(protein.getProteinId());
             idpProt.setClusterId(protein.getProteinClusterId());
@@ -75,37 +92,14 @@ public class IdPickerResultSaver {
             int pinferProteinId = protDao.saveIdPickerProtein(idpProt);
             
             
-            // save the peptides and the associated spectrum matches
-            for(PeptideEvidence<SpectrumMatchIDP> pev: protein.getPeptides()) {
+            // save the peptides, ions and the associated spectrum matches
+            for(PeptideEvidence<T> pev: protein.getPeptides()) {
                 Peptide peptide = pev.getPeptide();
                 Integer pinferPeptideId = idpPeptideIds.get(peptide.getSequence());
                 if(pinferPeptideId == null) {
-                    IdPickerPeptide idpPept = new IdPickerPeptide();
-                    idpPept.setGroupId(peptide.getPeptideGroupId());
-                    idpPept.setSequence(peptide.getSequence());
-                    pinferPeptideId = peptDao.saveIdPickerPeptide(idpPept);
+                    pinferPeptideId = savePeptideEvidence(pev, pinferId);
                     // add to our map
                     idpPeptideIds.put(peptide.getSequence(), pinferPeptideId);
-                    
-                    
-                    // save all the ions (sequence + mod_state + charge) form the peptide
-                    Set<String> ionSet = new HashSet<String>();
-                    
-                    // save the spectrum matches for this peptide
-                    for(IdPickerSpectrumMatch psm: peptide.getSpectrumMatchList()) {
-                        psm.setProteinferPeptideId(id);
-                        idpPsmDao.saveSpectrumMatch(psm);
-                    }
-                    List<IdPickerSpectrumMatch> idpPsmList = new ArrayList<IdPickerSpectrumMatch>(pev.getSpectrumMatchCount());
-                    for(SpectrumMatchIDP psm: pev.getSpectrumMatchList()) {
-                        IdPickerSpectrumMatch idpPsm = new IdPickerSpectrumMatch();
-                        idpPsm.setMsRunSearchResultId(psm.getHitId());
-                        idpPsm.setFdr(psm.getFdr());
-                        idpPsmList.add(idpPsm);
-                    }
-                    idpPept.setSpectrumMatchList(idpPsmList);
-                    pinferPeptideId = peptDao.saveIdPickerPeptide(idpPept); // this will save the spectrum matches also
-                    
                 }
                 // link the protein and peptide
                 protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);
@@ -115,7 +109,75 @@ public class IdPickerResultSaver {
         }
     }
 
-    private static float timeElapsed(long start, long end) {
-        return (end - start)/(1000.0f);
+    private <T extends SpectrumMatch> int savePeptideEvidence(PeptideEvidence<T> pev, int pinferId) {
+        pev.getProteinMatchCount();
+        Peptide peptide = pev.getPeptide();
+        IdPickerPeptideBase idpPept = new IdPickerPeptideBase();
+        idpPept.setGroupId(peptide.getPeptideGroupId());
+        idpPept.setSequence(peptide.getSequence());
+        idpPept.setUniqueToProtein(pev.getProteinMatchCount() == 1);
+        idpPept.setProteinferId(pinferId);
+        
+        int pinferPeptideId = peptDao.saveIdPickerPeptide(idpPept);
+        
+        
+        // sort the psm's by sequence + mod_state + charge
+        Map<String, List<T>> map = new HashMap<String, List<T>>(pev.getSpectrumMatchList().size());
+        Map<String, Integer> modIds = new HashMap<String, Integer>();
+        int modId = 1;
+        for(T psm: pev.getSpectrumMatchList()) {
+            MsSearchResult res = resDao.load(psm.getHitId());
+            String modseq = res.getResultPeptide().getModifiedPeptideSequence();
+            
+            
+            String key = modseq+"_"+psm.getCharge();
+            List<T> list = map.get(key);
+            if(list == null) {
+                list = new ArrayList<T>();
+                map.put(key, list);
+                
+                // get the modification id
+                Integer mid = modIds.get(modseq);
+                if(mid == null) {
+                    mid = modId;
+                    modId++;
+                    modIds.put(modseq, mid);
+                }
+            }
+            list.add(psm);
+        }
+        
+        // save all the ions (sequence + mod_state + charge) for the peptide
+        for(String key: map.keySet()) {
+            ProteinferIon ion = new ProteinferIon();
+            List<T> psmList = map.get(key);
+            ion.setProteinferPeptideId(pinferPeptideId);
+            ion.setCharge(psmList.get(0).getCharge());
+            String modseq = key.substring(0, key.lastIndexOf("_"));
+            ion.setSequence(modseq);
+            ion.setModificationStateId(modIds.get(modseq));
+            int ionId = ionDao.save(ion);
+            
+            // save all the spectra for this ion
+            for(T psm: psmList) {
+                if(psm instanceof SpectrumMatchIDP) {
+                    IdPickerSpectrumMatch idpPsm = new IdPickerSpectrumMatch();
+                    idpPsm.setProteinferIonId(ionId);
+                    idpPsm.setMsRunSearchResultId(psm.getHitId());
+                    idpPsm.setFdr(((SpectrumMatchIDP)psm).getFdr());
+                    idpPsm.setRank(psm.getRank());
+                    idpPsmDao.saveSpectrumMatch(idpPsm);
+                }
+                else {
+                    ProteinferSpectrumMatch idpPsm = new ProteinferSpectrumMatch();
+                    idpPsm.setProteinferIonId(ionId);
+                    idpPsm.setMsRunSearchResultId(psm.getHitId());
+                    idpPsm.setRank(psm.getRank());
+                    psmDao.saveSpectrumMatch(idpPsm);
+                }
+            }
+        }
+        return pinferPeptideId;
     }
+   
 }

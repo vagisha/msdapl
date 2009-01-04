@@ -8,9 +8,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 import edu.uwpr.protinfer.database.dao.GenericProteinferInputDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 
-public class IdPickerInputDAO extends BaseSqlMapDAO implements GenericProteinferInputDAO<IdPickerInputSummary> {
+public class IdPickerInputDAO extends BaseSqlMapDAO implements GenericProteinferInputDAO<IdPickerInput> {
 
     private static final String sqlMapNameSpace = "IdPickerInput";
     private final ProteinferInputDAO pinferInputDao;
@@ -20,26 +20,26 @@ public class IdPickerInputDAO extends BaseSqlMapDAO implements GenericProteinfer
         this.pinferInputDao = inputDao;
     }
 
-    public List<IdPickerInputSummary> getProteinferInputList(int pinferId) {
+    public List<IdPickerInput> loadProteinferInputList(int pinferId) {
         return queryForList(sqlMapNameSpace+".selectIdPickerInputList", pinferId);
     }
     
-    public int saveProteinferInput(IdPickerInputSummary input) {
+    public int saveProteinferInput(IdPickerInput input) {
         int inputId = pinferInputDao.saveProteinferInput(input);
         input.setId(inputId);
         save(sqlMapNameSpace+".saveIdPickerInput", input);
         return inputId;
     }
     
-    public void updateIdPickerInputSummary(IdPickerInputSummary input) {
+    public void updateIdPickerInputSummary(IdPickerInput input) {
         update(sqlMapNameSpace+".updateIdPickerInput", input);
     }
     
-    public void saveIdPickerInputList(List<IdPickerInputSummary> inputList) {
+    public void saveIdPickerInputList(List<IdPickerInput> inputList) {
         if(inputList.size() == 0)
             return;
         StringBuilder buf = new StringBuilder();
-        for(IdPickerInputSummary input: inputList) {
+        for(IdPickerInput input: inputList) {
             buf.append(",("+input.getId()+",");
             if(input.getNumTargetHits() == -1)
                 buf.append("NULL,");
@@ -65,7 +65,7 @@ public class IdPickerInputDAO extends BaseSqlMapDAO implements GenericProteinfer
     }
 
     @Override
-    public List<Integer> getRunSearchIdsForProteinferRun(int pinferId) {
-        return pinferInputDao.getRunSearchIdsForProteinferRun(pinferId);
+    public List<Integer> loadInputIdsForProteinferRun(int pinferId) {
+        return pinferInputDao.loadInputIdsForProteinferRun(pinferId);
     }
 }

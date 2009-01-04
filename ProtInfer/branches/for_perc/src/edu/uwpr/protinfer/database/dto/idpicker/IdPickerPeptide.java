@@ -1,7 +1,9 @@
 package edu.uwpr.protinfer.database.dto.idpicker;
 
+import edu.uwpr.protinfer.database.dto.GenericProteinferPeptide;
 
-public class IdPickerPeptide extends BaseIdPickerPeptide<IdPickerSpectrumMatch, IdPickerIon> {
+
+public class IdPickerPeptide extends GenericIdPickerPeptide<IdPickerSpectrumMatch, IdPickerIon> {
 
     
     public IdPickerPeptide() {
@@ -31,5 +33,10 @@ public class IdPickerPeptide extends BaseIdPickerPeptide<IdPickerSpectrumMatch, 
             }
         }
         return bestPsm;
+    }
+
+    @Override
+    protected GenericProteinferPeptide<IdPickerSpectrumMatch, IdPickerIon> newPeptide() {
+        return new IdPickerPeptide();
     }
 }

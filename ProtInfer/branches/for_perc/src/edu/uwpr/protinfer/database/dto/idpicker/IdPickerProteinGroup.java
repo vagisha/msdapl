@@ -7,7 +7,7 @@ public class IdPickerProteinGroup {
 
     private final int pinferId;
     private final int groupId;
-    private List<IdPickerProtein> proteins;
+    private List<IdPickerProteinBase> proteins;
     
     private int numPeptides_S;
     private int numUniquePeptides_S;
@@ -26,7 +26,7 @@ public class IdPickerProteinGroup {
     public IdPickerProteinGroup(int pinferId, int groupId) {
         this.pinferId = pinferId;
         this.groupId = groupId;
-        proteins = new ArrayList<IdPickerProtein>();
+        proteins = new ArrayList<IdPickerProteinBase>();
         peptideGroupIds = new ArrayList<Integer>();
         uniqPeptideGroupIds = new ArrayList<Integer>();
     }
@@ -45,16 +45,16 @@ public class IdPickerProteinGroup {
         else
             return 0;
     }
-    public void setProteins(List<IdPickerProtein> proteins) {
+    public void setProteins(List<IdPickerProteinBase> proteins) {
         if(proteins != null)
             this.proteins = proteins;
     }
     
-    public void addProtein(IdPickerProtein protein) {
+    public void addProtein(IdPickerProteinBase protein) {
         this.proteins.add(protein);
     }
     
-    public List<IdPickerProtein> getProteins() {
+    public List<IdPickerProteinBase> getProteins() {
         return this.proteins;
     }
     

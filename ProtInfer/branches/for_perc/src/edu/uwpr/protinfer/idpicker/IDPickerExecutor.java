@@ -7,13 +7,9 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -23,17 +19,11 @@ import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.SearchProgram;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
-import edu.uwpr.protinfer.filter.Filter;
-import edu.uwpr.protinfer.filter.FilterException;
-import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
-import edu.uwpr.protinfer.filter.fdr.FdrFilterCriteria;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
@@ -52,7 +42,7 @@ public class IDPickerExecutor {
     
     public void execute(IdPickerRun idpRun) throws Exception {
         
-        if(idpRun.getInputSummaryList().size() == 0)
+        if(idpRun.getInputList().size() == 0)
             return;
         
         long start = System.currentTimeMillis();
@@ -60,55 +50,25 @@ public class IDPickerExecutor {
         // create the parameters object
         IDPickerParams params = makeIdPickerParams(idpRun.getFilters());
         
-        // get the program used for the data
-        // NOTE: WE ASSUME ALL THE GIVEN runSearchIds WERE SEARCHED WITH THE SAME PROGRAM
-        SearchProgram program = getSearchProgram(idpRun.getInputSummaryList().get(0));
         
-        // get all the search hits for the given runSearchIds
-        List<PeptideSpectrumMatchIDP> allPsms = getAllSearchHits(idpRun, params, program);
-        
-        // filter the search hits
-        List<PeptideSpectrumMatchIDP> filteredPsms;
-        try {
-            filteredPsms = filterSearchHits(allPsms, params, program);
+        // Are we going to do FDR calculation?
+        if(params.getDoFdrCalculation()) {
+            IdPickerExecutorFDR fdrExe  = new IdPickerExecutorFDR();
+            fdrExe.execute(idpRun, params);
         }
-        catch (FdrCalculatorException e) {
-            log.error("Error calculating FDR", e);
-            throw new Exception(e);
-        }
-        catch (FilterException e) {
-            log.error("Error filtering on fdr", e);
-            throw new Exception(e);
+        else {
+            IdPickerExecutorNoFDR noFdrExe = new IdPickerExecutorNoFDR();
+            noFdrExe.execute(idpRun, params);
         }
         
-        if(filteredPsms == null || filteredPsms.size() == 0) {
-            log.error("No filtered hits found!");
-            throw new Exception("No filtered hits found!");
-        }
-        
-        // update the summary statistics
-        updateSummaryAfterFiltering(filteredPsms, idpRun);
-        
-        // assign ids to peptides and proteins(nrseq ids)
-        assignIdsToPeptidesAndProteins(filteredPsms);
-        
-        // infer the proteins;
-        List<InferredProtein<SpectrumMatchIDP>> proteins = inferProteins(filteredPsms, params);
-        
-        // calculate the protein coverage
-        calculateProteinSequenceCoverage(proteins);
-        
-        
-        // FINALLY save the results
-        IdPickerResultSaver.instance().saveIdPickerResults(idpRun, proteins);
         
         long end = System.currentTimeMillis();
         log.info("IDPicker TOTAL run time: "+timeElapsed(start, end));
     }
     
-    private static void calculateProteinSequenceCoverage(List<InferredProtein<SpectrumMatchIDP>> proteins) throws Exception {
+    protected static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
         
-        for(InferredProtein<SpectrumMatchIDP> prot: proteins) {
+        for(InferredProtein<T> prot: proteins) {
             int nrseqProteinId = prot.getProteinId();
             String proteinSeq = null;
             try {
@@ -126,7 +86,7 @@ public class IDPickerExecutor {
             }
                 
             List<String> peptides = new ArrayList<String>();
-            for(PeptideEvidence<SpectrumMatchIDP> pev: prot.getPeptides()) {
+            for(PeptideEvidence<T> pev: prot.getPeptides()) {
                 peptides.add(pev.getPeptideSeq());
             }
             int lengthCovered = StringUtils.getCoveredSequenceLength(proteinSeq, peptides);
@@ -135,15 +95,15 @@ public class IDPickerExecutor {
         }
     }
 
-    private void assignIdsToPeptidesAndProteins(List<PeptideSpectrumMatchIDP> filteredPsms) throws Exception {
+    protected static <T extends PeptideSpectrumMatch<?>> void assignIdsToPeptidesAndProteins(List<T> filteredPsms) throws Exception {
         assignNrSeqProteinIds(filteredPsms);
         assignPeptideIds(filteredPsms);
     }
 
-    private void assignPeptideIds(List<PeptideSpectrumMatchIDP> filteredPsms) {
+    private static <T extends PeptideSpectrumMatch<?>> void assignPeptideIds(List<T> filteredPsms) {
         Map<String, Integer> peptideIds = new HashMap<String, Integer>(filteredPsms.size());
         int lastPeptId = 1;
-        for(PeptideSpectrumMatchIDP psm: filteredPsms) {
+        for(T psm: filteredPsms) {
             Peptide pept = psm.getPeptideHit().getPeptide();
             Integer id = peptideIds.get(pept.getSequence());
             if (id == null) {
@@ -155,7 +115,7 @@ public class IDPickerExecutor {
         }
     }
 
-    private int getNrSeqDatabaseId(int runSearchId) {
+    private static int getNrSeqDatabaseId(int runSearchId) {
         DAOFactory fact = DAOFactory.instance();
         MsRunSearchDAO runSearchDao = fact.getMsRunSearchDAO();
         MsSearchDatabaseDAO dbDao = fact.getMsSequenceDatabaseDAO();
@@ -174,12 +134,12 @@ public class IDPickerExecutor {
         return nrseqDbId;
     }
     
-    private void assignNrSeqProteinIds(List<PeptideSpectrumMatchIDP> filteredPsms) throws Exception {
+    private static <T extends PeptideSpectrumMatch<?>> void assignNrSeqProteinIds(List<T> filteredPsms) throws Exception {
         
         Map<Integer, Integer> nrseqDbIds = new HashMap<Integer, Integer>();
         Map<String, NrDbProtein> nrseqIdMap = new HashMap<String, NrDbProtein>();
        
-        for(PeptideSpectrumMatchIDP hit: filteredPsms) {
+        for(T hit: filteredPsms) {
             
            int runSearchId = hit.getSpectrumMatch().getSourceId();
            Integer nrseqDbId = nrseqDbIds.get(runSearchId);
@@ -233,60 +193,22 @@ public class IDPickerExecutor {
         }
         
     }
-
-    // This method also updates the summary with the total number of proteins found for all the 
-    // search hits.
-    private List<PeptideSpectrumMatchIDP> getAllSearchHits(IdPickerRun idpRun, IDPickerParams params, SearchProgram program) {
-        
-        Set<String> allProteins = new HashSet<String>();
-        Set<String> allPeptides = new HashSet<String>();
-        
-        List<IdPickerInputSummary> idpInputList = idpRun.getInputSummaryList();
-        List<PeptideSpectrumMatchIDP> allPsms = new ArrayList<PeptideSpectrumMatchIDP>();
-        SearchResultsGetter resGetter = SearchResultsGetter.instance();
-        
-        for(IdPickerInputSummary input: idpInputList) {
-            
-            int runSearchId = input.getInputId();
-            List<PeptideSpectrumMatchIDP> psms = resGetter.getHitsForRunSearch(runSearchId, params.getDecoyPrefix(), program);
-            allPsms.addAll(psms);
-            
-            // count the number of target and decoy hits
-            int target = 0;
-            int decoy = 0;
-            for(PeptideSpectrumMatchIDP psm: psms) {
-                if(psm.isDecoyMatch())  decoy++;
-                else                    target++;
-                
-                PeptideHit pept = psm.getPeptideHit();
-                allPeptides.add(pept.getSequence());
-                for(ProteinHit prot: pept.getProteinList()) {
-                    allProteins.add(prot.getAccession());
-                }
-            }
-            
-            input.setNumDecoyHits(decoy);
-            input.setNumTargetHits(target); 
-        }
-        idpRun.setNumUnfilteredProteins(allProteins.size());
-        idpRun.setNumUnfilteredPeptides(allPeptides.size());
-        
-        return allPsms;
-    }
-
-    private SearchProgram getSearchProgram(IdPickerInputSummary idpInput) {
-        MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
-        int runSearchId = idpInput.getInputId();
-        return runSearchDao.loadSearchProgramForRunSearch(runSearchId);
-    }
     
     private IDPickerParams makeIdPickerParams(List<IdPickerFilter> filters) {
+        
         IDPickerParams params = new IDPickerParams();
+        params.setDoFdrCalculation(false); // set this to false initially
+                                           // if we find FDR calculation filters we will set this to true;
+        List<IdPickerFilter> moreFilters = new ArrayList<IdPickerFilter>();
         for(IdPickerFilter filter: filters) {
-            if(filter.getFilterName().equalsIgnoreCase("maxAbsFDR"))
+            if(filter.getFilterName().equalsIgnoreCase("maxAbsFDR")) {
                 params.setMaxAbsoluteFdr(Float.valueOf(filter.getFilterValue()));
-            else if(filter.getFilterName().equalsIgnoreCase("maxRelativeFDR"))
+                params.setDoFdrCalculation(true);
+            }
+            else if(filter.getFilterName().equalsIgnoreCase("maxRelativeFDR")) {
                 params.setMaxRelativeFdr(Float.valueOf(filter.getFilterValue()));
+                params.setDoFdrCalculation(true);
+            }
             else if (filter.getFilterName().equalsIgnoreCase("decoyRatio"))
                 params.setDecoyRatio(Float.valueOf(filter.getFilterValue()));
             else if (filter.getFilterName().equalsIgnoreCase("decoyPrefix"))
@@ -300,164 +222,32 @@ public class IDPickerExecutor {
                 else
                     params.setUseIdPickerFDRFormula(false);
             }
+            else {
+                moreFilters.add(filter);
+            }
         }
+        if(moreFilters.size() > 0)
+            params.addMoreFilters(moreFilters);
         return params;
     }
 
     
-    private  List<PeptideSpectrumMatchIDP> filterSearchHits(List<PeptideSpectrumMatchIDP> searchHits, 
-            IDPickerParams params, SearchProgram program) throws FdrCalculatorException, FilterException {
-        
-        Comparator<PeptideSpectrumMatchIDP> absScoreComparator = getAbsoluteScoreComparator(program);
-        Comparator<PeptideSpectrumMatchIDP> relScoreComparator = getRelativeScoreComparator(program);
-        
-        return filterSearchHits(searchHits, params, program, absScoreComparator, relScoreComparator);
-    }
-
-    
-    private  List<PeptideSpectrumMatchIDP> filterSearchHits(List<PeptideSpectrumMatchIDP> searchHits, 
-                                                           IDPickerParams params, SearchProgram program,
-                                                           Comparator<PeptideSpectrumMatchIDP> absoluteScoreComparator,
-                                                           Comparator<PeptideSpectrumMatchIDP> relativeScoreComparator) 
-    throws FdrCalculatorException, FilterException {
-
-        long start = System.currentTimeMillis();
-        long s = start;
-        
-        FdrCalculatorIdPicker<PeptideSpectrumMatchIDP> calculator = new FdrCalculatorIdPicker<PeptideSpectrumMatchIDP>();
-        if(!params.useIdPickerFDRFormula()) {
-            calculator.setUseIdPickerFdr(false);
-        }
-        
-        calculator.setDecoyRatio(params.getDecoyRatio());
-
-        // Calculate FDR from relative scores (e.g. DeltaCN) first.
-        calculator.calculateFdr(searchHits, relativeScoreComparator);
-        
-        // Filter based on the given FDR cutoff
-        FdrFilterCriteria filterCriteria = new FdrFilterCriteria(params.getMaxRelativeFdr());
-        List<PeptideSpectrumMatchIDP> filteredHits = Filter.filter(searchHits, filterCriteria);
-        long e = System.currentTimeMillis();
-        log.info("Calculated FDR for relative scores + filtered in: "+timeElapsed(s, e));
-
-        // Clear the fdr scores for the filtered hits and calculate FDR from xCorr scores
-        for (PeptideSpectrumMatchIDP hit: filteredHits)
-            hit.setFdr(1.0);
-
-        // Calculate FDR from absolute scores (e.g. XCorr)
-        s = System.currentTimeMillis();
-        
-        // IDPicker separates charge states for calculating FDR using XCorr scores
-        if(program == SearchProgram.SEQUEST || program == SearchProgram.EE_NORM_SEQUEST)
-            calculator.separateChargeStates(true);
-        
-        calculator.calculateFdr(searchHits, absoluteScoreComparator);
-
-        filterCriteria = new FdrFilterCriteria(params.getMaxAbsoluteFdr());
-        filteredHits = Filter.filter(searchHits, filterCriteria);
-        e = System.currentTimeMillis();
-        log.info("Calculated FDR for absolute scores + filtered in: "+timeElapsed(s, e));
-        
-        log.info("Total time for filtering: "+timeElapsed(start, e));
-        
-        return filteredHits;
-    }
-    
-    private void updateSummaryAfterFiltering(List<PeptideSpectrumMatchIDP> filteredPsms, IdPickerRun idpRun) {
-        
-        // sort the filtered hits by source
-        Collections.sort(filteredPsms, new Comparator<PeptideSpectrumMatchIDP>() {
-            public int compare(PeptideSpectrumMatchIDP o1,PeptideSpectrumMatchIDP o2) {
-                return Integer.valueOf(o1.getSpectrumMatch().getSourceId()).compareTo(o2.getSpectrumMatch().getSourceId());
-            }});
-        
-        // count the number of filtered hits for each source
-        int filteredCnt = 0;
-        int lastSourceId = -1;
-        for(PeptideSpectrumMatchIDP hit: filteredPsms) {
-            if(lastSourceId != hit.getSpectrumMatch().getSourceId()) {
-                if(lastSourceId != -1){
-                    IdPickerInputSummary input = idpRun.getInputSummaryForRunSearch(lastSourceId);
-                    if(input == null) {
-                        log.error("Could not find input summary for runSearchID: "+lastSourceId);
-                    }
-                    else {
-                        input.setNumFilteredTargetHits(filteredCnt);
-                    }
-                }
-                filteredCnt = 0;
-                lastSourceId = hit.getSpectrumMatch().getSourceId();
-            }
-            filteredCnt++;
-        }
-        // update the last one;
-        if(lastSourceId != -1) {
-            IdPickerInputSummary input = idpRun.getInputSummaryForRunSearch(lastSourceId);
-            if(input == null) {
-                log.error("Could not find input summary for runSearchID: "+lastSourceId);
-            }
-            else {
-                input.setNumFilteredTargetHits(filteredCnt);
-            }
-        }
-        else {
-            log.error("Could not update input summary for runSearchIds");
-        }
-    }
-    
-    private Comparator<PeptideSpectrumMatchIDP> getAbsoluteScoreComparator(SearchProgram program) {
-        if(program == SearchProgram.SEQUEST || program == SearchProgram.EE_NORM_SEQUEST) {
-            // we will be comparing XCorr
-            return new Comparator<PeptideSpectrumMatchIDP>() {
-                public int compare(PeptideSpectrumMatchIDP o1, PeptideSpectrumMatchIDP o2) {
-                    return Double.valueOf(o1.getAbsoluteScore()).compareTo(o2.getAbsoluteScore());
-                }};
-        }
-        else if(program == SearchProgram.PROLUCID) {
-            // TODO here we need to know what primary score is used by ProLuCID
-            return null;
-        }
-        else {
-            log.error("Unsupported search file format: "+program.toString());
-            return null;
-        }
-    }
-    
-    private Comparator<PeptideSpectrumMatchIDP> getRelativeScoreComparator(SearchProgram program) {
-        if(program == SearchProgram.SEQUEST || program == SearchProgram.EE_NORM_SEQUEST) {
-            // we will be comparing DeltaCN -- 0.0 is be best score; 1.0 is worst
-            return new Comparator<PeptideSpectrumMatchIDP>() {
-                public int compare(PeptideSpectrumMatchIDP o1, PeptideSpectrumMatchIDP o2) {
-                    return Double.valueOf(o2.getRelativeScore()).compareTo(o1.getRelativeScore());
-                }};
-        }
-        else if(program == SearchProgram.PROLUCID) {
-            // TODO here we need to know what primary score is used by ProLuCID
-            return null;
-        }
-        else {
-            log.error("Unsupported search file format: "+program.toString());
-            return null;
-        }
-    }
-
-    
-    public <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
+    protected static final <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
         List<InferredProtein<S>> inferProteins(List<T> psms, IDPickerParams params) {
         
         ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker(params.getDoParsimonyAnalysis());
         return inferrer.inferProteins(psms);
     }
     
-    private static float timeElapsed(long start, long end) {
+    private float timeElapsed(long start, long end) {
         return (end - start)/(1000.0f);
     }
     
     public static void main(String[] args) {
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.getProteinferRun(1);
-        System.out.println("Number of files: "+run.getInputSummaryList().size());
+        IdPickerRun run = runDao.loadProteinferRun(1);
+        System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getFilters().size());
         
         IDPickerExecutor executor = new IDPickerExecutor();

@@ -2,23 +2,20 @@ package edu.uwpr.protinfer.database.dao;
 
 import java.util.List;
 
-import edu.uwpr.protinfer.database.dto.BaseProteinferPeptide;
-import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
+import edu.uwpr.protinfer.database.dto.GenericProteinferPeptide;
 
-public interface GenericProteinferPeptideDAO<S extends ProteinferSpectrumMatch, T extends BaseProteinferPeptide<S>> {
+public interface GenericProteinferPeptideDAO<T extends GenericProteinferPeptide<?,?>> {
 
-    public abstract int save(BaseProteinferPeptide<?> peptide);
+    public abstract int save(GenericProteinferPeptide<?,?> peptide);
 
     public abstract List<Integer> getPeptideIdsForProteinferProtein(int pinferProteinId);
 
-    public abstract List<T> getPeptidesForProteinferProtein(int pinferProteinId);
+    public abstract List<T> loadPeptidesForProteinferProtein(int pinferProteinId);
 
     public abstract List<Integer> getPeptideIdsForProteinferRun(int proteinferId);
 
-    public abstract List<T> getPeptidesForProteinferRun(int proteinferId);
+    public abstract T load(int pinferPeptideId);
 
-    public abstract T getPeptide(int pinferPeptideId);
-
-    public abstract void deleteProteinferPeptide(int id);
+    public abstract void delete(int id);
 
 }

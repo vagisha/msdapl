@@ -4,24 +4,25 @@
 <sqlMap namespace="ProteinferPeptide"> 
 
 	<typeAlias alias="ProteinferPeptide" type="edu.uwpr.protinfer.database.dto.ProteinferPeptide"/>
-	<typeAlias alias="BaseProteinferPeptide" type="edu.uwpr.protinfer.database.dto.BaseProteinferPeptide"/>
+	<typeAlias alias="BaseProteinferPeptide" type="edu.uwpr.protinfer.database.dto.GenericProteinferPeptide"/>
 	
 	<resultMap class="BaseProteinferPeptide" id="pinferPeptideBaseResult">
 		<result property="id" column="id" />
+		<result property="proteinferId" column="piRunID" nullValue="0"/>
 		<result property="sequence" column="sequence" />
-		<result property="matchingProteinIds" 
-				select="ProteinferPeptide.selectProteinIdsForPeptide"
-				column="id"/>
+		<result property="uniqueToProtein" column="uniqueToProtein"/>
 	</resultMap>
 	
 	<resultMap class="ProteinferPeptide" id="pinferPeptideResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
-		<result property="spectrumMatchList" 
-				select="ProteinferSpectrumMatch.selectMatchesForPeptide"
+		<result property="ionList" 
+				select="ProteinferIon.selectIonsForPeptide"
 				column="id"/>
 	</resultMap>
 	
 	<parameterMap class="BaseProteinferPeptide" id="pinferPeptideParam">
+		<parameter property="proteinferId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="sequence" jdbcType="VARCHAR" />
+		<parameter property="uniqueToProtein" jdbcType="TINYINT" />
 	</parameterMap>
 	
 	<select id="select" resultMap="pinferPeptideResult" parameterClass="Integer">
@@ -33,7 +34,7 @@
     </select>
     
     <select id="selectPeptidesForProtein" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT p.id, p.sequence
+    	SELECT p.*
     	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch 
     	WHERE p.id = protMatch.piPeptideID
     	AND protMatch.piProteinID = #id#
@@ -44,24 +45,19 @@
     </select>
     
     <select id="selectPeptideIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
-    	SELECT mtch.piPeptideID
-    	FROM msProteinInferProtein AS prot, msProteinInferProteinPeptideMatch AS mtch
-    	WHERE prot.piRunID=#id#
-    	AND prot.id = mtch.piProteinID
+    	SELECT id FROM msProteinInferPeptide WHERE piRunID=#id#
     </select>
     
     <select id="selectPeptidesForProteinferRun" resultMap="pinferPeptideResult" parameterClass="Integer">
-    	SELECT pep.id, pep.sequence 
-    	FROM msProteinInferPeptide as pep, msProteinInferProtein as prot, msProteinInferProteinPeptideMatch as mtch
-    	WHERE prot.piRunID=#id#
-    	AND prot.id = mtch.piProteinID
-    	AND pep.id = mtch.piPeptideID
+    	SELECT * FROM msProteinInferPeptide WHERE piRunID=#id#
     </select>
    
     <insert id="insert" parameterMap="pinferPeptideParam">
     	INSERT INTO msProteinInferPeptide (
-    	sequence) 
-    	VALUES (?)
+    	piRunID,
+    	sequence,
+    	uniqueToProtein) 
+    	VALUES (?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
