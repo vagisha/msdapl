@@ -23,11 +23,11 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
             Peptide psmPeptide = psm.getPeptideHit().getPeptide();
             
             // add this to the peptideMap if not already there
-            PeptideEvidence<S> evidence = peptideMap.get(psmPeptide.getModifiedSequence());
+            PeptideEvidence<S> evidence = peptideMap.get(psmPeptide.getSequence());
             if(evidence == null) {
                 evidence = new PeptideEvidence<S>(psmPeptide);
                 evidence.setProteinMatchCount(psm.getPeptideHit().getMatchProteinCount());
-                peptideMap.put(psmPeptide.getModifiedSequence(), evidence);
+                peptideMap.put(psmPeptide.getSequence(), evidence);
             }
             evidence.addSpectrumMatch(psm.getSpectrumMatch());
             

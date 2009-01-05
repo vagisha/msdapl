@@ -10,5 +10,13 @@ public interface SpectrumMatch {
     
     public abstract int getCharge();
     
+    /**
+     * Returns the sequence with modifications
+     * @return
+     */
+    public abstract String getSequence();
+    
     public abstract int getRank();
+    
+    public abstract void setRank(int rank);
 }

@@ -81,20 +81,20 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
                     peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
 
                 }
-
-                SpectrumMatchNoFDRImpl specMatch = new SpectrumMatchNoFDRImpl();
-                specMatch.setHitId(result.getId());
-                specMatch.setScanId(result.getScanId());
-                specMatch.setCharge(result.getCharge());
-                specMatch.setSourceId(inputId);
-                specMatch.setRank(resultRanks.get(result.getId()));
-
-                PeptideSpectrumMatchNoFDRImpl psm = new PeptideSpectrumMatchNoFDRImpl();
-                psm.setPeptide(peptHit);
-                psm.setSpectrumMatch(specMatch);
-
-                psmList.add(psm);
             }
+            SpectrumMatchNoFDRImpl specMatch = new SpectrumMatchNoFDRImpl();
+            specMatch.setHitId(result.getId());
+            specMatch.setScanId(result.getScanId());
+            specMatch.setCharge(result.getCharge());
+            specMatch.setSourceId(inputId);
+            specMatch.setSequence(result.getResultPeptide().getModifiedPeptideSequence());
+            specMatch.setRank(resultRanks.get(result.getId()));
+
+            PeptideSpectrumMatchNoFDRImpl psm = new PeptideSpectrumMatchNoFDRImpl();
+            psm.setPeptide(peptHit);
+            psm.setSpectrumMatch(specMatch);
+
+            psmList.add(psm);
         }
         e = System.currentTimeMillis();
         log.info("\tTime to get matching proteins and create list of spectrum matches: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
@@ -105,15 +105,11 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
 
     private Map<Integer, Integer> rankResults(List<PercolatorResult> resultList, PercolatorParams percParams) {
         
-        // sort the results by scanID and charge first
+        // sort the results by peptide sequence
         Collections.sort(resultList, new Comparator<PercolatorResult>() {
             @Override
             public int compare(PercolatorResult o1, PercolatorResult o2) {
-                if(o1.getScanId() < o2.getScanId()) return -1;
-                if(o1.getScanId() > o2.getScanId()) return 1;
-                if(o1.getCharge() < o2.getCharge()) return -1;
-                if(o1.getCharge() > o2.getCharge()) return 1;
-                return 0;
+                return o1.getResultPeptide().getPeptideSequence().compareTo(o2.getResultPeptide().getPeptideSequence());
                 
             }});
         
@@ -136,12 +132,11 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         Map<Integer, Integer> resultRankMap = new HashMap<Integer, Integer>(resultList.size());
         
         List<PercolatorResult> resForScanCharge = new ArrayList<PercolatorResult>();
-        int lastScanId = -1;
-        int lastCharge = -1;
+        String lastPeptideSeq = null;
         for(PercolatorResult result: resultList) {
             
-            if(result.getScanId() != lastScanId || result.getCharge() != lastCharge) {
-                if(lastScanId != -1 && lastCharge != -1) {
+            if(!result.getResultPeptide().getModifiedPeptideSequence().equals(lastPeptideSeq)) {
+                if(lastPeptideSeq != null) {
                     Collections.sort(resForScanCharge, scoreComparator);
                     int rank = 1;
                     for(PercolatorResult res: resForScanCharge) {
@@ -149,8 +144,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
                     }
                 }
                 resForScanCharge.clear();
-                lastScanId = result.getScanId();
-                lastCharge = result.getCharge();
+                lastPeptideSeq = result.getResultPeptide().getModifiedPeptideSequence();
             }
             resForScanCharge.add(result);
         }

@@ -23,8 +23,10 @@ import edu.uwpr.protinfer.filter.FilterException;
 import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
 import edu.uwpr.protinfer.filter.fdr.FdrFilterCriteria;
 import edu.uwpr.protinfer.infer.InferredProtein;
+import edu.uwpr.protinfer.infer.PeptideEvidence;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
  * 
@@ -72,6 +74,9 @@ public class IdPickerExecutorFDR {
         
         // calculate the protein coverage
         IDPickerExecutor.calculateProteinSequenceCoverage(proteins);
+        
+        // rank spectrum matches (based on FDR)
+        rankPeptideSpectrumMatches(proteins);
         
         // FINALLY save the results
         IdPickerResultSaver.instance().saveResults(idpRun, proteins);
@@ -150,7 +155,7 @@ public class IdPickerExecutorFDR {
         FdrFilterCriteria filterCriteria = new FdrFilterCriteria(params.getMaxRelativeFdr());
         List<PeptideSpectrumMatchIDP> filteredHits = Filter.filter(searchHits, filterCriteria);
         long e = System.currentTimeMillis();
-        log.info("Calculated FDR for relative scores + filtered in: "+timeElapsed(s, e));
+        log.info("Calculated FDR for relative scores + filtered in: "+TimeUtils.timeElapsedSeconds(s, e));
 
         // Clear the fdr scores for the filtered hits and calculate FDR from xCorr scores
         for (PeptideSpectrumMatchIDP hit: filteredHits)
@@ -168,9 +173,9 @@ public class IdPickerExecutorFDR {
         filterCriteria = new FdrFilterCriteria(params.getMaxAbsoluteFdr());
         filteredHits = Filter.filter(searchHits, filterCriteria);
         e = System.currentTimeMillis();
-        log.info("Calculated FDR for absolute scores + filtered in: "+timeElapsed(s, e));
+        log.info("Calculated FDR for absolute scores + filtered in: "+TimeUtils.timeElapsedSeconds(s, e));
         
-        log.info("Total time for filtering: "+timeElapsed(start, e));
+        log.info("Total time for filtering: "+TimeUtils.timeElapsedSeconds(start, e));
         
         return filteredHits;
     }
@@ -253,7 +258,25 @@ public class IdPickerExecutorFDR {
         }
     }
 
-    private float timeElapsed(long start, long end) {
-        return (end - start)/(1000.0f);
+    private void rankPeptideSpectrumMatches(List<InferredProtein<SpectrumMatchIDP>> proteins) {
+       
+        for(InferredProtein<SpectrumMatchIDP> protein: proteins) {
+            
+            // look at each peptide for the protein
+            for(PeptideEvidence<SpectrumMatchIDP> pev: protein.getPeptides()) {
+                // rank all the spectra for this peptide (based on calculated FDR)
+                List<SpectrumMatchIDP> psmList = pev.getSpectrumMatchList();
+                Collections.sort(psmList, new Comparator<SpectrumMatchIDP>(){
+                    @Override
+                    public int compare(SpectrumMatchIDP o1, SpectrumMatchIDP o2) {
+                        return Double.valueOf(o1.getFdr()).compareTo(o2.getFdr());
+                    }});
+                int rank = 1;
+                for(SpectrumMatchIDP psm: psmList) {
+                    psm.setRank(rank); 
+                    rank++;
+                }
+            }
+        }
     }
 }

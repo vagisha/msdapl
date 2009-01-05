@@ -17,6 +17,7 @@ public class SpectrumMatchNoFDRImpl implements SpectrumMatch {
     private int hitId;
     private int runSearchId;
     private int scanId;
+    private String peptideSequence;
     private int rank;
     
     public void setCharge(int charge) {
@@ -60,5 +61,14 @@ public class SpectrumMatchNoFDRImpl implements SpectrumMatch {
     
     public void setRank(int rank) {
         this.rank = rank;
+    }
+    
+    @Override
+    public String getSequence() {
+        return peptideSequence;
+    }
+    
+    public void setSequence(String sequence) {
+        this.peptideSequence = sequence;
     }
 }

@@ -93,7 +93,8 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(inputId);
-            specMatch.setRank(scores.getPrimaryScoreRank());
+            specMatch.setSequence(result.getResultPeptide().getModifiedPeptideSequence());
+            // specMatch.setRank(scores.getPrimaryScoreRank());  // Rank will be based on calculated FDR
             
             PeptideSpectrumMatchIDPImpl psm = new PeptideSpectrumMatchIDPImpl();
             psm.setPeptide(peptHit);

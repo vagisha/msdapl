@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.domain.search.MsSearchResult;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferIonDAO;
@@ -42,7 +39,6 @@ public class IdPickerResultSaver {
     private static final ProteinferSpectrumMatchDAO psmDao = factory.getProteinferSpectrumMatchDao();
     private static final IdPickerSpectrumMatchDAO idpPsmDao = factory.getIdPickerSpectrumMatchDao();
     
-    private static final MsSearchResultDAO resDao = DAOFactory.instance().getMsSearchResultDAO();
     
     private static final IdPickerResultSaver instance = new IdPickerResultSaver();
     
@@ -126,8 +122,7 @@ public class IdPickerResultSaver {
         Map<String, Integer> modIds = new HashMap<String, Integer>();
         int modId = 1;
         for(T psm: pev.getSpectrumMatchList()) {
-            MsSearchResult res = resDao.load(psm.getHitId());
-            String modseq = res.getResultPeptide().getModifiedPeptideSequence();
+            String modseq = psm.getSequence(); // this is the modified sequence
             
             
             String key = modseq+"_"+psm.getCharge();

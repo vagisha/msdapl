@@ -24,9 +24,9 @@ public class PeptideHit {
         return peptide;
     }
     
-    public String getModifiedSequence() {
-        return peptide.getModifiedSequence();
-    }
+//    public String getModifiedSequence() {
+//        return peptide.getModifiedSequence();
+//    }
     
     public String getSequence() {
         return peptide.getSequence();
@@ -54,7 +54,7 @@ public class PeptideHit {
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(peptide.getModifiedSequence()+"\n");
+        buf.append(peptide.getSequence()+"\n");
         for(ProteinHit protHit: proteins) {
             buf.append("\t"+protHit+"\n");
         }

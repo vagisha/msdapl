@@ -92,7 +92,8 @@ public class SequestResultsGetter implements ResultsGetter {
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(inputId);
-            specMatch.setRank(scores.getxCorrRank());
+            specMatch.setSequence(result.getResultPeptide().getModifiedPeptideSequence());
+//            specMatch.setRank(scores.getxCorrRank()); // Rank will be based on calculated FDR
             
             PeptideSpectrumMatchIDPImpl psm = new PeptideSpectrumMatchIDPImpl();
             psm.setPeptide(peptHit);

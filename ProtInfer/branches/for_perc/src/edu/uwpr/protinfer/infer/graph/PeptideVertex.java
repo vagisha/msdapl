@@ -32,7 +32,7 @@ public class PeptideVertex extends Vertex<PeptideVertex> {
     public String getPeptideStringLabel() {
         StringBuilder buf = new StringBuilder();
         for(Peptide peptide: peptides) 
-            buf.append(peptide.getModifiedSequence()+"_");
+            buf.append(peptide.getSequence()+"_");
         buf.deleteCharAt(buf.length() - 1);
         return buf.toString();
     }

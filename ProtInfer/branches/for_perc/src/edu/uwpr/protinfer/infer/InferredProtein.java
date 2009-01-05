@@ -22,14 +22,14 @@ public class InferredProtein <T extends SpectrumMatch> {
     }
     
     public void addPeptideEvidence(PeptideEvidence<T> peptideEv) {
-        PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getModifiedPeptideSeq());
+        PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getPeptideSeq());
         if (evidence == null) {
-            this.peptideEvList.put(peptideEv.getModifiedPeptideSeq(), peptideEv);
+            this.peptideEvList.put(peptideEv.getPeptideSeq(), peptideEv);
         }
     }
     
     public PeptideEvidence<T> getPeptideEvidence(Peptide peptide) {
-        return peptideEvList.get(peptide.getModifiedSequence());
+        return peptideEvList.get(peptide.getSequence());
     }
     
     public int getPeptideEvidenceCount() {

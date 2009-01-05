@@ -50,9 +50,9 @@ public class PeptideEvidence <T extends SpectrumMatch>{
      * Returns the sequence of the peptide WITH modifications;
      * @return
      */
-    public String getModifiedPeptideSeq() {
-        return peptide.getModifiedSequence();
-    }
+//    public String getModifiedPeptideSeq() {
+//        return peptide.getModifiedSequence();
+//    }
     
     public Peptide getPeptide() {
         return peptide;
