@@ -40,7 +40,7 @@ public class IdPickerExecutorNoFDR {
         List<PeptideSpectrumMatchNoFDR> allPsms = getAllSearchHits(idpRun, params, program);
         
         // assign ids to peptides and proteins(nrseq ids)
-        IDPickerExecutor.assignIdsToPeptidesAndProteins(allPsms);
+        IDPickerExecutor.assignIdsToPeptidesAndProteins(allPsms, program);
         
         // infer the proteins;
         List<InferredProtein<SpectrumMatch>> proteins = IDPickerExecutor.inferProteins(allPsms, params);
@@ -50,7 +50,7 @@ public class IdPickerExecutorNoFDR {
         
         
         // FINALLY save the results
-        IdPickerResultSaver.instance().saveIdPickerResultsNoFDR(idpRun, proteins);
+        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
     }
     
     // This method also updates the summary with the total number of proteins found for all the 
@@ -85,21 +85,5 @@ public class IdPickerExecutorNoFDR {
         idpRun.setNumUnfilteredPeptides(allPeptides.size());
         
         return allPsms;
-    }
-    
-    public static void main(String[] args) {
-        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
-        IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(5);
-        System.out.println("Number of files: "+run.getInputList().size());
-        System.out.println("Number of filters: "+run.getFilters().size());
-        
-        IdPickerExecutorPercolator executor = new IdPickerExecutorPercolator();
-        try {
-            executor.execute(run);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

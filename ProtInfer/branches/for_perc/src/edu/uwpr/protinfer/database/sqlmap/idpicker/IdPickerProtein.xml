@@ -24,7 +24,7 @@
 				column="id"/>
 	</resultMap>
 	
-	<parameterMap class="IdPickerProtein" id="idpickerProteinParam">
+	<parameterMap class="IdPickerProteinBase" id="idpickerProteinParam">
 		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="isParsimonious" jdbcType="TINYINT" />
 		<parameter property="clusterId" jdbcType="INTEGER" nullValue="0"/>

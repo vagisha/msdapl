@@ -20,7 +20,7 @@
 				column="id"/>
 	</resultMap>
 	
-	<parameterMap class="IdPickerPeptide" id="idpickerPeptideParam">
+	<parameterMap class="IdPickerPeptideBase" id="idpickerPeptideParam">
 		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
 	</parameterMap>

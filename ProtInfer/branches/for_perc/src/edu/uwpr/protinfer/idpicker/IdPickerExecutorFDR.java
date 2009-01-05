@@ -67,7 +67,7 @@ public class IdPickerExecutorFDR {
         updateSummaryAfterFiltering(filteredPsms, idpRun);
         
         // assign ids to peptides and proteins(nrseq ids)
-        IDPickerExecutor.assignIdsToPeptidesAndProteins(filteredPsms);
+        IDPickerExecutor.assignIdsToPeptidesAndProteins(filteredPsms, program);
         
         // infer the proteins;
         List<InferredProtein<SpectrumMatchIDP>> proteins = IDPickerExecutor.inferProteins(filteredPsms, params);

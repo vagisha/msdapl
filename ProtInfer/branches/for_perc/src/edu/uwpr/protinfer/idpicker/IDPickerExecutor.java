@@ -13,12 +13,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDatabaseDAO;
+import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
@@ -33,6 +36,7 @@ import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
 import edu.uwpr.protinfer.util.StringUtils;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 
 public class IDPickerExecutor {
@@ -63,17 +67,19 @@ public class IDPickerExecutor {
         
         
         long end = System.currentTimeMillis();
-        log.info("IDPicker TOTAL run time: "+timeElapsed(start, end));
+        log.info("IDPicker TOTAL run time: "+TimeUtils.timeElapsedMinutes(start, end));
     }
     
     protected static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
+        
+        long start = System.currentTimeMillis();
         
         for(InferredProtein<T> prot: proteins) {
             int nrseqProteinId = prot.getProteinId();
             String proteinSeq = null;
             try {
-//                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
-                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
+                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
+//                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
             }
             catch (Exception e) {
                 log.error("Exception getting nrseq protein for proteinId: "+nrseqProteinId, e);
@@ -93,10 +99,12 @@ public class IDPickerExecutor {
             float percCovered = ((float)lengthCovered/(float)proteinSeq.length()) * 100.0f;
             prot.setPercentCoverage(percCovered);
         }
+        long end = System.currentTimeMillis();
+        log.info("Calculated protein sequence coverage in : "+TimeUtils.timeElapsedSeconds(start, end)+" seconds");
     }
 
-    protected static <T extends PeptideSpectrumMatch<?>> void assignIdsToPeptidesAndProteins(List<T> filteredPsms) throws Exception {
-        assignNrSeqProteinIds(filteredPsms);
+    protected static <T extends PeptideSpectrumMatch<?>> void assignIdsToPeptidesAndProteins(List<T> filteredPsms, Program inputGenerator) throws Exception {
+        assignNrSeqProteinIds(filteredPsms, inputGenerator);
         assignPeptideIds(filteredPsms);
     }
 
@@ -115,11 +123,22 @@ public class IDPickerExecutor {
         }
     }
 
-    private static int getNrSeqDatabaseId(int runSearchId) {
+    private static int getNrSeqDatabaseId(int inputId, Program inputGenerator) {
+        
         DAOFactory fact = DAOFactory.instance();
         MsRunSearchDAO runSearchDao = fact.getMsRunSearchDAO();
         MsSearchDatabaseDAO dbDao = fact.getMsSequenceDatabaseDAO();
         
+        int runSearchId = 0;
+        if(Program.isSearchProgram(inputGenerator)) {
+            runSearchId = inputId;
+        }
+        else {
+            MsRunSearchAnalysisDAO rsAnalysisDao = fact.getMsRunSearchAnalysisDAO();
+            MsRunSearchAnalysis analysis = rsAnalysisDao.load(inputId);
+            
+            runSearchId = analysis.getRunSearchId();
+        }
         MsRunSearch runSearch = runSearchDao.loadRunSearch(runSearchId);
         if(runSearch == null) {
             log.error("Could not load runSearch with id: "+runSearchId);
@@ -134,22 +153,24 @@ public class IDPickerExecutor {
         return nrseqDbId;
     }
     
-    private static <T extends PeptideSpectrumMatch<?>> void assignNrSeqProteinIds(List<T> filteredPsms) throws Exception {
+    private static <T extends PeptideSpectrumMatch<?>> void assignNrSeqProteinIds(List<T> filteredPsms, Program inputGenerator) throws Exception {
+        
+        long start = System.currentTimeMillis();
         
         Map<Integer, Integer> nrseqDbIds = new HashMap<Integer, Integer>();
         Map<String, NrDbProtein> nrseqIdMap = new HashMap<String, NrDbProtein>();
        
         for(T hit: filteredPsms) {
             
-           int runSearchId = hit.getSpectrumMatch().getSourceId();
-           Integer nrseqDbId = nrseqDbIds.get(runSearchId);
+           int inputId = hit.getSpectrumMatch().getSourceId();
+           Integer nrseqDbId = nrseqDbIds.get(inputId);
            if(nrseqDbId == null) {
-               nrseqDbId = getNrSeqDatabaseId(runSearchId);
+               nrseqDbId = getNrSeqDatabaseId(inputId, inputGenerator);
                if(nrseqDbId == 0) {
-                   log.error("Could not find nrseq db ID for runSearchID "+runSearchId);
-                   throw new Exception("Could not find nrseq db ID for runSearchID "+runSearchId);
+                   log.error("Could not find nrseq db ID for runSearchID "+inputId);
+                   throw new Exception("Could not find nrseq db ID for runSearchID "+inputId);
                }
-               nrseqDbIds.put(runSearchId, nrseqDbId);
+               nrseqDbIds.put(inputId, nrseqDbId);
            }
            
            
@@ -185,13 +206,14 @@ public class IDPickerExecutor {
                    else
                        nrseqIdMap.put(pr.getAccession(), nrDbProt);
                }
-//               pr.setId(nrDbProt.getId());
-               pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+               pr.setId(nrDbProt.getId());
+//               pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
                pr.setAccession(nrDbProt.getAccessionString()); // this will set the correct accession; 
                                                                // SQT files sometimes have truncated accessions
            }
         }
-        
+        long end = System.currentTimeMillis();
+        log.info("Retrieved NRSEQ ids in: "+TimeUtils.timeElapsedMinutes(start, end));
     }
     
     private IDPickerParams makeIdPickerParams(List<IdPickerFilter> filters) {
@@ -239,14 +261,11 @@ public class IDPickerExecutor {
         return inferrer.inferProteins(psms);
     }
     
-    private float timeElapsed(long start, long end) {
-        return (end - start)/(1000.0f);
-    }
     
     public static void main(String[] args) {
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(1);
+        IdPickerRun run = runDao.loadProteinferRun(7);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getFilters().size());
         

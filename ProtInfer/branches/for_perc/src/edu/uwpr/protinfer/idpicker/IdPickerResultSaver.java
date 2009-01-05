@@ -48,10 +48,6 @@ public class IdPickerResultSaver {
         return instance;
     }
     
-    public void saveIdPickerResultsNoFDR(IdPickerRun idpRun, List<InferredProtein<SpectrumMatch>> proteins) {
-        
-    }
-    
     public <T extends SpectrumMatch> void saveResults(IdPickerRun idpRun, List<InferredProtein<T>> proteins) {
         
         long s = System.currentTimeMillis();

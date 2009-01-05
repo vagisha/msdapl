@@ -49,7 +49,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
 
         long start = System.currentTimeMillis();
         long s = start;
-        List<PercolatorResult> resultList = resultDao.loadResultsWithScoreThresholdForRunSearch(inputId, 
+        List<PercolatorResult> resultList = resultDao.loadResultsWithScoreThresholdForRunSearchAnalysis(inputId, 
                                             percParams.getQvalueCutoff(), 
                                             percParams.getPEPCutoff(), 
                                             percParams.getDiscriminantScoreCutoff());
