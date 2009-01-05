@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 /**
  * 
@@ -57,7 +57,7 @@ public interface GenericSearchDAO <I extends MsSearchIn, O extends MsSearch> {
      * @param program
      * @return number of rows updated.
      */
-    public abstract int updateSearchProgram(int searchId, SearchProgram program);
+    public abstract int updateSearchProgram(int searchId, Program program);
     
     /**
      * Deletes the search

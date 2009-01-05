@@ -8,11 +8,11 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 public class MsSearchAnalysisDAOImplTest extends BaseDAOTestCase {
 
-    private static final MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getSearchAnalysisDAO();
+    private static final MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
     protected void setUp() throws Exception {
         super.setUp();
         BaseDAOTestCase.resetDatabase();
@@ -24,7 +24,7 @@ public class MsSearchAnalysisDAOImplTest extends BaseDAOTestCase {
 
     public final void testSaveMsSearchAnalysis() {
         SearchAnalysisBean analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setSearchId(23);
         analysis.setAnalysisProgramVersion("1.07");
         int id = analysisDao.save(analysis);
@@ -34,27 +34,27 @@ public class MsSearchAnalysisDAOImplTest extends BaseDAOTestCase {
     public final void testLoad() {
         
         SearchAnalysisBean analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setSearchId(23);
         analysis.setAnalysisProgramVersion("1.07");
         int id1 = analysisDao.save(analysis);
         assertEquals(1, id1);
         
         analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.BIBLIOSPEC);
+        analysis.setAnalysisProgram(Program.BIBLIOSPEC);
         analysis.setSearchId(123);
         analysis.setAnalysisProgramVersion("1.03");
         int id2 = analysisDao.save(analysis);
         assertEquals(2, id2);
         
         MsSearchAnalysis fromDb = analysisDao.load(2);
-        assertEquals(SearchProgram.BIBLIOSPEC, fromDb.getAnalysisProgram());
+        assertEquals(Program.BIBLIOSPEC, fromDb.getAnalysisProgram());
         assertEquals("1.03", fromDb.getAnalysisProgramVersion());
         assertEquals(id2, fromDb.getId());
         assertEquals(123, fromDb.getSearchId());
         
         fromDb = analysisDao.load(1);
-        assertEquals(SearchProgram.PERCOLATOR, fromDb.getAnalysisProgram());
+        assertEquals(Program.PERCOLATOR, fromDb.getAnalysisProgram());
         assertEquals("1.07", fromDb.getAnalysisProgramVersion());
         assertEquals(id1, fromDb.getId());
         assertEquals(23, fromDb.getSearchId());
@@ -63,14 +63,14 @@ public class MsSearchAnalysisDAOImplTest extends BaseDAOTestCase {
 
     public final void testGetAnalysisIdsForSearch() {
         SearchAnalysisBean analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setSearchId(23);
         analysis.setAnalysisProgramVersion("1.07");
         int id1 = analysisDao.save(analysis);
         assertEquals(1, id1);
         
         analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setSearchId(23);
         analysis.setAnalysisProgramVersion("1.03");
         int id2 = analysisDao.save(analysis);
@@ -86,28 +86,28 @@ public class MsSearchAnalysisDAOImplTest extends BaseDAOTestCase {
     public final void testUpdateAnalysisProgram() {
         
         SearchAnalysisBean analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setSearchId(23);
         analysis.setAnalysisProgramVersion("1.07");
         int id1 = analysisDao.save(analysis);
         assertEquals(1, id1);
         
         analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.BIBLIOSPEC);
+        analysis.setAnalysisProgram(Program.BIBLIOSPEC);
         analysis.setSearchId(123);
         analysis.setAnalysisProgramVersion("1.03");
         int id2 = analysisDao.save(analysis);
         assertEquals(2, id2);
         
         MsSearchAnalysis fromDb = analysisDao.load(2);
-        assertEquals(SearchProgram.BIBLIOSPEC, fromDb.getAnalysisProgram());
+        assertEquals(Program.BIBLIOSPEC, fromDb.getAnalysisProgram());
         assertEquals("1.03", fromDb.getAnalysisProgramVersion());
         assertEquals(id2, fromDb.getId());
         assertEquals(123, fromDb.getSearchId());
         
-        analysisDao.updateAnalysisProgram(id2, SearchProgram.PERCOLATOR);
+        analysisDao.updateAnalysisProgram(id2, Program.PERCOLATOR);
         fromDb = analysisDao.load(2);
-        assertEquals(SearchProgram.PERCOLATOR, fromDb.getAnalysisProgram());
+        assertEquals(Program.PERCOLATOR, fromDb.getAnalysisProgram());
         assertEquals("1.03", fromDb.getAnalysisProgramVersion());
         assertEquals(id2, fromDb.getId());
         assertEquals(123, fromDb.getSearchId());
@@ -115,28 +115,28 @@ public class MsSearchAnalysisDAOImplTest extends BaseDAOTestCase {
 
     public final void testUpdateAnalysisProgramVersion() {
         SearchAnalysisBean analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setSearchId(23);
         analysis.setAnalysisProgramVersion("1.07");
         int id1 = analysisDao.save(analysis);
         assertEquals(1, id1);
         
         analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.BIBLIOSPEC);
+        analysis.setAnalysisProgram(Program.BIBLIOSPEC);
         analysis.setSearchId(123);
         analysis.setAnalysisProgramVersion("1.03");
         int id2 = analysisDao.save(analysis);
         assertEquals(2, id2);
         
         MsSearchAnalysis fromDb = analysisDao.load(2);
-        assertEquals(SearchProgram.BIBLIOSPEC, fromDb.getAnalysisProgram());
+        assertEquals(Program.BIBLIOSPEC, fromDb.getAnalysisProgram());
         assertEquals("1.03", fromDb.getAnalysisProgramVersion());
         assertEquals(id2, fromDb.getId());
         assertEquals(123, fromDb.getSearchId());
         
         analysisDao.updateAnalysisProgramVersion(id2, "1.05");
         fromDb = analysisDao.load(2);
-        assertEquals(SearchProgram.BIBLIOSPEC, fromDb.getAnalysisProgram());
+        assertEquals(Program.BIBLIOSPEC, fromDb.getAnalysisProgram());
         assertEquals("1.05", fromDb.getAnalysisProgramVersion());
         assertEquals(id2, fromDb.getId());
         assertEquals(123, fromDb.getSearchId());
@@ -145,14 +145,14 @@ public class MsSearchAnalysisDAOImplTest extends BaseDAOTestCase {
     public final void testDeleteInt() {
         
         SearchAnalysisBean analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         analysis.setSearchId(23);
         analysis.setAnalysisProgramVersion("1.07");
         int id1 = analysisDao.save(analysis);
         assertEquals(1, id1);
         
         analysis = new SearchAnalysisBean();
-        analysis.setAnalysisProgram(SearchProgram.BIBLIOSPEC);
+        analysis.setAnalysisProgram(Program.BIBLIOSPEC);
         analysis.setSearchId(123);
         analysis.setAnalysisProgramVersion("1.03");
         int id2 = analysisDao.save(analysis);

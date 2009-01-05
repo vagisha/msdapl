@@ -37,4 +37,15 @@ public class MsRunSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsRunSe
         return queryForList(namespace+".selectIdsForAnalysis", analysisId);
     }
 
+    @Override
+    public String loadFilenameForRunSearchAnalysis(int runSearchAnalysisId) {
+        String filename = (String)queryForObject(namespace+".selectFileNameForRunSearchAnalysisId", runSearchAnalysisId);
+        if(filename == null)
+            return null;
+        int idx = filename.lastIndexOf('.');
+        if (idx != -1)
+            filename = filename.substring(0, idx);
+        return filename;
+    }
+
 }

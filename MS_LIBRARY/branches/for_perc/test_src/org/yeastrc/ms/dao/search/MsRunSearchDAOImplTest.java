@@ -10,7 +10,7 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
 import org.yeastrc.ms.domain.search.impl.MsRunSearchWrap;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -172,8 +172,8 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         }
 
         @Override
-        public SearchProgram getSearchProgram() {
-            return SearchProgram.programForFileFormat(fileFormat);
+        public Program getSearchProgram() {
+            return Program.programForFileFormat(fileFormat);
         }
     }
 }

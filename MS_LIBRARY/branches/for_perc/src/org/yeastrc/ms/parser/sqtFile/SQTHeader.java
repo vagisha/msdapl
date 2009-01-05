@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 import org.yeastrc.ms.domain.search.sqtfile.impl.HeaderItemBean;
@@ -36,7 +36,7 @@ public class SQTHeader implements SQTRunSearchIn {
     private List<SQTHeaderItem> headerItems;
     
     private SearchFileFormat sqtType = null;
-    private SearchProgram program = null;
+    private Program program = null;
     
     public SQTHeader() {
         headerItems = new ArrayList<SQTHeaderItem>();
@@ -166,21 +166,21 @@ public class SQTHeader implements SQTRunSearchIn {
         // Percolator files do not add Percolator to the sqtGenerator header.
         // Look for it in the other headers
         for(SQTHeaderItem f: headerItems) {
-            if (f.getName().equalsIgnoreCase(SearchProgram.PERCOLATOR.displayName())) {
+            if (f.getName().equalsIgnoreCase(Program.PERCOLATOR.displayName())) {
                 sqtType = SearchFileFormat.SQT_PERC;
                 this.sqtGeneratorVersion = parsePercolatorVersion(f.getValue());
                 return sqtType;
             }
         }
-        if (sqtGenerator.equalsIgnoreCase(SearchProgram.SEQUEST.displayName()))
+        if (sqtGenerator.equalsIgnoreCase(Program.SEQUEST.displayName()))
             sqtType = SearchFileFormat.SQT_SEQ;
-        else if (sqtGenerator.equalsIgnoreCase(SearchProgram.EE_NORM_SEQUEST.displayName()))
+        else if (sqtGenerator.equalsIgnoreCase(Program.EE_NORM_SEQUEST.displayName()))
             sqtType = SearchFileFormat.SQT_NSEQ;
-        else if (sqtGenerator.equalsIgnoreCase(SearchProgram.PERCOLATOR.displayName()))
+        else if (sqtGenerator.equalsIgnoreCase(Program.PERCOLATOR.displayName()))
             sqtType = SearchFileFormat.SQT_PERC;
-        else if (sqtGenerator.equalsIgnoreCase(SearchProgram.PROLUCID.displayName()))
+        else if (sqtGenerator.equalsIgnoreCase(Program.PROLUCID.displayName()))
             sqtType = SearchFileFormat.SQT_PLUCID;
-        else if (sqtGenerator.equalsIgnoreCase(SearchProgram.PEPPROBE.displayName()))
+        else if (sqtGenerator.equalsIgnoreCase(Program.PEPPROBE.displayName()))
             sqtType = SearchFileFormat.SQT_PPROBE;
         else {
             sqtType = SearchFileFormat.UNKNOWN;
@@ -199,10 +199,10 @@ public class SQTHeader implements SQTRunSearchIn {
     }
 
     @Override
-    public SearchProgram getSearchProgram() {
+    public Program getSearchProgram() {
         if (program != null)
             return program;
-        program = SearchProgram.programForFileFormat(getSearchFileFormat());
+        program = Program.programForFileFormat(getSearchFileFormat());
         return program;
     }
     

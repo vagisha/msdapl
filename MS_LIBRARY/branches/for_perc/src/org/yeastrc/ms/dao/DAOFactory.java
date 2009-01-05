@@ -313,11 +313,11 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     // Post search analysis related
     //-------------------------------------------------------------------------------------------
-    public MsSearchAnalysisDAO getSearchAnalysisDAO() {
+    public MsSearchAnalysisDAO getMsSearchAnalysisDAO() {
         return analysisDAO;
     }
     
-    public MsRunSearchAnalysisDAO getRunSearchAnalysisDAO(){
+    public MsRunSearchAnalysisDAO getMsRunSearchAnalysisDAO(){
         return rsAnalysisDAO;
     }
     

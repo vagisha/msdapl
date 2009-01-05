@@ -37,7 +37,7 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -140,7 +140,7 @@ public class PercolatorSQTDataUploadService {
 
     public static void updateProgramVersion(int analysisId, String programVersion) {
         try {
-            MsSearchAnalysisDAO analysisDao = daoFactory.getSearchAnalysisDAO();
+            MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
             analysisDao.updateAnalysisProgramVersion(analysisId, programVersion);
         }
         catch(RuntimeException e) {
@@ -156,7 +156,7 @@ public class PercolatorSQTDataUploadService {
      * @param remoteDirectory 
      * @param searchDate 
      */
-    public int uploadPostSearchAnalysis(int searchId, SearchProgram searchProgram,
+    public int uploadPostSearchAnalysis(int searchId, Program searchProgram,
             String fileDirectory, 
             Set<String> fileNames, Map<String,Integer> runSearchIdMap, 
             String remoteDirectory) {
@@ -269,10 +269,10 @@ public class PercolatorSQTDataUploadService {
     }
 
     private int saveTopLevelAnalysis(int searchId, String remoteDirectory) throws UploadException {
-        MsSearchAnalysisDAO analysisDao = daoFactory.getSearchAnalysisDAO();
+        MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
         SearchAnalysisBean analysis = new SearchAnalysisBean();
         analysis.setSearchId(searchId);
-        analysis.setAnalysisProgram(SearchProgram.PERCOLATOR);
+        analysis.setAnalysisProgram(Program.PERCOLATOR);
         try {
             return analysisDao.save(analysis);
         }
@@ -283,7 +283,7 @@ public class PercolatorSQTDataUploadService {
         }
     }
     
-    private void uploadSqtFile(String filePath, int runSearchId, SearchProgram searchProgram) throws UploadException {
+    private void uploadSqtFile(String filePath, int runSearchId, Program searchProgram) throws UploadException {
         
         log.info("BEGIN PERCOLATOR SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_SEARCH_ID: "+runSearchId);
         
@@ -441,7 +441,7 @@ public class PercolatorSQTDataUploadService {
             }
         }
         // save the run search analysis and return the database id
-        MsRunSearchAnalysisDAO runSearchAnalysisDao = daoFactory.getRunSearchAnalysisDAO();
+        MsRunSearchAnalysisDAO runSearchAnalysisDao = daoFactory.getMsRunSearchAnalysisDAO();
         RunSearchAnalysisBean rsa = new RunSearchAnalysisBean();
         rsa.setAnalysisFileFormat(SearchFileFormat.SQT_PERC);
         rsa.setAnalysisId(analysisId);
@@ -527,7 +527,7 @@ public class PercolatorSQTDataUploadService {
     public static void deleteAnalysis(int analysisId) {
         if (analysisId == 0)
             return;
-        MsSearchAnalysisDAO analysisDao = daoFactory.getSearchAnalysisDAO();
+        MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
         analysisDao.delete(analysisId);
     }
     
@@ -543,7 +543,7 @@ public class PercolatorSQTDataUploadService {
         }
         String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
         PercolatorSQTDataUploadService service = new PercolatorSQTDataUploadService();
-        service.uploadPostSearchAnalysis(searchId, SearchProgram.SEQUEST,
+        service.uploadPostSearchAnalysis(searchId, Program.SEQUEST,
                 fileDirectory, runSearchIdMap.keySet(), runSearchIdMap, fileDirectory);
     }
 }

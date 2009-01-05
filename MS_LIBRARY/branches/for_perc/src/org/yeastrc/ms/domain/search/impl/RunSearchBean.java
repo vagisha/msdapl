@@ -10,7 +10,7 @@ import java.sql.Date;
 
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 public class RunSearchBean implements MsRunSearch {
 
@@ -66,8 +66,8 @@ public class RunSearchBean implements MsRunSearch {
     }
     
     @Override
-    public SearchProgram getSearchProgram() {
-        return SearchProgram.programForFileFormat(this.originalFileType);
+    public Program getSearchProgram() {
+        return Program.programForFileFormat(this.originalFileType);
     }
     
     public SearchFileFormat getSearchFileFormat() {

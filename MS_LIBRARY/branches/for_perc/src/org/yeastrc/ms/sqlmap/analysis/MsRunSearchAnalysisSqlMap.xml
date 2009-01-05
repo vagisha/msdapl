@@ -36,6 +36,13 @@
     	SELECT id FROM msRunSearchAnalysis WHERE searchAnalysisID = #analysisId#
     </select>
     
+    <select id="selectFileNameForRunSearchAnalysisId" resultClass="String" parameterClass="Integer">
+    	SELECT filename FROM msRunSearchAnalysis AS rsa, msRunSearch AS rs, msRun AS run
+    	WHERE rsa.runSearchID = rs.id
+    	AND rs.runID = run.id
+    	AND rsa.id=#id#
+    </select>
+    
     <insert id="insert" parameterMap="msRsAnalysisParam">
     	INSERT INTO msRunSearchAnalysis (
     	searchAnalysisID,

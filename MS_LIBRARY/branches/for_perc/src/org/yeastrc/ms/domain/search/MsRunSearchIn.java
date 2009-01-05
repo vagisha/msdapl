@@ -12,7 +12,7 @@ public interface MsRunSearchIn {
     /**
      * @return searchProgram
      */
-    public abstract SearchProgram getSearchProgram();
+    public abstract Program getSearchProgram();
     /**
      * @return the searchDate
      */

@@ -27,7 +27,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
@@ -373,7 +373,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(SearchFileFormat.SQT_PLUCID, runSearch.getSearchFileFormat());
         assertEquals("2008-01-29", runSearch.getSearchDate().toString());
         assertEquals(167, runSearch.getSearchDuration());
-        assertEquals(SearchProgram.PROLUCID, runSearch.getSearchProgram());
+        assertEquals(Program.PROLUCID, runSearch.getSearchProgram());
 
         // check headers
         checkRunSearchHeaders2(runSearch);
@@ -390,7 +390,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         ProlucidSearch search = psearchDao.loadSearch(searchId);
 //      assertEquals(experimentDate, search.getSearchDate());
         assertEquals("remoteDirectory", search.getServerDirectory());
-        assertEquals(SearchProgram.PROLUCID, search.getSearchProgram());
+        assertEquals(Program.PROLUCID, search.getSearchProgram());
         assertEquals("3.0", search.getSearchProgramVersion());
 
         // check the database

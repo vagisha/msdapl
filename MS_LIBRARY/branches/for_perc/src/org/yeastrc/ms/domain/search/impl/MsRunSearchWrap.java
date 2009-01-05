@@ -11,7 +11,7 @@ import java.sql.Date;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 /**
  * 
@@ -63,7 +63,7 @@ public class MsRunSearchWrap implements MsRunSearch {
     }
 
     @Override
-    public SearchProgram getSearchProgram() {
+    public Program getSearchProgram() {
         return runSearch.getSearchProgram();
     }
 }

@@ -18,7 +18,7 @@ import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
@@ -75,7 +75,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertNull(searchDao.loadSearch(24));
         
         assertEquals("remoteDirectory", search.getServerDirectory());
-        assertEquals(SearchProgram.SEQUEST, search.getSearchProgram());
+        assertEquals(Program.SEQUEST, search.getSearchProgram());
         assertEquals("3.0", search.getSearchProgramVersion());
 //        System.out.println(date.toString());
 //        System.out.println(search.getSearchDate().toString());
@@ -233,7 +233,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(searchId, runSearch.getSearchId());
         assertEquals(runSearchId, runSearch.getId());
         assertEquals(SearchFileFormat.SQT_SEQ, runSearch.getSearchFileFormat());
-        assertEquals(SearchProgram.SEQUEST, runSearch.getSearchProgram());
+        assertEquals(Program.SEQUEST, runSearch.getSearchProgram());
         // TODO check search date and search duration
         List<SQTHeaderItem> headerList = runSearch.getHeaders();
         assertEquals(23, headerList.size());

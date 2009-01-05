@@ -8,7 +8,7 @@ package org.yeastrc.ms.domain.analysis;
 
 import java.sql.Date;
 
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 /**
  * 
@@ -35,7 +35,7 @@ public interface MsSearchAnalysis {
     /**
      * @return the analysisProgramName
      */
-    public abstract SearchProgram getAnalysisProgram();
+    public abstract Program getAnalysisProgram();
 
     /**
      * @return the analysisProgramVersion

@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 
 public class SearchBean implements MsSearch {
@@ -26,7 +26,7 @@ public class SearchBean implements MsSearch {
     private Date searchDate;
     private String serverAddress;
     private String serverDirectory;
-    private SearchProgram analysisProgram;
+    private Program analysisProgram;
     private String analysisProgramVersion;
     
     private List<MsSearchDatabase> searchDatabases;
@@ -95,11 +95,11 @@ public class SearchBean implements MsSearch {
         this.serverDirectory = directory;
     }
 
-    public SearchProgram getSearchProgram() {
+    public Program getSearchProgram() {
         return analysisProgram;
     }
     
-    public void setSearchProgram(SearchProgram program) {
+    public void setSearchProgram(Program program) {
         this.analysisProgram = program;
     }
     

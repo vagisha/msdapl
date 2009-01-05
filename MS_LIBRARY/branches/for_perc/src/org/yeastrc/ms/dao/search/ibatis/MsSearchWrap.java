@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao.search.ibatis;
 import java.sql.Date;
 
 import org.yeastrc.ms.domain.search.MsSearchIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 /**
  * NOTE: This class is used internally by MsSearchDAOImpl.
@@ -32,7 +32,7 @@ public class MsSearchWrap {
         return search.getSearchDate();
     }
 
-    public SearchProgram getSearchProgram() {
+    public Program getSearchProgram() {
         return search.getSearchProgram();
     }
 

@@ -26,7 +26,7 @@ public interface MsSearchBase {
     /**
      * @return the analysisProgramName
      */
-    public abstract SearchProgram getSearchProgram();
+    public abstract Program getSearchProgram();
 
     /**
      * @return the analysisProgramVersion

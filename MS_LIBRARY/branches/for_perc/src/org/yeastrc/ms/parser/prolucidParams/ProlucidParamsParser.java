@@ -19,7 +19,7 @@ import org.yeastrc.ms.domain.general.impl.Enzyme;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.domain.search.impl.SearchDatabase;
@@ -76,8 +76,8 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return dynamicTerminalModifications;
     }
     
-    public SearchProgram getSearchProgram() {
-        return SearchProgram.PROLUCID;
+    public Program getSearchProgram() {
+        return Program.PROLUCID;
     }
     
     public List<ProlucidParamIn> getParamList() {

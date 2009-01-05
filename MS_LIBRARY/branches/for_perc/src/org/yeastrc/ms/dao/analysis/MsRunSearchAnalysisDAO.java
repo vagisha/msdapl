@@ -20,4 +20,11 @@ public interface MsRunSearchAnalysisDAO {
     public abstract MsRunSearchAnalysis load(int runSearchAnalysisId);
     
     public abstract List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId);
+    
+    /**
+     * Returns the base name of the original file for this analysis
+     * @param runSearchAnalysisId
+     * @return
+     */
+    public abstract String loadFilenameForRunSearchAnalysis(int runSearchAnalysisId);
 }

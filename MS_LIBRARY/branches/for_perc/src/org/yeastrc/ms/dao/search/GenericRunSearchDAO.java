@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao.search;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 /**
  * 
@@ -56,7 +56,7 @@ public interface GenericRunSearchDAO <O extends MsRunSearch> {
      * @param runSearchId
      * @return
      */
-    public abstract SearchProgram loadSearchProgramForRunSearch(int runSearchId);
+    public abstract Program loadSearchProgramForRunSearch(int runSearchId);
     
     
     /**

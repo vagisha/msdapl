@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultIn;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorSearchScan;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -30,18 +30,18 @@ import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 public class PercolatorSQTFileReader extends SQTFileReader {
 
     private float percolatorVersion;
-    private SearchProgram searchProgram;
+    private Program searchProgram;
 
     public PercolatorSQTFileReader() {
         super();
     }
 
-    public void open(String filePath, SearchProgram searchProgram) throws DataProviderException{
+    public void open(String filePath, Program searchProgram) throws DataProviderException{
         super.open(filePath);
         this.searchProgram = searchProgram;
     }
 
-    public void open(String fileName, Reader input, SearchProgram searchProgram) throws DataProviderException  {
+    public void open(String fileName, Reader input, Program searchProgram) throws DataProviderException  {
         super.open(fileName, input);
         this.searchProgram = searchProgram;
     }
@@ -251,7 +251,7 @@ public class PercolatorSQTFileReader extends SQTFileReader {
         String file = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/13NOV08-DIA-700-760-01.sqt";
         
         PercolatorSQTFileReader reader = new PercolatorSQTFileReader();
-        reader.open(file, SearchProgram.SEQUEST);
+        reader.open(file, Program.SEQUEST);
         SQTHeader header = reader.getSearchHeader();
         System.out.println(header.toString());
         while(reader.hasNextSearchScan()) {

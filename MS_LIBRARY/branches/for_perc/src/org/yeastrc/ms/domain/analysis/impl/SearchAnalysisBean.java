@@ -3,14 +3,14 @@ package org.yeastrc.ms.domain.analysis.impl;
 import java.sql.Date;
 
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 public class SearchAnalysisBean implements MsSearchAnalysis {
 
     private int id;
     private int searchId;
     private Date uploadDate;
-    private SearchProgram analysisProgram;
+    private Program analysisProgram;
     private String analysisProgramVersion;
     
     /**
@@ -34,11 +34,11 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
         this.searchId = searchId;
     }
     
-    public SearchProgram getAnalysisProgram() {
+    public Program getAnalysisProgram() {
         return analysisProgram;
     }
     
-    public void setAnalysisProgram(SearchProgram program) {
+    public void setAnalysisProgram(Program program) {
         this.analysisProgram = program;
     }
     

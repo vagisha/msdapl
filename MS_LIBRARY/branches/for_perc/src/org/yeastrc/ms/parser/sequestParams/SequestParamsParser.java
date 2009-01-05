@@ -22,7 +22,7 @@ import org.yeastrc.ms.domain.general.impl.Enzyme;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.domain.search.impl.SearchDatabase;
@@ -91,8 +91,8 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     // or ee-normalized sequest.  That information is available in the sqt files
     // This method returns sequest as the SearchProgram.
     @Override
-    public SearchProgram getSearchProgram() {
-        return SearchProgram.SEQUEST;
+    public Program getSearchProgram() {
+        return Program.SEQUEST;
     }
     
     public boolean reportEvalue() {

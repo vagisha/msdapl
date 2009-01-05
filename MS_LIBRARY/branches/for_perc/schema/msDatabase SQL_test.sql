@@ -1,8 +1,26 @@
-DROP DATABASE IF EXISTS msData_test2;
-CREATE DATABASE msData_test2;
-USE msData_test2;
+DROP DATABASE IF EXISTS msData_junit;
+CREATE DATABASE msData_junit;
+USE msData_junit;
+
+
+# EXPERIMENT
+
+CREATE TABLE msExperiment (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	serverAddress VARCHAR(500),
+	serverDirectory VARCHAR(500),
+	uploadDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	lastUpdate TIMESTAMP NOT NULL
+);
+
 
 # SPECTRA SIDE
+
+CREATE TABLE msExperimentRun (
+	experimentID INT UNSIGNED NOT NULL,
+	runID INT UNSIGNED NOT NULL
+);
+ALTER TABLE  msExperimentRun ADD PRIMARY KEY (runID, experimentID);
 
 CREATE TABLE msRun (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -15,7 +33,6 @@ CREATE TABLE msRun (
    instrumentVendor VARCHAR(255),
    instrumentType VARCHAR(255),
    instrumentSN VARCHAR(255),
-   dataType VARCHAR(255),
    acquisitionMethod VARCHAR(255),
    originalFileType VARCHAR(10),
    separateDigestion ENUM('T','F'),
@@ -27,7 +44,6 @@ ALTER TABLE msRun ADD INDEX(filename);
 CREATE TABLE msRunLocation (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    runID INT UNSIGNED NOT NULL,
-   serverAddress VARCHAR(500),
    serverDirectory VARCHAR(500),
    createDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -54,9 +70,9 @@ ALTER TABLE msScan ADD INDEX(startScanNumber);
 CREATE TABLE msScanData (
    scanID INT UNSIGNED NOT NULL PRIMARY KEY,
    data LONGBLOB NOT NULL
-)
-PARTITION BY KEY()
-PARTITIONS 100;
+);
+# PARTITION BY KEY()
+# PARTITIONS 100;
 ALTER TABLE msScanData ADD INDEX(scanID);
 
 CREATE TABLE MS2FileScanCharge (
@@ -115,14 +131,15 @@ ALTER TABLE msRunEnzyme ADD INDEX (enzymeID);
 
 CREATE TABLE msSearch (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   experimentID INT UNSIGNED NOT NULL,
    expDate DATE,
-   serverAddress VARCHAR(500),
    serverDirectory VARCHAR(500),
    analysisProgramName VARCHAR(255),
    analysisProgramVersion VARCHAR(20),
    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ALTER TABLE msSearch ADD INDEX(expDate);
+ALTER TABLE msSearch ADD INDEX(experimentID);
 
 
 CREATE TABLE SQTParams (
@@ -132,6 +149,15 @@ CREATE TABLE SQTParams (
    value TEXT
 );
 ALTER TABLE SQTParams ADD INDEX(searchID,param);
+
+CREATE TABLE ProLuCIDParams (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   searchID INT UNSIGNED NOT NULL,
+   elementName VARCHAR(255) NOT NULL,
+   value TEXT,
+   parentID INT UNSIGNED
+);
+ALTER TABLE ProLuCIDParams ADD INDEX(searchID,elementName);
 
 
 CREATE TABLE msRunSearch (
@@ -172,11 +198,13 @@ ALTER TABLE msRunSearchResult ADD INDEX(peptide);
 # DO I WANT ALL THESE INDICES?
 
 CREATE TABLE msProteinMatch (
-   resultID INT UNSIGNED NOT NULL,
-   proteinID INT UNSIGNED NOT NULL
+    resultID INT UNSIGNED NOT NULL,
+    accession VARCHAR(255) NOT NULL
 );
-ALTER TABLE msProteinMatch ADD PRIMARY KEY(resultID, proteinID);
-ALTER TABLE msProteinMatch ADD INDEX(proteinID);
+# PARTITION BY KEY(resultID)
+# PARTITIONS 100;
+ALTER TABLE msProteinMatch ADD PRIMARY KEY(resultID, accession);
+ALTER TABLE msProteinMatch ADD INDEX(accession);
 
 
 CREATE TABLE SQTSpectrumData (
@@ -206,8 +234,7 @@ CREATE TABLE msSequenceDatabaseDetail (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    serverAddress VARCHAR(100),
    serverPath VARCHAR(500),
-   sequenceLength INT UNSIGNED,
-   proteinCount INT UNSIGNED
+   sequenceDatabaseID INT UNSIGNED NOT NULL
 );
 
 CREATE TABLE msSearchDatabase (
@@ -275,7 +302,7 @@ CREATE TABLE SQTSearchResult (
    spRank INT UNSIGNED NOT NULL,
    deltaCN DECIMAL(10,5) NOT NULL,
    XCorr DECIMAL(10,5) NOT NULL,
-   sp DECIMAL(10,5) NOT NULL,
+   sp DECIMAL(10,5),
    calculatedMass DECIMAL(18,9),
    matchingIons INT UNSIGNED,
    predictedIons INT UNSIGNED,
@@ -287,8 +314,96 @@ ALTER TABLE SQTSearchResult ADD INDEX(deltaCN);
 ALTER TABLE SQTSearchResult ADD INDEX(XCorr);
 ALTER TABLE SQTSearchResult ADD INDEX(sp);
 
+CREATE TABLE ProLuCIDSearchResult (
+   resultID INT UNSIGNED NOT NULL PRIMARY KEY,
+   primaryScoreRank INT UNSIGNED NOT NULL,
+   secondaryScoreRank INT UNSIGNED NOT NULL,
+   deltaCN DECIMAL(10,5)  NOT NULL,
+   primaryScore DOUBLE  UNSIGNED NOT NULL,
+   secondaryScore DOUBLE  UNSIGNED NOT NULL,
+   calculatedMass DECIMAL(18,9),
+   matchingIons INT UNSIGNED,
+   predictedIons INT UNSIGNED
+);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(primaryScoreRank);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScoreRank);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(deltaCN);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(primaryScore);
+ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScore);
 
+
+#####################################################################
+# Percolator tables
+#####################################################################
+CREATE TABLE msSearchAnalysis (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		searchID INT UNSIGNED NOT NULL,
+	   	programName VARCHAR(255) NOT NULL,
+	   	programVersion VARCHAR(20),
+	   	uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE msSearchAnalysis ADD INDEX(searchID);
+
+CREATE TABLE msRunSearchAnalysis (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		searchAnalysisID INT UNSIGNED NOT NULL,
+		runSearchID INT UNSIGNED NOT NULL,
+	   	originalFileType VARCHAR(10) NOT NULL
+);
+ALTER TABLE msRunSearchAnalysis ADD INDEX(searchAnalysisID);
+ALTER TABLE msRunSearchAnalysis ADD INDEX(runSearchID);
+
+
+CREATE TABLE PercolatorParams (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		searchAnalysisID INT UNSIGNED NOT NULL,
+		param VARCHAR(255) NOT NULL,
+   		value TEXT
+);
+ALTER TABLE PercolatorParams ADD INDEX(searchAnalysisID, param);
+
+
+CREATE TABLE PercolatorResult (
+		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
+		runSearchAnalysisID INT UNSIGNED NOT NULL,
+		qvalue DOUBLE UNSIGNED NOT NULL,
+		pep DOUBLE UNSIGNED,
+		discriminantScore DOUBLE UNSIGNED
+);
+ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
+
+
+
+#######################################################################################
 # TRIGGERS TO ENSURE CASCADING DELETES
+#######################################################################################
+
+
+#######################################################################################
+# Percolator tables
+#######################################################################################
+DELIMITER |
+CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
+ FOR EACH ROW
+ BEGIN
+   	DELETE FROM PercolatorParams WHERE searchAnalysisID = OLD.id;
+	DELETE FROM msRunSearchAnalysis WHERE searchAnalysisID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msRunSearchAnalysis_bdelete BEFORE DELETE ON msRunSearchAnalysis
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM PercolatorResult WHERE runSearchAnalysisID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+#######################################################################################
+
+
 
 DELIMITER |
 CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
@@ -296,8 +411,10 @@ CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
  BEGIN
    DELETE FROM msProteinMatch WHERE resultID = OLD.id;
    DELETE FROM SQTSearchResult WHERE resultID = OLD.id;
+   DELETE FROM ProLuCIDSearchResult WHERE resultID = OLD.id;
    DELETE FROM msDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM msTerminalDynamicModResult WHERE resultID = OLD.id;
+   DELETE FROM PercolatorResult WHERE resultID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -336,6 +453,7 @@ CREATE TRIGGER msRunSearch_bdelete BEFORE DELETE ON msRunSearch
    DELETE FROM msRunSearchResult WHERE runSearchID = OLD.id;
    DELETE FROM SQTSpectrumData WHERE runSearchID = OLD.id;
    DELETE FROM SQTFileHeader WHERE runSearchID = OLD.id;
+   DELETE FROM msRunSearchAnalysis WHERE runSearchID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -381,6 +499,7 @@ CREATE TRIGGER msRun_bdelete BEFORE DELETE ON msRun
    DELETE FROM msRunEnzyme WHERE runID = OLD.id;
    DELETE FROM MS2FileHeader WHERE runID = OLD.id;
    DELETE FROM msRunLocation WHERE runID = OLD.id;
+   DELETE FROM msExperimentRun WHERE runID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -391,12 +510,24 @@ CREATE TRIGGER msSearch_bdelete BEFORE DELETE ON msSearch
  BEGIN
    DELETE FROM msSearchDatabase WHERE searchID = OLD.id;
    DELETE FROM SQTParams WHERE searchID = OLD.id;
+   DELETE FROM ProLuCIDParams WHERE searchID = OLD.id;
    DELETE FROM msSearchEnzyme WHERE searchID = OLD.id;
    DELETE FROM msRunSearch WHERE searchID = OLD.id;
    DELETE FROM msSearchStaticMod WHERE searchID = OLD.id;
    DELETE FROM msSearchTerminalStaticMod WHERE searchID = OLD.id;
    DELETE FROM msSearchDynamicMod WHERE searchID = OLD.id;
    DELETE FROM msSearchTerminalDynamicMod WHERE searchID = OLD.id;
+   DELETE FROM msSearchAnalysis WHERE searchID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msExperiment_bdelete BEFORE DELETE ON msExperiment
+ FOR EACH ROW
+ BEGIN
+   DELETE FROM msSearch WHERE experimentID = OLD.id;
+   DELETE FROM msExperimentRun WHERE experimentID = OLD.id;
  END;
 |
 DELIMITER ;

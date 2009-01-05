@@ -18,7 +18,7 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 
 public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
 
-    private static final MsRunSearchAnalysisDAO rsaDao = DAOFactory.instance().getRunSearchAnalysisDAO();
+    private static final MsRunSearchAnalysisDAO rsaDao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
     private static final PercolatorResultDAO percResDao = DAOFactory.instance().getPercolatorResultDAO();
     
     protected void setUp() throws Exception {
@@ -279,14 +279,14 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
         }
         percResDao.saveAllPercolatorResultData(dataList);
         
-        List<PercolatorResult> resultList = percResDao.loadResultsWithScoreThresholdForRunSearch(12, 
+        List<PercolatorResult> resultList = percResDao.loadResultsWithScoreThresholdForRunSearchAnalysis(21, 
                     0.05, -1.0, -1.0);
         assertEquals(3, resultList.size());
         
-        resultList = percResDao.loadResultsWithScoreThresholdForRunSearch(12, 0.05, 0.25, -1.0);
+        resultList = percResDao.loadResultsWithScoreThresholdForRunSearchAnalysis(12, 0.05, 0.25, -1.0);
         assertEquals(2, resultList.size());
         
-        resultList = percResDao.loadResultsWithScoreThresholdForRunSearch(12, 0.05, -1.0, 0.5);
+        resultList = percResDao.loadResultsWithScoreThresholdForRunSearchAnalysis(12, 0.05, -1.0, 0.5);
         assertEquals(0, resultList.size());
     }
 }

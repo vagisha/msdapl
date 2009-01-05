@@ -9,12 +9,12 @@ package org.yeastrc.ms.domain.search;
 
 public enum SearchFileFormat {
 
-    SQT_SEQ("SQT: "+SearchProgram.SEQUEST.displayName()), 
-    SQT_NSEQ("SQT: "+SearchProgram.EE_NORM_SEQUEST.displayName()), 
-    SQT_PLUCID("SQT: "+SearchProgram.PROLUCID.displayName()), 
-    SQT_PPROBE("SQT: "+SearchProgram.PEPPROBE), 
-    SQT_PERC("SQT: "+SearchProgram.PERCOLATOR.displayName()), 
-    SQT_BIBLIO("SQT: "+SearchProgram.BIBLIOSPEC.displayName()),
+    SQT_SEQ("SQT: "+Program.SEQUEST.displayName()), 
+    SQT_NSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
+    SQT_PLUCID("SQT: "+Program.PROLUCID.displayName()), 
+    SQT_PPROBE("SQT: "+Program.PEPPROBE), 
+    SQT_PERC("SQT: "+Program.PERCOLATOR.displayName()), 
+    SQT_BIBLIO("SQT: "+Program.BIBLIOSPEC.displayName()),
     PEPXML("pepxml"), 
     UNKNOWN("Unknown");
 

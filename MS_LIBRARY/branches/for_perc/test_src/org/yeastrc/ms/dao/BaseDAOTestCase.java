@@ -63,7 +63,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
@@ -309,7 +309,7 @@ public class BaseDAOTestCase extends TestCase {
     protected MsSearchIn makeSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods, boolean addEnzymes) {
 
         MsSearchTest search = new MsSearchTest();
-        search.setSearchProgram(SearchProgram.SEQUEST);
+        search.setSearchProgram(Program.SEQUEST);
         search.setAnalysisProgramVersion("1.0");
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
 

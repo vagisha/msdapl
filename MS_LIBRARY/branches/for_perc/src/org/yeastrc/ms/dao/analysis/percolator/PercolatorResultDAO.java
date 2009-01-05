@@ -16,7 +16,7 @@ public interface PercolatorResultDAO {
     
     public abstract List<Integer> loadResultIdsWithPepThreshold(int analysisId, double pep);
     
-    public abstract List<PercolatorResult> loadResultsWithScoreThresholdForRunSearch(int runSearchId, 
+    public abstract List<PercolatorResult> loadResultsWithScoreThresholdForRunSearchAnalysis(int runSearchAnalysisId, 
                                 double qvalue, double pep, double discriminantScore);
     
     public abstract List<Integer> loadResultIdsForRunSearch(int runSearchId);

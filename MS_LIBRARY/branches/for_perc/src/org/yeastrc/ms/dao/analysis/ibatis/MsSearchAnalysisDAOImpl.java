@@ -7,7 +7,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -36,7 +36,7 @@ public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAn
     }
 
     @Override
-    public int updateAnalysisProgram(int analysisId, SearchProgram program) {
+    public int updateAnalysisProgram(int analysisId, Program program) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("analysisProgram", program);
         map.put("analysisId", analysisId);

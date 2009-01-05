@@ -20,7 +20,7 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
@@ -72,8 +72,8 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
         return db;
     }
 
-    SearchProgram getSearchProgram() {
-        return SearchProgram.PROLUCID;
+    Program getSearchProgram() {
+        return Program.PROLUCID;
     }
     
     @Override
@@ -248,7 +248,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
             @Override
             public List<MsTerminalModificationIn> getStaticTerminalMods() {return parser.getStaticTerminalMods();}
             @Override
-            public SearchProgram getSearchProgram() {return parser.getSearchProgram();}
+            public Program getSearchProgram() {return parser.getSearchProgram();}
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in search.xml
             public Date getSearchDate() {return searchDate;}

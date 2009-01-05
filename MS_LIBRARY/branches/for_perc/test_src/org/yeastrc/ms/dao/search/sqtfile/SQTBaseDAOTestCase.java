@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
@@ -40,7 +40,7 @@ public class SQTBaseDAOTestCase extends BaseDAOTestCase {
 
     protected SequestSearchIn makeSequestSearch(boolean addSeqDb, boolean addStaticMods, boolean addDynaMods) {
         SequestSearchTest search = new SequestSearchTest();
-        search.setSearchProgram(SearchProgram.SEQUEST);
+        search.setSearchProgram(Program.SEQUEST);
         search.setAnalysisProgramVersion("1.0");
         search.setSearchDate(new Date(getTime("01/29/2008, 03:34 AM", true)));
         

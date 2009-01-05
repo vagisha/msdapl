@@ -26,7 +26,7 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
@@ -80,8 +80,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         return db;
     }
 
-    SearchProgram getSearchProgram() {
-        return SearchProgram.SEQUEST;
+    Program getSearchProgram() {
+        return Program.SEQUEST;
     }
     
     @Override
@@ -208,8 +208,12 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
                 // save all the search results for this scan
                 for (SequestSearchResultIn result: scan.getScanResults()) {
-                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
-                    numResults++;
+                    // upload results with XCorr rank = 1
+                    // TODO This is temporary for MacCoss Data.  We need only the top hit for a scan
+                    if(result.getSequestResultData().getxCorrRank() == 1) {
+                        uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                        numResults++;
+                    }
                 }
             }
         }
@@ -251,7 +255,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             @Override
             public List<MsTerminalModificationIn> getStaticTerminalMods() {return parser.getStaticTerminalMods();}
             @Override
-            public SearchProgram getSearchProgram() {return parser.getSearchProgram();}
+            public Program getSearchProgram() {return parser.getSearchProgram();}
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in sequest.params
             public Date getSearchDate() {return searchDate;}

@@ -22,7 +22,7 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
 import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseWrap;
 import org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap;
@@ -108,7 +108,7 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
     }
     
     @Override
-    public int updateSearchProgram(int searchId, SearchProgram program) {
+    public int updateSearchProgram(int searchId, Program program) {
         Map<String, Object> map = new HashMap<String, Object>(2);
         map.put("searchId", searchId);
         map.put("analysisProgram", program);
@@ -133,8 +133,8 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
         public Object getResult(ResultGetter getter) throws SQLException {
             String program = getter.getString();
             if (getter.wasNull())
-                return SearchProgram.UNKNOWN;
-            return SearchProgram.instance(program);
+                return Program.UNKNOWN;
+            return Program.instance(program);
         }
 
         public void setParameter(ParameterSetter setter, Object parameter)
@@ -142,11 +142,11 @@ public class MsSearchDAOImpl extends BaseSqlMapDAO implements MsSearchDAO {
             if (parameter == null)
                 setter.setNull(java.sql.Types.VARCHAR);
             else
-                setter.setString(((SearchProgram)parameter).name());
+                setter.setString(((Program)parameter).name());
         }
 
         public Object valueOf(String s) {
-            return SearchProgram.instance(s);
+            return Program.instance(s);
         }
     }
 }

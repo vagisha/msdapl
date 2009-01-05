@@ -11,7 +11,7 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 
 public class MsSearchDAOImplTest extends BaseDAOTestCase {
 
@@ -54,9 +54,9 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         checkSearch(search_2, searchDao.loadSearch(searchId_2));
         
         
-        searchDao.updateSearchProgram(searchId_2, SearchProgram.PROLUCID);
+        searchDao.updateSearchProgram(searchId_2, Program.PROLUCID);
         MsSearch fromDb = searchDao.loadSearch(searchId_2);
-        assertEquals(SearchProgram.PROLUCID, fromDb.getSearchProgram());
+        assertEquals(Program.PROLUCID, fromDb.getSearchProgram());
         
         // delete the searches
         searchDao.deleteSearch(searchId_1);
@@ -87,7 +87,7 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
         private List<MsSearchDatabaseIn> searchDatabases = new ArrayList<MsSearchDatabaseIn>();
         private List<MsEnzymeIn> enzymes = new ArrayList<MsEnzymeIn>();
         private String searchEngineVersion;
-        private SearchProgram searchProgram;
+        private Program searchProgram;
         private Date searchDate;
 
 
@@ -151,12 +151,12 @@ public class MsSearchDAOImplTest extends BaseDAOTestCase {
             this.staticTerminalModifications = mods;
         }
         
-        public void setSearchProgram(SearchProgram searchProgram) {
+        public void setSearchProgram(Program searchProgram) {
             this.searchProgram = searchProgram;
         }
         
         @Override
-        public SearchProgram getSearchProgram() {
+        public Program getSearchProgram() {
             return searchProgram;
         }
 

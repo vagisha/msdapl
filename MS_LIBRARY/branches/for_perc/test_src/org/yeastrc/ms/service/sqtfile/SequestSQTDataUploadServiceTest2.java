@@ -26,7 +26,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
@@ -332,7 +332,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         assertEquals(SearchFileFormat.SQT_SEQ, runSearch.getSearchFileFormat());
         assertEquals("2008-01-29", runSearch.getSearchDate().toString());
         assertEquals(167, runSearch.getSearchDuration());
-        assertEquals(SearchProgram.SEQUEST, runSearch.getSearchProgram());
+        assertEquals(Program.SEQUEST, runSearch.getSearchProgram());
 
         // check headers
         checkRunSearchHeaders2(runSearch);
@@ -349,7 +349,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         SequestSearch search = ssearchDao.loadSearch(searchId);
 //      assertEquals(experimentDate, search.getSearchDate());
         assertEquals("remoteDirectory", search.getServerDirectory());
-        assertEquals(SearchProgram.SEQUEST, search.getSearchProgram());
+        assertEquals(Program.SEQUEST, search.getSearchProgram());
         assertEquals("3.0", search.getSearchProgramVersion());
 
         // check the database

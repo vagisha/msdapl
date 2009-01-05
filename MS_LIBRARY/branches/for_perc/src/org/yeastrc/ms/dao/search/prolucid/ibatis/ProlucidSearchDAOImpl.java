@@ -13,7 +13,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearch;
@@ -101,7 +101,7 @@ public class ProlucidSearchDAOImpl extends BaseSqlMapDAO implements ProlucidSear
     }
     
     @Override
-    public int updateSearchProgram(int searchId, SearchProgram program) {
+    public int updateSearchProgram(int searchId, Program program) {
         return searchDao.updateSearchProgram(searchId, program);
     }
     

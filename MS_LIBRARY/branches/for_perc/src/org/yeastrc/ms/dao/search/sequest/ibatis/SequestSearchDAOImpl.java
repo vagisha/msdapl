@@ -13,7 +13,7 @@ import java.util.Map;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
@@ -91,7 +91,7 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
     }
     
     @Override
-    public int updateSearchProgram(int searchId, SearchProgram program) {
+    public int updateSearchProgram(int searchId, Program program) {
         return searchDao.updateSearchProgram(searchId, program);
     }
     

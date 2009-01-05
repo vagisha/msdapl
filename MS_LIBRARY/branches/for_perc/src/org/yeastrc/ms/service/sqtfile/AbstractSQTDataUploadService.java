@@ -30,7 +30,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
 import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
 import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
@@ -53,7 +53,7 @@ public abstract class AbstractSQTDataUploadService {
 
     private DynamicModLookupUtil dynaModLookup;
 
-    static final int BUF_SIZE = 1000;
+    static final int BUF_SIZE = 500;
     
     private static final double HYDROGEN = 1.00794;
 
@@ -70,7 +70,7 @@ public abstract class AbstractSQTDataUploadService {
     
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
     private String programVersion = "uninit";
-    private SearchProgram programFromSqt = null;
+    private Program programFromSqt = null;
 
     int lastUploadedRunSearchId;
     int searchId;
@@ -154,7 +154,7 @@ public abstract class AbstractSQTDataUploadService {
         }
     }
 
-    static void updateProgram(int searchId, SearchProgram program) {
+    static void updateProgram(int searchId, Program program) {
         try {
             MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
             searchDao.updateSearchProgram(searchId, program);
@@ -172,7 +172,7 @@ public abstract class AbstractSQTDataUploadService {
     // NOTE: this method should be called AFTER uploadSearchParameters.
     abstract MsSearchDatabaseIn getSearchDatabase();
     
-    abstract SearchProgram getSearchProgram();
+    abstract Program getSearchProgram();
     
     abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
     
@@ -261,7 +261,7 @@ public abstract class AbstractSQTDataUploadService {
         
         // if search program from sqt files is not the same as the defalt program returned by the uploader, update it in the msSearch table
         // For now we do this only for SEQUEST and EE-normalized SEQUEST
-        if (getSearchProgram() == SearchProgram.SEQUEST && this.programFromSqt == SearchProgram.EE_NORM_SEQUEST) {
+        if (getSearchProgram() == Program.SEQUEST && this.programFromSqt == Program.EE_NORM_SEQUEST) {
             updateProgram(searchId, programFromSqt);
         }
         
@@ -311,7 +311,7 @@ public abstract class AbstractSQTDataUploadService {
                 this.programFromSqt = header.getSearchProgram();
             
             // make sure program is same in all sqt headers
-            if (programFromSqt == null || programFromSqt == SearchProgram.UNKNOWN || programFromSqt != header.getSearchProgram()) {
+            if (programFromSqt == null || programFromSqt == Program.UNKNOWN || programFromSqt != header.getSearchProgram()) {
                 throw new DataProviderException("Value of SQTGenerator is missing or not the same in all SQT files.");
             }
             

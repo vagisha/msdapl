@@ -9,7 +9,7 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SQTSearchResult;
 import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidResultPeptideBuilder;
@@ -33,11 +33,11 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
     private double discriminantScore = -1.0;
     private double qvalue = -1.0;
     
-    private SearchProgram searchProgram;
+    private Program searchProgram;
     
     
     public PercolatorAnalysisResult(List<MsResidueModificationIn> searchDynaResidueMods, List<MsTerminalModificationIn> searchDynaTermMods,
-            SearchProgram searchProgram) {
+            Program searchProgram) {
         super();
         if (searchDynaResidueMods != null)
             this.searchDynaResidueMods = searchDynaResidueMods;
@@ -129,10 +129,10 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
         if(searchProgram == null)
             throw new SQTParseException("Cannot parse peptide string without know the name of the search program that created it", SQTParseException.FATAL);
         
-        if(searchProgram == SearchProgram.SEQUEST || searchProgram == SearchProgram.EE_NORM_SEQUEST)
+        if(searchProgram == Program.SEQUEST || searchProgram == Program.EE_NORM_SEQUEST)
             resultPeptide = SequestResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods);
         
-        else if (searchProgram == SearchProgram.PROLUCID)
+        else if (searchProgram == Program.PROLUCID)
             resultPeptide = ProlucidResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods, searchDynaTermMods);
 
         return resultPeptide;

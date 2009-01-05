@@ -88,7 +88,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public List<PercolatorResult> loadResultsWithScoreThresholdForRunSearch(
+    public List<PercolatorResult> loadResultsWithScoreThresholdForRunSearchAnalysis(
             int runSearchId, double qvalue, double pep, double discriminantScore) {
         
         Connection conn = null;
@@ -103,7 +103,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             buf.append("WHERE ");
             buf.append("res.id = pres.resultID");
             buf.append(" AND ");
-            buf.append("res.runSearchID = ?");
+            buf.append("pres.runSearchAnalysisID = ?");
             if(qvalue != -1.0) {
                 buf.append(" AND qValue <= "+qvalue);
             }
@@ -113,7 +113,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             if(discriminantScore != -1.0) {
                 buf.append(" AND discriminantScore <= "+discriminantScore);
             }
-            buf.append(" GROUP BY res.scanID, res.charge ORDER BY res.id");
+//            buf.append(" GROUP BY res.scanID, res.charge ORDER BY res.id");
+            buf.append(" ORDER BY res.id");
             
             String sql = buf.toString();
             
