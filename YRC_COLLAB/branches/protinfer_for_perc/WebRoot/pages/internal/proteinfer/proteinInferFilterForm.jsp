@@ -3,9 +3,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<script src="/yrc/js/tooltip.js"></script>
-
-  <html:form action="/viewProteinInferenceResult" method="post" styleId="form1" >
+  <html:form action="/updateProteinInferenceResult" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
   

@@ -2,57 +2,52 @@ package org.yeastrc.www.proteinfer.idpicker;
 
 import org.yeastrc.ms.domain.search.MsSearchResult;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch;
+import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 
-public class WIdPickerSpectrumMatch <T extends MsSearchResult> {
+public class WIdPickerSpectrumMatch {
     
     private int scanNumber;
-    private T spectrumMatch;
-    private IdPickerSpectrumMatch idpPsm;
+    private MsSearchResult spectrumMatch;
+    private ProteinferSpectrumMatch idpPsm;
     
-    public WIdPickerSpectrumMatch() {}
+    public WIdPickerSpectrumMatch(ProteinferSpectrumMatch idpPsm, MsSearchResult psm) {
+        this.idpPsm = idpPsm;
+        this.spectrumMatch = psm;
+    }
 
     public int getScanNumber() {
         return scanNumber;
-    }
-
-    public T getSpectrumMatch() {
-        return spectrumMatch;
-    }
-
-    public double getFdr() {
-        return idpPsm.getFdrRounded();
-    }
-
-    public int getScanId() {
-        return spectrumMatch.getScanId();
-    }
-    
-    public int getSearchResultId() {
-        return idpPsm.getMsRunSearchResultId();
-    }
-    
-    public IdPickerSpectrumMatch getIdPickerSpectrumMatch() {
-        return idpPsm;
-    }
-
-    public void setIdPickerSpectrumMatch(IdPickerSpectrumMatch idpPsm) {
-        this.idpPsm = idpPsm;
     }
 
     public void setScanNumber(int scanNumber) {
         this.scanNumber = scanNumber;
     }
 
-    public void setSpectrumMatch(T spectrumMatch) {
-        this.spectrumMatch = spectrumMatch;
+    public int getScanId() {
+        return spectrumMatch.getScanId();
     }
     
-    public String getSequence() {
-        return spectrumMatch.getResultPeptide().getPeptideSequence();
+    public int getRunSearchResultId() {
+        return idpPsm.getMsRunSearchResultId();
     }
     
+    public ProteinferSpectrumMatch getProteinferSpectrumMatch() {
+        return idpPsm;
+    }
+
+    public MsSearchResult getSpectrumMatch() {
+        return spectrumMatch;
+    }
+
     public String getModifiedSequence() {
-        return spectrumMatch.getResultPeptide().getModifiedPeptideSequence();
+        return removeTerminalResidues(spectrumMatch.getResultPeptide().getModifiedPeptideSequence());
+    }
+    
+    private static String removeTerminalResidues(String peptide) {
+        int f = peptide.indexOf('.');
+        int l = peptide.lastIndexOf('.');
+        f = f == -1 ? 0 : f+1;
+        l = l == -1 ? peptide.length() : l;
+        return peptide.substring(f, l);
     }
 }

@@ -6,18 +6,18 @@
  */
 package org.yeastrc.www.proteinfer.idpicker;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
 
 public class WIdPickerProtein {
     
-    private IdPickerProtein idpProtein;
+    private IdPickerProteinBase idpProtein;
     private String accession = "";
     private String description = "";
     
-    public WIdPickerProtein(IdPickerProtein prot) {
+    public WIdPickerProtein(IdPickerProteinBase prot) {
         this.idpProtein = prot;
     }
-    public IdPickerProtein getProtein() {
+    public IdPickerProteinBase getProtein() {
         return idpProtein;
     }
     public String getAccession() {

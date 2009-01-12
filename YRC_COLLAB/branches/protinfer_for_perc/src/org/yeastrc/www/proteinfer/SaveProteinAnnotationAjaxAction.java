@@ -17,9 +17,9 @@ import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
+import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 
 /**
  * 
@@ -57,8 +57,8 @@ public class SaveProteinAnnotationAjaxAction extends Action {
 
         
         // get the protein 
-        IdPickerProteinDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
-        IdPickerProtein protein = protDao.getProtein(pinferProtId);
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+        ProteinferProtein protein = protDao.loadProtein(pinferProtId);
         if(protein == null) {
             response.setContentType("text/html");
             response.getWriter().write("ERROR: No protein found with protein ID: "+pinferProtId);
@@ -66,6 +66,7 @@ public class SaveProteinAnnotationAjaxAction extends Action {
         }
         
         String comments = request.getParameter("comments");
+        comments = comments.trim();
         String validationStatus = request.getParameter("validation");
         ProteinUserValidation validation = ProteinUserValidation.getStatusForChar(validationStatus.charAt(0));
         

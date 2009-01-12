@@ -1092,6 +1092,34 @@
 	</action>
 	
 	<action 
+		path="/updateProteinInferenceResult"
+		type="org.yeastrc.www.proteinfer.UpdateProteinInferenceResultAjaxAction"
+		name="proteinInferFilterForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/proteinlist.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/pageProteinInferenceResult"
+		type="org.yeastrc.www.proteinfer.PageProteinferResultsAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinListTable.jsp" redirect="false" />
+		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/sortProteinInferenceResult"
+		type="org.yeastrc.www.proteinfer.SortProteinferResultsAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinListTable.jsp" redirect="false" />
+		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
+	</action>
+	
+	
+	<action 
 		path="/getProteinPeptides"
 		type="org.yeastrc.www.proteinfer.ProteinPeptidesAjaxAction"
 	>

@@ -1,13 +1,13 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInputSummary;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 
 public class WIdPickerInputSummary {
 
-    private IdPickerInputSummary idpInput;
+    private IdPickerInput idpInput;
     private String fileName;
     
-    public WIdPickerInputSummary(IdPickerInputSummary idpInput) {
+    public WIdPickerInputSummary(IdPickerInput idpInput) {
         this.idpInput = idpInput;
     }
     
@@ -19,7 +19,7 @@ public class WIdPickerInputSummary {
         this.fileName = fileName;
     }
     
-    public IdPickerInputSummary getInput() {
+    public IdPickerInput getInput() {
         return idpInput;
     }
 }

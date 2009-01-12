@@ -6,26 +6,26 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideIonWSpectra;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonWAllSpectra;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
+import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 public class ProteinDetailsAjaxAction extends Action {
 
+    private static final Logger log = Logger.getLogger(ProteinDetailsAjaxAction.class);
+    
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -61,16 +61,29 @@ public class ProteinDetailsAjaxAction extends Action {
             return null;
         }
 
+        // Get the peptide definition from the session, if present
+        PeptideDefinition peptideDef = null;
+        Integer pinferId_session = (Integer)request.getSession().getAttribute("pinferId");
+        if(pinferId_session != null && pinferId_session == pinferId) {
+            ProteinFilterCriteria filterCriteria = (ProteinFilterCriteria) request.getAttribute("pinferFilterCriteria");
+            if(filterCriteria != null) {
+                peptideDef = filterCriteria.getPeptideDefinition();
+            }
+        }
+        if(peptideDef == null) peptideDef = new PeptideDefinition();
+        
         System.out.println("Got request for protien inference protein ID: "+pinferProtId+" of protein inference run: "+pinferId);
 
-
+        long s = System.currentTimeMillis();
         
         // get the protein 
-        WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId);
+        WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
         request.setAttribute("protein", iProt);
         
         // get other proteins in this group
-        List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, iProt.getProtein().getGroupId());
+        List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, 
+                                                    iProt.getProtein().getGroupId(), 
+                                                    peptideDef);
         if(groupProteins.size() == 1)
             groupProteins.clear();
         else {
@@ -86,34 +99,20 @@ public class ProteinDetailsAjaxAction extends Action {
         request.setAttribute("groupProteins", groupProteins);
         
         // We will return all the filtered search hits for each peptide ion
-        // First we need to find out the search program used (Sequest, ProLuCID etc. ) so 
-        // that we can query the appropriate tables. 
-        ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
-        ProteinferRun run = factory.getProteinferRunDao().getProteinferRun(pinferId);
-        int runSearchId = run.getInputSummaryList().get(0).getRunSearchId();
-        DAOFactory msDaoFactory = DAOFactory.instance();
-        SearchProgram searchProgram = msDaoFactory.getMsRunSearchDAO().loadSearchProgramForRunSearch(runSearchId);
-        
-        
-        if(searchProgram == SearchProgram.SEQUEST || searchProgram == SearchProgram.EE_NORM_SEQUEST) {
-            // load sequest results
-            request.setAttribute("searchProgram", "sequest");
-            List<WIdPickerPeptideIonWSpectra<SequestSearchResult>> psmList = 
-                    IdPickerResultsLoader.getPeptideIonsWithSequestResults(iProt.getProtein().getId());
-            request.setAttribute("ionList", psmList);
-        }
-        
-        else if (searchProgram == SearchProgram.PROLUCID) {
-            // load ProLuCID results
-            request.setAttribute("searchProgram", "prolucid");
-            List<WIdPickerPeptideIonWSpectra<ProlucidSearchResult>> psmList = 
-                    IdPickerResultsLoader.getPeptideIonsWithProlucidResults(iProt.getProtein().getId());
-            request.setAttribute("ionList", psmList);
-        }
+        List<WIdPickerIonWAllSpectra> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
+        request.setAttribute("ionList", ionsWAllSpectra);
         
         
         request.setAttribute("pinferProtId", pinferProtId);
         request.setAttribute("pinferId", pinferId);
+        
+        
+        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
+        request.setAttribute("protInferProgram", run.getProgram().name());
+        request.setAttribute("inputGenerator", run.getInputGenerator().name());
+        
+        long e = System.currentTimeMillis();
+        log.info("Total time (ProteinDetailsAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         return mapping.findForward("Success");
     }

@@ -3,21 +3,24 @@ package org.yeastrc.www.proteinfer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MsSearchSummary {
+public class ProteinInferInputSummary {
 
     private int searchId;
     private String searchProgram;
     private String searchProgramVersion;
+    
+    private int searchAnalysisId;
     private String analysisProgram;
     private String analysisProgramVersion;
-    private String searchDatabase;
-    private List<RunSearchFile> files;
     
-    public MsSearchSummary() {
-        files = new ArrayList<RunSearchFile>();
+    private String searchDatabase;
+    private List<ProteinInferIputFile> files;
+    
+    public ProteinInferInputSummary() {
+        files = new ArrayList<ProteinInferIputFile>();
     }
     
-    public List<RunSearchFile> getFiles() {
+    public List<ProteinInferIputFile> getInputFiles() {
         return files;
     }
     
@@ -29,18 +32,18 @@ public class MsSearchSummary {
         this.searchId = searchId;
     }
 
-    public void setFiles(List<RunSearchFile> files) {
+    public void setInputFiles(List<ProteinInferIputFile> files) {
         this.files = files;
     }
     
     // to be used by struts indexed properties
-    public RunSearchFile getRunSearch(int index) {
+    public ProteinInferIputFile getInputFile(int index) {
         while(index >= files.size())
-            files.add(new RunSearchFile());
+            files.add(new ProteinInferIputFile());
         return files.get(index);
     }
     
-    public void addRunSearch(RunSearchFile runSearch) {
+    public void addRunSearch(ProteinInferIputFile runSearch) {
         files.add(runSearch);
     }
     
@@ -60,6 +63,15 @@ public class MsSearchSummary {
         this.searchProgramVersion = searchProgramVersion;
     }
 
+    
+    public int getSearchAnalysisId() {
+        return searchAnalysisId;
+    }
+
+    public void setSearchAnalysisId(int searchAnalysisId) {
+        this.searchAnalysisId = searchAnalysisId;
+    }
+    
     public String getAnalysisProgram() {
         return analysisProgram;
     }
@@ -85,20 +97,20 @@ public class MsSearchSummary {
     }
     
     
-    public static final class RunSearchFile {
-        private int runSearchId;
+    public static final class ProteinInferIputFile {
+        private int inputId; // could be runSearchID or runSearchAnalysisID
         private String runName;
         private boolean selected = false;
         
-        public RunSearchFile() {}
+        public ProteinInferIputFile() {}
         
-        public RunSearchFile(int runSearchId, String runName) {
-            this.runSearchId = runSearchId;
+        public ProteinInferIputFile(int inputId, String runName) {
+            this.inputId = inputId;
             this.runName = runName;
         }
         
-        public void setRunSearchId(int runSearchId) {
-            this.runSearchId = runSearchId;
+        public void setInputId(int inputId) {
+            this.inputId = inputId;
         }
 
         public void setRunName(String runName) {
@@ -113,8 +125,8 @@ public class MsSearchSummary {
             this.selected = selected;
         }
 
-        public int getRunSearchId() {
-            return runSearchId;
+        public int getInputId() {
+            return inputId;
         }
 
         public String getRunName() {

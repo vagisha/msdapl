@@ -9,9 +9,14 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideIon;
+import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerIon;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+
+import edu.uwpr.protinfer.ProteinInferenceProgram;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
 public class ProteinPeptidesAjaxAction extends Action {
 
@@ -56,7 +61,7 @@ public class ProteinPeptidesAjaxAction extends Action {
         try {proteinId = Integer.parseInt(request.getParameter("proteinId"));}
         catch(NumberFormatException e) {}
 
-        System.out.println("Got request for protein group Id: "+proteinId+" of protein inference run: "+pinferId+
+        System.out.println("Got request for protein group Id: "+proteinGroupId+" of protein inference run: "+pinferId+
                 "(protein Id: "+proteinId+")");
 
         request.setAttribute("pinferId", pinferId);
@@ -65,8 +70,12 @@ public class ProteinPeptidesAjaxAction extends Action {
             request.setAttribute("proteinId", proteinId); // this is needed so that the peptides table has the right html id.
         }
         
-        List<WIdPickerPeptideIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
-        request.setAttribute("proteinPeptides", ionList);
+        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
+        request.setAttribute("protInferProgram", run.getProgram().name());
+        request.setAttribute("inputGenerator", run.getInputGenerator().name());
+        
+        List<WIdPickerIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
+        request.setAttribute("proteinPeptideIons", ionList);
         
         return mapping.findForward("Success");
     }

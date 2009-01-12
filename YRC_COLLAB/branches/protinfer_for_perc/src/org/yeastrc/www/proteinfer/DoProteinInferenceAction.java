@@ -43,7 +43,7 @@ public class DoProteinInferenceAction extends Action {
         }
 
         ProteinInferenceForm prinferForm = (ProteinInferenceForm) form;
-        MsSearchSummary searchSummary = prinferForm.getSearchSummary();
+        ProteinInferInputSummary searchSummary = prinferForm.getInputSummary();
         ProgramParameters params = prinferForm.getProgramParams();
         
         // TODO validate the parameters (should be done in form?)

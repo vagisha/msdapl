@@ -136,7 +136,7 @@ public class ViewProjectAction extends Action {
 			    
 			    yatesRunToMsSearchMap.put(runId, searchId);
 			    if(searchId > 0) {
-			        List<ProteinferJob> proteinferRunIds = ProteinferRunSearcher.getProteinferRunIdsForMsSearch(searchId);
+			        List<ProteinferJob> proteinferRunIds = ProteinferRunSearcher.getProteinferJobsForMsSearch(searchId);
 			        yatesRunToProteinferRunMap.put(searchId, proteinferRunIds);
 			    }
 			}

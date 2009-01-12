@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
@@ -24,16 +25,22 @@ public class ProteinferRunSearcher {
     
     private ProteinferRunSearcher() {}
     
-    public static List<ProteinferJob> getProteinferRunIdsForMsSearch(int msSearchId) {
+    public static List<ProteinferJob> getProteinferJobsForMsSearch(int msSearchId) {
+        
         List<Integer> msRunSearchIds = getRunSearchIdsForMsSearch(msSearchId);
-        List<Integer> pinferRunIds = getProteinferRunIdsForRunSearches(msRunSearchIds);
+        List<Integer> pinferRunIds = runDao.loadProteinferIdsForInputIds(msRunSearchIds);
         if(pinferRunIds == null || pinferRunIds.size() == 0)
             return new ArrayList<ProteinferJob>(0);
         
         List<ProteinferJob> jobs = new ArrayList<ProteinferJob>(pinferRunIds.size());
         for(int pid: pinferRunIds) {
-            ProteinferRun run = runDao.getProteinferRun(pid);
+            ProteinferRun run = runDao.loadProteinferRun(pid);
             if(run != null) {
+                
+                // make sure the input generator for this protein inference program was
+                // a search program
+                if(!Program.isSearchProgram(run.getInputGenerator()))
+                    continue;
                 ProteinferJob job = null;
                 try {
                     job = getJobForPinferRunId(run.getId());
@@ -102,10 +109,6 @@ public class ProteinferRunSearcher {
             }           
         }
         return null;
-    }
-
-    private static List<Integer> getProteinferRunIdsForRunSearches(List<Integer> msRunSearchIds) {
-        return runDao.getProteinferIdsForRunSearches(msRunSearchIds);
     }
 
     private static List<Integer> getRunSearchIdsForMsSearch(int msSearchId) {

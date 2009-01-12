@@ -34,7 +34,7 @@
  			<tr>
  				<td>
  					<span style="text-decoration: underline; cursor: pointer;"
- 								onclick="showSpectrumMatches(<bean:write name="input" property="input.runSearchId" />, '<bean:write name="input" property="fileName" />')">
+ 								onclick="showSpectrumMatches(<bean:write name="input" property="input.inputId" />, '<bean:write name="input" property="fileName" />')">
  					<bean:write name="input" property="fileName" />
  					</span>
  				</td>
@@ -53,5 +53,5 @@
 		</table>
 	<br><br>
 	<logic:iterate name="inputSummary" id="input">
-		<div id="psm_<bean:write name="input" property="input.runSearchId" />" style="display: none;" class="input_psm"></div>
+		<div id="psm_<bean:write name="input" property="input.inputId" />" style="display: none;" class="input_psm"></div>
 	</logic:iterate>

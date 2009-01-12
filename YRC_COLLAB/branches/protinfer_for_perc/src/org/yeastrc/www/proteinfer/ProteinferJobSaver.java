@@ -7,9 +7,13 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
-import org.yeastrc.www.proteinfer.MsSearchSummary.RunSearchFile;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
-
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 
 import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
@@ -17,6 +21,7 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerFilterDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
+import edu.uwpr.protinfer.database.dto.ProteinferRun;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
 
 public class ProteinferJobSaver {
@@ -37,7 +42,7 @@ public class ProteinferJobSaver {
         return saver;
     }
     
-    public void saveJobToDatabase(int submitterId, MsSearchSummary searchSummary, ProgramParameters params) throws Exception {
+    public void saveJobToDatabase(int submitterId, ProteinInferInputSummary inputSummary, ProgramParameters params) throws Exception {
         
         // create an entry in the main protein inference table and get an id 
         // for this protein inference run
@@ -46,18 +51,33 @@ public class ProteinferJobSaver {
             log.error("Could not find protein inference program with name: "+params.getProgramName());
             throw new Exception("Could not find protein inference program with name: "+params.getProgramName());
         }
-        int pinferId = pinferDao.saveNewProteinferRun(program);
+        ProteinferRun pirun = new ProteinferRun();
+        pirun.setProgram(program);
+        
+        int searchAnalysisId = inputSummary.getSearchAnalysisId();
+        if(searchAnalysisId == 0) {
+            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+            MsSearch search = searchDao.loadSearch(inputSummary.getSearchId());
+            pirun.setInputGenerator(search.getSearchProgram());
+        }
+        else {
+            MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+            MsSearchAnalysis analysis = analysisDao.load(searchAnalysisId);
+            pirun.setInputGenerator(analysis.getAnalysisProgram());
+        }
+        int pinferId = pinferDao.save(pirun);
+        
         if(pinferId <= 0) {
             log.error("Error saving a new entry for Protein Inference");
             throw new Exception("Error saving a new entry for Protein Inference");
         }
         
         // save the input file information
-        for(RunSearchFile runSearch: searchSummary.getFiles()) {
+        for(ProteinInferIputFile runSearch: inputSummary.getInputFiles()) {
             if(!runSearch.getIsSelected()) continue; // if this file was not selected don't save it
             ProteinferInput input = new ProteinferInput();
             input.setProteinferId(pinferId);
-            input.setRunSearchId(runSearch.getRunSearchId());
+            input.setInputId(runSearch.getInputId());
             pinferInputDao.saveProteinferInput(input);
         }
         

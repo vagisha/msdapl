@@ -1,11 +1,7 @@
 package org.yeastrc.www.proteinfer;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,12 +16,16 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 public class ViewProteinInferenceResultAction extends Action {
 
@@ -57,8 +57,6 @@ public class ViewProteinInferenceResultAction extends Action {
             System.out.println("Creating a new filter form!!"); // this should never happen??
         }
         request.setAttribute("proteinInferFilterForm", filterForm);
-        System.out.println("Sequence: "+filterForm.isPeptideDef_useSequence());
-        System.out.println("Group Proteins: "+filterForm.isJoinGroupProteins());
         
         // look for the protein inference run id in the form first
         int pinferId = filterForm.getPinferId();
@@ -74,6 +72,9 @@ public class ViewProteinInferenceResultAction extends Action {
         // return an error.
         if(pinferId <= 0) {
             log.error("Invalid protein inference run id: "+pinferId);
+            ActionErrors errors = new ActionErrors();
+            errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.pinferId"));
+            saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
         
@@ -82,17 +83,54 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("pinferId", pinferId);
         filterForm.setPinferId(pinferId);
         
-        // get the IdPicker Protein groups for the given run
-        PeptideDefinition peptideDef = new PeptideDefinition(filterForm.isPeptideDef_useMods(), filterForm.isPeptideDef_useCharge());
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinferProteinGroups(pinferId, peptideDef);
         
-        // filter based on the given thresholds
-        filterProteins(proteinGroups, filterForm);
+        // Get the filtering criteria
+        PeptideDefinition peptideDef = new PeptideDefinition(filterForm.isPeptideDef_useMods(), filterForm.isPeptideDef_useCharge());
+        ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+        filterCriteria.setCoverage(filterForm.getMinCoverage());
+        filterCriteria.setNumPeptides(filterForm.getMinPeptides());
+        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
+        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
+        filterCriteria.setPeptideDefinition(peptideDef);
+        filterCriteria.setSortBy(SORT_BY.GROUP_ID);
+        filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
+        
+        // put the list of filtered and sorted protein IDs in the session, along with the filter criteria
+        request.getSession().setAttribute("proteinIds", proteinIds);
+        request.getSession().setAttribute("pinferId", pinferId);
+        request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);
+        
+        // page number is now 1
+        int pageNum = 1;
+        
+        
+        // limit to the proteins that will be displayed on this page
+        List<Integer> proteinIdsPage = ProteinferResultsPager.instance().page(proteinIds, pageNum, true);
+        
+        // get the protein groups 
+        List<WIdPickerProteinGroup> proteinGroups = null;
+        if(filterCriteria.isGroupProteins())
+            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
+        else
+            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, false, peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
         
+        // get the list of page numbers to display
+        int pageCount = ProteinferResultsPager.instance().getPageCount(proteinIds.size());
+        List<Integer> pages = ProteinferResultsPager.instance().getPageList(proteinIds.size(), pageNum);
+        
+        request.setAttribute("currentPage", pageNum);
+        request.setAttribute("onFirst", pageNum == 1);
+        request.setAttribute("onLast", (pageNum == pages.get(pages.size() - 1)));
+        request.setAttribute("pages", pages);
+        request.setAttribute("pageCount", pageCount);
+        
+        
+        
         // Get some summary
-        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().getProteinferRun(pinferId);
+        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
         request.setAttribute("unfilteredProteinCount", run.getNumUnfilteredProteins());
         request.setAttribute("filteredProteinGrpCount", proteinGroups.size());
         int parsimGrpCount = 0;
@@ -113,89 +151,34 @@ public class ViewProteinInferenceResultAction extends Action {
         
 
         // Cluster IDs in this set
-        Set<Integer> clusterIds = new HashSet<Integer>();
-        for(WIdPickerProteinGroup protGrp: proteinGroups) {
-            clusterIds.add(protGrp.getClusterId());
-        }
-        List<Integer> clusterIdList = new ArrayList<Integer>(clusterIds);
+        List<Integer> clusterIdList = IdPickerResultsLoader.getClusterIds(pinferId);
         Collections.sort(clusterIdList);
         request.setAttribute("clusterIds", clusterIdList);
         
         
         // Run summary
-        IdPickerRun idpickerRun = ProteinferDAOFactory.instance().getIdPickerRunDao().getProteinferRun(pinferId);
+        IdPickerRun idpickerRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
         request.setAttribute("idpickerRun", idpickerRun);
         
         // Input summary
         List<WIdPickerInputSummary> inputSummary = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
         request.setAttribute("inputSummary", inputSummary);
-        int totalDecoyHits = 0;
-        int totalTargetHits = 0;
-        int filteredTargetHits = 0;
-        for(WIdPickerInputSummary input: inputSummary) {
-            totalDecoyHits += input.getInput().getNumDecoyHits();
-            totalTargetHits += input.getInput().getNumTargetHits();
-            filteredTargetHits += input.getInput().getNumFilteredTargetHits();
-        }
-        request.setAttribute("totalDecoyHits", totalDecoyHits);
-        request.setAttribute("totalTargetHits", totalTargetHits);
-        request.setAttribute("filteredTargetHits", filteredTargetHits);
+        
+        // Results summary
+        WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);
+        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
+        request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
+        request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
+        request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
+        request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
         
         
         
         long e = System.currentTimeMillis();
-        log.info("Total time (ViewProteinInferenceResultAction): "+getTime(s, e));
+        log.info("Total time (ViewProteinInferenceResultAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         // Go!
         return mapping.findForward("Success");
     }
-    
-    private void filterProteins(List<WIdPickerProteinGroup> proteinGroups, ProteinInferFilterForm filterForm) {
-        
-        
-        // If we filtering on coverage we will have to look at individual proteins in the group
-        if(filterForm.getMinCoverage() > 0.0) {
-            double minCoverage = filterForm.getMinCoverage();
-            for(WIdPickerProteinGroup group: proteinGroups) {
-                
-                Iterator<WIdPickerProtein> protIter = group.getProteins().iterator();
-                while(protIter.hasNext()) {
-                    WIdPickerProtein prot = protIter.next();
-                    if(prot.getProtein().getCoverage() < minCoverage)
-                        protIter.remove();
-                }
-             }
-            
-            // if there are any protein groups with no proteins remove them
-            Iterator<WIdPickerProteinGroup> grpIter = proteinGroups.iterator();
-            while(grpIter.hasNext()) {
-                WIdPickerProteinGroup grp = grpIter.next();
-                if(grp.getProteinCount() == 0)
-                    grpIter.remove();
-            }
-        }
-        
-        // rest of the filters can operate at the protein group level
-        Iterator<WIdPickerProteinGroup> grpIter = proteinGroups.iterator();
-        int minSpetrumMatches = filterForm.getMinSpectrumMatches();
-        int minPeptides = filterForm.getMinPeptides();
-        int minUniqPeptides = filterForm.getMinUniquePeptides();
-        
-        while(grpIter.hasNext()) {
-            WIdPickerProteinGroup grp = grpIter.next();
-            
-            if(grp.getMatchingPeptideCount() < minPeptides)
-                grpIter.remove();
-            else if(grp.getUniqMatchingPeptideCount() < minUniqPeptides)
-                grpIter.remove();
-            else if(grp.getSpectrumCount() < minSpetrumMatches)
-                grpIter.remove();
-        }
-    }
 
-    private static float getTime(long start, long end) {
-        long time = end - start;
-        float seconds = (float)time / (1000.0f);
-        return seconds;
-    }
 }

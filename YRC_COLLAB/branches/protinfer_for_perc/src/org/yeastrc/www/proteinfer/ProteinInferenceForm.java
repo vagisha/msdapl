@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.www.proteinfer.MsSearchSummary.RunSearchFile;
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 
 /**
@@ -21,10 +21,10 @@ public class ProteinInferenceForm extends ActionForm {
 
     private int projectId;
     private ProgramParameters programParams;
-    private MsSearchSummary searchFiles;
+    private ProteinInferInputSummary inputSummary;
     
     public ProteinInferenceForm () {
-        searchFiles = new MsSearchSummary();
+        inputSummary = new ProteinInferInputSummary();
         programParams = new ProgramParameters();
     }
     /**
@@ -44,16 +44,16 @@ public class ProteinInferenceForm extends ActionForm {
         return errors;
     }
     
-    public void setSearchSummary(MsSearchSummary searchFiles) {
-        this.searchFiles = searchFiles;
+    public void setInputSummary(ProteinInferInputSummary inputSummary) {
+        this.inputSummary = inputSummary;
     }
 
-    public MsSearchSummary getSearchSummary() {
-        return searchFiles;
+    public ProteinInferInputSummary getInputSummary() {
+        return inputSummary;
     }
     
-    public RunSearchFile getRunSearch(int index) {
-        return searchFiles.getRunSearch(index);
+    public ProteinInferIputFile getInputFile(int index) {
+        return inputSummary.getInputFile(index);
     }
     
     public ProgramParameters getProgramParams() {

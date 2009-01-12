@@ -31,7 +31,7 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.util.PeakConverterString;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -186,13 +186,13 @@ public class ViewSpectrumAction extends Action {
         // Need these values from the search parameters 
         MassType fragMassType = null;
         MassType parentMassType = null;
-        if (search.getSearchProgram() == SearchProgram.SEQUEST || 
-            search.getSearchProgram() == SearchProgram.EE_NORM_SEQUEST) {
+        if (search.getSearchProgram() == Program.SEQUEST || 
+            search.getSearchProgram() == Program.EE_NORM_SEQUEST) {
             SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();
             fragMassType = seqSearchDao.getFragmentMassType(searchId);
             parentMassType = seqSearchDao.getParentMassType(searchId);
         }
-        else if (search.getSearchProgram() == SearchProgram.PROLUCID) {
+        else if (search.getSearchProgram() == Program.PROLUCID) {
             ProlucidSearchDAO psearchDao = DAOFactory.instance().getProlucidSearchDAO();
             fragMassType = psearchDao.getFragmentMassType(searchId);
             parentMassType = psearchDao.getParentMassType(searchId);

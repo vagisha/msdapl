@@ -15,15 +15,16 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
+import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 
 public class ProteinSequenceAjaxAction extends Action {
 
@@ -40,10 +41,6 @@ public class ProteinSequenceAjaxAction extends Action {
             response.getWriter().write("You are not logged in!");
             response.setStatus(HttpServletResponse.SC_SEE_OTHER); // Status code (303) indicating that the response to the request can be found under a different URI.
             return null;
-//            ActionErrors errors = new ActionErrors();
-//            errors.add("username", new ActionMessage("error.login.notloggedin"));
-//            saveErrors( request, errors );
-//            return mapping.findForward("authenticate");
         }
 
         int pinferProteinId = 0;
@@ -56,11 +53,11 @@ public class ProteinSequenceAjaxAction extends Action {
             return null;
         }
 
-        IdPickerProteinDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
-        IdPickerProtein protein = protDao.getProtein(pinferProteinId);
-        List<IdPickerPeptide> peptides = protein.getPeptides();
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+        ProteinferProtein protein = protDao.loadProtein(pinferProteinId);
+        List<ProteinferPeptide> peptides = protein.getPeptides();
         Set<String> sequences = new HashSet<String>(peptides.size());
-        for(IdPickerPeptide peptide: peptides) {
+        for(ProteinferPeptide peptide: peptides) {
             sequences.add(peptide.getSequence());
         }
         
@@ -75,23 +72,24 @@ public class ProteinSequenceAjaxAction extends Action {
 
     private String getHtmlForProtein(int nrseqid, List<String> peptides) {
         
-        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-        NRProtein protein = null;
-        try {
-            protein = (NRProtein)(nrpf.getProtein(nrseqid));
-        }
-        catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        NRProtein protein = null;
+//        try {
+//            protein = (NRProtein)(nrpf.getProtein(nrseqid));
+//        }
+//        catch (IllegalArgumentException e) {
+//            e.printStackTrace();
+//        }
+//        catch (SQLException e) {
+//            e.printStackTrace();
+//        }        NRProteinFactory nrpf = NRProteinFactory.getInstance();
 
-        if(protein == null) {
-            return "<b>Could not find protein with ID: "+nrseqid+"</b>";
-        }
+//        if(protein == null) {
+//            return "<b>Could not find protein with ID: "+nrseqid+"</b>";
+//        }
 
-        String parentSequence = protein.getPeptide().getSequenceString();
+//        String parentSequence = protein.getPeptide().getSequenceString();
+        
+        String parentSequence = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqid);
 
         char[] reschars = parentSequence.toCharArray();
         String[] residues = new String[reschars.length];        // the array of strings, which are the residues of the matched protein

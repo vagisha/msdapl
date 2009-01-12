@@ -3,6 +3,7 @@ package org.yeastrc.www.proteinfer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -11,11 +12,13 @@ import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 
 public class DeleteProteinAnnotationAjaxAction extends Action {
 
+    private static final Logger log = Logger.getLogger(DeleteProteinAnnotationAjaxAction.class);
+    
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -36,19 +39,19 @@ public class DeleteProteinAnnotationAjaxAction extends Action {
         try {pinferProtId = Integer.parseInt(request.getParameter("pinferProtId"));}
         catch(NumberFormatException e) {}
 
-        if(pinferProtId == 0) {
+        if(pinferProtId <= 0) {
             response.setContentType("text/html");
             response.getWriter().write("ERROR: Invalid protein inference protein ID: "+pinferProtId);
             return null;
         }
 
-        System.out.println("Got request for protien inference protein ID: "+pinferProtId);
+        System.out.println("Got request for deleting annotation for protien inference protein ID: "+pinferProtId);
 
 
         
         // get the protein 
-        IdPickerProteinDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
-        IdPickerProtein protein = protDao.getProtein(pinferProtId);
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+        ProteinferProtein protein = protDao.loadProtein(pinferProtId);
         if(protein == null) {
             response.setContentType("text/html");
             response.getWriter().write("ERROR: No protein found with protein ID: "+pinferProtId);
@@ -56,11 +59,13 @@ public class DeleteProteinAnnotationAjaxAction extends Action {
         }
         
         try {
-            protDao.delete(pinferProtId);
+            protDao.updateUserAnnotation(pinferProtId, null);
+            protDao.updateUserValidation(pinferProtId, null);
         }
         catch(RuntimeException e) {
+            log.error("Error deleting annotation for protein ID: "+pinferProtId, e);
             response.setContentType("text/html");
-            response.getWriter().write("ERROR: Exception deleting protein with protein ID: "+pinferProtId);
+            response.getWriter().write("ERROR: Exception deleting annotation for protein with protein ID: "+pinferProtId);
             return null; 
         }
         

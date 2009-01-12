@@ -22,8 +22,8 @@ import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
-import org.yeastrc.ms.domain.search.SearchProgram;
-import org.yeastrc.www.proteinfer.MsSearchSummary.RunSearchFile;
+import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -82,8 +82,8 @@ public class NewProteinInferenceAction extends Action {
         request.setAttribute("proteinInferenceForm", newForm);
         
         newForm.setProjectId(projectId);
-        MsSearchSummary searchSummary = getSearchSummary(searchId);
-        newForm.setSearchSummary(searchSummary);
+        ProteinInferInputSummary searchSummary = getSearchSummary(searchId);
+        newForm.setInputSummary(searchSummary);
         
         // we will be using IDPicker -- set the IDPicker parameters
         ProgramParameters params = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
@@ -97,8 +97,8 @@ public class NewProteinInferenceAction extends Action {
     }
     
     private void setProgramDetails(ProgramParameters params, String searchProgram) {
-        if(searchProgram.equals(SearchProgram.SEQUEST.displayName()) || 
-           searchProgram.equals(SearchProgram.EE_NORM_SEQUEST.displayName())) {
+        if(searchProgram.equals(Program.SEQUEST.displayName()) || 
+           searchProgram.equals(Program.EE_NORM_SEQUEST.displayName())) {
             for(Param p: params.getParamList()) {
                 if(p.getName().equalsIgnoreCase("maxAbsFDR")) {
                     p.setNotes("For Score: XCorr");
@@ -111,7 +111,7 @@ public class NewProteinInferenceAction extends Action {
                 }
             }
         }
-        else if(searchProgram.equals(SearchProgram.PROLUCID.displayName())) {
+        else if(searchProgram.equals(Program.PROLUCID.displayName())) {
             for(Param p: params.getParamList()) {
                 if(p.getName().equalsIgnoreCase("maxAbsFDR")) {
                     p.setNotes("For Score: Primary Score"); // TODO what was the primary score used 
@@ -127,10 +127,10 @@ public class NewProteinInferenceAction extends Action {
         }
     }
 
-    private MsSearchSummary getSearchSummary(int searchId) {
+    private ProteinInferInputSummary getSearchSummary(int searchId) {
         DAOFactory daoFactory = DAOFactory.instance();
         
-        MsSearchSummary searchSummary = new MsSearchSummary();
+        ProteinInferInputSummary searchSummary = new ProteinInferInputSummary();
         searchSummary.setSearchId(searchId);
         
         // get the name of the search program
@@ -155,7 +155,7 @@ public class NewProteinInferenceAction extends Action {
         
         for (int id: runSearchIds) {
             String filename = runSearchDao.loadFilenameForRunSearch(id);
-            RunSearchFile rs = new RunSearchFile(id, filename);
+            ProteinInferIputFile rs = new ProteinInferIputFile(id, filename);
             rs.setIsSelected(true);
             searchSummary.addRunSearch(rs);
         }
