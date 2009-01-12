@@ -42,6 +42,11 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
         return pep;
     }
     
+    @Override
+    public double getPosteriorErrorProbabilityRounded() {
+        return Math.round(pep * 1000.0) / 1000.0;
+    }
+
     public void setPosteriorErrorProbability(double pep) {
         this.pep = pep;
     }
@@ -51,7 +56,13 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
         return qvalue;
     }
     
+    @Override
+    public double getQvalueRounded() {
+        return Math.round(qvalue * 1000.0) / 1000.0;
+    }
+    
     public void setQvalue(double qvalue) {
         this.qvalue = qvalue;
     }
+
 }

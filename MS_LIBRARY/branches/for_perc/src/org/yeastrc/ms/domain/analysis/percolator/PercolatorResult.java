@@ -21,11 +21,15 @@ public interface PercolatorResult extends MsSearchResult {
      */
     public abstract double getQvalue();
     
+    public abstract double getQvalueRounded();
+    
     /**
      * @return the posterior error probability or -1.0 if there was no posterior probability 
      * for this result
      */
     public abstract double getPosteriorErrorProbability();
+    
+    public abstract double getPosteriorErrorProbabilityRounded();
     
     /**
      * @return the percolator discriminant score or -1.0 if there was no discriminant score. 
