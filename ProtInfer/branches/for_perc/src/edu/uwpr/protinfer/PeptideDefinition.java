@@ -25,5 +25,11 @@ public class PeptideDefinition {
         this.useCharge = useCharge;
     }
     
-    
+    public boolean equals(Object o) {
+        if(!(o instanceof PeptideDefinition))
+            return false;
+        
+        PeptideDefinition that = (PeptideDefinition) o;
+        return (this.useCharge == that.useCharge && this.useMods == that.useMods);
+    }
 }

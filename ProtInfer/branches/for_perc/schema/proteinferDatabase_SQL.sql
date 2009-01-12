@@ -58,8 +58,8 @@ CREATE TABLE msProteinInferIon(
 	sequence VARCHAR(255) NOT NULL
 );
 ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID);
-ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID, charge);
-ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID, modificationStateID);
+ALTER TABLE  msProteinInferIon ADD INDEX (charge);
+ALTER TABLE  msProteinInferIon ADD INDEX (modificationStateID);
 
 
 

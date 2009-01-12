@@ -21,7 +21,7 @@ public interface GenericProteinferProteinDAO  <P extends GenericProteinferProtei
 
     public abstract List<P> loadProteins(int proteinferId);
 
-    public abstract int getFilteredProteinCount(int proteinferId);
+    public abstract int getProteinCount(int proteinferId);
 
     public abstract void delete(int pinferProteinId);
 

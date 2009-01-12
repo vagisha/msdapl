@@ -30,22 +30,23 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
     }
     
     public void saveProteinferProteinPeptideMatch(int pinferProteinId, int pinferPeptideId) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
         map.put("pinferProteinId", pinferProteinId);
         map.put("pinferPeptideId", pinferPeptideId);
         super.save(sqlMapNameSpace+".insertPeptideProteinMatch", map);
     }
     
     public void updateUserAnnotation(int pinferProteinId, String annotation) {
-        Map<String, Object> map = new HashMap<String, Object>(2);
+        Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("annotation", annotation);
         map.put("pinferProteinId", pinferProteinId);
         super.update(sqlMapNameSpace+".updateUserAnnotation", map);
     }
     
     public void updateUserValidation(int pinferProteinId, ProteinUserValidation validation) {
-        Map<String, Object> map = new HashMap<String, Object>(2);
-        map.put("userValidation", String.valueOf(validation.getStatusChar()));
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        String validationStr = validation == null ? null : String.valueOf(validation.getStatusChar());
+        map.put("userValidation", validationStr);
         map.put("pinferProteinId", pinferProteinId);
         super.update(sqlMapNameSpace+".updateUserValidation", map);
     }
@@ -62,7 +63,7 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
         return queryForList(sqlMapNameSpace+".selectProteinsForProteinferRun", proteinferId);
     }
     
-    public int getFilteredProteinCount(int proteinferId) {
+    public int getProteinCount(int proteinferId) {
        return (Integer) queryForObject(sqlMapNameSpace+".selectProteinCountForProteinferRun", proteinferId); 
     }
     

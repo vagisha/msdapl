@@ -38,7 +38,7 @@ public class ProteinferProteinDAOTest extends TestCase {
     
 
     public final void testGetFilteredProteinCount() {
-        assertEquals(3, protDao.getFilteredProteinCount(456));
+        assertEquals(3, protDao.getProteinCount(456));
     }
     
     public final void testGetProteinferProtein() {

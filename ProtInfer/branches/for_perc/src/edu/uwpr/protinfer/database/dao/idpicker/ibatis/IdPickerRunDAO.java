@@ -6,7 +6,6 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.GenericProteinferRunDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
