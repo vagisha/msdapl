@@ -17,7 +17,8 @@ DROP TABLE IF EXISTS msProteinInferInput;
 CREATE TABLE msProteinInferInput (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     piRunID INT UNSIGNED NOT NULL,
-    inputID INT UNSIGNED NOT NULL
+    inputID INT UNSIGNED NOT NULL,
+    inputType ENUM('S','A')
 );
 ALTER TABLE msProteinInferInput ADD INDEX (piRunID);
 ALTER TABLE msProteinInferInput ADD INDEX (inputID);

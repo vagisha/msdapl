@@ -1,7 +1,9 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -44,7 +46,13 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
             ProteinInferrerMaximal inferrer = new ProteinInferrerMaximal();
             List<InferredProtein<S>> allProteins = inferrer.inferProteins(psms);
 
-
+//            Set<Integer> protIds = new HashSet<Integer>();
+//            for(InferredProtein<S> prot: allProteins) {
+//                if(protIds.contains(prot.getProteinId()))
+//                    System.out.println("Duplicate found!");
+//                else
+//                    protIds.add(prot.getProteinId());
+//            }
             // build a graph
             GraphBuilder graphBuilder = new GraphBuilder();
             BipartiteGraph<ProteinVertex, PeptideVertex> graph = graphBuilder.buildGraph(allProteins);
