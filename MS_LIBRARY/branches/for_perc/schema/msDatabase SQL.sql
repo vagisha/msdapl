@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS msData_maccoss;
-CREATE DATABASE msData_maccoss;
-USE msData_maccoss;
+DROP DATABASE IF EXISTS msData;
+CREATE DATABASE msData;
+USE msData;
 
 
 # EXPERIMENT
@@ -333,7 +333,7 @@ ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScore);
 
 
 #####################################################################
-# Percolator tables
+# Search Analysis & Percolator tables
 #####################################################################
 CREATE TABLE msSearchAnalysis (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -360,7 +360,7 @@ CREATE TABLE PercolatorParams (
 		param VARCHAR(255) NOT NULL,
    		value TEXT
 );
-ALTER TABLE PercolatorParams ADD INDEX(searchAnalysisID, param);
+ALTER TABLE PercolatorParams ADD INDEX(searchAnalysisID);
 
 
 CREATE TABLE PercolatorResult (
@@ -368,9 +368,143 @@ CREATE TABLE PercolatorResult (
 		runSearchAnalysisID INT UNSIGNED NOT NULL,
 		qvalue DOUBLE UNSIGNED NOT NULL,
 		pep DOUBLE UNSIGNED,
-		discriminantScore DOUBLE UNSIGNED
+		discriminantScore DOUBLE,
+		predictedRetentionTime DECIMAL(10,5)
 );
 ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
+ALTER TABLE PercolatorResult ADD INDEX(qvalue);
+ALTER TABLE PercolatorResult ADD INDEX(pep);
+ALTER TABLE PercolatorResult ADD INDEX(discriminantScore);
+
+
+#######################################################################################
+# Protein Inference tables
+#######################################################################################
+
+CREATE TABLE msProteinInferRun (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	program VARCHAR(255) NOT NULL,
+	inputGenerator VARCHAR(255) NOT NULL,
+	dateRun DATETIME,
+	comments TEXT(10)
+);
+
+CREATE TABLE msProteinInferInput (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    piRunID INT UNSIGNED NOT NULL,
+    inputID INT UNSIGNED NOT NULL,
+    inputType ENUM('S','A')
+);
+ALTER TABLE msProteinInferInput ADD INDEX (piRunID);
+ALTER TABLE msProteinInferInput ADD INDEX (inputID);
+
+
+CREATE TABLE msProteinInferProtein (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	nrseqProteinID INT UNSIGNED NOT NULL,
+	piRunID INT UNSIGNED NOT NULL,
+    coverage DOUBLE UNSIGNED,
+    userValidation CHAR(1),
+    userAnnotation TEXT(10)
+);
+ALTER TABLE  msProteinInferProtein ADD INDEX (piRunID);
+ALTER TABLE  msProteinInferProtein ADD INDEX (nrseqProteinID);
+
+
+CREATE TABLE msProteinInferPeptide (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piRunID INT UNSIGNED NOT NULL,
+	sequence VARCHAR(255) NOT NULL,
+	uniqueToProtein TINYINT NOT NULL DEFAULT 0
+);
+ALTER TABLE  msProteinInferPeptide ADD INDEX (piRunID);
+
+
+CREATE TABLE msProteinInferIon(
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piPeptideID INT UNSIGNED NOT NULL,
+	charge INT UNSIGNED NOT NULL,
+	modificationStateID INT UNSIGNED NOT NULL,
+	sequence VARCHAR(255) NOT NULL
+);
+ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID);
+ALTER TABLE  msProteinInferIon ADD INDEX (charge);
+ALTER TABLE  msProteinInferIon ADD INDEX (modificationStateID);
+
+
+CREATE TABLE msProteinInferProteinPeptideMatch (
+    piProteinID INT UNSIGNED NOT NULL,
+    piPeptideID INT UNSIGNED NOT NULL
+);
+ALTER TABLE msProteinInferProteinPeptideMatch ADD PRIMARY KEY (piProteinID, piPeptideID);
+
+
+CREATE TABLE msProteinInferSpectrumMatch (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piIonID INT UNSIGNED NOT NULL,
+    runSearchResultID INT UNSIGNED NOT NULL,
+    rank INT UNSIGNED
+);
+ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (msRunSearchResultID);
+ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piIonID);
+
+
+#####################################################################
+# IDPicker Tables
+#####################################################################
+CREATE TABLE IDPickerRunSummary (
+	piRunID INT UNSIGNED NOT NULL PRIMARY KEY,
+	numUnfilteredProteins INT UNSIGNED,
+	numUnfilteredPeptides INT UNSIGNED
+);
+
+
+CREATE TABLE IDPickerInputSummary (
+	piInputID INT UNSIGNED NOT NULL PRIMARY KEY,
+	numTargetHits INT UNSIGNED,
+    numDecoyHits INT UNSIGNED,
+    numFilteredTargetHits INT UNSIGNED
+);
+
+
+CREATE TABLE IDPickerFilter (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    piRunID INT UNSIGNED NOT NULL,
+    filterName VARCHAR(255) NOT NULL,
+   	filterValue VARCHAR(255)
+);
+ALTER TABLE  IDPickerFilter ADD INDEX (piRunID);
+
+
+CREATE TABLE IDPickerProtein (
+	piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
+	clusterID INT UNSIGNED NOT NULL,
+    groupID INT UNSIGNED NOT NULL,
+    isParsimonious TINYINT NOT NULL DEFAULT 0
+);
+ALTER TABLE IDPickerProtein ADD INDEX(clusterID);
+ALTER TABLE IDPickerProtein ADD INDEX(groupID);
+
+
+CREATE TABLE IDPickerPeptide (
+	piPeptideID INT UNSIGNED NOT NULL PRIMARY KEY,
+	groupID INT UNSIGNED NOT NULL
+);
+ALTER TABLE IDPickerPeptide ADD INDEX(groupID);
+
+
+CREATE TABLE IDPickerGroupAssociation (
+	piRunID INT UNSIGNED NOT NULL,
+	proteinGroupID INT UNSIGNED NOT NULL,
+	peptideGroupID INT UNSIGNED NOT NULL
+);
+ALTER TABLE IDPickerGroupAssociation ADD PRIMARY KEY(piRunID, proteinGroupID, peptideGroupID);
+
+
+CREATE TABLE IDPickerSpectrumMatch (
+	piSpectrumMatchID INT UNSIGNED NOT NULL PRIMARY KEY,
+	fdr DOUBLE UNSIGNED
+);
 
 
 
@@ -380,7 +514,78 @@ ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
 
 
 #######################################################################################
-# Percolator tables
+# Protein Inference tables
+#######################################################################################
+DELIMITER |
+CREATE TRIGGER msProteinInferSpectrumMatch_bdelete BEFORE DELETE ON msProteinInferSpectrumMatch
+ FOR EACH ROW
+ BEGIN
+   DELETE FROM IDPickerSpectrumMatch WHERE piSpectrumMatchID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msProteinInferIon_bdelete BEFORE DELETE ON msProteinInferIon
+ FOR EACH ROW
+ BEGIN
+   DELETE FROM msProteinInferSpectrumMatch WHERE piIonID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msProteinInferPeptide_bdelete BEFORE DELETE ON msProteinInferPeptide
+ FOR EACH ROW
+ BEGIN
+   DELETE FROM msProteinInferIon WHERE piPeptideID = OLD.id;
+   DELETE FROM IDPickerPeptide WHERE piPeptideID = OLD.id;
+   DELETE FROM msProteinInferProteinPeptideMatch WHERE piPeptideID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+
+DELIMITER |
+CREATE TRIGGER msProteinInferProtein_bdelete BEFORE DELETE ON msProteinInferProtein
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM IDPickerProtein WHERE piProteinID = OLD.id;
+   	DELETE FROM msProteinInferProteinPeptideMatch WHERE piProteinID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+DELIMITER |
+CREATE TRIGGER msProteinInferInput_bdelete BEFORE DELETE ON msProteinInferInput
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM IDPickerInputSummary WHERE piInputID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+
+DELIMITER |
+CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
+ FOR EACH ROW
+ BEGIN
+ 	DELETE FROM IDPickerRunSummary WHERE piRunID = OLD.id;
+  	DELETE FROM IDPickerFilter WHERE piRunID = OLD.id;
+  	DELETE FROM IDPickerGroupAssociation WHERE piRunID = OLD.id;
+   	DELETE FROM msProteinInferInput WHERE piRunID = OLD.id;
+  	DELETE FROM msProteinInferProtein WHERE piRunID = OLD.id;
+  	DELETE FROM msProteinInferPeptide WHERE piRunID = OLD.id;
+ END;
+|
+DELIMITER ;
+
+#######################################################################################
+
+
+
+#######################################################################################
+# Search Analysis tables
 #######################################################################################
 DELIMITER |
 CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
@@ -397,6 +602,7 @@ CREATE TRIGGER msRunSearchAnalysis_bdelete BEFORE DELETE ON msRunSearchAnalysis
  FOR EACH ROW
  BEGIN
  	DELETE FROM PercolatorResult WHERE runSearchAnalysisID = OLD.id;
+ 	DELETE FROM msProteinInferInput WHERE inputID = OLD.id AND inputType = 'A';
  END;
 |
 DELIMITER ;
@@ -415,6 +621,7 @@ CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
    DELETE FROM msDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM msTerminalDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM PercolatorResult WHERE resultID = OLD.id;
+   DELETE FROM msProteinInferSpectrumMatch WHERE runSearchResultID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -454,6 +661,7 @@ CREATE TRIGGER msRunSearch_bdelete BEFORE DELETE ON msRunSearch
    DELETE FROM SQTSpectrumData WHERE runSearchID = OLD.id;
    DELETE FROM SQTFileHeader WHERE runSearchID = OLD.id;
    DELETE FROM msRunSearchAnalysis WHERE runSearchID = OLD.id;
+   DELETE FROM msProteinInferInput WHERE inputID = OLD.id AND inputType = 'S';
  END;
 |
 DELIMITER ;
