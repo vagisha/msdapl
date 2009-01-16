@@ -79,8 +79,9 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             double pep = data.getPosteriorErrorProbability();
             values.append(pep == -1.0 ? "NULL" : pep);
             values.append(",");
-            double discrimScore = data.getDiscriminantScore();
-            values.append(discrimScore == -1.0 ? "NULL" : discrimScore);
+            values.append(data.getDiscriminantScore());
+            values.append(",");
+            values.append(data.getPredictedRetentionTime());
             values.append(")");
         }
         values.deleteCharAt(0);
@@ -148,6 +149,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
                     result.setQvalue(rs.getDouble("PEP"));
                 if(rs.getObject("discriminantScore") != null)
                     result.setDiscriminantScore(rs.getDouble("discriminantScore"));
+                result.setPredictedRetentionTime(rs.getBigDecimal("predictedRetentionTime"));
                 
                 resultList.add(result);
             

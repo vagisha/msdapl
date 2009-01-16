@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain.analysis.percolator.impl;
 
+import java.math.BigDecimal;
+
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.search.impl.SearchResultBean;
 
@@ -14,55 +16,67 @@ import org.yeastrc.ms.domain.search.impl.SearchResultBean;
  */
 public class PercolatorResultBean extends SearchResultBean implements PercolatorResult{
 
-    private int runSearchAnalysisId;
-    private double discriminantScore = -1.0;
-    private double pep = -1.0;
-    private double qvalue = -1.0;
+    private PercolatorResultDataBean data = new PercolatorResultDataBean();
     
     @Override
-    public double getDiscriminantScore() {
-        return discriminantScore;
+    public Double getDiscriminantScore() {
+        return data.getDiscriminantScore();
     }
 
     public void setDiscriminantScore(double discriminantScore) {
-        this.discriminantScore = discriminantScore;
+        data.setDiscriminantScore(discriminantScore);
     }
 
     @Override
     public int getRunSearchAnalysisId() {
-        return runSearchAnalysisId;
+        return data.getRunSearchAnalysisId();
     }
     
     public void setRunSearchAnalysisId(int runSearchAnalysisId) {
-        this.runSearchAnalysisId = runSearchAnalysisId;
+        this.data.setRunSearchAnalysisId(runSearchAnalysisId);
     }
 
     @Override
     public double getPosteriorErrorProbability() {
-        return pep;
+        return data.getPosteriorErrorProbability();
     }
     
     @Override
     public double getPosteriorErrorProbabilityRounded() {
-        return Math.round(pep * 1000.0) / 1000.0;
+        return Math.round(data.getPosteriorErrorProbability() * 1000.0) / 1000.0;
     }
 
     public void setPosteriorErrorProbability(double pep) {
-        this.pep = pep;
+        data.setPosteriorErrorProbability(pep);
     }
 
     @Override
     public double getQvalue() {
-        return qvalue;
+        return data.getQvalue();
     }
     
     @Override
     public double getQvalueRounded() {
-        return Math.round(qvalue * 1000.0) / 1000.0;
+        return Math.round(data.getQvalue() * 1000.0) / 1000.0;
     }
     
     public void setQvalue(double qvalue) {
-        this.qvalue = qvalue;
+        data.setQvalue(qvalue);
     }
 
+    @Override
+    public Double getDiscriminantScoreRounded() {
+        Double discriminantScore = data.getDiscriminantScore();
+        if(discriminantScore == null)   return null;
+        return Math.round(discriminantScore * 1000.0) / 1000.0;
+    }
+
+    @Override
+    public BigDecimal getPredictedRetentionTime() {
+        return data.getPredictedRetentionTime();
+    }
+    
+    public void setPredictedRetentionTime(BigDecimal predictedRT) {
+        data.setPredictedRetentionTime(predictedRT);
+    }
 }

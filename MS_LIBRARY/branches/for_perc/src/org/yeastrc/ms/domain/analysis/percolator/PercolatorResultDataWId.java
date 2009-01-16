@@ -1,5 +1,7 @@
 package org.yeastrc.ms.domain.analysis.percolator;
 
+import java.math.BigDecimal;
+
 public interface PercolatorResultDataWId {
 
     public abstract int getRunSearchAnalysisId();
@@ -20,5 +22,10 @@ public interface PercolatorResultDataWId {
     /**
      * @return the percolator discriminant score or -1.0 if there was no discriminant score. 
      */
-    public abstract double getDiscriminantScore();
+    public abstract Double getDiscriminantScore();
+    
+    /**
+     * @return the Predicted Retention Time
+     */
+    public abstract BigDecimal getPredictedRetentionTime();
 }

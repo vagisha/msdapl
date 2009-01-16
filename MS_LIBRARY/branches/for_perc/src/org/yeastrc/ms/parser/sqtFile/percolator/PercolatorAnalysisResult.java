@@ -30,7 +30,7 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
     private BigDecimal mass; // Calculated M+H+ value for this sequence
     private BigDecimal deltaCN; 
     private double pep = -1.0;
-    private double discriminantScore = -1.0;
+    private Double discriminantScore = null;
     private double qvalue = -1.0;
     
     private Program searchProgram;
@@ -96,11 +96,11 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
 
     
     @Override
-    public double getDiscriminantScore() {
+    public Double getDiscriminantScore() {
         return discriminantScore;
     }
     
-    public void setDiscriminantScore(double score) {
+    public void setDiscriminantScore(Double score) {
         this.discriminantScore = score;
     }
 
@@ -122,6 +122,14 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
         this.qvalue = qvalue;
     }
 
+    /**
+     * This method returns null. Percolated SQT files do not have predicted retention time.
+     */
+    @Override
+    public BigDecimal getPredictedRetentionTime() {
+        return null;
+    }
+    
     public MsSearchResultPeptide buildPeptideResult() throws SQTParseException {
         if (resultPeptide != null)
             return resultPeptide;
@@ -176,4 +184,5 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
         buf.deleteCharAt(buf.length() -1); // delete last new line
         return buf.toString();
     }
+
 }

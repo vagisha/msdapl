@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.domain.analysis.percolator;
 
+import java.math.BigDecimal;
+
 import org.yeastrc.ms.domain.search.MsSearchResult;
 
 /**
@@ -32,7 +34,16 @@ public interface PercolatorResult extends MsSearchResult {
     public abstract double getPosteriorErrorProbabilityRounded();
     
     /**
-     * @return the percolator discriminant score or -1.0 if there was no discriminant score. 
+     * @return the percolator discriminant score or null if there was no discriminant score 
      */
-    public abstract double getDiscriminantScore();
+    public abstract Double getDiscriminantScore();
+    
+    public abstract Double getDiscriminantScoreRounded();
+    
+    
+    /**
+     * @return the Predicted Retention Time
+     */
+    public abstract BigDecimal getPredictedRetentionTime();
+    
 }

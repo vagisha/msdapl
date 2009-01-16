@@ -492,6 +492,7 @@ public class PercolatorSQTDataUploadService {
         PercolatorResultDataBean res = new PercolatorResultDataBean();
         res.setRunSearchAnalysisId(rsAnalysisId);
         res.setResultId(resultId);
+        res.setPredictedRetentionTime(resultData.getPredictedRetentionTime());
         res.setDiscriminantScore(resultData.getDiscriminantScore());
         res.setPosteriorErrorProbability(resultData.getPosteriorErrorProbability());
         res.setQvalue(resultData.getQvalue());

@@ -12,7 +12,8 @@
 		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
 		<result property="qvalue" column="qValue" nullValue="-1.0"/>
 		<result property="posteriorErrorProbability" column="PEP" nullValue="-1.0"/>
-		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
+		<result property="discriminantScore" column="discriminantScore" />
+		<result property="predictedRetentionTime" column="predictedRetentionTime" />
 	</resultMap>
 	
 	<resultMap class="PercolatorResultOut" id="percolatorResultResultN" groupBy="id">
@@ -25,7 +26,8 @@
 		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
 		<result property="qvalue" column="qValue" nullValue="-1.0"/>
 		<result property="posteriorErrorProbability" column="PEP" nullValue="-1.0"/>
-		<result property="discriminantScore" column="discriminantScore" nullValue="-1.0"/>
+		<result property="discriminantScore" column="discriminantScore" />
+		<result property="predictedRetentionTime" column="predictedRetentionTime" />
 	</resultMap>
 	
 	<parameterMap class="PercolatorResultIn" id="percolatorResultParam">
@@ -33,7 +35,8 @@
 		<parameter property="runSearchAnalysisId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="qvalue" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="posteriorErrorProbability" jdbcType="DOUBLE" nullValue="-1.0"/>
-		<parameter property="discriminantScore" jdbcType="DOUBLE" nullValue="-1.0"/>
+		<parameter property="discriminantScore" jdbcType="DOUBLE" />
+		<parameter property="predictedRetentionTime" jdbcType="DECIMAL" />
 	</parameterMap>
 	
 	
@@ -81,8 +84,9 @@
     	runSearchAnalysisID,
     	qValue,
     	PEP,
-    	discriminantScore) 
-    	VALUES (?,?,?,?,?)
+    	discriminantScore,
+    	predictedRetentionTime) 
+    	VALUES (?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
@@ -91,7 +95,8 @@
     	runSearchAnalysisID,
     	qValue,
     	PEP,
-    	discriminantScore) 
+    	discriminantScore,
+    	predictedRetentionTime) 
     	VALUES $values$
     </insert>
     
