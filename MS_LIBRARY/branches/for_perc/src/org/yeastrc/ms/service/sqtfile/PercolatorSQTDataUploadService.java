@@ -382,12 +382,12 @@ public class PercolatorSQTDataUploadService {
             if(sqtScan.getObservedMass().doubleValue() == scan.getObservedMass().doubleValue()) {
                 // save all the search results for this scan
                 for (PercolatorResultIn result: scan.getScanResults()) {
-                    uploadSearchResult(result, runSearchAnalysisId, runSearchId, scanId);
-                    numResults++;
+                    boolean uploaded = uploadSearchResult(result, runSearchAnalysisId, runSearchId, scanId);
+                    if(uploaded)    numResults++;
                 }
             }
             else {
-               //log.info("Ignoring Percolator search scan. "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge());
+               log.warn("Ignoring Percolator search scan. "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge()+"; mass: "+scan.getObservedMass().doubleValue());
             }
         }
         flush(); // save any cached data
@@ -449,7 +449,7 @@ public class PercolatorSQTDataUploadService {
         return runSearchAnalysisDao.save(rsa);
     }
 
-    private void uploadSearchResult(PercolatorResultIn result, int rsAnalysisId, int runSearchId, int scanId) throws UploadException {
+    private boolean uploadSearchResult(PercolatorResultIn result, int rsAnalysisId, int runSearchId, int scanId) throws UploadException {
         
         MsSearchResult searchResult = null;
         try {
@@ -468,16 +468,16 @@ public class PercolatorSQTDataUploadService {
                     " scanId: "+scanId+"; charge: "+result.getCharge()+
                     "; peptide: "+result.getResultPeptide().getPeptideSequence());
             //throw ex;
-            // log.info(ex.getErrorMessage());
+            log.warn(ex.getErrorMessage());
             numResultsNotFound++;
-            return;
+            return false;
         }
         
         // upload the Percolator specific information for this result.
-        uploadPercolatorResultData(result, rsAnalysisId, searchResult.getId());
+        return uploadPercolatorResultData(result, rsAnalysisId, searchResult.getId());
     }
 
-    private void uploadPercolatorResultData(PercolatorResultIn resultData, int rsAnalysisId, int resultId) {
+    private boolean uploadPercolatorResultData(PercolatorResultIn resultData, int rsAnalysisId, int resultId) {
         // upload the Percolator specific result information if the cache has enough entries
         if (percolatorResultDataList.size() >= BUF_SIZE) {
             uploadPercolatorResultBuffer();
@@ -485,7 +485,7 @@ public class PercolatorSQTDataUploadService {
         
         // TODO THIS IS TEMP TILL I SORT OUT THE DUPLICATE RESULTS IN PERCOLATOR SQT FILES
         if(uploadedResultIds.contains(resultId))
-            return;
+            return false;
         uploadedResultIds.add(resultId);
         
         // add the Percolator specific information for this result to the cache
@@ -499,6 +499,7 @@ public class PercolatorSQTDataUploadService {
         
        
         percolatorResultDataList.add(res);
+        return true;
     }
     
     private void uploadPercolatorResultBuffer() {
@@ -533,7 +534,7 @@ public class PercolatorSQTDataUploadService {
     }
     
     public static void main(String[] args) {
-        int searchId = 1;
+        int searchId = 2;
         MsRunSearchDAO runSearchDao = daoFactory.getMsRunSearchDAO();
         List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
         Map<String, Integer> runSearchIdMap = new HashMap<String, Integer>(runSearchIds.size());
@@ -542,7 +543,10 @@ public class PercolatorSQTDataUploadService {
             runSearchIdMap.put(filename, id);
             System.out.println(filename+"\t"+id);
         }
-        String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
+        //String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
+//        String fileDirectory = "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/percolator";
+        String fileDirectory = "/Users/vagisha/WORK/MacCoss_Genn_CE/2008-worm-thermo-LTQ/Rep3/percolator";
+        
         PercolatorSQTDataUploadService service = new PercolatorSQTDataUploadService();
         service.uploadPostSearchAnalysis(searchId, Program.SEQUEST,
                 fileDirectory, runSearchIdMap.keySet(), runSearchIdMap, fileDirectory);

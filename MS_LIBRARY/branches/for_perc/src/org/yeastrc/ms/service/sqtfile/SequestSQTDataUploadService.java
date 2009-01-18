@@ -210,10 +210,10 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                 for (SequestSearchResultIn result: scan.getScanResults()) {
                     // upload results with XCorr rank = 1
                     // TODO This is temporary for MacCoss Data.  We need only the top hit for a scan
-                    if(result.getSequestResultData().getxCorrRank() == 1) {
+                    //if(result.getSequestResultData().getxCorrRank() == 1) {
                         uploadSearchResult(result, lastUploadedRunSearchId, scanId);
                         numResults++;
-                    }
+                    //}
                 }
             }
         }

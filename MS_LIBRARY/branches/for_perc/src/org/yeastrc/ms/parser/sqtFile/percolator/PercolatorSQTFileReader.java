@@ -164,14 +164,29 @@ public class PercolatorSQTFileReader extends SQTFileReader {
             result.setxCorrRank(Integer.parseInt(tokens[1]));
             result.setSpRank(Integer.parseInt(tokens[2]));
             result.setMass(new BigDecimal(tokens[3]));
-            result.setDeltaCN(new BigDecimal(tokens[4]));
+            // TODO Percolator changes the value in DeltaCN column!! It can be "nan" -- causes exception
+            // Since we are not storing the DeltaCN values from Percolator SQT's I am ignoring this for now.
+           // result.setDeltaCN(new BigDecimal(tokens[4]));
+
+            // TODO Same here. Found "nan" in column 6 -- causes an exception. 
+            try {
+                double val = Double.parseDouble(tokens[5]);
+                if(percolatorVersion >= 1.07) {
+                    result.setPosteriorErrorProbability( 1 - val); // column has 1 - PEP
+                }
+                else {
+                    result.setDiscriminantScore(val);
+                }
+            }
+            catch(NumberFormatException ex) {
+                if(percolatorVersion >= 1.07) {
+                    result.setPosteriorErrorProbability(-1.0); // will set it to null
+                }
+                else {
+                    result.setDiscriminantScore(null); // will set it to null
+                }
+            }
             
-            if(percolatorVersion >= 1.07) {
-                result.setPosteriorErrorProbability( 1 - Double.parseDouble(tokens[5])); // column has 1 - PEP
-            }
-            else {
-                result.setDiscriminantScore(Double.parseDouble(tokens[5]));
-            }
             result.setQvalue(-Double.parseDouble(tokens[6])); // column has (minus)qvalue
             result.setNumMatchingIons(Integer.parseInt(tokens[7]));
             result.setNumPredictedIons(Integer.parseInt(tokens[8]));
