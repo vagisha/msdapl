@@ -29,7 +29,17 @@ public interface MsSearchResultPeptide {
     
     public abstract String getPeptideSequence();
     
-    public abstract String getModifiedPeptideSequence();
+    /**
+     * Returns the modified peptide sequence: e.g. PEP[80]TIDE
+     * @return
+     */
+    public abstract String getModifiedPeptide();
+    
+    /**
+     * Returns the modified peptide in a program specific format
+     * @return
+     */
+    public abstract String getModifiedPeptidePS();
     
     public abstract char getPreResidue();
     

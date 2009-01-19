@@ -25,6 +25,7 @@ public class Scan implements MS2ScanIn {
     public static final String PRECURSOR_SCAN = "PrecursorScan"; // precursor scan number
     public static final String ACTIVATION_TYPE = "ActivationType";
     public static final String RET_TIME = "RetTime";
+    public static final String RT_TIME = "RTime";
 
     private int startScan = -1;
     private int endScan = -1;
@@ -62,6 +63,8 @@ public class Scan implements MS2ScanIn {
         if (label == null)   return;
         analysisItems.add(new HeaderItem(label, value));
         if (label.equalsIgnoreCase(RET_TIME))
+            setRetentionTime(value);
+        else if (label.equalsIgnoreCase(RT_TIME))
             setRetentionTime(value);
         else if (label.equalsIgnoreCase(PRECURSOR_SCAN))
             setPrecursorScanNum(value);

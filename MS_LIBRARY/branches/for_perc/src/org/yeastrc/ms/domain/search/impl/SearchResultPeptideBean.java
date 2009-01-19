@@ -9,6 +9,7 @@ import org.yeastrc.ms.domain.search.MsModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.util.AminoAcidUtils;
 
 public class SearchResultPeptideBean  implements MsSearchResultPeptide {
 
@@ -93,10 +94,10 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     }
     
     /**
-     * Returns the sequence of the peptide with modifications. E.g. PEP*TIDE
+     * Returns the modified peptide in a program specific format
      * @return
      */
-    public String getModifiedPeptideSequence() {
+    public String getModifiedPeptidePS() {
         
         if (modifiedSequence != null)
             return modifiedSequence;
@@ -113,11 +114,46 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
                 seq.append(origseq.subSequence(lastIdx, mod.getModifiedPosition()+1)); // get sequence up to an including the modified position.
                 char modSymbol = mod.getModificationSymbol();
                 if(modSymbol == '\u0000') {
-                    seq.append("("+Math.round(mod.getModificationMass().doubleValue())+")");
+                    seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
+                            AminoAcidUtils.avgMass(origseq.charAt(mod.getModifiedPosition())))+"]");
                 }
                 else {
                     seq.append(modSymbol);
                 }
+                
+                lastIdx = mod.getModifiedPosition()+1;
+            }
+            if (lastIdx < origseq.length())
+                seq.append(origseq.subSequence(lastIdx, origseq.length()));
+            
+            modifiedSequence = seq.toString();
+            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
+        }
+        
+        return modifiedSequence;
+    }
+    
+    /**
+     * Returns the modified peptide sequence: e.g. PEP[80]TIDE
+     * @return
+     */
+    public String getModifiedPeptide() {
+        
+        if (modifiedSequence != null)
+            return modifiedSequence;
+        
+        if (dynaResidueMods.size() == 0) {
+            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
+        }
+        else {
+            String origseq = String.valueOf(sequence);
+            int lastIdx = 0;
+            StringBuilder seq = new StringBuilder();
+            sortDynaResidueModifications();
+            for (MsResultResidueMod mod: dynaResidueMods) {
+                seq.append(origseq.subSequence(lastIdx, mod.getModifiedPosition()+1)); // get sequence up to an including the modified position.
+                seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
+                        AminoAcidUtils.avgMass(origseq.charAt(mod.getModifiedPosition())))+"]");
                 
                 lastIdx = mod.getModifiedPosition()+1;
             }

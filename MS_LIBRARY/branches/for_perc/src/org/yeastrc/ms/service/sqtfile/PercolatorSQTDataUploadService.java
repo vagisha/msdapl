@@ -36,8 +36,8 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -463,14 +463,14 @@ public class PercolatorSQTDataUploadService {
             throw ex;
         }
         if(searchResult == null) {
+            numResultsNotFound++;
             UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_RESULT);
             ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
                     " scanId: "+scanId+"; charge: "+result.getCharge()+
                     "; peptide: "+result.getResultPeptide().getPeptideSequence());
-            //throw ex;
-            log.warn(ex.getErrorMessage());
-            numResultsNotFound++;
-            return false;
+            throw ex;
+            //log.warn(ex.getErrorMessage());
+            //return false;
         }
         
         // upload the Percolator specific information for this result.
@@ -487,6 +487,7 @@ public class PercolatorSQTDataUploadService {
         if(uploadedResultIds.contains(resultId))
             return false;
         uploadedResultIds.add(resultId);
+        
         
         // add the Percolator specific information for this result to the cache
         PercolatorResultDataBean res = new PercolatorResultDataBean();
@@ -545,7 +546,7 @@ public class PercolatorSQTDataUploadService {
         }
         //String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
 //        String fileDirectory = "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/percolator";
-        String fileDirectory = "/Users/vagisha/WORK/MacCoss_Genn_CE/2008-worm-thermo-LTQ/Rep3/percolator";
+        String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
         
         PercolatorSQTDataUploadService service = new PercolatorSQTDataUploadService();
         service.uploadPostSearchAnalysis(searchId, Program.SEQUEST,
