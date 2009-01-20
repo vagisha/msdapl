@@ -48,12 +48,12 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
     
     @Override
-    public List<Integer> loadResultIdsForRunSearch(int runSearchId) {
-        return queryForList(namespace+".selectResultIdsForRunSearch", runSearchId);
+    public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId) {
+        return queryForList(namespace+".selectResultIdsForRunSearchAnalysis", runSearchAnalysisId);
     }
 
     @Override
-    public List<Integer> loadResultIdsForPercolatorAnalysis(int analysisId) {
+    public List<Integer> loadResultIdsForAnalysis(int analysisId) {
         return queryForList(namespace+".selectResultIdsForAnalysis", analysisId);
     }
     

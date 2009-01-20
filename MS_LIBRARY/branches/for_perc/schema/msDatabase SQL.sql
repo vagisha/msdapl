@@ -445,19 +445,13 @@ CREATE TABLE msProteinInferSpectrumMatch (
     runSearchResultID INT UNSIGNED NOT NULL,
     rank INT UNSIGNED
 );
-ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (msRunSearchResultID);
+ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (runSearchResultID);
 ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piIonID);
 
 
 #####################################################################
 # IDPicker Tables
 #####################################################################
-CREATE TABLE IDPickerRunSummary (
-	piRunID INT UNSIGNED NOT NULL PRIMARY KEY,
-	numUnfilteredProteins INT UNSIGNED,
-	numUnfilteredPeptides INT UNSIGNED
-);
-
 
 CREATE TABLE IDPickerInputSummary (
 	piInputID INT UNSIGNED NOT NULL PRIMARY KEY,
@@ -467,13 +461,13 @@ CREATE TABLE IDPickerInputSummary (
 );
 
 
-CREATE TABLE IDPickerFilter (
+CREATE TABLE IDPickerParam (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     piRunID INT UNSIGNED NOT NULL,
-    filterName VARCHAR(255) NOT NULL,
-   	filterValue VARCHAR(255)
+    name VARCHAR(255) NOT NULL,
+   	value VARCHAR(255)
 );
-ALTER TABLE  IDPickerFilter ADD INDEX (piRunID);
+ALTER TABLE  IDPickerParam ADD INDEX (piRunID);
 
 
 CREATE TABLE IDPickerProtein (
@@ -570,8 +564,7 @@ DELIMITER |
 CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
  FOR EACH ROW
  BEGIN
- 	DELETE FROM IDPickerRunSummary WHERE piRunID = OLD.id;
-  	DELETE FROM IDPickerFilter WHERE piRunID = OLD.id;
+  	DELETE FROM IDPickerParam WHERE piRunID = OLD.id;
   	DELETE FROM IDPickerGroupAssociation WHERE piRunID = OLD.id;
    	DELETE FROM msProteinInferInput WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferProtein WHERE piRunID = OLD.id;

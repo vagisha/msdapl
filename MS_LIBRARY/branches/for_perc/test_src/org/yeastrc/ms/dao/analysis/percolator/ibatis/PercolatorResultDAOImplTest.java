@@ -192,7 +192,7 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
         pres1.setDiscriminantScore(0.30);
         percResDao.save(pres1);
         
-        List<Integer> resultIds = percResDao.loadResultIdsForRunSearch(13);
+        List<Integer> resultIds = percResDao.loadResultIdsForRunSearchAnalysis(13);
         assertEquals(2, resultIds.size());
         
         Collections.sort(resultIds);
@@ -253,7 +253,7 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
         pres1.setDiscriminantScore(0.30);
         percResDao.save(pres1);
         
-        List<Integer> resultIds = percResDao.loadResultIdsForPercolatorAnalysis(21);
+        List<Integer> resultIds = percResDao.loadResultIdsForAnalysis(21);
         assertEquals(3, resultIds.size());
         
         Collections.sort(resultIds);

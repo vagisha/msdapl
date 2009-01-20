@@ -51,11 +51,8 @@
     	WHERE searchAnalysisID = #analysisId# 
     </select>
     
-    <select id="selectResultIdsForRunSearch" resultClass="Integer" parameterClass="Integer">
-    	SELECT pres.resultID 
-    	FROM PercolatorResult AS pres, msRunSearchResult AS res
-    	WHERE pres.resultID = res.id
-    	AND res.runSearchID = #runSearchId#
+    <select id="selectResultIdsForRunSearchAnalysis" resultClass="Integer" parameterClass="Integer">
+    	SELECT resultID FROM PercolatorResult WHERE runSearchAnalysisID=#runSearchAnalysisId#
     </select>
     
     <select id="selectResultIdsForAnalysis" resultClass="Integer" parameterClass="Integer">
