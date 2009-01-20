@@ -13,7 +13,6 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerInputDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerPeptideBaseDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferIon;
 import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
@@ -31,7 +30,7 @@ public class IdPickerResultSaver {
 
     private static final Logger log = Logger.getLogger(IdPickerResultSaver.class);
     private static final ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
-    private static final IdPickerRunDAO runDao = factory.getIdPickerRunDao();
+//    private static final IdPickerRunDAO runDao = factory.getIdPickerRunDao();
     private static final IdPickerInputDAO inputDao = factory.getIdPickerInputDao();
     private static final IdPickerProteinBaseDAO protDao = factory.getIdPickerProteinBaseDao();
     private static final IdPickerPeptideBaseDAO peptDao = factory.getIdPickerPeptideBaseDao();
@@ -53,7 +52,7 @@ public class IdPickerResultSaver {
         long s = System.currentTimeMillis();
         
         // update the run summary
-        runDao.saveIdPickerRunSummary(idpRun); // this will save entries in the IDPickerRunSummary table only
+        // runDao.saveIdPickerRunSummary(idpRun); // this will save entries in the IDPickerRunSummary table only
         
         // save the summary for each input
         inputDao.saveIdPickerInputList(idpRun.getInputList());
@@ -63,7 +62,7 @@ public class IdPickerResultSaver {
         
         
         long e = System.currentTimeMillis();
-        log.info("SAVED IDPickerResults in: "+TimeUtils.timeElapsedSeconds(s,e));
+        log.info("SAVED IDPickerResults in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes.");
     }
     
     private <T extends SpectrumMatch> void saveInferredProteins(int pinferId, List<InferredProtein<T>> proteins) {

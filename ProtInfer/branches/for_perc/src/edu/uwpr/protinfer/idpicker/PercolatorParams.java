@@ -8,7 +8,7 @@ package edu.uwpr.protinfer.idpicker;
 
 import java.util.List;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 /**
  * 
@@ -22,14 +22,14 @@ public class PercolatorParams extends IDPickerParams {
     
     public PercolatorParams(IDPickerParams params) {
         
-        List<IdPickerFilter> moreFilters = params.getMoreFilters();
-        for(IdPickerFilter filter: moreFilters) {
-            if(filter.getFilterName().equalsIgnoreCase("qval_percolator"))
-                qvalue = Double.parseDouble(filter.getFilterValue());
-            else if(filter.getFilterName().equalsIgnoreCase("pep_percolator"))
-                pep = Double.parseDouble(filter.getFilterValue());
-            else if(filter.getFilterName().equalsIgnoreCase("discriminantScore_percolator"))
-                discriminantScore = Double.parseDouble(filter.getFilterValue());
+        List<IdPickerParam> moreFilters = params.getMoreFilters();
+        for(IdPickerParam filter: moreFilters) {
+            if(filter.getName().equalsIgnoreCase("qval_percolator"))
+                qvalue = Double.parseDouble(filter.getValue());
+            else if(filter.getName().equalsIgnoreCase("pep_percolator"))
+                pep = Double.parseDouble(filter.getValue());
+            else if(filter.getName().equalsIgnoreCase("discriminantScore_percolator"))
+                discriminantScore = Double.parseDouble(filter.getValue());
         }
     }
     

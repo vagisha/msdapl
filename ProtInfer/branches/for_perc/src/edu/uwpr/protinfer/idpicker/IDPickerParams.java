@@ -3,7 +3,7 @@ package edu.uwpr.protinfer.idpicker;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 public class IDPickerParams {
 
@@ -16,7 +16,7 @@ public class IDPickerParams {
     private String decoyPrefix = "";
     private boolean useIdPickerFDRFormula = true;
     
-    List<IdPickerFilter> moreFilters = new ArrayList<IdPickerFilter>();
+    List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
     
     
     public boolean useIdPickerFDRFormula() {
@@ -69,10 +69,10 @@ public class IDPickerParams {
         this.doFdrCalculation = doFdrCalculation;
     }
     
-    public List<IdPickerFilter> getMoreFilters() {
+    public List<IdPickerParam> getMoreFilters() {
         return moreFilters;
     }
-    public void addMoreFilters(List<IdPickerFilter> moreFilters) {
+    public void addMoreFilters(List<IdPickerParam> moreFilters) {
         this.moreFilters = moreFilters;
     }
     

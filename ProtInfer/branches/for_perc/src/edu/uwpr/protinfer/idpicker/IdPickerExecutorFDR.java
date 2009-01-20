@@ -82,7 +82,7 @@ public class IdPickerExecutorFDR {
         rankPeptideSpectrumMatches(proteins);
         
         // Before saving the results replace the nrseq dbProteinId with the proteinId.
-        IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(proteins);
+        //IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(proteins);
         
         // FINALLY save the results
         IdPickerResultSaver.instance().saveResults(idpRun, proteins);
@@ -122,8 +122,8 @@ public class IdPickerExecutorFDR {
             input.setNumDecoyHits(decoy);
             input.setNumTargetHits(target); 
         }
-        idpRun.setNumUnfilteredProteins(allProteins.size());
-        idpRun.setNumUnfilteredPeptides(allPeptides.size());
+        //idpRun.setNumUnfilteredProteins(allProteins.size());
+        //idpRun.setNumUnfilteredPeptides(allPeptides.size());
         
         return allPsms;
     }

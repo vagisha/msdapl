@@ -30,7 +30,7 @@ import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -72,7 +72,7 @@ public class IDPickerExecutor {
         
         
         long end = System.currentTimeMillis();
-        log.info("IDPicker TOTAL run time: "+TimeUtils.timeElapsedMinutes(start, end));
+        log.info("IDPicker TOTAL run time: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes");
     }
     
     protected static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
@@ -267,29 +267,29 @@ public class IDPickerExecutor {
         log.info("Retrieved NRSEQ ids in: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes");
     }
     
-    private IDPickerParams makeIdPickerParams(List<IdPickerFilter> filters) {
+    private IDPickerParams makeIdPickerParams(List<IdPickerParam> filters) {
         
         IDPickerParams params = new IDPickerParams();
         params.setDoFdrCalculation(false); // set this to false initially
                                            // if we find FDR calculation filters we will set this to true;
-        List<IdPickerFilter> moreFilters = new ArrayList<IdPickerFilter>();
-        for(IdPickerFilter filter: filters) {
-            if(filter.getFilterName().equalsIgnoreCase("maxAbsFDR")) {
-                params.setMaxAbsoluteFdr(Float.valueOf(filter.getFilterValue()));
+        List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
+        for(IdPickerParam filter: filters) {
+            if(filter.getName().equalsIgnoreCase("maxAbsFDR")) {
+                params.setMaxAbsoluteFdr(Float.valueOf(filter.getValue()));
                 params.setDoFdrCalculation(true);
             }
-            else if(filter.getFilterName().equalsIgnoreCase("maxRelativeFDR")) {
-                params.setMaxRelativeFdr(Float.valueOf(filter.getFilterValue()));
+            else if(filter.getName().equalsIgnoreCase("maxRelativeFDR")) {
+                params.setMaxRelativeFdr(Float.valueOf(filter.getValue()));
                 params.setDoFdrCalculation(true);
             }
-            else if (filter.getFilterName().equalsIgnoreCase("decoyRatio"))
-                params.setDecoyRatio(Float.valueOf(filter.getFilterValue()));
-            else if (filter.getFilterName().equalsIgnoreCase("decoyPrefix"))
-                params.setDecoyPrefix(filter.getFilterValue());
-            else if (filter.getFilterName().equalsIgnoreCase("parsimonyAnalysis"))
-                params.setDoParsimonyAnalysis(Boolean.valueOf(filter.getFilterValue()));
-            else if(filter.getFilterName().equalsIgnoreCase("FDRFormula")) {
-                String val = filter.getFilterValue();
+            else if (filter.getName().equalsIgnoreCase("decoyRatio"))
+                params.setDecoyRatio(Float.valueOf(filter.getValue()));
+            else if (filter.getName().equalsIgnoreCase("decoyPrefix"))
+                params.setDecoyPrefix(filter.getValue());
+            else if (filter.getName().equalsIgnoreCase("parsimonyAnalysis"))
+                params.setDoParsimonyAnalysis(Boolean.valueOf(filter.getValue()));
+            else if(filter.getName().equalsIgnoreCase("FDRFormula")) {
+                String val = filter.getValue();
                 if(val.equals("2R/(F+R)"))
                     params.setUseIdPickerFDRFormula(true);
                 else
@@ -332,8 +332,10 @@ public class IDPickerExecutor {
         Iterator<T> iter = psmList.iterator();
         while(iter.hasNext()) {
             T psm = iter.next();
-            if(scanIdsToRemove.contains(psm.getScanId()))
+            if(scanIdsToRemove.contains(psm.getScanId())) {
+//                log.info("Removing for scanID: "+psm.getScanId()+"; resultID: "+psm.getHitId());
                 iter.remove();
+            }
         }
         long e = System.currentTimeMillis();
         log.info("Removed scans with multiple results in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
@@ -364,7 +366,7 @@ public class IDPickerExecutor {
     public static void main(String[] args) {
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(6);
+        IdPickerRun run = runDao.loadProteinferRun(1);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getFilters().size());
         

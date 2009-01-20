@@ -9,42 +9,27 @@ import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
 
 public class IdPickerRun extends GenericProteinferRun<IdPickerInput> {
 
-    private int numUnfilteredProteins = -1;
-    private int numUnfilteredPeptides = -1;
     
-    private List<IdPickerFilter> filters;
+    private List<IdPickerParam> filters;
     
     public IdPickerRun() {
         super();
-        filters = new ArrayList<IdPickerFilter>();
+        filters = new ArrayList<IdPickerParam>();
     }
     
-    public int getNumUnfilteredProteins() {
-        return numUnfilteredProteins;
-    }
-    public void setNumUnfilteredProteins(int numUnfilteredProteins) {
-        this.numUnfilteredProteins = numUnfilteredProteins;
-    }
-    public int getNumUnfilteredPeptides() {
-        return numUnfilteredPeptides;
-    }
-    public void setNumUnfilteredPeptides(int numUnfilteredPeptides) {
-        this.numUnfilteredPeptides = numUnfilteredPeptides;
-    }
-    
-    public List<IdPickerFilter> getFilters() {
+    public List<IdPickerParam> getFilters() {
         return filters;
     }
 
-    public List<IdPickerFilter> getSortedFilters() {
-        Collections.sort(filters, new Comparator<IdPickerFilter>(){
-            public int compare(IdPickerFilter o1, IdPickerFilter o2) {
-                return o1.getFilterName().compareTo(o2.getFilterName());
+    public List<IdPickerParam> getSortedFilters() {
+        Collections.sort(filters, new Comparator<IdPickerParam>(){
+            public int compare(IdPickerParam o1, IdPickerParam o2) {
+                return o1.getName().compareTo(o2.getName());
             }});
         return filters;
     }
     
-    public void setFilters(List<IdPickerFilter> filter) {
+    public void setFilters(List<IdPickerParam> filter) {
         this.filters = filter;
     }
     

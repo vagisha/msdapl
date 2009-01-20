@@ -43,14 +43,6 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
         return runDao.save(run);
     }
 
-    /**
-     * Saves an entry only in the IDPickerInputSummary table
-     * @param run
-     */
-    public void saveIdPickerRunSummary(IdPickerRun run) {
-        super.save(sqlMapNameSpace+".insert", run);
-    }
-    
     @Override
     public void update(GenericProteinferRun<?> run) {
         runDao.update(run);

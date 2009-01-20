@@ -14,6 +14,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.Program;
 
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.InferredProtein;
@@ -37,20 +38,20 @@ public class IdPickerExecutorNoFDR {
         // get all the search hits for the given inputIds
         List<PeptideSpectrumMatchNoFDR> allPsms = getAllSearchHits(idpRun, params, program);
         
-        // assign ids to peptides and proteins(nrseq ids)
-        IDPickerExecutor.assignIdsToPeptidesAndProteins(allPsms, program);
-        
-        // infer the proteins;
-        List<InferredProtein<SpectrumMatch>> proteins = IDPickerExecutor.inferProteins(allPsms, params);
-        
-        // calculate the protein coverage
-        IDPickerExecutor.calculateProteinSequenceCoverage(proteins);
-        
-        // Before saving the results replace the nrseq dbProteinId with the proteinId.
-        IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(proteins);
-        
-        // FINALLY save the results
-        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
+//        // assign ids to peptides and proteins(nrseq ids)
+//        IDPickerExecutor.assignIdsToPeptidesAndProteins(allPsms, program);
+//        
+//        // infer the proteins;
+//        List<InferredProtein<SpectrumMatch>> proteins = IDPickerExecutor.inferProteins(allPsms, params);
+//        
+//        // calculate the protein coverage
+//        IDPickerExecutor.calculateProteinSequenceCoverage(proteins);
+//        
+//        // Before saving the results replace the nrseq dbProteinId with the proteinId.
+//        //IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(proteins);
+//        
+//        // FINALLY save the results
+//        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
     }
     
     // This method also updates the summary with the total number of proteins found for all the 
@@ -85,9 +86,10 @@ public class IdPickerExecutorNoFDR {
             input.setNumFilteredTargetHits(psms.size());
             input.setNumTargetHits(resGetter.getUnfilteredInputCount(inputId, inputGenerator));
         }
-        idpRun.setNumUnfilteredProteins(allProteins.size());
-        idpRun.setNumUnfilteredPeptides(allPeptides.size());
+        //idpRun.setNumUnfilteredProteins(allProteins.size());
+        //idpRun.setNumUnfilteredPeptides(allPeptides.size());
         
         return allPsms;
     }
+   
 }

@@ -47,8 +47,8 @@
 	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerIon.xml"/>
 	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerPeptide.xml"/>
 	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerProtein.xml"/>
-	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerFilter.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerParam.xml"/>
 	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerInputSummary.xml"/>
-	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerRunSummary.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerRun.xml"/>
 	
 </sqlMapConfig>	
