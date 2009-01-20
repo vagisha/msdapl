@@ -62,6 +62,9 @@ public class IdPickerExecutorFDR {
             log.error("No filtered hits found!");
             throw new Exception("No filtered hits found!");
         }
+        // Our search results should already be filtered at this point
+        // so remove all spectra with multiple results
+        IDPickerExecutor.removeSpectraWithMultipleResults(filteredPsms);
         
         // update the summary statistics
         updateSummaryAfterFiltering(filteredPsms, idpRun);
@@ -77,6 +80,9 @@ public class IdPickerExecutorFDR {
         
         // rank spectrum matches (based on FDR)
         rankPeptideSpectrumMatches(proteins);
+        
+        // Before saving the results replace the nrseq dbProteinId with the proteinId.
+        IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(proteins);
         
         // FINALLY save the results
         IdPickerResultSaver.instance().saveResults(idpRun, proteins);

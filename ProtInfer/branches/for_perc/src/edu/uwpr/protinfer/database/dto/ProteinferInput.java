@@ -5,6 +5,7 @@ public class ProteinferInput {
     private int id;
     private int pinferId;
     private int inputId;
+    private InputType inputType;
     
     public int getId() {
         return id;
@@ -26,5 +27,35 @@ public class ProteinferInput {
     }
     public void setInputId(int inputId) {
         this.inputId = inputId;
+    }
+    
+    public InputType getInputType() {
+        return this.inputType;
+    }
+    
+    public void setInputType(InputType inputType) {
+        this.inputType = inputType;
+    }
+    
+    public String getInputTypeString() {
+        return String.valueOf(inputType.shortName);
+    }
+    
+    public static enum InputType {
+        SEARCH('S'), ANALYSIS('A');
+        
+        private char shortName;
+        
+        private InputType(char shortName) {this.shortName = shortName;}
+        
+        public char getShortName() {return shortName;}
+        
+        public static InputType getInputTypeForChar(char shortName) {
+            switch (shortName) {
+                case 'S': return SEARCH;
+                case 'A': return ANALYSIS;
+                default:  return null;
+            }
+        }
     }
 }

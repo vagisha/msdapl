@@ -1,9 +1,7 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -22,6 +20,7 @@ import edu.uwpr.protinfer.infer.graph.InvalidVertexException;
 import edu.uwpr.protinfer.infer.graph.PeptideVertex;
 import edu.uwpr.protinfer.infer.graph.ProteinVertex;
 import edu.uwpr.protinfer.infer.graph.SetCoverFinder;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 public class ProteinInferrerIdPicker implements ProteinInferrer {
 
@@ -107,7 +106,8 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
             }
 
             long e = System.currentTimeMillis();
-            log.info("Inferred proteins in: "+timeElapsed(s, e)+"\nAll: "+allProteins.size()+" Parsimonious: "+inferredProteins.size());
+            log.info("Inferred proteins in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds \nAll: "+
+                    allProteins.size()+" Parsimonious: "+inferredProteins.size());
 
             return allProteins;
         }
@@ -155,11 +155,7 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         connCompFinder.findAllConnectedComponents(graph);
 
         long e = System.currentTimeMillis();
-        log.info("Inferred proteins in: "+timeElapsed(s, e));
+        log.info("Inferred proteins in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         return allProteins;
-    }
-    
-    private static float timeElapsed(long start, long end) {
-        return (end - start)/(1000.0f);
     }
 }

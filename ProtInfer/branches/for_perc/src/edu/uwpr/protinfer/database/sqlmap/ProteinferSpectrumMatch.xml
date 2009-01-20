@@ -7,7 +7,7 @@
 	
 	<resultMap class="ProteinferSpectrumMatch" id="pinferSMatchResult">
 		<result property="id" column="id" nullValue="0"/>
-		<result property="msRunSearchResultId" column="msRunSearchResultID" nullValue="0"/>
+		<result property="msRunSearchResultId" column="runSearchResultID" nullValue="0"/>
 		<result property="proteinferIonId" column="piIonID" nullValue="0"/>
 		<result property="rank" column="rank"/>
 	</resultMap>
@@ -61,7 +61,7 @@
     	WHERE pept.piRunID=#pinferId#
     	AND pept.id = ion.piPeptideID
     	AND ion.id = psm.piIonID
-    	AND psm.msRunSearchResultID = msRes.id
+    	AND psm.runSearchResultID = msRes.id
     	AND msRes.runSearchID = #runSearchId#
     </select>
     
@@ -75,14 +75,14 @@
     	WHERE pept.piRunID=#pinferId#
     	AND pept.id = ion.piPeptideID
     	AND ion.id = psm.piIonID
-    	AND psm.msRunSearchResultID = msRes.id
+    	AND psm.runSearchResultID = msRes.id
     	AND msRes.runSearchID = msa.runSearchID
     	AND msa.id = #analysisId#
     </select>
     
     <insert id="insert" parameterMap="pinferSMatchParam">
     	INSERT INTO msProteinInferSpectrumMatch (
-    	msRunSearchResultID,
+    	runSearchResultID,
     	piIonID,
     	rank) 
     	VALUES (?,?,?)

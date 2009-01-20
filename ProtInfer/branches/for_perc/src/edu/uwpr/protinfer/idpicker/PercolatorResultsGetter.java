@@ -87,7 +87,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(inputId);
-            specMatch.setSequence(result.getResultPeptide().getModifiedPeptideSequence());
+            specMatch.setSequence(result.getResultPeptide().getModifiedPeptide());
             specMatch.setRank(resultRanks.get(result.getId()));
 
             PeptideSpectrumMatchNoFDRImpl psm = new PeptideSpectrumMatchNoFDRImpl();
@@ -135,7 +135,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         String lastPeptideSeq = null;
         for(PercolatorResult result: resultList) {
             
-            if(!result.getResultPeptide().getModifiedPeptideSequence().equals(lastPeptideSeq)) {
+            if(!result.getResultPeptide().getModifiedPeptide().equals(lastPeptideSeq)) {
                 if(lastPeptideSeq != null) {
                     Collections.sort(resForScanCharge, scoreComparator);
                     int rank = 1;
@@ -144,7 +144,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
                     }
                 }
                 resForScanCharge.clear();
-                lastPeptideSeq = result.getResultPeptide().getModifiedPeptideSequence();
+                lastPeptideSeq = result.getResultPeptide().getModifiedPeptide();
             }
             resForScanCharge.add(result);
         }

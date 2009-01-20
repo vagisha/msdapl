@@ -20,11 +20,10 @@ public class IdPickerInputGetter {
     
     public int getUnfilteredInputCount(int inputId, Program program) {
         if(program == Program.PERCOLATOR) {
-            List<Integer> resultIds = DAOFactory.instance().getPercolatorResultDAO().loadResultIdsForRunSearch(inputId);
+            List<Integer> resultIds = DAOFactory.instance().getPercolatorResultDAO().loadResultIdsForRunSearchAnalysis(inputId);
             return resultIds.size();
         }
-        else if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST ||
-                program == Program.PROLUCID) {
+        else if( Program.isSearchProgram(program)) {
             List<Integer> resultIds = DAOFactory.instance().getMsSearchResultDAO().loadResultIdsForRunSearch(inputId);
             return resultIds.size();
         }

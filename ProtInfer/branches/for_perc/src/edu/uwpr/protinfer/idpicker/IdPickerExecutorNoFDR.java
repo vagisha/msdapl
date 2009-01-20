@@ -14,8 +14,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.Program;
 
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.InferredProtein;
@@ -36,7 +34,7 @@ public class IdPickerExecutorNoFDR {
         // NOTE: WE ASSUME ALL THE GIVEN inputIds WERE SEARCHED/ANALYSED WITH THE SAME PROGRAM
         Program program = idpRun.getInputGenerator();
         
-        // get all the search hits for the given runSearchIds
+        // get all the search hits for the given inputIds
         List<PeptideSpectrumMatchNoFDR> allPsms = getAllSearchHits(idpRun, params, program);
         
         // assign ids to peptides and proteins(nrseq ids)
@@ -48,6 +46,8 @@ public class IdPickerExecutorNoFDR {
         // calculate the protein coverage
         IDPickerExecutor.calculateProteinSequenceCoverage(proteins);
         
+        // Before saving the results replace the nrseq dbProteinId with the proteinId.
+        IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(proteins);
         
         // FINALLY save the results
         IdPickerResultSaver.instance().saveResults(idpRun, proteins);
@@ -69,6 +69,10 @@ public class IdPickerExecutorNoFDR {
             int inputId = input.getInputId();
             
             List<PeptideSpectrumMatchNoFDR> psms = resGetter.getInputNoFdr(inputId, params, inputGenerator);
+            // We are not going to calculate FDR so we remove all spectra with multiple results at this point
+            // Our search results should already be filtered at this point
+            IDPickerExecutor.removeSpectraWithMultipleResults(psms);
+            
             allPsms.addAll(psms);
             
             for(PeptideSpectrumMatchNoFDR psm: psms) {

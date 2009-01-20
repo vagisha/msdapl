@@ -7,9 +7,14 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
@@ -110,14 +115,14 @@ public class IDPickerExecutor {
 
     private static <T extends PeptideSpectrumMatch<?>> void assignPeptideIds(List<T> filteredPsms) {
         Map<String, Integer> peptideIds = new HashMap<String, Integer>(filteredPsms.size());
-        int lastPeptId = 1;
+        int currPeptId = 1;
         for(T psm: filteredPsms) {
             Peptide pept = psm.getPeptideHit().getPeptide();
             Integer id = peptideIds.get(pept.getSequence());
             if (id == null) {
-                id = lastPeptId;
+                id = currPeptId;
                 peptideIds.put(pept.getSequence(), id);
-                lastPeptId++;
+                currPeptId++;
             }
             pept.setId(id);
         }
@@ -174,46 +179,92 @@ public class IDPickerExecutor {
            }
            
            
+           List<ProteinHit> moreProteins = new ArrayList<ProteinHit>();
+           
            PeptideHit phit = hit.getPeptideHit();
            for(ProteinHit prHit: phit.getProteinList()) {
                Protein pr = prHit.getProtein();
-               // look for an exact match
+               
+               // look for a match in our map
                NrDbProtein nrDbProt = nrseqIdMap.get(pr.getAccession());
+               
+               // this protein is not in our map
                if(nrDbProt == null) {
+                   
+                   // look for an exact match
                    nrDbProt  = NrSeqLookupUtil.getDbProtein(nrseqDbId, pr.getAccession());
+                   
+                   // exact match not found
                    if(nrDbProt == null) {
                        // look for a match LIKE accession
                        List<Integer> ids = NrSeqLookupUtil.getDbProteinIdsPartialAccession(nrseqDbId, pr.getAccession());
+                       
+                       // more than one match found
                        if(ids.size() != 1) {
+                           
                            // finally try to match the peptide sequence and accession
                            ids = NrSeqLookupUtil.getDbProteinIdsForPeptidePartialAccession(nrseqDbId, pr.getAccession(),
                                    phit.getPeptide().getSequence());
                            if(ids.size() != 1) {
-                               log.error("Could not find nrseq id for protein: "+pr.getAccession()+
-                                           "; database: "+nrseqDbId);
-                               throw new Exception("Could not find nrseq id for protein: "+pr.getAccession()+"; database: "+nrseqDbId);
+                               log.error("Found multiple ("+ids.size()+") nrseq ids for protein: "+pr.getAccession()+
+                                           "; database: "+nrseqDbId+"; peptide: "+phit.getPeptide().getSequence());
+                              // throw new Exception("Could not find nrseq id for protein: "+pr.getAccession()+"; database: "+nrseqDbId);
+                           
+                               // IF WE HAVE MULTIPLE MATCHES IT MEANS WE HAVE A TRUNCATED ACCESSION AND
+                               // A VERY SHORT PEPTIDE SEQUENCE.  ADD THEM ALL TO THE LIST
+                               
+                               for(int id: ids) {
+                                   NrDbProtein nrDbProtM = NrSeqLookupUtil.getDbProtein(id);
+                                   nrseqIdMap.put(nrDbProtM.getAccessionString(), nrDbProtM);
+                                   Protein prM = new Protein(nrDbProtM.getAccessionString(), -1);
+                                   prM.setId(nrDbProtM.getId());
+                                   // pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+                                   prM.setAccession(nrDbProtM.getAccessionString());
+                                   moreProteins.add(new ProteinHit(prM, '\u0000', '\u0000'));
+                               }
+                           
                            }
+                           // match found -- with peptide sequence and partial accession
                            else {
                                nrDbProt = NrSeqLookupUtil.getDbProtein(ids.get(0));
                                nrseqIdMap.put(pr.getAccession(), nrDbProt);
                            }
                        }
+                       // match found with partial accession
                        else {
                            nrDbProt = NrSeqLookupUtil.getDbProtein(ids.get(0));
                            nrseqIdMap.put(pr.getAccession(), nrDbProt);
                        }
                    }
+                   // exact match found
                    else
                        nrseqIdMap.put(pr.getAccession(), nrDbProt);
                }
-               pr.setId(nrDbProt.getId());
-//               pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
-               pr.setAccession(nrDbProt.getAccessionString()); // this will set the correct accession; 
+               
+               // If we found an exact match
+               if(nrDbProt != null) {
+                   pr.setId(nrDbProt.getId());
+//                 pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+                   pr.setAccession(nrDbProt.getAccessionString()); // this will set the correct accession; 
                                                                // SQT files sometimes have truncated accessions
+               }
+               else {pr.setId(-1);}
+           }
+           
+           // REMOVE ALL PROTEINS FOR WHICH NO ID WAS FOUND
+           Iterator<ProteinHit> iter = phit.getProteinList().iterator();
+           while(iter.hasNext()) {
+               ProteinHit prot = iter.next();
+               if(prot.getProtein().getId() == -1)
+                   iter.remove();
+           }
+           // ADD ALL THE ADDITIONAL PROTEINS, IF ANY.
+           for(ProteinHit prot: moreProteins) {
+               phit.addProteinHit(prot);
            }
         }
         long end = System.currentTimeMillis();
-        log.info("Retrieved NRSEQ ids in: "+TimeUtils.timeElapsedMinutes(start, end));
+        log.info("Retrieved NRSEQ ids in: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes");
     }
     
     private IDPickerParams makeIdPickerParams(List<IdPickerFilter> filters) {
@@ -254,18 +305,66 @@ public class IDPickerExecutor {
     }
 
     
-    protected static final <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
+    protected static <T extends PeptideSpectrumMatch<?>> void removeSpectraWithMultipleResults(List<T> psmList) {
+        
+        long s = System.currentTimeMillis();
+        // sort by scanID
+        Collections.sort(psmList, new Comparator<PeptideSpectrumMatch<?>>() {
+            public int compare(PeptideSpectrumMatch<?> o1, PeptideSpectrumMatch<?> o2) {
+                return Integer.valueOf(o1.getScanId()).compareTo(o2.getScanId());
+            }});
+        
+        // get a list of scan Ids that have multiple results
+        Set<Integer> scanIdsToRemove = new HashSet<Integer>();
+        
+        int lastScanId = -1;
+        for (int i = 0; i < psmList.size(); i++) {
+            T psm = psmList.get(i);
+            if(lastScanId != -1){
+                if(lastScanId == psm.getScanId()) {
+                    scanIdsToRemove.add(lastScanId);
+                }
+            }
+            lastScanId = psm.getScanId();
+        }
+        log.info("Found "+scanIdsToRemove.size()+" scanIds with multiple results");
+        
+        Iterator<T> iter = psmList.iterator();
+        while(iter.hasNext()) {
+            T psm = iter.next();
+            if(scanIdsToRemove.contains(psm.getScanId()))
+                iter.remove();
+        }
+        long e = System.currentTimeMillis();
+        log.info("Removed scans with multiple results in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+    }
+    
+    
+    protected static <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
         List<InferredProtein<S>> inferProteins(List<T> psms, IDPickerParams params) {
         
         ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker(params.getDoParsimonyAnalysis());
         return inferrer.inferProteins(psms);
     }
     
+    public static <T extends InferredProtein<?>>void replaceNrSeqDbProtIdsWithProteinIds(List<T> proteins) {
+        
+        long s = System.currentTimeMillis();
+        for(T prot: proteins) {
+            Protein pr = prot.getProtein();
+            int nrseqDbProtId = pr.getId(); // This is the id (primary key) from tblProteinDatabase
+            NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(nrseqDbProtId);
+            pr.setId(nrDbProt.getProteinId());
+        }
+        long e = System.currentTimeMillis();
+        log.info("Replaced NRSEQ dbProt Ids with NRSEQ protein Ids in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+    }
+
     
     public static void main(String[] args) {
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(7);
+        IdPickerRun run = runDao.loadProteinferRun(6);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getFilters().size());
         
@@ -277,4 +376,5 @@ public class IDPickerExecutor {
             e.printStackTrace();
         }
     }
+
 }

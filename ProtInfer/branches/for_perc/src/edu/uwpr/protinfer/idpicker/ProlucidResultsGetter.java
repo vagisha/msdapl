@@ -80,12 +80,16 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
             List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(result.getId());
            
             for (MsSearchResultProtein protein: msProteinList) {
-                Protein prot = new Protein(protein.getAccession(), -1);
-                if(decoyPrefix != null) {
-                    if (prot.getAccession().startsWith(decoyPrefix))
-                        prot.setDecoy();
+                String[] accessionStrings = protein.getAccession().split("\\cA");
+
+                for(String accession: accessionStrings) {
+                    Protein prot = new Protein(accession, -1);
+                    if(decoyPrefix != null) {
+                        if (prot.getAccession().startsWith(decoyPrefix))
+                            prot.setDecoy();
+                    }
+                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
                 }
-                peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
             }
             
             SpectrumMatchIDPImpl specMatch = new SpectrumMatchIDPImpl();
@@ -93,7 +97,7 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(inputId);
-            specMatch.setSequence(result.getResultPeptide().getModifiedPeptideSequence());
+            specMatch.setSequence(result.getResultPeptide().getModifiedPeptide());
             // specMatch.setRank(scores.getPrimaryScoreRank());  // Rank will be based on calculated FDR
             
             PeptideSpectrumMatchIDPImpl psm = new PeptideSpectrumMatchIDPImpl();
