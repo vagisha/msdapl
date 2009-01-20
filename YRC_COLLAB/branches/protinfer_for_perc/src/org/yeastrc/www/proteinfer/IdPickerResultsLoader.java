@@ -336,7 +336,7 @@ public class IdPickerResultsLoader {
         
         WIdPickerResultSummary summary = new WIdPickerResultSummary();
         IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
-        summary.setUnfilteredProteinCount(run.getNumUnfilteredProteins());
+//        summary.setUnfilteredProteinCount(run.getNumUnfilteredProteins());
         summary.setFilteredProteinCount(proteinIds.size());
         // parsimonious protein IDs
         List<Integer> parsimProteinIds = idpProtBaseDao.getIdPickerProteinIds(pinferId, true);

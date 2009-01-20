@@ -38,7 +38,7 @@ public class WIdPickerIon {
     }
     
     public String getIonSequence() {
-        return removeTerminalResidues(bestSpectrumMatch.getResultPeptide().getModifiedPeptideSequence());
+        return removeTerminalResidues(bestSpectrumMatch.getResultPeptide().getModifiedPeptide());
     }
     
     public int getCharge() {

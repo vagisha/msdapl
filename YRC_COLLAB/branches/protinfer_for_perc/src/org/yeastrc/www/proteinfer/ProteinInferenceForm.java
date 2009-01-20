@@ -14,6 +14,8 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
+
 /**
  * 
  */
@@ -22,6 +24,7 @@ public class ProteinInferenceForm extends ActionForm {
     private int projectId;
     private ProgramParameters programParams;
     private ProteinInferInputSummary inputSummary;
+    private InputType inputType;
     
     public ProteinInferenceForm () {
         inputSummary = new ProteinInferInputSummary();
@@ -42,6 +45,22 @@ public class ProteinInferenceForm extends ActionForm {
 //      errors.add("fundingTypes", new ActionMessage("error.project.nofoundationname"));
 
         return errors;
+    }
+    
+    public InputType getInputType() {
+        return this.inputType;
+    }
+    
+    public void setInputType(InputType inputType) {
+        this.inputType = inputType;
+    }
+    
+    public char getInputTypeChar() {
+        return inputType.getShortName();
+    }
+    
+    public void setInputTypeChar(char shortName) {
+        this.inputType = InputType.getInputTypeForChar(shortName);
     }
     
     public void setInputSummary(ProteinInferInputSummary inputSummary) {

@@ -43,7 +43,7 @@ public class ProteinInferInputSummary {
         return files.get(index);
     }
     
-    public void addRunSearch(ProteinInferIputFile runSearch) {
+    public void addInputFile(ProteinInferIputFile runSearch) {
         files.add(runSearch);
     }
     

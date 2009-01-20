@@ -18,8 +18,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.Program;
@@ -29,6 +32,7 @@ import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.ProteinInferenceProgram;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 
 /**
  * 
@@ -63,6 +67,8 @@ public class NewProteinInferenceAction extends Action {
             return mapping.findForward("Failure");
         }
         
+        // We need the projectID so we can redirect back to the project page after
+        // the protein inference job has been submitted.
         int projectId = -1;
         if (request.getParameter("projectId") != null) {
             try {projectId = Integer.parseInt(request.getParameter("projectId"));}
@@ -77,18 +83,45 @@ public class NewProteinInferenceAction extends Action {
         }
         request.setAttribute("projectId", projectId);
         
-        // Create our ActionForm
-        ProteinInferenceForm newForm = new ProteinInferenceForm();
-        request.setAttribute("proteinInferenceForm", newForm);
         
-        newForm.setProjectId(projectId);
-        ProteinInferInputSummary searchSummary = getSearchSummary(searchId);
-        newForm.setInputSummary(searchSummary);
+        // Create an ActionForm -- this will be used if the user chooses to run
+        // protein inference on output from a search program
+        ProteinInferenceForm newForm1 = new ProteinInferenceForm();
+        request.setAttribute("proteinInferenceFormSearch", newForm1);
+        newForm1.setInputType(InputType.SEARCH);
+        newForm1.setProjectId(projectId);
+        ProteinInferInputSummary searchSummary = getInputSearchSummary(searchId);
+        newForm1.setInputSummary(searchSummary);
+        // set the IDPicker parameters
+        ProgramParameters params1 = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
+        setProgramDetails(params1, searchSummary.getSearchProgram());
+        newForm1.setProgramParams(params1);
         
-        // we will be using IDPicker -- set the IDPicker parameters
-        ProgramParameters params = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
-        setProgramDetails(params, searchSummary.getSearchProgram());
-        newForm.setProgramParams(params);
+        
+        // check if there is a post-search analysis
+        MsSearchAnalysisDAO saDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+        List<Integer> saIds = saDao.getAnalysisIdsForSearch(searchId);
+        
+        
+        if(saIds.size() > 0) {
+            // Create another ActionForm -- this will be used if the user chooses to run
+            // protein inference on output from a analysis program
+            System.out.println("Found analysis for searchId: "+searchId);
+            // TODO We are assuming for now that there is only ONE analysis done on a search
+            // This may not be true later.
+            int analysisId = saIds.get(0);
+            // Create our ActionForm
+            ProteinInferenceForm newForm2 = new ProteinInferenceForm();
+            request.setAttribute("proteinInferenceFormAnalysis", newForm2);
+            newForm2.setInputType(InputType.ANALYSIS);
+            newForm2.setProjectId(projectId);
+            ProteinInferInputSummary inputSummary = getInputAnalysisSummary(searchId, analysisId);
+            newForm2.setInputSummary(inputSummary);
+            
+            // set the IDPicker parameters
+            ProgramParameters params2 = new ProgramParameters(ProteinInferenceProgram.IDPICKER_PERC);
+            newForm2.setProgramParams(params2);
+        }
         
 
         // Go!
@@ -127,7 +160,7 @@ public class NewProteinInferenceAction extends Action {
         }
     }
 
-    private ProteinInferInputSummary getSearchSummary(int searchId) {
+    private ProteinInferInputSummary getInputSearchSummary(int searchId) {
         DAOFactory daoFactory = DAOFactory.instance();
         
         ProteinInferInputSummary searchSummary = new ProteinInferInputSummary();
@@ -157,8 +190,51 @@ public class NewProteinInferenceAction extends Action {
             String filename = runSearchDao.loadFilenameForRunSearch(id);
             ProteinInferIputFile rs = new ProteinInferIputFile(id, filename);
             rs.setIsSelected(true);
-            searchSummary.addRunSearch(rs);
+            searchSummary.addInputFile(rs);
         }
         return searchSummary;
+    }
+    
+    private ProteinInferInputSummary getInputAnalysisSummary(int searchId, int analysisId) {
+        DAOFactory daoFactory = DAOFactory.instance();
+        
+        ProteinInferInputSummary inputSummary = new ProteinInferInputSummary();
+        inputSummary.setSearchId(searchId);
+        inputSummary.setSearchAnalysisId(analysisId);
+        
+        // get the name of the search program
+        MsSearchDAO searchDao = daoFactory.getMsSearchDAO();
+        MsSearch search = searchDao.loadSearch(searchId);
+        inputSummary.setSearchProgram(search.getSearchProgram().displayName());
+        inputSummary.setSearchProgramVersion(search.getSearchProgramVersion());
+        
+        // get the name of the analysis program
+        MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
+        MsSearchAnalysis analysis = analysisDao.load(analysisId);
+        inputSummary.setAnalysisProgram(analysis.getAnalysisProgram().displayName());
+        inputSummary.setAnalysisProgramVersion(analysis.getAnalysisProgramVersion());
+        
+        // get the name(s) of the search databases.
+        StringBuilder databases = new StringBuilder();
+        for(MsSearchDatabase db: search.getSearchDatabases()) {
+            databases.append(", ");
+            databases.append(db.getDatabaseFileName());
+        }
+        if(databases.length() > 0)  databases.deleteCharAt(0);
+        inputSummary.setSearchDatabase(databases.toString());
+        
+        
+        
+        MsRunSearchAnalysisDAO rsAnalysisDao = daoFactory.getMsRunSearchAnalysisDAO();
+        
+        List<Integer> rsAnalysisIds = rsAnalysisDao.getRunSearchAnalysisIdsForAnalysis(analysisId);
+        
+        for (int id: rsAnalysisIds) {
+            String filename = rsAnalysisDao.loadFilenameForRunSearchAnalysis(id);
+            ProteinInferIputFile rs = new ProteinInferIputFile(id, filename);
+            rs.setIsSelected(true);
+            inputSummary.addInputFile(rs);
+        }
+        return inputSummary;
     }
 }

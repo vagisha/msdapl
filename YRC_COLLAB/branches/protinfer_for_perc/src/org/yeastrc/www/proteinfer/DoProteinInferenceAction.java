@@ -43,15 +43,17 @@ public class DoProteinInferenceAction extends Action {
         }
 
         ProteinInferenceForm prinferForm = (ProteinInferenceForm) form;
-        ProteinInferInputSummary searchSummary = prinferForm.getInputSummary();
+        ProteinInferInputSummary inputSummary = prinferForm.getInputSummary();
         ProgramParameters params = prinferForm.getProgramParams();
         
         // TODO validate the parameters (should be done in form?)
-        ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), searchSummary, params);
+        ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), inputSummary, params, prinferForm.getInputType());
         
         // Go!
         ActionForward success = mapping.findForward( "Success" ) ;
-        success = new ActionForward( success.getPath() + "?ID="+prinferForm.getProjectId(), success.getRedirect() ) ;
+        // success = new ActionForward( success.getPath() + "?ID="+prinferForm.getProjectId(), success.getRedirect() ) ;
+        // TODO temporary for MacCoss data.
+        success = new ActionForward("/viewAllSearches.do", true);
         return success;
 
     }

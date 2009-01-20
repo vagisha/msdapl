@@ -26,7 +26,7 @@ public class WIdPickerIonWAllSpectra {
     public String getIonSequence() {
         if(psmList.size() > 0) {
             MsSearchResult res = psmList.get(0).getSpectrumMatch();
-            return removeTerminalResidues(res.getResultPeptide().getModifiedPeptideSequence());
+            return removeTerminalResidues(res.getResultPeptide().getModifiedPeptide());
         }
         else
             return null;

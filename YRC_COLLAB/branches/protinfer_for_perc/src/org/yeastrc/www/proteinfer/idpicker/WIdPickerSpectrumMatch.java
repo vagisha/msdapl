@@ -40,7 +40,7 @@ public class WIdPickerSpectrumMatch {
     }
 
     public String getModifiedSequence() {
-        return removeTerminalResidues(spectrumMatch.getResultPeptide().getModifiedPeptideSequence());
+        return removeTerminalResidues(spectrumMatch.getResultPeptide().getModifiedPeptide());
     }
     
     private static String removeTerminalResidues(String peptide) {

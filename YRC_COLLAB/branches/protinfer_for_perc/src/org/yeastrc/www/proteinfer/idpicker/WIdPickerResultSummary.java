@@ -11,19 +11,19 @@ package org.yeastrc.www.proteinfer.idpicker;
  */
 public class WIdPickerResultSummary {
 
-    private int unfilteredProteinCount;
+//    private int unfilteredProteinCount;
     private int filteredProteinCount;
     private int filteredParsimoniousProteinCount;
     
     private int filteredProteinGroupCount;
     private int filteredParsimoniousProteinGroupCount;
     
-    public int getUnfilteredProteinCount() {
-        return unfilteredProteinCount;
-    }
-    public void setUnfilteredProteinCount(int unfilteredProteinCount) {
-        this.unfilteredProteinCount = unfilteredProteinCount;
-    }
+//    public int getUnfilteredProteinCount() {
+//        return unfilteredProteinCount;
+//    }
+//    public void setUnfilteredProteinCount(int unfilteredProteinCount) {
+//        this.unfilteredProteinCount = unfilteredProteinCount;
+//    }
     public int getFilteredProteinCount() {
         return filteredProteinCount;
     }

@@ -19,10 +19,11 @@ import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerFilterDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerParamDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerFilter;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 public class ProteinferJobSaver {
 
@@ -31,7 +32,7 @@ public class ProteinferJobSaver {
     private static final ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
     private static final ProteinferRunDAO pinferDao = fact.getProteinferRunDao();
     private static final ProteinferInputDAO pinferInputDao = fact.getProteinferInputDao();
-    private static final IdPickerFilterDAO pinferFilterDao = fact.getProteinferFilterDao();
+    private static final IdPickerParamDAO pinferFilterDao = fact.getProteinferParamDao();
     
     
     private static final ProteinferJobSaver saver = new ProteinferJobSaver();
@@ -42,7 +43,9 @@ public class ProteinferJobSaver {
         return saver;
     }
     
-    public void saveJobToDatabase(int submitterId, ProteinInferInputSummary inputSummary, ProgramParameters params) throws Exception {
+    public void saveJobToDatabase(int submitterId, 
+            ProteinInferInputSummary inputSummary, ProgramParameters params,
+            InputType inputType) throws Exception {
         
         // create an entry in the main protein inference table and get an id 
         // for this protein inference run
@@ -54,17 +57,17 @@ public class ProteinferJobSaver {
         ProteinferRun pirun = new ProteinferRun();
         pirun.setProgram(program);
         
-        int searchAnalysisId = inputSummary.getSearchAnalysisId();
-        if(searchAnalysisId == 0) {
+        if(inputType == InputType.SEARCH) {
             MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
             MsSearch search = searchDao.loadSearch(inputSummary.getSearchId());
             pirun.setInputGenerator(search.getSearchProgram());
         }
-        else {
+        else if(inputType == InputType.ANALYSIS) {
             MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
-            MsSearchAnalysis analysis = analysisDao.load(searchAnalysisId);
+            MsSearchAnalysis analysis = analysisDao.load(inputSummary.getSearchAnalysisId());
             pirun.setInputGenerator(analysis.getAnalysisProgram());
         }
+        
         int pinferId = pinferDao.save(pirun);
         
         if(pinferId <= 0) {
@@ -78,6 +81,7 @@ public class ProteinferJobSaver {
             ProteinferInput input = new ProteinferInput();
             input.setProteinferId(pinferId);
             input.setInputId(runSearch.getInputId());
+            input.setInputType(inputType);
             pinferInputDao.saveProteinferInput(input);
         }
         
@@ -96,10 +100,10 @@ public class ProteinferJobSaver {
 
     private void saveIdPickerFilters(int pinferId, ProgramParameters params) {
         for(Param param: params.getParamList()) {
-            IdPickerFilter filter = new IdPickerFilter();
+            IdPickerParam filter = new IdPickerParam();
             filter.setProteinferId(pinferId);
-            filter.setFilterName(param.getName());
-            filter.setFilterValue(param.getValue());
+            filter.setName(param.getName());
+            filter.setValue(param.getValue());
             pinferFilterDao.saveProteinferFilter(filter);
         }
     }
