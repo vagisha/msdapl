@@ -131,8 +131,8 @@ public class ViewProteinInferenceResultAction extends Action {
         
         // Get some summary
         IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
-        request.setAttribute("unfilteredProteinCount", run.getNumUnfilteredProteins());
-        request.setAttribute("filteredProteinGrpCount", proteinGroups.size());
+//        request.setAttribute("unfilteredProteinCount", run.getNumUnfilteredProteins());
+//        request.setAttribute("filteredProteinGrpCount", proteinGroups.size());
         int parsimGrpCount = 0;
         int filteredProteinCount = 0;
         int parsimProteinCount = 0;
@@ -166,7 +166,7 @@ public class ViewProteinInferenceResultAction extends Action {
         
         // Results summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);
-        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
+//        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
         request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
         request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
         request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
