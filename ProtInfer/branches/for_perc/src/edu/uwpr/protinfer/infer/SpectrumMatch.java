@@ -14,7 +14,7 @@ public interface SpectrumMatch {
      * Returns the sequence with modifications
      * @return
      */
-    public abstract String getSequence();
+    public abstract String getModifiedSequence();
     
     public abstract int getRank();
     

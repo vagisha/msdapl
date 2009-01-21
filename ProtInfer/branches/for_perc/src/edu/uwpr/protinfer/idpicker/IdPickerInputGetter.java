@@ -33,6 +33,11 @@ public class IdPickerInputGetter {
         }
     }
     
+    /**
+     * Returns a list of peptide spectrum matches which are filtered by relevant score(s)
+     * and for min peptide length and 
+     * ranked by relevant score(s) for each peptide (as defined in the PeptideDefinition). 
+     */
     public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(int inputId, IDPickerParams params, 
                                             Program program) {
         

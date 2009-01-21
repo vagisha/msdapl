@@ -36,15 +36,6 @@ public class InferredProtein <T extends SpectrumMatch> {
         return peptideEvList.size();
     }
     
-    public int getUniquePeptideEvidenceCount() {
-        int cnt = 0;
-        for(PeptideEvidence<T> pev: peptideEvList.values()) {
-            if(pev.getProteinMatchCount() == 1)
-                cnt++;
-        }
-        return cnt;
-    }
-    
     public int getSpectralEvidenceCount() {
         int count = 0;
         for(PeptideEvidence<T> ev: peptideEvList.values()) {

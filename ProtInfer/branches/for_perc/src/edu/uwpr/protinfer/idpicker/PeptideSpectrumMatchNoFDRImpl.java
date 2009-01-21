@@ -40,7 +40,7 @@ public class PeptideSpectrumMatchNoFDRImpl implements PeptideSpectrumMatchNoFDR 
 
     @Override
     public String getPeptideSequence() {
-        return peptide.getSequence();
+        return peptide.getPeptide().getPeptideSequence();
     }
 
     @Override

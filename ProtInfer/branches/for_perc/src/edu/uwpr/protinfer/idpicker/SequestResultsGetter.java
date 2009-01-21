@@ -19,6 +19,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 
+import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
@@ -72,13 +74,16 @@ public class SequestResultsGetter implements ResultsGetter {
         
         String decoyPrefix = params.getDecoyPrefix();
         
+        PeptideDefinition peptideDef = params.getPeptideDefinition();
+        
         List<PeptideSpectrumMatchIDP> psmList = new ArrayList<PeptideSpectrumMatchIDP>(resultList.size());
         for (SequestSearchResult result: resultList) {
             
             SequestResultData scores = result.getSequestResultData();
             
             // get the peptide
-            Peptide peptide = new Peptide(result.getResultPeptide().getPeptideSequence(), -1);
+            String peptideKey = PeptideKeyCalculator.getKey(result, peptideDef);
+            Peptide peptide = new Peptide(result.getResultPeptide().getPeptideSequence(), peptideKey, -1);
             PeptideHit peptHit = new PeptideHit(peptide);
             
             // read the matching proteins from the database now
@@ -103,7 +108,7 @@ public class SequestResultsGetter implements ResultsGetter {
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(inputId);
-            specMatch.setSequence(result.getResultPeptide().getModifiedPeptide());
+            specMatch.setModifiedSequence(result.getResultPeptide().getModifiedPeptide());
 //            specMatch.setRank(scores.getxCorrRank()); // Rank will be based on calculated FDR
             
             PeptideSpectrumMatchIDPImpl psm = new PeptideSpectrumMatchIDPImpl();
@@ -134,7 +139,7 @@ public class SequestResultsGetter implements ResultsGetter {
                 removed++;
             }
         }
-        log.info("\tRemoved "+removed+" spectra");
+        log.info("\tRemoved "+removed+" spectra. Remaining spectra: "+resultList.size());
      }
     
 }

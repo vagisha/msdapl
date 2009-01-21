@@ -30,7 +30,7 @@ public class PeptideSpectrumMatchIDPImpl implements PeptideSpectrumMatchIDP {
 
     @Override
     public String getPeptideSequence() {
-        return peptide.getSequence();
+        return peptide.getPeptide().getPeptideSequence();
     }
 
     @Override

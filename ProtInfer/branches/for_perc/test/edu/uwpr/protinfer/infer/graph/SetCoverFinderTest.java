@@ -85,7 +85,7 @@ public class SetCoverFinderTest extends TestCase {
     }
     
     private PeptideVertex makePeptideVertex(String index, int idx) {
-        Peptide pept = new Peptide("peptide_"+index, idx);
+        Peptide pept = new Peptide("peptide_"+index, "peptide_"+index, idx);
         return new PeptideVertex(pept);
     }
 }

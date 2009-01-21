@@ -20,6 +20,10 @@ public class ProteinVertex extends Vertex<ProteinVertex> {
             prot.setAccepted(isAccepted);
     }
     
+    public boolean isAccepted() {
+        return proteins.get(0).isAccepted();
+    }
+    
     private ProteinVertex(List<Protein> proteins) {
         super(makeLabel(proteins));
         this.proteins = proteins;

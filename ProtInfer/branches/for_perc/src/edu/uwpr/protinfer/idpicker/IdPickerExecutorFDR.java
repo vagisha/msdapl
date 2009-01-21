@@ -9,9 +9,7 @@ package edu.uwpr.protinfer.idpicker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.Program;
@@ -24,8 +22,6 @@ import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;
 import edu.uwpr.protinfer.filter.fdr.FdrFilterCriteria;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
-import edu.uwpr.protinfer.infer.PeptideHit;
-import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -41,7 +37,7 @@ public class IdPickerExecutorFDR {
         // NOTE: WE ASSUME ALL THE GIVEN inputIds WERE SEARCHED/ANALYSED WITH THE SAME PROGRAM
         Program program = idpRun.getInputGenerator();
         
-        // get all the search hits for the given runSearchIds
+        // get all the search hits for the given inputIds
         List<PeptideSpectrumMatchIDP> allPsms = getAllSearchHits(idpRun, params, program);
         
         // filter the search hits
@@ -77,9 +73,6 @@ public class IdPickerExecutorFDR {
         // infer the proteins;
         List<InferredProtein<SpectrumMatchIDP>> proteins = IDPickerExecutor.inferProteins(filteredPsms, params);
         
-        // calculate the protein coverage
-        IDPickerExecutor.calculateProteinSequenceCoverage(proteins);
-        
         // rank spectrum matches (based on FDR)
         rankPeptideSpectrumMatches(proteins);
         
@@ -94,8 +87,6 @@ public class IdPickerExecutorFDR {
     // search hits.
     private List<PeptideSpectrumMatchIDP> getAllSearchHits(IdPickerRun idpRun, IDPickerParams params, Program program) {
         
-        Set<String> allProteins = new HashSet<String>();
-        Set<String> allPeptides = new HashSet<String>();
         
         List<IdPickerInput> idpInputList = idpRun.getInputList();
         List<PeptideSpectrumMatchIDP> allPsms = new ArrayList<PeptideSpectrumMatchIDP>();
@@ -104,6 +95,8 @@ public class IdPickerExecutorFDR {
         for(IdPickerInput input: idpInputList) {
             
             int runSearchId = input.getInputId();
+            
+            // These peptides are already filtered for min peptide length
             List<PeptideSpectrumMatchIDP> psms = resGetter.getInput(runSearchId, params, program);
             allPsms.addAll(psms);
             
@@ -114,18 +107,11 @@ public class IdPickerExecutorFDR {
                 if(psm.isDecoyMatch())  decoy++;
                 else                    target++;
                 
-                PeptideHit pept = psm.getPeptideHit();
-                allPeptides.add(pept.getSequence());
-                for(ProteinHit prot: pept.getProteinList()) {
-                    allProteins.add(prot.getAccession());
-                }
             }
             
             input.setNumDecoyHits(decoy);
             input.setNumTargetHits(target); 
         }
-        //idpRun.setNumUnfilteredProteins(allProteins.size());
-        //idpRun.setNumUnfilteredPeptides(allPeptides.size());
         
         return allPsms;
     }

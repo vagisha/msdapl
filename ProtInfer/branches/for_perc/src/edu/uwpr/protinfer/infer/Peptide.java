@@ -5,26 +5,40 @@ package edu.uwpr.protinfer.infer;
 public class Peptide {
 
     private final String sequence;
-//    private String modifiedSequence;
-    
-//    private List<PeptideModification> modifications;
+    private final String peptideKey;   // based on the peptide definition
+                                       // If peptide definition == sequence; peptideKey = sequence
+                                       // If peptide definition == sequence+mods; peptideKey = modifiedSequence
+                                       // If peptide definition == sequence+mods+charge; peptideKey = modifiedSequence_charge
     
     private int id;
     private int peptideGroupId;
     
+    private boolean isUnique = false;
     
     /**
      * @param sequence
      * @param id unique id for this peptide
      */
-    public Peptide(String sequence, int id) {
+    public Peptide(String sequence, String peptideKey, int id) {
         this.sequence = sequence;
+        this.peptideKey = peptideKey;
         this.id = id;
-//        modifications = new ArrayList<PeptideModification>();
     }
     
-    public String getSequence() {
+    public String getPeptideSequence() {
         return sequence;
+    }
+    
+    public String getPeptideKey() {
+        return peptideKey;
+    }
+    
+    public boolean isUniqueToProtein() {
+        return isUnique;
+    }
+    
+    public void markUnique(boolean isUnique) {
+        this.isUnique = isUnique;
     }
     
     public int getId() {
@@ -43,52 +57,9 @@ public class Peptide {
         this.peptideGroupId = peptideGroupId;
     }
     
-//    public void addModification(PeptideModification modification) {
-//        modifications.add(modification);
-//        // if the modified sequence has been initialized, set it to null
-//        modifiedSequence = null;
-//    }
-    
-    /**
-     * Returns the sequence of the peptide with modifications. E.g. PEP(80.0)TIDE
-     * @return
-     */
-//    public String getModifiedSequence() {
-//        
-//        if (modifiedSequence != null)
-//            return modifiedSequence;
-//        
-//        if (modifications.size() == 0) {
-//            modifiedSequence = sequence;
-//        }
-//        else {
-//            int lastIdx = 0;
-//            StringBuilder seq = new StringBuilder();
-//            sortModifications();
-//            for (PeptideModification mod: modifications) {
-//                seq.append(sequence.subSequence(lastIdx, mod.getModifiedIndex()+1)); // get sequence up to an including the modified position.
-//                seq.append("["+Math.round(mod.getMassShift().doubleValue())+"]");
-//                lastIdx = mod.getModifiedIndex()+1;
-//            }
-//            if (lastIdx < sequence.length())
-//                seq.append(sequence.subSequence(lastIdx, sequence.length()));
-//            modifiedSequence = seq.toString();
-//        }
-//        return modifiedSequence;
-//    }
-//    
-//    public int getModificationCount() {
-//        return this.modifications.size();
-//    }
-//    
-//    private void sortModifications() {
-//        Collections.sort(modifications, new Comparator<PeptideModification>(){
-//            public int compare(PeptideModification o1, PeptideModification o2) {
-//                return Integer.valueOf(o1.getModifiedIndex()).compareTo(Integer.valueOf(o2.getModifiedIndex()));
-//            }});
-//    }
-    
     public String toString() {
-       return sequence;
+       StringBuilder buf = new StringBuilder();
+       buf.append("ID: "+id+"\tGroupID: "+peptideGroupId+"\tSequence: "+sequence+"\tKey: "+peptideKey);
+       return buf.toString();
     }
 }

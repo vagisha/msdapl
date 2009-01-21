@@ -18,6 +18,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 
+import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
@@ -71,13 +73,16 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
         
         String decoyPrefix = params.getDecoyPrefix();
        
+        PeptideDefinition peptideDef = params.getPeptideDefinition();
+        
         List<PeptideSpectrumMatchIDP> psmList = new ArrayList<PeptideSpectrumMatchIDP>(resultList.size());
         for (ProlucidSearchResult result: resultList) {
             
             ProlucidResultData scores = result.getProlucidResultData();
             
             // get the peptide
-            Peptide peptide = new Peptide(result.getResultPeptide().getPeptideSequence(), -1);
+            String peptideKey = PeptideKeyCalculator.getKey(result, peptideDef);
+            Peptide peptide = new Peptide(result.getResultPeptide().getPeptideSequence(), peptideKey, -1);
             PeptideHit peptHit = new PeptideHit(peptide);
             
             // read the matching proteins from the database now
@@ -101,7 +106,7 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(inputId);
-            specMatch.setSequence(result.getResultPeptide().getModifiedPeptide());
+            specMatch.setModifiedSequence(result.getResultPeptide().getModifiedPeptide());
             // specMatch.setRank(scores.getPrimaryScoreRank());  // Rank will be based on calculated FDR
             
             PeptideSpectrumMatchIDPImpl psm = new PeptideSpectrumMatchIDPImpl();
@@ -132,7 +137,7 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
                 removed++;
             }
         }
-        log.info("\tRemoved "+removed+" spectra");
+        log.info("\tRemoved "+removed+" spectra. Remaining spectra: "+resultList.size());
      }
     
 }

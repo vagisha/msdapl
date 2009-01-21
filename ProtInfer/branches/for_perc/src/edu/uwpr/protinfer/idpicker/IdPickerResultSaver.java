@@ -67,8 +67,8 @@ public class IdPickerResultSaver {
     
     private <T extends SpectrumMatch> void saveInferredProteins(int pinferId, List<InferredProtein<T>> proteins) {
         
-        // map of peptide sequence and pinferPeptideIDs
-        Map<String, Integer> idpPeptideIds = new HashMap<String, Integer>();
+        // map of peptide id and pinferPeptideIDs
+        Map<Integer, Integer> idpPeptideIds = new HashMap<Integer, Integer>();
         
         for(InferredProtein<T> protein: proteins) {
             
@@ -86,11 +86,11 @@ public class IdPickerResultSaver {
             // save the peptides, ions and the associated spectrum matches
             for(PeptideEvidence<T> pev: protein.getPeptides()) {
                 Peptide peptide = pev.getPeptide();
-                Integer pinferPeptideId = idpPeptideIds.get(peptide.getSequence());
+                Integer pinferPeptideId = idpPeptideIds.get(peptide.getId());
                 if(pinferPeptideId == null) {
                     pinferPeptideId = savePeptideEvidence(pev, pinferId);
                     // add to our map
-                    idpPeptideIds.put(peptide.getSequence(), pinferPeptideId);
+                    idpPeptideIds.put(peptide.getId(), pinferPeptideId);
                 }
                 // link the protein and peptide
                 protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);
@@ -101,12 +101,12 @@ public class IdPickerResultSaver {
     }
 
     private <T extends SpectrumMatch> int savePeptideEvidence(PeptideEvidence<T> pev, int pinferId) {
-        pev.getProteinMatchCount();
+        
         Peptide peptide = pev.getPeptide();
         IdPickerPeptideBase idpPept = new IdPickerPeptideBase();
         idpPept.setGroupId(peptide.getPeptideGroupId());
-        idpPept.setSequence(peptide.getSequence());
-        idpPept.setUniqueToProtein(pev.getProteinMatchCount() == 1);
+        idpPept.setSequence(peptide.getPeptideSequence());
+        idpPept.setUniqueToProtein(peptide.isUniqueToProtein());
         idpPept.setProteinferId(pinferId);
         
         int pinferPeptideId = peptDao.saveIdPickerPeptide(idpPept);
@@ -117,7 +117,7 @@ public class IdPickerResultSaver {
         Map<String, Integer> modIds = new HashMap<String, Integer>();
         int modId = 1;
         for(T psm: pev.getSpectrumMatchList()) {
-            String modseq = psm.getSequence(); // this is the modified sequence
+            String modseq = psm.getModifiedSequence(); // this is the modified sequence
             
             
             String key = modseq+"_"+psm.getCharge();

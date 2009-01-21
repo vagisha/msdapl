@@ -9,7 +9,7 @@ public class SpectrumMatchIDPImpl implements SpectrumMatchIDP {
     private int scanId;
     private double fdr = 1.0;
     private boolean accepted;
-    private String peptideSequence;
+    private String peptideModifiedSequence;
     private int rank;
     
     public void setCharge(int charge) {
@@ -75,12 +75,12 @@ public class SpectrumMatchIDPImpl implements SpectrumMatchIDP {
     }
 
     @Override
-    public String getSequence() {
-        return peptideSequence;
+    public String getModifiedSequence() {
+        return peptideModifiedSequence;
     }
     
-    public void setSequence(String sequence) {
-        this.peptideSequence = sequence;
+    public void setModifiedSequence(String sequence) {
+        this.peptideModifiedSequence = sequence;
     }
 
 }

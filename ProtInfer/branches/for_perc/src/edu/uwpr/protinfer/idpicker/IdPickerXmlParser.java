@@ -161,7 +161,8 @@ public class IdPickerXmlParser {
                         sequence = reader.getAttributeValue(i);
                     }
                 }
-                hit = new PeptideHit(new Peptide(sequence, id));
+                String peptideKey = sequence;
+                hit = new PeptideHit(new Peptide(sequence, peptideKey, id));
                 lastId = id;
             }
             else if (isStartLocus(evtType)) {

@@ -21,10 +21,10 @@ public class IdPickerRun extends GenericProteinferRun<IdPickerInput> {
         return filters;
     }
 
-    public List<IdPickerParam> getSortedFilters() {
+    public List<IdPickerParam> getSortedParams() {
         Collections.sort(filters, new Comparator<IdPickerParam>(){
             public int compare(IdPickerParam o1, IdPickerParam o2) {
-                return o1.getName().compareTo(o2.getName());
+                return Integer.valueOf(o1.getId()).compareTo(o2.getId());
             }});
         return filters;
     }

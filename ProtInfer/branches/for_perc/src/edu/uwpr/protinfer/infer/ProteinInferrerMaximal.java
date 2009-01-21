@@ -5,12 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import edu.uwpr.protinfer.util.TimeUtils;
+
 public class ProteinInferrerMaximal implements ProteinInferrer {
 
+    private static final Logger log = Logger.getLogger(ProteinInferrerMaximal.class);
     
     @Override
     public <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
         List<InferredProtein<S>> inferProteins(List<T> psmList) {
+        
+        long s = System.currentTimeMillis();
         
         Map<Integer, InferredProtein<S>> proteinMap = new HashMap<Integer, InferredProtein<S>>();
         Map<Integer, PeptideEvidence<S>> peptideMap = new HashMap<Integer, PeptideEvidence<S>>();
@@ -26,7 +33,7 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
             PeptideEvidence<S> evidence = peptideMap.get(psmPeptide.getId());
             if(evidence == null) {
                 evidence = new PeptideEvidence<S>(psmPeptide);
-                evidence.setProteinMatchCount(psm.getPeptideHit().getMatchProteinCount());
+                psmPeptide.markUnique(psm.getPeptideHit().getMatchProteinCount() == 1);
                 peptideMap.put(psmPeptide.getId(), evidence);
             }
             evidence.addSpectrumMatch(psm.getSpectrumMatch());
@@ -52,6 +59,11 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
         
         List<InferredProtein<S>> inferredProteins = new ArrayList<InferredProtein<S>>(proteinMap.size());
         inferredProteins.addAll(proteinMap.values());
+        
+        long e = System.currentTimeMillis();
+        log.info("Inferred proteins (maximal) in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds \nAll: "+
+                inferredProteins.size());
+        
         return inferredProteins;
     }
 }

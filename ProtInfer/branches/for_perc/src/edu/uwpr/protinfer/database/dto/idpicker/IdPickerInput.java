@@ -4,9 +4,9 @@ import edu.uwpr.protinfer.database.dto.ProteinferInput;
 
 public class IdPickerInput extends ProteinferInput {
 
-    private int numTargetHits = -1;
-    private int numDecoyHits = -1;
-    private int numFilteredTargetHits = -1;
+    private int numTargetHits = 0;
+    private int numDecoyHits = 0;
+    private int numFilteredTargetHits = 0;
     
     public int getNumTargetHits() {
         return numTargetHits;

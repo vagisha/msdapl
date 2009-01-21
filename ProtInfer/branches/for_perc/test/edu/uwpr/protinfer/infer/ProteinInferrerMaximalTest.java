@@ -18,8 +18,8 @@ public class ProteinInferrerMaximalTest extends TestCase {
     public final void testInferProteins() {
         SearchSource source = new SearchSource("dummy");
         
-        Peptide p1 = new Peptide("ABCDE", 1);
-        Peptide p2 = new Peptide("ABCDE", 1);
+        Peptide p1 = new Peptide("ABCDE", "ABCDE", 1);
+        Peptide p2 = new Peptide("ABCDE", "ABCDE", 1);
         PeptideHit hit1 = new PeptideHit(p1);
         hit1.addProteinHit(new ProteinHit(new Protein("Protein1", 1)));
         hit1.addProteinHit(new ProteinHit(new Protein("Protein2", 2)));

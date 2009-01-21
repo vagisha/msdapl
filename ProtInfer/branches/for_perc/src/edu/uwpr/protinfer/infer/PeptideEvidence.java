@@ -8,7 +8,6 @@ public class PeptideEvidence <T extends SpectrumMatch>{
     
     private Peptide peptide;
     private List<T> spectrumMatchList;
-    private int numProteinMatch = 0;
     private double bestFdr = 1.0;
     
     public PeptideEvidence(Peptide peptide) {
@@ -38,36 +37,8 @@ public class PeptideEvidence <T extends SpectrumMatch>{
         return spectrumMatchList.size();
     }
     
-    /**
-     * Returns the sequence of the peptide without modifications;
-     * @return
-     */
-    public String getPeptideSeq() {
-        return peptide.getSequence();
-    }
-    
-    /**
-     * Returns the sequence of the peptide WITH modifications;
-     * @return
-     */
-//    public String getModifiedPeptideSeq() {
-//        return peptide.getModifiedSequence();
-//    }
-    
     public Peptide getPeptide() {
         return peptide;
-    }
-    
-    public int getProteinMatchCount() {
-        return this.numProteinMatch;
-    }
-    
-    public void setProteinMatchCount(int count) {
-        this.numProteinMatch = count;
-    }
-    
-    public boolean isUniqueToProtein() {
-        return numProteinMatch == 1;
     }
     
     public double getBestFdr() {
@@ -88,16 +59,4 @@ public class PeptideEvidence <T extends SpectrumMatch>{
         return buf.toString();
     }
     
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || (o.getClass() != this.getClass()))
-            return false;
-        PeptideEvidence<?> that = (PeptideEvidence<?>) o;
-        return this.peptide.getSequence().equals(that.peptide.getSequence());
-    }
-    
-    public int hashCode() {
-        return peptide.getSequence().hashCode();
-    }
 }

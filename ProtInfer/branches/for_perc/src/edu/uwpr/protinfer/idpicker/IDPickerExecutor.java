@@ -60,7 +60,7 @@ public class IDPickerExecutor {
         
         // create the parameters object
         IDPickerParams params = makeIdPickerParams(idpRun.getFilters());
-        log.info(params.toString());
+        log.info("\n"+params.toString());
         
         // Are we going to do FDR calculation?
         if(params.getDoFdrCalculation()) {
@@ -77,7 +77,7 @@ public class IDPickerExecutor {
         log.info("IDPicker TOTAL run time: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes");
     }
     
-    protected static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
+    private static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
         
         long start = System.currentTimeMillis();
         
@@ -100,7 +100,7 @@ public class IDPickerExecutor {
                 
             List<String> peptides = new ArrayList<String>();
             for(PeptideEvidence<T> pev: prot.getPeptides()) {
-                peptides.add(pev.getPeptideSeq());
+                peptides.add(pev.getPeptide().getPeptideSequence());
             }
             int lengthCovered = StringUtils.getCoveredSequenceLength(proteinSeq, peptides);
             float percCovered = ((float)lengthCovered/(float)proteinSeq.length()) * 100.0f;
@@ -120,10 +120,10 @@ public class IDPickerExecutor {
         int currPeptId = 1;
         for(T psm: filteredPsms) {
             Peptide pept = psm.getPeptideHit().getPeptide();
-            Integer id = peptideIds.get(pept.getSequence());
+            Integer id = peptideIds.get(pept.getPeptideKey());
             if (id == null) {
                 id = currPeptId;
-                peptideIds.put(pept.getSequence(), id);
+                peptideIds.put(pept.getPeptideKey(), id);
                 currPeptId++;
             }
             pept.setId(id);
@@ -206,10 +206,10 @@ public class IDPickerExecutor {
                            
                            // finally try to match the peptide sequence and accession
                            ids = NrSeqLookupUtil.getDbProteinIdsForPeptidePartialAccession(nrseqDbId, pr.getAccession(),
-                                   phit.getPeptide().getSequence());
+                                   phit.getPeptide().getPeptideSequence());
                            if(ids.size() != 1) {
                                log.error("Found multiple ("+ids.size()+") nrseq ids for protein: "+pr.getAccession()+
-                                           "; database: "+nrseqDbId+"; peptide: "+phit.getPeptide().getSequence());
+                                           "; database: "+nrseqDbId+"; peptide: "+phit.getPeptide().getPeptideSequence());
                               // throw new Exception("Could not find nrseq id for protein: "+pr.getAccession()+"; database: "+nrseqDbId);
                            
                                // IF WE HAVE MULTIPLE MATCHES IT MEANS WE HAVE A TRUNCATED ACCESSION AND
@@ -377,7 +377,6 @@ public class IDPickerExecutor {
             }
             lastScanId = psm.getScanId();
         }
-        log.info("Found "+scanIdsToRemove.size()+" scanIds with multiple results");
         
         Iterator<T> iter = psmList.iterator();
         while(iter.hasNext()) {
@@ -389,7 +388,8 @@ public class IDPickerExecutor {
         }
         long e = System.currentTimeMillis();
 //        log.info("\nRR\t"+runSearchAnalysisId+"\t"+allScanIds.size()+"\t"+scanIdsToRemove.size());
-        log.info("Removed scans with multiple results in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        log.info("Removed "+scanIdsToRemove.size()+" scans with multiple results. "+
+                "Remaining results: "+psmList.size()+". Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds\n");
     }
     
     
@@ -415,17 +415,10 @@ public class IDPickerExecutor {
                     iter.remove();
                 }
             }
-            
-            // if some proteins were removed, update all peptides that map to the removed proteins
-            for(InferredProtein<S> prot: allProteins) {
-                List<PeptideEvidence<S>> peptides = prot.getPeptides();
-                for(PeptideEvidence<S> pep)
-            }
         }
         
-        
-        ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker(params.getDoParsimonyAnalysis());
-        return inferrer.inferProteins(psms);
+        ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker();
+        return inferrer.inferProteins(allProteins, params);
     }
     
     public static <T extends InferredProtein<?>>void replaceNrSeqDbProtIdsWithProteinIds(List<T> proteins) {
@@ -480,7 +473,7 @@ public class IDPickerExecutor {
         
         
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(5);
+        IdPickerRun run = runDao.loadProteinferRun(6);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getFilters().size());
         
