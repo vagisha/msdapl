@@ -23,7 +23,7 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
         return data.getDiscriminantScore();
     }
 
-    public void setDiscriminantScore(double discriminantScore) {
+    public void setDiscriminantScore(Double discriminantScore) {
         data.setDiscriminantScore(discriminantScore);
     }
 

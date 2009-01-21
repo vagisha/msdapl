@@ -103,7 +103,8 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             return modifiedSequence;
         
         if (dynaResidueMods.size() == 0) {
-            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
+//            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
+            modifiedSequence = String.valueOf(sequence);
         }
         else {
             String origseq = String.valueOf(sequence);
@@ -127,7 +128,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
                 seq.append(origseq.subSequence(lastIdx, origseq.length()));
             
             modifiedSequence = seq.toString();
-            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
+//            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
         }
         
         return modifiedSequence;
@@ -143,7 +144,8 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             return modifiedSequence;
         
         if (dynaResidueMods.size() == 0) {
-            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
+//            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
+            modifiedSequence = String.valueOf(sequence);
         }
         else {
             String origseq = String.valueOf(sequence);
@@ -161,7 +163,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
                 seq.append(origseq.subSequence(lastIdx, origseq.length()));
             
             modifiedSequence = seq.toString();
-            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
+//            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
         }
         
         return modifiedSequence;
