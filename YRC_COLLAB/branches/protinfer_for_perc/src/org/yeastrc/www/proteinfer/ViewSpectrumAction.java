@@ -112,7 +112,8 @@ public class ViewSpectrumAction extends Action {
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         MsSearch search = searchDao.loadSearch(searchId);
         
-        String Sq = result.getResultPeptide().getModifiedPeptideSequence();
+        String Sq = result.getResultPeptide().getModifiedPeptide();
+        Sq = result.getResultPeptide().getPreResidue()+"."+Sq+"."+result.getResultPeptide().getPostResidue();
         request.setAttribute("peptideSeq", Sq);
         
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
