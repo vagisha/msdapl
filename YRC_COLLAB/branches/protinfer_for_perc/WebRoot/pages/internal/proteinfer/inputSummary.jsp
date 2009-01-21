@@ -6,13 +6,13 @@
   		<tr>
   			<th colspan="2" class="ms_A" style="font-size: 10pt;">IDPicker Parameters</th>
   		</tr>
-  		<logic:iterate name="idpickerRun" property="sortedFilters" id="filter">
+  		<logic:iterate name="idpickerRun" property="sortedParams" id="param">
   		<tr>
     	<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;">
-    		<bean:write name="filter" property="filterName" />
+    		<bean:write name="param" property="name" />
     	</td>
     	<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;">
-    		<bean:write name="filter" property="filterValue" />
+    		<bean:write name="param" property="value" />
     	</td>
    		</tr>
    		</logic:iterate>
@@ -38,8 +38,8 @@
  					<bean:write name="input" property="fileName" />
  					</span>
  				</td>
- 				<td><bean:write name="input" property="input.numTargetHits" /></td>
  				<td><bean:write name="input" property="input.numDecoyHits" /></td>
+ 				<td><bean:write name="input" property="input.numTargetHits" /></td>
  				<td><bean:write name="input" property="input.numFilteredTargetHits" /></td>
  			</tr>
 	 	</logic:iterate>

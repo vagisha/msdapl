@@ -10,9 +10,8 @@
 		<td valign="top">
 		<table CELLPADDING="5px" CELLSPACING="2px" align="center" style="border: 1px solid gray;">
 			<tr>
-				<td style="border: 1px dotted #AAAAAA;"># Unfiltered Proteins: <b><bean:write name="unfilteredProteinCount" /></b></td>
 				<td style="border: 1px dotted #AAAAAA;">
-					# Filtered Protein Groups (# proteins): 
+					# Protein Groups (# proteins): 
 					<b><bean:write name="filteredProteinGrpCount" /></b>(<bean:write name="filteredProteinCount" />)
 				</td>
 				<td style="border: 1px dotted #AAAAAA;"># Parsimonious Protein Groups (# proteins): 

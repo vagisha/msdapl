@@ -14,7 +14,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
 import org.yeastrc.www.user.User;
@@ -128,27 +127,6 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("pageCount", pageCount);
         
         
-        
-        // Get some summary
-        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
-//        request.setAttribute("unfilteredProteinCount", run.getNumUnfilteredProteins());
-//        request.setAttribute("filteredProteinGrpCount", proteinGroups.size());
-        int parsimGrpCount = 0;
-        int filteredProteinCount = 0;
-        int parsimProteinCount = 0;
-        for(WIdPickerProteinGroup group: proteinGroups) {
-            if(group.getProteins().get(0).getProtein().getIsParsimonious())
-                parsimGrpCount++;
-            for(WIdPickerProtein prot: group.getProteins()) {
-                filteredProteinCount++;
-                if(prot.getProtein().getIsParsimonious())
-                    parsimProteinCount++;
-            }
-        }
-        request.setAttribute("filteredProteinCount", filteredProteinCount);
-        request.setAttribute("parsimProteinGrpCount", parsimGrpCount);
-        request.setAttribute("parsimProteinCount", parsimProteinCount);
-        
 
         // Cluster IDs in this set
         List<Integer> clusterIdList = IdPickerResultsLoader.getClusterIds(pinferId);
@@ -163,6 +141,17 @@ public class ViewProteinInferenceResultAction extends Action {
         // Input summary
         List<WIdPickerInputSummary> inputSummary = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
         request.setAttribute("inputSummary", inputSummary);
+        int totalDecoyHits = 0;
+        int totalTargetHits = 0;
+        int filteredTargetHits = 0;
+        for(WIdPickerInputSummary input: inputSummary) {
+            totalDecoyHits += input.getInput().getNumDecoyHits();
+            totalTargetHits += input.getInput().getNumTargetHits();
+            filteredTargetHits += input.getInput().getNumFilteredTargetHits();
+        }
+        request.setAttribute("totalDecoyHits", totalDecoyHits);
+        request.setAttribute("totalTargetHits", totalTargetHits);
+        request.setAttribute("filteredTargetHits", filteredTargetHits);
         
         // Results summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);
