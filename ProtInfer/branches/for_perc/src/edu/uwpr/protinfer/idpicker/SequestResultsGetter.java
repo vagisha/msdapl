@@ -7,12 +7,14 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
@@ -61,6 +63,10 @@ public class SequestResultsGetter implements ResultsGetter {
         log.info("\tTime: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
         
        
+        // Remove search hits to small peptides
+        removeSmallPeptides(resultList, params);
+        
+        
         // make a list of peptide spectrum matches and read the matching proteins from the database
         s = System.currentTimeMillis();
         
@@ -114,5 +120,21 @@ public class SequestResultsGetter implements ResultsGetter {
         log.info("Total time: "+TimeUtils.timeElapsedSeconds(start, e)+" seconds.");
         return psmList;
     }
+    
+    private void removeSmallPeptides(List<SequestSearchResult> resultList, IDPickerParams params) {
+        
+        log.info("Removing search hits with peptide length < "+params.getMinPeptideLength());
+        Iterator<SequestSearchResult> iter = resultList.iterator();
+        int removed = 0;
+        while(iter.hasNext()) {
+            SequestSearchResult res = iter.next();
+            // if the length of the peptide is less than the required threshold do not add it to the final list
+            if(res.getResultPeptide().getPeptideSequence().length() < params.getMinPeptideLength()) {
+                iter.remove();
+                removed++;
+            }
+        }
+        log.info("\tRemoved "+removed+" spectra");
+     }
     
 }

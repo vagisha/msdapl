@@ -12,8 +12,8 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
     public <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
         List<InferredProtein<S>> inferProteins(List<T> psmList) {
         
-        Map<String, InferredProtein<S>> proteinMap = new HashMap<String, InferredProtein<S>>();
-        Map<String, PeptideEvidence<S>> peptideMap = new HashMap<String, PeptideEvidence<S>>();
+        Map<Integer, InferredProtein<S>> proteinMap = new HashMap<Integer, InferredProtein<S>>();
+        Map<Integer, PeptideEvidence<S>> peptideMap = new HashMap<Integer, PeptideEvidence<S>>();
         
         
         // for each peptide sequence match
@@ -23,11 +23,11 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
             Peptide psmPeptide = psm.getPeptideHit().getPeptide();
             
             // add this to the peptideMap if not already there
-            PeptideEvidence<S> evidence = peptideMap.get(psmPeptide.getSequence());
+            PeptideEvidence<S> evidence = peptideMap.get(psmPeptide.getId());
             if(evidence == null) {
                 evidence = new PeptideEvidence<S>(psmPeptide);
                 evidence.setProteinMatchCount(psm.getPeptideHit().getMatchProteinCount());
-                peptideMap.put(psmPeptide.getSequence(), evidence);
+                peptideMap.put(psmPeptide.getId(), evidence);
             }
             evidence.addSpectrumMatch(psm.getSpectrumMatch());
             
@@ -35,12 +35,12 @@ public class ProteinInferrerMaximal implements ProteinInferrer {
             List<ProteinHit> protHitList = psm.getPeptideHit().getProteinList();
             for (ProteinHit protHit: protHitList) {
                 
-                InferredProtein<S> inferredProtein = proteinMap.get(protHit.getAccession());
+                InferredProtein<S> inferredProtein = proteinMap.get(protHit.getProtein().getId());
                 
                 // if we have not seen this protein add a new InferredProtein to the proteinMap
                 if (inferredProtein == null) {
                     inferredProtein = new InferredProtein<S>(protHit.getProtein());
-                    proteinMap.put(protHit.getAccession(), inferredProtein);
+                    proteinMap.put(protHit.getProtein().getId(), inferredProtein);
                 }
                 
                 // if this protein does not already have this peptide evidence add it

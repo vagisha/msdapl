@@ -64,7 +64,9 @@ public class IdPickerExecutorFDR {
         }
         // Our search results should already be filtered at this point
         // so remove all spectra with multiple results
-        IDPickerExecutor.removeSpectraWithMultipleResults(filteredPsms);
+        if(params.isRemoveAmbiguousSpectra()) {
+            IDPickerExecutor.removeSpectraWithMultipleResults(filteredPsms);
+        }
         
         // update the summary statistics
         updateSummaryAfterFiltering(filteredPsms, idpRun);

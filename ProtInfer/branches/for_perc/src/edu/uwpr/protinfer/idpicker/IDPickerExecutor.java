@@ -28,6 +28,7 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.Program;
 
+import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
@@ -39,6 +40,7 @@ import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.PeptideSpectrumMatch;
 import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.infer.ProteinInferrerMaximal;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
 import edu.uwpr.protinfer.util.StringUtils;
 import edu.uwpr.protinfer.util.TimeUtils;
@@ -58,7 +60,7 @@ public class IDPickerExecutor {
         
         // create the parameters object
         IDPickerParams params = makeIdPickerParams(idpRun.getFilters());
-        
+        log.info(params.toString());
         
         // Are we going to do FDR calculation?
         if(params.getDoFdrCalculation()) {
@@ -107,7 +109,7 @@ public class IDPickerExecutor {
         long end = System.currentTimeMillis();
         log.info("Calculated protein sequence coverage in : "+TimeUtils.timeElapsedSeconds(start, end)+" seconds");
     }
-
+    
     protected static <T extends PeptideSpectrumMatch<?>> void assignIdsToPeptidesAndProteins(List<T> filteredPsms, Program inputGenerator) throws Exception {
         assignNrSeqProteinIds(filteredPsms, inputGenerator);
         assignPeptideIds(filteredPsms);
@@ -274,26 +276,72 @@ public class IDPickerExecutor {
                                            // if we find FDR calculation filters we will set this to true;
         List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
         for(IdPickerParam filter: filters) {
-            if(filter.getName().equalsIgnoreCase("maxAbsFDR")) {
-                params.setMaxAbsoluteFdr(Float.valueOf(filter.getValue()));
+            // Max. Absolute FDR
+            if(filter.getName().equals("maxAbsFDR")) {
+                params.setMaxAbsoluteFdr(Float.parseFloat(filter.getValue()));
                 params.setDoFdrCalculation(true);
             }
-            else if(filter.getName().equalsIgnoreCase("maxRelativeFDR")) {
-                params.setMaxRelativeFdr(Float.valueOf(filter.getValue()));
+            // Max. Relative FDR
+            else if(filter.getName().equals("maxRelativeFDR")) {
+                params.setMaxRelativeFdr(Float.parseFloat(filter.getValue()));
                 params.setDoFdrCalculation(true);
             }
-            else if (filter.getName().equalsIgnoreCase("decoyRatio"))
-                params.setDecoyRatio(Float.valueOf(filter.getValue()));
-            else if (filter.getName().equalsIgnoreCase("decoyPrefix"))
+            // Decoy Ratio
+            else if (filter.getName().equals("decoyRatio"))
+                params.setDecoyRatio(Float.parseFloat(filter.getValue()));
+            // Decoy Prefix
+            else if (filter.getName().equals("decoyPrefix"))
                 params.setDecoyPrefix(filter.getValue());
-            else if (filter.getName().equalsIgnoreCase("parsimonyAnalysis"))
-                params.setDoParsimonyAnalysis(Boolean.valueOf(filter.getValue()));
-            else if(filter.getName().equalsIgnoreCase("FDRFormula")) {
+//            else if (filter.getName().equalsIgnoreCase("parsimonyAnalysis"))
+//                params.setDoParsimonyAnalysis(Boolean.valueOf(filter.getValue()));
+            
+            // Formula that will be used to calculate FDR
+            else if(filter.getName().equals("FDRFormula")) {
                 String val = filter.getValue();
                 if(val.equals("2R/(F+R)"))
                     params.setUseIdPickerFDRFormula(true);
                 else
                     params.setUseIdPickerFDRFormula(false);
+            }
+            // Peptide Definition
+            else if(filter.getName().equals("PeptDef")) {
+                PeptideDefinition peptDef = new PeptideDefinition();
+                String val = filter.getValue();
+                if(val.equals("Sequence + Modifications")) {
+                    peptDef.setUseMods(true);
+                }
+                else if(val.equals("Sequence + Charge")) {
+                    peptDef.setUseCharge(true);
+                }
+                else if(val.equals("Sequence + Modifications + Charge")) {
+                    peptDef.setUseCharge(true);
+                    peptDef.setUseMods(true);
+                }
+                params.setPeptideDefinition(peptDef);
+            }
+            // Min. Peptides
+            else if(filter.getName().equals("minPept")) {
+                params.setMinPeptides(Integer.parseInt(filter.getValue()));
+            }
+            // Min Unique Peptides
+            else if(filter.getName().equals("minUniqePept")) {
+                params.setMinUniquePeptides(Integer.parseInt(filter.getValue()));
+            }
+            // Min. Peptide Length
+            else if(filter.getName().equals("minPeptLen")) {
+                params.setMinPeptideLength(Integer.parseInt(filter.getValue()));
+            }
+            // Min. spectra per peptide
+//            else if(filter.getName().equals("minPeptSpectra")) {
+//                params.setMinPeptideSpectra(Integer.parseInt(filter.getValue()));
+//            }
+            //Min Coverage for a protein
+            else if(filter.getName().equals("coverage")) {
+                params.setMinCoverage(Float.parseFloat(filter.getValue()));
+            }
+            // Remove Ambiguous Spectra
+            else if(filter.getName().equals("removeAmbigSpectra")) {
+                params.setRemoveAmbiguousSpectra(Boolean.parseBoolean(filter.getValue()));
             }
             else {
                 moreFilters.add(filter);
@@ -316,10 +364,12 @@ public class IDPickerExecutor {
         
         // get a list of scan Ids that have multiple results
         Set<Integer> scanIdsToRemove = new HashSet<Integer>();
+//        Set<Integer> allScanIds = new HashSet<Integer>();
         
         int lastScanId = -1;
         for (int i = 0; i < psmList.size(); i++) {
             T psm = psmList.get(i);
+//            allScanIds.add(psm.getScanId());
             if(lastScanId != -1){
                 if(lastScanId == psm.getScanId()) {
                     scanIdsToRemove.add(lastScanId);
@@ -338,12 +388,41 @@ public class IDPickerExecutor {
             }
         }
         long e = System.currentTimeMillis();
+//        log.info("\nRR\t"+runSearchAnalysisId+"\t"+allScanIds.size()+"\t"+scanIdsToRemove.size());
         log.info("Removed scans with multiple results in: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
     }
     
     
     protected static <S extends SpectrumMatch, T extends PeptideSpectrumMatch<S>> 
-        List<InferredProtein<S>> inferProteins(List<T> psms, IDPickerParams params) {
+        List<InferredProtein<S>> inferProteins(List<T> psms, IDPickerParams params) throws Exception {
+        
+        // first infer all proteins
+        ProteinInferrerMaximal maxInferrer = new ProteinInferrerMaximal();
+        List<InferredProtein<S>> allProteins = maxInferrer.inferProteins(psms);
+        
+        // calculate protein coverage
+        calculateProteinSequenceCoverage(allProteins); // throws exception
+        
+        // filter proteins by coverage
+        if(params.getMinCoverage() > 0.0) {
+            List<InferredProtein<S>> removed = new ArrayList<InferredProtein<S>>();
+            float coverage = params.getMinCoverage();
+            Iterator<InferredProtein<S>> iter = allProteins.iterator();
+            while(iter.hasNext()) {
+                InferredProtein<S> prot = iter.next();
+                if(prot.getPercentCoverage() < coverage) {
+                    removed.add(prot);
+                    iter.remove();
+                }
+            }
+            
+            // if some proteins were removed, update all peptides that map to the removed proteins
+            for(InferredProtein<S> prot: allProteins) {
+                List<PeptideEvidence<S>> peptides = prot.getPeptides();
+                for(PeptideEvidence<S> pep)
+            }
+        }
+        
         
         ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker(params.getDoParsimonyAnalysis());
         return inferrer.inferProteins(psms);
@@ -364,9 +443,44 @@ public class IDPickerExecutor {
 
     
     public static void main(String[] args) {
+        
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
+        
+//        // save a protein inference run and input files
+//        ProteinferRun pirun = new ProteinferRun();
+//        pirun.setInputGenerator(Program.PERCOLATOR);
+//        pirun.setProgram(ProteinInferenceProgram.IDPICKER_PERC);
+//        int pinferId = factory.getProteinferRunDao().save(pirun);
+//        
+//        int searchAnalysisId = 4;
+//        MsRunSearchAnalysisDAO adao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
+//        List<Integer> rsAnalysisIds = adao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
+//        for(int id: rsAnalysisIds) {
+////            MsRunSearchAnalysis analysis = adao.load(id); 
+//            ProteinferInput input = new ProteinferInput();
+//            input.setProteinferId(pinferId);
+//            input.setInputId(id);
+//            factory.getProteinferInputDao().saveProteinferInput(input);
+//        }
+        
+//        // save the parameters
+//        IdPickerFilterDAO filterDao = factory.getProteinferFilterDao();
+//        IdPickerFilter filter = new IdPickerFilter();
+//        filter.setFilterName("pep_percolator");
+//        filter.setFilterValue("0.05");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveProteinferFilter(filter);
+//        filter = new IdPickerFilter();
+//        filter.setFilterName("qval_percolator");
+//        filter.setFilterValue("0.05");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveProteinferFilter(filter);
+        
+        
+        
+        
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(1);
+        IdPickerRun run = runDao.loadProteinferRun(5);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getFilters().size());
         

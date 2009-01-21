@@ -3,6 +3,7 @@ package edu.uwpr.protinfer.idpicker;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 public class IDPickerParams {
@@ -10,13 +11,45 @@ public class IDPickerParams {
     private float maxAbsoluteFdr = 0.05f;
     private float maxRelativeFdr = 0.05f;
     private float decoyRatio = 1.0f;
-//    private int minDistinctPeptides = 1;
     private boolean doParsimonyAnalysis = true;
     private boolean doFdrCalculation = true;
     private String decoyPrefix = "";
     private boolean useIdPickerFDRFormula = true;
     
+    
+    private PeptideDefinition peptideDefinition;
+    private int minPeptides = 1;
+    private int minUniquePeptides = 0;
+    private float minCoverage = 0;
+//    private int minPeptideSpectra = 1;
+    private int minPeptideLength = 1;
+    private boolean removeAmbiguousSpectra = true;
+    
     List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
+    
+    
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        if(doFdrCalculation) {
+            buf.append("Max Abs. FDR: "+maxAbsoluteFdr+"\n");
+            buf.append("Max rel. FDR: "+maxRelativeFdr+"\n");
+            buf.append("Decoy Ratio: "+decoyRatio+"\n");
+            buf.append("Decoy Prefix: "+decoyPrefix+"\n");
+            buf.append("Use IDPicker FDR formula: "+useIdPickerFDRFormula+"\n");
+        }
+        buf.append("Peptide Definition: "+peptideDefinition.toString()+"\n");
+        buf.append("Min Peptides: "+minPeptides+"\n");
+        buf.append("Min Unique Peptides: "+minUniquePeptides+"\n");
+        buf.append("Min Coverage: "+minCoverage+"\n");
+        buf.append("Min Peptide Length: "+minPeptideLength+"\n");
+//        buf.append("Min Spectra / Peptide: "+minPeptideSpectra+"\n");
+        buf.append("Remove Ambiguous Spectra: "+removeAmbiguousSpectra+"\n");
+        buf.append("MORE PARAMS: \n");
+        for(IdPickerParam param: moreFilters) {
+            buf.append(param.toString()+"\n");
+        }
+        return buf.toString();
+    }
     
     
     public boolean useIdPickerFDRFormula() {
@@ -49,12 +82,7 @@ public class IDPickerParams {
     public void setDecoyRatio(float decoyRatio) {
         this.decoyRatio = decoyRatio;
     }
-//    public int getMinDistinctPeptides() {
-//        return minDistinctPeptides;
-//    }
-//    public void setMinDistinctPeptides(int minDistinctPeptides) {
-//        this.minDistinctPeptides = minDistinctPeptides;
-//    }
+    
     public boolean getDoParsimonyAnalysis() {
         return doParsimonyAnalysis;
     }
@@ -74,6 +102,52 @@ public class IDPickerParams {
     }
     public void addMoreFilters(List<IdPickerParam> moreFilters) {
         this.moreFilters = moreFilters;
+    }
+    public PeptideDefinition getPeptideDefinition() {
+        return peptideDefinition;
+    }
+    public void setPeptideDefinition(PeptideDefinition peptideDefinition) {
+        this.peptideDefinition = peptideDefinition;
+    }
+    public int getMinPeptides() {
+        return minPeptides;
+    }
+    public void setMinPeptides(int minPeptides) {
+        this.minPeptides = minPeptides;
+    }
+    public int getMinUniquePeptides() {
+        return minUniquePeptides;
+    }
+    public void setMinUniquePeptides(int minUniquePeptides) {
+        this.minUniquePeptides = minUniquePeptides;
+    }
+    public float getMinCoverage() {
+        return minCoverage;
+    }
+    public void setMinCoverage(float minCoverage) {
+        this.minCoverage = minCoverage;
+    }
+//    public int getMinPeptideSpectra() {
+//        return minPeptideSpectra;
+//    }
+//    public void setMinPeptideSpectra(int minPeptideSpectra) {
+//        this.minPeptideSpectra = minPeptideSpectra;
+//    }
+    public int getMinPeptideLength() {
+        return minPeptideLength;
+    }
+    public void setMinPeptideLength(int minPeptideLength) {
+        this.minPeptideLength = minPeptideLength;
+    }
+    public boolean isRemoveAmbiguousSpectra() {
+        return removeAmbiguousSpectra;
+    }
+    public void setRemoveAmbiguousSpectra(
+            boolean removeSpectraWithMultiplePeptides) {
+        this.removeAmbiguousSpectra = removeSpectraWithMultiplePeptides;
+    }
+    public boolean isUseIdPickerFDRFormula() {
+        return useIdPickerFDRFormula;
     }
     
 }

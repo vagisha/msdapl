@@ -12,24 +12,24 @@ public class InferredProtein <T extends SpectrumMatch> {
     
     private Protein protein;
     
-    private Map<String, PeptideEvidence<T>> peptideEvList;
+    private Map<Integer, PeptideEvidence<T>> peptideEvList;
     
     private float percentCoverage;
     
     public InferredProtein(Protein protein) {
         this.protein = protein;
-        peptideEvList = new HashMap<String, PeptideEvidence<T>>();
+        peptideEvList = new HashMap<Integer, PeptideEvidence<T>>();
     }
     
     public void addPeptideEvidence(PeptideEvidence<T> peptideEv) {
-        PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getPeptideSeq());
+        PeptideEvidence<T> evidence = peptideEvList.get(peptideEv.getPeptide().getId());
         if (evidence == null) {
-            this.peptideEvList.put(peptideEv.getPeptideSeq(), peptideEv);
+            this.peptideEvList.put(peptideEv.getPeptide().getId(), peptideEv);
         }
     }
     
     public PeptideEvidence<T> getPeptideEvidence(Peptide peptide) {
-        return peptideEvList.get(peptide.getSequence());
+        return peptideEvList.get(peptide.getId());
     }
     
     public int getPeptideEvidenceCount() {
@@ -51,14 +51,6 @@ public class InferredProtein <T extends SpectrumMatch> {
             count += ev.getSpectrumMatchCount();
         }
         return count;
-    }
-    
-    /**
-     * @param modifiedPeptideSequence -- modified sequence
-     * @return
-     */
-    public PeptideEvidence<T> getPeptideEvidence(String modifiedPeptideSequence) {
-        return peptideEvList.get(modifiedPeptideSequence);
     }
     
     public List<PeptideEvidence<T>> getPeptides() {

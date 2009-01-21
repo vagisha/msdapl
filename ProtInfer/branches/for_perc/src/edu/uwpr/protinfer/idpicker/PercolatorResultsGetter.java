@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,8 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 
+import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
@@ -57,7 +60,11 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         long e = System.currentTimeMillis();
 
         log.info("\tTime: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
+        
+        // Remove search hits to small peptides
+        removeSmallPeptides(resultList, params);
 
+        // Rank the Percolator results
         Map<Integer, Integer> resultRanks = rankResults(resultList, percParams);
         
         // make a list of peptide spectrum matches and read the matching proteins from the database
@@ -68,6 +75,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
 
             // get the peptide
             Peptide peptide = new Peptide(result.getResultPeptide().getPeptideSequence(), -1);
+            
             PeptideHit peptHit = new PeptideHit(peptide);
 
             // read the matching proteins from the database now
@@ -103,16 +111,35 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         return psmList;
     }
 
+    private void removeSmallPeptides(List<PercolatorResult> resultList, IDPickerParams params) {
+        
+       log.info("Removing search hits with peptide length < "+params.getMinPeptideLength());
+       Iterator<PercolatorResult> iter = resultList.iterator();
+       int removed = 0;
+       while(iter.hasNext()) {
+           PercolatorResult res = iter.next();
+           // if the length of the peptide is less than the required threshold do not add it to the final list
+           if(res.getResultPeptide().getPeptideSequence().length() < params.getMinPeptideLength()) {
+               iter.remove();
+               removed++;
+           }
+       }
+       log.info("\tRemoved "+removed+" spectra");
+    }
+
     private Map<Integer, Integer> rankResults(List<PercolatorResult> resultList, PercolatorParams percParams) {
         
-        // sort the results by peptide sequence
+        final PeptideDefinition peptideDef = percParams.getPeptideDefinition(); 
+   
+        // sort the results by peptide key based on the peptide definition
         Collections.sort(resultList, new Comparator<PercolatorResult>() {
             @Override
             public int compare(PercolatorResult o1, PercolatorResult o2) {
-                return o1.getResultPeptide().getPeptideSequence().compareTo(o2.getResultPeptide().getPeptideSequence());
+                return PeptideKeyCalculator.getKey(o1, peptideDef).compareTo(PeptideKeyCalculator.getKey(o2, peptideDef));
                 
             }});
         
+        // which score comparator will we use
         Comparator<PercolatorResult> scoreComparator = null;
         if(percParams.getQvalueCutoff() != -1.0 && percParams.getPEPCutoff() != -1.0) {
                 scoreComparator = new PercolatorResultComparatorPEPQVal();
@@ -129,28 +156,29 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         scoreComparator = new PercolatorResultComparatorQVal();
         
         
+        // Map of resultID and rank
         Map<Integer, Integer> resultRankMap = new HashMap<Integer, Integer>(resultList.size());
         
-        List<PercolatorResult> resForScanCharge = new ArrayList<PercolatorResult>();
-        String lastPeptideSeq = null;
+        List<PercolatorResult> resForPeptide = new ArrayList<PercolatorResult>();
+        String lastPeptideKey = null;
         for(PercolatorResult result: resultList) {
             
-            if(!result.getResultPeptide().getModifiedPeptide().equals(lastPeptideSeq)) {
-                if(lastPeptideSeq != null) {
-                    Collections.sort(resForScanCharge, scoreComparator);
+            if(!PeptideKeyCalculator.getKey(result, peptideDef).equals(lastPeptideKey)) {
+                if(lastPeptideKey != null) {
+                    Collections.sort(resForPeptide, scoreComparator);
                     int rank = 1;
-                    for(PercolatorResult res: resForScanCharge) {
+                    for(PercolatorResult res: resForPeptide) {
                         resultRankMap.put(res.getId(), rank); rank++;
                     }
                 }
-                resForScanCharge.clear();
-                lastPeptideSeq = result.getResultPeptide().getModifiedPeptide();
+                resForPeptide.clear();
+                lastPeptideKey = PeptideKeyCalculator.getKey(result, peptideDef);
             }
-            resForScanCharge.add(result);
+            resForPeptide.add(result);
         }
-        Collections.sort(resForScanCharge, scoreComparator);
+        Collections.sort(resForPeptide, scoreComparator);
         int rank = 1;
-        for(PercolatorResult res: resForScanCharge) {
+        for(PercolatorResult res: resForPeptide) {
             resultRankMap.put(res.getId(), rank); rank++;
         }
         return resultRankMap;

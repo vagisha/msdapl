@@ -12,6 +12,17 @@ public class PeptideDefinition {
         this.useCharge = useCharge;
     }
     
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("Sequence");
+        if(useMods)
+            buf.append(" + Modifications");
+        if(useCharge)
+            buf.append(" + Charge");
+        return buf.toString();
+    }
+    
+    
     public boolean isUseMods() {
         return useMods;
     }

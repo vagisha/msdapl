@@ -17,15 +17,15 @@ public class IdPickerParamDAO extends BaseSqlMapDAO {
         super(sqlMap);
     }
 
-    public int saveProteinferFilter(IdPickerParam filter) {
-        return super.saveAndReturnId(sqlMapNameSpace+".insert", filter);
+    public int saveIdPickerParam(IdPickerParam param) {
+        return super.saveAndReturnId(sqlMapNameSpace+".insert", param);
     }
     
-    public List<IdPickerParam> getFiltersForProteinferRun(int pinferId) {
+    public List<IdPickerParam> getParamsForIdPickerRun(int pinferId) {
         return super.queryForList(sqlMapNameSpace+".selectParamsForRun", pinferId);
     }
     
-    public void deleteProteinferFilter(int id) {
+    public void deleteIdPickerParam(int id) {
         super.delete(sqlMapNameSpace+".delete", id);
     }
 }

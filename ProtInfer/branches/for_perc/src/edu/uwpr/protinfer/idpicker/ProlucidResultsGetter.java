@@ -7,6 +7,7 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -62,6 +63,9 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
         log.info("\tTime: "+TimeUtils.timeElapsedSeconds(s,e)+" seconds.");
         
         
+        // Remove search hits to small peptides
+        removeSmallPeptides(resultList, params);
+        
         // make a list of peptide spectrum matches and read the matching proteins from the database
         s = System.currentTimeMillis();
         
@@ -114,5 +118,21 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
         log.info("Total time: "+TimeUtils.timeElapsedSeconds(start, e)+" seconds.");
         return psmList;
     }
+    
+    private void removeSmallPeptides(List<ProlucidSearchResult> resultList, IDPickerParams params) {
+        
+        log.info("Removing search hits with peptide length < "+params.getMinPeptideLength());
+        Iterator<ProlucidSearchResult> iter = resultList.iterator();
+        int removed = 0;
+        while(iter.hasNext()) {
+            ProlucidSearchResult res = iter.next();
+            // if the length of the peptide is less than the required threshold do not add it to the final list
+            if(res.getResultPeptide().getPeptideSequence().length() < params.getMinPeptideLength()) {
+                iter.remove();
+                removed++;
+            }
+        }
+        log.info("\tRemoved "+removed+" spectra");
+     }
     
 }

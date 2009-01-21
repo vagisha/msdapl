@@ -19,6 +19,9 @@ public class IdPickerParam {
         this.pinferId = pinferId;
     }
     
+    public String toString() {
+        return "Name: "+name+"; Value: "+value;
+    }
     public int getId() {
         return id;
     }
