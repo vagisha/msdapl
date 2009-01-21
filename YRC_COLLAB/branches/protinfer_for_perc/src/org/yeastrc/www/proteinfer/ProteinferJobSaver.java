@@ -32,7 +32,7 @@ public class ProteinferJobSaver {
     private static final ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
     private static final ProteinferRunDAO pinferDao = fact.getProteinferRunDao();
     private static final ProteinferInputDAO pinferInputDao = fact.getProteinferInputDao();
-    private static final IdPickerParamDAO pinferFilterDao = fact.getProteinferParamDao();
+    private static final IdPickerParamDAO pinferParamDao = fact.getProteinferParamDao();
     
     
     private static final ProteinferJobSaver saver = new ProteinferJobSaver();
@@ -85,10 +85,10 @@ public class ProteinferJobSaver {
             pinferInputDao.saveProteinferInput(input);
         }
         
-        // save the filters
+        // save the parameters
         if(program == ProteinInferenceProgram.IDPICKER ||
            program == ProteinInferenceProgram.IDPICKER_PERC) {
-            saveIdPickerFilters(pinferId, params);
+            saveIdPickerParams(pinferId, params);
         }
         
         // create and entry in tblJobs
@@ -98,13 +98,13 @@ public class ProteinferJobSaver {
         createEntryInTblProteinferJobs(jobId, pinferId);
     }
 
-    private void saveIdPickerFilters(int pinferId, ProgramParameters params) {
+    private void saveIdPickerParams(int pinferId, ProgramParameters params) {
         for(Param param: params.getParamList()) {
-            IdPickerParam filter = new IdPickerParam();
-            filter.setProteinferId(pinferId);
-            filter.setName(param.getName());
-            filter.setValue(param.getValue());
-            pinferFilterDao.saveProteinferFilter(filter);
+            IdPickerParam idpParam = new IdPickerParam();
+            idpParam.setProteinferId(pinferId);
+            idpParam.setName(param.getName());
+            idpParam.setValue(param.getValue());
+            pinferParamDao.saveIdPickerParam(idpParam);
         }
     }
 
