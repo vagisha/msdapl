@@ -3,6 +3,7 @@ package org.yeastrc.www.proteinfer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -19,9 +20,11 @@ import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIon;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonWAllSpectra;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideGroup;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
@@ -547,7 +550,70 @@ public class IdPickerResultsLoader {
         return new WIdPickerIonWAllSpectra(ion, wPsmList);
     }
     
-//    public static List<WIdPickerPeptideIon> getIonsForWPeptide(WIdPickerPeptide peptide) {
+
+    
+    //---------------------------------------------------------------------------------------------------
+    // Protein and Peptide groups for a cluster
+    //--------------------------------------------------------------------------------------------------- 
+    public static WIdPickerCluster getIdPickerCluster(int pinferId, int clusterId, PeptideDefinition peptideDef) {
+       
+        List<Integer> protGroupIds = idpProtBaseDao.getGroupIdsForCluster(pinferId, clusterId);
+        
+        Map<Integer, WIdPickerProteinGroup> proteinGroups = new HashMap<Integer, WIdPickerProteinGroup>(protGroupIds.size()*2);
+        
+        // map of peptide groupID and peptide group
+        Map<Integer, WIdPickerPeptideGroup> peptideGroups = new HashMap<Integer, WIdPickerPeptideGroup>();
+        
+        // get a list of protein groups
+        for(int protGrpId: protGroupIds) {
+            List<WIdPickerProtein> grpProteins = getGroupProteins(pinferId, protGrpId, peptideDef);
+            WIdPickerProteinGroup grp = new WIdPickerProteinGroup(grpProteins);
+            proteinGroups.put(protGrpId, grp);
+            
+            List<Integer> peptideGroupIds =  idpPeptBaseDao.getMatchingPeptGroupIds(pinferId, protGrpId);
+            
+            for(int peptGrpId: peptideGroupIds) {
+                WIdPickerPeptideGroup peptGrp = peptideGroups.get(peptGrpId);
+                if(peptGrp == null) {
+                    List<IdPickerPeptideBase> groupPeptides = idpPeptBaseDao.loadIdPickerGroupPeptides(pinferId, peptGrpId);
+                    peptGrp = new WIdPickerPeptideGroup(groupPeptides);
+                    peptideGroups.put(peptGrpId, peptGrp);
+                }
+                peptGrp.addMatchingProteinGroupId(protGrpId);
+            }
+        }
+        
+        for(WIdPickerPeptideGroup peptGrp: peptideGroups.values()) {
+            List<Integer> protGrpIds = peptGrp.getMatchingProteinGroupIds();
+            if(protGrpIds.size() == 1) {
+                proteinGroups.get(protGrpIds.get(0)).addUniqPeptideGrpId(peptGrp.getGroupId());
+            }
+            else {
+                for(int protGrpId: protGrpIds)
+                    proteinGroups.get(protGrpId).addNonUniqPeptideGrpId(peptGrp.getGroupId());
+            }
+        }
+        
+        WIdPickerCluster wCluster = new WIdPickerCluster(pinferId, clusterId);
+        wCluster.setProteinGroups(new ArrayList<WIdPickerProteinGroup>(proteinGroups.values()));
+        wCluster.setPeptideGroups(new ArrayList<WIdPickerPeptideGroup>(peptideGroups.values()));
+        
+        return wCluster;
+    }  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //    public static List<WIdPickerPeptideIon> getIonsForWPeptide(WIdPickerPeptide peptide) {
 //        
 //        Map<String, WIdPickerPeptideIon> ionMap = new HashMap<String, WIdPickerPeptideIon>();
 //        List<IdPickerSpectrumMatch> psmList = peptide.getPeptide().getSpectrumMatchList();
@@ -738,31 +804,7 @@ public class IdPickerResultsLoader {
 //        wGroup.setUniqMatchingPeptideCount(numUniqPeptides);
 //    }
     
-    
-
-
-//    public static WIdPickerCluster getProteinferCluster(int pinferId, int clusterId) {
-//        IdPickerCluster cluster = protDao.getIdPickerCluster(pinferId, clusterId);
-//        WIdPickerCluster wCluster = new WIdPickerCluster(pinferId, clusterId);
-//        wCluster.setPeptideGroups(cluster.getPeptideGroups());
-//        
-//        // set the accession and description for the proteins in this cluster
-//        List<WIdPickerProteinGroup> wProtGrps = new ArrayList<WIdPickerProteinGroup>(cluster.getProteinGroups().size());
-//        for(IdPickerProteinGroup protGrp: cluster.getProteinGroups()) {
-//            
-//            WIdPickerProteinGroup wProtGrp = new WIdPickerProteinGroup(protGrp);
-//            wProtGrps.add(wProtGrp);
-//            
-//            for(WIdPickerProtein wProt: wProtGrp.getProteins()) {
-//                // set the description for the proteins.  This requires querying the 
-//                // NRSEQ database
-//                assignProteinAccessionDescription(wProt);
-//            }
-//            
-//        }
-//        wCluster.setProteinGroups(wProtGrps);
-//        return wCluster;
-//    }
+   
     
 //    public static List<WIdPickerSpectrumMatch<SequestSearchResult>> getSequestSpectrumMmatchesForRunSearch(int pinferId, int runSearchId) {
 //        

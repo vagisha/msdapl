@@ -1,5 +1,5 @@
 
-<%@page import="org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster"%>
+<%@page import="org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster"%>	
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -55,7 +55,6 @@
         <th><b><font size="2pt">Peptide<br>Group ID</font></b></th>
         <th><b><font size="2pt">Sequence(s)</font></b></th>
         <th><b><font size="2pt"># Spectra</font></b></th>
-        <th><b><font size="2pt">Best FDR</font></b></th>
         </tr>
         
         <logic:iterate name="cluster" property="peptideGroups" id="peptGrp">
@@ -63,8 +62,7 @@
         	<tr class="peptGrp_<bean:write name="pept" property="groupId" />">
         		<td><bean:write name="pept" property="groupId" /></td>
         		<td><bean:write name="pept" property="sequence" /></td>
-        		<td><bean:write name="pept" property="spectralCount" /></td>
-        		<td><bean:write name="pept" property="bestFdr" /></td>
+        		<td><bean:write name="pept" property="spectrumCount" /></td>
         	</tr>
        		</logic:iterate>
         </logic:iterate>
@@ -88,7 +86,7 @@
 	<%
 	    WIdPickerCluster cluster = (WIdPickerCluster)request.getAttribute("cluster");
 	%>
-	<logic:iterate name="cluster" property="peptideGroups" id="peptGrp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideGroup">
+	<logic:iterate name="cluster" property="peptideGroups" id="peptGrp" type="org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideGroup">
     <tr>
        	<th><b><font size="2pt"><bean:write name="peptGrp" property="groupId" /></font></b></th>
 		<logic:iterate name="cluster" property="proteinGroups" id="protGrp" type="org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup">

@@ -11,6 +11,9 @@ import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
+import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
+
 public class ProteinClusterAjaxAction extends Action{
 
     public ActionForward execute( ActionMapping mapping,
@@ -26,11 +29,6 @@ public class ProteinClusterAjaxAction extends Action{
             response.getWriter().write("You are not logged in!");
             response.setStatus(HttpServletResponse.SC_SEE_OTHER); // Status code (303) indicating that the response to the request can be found under a different URI.
             return null;
-//            ActionErrors errors = new ActionErrors();
-//            errors.add("username", new ActionMessage("error.login.notloggedin"));
-//            saveErrors( request, errors );
-//            return mapping.findForward("authenticate");
-            
         }
 
         int pinferId = 0;
@@ -42,6 +40,16 @@ public class ProteinClusterAjaxAction extends Action{
             response.getWriter().write("<b>Invalid Protein Inference ID: "+pinferId+"</b>");
             return null;
         }
+        // make sure protein inference ID in the request matches the ID for results stored in the session
+        Integer pinferId_session = (Integer)request.getSession().getAttribute("pinferId");
+        if(pinferId_session == null || pinferId_session != pinferId) {
+            // redirect to the /viewProteinInferenceResult action if this different from the
+            // protein inference ID stored in the session
+            ActionForward newResults = mapping.findForward( "ViewNewResults" ) ;
+            newResults = new ActionForward( newResults.getPath() + "inferId="+pinferId, newResults.getRedirect() ) ;
+            return newResults;
+        }
+        
 
         int clusterId = 0;
         try {clusterId = Integer.parseInt(request.getParameter("clusterId"));}
@@ -53,11 +61,18 @@ public class ProteinClusterAjaxAction extends Action{
             return null;
         }
 
+        // Peptide definition from the session
+        ProteinFilterCriteria filterCriteria = (ProteinFilterCriteria) request.getSession().getAttribute("pinferFilterCriteria");
+        if(filterCriteria == null)  filterCriteria = new ProteinFilterCriteria();
+        PeptideDefinition peptideDef = filterCriteria.getPeptideDefinition();
+        
         System.out.println("Got request for clusterId: "+clusterId+" of protein inference run: "+pinferId);
 
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("clusterId", clusterId);
-        WIdPickerCluster cluster = IdPickerResultsLoader.getProteinferCluster(pinferId, clusterId);
+        
+        
+        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(pinferId, clusterId, peptideDef);
         request.setAttribute("cluster", cluster);
         
         return mapping.findForward("Success");

@@ -167,6 +167,8 @@ function showProteinDetails(proteinId) {
 	// first hide all divs 
 	$(".protdetail_prot").hide();
 	
+	// TODO If we already have the details for this protein show the appropriate div
+	
 	// load content in the appropriate div
 	$("#protein_"+proteinId).load("proteinDetails.do",   									// url
 								  {'pinferId': <%=pinferId%>, 'pinferProtId': proteinId}, 	// data
@@ -191,8 +193,8 @@ function showProteinDetails(proteinId) {
 // ---------------------------------------------------------------------------------------    
 function showProteinCluster(proteinClusterIdx) {
 
-	$("#clusterlist")[0].selectedIndex = proteinClusterIdx - 1;
-	selectProteinCluster();
+	//$("#clusterlist")[0].selectedIndex = proteinClusterIdx - 1;
+	selectProteinCluster(proteinClusterIdx);
 	
 	var $tabs = $("#results").tabs();
 	$("#protclusterslink").click();
@@ -201,9 +203,9 @@ function showProteinCluster(proteinClusterIdx) {
 }
   
   
-function selectProteinCluster() {
+function selectProteinCluster(clusterId) {
 
-	var clusterId = $("#clusterlist")[0].selectedIndex + 1;
+	//var clusterId = $("#clusterlist")[0].selectedIndex + 1;
 	
 	// hide all other first
 	for(var i = 1; i <= <%=clusterCount%>; i++) {
@@ -738,11 +740,12 @@ function toggleDivVisibility(mydiv) {
 
 <CENTER>
 
-<yrcwww:contentbox title="IDPicker* Results" centered="true" width="1000" scheme="ms">
+<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="1000" scheme="ms">
 
 
 <div style="font-size: 8pt;margin-top: 3px;" align="center">
- 	<i>*Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
+	*This protein inference program is based on the IDPicker algorithm published in:<br>
+ 	<i>Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
  	<br>
 	Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
 </div>
@@ -775,13 +778,6 @@ function toggleDivVisibility(mydiv) {
     
       <!-- PROTEIN CLUSTER -->
       <div id="protclusters"><font color="black">
-          	<b>Select Protein Cluster: </b>
-          	<select id="clusterlist" onchange="selectProteinCluster()">
-          		<logic:iterate name="clusterIds" id="id">
-          			<option value="<bean:write name="id" />"><bean:write name="id" /></option>
-          		</logic:iterate>
-          	</select>
-          	
           	<!-- create a placeholder div for each protein cluster -->
           	<logic:iterate name="clusterIds" id="id">
           		<div id="protcluster_<bean:write name="id" />" style="display: none;"></div>

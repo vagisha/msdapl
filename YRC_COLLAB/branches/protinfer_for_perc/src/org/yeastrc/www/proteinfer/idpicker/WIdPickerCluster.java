@@ -9,7 +9,7 @@ public class WIdPickerCluster {
     private int pinferId;
     private int clusterId;
     private List<WIdPickerProteinGroup> proteinGroups;
-    private List<IdPickerPeptideGroup> peptideGroups;
+    private List<WIdPickerPeptideGroup> peptideGroups;
     
     public WIdPickerCluster(int pinferId, int clusterId) {
         this.pinferId = pinferId;
@@ -20,7 +20,7 @@ public class WIdPickerCluster {
         this.proteinGroups = proteinGroups;
     }
     
-    public void setPeptideGroups(List<IdPickerPeptideGroup> peptideGroups) {
+    public void setPeptideGroups(List<WIdPickerPeptideGroup> peptideGroups) {
         this.peptideGroups = peptideGroups;
     }
 
@@ -44,12 +44,12 @@ public class WIdPickerCluster {
         return proteinGroups;
     }
 
-    public List<IdPickerPeptideGroup> getPeptideGroups() {
+    public List<WIdPickerPeptideGroup> getPeptideGroups() {
         return peptideGroups;
     }
     
     public boolean proteinAndPeptideGroupsMatch(int protGrpId, int peptGrpId) {
-        for(IdPickerPeptideGroup peptGrp: peptideGroups) {
+        for(WIdPickerPeptideGroup peptGrp: peptideGroups) {
             if(peptGrp.getGroupId() == peptGrpId) {
                 return peptGrp.matchesProteinGroup(protGrpId);
             }
