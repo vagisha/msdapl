@@ -3,6 +3,25 @@ DIV.pinfer_header {
 }
 /*background-color: #a0df82;*/
 
+TABLE.sortable TH.header {
+	background-image:url(../images/proteinfer/bg.gif);
+	background-position:right center;
+	background-repeat:no-repeat;
+	cursor: pointer;
+}
+
+TABLE.sortable TH.sorted-asc {
+	background-image:url(../images/proteinfer/asc.gif);
+	background-position:right center;
+	background-repeat:no-repeat;
+}
+
+TABLE.sortable TH.sorted-desc {
+	background-image:url(../images/proteinfer/desc.gif);
+	background-position:right center;
+	background-repeat:no-repeat;
+}
+
 TH.ms_A {
 	background-color: #a0df82;
     color: #FFFFFF;

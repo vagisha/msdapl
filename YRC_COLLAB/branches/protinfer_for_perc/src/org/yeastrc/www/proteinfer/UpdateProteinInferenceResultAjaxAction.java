@@ -80,7 +80,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         ProteinFilterCriteria filterCritSession = (ProteinFilterCriteria) request.getSession().getAttribute("pinferFilterCriteria");
         
         // Get the filtering criteria from the request
-        PeptideDefinition peptideDef = new PeptideDefinition(filterForm.isPeptideDef_useMods(), filterForm.isPeptideDef_useCharge());
+        PeptideDefinition peptideDef = filterCritSession.getPeptideDefinition();
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverage());
         filterCriteria.setNumPeptides(filterForm.getMinPeptides());
@@ -90,6 +90,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         SORT_BY sortBy = filterCritSession == null ? SORT_BY.GROUP_ID : filterCritSession.getSortBy();
         filterCriteria.setSortBy(sortBy);
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         
         // Match this filtering criteria with the one in the request
         boolean match = false;
@@ -138,7 +139,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         
         // Get some summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, storedProteinIds);
-        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
+//        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
         request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
         request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
         request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
@@ -159,7 +160,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                 filterCritSession.getNumPeptides() == filterCriteria.getNumPeptides() &&
                 filterCritSession.getNumUniquePeptides() == filterCriteria.getNumUniquePeptides() &&
                 filterCritSession.getNumSpectra() == filterCriteria.getNumSpectra() &&
-                filterCritSession.getPeptideDefinition().equals(filterCriteria.getPeptideDefinition())
+                filterCritSession.getPeptideDefinition().equals(filterCriteria.getPeptideDefinition()) &&
+                filterCritSession.showParsimonious() == filterCriteria.showParsimonious()
                 );
         
     }

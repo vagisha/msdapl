@@ -22,8 +22,8 @@
 </logic:notPresent>
 
   	 <thead><tr>
+  	 <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Uniq</th>
      <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Peptide</th>
-     <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Unique</th>
      <th style="text-decoration: underline;font-size: 10pt;" class="sort-int" align="left">Charge</th>
      <th style="text-decoration: underline;font-size: 10pt;" class="sort-int" align="left"># Spectra</th>
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.IDPICKER.name()%>">
@@ -54,11 +54,11 @@
      <logic:iterate name="proteinPeptideIons" id="ion">
      
      	<tr>
-     		<td><bean:write name="ion" property="ionSequence" /></td>
      		<td>
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="true">*</logic:equal>
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false"></logic:equal>
      		</td>
+     		<td><bean:write name="ion" property="ionSequence" /></td>
      		<td><bean:write name="ion" property="charge" /></td>
      		<td><bean:write name="ion" property="spectrumCount" /></td>
      		

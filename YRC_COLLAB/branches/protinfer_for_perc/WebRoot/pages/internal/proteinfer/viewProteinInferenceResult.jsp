@@ -650,9 +650,6 @@ function makeSortable(table) {
       			function() {$(this).addClass('ms_hover');} , 
       			function() {$(this).removeClass('ms_hover');}).click(function() {
 
-				// the header for the column used for sorting is highlighted
-				$('th', $table).each(function(){$(this).removeClass('ms_selected_header');});
-				$header.addClass('ms_selected_header');
 				
 				// remove row striping
 				if($table.is('.stripe_table')) {
@@ -661,15 +658,15 @@ function makeSortable(table) {
 				
 				// sorting direction
 				var newDirection = 1;
-        				if ($(this).is('.sorted-asc')) {
-          				newDirection = -1;
-        				}
+        		if ($(this).is('.sorted-asc')) {
+          			newDirection = -1;
+        		}
         				
-        				var rows = $table.find('tbody > tr').get();
+        		var rows = $table.find('tbody > tr').get();
         				
-        				if ($header.is('.sort-alpha')) {
-        					$.each(rows, function(index, row) {
-								row.sortKey = $(row).children('td').eq(column).text().toUpperCase();
+        		if ($header.is('.sort-alpha')) {
+        			$.each(rows, function(index, row) {
+						row.sortKey = $(row).children('td').eq(column).text().toUpperCase();
 					});
 				}
 				
@@ -694,27 +691,36 @@ function makeSortable(table) {
 					});
 				}
 
-        				rows.sort(function(a, b) {
-          				if (a.sortKey < b.sortKey) return -newDirection;
-							if (a.sortKey > b.sortKey) return newDirection;
-							return 0;
-        				});
+     			rows.sort(function(a, b) {
+       				if (a.sortKey < b.sortKey) return -newDirection;
+					if (a.sortKey > b.sortKey) return newDirection;
+					return 0;
+     			});
 
-        				$.each(rows, function(index, row) {
-          				$table.children('tbody').append(row);
-          				row.sortKey = null;
-        				});
-        				
-        				var $sortHead = $table.find('th').filter(':nth-child(' + (column + 1) + ')');
+     			$.each(rows, function(index, row) {
+       				$table.children('tbody').append(row);
+       				row.sortKey = null;
+     			});
+     			
+     			// the header for the column used for sorting is highlighted
+				$('th', $table).each(function(){
+					$(this).removeClass('ms_selected_header');
+					$(this).removeClass('sorted-desc');
+	    			$(this).removeClass('sorted-asc');
+				});
+				$header.addClass('ms_selected_header');
+				
+     			var $sortHead = $table.find('th').filter(':nth-child(' + (column + 1) + ')');
 
 	          	if (newDirection == 1) {$sortHead.addClass('sorted-asc'); $sortHead.removeClass('sorted-desc');} 
 	          	else {$sortHead.addClass('sorted-desc'); $sortHead.removeClass('sorted-asc');}
         
-        				// add row striping back
-        				if($table.is('.stripe_table')) {
+        		
+        		// add row striping back
+        		if($table.is('.stripe_table')) {
 					$("tbody > tr:odd", $table).addClass("ms_A");
-        				}
-      			});
+        		}
+      		});
 	}
   });
 }

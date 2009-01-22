@@ -24,6 +24,8 @@ import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
+import edu.uwpr.protinfer.idpicker.IDPickerParams;
+import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 public class ViewProteinInferenceResultAction extends Action {
@@ -82,9 +84,13 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("pinferId", pinferId);
         filterForm.setPinferId(pinferId);
         
+        // Get the peptide definition
+        IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
+        IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
+        PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
+        
         
         // Get the filtering criteria
-        PeptideDefinition peptideDef = new PeptideDefinition(filterForm.isPeptideDef_useMods(), filterForm.isPeptideDef_useCharge());
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverage());
         filterCriteria.setNumPeptides(filterForm.getMinPeptides());
@@ -93,6 +99,7 @@ public class ViewProteinInferenceResultAction extends Action {
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(SORT_BY.GROUP_ID);
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
         
         // put the list of filtered and sorted protein IDs in the session, along with the filter criteria
