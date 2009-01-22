@@ -38,18 +38,21 @@
   <td><table>
   <tr>
   	<td colspan="2">Group Indistinguishable Proteins: </td>
-  	<td colspan="2">
+  	<td>
   		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="true">Yes</html:radio>
+  	</td>
+  	<td>
   		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="false">No</html:radio>
   	</td>
   </tr>
   <tr>
   	<td colspan="2">Show Proteins: </td>
-  	<td colspan="2">
+  	<td>
   		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="true">All</html:radio>
+  	</td>
+  	<td>
   		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="false">Parsimonious</html:radio>
   	</td>
-  </tr>
   </tr>
   </table></td>
   </tr>

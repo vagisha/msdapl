@@ -136,36 +136,36 @@
 				class="editprotannot"
 				style="text-decoration: underline; cursor: pointer" >
 				
-				<!-- Are there user entered comments for this protein -->
-				<logic:present name="protein" property="protein.userAnnotation">
-					<span 
-						id="annot_comment_<bean:write name="protein" property="protein.id" />" 
-						style="display: none;"><bean:write name="protein" property="protein.userAnnotation" /></span>
-				</logic:present>
-				<logic:notPresent name="protein" property="protein.userAnnotation">
-					<span id="annot_comment_<bean:write name="protein" property="protein.id" />" style="display: none;"></span>
-				</logic:notPresent>
-				
-				<!-- User entered validation -->
-				<logic:present name="protein" property="protein.userValidation">
-					<span 
-					class="prot_annot_<bean:write name="protein" property="protein.userValidation.statusChar" />"
-					id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
-					<span 
-					class="sort_key"
-					style="display: none;"
-					id="annot_validation_text_<bean:write name="protein" property="protein.id" />"><bean:write name="protein" property="protein.userValidation.statusChar" /></span>
-				</logic:present>
-				
-				<logic:notPresent name="protein" property="protein.userValidation">
-					<span 
-					class="prot_annot_U"
-					id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
-					<span 
-					class="sort_key"
-					style="display: none;"
-					id="annot_validation_text_<bean:write name="protein" property="protein.id" />">U</span>
-				</logic:notPresent>
+			<!-- Are there user entered comments for this protein -->
+			<logic:present name="protein" property="protein.userAnnotation">
+				<span 
+					id="annot_comment_<bean:write name="protein" property="protein.id" />" 
+					style="display: none;"><bean:write name="protein" property="protein.userAnnotation" /></span>
+			</logic:present>
+			<logic:notPresent name="protein" property="protein.userAnnotation">
+				<span id="annot_comment_<bean:write name="protein" property="protein.id" />" style="display: none;"></span>
+			</logic:notPresent>
+			
+			<!-- User entered validation -->
+			<logic:present name="protein" property="protein.userValidation">
+				<span 
+				class="prot_annot_<bean:write name="protein" property="protein.userValidation.statusChar" />"
+				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
+				<span 
+				class="sort_key"
+				style="display: none;"
+				id="annot_validation_text_<bean:write name="protein" property="protein.id" />"><bean:write name="protein" property="protein.userValidation.statusChar" /></span>
+			</logic:present>
+			
+			<logic:notPresent name="protein" property="protein.userValidation">
+				<span 
+				class="prot_annot_U"
+				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
+				<span 
+				class="sort_key"
+				style="display: none;"
+				id="annot_validation_text_<bean:write name="protein" property="protein.id" />">U</span>
+			</logic:notPresent>
 					
 			</span>
 			</td>
@@ -246,8 +246,9 @@
 				
 			<!-- Are there user entered comments for this protein -->
 			<logic:present name="protein" property="protein.userAnnotation">
-				<span id="annot_comment_<bean:write name="protein" property="protein.id" />" style="display: none;">
-					<bean:write name="protein" property="protein.userAnnotation" />
+				<span id="annot_comment_<bean:write 
+				      name="protein" property="protein.id" />" 
+				      style="display: none;"><bean:write name="protein" property="protein.userAnnotation" />
 				</span>
 			</logic:present>
 			<logic:notPresent name="protein" property="protein.userAnnotation">

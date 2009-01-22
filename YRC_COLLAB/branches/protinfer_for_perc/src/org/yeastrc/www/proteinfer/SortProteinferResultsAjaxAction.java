@@ -7,6 +7,7 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -108,12 +109,39 @@ public class SortProteinferResultsAjaxAction extends Action{
             
             if(sortBy_r != sortBy_session) {
                 log.info("Sorting results by "+sortBy_r.name()+"; order: "+filterCriteria.getSortOrder().name());
-                // resort  the results based on the given criteria
-                List<Integer> newOrderIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
+                
+                
+                List<Integer> newOrderIds = null;
+                
+                // Sorting by accession is a special case.
+                // If we are sorting by accession, first check if the protein accession map in the session is current
+                if(sortBy_r == SORT_BY.ACCESSION) {
+                    Map<Integer, String> proteinAccessionMap = (Map<Integer, String>) request.getSession().getAttribute("proteinAccessionMap");
+                    if(proteinAccessionMap == null) {
+                        proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
+                    }
+                    else {
+                        Integer pinferIdForProtAccession = (Integer)request.getSession().getAttribute("pinferIdForProtAccession");
+                        if(pinferIdForProtAccession != null && pinferIdForProtAccession != pinferId) {
+                            proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
+                            
+                        }
+                    }
+                    request.getSession().setAttribute("proteinAccessionMap", proteinAccessionMap);
+                    request.getSession().setAttribute("pinferIdForProtAccession", pinferId);
+                    
+                    // sort the results based accession
+                    newOrderIds = IdPickerResultsLoader.sortIdsByAccession(storedProteinIds, proteinAccessionMap);
+                }
+                //Sorting by any other column
+                else {
+                    // resort  the results based on the given criteria
+                    newOrderIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
                             peptideDef, 
                             storedProteinIds, 
                             sortBy_r, 
                             group);
+                }
                 
                 filterCriteria.setSortBy(sortBy_r);
                 request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);

@@ -5,13 +5,13 @@ DIV.pinfer_header {
 
 TH.sorted-asc {
 	background-image:url(../images/proteinfer/asc.gif);
-	background-position:right center;
+	background-position:bottom center;
 	background-repeat:no-repeat;
 }
 
 TH.sorted-desc {
 	background-image:url(../images/proteinfer/desc.gif);
-	background-position:right center;
+	background-position:bottom center;
 	background-repeat:no-repeat;
 }
 

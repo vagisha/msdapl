@@ -117,9 +117,9 @@ public class IdPickerResultsLoader {
         else if (sortBy == SORT_BY.NUM_SPECTRA) {
             allIds = idpProtBaseDao.sortProteinIdsBySpectrumCount(pinferId, groupProteins);
         }
-        else if (sortBy == SORT_BY.ACCESSION) {
-            allIds = sortIdsByAccession(proteinIds);
-        }
+//        else if (sortBy == SORT_BY.ACCESSION) {
+//            allIds = sortIdsByAccession(proteinIds);
+//        }
         if(allIds == null) {
             log.warn("Could not get sorted order for all protein IDs for protein inference run: "+pinferId);
         }
@@ -142,14 +142,23 @@ public class IdPickerResultsLoader {
         return allIds;
     }
     
-    
-    private static List<Integer> sortIdsByAccession(List<Integer> proteinIds) {
-        List<ProteinIdAccession> accMap = new ArrayList<ProteinIdAccession>(proteinIds.size());
-        for(int id: proteinIds) {
-            // get the protein
-            ProteinferProtein protein = protDao.loadProtein(id);
+    public static Map<Integer, String> getProteinAccessionMap(int pinferId) {
+        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
+        Map<Integer, String> map = new HashMap<Integer, String>((int) (proteins.size() * 1.5));
+        
+        for(ProteinferProtein protein: proteins) {
             String[] acc_descr = getProteinAccessionDescription(protein.getNrseqProteinId());
-            accMap.add(new ProteinIdAccession(id, acc_descr[0]));
+            map.put(protein.getId(), acc_descr[0]);
+        }
+        return map;
+    }
+    
+    public static List<Integer> sortIdsByAccession(List<Integer> proteinIds, Map<Integer, String> proteinAccessionMap) {
+        
+        List<ProteinIdAccession> accMap = new ArrayList<ProteinIdAccession>(proteinIds.size());
+        
+        for(int id: proteinIds) {
+            accMap.add(new ProteinIdAccession(id, proteinAccessionMap.get(id)));
         }
         Collections.sort(accMap, new Comparator<ProteinIdAccession>() {
             public int compare(ProteinIdAccession o1, ProteinIdAccession o2) {
@@ -161,6 +170,8 @@ public class IdPickerResultsLoader {
         }
         return sortedIds;
     }
+    
+    
     
     private static class ProteinIdAccession {
         int proteinId;
@@ -295,9 +306,9 @@ public class IdPickerResultsLoader {
         wProt.setDescription(acc_descr[1]);
     }
     
-    private static String[] getProteinAccessionDescription(int nrseqProtenId) {
+    private static String[] getProteinAccessionDescription(int nrseqProteinId) {
         
-        NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(nrseqProtenId);
+        NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(nrseqProteinId);
         return new String[] {nrDbProt.getAccessionString(), nrDbProt.getDescription()};
         
 //      NRProteinFactory nrpf = NRProteinFactory.getInstance();
