@@ -9,7 +9,7 @@ public interface GenericIdPickerPeptideDAO <T extends GenericIdPickerPeptide<?,?
 
     public abstract int saveIdPickerPeptide(GenericIdPickerPeptide<?,?> peptide);
     
-    public abstract List<T> getIdPickerGroupPeptides(int pinferId, int groupId);
+    public abstract List<T> loadIdPickerGroupPeptides(int pinferId, int groupId);
     
-    public abstract List<Integer> getMatchingProtGroupIds(int pinferId, int peptideGroupId);
+    public abstract List<Integer> getMatchingPeptGroupIds(int pinferId, int proteinGroupId); 
 }

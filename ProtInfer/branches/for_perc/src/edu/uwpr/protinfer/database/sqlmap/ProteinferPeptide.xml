@@ -33,6 +33,14 @@
     	SELECT piPeptideID FROM msProteinInferProteinPeptideMatch WHERE piProteinID = #id#
     </select>
     
+    <select id="selectUniquePeptideIdsForProtein" resultClass="Integer" parameterClass="Integer">
+    	SELECT m.piProteinID 
+    	FROM msProteinInferProteinPeptideMatch AS m, msProteinInferPeptide as pept
+    	WHERE m.piPeptideID = pept.id
+    	AND pept.uniqueToProtein=1 
+    	AND m.piPeptideID=#id#
+    </select>
+    
     <select id="selectPeptidesForProtein" resultMap="pinferPeptideResult" parameterClass="Integer">
     	SELECT p.*
     	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch 

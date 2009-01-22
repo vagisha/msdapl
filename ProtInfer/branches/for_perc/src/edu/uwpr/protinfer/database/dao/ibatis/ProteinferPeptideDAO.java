@@ -28,6 +28,11 @@ public class ProteinferPeptideDAO extends BaseSqlMapDAO implements
         return super.queryForList(sqlMapNameSpace+".selectPeptideIdsForProtein", pinferProteinId);
     }
     
+    public List<Integer> getUniquePeptideIdsForProteinferProtein(
+            int pinferProteinId) {
+        return super.queryForList(sqlMapNameSpace+".selectUniquePeptideIdsForProtein", pinferProteinId);
+    }
+    
     public List<ProteinferPeptide> loadPeptidesForProteinferProtein(int pinferProteinId) {
         return super.queryForList(sqlMapNameSpace+".selectPeptidesForProtein", pinferProteinId);
     }

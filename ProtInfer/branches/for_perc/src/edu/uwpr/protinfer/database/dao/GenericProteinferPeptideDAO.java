@@ -9,6 +9,8 @@ public interface GenericProteinferPeptideDAO<T extends GenericProteinferPeptide<
     public abstract int save(GenericProteinferPeptide<?,?> peptide);
 
     public abstract List<Integer> getPeptideIdsForProteinferProtein(int pinferProteinId);
+    
+    public abstract List<Integer> getUniquePeptideIdsForProteinferProtein(int pinferProteinId);
 
     public abstract List<T> loadPeptidesForProteinferProtein(int pinferProteinId);
 

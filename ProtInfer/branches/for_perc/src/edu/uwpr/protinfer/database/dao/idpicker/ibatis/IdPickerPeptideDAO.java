@@ -26,7 +26,7 @@ public class IdPickerPeptideDAO extends AbstractIdPickerPeptideDAO<IdPickerPepti
         return super.queryForList(sqlMapNameSpace+".selectPeptidesForProtein", pinferProteinId);
     }
     
-    public List<IdPickerPeptide> getIdPickerGroupPeptides(int pinferId, int groupId) {
+    public List<IdPickerPeptide> loadIdPickerGroupPeptides(int pinferId, int groupId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("pinferId", pinferId);
         map.put("groupId", groupId);

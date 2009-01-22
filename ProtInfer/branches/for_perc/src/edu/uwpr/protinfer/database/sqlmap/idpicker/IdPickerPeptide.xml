@@ -69,10 +69,10 @@
     	AND idpPep.groupID=#groupId#
     </select>
     
-    <select id="selectProtGrpIdsForPeptGrpId" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT proteinGroupID FROM IDPickerGroupAssociation
+    <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT peptideGroupID FROM IDPickerGroupAssociation
     	WHERE piRunID=#pinferId#
-    	AND peptideGroupID=#groupId#
+    	AND proteinGroupID=#groupId#
     </select>
    
     <insert id="insert" parameterMap="idpickerPeptideParam">
