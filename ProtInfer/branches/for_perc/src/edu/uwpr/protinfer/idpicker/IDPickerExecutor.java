@@ -59,7 +59,7 @@ public class IDPickerExecutor {
         long start = System.currentTimeMillis();
         
         // create the parameters object
-        IDPickerParams params = makeIdPickerParams(idpRun.getFilters());
+        IDPickerParams params = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
         log.info("\n"+params.toString());
         
         // Are we going to do FDR calculation?
@@ -269,89 +269,6 @@ public class IDPickerExecutor {
         log.info("Retrieved NRSEQ ids in: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes");
     }
     
-    private IDPickerParams makeIdPickerParams(List<IdPickerParam> filters) {
-        
-        IDPickerParams params = new IDPickerParams();
-        params.setDoFdrCalculation(false); // set this to false initially
-                                           // if we find FDR calculation filters we will set this to true;
-        List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
-        for(IdPickerParam filter: filters) {
-            // Max. Absolute FDR
-            if(filter.getName().equals("maxAbsFDR")) {
-                params.setMaxAbsoluteFdr(Float.parseFloat(filter.getValue()));
-                params.setDoFdrCalculation(true);
-            }
-            // Max. Relative FDR
-            else if(filter.getName().equals("maxRelativeFDR")) {
-                params.setMaxRelativeFdr(Float.parseFloat(filter.getValue()));
-                params.setDoFdrCalculation(true);
-            }
-            // Decoy Ratio
-            else if (filter.getName().equals("decoyRatio"))
-                params.setDecoyRatio(Float.parseFloat(filter.getValue()));
-            // Decoy Prefix
-            else if (filter.getName().equals("decoyPrefix"))
-                params.setDecoyPrefix(filter.getValue());
-//            else if (filter.getName().equalsIgnoreCase("parsimonyAnalysis"))
-//                params.setDoParsimonyAnalysis(Boolean.valueOf(filter.getValue()));
-            
-            // Formula that will be used to calculate FDR
-            else if(filter.getName().equals("FDRFormula")) {
-                String val = filter.getValue();
-                if(val.equals("2R/(F+R)"))
-                    params.setUseIdPickerFDRFormula(true);
-                else
-                    params.setUseIdPickerFDRFormula(false);
-            }
-            // Peptide Definition
-            else if(filter.getName().equals("PeptDef")) {
-                PeptideDefinition peptDef = new PeptideDefinition();
-                String val = filter.getValue();
-                if(val.equals("Sequence + Modifications")) {
-                    peptDef.setUseMods(true);
-                }
-                else if(val.equals("Sequence + Charge")) {
-                    peptDef.setUseCharge(true);
-                }
-                else if(val.equals("Sequence + Modifications + Charge")) {
-                    peptDef.setUseCharge(true);
-                    peptDef.setUseMods(true);
-                }
-                params.setPeptideDefinition(peptDef);
-            }
-            // Min. Peptides
-            else if(filter.getName().equals("minPept")) {
-                params.setMinPeptides(Integer.parseInt(filter.getValue()));
-            }
-            // Min Unique Peptides
-            else if(filter.getName().equals("minUniqePept")) {
-                params.setMinUniquePeptides(Integer.parseInt(filter.getValue()));
-            }
-            // Min. Peptide Length
-            else if(filter.getName().equals("minPeptLen")) {
-                params.setMinPeptideLength(Integer.parseInt(filter.getValue()));
-            }
-            // Min. spectra per peptide
-//            else if(filter.getName().equals("minPeptSpectra")) {
-//                params.setMinPeptideSpectra(Integer.parseInt(filter.getValue()));
-//            }
-            //Min Coverage for a protein
-            else if(filter.getName().equals("coverage")) {
-                params.setMinCoverage(Float.parseFloat(filter.getValue()));
-            }
-            // Remove Ambiguous Spectra
-            else if(filter.getName().equals("removeAmbigSpectra")) {
-                params.setRemoveAmbiguousSpectra(Boolean.parseBoolean(filter.getValue()));
-            }
-            else {
-                moreFilters.add(filter);
-            }
-        }
-        if(moreFilters.size() > 0)
-            params.addMoreFilters(moreFilters);
-        return params;
-    }
-
     
     protected static <T extends PeptideSpectrumMatch<?>> void removeSpectraWithMultipleResults(List<T> psmList) {
         
@@ -475,7 +392,7 @@ public class IDPickerExecutor {
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
         IdPickerRun run = runDao.loadProteinferRun(6);
         System.out.println("Number of files: "+run.getInputList().size());
-        System.out.println("Number of filters: "+run.getFilters().size());
+        System.out.println("Number of filters: "+run.getParams().size());
         
         IDPickerExecutor executor = new IDPickerExecutor();
         try {

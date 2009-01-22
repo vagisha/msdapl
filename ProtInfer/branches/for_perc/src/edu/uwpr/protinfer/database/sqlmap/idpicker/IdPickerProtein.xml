@@ -194,7 +194,7 @@
     	WHERE piRunID=#pinferId#
     	AND coverage >=#coverage# 
     	<isPropertyAvailable property="sort">
-    		ORDER BY coverage DESC
+    		ORDER BY coverage ASC
     	</isPropertyAvailable>
     </select>
 
@@ -218,7 +218,7 @@
 			<isPropertyAvailable property="groupProteins">
 				, idpProt.groupID
 			</isPropertyAvailable>
-    		DESC
+    		ASC
     	</isPropertyAvailable>
     </select>
     
@@ -244,7 +244,7 @@
 			<isPropertyAvailable property="groupProteins">
 				, idpProt.groupID
 			</isPropertyAvailable>
-    		DESC
+    		ASC
     	</isPropertyAvailable>
     </select>
     
@@ -272,7 +272,7 @@
 			<isPropertyAvailable property="groupProteins">
 				, idpProt.groupID
 			</isPropertyAvailable>
-    		DESC
+    		ASC
     	</isPropertyAvailable>
     </select>
    <!-- =========================================================================== -->

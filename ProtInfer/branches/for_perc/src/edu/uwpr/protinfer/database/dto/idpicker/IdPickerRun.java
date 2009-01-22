@@ -10,27 +10,27 @@ import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
 public class IdPickerRun extends GenericProteinferRun<IdPickerInput> {
 
     
-    private List<IdPickerParam> filters;
+    private List<IdPickerParam> params;
     
     public IdPickerRun() {
         super();
-        filters = new ArrayList<IdPickerParam>();
+        params = new ArrayList<IdPickerParam>();
     }
     
-    public List<IdPickerParam> getFilters() {
-        return filters;
+    public List<IdPickerParam> getParams() {
+        return params;
     }
 
     public List<IdPickerParam> getSortedParams() {
-        Collections.sort(filters, new Comparator<IdPickerParam>(){
+        Collections.sort(params, new Comparator<IdPickerParam>(){
             public int compare(IdPickerParam o1, IdPickerParam o2) {
                 return Integer.valueOf(o1.getId()).compareTo(o2.getId());
             }});
-        return filters;
+        return params;
     }
     
-    public void setFilters(List<IdPickerParam> filter) {
-        this.filters = filter;
+    public void setParams(List<IdPickerParam> params) {
+        this.params = params;
     }
     
     public IdPickerInput getInputSummaryForRunSearch(int runSearchId) {

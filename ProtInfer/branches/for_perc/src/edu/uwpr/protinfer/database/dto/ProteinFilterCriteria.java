@@ -7,6 +7,7 @@
 package edu.uwpr.protinfer.database.dto;
 
 import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
 
 /**
  * 
@@ -36,13 +37,20 @@ public class ProteinFilterCriteria {
             else    return NONE;
             
         }
+        
+      public static enum SORT_ORDER {ASC, DESC;
+          public static SORT_ORDER getSortByForString(String sortOrder) {
+              if(sortOrder == null || sortOrder.equalsIgnoreCase("ASC")) return ASC;
+              else return DESC;
+          }
+      }
     }
     
     private int numPeptides;
     private int numUniquePeptides;
     private PeptideDefinition peptideDefinition = new PeptideDefinition();
     
-    private boolean isParsimonious = false;
+    private boolean showParsimonious = false;
     
     private boolean groupProteins = true;
     
@@ -50,7 +58,17 @@ public class ProteinFilterCriteria {
     private double coverage;
     
     private SORT_BY sortBy = SORT_BY.NONE;
+    private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
+    
+    public SORT_ORDER getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(SORT_ORDER sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
     public SORT_BY getSortBy() {
         return sortBy;
     }
@@ -99,12 +117,12 @@ public class ProteinFilterCriteria {
         this.coverage = coverage;
     }
 
-    public boolean isParsimonious() {
-        return isParsimonious;
+    public boolean showParsimonious() {
+        return showParsimonious;
     }
 
-    public void setParsimonious(boolean isParsimonious) {
-        this.isParsimonious = isParsimonious;
+    public void setShowParsimonious(boolean isParsimonious) {
+        this.showParsimonious = isParsimonious;
     }
 
     public boolean isGroupProteins() {

@@ -389,7 +389,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                             filterCriteria.getPeptideDefinition(),
                                             sort, 
                                             filterCriteria.isGroupProteins(), 
-                                            filterCriteria.isParsimonious()
+                                            filterCriteria.showParsimonious()
                                             );
         
         // Get a list of protein ids filtered by unique peptide count
@@ -403,7 +403,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                                filterCriteria.getPeptideDefinition(),
                                                sort,
                                                filterCriteria.isGroupProteins(),
-                                               filterCriteria.isParsimonious());
+                                               filterCriteria.showParsimonious());
         }
         
         

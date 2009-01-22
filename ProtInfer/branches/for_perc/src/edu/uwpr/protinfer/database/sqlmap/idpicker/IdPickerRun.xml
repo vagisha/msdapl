@@ -9,7 +9,7 @@
 		<result property="inputSummaryList" 
 				select="IdPickerInput.selectIdPickerInputList"
 				column="id"/>
-		<result property="filters" 
+		<result property="params" 
 				select="IdPickerParam.selectParamsForRun"
 				column="id"/>
 	</resultMap>
