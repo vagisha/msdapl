@@ -91,14 +91,22 @@ private static final Logger log = Logger.getLogger(SequestResultsGetter.class);
             for (MsSearchResultProtein protein: msProteinList) {
                 String[] accessionStrings = protein.getAccession().split("\\cA");
 
-                for(String accession: accessionStrings) {
-                    Protein prot = new Protein(accession, -1);
-                    if(decoyPrefix != null) {
-                        if (prot.getAccession().startsWith(decoyPrefix))
-                            prot.setDecoy();
-                    }
-                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+                // keep the first one only
+                Protein prot = new Protein(accessionStrings[0], -1);
+                if(decoyPrefix != null) {
+                    if (prot.getAccession().startsWith(decoyPrefix))
+                        prot.setDecoy();
                 }
+                peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+                
+//                for(String accession: accessionStrings) {
+//                    Protein prot = new Protein(accession, -1);
+//                    if(decoyPrefix != null) {
+//                        if (prot.getAccession().startsWith(decoyPrefix))
+//                            prot.setDecoy();
+//                    }
+//                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+//                }
             }
             
             SpectrumMatchIDPImpl specMatch = new SpectrumMatchIDPImpl();

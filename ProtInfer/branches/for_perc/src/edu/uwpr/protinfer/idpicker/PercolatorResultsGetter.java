@@ -91,12 +91,14 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
 
             for (MsSearchResultProtein protein: msProteinList) {
                 String[] accessionStrings = protein.getAccession().split("\\cA");
-
-                for(String accession: accessionStrings) {
-                    Protein prot = new Protein(accession, -1);
-                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
-
-                }
+                // keep the first one only
+                Protein prot = new Protein(accessionStrings[0], -1);
+                peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+                
+//                for(String accession: accessionStrings) {
+//                    Protein prot = new Protein(accession, -1);
+//                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+//                }
             }
             SpectrumMatchNoFDRImpl specMatch = new SpectrumMatchNoFDRImpl();
             specMatch.setHitId(result.getId());

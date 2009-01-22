@@ -28,10 +28,8 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.Program;
 
-import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -201,12 +199,25 @@ public class IDPickerExecutor {
                        // look for a match LIKE accession
                        List<Integer> ids = NrSeqLookupUtil.getDbProteinIdsPartialAccession(nrseqDbId, pr.getAccession());
                        
+                       if(ids.size() == 0) {
+                           log.error("Could not find nrseq ids for protein: "+pr.getAccession()+
+                                   "; database: "+nrseqDbId+"; peptide: "+phit.getPeptide().getPeptideSequence());
+                           throw new Exception("Could not find nrseq id for protein: "+pr.getAccession()+"; database: "+nrseqDbId);
+                       }
+                       
                        // more than one match found
                        if(ids.size() != 1) {
                            
                            // finally try to match the peptide sequence and accession
                            ids = NrSeqLookupUtil.getDbProteinIdsForPeptidePartialAccession(nrseqDbId, pr.getAccession(),
                                    phit.getPeptide().getPeptideSequence());
+                           
+                           if(ids.size() == 0) {
+                               log.error("Could not find nrseq ids for protein: "+pr.getAccession()+
+                                       "; database: "+nrseqDbId+"; peptide: "+phit.getPeptide().getPeptideSequence());
+                               throw new Exception("Could not find nrseq id for protein: "+pr.getAccession()+"; database: "+nrseqDbId);
+                           }
+                           
                            if(ids.size() != 1) {
                                log.error("Found multiple ("+ids.size()+") nrseq ids for protein: "+pr.getAccession()+
                                            "; database: "+nrseqDbId+"; peptide: "+phit.getPeptide().getPeptideSequence());
@@ -390,7 +401,7 @@ public class IDPickerExecutor {
         
         
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(6);
+        IdPickerRun run = runDao.loadProteinferRun(7);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getParams().size());
         

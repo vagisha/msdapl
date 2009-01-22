@@ -22,6 +22,7 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dto.GenericProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
+import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.idpicker.GenericIdPickerProtein;
 
@@ -85,6 +86,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     
     public List<Integer> getClusterIds(int pinferId) {
        return queryForList(sqlMapNameSpace+".selectClusterIdsForPinfer", pinferId); 
+    }
+    
+    public List<ProteinferProtein> loadProteinsN(int pinferId) {
+        return protDao.loadProteinsN(pinferId);
     }
     
     public int getFilteredParsimoniousProteinCount(int proteinferId) {
