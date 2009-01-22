@@ -33,10 +33,11 @@
 	 	<logic:iterate name="inputSummary"  id="input">
  			<tr>
  				<td>
- 					<span style="text-decoration: underline; cursor: pointer;"
+ 					<!--  <span style="text-decoration: underline; cursor: pointer;"
  								onclick="showSpectrumMatches(<bean:write name="input" property="input.inputId" />, '<bean:write name="input" property="fileName" />')">
+ 					-->
  					<bean:write name="input" property="fileName" />
- 					</span>
+ 					<!-- </span> -->
  				</td>
  				<td><bean:write name="input" property="input.numDecoyHits" /></td>
  				<td><bean:write name="input" property="input.numTargetHits" /></td>

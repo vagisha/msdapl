@@ -23,6 +23,7 @@ import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -49,14 +50,14 @@ public class ViewProteinInferenceResultAction extends Action {
         }
 
         // form for filtering and display options
-        ProteinInferFilterForm filterForm = null;
-        if(form != null) {
-            filterForm = (ProteinInferFilterForm)form;
-        }
-        else {
-            filterForm = new ProteinInferFilterForm();
+//        ProteinInferFilterForm filterForm = null;
+//        if(form != null) {
+//            filterForm = (ProteinInferFilterForm)form;
+//        }
+//        else {
+        ProteinInferFilterForm filterForm = new ProteinInferFilterForm();
             System.out.println("Creating a new filter form!!"); // this should never happen??
-        }
+//        }
         request.setAttribute("proteinInferFilterForm", filterForm);
         
         // look for the protein inference run id in the form first
@@ -98,6 +99,7 @@ public class ViewProteinInferenceResultAction extends Action {
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(SORT_BY.GROUP_ID);
+        filterCriteria.setSortOrder(SORT_ORDER.ASC);
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
@@ -112,7 +114,8 @@ public class ViewProteinInferenceResultAction extends Action {
         
         
         // limit to the proteins that will be displayed on this page
-        List<Integer> proteinIdsPage = ProteinferResultsPager.instance().page(proteinIds, pageNum, true);
+        List<Integer> proteinIdsPage = ProteinferResultsPager.instance().page(proteinIds, pageNum,
+                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups 
         List<WIdPickerProteinGroup> proteinGroups = null;
@@ -169,6 +172,8 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
         
         
+        request.setAttribute("sortBy", filterCriteria.getSortBy());
+        request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
         long e = System.currentTimeMillis();
         log.info("Total time (ViewProteinInferenceResultAction): "+TimeUtils.timeElapsedSeconds(s, e));

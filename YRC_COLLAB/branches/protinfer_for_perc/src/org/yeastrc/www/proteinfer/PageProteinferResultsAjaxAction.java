@@ -22,6 +22,8 @@ import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -95,12 +97,13 @@ public class PageProteinferResultsAjaxAction extends Action {
         
         long s = System.currentTimeMillis();
         
-        log.info("Paging results for protein inference: "+pinferId+"; page num: "+pageNum);
+        log.info("Paging results for protein inference: "+pinferId+"; page num: "+pageNum+"; sort order: "+filterCriteria.getSortOrder() );
         
         
         // determine the list of proteins we will be displaying
         ProteinferResultsPager pager = ProteinferResultsPager.instance();
-        List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, true);
+        List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, 
+                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups
         List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, group, peptideDef);
@@ -115,6 +118,9 @@ public class PageProteinferResultsAjaxAction extends Action {
         request.setAttribute("onLast", (pageNum == pages.get(pages.size() - 1)));
         request.setAttribute("pages", pages);
         request.setAttribute("pageCount", pageCount);
+        
+        request.setAttribute("sortBy", filterCriteria.getSortBy());
+        request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
         long e = System.currentTimeMillis();
         log.info("Total time (PageProteinInferenceResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));

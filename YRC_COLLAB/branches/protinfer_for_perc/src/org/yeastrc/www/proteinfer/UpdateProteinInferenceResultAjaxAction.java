@@ -24,6 +24,7 @@ import org.yeastrc.www.user.UserUtils;
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -87,8 +88,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
         filterCriteria.setPeptideDefinition(peptideDef);
-        SORT_BY sortBy = filterCritSession == null ? SORT_BY.GROUP_ID : filterCritSession.getSortBy();
-        filterCriteria.setSortBy(sortBy);
+        filterCriteria.setSortBy(filterCritSession == null ? SORT_BY.GROUP_ID : filterCritSession.getSortBy());
+        filterCriteria.setSortOrder(filterCritSession == null ? SORT_ORDER.ASC : filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         
@@ -113,12 +114,16 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         request.getSession().setAttribute("proteinIds", storedProteinIds);
         request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);
         
+        request.setAttribute("sortBy", filterCriteria.getSortBy());
+        request.setAttribute("sortOrder", filterCriteria.getSortOrder());
+        
         // page number is now 1
         int pageNum = 1;
         
         
         // limit to the proteins that will be displayed on this page
-        List<Integer> proteinIds = ProteinferResultsPager.instance().page(storedProteinIds, pageNum, true);
+        List<Integer> proteinIds = ProteinferResultsPager.instance().page(storedProteinIds, pageNum, 
+                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups 
         List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 

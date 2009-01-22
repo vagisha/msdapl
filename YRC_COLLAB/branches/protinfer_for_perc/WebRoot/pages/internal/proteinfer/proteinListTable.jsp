@@ -1,5 +1,7 @@
 
-<%@page import="edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY"%><%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@page import="edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY"%>
+<%@page import="edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER"%>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 
@@ -36,14 +38,24 @@
 	&nbsp; &nbsp; Page <bean:write name="currentPage" /> of <bean:write name="pageCount" />
 </div>
 
-
+<%
+ SORT_BY sortBy = (SORT_BY)request.getAttribute("sortBy");
+ SORT_BY.SORT_ORDER sortOrder = (SORT_ORDER)request.getAttribute("sortOrder");
+ String sortedClass = "";
+ if(sortOrder == SORT_ORDER.ASC)	sortedClass = "sorted-asc ms_selected_header";
+ else sortedClass = "sorted-desc ms_selected_header";
+ %>
 
 <table cellpadding="4" cellspacing="2" align="center" width="99%"  id="protlisttable">
 
 	<logic:notEmpty name="proteinGroups">
 		<thead>
 		<tr>
-		<th class="sortable" width="1%" id="<%=SORT_BY.GROUP_ID.name()%>">
+		
+		<% String colSortedClass = "";
+			 if(sortBy == SORT_BY.GROUP_ID) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_asc <%=colSortedClass %>" width="1%" id="<%=SORT_BY.GROUP_ID.name()%>">
 			<b><font size="2pt">Protein Group</font></b>
 		</th>
 		
@@ -52,26 +64,52 @@
 			<th width="1%"><b><font size="2pt">&nbsp;</font></b></th>
 			<th><b><font size="2pt">Protein</font></b></th>
 			<th><b><font size="2pt">Description</font></b></th>
+			<th><b><font size="2pt">Coverage(%)</font></b></th>
 		</logic:equal>
 		
 		<logic:equal name="groupProteins" value="false">
+			<% colSortedClass = "";
+			 if(sortBy == SORT_BY.ACCESSION) colSortedClass = sortedClass;
+			%>
 			<th class="" width="1%" ><b><font size="2pt">&nbsp;</font></b></th>
-			<th class="sortable" id="<%=SORT_BY.ACCESSION.name()%>"><b><font size="2pt">Protein</font></b></th>
+			<th class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.ACCESSION.name()%>"><b><font size="2pt">Protein</font></b></th>
 			<th class=""><b><font size="2pt">Description</font></b></th>
+		
+			<% colSortedClass = "";
+			 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
+			%>
+			<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.COVERAGE.name()%>">
+				<b><font size="2pt">Coverage (%)</font></b>
+			</th>
+			
 		</logic:equal>
 		
-		<th class="sortable" width="3%" id="<%=SORT_BY.COVERAGE.name()%>">
-			<b><font size="2pt">Coverage (%)</font></b>
-		</th>
-		<th class="sortable" width="3%" id="<%=SORT_BY.NUM_PEPT.name()%>">
+		
+		<% colSortedClass = "";
+			 if(sortBy == SORT_BY.NUM_PEPT) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.NUM_PEPT.name()%>">
 			<b><font size="2pt"># Peptides</font></b>
 		</th>
-		<th class="sortable" width="3%" id="<%=SORT_BY.NUM_UNIQ_PEPT.name()%>">
+		
+		<% colSortedClass = "";
+			 if(sortBy == SORT_BY.NUM_UNIQ_PEPT) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.NUM_UNIQ_PEPT.name()%>">
 			<b><font size="2pt"># Uniq. Peptides</font></b></th>
-		<th class="sortable" width="3%" id="<%=SORT_BY.NUM_SPECTRA.name()%>">
+		
+		<% colSortedClass = "";
+			 if(sortBy == SORT_BY.NUM_SPECTRA) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.NUM_SPECTRA.name()%>">
 			<b><font size="2pt"># Spectra</font></b></th>
-		<th class="sortable" width="3%" id="<%=SORT_BY.CLUSTER_ID.name()%>">
+		
+		<% colSortedClass = "";
+			 if(sortBy == SORT_BY.CLUSTER_ID) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_asc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.CLUSTER_ID.name()%>">
 			<b><font size="2pt">Protein Cluster</font></b></th>
+			
 		</tr>
 		</thead>
 	</logic:notEmpty>

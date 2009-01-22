@@ -47,7 +47,7 @@
 // ---------------------------------------------------------------------------------------
   $.ajaxSetup({
   	type: 'POST',
-  	timeout: 15000,
+  	timeout: 30000,
   	dataType: 'html',
   	error: function(xhr) {
   				var statusCode = xhr.status;
@@ -165,12 +165,12 @@ function viewSpectrum (scanId, hitId) {
 // ---------------------------------------------------------------------------------------  
 function showProteinDetails(proteinId) {
 	// first hide all divs 
-	$(".protdetail_prot").hide();
+	//$(".protdetail_prot").hide();
 	
 	// TODO If we already have the details for this protein show the appropriate div
 	
 	// load content in the appropriate div
-	$("#protein_"+proteinId).load("proteinDetails.do",   									// url
+	$("#protein_div").load("proteinDetails.do",   									// url
 								  {'pinferId': <%=pinferId%>, 'pinferProtId': proteinId}, 	// data
 								  function(responseText, status, xhr) {						// callback
 								  		// stripe the table
@@ -208,11 +208,11 @@ function selectProteinCluster(clusterId) {
 	//var clusterId = $("#clusterlist")[0].selectedIndex + 1;
 	
 	// hide all other first
-	for(var i = 1; i <= <%=clusterCount%>; i++) {
-		$("#protcluster_"+i).hide();
-	}
+	//for(var i = 1; i <= <%=clusterCount%>; i++) {
+	//	$("#protcluster_"+i).hide();
+	//}
 	// get data from the server and put it in the appropriate div
-	$("#protcluster_"+clusterId).load("proteinCluster.do",   								// url
+	$("#protcluster_div").load("proteinCluster.do",   								// url
 								  	  {'pinferId': <%=pinferId%>, 'clusterId': clusterId}, 	// data
 								      function(responseText, status, request) {				// callback
  								  		
@@ -544,8 +544,8 @@ function setupAnnotationsLinks() {
 function makeProteinListSortable() {
 	
 	// the header for the column that is sorted is highlighted
-	$('th', $table).each(function(){$(this).removeClass('ms_selected_header');});
-	$(this).addClass('ms_selected_header');
+	//$('th', $table).each(function(){$(this).removeClass('ms_selected_header');});
+	//$(this).addClass('ms_selected_header');
 	
 	var $table = $("#protlisttable");
 	$('th', $table).each(function(column) {
@@ -559,11 +559,17 @@ function makeProteinListSortable() {
       			function() {$(this).addClass('ms_hover');} , 
       			function() {$(this).removeClass('ms_hover');}).click(function() {
 				
-					alert("sorting by "+sortBy);
+					// alert("sorting by "+sortBy);
 					// sorting direction
 					var sortOrder = 1;
-	        		if ($(this).is('.sorted-desc')) {
+					if ($(this).is('.sorted-asc')) {
 	          			sortOrder = -1;
+	        		}
+	        		else if ($(this).is('.sorted-desc')) {
+	          			sortOrder = 1;
+	        		}
+	        		else if($(this).is('.def_sort_desc')) {
+	        			sortOrder = -1;
 	        		}
         			sortResults(<%=pinferId%>, sortBy, sortOrder);
       			});
@@ -784,10 +790,8 @@ function toggleDivVisibility(mydiv) {
     
       <!-- PROTEIN CLUSTER -->
       <div id="protclusters"><font color="black">
-          	<!-- create a placeholder div for each protein cluster -->
-          	<logic:iterate name="clusterIds" id="id">
-          		<div id="protcluster_<bean:write name="id" />" style="display: none;"></div>
-          	</logic:iterate>
+          <!-- create a placeholder div for protein cluster -->
+          <div id="protcluster_div" style="display: none;"></div>
       </font></div>
       
       
@@ -795,12 +799,8 @@ function toggleDivVisibility(mydiv) {
       
       <!-- PROTEIN DETAILS -->
       <div id="protdetails">
-      		<!-- create a placeholder div for each protein -->
-      		<logic:iterate name="proteinGroups" id="proteinGroup">
-      			<logic:iterate name="proteinGroup" property="proteins" id="protein">
-      				<div id="protein_<bean:write name="protein" property="protein.id" />" style="display: none;" class="protdetail_prot"></div>
-      			</logic:iterate>
-      		</logic:iterate>
+      		<!-- create a placeholder div for protein details -->
+      		<div id="protein_div" style="display: none;" class="protdetail_prot"></div>
       </div>
       
       <!-- INPUT SUMMARY -->

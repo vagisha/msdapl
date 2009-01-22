@@ -27,13 +27,13 @@ public class ProteinferResultsPager {
      * @param proteinIds
      * @param pageNum
      * @param numPerPage
-     * @param forward
+     * @param descending
      * @return
      */
-    public List<Integer> page(List<Integer> proteinIds, int pageNum, int numPerPage, boolean forward) {
+    public List<Integer> page(List<Integer> proteinIds, int pageNum, int numPerPage, boolean descending) {
         
         List<Integer> sublist = new ArrayList<Integer>(numPerPage);
-        if(forward) {
+        if(!descending) {
             int s = (pageNum - 1) * numPerPage;
             if(s >= proteinIds.size())
                 return new ArrayList<Integer>(0);

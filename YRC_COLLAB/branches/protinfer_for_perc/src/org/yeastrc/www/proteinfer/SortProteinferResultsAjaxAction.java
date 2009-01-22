@@ -23,6 +23,7 @@ import org.yeastrc.www.user.UserUtils;
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -89,15 +90,24 @@ public class SortProteinferResultsAjaxAction extends Action{
        
         
         SORT_BY sortBy_session = filterCriteria.getSortBy();
+        
         String sortBy_request = (String) request.getParameter("sortBy");
         
+        String sortOrder_request = (String) request.getParameter("sortOrder");
+        if(sortOrder_request != null) {
+            SORT_ORDER sortOrder_r = SORT_ORDER.getSortByForString(sortOrder_request);
+            filterCriteria.setSortOrder(sortOrder_r);
+        }
+        
+        
         long s = System.currentTimeMillis();
-        log.info("Sorting results for protein inference: "+pinferId+"; sort by: "+sortBy_request);
+        log.info("Sorting results for protein inference: "+pinferId+"; sort by: "+sortBy_request+"; sort order: "+sortOrder_request);
         
         if(sortBy_request != null){
             SORT_BY sortBy_r = SORT_BY.getSortByForString(sortBy_request);
+            
             if(sortBy_r != sortBy_session) {
-                log.info("Sorting results by "+sortBy_r.name());
+                log.info("Sorting results by "+sortBy_r.name()+"; order: "+filterCriteria.getSortOrder().name());
                 // resort  the results based on the given criteria
                 List<Integer> newOrderIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
                             peptideDef, 
@@ -118,7 +128,8 @@ public class SortProteinferResultsAjaxAction extends Action{
         
         // determine the list of proteins we will be displaying
         ProteinferResultsPager pager = ProteinferResultsPager.instance();
-        List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, true);
+        List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, 
+                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups
         List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, group, peptideDef);
@@ -134,6 +145,9 @@ public class SortProteinferResultsAjaxAction extends Action{
         request.setAttribute("onLast", (pageNum == pages.get(pages.size() - 1)));
         request.setAttribute("pages", pages);
         request.setAttribute("pageCount", pageCount);
+        
+        request.setAttribute("sortBy", filterCriteria.getSortBy());
+        request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
         long e = System.currentTimeMillis();
         log.info("Total time (SortProteinInferenceResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
