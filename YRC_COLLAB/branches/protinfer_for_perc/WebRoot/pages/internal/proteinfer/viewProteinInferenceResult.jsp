@@ -834,6 +834,19 @@ function toggleDivVisibility(mydiv) {
    </div>
       
       
+    <!-- Protein Annotation Dialog -->
+	<div id="prot_annot_dialog" class="flora" title="Annotate Protein">
+		<input type="hidden" id="prot_id" value="" />
+		Protein: <b><span id="prot_name"></span></b><br>
+		<input type="radio" name="annotate" value="Accept" id="prot_accept" checked="checked"/>
+		Accept	
+		<input type="radio" name="annotate" value="Reject" id="prot_reject"/>
+		Reject
+		<input type="radio" name="annotate" value="Not Sure" id="prot_notsure" />
+		Not Sure
+		<br>
+		<textarea name="comments" rows="4" cols="45" id="prot_comments"></textarea>
+	</div>
       
     <!-- PROTEIN LIST -->
 	<div id="protlist">
