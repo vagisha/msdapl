@@ -9,6 +9,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 import edu.uwpr.protinfer.database.dao.GenericProteinferRunDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
@@ -34,8 +35,8 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     }
 
     @Override
-    public List<Integer> loadProteinferIdsForInputIds(List<Integer> runSearchIds) {
-        return runDao.loadProteinferIdsForInputIds(runSearchIds);
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> runSearchIds, InputType inputType) {
+        return runDao.loadProteinferIdsForInputIds(runSearchIds, inputType);
     }
 
     @Override

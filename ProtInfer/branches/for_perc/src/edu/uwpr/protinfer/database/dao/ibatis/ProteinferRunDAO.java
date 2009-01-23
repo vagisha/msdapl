@@ -2,7 +2,9 @@ package edu.uwpr.protinfer.database.dao.ibatis;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
@@ -17,6 +19,7 @@ import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
 import edu.uwpr.protinfer.database.dto.ProteinferStatus;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 
 public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinferRunDAO<ProteinferInput, ProteinferRun> {
 
@@ -39,7 +42,7 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         return (ProteinferRun) super.queryForObject(sqlMapNameSpace+".select", proteinferId);
     }
     
-    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds) {
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, InputType inputType) {
         if(inputIds.size() == 0) 
             return new ArrayList<Integer>(0);
         
@@ -51,7 +54,11 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         buf.deleteCharAt(buf.length() - 1);
         buf.append(")");
         
-        return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIds", buf.toString());
+        Map<String, String> map = new HashMap<String, String>(4);
+        map.put("inputType", String.valueOf(inputType.getShortName()));
+        map.put("inputIds", buf.toString());
+        
+        return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIds", map);
     }
     
     public void delete(int pinferId) {

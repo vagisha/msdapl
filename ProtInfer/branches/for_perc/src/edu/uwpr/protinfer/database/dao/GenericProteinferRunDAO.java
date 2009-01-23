@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.uwpr.protinfer.database.dto.GenericProteinferRun;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 
 public interface GenericProteinferRunDAO <S extends ProteinferInput, T extends GenericProteinferRun<S>>{
 
@@ -13,7 +14,7 @@ public interface GenericProteinferRunDAO <S extends ProteinferInput, T extends G
 
     public abstract T loadProteinferRun(int proteinferId);
 
-    public abstract List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds);
+    public abstract List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, InputType inputType);
 
     public abstract void delete(int pinferId);
 
