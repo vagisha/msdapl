@@ -162,17 +162,17 @@ $(document).ready(function() {
 // View the protein sequence
 function toggleProteinSequence (pinferProteinId) {
 
-		//alert("protein id: "+pinferProteinId+" pinferId: "+pinferId);
-		var button = $("#protseqbutton_"+pinferProteinId);
-		
-		if(button.text() == "[View Sequence]") {
-			//alert("View");
-			if($("#protsequence_"+pinferProteinId).html().length == 0) {
-				//alert("Getting...");
-				// load data in the appropriate div
-				$.blockUI(); 
-				$("#protsequence_"+pinferProteinId).load("proteinSequence.do",   				// url
-								                        {'pinferProteinId': pinferProteinId}); 	// data
+	//alert("protein id: "+pinferProteinId+" pinferId: "+pinferId);
+	var button = $("#protseqbutton_"+pinferProteinId);
+	
+	if(button.text() == "[View Sequence]") {
+		//alert("View");
+		if($("#protsequence_"+pinferProteinId).html().length == 0) {
+			//alert("Getting...");
+			// load data in the appropriate div
+			$.blockUI(); 
+			$("#protsequence_"+pinferProteinId).load("proteinSequence.do",   				// url
+							                        {'pinferProteinId': pinferProteinId}); 	// data
 		}
 		button.text("[Hide Sequence]");
 		$("#protseqtbl_"+pinferProteinId).show();

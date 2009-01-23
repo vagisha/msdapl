@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.domain.search.SearchProgram;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
@@ -65,13 +65,13 @@ public class PeptideSequenceMatchesAjaxAction extends Action {
         // First we need to find out the search program used (Sequest, ProLuCID etc. ) so 
         // that we can query the appropriate tables. 
         DAOFactory msDaoFactory = DAOFactory.instance();
-        SearchProgram searchProgram = msDaoFactory.getMsRunSearchDAO().loadSearchProgramForRunSearch(runSearchId);
+        Program searchProgram = msDaoFactory.getMsRunSearchDAO().loadSearchProgramForRunSearch(runSearchId);
         
         
-        if(searchProgram == SearchProgram.SEQUEST || searchProgram == SearchProgram.EE_NORM_SEQUEST) {
+        if(searchProgram == Program.SEQUEST || searchProgram == Program.EE_NORM_SEQUEST) {
             // load sequest results
             request.setAttribute("searchProgram", "sequest");
-            List<WIdPickerSpectrumMatch<SequestSearchResult>> psmList = 
+            List<WIdPickerSpectrumMatch> psmList = 
                     IdPickerResultsLoader.getSequestSpectrumMmatchesForRunSearch(pinferId, runSearchId);
             
             if(psmList.size() == 0) {
@@ -84,10 +84,10 @@ public class PeptideSequenceMatchesAjaxAction extends Action {
             request.setAttribute("psmList", psmList);
         }
         
-        else if (searchProgram == SearchProgram.PROLUCID) {
+        else if (searchProgram == Program.PROLUCID) {
             // load ProLuCID results
             request.setAttribute("searchProgram", "prolucid");
-            List<WIdPickerSpectrumMatch<ProlucidSearchResult>>  psmList = 
+            List<WIdPickerSpectrumMatch>  psmList = 
                     IdPickerResultsLoader.getProlucidSpectrumMmatchesForRunSearch(pinferId, runSearchId);
             
             if(psmList.size() == 0) {

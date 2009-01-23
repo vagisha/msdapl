@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
@@ -15,6 +17,7 @@ import org.yeastrc.ms.domain.search.Program;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 
 public class ProteinferRunSearcher {
 
@@ -27,8 +30,27 @@ public class ProteinferRunSearcher {
     
     public static List<ProteinferJob> getProteinferJobsForMsSearch(int msSearchId) {
         
+        Set<Integer> pinferRunIds = new HashSet<Integer>();
+        
+        // first check if search results were used to do protein inference
         List<Integer> msRunSearchIds = getRunSearchIdsForMsSearch(msSearchId);
-        List<Integer> pinferRunIds = runDao.loadProteinferIdsForInputIds(msRunSearchIds);
+        List<Integer> sPinferRunIds = runDao.loadProteinferIdsForInputIds(msRunSearchIds, InputType.SEARCH);
+        if(pinferRunIds != null)    
+            pinferRunIds.addAll(sPinferRunIds);
+        
+        // now check if there is any analysis associated with this search
+        List<Integer> analysisIds = getAnalysisIdsForMsSearch(msSearchId);
+        
+        // for each analysisId get the ids of all the protein inference runs
+        for(int analysisId: analysisIds) {
+            // get a list run search analyses
+            List<Integer> rsAnalysisIds = getRunSearchAnalysisIdsForAnalysis(analysisId);
+            // get a list of protein inference ids associated with these run search analyses
+            List<Integer> aPinferIds = runDao.loadProteinferIdsForInputIds(rsAnalysisIds, InputType.ANALYSIS);
+            if(aPinferIds != null)
+                pinferRunIds.addAll(aPinferIds);
+        }
+        
         if(pinferRunIds == null || pinferRunIds.size() == 0)
             return new ArrayList<ProteinferJob>(0);
         
@@ -38,8 +60,8 @@ public class ProteinferRunSearcher {
             if(run != null) {
                 
                 // make sure the input generator for this protein inference program was
-                // a search program
-                if(!Program.isSearchProgram(run.getInputGenerator()))
+                // a search program or an analysis program
+                if(!Program.isSearchProgram(run.getInputGenerator()) && !Program.isAnalysisProgram(run.getInputGenerator()))
                     continue;
                 ProteinferJob job = null;
                 try {
@@ -115,5 +137,15 @@ public class ProteinferRunSearcher {
         org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
         MsRunSearchDAO runSearchDao = factory.getMsRunSearchDAO();
         return runSearchDao.loadRunSearchIdsForSearch(msSearchId);
+    }
+    
+    private static List<Integer> getAnalysisIdsForMsSearch(int msSearchId) {
+        org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
+        return factory.getMsSearchAnalysisDAO().getAnalysisIdsForSearch(msSearchId);
+    }
+    
+    private static List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId) {
+        org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
+        return factory.getMsRunSearchAnalysisDAO().getRunSearchAnalysisIdsForAnalysis(analysisId);
     }
 }

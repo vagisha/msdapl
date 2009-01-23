@@ -52,6 +52,25 @@
 
 <br><br>
 
+<script type=text/javascript">
+	function toggleSpectrumMatches() {
+		var button = $("#psmToggle");
+	
+		if(button.text() == "Hide Spectrum Matches") {
+			$(".allPeptideSpectra").hide();
+			button.text("Show Spectrum Matches");
+		}
+		else {
+			$(".allPeptideSpectra").show();
+			button.text("Hide Spectrum Matches");
+		}
+	}
+</script>
+<div 
+	id = "psmToggle"
+	style="text-decoration: underline; cursor: pointer;font-size: 8pt; color: #3D902A;" 
+	onclick="toggleSpectrumMatches()">Hide Spectrum Matches</div>
+	
 <table width="95%" id="protdetailstbl_<bean:write name="protein" property="protein.id"/>" >
 	<thead>
     <tr class="main">
@@ -67,7 +86,7 @@
             <td><bean:write name="ion" property="ionSequence" /></td>
             <td>
             	<logic:equal name="ion" property="isUniqueToProteinGroup" value="true">*</logic:equal>
-     			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false">-</logic:equal>
+     			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false">&nbsp</logic:equal>
             </td>
             <td><bean:write name="ion" property="charge" /></td>
             <td><bean:write name="ion" property="spectrumCount" /></td>
@@ -75,7 +94,7 @@
            	<tr><td colspan="5">
        			<table align="center" width="70%"
        			style="border: 1px dashed gray; border-spacing: 4px; margin-top: 6px; margin-bottom: 6px;" 
-       			class="sortable allpsms">
+       			class="sortable allpsms allPeptideSpectra">
        			
        			<thead><tr>
 				     <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Scan Number</th>
@@ -138,7 +157,7 @@
 		     			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
 		     		</logic:equal>
 		     		 
-		     		<td><span style="text-decoration: underline; cursor: pointer;" 
+		     		<td><span style="text-decoration: underline; cursor: pointer;"
 						onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="runSearchResultId" />)" >
 						View
 					</span>

@@ -35,7 +35,7 @@
 	   	<% if(searchId != null && searchId > 0) {%>
 	   	<div style="font-size:8pt; font-weight: bold;"><b>
 	   	<a href="/yrc/newProteinInference.do?searchId=<%=searchId %>&projectId=<bean:write name="projectId" />">
-	   	[Run IDPicker]
+	   	[Run Protein Inference]
 	   	</a></b></div>
 	   	<%} %>
 	   	
