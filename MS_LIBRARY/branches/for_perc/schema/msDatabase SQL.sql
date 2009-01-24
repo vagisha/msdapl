@@ -424,8 +424,7 @@ CREATE TABLE msProteinInferIon(
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	piPeptideID INT UNSIGNED NOT NULL,
 	charge INT UNSIGNED NOT NULL,
-	modificationStateID INT UNSIGNED NOT NULL,
-	sequence VARCHAR(255) NOT NULL
+	modificationStateID INT UNSIGNED NOT NULL
 );
 ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID);
 ALTER TABLE  msProteinInferIon ADD INDEX (charge);
@@ -443,7 +442,7 @@ CREATE TABLE msProteinInferSpectrumMatch (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	piIonID INT UNSIGNED NOT NULL,
     runSearchResultID INT UNSIGNED NOT NULL,
-    rank INT UNSIGNED
+    rankForPeptide INT UNSIGNED
 );
 ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (runSearchResultID);
 ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piIonID);
