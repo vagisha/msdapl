@@ -4,9 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
@@ -31,22 +29,6 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         return (PercolatorResult) queryForObject(namespace+".select", msResultId);
     }
 
-    @Override
-    public List<Integer> loadResultIdsWithPepThreshold(int runSearchAnalysisId, double pep) {
-        Map<String, Number> map = new HashMap<String, Number>(2);
-        map.put("rsAnalysisId", runSearchAnalysisId);
-        map.put("pep", pep);
-        return queryForList(namespace+".selectResultIdsWPepThreshold", map);
-    }
-
-    @Override
-    public List<Integer> loadResultIdsWithQvalueThreshold(int runSearchAnalysisId, double qvalue) {
-        Map<String, Number> map = new HashMap<String, Number>(2);
-        map.put("rsAnalysisId", runSearchAnalysisId);
-        map.put("qvalue", qvalue);
-        return queryForList(namespace+".selectResultIdsWQvalThreshold", map);
-    }
-    
     @Override
     public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId) {
         return queryForList(namespace+".selectResultIdsForRunSearchAnalysis", runSearchAnalysisId);
@@ -90,7 +72,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
 
     @Override
     public List<PercolatorResult> loadResultsWithScoreThresholdForRunSearchAnalysis(
-            int runSearchId, double qvalue, double pep, double discriminantScore) {
+            int runSearchId, Double qvalue, Double pep, Double discriminantScore) {
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -105,13 +87,13 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             buf.append("res.id = pres.resultID");
             buf.append(" AND ");
             buf.append("pres.runSearchAnalysisID = ?");
-            if(qvalue != -1.0) {
+            if(qvalue != null) {
                 buf.append(" AND qValue <= "+qvalue);
             }
-            if(pep != -1.0) {
+            if(pep != null) {
                 buf.append(" AND PEP <= "+pep);
             }
-            if(discriminantScore != -1.0) {
+            if(discriminantScore != null) {
                 buf.append(" AND discriminantScore <= "+discriminantScore);
             }
 //            buf.append(" GROUP BY res.scanID, res.charge ORDER BY res.id");
@@ -130,6 +112,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
                 PercolatorResultBean result = new PercolatorResultBean();
                 result.setId(rs.getInt("id"));
                 result.setRunSearchId(rs.getInt("runSearchID"));
+                result.setRunSearchAnalysisId(rs.getInt("runSearchAnalysisID"));
                 result.setScanId(rs.getInt("scanID"));
                 result.setCharge(rs.getInt("charge"));
                 SearchResultPeptideBean peptide = new SearchResultPeptideBean();

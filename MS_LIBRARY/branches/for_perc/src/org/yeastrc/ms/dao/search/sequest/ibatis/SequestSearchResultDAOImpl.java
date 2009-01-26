@@ -69,7 +69,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     
     /**
      * Returns the top hits (XCorr rank = 1) for a search. If multiple rank=1 hits
-     * are found for a scan + charge combination return only one. 
+     * are found for a scan + charge combination all are returned. 
      */
     public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
         
@@ -82,7 +82,8 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             conn = super.getConnection();
             String sql = "SELECT * from msRunSearchResult as res, SQTSearchResult as sres WHERE"+
                          " res.id = sres.resultID AND sres.XCorrRank = 1 AND res.runSearchID = ?"+
-                         " GROUP BY res.scanID, res.charge ORDER BY res.id";
+                         " ORDER BY res.id";
+                         //" GROUP BY res.scanID, res.charge ORDER BY res.id";
             stmt = conn.prepareStatement( sql );
             stmt.setInt( 1, runSearchId );
             rs = stmt.executeQuery();

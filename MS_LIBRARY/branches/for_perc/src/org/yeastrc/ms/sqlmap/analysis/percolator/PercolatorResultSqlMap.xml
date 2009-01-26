@@ -62,19 +62,6 @@
     	rsa.searchAnalysisID = #analysisId# 
     </select>
     
-    <select id="selectResultIdsWQvalThreshold" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT resultID FROM PercolatorResult
-    	WHERE runSearchAnalysisID = #rsAnalysisId#  
-    	AND qValue &lt;= #qvalue#
-    </select>
-    
-    <select id="selectResultIdsWPepThreshold" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT resultID FROM PercolatorResult
-    	WHERE runSearchAnalysisID = #rsAnalysisId# 
-    	AND PEP &lt;= #pep#
-    </select>
-    
-    
     <insert id="insert" parameterMap="percolatorResultParam">
     	INSERT INTO PercolatorResult 
     	(resultID, 
