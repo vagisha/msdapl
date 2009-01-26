@@ -99,8 +99,10 @@ You can also <b><html:link href="/yrc/newCollaboration.do">request a new collabo
 <yrcwww:member group="administrators">
 
 	<!-- List the Y2H Data here: -->
+	<%@ include file="listRecentY2H.jsp" %>
 
 	<!-- List the YATES Data here: -->
+	<%@ include file="listRecentMS.jsp" %>
 
 </yrcwww:member>
 
