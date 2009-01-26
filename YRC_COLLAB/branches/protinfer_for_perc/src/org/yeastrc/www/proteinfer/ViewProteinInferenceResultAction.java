@@ -1,6 +1,5 @@
 package org.yeastrc.www.proteinfer;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,14 +49,7 @@ public class ViewProteinInferenceResultAction extends Action {
         }
 
         // form for filtering and display options
-//        ProteinInferFilterForm filterForm = null;
-//        if(form != null) {
-//            filterForm = (ProteinInferFilterForm)form;
-//        }
-//        else {
-        ProteinInferFilterForm filterForm = new ProteinInferFilterForm();
-            System.out.println("Creating a new filter form!!"); // this should never happen??
-//        }
+        ProteinInferFilterForm filterForm = (ProteinInferFilterForm)form;
         request.setAttribute("proteinInferFilterForm", filterForm);
         
         // look for the protein inference run id in the form first
@@ -89,6 +81,11 @@ public class ViewProteinInferenceResultAction extends Action {
         IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
         IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
         PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
+        
+        // update the form with the parameters that were used to run protein inference
+        filterForm.setMinPeptides(idpParams.getMinPeptides());
+        filterForm.setMinUniquePeptides(idpParams.getMinUniquePeptides());
+        filterForm.setMinCoverage(idpParams.getMinCoverage());
         
         
         // Get the filtering criteria
@@ -139,9 +136,9 @@ public class ViewProteinInferenceResultAction extends Action {
         
 
         // Cluster IDs in this set
-        List<Integer> clusterIdList = IdPickerResultsLoader.getClusterIds(pinferId);
-        Collections.sort(clusterIdList);
-        request.setAttribute("clusterIds", clusterIdList);
+//        List<Integer> clusterIdList = IdPickerResultsLoader.getClusterIds(pinferId);
+//        Collections.sort(clusterIdList);
+//        request.setAttribute("clusterIds", clusterIdList);
         
         
         // Run summary

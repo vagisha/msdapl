@@ -15,14 +15,22 @@ public class ProteinInferFilterForm extends ActionForm {
     private int minUniquePeptides = 0;
     private int minSpectrumMatches = 1;
     
-//    private boolean peptideDef_useMods = false;
-//    private boolean peptideDef_useCharge = false;
-//    private boolean peptideDef_useSequence = true;
-    
     private boolean joinGroupProteins = true;
     private boolean showAllProteins = true;
     
+    private String accessionLike = null;
+    
     public ProteinInferFilterForm () {}
+    
+    public void reset() {
+        minCoverage = 0.0;
+        minPeptides = 1;
+        minUniquePeptides = 0;
+        minSpectrumMatches = 1;
+        joinGroupProteins = true;
+        showAllProteins = true;
+        accessionLike = null;
+    }
     
     /**
      * Validate the properties that have been sent from the HTTP request,
@@ -33,8 +41,8 @@ public class ProteinInferFilterForm extends ActionForm {
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
         
-        // TODO make sure at least one file was selected
         // TODO validate the parameter values
+        
         
 //      errors.add("fundingTypes", new ActionMessage("error.project.nofoundationname"));
 
@@ -81,30 +89,6 @@ public class ProteinInferFilterForm extends ActionForm {
         this.minSpectrumMatches = minSpectrumMatches;
     }
 
-//    public boolean isPeptideDef_useMods() {
-//        return peptideDef_useMods;
-//    }
-//
-//    public void setPeptideDef_useMods(boolean peptideDef_useMods) {
-//        this.peptideDef_useMods = peptideDef_useMods;
-//    }
-//
-//    public boolean isPeptideDef_useCharge() {
-//        return peptideDef_useCharge;
-//    }
-//
-//    public void setPeptideDef_useCharge(boolean peptideDef_useCharge) {
-//        this.peptideDef_useCharge = peptideDef_useCharge;
-//    }
-//
-//    public boolean isPeptideDef_useSequence() {
-//        return peptideDef_useSequence;
-//    }
-//
-//    public void setPeptideDef_useSequence(boolean peptideDef_useSequence) {
-//        this.peptideDef_useSequence = peptideDef_useSequence;
-//    }
-
     public boolean isJoinGroupProteins() {
         return joinGroupProteins;
     }
@@ -119,6 +103,18 @@ public class ProteinInferFilterForm extends ActionForm {
 
     public void setShowAllProteins(boolean showAllProteins) {
         this.showAllProteins = showAllProteins;
+    }
+    
+    public String getAccessionLike() {
+        if(accessionLike == null || accessionLike.trim().length() == 0)
+            return null;
+        else
+            return accessionLike.trim();
+            
+    }
+    
+    public void setAccessionLike(String accessionLike) {
+        this.accessionLike = accessionLike;
     }
    
 }

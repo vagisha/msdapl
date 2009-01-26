@@ -166,7 +166,7 @@
 		        </logic:iterate>
 		        </tbody>
 			  </table>
-            </tr>
+			</td></tr>
         </logic:iterate>
         </tbody>
         </table>

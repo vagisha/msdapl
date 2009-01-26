@@ -7,6 +7,7 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -92,6 +93,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setSortOrder(filterCritSession == null ? SORT_ORDER.ASC : filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         
         // Match this filtering criteria with the one in the request
         boolean match = false;
@@ -107,6 +109,11 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         if(!match)  {
             // Get a list of filtered and sorted proteins
             storedProteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
+            if(filterCriteria.getAccessionLike() != null) {
+                Map<Integer, String> proteinAccessionMap = getProteinAccessionMap(request, pinferId);
+                storedProteinIds = IdPickerResultsLoader.filterByProteinAccession(storedProteinIds, proteinAccessionMap, 
+                        filterCriteria.getAccessionLike());
+            }
         }
         
         
@@ -137,7 +144,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         
         request.setAttribute("currentPage", pageNum);
         request.setAttribute("onFirst", pageNum == 1);
-        request.setAttribute("onLast", (pageNum == pages.get(pages.size() - 1)));
+        request.setAttribute("onLast", ( pages.size() == 0 || (pageNum == pages.get(pages.size() - 1))));
         request.setAttribute("pages", pages);
         request.setAttribute("pageCount", pageCount);
         
@@ -160,14 +167,37 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         return mapping.findForward("Success");
     }
 
-    private boolean matchFilterCriteria(ProteinFilterCriteria filterCritSession,  ProteinFilterCriteria filterCriteria) {
-        return (filterCritSession.getCoverage() == filterCriteria.getCoverage() &&
-                filterCritSession.getNumPeptides() == filterCriteria.getNumPeptides() &&
-                filterCritSession.getNumUniquePeptides() == filterCriteria.getNumUniquePeptides() &&
-                filterCritSession.getNumSpectra() == filterCriteria.getNumSpectra() &&
-                filterCritSession.getPeptideDefinition().equals(filterCriteria.getPeptideDefinition()) &&
-                filterCritSession.showParsimonious() == filterCriteria.showParsimonious()
-                );
+    private Map<Integer, String> getProteinAccessionMap(
+            HttpServletRequest request, int pinferId) {
+        Map<Integer, String> proteinAccessionMap = (Map<Integer, String>) request.getSession().getAttribute("proteinAccessionMap");
+        if(proteinAccessionMap == null) {
+            proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
+        }
+        else {
+            Integer pinferIdForProtAccession = (Integer)request.getSession().getAttribute("pinferIdForProtAccession");
+            if(pinferIdForProtAccession != null && pinferIdForProtAccession != pinferId) {
+                proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
+                
+            }
+        }
+        request.getSession().setAttribute("proteinAccessionMap", proteinAccessionMap);
+        request.getSession().setAttribute("pinferIdForProtAccession", pinferId);
+        return proteinAccessionMap;
+    }
+
+    private boolean matchFilterCriteriaExceptAccession(ProteinFilterCriteria filterCritSession, ProteinFilterCriteria filterCriteria) {
+        boolean allSame = (filterCritSession.getCoverage() == filterCriteria.getCoverage() &&
+                           filterCritSession.getNumPeptides() == filterCriteria.getNumPeptides() &&
+                           filterCritSession.getNumUniquePeptides() == filterCriteria.getNumUniquePeptides() &&
+                           filterCritSession.getNumSpectra() == filterCriteria.getNumSpectra() &&
+                           filterCritSession.getPeptideDefinition().equals(filterCriteria.getPeptideDefinition()) &&
+                           filterCritSession.showParsimonious() == filterCriteria.showParsimonious()
+                        );
         
+        return allSame;
+    }
+
+    private boolean matchFilterCriteria(ProteinFilterCriteria filterCritSession,  ProteinFilterCriteria filterCriteria) {
+        return filterCritSession.equals(filterCriteria);
     }
 }

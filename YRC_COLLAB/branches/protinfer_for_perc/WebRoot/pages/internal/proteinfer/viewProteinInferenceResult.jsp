@@ -22,7 +22,6 @@
 
 <script src="/yrc/js/jquery.blockUI.js"></script>
 
-
 <link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
 
 <yrcwww:notauthenticated>
@@ -37,7 +36,7 @@
 
 <%
 	int pinferId = (Integer)request.getAttribute("pinferId");
-	int clusterCount = ((List<Integer>)request.getAttribute("clusterIds")).size();
+	//int clusterCount = ((List<Integer>)request.getAttribute("clusterIds")).size();
 %>
 
 <script>
@@ -108,6 +107,11 @@ $(document).ready(function() {
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
 	
+	// reset the form.  When clicking the reload button the form is 
+	// not resest, so we reset it manually. 
+ 	$("#filterForm")[0].reset();
+ 	
+ 	
 	var selected = 0;
 	if(location.hash == "#protclusters") selected = 1;
 	if(location.hash == "#protdetails")  selected = 2;
@@ -119,6 +123,7 @@ $(document).ready(function() {
   
  	$(".stripe_table th").addClass("ms_A");
  	$(".stripe_table tbody > tr:odd").addClass("ms_A");
+ 	
  	
   	setupProteinListTable();
   	
@@ -647,8 +652,57 @@ $(document).ready(function() {
     // bind 'filterForm' and provide a callback function 
     $('#filterForm').ajaxForm(options); 
 });
+// validate the form parameters before submit.
 function beforeSubmit() {
+	// fieldValue is a Form Plugin method that can be invoked to find the 
+    // current value of a field 
+    
+    var value = $('input[@name=minPeptides]').fieldValue();
+    var valid = validateInt(value, "Min. Peptides", 1);
+    if(!valid)	return false;
+    var minPept = parseInt(value);
+    $('input[@name=minPeptides]').val(minPept);
+    
+    value = $('input[@name=minUniquePeptides]').fieldValue();
+    valid = validateInt(value, "Min. Unique Peptides", 0, minPept);
+    if(!valid)	return false;
+    $('input[@name=minUniquePeptides]').val(parseInt(value));
+    
+    value = $('input[@name=minCoverage]').fieldValue();
+    valid = validateFloat(value, "Min. Coverage", 0.0, 100.0);
+    if(!valid)	return false;
+    
+    value = $('input[@name=minSpectrumMatches]').fieldValue();
+    valid = validateInt(value, "Min. Spectrum Matches", 1);
+    if(!valid)	return false;
+    $('input[@name=minSpectrumMatches]').val(parseInt(value));
+    
 	$.blockUI();
+}
+function validateInt(value, fieldName, min, max) {
+	var intVal = parseInt(value);
+	var valid = true;
+	if(isNaN(intVal))						valid = false;
+	if(valid && intVal < min)				valid = false;
+	if(max && (valid && intVal > max))		valid = false;
+	
+	if(!valid) {
+		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
+		else	alert("Value for "+fieldName+" should be >= "+min);
+	}
+	return valid;
+}
+function validateFloat(value, fieldName, min, max) {
+	var floatVal = parseFloat(value);
+	var valid = true;
+	if(isNaN(floatVal))						valid = false;
+	if(valid && floatVal < min)			valid = false;
+	if(max && (valid && floatVal > max))	valid = false;
+	if(!valid) {
+		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
+		else	alert("Value for "+fieldName+" should be >= "+min);
+	}
+	return valid;
 }
 function updateResults(responseText, statusText) {
   	setupProteinListTable();

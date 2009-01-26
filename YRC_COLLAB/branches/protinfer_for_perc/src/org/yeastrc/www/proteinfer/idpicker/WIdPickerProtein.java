@@ -32,9 +32,9 @@ public class WIdPickerProtein {
     public String getShortDescription() {
         if(description == null)
             return "No Description";
-        if(description.length() <= 40)
+        if(description.length() <= 125)
             return description;
-        return description.substring(0, 40)+"...";
+        return description.substring(0, 125)+"...";
     }
     public void setDescription(String description) {
         this.description = description;

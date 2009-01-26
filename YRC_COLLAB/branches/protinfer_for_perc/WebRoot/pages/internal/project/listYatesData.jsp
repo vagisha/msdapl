@@ -32,12 +32,14 @@
 	  <yrcwww:colorrow scheme="ms">
 	   <TD valign="top" width="20%">
 	   	<html:link href="/yrc/viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">View Run</html:link>
+	   	<yrcwww:member group="any">
 	   	<% if(searchId != null && searchId > 0) {%>
 	   	<div style="font-size:8pt; font-weight: bold;"><b>
 	   	<a href="/yrc/newProteinInference.do?searchId=<%=searchId %>&projectId=<bean:write name="projectId" />">
 	   	[Run Protein Inference]
 	   	</a></b></div>
 	   	<%} %>
+	   	</yrcwww:member>
 	   	
 	  </TD>
 	   <TD valign="top" width="20%"><bean:write name="run" property="runDate"/></TD>
@@ -81,7 +83,7 @@
 	 		 <b>Protein Inference Results</b>
 	 		 <table align="center" width="90%" style="border: 1px solid gray;">
 	   	     <tr>
-	   	     <td style="font-size: 8pt; font-weight: bold;">Run ID</td>
+	   	     <td style="font-size: 8pt; font-weight: bold;">ID</td>
 	   	     <td style="font-size: 8pt; font-weight: bold;">Submitter</td>
 	   	     <td style="font-size: 8pt; font-weight: bold;">Date</td>
 	   	     <td style="font-size: 8pt; font-weight: bold;">Status</td>

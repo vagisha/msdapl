@@ -7,6 +7,8 @@
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
   
+  <div align="center"><b>Filtering Options</b></div>
+  
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
   <!-- Filtering options -->
@@ -56,9 +58,24 @@
   </tr>
   </table></td>
   </tr>
+  
   <tr>
-    	<td colspan="3" align="center"><html:submit styleClass="button" >Update</html:submit></td>
+  	<td colspan="3">
+  		<table>
+  			<tr>
+  			<td>
+  				Protein(s): <html:text name="proteinInferFilterForm" property="accessionLike" size="50"></html:text><br>
+  				<span style="font-size:8pt; color:#3D902A;">Enter a comma-separated list of complete or partial protein accessions</span>
+  			</td>
+  			</tr>
+  		</table>
+  	</td>
   </tr>
+  
+  <tr>
+    	<td colspan="3" align="center"><html:submit styleClass="button" style="margin-top:2px;">Update</html:submit></td>
+  </tr>
+  
  </TABLE>
  
 </html:form>

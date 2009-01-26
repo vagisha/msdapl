@@ -91,6 +91,36 @@ public class IdPickerResultsLoader {
         return proteinIds;
     }
     
+    public static List<Integer> filterByProteinAccession(
+            List<Integer> allProteinIds,
+            Map<Integer, String> proteinAccessionMap, String accessionLike) {
+        
+        Set<String> reqAcc = new HashSet<String>();
+        String[] tokens = accessionLike.split(",");
+        for(String tok: tokens)
+            reqAcc.add(tok.trim().toLowerCase());
+        
+        List<Integer> filtered = new ArrayList<Integer>();
+        for(int id: allProteinIds) {
+            String acc = proteinAccessionMap.get(id);
+            if(acc != null) acc = acc.toLowerCase();
+            // first check if the exact accession is given to us
+            if(reqAcc.contains(acc)) {
+                filtered.add(id);
+                continue;
+            }
+            // we may have a partial accession
+            for(String ra: reqAcc) {
+                if(acc.contains(ra)) {
+                    filtered.add(id);
+                    break;
+                }
+            }
+        }
+        return filtered;
+    }
+
+    
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given sorting criteria
     //---------------------------------------------------------------------------------------------------
@@ -243,12 +273,15 @@ public class IdPickerResultsLoader {
         long s = System.currentTimeMillis();
         List<WIdPickerProtein> proteins = getProteins(pinferId, proteinIds, peptideDef);
         
+        if(proteins.size() == 0) {
+            return new ArrayList<WIdPickerProteinGroup>(0);
+        }
         
         if(append) {
             // protein Ids should be sorted by groupID. If the proteins at the top of the list
             // does not have all members of the group in the list, add them
-            int groupId = proteins.get(0).getProtein().getGroupId();
-            List<IdPickerProteinBase> groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId);
+            int groupId_top = proteins.get(0).getProtein().getGroupId();
+            List<IdPickerProteinBase> groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId_top);
             for(IdPickerProteinBase prot: groupProteins) {
                 if(!proteinIds.contains(prot.getId())) {
                     prot.setPeptideDefinition(peptideDef);
@@ -258,12 +291,14 @@ public class IdPickerResultsLoader {
 
             // protein Ids should be sorted by groupID. If the proteins at the bottom of the list
             // does not have all members of the group in the list, add them
-            groupId = proteins.get(proteins.size() - 1).getProtein().getGroupId();
-            groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId);
-            for(IdPickerProteinBase prot: groupProteins) {
-                if(!proteinIds.contains(prot.getId())) {
-                    prot.setPeptideDefinition(peptideDef);
-                    proteins.add(getWIdPickerProtein(prot));
+            int groupId_last = proteins.get(proteins.size() - 1).getProtein().getGroupId();
+            if(groupId_last != groupId_top) {
+                groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId_last);
+                for(IdPickerProteinBase prot: groupProteins) {
+                    if(!proteinIds.contains(prot.getId())) {
+                        prot.setPeptideDefinition(peptideDef);
+                        proteins.add(getWIdPickerProtein(prot));
+                    }
                 }
             }
         }
@@ -349,7 +384,7 @@ public class IdPickerResultsLoader {
         long s = System.currentTimeMillis();
         
         WIdPickerResultSummary summary = new WIdPickerResultSummary();
-        IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
+//        IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
 //        summary.setUnfilteredProteinCount(run.getNumUnfilteredProteins());
         summary.setFilteredProteinCount(proteinIds.size());
         // parsimonious protein IDs
@@ -610,189 +645,20 @@ public class IdPickerResultsLoader {
         wCluster.setPeptideGroups(new ArrayList<WIdPickerPeptideGroup>(peptideGroups.values()));
         
         return wCluster;
-    }  
+    }
+
+   
     
     
     
     
+
     
+
+
     
-    
-    
-    
-    
-    
-    
-    
-    //    public static List<WIdPickerPeptideIon> getIonsForWPeptide(WIdPickerPeptide peptide) {
-//        
-//        Map<String, WIdPickerPeptideIon> ionMap = new HashMap<String, WIdPickerPeptideIon>();
-//        List<IdPickerSpectrumMatch> psmList = peptide.getPeptide().getSpectrumMatchList();
-//
-//        // for each spectrum match
-//        for(IdPickerSpectrumMatch psm: psmList) {
-//            // get the underlying search result 
-//            MsSearchResult res = seqResDao.load(psm.getMsRunSearchResultId());
-//            int charge = res.getCharge();
-//            String modifiedSeq = res.getResultPeptide().getModifiedPeptideSequence();
-//            modifiedSeq = removeTerminalResidues(modifiedSeq);
-//
-//            // separate by ion type(charge + modifications)
-//            String ionKey = modifiedSeq+"_chg"+charge;
-//            WIdPickerPeptideIon wion = ionMap.get(ionKey);
-//            if(wion == null) {
-//                IdPickerPeptideIon ion = new IdPickerPeptideIon();
-//                ion.setCharge(charge);
-//                ion.setGroupId(peptide.getPeptide().getGroupId());
-//                ion.setSequence(modifiedSeq);
-//                wion = new WIdPickerPeptideIon(ion);
-//                wion.setScanId(res.getScanId());
-//                wion.setIsUniqueToProteinGroup(peptide.getIsUniqueToProteinGroup());
-//                ionMap.put(ionKey, wion);
-//            }
-//            wion.getIon().addSpectrumMatch(psm);
-//        }
-//        return new ArrayList<WIdPickerPeptideIon>(ionMap.values());
-//    }
-    
-//    public static List<IdPickerPeptideIon> getIonsForPeptide(IdPickerPeptide peptide, PeptideDefinition peptideDef) {
-//        
-//        Map<String, IdPickerPeptideIon> ionMap = new HashMap<String, IdPickerPeptideIon>();
-//        List<IdPickerSpectrumMatch> psmList = peptide.getSpectrumMatchList();
-//
-//        // for each spectrum match
-//        for(IdPickerSpectrumMatch psm: psmList) {
-//            // get the underlying search result 
-//            MsSearchResult res = seqResDao.load(psm.getMsRunSearchResultId());
-//            int charge = res.getCharge();
-//            
-//            String ionseq = null;
-//            if(peptideDef.isUseMods()) {
-//                ionseq = res.getResultPeptide().getModifiedPeptideSequence();
-//            }
-//            else {
-//                ionseq = res.getResultPeptide().getPeptideSequence();
-//            }
-//            ionseq = removeTerminalResidues(ionseq);
-//
-//            // separate by ion type(based on given peptide definition)
-//            String ionKey = ionseq;
-//            if(peptideDef.isUseCharge()) {
-//                ionKey = ionKey+"_chg"+charge;
-//            }
-//            IdPickerPeptideIon ion = ionMap.get(ionKey);
-//            if(ion == null) {
-//                ion = new IdPickerPeptideIon();
-//                ion.setCharge(charge);
-//                ion.setGroupId(peptide.getGroupId());
-//                ion.setSequence(ionseq);
-//                ionMap.put(ionKey, ion);
-//            }
-//            ion.addSpectrumMatch(psm);
-//        }
-//        return new ArrayList<IdPickerPeptideIon>(ionMap.values());
-//    }
-//    
-//    public static <T extends MsSearchResult> List<WIdPickerPeptideIonWSpectra<T>> 
-//            getIonsForWPeptide(WIdPickerPeptide peptide, SearchProgram program) {
-//        
-//        Map<String, WIdPickerPeptideIonWSpectra<T>> ionMap = new HashMap<String, WIdPickerPeptideIonWSpectra<T>>();
-//        List<IdPickerSpectrumMatch> psmList = peptide.getPeptide().getSpectrumMatchList();
-//
-//        // for each spectrum match
-//        for(IdPickerSpectrumMatch psm: psmList) {
-//            
-//            // get the underlying search result 
-//            MsSearchResult res = null;
-//            if(program == SearchProgram.SEQUEST || program == SearchProgram.EE_NORM_SEQUEST) {
-//                res = seqResDao.load(psm.getMsRunSearchResultId());
-//            }
-//            else if (program == SearchProgram.PROLUCID) {
-//                res = plcResDao.load(psm.getMsRunSearchResultId());
-//            }
-//            else {
-//                res = seqResDao.load(psm.getMsRunSearchResultId());
-//            }
-//            int charge = res.getCharge();
-//            String modifiedSeq = res.getResultPeptide().getModifiedPeptideSequence();
-//            modifiedSeq = removeTerminalResidues(modifiedSeq);
-//            int scanNum = scanDao.load(res.getScanId()).getStartScanNum();
-//            
-//
-//            // separate by ion type(charge + modifications)
-//            String ionKey = modifiedSeq+"_chg"+charge;
-//            WIdPickerPeptideIonWSpectra<T> wion = ionMap.get(ionKey);
-//            if(wion == null) {
-//                IdPickerPeptideIon ion = new IdPickerPeptideIon();
-//                ion.setCharge(charge);
-//                ion.setGroupId(peptide.getPeptide().getGroupId());
-//                ion.setSequence(modifiedSeq);
-//                wion = new WIdPickerPeptideIonWSpectra<T>(ion);
-//                wion.setIdUniqueToProteinGroup(peptide.getIsUniqueToProteinGroup());
-//                ionMap.put(ionKey, wion);
-//            }
-//            WIdPickerSpectrumMatch<T> wpsm = new WIdPickerSpectrumMatch<T>();
-//            wpsm.setScanNumber(scanNum);
-//            wpsm.setIdPickerSpectrumMatch(psm);
-//            wpsm.setSpectrumMatch((T) res);
-//           
-//            wion.addMsSearchResult(wpsm);
-//        }
-//        return new ArrayList<WIdPickerPeptideIonWSpectra<T>>(ionMap.values());
-//    }
-    
-//    public static List<WIdPickerPeptideIonWSpectra<SequestSearchResult>> getPeptideIonsWithSequestResults(int pinferProteinId) {
-//        
-//        IdPickerProtein protein = protDao.loadProtein(pinferProteinId);
-//        List<IdPickerPeptide> peptides = protein.getPeptides();
-//        List<WIdPickerPeptideIonWSpectra<SequestSearchResult>> wIons = 
-//            new ArrayList<WIdPickerPeptideIonWSpectra<SequestSearchResult>>(peptides.size());
-//        for(IdPickerPeptide peptide: peptides) {
-//            WIdPickerPeptide wPept = new WIdPickerPeptide(peptide);
-//            List<Integer> matchingProteinGrpIds = peptDao.getMatchingProtGroupIds(protein.getProteinferId(), peptide.getGroupId());
-//            wPept.setIsUniqueToProteinGroup(matchingProteinGrpIds.size() == 1 ? true : false);
-//            List<WIdPickerPeptideIonWSpectra<SequestSearchResult>> ionList = getIonsForWPeptide(wPept, Program.SEQUEST);
-//            wIons.addAll(ionList);
-//        }
-//        return wIons;
-//    }
-    
-//    public static List<WIdPickerPeptideIonWSpectra<ProlucidSearchResult>> getPeptideIonsWithProlucidResults(int pinferProteinId) {
-//        IdPickerProtein protein = protDao.loadProtein(pinferProteinId);
-//        List<IdPickerPeptide> peptides = protein.getPeptides();
-//        List<WIdPickerPeptideIonWSpectra<ProlucidSearchResult>> wIons = 
-//            new ArrayList<WIdPickerPeptideIonWSpectra<ProlucidSearchResult>>(peptides.size());
-//        for(IdPickerPeptide peptide: peptides) {
-//            WIdPickerPeptide wPept = new WIdPickerPeptide(peptide);
-//            List<Integer> matchingProteinGrpIds = peptDao.getMatchingProtGroupIds(protein.getProteinferId(), peptide.getGroupId());
-//            wPept.setIsUniqueToProteinGroup(matchingProteinGrpIds.size() == 1 ? true : false);
-//            List<WIdPickerPeptideIonWSpectra<ProlucidSearchResult>> ionList = getIonsForWPeptide(wPept, SearchProgram.PROLUCID);
-//            wIons.addAll(ionList);
-//        }
-//        return wIons;
-//    }
-    
-//    public static List<WIdPickerProteinGroup> getProteinferProteinGroups(int pinferId, PeptideDefinition peptideDef) {
-//        
-//        List<IdPickerProteinGroup> proteinGrps = protDao.getIdPickerProteinGroups(pinferId);
-//        
-//        List<WIdPickerProteinGroup> wProtGrps = new ArrayList<WIdPickerProteinGroup>(proteinGrps.size());
-//        
-//        for(IdPickerProteinGroup protGrp: proteinGrps) {
-//            
-//            WIdPickerProteinGroup wProtGrp = new WIdPickerProteinGroup(protGrp);
-//            wProtGrps.add(wProtGrp);
-//            
-//            for(WIdPickerProtein wProt: wProtGrp.getProteins()) {
-//                // set the description for the proteins.  This requires querying the 
-//                // NRSEQ database
-//                assignProteinAccessionDescription(wProt);
-//            }
-//            
-//            satisfyPeptideDefinition(wProtGrp, protGrp, peptideDef);
-//        }
-//        return wProtGrps;
-//    }
+
+
     
 //    private static void satisfyPeptideDefinition(WIdPickerProteinGroup wGroup, 
 //            IdPickerProteinGroup group, PeptideDefinition peptideDef) {
