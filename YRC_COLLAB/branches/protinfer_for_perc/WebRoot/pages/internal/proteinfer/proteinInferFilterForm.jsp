@@ -7,7 +7,6 @@
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
   
-  <div align="center"><b>Filtering Options</b></div>
   
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
