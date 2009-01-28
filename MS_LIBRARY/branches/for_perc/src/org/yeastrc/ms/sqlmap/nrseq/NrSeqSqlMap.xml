@@ -110,4 +110,8 @@
     	AND dbProt.id = #id#
     </select>
     
+    <select id="selectDbProteinIdsForDescription" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM tblProteinDatabase WHERE databaseID=#databaseId# AND description LIKE #description#
+    </select>
+    
 </sqlMap>

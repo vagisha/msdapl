@@ -10,15 +10,23 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.ValidationStatus;
-import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
+import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
@@ -33,11 +41,15 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements SequestSearchResultDAO {
 
     private MsSearchResultDAO resultDao;
+    private MsRunSearchDAO runSearchDao;
+    private MsSearchModificationDAO modDao;
     
     public SequestSearchResultDAOImpl(SqlMapClient sqlMap,
-            MsSearchResultDAO resultDao) {
+            MsSearchResultDAO resultDao, MsRunSearchDAO runSearchDao, MsSearchModificationDAO modDao) {
         super(sqlMap);
         this.resultDao = resultDao;
+        this.runSearchDao = runSearchDao;
+        this.modDao = modDao;
     }
     
     public SequestSearchResult load(int resultId) {
@@ -61,77 +73,96 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
     
 //    @Override
-//    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
+//    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId, boolean getDynaResMods) {
 //        return queryForList("SequestResult.selectTopResultsForRunSearchN", runSearchId);
 //    }
-    
     
     
     /**
      * Returns the top hits (XCorr rank = 1) for a search. If multiple rank=1 hits
      * are found for a scan + charge combination all are returned. 
      */
-    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId) {
+    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId, boolean getDynaResMods) {
+        
+        if(!getDynaResMods)
+            return loadTopResultsForRunSearchNNoMods(runSearchId);
+        else
+            return loadTopResultsForRunSearchNWMods(runSearchId);
+    }
+    
+    private List<SequestSearchResult> loadTopResultsForRunSearchNWMods(int runSearchId) {
+    
+        // get the dynamic residue modifications for the search
+        MsRunSearch runSearch = runSearchDao.loadRunSearch(runSearchId);
+        if(runSearch == null) {
+            log.error("No run search found with ID: "+runSearchId);
+            throw new IllegalArgumentException("No run search found with ID: "+runSearchId);
+        }
+        List<MsResidueModification> searchDynaMods = modDao.loadDynamicResidueModsForSearch(runSearch.getSearchId());
+        Map<Integer, MsResidueModification> dynaModMap = new HashMap<Integer, MsResidueModification>();
+        for(MsResidueModification mod: searchDynaMods) {
+            dynaModMap.put(mod.getId(), mod);
+        }
         
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         
+        String sql = "SELECT * FROM (msRunSearchResult AS res, SQTSearchResult AS sres) "+
+        "LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) "+
+        "WHERE res.id = sres.resultID "+
+        "AND sres.XCorrRank = 1 "+
+        "AND runSearchID=? "+
+        "ORDER BY res.id";
+        
         try {
             
             conn = super.getConnection();
-            String sql = "SELECT * from msRunSearchResult as res, SQTSearchResult as sres WHERE"+
-                         " res.id = sres.resultID AND sres.XCorrRank = 1 AND res.runSearchID = ?"+
-                         " ORDER BY res.id";
-                         //" GROUP BY res.scanID, res.charge ORDER BY res.id";
             stmt = conn.prepareStatement( sql );
             stmt.setInt( 1, runSearchId );
             rs = stmt.executeQuery();
             
+            
             List<SequestSearchResult> resultList = new ArrayList<SequestSearchResult>();
+            
+            SequestSearchResultBean lastResult = null;
+            List<MsResultResidueMod> resultDynaMods = new ArrayList<MsResultResidueMod>();
+            
             
             while ( rs.next() ) {
             
-                SequestSearchResultBean result = new SequestSearchResultBean();
-                result.setId(rs.getInt("id"));
-                result.setRunSearchId(rs.getInt("runSearchID"));
-                result.setScanId(rs.getInt("scanID"));
-                result.setCharge(rs.getInt("charge"));
-                SearchResultPeptideBean peptide = new SearchResultPeptideBean();
-                peptide.setPeptideSequence(rs.getString("peptide"));
-                String preRes = rs.getString("preResidue");
-                if(preRes != null)
-                    peptide.setPreResidue(preRes.charAt(0));
-                String postRes = rs.getString("postResidue");
-                if(postRes != null)
-                    peptide.setPostResidue(postRes.charAt(0));
-                result.setResultPeptide(peptide);
-                String vStatus = rs.getString("validationStatus");
-                if(vStatus != null)
-                    result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));
-                result.setSp(rs.getBigDecimal("sp"));
-                result.setSpRank(rs.getInt("spRank"));
-                result.setxCorr(rs.getBigDecimal("XCorr"));
-                result.setxCorrRank(rs.getInt("XCorrRank"));
-                result.setDeltaCN(rs.getBigDecimal("deltaCN"));
-                if(rs.getObject("evalue") != null)
-                    result.setEvalue(rs.getDouble("evalue"));
-                result.setCalculatedMass(rs.getBigDecimal("calculatedMass"));
-                result.setMatchingIons(rs.getInt("matchingIons"));
-                result.setPredictedIons(rs.getInt("predictedIons"));
+                int resultId = rs.getInt("id");
                 
-                resultList.add(result);
+                if(lastResult == null || resultId != lastResult.getId()) {
+                    
+                    if(lastResult != null) {
+                        lastResult.getResultPeptide().setDynamicResidueModifications(resultDynaMods);
+                    }
+                    
+                    SequestSearchResultBean result = makeSequestSearchResult(rs);
+                    resultList.add(result);
+                    
+                    lastResult = result;
+                    resultDynaMods = new ArrayList<MsResultResidueMod>();
+                }
+                
+                int modId = rs.getInt("modID");
+                if(modId != 0) {
+                    ResultResidueModBean resMod = makeResultResidueMod(rs, dynaModMap.get(modId));
+                    
+                    resultDynaMods.add(resMod);
+                }
             
             }
-            rs.close(); rs = null;
-            stmt.close(); stmt = null;
-            conn.close(); conn = null;
+            if(lastResult != null)
+                lastResult.getResultPeptide().setDynamicResidueModifications(resultDynaMods);
             
             return resultList;
           
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        catch (SQLException e) {
+            log.error("Failed to execute query: "+sql, e);
+            throw new RuntimeException("Failed to execute query: "+sql, e);
         } finally {
             
             if (rs != null) {
@@ -146,7 +177,96 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
                 try { conn.close(); conn = null; } catch (Exception e) { ; }
             }           
         }
-        return null;
+    }
+
+    private ResultResidueModBean makeResultResidueMod(ResultSet rs, MsResidueModification searchDynaMod)
+            throws SQLException {
+        ResultResidueModBean resMod = new ResultResidueModBean();
+        resMod.setModifiedPosition(rs.getInt("position"));
+        resMod.setModificationMass(searchDynaMod.getModificationMass());
+        resMod.setModificationSymbol(searchDynaMod.getModificationSymbol());
+        resMod.setModifiedResidue(searchDynaMod.getModifiedResidue());
+        return resMod;
+    }
+    
+    private List<SequestSearchResult> loadTopResultsForRunSearchNNoMods(int runSearchId) {
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        String sql = "SELECT * from msRunSearchResult as res, SQTSearchResult as sres WHERE"+
+        " res.id = sres.resultID AND sres.XCorrRank = 1 AND res.runSearchID = ?"+
+        " ORDER BY res.id";
+        //" GROUP BY res.scanID, res.charge ORDER BY res.id";
+        
+        try {
+            
+            conn = super.getConnection();
+            stmt = conn.prepareStatement( sql );
+            stmt.setInt( 1, runSearchId );
+            rs = stmt.executeQuery();
+            
+            
+            List<SequestSearchResult> resultList = new ArrayList<SequestSearchResult>();
+            
+            
+            while ( rs.next() ) {
+            
+                SequestSearchResultBean result = makeSequestSearchResult(rs);
+                resultList.add(result);
+            
+            }
+            return resultList;
+          
+        }
+        catch (Exception e) {
+            log.error("Failed to execute query: "+sql, e);
+            throw new RuntimeException("Failed to execute query: "+sql, e);
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+    }
+
+    private SequestSearchResultBean makeSequestSearchResult(ResultSet rs)
+            throws SQLException {
+        SequestSearchResultBean result = new SequestSearchResultBean();
+        result.setId(rs.getInt("resultID"));
+        result.setRunSearchId(rs.getInt("runSearchID"));
+        result.setScanId(rs.getInt("scanID"));
+        result.setCharge(rs.getInt("charge"));
+        result.setPeptideSequence(rs.getString("peptide"));
+        String preRes = rs.getString("preResidue");
+        if(preRes != null)
+            result.setPreResidue(preRes.charAt(0));
+        String postRes = rs.getString("postResidue");
+        if(postRes != null)
+            result.setPostResidue(postRes.charAt(0));
+        String vStatus = rs.getString("validationStatus");
+        if(vStatus != null)
+            result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));
+        result.setSp(rs.getBigDecimal("sp"));
+        result.setSpRank(rs.getInt("spRank"));
+        result.setxCorr(rs.getBigDecimal("XCorr"));
+        result.setxCorrRank(rs.getInt("XCorrRank"));
+        result.setDeltaCN(rs.getBigDecimal("deltaCN"));
+        if(rs.getObject("evalue") != null)
+            result.setEvalue(rs.getDouble("evalue"));
+        result.setCalculatedMass(rs.getBigDecimal("calculatedMass"));
+        result.setMatchingIons(rs.getInt("matchingIons"));
+        result.setPredictedIons(rs.getInt("predictedIons"));
+        return result;
     }
     
     

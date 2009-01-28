@@ -20,34 +20,19 @@
 		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
 	</resultMap>
 	
-	<resultMap class="SequestResultOut" id="sequestResultWProteinResultN" groupBy="id">
-		<result property="id" column="id" />
-		<result property="runSearchId" column="runSearchID" nullValue="0"/>
-		<result property="scanId" column="scanID" nullValue="0"/>
-		<result property="charge" column="charge" nullValue="0"/>
-		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
-		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
-		<result property="proteinMatchList" 
-				resultMap="MsResultProtein.msResultProteinResult" 
-				column="id"/>
-		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
-		<result property="spRank" column="spRank" nullValue="-1"/>
-		<result property="deltaCN" column="deltaCN"/>
-		<result property="xCorr" column="XCorr"/>
-		<result property="sp" column="sp"/>
-		<result property="evalue" column="evalue"/>
-		<result property="calculatedMass" column="calculatedMass" />
-		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
-		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
-	</resultMap>
-	
+	<!-- 
 	<resultMap class="SequestResultOut" id="sequestResultResultN" groupBy="id">
 		<result property="id" column="id" />
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="scanId" column="scanID" nullValue="0"/>
 		<result property="charge" column="charge" nullValue="0"/>
 		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
-		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
+		<result property="peptideSequence" column="peptide" />
+		<result property="preResidue" column="preResidue" typeHandler="CharTypeHandler" />
+		<result property="postResidue" column="postResidue" typeHandler="CharTypeHandler" />
+		<result property="dynamicResidueModifications"
+				resultMap="MsSearchMod.msResultDynaResidueModResult" 
+				/>
 		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
 		<result property="spRank" column="spRank" nullValue="-1"/>
 		<result property="deltaCN" column="deltaCN"/>
@@ -58,6 +43,7 @@
 		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
 		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
 	</resultMap>
+	-->
 	
 	<parameterMap class="SequestResultDataIn" id="sequestResultDataParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
@@ -86,14 +72,25 @@
     	AND runSearchID = #id#
     </select>
     
+    <!--  
     <select id="selectTopResultsForRunSearchN" resultMap="sequestResultResultN" parameterClass="Integer">
     	SELECT * FROM msRunSearchResult as res, SQTSearchResult sres
     	WHERE res.id = sres.resultID 
     	AND sres.XCorrRank=1  
     	AND runSearchID = #id#
-    	GROUP BY res.scanID, res.charge
     	ORDER BY res.id
     </select>
+    
+    <select id="selectTopResultsForRunSearchN" resultMap="sequestResultResultN" parameterClass="Integer">
+    	SELECT * FROM (msRunSearchResult AS res, SQTSearchResult AS sres)
+    	LEFT JOIN (msDynamicModResult AS rmod, msSearchDynamicMod AS dmod)
+    	ON (rmod.resultID = res.id AND dmod.id = rmod.modID)
+    	WHERE res.id = sres.resultID 
+    	AND sres.XCorrRank=1  
+    	AND runSearchID = #id#
+    	ORDER BY res.id
+    </select>
+    -->
     
     <insert id="insert" parameterMap="sequestResultDataParam">
     	INSERT INTO SQTSearchResult 

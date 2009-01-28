@@ -9,8 +9,8 @@ package org.yeastrc.ms.domain.search.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResult;
-import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
@@ -28,11 +28,12 @@ public class SearchResultBean implements MsSearchResult {
 
     private List<MsSearchResultProtein> proteinMatchList;
 
-    private MsSearchResultPeptide resultPeptide;
+    private SearchResultPeptideBean resultPeptide;
 
 
     public SearchResultBean() {
         proteinMatchList = new ArrayList<MsSearchResultProtein>();
+        resultPeptide = new SearchResultPeptideBean();
     }
 
     /**
@@ -107,11 +108,11 @@ public class SearchResultBean implements MsSearchResult {
     // ----------------------------------------------------------------------------------------
     // Peptide sequence information for this result
     // ----------------------------------------------------------------------------------------
-    public MsSearchResultPeptide getResultPeptide() {
+    public SearchResultPeptideBean getResultPeptide() {
         return resultPeptide;
     }
     
-    public void setResultPeptide(MsSearchResultPeptide peptide) {
+    public void setResultPeptide(SearchResultPeptideBean peptide) {
         this.resultPeptide = peptide;
     }
     
@@ -119,12 +120,32 @@ public class SearchResultBean implements MsSearchResult {
         return resultPeptide.getPreResidue();
     }
     
+    public void setPreResidue(char preResidue) {
+        resultPeptide.setPreResidue(preResidue);
+    }
+    
     public char getPostResidue() {
         return resultPeptide.getPostResidue();
     }
 
+    public void setPostResidue(char postResidue) {
+        resultPeptide.setPostResidue(postResidue);
+    }
+    
     public String getPeptideSequence() {
         return resultPeptide.getPeptideSequence();
+    }
+    
+    public void setPeptideSequence(String sequence) {
+        resultPeptide.setPeptideSequence(sequence);
+    }
+    
+    public void setDynamicResidueModifications(List<MsResultResidueMod> dynaMods) {
+        resultPeptide.setDynamicResidueModifications(dynaMods);
+    }
+    
+    public List<MsResultResidueMod> getDynamicResidueModifications() {
+        return resultPeptide.getResultDynamicResidueModifications();
     }
     
     // ----------------------------------------------------------------------------------------

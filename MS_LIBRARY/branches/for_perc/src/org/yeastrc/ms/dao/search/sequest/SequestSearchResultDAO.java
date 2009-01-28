@@ -14,9 +14,13 @@ public interface SequestSearchResultDAO extends GenericSearchResultDAO<SequestSe
     public abstract List<Integer> loadTopResultIdsForRunSearch(int runSearchId);
     
     /**
-     * Returns the search results without any associated proteins. 
+     * Returns the search results without any associated proteins.
+     * The peptide for each result can optionally be associated with itd 
+     * dynamic residue modifications.  Terminal and static modification information is not
+     * added. 
      * @param runSearchId
      * @return
      */
-    public abstract List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId);
+    public abstract List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId, 
+                                                        boolean getDynaResMods);
 }

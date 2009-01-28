@@ -71,7 +71,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     
     //-----------------------------------------------------------------------------------------
     // DYNAMIC MODIFICATIONS
-    //-----------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------O---
     public List<MsResultResidueMod> getResultDynamicResidueModifications() {
         return (List<MsResultResidueMod>) dynaResidueMods;
     }
@@ -99,12 +99,10 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
      */
     public String getModifiedPeptidePS() {
         
-        if (modifiedSequence != null)
-            return modifiedSequence;
         
         if (dynaResidueMods.size() == 0) {
 //            modifiedSequence = preResidue+"."+String.valueOf(sequence)+"."+postResidue;
-            modifiedSequence = String.valueOf(sequence);
+            return String.valueOf(sequence);
         }
         else {
             String origseq = String.valueOf(sequence);
@@ -127,11 +125,9 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             if (lastIdx < origseq.length())
                 seq.append(origseq.subSequence(lastIdx, origseq.length()));
             
-            modifiedSequence = seq.toString();
+            return seq.toString();
 //            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
         }
-        
-        return modifiedSequence;
     }
     
     /**

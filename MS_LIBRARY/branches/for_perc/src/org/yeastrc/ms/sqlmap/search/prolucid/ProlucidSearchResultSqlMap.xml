@@ -19,43 +19,6 @@
 		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
 	</resultMap>
 	
-	<resultMap class="ProlucidResultOut" id="prolucidResultWProteinsResultN" groupBy="id">
-		<result property="id" column="id" />
-		<result property="runSearchId" column="runSearchID" nullValue="0"/>
-		<result property="scanId" column="scanID" nullValue="0"/>
-		<result property="charge" column="charge" nullValue="0"/>
-		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
-		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
-		<result property="proteinMatchList" 
-				resultMap="MsResultProtein.msResultProteinResult" 
-				column="id"/>
-		<result property="primaryScoreRank" column="primaryScoreRank" nullValue="-1"/>
-		<result property="secondaryScoreRank" column="secondaryScoreRank" nullValue="-1"/>
-		<result property="primaryScore" column="primaryScore" />
-		<result property="secondaryScore" column="secondaryScore" />
-		<result property="deltaCN" column="deltaCN"/>
-		<result property="calculatedMass" column="calculatedMass" />
-		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
-		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
-	</resultMap>
-	
-	<resultMap class="ProlucidResultOut" id="prolucidResultResultN" groupBy="id">
-		<result property="id" column="id" />
-		<result property="runSearchId" column="runSearchID" nullValue="0"/>
-		<result property="scanId" column="scanID" nullValue="0"/>
-		<result property="charge" column="charge" nullValue="0"/>
-		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
-		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
-		<result property="primaryScoreRank" column="primaryScoreRank" nullValue="-1"/>
-		<result property="secondaryScoreRank" column="secondaryScoreRank" nullValue="-1"/>
-		<result property="primaryScore" column="primaryScore" />
-		<result property="secondaryScore" column="secondaryScore" />
-		<result property="deltaCN" column="deltaCN"/>
-		<result property="calculatedMass" column="calculatedMass" />
-		<result property="matchingIons" column="matchingIons" nullValue="-1"/>
-		<result property="predictedIons" column="predictedIons" nullValue="-1"/>
-	</resultMap>
-	
 	<parameterMap class="ProlucidResultDataIn" id="prolucidResultDataParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="primaryScoreRank" jdbcType="INTEGER" nullValue="-1" />
@@ -80,15 +43,6 @@
     	WHERE res.id = pres.resultID 
     	AND pres.primaryScoreRank=1  
     	AND runSearchID = #id#
-    </select>
-    
-    <select id="selectTopResultsForRunSearchN" resultMap="prolucidResultResultN" parameterClass="Integer">
-    	SELECT * FROM msRunSearchResult as res, ProLuCIDSearchResult pres
-    	WHERE res.id = pres.resultID 
-    	AND pres.primaryScoreRank=1 
-    	AND runSearchID = #id#
-    	GROUP BY res.scanID, res.charge
-    	ORDER BY res.id
     </select>
     
     <insert id="insert" parameterMap="prolucidResultDataParam">

@@ -172,11 +172,11 @@ public class DAOFactory {
         sqtRunSearchDAO = new SQTRunSearchDAOImpl(sqlMap, runSearchDAO, sqtHeaderDAO);
         
         // sequest search related
-        sequestResultDAO = new SequestSearchResultDAOImpl(sqlMap, searchResultDAO);
+        sequestResultDAO = new SequestSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
         sequestSearchDAO = new SequestSearchDAOImpl(sqlMap, searchDAO);
         
         // prolucid search related
-        prolucidResultDAO = new ProlucidSearchResultDAOImpl(sqlMap, searchResultDAO);
+        prolucidResultDAO = new ProlucidSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
         prolucidSearchDAO = new ProlucidSearchDAOImpl(sqlMap, searchDAO);
         
         // post search analysis related
@@ -185,7 +185,7 @@ public class DAOFactory {
         
         // Percolator post search analysis related 
         percSQTHeaderDAO = new PercolatorParamsDAOImpl(sqlMap);
-        percResultDAO = new PercolatorResultDAOImpl(sqlMap);
+        percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
         
     }
     
