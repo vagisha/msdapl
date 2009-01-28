@@ -16,8 +16,11 @@ import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 public class PercolatorParams {
     
     private double qvalue;
-    private double pep = -1.0;
-    private double discriminantScore = -1.0;
+    private boolean hasQvalueCutoff = false;
+    private double pep;
+    private boolean hasPepCutoff = false;
+    private double discriminantScore;
+    private boolean hasDiscriminantScoreCutoff = false;
     private IDPickerParams idpParams = null;
     
     public PercolatorParams(IDPickerParams params) {
@@ -25,12 +28,18 @@ public class PercolatorParams {
         this.idpParams = params;
         List<IdPickerParam> moreFilters = params.getMoreFilters();
         for(IdPickerParam filter: moreFilters) {
-            if(filter.getName().equalsIgnoreCase("qval_percolator"))
+            if(filter.getName().equalsIgnoreCase("qval_percolator")) {
                 qvalue = Double.parseDouble(filter.getValue());
-            else if(filter.getName().equalsIgnoreCase("pep_percolator"))
+                hasQvalueCutoff = true;
+            }
+            else if(filter.getName().equalsIgnoreCase("pep_percolator")) {
                 pep = Double.parseDouble(filter.getValue());
-            else if(filter.getName().equalsIgnoreCase("discriminantScore_percolator"))
+                hasPepCutoff = true;
+            }
+            else if(filter.getName().equalsIgnoreCase("discriminantScore_percolator")) {
                 discriminantScore = Double.parseDouble(filter.getValue());
+                hasDiscriminantScoreCutoff = true;
+            }
         }
     }
     
@@ -48,5 +57,17 @@ public class PercolatorParams {
     
     public IDPickerParams getIdPickerParams() {
         return idpParams;
+    }
+
+    public boolean hasQvalueCutoff() {
+        return hasQvalueCutoff;
+    }
+
+    public boolean hasPepCutoff() {
+        return hasPepCutoff;
+    }
+
+    public boolean hasDiscriminantScoreCutoff() {
+        return hasDiscriminantScoreCutoff;
     }
 }

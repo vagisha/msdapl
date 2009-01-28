@@ -226,7 +226,7 @@ public class PepxmlFileReader {
         PeptideHit peptideHit = peptideHits.get(peptideSeq);
         if (peptideHit == null) {
             // if not create a new PeptideHit
-            peptideHit = new PeptideHit(new Peptide(peptideSeq, peptideHitId++));
+            peptideHit = new PeptideHit(new Peptide(peptideSeq, peptideSeq, peptideHitId++));
             // add the protein hits
             for (ProteinHit ph: proteinAccList) {
                 Protein prot = proteinList.get(ph.getAccession());
@@ -237,20 +237,20 @@ public class PepxmlFileReader {
                         prot.setDecoy();
                     proteinList.put(ph.getAccession(), prot);
                 }
-                peptideHit.addProteinHit(new ProteinHit(prot, ph.getPreResidue(), ph.getPostResidue()));
+                peptideHit.addProtein(prot);
             }
             peptideHits.put(peptideSeq, peptideHit);
         }
         else {
             // make sure the matching proteins are the same as the ones we found in this search_hit element
-            List<ProteinHit> protHits = peptideHit.getProteinList();
-            if (protHits.size() != proteinAccList.size()) {
+            List<Protein> prots = peptideHit.getProteinList();
+            if (prots.size() != proteinAccList.size()) {
                 throw new DataProviderException("Number of proteins previously seen for this peptide do not match the number found in the current search_hit element");
             }
             for (ProteinHit ph: proteinAccList) {
                 boolean found = false;
-                for (ProteinHit protHit: protHits) {
-                    if (ph.getAccession().equalsIgnoreCase(protHit.getAccession())) {
+                for (Protein prot: prots) {
+                    if (ph.getAccession().equalsIgnoreCase(prot.getAccession())) {
                         found = true;
                         break;
                     }
@@ -280,13 +280,13 @@ public class PepxmlFileReader {
             if (scanResult.getSearchHits().size() != 1)
                 System.out.println("Scan has "+scanResult.getSearchHits().size()+" hits!!!");
             for (SequestSearchHit hit: scanResult.getSearchHits()) {
-                List<ProteinHit> proteins = hit.getProteinHits();
+                List<Protein> proteins = hit.getProteins();
 //                if (proteins.size() != 1)
 //                    System.out.println("Hit "+scanResult.getSpectrumString()+" has "+proteins.size()+" matching proteins");
                 boolean target = false;
                 boolean decoy = false;
-                for (ProteinHit prot: proteins) {
-                    if (prot.getProtein().isDecoy())
+                for (Protein prot: proteins) {
+                    if (prot.isDecoy())
                         decoy = true;
                     else
                         target = true;

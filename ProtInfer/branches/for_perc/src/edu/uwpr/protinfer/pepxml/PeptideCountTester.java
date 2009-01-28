@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.infer.Protein;
 import edu.uwpr.protinfer.util.StringUtils;
 
 public class PeptideCountTester {
@@ -65,12 +65,12 @@ public class PeptideCountTester {
                 
                 for (SequestSearchHit hit: topDecoyAndTargetHits) {
                     
-                    List<ProteinHit> proteins = hit.getProteinHits();
+                    List<Protein> proteins = hit.getProteins();
                     boolean target = false;
                     boolean decoy = false;
-                    for (ProteinHit prot: proteins) {
+                    for (Protein prot: proteins) {
                         
-                        if (prot.getProtein().isDecoy()) {
+                        if (prot.isDecoy()) {
                             decoy = true;
                             // have we seen this protein before? 
                             ProteinInfo pinfo = revProtCoverage.get(prot.getAccession());
@@ -78,7 +78,7 @@ public class PeptideCountTester {
                                 pinfo = new ProteinInfo();
                             }
                             pinfo.spectrumCount++;
-                            pinfo.peptides.add(hit.getPeptide().getSequence());
+                            pinfo.peptides.add(hit.getPeptide().getPeptide().getPeptideSequence());
                             revProtCoverage.put(prot.getAccession(), pinfo);
                         }
                         else {
@@ -90,11 +90,11 @@ public class PeptideCountTester {
                                 pinfo = new ProteinInfo();
                             }
                             pinfo.spectrumCount++;
-                            pinfo.peptides.add(hit.getPeptide().getSequence());
+                            pinfo.peptides.add(hit.getPeptide().getPeptide().getPeptideSequence());
                             fwdProtCoverage.put(prot.getAccession(), pinfo);
                         }
                     }
-                    peptidesFound.add(hit.getPeptide().getSequence());
+                    peptidesFound.add(hit.getPeptide().getPeptide().getPeptideSequence());
                     
                     if (target && !decoy)   targetHitcount++;
                     if (decoy && !target)   decoyHitCount++;

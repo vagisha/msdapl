@@ -7,14 +7,14 @@ import java.util.List;
 public class PeptideHit {
 
     private Peptide peptide;
-    private List<ProteinHit> proteins;
+    private List<Protein> proteins;
     
     public PeptideHit(Peptide peptide) {
         this.peptide = peptide;
-        proteins = new ArrayList<ProteinHit>();
+        proteins = new ArrayList<Protein>();
     }
     
-    public PeptideHit(Peptide peptide, List<ProteinHit> proteins) {
+    public PeptideHit(Peptide peptide, List<Protein> proteins) {
         this(peptide);
         if (proteins != null)
             this.proteins = proteins;
@@ -24,11 +24,12 @@ public class PeptideHit {
         return peptide;
     }
     
-    public void addProteinHit(ProteinHit hit) {
-        this.proteins.add(hit);
+    public void addProtein(Protein protein) {
+        if(!proteins.contains(protein))
+            this.proteins.add(protein);
     }
     
-    public List<ProteinHit> getProteinList() {
+    public List<Protein> getProteinList() {
         return proteins;
     }
     
@@ -37,8 +38,8 @@ public class PeptideHit {
     }
     
     public boolean isDecoyPeptide() {
-        for (ProteinHit protHit: getProteinList()) {
-            if (!protHit.getProtein().isDecoy())
+        for (Protein prot: getProteinList()) {
+            if (!prot.isDecoy())
                 return false;
         }
         return true;
@@ -48,8 +49,8 @@ public class PeptideHit {
         StringBuilder buf = new StringBuilder();
         buf.append("peptide: "+peptide.getPeptideSequence()+"\n");
         buf.append("key: "+peptide.getPeptideKey()+"\n");
-        for(ProteinHit protHit: proteins) {
-            buf.append("\t"+protHit+"\n");
+        for(Protein prot: proteins) {
+            buf.append("\t"+prot+"\n");
         }
         return buf.toString();
     }

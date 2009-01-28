@@ -8,7 +8,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.parser.DataProviderException;
 
-import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.infer.Protein;
 
 public class InteractPepXmlFileReader extends PepxmlFileReader{
 
@@ -77,13 +77,13 @@ public class InteractPepXmlFileReader extends PepxmlFileReader{
                 if (scanResult.getSearchHits().size() != 1)
                     System.out.println("Scan has "+scanResult.getSearchHits().size()+" hits!!!");
                 for (SequestSearchHit hit: scanResult.getSearchHits()) {
-                    List<ProteinHit> proteins = hit.getProteinHits();
+                    List<Protein> proteins = hit.getProteins();
 //                  if (proteins.size() != 1)
 //                  System.out.println("Hit "+scanResult.getSpectrumString()+" has "+proteins.size()+" matching proteins");
                     boolean target = false;
                     boolean decoy = false;
-                    for (ProteinHit prot: proteins) {
-                        if (prot.getProtein().isDecoy())
+                    for (Protein prot: proteins) {
+                        if (prot.isDecoy())
                             decoy = true;
                         else
                             target = true;

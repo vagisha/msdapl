@@ -33,14 +33,6 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         
         long s = System.currentTimeMillis();
         
-//      Set<Integer> protIds = new HashSet<Integer>();
-//      for(InferredProtein<S> prot: allProteins) {
-//      if(protIds.contains(prot.getProteinId()))
-//      System.out.println("Duplicate found!");
-//      else
-//      protIds.add(prot.getProteinId());
-//      }
-        
         
         // build a graph
         GraphBuilder graphBuilder = new GraphBuilder();
@@ -62,17 +54,43 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
             log.error("Error building graph: "+e.getMessage());
             return null;
         }
+        log.info("# proteins GROUPS in graph: "+graph.getLeftVertices().size());
+        log.info("# peptides GROUPS in graph: "+graph.getRightVertices().size());
+        
         
         // FILTER!!
-        log.info("Number of proteins before filtering: "+allProteins.size());
-        if(params != null) {
-            if(params.getMinPeptides() > 1) {
-                removeProteinsForMinPeptides(allProteins, graph, params.getMinPeptides());
-                log.info("Number of proteins after filtering for "+params.getMinPeptides()+" minPeptides: "+allProteins.size());
-            }
-            removeProteinsForMinUniquePeptides(allProteins, graph, params.getMinUniquePeptides());
-            log.info("Number of proteins after filtering for "+params.getMinUniquePeptides()+" minUniquePeptides: "+allProteins.size());
+        log.info("Number of proteins BEFORE filtering: "+allProteins.size());
+        log.info("Number of protein GROUPS BEFORE filtering: "+graph.getLeftVertices().size());
+        
+        // mark all proteins as accepted to begin with
+        markAllProteinsAccepted(graph);
+        
+        // mark unique peptides
+        markUniquePeptides(graph);
+        
+        // mark proteins un-accepted by coverage.
+        if(params.getMinCoverage() > 0.0) {
+            markProteinsUnacceptedByCoverage(graph, allProteins, params.getMinCoverage());
         }
+        
+        // mark proteins un-accepted by min peptides
+        if(params.getMinPeptides() > 1) {
+            markProteinsUnacceptedByMinPeptides(graph, params.getMinPeptides());
+        }
+        
+        // mark proteins un-accepted by min unique peptides
+        if(params.getMinUniquePeptides() > 1) {
+            markProteinsUnacceptedByMinUniquePeptides(graph, params.getMinUniquePeptides());
+        }
+        
+        // remove un-accepted proteins
+        removeUnacceptedProteins(graph, allProteins);
+        
+        log.info("Number of proteins AFTER filtering: "+allProteins.size());
+        log.info("Number of protein GROUPS AFTER filtering: "+graph.getLeftVertices().size());
+        
+        // mark all remaining proteins unaccepted -- for parsimony analysis in the last step
+        markAllProteinsUnaccepted(graph);
         
         
         // set the protein and peptide group ids.
@@ -113,84 +131,127 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         return allProteins;
     }
 
-
-    private <S extends SpectrumMatch> void removeProteinsForMinPeptides(List<InferredProtein<S>> proteins, 
-            BipartiteGraph<ProteinVertex, PeptideVertex> graph, int minPeptides) {
-       
-        // mark proteins that will not be accepted
-        List<ProteinVertex> removed = new ArrayList<ProteinVertex>();
-        for(ProteinVertex v: graph.getLeftVertices()) {
-            if(graph.getAdjacentVerticesL(v).size() < minPeptides) {
-                v.setAccepted(false);
-                removed.add(v);
-            }
-            else
-                v.setAccepted(true);
-        }
+    private void markUniquePeptides(BipartiteGraph<ProteinVertex, PeptideVertex> graph) {
         
-        // remove the proteins
-        Iterator<InferredProtein<S>> iter = proteins.iterator();
-        while(iter.hasNext()) {
-            InferredProtein<S> prot = iter.next();
-            if(!prot.getProtein().isAccepted()) {
-                iter.remove();
-            }
-        }
-        
-        // now remove vertices from the graph
-        for(ProteinVertex v: removed) {
-            if(!v.isAccepted())
-                graph.removeLeftVertex(v);
-        }
-        
-        // reset everything to false
         for(ProteinVertex v: graph.getLeftVertices()) {
-            v.setAccepted(false);
-        }
-    }
-    
-    private <S extends SpectrumMatch> void removeProteinsForMinUniquePeptides(List<InferredProtein<S>> proteins, 
-            BipartiteGraph<ProteinVertex, PeptideVertex> graph, int minUniqPeptides) {
-       
-        // mark proteins that will not be accepted
-        List<ProteinVertex> removed = new ArrayList<ProteinVertex>();
-        for(ProteinVertex v: graph.getLeftVertices()) {
-            int uniqCount = 0;
+            
             List<PeptideVertex> peptList = graph.getAdjacentVerticesL(v);
             for(PeptideVertex pept: peptList) {
                 if(graph.getAdjacentVerticesR(pept).size() == 1) {
                     // mark all the peptides in this vertex as unique
                     for(Peptide p: pept.getPeptides())
                         p.markUnique(true);
-                    uniqCount++;
                 }
             }
-            if(uniqCount < minUniqPeptides)
-                v.setAccepted(false);
-            else
-                v.setAccepted(true);
         }
-        
-        if(minUniqPeptides > 0) {
-            // remove the proteins
-            Iterator<InferredProtein<S>> iter = proteins.iterator();
-            while(iter.hasNext()) {
-                InferredProtein<S> prot = iter.next();
-                if(!prot.getProtein().isAccepted()) {
-                    iter.remove();
-                }
-            }
+    }
 
-            // now remove vertices from the graph
-            for(ProteinVertex v: removed) {
-                if(!v.isAccepted())
-                    graph.removeLeftVertex(v);
-            }
-        }
-        
-        // reset everything to false
+    private void markAllProteinsUnaccepted(BipartiteGraph<ProteinVertex, PeptideVertex> graph) {
         for(ProteinVertex v: graph.getLeftVertices()) {
             v.setAccepted(false);
+        }
+    }
+    
+    private void markAllProteinsAccepted(BipartiteGraph<ProteinVertex, PeptideVertex> graph) {
+        for(ProteinVertex v: graph.getLeftVertices()) {
+            v.setAccepted(true);
+        }
+    }
+    
+    // Coverage is at a protein level but the graph we are given has protein groups as vertices
+    // We will mark a vertex un-accepted if ALL proteins in the vertex are below the min coverage
+    private <S extends SpectrumMatch> void markProteinsUnacceptedByCoverage(
+            BipartiteGraph<ProteinVertex, PeptideVertex> graph, 
+            List<InferredProtein<S>> proteins, 
+            float coverage) {
+        
+        int numUnaccepted = 0;
+        
+        Iterator<InferredProtein<S>> iter = proteins.iterator();
+        while(iter.hasNext()) {
+            InferredProtein<S> prot = iter.next();
+            if(prot.getPercentCoverage() < coverage) {
+                prot.getProtein().setAccepted(false);
+                numUnaccepted++;
+            }
+        }
+        log.info("Num proteins below COVERAGE: "+numUnaccepted);
+        
+        numUnaccepted = 0;
+        for(ProteinVertex v: graph.getLeftVertices()) {
+            int belowCoverage = 0;
+            for(Protein prot: v.getProteins()) {
+                if(!prot.isAccepted()) belowCoverage++;
+            }
+            if(belowCoverage == v.getProteins().size()) {
+                v.setAccepted(false);
+                numUnaccepted++;
+            }
+        }
+        log.info("Num protein GROUPS below COVERAGE: "+numUnaccepted);
+    }
+
+    
+    // At this point peptide vertices are also collapsed.  We will count all the peptides in each peptide vertex
+    private void markProteinsUnacceptedByMinPeptides(
+            BipartiteGraph<ProteinVertex, PeptideVertex> graph, int minPeptides) {
+        
+        int numUnaccepted = 0;
+        for(ProteinVertex v: graph.getLeftVertices()) {
+            List<PeptideVertex> peptideGroups = graph.getAdjacentVerticesL(v);
+            int peptCount = 0;
+            for(PeptideVertex peptV: peptideGroups)
+                peptCount += peptV.getPeptides().size();
+            if(peptCount < minPeptides) {
+                v.setAccepted(false);
+                numUnaccepted++;
+            }
+        }
+        log.info("Num protein GROUPS below MIN PEPTIDES: "+numUnaccepted);
+    }
+    
+    private void markProteinsUnacceptedByMinUniquePeptides(
+            BipartiteGraph<ProteinVertex, PeptideVertex> graph, int minUniqPeptides) {
+        
+        int numUnaccepted = 0;
+        for(ProteinVertex v: graph.getLeftVertices()) {
+            int uniqCount = 0;
+            List<PeptideVertex> peptGroups = graph.getAdjacentVerticesL(v);
+            for(PeptideVertex peptV: peptGroups) {
+                // unique peptides have already been marked. Look at the first peptide in this group
+                if(peptV.getPeptides().get(0).isUniqueToProtein()) 
+                    uniqCount += peptV.getPeptides().size();
+            }
+            if(uniqCount < minUniqPeptides) {
+                v.setAccepted(false);
+                numUnaccepted++;
+            }
+        }
+        log.info("Num protein GROUPS below MIN PEPTIDES: "+numUnaccepted);
+    }
+    
+    private <S extends SpectrumMatch> void removeUnacceptedProteins(
+            BipartiteGraph<ProteinVertex, PeptideVertex> graph,
+            List<InferredProtein<S>> proteins) {
+        
+        // remove nodes from the graph
+        List<ProteinVertex> toRemove = new ArrayList<ProteinVertex>();
+        for(ProteinVertex v: graph.getLeftVertices()) {
+            if(!v.isAccepted()) {
+                toRemove.add(v);
+            }
+        }
+        for(ProteinVertex v: toRemove) {
+            graph.removeLeftVertex(v);
+        }
+        
+        // remove proteins from the list
+        Iterator<InferredProtein<S>> iter = proteins.iterator();
+        while(iter.hasNext()) {
+            InferredProtein<S> prot = iter.next();
+            if(!prot.getProtein().isAccepted()) {
+                iter.remove();
+            }
         }
     }
 

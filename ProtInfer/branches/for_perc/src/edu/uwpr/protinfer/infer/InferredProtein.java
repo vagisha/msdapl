@@ -8,13 +8,12 @@ import java.util.Map;
 
 public class InferredProtein <T extends SpectrumMatch> {
 
-    private double score;
-    
     private Protein protein;
     
     private Map<Integer, PeptideEvidence<T>> peptideEvList;
     
     private float percentCoverage;
+    private double nsaf;
     
     public InferredProtein(Protein protein) {
         this.protein = protein;
@@ -66,12 +65,12 @@ public class InferredProtein <T extends SpectrumMatch> {
         return protein.isAccepted();
     }
 
-    public double getScore() {
-        return score;
+    public double getNSAF() {
+        return nsaf;
     }
 
-    public void setScore(double score) {
-        this.score = score;
+    public void setNSAF(double nsaf) {
+        this.nsaf = nsaf;
     }
 
     public int getProteinGroupId() {

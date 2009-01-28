@@ -157,11 +157,11 @@ public class BipartiteGraph <L extends IVertex<L>, R extends IVertex<R>> impleme
         return adjListR.get(vertex.getLabel());
     }
     
-    public List<IVertex<?>> getAdjacentVertices(IVertex<?> vertex) {
+    public <I extends IVertex<?>, O extends IVertex<?>> List<O> getAdjacentVertices(I vertex) {
         if (verticesL.get(vertex.getLabel()) == vertex) 
-            return (List<IVertex<?>>) getAdjacentVerticesL((L) vertex);
+            return (List<O>) getAdjacentVerticesL((L) vertex);
         else if (verticesR.get(vertex.getLabel()) == vertex)
-            return (List<IVertex<?>>) getAdjacentVerticesR((R) vertex);
+            return (List<O>) getAdjacentVerticesR((R) vertex);
         return null;
     }
     

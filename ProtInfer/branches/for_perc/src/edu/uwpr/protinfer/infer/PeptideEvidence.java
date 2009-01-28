@@ -8,7 +8,7 @@ public class PeptideEvidence <T extends SpectrumMatch>{
     
     private Peptide peptide;
     private List<T> spectrumMatchList;
-    private double bestFdr = 1.0;
+//    private double bestFdr = 1.0;
     
     public PeptideEvidence(Peptide peptide) {
         this.peptide = peptide;
@@ -41,14 +41,14 @@ public class PeptideEvidence <T extends SpectrumMatch>{
         return peptide;
     }
     
-    public double getBestFdr() {
-        return bestFdr;
-    }
-    
-    public void setBestFdr(double fdr) {
-        fdr = Math.round((fdr*100.0))/100.0;
-        this.bestFdr = fdr;
-    }
+//    public double getBestFdr() {
+//        return bestFdr;
+//    }
+//    
+//    public void setBestFdr(double fdr) {
+//        fdr = Math.round((fdr*100.0))/100.0;
+//        this.bestFdr = fdr;
+//    }
     
     public String toString() {
         StringBuilder buf = new StringBuilder();

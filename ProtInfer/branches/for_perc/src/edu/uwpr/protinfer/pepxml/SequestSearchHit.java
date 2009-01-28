@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import edu.uwpr.protinfer.infer.PeptideHit;
-import edu.uwpr.protinfer.infer.ProteinHit;
+import edu.uwpr.protinfer.infer.Protein;
 
 public class SequestSearchHit {
 
@@ -76,16 +76,16 @@ public class SequestSearchHit {
         this.calcNeutralMass = calcNeutralMass;
     }
 
-    public List<ProteinHit> getProteinHits() {
+    public List<Protein> getProteins() {
         return peptide.getProteinList();
     }
     
-    public ProteinHit getFirstProteinHit() {
-        return getProteinHits().get(0);
+    public Protein getFirstProtein() {
+        return getProteins().get(0);
     }
     
-    public boolean hasUniqueProteinHit() {
-        return getProteinHits().size() == 1;
+    public boolean hasUniqueProtein() {
+        return getProteins().size() == 1;
     }
     
     /**

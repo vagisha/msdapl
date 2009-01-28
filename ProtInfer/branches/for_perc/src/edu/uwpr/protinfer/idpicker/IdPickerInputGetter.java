@@ -6,6 +6,8 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.search.Program;
 
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
+
 public class IdPickerInputGetter {
 
     private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
@@ -38,16 +40,16 @@ public class IdPickerInputGetter {
      * and for min peptide length and 
      * ranked by relevant score(s) for each peptide (as defined in the PeptideDefinition). 
      */
-    public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(int inputId, IDPickerParams params, 
-                                            Program program) {
+    public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(IdPickerRun run , IDPickerParams params) {
         
-        log.info("Reading search/analysis results for inputId: "+inputId+"; Program: "+program.displayName());
-        if(program == Program.PERCOLATOR) {
+        Program inputGenerator = run.getInputGenerator();
+        log.info("Reading search/analysis results for Protein Inference run: "+run.getId()+"; Input Generator Program: "+inputGenerator.displayName());
+        if(inputGenerator == Program.PERCOLATOR) {
            PercolatorResultsGetter percResGetter = PercolatorResultsGetter.instance();
-           return percResGetter.getResultsNoFdr(inputId, params);
+           return percResGetter.getResultsNoFdr(run, params);
         }
         else {
-            log.error("Don't know how to get IDPicker input for: "+program);
+            log.error("Don't know how to get IDPicker input for: "+inputGenerator);
             return null;
         }
     }

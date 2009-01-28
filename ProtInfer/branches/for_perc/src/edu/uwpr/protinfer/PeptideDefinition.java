@@ -37,6 +37,9 @@ public class PeptideDefinition {
     }
     
     public boolean equals(Object o) {
+        if(this == o)
+            return true;
+        
         if(!(o instanceof PeptideDefinition))
             return false;
         

@@ -83,8 +83,15 @@ public class IdPickerResultSaver {
             int pinferProteinId = protDao.saveIdPickerProtein(idpProt);
             
             
+            // If the user ran protein inference with a peptide evidence being more
+            // than just the peptide sequence, we will group all peptide evidence 
+            // that reprensent the same peptide sequence (w/o mods). This is because
+            // data in the tables should be stored uniformly regardless of peptide
+            // definition used for running protein inference
+            List<PeptideEvidence<T>> pevList = groupPeptideEvidenceByPeptideSeq(protein.getPeptides());
+            
             // save the peptides, ions and the associated spectrum matches
-            for(PeptideEvidence<T> pev: protein.getPeptides()) {
+            for(PeptideEvidence<T> pev: pevList) {
                 Peptide peptide = pev.getPeptide();
                 Integer pinferPeptideId = idpPeptideIds.get(peptide.getId());
                 if(pinferPeptideId == null) {
@@ -100,6 +107,31 @@ public class IdPickerResultSaver {
         }
     }
 
+    private<T extends SpectrumMatch> List<PeptideEvidence<T>> groupPeptideEvidenceByPeptideSeq(List<PeptideEvidence<T>> pevList) {
+        
+        Map<String, PeptideEvidence<T>> peptListMap = new HashMap<String, PeptideEvidence<T>>(pevList.size()*2);
+        for(PeptideEvidence<T> pev: pevList) {
+            PeptideEvidence<T> pevO = peptListMap.get(pev.getPeptide().getPeptideSequence());
+            if(pevO == null) {
+                peptListMap.put(pev.getPeptide().getPeptideSequence(), pev);
+            }
+            else {
+                PeptideEvidence<T> pevC = combinePeptideEvidence(pev, pevO);
+                peptListMap.put(pev.getPeptide().getPeptideSequence(), pevC);
+            }
+        }
+        
+        return new ArrayList<PeptideEvidence<T>>(peptListMap.values());
+    }
+    
+    private <T extends SpectrumMatch> PeptideEvidence<T> combinePeptideEvidence(PeptideEvidence<T> pev1, PeptideEvidence<T> pev2) {
+       
+        for(T psm: pev1.getSpectrumMatchList()) {
+            pev2.addSpectrumMatch(psm);
+        }
+        return pev2;
+    }
+    
     private <T extends SpectrumMatch> int savePeptideEvidence(PeptideEvidence<T> pev, int pinferId) {
         
         Peptide peptide = pev.getPeptide();

@@ -15,7 +15,7 @@ public class SpectrumMatchNoFDRImpl implements SpectrumMatch {
 
     private int charge;
     private int hitId;
-    private int runSearchId;
+    private int sourceId;
     private int scanId;
     private String peptideModifiedSequence;
     private int rank;
@@ -38,11 +38,11 @@ public class SpectrumMatchNoFDRImpl implements SpectrumMatch {
 
     
     public int getSourceId() {
-        return runSearchId;
+        return sourceId;
     }
     
     public void setSourceId(int sourceId) {
-        this.runSearchId = sourceId;
+        this.sourceId = sourceId;
     }
     
     public void setScanId(int scanId) {

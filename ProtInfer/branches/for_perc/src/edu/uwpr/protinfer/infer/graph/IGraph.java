@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IGraph {
 
-    public abstract List<IVertex<?>> getAdjacentVertices(IVertex<?> vertex);
+    public abstract <I extends IVertex<?>, O extends IVertex<?>> List<O> getAdjacentVertices(I vertex);
 
     public abstract List<IVertex<?>> getAllVertices();
 

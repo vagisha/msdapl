@@ -57,6 +57,8 @@ public class ProteinFilterCriteria {
     private int numSpectra;
     private double coverage;
     
+    private String accessionLike;
+    
     private SORT_BY sortBy = SORT_BY.NONE;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
@@ -131,5 +133,36 @@ public class ProteinFilterCriteria {
 
     public void setGroupProteins(boolean groupProteins) {
         this.groupProteins = groupProteins;
+    }
+
+    public String getAccessionLike() {
+        return accessionLike;
+    }
+
+    public void setAccessionLike(String accessionLike) {
+        this.accessionLike = accessionLike;
+    }
+    
+    public boolean equals(ProteinFilterCriteria o) {
+        if(this == o)
+            return true;
+        if(!(o instanceof ProteinFilterCriteria))
+            return false;
+        ProteinFilterCriteria that = (ProteinFilterCriteria)o;
+        if(this.numPeptides != that.numPeptides)                return false;
+        if(this.numUniquePeptides != that.numUniquePeptides)    return false;
+        if(this.numSpectra != that.numSpectra)                  return false;
+        if(this.coverage != that.coverage)                      return false;
+//        if(this.groupProteins != that.groupProteins)            return false;
+        if(this.showParsimonious != that.showParsimonious)      return false;
+        if(!this.peptideDefinition.equals(that.peptideDefinition))  return false;
+        
+        if(accessionLike == null) {
+            if(that.accessionLike != null)  return false;
+        }
+        else {
+            if(!this.accessionLike.equalsIgnoreCase(that.accessionLike));
+        }
+        return true;
     }
 }

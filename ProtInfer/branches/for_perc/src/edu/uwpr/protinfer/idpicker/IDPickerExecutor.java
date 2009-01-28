@@ -37,7 +37,6 @@ import edu.uwpr.protinfer.infer.PeptideEvidence;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.PeptideSpectrumMatch;
 import edu.uwpr.protinfer.infer.Protein;
-import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.infer.ProteinInferrerMaximal;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
 import edu.uwpr.protinfer.util.StringUtils;
@@ -179,11 +178,10 @@ public class IDPickerExecutor {
            }
            
            
-           List<ProteinHit> moreProteins = new ArrayList<ProteinHit>();
+           List<Protein> moreProteins = new ArrayList<Protein>();
            
            PeptideHit phit = hit.getPeptideHit();
-           for(ProteinHit prHit: phit.getProteinList()) {
-               Protein pr = prHit.getProtein();
+           for(Protein pr: phit.getProteinList()) {
                
                // look for a match in our map
                NrDbProtein nrDbProt = nrseqIdMap.get(pr.getAccession());
@@ -231,9 +229,9 @@ public class IDPickerExecutor {
                                    nrseqIdMap.put(nrDbProtM.getAccessionString(), nrDbProtM);
                                    Protein prM = new Protein(nrDbProtM.getAccessionString(), -1);
                                    prM.setId(nrDbProtM.getId());
-                                   // pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+//                                   pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
                                    prM.setAccession(nrDbProtM.getAccessionString());
-                                   moreProteins.add(new ProteinHit(prM, '\u0000', '\u0000'));
+                                   moreProteins.add(prM);
                                }
                            
                            }
@@ -257,7 +255,7 @@ public class IDPickerExecutor {
                // If we found an exact match
                if(nrDbProt != null) {
                    pr.setId(nrDbProt.getId());
-//                 pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+//                   pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
                    pr.setAccession(nrDbProt.getAccessionString()); // this will set the correct accession; 
                                                                // SQT files sometimes have truncated accessions
                }
@@ -265,15 +263,15 @@ public class IDPickerExecutor {
            }
            
            // REMOVE ALL PROTEINS FOR WHICH NO ID WAS FOUND
-           Iterator<ProteinHit> iter = phit.getProteinList().iterator();
+           Iterator<Protein> iter = phit.getProteinList().iterator();
            while(iter.hasNext()) {
-               ProteinHit prot = iter.next();
-               if(prot.getProtein().getId() == -1)
+               Protein prot = iter.next();
+               if(prot.getId() == -1)
                    iter.remove();
            }
            // ADD ALL THE ADDITIONAL PROTEINS, IF ANY.
-           for(ProteinHit prot: moreProteins) {
-               phit.addProteinHit(prot);
+           for(Protein prot: moreProteins) {
+               phit.addProtein(prot);
            }
         }
         long end = System.currentTimeMillis();
@@ -331,22 +329,32 @@ public class IDPickerExecutor {
         // calculate protein coverage
         calculateProteinSequenceCoverage(allProteins); // throws exception
         
-        // filter proteins by coverage
-        if(params.getMinCoverage() > 0.0) {
-            List<InferredProtein<S>> removed = new ArrayList<InferredProtein<S>>();
-            float coverage = params.getMinCoverage();
-            Iterator<InferredProtein<S>> iter = allProteins.iterator();
-            while(iter.hasNext()) {
-                InferredProtein<S> prot = iter.next();
-                if(prot.getPercentCoverage() < coverage) {
-                    removed.add(prot);
-                    iter.remove();
-                }
+        // filter and do parsimony analysis
+        ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker();
+        allProteins =  inferrer.inferProteins(allProteins, params);
+        
+        // Replace the nrseq dbProteinId with the proteinId.
+        IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(allProteins);
+        
+        // If two proteins end up having the same proteinID (nrseqq) keep only one.
+        // TODO should make sure that "duplicate" proteins has identical peptides assigned to them. 
+        Set<Integer> seen = new HashSet<Integer>((int) (allProteins.size() * 1.5));
+        Iterator<InferredProtein<S>> iter = allProteins.iterator();
+        while(iter.hasNext()) {
+            InferredProtein<S> prot = iter.next();
+            if(seen.contains(prot.getProteinId()))
+                iter.remove();
+            else {
+                seen.add(prot.getProteinId());
             }
         }
         
-        ProteinInferrerIdPicker inferrer = new ProteinInferrerIdPicker();
-        return inferrer.inferProteins(allProteins, params);
+        // calculate normalized spectrum counts
+        NSAFCalculator.instance().calculateNSAF(allProteins);
+        
+        
+        log.info("Number of proteins remaining after removing \"duplicate\" proteins: "+allProteins.size());
+        return allProteins;
     }
     
     public static <T extends InferredProtein<?>>void replaceNrSeqDbProtIdsWithProteinIds(List<T> proteins) {
@@ -367,44 +375,80 @@ public class IDPickerExecutor {
         
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
         
-//        // save a protein inference run and input files
+        // save a protein inference run and input files
 //        ProteinferRun pirun = new ProteinferRun();
 //        pirun.setInputGenerator(Program.PERCOLATOR);
 //        pirun.setProgram(ProteinInferenceProgram.IDPICKER_PERC);
 //        int pinferId = factory.getProteinferRunDao().save(pirun);
-//        
-//        int searchAnalysisId = 4;
+//
+//        int searchAnalysisId = 1;
 //        MsRunSearchAnalysisDAO adao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
 //        List<Integer> rsAnalysisIds = adao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
 //        for(int id: rsAnalysisIds) {
-////            MsRunSearchAnalysis analysis = adao.load(id); 
+////            MsRunSearchAnalysis analysis = adao.load(id);
 //            ProteinferInput input = new ProteinferInput();
 //            input.setProteinferId(pinferId);
 //            input.setInputId(id);
+//            input.setInputType(InputType.ANALYSIS);
 //            factory.getProteinferInputDao().saveProteinferInput(input);
 //        }
-        
+//
 //        // save the parameters
-//        IdPickerFilterDAO filterDao = factory.getProteinferFilterDao();
-//        IdPickerFilter filter = new IdPickerFilter();
-//        filter.setFilterName("pep_percolator");
-//        filter.setFilterValue("0.05");
+//        IdPickerParamDAO filterDao = factory.getProteinferParamDao();
+//        IdPickerParam filter = new IdPickerParam();
+//        filter.setName("pep_percolator");
+//        filter.setValue("0.01");
 //        filter.setProteinferId(pinferId);
-//        filterDao.saveProteinferFilter(filter);
-//        filter = new IdPickerFilter();
-//        filter.setFilterName("qval_percolator");
-//        filter.setFilterValue("0.05");
+//        filterDao.saveIdPickerParam(filter);
+//
+//        filter = new IdPickerParam();
+//        filter.setName("qval_percolator");
+//        filter.setValue("0.05");
 //        filter.setProteinferId(pinferId);
-//        filterDao.saveProteinferFilter(filter);
-        
-        
-        
+//        filterDao.saveIdPickerParam(filter);
+//
+//        filter = new IdPickerParam();
+//        filter.setName("PeptDef");
+//        filter.setValue("Sequence");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveIdPickerParam(filter);
+//
+//        filter = new IdPickerParam();
+//        filter.setName("minPept");
+//        filter.setValue("1");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveIdPickerParam(filter);
+//
+//        filter = new IdPickerParam();
+//        filter.setName("minUniqePept");
+//        filter.setValue("0");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveIdPickerParam(filter);
+//
+//        filter = new IdPickerParam();
+//        filter.setName("coverage");
+//        filter.setValue("0");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveIdPickerParam(filter);
+//
+//        filter = new IdPickerParam();
+//        filter.setName("minPeptLen");
+//        filter.setValue("1");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveIdPickerParam(filter);
+//
+//        filter = new IdPickerParam();
+//        filter.setName("removeAmbigSpectra");
+//        filter.setValue("true");
+//        filter.setProteinferId(pinferId);
+//        filterDao.saveIdPickerParam(filter);
+
         
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(7);
+        IdPickerRun run = runDao.loadProteinferRun(5);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getParams().size());
-        
+
         IDPickerExecutor executor = new IDPickerExecutor();
         try {
             executor.execute(run);

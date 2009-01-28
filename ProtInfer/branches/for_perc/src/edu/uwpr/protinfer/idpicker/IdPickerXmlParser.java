@@ -121,8 +121,8 @@ public class IdPickerXmlParser {
             }
         }
         PeptideHit pHit = peptideHits.get(peptideId);
-        for(ProteinHit prHit: pHit.getProteinList()) {
-            if (prHit.getAccession().startsWith("rev_"))
+        for(Protein prot: pHit.getProteinList()) {
+            if (prot.getAccession().startsWith("rev_"))
                 return false; // this is a hit to the decoy database;
         }
 //        SequestSearchResultBean hit = new SequestSearchResultBean(source, scan, charge, pHit);
@@ -169,7 +169,7 @@ public class IdPickerXmlParser {
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
                     if (reader.getAttributeLocalName(i).equalsIgnoreCase("id")) {
                         int proteinId = Integer.parseInt(reader.getAttributeValue(i));
-                        hit.addProteinHit(new ProteinHit(proteinList.get(proteinId), '\u0000', '\u0000'));
+                        hit.addProtein(proteinList.get(proteinId));
                     }
                 }
             }
