@@ -19,6 +19,7 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean showAllProteins = true;
     
     private String accessionLike = null;
+    private String descriptionLike = null;
     
     public ProteinInferFilterForm () {}
     
@@ -115,6 +116,18 @@ public class ProteinInferFilterForm extends ActionForm {
     
     public void setAccessionLike(String accessionLike) {
         this.accessionLike = accessionLike;
+    }
+    
+    public String getDescriptionLike() {
+        if(descriptionLike == null || descriptionLike.trim().length() == 0)
+            return null;
+        else
+            return descriptionLike.trim();
+            
+    }
+    
+    public void setDescriptionLike(String descriptionLike) {
+        this.descriptionLike = descriptionLike;
     }
    
 }

@@ -11,13 +11,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
+import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
@@ -47,6 +50,7 @@ import edu.uwpr.protinfer.database.dto.ProteinferIon;
 import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerIon;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
@@ -61,6 +65,7 @@ public class IdPickerResultsLoader {
     private static final org.yeastrc.ms.dao.DAOFactory msDataDaoFactory = org.yeastrc.ms.dao.DAOFactory.instance();
     private static final MsScanDAO scanDao = msDataDaoFactory.getMsScanDAO();
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
+    private static final MsRunSearchAnalysisDAO rsaDao = msDataDaoFactory.getMsRunSearchAnalysisDAO();
     
     private static final SequestSearchResultDAO seqResDao = msDataDaoFactory.getSequestResultDAO();
     private static final ProlucidSearchResultDAO plcResDao = msDataDaoFactory.getProlucidResultDAO();
@@ -120,6 +125,49 @@ public class IdPickerResultsLoader {
         return filtered;
     }
 
+    public static List<Integer> filterByProteinDescription(int pinferId,
+            List<Integer> storedProteinIds, String descriptionLike) {
+        
+//        IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
+//        List<IdPickerInput> inputList = run.getInputList();
+//        Set<Integer> searchIds = new HashSet<Integer>();
+//        for(IdPickerInput input: inputList) {
+//            if(input.getInputType() == InputType.SEARCH) { // this is a runSearchID
+//                MsRunSearch rs = rsDao.loadRunSearch(input.getInputId());
+//                if(rs == null) {
+//                    log.error("No run search found with ID: "+input.getInputId());
+//                    throw new IllegalArgumentException("No run search found with ID: "+input.getInputId());
+//                }
+//                searchIds.add(rs.getSearchId());
+//            }
+//            else if(input.getInputType() == InputType.ANALYSIS) { // this is a runSearchAnalysisID
+//                MsRunSearchAnalysis rsa = rsaDao.load(input.getInputId());
+//                if(rsa == null) {
+//                    log.error("No run search analysis found with ID: "+input.getInputId());
+//                    throw new IllegalArgumentException("No run search analysis found with ID: "+input.getInputId());
+//                }
+//            }
+//        }
+        
+        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
+        Set<Integer> accepted = new HashSet<Integer>();
+        descriptionLike = descriptionLike.toLowerCase();
+        for(ProteinferProtein protein: proteins) {
+            String[] acc_descr = getProteinAccessionDescription(protein.getNrseqProteinId());
+            if(acc_descr[1] != null) {
+                String protDescr = acc_descr[1].toLowerCase();
+                if(protDescr.contains(descriptionLike))
+                    accepted.add(protein.getId());
+            }
+        }
+        
+        List<Integer> acceptedProteinIds = new ArrayList<Integer>(accepted.size());
+        for(int id: storedProteinIds) {
+            if(accepted.contains(id))
+                acceptedProteinIds.add(id);
+        }
+        return acceptedProteinIds;
+    }
     
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given sorting criteria
@@ -647,7 +695,6 @@ public class IdPickerResultsLoader {
         return wCluster;
     }
 
-   
     
     
     

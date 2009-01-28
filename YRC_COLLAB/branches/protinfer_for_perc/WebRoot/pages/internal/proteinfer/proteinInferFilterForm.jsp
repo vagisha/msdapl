@@ -60,14 +60,20 @@
   
   <tr>
   	<td colspan="3">
-  		<table>
-  			<tr>
-  			<td>
-  				Protein(s): <html:text name="proteinInferFilterForm" property="accessionLike" size="50"></html:text><br>
-  				<span style="font-size:8pt; color:#3D902A;">Enter a comma-separated list of complete or partial protein accessions</span>
+  	<table align="left">
+  		<tr>
+  			<td>Protein(s): </td>
+  			<td><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
+  				<span style="font-size:8pt; color:#3D902A;">Enter a comma-separated list of complete or partial protein names</span>
   			</td>
-  			</tr>
-  		</table>
+  			<td>Description: </td>
+  			<td>
+  				<html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text>
+  			</td>
+  		</tr>
+  		<tr>
+  		</tr>
+  	</table>
   	</td>
   </tr>
   
