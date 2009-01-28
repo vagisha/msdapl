@@ -58,6 +58,7 @@ public class ProteinFilterCriteria {
     private double coverage;
     
     private String accessionLike;
+    private String descriptionLike;
     
     private SORT_BY sortBy = SORT_BY.NONE;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
@@ -143,6 +144,14 @@ public class ProteinFilterCriteria {
         this.accessionLike = accessionLike;
     }
     
+    public String getDescriptionLike() {
+        return descriptionLike;
+    }
+    
+    public void setDescriptionLike(String descriptionLike) {
+        this.descriptionLike = descriptionLike;
+    }
+    
     public boolean equals(ProteinFilterCriteria o) {
         if(this == o)
             return true;
@@ -161,7 +170,16 @@ public class ProteinFilterCriteria {
             if(that.accessionLike != null)  return false;
         }
         else {
-            if(!this.accessionLike.equalsIgnoreCase(that.accessionLike));
+            if(!this.accessionLike.equalsIgnoreCase(that.accessionLike))
+                return false;
+        }
+        
+        if(descriptionLike == null) {
+            if(that.descriptionLike != null)  return false;
+        }
+        else {
+            if(!this.descriptionLike.equalsIgnoreCase(that.descriptionLike))
+                return false;
         }
         return true;
     }
