@@ -6,15 +6,23 @@
  */
 package org.yeastrc.ms.dao.search.sqtfile.ibatis;
 
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
+import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  * 
@@ -48,5 +56,47 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
         map.put("scanId", scanId);
         map.put("charge", charge);
         delete("SqtSpectrum.delete", map);
+    }
+
+    @Override
+    public void saveAll(List<SQTSearchScan> scanDataList) {
+        if (scanDataList.size() == 0)
+            return;
+//        INSERT INTO SQTSpectrumData 
+//        (runSearchID, 
+//        scanID, 
+//        charge, 
+//        processTime, 
+//        serverName,
+//        totalIntensity,
+//        observedMass,
+//        lowestSp,
+//        sequenceMatches) 
+        StringBuilder values = new StringBuilder();
+        for ( SQTSearchScan scan: scanDataList) {
+            values.append(",(");
+            values.append(scan.getRunSearchId() == 0 ? "NULL" : scan.getRunSearchId());
+            values.append(",");
+            values.append(scan.getScanId() == 0 ? "NULL" : scan.getScanId());
+            values.append(",");
+            values.append(scan.getCharge() == 0 ? "NULL" : scan.getCharge());
+            values.append(",");
+            values.append(scan.getProcessTime());
+            values.append(",");
+            values.append("\""+scan.getServerName()+"\"");
+            values.append(",");
+            values.append(scan.getTotalIntensity());
+            values.append(",");
+            values.append(scan.getObservedMass());
+            values.append(",");
+            values.append(scan.getLowestSp());
+            values.append(",");
+            values.append(scan.getSequenceMatches());
+            values.append(")");
+        }
+        values.deleteCharAt(0);
+        
+        save("SqtSpectrum.insertAll", values.toString());
+        
     }
 }

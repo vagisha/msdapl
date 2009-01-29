@@ -9,7 +9,9 @@
 	
 	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
 	
-	
+	<!-- Peak data is not lazy loaded since lazy-loading of 1:1 relationships is not supported 
+	     without an external library
+	 -->
 	<resultMap class="MsScanOut" id="msScanResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" nullValue="0" />
@@ -57,6 +59,9 @@
         SELECT id FROM msScan WHERE runID = #id#
     </select> 
     
+    <!-- Peak data is not lazy loaded since lazy-loading of 1:1 relationships is not supported 
+	     without an external library
+	 -->
     <select id="select" resultMap="msScanResult" parameterClass="Integer">
     	SELECT id, 
     			runID, 

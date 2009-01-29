@@ -54,6 +54,20 @@
     	VALUES (?,?,?,?,?,?,?,?,?)
     </insert>
     
+    <insert id="insertAll" parameterClass="String">
+    	INSERT INTO SQTSpectrumData 
+    	(runSearchID, 
+    	scanID, 
+    	charge, 
+    	processTime, 
+    	serverName,
+    	totalIntensity,
+    	observedMass,
+    	lowestSp,
+    	sequenceMatches) 
+    	VALUES $values$
+    </insert>
+    
     <delete id="deleteForRunSearch" parameterClass="Integer">
 		DELETE FROM SQTSpectrumData WHERE runSearchID=#id#
     </delete>

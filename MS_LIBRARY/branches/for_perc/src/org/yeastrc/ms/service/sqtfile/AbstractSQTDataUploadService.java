@@ -3,6 +3,7 @@ package org.yeastrc.ms.service.sqtfile;
 import java.io.File;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -61,6 +62,7 @@ public abstract class AbstractSQTDataUploadService {
     List<MsSearchResultProtein> proteinMatchList;
     List<MsResultResidueModIds> resultResidueModList;
     List<MsResultTerminalModIds> resultTerminalModList;
+    Map<String, SQTSearchScan> searchScanMap;
 
 
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
@@ -80,6 +82,7 @@ public abstract class AbstractSQTDataUploadService {
         this.proteinMatchList = new ArrayList<MsSearchResultProtein>(BUF_SIZE);
         this.resultResidueModList = new ArrayList<MsResultResidueModIds>(BUF_SIZE);
         this.resultTerminalModList = new ArrayList<MsResultTerminalModIds>(BUF_SIZE);
+        this.searchScanMap = new HashMap<String, SQTSearchScan>((int) (BUF_SIZE*1.5));
         this.uploadExceptionList = new ArrayList<UploadException>();
     }
     
@@ -106,6 +109,7 @@ public abstract class AbstractSQTDataUploadService {
         proteinMatchList.clear();
         resultResidueModList.clear();
         resultTerminalModList.clear();
+        searchScanMap.clear();
 
         lastUploadedRunSearchId = 0;
     }
@@ -321,6 +325,27 @@ public abstract class AbstractSQTDataUploadService {
         return runSearchDao.saveRunSearch(new SQTRunSearchWrap(search, searchId, runId));
     }
 
+    private SQTSearchScan getOldScanIfExists(int runSearchId, int scanId, int charge) {
+        // look in the cache first
+        SQTSearchScan scan = searchScanMap.get(scanId+"_"+charge);
+        if(scan != null)   return scan;
+        // now look in the database
+        SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
+        return spectrumDataDao.load(runSearchId, scanId, charge);
+    }
+    
+    private void deleteOldSearchScan(int runSearchId, int scanId, int charge) {
+        // look in the cache first
+        SQTSearchScan scan = searchScanMap.get(scanId+"_"+charge);
+        if(scan != null)
+            searchScanMap.remove(scanId+"_"+charge);
+        // if it is not found in the cache remove from the database
+        else {
+            SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
+            spectrumDataDao.delete(runSearchId, scanId, charge);
+        }
+    }
+    
     /**
      * 
      * @param scan
@@ -334,9 +359,10 @@ public abstract class AbstractSQTDataUploadService {
         
         // NOTE: Added some changes to deal with duplicate results in MacCoss lab data
         int charge = scan.getCharge();
-        SQTSearchScan oldScan = spectrumDataDao.load(runSearchId, scanId, charge);
+        SQTSearchScan oldScan = getOldScanIfExists(runSearchId, scanId, charge);
         if(oldScan == null) {
-            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
+            uploadSearchScan(new SQTSearchScanWrap(scan, runSearchId, scanId));
+//            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
             return true;
         }
         
@@ -361,7 +387,8 @@ public abstract class AbstractSQTDataUploadService {
         double newDiff = Math.abs(peptideMH - scan.getObservedMass().doubleValue());
         if(newDiff < oldDiff) {
             // first delete old results
-            spectrumDataDao.delete(runSearchId, scanId, charge);
+            deleteOldSearchScan(runSearchId, scanId, charge);
+//            spectrumDataDao.delete(runSearchId, scanId, charge);
             List<Integer> resultIdsToDelete = resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
             resultDao.deleteResults(runSearchId, scanId, charge);
             
@@ -369,7 +396,8 @@ public abstract class AbstractSQTDataUploadService {
             removeCachedResultIds(resultIdsToDelete);
             
             // save the new result
-            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
+            uploadSearchScan(new SQTSearchScanWrap(scan, runSearchId, scanId));
+//            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
             log.info("\tNEW result is better");
             return true;
         }
@@ -426,6 +454,22 @@ public abstract class AbstractSQTDataUploadService {
         return resultId;
     }
 
+    // SEARCH SCAN
+    final void uploadSearchScan(SQTSearchScan searchScan) {
+        // if the cache has enough entries upload 
+        if(searchScanMap.size() >= BUF_SIZE) {
+            uploadSearchScanBuffer();
+        }
+        String key = searchScan.getScanId()+"_"+searchScan.getCharge();
+        searchScanMap.put(key, searchScan);
+    }
+    
+    private void uploadSearchScanBuffer() {
+        SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
+        spectrumDataDao.saveAll(new ArrayList(this.searchScanMap.values()));
+        searchScanMap.clear();
+    }
+    
     // PROTEIN MATCHES
     final void uploadProteinMatches(MsSearchResultIn result, final String peptide, final int resultId, int databaseId)
         throws UploadException {
@@ -523,6 +567,9 @@ public abstract class AbstractSQTDataUploadService {
         }
         if (resultTerminalModList.size() > 0) {
             uploadResultTerminalModBuffer();
+        }
+        if(searchScanMap.size() > 0) {
+            uploadSearchScanBuffer();
         }
     }
 
