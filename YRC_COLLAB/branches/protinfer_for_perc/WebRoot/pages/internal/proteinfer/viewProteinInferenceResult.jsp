@@ -869,14 +869,6 @@ function toggleDivVisibility(mydiv) {
 <CENTER>
 
 <yrcwww:contentbox title="Protein Inference* Results" centered="true" width="1000" scheme="ms">
-
-
-<div style="font-size: 8pt;margin-top: 3px;" align="center">
-	*This protein inference program is based on the IDPicker algorithm published in:<br>
- 	<i>Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
- 	<br>
-	Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
-</div>
   
   <div id="results" class="flora">
       <ul>
@@ -936,6 +928,17 @@ function toggleDivVisibility(mydiv) {
       <div id="input">
       	<%@ include file="inputSummary.jsp" %>
 	  </div>
+
+<div style="font-size: 8pt;margin-top: 3px;" align="left">
+	*This protein inference program is based on the IDPicker algorithm published in:<br>
+ 	<i>Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
+ 	&nbsp; &nbsp;
+	Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
+</div>
+<br>
+<div style="font-size: 8pt;margin-top: 3px;" align="left">
+	**Normalized Spectral Abundance Factor (NSAF)<br>
+</div>
 
  	
 </yrcwww:contentbox>

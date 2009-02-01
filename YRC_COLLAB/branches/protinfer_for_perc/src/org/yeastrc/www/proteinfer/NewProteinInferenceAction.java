@@ -6,6 +6,8 @@
  */
 package org.yeastrc.www.proteinfer;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,6 +85,7 @@ public class NewProteinInferenceAction extends Action {
         }
         request.setAttribute("projectId", projectId);
         
+        ProteinInferInputGetter inputGetter = ProteinInferInputGetter.instance();
         
         // Create an ActionForm -- this will be used if the user chooses to run
         // protein inference on output from a search program
@@ -90,7 +93,7 @@ public class NewProteinInferenceAction extends Action {
         request.setAttribute("proteinInferenceFormSearch", newForm1);
         newForm1.setInputType(InputType.SEARCH);
         newForm1.setProjectId(projectId);
-        ProteinInferInputSummary searchSummary = getInputSearchSummary(searchId);
+        ProteinInferInputSummary searchSummary = inputGetter.getInputSearchSummary(searchId);
         newForm1.setInputSummary(searchSummary);
         // set the IDPicker parameters
         ProgramParameters params1 = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
@@ -115,7 +118,7 @@ public class NewProteinInferenceAction extends Action {
             request.setAttribute("proteinInferenceFormAnalysis", newForm2);
             newForm2.setInputType(InputType.ANALYSIS);
             newForm2.setProjectId(projectId);
-            ProteinInferInputSummary inputSummary = getInputAnalysisSummary(searchId, analysisId);
+            ProteinInferInputSummary inputSummary = inputGetter.getInputAnalysisSummary(analysisId);
             newForm2.setInputSummary(inputSummary);
             
             // set the IDPicker parameters
@@ -160,81 +163,5 @@ public class NewProteinInferenceAction extends Action {
         }
     }
 
-    private ProteinInferInputSummary getInputSearchSummary(int searchId) {
-        DAOFactory daoFactory = DAOFactory.instance();
-        
-        ProteinInferInputSummary searchSummary = new ProteinInferInputSummary();
-        searchSummary.setSearchId(searchId);
-        
-        // get the name of the search program
-        MsSearchDAO searchDao = daoFactory.getMsSearchDAO();
-        MsSearch search = searchDao.loadSearch(searchId);
-        searchSummary.setSearchProgram(search.getSearchProgram().displayName());
-        searchSummary.setSearchProgramVersion(search.getSearchProgramVersion());
-        
-        // get the name(s) of the search databases.
-        StringBuilder databases = new StringBuilder();
-        for(MsSearchDatabase db: search.getSearchDatabases()) {
-            databases.append(", ");
-            databases.append(db.getDatabaseFileName());
-        }
-        if(databases.length() > 0)  databases.deleteCharAt(0);
-        searchSummary.setSearchDatabase(databases.toString());
-        
-        
-        
-        MsRunSearchDAO runSearchDao = daoFactory.getMsRunSearchDAO();
-        List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
-        
-        for (int id: runSearchIds) {
-            String filename = runSearchDao.loadFilenameForRunSearch(id);
-            ProteinInferIputFile rs = new ProteinInferIputFile(id, filename);
-            rs.setIsSelected(true);
-            searchSummary.addInputFile(rs);
-        }
-        return searchSummary;
-    }
     
-    private ProteinInferInputSummary getInputAnalysisSummary(int searchId, int analysisId) {
-        DAOFactory daoFactory = DAOFactory.instance();
-        
-        ProteinInferInputSummary inputSummary = new ProteinInferInputSummary();
-        inputSummary.setSearchId(searchId);
-        inputSummary.setSearchAnalysisId(analysisId);
-        
-        // get the name of the search program
-        MsSearchDAO searchDao = daoFactory.getMsSearchDAO();
-        MsSearch search = searchDao.loadSearch(searchId);
-        inputSummary.setSearchProgram(search.getSearchProgram().displayName());
-        inputSummary.setSearchProgramVersion(search.getSearchProgramVersion());
-        
-        // get the name of the analysis program
-        MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
-        MsSearchAnalysis analysis = analysisDao.load(analysisId);
-        inputSummary.setAnalysisProgram(analysis.getAnalysisProgram().displayName());
-        inputSummary.setAnalysisProgramVersion(analysis.getAnalysisProgramVersion());
-        
-        // get the name(s) of the search databases.
-        StringBuilder databases = new StringBuilder();
-        for(MsSearchDatabase db: search.getSearchDatabases()) {
-            databases.append(", ");
-            databases.append(db.getDatabaseFileName());
-        }
-        if(databases.length() > 0)  databases.deleteCharAt(0);
-        inputSummary.setSearchDatabase(databases.toString());
-        
-        
-        
-        MsRunSearchAnalysisDAO rsAnalysisDao = daoFactory.getMsRunSearchAnalysisDAO();
-        
-        List<Integer> rsAnalysisIds = rsAnalysisDao.getRunSearchAnalysisIdsForAnalysis(analysisId);
-        
-        for (int id: rsAnalysisIds) {
-            String filename = rsAnalysisDao.loadFilenameForRunSearchAnalysis(id);
-            ProteinInferIputFile rs = new ProteinInferIputFile(id, filename);
-            rs.setIsSelected(true);
-            inputSummary.addInputFile(rs);
-        }
-        return inputSummary;
-    }
 }

@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,6 +82,11 @@ public class ProteinferRunSearcher {
                 jobs.add(job);
             }
         }
+        // sort jobs by id
+        Collections.sort(jobs, new Comparator<ProteinferJob>() {
+            public int compare(ProteinferJob o1, ProteinferJob o2) {
+                return Integer.valueOf(o1.getPinferId()).compareTo(o2.getPinferId());
+            }});
         return jobs;
     }
     
@@ -111,10 +118,6 @@ public class ProteinferRunSearcher {
                 job.setPinferRunId(pinferRunId);
                 return job;
             }
-            
-            rs.close(); rs = null;
-            stmt.close(); stmt = null;
-            conn.close(); conn = null;
             
         } finally {
             

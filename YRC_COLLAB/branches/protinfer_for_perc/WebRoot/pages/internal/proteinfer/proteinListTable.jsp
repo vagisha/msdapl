@@ -65,6 +65,7 @@
 			<th><b><font size="2pt">Protein</font></b></th>
 			<th><b><font size="2pt">Description</font></b></th>
 			<th><b><font size="2pt">Coverage(%)</font></b></th>
+			<th><b><font size="2pt">NSAF**</font></b></th>
 		</logic:equal>
 		
 		<logic:equal name="groupProteins" value="false">
@@ -80,6 +81,10 @@
 			%>
 			<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.COVERAGE.name()%>">
 				<b><font size="2pt">Coverage (%)</font></b>
+			</th>
+			
+			<th>
+				<b><font size="2pt">NSAF**</font></b>
 			</th>
 			
 		</logic:equal>
@@ -183,6 +188,7 @@
 			</td>
 			<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 			<td><bean:write name="protein" property="protein.coverage"/></td>
+			<td><bean:write name="protein" property="protein.nsaf"/></td>
 		
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 				<bean:write name="proteinGroup" property="matchingPeptideCount"/>
@@ -292,6 +298,7 @@
 		</td>
 		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 		<td><bean:write name="protein" property="protein.coverage"/></td>
+		<td><bean:write name="protein" property="protein.nsaf"/></td>
 		
 		<%if(first) { first = false;%>
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">

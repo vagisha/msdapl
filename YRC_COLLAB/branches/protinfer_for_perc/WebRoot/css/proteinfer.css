@@ -1,3 +1,24 @@
+.clickable {
+	text-decoration: underline; 
+	cursor: pointer;
+}
+
+.foldable {
+	cursor: pointer;
+}
+
+.fold-open{
+	background-image:url(../images/proteinfer/asc.gif);
+	background-position:center right;
+	background-repeat:no-repeat;
+}
+.fold-close{
+	background-image:url(../images/proteinfer/desc.gif);
+	background-position:center right;
+	background-repeat:no-repeat;
+}
+
+
 DIV.pinfer_header {
     color: #50A029;
 }

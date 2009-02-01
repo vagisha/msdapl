@@ -1182,30 +1182,21 @@
 		
 	</action>
 	
-	<!-- THESE ARE TEMPORARY FOR GENN's PROJECT -->
-	<action 
-		path="/viewAllSearches"
-		type="org.yeastrc.www.proteinfer.maccoss.MacCossSearchList"
+	<action
+		path="/listInputGroups"
+		type="org.yeastrc.www.proteinfer.ListProteinInferInputGroupAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/maccoss/viewSearches.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/listInputGroups.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/listInputGroups.jsp" redirect="false" />
+		
 	</action>
 	
 	<action 
-		path="/newPercolatorProtInfer"
-		type="org.yeastrc.www.proteinfer.maccoss.NewPercolatorProteinInference"
+		path="/getInputList"
+		type="org.yeastrc.www.proteinfer.InputListAjaxAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/maccoss/percolatorProtInferForm.jsp" redirect="false" />
-	</action>
-	
-	<action 
-		path="/doPercolatorProtInfer"
-		type="org.yeastrc.www.proteinfer.maccoss.DoPercolatorProteinInference"
-		name="proteinInferenceForm"
-		input="/pages/internal/proteinfer/maccoss/percolatorProtInferForm.jsp"
-		scope="request"
-		validate="true"
-	>
-		<forward name="Success" path="/viewAllSearches.do" redirect="true" />
+		<forward name="Success" path="/pages/internal/proteinfer/inputlist.jsp" redirect="false" />
+		
 	</action>
 	
 	<!-- ================================================================================== -->

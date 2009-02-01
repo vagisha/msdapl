@@ -62,12 +62,12 @@
   	<td colspan="3">
   	<table align="left">
   		<tr>
-  			<td>Protein(s): </td>
-  			<td><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
+  			<td valign="top">Protein(s): </td>
+  			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
   				<span style="font-size:8pt; color:#3D902A;">Enter a comma-separated list of complete or partial protein names</span>
   			</td>
-  			<td>Description: </td>
-  			<td>
+  			<td valign="top">Description: </td>
+  			<td valign="top">
   				<html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text>
   			</td>
   		</tr>
