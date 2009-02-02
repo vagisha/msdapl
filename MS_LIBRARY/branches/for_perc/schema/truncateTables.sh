@@ -1,9 +1,9 @@
 #!/bin/bash
  
- dbname="msData";
+ dbname="msData_junit";
  user="root";
  
- basecmd="mysql -u ${user}  -D ${dbname}";
+ basecmd="/usr/local/mysql/bin/mysql -u ${user}  -D ${dbname}";
  
 tables=$(${basecmd} -e "SHOW TABLES;" | grep -v "+--" | grep -v  -i "Tables_in_${dbname}")
 if [ $? -ne 0 ]; then

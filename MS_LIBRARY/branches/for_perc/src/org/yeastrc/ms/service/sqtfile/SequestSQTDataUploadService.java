@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -216,6 +215,9 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                     //}
                 }
             }
+            else {
+                log.info("Ignoring search scan: "+scan.getScanNumber()+"; scanId: "+scanId+"; charge: "+scan.getCharge()+"; mass: "+scan.getObservedMass());
+            }
         }
         flush(); // save any cached data
         log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
@@ -223,16 +225,6 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                 
     }
 
-    @Override
-    void removeCacheForResultIds(List<Integer> resultIds) {
-        Iterator<SequestResultDataWId> iter = sequestResultDataList.iterator();
-        while(iter.hasNext()) {
-            SequestResultDataWId data = iter.next();
-            if(resultIds.contains(data.getResultId()))
-                iter.remove();
-        }
-    }
-    
     private SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteDirectory, final Date searchDate) {
         return new SequestSearchIn() {
             @Override

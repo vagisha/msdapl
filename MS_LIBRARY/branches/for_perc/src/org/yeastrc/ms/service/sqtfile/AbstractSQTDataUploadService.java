@@ -5,7 +5,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +21,7 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
@@ -56,7 +55,7 @@ public abstract class AbstractSQTDataUploadService {
 
     static final int BUF_SIZE = 500;
     
-    private static final double HYDROGEN = 1.00794;
+    //private static final double HYDROGEN = 1.00794;
 
     // these are the things we will cache and do bulk-inserts
     List<MsSearchResultProtein> proteinMatchList;
@@ -78,12 +77,18 @@ public abstract class AbstractSQTDataUploadService {
     int searchId;
     int sequenceDatabaseId; // nrseq database id
     
+    boolean doScanChargeMassCheck = false; // for data from MacCoss lab
+    
     public AbstractSQTDataUploadService() {
         this.proteinMatchList = new ArrayList<MsSearchResultProtein>(BUF_SIZE);
         this.resultResidueModList = new ArrayList<MsResultResidueModIds>(BUF_SIZE);
         this.resultTerminalModList = new ArrayList<MsResultTerminalModIds>(BUF_SIZE);
         this.searchScanMap = new HashMap<String, SQTSearchScan>((int) (BUF_SIZE*1.5));
         this.uploadExceptionList = new ArrayList<UploadException>();
+    }
+    
+    public void doScanChargeMassCheck(boolean doCheck) {
+        this.doScanChargeMassCheck = doCheck;
     }
     
     void reset() {
@@ -101,6 +106,7 @@ public abstract class AbstractSQTDataUploadService {
         sequenceDatabaseId = 0;
         programVersion = "uninit";
         programFromSqt = null;
+        
     }
 
     // called before uploading each sqt file and in the reset() method.
@@ -180,7 +186,6 @@ public abstract class AbstractSQTDataUploadService {
     
     abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
     
-    abstract void removeCacheForResultIds(List<Integer> resultIds);
     //--------------------------------------------------------------------------------------------------
     
     /**
@@ -334,108 +339,58 @@ public abstract class AbstractSQTDataUploadService {
         return spectrumDataDao.load(runSearchId, scanId, charge);
     }
     
-    private void deleteOldSearchScan(int runSearchId, int scanId, int charge) {
-        // look in the cache first
-        SQTSearchScan scan = searchScanMap.get(scanId+"_"+charge);
-        if(scan != null)
-            searchScanMap.remove(scanId+"_"+charge);
-        // if it is not found in the cache remove from the database
-        else {
-            SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-            spectrumDataDao.delete(runSearchId, scanId, charge);
-        }
-    }
-    
     /**
      * 
      * @param scan
      * @param runSearchId
      * @param scanId
      * @return true if the search scan got uploaded, false otherwise
+     * @throws UploadException 
      */
-    final boolean uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) {
-        SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
+    final boolean uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) throws UploadException {
         
         // NOTE: Added some changes to deal with duplicate results in MacCoss lab data
+        // This will not work if the raw data was not MS2 or CMS2
         int charge = scan.getCharge();
-        SQTSearchScan oldScan = getOldScanIfExists(runSearchId, scanId, charge);
-        if(oldScan == null) {
-            uploadSearchScan(new SQTSearchScanWrap(scan, runSearchId, scanId));
-//            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
-            return true;
-        }
-        
-        log.info("Found duplicate result for runSearchId: "+runSearchId+", scanID: "+scanId+" and charge: "+charge);
-        // If we already have results with with the same scanID and charge we will 
-        // keep the "better" results.
-        
-        // First check if both results are the same. If they are don't upload this one.
-        if(oldScan.getObservedMass().doubleValue() == scan.getObservedMass().doubleValue()) {
-            log.info("\tResults are the same. Keeping the old one...");
-            return false;
-        }
-        
-        // To determine which is a better result, look at the observedMass for the 
-        // old searchScan and the new searchScan.  Keep the one where the observedMass
-        // is closer to the preMZ of the scan
-        MsScan msScan = DAOFactory.instance().getMsScanDAO().load(scanId);
-        double premz = msScan.getPrecursorMz().doubleValue();
-        log.info("\tPrecursor M/Z: "+premz+"; old mass: "+oldScan.getObservedMass()+"; new mass: "+scan.getObservedMass());
-        double peptideMH = (premz - HYDROGEN) * charge + HYDROGEN;
-        double oldDiff = Math.abs(peptideMH - oldScan.getObservedMass().doubleValue());
-        double newDiff = Math.abs(peptideMH - scan.getObservedMass().doubleValue());
-        if(newDiff < oldDiff) {
-            // first delete old results
-            deleteOldSearchScan(runSearchId, scanId, charge);
-//            spectrumDataDao.delete(runSearchId, scanId, charge);
-            List<Integer> resultIdsToDelete = resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
-            resultDao.deleteResults(runSearchId, scanId, charge);
+        if(doScanChargeMassCheck) {
+            // get the Z lines for the MS2 files 
+            List<MS2ScanCharge> scanChgStates = daoFactory.getMS2FileScanChargeDAO().loadScanChargesForScan(scanId);
+            if(scanChgStates.size() == 0) {
+                UploadException ex = new UploadException(ERROR_CODE.SCAN_CHARGE_NOT_FOUND);
+                ex.setErrorMessage("No matching scan+charge results found for: scanId: "+
+                        scanId);
+                throw ex;
+            }
+            // if we don't find a match with the charge and observed mass of the given scan
+            // we will not upload this scan
+            boolean found = false;
+            for(MS2ScanCharge sc: scanChgStates) {
+                if(sc.getCharge() == charge && sc.getMass().doubleValue() == scan.getObservedMass().doubleValue()) {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                log.info("No matching scan+charge result found for: scanId: "+
+                        scanId+"; charge: "+charge+"; mass: "+scan.getObservedMass());
+                return false;
+            }
             
-            // If there are cahced entries for this resultIds, remove them
-            removeCachedResultIds(resultIdsToDelete);
-            
-            // save the new result
-            uploadSearchScan(new SQTSearchScanWrap(scan, runSearchId, scanId));
-//            spectrumDataDao.save(new SQTSearchScanWrap(scan, runSearchId, scanId));
-            log.info("\tNEW result is better");
-            return true;
+            // sometimes results can be exact duplicates.  In this case we will keep the old result and ignore this one
+            if(found) {
+                SQTSearchScan oldScan = getOldScanIfExists(runSearchId, scanId, charge);
+                if(oldScan != null) {
+                    log.info("Duplicate scan+charge result found for: scanId: "+
+                            scanId+"; charge: "+charge+"; mass: "+scan.getObservedMass());
+                    return false;
+                }
+            }
         }
-        else {
-            log.info("\tOLD result was better");
-            return false;
-        }
+        // save the scan+charge data
+        uploadSearchScan(new SQTSearchScanWrap(scan, runSearchId, scanId));
+        return true;
     }
 
-    // If there is cached data for the following result Ids remove it
-    private void removeCachedResultIds(List<Integer> resultIds) {
-        
-        log.info("\tRemoving cached entries for "+resultIds.size()+" resultIds");
-        Iterator<MsSearchResultProtein> iter = proteinMatchList.iterator();
-        while(iter.hasNext()) {
-            MsSearchResultProtein prot = iter.next();
-            if(resultIds.contains(prot.getResultId()))
-                iter.remove();
-        }
-        
-        Iterator<MsResultResidueModIds> rmodIter = resultResidueModList.iterator();
-        while(rmodIter.hasNext()) {
-            MsResultResidueModIds mod = rmodIter.next();
-            if(resultIds.contains(mod.getResultId()))
-                iter.remove();
-        }
-        
-        Iterator<MsResultTerminalModIds> tmodIter = resultTerminalModList.iterator();
-        while(tmodIter.hasNext()) {
-            MsResultTerminalModIds mod = tmodIter.next();
-            if(resultIds.contains(mod.getResultId()))
-                iter.remove();
-        }
-        
-        // subclasses should also clear any cached data with these resultIds
-        removeCacheForResultIds(resultIds);
-    }
-    
     
     final int uploadBaseSearchResult(MsSearchResultIn result, int runSearchId, int scanId) throws UploadException {
         
@@ -466,7 +421,7 @@ public abstract class AbstractSQTDataUploadService {
     
     private void uploadSearchScanBuffer() {
         SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        spectrumDataDao.saveAll(new ArrayList(this.searchScanMap.values()));
+        spectrumDataDao.saveAll(new ArrayList<SQTSearchScan>(this.searchScanMap.values()));
         searchScanMap.clear();
     }
     

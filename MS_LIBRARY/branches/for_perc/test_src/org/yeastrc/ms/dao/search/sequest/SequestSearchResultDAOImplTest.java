@@ -151,12 +151,12 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         int resultId2 = sequestResDao.save(97, result2, 45, 32);
         int resultId3 = sequestResDao.save(97, result3, 45, 32);
         
-        // We put 3 results in but the following queries should give us 1 results only
+        // We put 3 results in but the following queries should give us 2 results only
         // because result2 has XCorrRank > 1 and result1 and result3 are tied for XCorrRank = 1
         List<Integer> resultIds= sequestResDao.loadTopResultIdsForRunSearch(45);
         assertEquals(2, resultIds.size());
-        List<SequestSearchResult> resultList = sequestResDao.loadTopResultsForRunSearchN(45);
-        assertEquals(1, resultList.size());
+        List<SequestSearchResult> resultList = sequestResDao.loadTopResultsForRunSearchN(45, false);
+        assertEquals(2, resultList.size());
         
         SequestSearchResult res = resultList.get(0);
         assertEquals(0, res.getProteinMatchList().size());

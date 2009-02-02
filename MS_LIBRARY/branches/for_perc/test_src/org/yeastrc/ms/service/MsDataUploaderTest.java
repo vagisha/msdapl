@@ -99,16 +99,18 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/invalid_ms2_peak_dir";
         try {
             uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
-            fail("1.ms2 is invalid");
+            // fail("1.ms2 is invalid");
         }
         catch (UploadException e1) {
-            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
-            String msg = "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: 11"+
-            "\n\tLINE NUMBER: 61\n\tLINE: S\t000012\t000012\t1394.58000";
-            System.out.println(e1.getMessage());
-            assertTrue(e1.getMessage().contains(msg));
+            // We are no longer throwing exception for scan with missing peak data.
+            fail("1.ms2 is valid");
+//            assertEquals(ERROR_CODE.INVALID_MS2_SCAN, e1.getErrorCode());
+//            String msg = "Invalid MS2 scan -- no valid peaks and/or charge states found for scan: 11"+
+//            "\n\tLINE NUMBER: 61\n\tLINE: S\t000012\t000012\t1394.58000";
+//            System.out.println(e1.getMessage());
+//            assertTrue(e1.getMessage().contains(msg));
         }
-        assertEquals(0, runDao.loadRunIdsForFileName("1.ms2").size());
+        assertEquals(1, runDao.loadRunIdsForFileName("1.ms2").size());
         assertEquals(1, runDao.loadRunIdsForFileName("2.ms2").size());
         assertNull(searchDao.loadSearch(1));
     }

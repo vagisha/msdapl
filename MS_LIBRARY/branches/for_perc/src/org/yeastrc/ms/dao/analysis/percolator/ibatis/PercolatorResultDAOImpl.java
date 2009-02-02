@@ -130,9 +130,9 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
                      "WHERE res.id = pres.resultID "+
                      "AND pres.runSearchAnalysisID = ? ";
         if(qvalue != null)
-            sql +=   " AND qValue <= "+qvalue;
+            sql +=   " AND qvalue <= "+qvalue;
         if(pep != null) 
-            sql +=   " AND PEP <= "+pep;
+            sql +=   " AND pep <= "+pep;
         if(discriminantScore != null)
             sql +=   " AND discriminantScore <= "+discriminantScore;
 
@@ -222,9 +222,9 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         buf.append("WHERE res.id = pres.resultID ");
         buf.append("AND pres.runSearchAnalysisID = ?");
         if(qvalue != null)
-            buf.append(" AND qValue <= "+qvalue);
+            buf.append(" AND qvalue <= "+qvalue);
         if(pep != null)
-            buf.append(" AND PEP <= "+pep);
+            buf.append(" AND pep <= "+pep);
         if(discriminantScore != null)
             buf.append(" AND discriminantScore <= "+discriminantScore);
         buf.append(" ORDER BY res.id");
@@ -277,9 +277,9 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         String vStatus = rs.getString("validationStatus");
         if(vStatus != null)
             result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));
-        result.setQvalue(rs.getDouble("qValue"));
-        if(rs.getObject("PEP") != null)
-            result.setQvalue(rs.getDouble("PEP"));
+        result.setQvalue(rs.getDouble("qvalue"));
+        if(rs.getObject("pep") != null)
+            result.setQvalue(rs.getDouble("pep"));
         if(rs.getObject("discriminantScore") != null)
             result.setDiscriminantScore(rs.getDouble("discriminantScore"));
         result.setPredictedRetentionTime(rs.getBigDecimal("predictedRetentionTime"));

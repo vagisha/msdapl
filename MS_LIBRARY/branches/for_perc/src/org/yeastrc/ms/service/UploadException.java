@@ -51,6 +51,8 @@ public class UploadException extends Exception {
         SEARCHDB_NOT_FOUND      ("No matching search database found", ERROR),
         PROTEIN_NOT_FOUND       ("Protein not found in database", ERROR),
         
+        SCAN_CHARGE_NOT_FOUND   ("MS2 scan charge information not found", ERROR),
+        
         // For Percolator uploads
         NO_RUNSEARCHID_FOR_SQT  ("No runSearchID found for Percolator sqt file", WARN),
         NO_PERC_ANALYSIS_UPLOADED("No Percolator analysis files were uploaded", ERROR),

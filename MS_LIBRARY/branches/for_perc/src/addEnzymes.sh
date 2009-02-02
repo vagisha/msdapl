@@ -1,3 +1,3 @@
 #!/usr/bin/sh
 
-/usr/local/mysql/bin/mysql -uroot msData_test <  /Users/vagisha/WORK/MS_LIBRARY/new_lib/schema/msDigestionEnzyme.sql;
+/usr/local/mysql/bin/mysql -uroot msData_junit <  /Users/silmaril/WORK/UW/MS_LIBRARY/for_perc/schema/msDigestionEnzyme.sql;

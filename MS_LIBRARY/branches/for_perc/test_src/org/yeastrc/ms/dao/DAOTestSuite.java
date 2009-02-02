@@ -3,6 +3,9 @@ package org.yeastrc.ms.dao;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImplTest;
+import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImplTest;
+import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorResultDAOImplTest;
 import org.yeastrc.ms.dao.general.MsEnzymeDAOImplTest;
 import org.yeastrc.ms.dao.run.MsRunDAOImplTest;
 import org.yeastrc.ms.dao.run.MsScanDAOImplTest;
@@ -61,6 +64,14 @@ public class DAOTestSuite {
         suite.addTestSuite(SequestSearchDAOImplTest.class);
 
         // TODO Prolucid search
+        
+        
+        // Search Analysis
+        suite.addTestSuite(MsSearchAnalysisDAOImplTest.class);
+        
+        // Percolator
+        suite.addTestSuite(PercolatorParamsDAOImplTest.class);
+        suite.addTestSuite(PercolatorResultDAOImplTest.class);
         
         //$JUnit-END$
         return suite;

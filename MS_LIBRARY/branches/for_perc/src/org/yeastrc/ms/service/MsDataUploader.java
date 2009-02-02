@@ -39,6 +39,8 @@ public class MsDataUploader {
     private String remoteDirectory;
     private String uploadDirectory;
     
+    private boolean isMacCossData = false;
+    
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
     
@@ -55,6 +57,11 @@ public class MsDataUploader {
         remoteServer = null;
         remoteDirectory = null;
         uploadDirectory = null;
+        
+    }
+    
+    public void setIsMaccossData(boolean isMaccossData) {
+        this.isMacCossData = isMaccossData;
     }
     
     public List<UploadException> getUploadExceptionList() {
@@ -422,6 +429,11 @@ public class MsDataUploader {
     private int uploadSequestSearch(Set<String> filenames, Map<String, Integer> runIdMap, final Date searchDate) {
         
         SequestSQTDataUploadService service = new SequestSQTDataUploadService();
+        // If this is data from the MacCoss lab we will check for "duplicate" results for
+        // a scan+charge combination.
+        if(isMacCossData)
+            service.doScanChargeMassCheck(true);
+        
         int searchId = service.uploadSearch(uploadedExptId, uploadDirectory, filenames, runIdMap, 
                                         remoteServer, remoteDirectory, 
                                         new java.sql.Date(searchDate.getTime()));
@@ -482,9 +494,9 @@ public class MsDataUploader {
     
     private void deleteExperiment() {
         log.error("\n\tDELETING EXPERIMENT: "+uploadedExptId);
-        this.uploadedExptId = 0;
         MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
         exptDao.deleteExperiment(uploadedExptId);
+        this.uploadedExptId = 0;
     }
     
     public static int getScanIdFor(String runFileScanString, int searchId) {
@@ -517,11 +529,25 @@ public class MsDataUploader {
     
     public static void main(String[] args) throws UploadException {
         long start = System.currentTimeMillis();
+
+//        for(int i = 0; i < 10; i++) {
         MsDataUploader uploader = new MsDataUploader();
+        uploader.setIsMaccossData(true);
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", new Date());
+//        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", new Date());
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
+        
+        // /Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp
+        uploader.uploadExperimentToDb("local", 
+                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3136_exptID90/phos",
+                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3136_exptID90/phos",
+                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp/speed_test", 
+                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp/speed_test",
+                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
+                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
+                new Date());
+//        }
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");
     }

@@ -10,8 +10,8 @@
 	
 	<resultMap class="PercolatorResultOut" id="percolatorResultResult" extends="MsSearchResult.msSearchResult">
 		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
-		<result property="qvalue" column="qValue" nullValue="-1.0"/>
-		<result property="posteriorErrorProbability" column="PEP" nullValue="-1.0"/>
+		<result property="qvalue" column="qvalue" nullValue="-1.0"/>
+		<result property="posteriorErrorProbability" column="pep" nullValue="-1.0"/>
 		<result property="discriminantScore" column="discriminantScore" />
 		<result property="predictedRetentionTime" column="predictedRetentionTime" />
 	</resultMap>
@@ -47,8 +47,8 @@
     	INSERT INTO PercolatorResult 
     	(resultID, 
     	runSearchAnalysisID,
-    	qValue,
-    	PEP,
+    	qvalue,
+    	pep,
     	discriminantScore,
     	predictedRetentionTime) 
     	VALUES (?,?,?,?,?,?)
@@ -58,8 +58,8 @@
     	INSERT INTO PercolatorResult 
     	(resultID, 
     	runSearchAnalysisID,
-    	qValue,
-    	PEP,
+    	qvalue,
+    	pep,
     	discriminantScore,
     	predictedRetentionTime) 
     	VALUES $values$
