@@ -14,26 +14,34 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
+import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
@@ -51,8 +59,10 @@ import org.yeastrc.ms.util.AminoAcidUtils;
 public class MsDataToPepXmlConverter {
 
     private static final DAOFactory daofactory = DAOFactory.instance();
-    private static final SequestSearchDAO searchDao = daofactory.getSequestSearchDAO();
+    private static final SequestSearchDAO seqSearchDao = daofactory.getSequestSearchDAO();
+    private static final ProlucidSearchDAO plcidSearchDao = daofactory.getProlucidSearchDAO();
     private static final SQTRunSearchDAO runSearchDao = daofactory.getSqtRunSearchDAO();
+    private static final MsRunDAO runDao = daofactory.getMsRunDAO();
     private static final MsScanDAO scanDao = daofactory.getMsScanDAO();
     private static final SQTSearchScanDAO sqtScanDao = daofactory.getSqtSpectrumDAO();
     private static final SequestSearchResultDAO resultDao = daofactory.getSequestResultDAO();
@@ -61,9 +71,10 @@ public class MsDataToPepXmlConverter {
     
     private List<MsResidueModification> staticMods;
     
-    public boolean convertSearch(int searchId, String outfile) throws FileNotFoundException, XMLStreamException {
+    
+    public boolean convertSearch(int searchId, String outfile) throws FileNotFoundException, XMLStreamException, DatatypeConfigurationException {
         
-        SequestSearch search = searchDao.loadSearch(searchId);
+        SequestSearch search = seqSearchDao.loadSearch(searchId);
         staticMods = search.getStaticResidueMods();
         
         if(search == null) {
@@ -84,7 +95,7 @@ public class MsDataToPepXmlConverter {
         return true;
     }
     
-    public boolean convertRunSearch(int runSearchId, String outdir) throws FileNotFoundException, XMLStreamException {
+    public boolean convertRunSearch(int runSearchId, String outdir) throws FileNotFoundException, XMLStreamException, DatatypeConfigurationException {
         
         SQTRunSearch runSearch = runSearchDao.loadRunSearch(runSearchId);
         if(runSearch == null) {
@@ -92,7 +103,7 @@ public class MsDataToPepXmlConverter {
             return false;
         }
         
-        SequestSearch search = searchDao.loadSearch(runSearch.getSearchId());
+        SequestSearch search = seqSearchDao.loadSearch(runSearch.getSearchId());
         this.staticMods = search.getStaticResidueMods();
         
         String outfile = runSearchDao.loadFilenameForRunSearch(runSearchId)+".pep.xml";
@@ -106,29 +117,34 @@ public class MsDataToPepXmlConverter {
         return true;
     }
     
-    private XMLStreamWriter initDocument(String outfile) throws XMLStreamException, FileNotFoundException {
+    private XMLStreamWriter initDocument(String outfile) throws XMLStreamException, FileNotFoundException, DatatypeConfigurationException {
         OutputStream out = new FileOutputStream(outfile);
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
         
         writeHeaders(writer);
-        startDocument(writer);
+        startDocument(writer, outfile);
         return writer;
     }
     
     private void writeHeaders(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartDocument("UTF-8", "1.0");
-        writer.writeCharacters("\n");
+        newLine(writer);
         writer.writeDTD("<?xml-stylesheet type=\"text/xsl\" href=\"http://regis-web.systemsbiology.net/pepXML_std.xsl\"?>");
         newLine(writer);
     }
     
-    private void startDocument(XMLStreamWriter writer) throws XMLStreamException {
+    private void startDocument(XMLStreamWriter writer, String outFilePath) throws XMLStreamException, DatatypeConfigurationException {
         writer.writeStartElement("msms_pipeline_analysis");
-        writer.writeAttribute("date", "008-05-15T18:15:23");
-        writer.writeAttribute("xmlns", "http://regis-web.systemsbiology.net/pepXML");
-        writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        writer.writeAttribute("xsi:schemaLocation", "http://regis-web.systemsbiology.net/pepXML /net/pr/vol1/ProteomicsResource/bin/TPP/bin/20080417-TPP_v3.5.3/schema/pepXML_v110.xsd");
+        DatatypeFactory df;
+        df = DatatypeFactory.newInstance();
+        XMLGregorianCalendar calendar = df.newXMLGregorianCalendar(new GregorianCalendar());
+        writer.writeAttribute("date", calendar.toXMLFormat());
+        writer.writeAttribute("summary_xml", outFilePath);
+        
+        //writer.writeAttribute("xmlns", "http://regis-web.systemsbiology.net/pepXML");
+        //writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        //writer.writeAttribute("xsi:schemaLocation", "http://regis-web.systemsbiology.net/pepXML /net/pr/vol1/ProteomicsResource/bin/TPP/bin/20080417-TPP_v3.5.3/schema/pepXML_v110.xsd");
         newLine(writer);
     }
     
@@ -146,6 +162,15 @@ public class MsDataToPepXmlConverter {
         String basefile = runSearchDao.loadFilenameForRunSearch(runSearch.getId());
         writer.writeStartElement("msms_run_summary");
         writer.writeAttribute("base_name", basefile);
+        
+        MsRun run = runDao.loadRun(runSearch.getRunId());
+        if(run == null) {
+            log.error("No run found with ID: "+runSearch.getRunId());
+            throw new IllegalArgumentException("No run found with ID: "+runSearch.getRunId());
+        }
+        writer.writeAttribute("raw_data_type", "."+run.getRunFileFormat().name().toLowerCase());
+        writer.writeAttribute("raw_data", "."+run.getRunFileFormat().name().toLowerCase());
+        
         //writer.writeAttribute("msManufacturer", "Thermo Finnigan");
         newLine(writer);
         
@@ -167,6 +192,7 @@ public class MsDataToPepXmlConverter {
         writer.writeStartElement("search_summary");
         writer.writeAttribute("base_name", basefile);
         writer.writeAttribute("search_engine", search.getSearchProgram().toString());
+        
         writer.writeAttribute("precursor_mass_type", "monoisotopic");
         writer.writeAttribute("fragment_mass_type", "average");
         writer.writeAttribute("search_id", String.valueOf(runSearch.getId()));
@@ -218,8 +244,12 @@ public class MsDataToPepXmlConverter {
         writer.writeEndElement();
         newLine(writer);
     }
+    
+    private String getPrecursorMassType(MsSearch search) {
+        
+    }
 
-    private void writeEnzymes(SequestSearch search, XMLStreamWriter writer)
+    private void writeEnzymes(MsSearch search, XMLStreamWriter writer)
             throws XMLStreamException {
         // write enzymes used
         List<MsEnzyme> enzymes = search.getEnzymeList();
@@ -231,7 +261,8 @@ public class MsDataToPepXmlConverter {
                 // <specificity cut="KR" no_cut="P" sense="C"/>
                 writer.writeStartElement("specificity");
                 writer.writeAttribute("cut", enz.getCut());
-                writer.writeAttribute("no_cut", enz.getNocut());
+                if(enz.getNocut() != null && enz.getNocut().length() > 0)
+                    writer.writeAttribute("no_cut", enz.getNocut());
                 writer.writeAttribute("sense", enz.getSense().getShortVal() == Sense.NTERM.getShortVal() ? "N" : "C");
                 writer.writeEndElement();
                 newLine(writer);
