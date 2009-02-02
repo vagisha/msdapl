@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.GenericSearchDAO.MassType;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
@@ -72,7 +73,7 @@ public class SequestPepXmlConverter extends PepXmlConverter {
             String basefile = runSearchDao.loadFilenameForRunSearch(runSearch.getId());
             // write search summary; "search_summary" element
             writeSearchSummary(search, runSearch, writer, basefile);
-            writeSearchResults(runSearch, writer, basefile);
+            //writeSearchResults(runSearch, writer, basefile);
             endMsmsRunSummary(writer);
             endMsmsPipelineAnalysis(writer);
         }
@@ -95,10 +96,12 @@ public class SequestPepXmlConverter extends PepXmlConverter {
         }
     }
     
+    MassType getPrecursorMassType(int searchId) {
+        return seqSearchDao.getParentMassType(searchId);
+    }
     
-    
-    private String getPrecursorMassType(MsSearch search) {
-        
+    MassType getFragmentMassType(int searchId){
+        return seqSearchDao.getFragmentMassType(searchId);
     }
     
 }

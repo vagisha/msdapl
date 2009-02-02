@@ -139,8 +139,11 @@ public abstract class PepXmlConverter {
         writer.writeAttribute("base_name", basefile);
         writer.writeAttribute("search_engine", search.getSearchProgram().toString());
         
-        writer.writeAttribute("precursor_mass_type", "monoisotopic");
-        writer.writeAttribute("fragment_mass_type", "average");
+        // mass type used for the search
+        String pmt = getPrecursorMassType(search.getId()) == MassType.MONO ? "monoisotopic" : "average";
+        writer.writeAttribute("precursor_mass_type", pmt);
+        pmt = getFragmentMassType(search.getId()) == MassType.MONO ? "monoisotopic" : "average";
+        writer.writeAttribute("fragment_mass_type", pmt);
         writer.writeAttribute("search_id", String.valueOf(runSearch.getId()));
         newLine(writer);
         
