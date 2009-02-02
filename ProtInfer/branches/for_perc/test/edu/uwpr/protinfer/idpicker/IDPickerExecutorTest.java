@@ -12,7 +12,6 @@ import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
-import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.infer.SearchSource;
 
 public class IDPickerExecutorTest extends TestCase {
@@ -25,10 +24,26 @@ public class IDPickerExecutorTest extends TestCase {
         super.tearDown();
     }
 
-    public final void testFilterSearchHits() {
-//        fail("Not yet implemented"); // TODO
+    public final void testPeptideProteinMatch() {
+        
+        String peptide = "ABCD";
+        String protein = null;
+        assertFalse(IDPickerExecutor.peptideProteinMatch(protein, peptide));
+        
+        protein = "ABCDEGFH";
+        assertFalse(IDPickerExecutor.peptideProteinMatch(protein, peptide));
+        
+        protein = "KABCACBABC";
+        assertFalse(IDPickerExecutor.peptideProteinMatch(protein, peptide));
+        
+        protein = "KABCDXYZABC";
+        assertTrue(IDPickerExecutor.peptideProteinMatch(protein, peptide));
+        
+        protein = "ABCDKABCDXYZ";
+        assertTrue(IDPickerExecutor.peptideProteinMatch(protein, peptide));
+        
     }
-
+    
     public final void testInferProteins() {
         
         IDPickerParams params = new IDPickerParams();
@@ -40,7 +55,14 @@ public class IDPickerExecutorTest extends TestCase {
         List<PeptideSpectrumMatchIDP> searchHits = makeSequestHits();
         
         IDPickerExecutor executor = new IDPickerExecutor();
-        List<InferredProtein<SpectrumMatchIDP>> proteins = executor.inferProteins(searchHits, params);
+        List<InferredProtein<SpectrumMatchIDP>> proteins = null;
+        try {
+            proteins = executor.inferProteins(searchHits, params);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            fail("failed");
+        }
         
         assertEquals(9, proteins.size());
         int parsimonious = 0;
@@ -160,7 +182,7 @@ public class IDPickerExecutorTest extends TestCase {
         assertEquals(3, prot.getProtein().getId());
         assertEquals("protein_3", prot.getAccession());
         assertEquals(1, prot.getPeptides().size());
-        assertTrue(prot.getIsAccepted());
+        assertFalse(prot.getIsAccepted());
         
         prot = map.get("protein_4");
         assertEquals(4, prot.getProtein().getId());
@@ -178,7 +200,7 @@ public class IDPickerExecutorTest extends TestCase {
         assertEquals(6, prot.getProtein().getId());
         assertEquals("protein_6", prot.getAccession());
         assertEquals(2, prot.getPeptides().size());
-        assertFalse(prot.getIsAccepted());
+        assertTrue(prot.getIsAccepted());
         
         prot = map.get("protein_7");
         assertEquals(7, prot.getProtein().getId());
@@ -247,10 +269,10 @@ public class IDPickerExecutorTest extends TestCase {
     }
     
     private void addSearchHits(int peptideId, List<PeptideSpectrumMatchIDP> hits, SearchSource source, int scanId, Protein[] proteins) {
-        Peptide p = new Peptide("peptide_"+peptideId, peptideId);
+        Peptide p = new Peptide("peptide_"+peptideId, "peptide_"+peptideId, peptideId);
         PeptideHit peptHit = new PeptideHit(p);
         for(Protein prot: proteins) {
-            peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+            peptHit.addProtein(prot);
         }
         PeptideSpectrumMatchIDPImpl h1 = new PeptideSpectrumMatchIDPImpl(); //(source, scanId++, 2, peptHit);
         SpectrumMatchIDPImpl sm = new SpectrumMatchIDPImpl();
@@ -263,7 +285,7 @@ public class IDPickerExecutorTest extends TestCase {
         hits.add(h1);
         peptHit = new PeptideHit(p);
         for(Protein prot: proteins) {
-            peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
+            peptHit.addProtein(prot);
         }
 //        SequestHit h2 = new SequestHit(source, scanId, 3, peptHit);
         PeptideSpectrumMatchIDPImpl h2 = new PeptideSpectrumMatchIDPImpl(); //(source, scanId++, 2, peptHit);

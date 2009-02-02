@@ -10,6 +10,7 @@
 		<result property="clusterId" column="clusterID" nullValue="0"/>
 		<result property="isParsimonious" column="isParsimonious" />
 		<result property="groupId" column="groupID" nullValue="0"/>
+		<result property="nsaf" column="nsaf" nullValue="-1.0"/>
 	</resultMap>
 	
 	<resultMap class="IdPickerProtein" id="idpickerProteinResult" extends="IdPickerProtein.baseResult">
@@ -29,6 +30,7 @@
 		<parameter property="isParsimonious" jdbcType="TINYINT" />
 		<parameter property="clusterId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="nsaf" jdbcType="DOUBLE" nullValue="-1.0"/>
 	</parameterMap>
 	
 	<select id="select" resultMap="idpickerProteinResult" parameterClass="Integer">
@@ -292,8 +294,9 @@
     	piProteinID,
     	isParsimonious,
     	clusterID,
-    	groupID) 
-    	VALUES (?,?,?,?)
+    	groupID,
+    	nsaf) 
+    	VALUES (?,?,?,?,?)
     </insert>
     
     <delete id="delete" parameterClass="Integer">

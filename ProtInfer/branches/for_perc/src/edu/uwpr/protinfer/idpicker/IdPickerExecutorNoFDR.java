@@ -41,13 +41,13 @@ public class IdPickerExecutorNoFDR {
         System.out.println("After Sleeping");
         
         // infer the proteins;
-        IDPickerExecutor.inferProteins(allPsms, params);
+        List<InferredProtein<SpectrumMatch>> proteins = IDPickerExecutor.inferProteins(allPsms, params);
         System.out.println("Got inferred proteins");
         Thread.sleep(5*1000);
         System.out.println("After Sleeping");
         
         // FINALLY save the results
-        //IdPickerResultSaver.instance().saveResults(idpRun, proteins);
+        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
     }
    
 }

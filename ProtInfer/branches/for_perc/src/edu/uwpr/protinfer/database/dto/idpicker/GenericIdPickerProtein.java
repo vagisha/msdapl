@@ -7,7 +7,15 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
     private int clusterId = -1;
     private int groupId = -1;
     private boolean isParsimonious;
+    private double nsaf = -1.0; // normalized spectrum abundance factor
     
+    
+    public double getNsaf() {
+        return nsaf;
+    }
+    public void setNsaf(double nsaf) {
+        this.nsaf = nsaf;
+    }
     
     public int getClusterId() {
         return clusterId;

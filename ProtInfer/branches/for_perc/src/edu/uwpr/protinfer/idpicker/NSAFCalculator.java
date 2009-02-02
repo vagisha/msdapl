@@ -13,6 +13,7 @@ import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.SpectrumMatch;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
  * 
@@ -32,11 +33,12 @@ public class NSAFCalculator {
     public <S extends SpectrumMatch> void calculateNSAF(List<InferredProtein<S>> proteins) throws Exception {
         double totalSpC_L = 0;
         
+        long s = System.currentTimeMillis();
         for(InferredProtein<S> protein: proteins) {
             String proteinSeq = null;
             try {
-//                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(protein.getProteinId());
-                proteinSeq = NrSeqLookupUtil.getProteinSequence(protein.getProteinId());
+                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(protein.getProteinId());
+//                proteinSeq = NrSeqLookupUtil.getProteinSequence(protein.getProteinId());
             }
             catch (Exception e) {
                 log.error("Exception getting nrseq protein for proteinId: "+protein.getProteinId(), e);
@@ -48,7 +50,7 @@ public class NSAFCalculator {
                 throw new Exception("Protein sequence for proteinId: "+protein.getProteinId()+" is null.");
             }
             
-            double spc_L = protein.getSpectralEvidenceCount() / (double)proteinSeq.length();
+            double spc_L = (double)protein.getSpectralEvidenceCount() / (double)proteinSeq.length();
             totalSpC_L += spc_L;
             protein.setNSAF(spc_L);
         }
@@ -56,5 +58,7 @@ public class NSAFCalculator {
         for(InferredProtein<S> protein: proteins) {
             protein.setNSAF(protein.getNSAF() / totalSpC_L);
         }
+        long e = System.currentTimeMillis();
+        log.info("Time to calculate NSAF: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
     }
 }

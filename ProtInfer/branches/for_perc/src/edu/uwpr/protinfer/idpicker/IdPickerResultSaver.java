@@ -80,6 +80,7 @@ public class IdPickerResultSaver {
             idpProt.setGroupId(protein.getProteinGroupId());
             idpProt.setIsParsimonious(protein.getIsAccepted());
             idpProt.setCoverage(protein.getPercentCoverage());
+            idpProt.setNsaf(protein.getNSAF());
             int pinferProteinId = protDao.saveIdPickerProtein(idpProt);
             
             
