@@ -21,6 +21,8 @@ interface MsRunBase {
     public abstract RunFileFormat getRunFileFormat();
 
     public abstract String getFileName();
+    
+    public abstract String getFileNameNoExt();
 
     public abstract String getCreationDate();
 

@@ -103,6 +103,17 @@ public class MS2Header implements MS2RunIn {
         return fileName;
     }
    
+    @Override
+    public String getFileNameNoExt() {
+        String fn = fileName;
+        if(fn == null)
+            return null;
+        int idx = fn.lastIndexOf('.');
+        if (idx != -1)
+            fn = fn.substring(0, idx);
+        return fn;
+    }
+    
     public String getCreationDate() {
         return creationDate;
     }

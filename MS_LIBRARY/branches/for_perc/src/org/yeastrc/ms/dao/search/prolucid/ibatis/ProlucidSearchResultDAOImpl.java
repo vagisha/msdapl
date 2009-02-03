@@ -282,6 +282,10 @@ ProlucidSearchResultDAO {
         return resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
     }
 
+    @Override
+    public List<Integer> loadResultIdsForSearchScan(int runSearchId, int scanId) {
+        return resultDao.loadResultIdsForSearchScan(runSearchId, scanId);
+    }
 
     @Override
     public int save(int searchId, ProlucidSearchResultIn searchResult, int runSearchId, int scanId) {

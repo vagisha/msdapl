@@ -70,6 +70,12 @@
     	AND charge = #charge#
     </select>
     
+    <select id="selectResultIdsForRunSearchScan" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msRunSearchResult 
+    	WHERE runSearchID = #runSearchId# 
+    	AND scanID = #scanId#
+    </select>
+    
     <insert id="insert" parameterMap="msSearchResultParam">
     	INSERT INTO msRunSearchResult (
     	runSearchID,

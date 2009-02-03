@@ -54,6 +54,14 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
+    public List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("runSearchAnalysisId", runSearchAnalysisId);
+        map.put("scanId", scanId);
+        return queryForList(namespace+".selectResultIdsForRunSearchAnalysisScan", map);
+    }
+    
+    @Override
     public List<Integer> loadResultIdsForAnalysis(int analysisId) {
         return queryForList(namespace+".selectResultIdsForAnalysis", analysisId);
     }
@@ -295,5 +303,4 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         result.setResultPeptide(peptide);
         return result;
     }
-   
 }

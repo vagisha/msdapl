@@ -11,6 +11,7 @@ package org.yeastrc.ms.util;
  */
 public class AminoAcidUtils {
 
+    public static final double HYDROGEN = 1.00794;
     
     private AminoAcidUtils() {}
     
@@ -72,6 +73,28 @@ public class AminoAcidUtils {
             case 'W': return monoMass_W();
             default : return 0;
         }
+    }
+    
+    public static double monoMassPeptide(String peptide) {
+        if(peptide == null || peptide.length() == 0)
+            return 0;
+        double mass = 0;
+        peptide.toUpperCase();
+        for(int i = 0; i < peptide.length(); i++) {
+            mass += monoMass(peptide.charAt(i));
+        }
+        return mass;
+    }
+    
+    public static double avgMassPeptide(String peptide) {
+        if(peptide == null || peptide.length() == 0)
+            return 0;
+        double mass = 0;
+        peptide.toUpperCase();
+        for(int i = 0; i < peptide.length(); i++) {
+            mass += avgMass(peptide.charAt(i));
+        }
+        return mass;
     }
     
 //  add_G_Glycine = 0.0000                 ; added to G - avg.  57.0519, mono.  57.02146

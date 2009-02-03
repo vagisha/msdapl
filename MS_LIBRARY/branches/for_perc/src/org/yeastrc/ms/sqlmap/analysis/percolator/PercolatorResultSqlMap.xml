@@ -36,6 +36,14 @@
     	SELECT resultID FROM PercolatorResult WHERE runSearchAnalysisID=#runSearchAnalysisId#
     </select>
     
+    <select id="selectResultIdsForRunSearchAnalysisScan" resultClass="Integer" parameterClass="Integer">
+    	SELECT pres.resultID
+    	FROM msRunSearchResult AS res, PercolatorResult AS pres 
+    	WHERE pres.runSearchAnalysisID=#runSearchAnalysisId#
+    	AND   pres.resultID = res.id
+    	AND   res.scanID = #scanId#
+    </select>
+    
     <select id="selectResultIdsForAnalysis" resultClass="Integer" parameterClass="Integer">
     	SELECT pres.resultID 
     	FROM PercolatorResult AS pres, msRunSearchAnalysis as rsa 

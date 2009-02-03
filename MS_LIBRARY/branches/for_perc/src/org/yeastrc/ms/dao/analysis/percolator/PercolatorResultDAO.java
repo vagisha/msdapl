@@ -16,6 +16,8 @@ public interface PercolatorResultDAO {
     
     public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId);
     
+    public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
+    
     
     public abstract List<Integer> loadResultIdsForAnalysis(int analysisId);
     
