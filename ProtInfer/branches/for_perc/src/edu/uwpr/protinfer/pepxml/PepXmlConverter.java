@@ -9,11 +9,15 @@ package edu.uwpr.protinfer.pepxml;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -33,20 +37,21 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzyme.Sense;
 import org.yeastrc.ms.domain.run.MsRun;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.util.AminoAcidUtils;
 
 /**
  * 
  */
-public abstract class PepXmlConverter {
+public abstract class PepXmlConverter <T extends MsSearchResult> {
 
     
     static final DAOFactory daofactory = DAOFactory.instance();
@@ -59,8 +64,9 @@ public abstract class PepXmlConverter {
     private static final Logger log = Logger.getLogger(PepXmlConverter.class);
     
     private MassType fragmentMassType;
+    private int spectrumQueryIndex  = 1;
     
-    XMLStreamWriter initDocument(String outfile) throws XMLStreamException, FileNotFoundException, DatatypeConfigurationException {
+    XMLStreamWriter initDocument(String outfile) throws XMLStreamException, FileNotFoundException {
         OutputStream out = new FileOutputStream(outfile);
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
@@ -79,18 +85,31 @@ public abstract class PepXmlConverter {
     //-------------------------------------------------------------------------------------------
     // ms_ms_pipeline_analysis
     //-------------------------------------------------------------------------------------------
-    void startMsmsPipelineAnalysis(XMLStreamWriter writer, String outFilePath) throws XMLStreamException, DatatypeConfigurationException {
+    void startMsmsPipelineAnalysis(XMLStreamWriter writer, String outFilePath) throws XMLStreamException {
         writer.writeStartElement("msms_pipeline_analysis");
-        DatatypeFactory df;
-        df = DatatypeFactory.newInstance();
-        XMLGregorianCalendar calendar = df.newXMLGregorianCalendar(new GregorianCalendar());
-        writer.writeAttribute("date", calendar.toXMLFormat());
+        
+        writer.writeAttribute("date", getXMLDate(new Date()));
         writer.writeAttribute("summary_xml", outFilePath);
         
         //writer.writeAttribute("xmlns", "http://regis-web.systemsbiology.net/pepXML");
         //writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         //writer.writeAttribute("xsi:schemaLocation", "http://regis-web.systemsbiology.net/pepXML /net/pr/vol1/ProteomicsResource/bin/TPP/bin/20080417-TPP_v3.5.3/schema/pepXML_v110.xsd");
         newLine(writer);
+    }
+    
+    final String getXMLDate(java.util.Date date) {
+        DatatypeFactory df;
+        try {
+            df = DatatypeFactory.newInstance();
+        }
+        catch (DatatypeConfigurationException e) {
+            log.error("Error converting to XML date.",e);
+            throw new IllegalArgumentException("Error converting to XML date.",e);
+        }
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        XMLGregorianCalendar calendar = df.newXMLGregorianCalendar(gc);
+        return calendar.toXMLFormat();
     }
     
     void endMsmsPipelineAnalysis(XMLStreamWriter writer) throws XMLStreamException {
@@ -103,17 +122,12 @@ public abstract class PepXmlConverter {
     //-------------------------------------------------------------------------------------------
     // ms_ms_run_summary
     //-------------------------------------------------------------------------------------------
-    void startMsmsRunSummary(int runSearchId, XMLStreamWriter writer) throws XMLStreamException {
+    void startMsmsRunSummary(MsRun run, XMLStreamWriter writer) throws XMLStreamException {
 
-        String basefile = runSearchDao.loadFilenameForRunSearch(runSearchId);
+        String basefile = run.getFileNameNoExt();
         writer.writeStartElement("msms_run_summary");
         writer.writeAttribute("base_name", basefile);
 
-        MsRun run = runDao.loadRun(runSearchId);
-        if(run == null) {
-            log.error("No run found with ID: "+runSearchId);
-            throw new IllegalArgumentException("No run found with ID: "+runSearchId);
-        }
         writer.writeAttribute("raw_data_type", "."+run.getRunFileFormat().name().toLowerCase());
         writer.writeAttribute("raw_data", "."+run.getRunFileFormat().name().toLowerCase());
 
@@ -156,12 +170,11 @@ public abstract class PepXmlConverter {
     //-------------------------------------------------------------------------------------------
     // search_summary
     //-------------------------------------------------------------------------------------------
-    void writeSearchSummary(MsSearch search,
-            MsRunSearch runSearch, XMLStreamWriter writer, String basefile)
+    void writeSearchSummary(MsSearch search, XMLStreamWriter writer, String basefile)
             throws XMLStreamException {
         
         // search summary
-        startSearchSummary(search, runSearch, writer, basefile);
+        startSearchSummary(search, writer, basefile);
         
         // search database
         writeSearchDatabase(search, writer);
@@ -173,7 +186,7 @@ public abstract class PepXmlConverter {
         writeModifications(search, writer);
         
         // subclass can write any program specif parameters
-        wirteProgramSpecificParams(search.getId(), writer);
+        writeProgramSpecificParams(search.getId(), writer);
         
         endSearchSummary(writer);
     }
@@ -287,8 +300,7 @@ public abstract class PepXmlConverter {
         newLine(writer);
     }
 
-    private void startSearchSummary(MsSearch search,
-            MsRunSearch runSearch, XMLStreamWriter writer, String basefile)
+    private void startSearchSummary(MsSearch search, XMLStreamWriter writer, String basefile)
             throws XMLStreamException {
         writer.writeStartElement("search_summary");
         writer.writeAttribute("base_name", basefile);
@@ -301,7 +313,7 @@ public abstract class PepXmlConverter {
         pmt = fragmentMassType == MassType.MONO ? "monoisotopic" : "average";
         
         writer.writeAttribute("fragment_mass_type", pmt);
-        writer.writeAttribute("search_id", String.valueOf(runSearch.getId()));
+        writer.writeAttribute("search_id", String.valueOf(search.getId()));
         newLine(writer);
     }
     
@@ -313,36 +325,204 @@ public abstract class PepXmlConverter {
     //-------------------------------------------------------------------------------------------
     // spectrum_query
     //-------------------------------------------------------------------------------------------
-    private void writeSearchResults(MsRunSearch runSearch, XMLStreamWriter writer, String basefile) throws XMLStreamException {
+    void writeResultsForScan(List<T> results, List<MsResidueModification> staticMods, String basefile, XMLStreamWriter writer) throws XMLStreamException {
         
-        List<Integer> resultIds = resultDao.loadResultIdsForRunSearch(runSearch.getId());
-        List<SequestSearchResult> results = new ArrayList<SequestSearchResult>(resultIds.size());
-        for(Integer resId: resultIds) {
-            SequestSearchResult res = resultDao.load(resId);
-            results.add(res);
-        }
+        // sort results by charge
+        Collections.sort(results, new Comparator<T>() {
+            @Override
+            public int compare(T o1, T o2) {
+                return Integer.valueOf(o1.getCharge()).compareTo(o2.getCharge());
+            }});
         
-        int lastScanId = -1;
+        // get the scan
+        MsScan scan = scanDao.load(results.get(0).getScanId());
+        
         int lastCharge = -1;
-        int index = 1;
-        List<SequestSearchResult> resForScan = new ArrayList<SequestSearchResult>();
-        for(SequestSearchResult result: results) {
-            if(result.getScanId() != lastScanId || result.getCharge() != lastCharge) {
-                if(resForScan.size() > 0) {
-                    int scanNumber = scanDao.load(lastScanId).getStartScanNum();
-                    SQTSearchScan sqtScan = sqtScanDao.load(runSearch.getId(), lastScanId, lastCharge);
-                    writeResultsForScanCharge(resForScan, writer, index, basefile, sqtScan);
-                    index++;
+        List<T> resForScanCharge = new ArrayList<T>();
+        for(T result: results) {
+            if(result.getCharge() != lastCharge) {
+                if(resForScanCharge.size() > 0) {
+                    writeResultsForScanCharge(resForScanCharge, staticMods, scan, writer, basefile);
                 }
-                resForScan.clear();
-                lastScanId = result.getScanId();
+                resForScanCharge.clear();
                 lastCharge = result.getCharge();
             }
-            resForScan.add(result);
+            resForScanCharge.add(result);
         }
-        SQTSearchScan sqtScan = sqtScanDao.load(runSearch.getId(), lastScanId, lastCharge);
-        writeResultsForScanCharge(resForScan, writer, index, basefile, sqtScan);
+        writeResultsForScanCharge(resForScanCharge, staticMods, scan, writer, basefile);
     }
+    
+    private void writeResultsForScanCharge(List<T> resForScanCharge, List<MsResidueModification> staticMods, MsScan scan, XMLStreamWriter writer, 
+            String filename) 
+        throws XMLStreamException {
+        
+        if(resForScanCharge.size() == 0)
+            return;
+        
+        
+        startSpectrumQuery(resForScanCharge, scan, writer, filename);
+        
+        // sort results by rank
+        sortResultsByRank(resForScanCharge);
+        
+        for(T result: resForScanCharge) {
+            
+            writeSearchResult(result, resForScanCharge, staticMods, scan, writer);
+        }
+        writer.writeEndElement(); // spectrum_query
+        newLine(writer);
+    }
+
+    private void writeSearchResult(T result, List<T> resForScanCharge, List<MsResidueModification> staticMods,
+            MsScan scan, XMLStreamWriter writer) throws XMLStreamException {
+        
+        MsSearchResultPeptide peptide = result.getResultPeptide();
+        List<MsSearchResultProtein> proteins = result.getProteinMatchList();
+        // accession strings may be separated by ^A; Calculate the number of proteins
+        int numProteins = 0;
+        for(MsSearchResultProtein protein: proteins) {
+            String[] accessionStrings = protein.getAccession().split("\\cA");
+            numProteins += accessionStrings.length;
+        }
+        writer.writeStartElement("search_result");
+        writer.writeStartElement("search_hit");
+        writer.writeAttribute("hit_rank", String.valueOf(getResultRankInList(resForScanCharge, result)));
+        writer.writeAttribute("peptide", peptide.getPeptideSequence());
+        writer.writeAttribute("peptide_prev_aa", String.valueOf(peptide.getPreResidue()));
+        writer.writeAttribute("peptide_next_aa", String.valueOf(peptide.getPostResidue()));
+        writer.writeAttribute("protein", proteins.get(0).getAccession());
+        writer.writeAttribute("num_tot_proteins", String.valueOf(numProteins));
+        double peptNeutralMass = 0;
+        if(fragmentMassType == MassType.AVG) {
+            peptNeutralMass = AminoAcidUtils.avgMassPeptide(peptide.getPeptideSequence());
+        }
+        else {
+            peptNeutralMass = AminoAcidUtils.monoMassPeptide(peptide.getPeptideSequence());
+        }
+        writer.writeAttribute("calc_neutral_pep_mass", String.valueOf(peptNeutralMass));
+        double massdiff = this.getNeutralPrecursorMass(scan.getPrecursorMz().doubleValue(), result.getCharge()) - peptNeutralMass;
+        writer.writeAttribute("massdiff", String.valueOf(massdiff));
+        newLine(writer);
+        
+        // write all the other proteins
+        writeAlternativeProteins(proteins, writer);
+        
+        // write modifications
+        writeModificationInfo(peptide, staticMods, writer);
+        
+        // write program specific scores
+        writeScores(result, writer);
+        
+        
+        writer.writeEndElement(); // search_hit
+        writer.writeEndElement(); // search_result
+        newLine(writer);
+    }
+
+    
+    private void writeModificationInfo(MsSearchResultPeptide peptide, List<MsResidueModification> staticMods, XMLStreamWriter writer) throws XMLStreamException {
+        
+        // get the dynamic mods
+        List<MsResultResidueMod> resultDynaMods = peptide.getResultDynamicResidueModifications();
+        
+        // get the static mods
+        Map<Integer, Double> resultStaticMods = new HashMap<Integer, Double>();
+        String seq = peptide.getPeptideSequence();
+        for(MsResidueModification mod: staticMods) {
+            char modifiedAA = mod.getModifiedResidue();
+            double mass = getModifiedAminoAcidMass(mod.getModificationMass().doubleValue(), modifiedAA);
+            int s = 0;
+            int idx = -1;
+            while((idx = seq.indexOf(modifiedAA, s)) != -1) {
+                resultStaticMods.put(idx, mass);
+                s = idx+1;
+            }
+        }
+        
+        // If there are no modifications don't write anything
+        if(resultDynaMods.size() == 0 && resultStaticMods.size() == 0)
+            return;
+        
+        writer.writeStartElement("modification_info");
+        //writer.writeAttribute("modified_peptide", peptide.getModifiedPeptide());
+        newLine(writer);
+        
+        for(MsResultResidueMod mod: resultDynaMods) {
+            writer.writeStartElement("mod_aminoacid_mass");
+            writer.writeAttribute("position", String.valueOf(mod.getModifiedPosition()+1));
+            double modMass = getModifiedAminoAcidMass(mod.getModificationMass().doubleValue(), seq.charAt(mod.getModifiedPosition()));
+            writer.writeAttribute("mass", String.valueOf(modMass));
+            writer.writeEndElement();
+            newLine(writer);
+        }
+        
+        for(Integer pos: resultStaticMods.keySet()) {
+            writer.writeStartElement("mod_aminoacid_mass");
+            writer.writeAttribute("position", String.valueOf(pos+1));
+            writer.writeAttribute("mass", String.valueOf(resultStaticMods.get(pos)));
+            writer.writeEndElement();
+            newLine(writer);
+        }
+        
+        writer.writeEndElement();
+        newLine(writer);
+    }
+    
+    private double getModifiedAminoAcidMass(double massDiff, char aa) {
+        double mass = massDiff;
+        if(fragmentMassType == MassType.AVG)
+            mass += AminoAcidUtils.avgMass(aa);
+        else
+            mass += AminoAcidUtils.monoMass(aa);
+        return Math.round(mass*1000000)/1000000.0;
+    }
+    
+    private void writeAlternativeProteins(List<MsSearchResultProtein> proteins,
+            XMLStreamWriter writer) throws XMLStreamException {
+        for(int i = 1; i < proteins.size(); i++) {
+            String[] accessionStrings = proteins.get(i).getAccession().split("\\cA");
+            for(String acc: accessionStrings) {
+                writer.writeStartElement("alternative_protein");
+                writer.writeAttribute("protein", acc);
+                //writer.writeAttribute("peptide_prev_aa", String.valueOf(peptide.getPreResidue()));
+                //writer.writeAttribute("peptide_next_aa", String.valueOf(peptide.getPostResidue()));
+                writer.writeEndElement();
+                newLine(writer);
+            }
+        }
+    }
+
+    private void startSpectrumQuery(List<T> resForScanCharge, MsScan scan,
+            XMLStreamWriter writer, String filename)
+            throws XMLStreamException {
+        
+        int scanNumber = scan.getStartScanNum();
+        int charge = resForScanCharge.get(0).getCharge();
+        BigDecimal mass = scan.getPrecursorMz();
+        //TODO Is this correct?
+        double neutralMass = getNeutralPrecursorMass(mass.doubleValue(), charge);
+        
+        BigDecimal rt = scan.getRetentionTime();
+        
+        writer.writeStartElement("spectrum_query");
+        String spectrum = filename+"."+scanNumber+"."+scanNumber+"."+charge;
+        writer.writeAttribute("spectrum", spectrum);
+        writer.writeAttribute("start_scan", String.valueOf(scanNumber));
+        writer.writeAttribute("end_scan", String.valueOf(scanNumber));
+        writer.writeAttribute("precursor_neutral_mass", String.valueOf(neutralMass)); 
+        writer.writeAttribute("assumed_charge", String.valueOf(charge));
+        if(rt != null)
+            writer.writeAttribute("retention_time_sec", rt.toString());
+        writer.writeAttribute("index", String.valueOf(this.spectrumQueryIndex));
+        spectrumQueryIndex++;
+        newLine(writer);
+    }
+    
+    // TODO Is this correct?
+    private double getNeutralPrecursorMass(double preMz, int charge) {
+        return (preMz - AminoAcidUtils.HYDROGEN)*charge;
+    }
+
     
     //-------------------------------------------------------------------------------------------
     // TO BE IMPLEMENTED BY SUBCLASSES
@@ -355,7 +535,14 @@ public abstract class PepXmlConverter {
     
     abstract String getMinNumTermini(int id);
     
-    abstract void wirteProgramSpecificParams(int id, XMLStreamWriter writer) throws XMLStreamException;
+    abstract void writeProgramSpecificParams(int id, XMLStreamWriter writer) throws XMLStreamException;
+    
+    abstract void sortResultsByRank(List<T> results);
+    
+    abstract int getResultRankInList(List<T> resultList, T result);
+    
+    abstract void writeScores(T result, XMLStreamWriter writer) throws XMLStreamException;
+    
     //-------------------------------------------------------------------------------------------
     //-------------------------------------------------------------------------------------------
     
