@@ -24,9 +24,7 @@ import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.domain.search.MsResidueModification;
-import org.yeastrc.ms.domain.search.MsRunSearch;
-import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 
@@ -73,7 +71,9 @@ public class SequestPepXmlConverter extends PepXmlConverter {
             String basefile = runSearchDao.loadFilenameForRunSearch(runSearch.getId());
             // write search summary; "search_summary" element
             writeSearchSummary(search, runSearch, writer, basefile);
-            //writeSearchResults(runSearch, writer, basefile);
+            // write the search results; "spectrum_query" elements.
+            writeSearchResults(runSearch, writer, basefile);
+            
             endMsmsRunSummary(writer);
             endMsmsPipelineAnalysis(writer);
         }
@@ -103,5 +103,29 @@ public class SequestPepXmlConverter extends PepXmlConverter {
     MassType getFragmentMassType(int searchId){
         return seqSearchDao.getFragmentMassType(searchId);
     }
-    
+
+    @Override
+    String getMaxNumInternalClevages(int searchId) {
+        return seqSearchDao.getSearchParamValue(searchId, "max_num_internal_cleavage_sites");
+    }
+
+    @Override
+    String getMinNumTermini(int searchId) {
+        return seqSearchDao.getSearchParamValue(searchId, "num_enzyme_termini");
+    }
+
+    @Override
+    void wirteProgramSpecificParams(int searchId, XMLStreamWriter writer) throws XMLStreamException {
+        SequestSearch search = seqSearchDao.loadSearch(searchId);
+        List<SequestParam> params = search.getSequestParams();
+        // TODO do we really need to write this out
+        for(SequestParam param: params) {
+            writer.writeStartElement("parameter");
+            writer.writeAttribute("name", param.getParamName());
+            writer.writeAttribute("value", param.getParamValue());
+            newLine(writer);
+            writer.writeEndElement();
+            newLine(writer);
+        }
+    }
 }

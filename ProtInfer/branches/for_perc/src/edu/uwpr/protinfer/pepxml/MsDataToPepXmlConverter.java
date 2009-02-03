@@ -189,23 +189,22 @@ public class MsDataToPepXmlConverter {
             SQTRunSearch runSearch, XMLStreamWriter writer, String basefile)
             throws XMLStreamException {
         // search summary
-        writer.writeStartElement("search_summary");
-        writer.writeAttribute("base_name", basefile);
-        writer.writeAttribute("search_engine", search.getSearchProgram().toString());
-        
-        writer.writeAttribute("precursor_mass_type", "monoisotopic");
-        writer.writeAttribute("fragment_mass_type", "average");
-        writer.writeAttribute("search_id", String.valueOf(runSearch.getId()));
-        newLine(writer);
+        startSearchSummary(search, runSearch, writer, basefile);
         
         // search database
-        writer.writeStartElement("search_database");
-        List<MsSearchDatabase> dbs = search.getSearchDatabases();
-        writer.writeAttribute("local_path", dbs.get(0).getDatabaseFileName());
-        writer.writeAttribute("type", "AA");
-        writer.writeEndElement();
-        newLine(writer);
+        writeSearchDatabase(search, writer);
         
+        if(search.getEnzymeList().size() > 0) {
+            MsEnzyme enzyme = search.getEnzymeList().get(0);
+            writer.writeStartElement("enzymatic_search_constraint");
+            writer.writeAttribute("enzyme", enzyme.getName());
+            String maxNumIntClv = getMaxNumInternalClevages(search.getId());
+            if(maxNumIntClv != null)
+                writer.writeAttribute("max_num_internal_cleavages", maxNumIntClv);
+            writer.writeEndElement();
+            newLine(writer);
+            
+        }
         // dynamic modifications
         //<aminoacid_modification aminoacid="M" massdiff="15.9990" mass="147.1916" variable="Y" symbol="*"/>
         List<MsResidueModification> dynamods = search.getDynamicResidueMods();
@@ -241,6 +240,38 @@ public class MsDataToPepXmlConverter {
             newLine(writer);
         }
         
+        endSearchSummary(writer);
+    }
+
+    private String getMaxNumInternalClevages(int id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private void writeSearchDatabase(SequestSearch search,
+            XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeStartElement("search_database");
+        List<MsSearchDatabase> dbs = search.getSearchDatabases();
+        writer.writeAttribute("local_path", dbs.get(0).getDatabaseFileName());
+        writer.writeAttribute("type", "AA");
+        writer.writeEndElement();
+        newLine(writer);
+    }
+
+    private void startSearchSummary(SequestSearch search,
+            SQTRunSearch runSearch, XMLStreamWriter writer, String basefile)
+            throws XMLStreamException {
+        writer.writeStartElement("search_summary");
+        writer.writeAttribute("base_name", basefile);
+        writer.writeAttribute("search_engine", search.getSearchProgram().toString());
+        
+        writer.writeAttribute("precursor_mass_type", "monoisotopic");
+        writer.writeAttribute("fragment_mass_type", "average");
+        writer.writeAttribute("search_id", String.valueOf(runSearch.getId()));
+        newLine(writer);
+    }
+    
+    private void endSearchSummary(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeEndElement();
         newLine(writer);
     }
