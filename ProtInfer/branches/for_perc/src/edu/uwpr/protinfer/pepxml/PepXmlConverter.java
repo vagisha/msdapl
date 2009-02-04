@@ -91,9 +91,12 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         writer.writeAttribute("date", getXMLDate(new Date()));
         writer.writeAttribute("summary_xml", outFilePath);
         
-        //writer.writeAttribute("xmlns", "http://regis-web.systemsbiology.net/pepXML");
-        //writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        //writer.writeAttribute("xsi:schemaLocation", "http://regis-web.systemsbiology.net/pepXML /net/pr/vol1/ProteomicsResource/bin/TPP/bin/20080417-TPP_v3.5.3/schema/pepXML_v110.xsd");
+//        xmlns="http://regis-web.systemsbiology.net/pepXML" 
+//        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+//        xsi:schemaLocation="http://regis-web.systemsbiology.net/pepXML /net/pr/vol1/ProteomicsResource/bin/TPP/bin/20080417-TPP_v3.5.3/schema/pepXML_v110.xsd"
+        writer.writeAttribute("xmlns", "http://regis-web.systemsbiology.net/pepXML");
+        writer.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        writer.writeAttribute("xsi:schemaLocation", "http://regis-web.systemsbiology.net/pepXML /net/pr/vol1/ProteomicsResource/bin/TPP/bin/20080417-TPP_v3.5.3/schema/pepXML_v110.xsd");
         newLine(writer);
     }
     
@@ -163,6 +166,12 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
                 writer.writeEndElement();
                 newLine(writer);
             }
+        }
+        else {
+            writer.writeStartElement("sample_enzyme");
+            writer.writeAttribute("name","NONE");
+            writer.writeEndElement();
+            newLine(writer);
         }
     }
     
@@ -314,6 +323,10 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         
         writer.writeAttribute("fragment_mass_type", pmt);
         writer.writeAttribute("search_id", String.valueOf(search.getId()));
+        
+        //out_data_type="out" out_data=".tgz"
+        writer.writeAttribute("out_data_type", "out");
+        writer.writeAttribute("out_data", ".tgz");
         newLine(writer);
     }
     
@@ -326,6 +339,11 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
     // spectrum_query
     //-------------------------------------------------------------------------------------------
     void writeResultsForScan(List<T> results, List<MsResidueModification> staticMods, String basefile, XMLStreamWriter writer) throws XMLStreamException {
+        
+        if(results.size() == 0) {
+            log.info("No search results found");
+            return;
+        }
         
         // sort results by charge
         Collections.sort(results, new Comparator<T>() {
@@ -392,13 +410,7 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         writer.writeAttribute("peptide_next_aa", String.valueOf(peptide.getPostResidue()));
         writer.writeAttribute("protein", proteins.get(0).getAccession());
         writer.writeAttribute("num_tot_proteins", String.valueOf(numProteins));
-        double peptNeutralMass = 0;
-        if(fragmentMassType == MassType.AVG) {
-            peptNeutralMass = AminoAcidUtils.avgMassPeptide(peptide.getPeptideSequence());
-        }
-        else {
-            peptNeutralMass = AminoAcidUtils.monoMassPeptide(peptide.getPeptideSequence());
-        }
+        double peptNeutralMass = calculatePeptideNeutralMass(peptide, staticMods);
         writer.writeAttribute("calc_neutral_pep_mass", String.valueOf(peptNeutralMass));
         double massdiff = this.getNeutralPrecursorMass(scan.getPrecursorMz().doubleValue(), result.getCharge()) - peptNeutralMass;
         writer.writeAttribute("massdiff", String.valueOf(massdiff));
@@ -417,6 +429,34 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         writer.writeEndElement(); // search_hit
         writer.writeEndElement(); // search_result
         newLine(writer);
+    }
+    
+    private double calculatePeptideNeutralMass(MsSearchResultPeptide peptide, List<MsResidueModification> staticMods) {
+        double peptNeutralMass = 0;
+        if(fragmentMassType == MassType.AVG) {
+            peptNeutralMass = AminoAcidUtils.avgMassPeptide(peptide.getPeptideSequence());
+        }
+        else {
+            peptNeutralMass = AminoAcidUtils.monoMassPeptide(peptide.getPeptideSequence());
+        }
+        // get the dynamic mods
+        List<MsResultResidueMod> resultDynaMods = peptide.getResultDynamicResidueModifications();
+        for(MsResultResidueMod mod: resultDynaMods) {
+            peptNeutralMass += mod.getModificationMass().doubleValue();
+        }
+        
+        // get the static mods
+        Map<Character, Double> staticModMap = new HashMap<Character, Double>();
+        for(MsResidueModification mod: staticMods) {
+            staticModMap.put(mod.getModifiedResidue(), mod.getModificationMass().doubleValue());
+        }
+        String seq = peptide.getPeptideSequence();
+        for(int i = 0; i < seq.length(); i++) {
+            if(staticModMap.containsKey(seq.charAt(i)))
+                peptNeutralMass += staticModMap.get(seq.charAt(i)).doubleValue();
+        }
+        peptNeutralMass += (AminoAcidUtils.HYDROGEN*2 + AminoAcidUtils.OXYGEN);
+        return Math.round(peptNeutralMass*1000000)/1000000.0;
     }
 
     

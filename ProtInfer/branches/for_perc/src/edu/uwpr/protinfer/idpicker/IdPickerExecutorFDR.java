@@ -76,9 +76,6 @@ public class IdPickerExecutorFDR {
         // rank spectrum matches (based on FDR)
         rankPeptideSpectrumMatches(proteins);
         
-        // Before saving the results replace the nrseq dbProteinId with the proteinId.
-        //IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(proteins);
-        
         // FINALLY save the results
         IdPickerResultSaver.instance().saveResults(idpRun, proteins);
     }

@@ -40,7 +40,7 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
     private static final SQTRunSearchDAO runSearchDao = daofactory.getSqtRunSearchDAO();
     private static final SequestSearchResultDAO resultDao = daofactory.getSequestResultDAO();
     
-    private static final Logger log = Logger.getLogger(MsDataToPepXmlConverter.class);
+    private static final Logger log = Logger.getLogger(SequestPepXmlConverter.class);
     
     
     public void convertSearch(int searchId, String outfile) {
@@ -250,5 +250,12 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
         writer.writeAttribute("value", String.valueOf(resData.getSpRank()));
         writer.writeEndElement();
         newLine(writer);
+    }
+    
+    public static void main(String[] args) {
+        int runSearchId = 7; // PARC_1_ip_01_itms.sqt
+        String outDir = "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375/pepxml";
+        SequestPepXmlConverter converter = new SequestPepXmlConverter();
+        converter.convertRunSearch(runSearchId, outDir);
     }
 }

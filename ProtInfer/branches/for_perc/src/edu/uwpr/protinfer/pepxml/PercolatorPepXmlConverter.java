@@ -47,7 +47,7 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
     private static final SequestSearchDAO seqSearchDao = daofactory.getSequestSearchDAO();
     private static final PercolatorResultDAO resultDao = daofactory.getPercolatorResultDAO();
     
-    private static final Logger log = Logger.getLogger(MsDataToPepXmlConverter.class);
+    private static final Logger log = Logger.getLogger(PercolatorPepXmlConverter.class);
     
     
     public void convertSearchAnalysis(int searchAnalysisId, String outfile) {

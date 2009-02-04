@@ -7,24 +7,25 @@
 package edu.uwpr.protinfer.idpicker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.PeptideKeyCalculator;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;
-import edu.uwpr.protinfer.infer.ProteinHit;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -43,7 +44,7 @@ public class SequestResultsGetter implements ResultsGetter {
     }
 
     @Override
-    public List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(int inputId, IDPickerParams params) {
+    public List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(IdPickerRun run, IDPickerParams params) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -58,7 +59,7 @@ public class SequestResultsGetter implements ResultsGetter {
         
         long start = System.currentTimeMillis();
         long s = start;
-        List<SequestSearchResult> resultList = resultDao.loadTopResultsForRunSearchN(inputId);
+        List<SequestSearchResult> resultList = resultDao.loadTopResultsForRunSearchN(inputId, true); // get modifications
         log.info("\tTotal top hits for "+inputId+": "+resultList.size());
         long e = System.currentTimeMillis();
         
@@ -76,38 +77,50 @@ public class SequestResultsGetter implements ResultsGetter {
         
         PeptideDefinition peptideDef = params.getPeptideDefinition();
         
+        // map of peptide_key and peptideHit
+        Map<String, PeptideHit> peptideHitMap = new HashMap<String, PeptideHit>();
+        
+        // map of protein accession and protein
+        Map<String, Protein> proteinMap = new HashMap<String, Protein>();
+        
         List<PeptideSpectrumMatchIDP> psmList = new ArrayList<PeptideSpectrumMatchIDP>(resultList.size());
+        
         for (SequestSearchResult result: resultList) {
             
             SequestResultData scores = result.getSequestResultData();
             
             // get the peptide
             String peptideKey = PeptideKeyCalculator.getKey(result, peptideDef);
-            Peptide peptide = new Peptide(result.getResultPeptide().getPeptideSequence(), peptideKey, -1);
-            PeptideHit peptHit = new PeptideHit(peptide);
+            
+            PeptideHit peptHit = peptideHitMap.get(peptideKey);
+            // If we haven't already seen this peptide, create a new entry
+            if(peptHit == null) {
+                Peptide peptide = new Peptide(result.getResultPeptide().getPeptideSequence(), peptideKey, -1);
+                peptHit = new PeptideHit(peptide);
+                peptideHitMap.put(peptideKey, peptHit);
+            }
             
             // read the matching proteins from the database now
             List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(result.getId());
            
             for (MsSearchResultProtein protein: msProteinList) {
                 
+                // we could have multiple accessions, keep the first one only
                 String[] accessionStrings = protein.getAccession().split("\\cA");
-
-                // keep the first one only
-                Protein prot = new Protein(accessionStrings[0], -1);
-                if(decoyPrefix != null) {
-                    if (prot.getAccession().startsWith(decoyPrefix))
-                        prot.setDecoy();
+            
+                Protein prot = proteinMap.get(accessionStrings[0]);
+                // If we have not already seen this protein create a new entry
+                if(prot == null) {
+                    prot = new Protein(accessionStrings[0], -1);
+                    if(decoyPrefix != null) {
+                        if (prot.getAccession().startsWith(decoyPrefix))
+                            prot.setDecoy();
+                    }
+                    proteinMap.put(accessionStrings[0], prot);
                 }
-                peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
-//                for(String accession: accessionStrings) {
-//                    Protein prot = new Protein(accession, -1);
-//                    if(decoyPrefix != null) {
-//                        if (prot.getAccession().startsWith(decoyPrefix))
-//                            prot.setDecoy();
-//                    }
-//                    peptHit.addProteinHit(new ProteinHit(prot, '\u0000', '\u0000'));
-//                }
+                
+                peptHit.addProtein(prot);
+
             }
             
             SpectrumMatchIDPImpl specMatch = new SpectrumMatchIDPImpl();
