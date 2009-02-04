@@ -1,5 +1,6 @@
 package org.yeastrc.ms.parser.prolucidParams;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -80,6 +81,11 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         return Program.PROLUCID;
     }
     
+    @Override
+    public String paramsFileName() {
+        return "search.xml";
+    }
+    
     public List<ProlucidParamIn> getParamList() {
         return this.parentParams;
     }
@@ -109,7 +115,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         dynamicTerminalModifications = new ArrayList<MsTerminalModificationIn>();
     }
     
-    public void parseParamsFile(String remoteServer, String filePath) throws DataProviderException {
+    public void parseParams(String remoteServer, String paramsFileDir) throws DataProviderException {
 
         init(remoteServer);
 
@@ -119,7 +125,7 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
         Document doc = null;
         try {
             b = f.newDocumentBuilder();
-            doc = b.parse(filePath);
+            doc = b.parse(paramsFileDir+File.separator+paramsFileName());
             parseDocument(doc);
         }
         catch (ParserConfigurationException e) {
@@ -676,8 +682,9 @@ public class ProlucidParamsParser implements SearchParamsDataProvider {
 
 
     public static void main(String[] args) throws DataProviderException {
-        String file = "resources/prolucid_search_format1.xml";
+//        String file = "resources/prolucid_search_format1.xml";
+        String dir = "resources/prolucid_params_format1";
         ProlucidParamsParser parser = new ProlucidParamsParser();
-        parser.parseParamsFile("remote.server", file);
+        parser.parseParams("remote.server", dir);
     }
 }

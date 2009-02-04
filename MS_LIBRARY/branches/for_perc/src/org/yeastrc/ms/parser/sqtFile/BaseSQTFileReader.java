@@ -1,63 +1,40 @@
 /**
- * SequestSQTFileReader.java
+ * BaseSQTFileReader.java
  * @author Vagisha Sharma
- * Aug 21, 2008
+ * Feb 2, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.parser.sqtFile.sequest;
+package org.yeastrc.ms.parser.sqtFile;
 
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
+import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.sqtFile.DbLocus;
-import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms.parser.sqtFile.SQTParseException;
-import org.yeastrc.ms.parser.sqtFile.SearchScan;
 
 /**
  * 
  */
-public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
+public class BaseSQTFileReader extends SQTFileReader<SQTSearchScanIn<MsSearchResultIn>> {
 
-    private boolean useEvalue = false;
-
-    public SequestSQTFileReader() {
-        super();
+    private final PeptideResultBuilder peptideResultBuilder;
+    
+    public BaseSQTFileReader(PeptideResultBuilder peptideResultBuilder) {
+        this.peptideResultBuilder = peptideResultBuilder;
     }
-
-    public void open(String filePath, boolean useEvalue) throws DataProviderException{
-        super.open(filePath);
-        this.useEvalue = useEvalue;
-    }
-
-    public void open(String fileName, Reader input, boolean useEvalue) throws DataProviderException  {
-        super.open(fileName, input);
-        this.useEvalue = useEvalue;
-    }
-
-    public void init() {
-        super.init();
-        useEvalue = false;
-    }
-    /**
-     * Returns the next scan in the file. 
-     * @return
-     * @throws DataProviderException if the scan or any of its associated results were invalid
-     */
+    
     @Override
-    public SequestSearchScan getNextSearchScan() throws DataProviderException {
-        SeqSearchScan scan = new SeqSearchScan(parseScan(currentLine));
+    public SQTSearchScanIn<MsSearchResultIn> getNextSearchScan() throws DataProviderException {
+        
+        BaseSearchScan scan = new BaseSearchScan(parseScan(currentLine));
         advanceLine();
 
         while(currentLine != null) {
             // is this one of the results for the scan ('M' line)
             if (isResultLine(currentLine)) {
-                SequestSearchResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
+                MsSearchResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
                 if (result != null) 
                     scan.addSearchResult(result);
             }
@@ -75,9 +52,9 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
      * @return
      * @throws DataProviderException 
      */
-    private SequestSearchResultIn parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
+    private MsSearchResultIn parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
 
-        SequestResult result = parsePeptideResult(currentLine, scanNumber, charge);
+        BaseSQTResult result = parsePeptideResult(currentLine, scanNumber, charge);
 
         advanceLine();
 
@@ -107,31 +84,14 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
      *                         there was an error parsing numbers in the line OR
      *                         there was an error parsing the peptide sequence in this 'M' line.
      */
-    SequestResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
+    BaseSQTResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
 
         String[] tokens = line.split("\\s+");
         if (tokens.length != 11) {
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-        SequestResult result = new SequestResult(getDynamicResidueMods());
-        try {
-            result.setxCorrRank(Integer.parseInt(tokens[1]));
-            result.setSpRank(Integer.parseInt(tokens[2]));
-            result.setMass(new BigDecimal(tokens[3]));
-            result.setDeltaCN(new BigDecimal(tokens[4]));
-            result.setXcorr(new BigDecimal(tokens[5]));
-            if (useEvalue)
-                result.setEvalue(Double.parseDouble(tokens[6]));
-            else
-                result.setSp(new BigDecimal(tokens[6]));
-            result.setNumMatchingIons(Integer.parseInt(tokens[7]));
-            result.setNumPredictedIons(Integer.parseInt(tokens[8]));
-        }
-        catch(NumberFormatException e) {
-            throw new DataProviderException(currentLineNum, "Invalid 'M' line. Error parsing number(s). "+e.getMessage(), line);
-        }
-
+        BaseSQTResult result = new BaseSQTResult(peptideResultBuilder, getDynamicResidueMods(), getDynamicTerminalMods());
         result.setOriginalPeptideSequence(tokens[9]);
         result.setValidationStatus(tokens[10].charAt(0));
         result.setCharge(charge);
@@ -146,20 +106,20 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
         }
         return result;
     }
-
-    private static final class SeqSearchScan implements SequestSearchScan {
+    
+    private static final class BaseSearchScan implements SQTSearchScanIn<MsSearchResultIn> {
 
         private SearchScan scan;
-        private List<SequestSearchResultIn> resultList;
+        private List<MsSearchResultIn> resultList;
 
-        public SeqSearchScan(SearchScan scan) {
+        public BaseSearchScan(SearchScan scan) {
             this.scan = scan;
-            resultList = new ArrayList<SequestSearchResultIn>();
+            resultList = new ArrayList<MsSearchResultIn>();
         }
-        public void addSearchResult(SequestSearchResultIn result) {
+        public void addSearchResult(MsSearchResultIn result) {
             resultList.add(result);
         }
-        public List<SequestSearchResultIn> getScanResults() {
+        public List<MsSearchResultIn> getScanResults() {
             return resultList;
         }
         public int getScanNumber() {
@@ -188,4 +148,3 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
         }
     }
 }
-

@@ -15,8 +15,8 @@ import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
 
 
-public abstract class SQTFileReader extends AbstractReader 
-    implements SQTSearchDataProvider  {
+public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends AbstractReader 
+    implements SQTSearchDataProvider<T>  {
 
     private List<? extends MsResidueModificationIn> searchDynamicResidueMods;
     private List<? extends MsTerminalModificationIn> searchDynamicTerminalMods;

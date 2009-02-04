@@ -271,7 +271,7 @@ public class PercolatorSQTDataUploadService {
     private int saveTopLevelAnalysis(int searchId, String remoteDirectory) throws UploadException {
         MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
         SearchAnalysisBean analysis = new SearchAnalysisBean();
-        analysis.setSearchId(searchId);
+//        analysis.setSearchId(searchId);
         analysis.setAnalysisProgram(Program.PERCOLATOR);
         try {
             return analysisDao.save(analysis);

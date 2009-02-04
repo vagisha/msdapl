@@ -337,12 +337,10 @@ ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScore);
 #####################################################################
 CREATE TABLE msSearchAnalysis (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-		searchID INT UNSIGNED NOT NULL,
 	   	programName VARCHAR(255) NOT NULL,
 	   	programVersion VARCHAR(20),
 	   	uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE msSearchAnalysis ADD INDEX(searchID);
 
 CREATE TABLE msRunSearchAnalysis (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -718,7 +716,6 @@ CREATE TRIGGER msSearch_bdelete BEFORE DELETE ON msSearch
    DELETE FROM msSearchTerminalStaticMod WHERE searchID = OLD.id;
    DELETE FROM msSearchDynamicMod WHERE searchID = OLD.id;
    DELETE FROM msSearchTerminalDynamicMod WHERE searchID = OLD.id;
-   DELETE FROM msSearchAnalysis WHERE searchID = OLD.id;
  END;
 |
 DELIMITER ;

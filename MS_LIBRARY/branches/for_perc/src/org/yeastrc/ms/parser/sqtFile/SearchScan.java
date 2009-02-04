@@ -1,17 +1,11 @@
 package org.yeastrc.ms.parser.sqtFile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
 
 /**
  * Represents a 'S' line in the SQT file
  */
-public class SearchScan implements SQTSearchScanIn {
+public class SearchScan {
 
     private int startScan;
     private int endScan;
@@ -23,11 +17,8 @@ public class SearchScan implements SQTSearchScanIn {
     private BigDecimal lowestSp; // Lowest Sp value for top 500 spectra
     private int numMatching; // Number of sequences matching this precursor ion
     
-    private List<SequestSearchResultIn> resultList;
     
-    public SearchScan() {
-        resultList = new ArrayList<SequestSearchResultIn>();
-    }
+    public SearchScan() {}
     
     /**
      * @return the startScan
@@ -159,9 +150,9 @@ public class SearchScan implements SQTSearchScanIn {
         this.numMatching = numMatching;
     }
 
-    public void addPeptideResult(SequestResult result) {
-        resultList.add(result);
-    }
+//    public void addPeptideResult(SequestResult result) {
+//        resultList.add(result);
+//    }
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
@@ -186,11 +177,6 @@ public class SearchScan implements SQTSearchScanIn {
         
         buf.append("\n");
         
-        for (SequestSearchResultIn res: resultList) {
-            buf.append(res.toString());
-            buf.append("\n");
-        }
-        
         buf.deleteCharAt(buf.length() -1);
         return buf.toString();        
         
@@ -203,8 +189,5 @@ public class SearchScan implements SQTSearchScanIn {
     public String getServerName() {
         return getServer();
     }
-
-    public List<SequestSearchResultIn> getScanResults() {
-        return this.resultList;
-    }
+    
 }

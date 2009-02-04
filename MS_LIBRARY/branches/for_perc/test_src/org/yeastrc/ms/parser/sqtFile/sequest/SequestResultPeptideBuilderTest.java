@@ -198,7 +198,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         String seq = "I.QKLRNY*FEAFEM#PG.S";
         MsSearchResultPeptide resultPeptide = null;
         try {
-            resultPeptide = builder.build(seq, dynaMods);
+            resultPeptide = builder.build(seq, dynaMods, null);
         }
         catch (SQTParseException e) {
             fail("Valid peptide sequence");
@@ -240,7 +240,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
             fail("Valid sequence for removeDots method");
         }
         
-        try{builder.build(seq, dynaMods); fail("Invalid sequence");}
+        try{builder.build(seq, dynaMods, null); fail("Invalid sequence");}
         catch(SQTParseException e) {assertEquals("No matching modification found: I|; sequence: "+dotLess, e.getMessage());}
     }
     
@@ -256,7 +256,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
             fail("Valid sequence for removeDots method");
         }
         
-        try{builder.build(seq, dynaMods); fail("Invalid sequence");}
+        try{builder.build(seq, dynaMods, null); fail("Invalid sequence");}
         catch(SQTParseException e) {assertEquals("No matching modification found: Gi; sequence: "+dotLess, e.getMessage());}
     }
     
@@ -264,7 +264,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         List<Mod> dynaMods = new ArrayList<Mod>(4);
         dynaMods.add(new Mod('S', '*', "80.0"));
         String seq = "A.*SCDS*.Z";
-        try {builder.build(seq, dynaMods);fail("Invalid sequence");}
+        try {builder.build(seq, dynaMods, null);fail("Invalid sequence");}
         catch(SQTParseException e){
             String errMsg = "No matching modification found: \u0000*; sequence: *SCDS*";
             assertEquals(errMsg.length(), e.getMessage().length());
@@ -283,7 +283,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         List<MsResidueModificationIn> resMods = new ArrayList<MsResidueModificationIn>(0);
         String seq = "I.QKLpRSFEAFSMPG.S";
         try {
-            builder.build(seq, resMods);
+            builder.build(seq, resMods, null);
             fail("Invalid character 'p' n sequence");
         }
         catch (SQTParseException e) {
@@ -300,7 +300,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         String seq = "I.QKLRS*FEAFS#MPGT*.S";
         MsSearchResultPeptide resultPeptide = null;
         try {
-            resultPeptide = builder.build(seq, dynaMods);
+            resultPeptide = builder.build(seq, dynaMods, null);
         }
         catch (SQTParseException e) {
             fail("Valid peptide sequence");
@@ -345,7 +345,7 @@ public class SequestResultPeptideBuilderTest extends TestCase {
         String seq = "I.QKLRS*#FEAFS#MPG.S";
         MsSearchResultPeptide resultPeptide = null;
         try {
-            resultPeptide = builder.build(seq, dynaMods);
+            resultPeptide = builder.build(seq, dynaMods, null);
         }
         catch (SQTParseException e) {
             fail("Valid peptide sequence");

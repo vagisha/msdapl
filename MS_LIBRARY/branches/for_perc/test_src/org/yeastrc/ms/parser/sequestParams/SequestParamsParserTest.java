@@ -225,9 +225,9 @@ public class SequestParamsParserTest extends TestCase {
     }
 
     public void testParseParamsFile() {
-        String file = "resources/sequest.params";
+        String paramsDir = "resources";
         try {
-            parser.parseParamsFile("remote.server", file);
+            parser.parseParams("remote.server", paramsDir);
             // database
             MsSearchDatabaseIn db = parser.getSearchDatabase();
             assertNotNull(db);

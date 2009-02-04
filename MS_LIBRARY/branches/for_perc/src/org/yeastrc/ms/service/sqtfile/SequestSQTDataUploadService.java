@@ -44,9 +44,6 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 public final class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
 
     
-    private static final String SEQUEST_PARAMS_FILE = "sequest.params";
-    
-    
     // these are the things we will cache and do bulk-inserts
     List<SequestResultDataWId> sequestResultDataList; // sequest scores
     
@@ -112,21 +109,20 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     
     private SequestParamsParser parseSequestParams(String fileDirectory, final String remoteServer) throws UploadException {
         
-        log.info("BEGIN Sequest search UPLOAD -- parsing sequest.params");
-        String paramFile = fileDirectory+File.separator+SEQUEST_PARAMS_FILE;
-        if (!(new File(paramFile).exists())) {
+        // parse the parameters file
+        final SequestParamsParser parser = new SequestParamsParser();
+        log.info("BEGIN Sequest search UPLOAD -- parsing parameters file: "+parser.paramsFileName());
+        if (!(new File(fileDirectory+File.separator+parser.paramsFileName()).exists())) {
             UploadException ex = new UploadException(ERROR_CODE.MISSING_SEQUEST_PARAMS);
             throw ex;
         }
-        // parse the parameters file
-        final SequestParamsParser parser = new SequestParamsParser();
         try {
-            parser.parseParamsFile(remoteServer, paramFile);
+            parser.parseParams(remoteServer, fileDirectory);
             return parser;
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PARAM_PARSING_ERROR);
-            ex.setFile(paramFile);
+            ex.setFile(fileDirectory+File.separator+parser.paramsFileName());
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
@@ -225,7 +221,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                 
     }
 
-    private SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteDirectory, final Date searchDate) {
+    static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteDirectory, final Date searchDate) {
         return new SequestSearchIn() {
             @Override
             public List<SequestParam> getSequestParams() {return parser.getParamList();}

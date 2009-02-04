@@ -1,6 +1,7 @@
 package org.yeastrc.ms.dao.search.sqtfile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
@@ -105,6 +106,11 @@ public class SQTSearchScanDAOImplTest extends SQTBaseDAOTestCase {
             @Override
             public BigDecimal getObservedMass() {
                 return new BigDecimal("1124.08");
+            }
+
+            @Override
+            public List getScanResults() {
+                throw new UnsupportedOperationException();
             }};
             return scan;
     }

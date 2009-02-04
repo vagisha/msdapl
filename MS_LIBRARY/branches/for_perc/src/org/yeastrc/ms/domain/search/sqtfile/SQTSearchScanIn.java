@@ -1,11 +1,15 @@
 package org.yeastrc.ms.domain.search.sqtfile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-public interface SQTSearchScanIn extends SQTSearchScanBase {
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
+
+public interface SQTSearchScanIn <T extends MsSearchResultIn> extends SQTSearchScanBase {
 
     public abstract int getScanNumber();
 
+    public abstract List<T> getScanResults();
 }
 
 interface SQTSearchScanBase {

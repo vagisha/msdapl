@@ -8,29 +8,13 @@ package org.yeastrc.ms.domain.analysis.percolator;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 
 /**
  * 
  */
-public interface PercolatorResultIn {
+public interface PercolatorResultIn extends MsSearchResultIn {
 
-    /**
-     * @return the scan number for this result
-     */
-    public abstract int getScanNumber();
-    
-    /**
-     * @return the charge
-     */
-    public abstract int getCharge();
-    
-    /**
-     * The peptide
-     * @return
-     */
-    public abstract MsSearchResultPeptide getResultPeptide();
-    
     /**
      * @return the qvalue
      */

@@ -22,12 +22,13 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.impl.ResultTerminalModBean;
+import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
  * 
  */
-public final class ProlucidResultPeptideBuilder {
+public final class ProlucidResultPeptideBuilder implements PeptideResultBuilder {
 
     public static final ProlucidResultPeptideBuilder instance = new ProlucidResultPeptideBuilder();
     
@@ -45,8 +46,8 @@ public final class ProlucidResultPeptideBuilder {
     }
 
     public MsSearchResultPeptide build(String resultSequence, 
-            List<MsResidueModificationIn> dynaResidueMods,
-            List<MsTerminalModificationIn> dynaTerminalMods) 
+            List<? extends MsResidueModificationIn> dynaResidueMods,
+            List<? extends MsTerminalModificationIn> dynaTerminalMods) 
     throws SQTParseException {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new SQTParseException("sequence cannot be null or empty");
@@ -98,8 +99,8 @@ public final class ProlucidResultPeptideBuilder {
      * @throws SQTParseException
      */
     List<MsResultTerminalMod> getResultTerminalMods(String peptide, 
-            List<MsTerminalModificationIn> dynaTermMods,
-            List<MsResidueModificationIn> dynaResMods) throws SQTParseException {
+            List<? extends MsTerminalModificationIn> dynaTermMods,
+            List<? extends MsResidueModificationIn> dynaResMods) throws SQTParseException {
 
         if (dynaResMods == null)
             dynaResMods = new ArrayList<MsResidueModificationIn>(0);

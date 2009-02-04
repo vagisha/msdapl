@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 
-public interface PercolatorSearchScan extends SQTSearchScanIn {
+public interface PercolatorSearchScan extends SQTSearchScanIn<PercolatorResultIn> {
     
     public abstract List<PercolatorResultIn> getScanResults();
 }

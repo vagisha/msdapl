@@ -3,6 +3,7 @@ package org.yeastrc.ms.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,13 +16,21 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.parser.SearchParamsDataProvider;
+import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
+import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
+import org.yeastrc.ms.service.sqtfile.BaseSQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
 
@@ -290,7 +299,8 @@ public class MsDataUploader {
             // For now we support only sequest, ee-normalized sequest and ProLuCID sqt files. 
             if (SearchFileFormat.SQT_SEQ != myType && 
                     SearchFileFormat.SQT_NSEQ != myType &&
-                    SearchFileFormat.SQT_PLUCID != myType) {
+                    SearchFileFormat.SQT_PLUCID != myType &&
+                    SearchFileFormat.SQT_PERC != myType) {
                 UploadException ex = new UploadException(ERROR_CODE.UNSUPPORTED_SQT);
                 ex.setFile(sqtFile);
                 throw ex;
@@ -419,6 +429,9 @@ public class MsDataUploader {
         else if (sqtType == SearchFileFormat.SQT_PLUCID) {
             return uploadProlucidSearch(filenames, runIdMap, searchDate);
         }
+        else if(sqtType == SearchFileFormat.SQT_PERC) {
+            return uploadPercolatorSearch(filenames, runIdMap, searchDate);
+        }
         else {
             log.error("Unknow SQT type");
             return 0;
@@ -452,6 +465,46 @@ public class MsDataUploader {
         this.uploadExceptionList.addAll(service.getUploadExceptionList());
         this.numSearchesToUpload = service.getNumSearchesToUpload();
         this.numSearchesUploaded = service.getNumSearchesUploaded();
+        return searchId;
+    }
+    
+    // upload percolator sqt files
+    private int uploadPercolatorSearch(Set<String> filenames, Map<String, Integer> runIdMap, final Date searchDate) {
+        
+        // first upload the sqt files to populate the core search tables
+        SearchParamsDataProvider paramsProvider = new SequestParamsParser();
+        PeptideResultBuilder peptbuilder = SequestResultPeptideBuilder.instance();
+        
+        BaseSQTDataUploadService service = new BaseSQTDataUploadService(paramsProvider, peptbuilder, Program.PERCOLATOR);
+        if(isMacCossData) 
+            service.doScanChargeMassCheck(true);
+        
+        int searchId = service.uploadSearch(uploadedExptId, uploadDirectory, filenames, runIdMap, 
+                        remoteServer, remoteDirectory, new java.sql.Date(searchDate.getTime()));
+        
+        this.uploadExceptionList.addAll(service.getUploadExceptionList());
+        this.numSearchesToUpload = service.getNumSearchesToUpload();
+        this.numSearchesUploaded = service.getNumSearchesUploaded();
+        
+        // if the search information could not be uploaded don't go any further
+        if(uploadExceptionList.size() > 0) {
+            return searchId;
+        }
+        
+        // now upload the Percolator search results
+        PercolatorSQTDataUploadService percService = new PercolatorSQTDataUploadService();
+        MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
+        List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
+        Map<String, Integer> runSearchIdMap = new HashMap<String, Integer>(runSearchIds.size());
+        for(Integer id: runSearchIds) {
+            String filename = runSearchDao.loadFilenameForRunSearch(id);
+            runSearchIdMap.put(filename, id);
+        }
+        percService.uploadPostSearchAnalysis(searchId, Program.SEQUEST, uploadDirectory, filenames, 
+                runSearchIdMap, remoteDirectory);
+        
+        this.uploadExceptionList.addAll(service.getUploadExceptionList());
+        
         return searchId;
     }
     
@@ -532,7 +585,7 @@ public class MsDataUploader {
 
 //        for(int i = 0; i < 10; i++) {
         MsDataUploader uploader = new MsDataUploader();
-        uploader.setIsMaccossData(true);
+        //uploader.setIsMaccossData(true);
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
 //        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", new Date());
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
@@ -544,8 +597,14 @@ public class MsDataUploader {
                 //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3136_exptID90/phos",
                 //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp/speed_test", 
                 //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp/speed_test",
-                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
-                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
+                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
+                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
+                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/UPLOAD_TEST",
+                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/UPLOAD_TEST",
+                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3417",
+                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3417",
+                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
+                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
                 new Date());
 //        }
         long end = System.currentTimeMillis();

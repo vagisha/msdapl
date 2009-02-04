@@ -105,7 +105,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
         if (resultPeptide != null)
             return resultPeptide;
         
-        resultPeptide = SequestResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods);
+        resultPeptide = SequestResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods, null);
         return resultPeptide;
     }
     

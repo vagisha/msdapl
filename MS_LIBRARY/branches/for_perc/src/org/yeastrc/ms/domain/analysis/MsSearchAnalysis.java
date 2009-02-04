@@ -24,7 +24,7 @@ public interface MsSearchAnalysis {
      * database id of the search on which Percolator was run.
      * @return
      */
-    public abstract int getSearchId();
+//    public abstract int getSearchId();
     
     /**
      * @return the date this search was uploaded

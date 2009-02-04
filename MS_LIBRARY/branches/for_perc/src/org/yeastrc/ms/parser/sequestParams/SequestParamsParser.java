@@ -7,6 +7,7 @@
 package org.yeastrc.ms.parser.sequestParams;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -95,6 +96,10 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return Program.SEQUEST;
     }
     
+    public String paramsFileName() {
+        return "sequest.params";
+    }
+    
     public boolean reportEvalue() {
         return reportEvalue;
     }
@@ -124,13 +129,13 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         dynamicResidueModifications.clear();
     }
     
-    public void parseParamsFile(String remoteServer, String filePath) throws DataProviderException {
+    public void parseParams(String remoteServer, String paramsFileDir) throws DataProviderException {
         
         init(remoteServer);
         
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(filePath));
+            reader = new BufferedReader(new FileReader(paramsFileDir+File.separator+paramsFileName()));
             while ((currentLine = reader.readLine())!= null) {
                 currentLineNum++;
                 currentLine = currentLine.trim();
@@ -153,10 +158,10 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             }
         }
         catch (FileNotFoundException e) {
-            throw new DataProviderException("Cannot find file: "+filePath, e);
+            throw new DataProviderException("Cannot find file: "+paramsFileDir, e);
         }
         catch (IOException e) {
-            throw new DataProviderException("Error reading file: "+filePath, e);
+            throw new DataProviderException("Error reading file: "+paramsFileDir, e);
         }
         finally{
             if (reader != null) try {
@@ -167,7 +172,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
             }
         }
         if (database == null || enzyme == null)
-            throw new DataProviderException("No database and/or enzyme information found in file: "+filePath);
+            throw new DataProviderException("No database and/or enzyme information found in file: "+paramsFileDir);
     }
 
     void parseEnzymes(BufferedReader reader) throws IOException {
@@ -333,8 +338,9 @@ public class SequestParamsParser implements SearchParamsDataProvider {
      * @throws DataProviderException 
      */
     public static void main(String[] args) throws DataProviderException {
-        String paramFile = "resources/sequest.params";
+        //String paramFile = "resources/sequest.params";
+        String paramsDir = "resources";
         SequestParamsParser parser = new SequestParamsParser();
-        parser.parseParamsFile("remote.server", paramFile);
+        parser.parseParams("remote.server", paramsDir);
     }
 }

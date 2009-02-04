@@ -12,7 +12,7 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 /**
  * 
  */
-public interface SQTSearchDataProvider {
+public interface SQTSearchDataProvider <T extends SQTSearchScanIn<?>> {
 
     public abstract String getFileName();
     
@@ -20,7 +20,7 @@ public interface SQTSearchDataProvider {
     
     public abstract boolean hasNextSearchScan();
     
-    public abstract SQTSearchScanIn getNextSearchScan() throws DataProviderException;
+    public abstract T getNextSearchScan() throws DataProviderException;
     
     public abstract void close();
 }

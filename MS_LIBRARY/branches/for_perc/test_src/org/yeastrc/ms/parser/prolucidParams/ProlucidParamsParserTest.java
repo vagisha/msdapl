@@ -13,12 +13,11 @@ import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.prolucidParams.ProlucidParamsParser.Score;
 
 public class ProlucidParamsParserTest extends TestCase {
 
-    private String format1file = "resources/prolucid_search_format1.xml";
-    private String format2file = "resources/prolucid_search_format2.xml";
+    private String format1dir = "resources/prolucid_params_format1/";
+    private String format2dir = "resources/prolucid_params_format2/";
 
     private ProlucidParamsParser parser;
 
@@ -34,7 +33,7 @@ public class ProlucidParamsParserTest extends TestCase {
     public void testGetSearchDatabase() {
         // format 1
         try {
-            parser.parseParamsFile("remote.server", format1file);
+            parser.parseParams("remote.server", format1dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -47,7 +46,7 @@ public class ProlucidParamsParserTest extends TestCase {
 
         // format 2
         try {
-            parser.parseParamsFile("remote.server", format2file);
+            parser.parseParams("remote.server", format2dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -62,7 +61,7 @@ public class ProlucidParamsParserTest extends TestCase {
     public void testGetSearchEnzyme() {
         // format 1
         try {
-            parser.parseParamsFile("remote.server", format1file);
+            parser.parseParams("remote.server", format1dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -78,7 +77,7 @@ public class ProlucidParamsParserTest extends TestCase {
 
         // format 2
         try {
-            parser.parseParamsFile("remote.server", format2file);
+            parser.parseParams("remote.server", format2dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -96,7 +95,7 @@ public class ProlucidParamsParserTest extends TestCase {
     public void testGetDynamicResidueMods() {
         // format 1
         try {
-            parser.parseParamsFile("remote.server", format1file);
+            parser.parseParams("remote.server", format1dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -119,7 +118,7 @@ public class ProlucidParamsParserTest extends TestCase {
         
         // format 2
         try {
-            parser.parseParamsFile("remote.server", format2file);
+            parser.parseParams("remote.server", format2dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -153,7 +152,7 @@ public class ProlucidParamsParserTest extends TestCase {
     public void testGetStaticResidueMods() {
         // format 1
         try {
-            parser.parseParamsFile("remote.server", format1file);
+            parser.parseParams("remote.server", format1dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -169,7 +168,7 @@ public class ProlucidParamsParserTest extends TestCase {
         
         // format 2
         try {
-            parser.parseParamsFile("remote.server", format2file);
+            parser.parseParams("remote.server", format2dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -183,7 +182,7 @@ public class ProlucidParamsParserTest extends TestCase {
     public void testGetStaticTerminalMods() {
         // format 1
         try {
-            parser.parseParamsFile("remote.server", format1file);
+            parser.parseParams("remote.server", format1dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -204,7 +203,7 @@ public class ProlucidParamsParserTest extends TestCase {
         
         // format 2
         try {
-            parser.parseParamsFile("remote.server", format2file);
+            parser.parseParams("remote.server", format2dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -226,7 +225,7 @@ public class ProlucidParamsParserTest extends TestCase {
     public void testGetDynamicTerminalMods() {
         // format 1
         try {
-            parser.parseParamsFile("remote.server", format1file);
+            parser.parseParams("remote.server", format1dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();
@@ -246,7 +245,7 @@ public class ProlucidParamsParserTest extends TestCase {
         
         // format 2
         try {
-            parser.parseParamsFile("remote.server", format2file);
+            parser.parseParams("remote.server", format2dir);
         }
         catch (DataProviderException e) {
             e.printStackTrace();

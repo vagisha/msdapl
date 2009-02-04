@@ -8,7 +8,7 @@ import org.yeastrc.ms.domain.search.Program;
 public class SearchAnalysisBean implements MsSearchAnalysis {
 
     private int id;
-    private int searchId;
+//    private int searchId;
     private Date uploadDate;
     private Program analysisProgram;
     private String analysisProgramVersion;
@@ -26,13 +26,13 @@ public class SearchAnalysisBean implements MsSearchAnalysis {
         this.id = id;
     }
     
-    public int getSearchId() {
-        return this.searchId;
-    }
-    
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
-    }
+//    public int getSearchId() {
+//        return this.searchId;
+//    }
+//    
+//    public void setSearchId(int searchId) {
+//        this.searchId = searchId;
+//    }
     
     public Program getAnalysisProgram() {
         return analysisProgram;

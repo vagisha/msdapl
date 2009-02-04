@@ -15,14 +15,16 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
+import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 
 /**
  * 
  */
-public final class SequestResultPeptideBuilder {
+public final class SequestResultPeptideBuilder implements PeptideResultBuilder {
 
     public static final SequestResultPeptideBuilder instance = new SequestResultPeptideBuilder();
 
@@ -33,7 +35,9 @@ public final class SequestResultPeptideBuilder {
     }
 
     public MsSearchResultPeptide build(String resultSequence, 
-                List<? extends MsResidueModificationIn> dynaResidueMods) 
+            List<? extends MsResidueModificationIn> dynaResidueMods,
+            List<? extends MsTerminalModificationIn> dynaTerminalMods)
+    
     throws SQTParseException {
         if (resultSequence == null || resultSequence.length() == 0)
             throw new SQTParseException("sequence cannot be null or empty");

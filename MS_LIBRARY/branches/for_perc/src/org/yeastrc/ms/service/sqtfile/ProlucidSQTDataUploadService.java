@@ -38,8 +38,6 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
  */
 public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadService {
 
-private static final String PROLUCID_PARAMS_FILE = "search.xml";
-    
     List<ProlucidResultDataWId> prolucidResultDataList; // cached prolucid search result data
     
     private MsSearchDatabaseIn db = null;
@@ -104,21 +102,20 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     
     private ProlucidParamsParser parseProlucidParams(String fileDirectory, final String remoteServer) throws UploadException {
         
-        log.info("BEGIN ProLuCID search upload -- parsing search.xml");
-        String paramFile = fileDirectory+File.separator+PROLUCID_PARAMS_FILE;
-        if (!(new File(paramFile).exists())) {
+        // parse the parameters file
+        final ProlucidParamsParser parser = new ProlucidParamsParser();
+        log.info("BEGIN ProLuCID search upload -- parsing parameters file: "+parser.paramsFileName());
+        if (!(new File(fileDirectory+File.separator+parser.paramsFileName()).exists())) {
             UploadException ex = new UploadException(ERROR_CODE.MISSING_PROLUCID_PARAMS);
             throw ex;
         }
-        // parse the parameters file
-        final ProlucidParamsParser parser = new ProlucidParamsParser();
         try {
-            parser.parseParamsFile(remoteServer, paramFile);
+            parser.parseParams(remoteServer, fileDirectory);
             return parser;
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PARAM_PARSING_ERROR);
-            ex.setFile(paramFile);
+            ex.setFile(fileDirectory+File.separator+parser.paramsFileName());
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
@@ -215,7 +212,7 @@ private static final String PROLUCID_PARAMS_FILE = "search.xml";
     }
 
     
-    private ProlucidSearchIn makeSearchObject(final ProlucidParamsParser parser, 
+    static ProlucidSearchIn makeSearchObject(final ProlucidParamsParser parser, 
                     final String remoteDirectory, final Date searchDate) {
         return new ProlucidSearchIn() {
             @Override

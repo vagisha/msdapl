@@ -140,7 +140,7 @@ public class DbToSqtFileConverter {
             for (MsSearchResultProtein pr: proteins) {
                 peptResult.addMatchingLocus(pr.getAccession(), null);
             }
-            currScan.addPeptideResult(peptResult);
+            //currScan.addPeptideResult(peptResult);
         }
         // print the last one
         if (currScan != null) {

@@ -138,7 +138,7 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
             throw new SQTParseException("Cannot parse peptide string without know the name of the search program that created it", SQTParseException.FATAL);
         
         if(searchProgram == Program.SEQUEST || searchProgram == Program.EE_NORM_SEQUEST)
-            resultPeptide = SequestResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods);
+            resultPeptide = SequestResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods, null);
         
         else if (searchProgram == Program.PROLUCID)
             resultPeptide = ProlucidResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods, searchDynaTermMods);

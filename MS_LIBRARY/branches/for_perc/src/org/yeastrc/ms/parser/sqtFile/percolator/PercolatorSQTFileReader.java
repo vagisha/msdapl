@@ -17,17 +17,17 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultIn;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorSearchScan;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
-import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
+import org.yeastrc.ms.parser.sqtFile.SearchScan;
 
 /**
  * 
  */
-public class PercolatorSQTFileReader extends SQTFileReader {
+public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan> {
 
     private float percolatorVersion;
     private Program searchProgram;
@@ -86,7 +86,7 @@ public class PercolatorSQTFileReader extends SQTFileReader {
      * @throws DataProviderException if the scan or any of its associated results were invalid
      */
     @Override
-    public PercSearchScan getNextSearchScan() throws DataProviderException {
+    public PercolatorSearchScan getNextSearchScan() throws DataProviderException {
         PercSearchScan scan = new PercSearchScan(parseScan(currentLine));
         advanceLine();
 
@@ -212,10 +212,10 @@ public class PercolatorSQTFileReader extends SQTFileReader {
 
     private static final class PercSearchScan implements PercolatorSearchScan {
 
-        private SQTSearchScanIn scan;
+        private SearchScan scan;
         private List<PercolatorResultIn> resultList;
 
-        public PercSearchScan(SQTSearchScanIn scan) {
+        public PercSearchScan(SearchScan scan) {
             this.scan = scan;
             resultList = new ArrayList<PercolatorResultIn>();
         }
@@ -270,7 +270,7 @@ public class PercolatorSQTFileReader extends SQTFileReader {
         SQTHeader header = reader.getSearchHeader();
         System.out.println(header.toString());
         while(reader.hasNextSearchScan()) {
-            PercSearchScan scan = reader.getNextSearchScan();
+            PercolatorSearchScan scan = reader.getNextSearchScan();
             System.out.println(scan);
         }
     }

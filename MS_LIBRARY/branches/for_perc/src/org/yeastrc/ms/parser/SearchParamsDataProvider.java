@@ -33,4 +33,7 @@ public interface SearchParamsDataProvider {
     
     public abstract Program getSearchProgram();
     
+    public abstract void parseParams(String remoteServer, String paramFileDir) throws DataProviderException;
+    
+    public abstract String paramsFileName(); 
 }
