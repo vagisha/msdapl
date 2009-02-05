@@ -1,5 +1,7 @@
 package edu.uwpr.protinfer.database.dto.idpicker;
 
+import java.text.DecimalFormat;
+
 import edu.uwpr.protinfer.database.dto.GenericProteinferProtein;
 
 public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> extends GenericProteinferProtein<T>{
@@ -15,6 +17,11 @@ public class GenericIdPickerProtein <T extends GenericIdPickerPeptide<?,?>> exte
     }
     public void setNsaf(double nsaf) {
         this.nsaf = nsaf;
+    }
+    public String getNsafFormatted() {
+        String format = "0.000000";
+        DecimalFormat df = new DecimalFormat(format);
+        return df.format(nsaf);
     }
     
     public int getClusterId() {

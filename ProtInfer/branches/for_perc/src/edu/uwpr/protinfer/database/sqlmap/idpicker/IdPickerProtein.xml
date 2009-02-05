@@ -199,6 +199,17 @@
     		ORDER BY coverage ASC
     	</isPropertyAvailable>
     </select>
+    
+    <select id="filterByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein 
+    	WHERE piRunID=#pinferId#
+    	<isPropertyAvailable property="validationStatus">
+    		AND userValidation IN $validationStatus$
+    	</isPropertyAvailable>
+    	<isPropertyAvailable property="sort">
+    		ORDER BY userValidation ASC
+    	</isPropertyAvailable>
+    </select>
 
     <select id="filterBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id, count(*) AS cnt 

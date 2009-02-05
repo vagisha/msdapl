@@ -40,7 +40,7 @@
     	SELECT * FROM IDPickerSpectrumMatch as idpPsm, msProteinInferSpectrumMatch as psm
     	WHERE psm.piIonID = #id#
     	AND psm.id = idpPsm.piSpectrumMatchID
-    	AND psm.rank = (SELECT min(rank) FROM msProteinInferSpectrumMatch WHERE piIonID = #id#)
+    	AND psm.rankForPeptide = (SELECT min(rankForPeptide) FROM msProteinInferSpectrumMatch WHERE piIonID = #id#)
     </select>
     
     <insert id="insert" parameterMap="idpickerSMatchParam">

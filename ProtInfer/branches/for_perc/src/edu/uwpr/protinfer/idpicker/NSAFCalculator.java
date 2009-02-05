@@ -35,10 +35,16 @@ public class NSAFCalculator {
         
         long s = System.currentTimeMillis();
         for(InferredProtein<S> protein: proteins) {
+            
+            // calculate this only for parsimonious proteins
+            if(!protein.getIsAccepted())
+                continue;
+                
+            
             String proteinSeq = null;
             try {
-                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(protein.getProteinId());
-//                proteinSeq = NrSeqLookupUtil.getProteinSequence(protein.getProteinId());
+//                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(protein.getProteinId());
+                proteinSeq = NrSeqLookupUtil.getProteinSequence(protein.getProteinId());
             }
             catch (Exception e) {
                 log.error("Exception getting nrseq protein for proteinId: "+protein.getProteinId(), e);

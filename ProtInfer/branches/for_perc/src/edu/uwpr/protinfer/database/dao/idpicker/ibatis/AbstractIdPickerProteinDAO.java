@@ -88,9 +88,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
        return queryForList(sqlMapNameSpace+".selectClusterIdsForPinfer", pinferId); 
     }
     
-    public List<ProteinferProtein> loadProteinsN(int pinferId) {
-        return protDao.loadProteinsN(pinferId);
-    }
+//    @Override
+//    public List<ProteinferProtein> loadProteinsN(int pinferId) {
+//        return protDao.loadProteinsN(pinferId);
+//    }
     
     public int getFilteredParsimoniousProteinCount(int proteinferId) {
         return (Integer) queryForObject(sqlMapNameSpace+".selectParsimProteinCountForProteinferRun", proteinferId); 
@@ -150,6 +151,26 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         map.put("coverage", minCoverage);
         if(sort)    map.put("sort", 1);
         return queryForList(sqlMapNameSpace+".filterByCoverage", map);
+    }
+    
+    public List<Integer> sortProteinIdsByValidationStatus(int pinferId) {
+        return proteinIdsByValidationStatus(pinferId, new ArrayList<ProteinUserValidation>(0), true);
+    }
+    
+    private List<Integer> proteinIdsByValidationStatus(int pinferId,
+            List<ProteinUserValidation> validationStatus, boolean sort) {
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        map.put("pinferId", pinferId);
+        if(validationStatus != null && validationStatus.size() > 0) {
+            String vs = "";
+            for(ProteinUserValidation v: validationStatus)
+                vs += ",\'"+v.getStatusChar()+"\'";
+            if(vs.length() > 0) vs = vs.substring(1); // remove first comma
+            vs = "("+vs+")";
+            map.put("validationStatus", vs);
+        }
+        if(sort)    map.put("sort", 1);
+        return queryForList(sqlMapNameSpace+".filterByValidationStatus", map);
     }
     
     public List<Integer> sortProteinIdsBySpectrumCount(int pinferId, boolean groupProteins) {
@@ -412,40 +433,53 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
         
         
+        // If the user is filtering on validation status 
+        List<Integer> ids_validation_status = null;
+        sort = filterCriteria.getSortBy() == SORT_BY.VALIDATION_STATUS;
+        if(filterCriteria.getValidationStatus().size() > 0 || sort) {
+            ids_validation_status = proteinIdsByValidationStatus(pinferId, filterCriteria.getValidationStatus(),
+                                                                 sort);
+        }
+        
         // get the set of common ids; keep the order of ids returned from the query
         // that returned sorted results
         if(filterCriteria.getSortBy() == SORT_BY.COVERAGE) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status);
             return getCommonIds(ids_cov, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA) {
-            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept);
+            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status);
             return getCommonIds(ids_spec_count, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept);
+            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_uniq_pept);
             return getCommonIds(ids_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status);
             return getCommonIds(ids_uniq_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.GROUP_ID) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status);
             List<Integer> idsbyGroup = sortProteinIdsByGroup(pinferId);
             return getCommonIds(idsbyGroup, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.CLUSTER_ID) {
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status);
+            List<Integer> idsbyCluster = sortProteinIdsByCluster(pinferId);
+            return getCommonIds(idsbyCluster, others);
+        }
+        else if(filterCriteria.getSortBy() == SORT_BY.VALIDATION_STATUS) {
             Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept);
-            List<Integer> idsbyGroup = sortProteinIdsByCluster(pinferId);
-            return getCommonIds(idsbyGroup, others);
+            return getCommonIds(ids_validation_status, others);
         }
         else {
-            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept);
+            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status);
             return new ArrayList<Integer>(combineLists);
         }
     }
     
+
     private final List<Integer> getCommonIds(List<Integer> ordered, Set<Integer> others) {
         Iterator<Integer> iter = ordered.iterator();
         while(iter.hasNext()) {
@@ -458,12 +492,16 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     
     private final Set<Integer> combineLists(List<Integer>...lists) {
         
+        int numValidLists = 0;
         int count = 0;
         for(List<Integer> list: lists) {
+            if(list == null)    continue;
+            numValidLists++;
             count = Math.min(count, list.size());
         }
         Map<Integer, Integer> idCount = new HashMap<Integer, Integer>((int) (count*1.5));
         for(List<Integer> list: lists) {
+            if(list == null)    continue;
             for(int id: list) {
                 Integer c = idCount.get(id);
                 if(c == null)   idCount.put(id, 1);
@@ -472,7 +510,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
         Set<Integer> set = new HashSet<Integer>((int) (count*1.5));
         for(int id: idCount.keySet()) {
-            if(idCount.get(id) == lists.length)    set.add(id);
+            if(idCount.get(id) == numValidLists)    set.add(id);
         }
         return set;
     }

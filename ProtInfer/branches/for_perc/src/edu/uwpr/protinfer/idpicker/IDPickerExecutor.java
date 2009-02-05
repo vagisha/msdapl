@@ -83,8 +83,8 @@ public class IDPickerExecutor {
             int nrseqProteinId = prot.getProteinId();
             String proteinSeq = null;
             try {
-                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
-//                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
+//                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
+                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
             }
             catch (Exception e) {
                 log.error("Exception getting nrseq protein for proteinId: "+nrseqProteinId, e);
@@ -128,8 +128,8 @@ public class IDPickerExecutor {
             int nrseqProteinId = prot.getProteinId();
             String proteinSeq = null;
             try {
-                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
-//                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
+//                proteinSeq = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqProteinId);
+                proteinSeq = NrSeqLookupUtil.getProteinSequence(nrseqProteinId);
             }
             catch (Exception e) {
                 log.error("Exception getting nrseq protein for proteinId: "+nrseqProteinId, e);
@@ -274,8 +274,8 @@ public class IDPickerExecutor {
                                    NrDbProtein nrDbProtM = NrSeqLookupUtil.getDbProtein(id);
                                    nrseqIdMap.put(nrDbProtM.getAccessionString(), nrDbProtM);
                                    Protein prM = new Protein(nrDbProtM.getAccessionString(), -1);
-                                   prM.setId(nrDbProtM.getId());
-//                                   pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+//                                   prM.setId(nrDbProtM.getId());
+                                   pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
                                    prM.setAccession(nrDbProtM.getAccessionString());
                                    moreProteins.add(prM);
                                }
@@ -300,8 +300,8 @@ public class IDPickerExecutor {
                
                // If we found an exact match
                if(nrDbProt != null) {
-                   pr.setId(nrDbProt.getId());
-//                   pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
+//                   pr.setId(nrDbProt.getId());
+                   pr.setId(nrDbProt.getProteinId()); // protein ID, NOT the id (primary key) from tblProteinDatabase
                    pr.setAccession(nrDbProt.getAccessionString()); // this will set the correct accession; 
                                                                // SQT files sometimes have truncated accessions
                }
@@ -383,20 +383,20 @@ public class IDPickerExecutor {
         allProteins =  inferrer.inferProteins(allProteins, params);
         
         // Replace the nrseq dbProteinId with the proteinId.
-        IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(allProteins);
-        
-        // If two proteins end up having the same proteinID (nrseqq) keep only one.
-        // TODO should make sure that "duplicate" proteins has identical peptides assigned to them. 
-        Set<Integer> seen = new HashSet<Integer>((int) (allProteins.size() * 1.5));
-        Iterator<InferredProtein<S>> iter = allProteins.iterator();
-        while(iter.hasNext()) {
-            InferredProtein<S> prot = iter.next();
-            if(seen.contains(prot.getProteinId()))
-                iter.remove();
-            else {
-                seen.add(prot.getProteinId());
-            }
-        }
+//        IDPickerExecutor.replaceNrSeqDbProtIdsWithProteinIds(allProteins);
+//        
+//        // If two proteins end up having the same proteinID (nrseqq) keep only one.
+//        // TODO should make sure that "duplicate" proteins has identical peptides assigned to them. 
+//        Set<Integer> seen = new HashSet<Integer>((int) (allProteins.size() * 1.5));
+//        Iterator<InferredProtein<S>> iter = allProteins.iterator();
+//        while(iter.hasNext()) {
+//            InferredProtein<S> prot = iter.next();
+//            if(seen.contains(prot.getProteinId()))
+//                iter.remove();
+//            else {
+//                seen.add(prot.getProteinId());
+//            }
+//        }
         
         // calculate normalized spectrum counts
         NSAFCalculator.instance().calculateNSAF(allProteins);
@@ -494,7 +494,7 @@ public class IDPickerExecutor {
 
         
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(16);
+        IdPickerRun run = runDao.loadProteinferRun(6);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getParams().size());
 

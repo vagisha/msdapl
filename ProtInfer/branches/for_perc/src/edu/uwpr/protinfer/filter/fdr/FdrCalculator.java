@@ -49,7 +49,7 @@ public abstract class FdrCalculator <T extends FdrCandidate> {
         
         targetCount = 0;
         decoyCount = 0;
-        int count = 0;
+//        int count = 0;
         for (T candidate: myCandidateList) {
             if (candidate.isTargetMatch())
                 targetCount++;
@@ -57,9 +57,24 @@ public abstract class FdrCalculator <T extends FdrCandidate> {
                 decoyCount++;
             if (candidate.isTargetMatch()) {
                 double fdr = calculateFdr(targetCount, decoyCount);
-                if (fdr <=  0.25)
-                    count++;
+//                if (fdr <=  0.25)
+//                    count++;
                 candidate.setFdr(fdr);
+            }
+        }
+        
+        // Replace FDR with q-values
+        double previousBest = 1.0;
+        for(int i = myCandidateList.size() - 1; i >= 0; i--) {
+            T candidate = myCandidateList.get(i);
+            if(candidate.isTargetMatch()) {
+                if(candidate.getFdr() > previousBest) {
+                    //System.out.println("replacing "+candidate.getFdr()+" with "+previousBest);
+                    candidate.setFdr(previousBest);
+                }
+                else {
+                    previousBest = candidate.getFdr();
+                }
             }
         }
     }

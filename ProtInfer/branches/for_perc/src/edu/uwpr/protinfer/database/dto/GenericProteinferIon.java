@@ -17,7 +17,7 @@ public class GenericProteinferIon <T extends ProteinferSpectrumMatch>{
     private int pinferPeptideId;
     private int charge;
     private int modificationStateId;
-    private String sequence;
+//    private String sequence;
     
     private T bestSpectrumMatch;
     private int spectrumCount;
@@ -38,13 +38,13 @@ public class GenericProteinferIon <T extends ProteinferSpectrumMatch>{
         this.pinferPeptideId = pinferPeptideId;
     }
     
-    public String getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(String sequence) {
-        this.sequence = sequence;
-    }
+//    public String getSequence() {
+//        return sequence;
+//    }
+//
+//    public void setSequence(String sequence) {
+//        this.sequence = sequence;
+//    }
     
     public int getCharge() {
         return charge;

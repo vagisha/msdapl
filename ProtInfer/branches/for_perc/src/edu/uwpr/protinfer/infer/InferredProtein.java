@@ -13,7 +13,7 @@ public class InferredProtein <T extends SpectrumMatch> {
     private Map<Integer, PeptideEvidence<T>> peptideEvList;
     
     private float percentCoverage;
-    private double nsaf;
+    private double nsaf = 0;
     
     public InferredProtein(Protein protein) {
         this.protein = protein;

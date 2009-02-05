@@ -9,7 +9,7 @@
 		<result property="id" column="id" nullValue="0"/>
 		<result property="msRunSearchResultId" column="runSearchResultID" nullValue="0"/>
 		<result property="proteinferIonId" column="piIonID" nullValue="0"/>
-		<result property="rank" column="rank"/>
+		<result property="rank" column="rankForPeptide"/>
 	</resultMap>
 	
 	<parameterMap class="ProteinferSpectrumMatch" id="pinferSMatchParam">
@@ -33,7 +33,7 @@
     <select id="selectBestMatchForIon" resultMap="pinferSMatchResult" parameterClass="Integer">
     	SELECT * FROM msProteinInferSpectrumMatch 
     	WHERE piIonID = #id#
-    	AND rank = (SELECT min(rank) FROM msProteinInferSpectrumMatch WHERE piIonID = #id#)
+    	AND rankForPeptide = (SELECT min(rankForPeptide) FROM msProteinInferSpectrumMatch WHERE piIonID = #id#)
     </select>
     
     <select id="selectMatchesForPeptide" resultMap="pinferSMatchResult" parameterClass="Integer">
@@ -84,7 +84,7 @@
     	INSERT INTO msProteinInferSpectrumMatch (
     	runSearchResultID,
     	piIonID,
-    	rank) 
+    	rankForPeptide) 
     	VALUES (?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id

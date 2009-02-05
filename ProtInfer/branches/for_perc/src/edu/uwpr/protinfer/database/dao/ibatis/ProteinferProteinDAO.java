@@ -1,26 +1,17 @@
 package edu.uwpr.protinfer.database.dao.ibatis;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.domain.search.ValidationStatus;
-import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
 import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
-import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.GenericProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dto.GenericProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
@@ -72,62 +63,62 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
         return queryForList(sqlMapNameSpace+".selectProteinsForProteinferRun", proteinferId);
     }
     
-    public List<ProteinferProtein> loadProteinsN(int pinferId) {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = super.getConnection();
-            String sql = "SELECT * from msProteinInferProtein WHERE piRunID=?";
-            stmt = conn.prepareStatement( sql );
-            stmt.setInt( 1, pinferId );
-            rs = stmt.executeQuery();
-            
-            List<ProteinferProtein> proteinList = new ArrayList<ProteinferProtein>();
-            
-            while ( rs.next() ) {
-            
-                ProteinferProtein protein = new ProteinferProtein();
-                protein.setId(rs.getInt("id"));
-                protein.setProteinferId(rs.getInt("piRunID"));
-                protein.setNrseqProteinId(rs.getInt("nrseqProteinID"));
-                protein.setCoverage(rs.getDouble("coverage"));
-                protein.setUserAnnotation(rs.getString("userAnnotation"));
-                String validationStr = rs.getString("userValidation");
-                ProteinUserValidation validation = ProteinUserValidation.UNVALIDATED;
-                if(validationStr != null && validationStr.length() > 0) {
-                    validation = ProteinUserValidation.getStatusForChar(validationStr.charAt(0));
-                }
-                protein.setUserValidation(validation);
-                proteinList.add(protein);
-            }
-            
-            rs.close(); rs = null;
-            stmt.close(); stmt = null;
-            conn.close(); conn = null;
-            
-            return proteinList;
-          
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            
-            if (rs != null) {
-                try { rs.close(); rs = null; } catch (Exception e) { ; }
-            }
-
-            if (stmt != null) {
-                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
-            }
-            
-            if (conn != null) {
-                try { conn.close(); conn = null; } catch (Exception e) { ; }
-            }           
-        }
-        return null;
-    }
+//    public List<ProteinferProtein> loadProteinsN(int pinferId) {
+//        Connection conn = null;
+//        PreparedStatement stmt = null;
+//        ResultSet rs = null;
+//        
+//        try {
+//            conn = super.getConnection();
+//            String sql = "SELECT * from msProteinInferProtein WHERE piRunID=?";
+//            stmt = conn.prepareStatement( sql );
+//            stmt.setInt( 1, pinferId );
+//            rs = stmt.executeQuery();
+//            
+//            List<ProteinferProtein> proteinList = new ArrayList<ProteinferProtein>();
+//            
+//            while ( rs.next() ) {
+//            
+//                ProteinferProtein protein = new ProteinferProtein();
+//                protein.setId(rs.getInt("id"));
+//                protein.setProteinferId(rs.getInt("piRunID"));
+//                protein.setNrseqProteinId(rs.getInt("nrseqProteinID"));
+//                protein.setCoverage(rs.getDouble("coverage"));
+//                protein.setUserAnnotation(rs.getString("userAnnotation"));
+//                String validationStr = rs.getString("userValidation");
+//                ProteinUserValidation validation = ProteinUserValidation.UNVALIDATED;
+//                if(validationStr != null && validationStr.length() > 0) {
+//                    validation = ProteinUserValidation.getStatusForChar(validationStr.charAt(0));
+//                }
+//                protein.setUserValidation(validation);
+//                proteinList.add(protein);
+//            }
+//            
+//            rs.close(); rs = null;
+//            stmt.close(); stmt = null;
+//            conn.close(); conn = null;
+//            
+//            return proteinList;
+//          
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            
+//            if (rs != null) {
+//                try { rs.close(); rs = null; } catch (Exception e) { ; }
+//            }
+//
+//            if (stmt != null) {
+//                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+//            }
+//            
+//            if (conn != null) {
+//                try { conn.close(); conn = null; } catch (Exception e) { ; }
+//            }           
+//        }
+//        return null;
+//    }
     
     public int getProteinCount(int proteinferId) {
        return (Integer) queryForObject(sqlMapNameSpace+".selectProteinCountForProteinferRun", proteinferId); 
@@ -150,7 +141,8 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
                 throws SQLException {
             ProteinUserValidation validation = (ProteinUserValidation) parameter;
             if (validation == null)
-                setter.setNull(java.sql.Types.CHAR);
+                //setter.setNull(java.sql.Types.CHAR);
+                setter.setString(String.valueOf(ProteinUserValidation.UNVALIDATED.getStatusChar()));
             else
                 setter.setString(String.valueOf(validation.getStatusChar()));
         }
@@ -161,7 +153,7 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
         
         private ProteinUserValidation stringToUserValidation(String validationStr) {
             if (validationStr == null)
-                return null;
+                return ProteinUserValidation.UNVALIDATED;
             if (validationStr.length() != 1)
                 throw new IllegalArgumentException("Cannot convert "+validationStr+" to ProteinUserValidation");
             ProteinUserValidation userValidation = ProteinUserValidation.getStatusForChar(Character.valueOf(validationStr.charAt(0)));

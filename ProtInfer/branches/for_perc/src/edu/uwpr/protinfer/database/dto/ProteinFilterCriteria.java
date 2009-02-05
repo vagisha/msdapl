@@ -6,6 +6,9 @@
  */
 package edu.uwpr.protinfer.database.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
 
@@ -22,6 +25,8 @@ public class ProteinFilterCriteria {
         NUM_SPECTRA, 
         GROUP_ID,
         CLUSTER_ID,
+        VALIDATION_STATUS,
+        NSAF,
         NONE;
         
         public static SORT_BY getSortByForString(String sortBy) {
@@ -34,6 +39,8 @@ public class ProteinFilterCriteria {
             else if (sortBy.equalsIgnoreCase(NUM_SPECTRA.name())) return NUM_SPECTRA;
             else if (sortBy.equalsIgnoreCase(GROUP_ID.name())) return GROUP_ID;
             else if (sortBy.equalsIgnoreCase(CLUSTER_ID.name())) return CLUSTER_ID;
+            else if (sortBy.equalsIgnoreCase(VALIDATION_STATUS.name())) return VALIDATION_STATUS;
+            else if (sortBy.equalsIgnoreCase(NSAF.name())) return NSAF;
             else    return NONE;
             
         }
@@ -53,6 +60,8 @@ public class ProteinFilterCriteria {
     private boolean showParsimonious = false;
     
     private boolean groupProteins = true;
+    
+    private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
     private int numSpectra;
     private double coverage;
@@ -152,6 +161,23 @@ public class ProteinFilterCriteria {
         this.descriptionLike = descriptionLike;
     }
     
+    public List<ProteinUserValidation> getValidationStatus() {
+        return validationStatus;
+    }
+
+    public void setValidationStatus(List<ProteinUserValidation> validationStatus) {
+        this.validationStatus = validationStatus;
+    }
+    
+    public void setValidationStatus(String[] validationStatusArr) {
+        for(String vs: validationStatusArr) {
+            if(vs != null && vs.length() == 1) {
+                ProteinUserValidation s = ProteinUserValidation.getStatusForChar(vs.charAt(0));
+                if(s != null)   this.validationStatus.add(s);
+            }
+        }
+    }
+
     public boolean equals(ProteinFilterCriteria o) {
         if(this == o)
             return true;
@@ -164,6 +190,13 @@ public class ProteinFilterCriteria {
         if(this.coverage != that.coverage)                      return false;
 //        if(this.groupProteins != that.groupProteins)            return false;
         if(this.showParsimonious != that.showParsimonious)      return false;
+        
+        if(this.validationStatus.size() != that.validationStatus.size()) return false;
+        else {
+            for(ProteinUserValidation vs: this.validationStatus)
+                if(!that.validationStatus.contains(vs))  return false;
+        }
+        
         if(!this.peptideDefinition.equals(that.peptideDefinition))  return false;
         
         if(accessionLike == null) {

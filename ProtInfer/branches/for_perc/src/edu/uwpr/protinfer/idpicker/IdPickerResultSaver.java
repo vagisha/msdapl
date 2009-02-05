@@ -177,7 +177,7 @@ public class IdPickerResultSaver {
             ion.setProteinferPeptideId(pinferPeptideId);
             ion.setCharge(psmList.get(0).getCharge());
             String modseq = key.substring(0, key.lastIndexOf("_"));
-            ion.setSequence(modseq);
+//            ion.setSequence(modseq);
             ion.setModificationStateId(modIds.get(modseq));
             int ionId = ionDao.save(ion);
             
