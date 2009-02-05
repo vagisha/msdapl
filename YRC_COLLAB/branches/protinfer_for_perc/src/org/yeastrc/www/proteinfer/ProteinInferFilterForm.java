@@ -20,6 +20,7 @@ public class ProteinInferFilterForm extends ActionForm {
     
     private String accessionLike = null;
     private String descriptionLike = null;
+    private String[] validationStatus = new String[]{"All"};
     
     public ProteinInferFilterForm () {}
     
@@ -42,11 +43,6 @@ public class ProteinInferFilterForm extends ActionForm {
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
         
-        // TODO validate the parameter values
-        
-        
-//      errors.add("fundingTypes", new ActionMessage("error.project.nofoundationname"));
-
         return errors;
     }
 
@@ -128,6 +124,16 @@ public class ProteinInferFilterForm extends ActionForm {
     
     public void setDescriptionLike(String descriptionLike) {
         this.descriptionLike = descriptionLike;
+    }
+
+    public String[] getValidationStatus() {
+        return validationStatus;
+    }
+
+    public void setValidationStatus(String[] validationStatus) {
+        for(String vs: validationStatus)
+            System.out.println(vs);
+        this.validationStatus = validationStatus;
     }
    
 }

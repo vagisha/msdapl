@@ -93,6 +93,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setSortOrder(filterCritSession == null ? SORT_ORDER.ASC : filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
         
@@ -104,10 +105,20 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         
         // Get the protein IDs from the session
         List<Integer> storedProteinIds = (List<Integer>) request.getSession().getAttribute("proteinIds");
+        System.out.println("stored protein ids: "+storedProteinIds.size());
 
         
         // if the filtering criteria has changed we need to filter the results again
         if(!match)  {
+            
+            // If the filter criteria has proteins GROUPED and the sort_by is
+            // on one of the protein specific columns change it to group_id
+            if(filterCriteria.isGroupProteins()) {
+                SORT_BY sortby = filterCriteria.getSortBy();
+                if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.COVERAGE || 
+                   sortby == SORT_BY.VALIDATION_STATUS || sortby == SORT_BY.NSAF)
+                filterCriteria.setSortBy(SORT_BY.GROUP_ID);
+            }
             // Get a list of filtered and sorted proteins
             storedProteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
             // filter by accession, if required
@@ -177,11 +188,15 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             HttpServletRequest request, int pinferId) {
         Map<Integer, String> proteinAccessionMap = (Map<Integer, String>) request.getSession().getAttribute("proteinAccessionMap");
         if(proteinAccessionMap == null) {
+            log.info("proteinAccessionMap was null ... creating a new one");
             proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
         }
         else {
             Integer pinferIdForProtAccession = (Integer)request.getSession().getAttribute("pinferIdForProtAccession");
             if(pinferIdForProtAccession != null && pinferIdForProtAccession != pinferId) {
+                log.info("proteinIdForProtAccession ("+pinferIdForProtAccession+
+                        ") does not match pinfer id in request ("+pinferId+") ... "+
+                        "... creating a new proteinAccessionMap");
                 proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
             }
         }
@@ -190,17 +205,6 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         return proteinAccessionMap;
     }
 
-//    private boolean matchFilterCriteriaExceptAccession(ProteinFilterCriteria filterCritSession, ProteinFilterCriteria filterCriteria) {
-//        boolean allSame = (filterCritSession.getCoverage() == filterCriteria.getCoverage() &&
-//                           filterCritSession.getNumPeptides() == filterCriteria.getNumPeptides() &&
-//                           filterCritSession.getNumUniquePeptides() == filterCriteria.getNumUniquePeptides() &&
-//                           filterCritSession.getNumSpectra() == filterCriteria.getNumSpectra() &&
-//                           filterCritSession.getPeptideDefinition().equals(filterCriteria.getPeptideDefinition()) &&
-//                           filterCritSession.showParsimonious() == filterCriteria.showParsimonious()
-//                        );
-//        
-//        return allSame;
-//    }
 
     private boolean matchFilterCriteria(ProteinFilterCriteria filterCritSession,  ProteinFilterCriteria filterCriteria) {
         return filterCritSession.equals(filterCriteria);

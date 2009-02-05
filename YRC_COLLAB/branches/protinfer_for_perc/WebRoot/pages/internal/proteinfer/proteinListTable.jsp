@@ -61,7 +61,7 @@
 		
 		<!-- Make Protein and Description columns sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
-			<th width="1%"><b><font size="2pt">&nbsp;</font></b></th>
+			<th width="1%"><b><font size="2pt">S</font></b></th>
 			<th><b><font size="2pt">Protein</font></b></th>
 			<th><b><font size="2pt">Description</font></b></th>
 			<th><b><font size="2pt">Coverage(%)</font></b></th>
@@ -72,7 +72,7 @@
 			<% colSortedClass = "";
 			 if(sortBy == SORT_BY.ACCESSION) colSortedClass = sortedClass;
 			%>
-			<th class="" width="1%" ><b><font size="2pt">&nbsp;</font></b></th>
+			<th width="1%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.VALIDATION_STATUS.name()%>"><b><font size="2pt">S</font></b></th>
 			<th class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.ACCESSION.name()%>"><b><font size="2pt">Protein</font></b></th>
 			<th class=""><b><font size="2pt">Description</font></b></th>
 		
@@ -152,7 +152,6 @@
 			</logic:notPresent>
 			
 			<!-- User entered validation -->
-			<logic:present name="protein" property="protein.userValidation">
 				<span 
 				class="prot_annot_<bean:write name="protein" property="protein.userValidation.statusChar" />"
 				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
@@ -160,17 +159,6 @@
 				class="sort_key"
 				style="display: none;"
 				id="annot_validation_text_<bean:write name="protein" property="protein.id" />"><bean:write name="protein" property="protein.userValidation.statusChar" /></span>
-			</logic:present>
-			
-			<logic:notPresent name="protein" property="protein.userValidation">
-				<span 
-				class="prot_annot_U"
-				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
-				<span 
-				class="sort_key"
-				style="display: none;"
-				id="annot_validation_text_<bean:write name="protein" property="protein.id" />">U</span>
-			</logic:notPresent>
 					
 			</span>
 			</td>
@@ -188,7 +176,7 @@
 			</td>
 			<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 			<td><bean:write name="protein" property="protein.coverage"/></td>
-			<td><bean:write name="protein" property="protein.nsaf"/></td>
+			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 				<bean:write name="proteinGroup" property="matchingPeptideCount"/>
@@ -228,7 +216,7 @@
 		
 		
 		
-		<!-- WE ARE DISPLAYING PROTEIN GROUP MEMBERSTOGETHER -->
+		<!-- WE ARE DISPLAYING PROTEIN GROUP MEMBERS TOGETHER -->
 		<logic:equal name="groupProteins" value="true">
 			<bean:define name="proteinGroup" property="proteinCount" id="rowspan" />
 		
@@ -262,25 +250,13 @@
 			</logic:notPresent>
 			
 			<!-- User entered validation -->
-			<logic:present name="protein" property="protein.userValidation">
-				<span 
-				class="prot_annot_<bean:write name="protein" property="protein.userValidation.statusChar" />"
-				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
-				<span 
-				class="sort_key"
-				style="display: none;"
-				id="annot_validation_text_<bean:write name="protein" property="protein.id" />"><bean:write name="protein" property="protein.userValidation.statusChar" /></span>
-			</logic:present>
-			
-			<logic:notPresent name="protein" property="protein.userValidation">
-				<span 
-				class="prot_annot_U"
-				id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
-				<span 
-				class="sort_key"
-				style="display: none;"
-				id="annot_validation_text_<bean:write name="protein" property="protein.id" />">U</span>
-			</logic:notPresent>
+			<span 
+			class="prot_annot_<bean:write name="protein" property="protein.userValidation.statusChar" />"
+			id="annot_validation_style_<bean:write name="protein" property="protein.id" />"></span>
+			<span 
+			class="sort_key"
+			style="display: none;"
+			id="annot_validation_text_<bean:write name="protein" property="protein.id" />"><bean:write name="protein" property="protein.userValidation.statusChar" /></span>
 					
 		</span>
 		</td>
@@ -298,7 +274,7 @@
 		</td>
 		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 		<td><bean:write name="protein" property="protein.coverage"/></td>
-		<td><bean:write name="protein" property="protein.nsaf"/></td>
+		<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
 		<%if(first) { first = false;%>
 		<td rowspan="<bean:write name="rowspan" />" valign="middle">

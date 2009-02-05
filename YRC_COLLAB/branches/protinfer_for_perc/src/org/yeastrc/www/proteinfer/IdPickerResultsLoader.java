@@ -13,14 +13,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.nr_seq.NRProtein;
+import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIon;
@@ -182,6 +182,9 @@ public class IdPickerResultsLoader {
         }
         else if (sortBy == SORT_BY.COVERAGE) {
             allIds = idpProtBaseDao.sortProteinIdsByCoverage(pinferId);
+        }
+        else if(sortBy == SORT_BY.VALIDATION_STATUS) {
+            allIds = idpProtBaseDao.sortProteinIdsByValidationStatus(pinferId);
         }
         else if (sortBy == SORT_BY.NUM_PEPT) {
             allIds = idpProtBaseDao.sortProteinIdsByPeptideCount(pinferId, peptideDef, groupProteins);
@@ -388,20 +391,19 @@ public class IdPickerResultsLoader {
     
     private static String[] getProteinAccessionDescription(int nrseqProteinId) {
         
-        NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(nrseqProteinId);
-        return new String[] {nrDbProt.getAccessionString(), nrDbProt.getDescription()};
+//        NrDbProtein nrDbProt = NrSeqLookupUtil.getDbProtein(nrseqProteinId);
+//        return new String[] {nrDbProt.getAccessionString(), nrDbProt.getDescription()};
         
-//      NRProteinFactory nrpf = NRProteinFactory.getInstance();
-//      NRProtein nrseqProt = null;
-//      try {
-//          nrseqProt = (NRProtein)(nrpf.getProtein(wProt.getProtein().getNrseqProteinId()));
-//          wProt.setAccession(nrseqProt.getListing());
-//          wProt.setDescription(nrseqProt.getDescription());
-//      }
-//      catch (Exception e) {
-//          log.error("Exception getting nrseq protein for protein Id: "+wProt.getProtein().getNrseqProteinId(), e);
-//      }
-        
+      NRProteinFactory nrpf = NRProteinFactory.getInstance();
+      NRProtein nrseqProt = null;
+      try {
+          nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
+          return new String[] {nrseqProt.getListing(), nrseqProt.getDescription()};
+      }
+      catch (Exception e) {
+          log.error("Exception getting accession/description for protein Id: "+nrseqProteinId, e);
+      }
+      return null;
     }
     
     //---------------------------------------------------------------------------------------------------

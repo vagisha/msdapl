@@ -43,10 +43,10 @@ public class ProteinferResultsPager {
         }
         else {
             int s = proteinIds.size() - ((pageNum - 1) * numPerPage) - 1;
-            if(s <= 0)
+            if(s < 0)
                 return new ArrayList<Integer>(0);
-            int e = Math.max(0, (s - numPerPage));
-            for(int i = s; i > e; i--) 
+            int e = Math.max(0, (s - numPerPage -1));
+            for(int i = s; i >= e; i--) 
                 sublist.add(proteinIds.get(i));
         }
         return sublist;

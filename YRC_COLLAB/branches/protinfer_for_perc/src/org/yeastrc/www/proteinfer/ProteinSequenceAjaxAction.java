@@ -15,7 +15,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.user.User;
@@ -72,24 +71,25 @@ public class ProteinSequenceAjaxAction extends Action {
 
     private String getHtmlForProtein(int nrseqid, List<String> peptides) {
         
-//        NRProtein protein = null;
-//        try {
-//            protein = (NRProtein)(nrpf.getProtein(nrseqid));
-//        }
-//        catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-//        }
-//        catch (SQLException e) {
-//            e.printStackTrace();
-//        }        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+        NRProtein protein = null;
+        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+        try {
+            protein = (NRProtein)(nrpf.getProtein(nrseqid));
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }        
 
-//        if(protein == null) {
-//            return "<b>Could not find protein with ID: "+nrseqid+"</b>";
-//        }
+        if(protein == null) {
+            return "<b>Could not find protein with ID: "+nrseqid+"</b>";
+        }
 
-//        String parentSequence = protein.getPeptide().getSequenceString();
+        String parentSequence = protein.getPeptide().getSequenceString();
         
-        String parentSequence = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqid);
+//        String parentSequence = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(nrseqid);
 
         char[] reschars = parentSequence.toCharArray();
         String[] residues = new String[reschars.length];        // the array of strings, which are the residues of the matched protein

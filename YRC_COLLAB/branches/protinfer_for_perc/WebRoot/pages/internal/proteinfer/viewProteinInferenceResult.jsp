@@ -868,7 +868,7 @@ function toggleDivVisibility(mydiv) {
 
 <CENTER>
 
-<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="1000" scheme="ms">
+<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="950" scheme="ms">
   
   <div id="results" class="flora">
       <ul>
@@ -881,7 +881,7 @@ function toggleDivVisibility(mydiv) {
       
       
     <!-- Protein Annotation Dialog -->
-	<div id="prot_annot_dialog" class="flora" title="Annotate Protein">
+	<div id="prot_annot_dialog" class="flora" title="Validate Protein">
 		<input type="hidden" id="prot_id" value="" />
 		Protein: <b><span id="prot_name"></span></b><br>
 		<input type="radio" name="annotate" value="Accept" id="prot_accept" checked="checked"/>
@@ -933,11 +933,14 @@ function toggleDivVisibility(mydiv) {
 	*This protein inference program is based on the IDPicker algorithm published in:<br>
  	<i>Proteomic Parsimony through Bipartite Graph Analysis Improves Accuracy and Transparency.</i>
  	&nbsp; &nbsp;
-	Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
+	<br>Tabb <i>et. al.</i> <i>J Proteome Res.</i> 2007 Sep;6(9):3549-57
 </div>
 <br>
 <div style="font-size: 8pt;margin-top: 3px;" align="left">
 	**Normalized Spectral Abundance Factor (NSAF)<br>
+	<i>Quantitative proteomic analysis of distinct mammalian mediator complexes using normalized spectral abundance factors.</i>
+    &nbsp; &nbsp;
+    <br>Paoletti <i>et. al.</i> <i>Proc. Natl. Acad. Sci. USA </i>2006;103:18928-33
 </div>
 
  	
