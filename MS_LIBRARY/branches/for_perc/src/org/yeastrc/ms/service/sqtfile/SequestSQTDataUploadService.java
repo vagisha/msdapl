@@ -52,8 +52,11 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     private List<MsResidueModificationIn> dynaResidueMods;
     private List<MsTerminalModificationIn> dynaTermMods;
     
-    public SequestSQTDataUploadService() {
+    private final Program program;
+    
+    public SequestSQTDataUploadService(Program program) {
         super();
+        this.program = program;
         this.sequestResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
@@ -77,7 +80,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     }
 
     Program getSearchProgram() {
-        return Program.SEQUEST;
+//        return Program.SEQUEST;
+        return program;
     }
     
     @Override
@@ -98,7 +102,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
             SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
-            return searchDAO.saveSearch(makeSearchObject(parser, remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
+            return searchDAO.saveSearch(makeSearchObject(parser, getSearchProgram(),
+                    remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
@@ -221,7 +226,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
                 
     }
 
-    static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final String remoteDirectory, final Date searchDate) {
+    static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final Program searchProgram,
+                final String remoteDirectory, final Date searchDate) {
         return new SequestSearchIn() {
             @Override
             public List<SequestParam> getSequestParams() {return parser.getParamList();}
@@ -243,7 +249,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             @Override
             public List<MsTerminalModificationIn> getStaticTerminalMods() {return parser.getStaticTerminalMods();}
             @Override
-            public Program getSearchProgram() {return parser.getSearchProgram();}
+            public Program getSearchProgram() {return searchProgram;}
+//            public Program getSearchProgram() {return parser.getSearchProgram();}
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in sequest.params
             public Date getSearchDate() {return searchDate;}
@@ -356,7 +363,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
         
         // $JAVA_HOME/bin/java -classpath .:bin/:lib/'*' org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService
-        SequestSQTDataUploadService uploader = new SequestSQTDataUploadService();
+        SequestSQTDataUploadService uploader = new SequestSQTDataUploadService(Program.SEQUEST);
         uploader.uploadSearch(experimentID, dir, fileNames, runIdMap, "local", dir, new Date(new java.util.Date().getTime()));
     }
 

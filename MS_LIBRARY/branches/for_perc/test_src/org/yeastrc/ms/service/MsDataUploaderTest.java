@@ -143,7 +143,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
       List<UploadException> exceptionList = uploader.getUploadExceptionList();
       assertEquals(1, exceptionList.size());
       String warnings = "ERROR: Unsupported sqt file found"+
-                          "\n\tFile: test_resources/invalid_sqt_dir/percolator.sqt"+
+                          "\n\tFile: test_resources/invalid_sqt_dir/pepprobe.sqt"+
                           "\n\t\n\tSEARCH WILL NOT BE UPLOADED.";
       
       assertEquals(warnings, uploader.getUploadWarnings().trim());

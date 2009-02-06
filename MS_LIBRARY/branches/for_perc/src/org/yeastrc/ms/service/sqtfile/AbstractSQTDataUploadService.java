@@ -71,7 +71,6 @@ public abstract class AbstractSQTDataUploadService {
     
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
     private String programVersion = "uninit";
-    private Program programFromSqt = null;
 
     int lastUploadedRunSearchId;
     int searchId;
@@ -105,8 +104,6 @@ public abstract class AbstractSQTDataUploadService {
         searchId = 0;
         sequenceDatabaseId = 0;
         programVersion = "uninit";
-        programFromSqt = null;
-        
     }
 
     // called before uploading each sqt file and in the reset() method.
@@ -268,12 +265,6 @@ public abstract class AbstractSQTDataUploadService {
             updateProgramVersion(searchId, programVersion);
         }
         
-        // if search program from sqt files is not the same as the defalt program returned by the uploader, update it in the msSearch table
-        // For now we do this only for SEQUEST and EE-normalized SEQUEST
-        if (getSearchProgram() == Program.SEQUEST && this.programFromSqt == Program.EE_NORM_SEQUEST) {
-            updateProgram(searchId, programFromSqt);
-        }
-        
         return searchId;
     }
     
@@ -314,16 +305,6 @@ public abstract class AbstractSQTDataUploadService {
             else if (!programVersion.equals(header.getSearchEngineVersion())) {
                 throw new DataProviderException("Value of SQTGeneratorVersion is not the same in all SQT files.");
             }
-            
-            // SEARCH PROGRAM IN THE SQT FILE
-            if (programFromSqt == null)
-                this.programFromSqt = header.getSearchProgram();
-            
-            // make sure program is same in all sqt headers
-            if (programFromSqt == null || programFromSqt == Program.UNKNOWN || programFromSqt != header.getSearchProgram()) {
-                throw new DataProviderException("Value of SQTGenerator is missing or not the same in all SQT files.");
-            }
-            
         }
         // save the run search and return the database id
         SQTRunSearchDAO runSearchDao = daoFactory.getSqtRunSearchDAO();

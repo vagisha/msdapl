@@ -226,7 +226,7 @@ public class PercolatorSQTDataUploadService {
         
         // Update the "analysisProgramVersion" in the msSearchAnalysis table
         if (this.programVersion != null && this.programVersion != "uninit") {
-            updateProgramVersion(searchId, programVersion);
+            updateProgramVersion(analysisId, programVersion);
         }
         
         // Add the Percolator parameters
@@ -364,30 +364,33 @@ public class PercolatorSQTDataUploadService {
             
             // Data from MacCoss Lab can have duplicate results for the same scan 
             // and charge. When uploading the sequest results the "observed mass" for
-            // a search scan is matched with the preMz of the MS2 scan.  Only one 
-            // search scan with the closest observed mass is uploaded. 
+            // a search scan is matched with the Z lines of the MS2 file.  The scan
+            // is uploaded only if the charge and mass match a Z line for the scan in the MS2 file. 
             // Before uploading the Percolator results for this search scan make
             // sure that the observed mass is the same as the observed mass
-            // for the uploaded sequest search scan. 
+            // for the uploaded sequest search scan. If not, ignore this scan
             int scanId = getScanId(runId, scan.getScanNumber());
             SQTSearchScan sqtScan = sqtScanDao.load(runSearchId, scanId, scan.getCharge());
             if(sqtScan == null) {
-                String msg = "No matching SQTSearchScan found with runSearchId: "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge();
-                UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_SCAN);
-                ex.setErrorMessage(msg);
-                throw ex;
-            }
-            // save results for this scan + charge only if a matching sequest entry was found in 
-            // SQTSpectrumData.
-            if(sqtScan.getObservedMass().doubleValue() == scan.getObservedMass().doubleValue()) {
-                // save all the search results for this scan
-                for (PercolatorResultIn result: scan.getScanResults()) {
-                    boolean uploaded = uploadSearchResult(result, runSearchAnalysisId, runSearchId, scanId);
-                    if(uploaded)    numResults++;
-                }
+                log.error("No matching SQTSearchScan found with runSearchId: "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge());
+//                String msg = "No matching SQTSearchScan found with runSearchId: "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge();
+//                UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_SCAN);
+//                ex.setErrorMessage(msg);
+//                throw ex;
             }
             else {
-               log.warn("Ignoring Percolator search scan. "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge()+"; mass: "+scan.getObservedMass().doubleValue());
+                // save results for this scan + charge only if a matching sequest entry was found in 
+                // SQTSpectrumData.
+                if(sqtScan.getObservedMass().doubleValue() == scan.getObservedMass().doubleValue()) {
+                    // save all the search results for this scan
+                    for (PercolatorResultIn result: scan.getScanResults()) {
+                        boolean uploaded = uploadSearchResult(result, runSearchAnalysisId, runSearchId, scanId);
+                        if(uploaded)    numResults++;
+                    }
+                }
+                else {
+                    log.warn("Ignoring Percolator search scan. "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge()+"; mass: "+scan.getObservedMass().doubleValue());
+                }
             }
         }
         flush(); // save any cached data
@@ -458,7 +461,7 @@ public class PercolatorSQTDataUploadService {
                         result.getResultPeptide().getPeptideSequence());
         }
         catch(RuntimeException e) {
-            UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_RESULT, e);
+            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
@@ -535,7 +538,7 @@ public class PercolatorSQTDataUploadService {
     }
     
     public static void main(String[] args) {
-        int searchId = 2;
+        int searchId = 3;
         MsRunSearchDAO runSearchDao = daoFactory.getMsRunSearchDAO();
         List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
         Map<String, Integer> runSearchIdMap = new HashMap<String, Integer>(runSearchIds.size());
@@ -546,6 +549,7 @@ public class PercolatorSQTDataUploadService {
         }
         //String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
 //        String fileDirectory = "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/percolator";
+        //String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
         String fileDirectory = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator";
         
         PercolatorSQTDataUploadService service = new PercolatorSQTDataUploadService();

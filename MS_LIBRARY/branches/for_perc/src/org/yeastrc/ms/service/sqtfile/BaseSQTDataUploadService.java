@@ -69,6 +69,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
             if(paramsProvider instanceof SequestParamsParser) {
                 SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
                 return searchDAO.saveSearch(SequestSQTDataUploadService.makeSearchObject((SequestParamsParser) parser, 
+                                                                                        this.searchProgram,
                                                                                         remoteDirectory, 
                                                                                         searchDate), 
                                               experimentId, sequenceDatabaseId);

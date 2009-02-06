@@ -424,7 +424,7 @@ public class MsDataUploader {
         
         // upload the search
         if (sqtType == SearchFileFormat.SQT_SEQ || sqtType == SearchFileFormat.SQT_NSEQ) {
-            return uploadSequestSearch(filenames, runIdMap, searchDate);
+            return uploadSequestSearch(filenames, runIdMap, sqtType, searchDate);
         }
         else if (sqtType == SearchFileFormat.SQT_PLUCID) {
             return uploadProlucidSearch(filenames, runIdMap, searchDate);
@@ -439,9 +439,11 @@ public class MsDataUploader {
     }
     
     // upload sequest sqt files
-    private int uploadSequestSearch(Set<String> filenames, Map<String, Integer> runIdMap, final Date searchDate) {
+    private int uploadSequestSearch(Set<String> filenames, Map<String, Integer> runIdMap, 
+            SearchFileFormat sqtType, final Date searchDate) {
         
-        SequestSQTDataUploadService service = new SequestSQTDataUploadService();
+        Program program = Program.programForFileFormat(sqtType);
+        SequestSQTDataUploadService service = new SequestSQTDataUploadService(program);
         // If this is data from the MacCoss lab we will check for "duplicate" results for
         // a scan+charge combination.
         if(isMacCossData)
@@ -585,7 +587,7 @@ public class MsDataUploader {
 
 //        for(int i = 0; i < 10; i++) {
         MsDataUploader uploader = new MsDataUploader();
-        //uploader.setIsMaccossData(true);
+        uploader.setIsMaccossData(true);
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
 //        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", new Date());
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
@@ -603,8 +605,10 @@ public class MsDataUploader {
                 //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/UPLOAD_TEST",
                 //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3417",
                 //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3417",
-                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
-                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
+//                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
+//                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
+                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
+                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
                 new Date());
 //        }
         long end = System.currentTimeMillis();
