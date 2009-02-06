@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.search.Program;
 
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
 public class IdPickerInputGetter {
@@ -54,22 +55,35 @@ public class IdPickerInputGetter {
         }
     }
     
-    
-    public List<PeptideSpectrumMatchIDP> getInput(int inputId, IDPickerParams params,
-            Program program) {
+    public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(List<IdPickerInput> inputList, Program inputGenerator, IDPickerParams params) {
         
-        log.info("Reading search/analysis results for inputId: "+inputId+"; Program: "+program.displayName());
-        
-        if (program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST) {
-            SequestResultsGetter seqResGetter = SequestResultsGetter.instance();
-            return seqResGetter.getResults(inputId, params);
-        }
-        else if (program == Program.PROLUCID) {
-            ProlucidResultsGetter plcidResGetter = ProlucidResultsGetter.instance();
-            return plcidResGetter.getResults(inputId, params);
+        log.info("Reading search/analysis results. Input Generator Program: "+inputGenerator.displayName());
+        if(inputGenerator == Program.PERCOLATOR) {
+           PercolatorResultsGetter percResGetter = PercolatorResultsGetter.instance();
+           return percResGetter.getResultsNoFdr(inputList, inputGenerator, params);
         }
         else {
-            log.error("Don't know how to get IDPicker input for: "+program);
+            log.error("Don't know how to get IDPicker input for: "+inputGenerator);
+            return null;
+        }
+    }
+    
+    
+    public List<PeptideSpectrumMatchIDP> getInput(IdPickerRun run, IDPickerParams params) {
+        
+        Program inputGenerator = run.getInputGenerator();
+        log.info("Reading search/analysis results for Protein Inference run: "+run.getId()+"; Input Generator Program: "+inputGenerator.displayName());
+        
+        if (inputGenerator == Program.SEQUEST || inputGenerator == Program.EE_NORM_SEQUEST) {
+            SequestResultsGetter seqResGetter = SequestResultsGetter.instance();
+            return seqResGetter.getResults(run, params);
+        }
+        else if (inputGenerator == Program.PROLUCID) {
+            ProlucidResultsGetter plcidResGetter = ProlucidResultsGetter.instance();
+            return plcidResGetter.getResults(run, params);
+        }
+        else {
+            log.error("Don't know how to get IDPicker input for: "+inputGenerator);
             return null;
         }
     }

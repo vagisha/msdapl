@@ -16,6 +16,7 @@ import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.PeptideKeyCalculator;
@@ -39,7 +40,13 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     }
     
     @Override
-    public List<PeptideSpectrumMatchIDP> getResults(int inputId, IDPickerParams params) {
+    public List<PeptideSpectrumMatchIDP> getResults(IdPickerRun run, IDPickerParams params) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public List<PeptideSpectrumMatchIDP> getResults(List<IdPickerInput> inputList, Program inputGenerator, IDPickerParams params) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -53,13 +60,21 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     @Override
     public  List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(IdPickerRun run, IDPickerParams params) {
         
-        long start = System.currentTimeMillis();
+        return getResultsNoFdr(run.getInputList(), run.getInputGenerator(), params);
+    }
+    
+    
+    @Override
+    public List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(List<IdPickerInput> inputList, Program inputGenerator,
+            IDPickerParams params) {
         
+        long start = System.currentTimeMillis();
+
         PercolatorParams percParams = new PercolatorParams(params);
         
         // 1. Get ALL the PercolatorResults (filtered by score(s) and peptide length
         //    Ambiguous spectra are also removed
-        List<PercolatorResult> allResults = getAllPercolatorResults(run, percParams);
+        List<PercolatorResult> allResults = getAllPercolatorResults(inputList, inputGenerator, percParams);
 
         // 2. Convert list of PercolatorResult to PeptideSpectrumMatchNoFDR
         //    Rank the results for each peptide.
@@ -70,10 +85,11 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         
         
         long end = System.currentTimeMillis();
-        log.info("Total time: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes \n");
+        log.info("Total time to get results: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes \n");
         
         return psmList;
     }
+    
     
     // Assign matching proteins to each peptide
     private void assignMatchingProteins(List<PeptideSpectrumMatchNoFDR> psmList) {
@@ -172,7 +188,9 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
 
     // Returns a list of PercolatorResults for the given inputIds, filtered by relevant scores and 
     // min. peptide length.
-    private List<PercolatorResult> getAllPercolatorResults(IdPickerRun run, PercolatorParams percParams) {
+    private List<PercolatorResult> getAllPercolatorResults(List<IdPickerInput> inputList, 
+            Program inputGenerator,
+            PercolatorParams percParams) {
         
         PercolatorResultDAO resultDao = DAOFactory.instance().getPercolatorResultDAO();
         
@@ -185,7 +203,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         log.info("Thresholds -- qvalue: "+qvalCutoff+"; pep: "+pepCutoff+" ds: "+dsCutoff);
         
         // first get all the results; remove all hits to small peptides; results will be filtered by relevant scores.
-        for(IdPickerInput input: run.getInputList()) {
+        for(IdPickerInput input: inputList) {
             
             int inputId = input.getInputId();
             
@@ -215,7 +233,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             allResults.addAll(resultList);
             
             input.setNumFilteredTargetHits(resultList.size());
-            input.setNumTargetHits(IdPickerInputGetter.instance().getUnfilteredInputCount(inputId, run.getInputGenerator()));
+            input.setNumTargetHits(IdPickerInputGetter.instance().getUnfilteredInputCount(inputId, inputGenerator));
         }
         return allResults;
     }
@@ -382,4 +400,5 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             return Double.valueOf(o1.getDiscriminantScore()).compareTo(o2.getDiscriminantScore());
         }
     }
+    
 }

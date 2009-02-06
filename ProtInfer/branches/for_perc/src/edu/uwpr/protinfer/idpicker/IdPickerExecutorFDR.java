@@ -38,7 +38,7 @@ public class IdPickerExecutorFDR {
         Program program = idpRun.getInputGenerator();
         
         // get all the search hits for the given inputIds
-        List<PeptideSpectrumMatchIDP> allPsms = getAllSearchHits(idpRun, params, program);
+        List<PeptideSpectrumMatchIDP> allPsms = getAllSearchHits(idpRun, params);
         
         // filter the search hits
         List<PeptideSpectrumMatchIDP> filteredPsms;
@@ -77,39 +77,14 @@ public class IdPickerExecutorFDR {
         rankPeptideSpectrumMatches(proteins);
         
         // FINALLY save the results
-        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
+        //IdPickerResultSaver.instance().saveResults(idpRun, proteins);
     }
     
-    // This method also updates the summary with the total number of proteins found for all the 
-    // search hits.
-    private List<PeptideSpectrumMatchIDP> getAllSearchHits(IdPickerRun idpRun, IDPickerParams params, Program program) {
+    
+    private List<PeptideSpectrumMatchIDP> getAllSearchHits(IdPickerRun idpRun, IDPickerParams params) {
         
-        
-        List<IdPickerInput> idpInputList = idpRun.getInputList();
-        List<PeptideSpectrumMatchIDP> allPsms = new ArrayList<PeptideSpectrumMatchIDP>();
         IdPickerInputGetter resGetter = IdPickerInputGetter.instance();
-        
-        for(IdPickerInput input: idpInputList) {
-            
-            int runSearchId = input.getInputId();
-            
-            // These peptides are already filtered for min peptide length
-            List<PeptideSpectrumMatchIDP> psms = resGetter.getInput(runSearchId, params, program);
-            allPsms.addAll(psms);
-            
-            // count the number of target and decoy hits
-            int target = 0;
-            int decoy = 0;
-            for(PeptideSpectrumMatchIDP psm: psms) {
-                if(psm.isDecoyMatch())  decoy++;
-                else                    target++;
-                
-            }
-            
-            input.setNumDecoyHits(decoy);
-            input.setNumTargetHits(target); 
-        }
-        
+        List<PeptideSpectrumMatchIDP> allPsms = resGetter.getInput(idpRun, params);
         return allPsms;
     }
     
