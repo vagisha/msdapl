@@ -43,15 +43,27 @@
 
 <bean:define name="program" id="program" type="edu.uwpr.protinfer.ProteinInferenceProgram"/>
 <logic:present name="params">
+<yrcwww:colorrow scheme="ms">
 <td colspan="2" align="center"><b>Parameters</b></td>
-	<logic:iterate name="params" id="param" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam">
-	<yrcwww:colorrow scheme="ms" repeat="true">
-		<td><%=program.getDisplayNameForParam(param.getName()) %></td>
-		<td><bean:write name="param" property="value"/></td>
-	</yrcwww:colorrow>
-	</logic:iterate>
+</yrcwww:colorrow>
+<logic:iterate name="params" id="param" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam">
+<yrcwww:colorrow scheme="ms" repeat="true">
+	<td><%=program.getDisplayNameForParam(param.getName()) %></td>
+	<td><bean:write name="param" property="value"/></td>
+</yrcwww:colorrow>
+</logic:iterate>
 </logic:present>
 
+<logic:present name="pinferJob" property="log">
+<yrcwww:colorrow scheme="ms">
+<td colspan="2" align="center"><b>Log</b></td>
+</yrcwww:colorrow>
+<yrcwww:colorrow scheme="ms" repeat="true">
+	<td colspan="2" align="center"><pre><bean:write name="pinferJob" property="log"/></pre></td>
+</yrcwww:colorrow>
+
+
+</logic:present>
 
 </table>
 </logic:present>
