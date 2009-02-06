@@ -120,6 +120,13 @@ public enum ProteinInferenceProgram {
             return NONE;
     }
     
+    public String getDisplayNameForParam(String name) {
+        for(ProgramParam param: params) {
+            if(param.getName().equals(name)) 
+                return param.getDisplayName();
+        }
+        return null;
+    }
     
     public static final class ProgramParam {
         
