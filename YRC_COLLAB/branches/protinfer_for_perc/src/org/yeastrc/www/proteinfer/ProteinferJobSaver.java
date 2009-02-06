@@ -47,6 +47,13 @@ public class ProteinferJobSaver {
             ProteinInferInputSummary inputSummary, ProgramParameters params,
             InputType inputType) throws Exception {
         
+        saveJobToDatabase(submitterId, inputSummary, params, inputType, null);
+    }
+    
+    public void saveJobToDatabase(int submitterId, 
+            ProteinInferInputSummary inputSummary, ProgramParameters params,
+            InputType inputType, String comments) throws Exception {
+        
         // create an entry in the main protein inference table and get an id 
         // for this protein inference run
         ProteinInferenceProgram program = ProteinInferenceProgram.getProgramForName(params.getProgramName());
@@ -56,6 +63,8 @@ public class ProteinferJobSaver {
         }
         ProteinferRun pirun = new ProteinferRun();
         pirun.setProgram(program);
+        if(comments != null)
+            pirun.setComments(comments);
         
         if(inputType == InputType.SEARCH) {
             MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();

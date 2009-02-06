@@ -47,7 +47,8 @@ public class DoProteinInferenceAction extends Action {
         ProgramParameters params = prinferForm.getProgramParams();
         
         // TODO validate the parameters (should be done in form)
-        ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), inputSummary, params, prinferForm.getInputType());
+        ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), inputSummary, params, 
+                prinferForm.getInputType(), prinferForm.getComments());
         
         // Go!
         ActionForward success = mapping.findForward( "Success" ) ;

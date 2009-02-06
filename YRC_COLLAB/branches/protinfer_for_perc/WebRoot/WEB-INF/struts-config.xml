@@ -1080,6 +1080,14 @@
 		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
 	</action>
 	
+	<action
+		path="/viewProteinInferenceJob"
+		type="org.yeastrc.www.proteinfer.ViewProteinInferenceJob"
+	>
+		<forward name="Failure" path="/viewProject.do" redirect="true" />
+		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceJob.jsp" redirect="false" />
+	</action>
+	
 	<action 
 		path="/viewProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.ViewProteinInferenceResultAction"

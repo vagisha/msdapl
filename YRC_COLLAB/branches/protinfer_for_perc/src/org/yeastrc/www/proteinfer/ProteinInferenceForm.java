@@ -25,7 +25,14 @@ public class ProteinInferenceForm extends ActionForm {
     private ProgramParameters programParams;
     private ProteinInferInputSummary inputSummary;
     private InputType inputType;
+    private String comments;
     
+    public String getComments() {
+        return comments;
+    }
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
     public ProteinInferenceForm () {
         inputSummary = new ProteinInferInputSummary();
         programParams = new ProgramParameters();

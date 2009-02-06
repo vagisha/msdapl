@@ -65,21 +65,9 @@ public class ProteinferRunSearcher {
                 // a search program or an analysis program
                 if(!Program.isSearchProgram(run.getInputGenerator()) && !Program.isAnalysisProgram(run.getInputGenerator()))
                     continue;
-                ProteinferJob job = null;
-                try {
-                    job = getJobForPinferRunId(run.getId());
-                }
-                catch (SQLException e) {
-                   log.error("Exception getting ProteinferJob", e);
-                   continue;
-                }
-                if(job == null) {
-                    log.error("No job found with protein inference run id: "+pid);
-                    continue;
-                }
-                job.setProgram(run.getProgramString());
-                job.setComments(run.getComments());
-                jobs.add(job);
+                ProteinferJob job = getJobForPinferRunId(run.getId());
+                if(job != null)
+                    jobs.add(job);
             }
         }
         // sort jobs by id
@@ -90,7 +78,36 @@ public class ProteinferRunSearcher {
         return jobs;
     }
     
-    private static ProteinferJob getJobForPinferRunId(int pinferRunId) throws SQLException {
+    public static ProteinferJob getJobForPinferRunId(int pinferRunId) {
+        
+        ProteinferRun run = runDao.loadProteinferRun(pinferRunId);
+        if(run != null) {
+            
+//            // make sure the input generator for this protein inference program was
+//            // a search program or an analysis program
+//            if(!Program.isSearchProgram(run.getInputGenerator()) && !Program.isAnalysisProgram(run.getInputGenerator()))
+//                continue;
+            ProteinferJob job = null;
+            try {
+                job = getJob(run.getId());
+            }
+            catch (SQLException e) {
+               log.error("Exception getting ProteinferJob", e);
+               return null;
+            }
+            if(job == null) {
+                log.error("No job found with protein inference run id: "+pinferRunId);
+                return null;
+            }
+            job.setProgram(run.getProgramString());
+            job.setComments(run.getComments());
+            return job;
+        }
+        return null;
+    }
+    
+    
+    private static ProteinferJob getJob(int pinferRunId) throws SQLException {
         
         Connection conn = null;
         PreparedStatement stmt = null;

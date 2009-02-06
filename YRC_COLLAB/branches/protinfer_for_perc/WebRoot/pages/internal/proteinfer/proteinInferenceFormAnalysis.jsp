@@ -199,6 +199,12 @@ function addAnalyses(selectedAnalyses) {
     </td>
    </yrcwww:colorrow>
    
+   <yrcwww:colorrow>
+    	<td colspan="2" align="center">Comments<br>
+    	<html:textarea name="proteinInferenceFormAnalysis" property="comments" rows="3" cols="50"/>
+    	</td>
+    </yrcwww:colorrow>
+    
    <yrcwww:colorrow scheme="ms" repeat="true">
    <td colspan="2" align="center">
    	<NOBR>

@@ -6,8 +6,6 @@
  */
 package org.yeastrc.www.proteinfer;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,15 +18,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
-import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;

@@ -1,15 +1,17 @@
+
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+	<bean:define name="idpickerRun" property="program" id="program" type="edu.uwpr.protinfer.ProteinInferenceProgram"/>
 	
 	<table cellpadding="2" align="center" style="font-family: Trebuchet MS,Trebuchet,Verdana,Helvetica,Arial,sans-serif;font-size:12px; border: 1px solid gray; border-spacing: 3px">
   		<tr>
   			<th colspan="2" class="ms_A" style="font-size: 10pt;">IDPicker Parameters</th>
   		</tr>
-  		<logic:iterate name="idpickerRun" property="sortedParams" id="param">
+  		<logic:iterate name="idpickerRun" property="sortedParams" id="param" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam">
   		<tr>
     	<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;">
-    		<bean:write name="param" property="name" />
+    		<%=program.getDisplayNameForParam(param.getName()) %>
     	</td>
     	<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;">
     		<bean:write name="param" property="value" />
