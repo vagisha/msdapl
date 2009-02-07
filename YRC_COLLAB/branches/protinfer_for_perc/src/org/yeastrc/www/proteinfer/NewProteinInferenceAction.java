@@ -19,6 +19,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.user.User;
@@ -59,6 +61,15 @@ public class NewProteinInferenceAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
+        // make sure a search with the given Id exists
+        MsSearch search = DAOFactory.instance().getMsSearchDAO().loadSearch(searchId);
+        if(search == null) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.searchId", searchId));
+            saveErrors( request, errors );
+            return mapping.findForward("Failure");
+        }
+        
         
         // We need the projectID so we can redirect back to the project page after
         // the protein inference job has been submitted.
@@ -76,20 +87,15 @@ public class NewProteinInferenceAction extends Action {
         }
         request.setAttribute("projectId", projectId);
         
-        ProteinInferInputGetter inputGetter = ProteinInferInputGetter.instance();
         
         // Create an ActionForm -- this will be used if the user chooses to run
         // protein inference on output from a search program
-        ProteinInferenceForm newForm1 = new ProteinInferenceForm();
-        request.setAttribute("proteinInferenceFormSearch", newForm1);
-        newForm1.setInputType(InputType.SEARCH);
-        newForm1.setProjectId(projectId);
-        ProteinInferInputSummary searchSummary = inputGetter.getInputSearchSummary(searchId);
-        newForm1.setInputSummary(searchSummary);
-        // set the IDPicker parameters
-        ProgramParameters params1 = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
-        setProgramDetails(params1, searchSummary.getSearchProgram());
-        newForm1.setProgramParams(params1);
+        // This form should be created only if the seach program was sequest or prolucid
+        
+        ProteinInferenceForm formForSearch = createFormForSearchInput(search, projectId);
+        if(formForSearch != null)
+            request.setAttribute("proteinInferenceFormSearch", formForSearch);
+        
         
         
         // check if there is a post-search analysis
@@ -104,23 +110,63 @@ public class NewProteinInferenceAction extends Action {
             // TODO We are assuming for now that there is only ONE analysis done on a search
             // This may not be true later.
             int analysisId = saIds.get(0);
+            MsSearchAnalysis analysis = saDao.load(analysisId);
             // Create our ActionForm
-            ProteinInferenceForm newForm2 = new ProteinInferenceForm();
-            request.setAttribute("proteinInferenceFormAnalysis", newForm2);
-            newForm2.setInputType(InputType.ANALYSIS);
-            newForm2.setProjectId(projectId);
-            ProteinInferInputSummary inputSummary = inputGetter.getInputAnalysisSummary(analysisId);
-            newForm2.setInputSummary(inputSummary);
+            ProteinInferenceForm formForAnalysis = createFormForAnalysisInput(analysis, projectId);
             
-            // set the IDPicker parameters
-            ProgramParameters params2 = new ProgramParameters(ProteinInferenceProgram.IDPICKER_PERC);
-            newForm2.setProgramParams(params2);
+            if(formForAnalysis != null)
+                request.setAttribute("proteinInferenceFormAnalysis", formForAnalysis);
         }
-        
 
         // Go!
         return mapping.findForward("Success");
 
+    }
+
+    private ProteinInferenceForm createFormForAnalysisInput(MsSearchAnalysis analysis, int projectId) {
+        
+        // This form should be created only if the analyis program is Percolator
+        if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
+            
+            ProteinInferInputGetter inputGetter = ProteinInferInputGetter.instance();
+            
+            ProteinInferenceForm formForAnalysis = new ProteinInferenceForm();
+            formForAnalysis.setInputType(InputType.ANALYSIS);
+            formForAnalysis.setProjectId(projectId);
+            ProteinInferInputSummary inputSummary = inputGetter.getInputAnalysisSummary(analysis);
+            formForAnalysis.setInputSummary(inputSummary);
+            // set the IDPicker parameters
+            ProgramParameters params2 = new ProgramParameters(ProteinInferenceProgram.IDPICKER_PERC);
+            formForAnalysis.setProgramParams(params2);
+            return formForAnalysis;
+        }
+        else
+            return null;
+    }
+
+    private ProteinInferenceForm createFormForSearchInput(MsSearch search, int projectId) {
+        
+        // This form should be created ONLY if search program for this search was either 
+        // Sequest or Percolator
+        Program program = search.getSearchProgram();
+        if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST || program == Program.PROLUCID) {
+            
+            ProteinInferInputGetter inputGetter = ProteinInferInputGetter.instance();
+            
+            ProteinInferInputSummary searchSummary = inputGetter.getInputSearchSummary(search);
+            ProteinInferenceForm formForSearch = new ProteinInferenceForm();
+            formForSearch.setInputSummary(searchSummary);
+            formForSearch.setInputType(InputType.SEARCH);
+            formForSearch.setProjectId(projectId);
+            // set the IDPicker parameters
+            ProgramParameters params1 = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
+            setProgramDetails(params1, searchSummary.getProgramName());
+            formForSearch.setProgramParams(params1);
+            return formForSearch;
+        }
+        else {
+            return null;
+        }
     }
     
     private void setProgramDetails(ProgramParameters params, String searchProgram) {

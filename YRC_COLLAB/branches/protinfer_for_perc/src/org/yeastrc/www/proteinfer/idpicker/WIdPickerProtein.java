@@ -13,7 +13,21 @@ public class WIdPickerProtein {
     private IdPickerProteinBase idpProtein;
     private String accession = "";
     private String description = "";
+    private String commonName = "";
     
+    public String getCommonName() {
+        return commonName;
+    }
+    public String getCommonNameShort() {
+        if(commonName == null)
+            return "";
+        if(commonName.length() <= 15)
+            return commonName;
+        return commonName.substring(0, 15)+"...";
+    }
+    public void setCommonName(String commonName) {
+        this.commonName = commonName;
+    }
     public WIdPickerProtein(IdPickerProteinBase prot) {
         this.idpProtein = prot;
     }
@@ -22,6 +36,13 @@ public class WIdPickerProtein {
     }
     public String getAccession() {
         return accession;
+    }
+    public String getShortAccession() {
+        if(accession == null)
+            return "No Accession";
+        if(accession.length() <= 15)
+            return accession;
+        return accession.substring(0, 15)+"...";
     }
     public void setAccession(String accession) {
         this.accession = accession;

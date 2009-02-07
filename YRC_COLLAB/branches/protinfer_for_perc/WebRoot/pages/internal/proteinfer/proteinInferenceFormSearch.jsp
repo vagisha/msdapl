@@ -3,9 +3,9 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<bean:define name="proteinInferenceFormSearch" property="inputSummary.searchId" id="searchIdInt" 
+<bean:define name="proteinInferenceFormSearch" property="inputSummary.inputGroupId" id="searchIdInt" 
     			scope="request"/>
-<bean:define name="proteinInferenceFormSearch" property="inputSummary.searchProgram" id="searchProgram" scope="request"/>
+<bean:define name="proteinInferenceFormSearch" property="inputSummary.programName" id="searchProgram" scope="request"/>
 
 <script type="text/javascript">
 
@@ -44,7 +44,7 @@ function addSearches(selectedSearches) {
 		}
 		var currentInputCount = 0;
 		for(i = 0; i < currentSearchIds.length; i++) {
-			currentInputCount += $("input[id='file_search_"+currentSearchIds[i]+"']").length;
+			currentInputCount += $("input[id='toggle_search_"+currentSearchIds[i]+"_file']").length;
 		}
 		//alert("current input count: "+currentInputCount);
 		
@@ -79,11 +79,10 @@ function addSearches(selectedSearches) {
 
 
 
-<div id="inputType_search">
   <html:form action="doProteinInference" method="post" styleId="form1">
   
   <html:hidden name="proteinInferenceFormSearch" property="projectId" />
-  <html:hidden name="proteinInferenceFormSearch" property="inputSummary.searchId" />
+  <html:hidden name="proteinInferenceFormSearch" property="inputSummary.inputGroupId" />
   <html:hidden name="proteinInferenceFormSearch" property="inputTypeChar" />
   
   <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
@@ -144,20 +143,20 @@ function addSearches(selectedSearches) {
     	
     	<div id="searchInputList">
     	
-    	<div id="search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchId"/>">
+    	<div id="search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>">
     	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
-    		 id="foldable_search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchId"/>">
-    		Search ID: <bean:write name="proteinInferenceFormSearch" property="inputSummary.searchId"/>
+    		 id="foldable_search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>">
+    		Search ID: <bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>
     	</div>
     	
     	
-    	<div id="foldable_search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchId"/>_div">
+    	<div id="foldable_search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>_div">
     	
     	<div style="color: black;">
     		Search Program: 
-    		<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchProgram" />&nbsp;
-  			<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchProgramVersion" />
+    		<bean:write name="proteinInferenceFormSearch" property="inputSummary.programName" />&nbsp;
+  			<bean:write name="proteinInferenceFormSearch" property="inputSummary.programVersion" />
   			<br>
   			Search Database:
   			<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchDatabase" /> 
@@ -196,7 +195,7 @@ function addSearches(selectedSearches) {
    
    </yrcwww:colorrow>
    
-    <yrcwww:colorrow>
+    <yrcwww:colorrow scheme="ms" repeat="true">
     	<td colspan="2" align="center">Comments<br>
     	<html:textarea name="proteinInferenceFormSearch" property="comments" rows="3" cols="50"/>
     	</td>
@@ -214,4 +213,3 @@ function addSearches(selectedSearches) {
 
  
 </html:form>
-</div>

@@ -8,9 +8,6 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:notPresent name="proteinInferenceFormSearch">
-	<logic:forward  name="newProteinInference" />
-</logic:notPresent>
  
 <%@ include file="/includes/header.jsp" %>
 
@@ -109,22 +106,35 @@ function toggleSelection(button) {
  <CENTER>
  
  
- <logic:present name="proteinInferenceFormAnalysis">
  <div align="center" style="color:black;">
 	<b>Select Input Type: </b> 
 		<input type="radio" name="inputSelector" value="Search" checked id="searchopt" >Search
 		<input type="radio" name="inputSelector" value="Search" id="analysisopt"> Analysis
  </div>
  <br>
- </logic:present>
  
 <!-- Form when using search results -->
-<%@include file="proteinInferenceFormSearch.jsp" %>
+<logic:present name="proteinInferenceFormSearch">
+<div id="inputType_search">
+	<%@include file="proteinInferenceFormSearch.jsp" %>
+</div>
+</logic:present>
+<logic:notPresent name="proteinInferenceFormSearch">
+	<div style="margin-top: 30; margin-bottom: 30;" id="inputType_search">No valid search input found for running Protein Inference.</div>
+</logic:notPresent>
+
  
 <!-- Form when using search analysis results -->
 <logic:present name="proteinInferenceFormAnalysis">
+ <div id="inputType_analysis" style="display: none;">
 	<%@include file="proteinInferenceFormAnalysis.jsp" %>
+</div>
 </logic:present>
+<logic:notPresent name="proteinInferenceFormAnalysis">
+	<div style="margin-top: 30; margin-bottom: 30; display: none;" id="inputType_analysis" >
+		No valid analysis input found for running Protein Inference.
+	</div>
+</logic:notPresent>
 
 
 <div style="font-size: 8pt;margin-top: 3px;">

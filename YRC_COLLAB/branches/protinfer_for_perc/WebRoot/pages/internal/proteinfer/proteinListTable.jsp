@@ -55,17 +55,18 @@
 		<% String colSortedClass = "";
 			 if(sortBy == SORT_BY.GROUP_ID) colSortedClass = sortedClass;
 		%>
-		<th class="sortable def_sort_asc <%=colSortedClass %>" width="1%" id="<%=SORT_BY.GROUP_ID.name()%>">
+		<th class="sortable def_sort_asc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.GROUP_ID.name()%>">
 			<b><font size="2pt">Protein Group</font></b>
 		</th>
 		
 		<!-- Make Protein and Description columns sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
 			<th width="1%"><b><font size="2pt">S</font></b></th>
-			<th><b><font size="2pt">Protein</font></b></th>
-			<th><b><font size="2pt">Description</font></b></th>
-			<th><b><font size="2pt">Coverage(%)</font></b></th>
-			<th><b><font size="2pt">NSAF**</font></b></th>
+			<th width="10%"><b><font size="2pt">Fasta ID</font></b></th>
+			<th width="10%"><b><font size="2pt">Common<br>Name</font></b></th>
+			<th width="55%"><b><font size="2pt">Description</font></b></th>
+			<th width="5%"><b><font size="2pt">Coverage(%)</font></b></th>
+			<th width="5%"><b><font size="2pt">NSAF**</font></b></th>
 		</logic:equal>
 		
 		<logic:equal name="groupProteins" value="false">
@@ -73,13 +74,14 @@
 			 if(sortBy == SORT_BY.ACCESSION) colSortedClass = sortedClass;
 			%>
 			<th width="1%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.VALIDATION_STATUS.name()%>"><b><font size="2pt">S</font></b></th>
-			<th class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.ACCESSION.name()%>"><b><font size="2pt">Protein</font></b></th>
-			<th class=""><b><font size="2pt">Description</font></b></th>
+			<th width="10%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.ACCESSION.name()%>"><b><font size="2pt">Fasta ID</font></b></th>
+			<th width="10%"><b><font size="2pt">Common<br>Name</font></b></th>
+			<th width="55%" class=""><b><font size="2pt">Description</font></b></th>
 		
 			<% colSortedClass = "";
 			 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
 			%>
-			<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.COVERAGE.name()%>">
+			<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.COVERAGE.name()%>">
 				<b><font size="2pt">Coverage (%)</font></b>
 			</th>
 			
@@ -93,26 +95,26 @@
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_PEPT) colSortedClass = sortedClass;
 		%>
-		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.NUM_PEPT.name()%>">
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NUM_PEPT.name()%>">
 			<b><font size="2pt"># Peptides</font></b>
 		</th>
 		
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_UNIQ_PEPT) colSortedClass = sortedClass;
 		%>
-		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.NUM_UNIQ_PEPT.name()%>">
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NUM_UNIQ_PEPT.name()%>">
 			<b><font size="2pt"># Uniq. Peptides</font></b></th>
 		
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_SPECTRA) colSortedClass = sortedClass;
 		%>
-		<th class="sortable def_sort_desc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.NUM_SPECTRA.name()%>">
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NUM_SPECTRA.name()%>">
 			<b><font size="2pt"># Spectra</font></b></th>
 		
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.CLUSTER_ID) colSortedClass = sortedClass;
 		%>
-		<th class="sortable def_sort_asc <%=colSortedClass %>" width="3%" id="<%=SORT_BY.CLUSTER_ID.name()%>">
+		<th class="sortable def_sort_asc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.CLUSTER_ID.name()%>">
 			<b><font size="2pt">Protein Cluster</font></b></th>
 			
 		</tr>
@@ -163,20 +165,37 @@
 			</span>
 			</td>
 			
+			<!-- Protein accesion -->
 			<td> 
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="text-decoration: underline; cursor: pointer">
-			<bean:write name="protein" property="accession" />
+			<bean:write name="protein" property="shortAccession" />
 			</span>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
 			
 			</td>
+			
+			<!-- Protein common name -->
+			<td> 
+			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
+			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
+			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
+					style="text-decoration: underline; cursor: pointer">
+				<bean:write name="protein" property="commonName" />
+			</span>
+			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
+			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
+			</td>
+			
+			<!-- Protein description -->
 			<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
 			<td><bean:write name="protein" property="protein.coverage"/></td>
 			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
+		
+		
 		
 			<td rowspan="<bean:write name="rowspan" />" valign="middle">
 				<bean:write name="proteinGroup" property="matchingPeptideCount"/>
@@ -261,18 +280,35 @@
 		</span>
 		</td>
 		
+		<!-- Protein accession -->
 		<td>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="text-decoration: underline; cursor: pointer">
-			<bean:write name="protein" property="accession" />
+			<bean:write name="protein" property="shortAccession" />
 			</span>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
 			
 		</td>
+		
+		<!-- Protein common name -->
+			<td> 
+			<logic:equal name="protein" property="protein.isParsimonious" value="true"><b></logic:equal>
+			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
+			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
+					style="text-decoration: underline; cursor: pointer">
+				<bean:write name="protein" property="commonName" />
+			</span>
+			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
+			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
+			</td>
+			
+		<!-- Protein Description -->
 		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
+		
+		
 		<td><bean:write name="protein" property="protein.coverage"/></td>
 		<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		

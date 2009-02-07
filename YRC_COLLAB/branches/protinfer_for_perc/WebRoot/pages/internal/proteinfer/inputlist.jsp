@@ -12,20 +12,20 @@
 
 <logic:iterate name="inputList" id="inputSummary">
 
-	<div id="<bean:write name="inputSummary" property="searchId"/>">
+	<div id="<bean:write name="inputSummary" property="inputGroupId"/>">
     	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
-    		 id="foldable_search_<bean:write name="inputSummary" property="searchId"/>">
-    		 Search ID: <bean:write name="inputSummary" property="searchId"/>
+    		 id="foldable_search_<bean:write name="inputSummary" property="inputGroupId"/>">
+    		 Search ID: <bean:write name="inputSummary" property="inputGroupId"/>
     	</div>
     	
     	
-    	<div id="foldable_search_<bean:write name="inputSummary" property="searchId"/>_div">
+    	<div id="foldable_search_<bean:write name="inputSummary" property="inputGroupId"/>_div">
     	
     	<div style="color: black;">
     		Search Program: 
-    		<bean:write name="inputSummary" property="searchProgram" />&nbsp;
-  			<bean:write name="inputSummary" property="searchProgramVersion" />
+    		<bean:write name="inputSummary" property="programName" />&nbsp;
+  			<bean:write name="inputSummary" property="programVersion" />
   			<br>
   			Search Database:
   			<bean:write name="inputSummary" property="searchDatabase" /> 
@@ -38,7 +38,7 @@
 		<yrcwww:colorrow scheme="ms" repeat="true">
 			<td WIDTH="20%" VALIGN="top"> 
 				<input type="checkbox" checked="checked" 
-					   id="toggle_search_<bean:write name="inputSummary" property="searchId"/>_file"
+					   id="toggle_search_<bean:write name="inputSummary" property="inputGroupId"/>_file"
 					   value="true"
 					   name="inputFile[<%=index %>].isSelected" />
 			</td>
@@ -54,7 +54,7 @@
 		</logic:iterate>
  		</table>
 		<div class="clickable toggle_selection" style="font-size: 7pt; color: #3D902A;" 
-		     id="toggle_search_<bean:write name="inputSummary" property="searchId"/>">Deselect All</div>
+		     id="toggle_search_<bean:write name="inputSummary" property="inputGroupId"/>">Deselect All</div>
 		</div>
 		</div>
 		<br>
@@ -68,20 +68,20 @@
 
 <logic:iterate name="inputList" id="inputSummary">
 
-	<div id="<bean:write name="inputSummary" property="searchAnalysisId"/>">
+	<div id="<bean:write name="inputSummary" property="inputGroupId"/>">
     	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
-    		 id="analysis_<bean:write name="inputSummary" property="searchAnalysisId"/>">
-    		Search Analysis ID: <bean:write name="inputSummary" property="searchAnalysisId"/>
+    		 id="foldable_analysis_<bean:write name="inputSummary" property="inputGroupId"/>">
+    		Search Analysis ID: <bean:write name="inputSummary" property="inputGroupId"/>
     	</div>
     	
     	
-    	<div id="foldable_analysis_<bean:write name="inputSummary" property="searchId"/>">
+    	<div id="foldable_analysis_<bean:write name="inputSummary" property="inputGroupId"/>_div">
     	
     	<div style="color: black;">
     		Analysis Program: 
-    		<bean:write name="inputSummary" property="analysisProgram" />&nbsp;
-  			<bean:write name="inputSummary" property="analysisProgramVersion" />
+    		<bean:write name="inputSummary" property="programName" />&nbsp;
+  			<bean:write name="inputSummary" property="programVersion" />
   			<br>
   			Search Database:
   			<bean:write name="inputSummary" property="searchDatabase" /> 
@@ -94,7 +94,7 @@
 		<yrcwww:colorrow scheme="ms" repeat="true">
 			<td WIDTH="20%" VALIGN="top"> 
 				<input type="checkbox" checked="checked" 
-					   id="file_analysis_<bean:write name="inputSummary" property="searchAnalysisId"/>"
+					   id="toggle_analysis_<bean:write name="inputSummary" property="inputGroupId"/>_file"
 					   value="true"
 					   name="inputFile[<%=index %>].isSelected" />
 			</td>
@@ -105,11 +105,12 @@
 				       name="inputFile[<%=index %>].runName"/>
 				<bean:write  name="inputFile" property="runName" />
 			</td>
+			<%index++; %>
 		</yrcwww:colorrow>
 		</logic:iterate>
  		</table>
 		<div class="clickable toggle_selection" style="font-size: 7pt; color: #3D902A;" 
-		     id="analysis_<bean:write name="inputSummary" property="searchAnalysisId"/>">Deselect All</div>
+		     id="toggle_analysis_<bean:write name="inputSummary" property="inputGroupId"/>">Deselect All</div>
 		</div>
 		</div>
 		<br>

@@ -19,6 +19,7 @@
 	<td># Peptides</td>
 	<td># Uniq.Peptides</td>
 	<td># Spectra </td>
+	<td>NSAF** </td>
 	<td>Parsimonious</td>
 	<td>Other Proteins in Group</td>
 </tr>
@@ -27,6 +28,7 @@
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.peptideCount" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.uniquePeptideCount" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.spectrumCount" /></td>
+	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.nsafFormatted" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center">
 		<logic:equal name="protein" property="protein.isParsimonious" value="true">Yes</logic:equal>
 		<logic:equal name="protein" property="protein.isParsimonious" value="false">No</logic:equal>

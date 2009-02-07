@@ -14,7 +14,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
@@ -61,10 +60,6 @@ public class ProteinferRunSearcher {
             ProteinferRun run = runDao.loadProteinferRun(pid);
             if(run != null) {
                 
-                // make sure the input generator for this protein inference program was
-                // a search program or an analysis program
-                if(!Program.isSearchProgram(run.getInputGenerator()) && !Program.isAnalysisProgram(run.getInputGenerator()))
-                    continue;
                 ProteinferJob job = getJobForPinferRunId(run.getId());
                 if(job != null)
                     jobs.add(job);

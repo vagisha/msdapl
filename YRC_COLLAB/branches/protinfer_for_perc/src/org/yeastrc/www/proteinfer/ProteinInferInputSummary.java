@@ -5,13 +5,13 @@ import java.util.List;
 
 public class ProteinInferInputSummary {
 
-    private int searchId;
-    private String searchProgram;
-    private String searchProgramVersion;
+    private int inputGroupId; // can be a searchId or searchAnalysisId
+    private String program;
+    private String programVersion;
     
-    private int searchAnalysisId;
-    private String analysisProgram;
-    private String analysisProgramVersion;
+//    private int searchAnalysisId;
+//    private String analysisProgram;
+//    private String analysisProgramVersion;
     
     private String searchDatabase;
     private List<ProteinInferIputFile> files;
@@ -24,12 +24,20 @@ public class ProteinInferInputSummary {
         return files;
     }
     
-    public int getSearchId() {
-        return searchId;
+    /**
+     * Either a searchId or a searchAnalysisId
+     * @return
+     */
+    public int getInputGroupId() {
+        return inputGroupId;
     }
 
-    public void setSearchId(int searchId) {
-        this.searchId = searchId;
+    /**
+     * Either a searchId or a searchAnalysisId
+     * @param inputGroupId
+     */
+    public void setInputGroupId(int inputGroupId) {
+        this.inputGroupId = inputGroupId;
     }
 
     public void setInputFiles(List<ProteinInferIputFile> files) {
@@ -47,46 +55,46 @@ public class ProteinInferInputSummary {
         files.add(runSearch);
     }
     
-    public String getSearchProgram() {
-        return searchProgram;
+    public String getProgramName() {
+        return program;
     }
 
-    public void setSearchProgram(String searchProgram) {
-        this.searchProgram = searchProgram;
+    public void setProgramName(String program) {
+        this.program = program;
     }
     
-    public String getSearchProgramVersion() {
-        return searchProgramVersion;
+    public String getProgramVersion() {
+        return programVersion;
     }
 
-    public void setSearchProgramVersion(String searchProgramVersion) {
-        this.searchProgramVersion = searchProgramVersion;
+    public void setProgramVersion(String programVersion) {
+        this.programVersion = programVersion;
     }
 
     
-    public int getSearchAnalysisId() {
-        return searchAnalysisId;
-    }
-
-    public void setSearchAnalysisId(int searchAnalysisId) {
-        this.searchAnalysisId = searchAnalysisId;
-    }
-    
-    public String getAnalysisProgram() {
-        return analysisProgram;
-    }
-
-    public void setAnalysisProgram(String analysisProgram) {
-        this.analysisProgram = analysisProgram;
-    }
-
-    public String getAnalysisProgramVersion() {
-        return analysisProgramVersion;
-    }
-
-    public void setAnalysisProgramVersion(String analysisProgramVersion) {
-        this.analysisProgramVersion = analysisProgramVersion;
-    }
+//    public int getSearchAnalysisId() {
+//        return searchAnalysisId;
+//    }
+//
+//    public void setSearchAnalysisId(int searchAnalysisId) {
+//        this.searchAnalysisId = searchAnalysisId;
+//    }
+//    
+//    public String getAnalysisProgram() {
+//        return analysisProgram;
+//    }
+//
+//    public void setAnalysisProgram(String analysisProgram) {
+//        this.analysisProgram = analysisProgram;
+//    }
+//
+//    public String getAnalysisProgramVersion() {
+//        return analysisProgramVersion;
+//    }
+//
+//    public void setAnalysisProgramVersion(String analysisProgramVersion) {
+//        this.analysisProgramVersion = analysisProgramVersion;
+//    }
 
     public String getSearchDatabase() {
         return searchDatabase;

@@ -3,9 +3,9 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<bean:define name="proteinInferenceFormAnalysis" property="inputSummary.searchAnalysisId" id="analysisIdInt" 
+<bean:define name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId" id="analysisIdInt" 
     			scope="request"/>
-<bean:define name="proteinInferenceFormAnalysis" property="inputSummary.analysisProgram" id="analysisProgram" scope="request"/>
+<bean:define name="proteinInferenceFormAnalysis" property="inputSummary.programName" id="analysisProgram" scope="request"/>
 
 <script type="text/javascript">
 
@@ -27,7 +27,7 @@ function requestAnalysisList() {
 			haveAnalyses += ",";
 		haveAnalyses += currentAnalysisIds[i];
 	}
-	alert(haveAnalyses);
+	//alert(haveAnalyses);
 	var winHeight = 500
 	var winWidth = 700;
 	var doc = "/yrc/listInputGroups.do?excludeInputGroups="+haveAnalyses+"&inputGenerator="+analysisProgram;
@@ -45,9 +45,9 @@ function addAnalyses(selectedAnalyses) {
 		}
 		var currentInputCount = 0;
 		for(i = 0; i < currentAnalysisIds.length; i++) {
-			currentInputCount += $("input[class='"+currentAnalysisIds[i]+"']").length;
+			currentInputCount += $("input[id='toggle_analysis_"+currentAnalysisIds[i]+"_file']").length;
 		}
-		//alert("current input count: "+currentInputCount);
+		alert("current input count: "+currentInputCount);
 		
 		$.ajax({
   			type: "GET",
@@ -82,12 +82,10 @@ function addAnalyses(selectedAnalyses) {
 
 
 
- <div id="inputType_analysis" style="display: none;">
   <html:form action="doProteinInference" method="post" styleId="form1">
   
   <html:hidden name="proteinInferenceFormAnalysis" property="projectId" />
-  <html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.searchId" />
-  <html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.searchAnalysisId" />
+  <html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId" />
   <html:hidden name="proteinInferenceFormAnalysis" property="inputTypeChar" />
   
   <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
@@ -148,23 +146,23 @@ function addAnalyses(selectedAnalyses) {
     	
     	<div id="analysisInputList">
     	
-    	<div id="analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.searchAnalysisId"/>">
+    	<div id="analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
     	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
-    		 id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.searchAnalysisId"/>">
-    		Analysis ID: <bean:write name="proteinInferenceFormAnalysis" property="inputSummary.searchAnalysisId"/>
+    		 id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
+    		Analysis ID: <bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>
     	</div>
     	
     	
-    	<div id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.searchAnalysisId"/>_div">
+    	<div id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>_div">
     	
     	<div style="color: black;">
     		Analysis Program: 
-    		<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.analysisProgram" />&nbsp;
-  			<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.analysisProgramVersion" />
+    		<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.programName" />&nbsp;
+  			<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.programVersion" />
   			<br>
   			Search Database:
-  			<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchDatabase" /> 
+  			<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.searchDatabase" /> 
     	</div>
     	<br>
     	
@@ -199,7 +197,7 @@ function addAnalyses(selectedAnalyses) {
     </td>
    </yrcwww:colorrow>
    
-   <yrcwww:colorrow>
+   <yrcwww:colorrow scheme="ms" repeat="true">
     	<td colspan="2" align="center">Comments<br>
     	<html:textarea name="proteinInferenceFormAnalysis" property="comments" rows="3" cols="50"/>
     	</td>
@@ -217,4 +215,3 @@ function addAnalyses(selectedAnalyses) {
 
  
 </html:form>
-</div>

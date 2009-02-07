@@ -45,6 +45,7 @@ public class ListProteinInferInputGroupAction extends Action {
 
     private static final Logger log = Logger.getLogger(ListProteinInferInputGroupAction.class);
     
+    
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -82,6 +83,7 @@ public class ListProteinInferInputGroupAction extends Action {
         }
         
         // get the projects for this user
+        @SuppressWarnings("unchecked")
         List<Project> userProjects = user.getProjects();
         
         

@@ -93,7 +93,7 @@
   	<td colspan="3">
   	<table align="left">
   		<tr>
-  			<td valign="top">Protein(s): </td>
+  			<td valign="top">Fasta ID(s): </td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
   				<span style="font-size:8pt; color:#3D902A;">Enter a comma-separated list of complete or partial identifiers</span>
   			</td>
