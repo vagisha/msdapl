@@ -40,6 +40,11 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     }
 
     @Override
+    public List<Integer> loadSearchIdsForProteinferRun(int pinferId) {
+        return runDao.loadSearchIdsForProteinferRun(pinferId);
+    }
+    
+    @Override
     public int save(GenericProteinferRun<?> run) {
         return runDao.save(run);
     }

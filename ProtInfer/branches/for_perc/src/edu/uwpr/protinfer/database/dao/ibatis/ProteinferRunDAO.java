@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.domain.search.Program;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -59,6 +60,24 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         map.put("inputIds", buf.toString());
         
         return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIds", map);
+    }
+    
+    @Override
+    public List<Integer> loadSearchIdsForProteinferRun(int pinferId) {
+        ProteinferRun run = loadProteinferRun(pinferId);
+        if(run == null) {
+            throw new IllegalArgumentException("No protein inference run for ID: "+pinferId);
+        }
+        Program program = run.getInputGenerator();
+        if(Program.isSearchProgram(program)) {
+            return queryForList(sqlMapNameSpace+".selectSearchIdsForRunSearchIds", pinferId);
+        }
+        else if(Program.isAnalysisProgram(program)) {
+            return queryForList(sqlMapNameSpace+".selectSearchIdsForRunSearchAnalysisIds", pinferId);
+        }
+        else {
+            throw new IllegalArgumentException("Unknown input genrator for protein inference: "+program.name());
+        }
     }
     
     public void delete(int pinferId) {
@@ -130,4 +149,5 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
             return program;
         }
     }
+   
 }

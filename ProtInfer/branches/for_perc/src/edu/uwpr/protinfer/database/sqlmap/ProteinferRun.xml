@@ -43,6 +43,21 @@
     	SELECT DISTINCT piRunID FROM msProteinInferInput WHERE inputID in $inputIds$ AND inputType=#inputType#
     </select>
     
+    <select id="selectSearchIdsForRunSearchIds" resultClass="Integer" parameterClass="Integer">
+    	SELECT DISTINCT rs.searchID
+    	FROM msProteinInferInput as i, msRunSearch as rs
+    	WHERE i.piRunID=#pinferId#
+    	AND   i.inputID = rs.id
+    </select>
+    
+    <select id="selectSearchIdsForRunSearchAnalysisIds" resultClass="Integer" parameterClass="Integer">
+    	SELECT DISTINCT rs.searchID
+    	FROM msProteinInferInput as i, msRunSearchAnalysis as ra, msRunSearch as rs
+    	WHERE i.piRunID=#pinferId#
+    	AND   i.inputID = ra.id
+    	AND   ra.runSearchID = rs.id
+    </select>
+    
     <insert id="insert" parameterMap="pinferRunParam">
     	INSERT INTO msProteinInferRun (
     	program,

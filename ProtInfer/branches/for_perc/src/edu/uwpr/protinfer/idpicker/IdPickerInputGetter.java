@@ -40,8 +40,9 @@ public class IdPickerInputGetter {
      * Returns a list of peptide spectrum matches which are filtered by relevant score(s)
      * and for min peptide length and 
      * ranked by relevant score(s) for each peptide (as defined in the PeptideDefinition). 
+     * @throws Exception 
      */
-    public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(IdPickerRun run , IDPickerParams params) {
+    public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(IdPickerRun run , IDPickerParams params) throws Exception {
         
         Program inputGenerator = run.getInputGenerator();
         log.info("Reading search/analysis results for Protein Inference run: "+run.getId()+"; Input Generator Program: "+inputGenerator.displayName());
@@ -50,12 +51,13 @@ public class IdPickerInputGetter {
            return percResGetter.getResultsNoFdr(run, params);
         }
         else {
-            log.error("Don't know how to get IDPicker input for: "+inputGenerator);
-            return null;
+            log.error("Don't know how to get Protein Inference input for: "+inputGenerator);
+            throw new Exception("Don't know how to get Protein Inference input for: "+inputGenerator);
         }
     }
     
-    public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(List<IdPickerInput> inputList, Program inputGenerator, IDPickerParams params) {
+    public List<PeptideSpectrumMatchNoFDR> getInputNoFdr(List<IdPickerInput> inputList, Program inputGenerator, IDPickerParams params) 
+            throws Exception {
         
         log.info("Reading search/analysis results. Input Generator Program: "+inputGenerator.displayName());
         if(inputGenerator == Program.PERCOLATOR) {
@@ -63,13 +65,13 @@ public class IdPickerInputGetter {
            return percResGetter.getResultsNoFdr(inputList, inputGenerator, params);
         }
         else {
-            log.error("Don't know how to get IDPicker input for: "+inputGenerator);
-            return null;
+            log.error("Don't know how to get Protein Inference input for: "+inputGenerator);
+            throw new Exception("Don't know how to get Protein Inference input for: "+inputGenerator);
         }
     }
     
     
-    public List<PeptideSpectrumMatchIDP> getInput(IdPickerRun run, IDPickerParams params) {
+    public List<PeptideSpectrumMatchIDP> getInput(IdPickerRun run, IDPickerParams params) throws Exception {
         
         Program inputGenerator = run.getInputGenerator();
         log.info("Reading search/analysis results for Protein Inference run: "+run.getId()+"; Input Generator Program: "+inputGenerator.displayName());
@@ -83,8 +85,8 @@ public class IdPickerInputGetter {
             return plcidResGetter.getResults(run, params);
         }
         else {
-            log.error("Don't know how to get IDPicker input for: "+inputGenerator);
-            return null;
+            log.error("Don't know how to get Protein Inference input for: "+inputGenerator);
+            throw new Exception("Don't know how to get Protein Inference input for: "+inputGenerator);
         }
     }
     

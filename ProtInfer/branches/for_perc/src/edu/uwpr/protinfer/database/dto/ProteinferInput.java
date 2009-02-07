@@ -37,10 +37,6 @@ public class ProteinferInput {
         this.inputType = inputType;
     }
     
-    public String getInputTypeString() {
-        return String.valueOf(inputType.shortName);
-    }
-    
     public static enum InputType {
         SEARCH('S'), ANALYSIS('A');
         

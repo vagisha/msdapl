@@ -6,7 +6,6 @@
  */
 package edu.uwpr.protinfer.idpicker;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -54,6 +53,9 @@ public class IdPickerExecutorFDR {
             throw new Exception(e);
         }
         
+        allPsms.clear();
+        allPsms = null;
+        
         if(filteredPsms == null || filteredPsms.size() == 0) {
             log.error("No filtered hits found!");
             throw new Exception("No filtered hits found!");
@@ -77,11 +79,11 @@ public class IdPickerExecutorFDR {
         rankPeptideSpectrumMatches(proteins);
         
         // FINALLY save the results
-        //IdPickerResultSaver.instance().saveResults(idpRun, proteins);
+        IdPickerResultSaver.instance().saveResults(idpRun, proteins);
     }
     
     
-    private List<PeptideSpectrumMatchIDP> getAllSearchHits(IdPickerRun idpRun, IDPickerParams params) {
+    private List<PeptideSpectrumMatchIDP> getAllSearchHits(IdPickerRun idpRun, IDPickerParams params) throws Exception {
         
         IdPickerInputGetter resGetter = IdPickerInputGetter.instance();
         List<PeptideSpectrumMatchIDP> allPsms = resGetter.getInput(idpRun, params);
