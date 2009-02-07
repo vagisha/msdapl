@@ -13,6 +13,8 @@ public interface MsSearchAnalysisDAO {
     
     public abstract List<Integer> getAnalysisIdsForSearch(int searchId);
     
+    public abstract List<Integer> getSearchIdsForAnalysis(int analysisId);
+    
     public abstract int updateAnalysisProgramVersion(int analysisId, String versionStr);
     
     public abstract int updateAnalysisProgram(int analysisId, Program program);

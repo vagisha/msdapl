@@ -34,6 +34,13 @@
     	AND rs.id = ra.runSearchID
     </select>
     
+    <select id="selectSearchIdsForAnalysis" resultClass="Integer" parameterClass="Integer">
+    	SELECT DISTINCT searchID 
+    	FROM msRunSearch AS rs, msRunSearchAnalysis AS ra 
+    	WHERE ra.searchAnalysisID = #searchAnalysisId# 
+    	AND rs.id = ra.runSearchID
+    </select>
+    
     <insert id="insert" parameterMap="msAnalysisParam">
     	INSERT INTO msSearchAnalysis (
     	programName,

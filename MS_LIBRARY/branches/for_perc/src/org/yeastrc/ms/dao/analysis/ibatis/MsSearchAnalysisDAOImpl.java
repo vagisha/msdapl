@@ -31,6 +31,11 @@ public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAn
     }
     
     @Override
+    public List<Integer> getSearchIdsForAnalysis(int analysisId) {
+        return queryForList(namespace+".selectSearchIdsForAnalysis", analysisId);
+    }
+    
+    @Override
     public int save(MsSearchAnalysis analysis) {
         return saveAndReturnId(namespace+".insert", analysis);
     }
@@ -55,4 +60,5 @@ public class MsSearchAnalysisDAOImpl extends BaseSqlMapDAO implements MsSearchAn
     public void delete(int analysisId) {
         delete(namespace+".delete", analysisId);
     }
+    
 }

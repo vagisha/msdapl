@@ -93,6 +93,13 @@
         WHERE id = #id#
     </select>
     
+    <select id="selectProtein" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE databaseID IN $databaseIds$ 
+        AND proteinID = #proteinId#
+    </select>
+    
     <select id="selectProteinSequence" resultClass="String" parameterClass="Integer">
     	SELECT seq.sequence 
     	FROM tblProtein AS prot 
@@ -110,8 +117,11 @@
     	AND dbProt.id = #id#
     </select>
     
-    <select id="selectDbProteinIdsForDescription" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM tblProteinDatabase WHERE databaseID=#databaseId# AND description LIKE #description#
+    <select id="selectDbProteinIdsForDescription" resultMap="nrDbProtResult" parameterClass="java.util.Map">
+    	SELECT * 
+    	FROM tblProteinDatabase 
+    	WHERE databaseID in $databaseIds$ 
+    	AND description LIKE #description#
     </select>
     
 </sqlMap>

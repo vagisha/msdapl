@@ -242,6 +242,30 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+    public static List<NrDbProtein> getProtein(int proteinId, List<Integer> dbIds) {
+        String statementName = "NrSeq.selectProtein";
+        
+        if(dbIds == null || dbIds.size() == 0)
+            throw new IllegalArgumentException("At least one database ID is required to search for protein");
+        
+        String dbIdStr = "";
+        for(int id: dbIds)
+            dbIdStr += ","+id;
+        dbIdStr = dbIdStr.substring(1); // remove first comma
+        dbIdStr = "("+dbIdStr+")";
+        
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("databaseIds", dbIdStr);
+        map.put("proteinId", proteinId);
+        try {
+            return sqlMap.queryForList(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     public static String getProteinSequence(int proteinId) {
         String statementName = "NrSeq.selectProteinSequence";
         try {
@@ -264,11 +288,21 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
-    public static List<Integer> getDbProteinIdsForDescription(int databaseId, String description) {
+    public static List<NrDbProtein> getDbProteinsForDescription(List<Integer> dbIds, String description) {
+        
+        if(dbIds == null || dbIds.size() == 0)
+            throw new IllegalArgumentException("At least one database ID is required to search for protein description");
+        
+        String dbIdStr = "";
+        for(int id: dbIds)
+            dbIdStr += ","+id;
+        dbIdStr = dbIdStr.substring(1); // remove first comma
+        dbIdStr = "("+dbIdStr+")";
+        
         String statementName = "NrSeq.selectDbProteinIdsForDescription";
         Map<String, Object> map = new HashMap<String, Object>(4);
-        map.put("databaseId", databaseId);
-        map.put("description", description);
+        map.put("databaseIds", dbIdStr);
+        map.put("description", "%"+description+"%");
         try {
             return sqlMap.queryForList(statementName, map);
         }
