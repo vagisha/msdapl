@@ -100,7 +100,7 @@ public class IdPickerResultsLoader {
         return proteinIds;
     }
     
-    public static List<Integer> filterByProteinAccession(
+    public static List<Integer> filterByProteinAccession(int pinferId,
             List<Integer> allProteinIds,
             Map<Integer, String> proteinAccessionMap, String accessionLike) {
         
@@ -110,22 +110,49 @@ public class IdPickerResultsLoader {
             reqAcc.add(tok.trim().toLowerCase());
         
         List<Integer> filtered = new ArrayList<Integer>();
-        for(int id: allProteinIds) {
-            String acc = proteinAccessionMap.get(id);
-            if(acc != null) acc = acc.toLowerCase();
-            // first check if the exact accession is given to us
-            if(reqAcc.contains(acc)) {
-                filtered.add(id);
-                continue;
-            }
-            // we may have a partial accession
-            for(String ra: reqAcc) {
-                if(acc.contains(ra)) {
+        
+        
+        // If we have a accession map look in there
+        if(proteinAccessionMap != null) {
+        
+            for(int id: allProteinIds) {
+                String acc = proteinAccessionMap.get(id);
+                if(acc != null) acc = acc.toLowerCase();
+                // first check if the exact accession is given to us
+                if(reqAcc.contains(acc)) {
                     filtered.add(id);
-                    break;
+                    continue;
+                }
+                // we may have a partial accession
+                for(String ra: reqAcc) {
+                    if(acc.contains(ra)) {
+                        filtered.add(id);
+                        break;
+                    }
                 }
             }
         }
+        
+        // Look in the database for matching ids.
+        else {
+            List<Integer> dbIds = getDatabaseIdsForProteinInference(pinferId);
+            Set<Integer> found = new HashSet<Integer>();
+            for(String ra: reqAcc) {
+                List<NrDbProtein> matching = NrSeqLookupUtil.getDbProteinsForAccession(dbIds, ra);
+                for(NrDbProtein prot: matching)
+                    found.add(prot.getProteinId());
+            }
+            // get the corresponding protein inference protein ids
+            if(found.size() > 0) {
+                List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(found));
+                Collections.sort(piProteinIds);
+                for(int id: allProteinIds) {
+                    if(Collections.binarySearch(piProteinIds, id) >= 0)
+                        filtered.add(id);
+                }
+            }
+        }
+        
         return filtered;
     }
     
@@ -563,7 +590,8 @@ public class IdPickerResultsLoader {
         ProteinInferenceProgram pinferProgram = run.getProgram();
         
         
-        if(pinferProgram == ProteinInferenceProgram.IDPICKER) {
+        if(pinferProgram == ProteinInferenceProgram.PROTINFER_SEQ ||
+           pinferProgram == ProteinInferenceProgram.PROTINFER_PLCID) {
             List<IdPickerPeptide> peptides = idpPeptDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptide peptide: peptides) {
                 List<IdPickerIon> ions = peptide.getIonList();
@@ -575,7 +603,7 @@ public class IdPickerResultsLoader {
                 }
             }
         }
-        else if (pinferProgram == ProteinInferenceProgram.IDPICKER_PERC) {
+        else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC) {
             List<IdPickerPeptideBase> peptides = idpPeptBaseDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptideBase peptide: peptides) {
                 List<ProteinferIon> ions = peptide.getIonList();
@@ -652,7 +680,8 @@ public class IdPickerResultsLoader {
         ProteinInferenceProgram pinferProgram = run.getProgram();
         
         
-        if(pinferProgram == ProteinInferenceProgram.IDPICKER) {
+        if(pinferProgram == ProteinInferenceProgram.PROTINFER_SEQ ||
+           pinferProgram == ProteinInferenceProgram.PROTINFER_PLCID) {
             List<IdPickerPeptide> peptides = idpPeptDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptide peptide: peptides) {
                 List<IdPickerIon> ions = peptide.getIonList();
@@ -664,7 +693,7 @@ public class IdPickerResultsLoader {
                 }
             }
         }
-        else if (pinferProgram == ProteinInferenceProgram.IDPICKER_PERC) {
+        else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC) {
             List<IdPickerPeptideBase> peptides = idpPeptBaseDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptideBase peptide: peptides) {
                 List<ProteinferIon> ions = peptide.getIonList();
@@ -692,10 +721,11 @@ public class IdPickerResultsLoader {
                                                             ProteinInferenceProgram pinferProgram) {
         
         List<? extends ProteinferSpectrumMatch> psmList = null;
-        if(pinferProgram == ProteinInferenceProgram.IDPICKER) {
+        if(pinferProgram == ProteinInferenceProgram.PROTINFER_SEQ ||
+           pinferProgram == ProteinInferenceProgram.PROTINFER_PLCID) {
             psmList = idpPsmDao.loadSpectrumMatchesForIon(ion.getId());
         }
-        else if (pinferProgram == ProteinInferenceProgram.IDPICKER_PERC) {
+        else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC) {
             psmList = psmDao.loadSpectrumMatchesForIon(ion.getId());
         }
         else {

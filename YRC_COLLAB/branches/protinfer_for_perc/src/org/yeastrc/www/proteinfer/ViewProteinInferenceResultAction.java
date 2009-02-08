@@ -129,18 +129,12 @@ public class ViewProteinInferenceResultAction extends Action {
         int pageCount = ProteinferResultsPager.instance().getPageCount(proteinIds.size());
         List<Integer> pages = ProteinferResultsPager.instance().getPageList(proteinIds.size(), pageNum);
         
+        
         request.setAttribute("currentPage", pageNum);
         request.setAttribute("onFirst", pageNum == 1);
-        request.setAttribute("onLast", (pageNum == pages.get(pages.size() - 1)));
+        request.setAttribute("onLast", (pages.size() == 0 || (pageNum == pages.get(pages.size() - 1))));
         request.setAttribute("pages", pages);
         request.setAttribute("pageCount", pageCount);
-        
-        
-
-        // Cluster IDs in this set
-//        List<Integer> clusterIdList = IdPickerResultsLoader.getClusterIds(pinferId);
-//        Collections.sort(clusterIdList);
-//        request.setAttribute("clusterIds", clusterIdList);
         
         
         // Run summary

@@ -22,7 +22,6 @@ import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -136,7 +135,7 @@ public class NewProteinInferenceAction extends Action {
             ProteinInferInputSummary inputSummary = inputGetter.getInputAnalysisSummary(analysis);
             formForAnalysis.setInputSummary(inputSummary);
             // set the IDPicker parameters
-            ProgramParameters params2 = new ProgramParameters(ProteinInferenceProgram.IDPICKER_PERC);
+            ProgramParameters params2 = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC);
             formForAnalysis.setProgramParams(params2);
             return formForAnalysis;
         }
@@ -159,9 +158,13 @@ public class NewProteinInferenceAction extends Action {
             formForSearch.setInputType(InputType.SEARCH);
             formForSearch.setProjectId(projectId);
             // set the IDPicker parameters
-            ProgramParameters params1 = new ProgramParameters(ProteinInferenceProgram.IDPICKER);
-            setProgramDetails(params1, searchSummary.getProgramName());
-            formForSearch.setProgramParams(params1);
+            ProgramParameters params = null;
+            if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST)
+                params = new ProgramParameters(ProteinInferenceProgram.PROTINFER_SEQ);
+            else if(program == Program.PROLUCID)
+                params = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PLCID);
+            setProgramDetails(params, search);
+            formForSearch.setProgramParams(params);
             return formForSearch;
         }
         else {
@@ -169,36 +172,12 @@ public class NewProteinInferenceAction extends Action {
         }
     }
     
-    private void setProgramDetails(ProgramParameters params, String searchProgram) {
-        if(searchProgram.equals(Program.SEQUEST.displayName()) || 
-           searchProgram.equals(Program.EE_NORM_SEQUEST.displayName())) {
-            for(Param p: params.getParamList()) {
-                if(p.getName().equalsIgnoreCase("maxAbsFDR")) {
-                    p.setNotes("For Score: XCorr");
-                }
-                else if (p.getName().equalsIgnoreCase("maxRelFDR")) {
-                    p.setNotes("For Score: DeltaCN");
-                }
-                else if(p.getName().equalsIgnoreCase("decoyRatio")) {
-                    p.setNotes("Decoy Ratio will not be used if using R/F for FDR calculation");
-                }
-            }
-        }
-        else if(searchProgram.equals(Program.PROLUCID.displayName())) {
-            for(Param p: params.getParamList()) {
-                if(p.getName().equalsIgnoreCase("maxAbsFDR")) {
-                    p.setNotes("For Score: Primary Score"); // TODO what was the primary score used 
-                    // for this Prolucid search?
-                }
-                else if (p.getName().equalsIgnoreCase("maxRelFDR")) {
-                    p.setNotes("For Score: DeltaCN");
-                }
-                else if(p.getName().equalsIgnoreCase("decoyRatio")) {
-                    p.setNotes("Decoy Ratio will not be used if using R/F for FDR calculation");
-                }
-            }
+    private void setProgramDetails(ProgramParameters params, MsSearch search) {
+        Program program = search.getSearchProgram();
+        
+        if(program == Program.PROLUCID) {
+            // TODO Tell the user the type of PrimaryScore reported by ProLuCID.
         }
     }
-
     
 }

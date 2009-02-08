@@ -101,8 +101,8 @@ public class ProteinferJobSaver {
         }
         
         // save the parameters
-        if(program == ProteinInferenceProgram.IDPICKER ||
-           program == ProteinInferenceProgram.IDPICKER_PERC) {
+        if(program == ProteinInferenceProgram.PROTINFER_SEQ || program == ProteinInferenceProgram.PROTINFER_PLCID ||
+           program == ProteinInferenceProgram.PROTINFER_PERC) {
             saveIdPickerParams(pinferId, params);
         }
         

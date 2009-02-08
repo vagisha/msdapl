@@ -1,5 +1,5 @@
 
-<%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -53,6 +53,13 @@
 </yrcwww:colorrow>
 </logic:iterate>
 </logic:present>
+
+<yrcwww:colorrow scheme="ms"><td colspan="2" align="center"><b>Input</b></td></yrcwww:colorrow>
+<logic:iterate name="inputList" id="input">
+<yrcwww:colorrow scheme="ms" repeat="true">
+<td colspan="2"><bean:write name="input" property="fileName" /></td>
+</yrcwww:colorrow>
+</logic:iterate>
 
 <logic:present name="pinferJob" property="log">
 <yrcwww:colorrow scheme="ms">

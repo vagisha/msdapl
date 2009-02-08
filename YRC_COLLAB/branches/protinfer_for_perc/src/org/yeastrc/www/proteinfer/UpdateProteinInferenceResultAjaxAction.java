@@ -123,8 +123,12 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             storedProteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
             // filter by accession, if required
             if(filterCriteria.getAccessionLike() != null) {
-                Map<Integer, String> proteinAccessionMap = getProteinAccessionMap(request, pinferId);
-                storedProteinIds = IdPickerResultsLoader.filterByProteinAccession(storedProteinIds, proteinAccessionMap, 
+                // get the protein accession map from the session if we have one
+                // but don't create a new one if it does not exist or does not match
+                // the protein inference we are looking at right now. 
+                Map<Integer, String> proteinAccessionMap = getProteinAccessionMap(request, pinferId, false);
+                storedProteinIds = IdPickerResultsLoader.filterByProteinAccession(pinferId,
+                        storedProteinIds, proteinAccessionMap, 
                         filterCriteria.getAccessionLike());
             }
             // filter by description, if required
@@ -185,24 +189,37 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
     }
 
     private Map<Integer, String> getProteinAccessionMap(
-            HttpServletRequest request, int pinferId) {
+            HttpServletRequest request, int pinferId, boolean createNew) {
+        
         Map<Integer, String> proteinAccessionMap = (Map<Integer, String>) request.getSession().getAttribute("proteinAccessionMap");
+        boolean foundMap = true;
+        
         if(proteinAccessionMap == null) {
-            log.info("proteinAccessionMap was null ... creating a new one");
-            proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
+            log.info("proteinAccessionMap was null.");
+            foundMap = false;
         }
         else {
             Integer pinferIdForProtAccession = (Integer)request.getSession().getAttribute("pinferIdForProtAccession");
             if(pinferIdForProtAccession != null && pinferIdForProtAccession != pinferId) {
                 log.info("proteinIdForProtAccession ("+pinferIdForProtAccession+
-                        ") does not match pinfer id in request ("+pinferId+") ... "+
-                        "... creating a new proteinAccessionMap");
-                proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
+                        ") does not match pinfer id in request ("+pinferId+") ... ");
+                foundMap = false;
             }
         }
-        request.getSession().setAttribute("proteinAccessionMap", proteinAccessionMap);
-        request.getSession().setAttribute("pinferIdForProtAccession", pinferId);
-        return proteinAccessionMap;
+        if(foundMap) {
+            return proteinAccessionMap;
+        }
+        else {
+            if(createNew) {
+                log.info("Creating new map....");
+                proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
+                request.getSession().setAttribute("proteinAccessionMap", proteinAccessionMap);
+                request.getSession().setAttribute("pinferIdForProtAccession", pinferId);
+                return proteinAccessionMap;
+            }
+            else
+                return null;
+        }
     }
 
 

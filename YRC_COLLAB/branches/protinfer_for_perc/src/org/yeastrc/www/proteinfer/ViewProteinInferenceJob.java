@@ -20,13 +20,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerParamDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
@@ -102,13 +105,11 @@ public class ViewProteinInferenceJob extends Action {
         }
         else {
             request.setAttribute("program", pinferRun.getProgram());
+            IdPickerRun idpRun = fact.getIdPickerRunDao().loadProteinferRun(pinferId);
+            request.setAttribute("params", idpRun.getParams());
             
-            if(pinferRun.getProgram() == ProteinInferenceProgram.IDPICKER ||
-               pinferRun.getProgram() == ProteinInferenceProgram.IDPICKER_PERC) {
-                
-                IdPickerRun idpRun = fact.getIdPickerRunDao().loadProteinferRun(pinferId);
-                request.setAttribute("params", idpRun.getParams());
-            }
+            List<WIdPickerInputSummary> inputList = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
+            request.setAttribute("inputList", inputList);
         }
         
         // Go!

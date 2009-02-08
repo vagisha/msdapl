@@ -3,9 +3,9 @@ package org.yeastrc.www.proteinfer;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uwpr.protinfer.ProgramParam;
 import edu.uwpr.protinfer.ProteinInferenceProgram;
-import edu.uwpr.protinfer.ProteinInferenceProgram.ProgramParam;
-import edu.uwpr.protinfer.ProteinInferenceProgram.ProgramParam.TYPE;
+import edu.uwpr.protinfer.ProgramParam.TYPE;
 
 public class ProgramParameters {
 
