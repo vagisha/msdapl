@@ -40,13 +40,6 @@ public class IdPickerExecutorFDR {
         // get all the search hits for the given inputIds
         List<PeptideSpectrumMatchIDP> allPsms = getAllSearchHits(idpRun, params);
         
-        int cnt = 0;
-        for(PeptideSpectrumMatchIDP psm: allPsms)
-            if(psm.getScore() > 0.01)
-                cnt++;
-        
-        log.info("Num above 0.01: "+cnt);
-        
         // filter the search hits
         List<PeptideSpectrumMatchIDP> filteredPsms;
         try {
