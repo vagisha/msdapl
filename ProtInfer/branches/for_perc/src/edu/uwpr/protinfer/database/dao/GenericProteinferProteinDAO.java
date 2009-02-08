@@ -1,10 +1,10 @@
 package edu.uwpr.protinfer.database.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.uwpr.protinfer.database.dto.GenericProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
-import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 
 public interface GenericProteinferProteinDAO  <P extends GenericProteinferProtein<?>> {
 
@@ -23,6 +23,8 @@ public interface GenericProteinferProteinDAO  <P extends GenericProteinferProtei
     public abstract List<P> loadProteins(int proteinferId);
     
 //    public abstract List<ProteinferProtein> loadProteinsN(int proteinferId);
+    
+    public abstract List<Integer> getProteinIdsForNrseqIds(int proteinferId, ArrayList<Integer> nrseqIds);
 
     public abstract int getProteinCount(int proteinferId);
 

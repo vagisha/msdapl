@@ -22,7 +22,6 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dto.GenericProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
-import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.idpicker.GenericIdPickerProtein;
 
@@ -92,6 +91,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
 //    public List<ProteinferProtein> loadProteinsN(int pinferId) {
 //        return protDao.loadProteinsN(pinferId);
 //    }
+    
+    public List<Integer> getProteinIdsForNrseqIds(int proteinferId, ArrayList<Integer> nrseqIds) {
+        return protDao.getProteinIdsForNrseqIds(proteinferId, nrseqIds);
+    }
     
     public int getFilteredParsimoniousProteinCount(int proteinferId) {
         return (Integer) queryForObject(sqlMapNameSpace+".selectParsimProteinCountForProteinferRun", proteinferId); 
@@ -274,12 +277,20 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
            stmt = conn.createStatement();
            sql = "INSERT INTO ion_temp "+
                   "(SELECT pept.id, ion.id FROM msProteinInferIon AS ion, msProteinInferPeptide AS pept "+
-                  "WHERE pept.piRunID=7 AND pept.id = ion.piPeptideID GROUP BY pept.id, pept.id, ion."+ionTableColumn+")";
+                  "WHERE pept.piRunID="+pinferId+
+                  " AND pept.id = ion.piPeptideID GROUP BY pept.id, ion."+ionTableColumn+")";
            stmt.executeUpdate(sql);
            
            stmt.close();
            
+           // add index on temp table
+           sql = "ALTER TABLE ion_temp ADD INDEX (piPeptideID)";
+           stmt = conn.createStatement();
+           stmt.executeUpdate(sql);
+           stmt.close();
            
+           
+           // no run the query we are interested in
            sql = prepareSql(pinferId, minPeptideCount, isParsimonious, 
                    uniqueToProtein, sort, groupProteins);
            pstmt = conn.prepareStatement(sql);

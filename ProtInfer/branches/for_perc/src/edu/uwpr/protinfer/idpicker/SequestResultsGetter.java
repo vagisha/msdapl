@@ -16,6 +16,7 @@ import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 
+import edu.uwpr.protinfer.ProgramParam.SCORE;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.util.TimeUtils;
@@ -36,7 +37,7 @@ public class SequestResultsGetter extends SearchResultsGetter<SequestSearchResul
     }
     
 
-    PeptideSpectrumMatchIDP createPeptideSpectrumMatch(SequestSearchResult result, PeptideHit peptHit) {
+    PeptideSpectrumMatchIDP createPeptideSpectrumMatch(SequestSearchResult result, PeptideHit peptHit, SCORE scoreForFdr) {
         
         SequestResultData scores = result.getSequestResultData();
         
@@ -51,8 +52,12 @@ public class SequestResultsGetter extends SearchResultsGetter<SequestSearchResul
         PeptideSpectrumMatchIDPImpl psm = new PeptideSpectrumMatchIDPImpl();
         psm.setPeptide(peptHit);
         psm.setSpectrumMatch(specMatch);
-        psm.setAbsoluteScore(scores.getxCorr().doubleValue());
-        psm.setRelativeScore(scores.getDeltaCN().doubleValue());
+        if(scoreForFdr == SCORE.XCorr)
+            psm.setScore(scores.getxCorr().doubleValue());
+        else if(scoreForFdr == SCORE.DeltaCN)
+            psm.setScore(scores.getDeltaCN().doubleValue());
+        else
+            throw new IllegalArgumentException("Unknow score type: "+scoreForFdr);
         return psm;
     }
     

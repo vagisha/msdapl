@@ -1,6 +1,7 @@
 package edu.uwpr.protinfer.database.dao.ibatis;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,24 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
     
     public List<ProteinferProtein> loadProteins(int proteinferId) {
         return queryForList(sqlMapNameSpace+".selectProteinsForProteinferRun", proteinferId);
+    }
+    
+    public List<Integer> getProteinIdsForNrseqIds(int proteinferId, ArrayList<Integer> nrseqIds) {
+        if(nrseqIds == null || nrseqIds.size() == 0)
+            return new ArrayList<Integer>(0);
+        
+        StringBuilder buf = new StringBuilder("(");
+        for(int id: nrseqIds) {
+            buf.append(id+",");
+        }
+        buf.deleteCharAt(buf.length() - 1);
+        buf.append(")");
+        
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("pinferId", proteinferId);
+        map.put("nrseqIds", buf.toString());
+        
+        return queryForList(sqlMapNameSpace+".selectProteinIdsForNrseqIds", map);
     }
     
 //    public List<ProteinferProtein> loadProteinsN(int pinferId) {

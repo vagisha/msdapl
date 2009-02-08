@@ -34,7 +34,7 @@ public class ProteinferRunDAOTest extends TestCase {
         assertEquals(1, id1);
         
         ProteinferRun run2 = new ProteinferRun();
-        run2.setProgram(ProteinInferenceProgram.IDPICKER_PERC);
+        run2.setProgram(ProteinInferenceProgram.PROTINFER_PERC);
         run2.setInputGenerator(Program.PERCOLATOR);
         int id2 = runDao.save(run2);
         assertEquals(2, id2);
@@ -50,7 +50,7 @@ public class ProteinferRunDAOTest extends TestCase {
         
         ProteinferRun run2_db = runDao.loadProteinferRun(id2);
         assertEquals(2, run2_db.getId());
-        assertEquals(ProteinInferenceProgram.IDPICKER_PERC, run2_db.getProgram());
+        assertEquals(ProteinInferenceProgram.PROTINFER_PERC, run2_db.getProgram());
         assertEquals(Program.PERCOLATOR, run2_db.getInputGenerator());
         assertEquals(0, run2_db.getInputList().size());
         assertNull(run2_db.getComments());

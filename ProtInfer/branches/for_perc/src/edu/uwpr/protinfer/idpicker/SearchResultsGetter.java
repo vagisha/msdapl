@@ -15,6 +15,7 @@ import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.PeptideKeyCalculator;
+import edu.uwpr.protinfer.ProgramParam.SCORE;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -58,13 +59,13 @@ public abstract class SearchResultsGetter <T extends MsSearchResult> implements 
 
         // 2. Convert list of SequestResult to PeptideSpectrumMatchIDP
         List<PeptideSpectrumMatchIDP> psmList = convertResults(allResults, params);
-
+        
         // 3. Get all the matching proteins
         assignMatchingProteins(psmList, params);
-
+        
         // 4. Update target and decoy count
         updateTargetAndDecoyCount(inputList, psmList);
-
+        
         // 5. Filter hits to small peptides
         removeSmallPeptides(psmList, params);
 
@@ -135,8 +136,7 @@ public abstract class SearchResultsGetter <T extends MsSearchResult> implements 
                 peptideHitMap.put(peptideKey, peptHit);
             }
 
-
-            PeptideSpectrumMatchIDP psm = createPeptideSpectrumMatch(result, peptHit);
+            PeptideSpectrumMatchIDP psm = createPeptideSpectrumMatch(result, peptHit, params.getScoreForFDR());
 
             psmList.add(psm);
             
@@ -215,5 +215,5 @@ public abstract class SearchResultsGetter <T extends MsSearchResult> implements 
     // --------------------------------------------------------------------------------------------------------------
     abstract List<T> getAllSearchResults(List<IdPickerInput> inputList, Program inputGenerator,  IDPickerParams params);
     
-    abstract PeptideSpectrumMatchIDP createPeptideSpectrumMatch(T result, PeptideHit peptHit);
+    abstract PeptideSpectrumMatchIDP createPeptideSpectrumMatch(T result, PeptideHit peptHit, SCORE score);
 }

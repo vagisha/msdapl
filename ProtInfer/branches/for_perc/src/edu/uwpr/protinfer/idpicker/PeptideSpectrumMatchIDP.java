@@ -5,7 +5,7 @@ import edu.uwpr.protinfer.infer.PeptideSpectrumMatch;
 
 public interface PeptideSpectrumMatchIDP extends PeptideSpectrumMatch<SpectrumMatchIDP>, FdrCandidateHasCharge, FdrFilterable {
     
-    public abstract double getAbsoluteScore();
+    public abstract double getScore();
     
-    public abstract double getRelativeScore();
+//    public abstract double getRelativeScore();
 }

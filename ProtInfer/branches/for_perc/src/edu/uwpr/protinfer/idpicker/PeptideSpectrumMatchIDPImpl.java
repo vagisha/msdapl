@@ -6,8 +6,8 @@ public class PeptideSpectrumMatchIDPImpl implements PeptideSpectrumMatchIDP {
 
     private SpectrumMatchIDPImpl specMatch;
     private PeptideHit peptide;
-    private double absoluteScore;   // e.g. Sequest's xCorr
-    private double relativeScore;  // e.g. Sequest's DeltaCN
+    private double score;   // e.g. Sequest's xCorr
+//    private double relativeScore;  // e.g. Sequest's DeltaCN
     
     public PeptideSpectrumMatchIDPImpl() {
         specMatch = new SpectrumMatchIDPImpl();
@@ -52,21 +52,21 @@ public class PeptideSpectrumMatchIDPImpl implements PeptideSpectrumMatchIDP {
         this.specMatch = specMatch;
     }
     
-    public void setAbsoluteScore(double score) {
-        this.absoluteScore = score;
+    public void setScore(double score) {
+        this.score = score;
     }
     
-    public double getAbsoluteScore() {
-        return absoluteScore;
+    public double getScore() {
+        return score;
     }
 
-    public void setRelativeScore(double score) {
-        this.relativeScore = score;
-    }
-    
-    public double getRelativeScore() {
-        return relativeScore;
-    }
+//    public void setRelativeScore(double score) {
+//        this.relativeScore = score;
+//    }
+//    
+//    public double getRelativeScore() {
+//        return relativeScore;
+//    }
     
     @Override
     public boolean isDecoyMatch() {

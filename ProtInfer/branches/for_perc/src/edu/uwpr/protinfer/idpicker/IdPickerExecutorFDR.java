@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.Program;
 
+import edu.uwpr.protinfer.ProgramParam.SCORE;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.filter.Filter;
@@ -38,6 +39,13 @@ public class IdPickerExecutorFDR {
         
         // get all the search hits for the given inputIds
         List<PeptideSpectrumMatchIDP> allPsms = getAllSearchHits(idpRun, params);
+        
+        int cnt = 0;
+        for(PeptideSpectrumMatchIDP psm: allPsms)
+            if(psm.getScore() > 0.01)
+                cnt++;
+        
+        log.info("Num above 0.01: "+cnt);
         
         // filter the search hits
         List<PeptideSpectrumMatchIDP> filteredPsms;
@@ -93,93 +101,81 @@ public class IdPickerExecutorFDR {
     private  List<PeptideSpectrumMatchIDP> filterSearchHits(List<PeptideSpectrumMatchIDP> searchHits, 
             IDPickerParams params, Program program) throws FdrCalculatorException, FilterException {
         
-        Comparator<PeptideSpectrumMatchIDP> absScoreComparator = getAbsoluteScoreComparator(program);
-        Comparator<PeptideSpectrumMatchIDP> relScoreComparator = getRelativeScoreComparator(program);
-        
-        return filterSearchHits(searchHits, params, program, absScoreComparator, relScoreComparator);
+        Comparator<PeptideSpectrumMatchIDP> scoreComparator = getScoreComparator(program, params);
+        return filterSearchHits(searchHits, params, program, scoreComparator);
     }
 
     
     private  List<PeptideSpectrumMatchIDP> filterSearchHits(List<PeptideSpectrumMatchIDP> searchHits, 
                                                            IDPickerParams params, Program program,
-                                                           Comparator<PeptideSpectrumMatchIDP> absoluteScoreComparator,
-                                                           Comparator<PeptideSpectrumMatchIDP> relativeScoreComparator) 
+                                                           Comparator<PeptideSpectrumMatchIDP> scoreComparator) 
     throws FdrCalculatorException, FilterException {
 
         long start = System.currentTimeMillis();
-        long s = start;
         
         FdrCalculatorIdPicker<PeptideSpectrumMatchIDP> calculator = new FdrCalculatorIdPicker<PeptideSpectrumMatchIDP>();
         if(!params.useIdPickerFDRFormula()) {
             calculator.setUseIdPickerFdr(false);
         }
         
-        calculator.setDecoyRatio(params.getDecoyRatio());
+        // IDPicker separates charge states for calculating FDR using XCorr scores
+        if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST) {
+            if(params.getScoreForFDR() == SCORE.XCorr)
+                calculator.separateChargeStates(true);
+        }
+        
+        // set the fdr to 1 in the beginning. 
+        for (PeptideSpectrumMatchIDP hit: searchHits)
+            hit.setFdr(1.0);
+        
+//        calculator.setDecoyRatio(params.getDecoyRatio());
 
-        // Calculate FDR from relative scores (e.g. DeltaCN) first.
-        calculator.calculateFdr(searchHits, relativeScoreComparator);
+        // Calculate FDR
+        calculator.calculateFdr(searchHits, scoreComparator);
+        long e = System.currentTimeMillis();
+        log.info("Calculated FDR for score ("+params.getScoreForFDR().name()+
+                ") in "+TimeUtils.timeElapsedSeconds(start, e)+" seconds");
+        
         
         // Filter based on the given FDR cutoff
-        FdrFilterCriteria filterCriteria = new FdrFilterCriteria(params.getMaxRelativeFdr());
+        FdrFilterCriteria filterCriteria = new FdrFilterCriteria(params.getMaxFdr());
         List<PeptideSpectrumMatchIDP> filteredHits = Filter.filter(searchHits, filterCriteria);
-        long e = System.currentTimeMillis();
-        log.info("Calculated FDR for relative scores + filtered in: "+TimeUtils.timeElapsedSeconds(s, e));
-
-        // Clear the fdr scores for the filtered hits and calculate FDR from xCorr scores
-        for (PeptideSpectrumMatchIDP hit: filteredHits)
-            hit.setFdr(1.0);
-
-        // Calculate FDR from absolute scores (e.g. XCorr)
-        s = System.currentTimeMillis();
-        
-        // IDPicker separates charge states for calculating FDR using XCorr scores
-        if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST)
-            calculator.separateChargeStates(true);
-        
-        calculator.calculateFdr(searchHits, absoluteScoreComparator);
-
-        filterCriteria = new FdrFilterCriteria(params.getMaxAbsoluteFdr());
-        filteredHits = Filter.filter(searchHits, filterCriteria);
+        log.info("BEFORE filtering: "+searchHits.size()+"; AFTER filtering: "+filteredHits.size());
         e = System.currentTimeMillis();
-        log.info("Calculated FDR for absolute scores + filtered in: "+TimeUtils.timeElapsedSeconds(s, e));
         
-        log.info("Total time for filtering: "+TimeUtils.timeElapsedSeconds(start, e));
+        log.info("Total time for FDR calculation + filtering: "+TimeUtils.timeElapsedSeconds(start, e));
         
         return filteredHits;
     }
     
-    private Comparator<PeptideSpectrumMatchIDP> getAbsoluteScoreComparator(Program program) {
+
+    private Comparator<PeptideSpectrumMatchIDP> getScoreComparator(Program program, IDPickerParams params) {
+        
         if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST) {
             // we will be comparing XCorr
-            return new Comparator<PeptideSpectrumMatchIDP>() {
-                public int compare(PeptideSpectrumMatchIDP o1, PeptideSpectrumMatchIDP o2) {
-                    return Double.valueOf(o1.getAbsoluteScore()).compareTo(o2.getAbsoluteScore());
-                }};
+            if(params.getScoreForFDR() == SCORE.XCorr) {
+                return new Comparator<PeptideSpectrumMatchIDP>() {
+                    public int compare(PeptideSpectrumMatchIDP o1, PeptideSpectrumMatchIDP o2) {
+                        return Double.valueOf(o1.getScore()).compareTo(o2.getScore());
+                    }};
+            }
+            else if(params.getScoreForFDR() == SCORE.DeltaCN) {
+                // we will be comparing DeltaCN -- 0.0 is be best score; 1.0 is worst
+                return new Comparator<PeptideSpectrumMatchIDP>() {
+                    public int compare(PeptideSpectrumMatchIDP o1, PeptideSpectrumMatchIDP o2) {
+                        return Double.valueOf(o2.getScore()).compareTo(o1.getScore());
+                    }};
+            }
+            else
+                throw new IllegalArgumentException("Unknown score type: "+params.getScoreForFDR().name());
+                         
         }
         else if(program == Program.PROLUCID) {
             // TODO here we need to know what primary score is used by ProLuCID
             return null;
         }
         else {
-            log.error("Unsupported search file format: "+program.toString());
-            return null;
-        }
-    }
-    
-    private Comparator<PeptideSpectrumMatchIDP> getRelativeScoreComparator(Program program) {
-        if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST) {
-            // we will be comparing DeltaCN -- 0.0 is be best score; 1.0 is worst
-            return new Comparator<PeptideSpectrumMatchIDP>() {
-                public int compare(PeptideSpectrumMatchIDP o1, PeptideSpectrumMatchIDP o2) {
-                    return Double.valueOf(o2.getRelativeScore()).compareTo(o1.getRelativeScore());
-                }};
-        }
-        else if(program == Program.PROLUCID) {
-            // TODO here we need to know what primary score is used by ProLuCID
-            return null;
-        }
-        else {
-            log.error("Unsupported search file format: "+program.toString());
+            log.error("Unsupported program: "+program.toString());
             return null;
         }
     }

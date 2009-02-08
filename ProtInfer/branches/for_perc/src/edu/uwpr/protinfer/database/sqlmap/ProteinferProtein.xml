@@ -49,6 +49,12 @@
     	SELECT count(*) FROM msProteinInferProtein WHERE piRunID = #id#
     </select>
     
+    <select id="selectProteinIdsForNrseqIds" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein 
+    	WHERE piRunID = #pinferId#
+    	AND nrseqProteinID IN $nrseqIds$
+    </select>
+    
     <update id="updateUserAnnotation" parameterClass="java.util.Map">
     	UPDATE msProteinInferProtein SET userAnnotation=#annotation# where id=#pinferProteinId#
     </update>

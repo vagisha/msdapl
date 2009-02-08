@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.ProgramParam.SCORE;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 public class IDPickerParams {
 
-    private float maxAbsoluteFdr = 0.05f;
-    private float maxRelativeFdr = 0.05f;
-    private float decoyRatio = 1.0f;
-    private boolean doParsimonyAnalysis = true;
+    private float maxFdr = 0.05f;
+    private SCORE scoreForFDR;
+//    private float maxRelativeFdr = 0.05f;
+//    private float decoyRatio = 1.0f;
+//    private boolean doParsimonyAnalysis = true;
     private boolean doFdrCalculation = true;
     private String decoyPrefix = "";
     private boolean useIdPickerFDRFormula = true;
@@ -31,9 +33,9 @@ public class IDPickerParams {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         if(doFdrCalculation) {
-            buf.append("Max Abs. FDR: "+maxAbsoluteFdr+"\n");
-            buf.append("Max rel. FDR: "+maxRelativeFdr+"\n");
-            buf.append("Decoy Ratio: "+decoyRatio+"\n");
+            buf.append("Max FDR: "+maxFdr+"\n");
+//            buf.append("Max rel. FDR: "+maxRelativeFdr+"\n");
+//            buf.append("Decoy Ratio: "+decoyRatio+"\n");
             buf.append("Decoy Prefix: "+decoyPrefix+"\n");
             buf.append("Use IDPicker FDR formula: "+useIdPickerFDRFormula+"\n");
         }
@@ -64,31 +66,31 @@ public class IDPickerParams {
     public void setDecoyPrefix(String decoyPrefix) {
         this.decoyPrefix = decoyPrefix;
     }
-    public float getMaxAbsoluteFdr() {
-        return maxAbsoluteFdr;
+    public float getMaxFdr() {
+        return maxFdr;
     }
-    public void setMaxAbsoluteFdr(float maxAbsoluteFdr) {
-        this.maxAbsoluteFdr = maxAbsoluteFdr;
+    public void setMaxFdr(float maxFdr) {
+        this.maxFdr = maxFdr;
     }
-    public float getMaxRelativeFdr() {
-        return maxRelativeFdr;
-    }
-    public void setMaxRelativeFdr(float maxRelativeFdr) {
-        this.maxRelativeFdr = maxRelativeFdr;
-    }
-    public float getDecoyRatio() {
-        return decoyRatio;
-    }
-    public void setDecoyRatio(float decoyRatio) {
-        this.decoyRatio = decoyRatio;
-    }
-    
-    public boolean getDoParsimonyAnalysis() {
-        return doParsimonyAnalysis;
-    }
-    public void setDoParsimonyAnalysis(boolean doParsimonyAnalysis) {
-        this.doParsimonyAnalysis = doParsimonyAnalysis;
-    }
+//    public float getMaxRelativeFdr() {
+//        return maxRelativeFdr;
+//    }
+//    public void setMaxRelativeFdr(float maxRelativeFdr) {
+//        this.maxRelativeFdr = maxRelativeFdr;
+//    }
+//    public float getDecoyRatio() {
+//        return decoyRatio;
+//    }
+//    public void setDecoyRatio(float decoyRatio) {
+//        this.decoyRatio = decoyRatio;
+//    }
+//    
+//    public boolean getDoParsimonyAnalysis() {
+//        return doParsimonyAnalysis;
+//    }
+//    public void setDoParsimonyAnalysis(boolean doParsimonyAnalysis) {
+//        this.doParsimonyAnalysis = doParsimonyAnalysis;
+//    }
     
     public boolean getDoFdrCalculation() {
         return doFdrCalculation;
@@ -148,6 +150,14 @@ public class IDPickerParams {
     }
     public boolean isUseIdPickerFDRFormula() {
         return useIdPickerFDRFormula;
+    }
+
+    public SCORE getScoreForFDR() {
+        return scoreForFDR;
+    }
+
+    public void setScoreForFDR(SCORE scoreForFDR) {
+        this.scoreForFDR = scoreForFDR;
     }
     
 }

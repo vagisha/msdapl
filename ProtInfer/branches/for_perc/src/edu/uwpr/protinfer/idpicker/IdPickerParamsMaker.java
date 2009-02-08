@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.ProgramParam.SCORE;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 /**
@@ -26,19 +27,16 @@ public class IdPickerParamsMaker {
         List<IdPickerParam> moreFilters = new ArrayList<IdPickerParam>();
         
         for(IdPickerParam param: paramList) {
-            // Max. Absolute FDR
-            if(param.getName().equals("maxAbsFDR")) {
-                idpParams.setMaxAbsoluteFdr(Float.parseFloat(param.getValue()));
+            // Max. FDR
+            if(param.getName().equals("maxFDR")) {
+                idpParams.setMaxFdr(Float.parseFloat(param.getValue()));
                 idpParams.setDoFdrCalculation(true);
             }
             // Max. Relative FDR
-            else if(param.getName().equals("maxRelativeFDR")) {
-                idpParams.setMaxRelativeFdr(Float.parseFloat(param.getValue()));
+            else if(param.getName().equals("useScore")) {
+                idpParams.setScoreForFDR(SCORE.valueOf(param.getValue()));
                 idpParams.setDoFdrCalculation(true);
             }
-            // Decoy Ratio
-            else if (param.getName().equals("decoyRatio"))
-                idpParams.setDecoyRatio(Float.parseFloat(param.getValue()));
             // Decoy Prefix
             else if (param.getName().equals("decoyPrefix"))
                 idpParams.setDecoyPrefix(param.getValue());

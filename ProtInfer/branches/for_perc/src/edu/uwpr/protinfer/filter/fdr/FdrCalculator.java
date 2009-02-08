@@ -49,18 +49,15 @@ public abstract class FdrCalculator <T extends FdrCandidate> {
         
         targetCount = 0;
         decoyCount = 0;
-//        int count = 0;
         for (T candidate: myCandidateList) {
             if (candidate.isTargetMatch())
                 targetCount++;
             else
                 decoyCount++;
-            if (candidate.isTargetMatch()) {
+//            if (candidate.isTargetMatch()) {
                 double fdr = calculateFdr(targetCount, decoyCount);
-//                if (fdr <=  0.25)
-//                    count++;
                 candidate.setFdr(fdr);
-            }
+//            }
         }
         
         // Replace FDR with q-values
