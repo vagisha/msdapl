@@ -101,7 +101,10 @@
        			<thead><tr>
 				     <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Scan Number</th>
 				     <th style="text-decoration: underline;font-size: 10pt;" class="sort-int" align="left">Charge</th>
-				     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.IDPICKER.name()%>">
+				     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
+				     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">FDR</th>
+				     </logic:equal>
+				     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_PLCID.name()%>">
 				     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">FDR</th>
 				     </logic:equal>
 				     <logic:equal name="inputGenerator" value="<%=Program.SEQUEST.name() %>">
@@ -130,7 +133,12 @@
 		     		<td><bean:write name="psm" property="scanNumber" /></td>
 		     		<td><bean:write name="ion" property="charge" /></td>
 		     		
-		     		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.IDPICKER.name()%>">
+		     		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
+		     			<bean:define name="psm" property="proteinferSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+		     			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
+		     		</logic:equal>
+		     		
+		     		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_PLCID.name()%>">
 		     			<bean:define name="psm" property="proteinferSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
 		     			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
 		     		</logic:equal>

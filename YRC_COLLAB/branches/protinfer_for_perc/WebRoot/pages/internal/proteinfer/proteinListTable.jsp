@@ -222,7 +222,7 @@
 				  id="<bean:write name="protein" property="protein.id" />"
 				  title="<bean:write name="proteinGroup" property="groupId" />"
 				  >Show Peptides</span></nobr></td>
-		<td colspan="7">
+		<td colspan="8">
 			<!--  peptides table will go here: proteinPeptides.jsp -->
 			<div id="peptforprot_<bean:write name="protein" property="protein.id" />_<bean:write name="proteinGroup" property="groupId" />"></div>
 		</td>
@@ -341,7 +341,7 @@
 					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #3D902A;" 
 					  id="<bean:write name="proteinGroup" property="groupId" />"
 					  >Show Peptides</span></nobr></td>
-			<td colspan="7">
+			<td colspan="8">
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="proteinGroup" property="groupId" />"></div>
 			</td>

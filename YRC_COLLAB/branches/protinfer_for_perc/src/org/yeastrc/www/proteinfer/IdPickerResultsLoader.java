@@ -1,5 +1,6 @@
 package org.yeastrc.www.proteinfer;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +36,8 @@ import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
+
+import com.sshtools.daemon.terminal.Terminal;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.ProteinInferenceProgram;
@@ -679,15 +682,22 @@ public class IdPickerResultsLoader {
         // Get the protein inference program used
         ProteinInferenceProgram pinferProgram = run.getProgram();
         
+        ProteinferProtein protein = protDao.loadProtein(proteinId);
+        String proteinSeq = getProteinSequence(protein);
         
         if(pinferProgram == ProteinInferenceProgram.PROTINFER_SEQ ||
            pinferProgram == ProteinInferenceProgram.PROTINFER_PLCID) {
             List<IdPickerPeptide> peptides = idpPeptDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptide peptide: peptides) {
+                List<Character>[] termResidues = getTerminalresidues(proteinSeq, peptide.getSequence());
+                
                 List<IdPickerIon> ions = peptide.getIonList();
                 sortIonList(ions);
                 for(IdPickerIon ion: ions) {
                     WIdPickerIonWAllSpectra wIon = makeWIdPickerIonWAllSpectra(ion, inputGenerator, pinferProgram);
+                    for(int i = 0; i < termResidues[0].size(); i++) {
+                        wIon.addTerminalResidues(termResidues[0].get(i), termResidues[1].get(i));
+                    }
                     wIon.setIsUniqueToProteinGroup(peptide.isUniqueToProtein());
                     ionList.add(wIon);
                 }
@@ -696,10 +706,15 @@ public class IdPickerResultsLoader {
         else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC) {
             List<IdPickerPeptideBase> peptides = idpPeptBaseDao.loadPeptidesForProteinferProtein(proteinId);
             for(IdPickerPeptideBase peptide: peptides) {
+                List<Character>[] termResidues = getTerminalresidues(proteinSeq, peptide.getSequence());
+                
                 List<ProteinferIon> ions = peptide.getIonList();
                 sortIonList(ions);
                 for(ProteinferIon ion: ions) {
                     WIdPickerIonWAllSpectra wIon = makeWIdPickerIonWAllSpectra(ion, inputGenerator, pinferProgram);
+                    for(int i = 0; i < termResidues[0].size(); i++) {
+                        wIon.addTerminalResidues(termResidues[0].get(i), termResidues[1].get(i));
+                    }
                     wIon.setIsUniqueToProteinGroup(peptide.isUniqueToProtein());
                     ionList.add(wIon);
                 }
@@ -714,6 +729,39 @@ public class IdPickerResultsLoader {
                 " -- "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         return ionList;
+    }
+    
+    private static List<Character>[] getTerminalresidues(String proteinSeq,
+            String sequence) {
+        List<Character> nterm = new ArrayList<Character>(2);
+        List<Character> cterm = new ArrayList<Character>(2);
+        int idx = proteinSeq.indexOf(sequence);
+        while(idx != -1) {
+            if(idx == 0)    nterm.add('-');
+            else            nterm.add(proteinSeq.charAt(idx-1));
+            if(idx+sequence.length() >= proteinSeq.length())
+                cterm.add('-');
+            else            cterm.add(proteinSeq.charAt(idx+sequence.length()));
+            
+            idx = proteinSeq.indexOf(sequence, idx+sequence.length());
+        }
+        return new List[]{nterm, cterm};
+    }
+
+    private static String getProteinSequence(ProteinferProtein protein) {
+        NRProtein nrprot = null;
+        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+        try {
+            nrprot = (NRProtein)(nrpf.getProtein(protein.getNrseqProteinId()));
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }        
+
+        return nrprot.getPeptide().getSequenceString();
     }
     
     private static <I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>>

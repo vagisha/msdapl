@@ -1,5 +1,6 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsSearchResult;
@@ -13,10 +14,18 @@ public class WIdPickerIonWAllSpectra {
     private List<WIdPickerSpectrumMatch> psmList;
     private boolean uniqueToProteinGrp = false;
     
+    private List<Character> ntermResidues = new ArrayList<Character>();
+    private List<Character> cTermResidues = new ArrayList<Character>();
+    
     public WIdPickerIonWAllSpectra(GenericProteinferIon<? extends ProteinferSpectrumMatch> ion, 
             List<WIdPickerSpectrumMatch> psmList) {
         this.ion = ion;
         this.psmList = psmList;
+    }
+    
+    public void addTerminalResidues(char nterm, char cterm) {
+        this.ntermResidues.add(nterm);
+        this.cTermResidues.add(cterm);
     }
     
     public List<WIdPickerSpectrumMatch> getPsmList() {
@@ -26,7 +35,12 @@ public class WIdPickerIonWAllSpectra {
     public String getIonSequence() {
         if(psmList.size() > 0) {
             MsSearchResult res = psmList.get(0).getSpectrumMatch();
-            return removeTerminalResidues(res.getResultPeptide().getModifiedPeptide());
+            String seq = removeTerminalResidues(res.getResultPeptide().getModifiedPeptide());
+            seq = "."+seq+".";
+            for(int i = 0; i < ntermResidues.size(); i++) {
+                seq = "("+ntermResidues.get(i)+")"+seq+"("+cTermResidues.get(i)+")";
+            }
+            return seq;
         }
         else
             return null;
