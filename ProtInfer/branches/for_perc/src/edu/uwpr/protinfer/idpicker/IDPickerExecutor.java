@@ -28,8 +28,14 @@ import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.Program;
 
+import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerParamDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferInput;
+import edu.uwpr.protinfer.database.dto.ProteinferRun;
+import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -66,9 +72,8 @@ public class IDPickerExecutor {
         }
         else {
             IdPickerExecutorNoFDR noFdrExe = new IdPickerExecutorNoFDR();
-            noFdrExe.execute(idpRun, params);
+            noFdrExe.execute(idpRun, params, true);
         }
-        
         
         long end = System.currentTimeMillis();
         log.info("IDPicker TOTAL run time: "+TimeUtils.timeElapsedMinutes(start, end)+" minutes");
@@ -120,7 +125,7 @@ public class IDPickerExecutor {
         return false;
     }
     
-    private static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
+    static <T extends SpectrumMatch> void calculateProteinSequenceCoverage(List<InferredProtein<T>> proteins) throws Exception {
         
         long start = System.currentTimeMillis();
         
@@ -425,76 +430,79 @@ public class IDPickerExecutor {
         ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
         
         // save a protein inference run and input files
-//        ProteinferRun pirun = new ProteinferRun();
-//        pirun.setInputGenerator(Program.PERCOLATOR);
-//        pirun.setProgram(ProteinInferenceProgram.IDPICKER_PERC);
-//        int pinferId = factory.getProteinferRunDao().save(pirun);
-//
-//        int searchAnalysisId = 1;
-//        MsRunSearchAnalysisDAO adao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
-//        List<Integer> rsAnalysisIds = adao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
-//        for(int id: rsAnalysisIds) {
-////            MsRunSearchAnalysis analysis = adao.load(id);
-//            ProteinferInput input = new ProteinferInput();
-//            input.setProteinferId(pinferId);
-//            input.setInputId(id);
-//            input.setInputType(InputType.ANALYSIS);
-//            factory.getProteinferInputDao().saveProteinferInput(input);
-//        }
-//
-//        // save the parameters
-//        IdPickerParamDAO filterDao = factory.getProteinferParamDao();
-//        IdPickerParam filter = new IdPickerParam();
-//        filter.setName("pep_percolator");
-//        filter.setValue("0.01");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
-//
-//        filter = new IdPickerParam();
-//        filter.setName("qval_percolator");
-//        filter.setValue("0.05");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
-//
-//        filter = new IdPickerParam();
-//        filter.setName("PeptDef");
-//        filter.setValue("Sequence");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
-//
-//        filter = new IdPickerParam();
-//        filter.setName("minPept");
-//        filter.setValue("1");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
-//
-//        filter = new IdPickerParam();
-//        filter.setName("minUniqePept");
-//        filter.setValue("0");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
-//
-//        filter = new IdPickerParam();
-//        filter.setName("coverage");
-//        filter.setValue("0");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
-//
-//        filter = new IdPickerParam();
-//        filter.setName("minPeptLen");
-//        filter.setValue("1");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
-//
-//        filter = new IdPickerParam();
-//        filter.setName("removeAmbigSpectra");
-//        filter.setValue("true");
-//        filter.setProteinferId(pinferId);
-//        filterDao.saveIdPickerParam(filter);
+        ProteinferRun pirun = new ProteinferRun();
+        pirun.setInputGenerator(Program.PERCOLATOR);
+        pirun.setProgram(ProteinInferenceProgram.PROTINFER_PERC);
+        int pinferId = factory.getProteinferRunDao().save(pirun);
+
+        int[] saIds = new int[] {2,10,11};
+//        int[] saIds = new int[] {12};
+        MsRunSearchAnalysisDAO adao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
+        for(int saId: saIds) {
+            List<Integer> rsAnalysisIds = adao.getRunSearchAnalysisIdsForAnalysis(saId);
+            for(int id: rsAnalysisIds) {
+//              MsRunSearchAnalysis analysis = adao.load(id);
+                ProteinferInput input = new ProteinferInput();
+                input.setProteinferId(pinferId);
+                input.setInputId(id);
+                input.setInputType(InputType.ANALYSIS);
+                factory.getProteinferInputDao().saveProteinferInput(input);
+            }
+        }
+
+        // save the parameters
+        IdPickerParamDAO filterDao = factory.getProteinferParamDao();
+        IdPickerParam filter = new IdPickerParam();
+        filter.setName("pep_percolator");
+        filter.setValue("1.0");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
+
+        filter = new IdPickerParam();
+        filter.setName("qval_percolator");
+        filter.setValue("0.01");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
+
+        filter = new IdPickerParam();
+        filter.setName("PeptDef");
+        filter.setValue("Sequence");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
+
+        filter = new IdPickerParam();
+        filter.setName("minPept");
+        filter.setValue("1");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
+
+        filter = new IdPickerParam();
+        filter.setName("minUniqePept");
+        filter.setValue("0");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
+
+        filter = new IdPickerParam();
+        filter.setName("coverage");
+        filter.setValue("0");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
+
+        filter = new IdPickerParam();
+        filter.setName("minPeptLen");
+        filter.setValue("5");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
+
+        filter = new IdPickerParam();
+        filter.setName("removeAmbigSpectra");
+        filter.setValue("true");
+        filter.setProteinferId(pinferId);
+        filterDao.saveIdPickerParam(filter);
 
         
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(6);
+        IdPickerRun run = runDao.loadProteinferRun(pinferId);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getParams().size());
 

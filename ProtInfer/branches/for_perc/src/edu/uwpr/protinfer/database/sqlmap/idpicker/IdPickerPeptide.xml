@@ -22,7 +22,7 @@
 	
 	<parameterMap class="IdPickerPeptideBase" id="idpickerPeptideParam">
 		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="groupId" jdbcType="INTEGER" />
 	</parameterMap>
 	
 	<select id="select" resultMap="idpickerPeptideResult" parameterClass="Integer">
@@ -89,5 +89,12 @@
     	peptideGroupID) 
     	VALUES (#protGrpId#, #peptGrpId#)
     </insert>
+    
+    <update id="updateIdPickerPeptide" parameterClass="IdPickerPeptideBase">
+    	UPDATE IDPickerPeptide 
+    	SET groupID=#groupId#
+    	WHERE piPeptideID=#id#
+    </update>
+    
     
 </sqlMap>

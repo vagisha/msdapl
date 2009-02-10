@@ -10,6 +10,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferPeptideDAO;
 import edu.uwpr.protinfer.database.dto.GenericProteinferPeptide;
+import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
 import edu.uwpr.protinfer.database.dto.idpicker.GenericIdPickerPeptide;
 
 public abstract class AbstractIdPickerPeptideDAO <T extends GenericIdPickerPeptide<?,?>>
@@ -58,5 +59,22 @@ public abstract class AbstractIdPickerPeptideDAO <T extends GenericIdPickerPepti
      public List<Integer> getPeptideIdsForProteinferRun(int proteinferId) {
          return peptDao.getPeptideIdsForProteinferRun(proteinferId);
      }
-
+     
+     @Override
+     public ProteinferPeptide loadPeptide(int pinferId, String peptideSequence) {
+        return peptDao.loadPeptide(pinferId, peptideSequence);
+     }
+     
+     @Override
+     public int update(GenericProteinferPeptide<?,?> peptide) {
+         return peptDao.update(peptide);
+     }
+     
+     public int updateIdPickerPeptide(GenericIdPickerPeptide<?,?> peptide) {
+         int updated = update(peptide);
+         if(updated > 0)
+             return update(sqlMapNameSpace+".updateIdPickerPeptide", peptide);
+         return 0;
+     }
+     
 }

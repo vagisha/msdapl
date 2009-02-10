@@ -22,6 +22,7 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.database.dto.GenericProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinUserValidation;
+import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.idpicker.GenericIdPickerProtein;
 
@@ -40,6 +41,17 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
 
     public int save(GenericProteinferProtein<?> protein) {
         return protDao.save(protein);
+    }
+    
+    public int update(GenericProteinferProtein<?> protein) {
+        return protDao.update(protein);
+    }
+    
+    public int updateIdPickerProtein(GenericIdPickerProtein<?> protein) {
+        int updated = update(protein);
+        if(updated > 0)
+            return update(sqlMapNameSpace+".updateIdPickerProtein", protein);
+        return 0;
     }
     
     public int saveIdPickerProtein(GenericIdPickerProtein<?> protein) {
@@ -85,6 +97,11 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     
     public List<Integer> getClusterIds(int pinferId) {
        return queryForList(sqlMapNameSpace+".selectClusterIdsForPinfer", pinferId); 
+    }
+    
+    @Override
+    public ProteinferProtein loadProtein(int proteinferId, int nrseqProteinId) {
+        return protDao.loadProtein(proteinferId, nrseqProteinId);
     }
     
 //    @Override

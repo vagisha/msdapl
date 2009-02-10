@@ -30,7 +30,23 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
         return saveAndReturnId(sqlMapNameSpace+".insert", protein);
     }
     
+    @Override
+    public int update(GenericProteinferProtein<?> protein) {
+        return update(sqlMapNameSpace+".update", protein);
+    }
+    
+    private boolean proteinPeptideMatchExists(int proteinId, int peptideId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(3);
+        map.put("proteinId", proteinId);
+        map.put("peptideId", peptideId);
+        int count = (Integer)queryForObject(sqlMapNameSpace+".checkProteinPeptideMatch", map);
+        return count > 0;
+    }
+    
     public void saveProteinferProteinPeptideMatch(int pinferProteinId, int pinferPeptideId) {
+        
+        if(proteinPeptideMatchExists(pinferProteinId, pinferPeptideId))
+            return;
         Map<String, Integer> map = new HashMap<String, Integer>(4);
         map.put("pinferProteinId", pinferProteinId);
         map.put("pinferPeptideId", pinferPeptideId);
@@ -54,6 +70,14 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
     
     public ProteinferProtein loadProtein(int pinferProteinId) {
         return (ProteinferProtein) super.queryForObject(sqlMapNameSpace+".select", pinferProteinId);
+    }
+    
+    @Override
+    public ProteinferProtein loadProtein(int proteinferId, int nrseqProteinId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("pinferId", proteinferId);
+        map.put("nrseqProteinId", nrseqProteinId);
+        return (ProteinferProtein) super.queryForObject(sqlMapNameSpace+".selectProteinForNrseqId", map);
     }
     
     public List<Integer> getProteinferProteinIds(int proteinferId) {
@@ -181,4 +205,5 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
             return userValidation;
         }
     }
+    
 }

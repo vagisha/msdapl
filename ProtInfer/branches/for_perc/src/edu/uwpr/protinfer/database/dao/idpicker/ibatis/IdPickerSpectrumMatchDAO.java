@@ -8,6 +8,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 import edu.uwpr.protinfer.database.dao.GenericProteinferSpectrumMatchDAO;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch;
 
 public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericProteinferSpectrumMatchDAO<IdPickerSpectrumMatch> {
@@ -52,5 +53,10 @@ public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericPr
     @Override
     public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
         return psmDao.getSpectrumMatchIdsForPinferRunInput(pinferId, inputId);
+    }
+
+    @Override
+    public int update(ProteinferSpectrumMatch psm) {
+        throw new UnsupportedOperationException("IdPickerSpectrumMatchDAO does not support update");
     }
 }

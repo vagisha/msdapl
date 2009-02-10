@@ -3,6 +3,7 @@ package edu.uwpr.protinfer.database.dao;
 import java.util.List;
 
 import edu.uwpr.protinfer.database.dto.GenericProteinferPeptide;
+import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
 
 public interface GenericProteinferPeptideDAO<T extends GenericProteinferPeptide<?,?>> {
 
@@ -17,7 +18,11 @@ public interface GenericProteinferPeptideDAO<T extends GenericProteinferPeptide<
     public abstract List<Integer> getPeptideIdsForProteinferRun(int proteinferId);
 
     public abstract T load(int pinferPeptideId);
+    
+    public abstract ProteinferPeptide loadPeptide(int pinferId, String peptideSequence);
 
+    public abstract int update(GenericProteinferPeptide<?,?> peptide);
+    
     public abstract void delete(int id);
 
 }

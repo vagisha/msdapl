@@ -79,6 +79,10 @@ public class GenericProteinferProtein <T extends GenericProteinferPeptide<?,?>>{
     public ProteinUserValidation getUserValidation() {
         return userValidation;
     }
+    
+    public String getUserValidationString() {
+        return String.valueOf(userValidation.getStatusChar());
+    }
 
     public void setUserValidation(ProteinUserValidation userValidation) {
         this.userValidation = userValidation;

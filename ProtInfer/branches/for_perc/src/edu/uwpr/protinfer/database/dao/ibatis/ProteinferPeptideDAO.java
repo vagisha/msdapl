@@ -1,6 +1,8 @@
 package edu.uwpr.protinfer.database.dao.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
@@ -49,7 +51,20 @@ public class ProteinferPeptideDAO extends BaseSqlMapDAO implements
         return (ProteinferPeptide) super.queryForObject(sqlMapNameSpace+".select", pinferPeptideId);
     }
     
+    @Override
+    public ProteinferPeptide loadPeptide(int pinferId, String peptideSequence) {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("pinferId", pinferId);
+        map.put("sequence", peptideSequence);
+        return (ProteinferPeptide) super.queryForObject(sqlMapNameSpace+".selectPeptideForSeq", map);
+    }
+    
     public void delete(int id) {
         super.delete(sqlMapNameSpace+".delete", id);
+    }
+
+    @Override
+    public int update(GenericProteinferPeptide<?,?> peptide) {
+        return update(sqlMapNameSpace+".update", peptide);
     }
 }

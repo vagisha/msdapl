@@ -153,10 +153,10 @@ public class IdPickerExecutorFDR {
                     }};
             }
             else if(params.getScoreForFDR() == SCORE.DeltaCN) {
-                // we will be comparing DeltaCN -- 0.0 is be best score; 1.0 is worst
+                // we will be comparing DeltaCN -- 0.0 is best (deltaCN = (topHit - currentHit)/topHit)
                 return new Comparator<PeptideSpectrumMatchIDP>() {
                     public int compare(PeptideSpectrumMatchIDP o1, PeptideSpectrumMatchIDP o2) {
-                        return Double.valueOf(o2.getScore()).compareTo(o1.getScore());
+                        return Double.valueOf(o1.getScore()).compareTo(o2.getScore());
                     }};
             }
             else

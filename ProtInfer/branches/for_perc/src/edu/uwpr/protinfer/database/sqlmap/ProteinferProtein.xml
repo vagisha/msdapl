@@ -37,6 +37,10 @@
     	SELECT * FROM msProteinInferProtein WHERE id=#id#
     </select>
     
+    <select id="selectProteinForNrseqId" resultMap="pinferProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferProtein WHERE piRunID=#pinferId# AND nrseqProteinID=#nrseqProteinId#
+    </select>
+    
     <select id="selectProteinIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
     	SELECT id FROM msProteinInferProtein WHERE piRunID = #id#
     </select>
@@ -63,6 +67,16 @@
     	UPDATE msProteinInferProtein SET userValidation=#userValidation# where id=#pinferProteinId#
     </update>
     
+    <update id="update" parameterClass="BaseProteinferProtein">
+    	UPDATE msProteinInferProtein 
+    	SET piRunID = #proteinferId#,
+    	nrseqProteinID = #nrseqProteinId#,
+    	coverage = #coverage#,
+    	userAnnotation = #userAnnotation#,
+    	userValidation = #userValidationString#
+    	WHERE id=#id#
+    </update>
+    
     <insert id="insert" parameterMap="pinferProteinParam">
     	INSERT INTO msProteinInferProtein (
     	piRunID,
@@ -82,6 +96,13 @@
     	piPeptideID) 
     	VALUES (#pinferProteinId#, #pinferPeptideId#)
     </insert>
+    
+    <select id="checkProteinPeptideMatch" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(*) FROM msProteinInferProteinPeptideMatch
+    	WHERE piProteinID=#proteinId#
+    	AND piPeptideID=#peptideId#
+    </select>
+    
     
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM msProteinInferProtein WHERE id=#id#		    

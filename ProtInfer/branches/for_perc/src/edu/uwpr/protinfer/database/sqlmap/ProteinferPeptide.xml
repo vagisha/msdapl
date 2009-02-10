@@ -29,6 +29,10 @@
     	SELECT * FROM msProteinInferPeptide WHERE id=#id#
     </select>
     
+    <select id="selectPeptideForSeq" resultMap="pinferPeptideResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferPeptide WHERE piRunID=#pinferId# AND sequence=#sequence#
+    </select>
+    
     <select id="selectPeptideIdsForProtein" resultClass="Integer" parameterClass="Integer">
     	SELECT piPeptideID FROM msProteinInferProteinPeptideMatch WHERE piProteinID = #id#
     </select>
@@ -70,6 +74,14 @@
       		select last_insert_id() as id
     	</selectKey>
     </insert>
+    
+    <update id="update" parameterClass="BaseProteinferPeptide">
+    	UPDATE msProteinInferPeptide 
+    	SET piRunID=#proteinferId#,
+    	sequence=#sequence#,
+    	uniqueToProtein=#uniqueToProtein#
+    	WHERE id=#id#
+    </update>
     
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM msProteinInferPeptide WHERE id=#id#		    

@@ -28,8 +28,8 @@
 	<parameterMap class="IdPickerProteinBase" id="idpickerProteinParam">
 		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="isParsimonious" jdbcType="TINYINT" />
-		<parameter property="clusterId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="clusterId" jdbcType="INTEGER" />
+		<parameter property="groupId" jdbcType="INTEGER" />
 		<parameter property="nsaf" jdbcType="DOUBLE" nullValue="-1.0"/>
 	</parameterMap>
 	
@@ -309,6 +309,16 @@
     	nsaf) 
     	VALUES (?,?,?,?,?)
     </insert>
+    
+    <update id="updateIdPickerProtein" parameterClass="IdPickerProteinBase">
+    	UPDATE IDPickerProtein 
+    	SET clusterID=#clusterId#,
+    	groupID=#groupId#,
+    	isParsimonious=#isParsimonious#,
+    	nsaf=#nsaf#
+    	WHERE piProteinID=#id#
+    </update>
+    
     
     <delete id="delete" parameterClass="Integer">
 		DELETE FROM msProteinInferProtein WHERE id=#id#		    

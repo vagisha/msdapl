@@ -38,7 +38,7 @@
     
     <select id="selectMatchesForPeptide" resultMap="pinferSMatchResult" parameterClass="Integer">
     	SELECT * FROM msProteinInferSpectrumMatch AS psm, msProteinInferIon as ion
-    	WHERE psm.ionID = ion.id
+    	WHERE psm.piIonID = ion.id
     	AND ion.piPeptideID = #id#
     </select>
     
@@ -79,6 +79,15 @@
     	AND msRes.runSearchID = msa.runSearchID
     	AND msa.id = #analysisId#
     </select>
+    
+     <update id="update" parameterClass="ProteinferSpectrumMatch">
+    	UPDATE msProteinInferSpectrumMatch 
+    	SET runSearchResultID=#msRunSearchResultId#,
+    	piIonID=#proteinferIonId#,
+    	rankForPeptide=#rank#
+    	WHERE id=#id#
+    </update>
+    
     
     <insert id="insert" parameterMap="pinferSMatchParam">
     	INSERT INTO msProteinInferSpectrumMatch (

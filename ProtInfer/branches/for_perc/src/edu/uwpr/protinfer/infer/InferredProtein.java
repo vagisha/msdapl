@@ -9,6 +9,7 @@ import java.util.Map;
 public class InferredProtein <T extends SpectrumMatch> {
 
     private Protein protein;
+    private int spectrumCount = -1;
     
     private Map<Integer, PeptideEvidence<T>> peptideEvList;
     
@@ -36,11 +37,16 @@ public class InferredProtein <T extends SpectrumMatch> {
     }
     
     public int getSpectralEvidenceCount() {
+        if(spectrumCount != -1)
+            return spectrumCount;
         int count = 0;
         for(PeptideEvidence<T> ev: peptideEvList.values()) {
             count += ev.getSpectrumMatchCount();
         }
         return count;
+    }
+    public void setSpectrumMatchCount(int count) {
+        this.spectrumCount = count;
     }
     
     public List<PeptideEvidence<T>> getPeptides() {

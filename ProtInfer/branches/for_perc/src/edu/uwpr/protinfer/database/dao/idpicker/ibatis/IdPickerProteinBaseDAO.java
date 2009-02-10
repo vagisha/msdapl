@@ -40,5 +40,4 @@ private static final String sqlMapNameSpace = "IdPickerProtein";
         map.put("groupId", groupId);
         return queryForList(sqlMapNameSpace+".selectBaseProteinsForGroup", map);
     }
-
 }

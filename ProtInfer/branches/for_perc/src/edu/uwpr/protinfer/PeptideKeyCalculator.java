@@ -8,6 +8,8 @@ package edu.uwpr.protinfer;
 
 import org.yeastrc.ms.domain.search.MsSearchResult;
 
+import edu.uwpr.protinfer.database.dto.ProteinferIon;
+
 /**
  * 
  */
@@ -25,6 +27,16 @@ public class PeptideKeyCalculator {
         }
         if(peptideDef.isUseCharge())
             key += "_"+result.getCharge();
+        return key;
+    }
+    
+    public static String getKey(ProteinferIon ion, PeptideDefinition peptideDef) {
+        String key = ""+ion.getProteinferPeptideId();
+        if(peptideDef.isUseMods()) {
+            key += "_"+ ion.getModificationStateId();
+        }
+        if(peptideDef.isUseCharge())
+            key += "_"+ion.getCharge();
         return key;
     }
 }

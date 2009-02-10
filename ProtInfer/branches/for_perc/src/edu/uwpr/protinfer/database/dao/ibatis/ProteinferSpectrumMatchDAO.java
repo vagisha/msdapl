@@ -67,4 +67,8 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements Generic
         else
             return null;
     }
+
+    public int update(ProteinferSpectrumMatch psm) {
+       return update(sqlMapNameSpace+".update", psm);
+    }
 }
