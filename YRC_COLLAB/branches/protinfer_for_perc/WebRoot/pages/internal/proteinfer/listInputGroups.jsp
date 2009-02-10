@@ -78,14 +78,14 @@
 	<bean:define id="title" value="Available Search Analyses"/>
 </logic:equal>
 		
-<yrcwww:contentbox scheme="ms" title="<%=title %>">
+<yrcwww:contentbox scheme="pinfer" title="<%=title %>">
 
 <center>
 <logic:notEmpty name="projectInputGroups">
 	
 	<table cellpadding="0" cellspacing="0" width="80%">
 	<thead>
-		<yrcwww:colorrow scheme="ms">
+		<yrcwww:colorrow scheme="pinfer">
 		<th width="5%"></th>
 		<th style="font-size:9pt;" width="25%" align="left">Project ID</th>
 		
@@ -103,7 +103,7 @@
 	</thead>
 	<tbody>
 	<logic:iterate name="projectInputGroups" id="inputGroup">
-		<yrcwww:colorrow scheme="ms">
+		<yrcwww:colorrow scheme="pinfer">
 			<td><input type="checkbox" name="search_cb" id="<bean:write name="inputGroup" property="inputGroupId" />" /></td>
 			<td><bean:write name="inputGroup" property="projectId" /></td>
 			<td><bean:write name="inputGroup" property="inputGroupId" /></td>
@@ -112,7 +112,7 @@
 			    class="fileViewer" 
 			    id="<bean:write name="inputGroup" property="inputGroupId" />">Hide Files</td>
 		</yrcwww:colorrow>
-		<yrcwww:colorrow scheme="ms" repeat="true">
+		<yrcwww:colorrow scheme="pinfer" repeat="true">
 			<td colspan=5">
 				<div id="files_<bean:write name="inputGroup" property="inputGroupId" />">
 				<table style="margin-top: 3px; margin-bottom: 3px; margin-left:25px;" width="95%"/>

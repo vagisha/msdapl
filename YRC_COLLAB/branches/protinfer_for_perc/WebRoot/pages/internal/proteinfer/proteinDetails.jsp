@@ -14,7 +14,7 @@
 
 
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
-<tr class="ms_A">
+<tr class="pinfer_A">
 	<td>Coverage(%)</td>
 	<td># Peptides</td>
 	<td># Uniq.Peptides</td>

@@ -19,11 +19,6 @@
 }
 
 
-DIV.pinfer_header {
-    color: #50A029;
-}
-/*background-color: #a0df82;*/
-
 TH.sorted-asc {
 	background-image:url(../images/proteinfer/asc.gif);
 	background-position:bottom center;
@@ -36,18 +31,32 @@ TH.sorted-desc {
 	background-repeat:no-repeat;
 }
 
-TH.ms_A {
-	background-color: #a0df82;
+TH.pinfer_A {
+	background-color: #2E8B57;
     color: #FFFFFF;
 }
+
+TH.pinfer_A_small {
+	background-color: #a2c9a2;
+    color: #FFFFFF;
+}
+
  /* background-color: #D4FECA; */
-TH.ms_hover {
-	color: #3D902A;
+TH.pinfer_hover {
+	color: 2E8B57;
+	background-color: #a2c9a2;
     cursor: pointer;
 }
 
-TH.ms_selected_header {
-	color: #3D902A;
+TH.pinfer_selected_header_small {
+	color: 2E8B57;
+	background-color: #a2c9a2;
+}
+
+
+TH.pinfer_selected_header {
+	color: white;
+	background-color: #2F5F4F;
 }
 
 /* FOR TOOLTIPS */
@@ -202,7 +211,7 @@ p.tooltip {
     color: #000;
 }
 .ui-tabs-panel {
-    border: 1px solid #3D902A;
+    border: 1px solid #2E8B57;
     padding: 10px;
     background: #EBFFE6; /* declare background color for container to avoid distorted fonts in IE while fading */
 }
@@ -229,7 +238,7 @@ p.tooltip {
 .flora .ui-dialog .ui-dialog-titlebar,
 .flora.ui-dialog .ui-dialog-titlebar {
 	border-bottom: 1px solid #d8d2aa;
-	background: #3D902A ;
+	background: #2E8B57 ;
 	padding: 0px;
 	height: 28px;
 	_height: 29px;

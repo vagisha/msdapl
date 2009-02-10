@@ -87,7 +87,7 @@ function addSearches(selectedSearches) {
   
   <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
    
-    <yrcwww:colorrow scheme="ms">
+    <yrcwww:colorrow scheme="pinfer">
     <td WIDTH="20%" VALIGN="top">
   		<B>Parameters:</B>
   		<html:hidden name="proteinInferenceFormSearch" property="programParams.programName" />
@@ -96,7 +96,7 @@ function addSearches(selectedSearches) {
   	</yrcwww:colorrow>
   	
   	<logic:iterate name="proteinInferenceFormSearch" property="programParams.paramList" id="param">
-    <yrcwww:colorrow scheme="ms" repeat="true">
+    <yrcwww:colorrow scheme="pinfer" repeat="true">
     
     <td WIDTH="20%" VALIGN="top">
     	<span class="tooltip" title="<bean:write name="param" property="tooltip" />" style="cursor: pointer;">
@@ -129,22 +129,22 @@ function addSearches(selectedSearches) {
    	</yrcwww:colorrow>
    </logic:iterate>
    
-   <yrcwww:colorrow scheme="ms">
+   <yrcwww:colorrow scheme="pinfer">
     <td VALIGN="top" colspan="2">
     <B>Select Input Files:</B>
     
     </td>
    </yrcwww:colorrow>
    
-   <yrcwww:colorrow scheme="ms" repeat="true">
+   <yrcwww:colorrow scheme="pinfer" repeat="true">
    
    	<td VALIGN="top" colspan="2">
-    	<div style="border: solid 1px #3D902A; padding-bottom: 5px;">
+    	<div style="border: solid 1px #2E8B57; padding-bottom: 5px;">
     	
     	<div id="searchInputList">
     	
     	<div id="search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>">
-    	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
+    	<div style="background-color: #2E8B57; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
     		 id="foldable_search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>">
     		Search ID: <bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>
@@ -171,7 +171,7 @@ function addSearches(selectedSearches) {
     
 		<table width="100%">
  		<logic:iterate name="proteinInferenceFormSearch" property="inputSummary.inputFiles" id="inputFile" >
-		<yrcwww:colorrow scheme="ms" repeat="true">
+		<yrcwww:colorrow scheme="pinfer" repeat="true">
 			<td WIDTH="20%" VALIGN="top"> 
 				<html:checkbox name="inputFile" property="isSelected" value="true" indexed="true" 
 				styleId="<%=checkboxId%>" />
@@ -184,7 +184,7 @@ function addSearches(selectedSearches) {
 		</yrcwww:colorrow>
 		</logic:iterate>
  		</table>
-		<div class="clickable toggle_selection" style="font-size: 7pt; color: #3D902A;" 
+		<div class="clickable toggle_selection" style="font-size: 7pt; color: #006400;" 
 		     id="<%=toggleIdDiv%>">Deselect All</div>
 		</div>
 		</div>
@@ -195,13 +195,13 @@ function addSearches(selectedSearches) {
    
    </yrcwww:colorrow>
    
-    <yrcwww:colorrow scheme="ms" repeat="true">
+    <yrcwww:colorrow scheme="pinfer" repeat="true">
     	<td colspan="2" align="center">Comments<br>
     	<html:textarea name="proteinInferenceFormSearch" property="comments" rows="3" cols="50"/>
     	</td>
     </yrcwww:colorrow>
     
-	<yrcwww:colorrow scheme="ms" repeat="true">
+	<yrcwww:colorrow scheme="pinfer" repeat="true">
    <td colspan="2" align="center">
    	<NOBR>
  		<html:submit value="Run Protein Inference" styleClass="button" />

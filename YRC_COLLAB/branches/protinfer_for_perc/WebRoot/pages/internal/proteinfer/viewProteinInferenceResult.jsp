@@ -121,8 +121,8 @@ $(document).ready(function() {
 	// set up the tabs and select the first tab
     $("#results > ul").tabs().tabs('select', selected);
   
- 	$(".stripe_table th").addClass("ms_A");
- 	$(".stripe_table tbody > tr:odd").addClass("ms_A");
+ 	$(".stripe_table th").addClass("pinfer_A");
+ 	$(".stripe_table tbody > tr:odd").addClass("pinfer_A");
  	
  	
   	setupProteinListTable();
@@ -216,8 +216,8 @@ function showProteinDetails(proteinId, display, block) {
 								  {'pinferId': <%=pinferId%>, 'pinferProtId': proteinId}, 	// data
 								  function(responseText, status, xhr) {						// callback
 								  		// stripe the table
-										$("#protdetailstbl_"+proteinId+" th.main").addClass("ms_A");
-										$("#protdetailstbl_"+proteinId+" tbody tr.main").addClass("ms_A");
+										$("#protdetailstbl_"+proteinId+" th.main").addClass("pinfer_A");
+										$("#protdetailstbl_"+proteinId+" tbody tr.main").addClass("pinfer_A");
 										if(showDiv) {
 											$("#protdetailslink").click(); // so that history works
 											//var $tabs = $("#results").tabs();
@@ -270,15 +270,15 @@ function selectProteinCluster(clusterId, block) {
  								  		
  								  		$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
  										$("#assoctable_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#assoctable_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
+								  		$("#assoctable_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("pinfer_A_small");
 								  	
 								  		$("#prot_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
 								  		$("#prot_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#prot_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
+								  		$("#prot_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("pinfer_A_small");
 								  	
 								  		$("#pept_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
 								  		$("#pept_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("ms_A");
+								  		$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("pinfer_A_small");
  										
  										$(".protgrplist").click(function(){
  											if($("#prot_grp_table_"+clusterId).is(':visible'))
@@ -328,7 +328,7 @@ function highlightProteinAndPeptides() {
  	removeProteinAndPeptideHighlights();
  	
  	// select the PROTEIN group cells the user wants to select
- 	$("#protGrp_"+proteinGroupId).css("background-color","#FFFF00");
+ 	$("#protGrp_"+proteinGroupId).css("background-color","#EEE8AA");
  	
  	
  	// now select the PEPTIDE group cells we want AND the PROTEIN-PEPTIDE association cells
@@ -336,15 +336,15 @@ function highlightProteinAndPeptides() {
 		var j = 0;
 		// peptide groups NOT unique to protein
 		for(var i = 0; i < peptGrpIds.length; i++) {
-			$(".peptGrp_"+peptGrpIds[i]).each(function() {$(this).css("background-color","#FFFF00");});
-			$("#peptEvFor_"+proteinGroupId+"_"+peptGrpIds[i]).css("background-color","#FFFF00");
+			$(".peptGrp_"+peptGrpIds[i]).each(function() {$(this).css("background-color","#EEE8AA");});
+			$("#peptEvFor_"+proteinGroupId+"_"+peptGrpIds[i]).css("background-color","#EEE8AA");
 			lastSelectedPeptGrpIds[j] = peptGrpIds[i];
 			j++;
 		}
 		// peptide groups UNIQUE to protein
 		for(var i = 0; i < uniqPeptGrpIds.length; i++) {
-			$(".peptGrp_"+uniqPeptGrpIds[i]).each(function() {$(this).css("background-color","#00FFFF");});
-			$("#peptEvFor_"+proteinGroupId+"_"+uniqPeptGrpIds[i]).css("background-color","#00FFFF");
+			$(".peptGrp_"+uniqPeptGrpIds[i]).each(function() {$(this).css("background-color","#FFFF55");});
+			$("#peptEvFor_"+proteinGroupId+"_"+uniqPeptGrpIds[i]).css("background-color","#FFFF55");
 			lastSelectedPeptGrpIds[j] = uniqPeptGrpIds[i];
 			j++;
 		}
@@ -387,8 +387,8 @@ function showSpectrumMatches(runSearchId, runName) {
 								{'pinferId': <%=pinferId%>, 'runSearchId': runSearchId},
 								function(responseText, status, xhr) {						// callback
 							  		// stripe the table
-									$("#psmtbl_"+runSearchId+" th").addClass("ms_A");
-									$("#psmtbl_"+runSearchId+" tr:even").addClass("ms_A");
+									$("#psmtbl_"+runSearchId+" th").addClass("pinfer_A");
+									$("#psmtbl_"+runSearchId+" tr:even").addClass("pinfer_A");
 									makeSortable($("#psmtbl_"+runSearchId));
 									$(this).show();
 							  });
@@ -402,8 +402,8 @@ function showSpectrumMatches(runSearchId, runName) {
 function setupProteinListTable() {
   
   	// stripe table rows
-  	$("#protlisttable tbody tr.protgrp_row").addClass("ms_A");
-  	$("#protlisttable > thead > tr > th").addClass("ms_A");
+  	$("#protlisttable tbody tr.protgrp_row").addClass("pinfer_A");
+  	$("#protlisttable > thead > tr > th").addClass("pinfer_A");
   	
   	setupShowPeptidesLinks();
   	
@@ -618,8 +618,8 @@ function makeProteinListSortable() {
   			var sortBy = $(this).attr('id');
   			
       		$(this).addClass('clickable').hover(
-      			function() {$(this).addClass('ms_hover');} , 
-      			function() {$(this).removeClass('ms_hover');}).click(function() {
+      			function() {$(this).addClass('pinfer_hover');} , 
+      			function() {$(this).removeClass('pinfer_hover');}).click(function() {
 				
 					// alert("sorting by "+sortBy);
 					// sorting direction
@@ -729,7 +729,7 @@ function sortResults(pinferId, sortBy, sortOrder) {
 							function(responseText, status, xhr) {			// callback
 										setupProteinListTable();
 										// highlight the sorted column
-										$("#"+sortBy).addClass("ms_selected_header");
+										$("#"+sortBy).addClass("pinfer_selected_header");
 										if(sortOrder == 1)
 											$("#"+sortBy).addClass("sorted-asc");
 										else
@@ -769,13 +769,13 @@ function makeSortable(table) {
   		
   			var $header = $(this);
       		$(this).addClass('clickable').hover(
-      			function() {$(this).addClass('ms_hover');} , 
-      			function() {$(this).removeClass('ms_hover');}).click(function() {
+      			function() {$(this).addClass('pinfer_hover');} , 
+      			function() {$(this).removeClass('pinfer_hover');}).click(function() {
 
 				
 				// remove row striping
 				if($table.is('.stripe_table')) {
-					$("tbody > tr:odd", $table).removeClass("ms_A");
+					$("tbody > tr:odd", $table).removeClass("pinfer_A");
 				}
 				
 				// sorting direction
@@ -826,11 +826,11 @@ function makeSortable(table) {
      			
      			// the header for the column used for sorting is highlighted
 				$('th', $table).each(function(){
-					$(this).removeClass('ms_selected_header');
+					$(this).removeClass('pinfer_selected_header_small');
 					$(this).removeClass('sorted-desc');
 	    			$(this).removeClass('sorted-asc');
 				});
-				$header.addClass('ms_selected_header');
+				$header.addClass('pinfer_selected_header_small');
 				
      			var $sortHead = $table.find('th').filter(':nth-child(' + (column + 1) + ')');
 
@@ -840,7 +840,7 @@ function makeSortable(table) {
         		
         		// add row striping back
         		if($table.is('.stripe_table')) {
-					$("tbody > tr:odd", $table).addClass("ms_A");
+					$("tbody > tr:odd", $table).addClass("pinfer_A");
         		}
       		});
 	}
@@ -868,7 +868,7 @@ function toggleDivVisibility(mydiv) {
 
 <CENTER>
 
-<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="950" scheme="ms">
+<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="950" scheme="pinfer">
   
   <div id="results" class="flora">
       <ul>

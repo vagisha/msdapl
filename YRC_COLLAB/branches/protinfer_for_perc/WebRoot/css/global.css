@@ -59,7 +59,7 @@ DIV.footer {
         margin:0px;
 }
 
-DIV.localization, DIV.ms, DIV.y2h, DIV.progress, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.about, DIV.account {
+DIV.localization, DIV.ms, DIV.pinfer, DIV.y2h, DIV.progress, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.about, DIV.account {
         border-width: 1;
         border-style: solid;
         padding: 10px;
@@ -71,7 +71,7 @@ DIV.localization, DIV.ms, DIV.y2h, DIV.progress, DIV.upload, DIV.adminSearch, DI
         margin:0px;
 }
 
-DIV.localization_header, DIV.ms_header, DIV.y2h_header, DIV.progress_header, DIV.upload_header, DIV.adminSearch_header, DIV.groups_header, DIV.search_header, DIV.register_header, DIV.error_header, DIV.login_header, DIV.project_header, DIV.about_header, DIV.account_header {
+DIV.localization_header, DIV.ms_header, DIV.pinfer_header, DIV.y2h_header, DIV.progress_header, DIV.upload_header, DIV.adminSearch_header, DIV.groups_header, DIV.search_header, DIV.register_header, DIV.error_header, DIV.login_header, DIV.project_header, DIV.about_header, DIV.account_header {
         border-width: 1;
         border-style: solid;
         padding: 10px;
@@ -343,6 +343,34 @@ TR.ms_B {
 
 DIV.ms .button {
 	background-color:#3D902A;
+	color: #EBFFE6;
+	font-size:10pt;
+	font-weight:bold;
+	margin-top:20px;	
+}
+
+
+DIV.pinfer {
+        width: 600;
+        border-color: #006400;
+        background-color: #EBFFE6;
+        color: #006400;
+}
+DIV.pinfer_header {
+        width: 600;
+        border-color: #2F5F4F;
+        background-color: #2F5F4F;
+        color: #EBFFE6;
+}
+TR.pinfer_A {
+	background-color: #BFECBF;
+}
+TR.pinfer_B {
+	background-color: #EBFFE6;
+}
+
+DIV.pinfer .button {
+	background-color:#2F5F4F;
 	color: #EBFFE6;
 	font-size:10pt;
 	font-weight:bold;

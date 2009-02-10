@@ -101,7 +101,7 @@ function toggleSelection(button) {
 
 
 
-<yrcwww:contentbox title="Protein Inference*" centered="true" width="750" scheme="ms">
+<yrcwww:contentbox title="Protein Inference*" centered="true" width="750" scheme="pinfer">
 
  <CENTER>
  

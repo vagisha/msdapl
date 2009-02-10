@@ -95,7 +95,7 @@
   		<tr>
   			<td valign="top">Fasta ID(s): </td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
-  				<span style="font-size:8pt; color:#3D902A;">Enter a comma-separated list of complete or partial identifiers</span>
+  				<span style="font-size:8pt; color:#006400;">Enter a comma-separated list of complete or partial identifiers</span>
   			</td>
   			<td valign="top">Description: </td>
   			<td valign="top">

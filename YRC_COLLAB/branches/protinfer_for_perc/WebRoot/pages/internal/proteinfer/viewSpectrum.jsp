@@ -18,11 +18,11 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <center>
-<yrcwww:contentbox title="View Peptide Spectra" centered="true" width="1000" scheme="ms">
+<yrcwww:contentbox title="View Peptide Spectra" centered="true" width="1000" scheme="pinfer">
 
 <center>
 <table border="0">
- <yrcwww:colorrow scheme="ms">
+ <yrcwww:colorrow scheme="pinfer"">
   <td><b>Sequence:</b></td>
   <td><b><bean:write name="peptideSeq" filter="false"/></b></td>
  </yrcwww:colorrow>

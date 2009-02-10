@@ -218,7 +218,7 @@
 		<tr class="pept_row linked_row">
 		<td valign="top" colspan="2"><nobr>
 			<span class="showpeptForProt" 
-				  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #3D902A;" 
+				  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #006400;" 
 				  id="<bean:write name="protein" property="protein.id" />"
 				  title="<bean:write name="proteinGroup" property="groupId" />"
 				  >Show Peptides</span></nobr></td>
@@ -338,7 +338,7 @@
 		<tr class="pept_row linked_row">
 			<td valign="top" colspan="2"><nobr>
 				<span class="showpeptForProtGrp" 
-					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #3D902A;" 
+					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #006400;" 
 					  id="<bean:write name="proteinGroup" property="groupId" />"
 					  >Show Peptides</span></nobr></td>
 			<td colspan="8">

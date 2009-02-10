@@ -47,7 +47,7 @@ function addAnalyses(selectedAnalyses) {
 		for(i = 0; i < currentAnalysisIds.length; i++) {
 			currentInputCount += $("input[id='toggle_analysis_"+currentAnalysisIds[i]+"_file']").length;
 		}
-		alert("current input count: "+currentInputCount);
+		//alert("current input count: "+currentInputCount);
 		
 		$.ajax({
   			type: "GET",
@@ -90,7 +90,7 @@ function addAnalyses(selectedAnalyses) {
   
   <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
    
-    <yrcwww:colorrow scheme="ms">
+    <yrcwww:colorrow scheme="pinfer">
     <td WIDTH="20%" VALIGN="top">
   		<B>Parameters:</B>
   		<html:hidden name="proteinInferenceFormAnalysis" property="programParams.programName" />
@@ -99,7 +99,7 @@ function addAnalyses(selectedAnalyses) {
   	</yrcwww:colorrow>
   	
   	<logic:iterate name="proteinInferenceFormAnalysis" property="programParams.paramList" id="param">
-    <yrcwww:colorrow scheme="ms" repeat="true">
+    <yrcwww:colorrow scheme="pinfer" repeat="true">
     
     <td WIDTH="20%" VALIGN="top">
     	<span class="tooltip" title="<bean:write name="param" property="tooltip" />" style="cursor: pointer;">
@@ -132,22 +132,22 @@ function addAnalyses(selectedAnalyses) {
    </logic:iterate>
    
    
-   <yrcwww:colorrow scheme="ms">
+   <yrcwww:colorrow scheme="pinfer">
     <td VALIGN="top" colspan="2">
     <B>Select Input Files:</B>
     
     </td>
    </yrcwww:colorrow>
    
-   <yrcwww:colorrow scheme="ms" repeat="true">
+   <yrcwww:colorrow scheme="pinfer" repeat="true">
    
     <td VALIGN="top" colspan="2">
-    	<div style="border: solid 1px #3D902A; padding-bottom: 5px;">
+    	<div style="border: solid 1px #2E8B57; padding-bottom: 5px;">
     	
     	<div id="analysisInputList">
     	
     	<div id="analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
-    	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
+    	<div style="background-color: #2E8B57; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
     		 id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
     		Analysis ID: <bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>
@@ -174,7 +174,7 @@ function addAnalyses(selectedAnalyses) {
     
 		<table width="100%">
  		<logic:iterate name="proteinInferenceFormAnalysis" property="inputSummary.inputFiles" id="inputFile" >
-		<yrcwww:colorrow scheme="ms" repeat="true">
+		<yrcwww:colorrow scheme="pinfer" repeat="true">
 			<td WIDTH="20%" VALIGN="top"> 
 				<html:checkbox name="inputFile" property="isSelected" value="true" indexed="true" 
 				styleId="<%=checkboxId%>" />
@@ -187,7 +187,7 @@ function addAnalyses(selectedAnalyses) {
 		</yrcwww:colorrow>
 		</logic:iterate>
  		</table>
-		<div class="clickable toggle_selection" style="font-size: 7pt; color: #3D902A;" 
+		<div class="clickable toggle_selection" style="font-size: 7pt; color: #006400;" 
 		     id="<%=toggleIdDiv%>">Deselect All</div>
 		</div>
 		</div>
@@ -197,13 +197,13 @@ function addAnalyses(selectedAnalyses) {
     </td>
    </yrcwww:colorrow>
    
-   <yrcwww:colorrow scheme="ms" repeat="true">
+   <yrcwww:colorrow scheme="pinfer" repeat="true">
     	<td colspan="2" align="center">Comments<br>
     	<html:textarea name="proteinInferenceFormAnalysis" property="comments" rows="3" cols="50"/>
     	</td>
     </yrcwww:colorrow>
     
-   <yrcwww:colorrow scheme="ms" repeat="true">
+   <yrcwww:colorrow scheme="pinfer" repeat="true">
    <td colspan="2" align="center">
    	<NOBR>
  		<html:submit value="Run Protein Inference" styleClass="button" />

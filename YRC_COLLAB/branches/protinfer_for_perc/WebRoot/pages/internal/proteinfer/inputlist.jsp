@@ -13,7 +13,7 @@
 <logic:iterate name="inputList" id="inputSummary">
 
 	<div id="<bean:write name="inputSummary" property="inputGroupId"/>">
-    	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
+    	<div style="background-color: #2E8B57; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
     		 id="foldable_search_<bean:write name="inputSummary" property="inputGroupId"/>">
     		 Search ID: <bean:write name="inputSummary" property="inputGroupId"/>
@@ -35,7 +35,7 @@
     
 		<table width="100%">
  		<logic:iterate name="inputSummary" property="inputFiles" id="inputFile" >
-		<yrcwww:colorrow scheme="ms" repeat="true">
+		<yrcwww:colorrow scheme="pinfer" repeat="true">
 			<td WIDTH="20%" VALIGN="top"> 
 				<input type="checkbox" checked="checked" 
 					   id="toggle_search_<bean:write name="inputSummary" property="inputGroupId"/>_file"
@@ -53,7 +53,7 @@
 		</yrcwww:colorrow>
 		</logic:iterate>
  		</table>
-		<div class="clickable toggle_selection" style="font-size: 7pt; color: #3D902A;" 
+		<div class="clickable toggle_selection" style="font-size: 7pt; color: #006400;" 
 		     id="toggle_search_<bean:write name="inputSummary" property="inputGroupId"/>">Deselect All</div>
 		</div>
 		</div>
@@ -69,7 +69,7 @@
 <logic:iterate name="inputList" id="inputSummary">
 
 	<div id="<bean:write name="inputSummary" property="inputGroupId"/>">
-    	<div style="background-color: #3D902A; color: white; font-weight: bold;" 
+    	<div style="background-color: #2E8B57; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
     		 id="foldable_analysis_<bean:write name="inputSummary" property="inputGroupId"/>">
     		Search Analysis ID: <bean:write name="inputSummary" property="inputGroupId"/>
@@ -91,7 +91,7 @@
     
 		<table width="100%">
  		<logic:iterate name="inputSummary" property="inputFiles" id="inputFile" >
-		<yrcwww:colorrow scheme="ms" repeat="true">
+		<yrcwww:colorrow scheme="pinfer" repeat="true">
 			<td WIDTH="20%" VALIGN="top"> 
 				<input type="checkbox" checked="checked" 
 					   id="toggle_analysis_<bean:write name="inputSummary" property="inputGroupId"/>_file"
@@ -109,7 +109,7 @@
 		</yrcwww:colorrow>
 		</logic:iterate>
  		</table>
-		<div class="clickable toggle_selection" style="font-size: 7pt; color: #3D902A;" 
+		<div class="clickable toggle_selection" style="font-size: 7pt; color: #006400;" 
 		     id="toggle_analysis_<bean:write name="inputSummary" property="inputGroupId"/>">Deselect All</div>
 		</div>
 		</div>

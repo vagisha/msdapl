@@ -6,7 +6,7 @@
 	
 	<table cellpadding="2" align="center" style="font-family: Trebuchet MS,Trebuchet,Verdana,Helvetica,Arial,sans-serif;font-size:12px; border: 1px solid gray; border-spacing: 3px">
   		<tr>
-  			<th colspan="2" class="ms_A" style="font-size: 10pt;">IDPicker Parameters</th>
+  			<th colspan="2" class="pinfer_A" style="font-size: 10pt;">IDPicker Parameters</th>
   		</tr>
   		<logic:iterate name="idpickerRun" property="sortedParams" id="param" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam">
   		<tr>
