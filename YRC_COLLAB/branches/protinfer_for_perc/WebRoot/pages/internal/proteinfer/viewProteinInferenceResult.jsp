@@ -343,8 +343,8 @@ function highlightProteinAndPeptides() {
 		}
 		// peptide groups UNIQUE to protein
 		for(var i = 0; i < uniqPeptGrpIds.length; i++) {
-			$(".peptGrp_"+uniqPeptGrpIds[i]).each(function() {$(this).css("background-color","#FFFF55");});
-			$("#peptEvFor_"+proteinGroupId+"_"+uniqPeptGrpIds[i]).css("background-color","#FFFF55");
+			$(".peptGrp_"+uniqPeptGrpIds[i]).each(function() {$(this).css("background-color","#ADD8E6");});
+			$("#peptEvFor_"+proteinGroupId+"_"+uniqPeptGrpIds[i]).css("background-color","#ADD8E6");
 			lastSelectedPeptGrpIds[j] = uniqPeptGrpIds[i];
 			j++;
 		}
