@@ -48,6 +48,11 @@ public class ProteinInferenceProgram {
         this.params = params;
     }
     
+    public static boolean isSupported(ProteinInferenceProgram program) {
+        return (program == PROTINFER_PERC || 
+                program == PROTINFER_SEQ || 
+                program == PROTINFER_PLCID);
+    }
     
     public static ProteinInferenceProgram getProgramForName(String name) {
         if("PROTINFER_SEQ".equalsIgnoreCase(name))
