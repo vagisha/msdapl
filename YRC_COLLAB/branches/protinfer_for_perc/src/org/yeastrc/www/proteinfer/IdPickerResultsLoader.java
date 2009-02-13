@@ -37,8 +37,6 @@ import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
 
-import com.sshtools.daemon.terminal.Terminal;
-
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
@@ -166,14 +164,14 @@ public class IdPickerResultsLoader {
             log.error("No search Ids found for protein inference ID: "+pinferId);
         }
         
-        List<Integer> databaseIds = new ArrayList<Integer>();
+        Set<Integer> databaseIds = new HashSet<Integer>();
         for(int searchId: searchIds) {
             MsSearch search = searchDao.loadSearch(searchId);
             for(MsSearchDatabase db: search.getSearchDatabases()) {
                 databaseIds.add(db.getSequenceDatabaseId());
             }
         }
-        return databaseIds;
+        return new ArrayList<Integer>(databaseIds);
     }
 
     public static List<Integer> filterByProteinDescription(int pinferId,

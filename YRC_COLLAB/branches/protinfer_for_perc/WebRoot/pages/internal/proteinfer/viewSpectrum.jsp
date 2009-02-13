@@ -22,7 +22,7 @@
 
 <center>
 <table border="0">
- <yrcwww:colorrow scheme="pinfer"">
+ <yrcwww:colorrow scheme="pinfer">
   <td><b>Sequence:</b></td>
   <td><b><bean:write name="peptideSeq" filter="false"/></b></td>
  </yrcwww:colorrow>
