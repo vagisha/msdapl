@@ -20,7 +20,11 @@ public class UploadException extends Exception {
         EXPT_NOT_FOUND          ("Experiment not found in the database", ERROR),
         DIRECTORY_NOT_FOUND     ("Directory not found.", ERROR),
         EMPTY_DIRECTORY         ("No files found to upload.", ERROR),
-        MISSING_MS2             ("Missing required ms2 files.", ERROR),
+        MISSING_SCAN_DATA_FILE  ("Missing required scan data files.", ERROR),
+        MULTI_SCAN_DATA_FORMATS ("More than one scan data file types found", ERROR),
+        NO_SCAN_DATA_FORMATS    ("No supported scan data file types found", ERROR),
+        UNSUPPORTED_SCAN_DATA_FORMAT ("Unsupported scan data format", ERROR),
+        
         
         CREATE_EXPT_ERROR       ("Error creating experiment.", ERROR),
         

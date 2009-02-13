@@ -47,4 +47,13 @@ public class PeakStringBuilder {
         else
             return number.substring(0, e+1);
     }
+    
+    public static String trimTrailingZerosKeepDecimalPoint(String number) {
+
+        String trimmed = trimTrailingZeros(number);
+        if(trimmed.lastIndexOf(".") == -1)
+            return trimmed+".0";
+        else
+            return trimmed;
+    }
 }

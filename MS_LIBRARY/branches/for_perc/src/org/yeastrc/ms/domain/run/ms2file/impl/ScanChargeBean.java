@@ -13,6 +13,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.parser.ms2File.HeaderItem;
+import org.yeastrc.ms.util.PeakStringBuilder;
 
 /**
  * 
@@ -60,7 +61,9 @@ public class ScanChargeBean implements MS2ScanCharge {
         buf.append("Z\t");
         buf.append(charge);
         buf.append("\t");
-        buf.append(mass.stripTrailingZeros());
+        String massS = mass.toString();
+        massS = PeakStringBuilder.trimTrailingZerosKeepDecimalPoint(massS);
+        buf.append(massS);
         buf.append("\n");
         for (MS2NameValuePair item: analysisItems) {
             buf.append("D\t");

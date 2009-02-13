@@ -79,12 +79,15 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
         return header;
     }
 
-    public boolean hasNextScan() {
+    private boolean hasNextScan() {
         return currentLine != null;
     }
 
     public MS2ScanIn getNextScan() throws DataProviderException {
 
+        if(!hasNextScan())
+            return null;
+        
         Scan scan = parseScan(currentLine);
 
         advanceLine(); // go to the next line

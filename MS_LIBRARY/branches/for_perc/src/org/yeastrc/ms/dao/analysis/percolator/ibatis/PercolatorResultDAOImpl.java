@@ -139,7 +139,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
                      "AND pres.runSearchAnalysisID = ? ";
         if(qvalue != null)
             sql +=   " AND qvalue <= "+qvalue;
-        if(pep != null) 
+        if(pep != null && pep < 1.0) 
             sql +=   " AND pep <= "+pep;
         if(discriminantScore != null)
             sql +=   " AND discriminantScore <= "+discriminantScore;

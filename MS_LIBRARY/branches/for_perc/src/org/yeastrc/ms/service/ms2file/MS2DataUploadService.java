@@ -21,6 +21,7 @@ import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
@@ -31,6 +32,7 @@ import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeDependentAnalysisWrap;
 import org.yeastrc.ms.domain.run.ms2file.impl.MS2ChargeIndependentAnalysisWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
+import org.yeastrc.ms.parser.ms2File.Cms2FileReader;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -111,7 +113,8 @@ public class MS2DataUploadService {
      * @return
      * @throws UploadException
      */
-    public Map<String, Integer> uploadRuns(int experimentId, String fileDirectory, Set<String> filenames, String serverDirectory) throws UploadException {
+    public Map<String, Integer> uploadRuns(int experimentId, String fileDirectory, Set<String> filenames, RunFileFormat format,
+                    String serverDirectory) throws UploadException {
         
         reset(); // reset all caches etc. 
         
@@ -121,7 +124,11 @@ public class MS2DataUploadService {
         for (String filename: filenames) {
             int runId = 0;
             try {
-                runId = uploadMS2Run(experimentId, fileDirectory+File.separator+filename+".ms2", serverDirectory);
+                String filepath = fileDirectory+File.separator+filename+"."+format.name().toLowerCase();
+                if(!(new File(filepath).exists()))
+                    filepath = fileDirectory+File.separator+filename+"."+format.name().toUpperCase();
+                
+                runId = uploadMS2Run(experimentId, filepath, format, serverDirectory);
                 // link experiment and run
                 linkExperimentAndRun(experimentId, runId);
                 numRunsUploaded++;
@@ -135,7 +142,7 @@ public class MS2DataUploadService {
         return runIdMap;
     }
     
-    private int uploadMS2Run(int experimentId, String filePath, String serverDirectory) throws UploadException {
+    private int uploadMS2Run(int experimentId, String filePath, RunFileFormat format, String serverDirectory) throws UploadException {
         
         // first check if the file in already in the database. If it is, return its database id
         // If a run with the same file name and SHA-1 hash code already exists in the 
@@ -153,7 +160,7 @@ public class MS2DataUploadService {
         }
         
         // this is a new file so we will upload it.
-        Ms2FileReader ms2Provider = new Ms2FileReader();
+        MS2RunDataProvider ms2Provider = getMS2DataProvider(filePath, sha1Sum, format);
         try {
             ms2Provider.open(filePath, sha1Sum);
             runId = uploadMS2Run(ms2Provider, serverDirectory);
@@ -176,6 +183,16 @@ public class MS2DataUploadService {
         }
     }
 
+    private MS2RunDataProvider getMS2DataProvider(String filePath, String sha1sum, RunFileFormat format) {
+        if(format == RunFileFormat.MS2) {
+            return new Ms2FileReader();
+        }
+        else if(format == RunFileFormat.CMS2) {
+            return new Cms2FileReader();
+        }
+        return null;
+    }
+    
     private void saveRunLocation(String serverDirectory, int runId) {
         MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         // Save the original location (on remote server) of the MS2 file, if the location is not in the database already.
@@ -252,10 +269,12 @@ public class MS2DataUploadService {
         MsScanDAO scanDao = daoFactory.getMsScanDAO();
         int all = 0;
         int uploaded = 0;
-        while(provider.hasNextScan()) {
+        while(true) {
             MS2ScanIn scan;
             try {
                 scan = provider.getNextScan();
+                if(scan == null)
+                    break;
             }
             catch (DataProviderException e) {
                 UploadException ex = new UploadException(ERROR_CODE.INVALID_MS2_SCAN);

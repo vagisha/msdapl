@@ -14,11 +14,13 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
  */
 public interface MS2RunDataProvider  {
 
+    public abstract void open(String filePath, String sha1Sum) throws DataProviderException;
+    
     public abstract String getFileName();
     
     public abstract MS2RunIn getRunHeader() throws DataProviderException;
     
-    public abstract boolean hasNextScan();
+//    public abstract boolean hasNextScan();
     
     public abstract MS2ScanIn getNextScan() throws DataProviderException;
     

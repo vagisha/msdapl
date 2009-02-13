@@ -374,6 +374,11 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         public String getSha1Sum() {
             return this.sha1Sum;
         }
+
+        @Override
+        public String getFileNameNoExt() {
+            throw new UnsupportedOperationException();
+        }
         
     }
 }

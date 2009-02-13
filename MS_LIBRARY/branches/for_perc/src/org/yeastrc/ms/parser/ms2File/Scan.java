@@ -8,6 +8,8 @@ package org.yeastrc.ms.parser.ms2File;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
+import org.yeastrc.ms.util.PeakStringBuilder;
 
 /**
  * 
@@ -169,12 +172,16 @@ public class Scan implements MS2ScanIn {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("S\t");
-        buf.append(String.format("%06d", startScan));
+        buf.append(startScan);
+//        buf.append(String.format("%06d", startScan));
         buf.append("\t");
-        buf.append(String.format("%06d", endScan));
+        buf.append(endScan);
+//        buf.append(String.format("%06d", endScan));
         if (precursorMz != null) {
             buf.append("\t");
-            buf.append(precursorMz);
+            String premz = precursorMz.toString();
+            premz = PeakStringBuilder.trimTrailingZerosKeepDecimalPoint(premz);
+            buf.append(premz);
         }
         buf.append("\n");
         // charge independent analysis
@@ -188,15 +195,24 @@ public class Scan implements MS2ScanIn {
             buf.append("\n");
         }
         // charge states along with their charge dependent analysis
+        Collections.sort(chargeStates, new Comparator<MS2ScanCharge>() {
+            @Override
+            public int compare(MS2ScanCharge o1, MS2ScanCharge o2) {
+                return Integer.valueOf(o1.getCharge()).compareTo(o2.getCharge());
+            }});
+        
         for (MS2ScanCharge charge: chargeStates) {
             buf.append(charge.toString());
             buf.append("\n");
         }
+        
         // peak data
         for (String[] peak: peakList){
-            buf.append(peak[0]);
-            buf.append(" ");
-            buf.append(peak[1]);
+            String mass = PeakStringBuilder.trimTrailingZerosKeepDecimalPoint(peak[0]);
+            String inten = PeakStringBuilder.trimTrailingZerosKeepDecimalPoint(peak[1]);
+            buf.append(mass);
+            buf.append("\t");
+            buf.append(inten);
             buf.append("\n");
         }
         buf.deleteCharAt(buf.length() - 1); // remove last new-line character

@@ -189,11 +189,20 @@ public class SQTHeader implements SQTRunSearchIn {
     }
 
     String parsePercolatorVersion(String value) {
+        
         // Example: Percolator v 1.07, Build Date Aug 27 2008 10:06:10
-        Pattern pattern = Pattern.compile("v\\s+(\\d+\\.\\d+)\\s*,.*"); 
-        Matcher matcher = pattern.matcher(value);
+        Pattern pattern1 = Pattern.compile("v\\s+(\\d+\\.\\d+)\\s*,.*"); 
+        // Percolator version 1.08, Build Date Jan 12 2009 13:47:51
+        Pattern pattern2 = Pattern.compile("version\\s+(\\d+\\.\\d+)\\s*,.*"); 
+        Matcher matcher = pattern1.matcher(value);
         if(matcher.matches()) {
             return matcher.group(1);
+        }
+        else {
+            matcher = pattern2.matcher(value);
+            if(matcher.matches()) {
+                return matcher.group(1);
+            }
         }
         return null;
     }

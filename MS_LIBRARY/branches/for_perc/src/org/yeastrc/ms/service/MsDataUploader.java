@@ -20,6 +20,7 @@ import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
@@ -49,6 +50,8 @@ public class MsDataUploader {
     private String uploadDirectory;
     
     private boolean isMacCossData = false;
+    
+    private RunFileFormat runFormat;
     
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
@@ -270,10 +273,38 @@ public class MsDataUploader {
             throw ex;
         }
         
-        // (3). make sure .ms2 files are present
-        String missingFile = missingMs2File(uploadDirectory, filenames);
+        // (3). Get the format of the spectrum data files 
+        List<RunFileFormat> runFormats = getRunFileFormat(uploadDirectory);
+        if(runFormats.size() == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.NO_SCAN_DATA_FORMATS);
+            ex.setDirectory(uploadDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
+        else if(runFormats.size() != 1) {
+            UploadException ex = new UploadException(ERROR_CODE.MULTI_SCAN_DATA_FORMATS);
+            ex.setDirectory(uploadDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
+        this.runFormat = runFormats.get(0);
+        
+        // (4). We cannot upload if we do not support the scan data file format
+        if(runFormat != RunFileFormat.MS2 && runFormat != RunFileFormat.CMS2) {
+            UploadException ex = new UploadException(ERROR_CODE.UNSUPPORTED_SCAN_DATA_FORMAT);
+            ex.setDirectory(uploadDirectory);
+            uploadExceptionList.add(ex);
+            log.error(ex.getMessage(), ex);
+            throw ex;
+        }
+        
+        
+        // (5). make sure .ms2 or .cms2 files are present
+        String missingFile = missingSpectrumDataFiles(uploadDirectory, filenames, runFormat);
         if (missingFile != null) {
-            UploadException ex = new UploadException(ERROR_CODE.MISSING_MS2);
+            UploadException ex = new UploadException(ERROR_CODE.MISSING_SCAN_DATA_FILE);
             ex.setErrorMessage("Missing file: "+missingFile);
             ex.setDirectory(uploadDirectory);
             uploadExceptionList.add(ex);
@@ -405,8 +436,9 @@ public class MsDataUploader {
      * @throws UploadException
      */
     private Map<String, Integer> uploadRuns(Set<String> filenames) throws UploadException {
+        
         MS2DataUploadService uploadService = new MS2DataUploadService();
-        Map<String, Integer> runMapIds = uploadService.uploadRuns(uploadedExptId, uploadDirectory, filenames, remoteDirectory);
+        Map<String, Integer> runMapIds = uploadService.uploadRuns(uploadedExptId, uploadDirectory, filenames, runFormat, remoteDirectory);
         this.numRunsToUpload = uploadService.getNumRunsToUpload();
         this.numRunsUploaded = uploadService.getNumRunsUploaded();
         this.uploadExceptionList.addAll(uploadService.getUploadExceptionList());
@@ -511,19 +543,38 @@ public class MsDataUploader {
     }
     
     /**
-     * Check for .ms2 files. 
+     * Check for .ms2 or .cms2 files. 
      * @param fileDirectory
      * @param filenames
      * @return
      */
-    private String missingMs2File(String fileDirectory, Set<String> filenames) {
+    private String missingSpectrumDataFiles(String fileDirectory, Set<String> filenames, RunFileFormat format) {
+        
         for (String filePrefix: filenames) {
-            if (!(new File(fileDirectory+File.separator+filePrefix+".ms2").exists())) {
-                log.error("Required file: "+filePrefix+".ms2 not found");
-                return filePrefix+".ms2";
+            if (!(new File(fileDirectory+File.separator+filePrefix+"."+format.name().toLowerCase()).exists())  ||
+                !(new File(fileDirectory+File.separator+filePrefix+"."+format.name().toUpperCase()).exists())) {
+                log.error("Required file: "+filePrefix+"."+format.name().toLowerCase()+" not found");
+                return filePrefix+"."+format.name().toLowerCase();
             }
         }
         return null;
+    }
+    
+    private List<RunFileFormat> getRunFileFormat(String fileDirectory) {
+        
+        File directory = new File (fileDirectory);
+        File[] files = directory.listFiles();
+        
+        Map<String, RunFileFormat> formats = new HashMap<String, RunFileFormat>();
+        for (int i = 0; i < files.length; i++) {
+            String fileName = files[i].getName();
+            String ext = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+            if(RunFileFormat.isSupportedFormat(ext)) {
+                RunFileFormat fmt = RunFileFormat.instance(ext);
+                formats.put(fmt.name(), fmt);
+            }
+        }
+        return new ArrayList<RunFileFormat>(formats.values());
     }
     
     private Set<String> getFileNamePrefixes(String fileDirectory) {
@@ -538,7 +589,8 @@ public class MsDataUploader {
         String name = null;
         for (int i = 0; i < files.length; i++) {
             String fileName = files[i].getName();
-            if (fileName.endsWith(".ms2") || fileName.endsWith(".sqt")) {
+            String fileName_LC = fileName.toLowerCase();
+            if (fileName_LC.endsWith(".ms2") || fileName_LC.endsWith(".cms2") || fileName_LC.endsWith(".sqt")) {
                 name = files[i].getName();
                 name = name.substring(0, name.indexOf('.'));
                 filenames.add(name);
@@ -587,11 +639,32 @@ public class MsDataUploader {
 
 //        for(int i = 0; i < 10; i++) {
         MsDataUploader uploader = new MsDataUploader();
-        uploader.setIsMaccossData(true);
+        
+        String directory = args[0];
+        if(directory == null || directory.length() == 0 || !(new File(directory).exists()))
+            System.out.println("Invalid directory: "+directory);
+        
+        boolean maccossData = Boolean.parseBoolean(args[1]);
+        uploader.setIsMaccossData(maccossData);
+        
+        System.out.println("Directory: "+directory+"; Maccoss Data: "+maccossData);
+        
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
 //        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", new Date());
 //      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
 //        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
+        
+//        uploader.uploadExperimentToDb("local", "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/", 
+//                "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/", new Date());
+        
+       
+//        uploader.uploadExperimentToDb("local", "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/REUPLOAD_100507-CRWD-24HR-02/sequest", 
+//              "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/REUPLOAD_100507-CRWD-24HR-02/sequest", new Date());
+        
+        
+//        uploader.uploadExperimentToDb("local", "/Users/vagisha/WORK/MacCoss_Genn_CE/2008-worm-thermo-LTQ/Rep2", 
+//              "/Users/vagisha/WORK/MacCoss_Genn_CE/2008-worm-thermo-LTQ/Rep3", new Date());
+        
         
         // /Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp
         uploader.uploadExperimentToDb("local", 
@@ -607,8 +680,10 @@ public class MsDataUploader {
                 //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3417",
 //                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
 //                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
-                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
-                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
+//                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
+ //               "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
+                directory,
+                directory,
                 new Date());
 //        }
         long end = System.currentTimeMillis();

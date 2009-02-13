@@ -129,20 +129,6 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
-    public static NrDbProtein getDbProtein(int databaseId, int proteinId) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("dbId", databaseId);
-        map.put("proteinId", proteinId);
-        String statementName = "NrSeq.selectDbProteinForDbIdProteinId";
-        try {
-            return  (NrDbProtein) sqlMap.queryForObject(statementName, map);
-        }
-        catch (SQLException e) {
-            log.error("Failed to execute select statement: ", e);
-            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
-        }
-    }
-    
     /**
      * 
      * @param databaseId
@@ -242,6 +228,20 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+//    public static NrDbProtein getDbProtein(int databaseId, int proteinId) {
+//        Map<String, Integer> map = new HashMap<String, Integer>(2);
+//        map.put("dbId", databaseId);
+//        map.put("proteinId", proteinId);
+//        String statementName = "NrSeq.selectDbProteinForDbIdProteinId";
+//        try {
+//            return  (NrDbProtein) sqlMap.queryForObject(statementName, map);
+//        }
+//        catch (SQLException e) {
+//            log.error("Failed to execute select statement: ", e);
+//            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+//        }
+//    }
+    
     public static List<NrDbProtein> getProtein(int proteinId, List<Integer> dbIds) {
         String statementName = "NrSeq.selectProtein";
         
@@ -327,6 +327,7 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("databaseIds", dbIdStr);
         map.put("accession", "%"+accession+"%");
+        
         try {
             return sqlMap.queryForList(statementName, map);
         }

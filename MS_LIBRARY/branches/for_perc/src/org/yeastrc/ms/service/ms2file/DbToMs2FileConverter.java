@@ -3,6 +3,7 @@ package org.yeastrc.ms.service.ms2file;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
@@ -37,6 +38,7 @@ public class DbToMs2FileConverter {
 
             MS2ScanDAO scanDao = DAOFactory.instance().getMS2FileScanDAO();
             List<Integer> scanIds = scanDao.loadScanIdsForRun(dbRunId);
+            Collections.sort(scanIds);
 
             for (Integer scanId: scanIds) {
                 MS2Scan scan = scanDao.load(scanId);
