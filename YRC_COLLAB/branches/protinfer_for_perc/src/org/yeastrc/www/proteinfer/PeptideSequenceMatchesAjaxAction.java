@@ -68,37 +68,37 @@ public class PeptideSequenceMatchesAjaxAction extends Action {
         Program searchProgram = msDaoFactory.getMsRunSearchDAO().loadSearchProgramForRunSearch(runSearchId);
         
         
-        if(searchProgram == Program.SEQUEST || searchProgram == Program.EE_NORM_SEQUEST) {
-            // load sequest results
-            request.setAttribute("searchProgram", "sequest");
-            List<WIdPickerSpectrumMatch> psmList = 
-                    IdPickerResultsLoader.getSequestSpectrumMmatchesForRunSearch(pinferId, runSearchId);
-            
-            if(psmList.size() == 0) {
-                System.out.println("No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId);
-                response.setContentType("text/html");
-                response.getWriter().write("<b>"+"No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId+"</b>");
-                return null;
-            }
-            
-            request.setAttribute("psmList", psmList);
-        }
-        
-        else if (searchProgram == Program.PROLUCID) {
-            // load ProLuCID results
-            request.setAttribute("searchProgram", "prolucid");
-            List<WIdPickerSpectrumMatch>  psmList = 
-                    IdPickerResultsLoader.getProlucidSpectrumMmatchesForRunSearch(pinferId, runSearchId);
-            
-            if(psmList.size() == 0) {
-                System.out.println("No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId);
-                response.setContentType("text/html");
-                response.getWriter().write("<b>"+"No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId+"</b>");
-                return null;
-            }
-            
-            request.setAttribute("psmList", psmList);
-        }
+//        if(searchProgram == Program.SEQUEST || searchProgram == Program.EE_NORM_SEQUEST) {
+//            // load sequest results
+//            request.setAttribute("searchProgram", "sequest");
+//            List<WIdPickerSpectrumMatch> psmList = 
+//                    IdPickerResultsLoader.getSequestSpectrumMmatchesForRunSearch(pinferId, runSearchId);
+//            
+//            if(psmList.size() == 0) {
+//                System.out.println("No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId);
+//                response.setContentType("text/html");
+//                response.getWriter().write("<b>"+"No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId+"</b>");
+//                return null;
+//            }
+//            
+//            request.setAttribute("psmList", psmList);
+//        }
+//        
+//        else if (searchProgram == Program.PROLUCID) {
+//            // load ProLuCID results
+//            request.setAttribute("searchProgram", "prolucid");
+//            List<WIdPickerSpectrumMatch>  psmList = 
+//                    IdPickerResultsLoader.getProlucidSpectrumMmatchesForRunSearch(pinferId, runSearchId);
+//            
+//            if(psmList.size() == 0) {
+//                System.out.println("No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId);
+//                response.setContentType("text/html");
+//                response.getWriter().write("<b>"+"No spectrum matches found for runSearchId: "+runSearchId+" and protein inference run: "+pinferId+"</b>");
+//                return null;
+//            }
+//            
+//            request.setAttribute("psmList", psmList);
+//        }
         
         long e = System.currentTimeMillis();
         

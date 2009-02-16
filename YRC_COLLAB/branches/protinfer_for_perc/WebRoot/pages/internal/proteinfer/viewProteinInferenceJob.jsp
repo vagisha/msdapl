@@ -66,7 +66,7 @@
 <td colspan="2" align="center"><b>Log</b></td>
 </yrcwww:colorrow>
 <yrcwww:colorrow scheme="pinfer" repeat="true">
-	<td colspan="2" align="center"><pre><bean:write name="pinferJob" property="log"/></pre></td>
+	<td colspan="2" align="left" style="font-size:8pt;font-family: courier;"><bean:write name="pinferJob" property="log"/></td>
 </yrcwww:colorrow>
 
 
