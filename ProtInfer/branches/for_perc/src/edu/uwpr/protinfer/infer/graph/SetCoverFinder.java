@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
     private void initSetCoverFinder(BipartiteGraph<L, R> graph) {
         int maxAdjCount = initMaps(graph);
         initUniqAdjacencyCounts();
-        initAdjacencyCountArray(maxAdjCount);
+        initAdjacencyCountArrayForVerticesWoUniqAdj(maxAdjCount);
     }
 
     private void initUniqAdjacencyCounts() {
@@ -66,9 +67,12 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
         return maxAdjCount;
     }
     
-    private void initAdjacencyCountArray(int maxAdjCount) {
+    private void initAdjacencyCountArrayForVerticesWoUniqAdj(int maxAdjCount) {
         adjCounts = new ArrayList[maxAdjCount+1];
         for(CoverVertex<L,R> qv: qVerticesMap.values()) {
+            
+            if(qv.hasUniqueAdjacent())  continue; // do not add vertices with unique adjacent vertices
+            
             List<String> qvWithAdjCount = adjCounts[qv.getAdjacentCount()];
             if (qvWithAdjCount == null) {
                 qvWithAdjCount = new ArrayList<String>();
@@ -84,6 +88,19 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
         
         List<L> setCover = new ArrayList<L>();
         
+        // as a first step add all ALL L nodes that have at least one unique R node (i.e a R node that 
+        // is connected only to this L node) to the set cover
+        addVerticesWithUniqAdjacent(setCover);
+        
+        
+        // now go over the remaining vertices
+        addRemainingSetCoverVertices(setCover);
+        
+        return setCover;
+    }
+
+    private void addRemainingSetCoverVertices(List<L> setCover) {
+        
         for (int i = adjCounts.length - 1 ; i >= 0; i--) {
             
             List<String> qvWithAdjCount = adjCounts[i];
@@ -93,6 +110,7 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
                 continue;
             
             // This is where we resolve ties.
+            // getBestVertex will also sort so that the best vertex is at index 0.
             String lLabel = getBestVertex(qvWithAdjCount);
 //            String lLabel = qvWithAdjCount.get(0);
             qvWithAdjCount.remove(0);
@@ -115,9 +133,35 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
             
             if (qvWithAdjCount.size() > 0) i++;
         }
-        
-        return setCover;
     }
+
+    private void addVerticesWithUniqAdjacent(List<L> setCover) {
+        
+        Iterator<CoverVertex<L,R>> iter = qVerticesMap.values().iterator();
+        while(iter.hasNext()) {
+            CoverVertex<L,R> qv = iter.next();
+            if(qv.getUniqAdjacentcount() > 0) {
+                setCover.add(qv.getVertex());
+            }
+        }
+        
+        // remove the vertices already added (and their adjacent vertices) from the graph
+        for(L v: setCover) {
+            CoverVertex<L,R> qv = qVerticesMap.get(v.getLabel());
+            // get all the labels of all vertices adjacent to this vertex
+            // and remove them from the graph. 
+            for (String rLabel: qv.getAdjRLabels()) {
+                Set<String> lLabels = rToLMap.get(rLabel);
+                // other L vertices adjacent to this R vertex
+                for (String label: lLabels) {
+                    CoverVertex<L, R> qvl = qVerticesMap.get(label);
+                    if (qvl == qv)  continue;
+                    removeAdjacentVertx(qvl, rLabel);
+                }
+            }
+        }
+    }
+    
     
     // the purpose is to sort the vertices for a particular adjacency count
     // such that the vertex with the maximum number of unique nodes is at the 
@@ -201,6 +245,10 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
         
         public void setUniqAdjacentcount(int count) {
             this.origUniqAdjCount = count;
+        }
+        
+        public boolean hasUniqueAdjacent() {
+            return origUniqAdjCount > 0;
         }
         
         // returns the number of vertices that were adjacent to this vertex when the graph was built
