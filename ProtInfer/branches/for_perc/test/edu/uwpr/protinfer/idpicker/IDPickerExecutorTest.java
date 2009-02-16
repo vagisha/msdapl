@@ -47,14 +47,14 @@ public class IDPickerExecutorTest extends TestCase {
     public final void testInferProteins() {
         
         IDPickerParams params = new IDPickerParams();
-        params.setDecoyRatio(1.0f);
-        params.setDoParsimonyAnalysis(true);
-        params.setMaxAbsoluteFdr(0.05f);
-        params.setMaxRelativeFdr(0.05f);
+        params.setMaxFdr(0.05f);
         
         List<PeptideSpectrumMatchIDP> searchHits = makeSequestHits();
         
         IDPickerExecutor executor = new IDPickerExecutor();
+        executor.doNotCalculateCoverage(); // don't calculate coverage; we don't want to 
+                                           // to look in nrseq database
+        
         List<InferredProtein<SpectrumMatchIDP>> proteins = null;
         try {
             proteins = executor.inferProteins(searchHits, params);

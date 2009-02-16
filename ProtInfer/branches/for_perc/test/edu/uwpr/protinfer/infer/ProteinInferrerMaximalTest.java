@@ -21,11 +21,11 @@ public class ProteinInferrerMaximalTest extends TestCase {
         Peptide p1 = new Peptide("ABCDE", "ABCDE", 1);
         Peptide p2 = new Peptide("ABCDE", "ABCDE", 1);
         PeptideHit hit1 = new PeptideHit(p1);
-        hit1.addProteinHit(new ProteinHit(new Protein("Protein1", 1)));
-        hit1.addProteinHit(new ProteinHit(new Protein("Protein2", 2)));
+        hit1.addProtein(new Protein("Protein1", 1));
+        hit1.addProtein(new Protein("Protein2", 2));
         PeptideHit hit2 = new PeptideHit(p2);
-        hit2.addProteinHit(new ProteinHit(new Protein("Protein1", 1)));
-        hit2.addProteinHit(new ProteinHit(new Protein("Protein2", 2)));
+        hit2.addProtein(new Protein("Protein1", 1));
+        hit2.addProtein(new Protein("Protein2", 2));
         
         SequestHit shit1 = new SequestHit(source, 1, 2, hit1);
         SequestHit shit2 = new SequestHit(source, 2, 3, hit2);
