@@ -60,9 +60,10 @@ public class MS2FileValidator {
         }
 
         // read the scans
-        while (dataProvider.hasNextScan()) {
+        while (true) {
             try {
-                dataProvider.getNextScan();
+                if(dataProvider.getNextScan() == null)
+                    break;
             }
             catch (DataProviderException e) {
                 log.error("ERROR reading file: "+filePath+". EXITING...", e);
