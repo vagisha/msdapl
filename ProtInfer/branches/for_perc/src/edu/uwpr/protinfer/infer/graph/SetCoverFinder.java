@@ -25,7 +25,7 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
     private void initSetCoverFinder(BipartiteGraph<L, R> graph) {
         int maxAdjCount = initMaps(graph);
         initUniqAdjacencyCounts();
-        initAdjacencyCountArrayForVerticesWoUniqAdj(maxAdjCount);
+        initAdjacencyCountArray(maxAdjCount);
     }
 
     private void initUniqAdjacencyCounts() {
@@ -67,11 +67,9 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
         return maxAdjCount;
     }
     
-    private void initAdjacencyCountArrayForVerticesWoUniqAdj(int maxAdjCount) {
+    private void initAdjacencyCountArray(int maxAdjCount) {
         adjCounts = new ArrayList[maxAdjCount+1];
         for(CoverVertex<L,R> qv: qVerticesMap.values()) {
-            
-            if(qv.hasUniqueAdjacent())  continue; // do not add vertices with unique adjacent vertices
             
             List<String> qvWithAdjCount = adjCounts[qv.getAdjacentCount()];
             if (qvWithAdjCount == null) {
@@ -159,6 +157,25 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
                     removeAdjacentVertx(qvl, rLabel);
                 }
             }
+        }
+        
+        // remove these vertices from the adjacency count list
+        // This should be done AFTER the previous step (removing all R vertices for vertices in set cover
+        // and updating L vertices that matched to them).
+        for(L v: setCover) {
+            CoverVertex<L,R> qv = qVerticesMap.get(v.getLabel());
+            List<String> qvWithAdjCount = adjCounts[qv.getAdjacentCount()];
+            Iterator<String> iterL = qvWithAdjCount.iterator();
+            boolean removed = false;
+            while(iterL.hasNext()) {
+                String label = iterL.next();
+                if(label.equals(qv.getVertex().getLabel())) {
+                   iterL.remove();
+                   removed = true;
+                   break;
+                }
+            }
+            if(!removed) throw new IllegalArgumentException("Vertex not removed; "+qv.getVertex().getLabel());
         }
     }
     
