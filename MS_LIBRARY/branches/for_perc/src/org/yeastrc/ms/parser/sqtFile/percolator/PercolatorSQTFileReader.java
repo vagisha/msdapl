@@ -123,14 +123,16 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
                 DbLocus locus = null;
                 locus = parseLocus(currentLine);
                 
-                // NOTE: IGNORE ALL 'M' LINES FOLLOWED BY THE FOLLOWING 'L' LINE
-                // L       Placeholder satisfying DTASelect
-                // This is not a valid result and we will return null
-                if(locus.getAccession().startsWith("Placeholder"))
-                    isPlaceholder = true;
-                
-                if (locus != null)
+                if (locus != null) {
                     result.addMatchingLocus(locus);
+                
+                    // NOTE: IGNORE ALL 'M' LINES FOLLOWED BY THE FOLLOWING 'L' LINE
+                    // L       Placeholder satisfying DTASelect
+                    // This is not a valid result and we will return null
+                    if(locus.getAccession().startsWith("Placeholder"))
+                        isPlaceholder = true;
+                }
+                
             }
             else
                 break;

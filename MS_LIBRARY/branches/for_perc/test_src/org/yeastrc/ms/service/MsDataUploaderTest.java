@@ -74,7 +74,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
             fail("Upload directory has missing ms2 files");
         }
         catch (UploadException e) {
-            assertEquals(ERROR_CODE.MISSING_MS2, e.getErrorCode());
+            assertEquals(ERROR_CODE.MISSING_SCAN_DATA_FILE, e.getErrorCode());
         }
         assertEquals(0, expId);
     }

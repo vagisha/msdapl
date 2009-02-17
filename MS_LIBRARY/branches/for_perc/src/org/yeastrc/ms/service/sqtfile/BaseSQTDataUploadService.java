@@ -126,6 +126,12 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
         long startTime = System.currentTimeMillis();
         BaseSQTFileReader provider = new BaseSQTFileReader(peptideResultBuilder); 
         
+        // If we are uploading MacCoss lab data we need to look for "Placeholder" peptide matches
+        // in the SQT files. 
+        if(this.doScanChargeMassCheck)
+            provider.doPercolatorMLineCheck();
+        
+        
         try {
             provider.open(filePath);
             provider.setDynamicResidueMods(this.dynaResidueMods);

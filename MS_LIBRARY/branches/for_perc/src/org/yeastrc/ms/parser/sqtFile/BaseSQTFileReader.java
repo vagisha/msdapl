@@ -21,8 +21,14 @@ public class BaseSQTFileReader extends SQTFileReader<SQTSearchScanIn<MsSearchRes
 
     private final PeptideResultBuilder peptideResultBuilder;
     
+    private boolean doPercolatorMLineCheck = false;
+    
     public BaseSQTFileReader(PeptideResultBuilder peptideResultBuilder) {
         this.peptideResultBuilder = peptideResultBuilder;
+    }
+    
+    public void doPercolatorMLineCheck() {
+        this.doPercolatorMLineCheck = true;
     }
     
     @Override
@@ -58,12 +64,23 @@ public class BaseSQTFileReader extends SQTFileReader<SQTSearchScanIn<MsSearchRes
 
         advanceLine();
 
+        
+        boolean isPlaceholder = false;
         while (currentLine != null) {
             if (isLocusLine(currentLine)) {
                 DbLocus locus = null;
                 locus = parseLocus(currentLine);
-                if (locus != null)
+                if (locus != null) {
                     result.addMatchingLocus(locus);
+
+                    if(doPercolatorMLineCheck) {
+                        // NOTE: IGNORE ALL 'M' LINES FOLLOWED BY THE FOLLOWING 'L' LINE
+                        // L       Placeholder satisfying DTASelect
+                        // This is not a valid result and we will return null
+                        if(locus.getAccession().startsWith("Placeholder"))
+                            isPlaceholder = true;
+                    }
+                }
             }
             else
                 break;
@@ -71,6 +88,7 @@ public class BaseSQTFileReader extends SQTFileReader<SQTSearchScanIn<MsSearchRes
         }
 //        if (result.getProteinMatchList().size() == 0)
 //            throw new DataProviderException(currentLineNum-1, "Invalid 'M' line.  No locus matches found." , null);
+        if(isPlaceholder)   result = null;
         return result;
     }
 
