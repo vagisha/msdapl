@@ -10,7 +10,6 @@ import com.ibatis.sqlmap.client.extensions.ParameterSetter;
 import com.ibatis.sqlmap.client.extensions.ResultGetter;
 import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
 
-import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.GenericProteinferInputDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferInput;
 import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
