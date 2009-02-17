@@ -391,12 +391,18 @@ public abstract class AbstractSQTDataUploadService {
     }
 
     // SEARCH SCAN
-    final void uploadSearchScan(SQTSearchScan searchScan) {
+    final void uploadSearchScan(SQTSearchScan searchScan) throws UploadException {
         // if the cache has enough entries upload 
         if(searchScanMap.size() >= BUF_SIZE) {
             uploadSearchScanBuffer();
         }
         String key = searchScan.getScanId()+"_"+searchScan.getCharge();
+        if(searchScanMap.get(key) != null) {
+            UploadException ex = new UploadException(ERROR_CODE.DUPLICATE_SCAN_CHARGE);
+            ex.appendErrorMessage("Result already exists for scanID: "+searchScan.getScanId()+
+                    " and charge: "+searchScan.getCharge());
+            throw ex;
+        }
         searchScanMap.put(key, searchScan);
     }
     

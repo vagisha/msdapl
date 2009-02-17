@@ -41,6 +41,7 @@ public class UploadException extends Exception {
         INVALID_SQT_HEADER      ("Invalid SQT header", WARN),
         INVALID_SQT_SCAN        ("Invalid SQT scan", WARN),
         NO_SCANID_FOR_SQT_SCAN  ("No database scanID found for SQT scan", WARN),
+        DUPLICATE_SCAN_CHARGE   ("Duplicate result found for scan + charge combination", ERROR),
         READ_ERROR_SQT          ("Error reading SQT file", ERROR),
         
         MOD_LOOKUP_FAILED       ("Modification lookup failed", WARN),

@@ -537,7 +537,7 @@ public class MsDataUploader {
         percService.uploadPostSearchAnalysis(searchId, Program.SEQUEST, uploadDirectory, filenames, 
                 runSearchIdMap, remoteDirectory);
         
-        this.uploadExceptionList.addAll(service.getUploadExceptionList());
+        this.uploadExceptionList.addAll(percService.getUploadExceptionList());
         
         return searchId;
     }
@@ -681,9 +681,11 @@ public class MsDataUploader {
 //                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
 //                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
 //                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
+//                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
+                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/MEM_TEST",
+                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/MEM_TEST",
+//                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
  //               "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
-                directory,
-                directory,
                 new Date());
 //        }
         long end = System.currentTimeMillis();
