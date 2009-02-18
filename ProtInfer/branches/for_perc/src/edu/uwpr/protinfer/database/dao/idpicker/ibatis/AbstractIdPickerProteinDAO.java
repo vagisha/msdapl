@@ -173,6 +173,18 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return queryForList(sqlMapNameSpace+".filterByCoverage", map);
     }
     
+    public List<Integer> sortProteinsByNSAF(int pinferId) {
+        return proteinIdsByNSAF(pinferId, 0.0, true);
+    }
+    
+    private List<Integer> proteinIdsByNSAF(int pinferId, double minNsaf, boolean sort) {
+        Map<String, Number> map = new HashMap<String, Number>(6);
+        map.put("pinferId", pinferId);
+        map.put("nsaf", minNsaf);
+        if(sort)    map.put("sort", 1);
+        return queryForList(sqlMapNameSpace+".filterByNsaf", map);
+    }
+    
     public List<Integer> sortProteinIdsByValidationStatus(int pinferId) {
         return proteinIdsByValidationStatus(pinferId, new ArrayList<ProteinUserValidation>(0), true);
     }

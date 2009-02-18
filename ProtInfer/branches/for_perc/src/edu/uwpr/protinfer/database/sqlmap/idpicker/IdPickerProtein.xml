@@ -200,6 +200,17 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterByNsaf" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	AND idpProt.nsaf >=#nsaf# 
+    	<isPropertyAvailable property="sort">
+    		ORDER BY idpProt.nsaf ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    
     <select id="filterByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 
     	WHERE piRunID=#pinferId#
