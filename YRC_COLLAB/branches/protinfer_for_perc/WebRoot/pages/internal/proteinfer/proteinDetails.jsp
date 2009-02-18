@@ -6,11 +6,18 @@
 
 <div  align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;" >
 <b><bean:write name="protein" property="accession"/></b>
+<br>
+<span style="color: #888888; font-size: 9pt"><bean:write name="protein" property="description" /></span>
+
+<br>
 <span style="text-decoration: underline; cursor: pointer; font-size: 8pt; color: red;"
       onclick="toggleProteinSequence(<bean:write name="protein" property="protein.id" />)"
       id="protseqbutton_<bean:write name="protein" property="protein.id" />">[View Sequence]</span>
-<br>
-<span style="color: #888888; font-size: 9pt"><bean:write name="protein" property="description" /></span>
+&nbsp; &nbsp;
+<span style="font-size: 8pt; color: red;">
+<a  style="color:red;" href="/yrc/viewProtein.do?id=<bean:write name="protein" property="protein.nrseqProteinId" />">[Protein Details]</a></span>
+<br><br>
+
 
 
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
