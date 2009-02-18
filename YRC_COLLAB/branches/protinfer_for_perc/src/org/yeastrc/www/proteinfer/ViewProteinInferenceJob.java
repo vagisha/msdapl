@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;

@@ -11,6 +11,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonWAllSpectra;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.user.User;

@@ -7,6 +7,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;

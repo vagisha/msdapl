@@ -1,4 +1,4 @@
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.idpicker;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,15 +27,6 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerIon;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonWAllSpectra;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideGroup;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.ProteinInferenceProgram;
