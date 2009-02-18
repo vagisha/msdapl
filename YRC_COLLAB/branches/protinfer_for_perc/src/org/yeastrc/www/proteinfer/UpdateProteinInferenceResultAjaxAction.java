@@ -111,14 +111,6 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         // if the filtering criteria has changed we need to filter the results again
         if(!match)  {
             
-            // If the filter criteria has proteins GROUPED and the sort_by is
-            // on one of the protein specific columns change it to group_id
-            if(filterCriteria.isGroupProteins()) {
-                SORT_BY sortby = filterCriteria.getSortBy();
-                if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.COVERAGE || 
-                   sortby == SORT_BY.VALIDATION_STATUS || sortby == SORT_BY.NSAF)
-                filterCriteria.setSortBy(SORT_BY.GROUP_ID);
-            }
             // Get a list of filtered and sorted proteins
             storedProteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
             // filter by accession, if required
@@ -135,6 +127,22 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             if(filterCriteria.getDescriptionLike() != null) {
                 storedProteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, storedProteinIds, filterCriteria.getDescriptionLike());
             }
+        }
+        
+        // If the filter criteria has proteins GROUPED and the sort_by is
+        // on one of the protein specific columns change it to group_id
+        if(filterCriteria.isGroupProteins()) {
+            SORT_BY sortby = filterCriteria.getSortBy();
+            if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.COVERAGE || 
+               sortby == SORT_BY.VALIDATION_STATUS || sortby == SORT_BY.NSAF)
+            filterCriteria.setSortBy(SORT_BY.GROUP_ID);
+            filterCriteria.setSortOrder(SORT_ORDER.ASC);
+            // resorted the filtered protein IDs
+            storedProteinIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
+                    peptideDef, 
+                    storedProteinIds, 
+                    SORT_BY.GROUP_ID, 
+                    true);
         }
         
         
