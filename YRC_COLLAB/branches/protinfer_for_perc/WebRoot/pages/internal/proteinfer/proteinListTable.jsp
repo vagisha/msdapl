@@ -85,7 +85,10 @@
 				<b><font size="2pt">Coverage (%)</font></b>
 			</th>
 			
-			<th>
+			<% colSortedClass = "";
+			 if(sortBy == SORT_BY.NSAF) colSortedClass = sortedClass;
+			%>
+			<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NSAF.name()%>">
 				<b><font size="2pt">NSAF**</font></b>
 			</th>
 			

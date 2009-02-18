@@ -225,6 +225,9 @@ public class IdPickerResultsLoader {
         else if (sortBy == SORT_BY.COVERAGE) {
             allIds = idpProtBaseDao.sortProteinIdsByCoverage(pinferId);
         }
+        else if(sortBy == SORT_BY.NSAF) {
+            allIds = idpProtBaseDao.sortProteinsByNSAF(pinferId);
+        }
         else if(sortBy == SORT_BY.VALIDATION_STATUS) {
             allIds = idpProtBaseDao.sortProteinIdsByValidationStatus(pinferId);
         }
