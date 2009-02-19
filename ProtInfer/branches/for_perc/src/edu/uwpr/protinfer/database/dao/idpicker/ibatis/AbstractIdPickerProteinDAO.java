@@ -171,6 +171,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         private int proteinId;
         private int proteinGroupId;
         private double coverage;
+        private double maxGrpCoverage;
         public void setProteinId(int proteinId) {
             this.proteinId = proteinId;
         }
@@ -200,20 +201,23 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
             // Set the coverage for each protein in a group to be the max coverage in the group.
             for(ProteinGroupCoverage pgc: prGrC) {
                 if(pgc.proteinGroupId != lastGrp) {
+                    pgc.maxGrpCoverage = pgc.coverage;
                     lastGrp = pgc.proteinGroupId;
                     lastMaxCoverage = pgc.coverage; // first protein (for a group) has the max coverage.
                 }
                 else {
-                    pgc.setCoverage(lastMaxCoverage);
+                    pgc.maxGrpCoverage = lastMaxCoverage;
                 }
             }
             // Sort on coverage then protein group.
             Collections.sort(prGrC, new Comparator<ProteinGroupCoverage>() {
                 @Override
                 public int compare(ProteinGroupCoverage o1, ProteinGroupCoverage o2) {
-                    int val = Double.valueOf(o1.coverage).compareTo(o2.coverage);
+                    int val = Double.valueOf(o1.maxGrpCoverage).compareTo(o2.maxGrpCoverage);
                     if(val != 0)    return val;
-                    return Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+                    val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+                    if(val != 0)    return val;
+                    return Double.valueOf(o1.coverage).compareTo(o2.coverage);
                 }});
             List<Integer> proteinIds = new ArrayList<Integer>(prGrC.size());
             
@@ -233,6 +237,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         private int proteinId;
         private int proteinGroupId;
         private double nsaf;
+        private double maxNsaf;
         public void setProteinId(int proteinId) {
             this.proteinId = proteinId;
         }
@@ -262,11 +267,12 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
             // Set the NSAF for each protein in a group to be the max NSAF in the group.
             for(ProteinGroupNsaf pgn: prGrN) {
                 if(pgn.proteinGroupId != lastGrp) {
+                    pgn.maxNsaf = pgn.nsaf;
                     lastGrp = pgn.proteinGroupId;
                     lastMaxNsaf = pgn.nsaf; // first protein (for a group) has the max nsaf.
                 }
                 else {
-                    pgn.setNsaf(lastMaxNsaf);
+                    pgn.maxNsaf = lastMaxNsaf;
                 }
             }
             // Sort on NSAF then protein group.
@@ -275,7 +281,9 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                 public int compare(ProteinGroupNsaf o1, ProteinGroupNsaf o2) {
                     int val = Double.valueOf(o1.nsaf).compareTo(o2.nsaf);
                     if(val != 0)    return val;
-                    return Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+                    val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+                    if(val != 0)    return val;
+                    return Double.valueOf(o1.maxNsaf).compareTo(o2.maxNsaf);
                 }});
             List<Integer> proteinIds = new ArrayList<Integer>(prGrN.size());
             
