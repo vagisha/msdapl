@@ -200,6 +200,17 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterProteinGroupCoverage" 
+    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupCoverage" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id, iprot.groupID, prot.coverage 
+    	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot 
+    	WHERE prot.id = iprot.piProteinID 
+    	AND prot.piRunID = #pinferId# 
+    	AND prot.coverage >=#coverage# 
+    	ORDER BY iprot.groupID, prot.coverage DESC
+    </select>
+    
     <select id="filterByNsaf" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
     	WHERE prot.piRunID=#pinferId#
@@ -210,6 +221,16 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterProteinGroupNSAF" 
+    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupNsaf" 
+    		parameterClass="Integer">
+    	SELECT prot.id, iprot.groupID, iprot.nsaf 
+    	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot 
+    	WHERE prot.id = iprot.piProteinID 
+    	AND prot.piRunID = #pinferId# 
+    	AND iprot.nsaf >=#nsaf# 
+    	ORDER BY iprot.groupID, iprot.nsaf DESC
+    </select>
     
     <select id="filterByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uwpr.protinfer.PeptideDefinition;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
 
 /**
  * 
@@ -45,13 +44,20 @@ public class ProteinFilterCriteria {
             
         }
         
+        public static SORT_BY defaultSortBy() {
+            return COVERAGE;
+        }
+    }
+        
       public static enum SORT_ORDER {ASC, DESC;
           public static SORT_ORDER getSortByForString(String sortOrder) {
               if(sortOrder == null || sortOrder.equalsIgnoreCase("ASC")) return ASC;
               else return DESC;
           }
+          public static SORT_ORDER defaultSortOrder() {
+              return DESC;
+          }
       }
-    }
     
     private int numPeptides;
     private int numUniquePeptides;

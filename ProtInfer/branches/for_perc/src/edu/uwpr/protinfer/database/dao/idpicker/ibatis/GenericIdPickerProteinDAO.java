@@ -35,9 +35,9 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract List<Integer> getFilteredSortedProteinIds(int pinferId, ProteinFilterCriteria filterCriteria);
 
-    public abstract List<Integer> sortProteinIdsByCoverage(int pinferId);
+    public abstract List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins);
     
-    public abstract List<Integer> sortProteinsByNSAF(int pinferId);
+    public abstract List<Integer> sortProteinsByNSAF(int pinferId, boolean groupProteins);
     
     public abstract List<Integer> sortProteinIdsByValidationStatus(int pinferId);
     

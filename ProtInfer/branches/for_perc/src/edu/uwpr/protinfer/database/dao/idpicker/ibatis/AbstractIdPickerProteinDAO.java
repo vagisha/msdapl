@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -161,28 +163,127 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     }
     
     
-    public List<Integer> sortProteinIdsByCoverage(int pinferId) {
-        return proteinIdsByCoverage(pinferId, 0.0, true);
+    public List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins) {
+        return proteinIdsByCoverage(pinferId, 0.0, true, groupProteins);
     }
     
-    private List<Integer> proteinIdsByCoverage(int pinferId, double minCoverage, boolean sort) {
+    public static class ProteinGroupCoverage {
+        private int proteinId;
+        private int proteinGroupId;
+        private double coverage;
+        public void setProteinId(int proteinId) {
+            this.proteinId = proteinId;
+        }
+        public void setProteinGroupId(int proteinGroupId) {
+            this.proteinGroupId = proteinGroupId;
+        }
+        public void setCoverage(double coverage) {
+            this.coverage = coverage;
+        }
+    }
+    
+    private List<Integer> proteinIdsByCoverage(int pinferId, double minCoverage, boolean sort, boolean groupProteins) {
+        
         Map<String, Number> map = new HashMap<String, Number>(6);
         map.put("pinferId", pinferId);
         map.put("coverage", minCoverage);
-        if(sort)    map.put("sort", 1);
-        return queryForList(sqlMapNameSpace+".filterByCoverage", map);
+        
+        if(!groupProteins || (groupProteins && !sort)) {
+            if(sort)    map.put("sort", 1);
+            return queryForList(sqlMapNameSpace+".filterByCoverage", map);
+        }
+        else { // group proteins and sort
+            // List of protein IDs along with their groupID and coverage (sorted by group, then coverage).
+            List<ProteinGroupCoverage> prGrC = queryForList(sqlMapNameSpace+".filterProteinGroupCoverage", map);
+            int lastGrp = -1;
+            double lastMaxCoverage = 0.0;
+            // Set the coverage for each protein in a group to be the max coverage in the group.
+            for(ProteinGroupCoverage pgc: prGrC) {
+                if(pgc.proteinGroupId != lastGrp) {
+                    lastGrp = pgc.proteinGroupId;
+                    lastMaxCoverage = pgc.coverage; // first protein (for a group) has the max coverage.
+                }
+                else {
+                    pgc.setCoverage(lastMaxCoverage);
+                }
+            }
+            // Sort on coverage then protein group.
+            Collections.sort(prGrC, new Comparator<ProteinGroupCoverage>() {
+                @Override
+                public int compare(ProteinGroupCoverage o1, ProteinGroupCoverage o2) {
+                    int val = Double.valueOf(o1.coverage).compareTo(o2.coverage);
+                    if(val != 0)    return val;
+                    return Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+                }});
+            List<Integer> proteinIds = new ArrayList<Integer>(prGrC.size());
+            
+            // return the list of protein IDs in the sorted order obove.
+            for(ProteinGroupCoverage pgc: prGrC)
+                proteinIds.add(pgc.proteinId);
+            return proteinIds;
+        }
     }
     
-    public List<Integer> sortProteinsByNSAF(int pinferId) {
-        return proteinIdsByNSAF(pinferId, 0.0, true);
+    public List<Integer> sortProteinsByNSAF(int pinferId, boolean groupProteins) {
+        
+        return proteinIdsByNSAF(pinferId, 0.0, true, groupProteins);
     }
     
-    private List<Integer> proteinIdsByNSAF(int pinferId, double minNsaf, boolean sort) {
+    public static class ProteinGroupNsaf {
+        private int proteinId;
+        private int proteinGroupId;
+        private double nsaf;
+        public void setProteinId(int proteinId) {
+            this.proteinId = proteinId;
+        }
+        public void setProteinGroupId(int proteinGroupId) {
+            this.proteinGroupId = proteinGroupId;
+        }
+        public void setNsaf(double nsaf) {
+            this.nsaf = nsaf;
+        }
+    }
+    
+    private List<Integer> proteinIdsByNSAF(int pinferId, double minNsaf, boolean sort, boolean groupProteins) {
+        
         Map<String, Number> map = new HashMap<String, Number>(6);
         map.put("pinferId", pinferId);
         map.put("nsaf", minNsaf);
-        if(sort)    map.put("sort", 1);
-        return queryForList(sqlMapNameSpace+".filterByNsaf", map);
+        
+        if (!groupProteins || (groupProteins && !sort)) {
+            if(sort)    map.put("sort", 1);
+            return queryForList(sqlMapNameSpace+".filterByNsaf", map);
+        }
+        else { // group proteins and sort
+            // List of protein IDs along with their groupID and NSAF (sorted by group, then NSAF).
+            List<ProteinGroupNsaf> prGrN = queryForList(sqlMapNameSpace+".filterProteinGroupNSAF", map);
+            int lastGrp = -1;
+            double lastMaxNsaf = 0.0;
+            // Set the NSAF for each protein in a group to be the max NSAF in the group.
+            for(ProteinGroupNsaf pgn: prGrN) {
+                if(pgn.proteinGroupId != lastGrp) {
+                    lastGrp = pgn.proteinGroupId;
+                    lastMaxNsaf = pgn.nsaf; // first protein (for a group) has the max nsaf.
+                }
+                else {
+                    pgn.setNsaf(lastMaxNsaf);
+                }
+            }
+            // Sort on NSAF then protein group.
+            Collections.sort(prGrN, new Comparator<ProteinGroupNsaf>() {
+                @Override
+                public int compare(ProteinGroupNsaf o1, ProteinGroupNsaf o2) {
+                    int val = Double.valueOf(o1.nsaf).compareTo(o2.nsaf);
+                    if(val != 0)    return val;
+                    return Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
+                }});
+            List<Integer> proteinIds = new ArrayList<Integer>(prGrN.size());
+            
+            // return the list of protein IDs in the sorted order obove.
+            for(ProteinGroupNsaf pgc: prGrN)
+                proteinIds.add(pgc.proteinId);
+            return proteinIds;
+        }
     }
     
     public List<Integer> sortProteinIdsByValidationStatus(int pinferId) {
@@ -443,7 +544,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         
         // Get a list of protein ids filtered by sequence coverage
         boolean sort = filterCriteria.getSortBy() == SORT_BY.COVERAGE;
-        List<Integer> ids_cov = proteinIdsByCoverage(pinferId, filterCriteria.getCoverage(), sort);
+        List<Integer> ids_cov = proteinIdsByCoverage(pinferId, filterCriteria.getCoverage(), sort, filterCriteria.isGroupProteins());
         
         // Get a list of protein ids filtered by spectrum count
         sort = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA;
