@@ -87,7 +87,7 @@
 	   		 <yrcwww:colorrow repeat="true" scheme="ms">
 	 		 <td colspan="5" align="center" style="font-size: 8pt;">
 	 		 <b>Protein Inference Results</b>
-	 		 <table align="center" width="90%" style="border: 1px solid gray;">
+	 		 <table align="center" width="90%" style="border: 1px solid gray; margin-bottom: 20px;">
 	   	     <tr>
 	   	     <td style="font-size: 8pt; font-weight: bold;">ID</td>
 	   	     <td style="font-size: 8pt; font-weight: bold;">Submitter</td>

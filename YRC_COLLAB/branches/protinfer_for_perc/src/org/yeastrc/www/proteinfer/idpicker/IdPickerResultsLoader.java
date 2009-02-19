@@ -468,17 +468,6 @@ public class IdPickerResultsLoader {
             }
         }
         return new String[] {acc, descr, commonName};
-        
-//      NRProteinFactory nrpf = NRProteinFactory.getInstance();
-//      NRProtein nrseqProt = null;
-//      try {
-//          nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-//          return new String[] {nrseqProt.getListing(), nrseqProt.getDescription()};
-//      }
-//      catch (Exception e) {
-//          log.error("Exception getting accession/description for protein Id: "+nrseqProteinId, e);
-//      }
-//      return null;
     }
     
     private static String[] getProteinAccessionDescription(int pinferId, int nrseqProteinId) {

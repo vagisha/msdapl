@@ -42,8 +42,8 @@
  SORT_BY sortBy = (SORT_BY)request.getAttribute("sortBy");
  SORT_ORDER sortOrder = (SORT_ORDER)request.getAttribute("sortOrder");
  String sortedClass = "";
- if(sortOrder == SORT_ORDER.ASC)	sortedClass = "sorted-asc ms_selected_header";
- else sortedClass = "sorted-desc ms_selected_header";
+ if(sortOrder == SORT_ORDER.ASC)	sortedClass = "sorted-asc pinfer_selected_header";
+ else sortedClass = "sorted-desc pinfer_selected_header";
  %>
 
 <table cellpadding="4" cellspacing="2" align="center" width="99%"  id="protlisttable">
