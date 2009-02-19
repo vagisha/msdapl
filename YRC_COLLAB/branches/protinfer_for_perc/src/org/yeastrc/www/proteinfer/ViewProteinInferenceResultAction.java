@@ -23,7 +23,7 @@ import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -96,8 +96,8 @@ public class ViewProteinInferenceResultAction extends Action {
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
         filterCriteria.setPeptideDefinition(peptideDef);
-        filterCriteria.setSortBy(SORT_BY.GROUP_ID);
-        filterCriteria.setSortOrder(SORT_ORDER.ASC);
+        filterCriteria.setSortBy(SORT_BY.defaultSortBy());
+        filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         

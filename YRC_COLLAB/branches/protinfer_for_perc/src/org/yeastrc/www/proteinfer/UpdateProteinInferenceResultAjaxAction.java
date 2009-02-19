@@ -26,7 +26,7 @@ import org.yeastrc.www.user.UserUtils;
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -90,13 +90,32 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
         filterCriteria.setPeptideDefinition(peptideDef);
-        filterCriteria.setSortBy(filterCritSession == null ? SORT_BY.GROUP_ID : filterCritSession.getSortBy());
-        filterCriteria.setSortOrder(filterCritSession == null ? SORT_ORDER.ASC : filterCritSession.getSortOrder());
+        filterCriteria.setSortBy(filterCritSession == null ? SORT_BY.defaultSortBy() : filterCritSession.getSortBy());
+        filterCriteria.setSortOrder(filterCritSession == null ? SORT_ORDER.defaultSortOrder() : filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        
+        
+        // Get the protein IDs from the session
+        List<Integer> storedProteinIds = (List<Integer>) request.getSession().getAttribute("proteinIds");
+        System.out.println("stored protein ids: "+storedProteinIds.size());
+
+        // check if the protein grouping has changed. If so we may have to resort the proteins. 
+        boolean resort = false;
+        if(filterCritSession.isGroupProteins() != filterCriteria.isGroupProteins()) {
+            // If the filter criteria has proteins GROUPED and the sort_by is
+            // on one of the protein specific columns change it to group_id
+            if(filterCriteria.isGroupProteins()) {
+                SORT_BY sortby = filterCriteria.getSortBy();
+                if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.VALIDATION_STATUS)
+                    filterCriteria.setSortBy(SORT_BY.defaultSortBy());
+                filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
+            }
+            resort = true; // if the grouping has changed we will resort proteins (UNLESS the filtering criteria has also changed).
+        }
         
         // Match this filtering criteria with the one in the request
         boolean match = false;
@@ -104,14 +123,10 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             match = matchFilterCriteria(filterCritSession, filterCriteria);
         }
         
-        // Get the protein IDs from the session
-        List<Integer> storedProteinIds = (List<Integer>) request.getSession().getAttribute("proteinIds");
-        System.out.println("stored protein ids: "+storedProteinIds.size());
-
-        
         // if the filtering criteria has changed we need to filter the results again
         if(!match)  {
             
+            resort = false; // no need to re-sort.  The method below will take that into account.
             // Get a list of filtered and sorted proteins
             storedProteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
             // filter by accession, if required
@@ -130,20 +145,13 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             }
         }
         
-        // If the filter criteria has proteins GROUPED and the sort_by is
-        // on one of the protein specific columns change it to group_id
-        if(filterCriteria.isGroupProteins()) {
-            SORT_BY sortby = filterCriteria.getSortBy();
-            if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.COVERAGE || 
-               sortby == SORT_BY.VALIDATION_STATUS || sortby == SORT_BY.NSAF)
-            filterCriteria.setSortBy(SORT_BY.GROUP_ID);
-            filterCriteria.setSortOrder(SORT_ORDER.ASC);
+        if(resort) {
             // resorted the filtered protein IDs
             storedProteinIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
                     peptideDef, 
                     storedProteinIds, 
-                    SORT_BY.GROUP_ID, 
-                    true);
+                    filterCriteria.getSortBy(), 
+                    filterCriteria.isGroupProteins());
         }
         
         

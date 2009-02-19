@@ -214,10 +214,10 @@ public class IdPickerResultsLoader {
             allIds = idpProtBaseDao.sortProteinIdsByGroup(pinferId);
         }
         else if (sortBy == SORT_BY.COVERAGE) {
-            allIds = idpProtBaseDao.sortProteinIdsByCoverage(pinferId);
+            allIds = idpProtBaseDao.sortProteinIdsByCoverage(pinferId, groupProteins);
         }
         else if(sortBy == SORT_BY.NSAF) {
-            allIds = idpProtBaseDao.sortProteinsByNSAF(pinferId);
+            allIds = idpProtBaseDao.sortProteinsByNSAF(pinferId, groupProteins);
         }
         else if(sortBy == SORT_BY.VALIDATION_STATUS) {
             allIds = idpProtBaseDao.sortProteinIdsByValidationStatus(pinferId);

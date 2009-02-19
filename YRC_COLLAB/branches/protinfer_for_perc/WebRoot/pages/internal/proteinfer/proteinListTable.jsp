@@ -1,6 +1,6 @@
 
 <%@page import="edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY"%>
-<%@page import="edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER"%>
+<%@page import="edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
@@ -40,7 +40,7 @@
 
 <%
  SORT_BY sortBy = (SORT_BY)request.getAttribute("sortBy");
- SORT_BY.SORT_ORDER sortOrder = (SORT_ORDER)request.getAttribute("sortOrder");
+ SORT_ORDER sortOrder = (SORT_ORDER)request.getAttribute("sortOrder");
  String sortedClass = "";
  if(sortOrder == SORT_ORDER.ASC)	sortedClass = "sorted-asc ms_selected_header";
  else sortedClass = "sorted-desc ms_selected_header";
@@ -59,42 +59,44 @@
 			<b><font size="2pt">Protein Group</font></b>
 		</th>
 		
-		<!-- Make Protein and Description columns sortable only if indistinguishable proteins are NOT grouped together -->
+		<!-- Make FastaID and protein annotation sortable only if indistinguishable proteins are NOT grouped together -->
 		<logic:equal name="groupProteins" value="true">
 			<th width="1%"><b><font size="2pt">S</font></b></th>
 			<th width="10%"><b><font size="2pt">Fasta ID</font></b></th>
-			<th width="10%"><b><font size="2pt">Common<br>Name</font></b></th>
-			<th width="55%"><b><font size="2pt">Description</font></b></th>
-			<th width="5%"><b><font size="2pt">Coverage(%)</font></b></th>
-			<th width="5%"><b><font size="2pt">NSAF**</font></b></th>
 		</logic:equal>
+		
 		
 		<logic:equal name="groupProteins" value="false">
 			<% colSortedClass = "";
-			 if(sortBy == SORT_BY.ACCESSION) colSortedClass = sortedClass;
+			 if(sortBy == SORT_BY.VALIDATION_STATUS) colSortedClass = sortedClass;
 			%>
 			<th width="1%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.VALIDATION_STATUS.name()%>"><b><font size="2pt">S</font></b></th>
+			
+			<% colSortedClass = "";
+			 if(sortBy == SORT_BY.ACCESSION) colSortedClass = sortedClass;
+			%>
 			<th width="10%" class="sortable def_sort_asc <%=colSortedClass %>" id="<%=SORT_BY.ACCESSION.name()%>"><b><font size="2pt">Fasta ID</font></b></th>
-			<th width="10%"><b><font size="2pt">Common<br>Name</font></b></th>
-			<th width="55%" class=""><b><font size="2pt">Description</font></b></th>
-		
-			<% colSortedClass = "";
-			 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
-			%>
-			<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.COVERAGE.name()%>">
-				<b><font size="2pt">Coverage (%)</font></b>
-			</th>
-			
-			<% colSortedClass = "";
-			 if(sortBy == SORT_BY.NSAF) colSortedClass = sortedClass;
-			%>
-			<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NSAF.name()%>">
-				<b><font size="2pt">NSAF**</font></b>
-			</th>
-			
 		</logic:equal>
 		
 		
+		<th width="10%"><b><font size="2pt">Common<br>Name</font></b></th>
+		<th width="55%"><b><font size="2pt">Description</font></b></th>
+		
+		
+		<% colSortedClass = "";
+		 if(sortBy == SORT_BY.COVERAGE) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.COVERAGE.name()%>">
+			<b><font size="2pt">Coverage (%)</font></b>
+		</th>
+		
+		<% colSortedClass = "";
+		 if(sortBy == SORT_BY.NSAF) colSortedClass = sortedClass;
+		%>
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.NSAF.name()%>">
+			<b><font size="2pt">NSAF**</font></b>
+		</th>
+			
 		<% colSortedClass = "";
 			 if(sortBy == SORT_BY.NUM_PEPT) colSortedClass = sortedClass;
 		%>

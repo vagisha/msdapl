@@ -23,8 +23,7 @@ import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY.SORT_ORDER;
+import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
