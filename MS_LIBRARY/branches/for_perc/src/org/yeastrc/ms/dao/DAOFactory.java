@@ -72,7 +72,7 @@ public class DAOFactory {
     
     static {
         Reader reader = null;
-        String ibatisConfigFile = "org/yeastrc/ms/sqlmap/SqlMapConfig.xml";
+        String ibatisConfigFile = "SqlMapConfig.xml";
         try {
             reader = Resources.getResourceAsReader(ibatisConfigFile);
             sqlMap = SqlMapClientBuilder.buildSqlMapClient(reader);
