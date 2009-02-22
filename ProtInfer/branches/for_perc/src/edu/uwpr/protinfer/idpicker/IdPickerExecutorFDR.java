@@ -182,7 +182,8 @@ public class IdPickerExecutorFDR {
             }});
         
         // count the number of filtered hits for each source
-        int filteredCnt = 0;
+        int filteredDecoyCnt = 0;
+        int filteredTargetCnt = 0;
         int lastSourceId = -1;
         for(PeptideSpectrumMatchIDP hit: filteredPsms) {
             if(lastSourceId != hit.getSpectrumMatch().getSourceId()) {
@@ -192,13 +193,16 @@ public class IdPickerExecutorFDR {
                         log.error("Could not find input summary for runSearchID: "+lastSourceId);
                     }
                     else {
-                        input.setNumFilteredTargetHits(filteredCnt);
+                        input.setNumFilteredTargetHits(filteredTargetCnt);
+                        input.setNumFilteredDecoyHits(filteredDecoyCnt);
                     }
                 }
-                filteredCnt = 0;
+                filteredTargetCnt = 0;
+                filteredDecoyCnt = 0;
                 lastSourceId = hit.getSpectrumMatch().getSourceId();
             }
-            filteredCnt++;
+            if(hit.isDecoyMatch())  filteredDecoyCnt++;
+            else                    filteredTargetCnt++;
         }
         // update the last one;
         if(lastSourceId != -1) {
@@ -207,7 +211,8 @@ public class IdPickerExecutorFDR {
                 log.error("Could not find input summary for runSearchID: "+lastSourceId);
             }
             else {
-                input.setNumFilteredTargetHits(filteredCnt);
+                input.setNumFilteredTargetHits(filteredTargetCnt);
+                input.setNumFilteredDecoyHits(filteredDecoyCnt);
             }
         }
         else {

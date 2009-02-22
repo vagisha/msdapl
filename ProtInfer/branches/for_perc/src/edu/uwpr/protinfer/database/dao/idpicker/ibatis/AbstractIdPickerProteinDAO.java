@@ -512,6 +512,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return queryForList(sqlMapNameSpace+".idPickerProteinIds", map);
     }
     
+    /**
+     * Returns a map of proteinIds and proteinGroupIds.
+     * Keys in the map are proteinIds and Values are proteinGroupIds
+     */
     public Map<Integer, Integer> getProteinGroupIds(int pinferId, boolean parsimonious) {
         Map<String, Number> map = new HashMap<String, Number>(8);
         map.put("pinferId", pinferId);

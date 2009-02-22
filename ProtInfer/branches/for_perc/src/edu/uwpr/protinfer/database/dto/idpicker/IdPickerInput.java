@@ -7,6 +7,7 @@ public class IdPickerInput extends ProteinferInput {
     private int numTargetHits = 0;
     private int numDecoyHits = 0;
     private int numFilteredTargetHits = 0;
+    private int numFilteredDecoyHits = 0;
     
     public int getNumTargetHits() {
         return numTargetHits;
@@ -27,5 +28,12 @@ public class IdPickerInput extends ProteinferInput {
     }
     public void setNumFilteredTargetHits(int numFilteredTargetHits) {
         this.numFilteredTargetHits = numFilteredTargetHits;
+    }
+    
+    public int getNumFilteredDecoyHits() {
+        return numFilteredDecoyHits;
+    }
+    public void setNumFilteredDecoyHits(int numFilteredDecoyHits) {
+        this.numFilteredDecoyHits = numFilteredDecoyHits;
     }
 }

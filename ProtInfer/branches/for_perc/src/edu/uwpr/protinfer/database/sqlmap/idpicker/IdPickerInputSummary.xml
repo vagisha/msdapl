@@ -9,6 +9,7 @@
 		<result property="numTargetHits" column="numTargetHits" nullValue="0"/>
 		<result property="numDecoyHits" column="numDecoyHits" nullValue="0"/>
 		<result property="numFilteredTargetHits" column="numFilteredTargetHits" nullValue="0"/>
+		<result property="numFilteredDecoyHits" column="numFilteredDecoyHits" nullValue="0"/>
 	</resultMap>
 	
 	<parameterMap class="IdPickerInputSummary" id="idpickerInputParam">
@@ -16,6 +17,7 @@
 		<parameter property="numTargetHits" jdbcType="INTEGER"  />
 		<parameter property="numDecoyHits" jdbcType="INTEGER" />
 		<parameter property="numFilteredTargetHits" jdbcType="INTEGER" />
+		<parameter property="numFilteredDecoyHits" jdbcType="INTEGER" />
 	</parameterMap>
 	
     <select id="selectIdPickerInputList" resultMap="idpickerInputResult" parameterClass="Integer">
@@ -36,6 +38,9 @@
     	<isNotEqual property="numFilteredTargetHits" compareValue="-1">
     		, numFilteredTargetHits = #numFilteredTargetHits#
     	</isNotEqual>
+    	<isNotEqual property="numFilteredDecoyHits" compareValue="-1">
+    		, numFilteredDecoyHits = #numFilteredDecoyHits#
+    	</isNotEqual>
     	WHERE piInputID=#id#
     </update>
     
@@ -44,7 +49,8 @@
     	piInputID,
     	numTargetHits,
     	numDecoyHits,
-    	numFilteredTargetHits)
+    	numFilteredTargetHits,
+    	numFilteredDecoyHits)
     	VALUES (?,?,?,?)
     </insert>
     
@@ -53,7 +59,8 @@
     	piInputID,
     	numTargetHits,
     	numDecoyHits,
-    	numFilteredTargetHits)
+    	numFilteredTargetHits,
+    	numFilteredDecoyHits)
     	VALUES $values$
     </insert>
     
