@@ -48,7 +48,7 @@ public class ProteinferDAOFactory {
             log.error("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
             throw new RuntimeException("Error initializing "+ProteinferDAOFactory.class.getName()+" class: ", e);
         }
-        System.out.println("Loaded Ibatis SQL map config: "+ibatisConfigFile);
+        System.out.println("Loaded Ibatis SQL map config -- "+ibatisConfigFile);
     }
     
     private static ProteinferDAOFactory instance = new ProteinferDAOFactory();
