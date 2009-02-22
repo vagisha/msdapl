@@ -454,7 +454,8 @@ CREATE TABLE IDPickerInputSummary (
 	piInputID INT UNSIGNED NOT NULL PRIMARY KEY,
 	numTargetHits INT UNSIGNED,
     numDecoyHits INT UNSIGNED,
-    numFilteredTargetHits INT UNSIGNED
+    numFilteredTargetHits INT UNSIGNED,
+    numFilteredDecoyHits INT UNSIGNED
 );
 
 
