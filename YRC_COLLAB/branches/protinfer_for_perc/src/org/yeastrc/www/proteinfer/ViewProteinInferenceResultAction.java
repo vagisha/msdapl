@@ -100,6 +100,7 @@ public class ViewProteinInferenceResultAction extends Action {
         filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        filterCriteria.setExhaustiveCommonNameLookup(false);
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
@@ -120,9 +121,11 @@ public class ViewProteinInferenceResultAction extends Action {
         // get the protein groups 
         List<WIdPickerProteinGroup> proteinGroups = null;
         if(filterCriteria.isGroupProteins())
-            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
+            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef,
+                    filterCriteria.doExhaustiveCommonNameLookup());
         else
-            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, false, peptideDef);
+            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, false, peptideDef,
+                    filterCriteria.doExhaustiveCommonNameLookup());
         
         request.setAttribute("proteinGroups", proteinGroups);
         

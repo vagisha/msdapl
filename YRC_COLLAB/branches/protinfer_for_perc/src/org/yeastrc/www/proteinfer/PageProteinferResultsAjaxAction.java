@@ -106,7 +106,9 @@ public class PageProteinferResultsAjaxAction extends Action {
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, group, peptideDef);
+        boolean fullLookup = filterCriteria.doExhaustiveCommonNameLookup();
+        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
+                group, peptideDef, fullLookup);
         request.setAttribute("proteinGroups", proteinGroups);
         
         // get the list of page numbers to display

@@ -74,6 +74,15 @@
   </table></td>
   </tr>
   
+  <!--  
+  <tr>
+  	<td colspan="2">
+  		All-inclusive Common Name Lookup: 
+  		<html:checkbox name="proteinInferFilterForm" property="exhaustiveCommonNameLookup" value="true"/>
+  	</td>
+  </tr>
+  -->
+  
   <tr>
   	<td colspan="2">
   		Validation Status: 
@@ -109,7 +118,11 @@
   </tr>
   
   <tr>
-    	<td colspan="3" align="center"><html:submit styleClass="button" style="margin-top:2px;">Update</html:submit></td>
+    	<td colspan="3" align="center">
+    		<html:submit styleClass="button" style="margin-top:2px;">Update</html:submit>
+    		&nbsp;&nbsp;
+    		<a href="/yrc/downloadProtInferResults.do?pinferId=<bean:write name="proteinInferFilterForm" property="pinferId" />">Download Results</a>
+    	</td>
   </tr>
   
  </TABLE>

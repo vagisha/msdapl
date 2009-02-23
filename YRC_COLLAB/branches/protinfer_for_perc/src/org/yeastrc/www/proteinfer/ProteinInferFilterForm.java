@@ -18,6 +18,8 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean joinGroupProteins = true;
     private boolean showAllProteins = true;
     
+    private boolean exhaustiveCommonNameLookup = false;
+    
     private String accessionLike = null;
     private String descriptionLike = null;
     private String[] validationStatus = new String[]{"All"};
@@ -134,6 +136,14 @@ public class ProteinInferFilterForm extends ActionForm {
         for(String vs: validationStatus)
             System.out.println(vs);
         this.validationStatus = validationStatus;
+    }
+
+    public boolean isExhaustiveCommonNameLookup() {
+        return exhaustiveCommonNameLookup;
+    }
+
+    public void setExhaustiveCommonNameLookup(boolean exhaustiveCommonNameLookup) {
+        this.exhaustiveCommonNameLookup = exhaustiveCommonNameLookup;
     }
    
 }
