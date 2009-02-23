@@ -434,6 +434,7 @@ CREATE TABLE msProteinInferProteinPeptideMatch (
     piPeptideID INT UNSIGNED NOT NULL
 );
 ALTER TABLE msProteinInferProteinPeptideMatch ADD PRIMARY KEY (piProteinID, piPeptideID);
+ALTER TABLE msProteinInferProteinPeptideMatch ADD INDEX (piPeptideID);
 
 
 CREATE TABLE msProteinInferSpectrumMatch (
