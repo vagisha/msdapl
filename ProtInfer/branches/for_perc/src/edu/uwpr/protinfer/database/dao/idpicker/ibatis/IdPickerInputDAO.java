@@ -52,7 +52,11 @@ public class IdPickerInputDAO extends BaseSqlMapDAO implements GenericProteinfer
             if(input.getNumFilteredTargetHits() == -1)
                 buf.append("NULL)");
             else
-               buf.append(input.getNumFilteredTargetHits()+")");
+               buf.append(input.getNumFilteredTargetHits()+",");
+            if(input.getNumFilteredDecoyHits() == -1)
+                buf.append("NULL)");
+            else
+               buf.append(input.getNumFilteredDecoyHits()+")");
         }
         buf.deleteCharAt(0);
 //        System.out.println(buf.toString());
