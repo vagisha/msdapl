@@ -67,6 +67,8 @@ public class ProteinFilterCriteria {
     
     private boolean groupProteins = true;
     
+    private boolean exhaustiveCommonNameLookup; 
+    
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
     private int numSpectra;
@@ -151,6 +153,14 @@ public class ProteinFilterCriteria {
         this.groupProteins = groupProteins;
     }
 
+    public boolean doExhaustiveCommonNameLookup() {
+        return exhaustiveCommonNameLookup;
+    }
+
+    public void setExhaustiveCommonNameLookup(boolean exhaustiveCommonNameLookup) {
+        this.exhaustiveCommonNameLookup = exhaustiveCommonNameLookup;
+    }
+    
     public String getAccessionLike() {
         return accessionLike;
     }
