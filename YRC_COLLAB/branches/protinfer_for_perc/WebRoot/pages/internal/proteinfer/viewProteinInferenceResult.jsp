@@ -46,9 +46,10 @@
 // ---------------------------------------------------------------------------------------
   $.ajaxSetup({
   	type: 'POST',
-  	timeout: 30000,
+  	//timeout: 5000,
   	dataType: 'html',
   	error: function(xhr) {
+  			
   				var statusCode = xhr.status;
 		  		// status code returned if user is not logged in
 		  		// reloading this page will redirect to the login page
@@ -64,6 +65,8 @@
   
   $.blockUI.defaults.message = '<b>Loading...</b>'; 
   $.blockUI.defaults.css.padding = 20;
+  $.blockUI.defaults.fadeIn = 0;
+  $.blockUI.defaults.fadeOut = 0;
   //$().ajaxStart($.blockUI).ajaxStop($.unblockUI);
   $().ajaxStop($.unblockUI);
 
@@ -177,7 +180,10 @@ function toggleProteinSequence (pinferProteinId) {
 			// load data in the appropriate div
 			$.blockUI(); 
 			$("#protsequence_"+pinferProteinId).load("proteinSequence.do",   				// url
-							                        {'pinferProteinId': pinferProteinId}); 	// data
+							                        {'pinferProteinId': pinferProteinId}, 	// data
+							                        function(responseText, status, xhr) {	// callback
+								  						$.unblockUI();
+								  					});
 		}
 		button.text("[Hide Sequence]");
 		$("#protseqtbl_"+pinferProteinId).show();
@@ -215,14 +221,12 @@ function showProteinDetails(proteinId, display, block) {
 	$("#protein_div").load("proteinDetails.do",   									// url
 								  {'pinferId': <%=pinferId%>, 'pinferProtId': proteinId}, 	// data
 								  function(responseText, status, xhr) {						// callback
+								  		
+								  		if(block)	$.unblockUI();
+								  		
 								  		// stripe the table
 										$("#protdetailstbl_"+proteinId+" th.main").addClass("pinfer_A");
 										$("#protdetailstbl_"+proteinId+" tbody tr.main").addClass("pinfer_A");
-										if(showDiv) {
-											$("#protdetailslink").click(); // so that history works
-											//var $tabs = $("#results").tabs();
-											//$tabs.tabs('select', 2);
-										}
 										$(".allpsms").each(function(){
 											var table = $(this);
 											makeSortable(table);
@@ -230,6 +234,11 @@ function showProteinDetails(proteinId, display, block) {
 										$(this).show();
 										// save a cookie
 										saveProtDetailCookie(<%=pinferId%>, proteinId);
+										if(showDiv) {
+											$("#protdetailslink").click(); // so that history works
+											//var $tabs = $("#results").tabs();
+											//$tabs.tabs('select', 2);
+										}
 								  });
 }
 
@@ -244,20 +253,16 @@ function saveProtDetailCookie(pinferId, proteinId) {
 // --------------------------------------------------------------------------------------- 
 function showProteinCluster(proteinClusterIdx, display, block) {
 
-	//$("#clusterlist")[0].selectedIndex = proteinClusterIdx - 1;
-	selectProteinCluster(proteinClusterIdx, block);
-	
 	if(display == undefined) display = true;
 	var showDiv = location.hash != "#protclusters" && display;
-	if(showDiv) {
-		$("#protclusterslink").click();
-		//var $tabs = $("#results").tabs();
-		//$tabs.tabs('select', 1);
-	}
+	
+	//$("#clusterlist")[0].selectedIndex = proteinClusterIdx - 1;
+	selectProteinCluster(proteinClusterIdx, block, showDiv);
+	
 	return false;
 }
   
-function selectProteinCluster(clusterId, block) {
+function selectProteinCluster(clusterId, block, showDiv) {
 
 	//var clusterId = $("#clusterlist")[0].selectedIndex + 1;
 	
@@ -267,6 +272,8 @@ function selectProteinCluster(clusterId, block) {
 	$("#protcluster_div").load("proteinCluster.do",   								// url
 								  	  {'pinferId': <%=pinferId%>, 'clusterId': clusterId}, 	// data
 								      function(responseText, status, request) {				// callback
+ 								  		
+ 								  		if(block) $.unblockUI();
  								  		
  								  		$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
  										$("#assoctable_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
@@ -297,6 +304,12 @@ function selectProteinCluster(clusterId, block) {
  										$(this).show();
  										// save a cookie
 										saveClusterDetailCookie(<%=pinferId%>, clusterId);
+										
+										if(showDiv) {
+											$("#protclusterslink").click();
+											//var $tabs = $("#results").tabs();
+											//$tabs.tabs('select', 1);
+										}
 								  });	
 }
 
@@ -432,6 +445,7 @@ function setupShowPeptidesLinks() {
   									 'proteinGroupId': id
   									 },
   									 function(responseText, status, xhr) {						// callback
+  									 	$.unblockUI();
   										$(this).show();
   										makeSortable($("#peptforprottbl_"+id));
   								   });
@@ -463,6 +477,7 @@ function setupShowPeptidesLinks() {
   									 'proteinId': protId
   									 },
   									 function(responseText, status, xhr) {			// callback
+  									 	$.unblockUI();
   										$(this).show();
   										makeSortable($("#peptforprottbl_"+protId+"_"+grpId));
   								   });
@@ -705,6 +720,7 @@ function validateFloat(value, fieldName, min, max) {
 	return valid;
 }
 function updateResults(responseText, statusText) {
+	$.unblockUI();
   	setupProteinListTable();
 }
 
@@ -727,13 +743,8 @@ function sortResults(pinferId, sortBy, sortOrder) {
 							 'sortBy': 			sortBy,
 							 'sortOrder': 		sortOrderStr}, 	            // data
 							function(responseText, status, xhr) {			// callback
+										$.unblockUI();
 										setupProteinListTable();
-										// highlight the sorted column
-										$("#"+sortBy).addClass("pinfer_selected_header");
-										if(sortOrder == 1)
-											$("#"+sortBy).addClass("sorted-asc");
-										else
-											$("#"+sortBy).addClass("sorted-desc");
 								   });	
 	
 	return false;
@@ -750,6 +761,7 @@ function pageResults(pageNum) {
   							{'inferId': 		<%=pinferId%>, 
   							 'pageNum': 		pageNum}, 	            	// data
   							function(responseText, status, xhr) {			// callback
+  										$.unblockUI();
   										setupProteinListTable();
   								   });	
   	
