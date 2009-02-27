@@ -195,6 +195,39 @@ function toggleProteinSequence (pinferProteinId) {
 }
 
 // ---------------------------------------------------------------------------------------
+// SHOW/HIDE HITS FOR AN ION
+// --------------------------------------------------------------------------------------- 
+// View all the hits for an ion
+function toggleHitsForIon (pinferIonId) {
+
+	// alert("ion id: "+pinferIonId);
+	var button = $("#showhitsforion_"+pinferIonId);
+	
+	if(button.text() == "[Show]") {
+		//alert("View");
+		if($("#hitsforion_"+pinferIonId).html().length == 0) {
+			//alert("Getting...");
+			// load data in the appropriate div
+			$.blockUI(); 
+			$("#hitsforion_"+pinferIonId).load("psmListForIon.do",   					// url
+							                        {'pinferId': <%=pinferId%>, 'pinferIonId': pinferIonId}, 		// data
+							                        function(responseText, status, xhr) {	// callback
+								  						$.unblockUI();
+								  						// make table sortable
+														var table = $("#allpsms_"+pinferIonId);
+														makeSortable(table);
+								  					});
+		}
+		button.text("[Hide]");
+		$("#hitsforion_"+pinferIonId).show();
+	}
+	else {
+		button.text("[Show]");
+		$("#hitsforion_"+pinferIonId).hide();
+	}
+}
+
+// ---------------------------------------------------------------------------------------
 // SHOW SPECTRUM
 // ---------------------------------------------------------------------------------------  
 function viewSpectrum (scanId, hitId) {
@@ -227,10 +260,6 @@ function showProteinDetails(proteinId, display, block) {
 								  		// stripe the table
 										$("#protdetailstbl_"+proteinId+" th.main").addClass("pinfer_A");
 										$("#protdetailstbl_"+proteinId+" tbody tr.main").addClass("pinfer_A");
-										$(".allpsms").each(function(){
-											var table = $(this);
-											makeSortable(table);
-										});
 										$(this).show();
 										// save a cookie
 										saveProtDetailCookie(<%=pinferId%>, proteinId);

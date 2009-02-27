@@ -11,8 +11,7 @@ public class WIdPickerIon {
     private MsSearchResult bestSpectrumMatch;
     private boolean uniqueToProteinGrp = false;
     
-    
-    public <T extends MsSearchResult, I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>> WIdPickerIon(I ion, T psm) {
+    public WIdPickerIon(GenericProteinferIon<? extends ProteinferSpectrumMatch> ion, MsSearchResult psm) {
         this.ion = ion;
         this.bestSpectrumMatch = psm;
     }
@@ -49,25 +48,12 @@ public class WIdPickerIon {
         return ion.getSpectrumCount();
     }
     
-    private static String removeTerminalResidues(String peptide) {
+    protected static String removeTerminalResidues(String peptide) {
         int f = peptide.indexOf('.');
         int l = peptide.lastIndexOf('.');
         f = f == -1 ? 0 : f+1;
         l = l == -1 ? peptide.length() : l;
         return peptide.substring(f, l);
     }
-    
-//    public boolean equals(Object that) {
-//        if(that == this)
-//            return true;
-//        if(!(that instanceof WIdPickerIon))
-//            return false;
-//        return (this.ion.getCharge() == ((WIdPickerIon)that).getIon().getCharge() &&
-//                this.ion.getSequence() == ((WIdPickerIon)that).getIon().getSequence());
-//    }
-//    
-//    public int hashCode() {
-//        String identifier = this.ion.getSequence()+"_charge"+this.ion.getCharge();
-//        return identifier.hashCode();
-//    }
+
 }

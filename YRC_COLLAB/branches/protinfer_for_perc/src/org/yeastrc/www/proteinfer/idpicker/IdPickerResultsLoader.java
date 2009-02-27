@@ -660,11 +660,11 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // Peptide ions for a protein group (sorted by sequence, modification state and charge
     //---------------------------------------------------------------------------------------------------
-    public static List<WIdPickerIonWAllSpectra> getPeptideIonsForProtein(int pinferId, int proteinId) {
+    public static List<WIdPickerIonForProtein> getPeptideIonsForProtein(int pinferId, int proteinId) {
         
         long s = System.currentTimeMillis();
         
-        List<WIdPickerIonWAllSpectra> ionList = new ArrayList<WIdPickerIonWAllSpectra>();
+        List<WIdPickerIonForProtein> ionList = new ArrayList<WIdPickerIonForProtein>();
         
         IdPickerRun run = idpRunDao.loadProteinferRun(pinferId);
         
@@ -686,7 +686,7 @@ public class IdPickerResultsLoader {
                 List<IdPickerIon> ions = peptide.getIonList();
                 sortIonList(ions);
                 for(IdPickerIon ion: ions) {
-                    WIdPickerIonWAllSpectra wIon = makeWIdPickerIonWAllSpectra(ion, inputGenerator, pinferProgram);
+                    WIdPickerIonForProtein wIon = makeWIdPickerIonForProtein(ion, inputGenerator);
                     for(int i = 0; i < termResidues[0].size(); i++) {
                         wIon.addTerminalResidues(termResidues[0].get(i), termResidues[1].get(i));
                     }
@@ -703,7 +703,7 @@ public class IdPickerResultsLoader {
                 List<ProteinferIon> ions = peptide.getIonList();
                 sortIonList(ions);
                 for(ProteinferIon ion: ions) {
-                    WIdPickerIonWAllSpectra wIon = makeWIdPickerIonWAllSpectra(ion, inputGenerator, pinferProgram);
+                    WIdPickerIonForProtein wIon = makeWIdPickerIonForProtein(ion, inputGenerator);
                     for(int i = 0; i < termResidues[0].size(); i++) {
                         wIon.addTerminalResidues(termResidues[0].get(i), termResidues[1].get(i));
                     }
@@ -757,16 +757,21 @@ public class IdPickerResultsLoader {
     }
     
     private static <I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>>
-        WIdPickerIonWAllSpectra makeWIdPickerIonWAllSpectra(I ion, Program inputGenerator,
-                                                            ProteinInferenceProgram pinferProgram) {
+            WIdPickerIonForProtein makeWIdPickerIonForProtein(I ion, Program inputGenerator) {
+        ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
+        MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
+        return new WIdPickerIonForProtein(ion, origResult);
+    }
+
+    public static List<WIdPickerSpectrumMatch> getHitsForIon(int pinferIonId, Program inputGenerator, ProteinInferenceProgram pinferProgram) {
         
         List<? extends ProteinferSpectrumMatch> psmList = null;
         if(pinferProgram == ProteinInferenceProgram.PROTINFER_SEQ ||
            pinferProgram == ProteinInferenceProgram.PROTINFER_PLCID) {
-            psmList = idpPsmDao.loadSpectrumMatchesForIon(ion.getId());
+            psmList = idpPsmDao.loadSpectrumMatchesForIon(pinferIonId);
         }
         else if (pinferProgram == ProteinInferenceProgram.PROTINFER_PERC) {
-            psmList = psmDao.loadSpectrumMatchesForIon(ion.getId());
+            psmList = psmDao.loadSpectrumMatchesForIon(pinferIonId);
         }
         else {
             log.error("Unknow version of IDPicker: "+pinferProgram);
@@ -781,7 +786,7 @@ public class IdPickerResultsLoader {
             wPsmList.add(wPsm);
         }
         
-        return new WIdPickerIonWAllSpectra(ion, wPsmList);
+        return wPsmList;
     }
     
 

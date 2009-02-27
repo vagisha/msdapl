@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonWAllSpectra;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -99,8 +99,8 @@ public class ProteinDetailsAjaxAction extends Action {
         }
         request.setAttribute("groupProteins", groupProteins);
         
-        // We will return all the filtered search hits for each peptide ion
-        List<WIdPickerIonWAllSpectra> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
+        // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
+        List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
         request.setAttribute("ionList", ionsWAllSpectra);
         
         
