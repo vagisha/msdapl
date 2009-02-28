@@ -73,6 +73,13 @@ public class ProteinInferenceProgram {
         return null;
     }
    
+    public ProgramParam getParamForName(String name) {
+        for(ProgramParam param: this.params) {
+            if(name.equalsIgnoreCase(param.getName()))
+                return param;
+        }
+        return null;
+    }
     
     static class PISequestProgram extends ProteinInferenceProgram {
         private PISequestProgram() {
