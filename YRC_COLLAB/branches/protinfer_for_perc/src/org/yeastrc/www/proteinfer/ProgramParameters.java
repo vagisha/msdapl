@@ -57,8 +57,18 @@ public class ProgramParameters {
     public static boolean validateParams(ProgramParameters params, String errorMessage) {
         String programName = params.getProgramName();
         ProteinInferenceProgram piProgram = ProteinInferenceProgram.getProgramForName(programName);
-        
-        
+        for(Param param: params.getParamList()) {
+            ProgramParam progParam = piProgram.getParamForName(param.getName());
+            if(progParam == null) {
+                errorMessage = "No parameter found with name: "+param.getName();
+                return false;
+            }
+            if(!progParam.validate(param.getValue())) {
+                errorMessage = "Invalid value for param: "+param.getName();
+                return false;
+            }
+        }
+        return true;
     }
     
     public static final class Param {
