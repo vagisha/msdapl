@@ -21,7 +21,8 @@ public final class ProgramParam {
     private TYPE type = TYPE.DOUBLE;
     private String[] values;
 
-
+    private ParamValidator validator = null;
+    
     ProgramParam(TYPE type, String name, String displayName, 
             String defaultVal, String[] values,
             String description) {
@@ -34,6 +35,10 @@ public final class ProgramParam {
             this.values = values;
         else
             values = new String[0];
+    }
+    
+    public void setValidator(ParamValidator validator) {
+        this.validator = validator;
     }
 
     public String getName() {
@@ -60,13 +65,24 @@ public final class ProgramParam {
         return this.values;
     }
     
+    public boolean validate(String value) {
+        if(validator == null)
+            return true;
+        return validator.validate(value);
+    }
+    
     public static class ParamMaker {
         
         public static ProgramParam makeMaxFDRParam() {
-            return new ProgramParam(TYPE.DOUBLE, 
+            ProgramParam param = new ProgramParam(TYPE.DOUBLE, 
                   "maxFDR", "Max. FDR", 
                   "0.05", null,
                   "This parameter sets the maximum FDR that the score of each peptide identification must meet");
+            DoubleValidator validator = new DoubleValidator();
+            validator.minVal = 0.0;
+            validator.maxVal = 1.0;
+            param.setValidator(validator);
+            return param;
         }
         
         public static ProgramParam makeFDRScoreParam(SCORE defaultScore, SCORE[] options) {
@@ -88,10 +104,15 @@ public final class ProgramParam {
         }
         
         public static ProgramParam makeDecoyPrefixParam() {
-            return new ProgramParam(TYPE.STRING, 
+            ProgramParam param = new ProgramParam(TYPE.STRING, 
                   "decoyPrefix", "Decoy Prefix", 
                   "Reverse_", null,
                   "Prefix used to identify decoy protein accessions");
+            param.setValidator(new ParamValidator() {
+                public boolean validate(String value) {
+                    return (value != null && value.length() > 0);
+                }});
+            return param;
         }
         
         public static ProgramParam makePeptideDefParam() {
@@ -105,23 +126,40 @@ public final class ProgramParam {
         }
         
         public static ProgramParam makeMinPeptParam() {
-            return new ProgramParam(TYPE.INTEGER, "minPept", "Min. Peptides", "2", null, 
+            ProgramParam param = new ProgramParam(TYPE.INTEGER, "minPept", "Min. Peptides", "2", null, 
                     "Minimum number of peptides required for a protein(group) to be included in the analysis.");
+            IntegerValidator validator = new IntegerValidator();
+            validator.minVal = 0;
+            param.setValidator(validator);
+            return param;
         }
         
         public static ProgramParam makeMinUniqPeptParam() {
-            return new ProgramParam(TYPE.INTEGER, "minUniqePept", "Min. Unique Peptides", "0", null, 
+            ProgramParam param = new ProgramParam(TYPE.INTEGER, "minUniqePept", "Min. Unique Peptides", "0", null, 
                     "Minimum number of unique peptides required for a protein(group) to be included in the analysis.");
+            IntegerValidator validator = new IntegerValidator();
+            validator.minVal = 0;
+            param.setValidator(validator);
+            return param;
         }
 
         public static ProgramParam makeMinCoverageParam() {
-            return new ProgramParam(TYPE.DOUBLE, "coverage", "Coverage(%)", "0", null, 
+            ProgramParam param = new ProgramParam(TYPE.DOUBLE, "coverage", "Min. Coverage(%)", "0", null, 
                     "Minimum sequence coverage required for a protein to be included in the analysis.");
+            DoubleValidator validator = new DoubleValidator();
+            validator.minVal = 0.0;
+            validator.maxVal = 100.0;
+            param.setValidator(validator);
+            return param;
         }
 
         public static ProgramParam makeMinPeptLengthParam() {
-            return new ProgramParam(TYPE.INTEGER, "minPeptLen", "Min. Peptide Length", "5", null, 
+            ProgramParam param = new ProgramParam(TYPE.INTEGER, "minPeptLen", "Min. Peptide Length", "5", null, 
                     "Minimum length required for a peptide to be included in the analysis.");
+            IntegerValidator validator = new IntegerValidator();
+            validator.minVal = 0;
+            param.setValidator(validator);
+            return param;
         }
 //      new ProgramParam(TYPE.INTEGER, "minPeptSpectra", "Min. Spectra / peptide", "1", null, "Minimum number of spectrum matches required for a peptide to be included in the analysis."),
         public static ProgramParam makeRemoveAmbigSpectraParam() {
@@ -135,6 +173,36 @@ public final class ProgramParam {
 //            "true", null,
 //            "This parameter controls whether the final protein list is filtered by the minimum covering set, i.e. the minimum set of proteins that is necessary to describe all identified peptides")
 
+    }
+    
+    private static abstract class ParamValidator {
+        public abstract boolean validate(String value);
+    }
+    
+    private static class DoubleValidator extends ParamValidator {
+        private double minVal = Double.MIN_VALUE;
+        private double maxVal = Double.MAX_VALUE;
+        public boolean validate(String value) {
+            double val = 0;
+            try {
+                val = Double.parseDouble(value);
+            }
+            catch(NumberFormatException e) {return false;}
+            return val >= minVal && val <= maxVal;
+        }
+    }
+    
+    private static class IntegerValidator extends ParamValidator {
+        private int minVal = Integer.MIN_VALUE;
+        private int maxVal = Integer.MAX_VALUE;
+        public boolean validate(String value) {
+            int val = 0;
+            try {
+                val = Integer.parseInt(value);
+            }
+            catch(NumberFormatException e) {return false;}
+            return val >= minVal && val <= maxVal;
+        }
     }
 }
 
