@@ -11,8 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
+import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
+import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 
 import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 
@@ -46,11 +47,24 @@ public class ProteinInferenceForm extends ActionForm {
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
         
-        // TODO make sure at least one file was selected
-        // TODO validate the parameter values
+        // Make sure at least one file was selected
+        boolean selected = false;
+        for(ProteinInferIputFile input: inputSummary.getInputFiles()) {
+            if(input.getIsSelected()) {
+                selected = true;
+                break;
+            }
+        }
+        if(!selected)
+            errors.add("proteinfer", new ActionMessage("error.proteinfer.noinput"));
         
-//      errors.add("fundingTypes", new ActionMessage("error.project.nofoundationname"));
-
+        // Validate the parameter values
+        if(inputType == InputType.SEARCH) {
+            
+        }
+        else if(inputType == InputType.ANALYSIS) {
+            
+        }
         return errors;
     }
     

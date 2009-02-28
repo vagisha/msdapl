@@ -54,6 +54,12 @@ public class ProgramParameters {
         paramList.add(param);
     }
     
+    public static boolean validateParams(ProgramParameters params, String errorMessage) {
+        String programName = params.getProgramName();
+        ProteinInferenceProgram piProgram = ProteinInferenceProgram.getProgramForName(programName);
+        
+        
+    }
     
     public static final class Param {
         private String name;
