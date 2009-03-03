@@ -40,6 +40,10 @@ public final class ProgramParam {
     public void setValidator(ParamValidator validator) {
         this.validator = validator;
     }
+    
+    public ParamValidator getValidator() {
+        return validator;
+    }
 
     public String getName() {
         return name;
@@ -175,13 +179,17 @@ public final class ProgramParam {
 
     }
     
-    private static abstract class ParamValidator {
+    public static abstract class ParamValidator {
         public abstract boolean validate(String value);
     }
     
-    private static class DoubleValidator extends ParamValidator {
+    public static class DoubleValidator extends ParamValidator {
         private double minVal = Double.MIN_VALUE;
         private double maxVal = Double.MAX_VALUE;
+        public void setMinVal(double minVal) {this.minVal = minVal;}
+        public double getMinVal() {return this.minVal;}
+        public double getMaxVal() {return this.maxVal;}
+        public void setMaxVal(double maxVal) {this.maxVal = maxVal;}
         public boolean validate(String value) {
             double val = 0;
             try {
@@ -192,9 +200,13 @@ public final class ProgramParam {
         }
     }
     
-    private static class IntegerValidator extends ParamValidator {
+    public static class IntegerValidator extends ParamValidator {
         private int minVal = Integer.MIN_VALUE;
         private int maxVal = Integer.MAX_VALUE;
+        public void setMinVal(int minVal) {this.minVal = minVal;}
+        public void setMaxVal(int maxVal) {this.maxVal = maxVal;}
+        public int getMinVal() {return this.minVal;}
+        public int getMaxVal() {return this.maxVal;}
         public boolean validate(String value) {
             int val = 0;
             try {

@@ -1,5 +1,6 @@
 package edu.uwpr.protinfer;
 
+import edu.uwpr.protinfer.ProgramParam.DoubleValidator;
 import edu.uwpr.protinfer.ProgramParam.ParamMaker;
 import edu.uwpr.protinfer.ProgramParam.SCORE;
 import edu.uwpr.protinfer.ProgramParam.TYPE;
@@ -124,21 +125,32 @@ public class ProteinInferenceProgram {
         private PIPickerPercolatorProgram() {
             super("PROTINFER_PERC", "ProtInfer");
             this.setDescription("This protein inference program is base on the IDPicker program developed in David Tabb's lab.");
+            
+            DoubleValidator validator = new DoubleValidator();
+            validator.setMinVal(0.0);
+            validator.setMaxVal(1.0);
+            
+            ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
+                    "qval_percolator", "Qvalue Threshold", 
+                    "0.05", null,
+                    "Qvalue threshold for filtering search hits");
+            qvalParam.setValidator(validator);
+            
+            ProgramParam pepParam = new ProgramParam(TYPE.DOUBLE, 
+                    "pep_percolator", "PEP Threshold", 
+                    "0.05", null,
+                    "Posterior Error Probability threshold for filtering search hits");
+            pepParam.setValidator(validator);
+            
             this.setProgramParams(new ProgramParam[]{
-                    new ProgramParam(TYPE.DOUBLE, 
-                          "qval_percolator", "Qvalue Threshold", 
-                          "0.05", null,
-                          "Qvalue threshold for filtering search hits"),
-                    new ProgramParam(TYPE.DOUBLE, 
-                          "pep_percolator", "PEP Threshold", 
-                          "0.05", null,
-                          "Posterior Error Probability threshold for filtering search hits"),
-                        ParamMaker.makePeptideDefParam(),
-                        ParamMaker.makeMinPeptParam(),
-                        ParamMaker.makeMinUniqPeptParam(),
-                        ParamMaker.makeMinCoverageParam(),
-                        ParamMaker.makeMinPeptLengthParam(),
-                        ParamMaker.makeRemoveAmbigSpectraParam()
+                    qvalParam,
+                    pepParam,
+                    ParamMaker.makePeptideDefParam(),
+                    ParamMaker.makeMinPeptParam(),
+                    ParamMaker.makeMinUniqPeptParam(),
+                    ParamMaker.makeMinCoverageParam(),
+                    ParamMaker.makeMinPeptLengthParam(),
+                    ParamMaker.makeRemoveAmbigSpectraParam()
             });
         }
     }
