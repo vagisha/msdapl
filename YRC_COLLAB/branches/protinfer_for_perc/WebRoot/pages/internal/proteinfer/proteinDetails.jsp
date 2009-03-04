@@ -29,6 +29,7 @@
 	<td>NSAF** </td>
 	<td>Parsimonious</td>
 	<td>Other Proteins in Group</td>
+	<td>Protein Cluster</td>
 </tr>
 <tr>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.coverage" /></td>
@@ -48,6 +49,12 @@
 		<bean:write name="prot" property="accession" />
 		</span><br>
 	</logic:iterate>
+	</td>
+	<td style="border: 1px #CCCCCC dotted;" align="center">
+		<span style="cursor:pointer;text-decoration:underline" 
+		  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
+		<bean:write name="protein" property="protein.clusterId"/>
+		</span>
 	</td>
 </tr>
 </table>

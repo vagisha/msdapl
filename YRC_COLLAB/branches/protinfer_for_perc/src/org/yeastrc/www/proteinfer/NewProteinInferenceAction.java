@@ -87,10 +87,11 @@ public class NewProteinInferenceAction extends Action {
         request.setAttribute("projectId", projectId);
         
         
+        boolean useSearchInput = true;
+        
         // Create an ActionForm -- this will be used if the user chooses to run
         // protein inference on output from a search program
         // This form should be created only if the seach program was sequest or prolucid
-        
         ProteinInferenceForm formForSearch = createFormForSearchInput(search, projectId);
         if(formForSearch != null)
             request.setAttribute("proteinInferenceFormSearch", formForSearch);
@@ -115,8 +116,12 @@ public class NewProteinInferenceAction extends Action {
             
             if(formForAnalysis != null)
                 request.setAttribute("proteinInferenceFormAnalysis", formForAnalysis);
+            
+            if(formForSearch == null && formForAnalysis != null) 
+                useSearchInput = false;
         }
-
+        request.setAttribute("useSearchInput", useSearchInput);
+        
         // Go!
         return mapping.findForward("Success");
 

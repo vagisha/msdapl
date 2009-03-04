@@ -54,21 +54,33 @@ public class ProgramParameters {
         paramList.add(param);
     }
     
-    public static boolean validateParams(ProgramParameters params, String errorMessage) {
+    public static boolean validateParams(ProgramParameters params, StringBuilder errorMessage) {
+        String programName = params.getProgramName();
+        ProteinInferenceProgram piProgram = ProteinInferenceProgram.getProgramForName(programName);
+        boolean valid = true;
+        for(Param param: params.getParamList()) {
+            ProgramParam progParam = piProgram.getParamForName(param.getName());
+            if(progParam == null) {
+                errorMessage.append("No parameter found with name: "+param.getDisplayName());
+                return false;
+            }
+            if(!progParam.validate(param.getValue())) {
+                errorMessage.append("Invalid value for param: "+param.getDisplayName()+"\n");
+                valid = false;
+            }
+        }
+        return valid;
+    }
+    
+    public static void updateParamDefaults(ProgramParameters params) {
         String programName = params.getProgramName();
         ProteinInferenceProgram piProgram = ProteinInferenceProgram.getProgramForName(programName);
         for(Param param: params.getParamList()) {
             ProgramParam progParam = piProgram.getParamForName(param.getName());
-            if(progParam == null) {
-                errorMessage = "No parameter found with name: "+param.getName();
-                return false;
-            }
-            if(!progParam.validate(param.getValue())) {
-                errorMessage = "Invalid value for param: "+param.getName();
-                return false;
+            if(progParam != null) {
+                param.updateDefaults(progParam);
             }
         }
-        return true;
     }
     
     public static final class Param {
@@ -96,16 +108,25 @@ public class ProgramParameters {
         
         public Param(ProgramParam param) {
             this.name = param.getName();
+            this.value = param.getDefaultValue();
+            
+            setDefaults(param);
+        }
+
+        private void setDefaults(ProgramParam param) {
             this.displayName = param.getDisplayName();
             this.tooltip = param.getDescription();
+            this.values = param.getValues();
             if(param.getType() == TYPE.BOOLEAN)
                 this.type = "checkbox";
             else if(param.getType() == TYPE.CHOICE)
                 this.type = "radio";
             else 
                 this.type="text";
-            this.value = param.getDefaultValue();
-            this.values = param.getValues();
+        }
+        
+        public void updateDefaults(ProgramParam param) {
+            setDefaults(param);
         }
         
         public String getName() {
@@ -131,12 +152,6 @@ public class ProgramParameters {
         }
         public void setTooltip(String tooltip) {
             this.tooltip = tooltip;
-        }
-        public String getNotes() {
-            return notes;
-        }
-        public void setNotes(String notes) {
-            this.notes = notes;
         }
     }
     

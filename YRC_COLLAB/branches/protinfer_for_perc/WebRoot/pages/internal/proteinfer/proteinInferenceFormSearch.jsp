@@ -1,3 +1,10 @@
+
+<%@page import="org.yeastrc.www.proteinfer.ProteinInferenceForm"%>
+<%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam.TYPE"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam.DoubleValidator"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam.IntegerValidator"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -75,11 +82,71 @@ function addSearches(selectedSearches) {
 		});
 	}
 }
+
+// VALIDATE FORM PARAMETERS  
+function validateFormForSearchInput() {
+	
+	
+	// first make sure that at least one file is selected
+	if($("input:checked[id^='toggle_search']").size() == 0) {
+		alert("Please select at least one file");
+		return false;
+	}
+	
+	// now validate the parameters
+	var fieldName;
+	var value;
+	var min;
+	var max;
+	var valid;
+	var errorMessage = "";
+	
+	<%
+		ProteinInferenceForm form_s = (ProteinInferenceForm)request.getAttribute("proteinInferenceFormSearch");
+		String programName_s = form_s.getProgramParams().getProgramName();
+        ProteinInferenceProgram program_s = ProteinInferenceProgram.getProgramForName(programName_s);
+		for(ProgramParam param: program_s.getProgramParams()) {
+			if(param.getType() == TYPE.BOOLEAN || param.getType() == TYPE.CHOICE)
+				continue;
+			ProgramParam.ParamValidator validator = param.getValidator();
+			
+	%>
+		fieldName = '<%=param.getDisplayName()%>';
+		value = $("form[id='form_s'] input:text[id='<%=param.getName()%>']").val();
+		//alert(value);
+		
+		<%if(validator != null && validator instanceof DoubleValidator) {%>
+			min = <%=((DoubleValidator)validator).getMinVal()%>;
+			max = <%=((DoubleValidator)validator).getMaxVal()%>;
+			valid = validateFloat(value, fieldName, min, max);
+			if(!valid)
+				errorMessage += "-- "+fieldName+" should be between "+min+" and "+max+"\n";
+		<%} else if(validator != null && validator instanceof IntegerValidator) {%>
+			min = <%=((IntegerValidator)validator).getMinVal()%>;
+			max = <%=((IntegerValidator)validator).getMaxVal()%>;
+			valid = validateInt(value, fieldName, min, max);
+			if(!valid)
+				errorMessage += "-- "+fieldName+" should be between "+min+" and "+max+"\n";
+		<%}else {%>
+			if(value.length == 0) {
+				errorMessage += "-- <%=param.getDisplayName()%> cannot be empty\n";
+				valid = false;
+			}
+		<%}%>
+		
+	<%}%>
+	if(errorMessage.length > 0) {
+		alert(errorMessage);
+		return false;
+	}
+	
+	return true;
+}
 </script>    			
 
 
 
-  <html:form action="doProteinInference" method="post" styleId="form1">
+  <html:form action="doProteinInferenceSearch" method="post" styleId="form_s" onsubmit="return validateFormForSearchInput(this);">
   
   <html:hidden name="proteinInferenceFormSearch" property="projectId" />
   <html:hidden name="proteinInferenceFormSearch" property="inputSummary.inputGroupId" />
@@ -95,7 +162,8 @@ function addSearches(selectedSearches) {
   	<td></td>
   	</yrcwww:colorrow>
   	
-  	<logic:iterate name="proteinInferenceFormSearch" property="programParams.paramList" id="param">
+  	<logic:iterate name="proteinInferenceFormSearch" property="programParams.paramList" id="param" 
+  		           type="org.yeastrc.www.proteinfer.ProgramParameters.Param">
     <yrcwww:colorrow scheme="pinfer" repeat="true">
     
     <td WIDTH="20%" VALIGN="top">
@@ -112,15 +180,14 @@ function addSearches(selectedSearches) {
     <td WIDTH="20%" VALIGN="top">
     	<html:hidden name="param" property="name" indexed="true" />
     	<logic:equal name="param" property="type" value="text">
-    		<html:text name="param" property="value" indexed="true" />
+    		<html:text name="param" property="value" indexed="true" styleId="<%=param.getName() %>"/>
     	</logic:equal>
     	<logic:equal name="param" property="type" value="checkbox">
     		<html:checkbox name="param" property="value" value="true" indexed="true" />
     	</logic:equal>
     	<logic:equal name="param" property="type" value="radio">
-    		<bean:define name="param" type="org.yeastrc.www.proteinfer.ProgramParameters.Param" id="progParam"/>
     		<!-- cannot use nested logic:iterate with indexed properties -->
-    		<%for(String option: progParam.getOptions()) { %>
+    		<%for(String option: param.getOptions()) { %>
     			<html:radio name="param" property="value" value="<%=option%>" indexed="true"><%=option%></html:radio><br>
     		<%} %>
     	</logic:equal>
@@ -154,12 +221,15 @@ function addSearches(selectedSearches) {
     	<div id="foldable_search_<bean:write name="proteinInferenceFormSearch" property="inputSummary.inputGroupId"/>_div">
     	
     	<div style="color: black;">
-    		Search Program: 
+    		Search Program:
+    		<html:hidden name="proteinInferenceFormSearch" property="inputSummary.programName" /> 
     		<bean:write name="proteinInferenceFormSearch" property="inputSummary.programName" />&nbsp;
+    		<html:hidden name="proteinInferenceFormSearch" property="inputSummary.programVersion" />
   			<bean:write name="proteinInferenceFormSearch" property="inputSummary.programVersion" />
   			<br>
   			Search Database:
   			<bean:write name="proteinInferenceFormSearch" property="inputSummary.searchDatabase" /> 
+  			<html:hidden name="proteinInferenceFormSearch" property="inputSummary.searchDatabase" />
     	</div>
     	<br>
     	

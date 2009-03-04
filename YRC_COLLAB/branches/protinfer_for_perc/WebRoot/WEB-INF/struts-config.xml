@@ -70,7 +70,8 @@
 	<form-bean name="microscopyCommentsForm" type="org.yeastrc.www.microscopy.MicroscopyCommentsForm"/>
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
-	<form-bean name="proteinInferenceForm" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
+	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
+	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
     </form-beans>
 
@@ -1069,9 +1070,21 @@
 	</action>
 	
 	<action 
-		path="/doProteinInference"
+		path="/doProteinInferenceSearch"
 		type="org.yeastrc.www.proteinfer.DoProteinInferenceAction"
-		name="proteinInferenceForm"
+		name="proteinInferenceFormSearch"
+		input="/pages/internal/proteinfer/proteinInferenceForm.jsp"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/viewProject.do" redirect="true" />
+		<forward name="Failure" path="/newProteinInference.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/doProteinInferenceAnalysis"
+		type="org.yeastrc.www.proteinfer.DoProteinInferenceAction"
+		name="proteinInferenceFormAnalysis"
 		input="/pages/internal/proteinfer/proteinInferenceForm.jsp"
 		scope="request"
 		validate="true"

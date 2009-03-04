@@ -1,3 +1,11 @@
+
+<%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam.ParamValidator"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam.DoubleValidator"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam.IntegerValidator"%>
+<%@page import="edu.uwpr.protinfer.ProgramParam.TYPE"%>
+<%@page import="org.yeastrc.www.proteinfer.ProteinInferenceForm"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -41,7 +49,7 @@ function addAnalyses(selectedAnalyses) {
 		var selected = selectedAnalyses.split(",");
 		for(i = 0; i < selected.length; i++) {
 			currentAnalysisIds[currentAnalysisIds.length] = selected[i];
-			$("#analysisInputList").append("<br><div id="+selected[i]+"></div")
+			$("#analysisInputList").append("<br><div id="+selected[i]+"></div>")
 		}
 		var currentInputCount = 0;
 		for(i = 0; i < currentAnalysisIds.length; i++) {
@@ -76,13 +84,74 @@ function addAnalyses(selectedAnalyses) {
 		});
 	}
 }
+
+// VALIDATE FORM PARAMETERS  
+function validateFormForAnalysisInput() {
+	
+	
+	// first make sure that at least one file is selected
+	// toggle_analysis_2_file
+	if($("input:checked[id^='toggle_analysis']").size() == 0) {
+		alert("Please select at least one file");
+		return false;
+	}
+	
+	// now validate the parameters
+	var fieldName;
+	var value;
+	var min;
+	var max;
+	var valid;
+	var errorMessage = "";
+	
+	<%
+		ProteinInferenceForm form_a = (ProteinInferenceForm)request.getAttribute("proteinInferenceFormAnalysis");
+		String programName_a = form_a.getProgramParams().getProgramName();
+        ProteinInferenceProgram program_a = ProteinInferenceProgram.getProgramForName(programName_a);
+		for(ProgramParam param: program_a.getProgramParams()) {
+			if(param.getType() == TYPE.BOOLEAN || param.getType() == TYPE.CHOICE)
+				continue;
+			ParamValidator validator = param.getValidator();
+			
+	%>
+		fieldName = '<%=param.getDisplayName()%>';
+		value = $("form[id='form_a'] input:text[id='<%=param.getName()%>']").val();
+		//alert(value);
+		
+		<%if(validator != null && validator instanceof DoubleValidator) {%>
+			min = <%=((DoubleValidator)validator).getMinVal()%>;
+			max = <%=((DoubleValidator)validator).getMaxVal()%>;
+			valid = validateFloat(value, fieldName, min, max);
+			if(!valid)
+				errorMessage += "-- "+fieldName+" should be between "+min+" and "+max+"\n";
+		<%} else if(validator != null && validator instanceof IntegerValidator) {%>
+			min = <%=((IntegerValidator)validator).getMinVal()%>;
+			max = <%=((IntegerValidator)validator).getMaxVal()%>;
+			valid = validateInt(value, fieldName, min, max);
+			if(!valid)
+				errorMessage += "-- "+fieldName+" should be between "+min+" and "+max+"\n";
+		<%}else {%>
+			if(value.length == 0) {
+				errorMessage += "-- <%=param.getDisplayName()%> cannot be empty\n";
+				valid = false;
+			}
+		<%}%>
+		
+	<%}%>
+	if(errorMessage.length > 0) {
+		alert(errorMessage);
+		return false;
+	}
+	
+	return true;
+}
 </script>    			
 
 
 
 
 
-  <html:form action="doProteinInference" method="post" styleId="form1">
+  <html:form action="doProteinInferenceAnalysis" method="post" styleId="form_a" onsubmit="return validateFormForAnalysisInput(this);">
   
   <html:hidden name="proteinInferenceFormAnalysis" property="projectId" />
   <html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId" />
@@ -98,7 +167,8 @@ function addAnalyses(selectedAnalyses) {
   	<td></td>
   	</yrcwww:colorrow>
   	
-  	<logic:iterate name="proteinInferenceFormAnalysis" property="programParams.paramList" id="param">
+  	<logic:iterate name="proteinInferenceFormAnalysis" property="programParams.paramList" id="param"
+  			type="org.yeastrc.www.proteinfer.ProgramParameters.Param">
     <yrcwww:colorrow scheme="pinfer" repeat="true">
     
     <td WIDTH="20%" VALIGN="top">
@@ -114,15 +184,14 @@ function addAnalyses(selectedAnalyses) {
     <td WIDTH="20%" VALIGN="top">
     	<html:hidden name="param" property="name" indexed="true" />
     	<logic:equal name="param" property="type" value="text">
-    		<html:text name="param" property="value" indexed="true" />
+    		<html:text name="param" property="value" indexed="true" styleId="<%=param.getName() %>"/>
     	</logic:equal>
     	<logic:equal name="param" property="type" value="checkbox">
     		<html:checkbox name="param" property="value" value="true" indexed="true" />
     	</logic:equal>
     	<logic:equal name="param" property="type" value="radio">
-    		<bean:define name="param" type="org.yeastrc.www.proteinfer.ProgramParameters.Param" id="progParam"/>
     		<!-- cannot use nested logic:iterate with indexed properties -->
-    		<%for(String option: progParam.getOptions()) { %>
+    		<%for(String option: param.getOptions()) { %>
     			<html:radio name="param" property="value" value="<%=option%>" indexed="true"><%=option%></html:radio><br>
     		<%} %>
     	</logic:equal>
@@ -158,11 +227,14 @@ function addAnalyses(selectedAnalyses) {
     	
     	<div style="color: black;">
     		Analysis Program: 
+    		<html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.programName" />
     		<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.programName" />&nbsp;
+    		<html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.programVersion" />
   			<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.programVersion" />
   			<br>
   			Search Database:
   			<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.searchDatabase" /> 
+  			<html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.searchDatabase" />
     	</div>
     	<br>
     	
@@ -207,7 +279,7 @@ function addAnalyses(selectedAnalyses) {
    <td colspan="2" align="center">
    	<NOBR>
  		<html:submit value="Run Protein Inference" styleClass="button" />
- 		<input type="button" class="button" onclick="javascript:onCancel(<bean:write name="projectId" />);" value="Cancel"/>
+ 		<input type="button" class="button" onclick="javascript:onCancel(<bean:write name="proteinInferenceFormAnalysis" property="projectId" />);" value="Cancel"/>
  	</NOBR>
    </td>
    </yrcwww:colorrow>

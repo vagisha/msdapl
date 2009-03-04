@@ -97,6 +97,22 @@ function toggleSelection(button) {
 	}
 }
 
+function validateInt(value, fieldName, min, max) {
+	var intVal = parseInt(value);
+	var valid = true;
+	if(isNaN(intVal))						valid = false;
+	if(valid && intVal < min)				valid = false;
+	if(max && (valid && intVal > max))		valid = false;
+	return valid;
+}
+function validateFloat(value, fieldName, min, max) {
+	var floatVal = parseFloat(value);
+	var valid = true;
+	if(isNaN(floatVal))						valid = false;
+	if(valid && floatVal < min)			valid = false;
+	if(max && (valid && floatVal > max))	valid = false;
+	return valid;
+}
 </script>
 
 
@@ -108,8 +124,16 @@ function toggleSelection(button) {
  
  <div align="center" style="color:black;">
 	<b>Select Input Type: </b> 
+	<logic:equal name="useSearchInput" value="true">
 		<input type="radio" name="inputSelector" value="Search" checked id="searchopt" >Search
 		<input type="radio" name="inputSelector" value="Search" id="analysisopt"> Analysis
+	</logic:equal>
+	
+	<logic:equal name="useSearchInput" value="false">
+		<input type="radio" name="inputSelector" value="Search" id="searchopt" >Search
+		<input type="radio" name="inputSelector" value="Search" checked id="analysisopt"> Analysis
+	</logic:equal>
+	
  </div>
  <br>
  
@@ -120,20 +144,39 @@ function toggleSelection(button) {
 </div>
 </logic:present>
 <logic:notPresent name="proteinInferenceFormSearch">
-	<div style="margin-top: 30; margin-bottom: 30;" id="inputType_search">No valid search input found for running Protein Inference.</div>
+	<logic:equal name="useSearchInput" value="true">
+		<div style="margin-top: 30; margin-bottom: 30;" id="inputType_search">No valid search input found for running Protein Inference.</div>
+	</logic:equal>
+	<logic:equal name="useSearchInput" value="false">
+		<div style="margin-top: 30; margin-bottom: 30; display: none;" id="inputType_search">No valid search input found for running Protein Inference.</div>
+	</logic:equal>
 </logic:notPresent>
 
  
 <!-- Form when using search analysis results -->
 <logic:present name="proteinInferenceFormAnalysis">
- <div id="inputType_analysis" style="display: none;">
-	<%@include file="proteinInferenceFormAnalysis.jsp" %>
-</div>
+<logic:equal name="useSearchInput" value="true">
+ 	<div id="inputType_analysis" style="display: none;">
+		<%@include file="proteinInferenceFormAnalysis.jsp" %>
+	</div>
+</logic:equal>
+<logic:equal name="useSearchInput" value="false">
+ 	<div id="inputType_analysis">
+		<%@include file="proteinInferenceFormAnalysis.jsp" %>
+	</div>
+</logic:equal>
 </logic:present>
 <logic:notPresent name="proteinInferenceFormAnalysis">
+<logic:equal name="useSearchInput" value="true">
 	<div style="margin-top: 30; margin-bottom: 30; display: none;" id="inputType_analysis" >
 		No valid analysis input found for running Protein Inference.
 	</div>
+</logic:equal>
+<logic:equal name="useSearchInput" value="false">
+	<div style="margin-top: 30; margin-bottom: 30;" id="inputType_analysis" >
+		No valid analysis input found for running Protein Inference.
+	</div>
+</logic:equal>
 </logic:notPresent>
 
 

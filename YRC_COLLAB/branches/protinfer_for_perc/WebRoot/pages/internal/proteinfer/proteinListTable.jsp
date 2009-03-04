@@ -211,11 +211,11 @@
 				<td rowspan="<bean:write name="rowspan" />" valign="middle">
 			<bean:write name="proteinGroup" property="spectrumCount"/>
 			</td>
-				<td rowspan="<bean:write name="rowspan" />" valign="middle">
-			<span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
+			<td rowspan="<bean:write name="rowspan" />" valign="middle">
+				<span id="protgrpslink" style="cursor:pointer;text-decoration:underline" 
 				  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
 				<bean:write name="protein" property="protein.clusterId"/>
-			</span>
+				</span>
 			</td>
 		</tr>
 		

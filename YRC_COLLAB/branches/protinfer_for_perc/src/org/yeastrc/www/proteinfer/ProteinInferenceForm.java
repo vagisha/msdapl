@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
 
@@ -45,26 +44,44 @@ public class ProteinInferenceForm extends ActionForm {
      * an empty ActionErrors object.
      */
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
-        ActionErrors errors = super.validate(mapping, request);
+        ActionErrors errors = new ActionErrors();
         
-        // Make sure at least one file was selected
-        boolean selected = false;
-        for(ProteinInferIputFile input: inputSummary.getInputFiles()) {
-            if(input.getIsSelected()) {
-                selected = true;
-                break;
-            }
-        }
-        if(!selected)
-            errors.add("proteinfer", new ActionMessage("error.proteinfer.noinput"));
+        // FORM VALIDATION WILL BE DONE VIA JAVASCRIPT.
         
-        // Validate the parameter values
-        if(inputType == InputType.SEARCH) {
-            
-        }
-        else if(inputType == InputType.ANALYSIS) {
-            
-        }
+//        boolean hasErrors = false;
+//        // Make sure at least one file was selected
+//        boolean selected = false;
+//        for(ProteinInferIputFile input: inputSummary.getInputFiles()) {
+//            if(input.getIsSelected()) {
+//                selected = true;
+//                break;
+//            }
+//        }
+//        if(!selected) {
+//            errors.add("proteinfer", new ActionMessage("error.proteinfer.noinput"));
+//            hasErrors = true;
+//        }
+//        
+//        updateProgramParameterDefaults(programParams);
+//        // Validate the parameter values
+//        StringBuilder errorMessage = new StringBuilder();
+//        if(!ProgramParameters.validateParams(this.programParams, errorMessage)) {
+//            String[] err = errorMessage.toString().split("\\n");
+//            for(String e: err)
+//                errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.param", e));
+//            hasErrors = true;
+//        }
+//        
+//        if(hasErrors) {
+//            String programName = programParams.getProgramName();
+//            ProteinInferenceProgram piProgram = ProteinInferenceProgram.getProgramForName(programName);
+//            // TODO Add a method in ProteinInferenceProgram -- something like ProteinInferenceProgram.usesSearchInput().
+//            if(piProgram == ProteinInferenceProgram.PROTINFER_PERC)
+//                request.setAttribute("useSearchInput", false);
+//            else
+//                request.setAttribute("useSearchInput", true);
+//        }
+        
         return errors;
     }
     

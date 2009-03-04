@@ -83,9 +83,9 @@ function callback(hash)
 		
 		if(hash == 'protlist')
 			$tabs.tabs('select', 0);
-		else if (hash == 'protclusters')
-			$tabs.tabs('select', 1);
 		else if (hash == 'protdetails')
+			$tabs.tabs('select', 1);
+		else if (hash == 'protclusters')
 			$tabs.tabs('select', 2);
 		else if (hash == 'input')
 			$tabs.tabs('select', 3);
@@ -116,8 +116,8 @@ $(document).ready(function() {
  	
  	
 	var selected = 0;
-	if(location.hash == "#protclusters") selected = 1;
-	if(location.hash == "#protdetails")  selected = 2;
+	if(location.hash == "#protdetails")  selected = 1;
+	if(location.hash == "#protclusters") selected = 2;
 	if(location.hash ==  "#input") 		 selected = 3;
 	
 	
@@ -266,7 +266,7 @@ function showProteinDetails(proteinId, display, block) {
 										if(showDiv) {
 											$("#protdetailslink").click(); // so that history works
 											//var $tabs = $("#results").tabs();
-											//$tabs.tabs('select', 2);
+											//$tabs.tabs('select', 1);
 										}
 								  });
 }
@@ -337,7 +337,7 @@ function selectProteinCluster(clusterId, block, showDiv) {
 										if(showDiv) {
 											$("#protclusterslink").click();
 											//var $tabs = $("#results").tabs();
-											//$tabs.tabs('select', 1);
+											//$tabs.tabs('select', 2);
 										}
 								  });	
 }
@@ -914,8 +914,8 @@ function toggleDivVisibility(mydiv) {
   <div id="results" class="flora">
       <ul>
           <li><a href="#protlist" rel="history" id="protlistlink"><span>Protein List</span></a></li>
-          <li><a href="#protclusters" rel="history" id="protclusterslink"><span>Protein Clusters</span></a></li>
           <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
+          <li><a href="#protclusters" rel="history" id="protclusterslink"><span>Protein Clusters</span></a></li>
           <li><a href="#input" rel="history" id="inputlink"><span>Summary</span></a></li>
       </ul>
    </div>
