@@ -567,6 +567,8 @@ public class MsDataUploader {
         
         Map<String, RunFileFormat> formats = new HashMap<String, RunFileFormat>();
         for (int i = 0; i < files.length; i++) {
+            if(files[i].isDirectory())
+                continue;
             String fileName = files[i].getName();
             String ext = fileName.substring(fileName.lastIndexOf("."), fileName.length());
             if(RunFileFormat.isSupportedFormat(ext)) {
@@ -588,6 +590,8 @@ public class MsDataUploader {
         File[] files = directory.listFiles();
         String name = null;
         for (int i = 0; i < files.length; i++) {
+            if(files[i].isDirectory())
+                continue;
             String fileName = files[i].getName();
             String fileName_LC = fileName.toLowerCase();
             if (fileName_LC.endsWith(".ms2") || fileName_LC.endsWith(".cms2") || fileName_LC.endsWith(".sqt")) {
@@ -649,43 +653,9 @@ public class MsDataUploader {
         
         System.out.println("Directory: "+directory+"; Maccoss Data: "+maccossData);
         
-//        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/YATES_CYCLE_DUMP/1542/");
-//        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", "/a/scratch/ms_data/1217528828156", new Date());
-//      uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/MacCossData/sequest");
-//        uploader.uploadExperimentToDb("serverPath", "serverDirectory", "/Users/vagisha/WORK/MS_LIBRARY/new_lib/resources/PARC/TEST");
-        
-//        uploader.uploadExperimentToDb("local", "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/", 
-//                "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/", new Date());
-        
-       
-//        uploader.uploadExperimentToDb("local", "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/REUPLOAD_100507-CRWD-24HR-02/sequest", 
-//              "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/REUPLOAD_100507-CRWD-24HR-02/sequest", new Date());
-        
-        
-//        uploader.uploadExperimentToDb("local", "/Users/vagisha/WORK/MacCoss_Genn_CE/2008-worm-thermo-LTQ/Rep2", 
-//              "/Users/vagisha/WORK/MacCoss_Genn_CE/2008-worm-thermo-LTQ/Rep3", new Date());
-        
-        
-        // /Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp
-        uploader.uploadExperimentToDb("local", 
-                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3136_exptID90/phos",
-                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3136_exptID90/phos",
-                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp/speed_test", 
-                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/seq_temp/speed_test",
-                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
-                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/ALL/batch2/021705-C8fract-tube14-totalN2",
-                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/UPLOAD_TEST",
-                //"/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/UPLOAD_TEST",
-                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3417",
-                //"/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID3417",
-//                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
-//                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375",
-//                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
-//                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
-                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/MEM_TEST",
-                "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/MEM_TEST",
-//                "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
- //               "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/DIA-NOV08/percolator",
+        uploader.uploadExperimentToDb("local",
+                directory,
+                directory,
                 new Date());
 //        }
         long end = System.currentTimeMillis();

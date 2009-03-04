@@ -34,7 +34,7 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
     
     static {
         Reader reader = null;
-        String ibatisConfigFile = "org/yeastrc/ms/sqlmap/nrseq/NrSeqSqlMapConfig.xml";
+        String ibatisConfigFile = "NrSeqSqlMapConfig.xml";
         try {
             reader = Resources.getResourceAsReader(ibatisConfigFile);
             sqlMap = SqlMapClientBuilder.buildSqlMapClient(reader);
