@@ -332,41 +332,8 @@ public class IDPickerExecutor {
     
     protected static <T extends PeptideSpectrumMatch<?>> void removeSpectraWithMultipleResults(List<T> psmList) {
         
-        long s = System.currentTimeMillis();
-        // sort by scanID
-        Collections.sort(psmList, new Comparator<PeptideSpectrumMatch<?>>() {
-            public int compare(PeptideSpectrumMatch<?> o1, PeptideSpectrumMatch<?> o2) {
-                return Integer.valueOf(o1.getScanId()).compareTo(o2.getScanId());
-            }});
-        
-        // get a list of scan Ids that have multiple results
-        Set<Integer> scanIdsToRemove = new HashSet<Integer>();
-//        Set<Integer> allScanIds = new HashSet<Integer>();
-        
-        int lastScanId = -1;
-        for (int i = 0; i < psmList.size(); i++) {
-            T psm = psmList.get(i);
-//            allScanIds.add(psm.getScanId());
-            if(lastScanId != -1){
-                if(lastScanId == psm.getScanId()) {
-                    scanIdsToRemove.add(lastScanId);
-                }
-            }
-            lastScanId = psm.getScanId();
-        }
-        
-        Iterator<T> iter = psmList.iterator();
-        while(iter.hasNext()) {
-            T psm = iter.next();
-            if(scanIdsToRemove.contains(psm.getScanId())) {
-//                log.info("Removing for scanID: "+psm.getScanId()+"; resultID: "+psm.getHitId());
-                iter.remove();
-            }
-        }
-        long e = System.currentTimeMillis();
-//        log.info("\nRR\t"+runSearchAnalysisId+"\t"+allScanIds.size()+"\t"+scanIdsToRemove.size());
-        log.info("Removed "+scanIdsToRemove.size()+" scans with multiple results. "+
-                "Remaining results: "+psmList.size()+". Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds\n");
+        AmbiguousSpectraFilter specFilter = AmbiguousSpectraFilter.instance();
+        specFilter.filterSpectraWithMultiplePSMs(psmList);
     }
     
     
@@ -487,9 +454,9 @@ public class IDPickerExecutor {
 //        filter.setProteinferId(pinferId);
 //        filterDao.saveIdPickerParam(filter);
 
-        
+        int piRunId = Integer.parseInt(args[0]);
         IdPickerRunDAO runDao = factory.getIdPickerRunDao();
-        IdPickerRun run = runDao.loadProteinferRun(9);
+        IdPickerRun run = runDao.loadProteinferRun(piRunId);
         System.out.println("Number of files: "+run.getInputList().size());
         System.out.println("Number of filters: "+run.getParams().size());
 

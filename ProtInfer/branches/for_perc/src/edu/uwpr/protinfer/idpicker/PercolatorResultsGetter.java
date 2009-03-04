@@ -240,42 +240,8 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     
     
     protected void removeSpectraWithMultipleResults(List<PercolatorResult> psmList) {
-        
-        long s = System.currentTimeMillis();
-        // sort by scanID
-        Collections.sort(psmList, new Comparator<PercolatorResult>() {
-            public int compare(PercolatorResult o1, PercolatorResult o2) {
-                return Integer.valueOf(o1.getScanId()).compareTo(o2.getScanId());
-            }});
-        
-        // get a list of scan Ids that have multiple results
-        Set<Integer> scanIdsToRemove = new HashSet<Integer>();
-//        Set<Integer> allScanIds = new HashSet<Integer>();
-        
-        int lastScanId = -1;
-        for (int i = 0; i < psmList.size(); i++) {
-            PercolatorResult psm = psmList.get(i);
-//            allScanIds.add(psm.getScanId());
-            if(lastScanId != -1){
-                if(lastScanId == psm.getScanId()) {
-                    scanIdsToRemove.add(lastScanId);
-                }
-            }
-            lastScanId = psm.getScanId();
-        }
-        
-        Iterator<PercolatorResult> iter = psmList.iterator();
-        while(iter.hasNext()) {
-            PercolatorResult psm = iter.next();
-            if(scanIdsToRemove.contains(psm.getScanId())) {
-//                log.info("Removing for scanID: "+psm.getScanId()+"; resultID: "+psm.getHitId());
-                iter.remove();
-            }
-        }
-        long e = System.currentTimeMillis();
-//        log.info("\nRR\t"+runSearchAnalysisId+"\t"+allScanIds.size()+"\t"+scanIdsToRemove.size());
-        log.info("Removed "+scanIdsToRemove.size()+" scans with multiple results. "+
-                "Remaining results: "+psmList.size()+". Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds\n");
+        AmbiguousSpectraFilter specFilter = AmbiguousSpectraFilter.instance();
+        specFilter.filterSpectraWithMultipleResults(psmList);
     }
 
 
