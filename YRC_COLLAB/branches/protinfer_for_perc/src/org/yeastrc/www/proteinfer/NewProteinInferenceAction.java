@@ -22,6 +22,8 @@ import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.project.Projects;
+import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -48,6 +50,17 @@ public class NewProteinInferenceAction extends Action {
             return mapping.findForward("authenticate");
         }
 
+        // Restrict access to yrc members
+        Groups groupMan = Groups.getInstance();
+        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
+          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
+          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("access", new ActionMessage("error.access.invalidgroup"));
+            saveErrors( request, errors );
+            return mapping.findForward( "Failure" );
+        }
+        
         int searchId = -1;
         if (request.getParameter("searchId") != null) {
             try {searchId = Integer.parseInt(request.getParameter("searchId"));}

@@ -4,6 +4,14 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+<SCRIPT LANGUAGE="JavaScript">
+ function confirmDelete() {
+    if(confirm("Are you sure you want to delete this protein inference job?")) {
+        document.location.href="/yrc/deleteProteinInferJob.do?pinferId=<bean:write name='pinferJob' property='pinferId'/>&projectId=<bean:write name='projectId'/>";
+        return 1;
+    }
+ }
+</SCRIPT>
 
 <yrcwww:notauthenticated>
  <logic:forward name="authenticate" />
@@ -34,7 +42,14 @@
 </yrcwww:colorrow>
 <yrcwww:colorrow scheme="pinfer">
 <td>Status: </td>
-<td><bean:write name="pinferJob" property="statusDescription"/></td>
+<td>
+	<bean:write name="pinferJob" property="statusDescription"/>
+	<logic:notEqual name="pinferJob" property="status" value="1"><!-- not running -->
+		[<span style="color:red; text-decoration: underline; cursor: pointer;" 
+		onClick="confirmDelete()"
+		>Delete</span>]
+	</logic:notEqual>
+</td>
 </yrcwww:colorrow>
 <yrcwww:colorrow scheme="pinfer">
 <td>Comments: </td>

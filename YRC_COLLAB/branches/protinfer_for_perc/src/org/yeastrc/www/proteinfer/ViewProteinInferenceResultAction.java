@@ -59,7 +59,7 @@ public class ViewProteinInferenceResultAction extends Action {
         // if this is a newly created form the id will be 0.  In this case
         // look for the pinferId in the request parameters
         if(pinferId == 0) {
-            try {pinferId = Integer.parseInt(request.getParameter("inferId"));}
+            try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
             catch(NumberFormatException e){};
         }
         

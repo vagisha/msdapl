@@ -106,10 +106,10 @@
 	   		 				String fontcolor = "black";
 	   		 				int projectId = (Integer)request.getAttribute("projectId");
 	   		 				String url = "/yrc/viewProteinInferenceJob.do?projectId="+projectId
-	   		 				             +"&inferId="+pijob.getPinferId();
+	   		 				             +"&pinferId="+pijob.getPinferId();
 	   		 				if(pijob.getStatus() == JobUtils.STATUS_COMPLETE) {
 	   		 					fontcolor = "green";
-	   		 					url = "/yrc/viewProteinInferenceResult.do?inferId="+pijob.getPinferId();
+	   		 					url = "/yrc/viewProteinInferenceResult.do?pinferId="+pijob.getPinferId();
 	   		 				} 
 	   		 				else if (pijob.getStatus() == JobUtils.STATUS_HARD_ERROR) {
 	   		 					fontcolor = "red";

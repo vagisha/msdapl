@@ -16,6 +16,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.project.Projects;
+import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -42,19 +44,27 @@ public class DoProteinInferenceAction extends Action {
             return mapping.findForward("authenticate");
         }
 
+        // Restrict access to yrc members
+        Groups groupMan = Groups.getInstance();
+        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
+          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
+          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("access", new ActionMessage("error.access.invalidgroup"));
+            saveErrors( request, errors );
+            return mapping.findForward( "Failure" );
+        }
+        
         ProteinInferenceForm prinferForm = (ProteinInferenceForm) form;
         ProteinInferInputSummary inputSummary = prinferForm.getInputSummary();
         ProgramParameters params = prinferForm.getProgramParams();
         
-        // TODO validate the parameters (should be done in form)
         ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), inputSummary, params, 
                 prinferForm.getInputType(), prinferForm.getComments());
         
         // Go!
         ActionForward success = mapping.findForward( "Success" ) ;
         success = new ActionForward( success.getPath() + "?ID="+prinferForm.getProjectId(), success.getRedirect() ) ;
-        // TODO temporary for MacCoss data.
-        //success = new ActionForward("/viewAllSearches.do", true);
         return success;
 
     }

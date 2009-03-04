@@ -15,6 +15,8 @@
 
 <%@ include file="/includes/header.jsp" %>
 
+<%@ include file="/includes/errors.jsp" %>
+
 <yrcwww:contentbox title="View Collaboration Details" centered="true" width="750">
 
 <SCRIPT LANGUAGE="JavaScript">

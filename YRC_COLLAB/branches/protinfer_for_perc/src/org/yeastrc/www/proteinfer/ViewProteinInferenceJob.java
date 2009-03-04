@@ -62,11 +62,11 @@ public class ViewProteinInferenceJob extends Action {
             saveErrors( request, errors );
             return mapping.findForward("standardHome");
         }
-        
+        request.setAttribute("projectId", projectId);
         
         // get the protein inference id
         int pinferId = 0;
-        try {pinferId = Integer.parseInt(request.getParameter("inferId"));}
+        try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
         catch(NumberFormatException e){};
         // if we  do not have a valid protein inference run id
         // return an error.
@@ -109,9 +109,5 @@ public class ViewProteinInferenceJob extends Action {
         
         // Go!
         return mapping.findForward("Success");
-//        success = new ActionForward( success.getPath() + "?ID="+prinferForm.getProjectId(), success.getRedirect() ) ;
-//        return success;
-
     }
-    
 }
