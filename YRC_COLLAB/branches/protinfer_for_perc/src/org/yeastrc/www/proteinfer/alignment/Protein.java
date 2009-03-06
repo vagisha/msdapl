@@ -6,14 +6,16 @@ import java.util.Set;
 public class Protein {
 
     private final int pinferProteinId;
+    private final int pinferProteinGroupId;
     private int nrseqId;
     private String accession;
     private String description;
     private Set<String> coveredFragments;
     private final String originalSequence;
 
-    public Protein(int pinferProteinid, String sequence) {
+    public Protein(int pinferProteinid, int pinferProteinGroupId, String sequence) {
         this.pinferProteinId = pinferProteinid;
+        this.pinferProteinGroupId = pinferProteinGroupId;
         this.originalSequence = sequence;
         coveredFragments = new HashSet<String>();
     }
@@ -64,5 +66,9 @@ public class Protein {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getPinferProteinGroupId() {
+        return pinferProteinGroupId;
     }
 }

@@ -10,9 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.yeastrc.project.Projects;
+import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -41,7 +45,17 @@ public class SaveProteinAnnotationAjaxAction extends Action {
             return null;
         }
 
-
+        // Restrict access to yrc members
+        Groups groupMan = Groups.getInstance();
+        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
+          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
+          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("access", new ActionMessage("error.access.invalidgroup"));
+            saveErrors( request, errors );
+            return mapping.findForward( "Failure" );
+        }
+        
         int pinferProtId = 0;
         try {pinferProtId = Integer.parseInt(request.getParameter("pinferProtId"));}
         catch(NumberFormatException e) {}

@@ -1219,6 +1219,24 @@
 	</action>
 	
 	<action 
+		path="/viewAlignedClusterProteins"
+		type="org.yeastrc.www.proteinfer.ViewAlignedClusterProteins"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinAlignment.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/proteinAlignment.jsp" redirect="false" />
+		
+	</action>
+	
+	<action 
+		path="/viewAlignedGroupProteins"
+		type="org.yeastrc.www.proteinfer.ViewAlignedGroupProteins"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinAlignment.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/proteinAlignment.jsp" redirect="false" />
+		
+	</action>
+	
+	<action 
 		path="/filterProteinferResults"
 		type="org.yeastrc.www.proteinfer.FilterProteinferResultsAjaxAction"
 	>

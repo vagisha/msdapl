@@ -30,21 +30,17 @@ public class AlignedProteins {
     public void addAlignedPair(AlignedPair aPair) throws AlignmentException {
         
         AlignedProtein pairAProt = aPair.getProtein1(); // this should be the anchor protein in the aligned pair
-        String mySeq = anchorProtein.getAlignedSequence();
-        String pairSeq = pairAProt.getAlignedSequence();
         int i = 0, j = 0;
         for(; i < anchorProtein.getAlignedLength() && j < pairAProt.getAlignedLength(); i++, j++) {
             
-            char c_i = mySeq.charAt(i);
-            char c_j = pairSeq.charAt(j);
+            char c_i = anchorProtein.getCharAt(i);
+            char c_j = pairAProt.getCharAt(j);
             if(c_i != c_j) {
                 if(c_i == '-') {
                     aPair.insertGap(j);
-                    j--;
                 }
                 else if(c_j == '-') {
                     this.insertGap(i);
-                    i--;
                 }
                 else {
                     throw new AlignmentException("Inconsistent anchor sequences:\n"+
@@ -55,9 +51,11 @@ public class AlignedProteins {
         }
         for(; i < anchorProtein.getAlignedLength(); i++) {
             aPair.insertGap(aPair.getAlignedLength());
+            j++;
         }
         for(; j < aPair.getAlignedLength(); j++) {
             anchorProtein.insertGap(anchorProtein.getAlignedLength());
+            i++;
         }
         this.alignedProteins.add(aPair.getProtein2());
     }
@@ -74,15 +72,17 @@ public class AlignedProteins {
         for(int i = 0; i < anchorProtein.getAlignedLength(); i++) {
             
             char c = anchorProtein.getCharAt(i);
+            if(c == '-')
+                continue; // TODO this is not right
             for(AlignedProtein prot: alignedProteins) {
                 char c_a = prot.getCharAt(i);
-                if(c != c_a) {
+                if(c_a != '-' && c != c_a) {
                     mismatchedIndexes.add(i);
                     break;
                 }
             }
         }
-        
+        System.out.println("NUMBER OF MIMATCHES: "+mismatchedIndexes.size());
         anchorProtein.setMismatchedIndexes(mismatchedIndexes);
         for(AlignedProtein prot: alignedProteins)
             prot.setMismatchedIndexes(mismatchedIndexes);
@@ -98,5 +98,16 @@ public class AlignedProteins {
 
     public List<AlignedProtein> getAlignedProteins() {
         return alignedProteins;
+    }
+    
+    public String printAlignment() {
+        StringBuilder buf = new StringBuilder();
+        buf.append(anchorProtein.getAlignedSequence());
+        buf.append("\n");
+        for(AlignedProtein prot: alignedProteins) {
+            buf.append(prot.getAlignedSequence());
+            buf.append("\n");
+        }
+        return buf.toString();
     }
 }

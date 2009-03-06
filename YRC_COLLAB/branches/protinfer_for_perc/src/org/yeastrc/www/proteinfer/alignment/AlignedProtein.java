@@ -8,16 +8,17 @@ import java.util.Set;
 public class AlignedProtein extends Protein {
 
     private String alignedSequence;
-    Set<Integer> mismatchedIndexes;
+    private Set<Integer> mismatchedIndexes;
+    private List<AlignedPosition> alignedPositions;
 
     
-    public AlignedProtein(int pinferProteinId, String sequence) {
-        super(pinferProteinId, sequence);
+    public AlignedProtein(int pinferProteinId, int pinferProteinGroupId, String sequence) {
+        super(pinferProteinId, pinferProteinGroupId, sequence);
         mismatchedIndexes = new HashSet<Integer>();
     }
     
     public AlignedProtein(Protein protein) {
-        super(protein.getPinferProteinId(), protein.getSequence());
+        super(protein.getPinferProteinId(), protein.getPinferProteinGroupId(), protein.getSequence());
         this.setAccession(protein.getAccession());
         this.setDescription(protein.getDescription());
         this.setNrseqId(protein.getNrseqId());
@@ -49,7 +50,8 @@ public class AlignedProtein extends Protein {
     }
     
     public List<AlignedPosition> getAlignedPositions() {
-        
+        if(alignedPositions != null)
+            return alignedPositions;
         List<AlignedPosition> list = new ArrayList<AlignedPosition>(this.getAlignedLength());
         for(int i = 0; i < alignedSequence.length(); i++) {
             AlignedPosition pos = new AlignedPosition(alignedSequence.charAt(i));
@@ -59,6 +61,7 @@ public class AlignedProtein extends Protein {
             list.add(pos);
         }
         markCovered(list);
+        alignedPositions = list;
         return list;
     }
     
@@ -82,6 +85,105 @@ public class AlignedProtein extends Protein {
                 if(s >= origSeq.length())   break;
             }
         }
+    }
+    
+    public List<Block> getUngappedBlocks() {
+        List<AlignedPosition> posList = getAlignedPositions();
+        List<Block> blks = new ArrayList<Block>();
+        int lastIdx = -1;
+        Block currBlk = null;
+        for(int i = 0; i < posList.size(); i++) {
+            AlignedPosition pos = posList.get(i);
+            if(!pos.isGap()) {
+                if(currBlk == null) {
+                    currBlk = new Block();
+                    currBlk.start = i;
+                    currBlk.end = i;
+                    blks.add(currBlk);
+                    lastIdx = i;
+                }
+                else {
+                    if(i == lastIdx + 1) {
+                        currBlk.end = i;
+                        lastIdx = i;
+                    }
+                    else {
+                        currBlk = new Block();
+                        currBlk.start = i;
+                        currBlk.end = i;
+                        blks.add(currBlk);
+                        lastIdx = i;
+                    }
+                }
+            }
+        }
+        return blks;
+    }
+    
+    public List<Block> getCoveredBlocks() {
+        List<AlignedPosition> posList = getAlignedPositions();
+        List<Block> blks = new ArrayList<Block>();
+        int lastIdx = -1;
+        Block currBlk = null;
+        for(int i = 0; i < posList.size(); i++) {
+            AlignedPosition pos = posList.get(i);
+            if(pos.isCovered()) {
+                if(currBlk == null) {
+                    currBlk = new Block();
+                    currBlk.start = i;
+                    currBlk.end = i;
+                    blks.add(currBlk);
+                    lastIdx = i;
+                }
+                else {
+                    if(i == lastIdx + 1) {
+                        currBlk.end = i;
+                        lastIdx = i;
+                    }
+                    else {
+                        currBlk = new Block();
+                        currBlk.start = i;
+                        currBlk.end = i;
+                        blks.add(currBlk);
+                        lastIdx = i;
+                    }
+                }
+            }
+        }
+        return blks;
+    }
+    
+    public List<Block> getMismatchedBlocks() {
+        List<AlignedPosition> posList = getAlignedPositions();
+        List<Block> blks = new ArrayList<Block>();
+        int lastIdx = -1;
+        Block currBlk = null;
+        for(int i = 0; i < posList.size(); i++) {
+            AlignedPosition pos = posList.get(i);
+            if(!pos.isGap() && pos.isMismatched()) {
+                if(currBlk == null) {
+                    currBlk = new Block();
+                    currBlk.start = i;
+                    currBlk.end = i;
+                    blks.add(currBlk);
+                    lastIdx = i;
+                }
+                else {
+                    if(i == lastIdx + 1) {
+                        currBlk.end = i;
+                        lastIdx = i;
+                    }
+                    else {
+                        currBlk = new Block();
+                        currBlk.start = i;
+                        currBlk.end = i;
+                        blks.add(currBlk);
+                        lastIdx = i;
+                    }
+                }
+            }
+        }
+        return blks;
     }
     
     private List<Integer> getGaplessToGappedIndexes() {
@@ -128,6 +230,25 @@ public class AlignedProtein extends Protein {
         public boolean isGap() {
             return character == '-';
         }
+        public String toString() {
+            StringBuilder buf = new StringBuilder();
+//            buf.append(character);
+            if(mismatched)buf.append("-");
+            else buf.append(" ");
+            return buf.toString();
+        }
+    }
+    
+    public static final class Block {
+        private int start;
+        private int end;
+        public int getStart() {
+            return start;
+        }
+        public int getEnd() {
+            return end;
+        }
+        
     }
 }
 

@@ -16,10 +16,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.www.proteinfer.alignment.AlignedProtein.AlignedPosition;
+import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 
+import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideBase;
 
 public class SequenceAligner {
@@ -53,6 +56,23 @@ public class SequenceAligner {
         aligned.updateMismatches();
         return aligned;
     }
+    
+    public AlignedProteins alignProteins(List<WIdPickerProtein> proteins) throws AlignmentException {
+        
+        WIdPickerProtein anchorProtein = getAnchorProtein(proteins);
+        List<AlignedPair> alignmentList = new ArrayList<AlignedPair>();
+        for(WIdPickerProtein prot: proteins) {
+            if(prot.getProtein().getId() == anchorProtein.getProtein().getId())
+                continue;
+            AlignedPair alignedPair = alignProteins(anchorProtein, prot);
+            alignmentList.add(alignedPair);
+        }
+        // merge alignments
+        AlignedProteins aligned =  mergeAlignedPairs(alignmentList);
+        // mark mismatched indexes
+        aligned.updateMismatches();
+        return aligned;
+    }
 
     public AlignedProteins mergeAlignedPairs(List<AlignedPair> alignedPairs) throws AlignmentException {
         
@@ -74,15 +94,21 @@ public class SequenceAligner {
 
     private WIdPickerProtein getAnchorProtein(WIdPickerCluster cluster) {
 
-        WIdPickerProtein protein = null;
+        List<WIdPickerProtein> list = new ArrayList<WIdPickerProtein>();
         for(WIdPickerProteinGroup prGrp: cluster.getProteinGroups()) {
-            for(WIdPickerProtein prot: prGrp.getProteins()) {
-                if(protein == null)
+            list.addAll(prGrp.getProteins());
+        }
+        return getAnchorProtein(list);
+    }
+    
+    private WIdPickerProtein getAnchorProtein(List<WIdPickerProtein> proteins) {
+        WIdPickerProtein protein = null;
+        for(WIdPickerProtein prot: proteins) {
+            if(protein == null)
+                protein = prot;
+            else {
+                if(prot.getProtein().getPeptideCount() > protein.getProtein().getPeptideCount()) 
                     protein = prot;
-                else {
-                    if(prot.getProtein().getPeptideCount() > protein.getProtein().getPeptideCount()) 
-                        protein = prot;
-                }
             }
         }
         return protein;
@@ -136,7 +162,7 @@ public class SequenceAligner {
     
     private Protein makeProtein(WIdPickerProtein wProtein) {
         String sequence = getProteinSequence(wProtein.getProtein().getNrseqProteinId());
-        Protein protein = new Protein(wProtein.getProtein().getId(), sequence);
+        Protein protein = new Protein(wProtein.getProtein().getId(), wProtein.getProtein().getGroupId(), sequence);
         protein.setAccession(wProtein.getAccession());
         protein.setDescription(wProtein.getDescription());
         protein.setNrseqId(wProtein.getProtein().getNrseqProteinId());
@@ -209,29 +235,34 @@ public class SequenceAligner {
     
     public static void main(String[] args) throws AlignmentException {
 
-//        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(14, 1, new PeptideDefinition(), false);
+        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(14, 1, new PeptideDefinition(), false);
 
         SequenceAligner aligner = SequenceAligner.instance();
-//        aligner.alignCluster(cluster);
+        AlignedProteins aligned = aligner.alignCluster(cluster);
+        System.out.println(aligned.printAlignment());
         
-        Protein protein1 = new Protein(1, "ABCDXYZEFGHI");
-        Protein protein2 = new Protein(2, "CDEFGK");
-        Protein protein3 = new Protein(3, "ABCDGHI");
-        AlignedPair alignedPair1 = aligner.alignProteins(protein1, protein2);
-        AlignedPair alignedPair2 = aligner.alignProteins(protein1, protein3);
-        System.out.println(alignedPair1.getProtein1().getAlignedSequence());
-        System.out.println(alignedPair1.getProtein2().getAlignedSequence());
-        System.out.println(alignedPair2.getProtein1().getAlignedSequence());
-        System.out.println(alignedPair2.getProtein2().getAlignedSequence());
         
-        List<AlignedPair> alignedPairs = new ArrayList<AlignedPair>();
-        alignedPairs.add(alignedPair1);
-        alignedPairs.add(alignedPair2);
-        AlignedProteins aligned = aligner.mergeAlignedPairs(alignedPairs);
+//        Protein protein1 = new Protein(1, "ABCDXYZEFGHI");
+//        Protein protein2 = new Protein(2, "CDEFGK");
+//        Protein protein3 = new Protein(3, "ABCDGHI");
+//        AlignedPair alignedPair1 = aligner.alignProteins(protein1, protein2);
+//        AlignedPair alignedPair2 = aligner.alignProteins(protein1, protein3);
+//        System.out.println(alignedPair1.getProtein1().getAlignedSequence());
+//        System.out.println(alignedPair1.getProtein2().getAlignedSequence());
+//        System.out.println(alignedPair2.getProtein1().getAlignedSequence());
+//        System.out.println(alignedPair2.getProtein2().getAlignedSequence());
+//        
+//        List<AlignedPair> alignedPairs = new ArrayList<AlignedPair>();
+//        alignedPairs.add(alignedPair1);
+//        alignedPairs.add(alignedPair2);
+//        AlignedProteins aligned = aligner.mergeAlignedPairs(alignedPairs);
 //        aligned.updateMismatches();
-        System.out.println("\nAFTER MERGING\n");
-        System.out.println(aligned.getAnchorProtein().getAlignedSequence());
-        for(AlignedProtein prot: aligned.getAlignedProteins())
-            System.out.println(prot.getAlignedSequence());
+//        System.out.println("\nAFTER MERGING\n");
+//        System.out.println(aligned.getAnchorProtein().getAlignedSequence());
+//        for(AlignedProtein prot: aligned.getAlignedProteins())
+//            System.out.println(prot.getAlignedSequence());
+        for(AlignedPosition pos: aligned.getAnchorProtein().getAlignedPositions())
+            System.out.print(pos);
+        System.out.println();
     }
 }

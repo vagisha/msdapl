@@ -100,6 +100,8 @@
     </logic:iterate>
 </table>
 </logic:greaterEqual>
+<br>
+<div align="center" style="font-weight:bold;"><a href="/yrc/viewAlignedClusterProteins.do?pinferId=<bean:write name='pinferId' />&clusterId=<bean:write name='clusterId' />" >View Alignment</></div>
 
 
 
