@@ -1,94 +1,108 @@
 package org.yeastrc.www.proteinfer.alignment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class AlignedProtein {
+public class AlignedProtein extends Protein {
 
-    private int pinferProteinId;
-    private int nrseqId;
-    private String accession;
-    private String description;
-    private List<AlignedPosition> gappedSequence;
-    private StringBuilder gapless;
-    private List<Integer> gaplessToGapped;
+    private String alignedSequence;
+    Set<Integer> mismatchedIndexes;
 
     
-    public AlignedProtein() {
-        gappedSequence = new ArrayList<AlignedPosition>();
-        gaplessToGapped = new ArrayList<Integer>();
+    public AlignedProtein(int pinferProteinId, String sequence) {
+        super(pinferProteinId, sequence);
+        mismatchedIndexes = new HashSet<Integer>();
     }
     
-    public void addToSequence(char seqChar, boolean mismatched, boolean covered) {
-        AlignedPosition pos = new AlignedPosition(seqChar, mismatched, covered);
-        gappedSequence.add(pos);
-        if(!pos.isGap()) {
-            gapless.append(gapless);
-            gaplessToGapped.add(gappedSequence.size() - 1);
-        }
+    public AlignedProtein(Protein protein) {
+        super(protein.getPinferProteinId(), protein.getSequence());
+        this.setAccession(protein.getAccession());
+        this.setDescription(protein.getDescription());
+        this.setNrseqId(protein.getNrseqId());
+        this.setCoveredFragments(protein.getCoveredFragments());
     }
     
-    public void markCovered(String subseq) {
-        String seq = gapless.toString();
-        int s = 0;
-        int idx = 0;
-        while((idx = seq.indexOf(subseq, s)) != -1) {
+    public void setAlignedSequence(String sequence) {
+        this.alignedSequence = sequence;
+    }
+    
+    public int getAlignedLength() {
+        return alignedSequence.length();
+    }
+    
+    public String getAlignedSequence() {
+        return alignedSequence;
+    }
+    
+    public void insertGap(int index) throws AlignmentException {
+        // should be able to insert gap at the end of the sequence
+        if(index < 0 || index > alignedSequence.length())
+            throw new AlignmentException("Invalid index for gap: "+index);
+        alignedSequence = alignedSequence.substring(0, index)+"-"+alignedSequence.substring(index);
+    }
+    
+    public void setMismatchedIndexes(Set<Integer> mismatchedIndexes) {
+        if(mismatchedIndexes != null)
+            this.mismatchedIndexes = mismatchedIndexes;
+    }
+    
+    public List<AlignedPosition> getAlignedPositions() {
+        
+        List<AlignedPosition> list = new ArrayList<AlignedPosition>(this.getAlignedLength());
+        for(int i = 0; i < alignedSequence.length(); i++) {
+            AlignedPosition pos = new AlignedPosition(alignedSequence.charAt(i));
+            if(mismatchedIndexes.contains(i))
+                pos.setMismatched(true);
             
-            for (int j = idx; j < idx+subseq.length(); j++) {
-                gappedSequence.get(gaplessToGapped.get(j)).setCovered(true);
+            list.add(pos);
+        }
+        markCovered(list);
+        return list;
+    }
+    
+    public char getCharAt(int index) {
+        return alignedSequence.charAt(index);
+    }
+    
+    private void markCovered(List<AlignedPosition> posList) {
+        
+        String origSeq = this.getSequence();
+        List<Integer> gaplessToGapped = getGaplessToGappedIndexes();
+        for(String fragment: this.getCoveredFragments()) {
+            int s = 0;
+            int idx = 0;
+            while((idx = origSeq.indexOf(fragment, s)) != -1) {
+
+                for (int j = idx; j < idx+fragment.length(); j++) {
+                    posList.get(gaplessToGapped.get(j)).setCovered(true);
+                }
+                s = idx + 1;
+                if(s >= origSeq.length())   break;
             }
-            
-            s = idx + 1;
-            if(s >= seq.length())   break;
         }
     }
     
-    public int getLength() {
-        return gappedSequence.size();
+    private List<Integer> getGaplessToGappedIndexes() {
+        String origSeq = this.getSequence();
+        List<Integer> gaplessToGapped = new ArrayList<Integer>(origSeq.length());
+        for(int i = 0, j = 0; i < alignedSequence.length(); i++) {
+            if(alignedSequence.charAt(i) == '-')
+                continue;
+            gaplessToGapped.add(j, i);
+            j++;
+        }
+        return gaplessToGapped;
     }
-
-    public int getPinferProteinId() {
-        return pinferProteinId;
-    }
-
-    public int getNrseqId() {
-        return nrseqId;
-    }
-
-    public void setNrseqId(int nrseqId) {
-        this.nrseqId = nrseqId;
-    }
-
-    public String getAccession() {
-        return accession;
-    }
-
-    public void setAccession(String accession) {
-        this.accession = accession;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<AlignedPosition> getSequence() {
-        return gappedSequence;
-    }
-
 
     public static final class AlignedPosition {
         private char character;
         private boolean mismatched;
         private boolean covered;
         
-        public AlignedPosition(char seqChar, boolean mismatched, boolean covered) {
+        public AlignedPosition(char seqChar) {
             this.character = seqChar;
-            this.mismatched = mismatched;
-            this.covered = covered;
         }
 
         public char getCharacter() {
@@ -99,7 +113,7 @@ public class AlignedProtein {
             return mismatched;
         }
         
-        public void setMismatches(boolean mismatched) {
+        public void setMismatched(boolean mismatched) {
             this.mismatched = mismatched;
         }
 
@@ -115,7 +129,6 @@ public class AlignedProtein {
             return character == '-';
         }
     }
-    
 }
 
 

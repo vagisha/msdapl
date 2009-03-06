@@ -7,19 +7,17 @@
 package org.yeastrc.www.proteinfer.alignment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import org.yeastrc.www.proteinfer.alignment.AlignedProtein.AlignedPosition;
+import java.util.Set;
 
 /**
  * 
  */
 public class AlignedProteins {
 
-    private int alignmentLength;
     private AlignedProtein anchorProtein;
     private List<AlignedProtein> alignedProteins;
-    private List<AlignedPosition> alignmentTrack;
     
     public AlignedProteins() {
         alignedProteins = new ArrayList<AlignedProtein>();
@@ -27,42 +25,71 @@ public class AlignedProteins {
     
     public void setAnchorProtein(AlignedProtein protein) {
         this.anchorProtein = protein;
-        this.alignmentLength = anchorProtein.getLength();
-        
-        alignmentTrack = new ArrayList<AlignedPosition>(alignmentLength);
-        for(AlignedPosition pos: anchorProtein.getSequence()) {
-            alignmentTrack.add(new AlignedPosition(' ', false, pos.isCovered()));
-        }
     }
     
-    public void addAlignedProtein(AlignedProtein protein) throws AlignmentException {
-        if(protein.getLength() != alignmentLength) {
-            throw new AlignmentException("Aligned protein "+protein.getAccession()+" not the same length as anchor protein");
-        }
+    public void addAlignedPair(AlignedPair aPair) throws AlignmentException {
         
-        List<AlignedPosition> protSeq = protein.getSequence();
-        
-        for(int i = 0;i < alignmentTrack.size(); i++) {
-            AlignedPosition track_pos = alignmentTrack.get(i);
-            AlignedPosition prot_pos = protSeq.get(i);
+        AlignedProtein pairAProt = aPair.getProtein1(); // this should be the anchor protein in the aligned pair
+        String mySeq = anchorProtein.getAlignedSequence();
+        String pairSeq = pairAProt.getAlignedSequence();
+        int i = 0, j = 0;
+        for(; i < anchorProtein.getAlignedLength() && j < pairAProt.getAlignedLength(); i++, j++) {
             
-            if(track_pos.isGap() || prot_pos.isGap())
-                continue;
-            
-            if(track_pos.getCharacter() != prot_pos.getCharacter()) {
-                track_pos.setMismatches(true);
-                prot_pos.setMismatches(true);
+            char c_i = mySeq.charAt(i);
+            char c_j = pairSeq.charAt(j);
+            if(c_i != c_j) {
+                if(c_i == '-') {
+                    aPair.insertGap(j);
+                    j--;
+                }
+                else if(c_j == '-') {
+                    this.insertGap(i);
+                    i--;
+                }
+                else {
+                    throw new AlignmentException("Inconsistent anchor sequences:\n"+
+                            anchorProtein.getAlignedSequence()+"\n"+
+                            pairAProt.getAlignedSequence());
+                }
             }
+        }
+        for(; i < anchorProtein.getAlignedLength(); i++) {
+            aPair.insertGap(aPair.getAlignedLength());
+        }
+        for(; j < aPair.getAlignedLength(); j++) {
+            anchorProtein.insertGap(anchorProtein.getAlignedLength());
+        }
+        this.alignedProteins.add(aPair.getProtein2());
+    }
+    
+    public void insertGap(int index) throws AlignmentException {
+        anchorProtein.insertGap(index);
+        for(AlignedProtein prot: alignedProteins)
+            prot.insertGap(index);
+    }
+    
+    public void updateMismatches() {
+        
+        Set<Integer> mismatchedIndexes = new HashSet<Integer>();
+        for(int i = 0; i < anchorProtein.getAlignedLength(); i++) {
             
-            if(prot_pos.isCovered())
-                track_pos.setCovered(true);
+            char c = anchorProtein.getCharAt(i);
+            for(AlignedProtein prot: alignedProteins) {
+                char c_a = prot.getCharAt(i);
+                if(c != c_a) {
+                    mismatchedIndexes.add(i);
+                    break;
+                }
+            }
         }
         
-        alignedProteins.add(protein);
+        anchorProtein.setMismatchedIndexes(mismatchedIndexes);
+        for(AlignedProtein prot: alignedProteins)
+            prot.setMismatchedIndexes(mismatchedIndexes);
     }
-
+    
     public int getAlignmentLength() {
-        return alignmentLength;
+        return anchorProtein.getAlignedLength();
     }
 
     public AlignedProtein getAnchorProtein() {
@@ -72,10 +99,4 @@ public class AlignedProteins {
     public List<AlignedProtein> getAlignedProteins() {
         return alignedProteins;
     }
-
-    public List<AlignedPosition> getAlignmentTrack() {
-        return alignmentTrack;
-    }
-    
-    
 }
