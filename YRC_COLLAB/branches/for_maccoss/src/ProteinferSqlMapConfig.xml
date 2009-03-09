@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" 
+	"http://ibatis.apache.org/dtd/sql-map-config-2.dtd" > 
+
+<sqlMapConfig>
+
+	<properties resource="msDataDB.properties" />
+	
+	<settings 
+		useStatementNamespaces="true"
+		lazyLoadingEnabled="true"
+	/>
+	
+	<transactionManager type="JDBC">
+		<dataSource type="JNDI"> 
+			<property name="DataSource" value="java:comp/env/jdbc/msData"/>
+    	</dataSource>
+	</transactionManager>
+	
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferSpectrumMatch.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferIon.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferPeptide.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferProtein.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferInput.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/ProteinferRun.xml"/>
+	
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerSpectrumMatch.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerIon.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerPeptide.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerProtein.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerParam.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerInputSummary.xml"/>
+	<sqlMap resource="edu/uwpr/protinfer/database/sqlmap/idpicker/IdPickerRun.xml"/>
+	
+</sqlMapConfig>	
