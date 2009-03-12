@@ -34,7 +34,6 @@ import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.y2h.Y2HScreenSearcher;
 import org.yeastrc.yates.YatesRun;
 import org.yeastrc.yates.YatesRunMsSearchLinker;
 import org.yeastrc.yates.YatesRunSearcher;
@@ -113,11 +112,6 @@ public class ViewProjectAction extends Action {
 		// Check for experiment data for this project
 		if (project.getShortType().equals(Projects.COLLABORATION) || project.getShortType().equals(Projects.TECHNOLOGY)) {
 
-			// Check for yeast two-hybrid data
-			Y2HScreenSearcher yss = new Y2HScreenSearcher();
-			yss.setProjectID(project.getID());
-			request.setAttribute("y2hdata", yss.search());
-			
 			// Check for yates MS data
 			YatesRunSearcher yrs = new YatesRunSearcher();
 			yrs.setProjectID(project.getID());

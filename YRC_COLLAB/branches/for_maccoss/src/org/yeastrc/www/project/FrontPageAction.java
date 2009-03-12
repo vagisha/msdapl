@@ -15,11 +15,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.y2h.Y2HScreenSearcher;
-import org.yeastrc.yates.YatesRunSearcher;
 
 /**
  * Controller class for viewing all highlights.
@@ -50,22 +47,6 @@ public class FrontPageAction extends Action {
 		c = user.getProjects();
 		request.setAttribute("userProjects", c);
 
-		Groups groupMan = Groups.getInstance();
-		if (groupMan.isMember(user.getResearcher().getID(), "administrators")) {
-			Y2HScreenSearcher yss = new Y2HScreenSearcher();
-			yss.setMostRecent(true);
-			yss.setNumResults(10);
-			request.setAttribute("y2hdata", yss.search());
-			yss = null;
-			
-			YatesRunSearcher yrs = new YatesRunSearcher();
-			yrs.setMostRecent(true);
-			yrs.setNumResults(10);
-			request.setAttribute("yatesdata", yrs.search());
-			yrs = null;
-		}
-		
-		
 		// Go!
 		return mapping.findForward("Success");
 	}	
