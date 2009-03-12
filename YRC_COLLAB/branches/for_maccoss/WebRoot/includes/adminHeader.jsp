@@ -21,7 +21,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 <head>
  <yrcwww:title />
 
- <link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+ <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css' />">
 
 </head>
 
@@ -108,7 +108,7 @@ document.onmousemove=positiontip
  <tr>
 
   <td WIDTH="478" VALIGN="BOTTOM" COLSPAN="2">
-   <nobr><img SRC="/yrc/images/left-top-round.gif" WIDTH="15" HEIGHT="15"><img SRC="/yrc/images/yrc_logo.gif" WIDTH="222" HEIGHT="44" ALT="YRC LOGO"><img SRC="/yrc/images/double-side-round.gif" WIDTH="15" HEIGHT="15"><html:link forward="adminSearch"><IMG SRC="/yrc/images/tabs/tab-top-admin_search.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link href="/yrc/uploadRedirect.do"><IMG SRC="/yrc/images/tabs/tab-top-admin_upload.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><yrcwww:member group="administrators"><html:link href="/yrc/manageGroups.do"><IMG SRC="/yrc/images/tabs/tab-top-admin_groups.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link forward="reportHome"><IMG SRC="/yrc/images/tabs/tab-top-admin_p41_report.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:member><html:link forward="standardHome"><IMG SRC="/yrc/images/tabs/tab-top-standard.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link href="/yrc/logout.do"><IMG SRC="/yrc/images/tabs/tab-top-logout.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></nobr></td>
+   <nobr><img SRC="<yrcwww:link path='images/left-top-round.gif' />" WIDTH="15" HEIGHT="15"><img SRC="<yrcwww:link path='images/yrc_logo.gif' />" WIDTH="222" HEIGHT="44" ALT="YRC LOGO"><img SRC="<yrcwww:link path='images/double-side-round.gif' />" WIDTH="15" HEIGHT="15"><html:link forward="adminSearch"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_search.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link action="uploadRedirect.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_upload.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><yrcwww:member group="administrators"><html:link action="manageGroups.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_groups.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:member><html:link forward="standardHome"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-standard.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link action="logout.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-logout.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></nobr></td>
 
   <td WIDTH="100%" ALIGN="RIGHT">
    <yrcwww:authenticated>
@@ -123,44 +123,25 @@ document.onmousemove=positiontip
  </tr>
 
  <tr BGCOLOR="#808080">
-  <td VALIGN="CENTER" WIDTH="236" BGCOLOR="#808080" COLSPAN="2"><nobr><img SRC="/yrc/images/left-bottom-round.gif" WIDTH="15" HEIGHT="20"><img SRC="/yrc/images/title-text.gif" WIDTH="221" HEIGHT="20"></nobr></td>
+  <td VALIGN="CENTER" WIDTH="236" BGCOLOR="#808080" COLSPAN="2"><nobr><img SRC="<yrcwww:link path='images/left-bottom-round.gif' />" WIDTH="15" HEIGHT="20"><img SRC="<yrcwww:link path='images/title-text.gif' />" WIDTH="221" HEIGHT="20"></nobr></td>
 
   <td BGCOLOR="#808080" ALIGN="RIGHT" WIDTH="100%">
-   <img SRC="/yrc/images/right-round.gif" WIDTH="15" HEIGHT="20"></td>
+   <img SRC="<yrcwww:link path='images/right-round.gif' />" WIDTH="15" HEIGHT="20"></td>
 
  </tr>
 
  <tr BGCOLOR="#FFFFFF">
 
   <td BGCOLOR="#FFFFFF" COLSPAN="3" ALIGN="LEFT" VALIGN="top"><NOBR>&nbsp;&nbsp;&nbsp;
-   <IMG SRC="/yrc/images/tabs/tab-bottom-yrc_administration.png" WIDTH="200" HEIGHT="15" BORDER="0">
+   <IMG SRC="<yrcwww:link path='images/tabs/tab-bottom-yrc_administration.png' />" WIDTH="200" HEIGHT="15" BORDER="0">
    <logic:equal name="dir" scope="request" value="search">
-    <html:link href="/yrc/pages/admin/search/searchProjects.jsp"><IMG SRC="/yrc/images/tabs/tab-bottom-admin_search_projects.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-    <html:link href="/yrc/searchPendingDisseminations.do"><IMG SRC="/yrc/images/tabs/tab-bottom-admin_unshipped.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-    <html:link href="javascript:alert('Coming soon!')"><IMG SRC="/yrc/images/tabs/tab-bottom-admin_search_data.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
+    <a href="<yrcwww:link path='pages/admin/search/searchProjects.jsp' />"><IMG SRC="<yrcwww:link path='images/tabs/tab-bottom-admin_search_projects.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></a>
    </logic:equal>
    <logic:equal name="dir" scope="request" value="upload">
-		<yrcwww:member group="TwoHybrid">
-			<html:link href="/yrc/uploadY2HFormAction.do"><IMG SRC="/yrc/images/tabs/tab-bottom-upload-y2h.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-		</yrcwww:member>
-		<yrcwww:member group="Yates">
-			<html:link href="/yrc/uploadYatesFormAction.do"><IMG SRC="/yrc/images/tabs/tab-bottom-upload-yates.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-				<yrcwww:notmember group="MacCoss">
-					<html:link href="/yrc/listUploadJobs.do"><IMG SRC="/yrc/images/tabs/tab-bottom-list-jobs.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-				</yrcwww:notmember>
-		</yrcwww:member>
 		<yrcwww:member group="MacCoss">
-			<html:link href="/yrc/uploadMacCossFormAction.do"><IMG SRC="/yrc/images/tabs/tab-bottom-upload-maccoss.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-			<html:link href="/yrc/listUploadJobs.do"><IMG SRC="/yrc/images/tabs/tab-bottom-list-jobs.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
+			<html:link action="uploadMacCossFormAction.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-bottom-upload-maccoss.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
+			<html:link action="listUploadJobs.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-bottom-list-jobs.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
 		</yrcwww:member>
-		<yrcwww:member group="Microscopy">
-			<html:link href="/yrc/uploadMicroscopyFormAction.do"><IMG SRC="/yrc/images/tabs/tab-bottom-upload-microscopy.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-		</yrcwww:member>
-   </logic:equal>
-   <logic:equal name="dir" scope="request" value="progress">
-    <html:link href="/yrc/viewProgressReport.do"><IMG SRC="/yrc/images/tabs/tab-bottom-run_report.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-    <html:link href="/yrc/listHighlights.do"><IMG SRC="/yrc/images/tabs/tab-bottom-list_highs.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
-    <html:link href="/yrc/pages/admin/progress/editHighlight.jsp"><IMG SRC="/yrc/images/tabs/tab-bottom-add_high.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
    </logic:equal>
   </NOBR></td>
 

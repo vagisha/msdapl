@@ -3,7 +3,7 @@
 
 <HTML>
  <HEAD>
-  <link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css' />">
   <TITLE>YRC</TITLE>
  </HEAD>
  

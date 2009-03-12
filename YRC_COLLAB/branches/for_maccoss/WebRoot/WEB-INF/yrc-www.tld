@@ -187,4 +187,15 @@
 
 </tag>
 
+<tag>
+<name>link</name>
+<tagclass>org.yeastrc.www.taglib.LinkTag</tagclass>
+<bodycontent>empty</bodycontent>
+<attribute>
+<name>path</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+</tag>
+
 </taglib>

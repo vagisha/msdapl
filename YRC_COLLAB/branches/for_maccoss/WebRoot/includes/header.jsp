@@ -13,7 +13,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 <head>
  <yrcwww:title />
 
- <link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+ <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
 
 </head>
 
@@ -100,7 +100,7 @@ document.onmousemove=positiontip
  <tr>
 
   <td WIDTH="478" VALIGN="BOTTOM" COLSPAN="2">
-   <nobr><img SRC="/yrc/images/left-top-round.gif" WIDTH="15" HEIGHT="15"><img SRC="/yrc/images/yrc_logo.gif" WIDTH="222" HEIGHT="44" ALT="YRC LOGO"><img SRC="/yrc/images/double-side-round.gif" WIDTH="15" HEIGHT="15"><yrcwww:authenticated><html:link href="/yrc/pages/internal/front.jsp"><IMG SRC="/yrc/images/tabs/tab-top-home.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link href="/yrc/editInformation.do"><IMG SRC="/yrc/images/tabs/tab-top-account.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><yrcwww:member group="any"><html:link forward="adminHome"><IMG SRC="/yrc/images/tabs/tab-top-admin.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:member><html:link href="/yrc/pages/about/front.jsp"><IMG SRC="/yrc/images/tabs/tab-top-about_YRC.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link href="/yrc/logout.do"><IMG SRC="/yrc/images/tabs/tab-top-logout.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:authenticated><yrcwww:notauthenticated><html:link href="/yrc/pages/about/front.jsp"><IMG SRC="/yrc/images/tabs/tab-top-about_YRC.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link href="/yrc/pages/internal/front.jsp"><IMG SRC="/yrc/images/tabs/tab-top-login.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:notauthenticated></nobr></td>
+   <nobr><img SRC="<yrcwww:link path='images/left-top-round.gif' />" WIDTH="15" HEIGHT="15"><img SRC="<yrcwww:link path='images/yrc_logo.gif' />" WIDTH="222" HEIGHT="44" ALT="YRC LOGO"><img SRC="<yrcwww:link path='images/double-side-round.gif' />" WIDTH="15" HEIGHT="15"><yrcwww:authenticated><a href="<yrcwww:link path='pages/internal/front.jsp' />"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-home.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></a><html:link action="editInformation.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-account.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><yrcwww:member group="any"><html:link forward="adminHome"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:member><html:link href="/yrc/pages/about/front.jsp"><IMG SRC="/yrc/images/tabs/tab-top-about_YRC.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link href="/yrc/logout.do"><IMG SRC="/yrc/images/tabs/tab-top-logout.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:authenticated><yrcwww:notauthenticated><html:link href="/yrc/pages/about/front.jsp"><IMG SRC="/yrc/images/tabs/tab-top-about_YRC.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link href="/yrc/pages/internal/front.jsp"><IMG SRC="/yrc/images/tabs/tab-top-login.png" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:notauthenticated></nobr></td>
   
   
   <td WIDTH="100%" ALIGN="RIGHT">
