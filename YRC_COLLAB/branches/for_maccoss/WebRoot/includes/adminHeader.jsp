@@ -108,7 +108,13 @@ document.onmousemove=positiontip
  <tr>
 
   <td WIDTH="478" VALIGN="BOTTOM" COLSPAN="2">
-   <nobr><img SRC="<yrcwww:link path='images/left-top-round.gif' />" WIDTH="15" HEIGHT="15"><img SRC="<yrcwww:link path='images/yrc_logo.gif' />" WIDTH="222" HEIGHT="44" ALT="YRC LOGO"><img SRC="<yrcwww:link path='images/double-side-round.gif' />" WIDTH="15" HEIGHT="15"><html:link forward="adminSearch"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_search.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link action="uploadRedirect.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_upload.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><yrcwww:member group="administrators"><html:link action="manageGroups.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_groups.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:member><html:link forward="standardHome"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-standard.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link><html:link action="logout.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-logout.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></nobr></td>
+   <nobr>
+   <img SRC="<yrcwww:link path='images/left-top-round.gif' />" WIDTH="15" HEIGHT="15"><img SRC="<yrcwww:link path='images/yrc_logo.gif' />" WIDTH="222" HEIGHT="44" ALT="YRC LOGO"><img SRC="<yrcwww:link path='images/double-side-round.gif' />" WIDTH="15" HEIGHT="15">
+   <html:link forward="adminSearch"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_search.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
+   <html:link action="uploadRedirect.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_upload.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
+   <yrcwww:member group="administrators"><html:link action="manageGroups.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-admin_groups.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></yrcwww:member>
+   <html:link forward="standardHome"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-standard.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link>
+   <html:link action="logout.do"><IMG SRC="<yrcwww:link path='images/tabs/tab-top-logout.png' />" WIDTH="100" HEIGHT="15" BORDER="0"></html:link></nobr></td>
 
   <td WIDTH="100%" ALIGN="RIGHT">
    <yrcwww:authenticated>
