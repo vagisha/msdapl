@@ -22,12 +22,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.GrantRecord;
-import org.yeastrc.project.Dissemination;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
 import org.yeastrc.project.Researcher;
-import org.yeastrc.project.Training;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -109,85 +107,23 @@ public class EditProjectAction extends Action {
 
 
 		// Forward them on to the happy success view page!		
-		if (project.getShortType().equals(Projects.COLLABORATION)) {
-			newForm = new EditCollaborationForm();			
-			request.setAttribute("editCollaborationForm", newForm);
-			forwardStr = "Collaboration";
-			
-			String[] groups = project.getGroupsArray();
-			((EditCollaborationForm)(newForm)).setGroups(groups);
-			
-			newForm.setGrantList(grants);
-			
-			// Set this project in the session. Needed to display any old grant information
-			// We have to set it in the session and not the request so that it is available 
-			// if the user omits some required information on the form and is redirected back 
-			// to the form. 
-	        // This should be removed in the saveCollaborationAction and newCollaborationAction classes
-			if (project.getFundingTypes() != null || !project.getFundingTypes().equalsIgnoreCase("None"))
-                request.getSession().setAttribute("project", project);
-		}
+		newForm = new EditCollaborationForm();			
+		request.setAttribute("editCollaborationForm", newForm);
+		forwardStr = "Collaboration";
 
+		String[] groups = project.getGroupsArray();
+		((EditCollaborationForm)(newForm)).setGroups(groups);
 
-		else if (project.getShortType().equals(Projects.DISSEMINATION)) {
-			newForm = new EditDisseminationForm();			
-			request.setAttribute("editDisseminationForm", newForm);
-			forwardStr = "Dissemination";
-			
-			String[] groups = project.getGroupsArray();
+		newForm.setGrantList(grants);
 
-			((EditDisseminationForm)(newForm)).setGroups(groups);
-			((EditDisseminationForm)(newForm)).setDescription(((Dissemination)project).getDescription());
-			((EditDisseminationForm)(newForm)).setName(((Dissemination)project).getName());
-			((EditDisseminationForm)(newForm)).setPhone(((Dissemination)project).getPhone());
-			((EditDisseminationForm)(newForm)).setEmail(((Dissemination)project).getEmail());
-			((EditDisseminationForm)(newForm)).setAddress(((Dissemination)project).getAddress());
-			((EditDisseminationForm)(newForm)).setFEDEX(((Dissemination)project).getFEDEX());
-			((EditDisseminationForm)(newForm)).setCommercial(((Dissemination)project).getCommercial());
-			((EditDisseminationForm)(newForm)).setShipped(((Dissemination)project).getShipped());
-		}
-
-		else if (project.getShortType().equals(Projects.TECHNOLOGY)) {
-			newForm = new EditTechnologyForm();			
-			request.setAttribute("editTechnologyForm", newForm);
-			forwardStr = "Technology";
-			
-			String[] groups = project.getGroupsArray();
-			((EditTechnologyForm)(newForm)).setGroups(groups);
-
-			newForm.setGrantList(grants);
-			
-			// Set this project in the session. Needed to display any old grant information
-            // We have to set it in the session and not the request so that it is available 
-            // if the user omits some required information on the form and is redirected back 
-            // to the form. 
-            // This should be removed in the saveTechnologyAction and newCollaborationAction classes
-			if (project.getFundingTypes() != null || !project.getFundingTypes().equalsIgnoreCase("None"))
-			    request.getSession().setAttribute("project", project);
+		// Set this project in the session. Needed to display any old grant information
+		// We have to set it in the session and not the request so that it is available 
+		// if the user omits some required information on the form and is redirected back 
+		// to the form. 
+		// This should be removed in the saveCollaborationAction and newCollaborationAction classes
+		if (project.getFundingTypes() != null || !project.getFundingTypes().equalsIgnoreCase("None"))
+		    request.getSession().setAttribute("project", project);
 		
-		}
-		
-		else if (project.getShortType().equals(Projects.TRAINING)) {
-			newForm = new EditTrainingForm();			
-			request.setAttribute("editTrainingForm", newForm);
-			forwardStr = "Training";
-			
-			String[] groups = project.getGroupsArray();
-
-			((EditTrainingForm)(newForm)).setGroups(groups);
-
-			((EditTrainingForm)(newForm)).setDescription(((Training)project).getDescription());
-			((EditTrainingForm)(newForm)).setHours(((Training)project).getHours());
-			((EditTrainingForm)(newForm)).setDays(((Training)project).getDays());
-		}
-		
-		else {
-			ActionErrors errors = new ActionErrors();
-			errors.add("username", new ActionMessage("error.project.invalidtype"));
-			saveErrors( request, errors );
-			return mapping.findForward("Failure");
-		}
-
 
 		// Set the parameters available to all project types
 		newForm.setTitle(project.getTitle());

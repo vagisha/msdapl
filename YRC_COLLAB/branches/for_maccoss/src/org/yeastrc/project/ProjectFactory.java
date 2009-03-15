@@ -9,10 +9,14 @@
 
 package org.yeastrc.project;
 
-import java.util.*;
-import java.sql.*;
-import org.yeastrc.db.*;
-import org.yeastrc.data.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.db.DBConnectionManager;
 
 
 
@@ -56,12 +60,6 @@ public class ProjectFactory {
 				
 				if (type.equals("C")) {
 					proj = new Collaboration();
-				} else if (type.equals("D")) {
-					proj = new Dissemination();
-				} else if (type.equals("T")) {
-					proj = new Training();
-				} else if (type.equals("Tech")) {
-					proj = new Technology();
 				} else {
 					throw new InvalidProjectTypeException("Type wasn't C, D, T or Tech...");
 				}

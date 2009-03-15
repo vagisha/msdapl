@@ -8,21 +8,32 @@
 
 package org.yeastrc.www.project;
 
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
 
-import javax.servlet.http.*;
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.*;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.apache.struts.util.MessageResources;
-
-import javax.mail.*;
-import javax.mail.internet.*;
-
-import org.yeastrc.project.*;
-import org.yeastrc.www.user.*;
-import org.yeastrc.data.*;
+import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.Grant;
 import org.yeastrc.grant.ProjectGrantRecord;
+import org.yeastrc.project.Collaboration;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.Researcher;
+import org.yeastrc.www.user.User;
+import org.yeastrc.www.user.UserUtils;
 
 /**
  * Controller class for saving a new collaboration or technology development project.
@@ -88,12 +99,7 @@ public class SaveNewCollaborationAction extends Action {
 		if (comments.equals("")) comments = null;
 
 		// Load our project
-		Project project;
-		if (isTech){
-			project = new Technology();
-		} else {
-			project = new Collaboration();
-		}
+		Project project = new Collaboration();
 
 		// Set this project in the request, as a bean to be displayed on the view
 		//request.setAttribute("project", project);
@@ -225,8 +231,6 @@ public class SaveNewCollaborationAction extends Action {
 		List<Grant> grants = ((EditCollaborationForm)(form)).getGrantList();
 		ProjectGrantRecord.getInstance().saveProjectGrants(project.getID(), grants);
 		
-		// Send signup confirmation to researcher
-		NewProjectUtils.sendEmailConfirmation(user.getResearcher(), project, getResources(request));
 
 		// Go!
 		ActionForward success = mapping.findForward("Success") ;

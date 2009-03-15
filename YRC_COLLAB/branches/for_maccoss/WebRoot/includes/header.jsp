@@ -119,12 +119,11 @@ document.onmousemove=positiontip
    	
    	</nobr>
    	</td>
-  
+
   <td WIDTH="100%" ALIGN="RIGHT">
    <yrcwww:authenticated>
     <jsp:useBean id="user" class="org.yeastrc.www.user.User" scope="session"/>
-    <FONT STYLE="font-size:8pt;">You are: <yrcwww:user attribute="username"/> (<yrcwww:user attribute="firstname"/> <yrcwww:user attribute="lastname"/>)<BR>
-    <bean:write name="user" property="researcher.organization"/></FONT>
+    <FONT STYLE="font-size:8pt;">Welcome <yrcwww:user attribute="firstname"/> <yrcwww:user attribute="lastname"/>!<BR></FONT>
     <div><html:link action="logout.do">Logout</html:link></div>
    </yrcwww:authenticated>
    <yrcwww:notauthenticated>
@@ -163,6 +162,6 @@ document.onmousemove=positiontip
 
 </table>
 
-   <yrcwww:authenticated><yrcwww:history/></yrcwww:authenticated>
+   <yrcwww:authenticated><div style="background:#F0F8FF"><yrcwww:history/></div></yrcwww:authenticated>
 
 <br>

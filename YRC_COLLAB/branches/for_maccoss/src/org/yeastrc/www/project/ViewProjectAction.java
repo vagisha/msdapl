@@ -110,83 +110,59 @@ public class ViewProjectAction extends Action {
 		request.setAttribute("grants", grants);
 		
 		// Check for experiment data for this project
-		if (project.getShortType().equals(Projects.COLLABORATION) || project.getShortType().equals(Projects.TECHNOLOGY)) {
 
-			// Check for yates MS data
-			YatesRunSearcher yrs = new YatesRunSearcher();
-			yrs.setProjectID(project.getID());
-			yrs.setMostRecent( true );
-			
-			List<YatesRun> yatesRuns = yrs.search();
-			request.setAttribute("yatesdata", yatesRuns);
-			
-			// Associate yatesRunIds with msData searchIds where possible AND
-			// Associate yatesRunIds with already saved Protein Inference Runs
-			Map<Integer, Integer> yatesRunToMsSearchMap = new HashMap<Integer, Integer>(yatesRuns.size());
-			Map<Integer, List<ProteinferJob>> yatesRunToProteinferRunMap = new HashMap<Integer, List<ProteinferJob>>();
-			for(YatesRun run: yatesRuns) {
-			    int runId = run.getId();
-			    int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
-			    
-			    yatesRunToMsSearchMap.put(runId, searchId);
-			    if(searchId > 0) {
-			        List<ProteinferJob> proteinferRunIds = ProteinferRunSearcher.getProteinferJobsForMsSearch(searchId);
-			        yatesRunToProteinferRunMap.put(searchId, proteinferRunIds);
-			    }
-			}
-			request.setAttribute("yatesRunToMsSearchMap", yatesRunToMsSearchMap);
-			request.setAttribute("yatesRunToProteinferRunMap", yatesRunToProteinferRunMap);
-			request.setAttribute("projectId", projectID);
-			
-			
-			
-			ExperimentSearcher es = ExperimentSearcher.getInstance();
-			es.setProjectID(project.getID());
-			List tmpList = es.search();
-			Collections.sort(tmpList, new ExperimentBaitComparator());
-			request.setAttribute("locdata", tmpList);
-			
-			Groups groupMan = Groups.getInstance();
-			if ( project.getGroups().contains( Projects.YATES ) &&
-					( groupMan.isMember( user.getResearcher().getID(), Projects.YATES ) || groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) )
-				request.setAttribute( "showYatesUpload", new Boolean( true ) );
-			else
-				request.setAttribute( "showYatesUpload", new Boolean( false ) );
-			
-			if ( project.getGroups().contains( Projects.MACCOSS ) && 
-					( groupMan.isMember( user.getResearcher().getID(), Projects.MACCOSS ) || groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) )
-				request.setAttribute( "showMacCossUpload", new Boolean( true ) );
-			else
-				request.setAttribute( "showMacCossUpload", new Boolean( false ) );
-			
-			if ( project.getGroups().contains( Projects.MICROSCOPY ) && 
-					( groupMan.isMember( user.getResearcher().getID(), Projects.MICROSCOPY ) || groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) )
-				request.setAttribute( "showMicroUpload", new Boolean( true ) );
-			else
-				request.setAttribute( "showMicroUpload", new Boolean( false ) );
-			
+		// Check for yates MS data
+		YatesRunSearcher yrs = new YatesRunSearcher();
+		yrs.setProjectID(project.getID());
+		yrs.setMostRecent( true );
+
+		List<YatesRun> yatesRuns = yrs.search();
+		request.setAttribute("yatesdata", yatesRuns);
+
+		// Associate yatesRunIds with msData searchIds where possible AND
+		// Associate yatesRunIds with already saved Protein Inference Runs
+		Map<Integer, Integer> yatesRunToMsSearchMap = new HashMap<Integer, Integer>(yatesRuns.size());
+		Map<Integer, List<ProteinferJob>> yatesRunToProteinferRunMap = new HashMap<Integer, List<ProteinferJob>>();
+		for(YatesRun run: yatesRuns) {
+		    int runId = run.getId();
+		    int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
+
+		    yatesRunToMsSearchMap.put(runId, searchId);
+		    if(searchId > 0) {
+		        List<ProteinferJob> proteinferRunIds = ProteinferRunSearcher.getProteinferJobsForMsSearch(searchId);
+		        yatesRunToProteinferRunMap.put(searchId, proteinferRunIds);
+		    }
 		}
+		request.setAttribute("yatesRunToMsSearchMap", yatesRunToMsSearchMap);
+		request.setAttribute("yatesRunToProteinferRunMap", yatesRunToProteinferRunMap);
+		request.setAttribute("projectId", projectID);
+
+
+
+		ExperimentSearcher es = ExperimentSearcher.getInstance();
+		es.setProjectID(project.getID());
+		List tmpList = es.search();
+		Collections.sort(tmpList, new ExperimentBaitComparator());
+		request.setAttribute("locdata", tmpList);
+
+		Groups groupMan = Groups.getInstance();
+		if ( project.getGroups().contains( Projects.YATES ) &&
+		        ( groupMan.isMember( user.getResearcher().getID(), Projects.YATES ) || groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) )
+		    request.setAttribute( "showYatesUpload", new Boolean( true ) );
+		else
+		    request.setAttribute( "showYatesUpload", new Boolean( false ) );
+
+		if ( project.getGroups().contains( Projects.MACCOSS ) && 
+		        ( groupMan.isMember( user.getResearcher().getID(), Projects.MACCOSS ) || groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) )
+		    request.setAttribute( "showMacCossUpload", new Boolean( true ) );
+		else
+		    request.setAttribute( "showMacCossUpload", new Boolean( false ) );
+
 		
 
 		// Forward them on to the happy success view page!
-		String theForward = null;
-		
-		if (project.getShortType().equals(Projects.COLLABORATION))
-			return mapping.findForward("Collaboration");
+		return mapping.findForward("Collaboration");
 
-		if (project.getShortType().equals(Projects.DISSEMINATION))
-			return mapping.findForward("Dissemination");
-
-		if (project.getShortType().equals(Projects.TECHNOLOGY))
-			return mapping.findForward("Technology");
-
-		if (project.getShortType().equals(Projects.TRAINING))
-			return mapping.findForward("Training");
-
-		ActionErrors errors = new ActionErrors();
-		errors.add("username", new ActionMessage("error.project.invalidtype"));
-		saveErrors( request, errors );
-		return mapping.findForward("Failure");
 
 	}
 	

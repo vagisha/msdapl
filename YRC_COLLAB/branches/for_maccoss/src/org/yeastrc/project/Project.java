@@ -9,14 +9,19 @@
 
 package org.yeastrc.project;
 
-import java.util.*;
-import java.sql.*;
-
-import org.yeastrc.data.*;
-import org.yeastrc.db.*;
-import org.yeastrc.www.user.Groups;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.yeastrc.data.IData;
+import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.www.user.Groups;
 
 
 /**
@@ -66,8 +71,6 @@ public abstract class Project implements Comparable, IData {
 		
 		this.BTA = (float)0.0;
 		
-		this.axisI = null;
-		this.axisII = null;
 	}
 
 	/**
@@ -140,22 +143,6 @@ public abstract class Project implements Comparable, IData {
 	 */
 	public abstract Set getGroups();
 	
-	
-	/**
-	 * Will return the unabbreviated name for the type of the project.  At the time of this writing, 
-	 * it will be one of the following:
-	 * "Collaboration", "Technology", "Training" or "Dissemination"
-	 * @return The unabbreviated name for the type of the project.
-	 */
-	public abstract String getLongType();
-	
-	/**
-	 * Will return the abbreviated name for the type of the project.  At the time of this writing,
-	 * it will be one of the following: "C", "T", "Tech", "D"
-	 * @return The abbreviated name for the type of the project.
-	 */
-	public abstract String getShortType();
-
 	/**
 	 * Set a group to which this project belongs.
 	 * This will add to a set of groups, so each consecutive call adds another group
@@ -215,8 +202,6 @@ public abstract class Project implements Comparable, IData {
 					throw new InvalidIDException("ID was set in a Project, but not found in database on save()");
 				}
 
-				// Make sure the result set is set up w/ current values from this object
-				rs.updateString("projectType", getShortType());
 				
 				if (this.title == null) { rs.updateNull("projectTitle"); }
 				else { rs.updateString("projectTitle", this.title); }
@@ -270,12 +255,6 @@ public abstract class Project implements Comparable, IData {
 
 				rs.updateFloat("projectBTA", this.BTA);
 				
-				if (this.axisI == null) { rs.updateNull("projectAxisI"); }
-				else { rs.updateString("projectAxisI", this.axisI); }
-
-				if (this.axisII == null) { rs.updateNull("projectAxisII"); }
-				else { rs.updateString("projectAxisII", this.axisII); }
-				
 				if (this.NCRRID == 0) { rs.updateNull("NCRR_ID"); }
 				else { rs.updateInt("NCRR_ID", this.NCRRID); }
 				
@@ -301,8 +280,6 @@ public abstract class Project implements Comparable, IData {
 				// We're adding a new row.
 
 				rs.moveToInsertRow();
-
-				rs.updateString("projectType", getShortType());
 
 				java.util.Date uDate = new java.util.Date();
 				this.submitDate = new java.sql.Date(uDate.getTime());
@@ -360,12 +337,6 @@ public abstract class Project implements Comparable, IData {
 				else { rs.updateString("projectComments", this.comments); }
 
 				rs.updateFloat("projectBTA", this.BTA);
-				
-				if (this.axisI == null) { rs.updateNull("projectAxisI"); }
-				else { rs.updateString("projectAxisI", this.axisI); }
-
-				if (this.axisII == null) { rs.updateNull("projectAxisII"); }
-				else { rs.updateString("projectAxisII", this.axisII); }
 				
 				if (this.NCRRID == 0) { rs.updateNull("NCRR_ID"); }
 				else { rs.updateInt("NCRR_ID", this.NCRRID); }
@@ -523,8 +494,6 @@ public abstract class Project implements Comparable, IData {
 			this.publications = rs.getString("projectPublications");
 			this.comments = rs.getString("projectComments");
 			this.BTA = rs.getFloat("projectBTA");
-			this.axisI = rs.getString("projectAxisI");
-			this.axisII = rs.getString("projectAxisII");
 			this.lastChange = rs.getDate("lastChange");
 			this.progressLastChange = rs.getDate("progressLastChange");
 			this.NCRRID = rs.getInt("NCRR_ID");
@@ -792,20 +761,6 @@ public abstract class Project implements Comparable, IData {
 	public void setBTA(float bta) { this.BTA = bta; }
 	
 	/**
-	 * Set the AXIS I codes for this project, as a single String.  This value is
-	 * used in the annual NCRR progress report
-	 * @param arg the AXIS I code string
-	 */
-	public void setAxisI(String arg) { this.axisI = arg; }
-	
-	/**
-	 * Set the AXIS II codes for this project, as a single String.  This value is
-	 * used in the annual NCRR progress report
-	 * @param arg the AXIS II code string
-	 */
-	public void setAxisII(String arg) { this.axisII = arg; }
-	
-	/**
 	 * Set the NCRR ID for this project, which should be its value in the NCRR database
 	 * @param arg the NCRR ID
 	 */
@@ -854,9 +809,6 @@ public abstract class Project implements Comparable, IData {
 	 * @return the project title.
 	 */
 	public String getTitle() {
-		if (this.title == null || this.title.equals(""))
-			return this.getLongType() + " Project";
-
 		return this.title;
 	}
 	
@@ -1013,18 +965,6 @@ public abstract class Project implements Comparable, IData {
 	public float getBTA() { return this.BTA; }
 	
 	/**
-	 * Returns the Axis I string entered for this project. (used for NCRR report)
-	 * @return the Axis I
-	 */
-	public String getAxisI() { return this.axisI; }
-	
-	/**
-	 * Returns the Axis II string entered for this project. (used for NCRR report)
-	 * @return the Axis II
-	 */
-	public String getAxisII() { return this.axisII; }
-
-	/**
 	 * Returns the last changed date (when the project was last modified in the database)
 	 * @return The date of the last change to this project.
 	 */
@@ -1165,10 +1105,6 @@ public abstract class Project implements Comparable, IData {
 
 	// The BTA number associated with this project, used for annual report
 	private float BTA;
-	
-	// The AXIS codes (as a string) associated with this project
-	private String axisI;
-	private String axisII;
 	
 	// When the project last changed (a timestamp from the database)
 	private java.sql.Date lastChange;

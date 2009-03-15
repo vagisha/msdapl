@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.taglib;
 
+import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
@@ -34,7 +35,8 @@ public class LinkTag extends TagSupport {
      */
     public int doStartTag() throws JspException {
 
-        String contextPath = pageContext.getServletContext().getContextPath();
+        ServletContext context = pageContext.getServletContext();
+        String contextPath = context.getContextPath();
         String output = contextPath + "/" + path;
         
         // Print this property value to our output writer, suitably filtered

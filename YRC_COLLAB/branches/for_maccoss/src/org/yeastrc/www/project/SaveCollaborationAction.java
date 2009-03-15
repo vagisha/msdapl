@@ -195,8 +195,6 @@ public class SaveCollaborationAction extends Action {
 		project.setPublications(publications);
 		project.setComments(comments);
 		project.setBTA(bta);
-		project.setAxisI(axisI);
-		project.setAxisII(axisII);
 		
 		
 		// Save the project

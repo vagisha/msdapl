@@ -57,7 +57,6 @@ public class SortProjectSearchAction extends Action {
 		Comparator comp = null;		
 		if (sortby.equals("change")) { comp = new ProjectLastChangeComparator(); }
 		else if (sortby.equals("pi")) { comp = new ProjectPIComparator(); }
-		else if (sortby.equals("type")) { comp = new ProjectTypeComparator(); }		
 		else if (sortby.equals("title")) { comp = new ProjectTitleComparator(); }
 		else if (sortby.equals("submit")) { comp = new ProjectSubmitDateComparator(); }
 		else if (sortby.equals("id")) { comp = new ProjectIDComparator(); }

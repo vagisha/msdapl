@@ -17,10 +17,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.GregorianCalendar;
 
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.db.DBConnectionManager;
@@ -157,12 +157,6 @@ public class Projects {
 				
 				if (type.equals("C")) {
 					proj = new Collaboration();
-				} else if (type.equals("D")) {
-					proj = new Dissemination();
-				} else if (type.equals("T")) {
-					proj = new Training();
-				} else if (type.equals("Tech")) {
-					proj = new Technology();
 				} else {
 					throw new InvalidProjectTypeException("Type wasn't C, D, T or Tech...");
 				}
