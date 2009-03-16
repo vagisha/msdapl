@@ -18,12 +18,12 @@
 
 <yrcwww:contentbox title="Welcome" centered="true" width="750">
 
-<P>Welcome to the MacCoss lab data repository server.
+<P>Welcome to the MacCoss lab data repository.
 
 <P>From here you can view and update your existing projects.
-You can also <b><html:link href="/yrc/newProject.do">create a new project</html:link></b>,
+You can also <b><html:link action="newProject.do">create a new project</html:link></b>,
 
-<P>To get started, just select a project from the list below to navigate to that project's page, or create a new project using the main menu.
+<P>To get started, select a project from the list below to navigate to that project's page, or create a new project using the main menu.
 
 
 <!-- SHOW ALL PROJECTS, FOR WHICH THIS USER IS LISTED AS A RESEARCHER -->
@@ -73,7 +73,7 @@ You can also <b><html:link href="/yrc/newProject.do">create a new project</html:
 		 <TR>
 		  <TD valign="top">
 		   <NOBR>
-		    <html:link href="/yrc/viewProject.do" paramId="ID" paramName="project" paramProperty="ID">View</html:link>
+		    <html:link action="viewProject.do" paramId="ID" paramName="project" paramProperty="ID">View</html:link>
 		   </NOBR>
 		  </TD>
 		  <TD valign="top"><bean:write name="project" property="ID"/></TD>

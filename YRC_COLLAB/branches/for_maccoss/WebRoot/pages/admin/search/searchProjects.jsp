@@ -28,14 +28,8 @@ you entered will be returned.  The researcher names on the project are also sear
   <NOBR><html:checkbox property="types" value="Tech"/>Technology Development</NOBR>
  
   <P><U>Groups:</U><BR>
-  <NOBR><html:checkbox property="groups" value="Yates"/>Yates</NOBR>
   <NOBR><html:checkbox property="groups" value="MacCoss"/>MacCoss</NOBR>
-  <NOBR><html:checkbox property="groups" value="MacCoss"/>Aebersold</NOBR>
-  <NOBR><html:checkbox property="groups" value="Microscopy"/>Microscopy</NOBR>
-  <NOBR><html:checkbox property="groups" value="TwoHybrid"/>Two Hybrid (Fields)</NOBR>
-  <NOBR><html:checkbox property="groups" value="Noble"/>Computational Biology (Noble)</NOBR>
   <NOBR><html:checkbox property="groups" value="Informatics"/>Informatics</NOBR>
-  <NOBR><html:checkbox property="groups" value="PSP"/>Protein Structure Prediction</NOBR>
  
  
  <P ALIGN="center"><html:submit value="Search Projects"/>
