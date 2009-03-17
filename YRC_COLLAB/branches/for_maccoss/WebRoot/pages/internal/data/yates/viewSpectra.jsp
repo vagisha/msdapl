@@ -27,14 +27,14 @@
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">Project:</TD>
    <TD valign="top" width="75%">
-     <html:link href="/yrc/viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
+     <html:link action="viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
      <bean:write name="result" property="project.title"/></html:link></TD>
   </yrcwww:colorrow>
 
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">MS Run:</TD>
    <TD valign="top" width="75%">
-     <html:link href="/yrc/viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">
+     <html:link action="viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">
      View Run</html:link></TD>
   </yrcwww:colorrow>
 
@@ -43,7 +43,7 @@
 
    <TD>
 				<nobr>
-				 <html:link href="/yrc/viewProtein.do" paramId="id" paramName="result" paramProperty="hitProtein.id">				 
+				 <html:link action="viewProtein.do" paramId="id" paramName="result" paramProperty="hitProtein.id">				 
 				  <bean:write name="result" property="hitProtein.listing"/></html:link>
 				</nobr>
    </TD>
@@ -53,7 +53,7 @@
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">Peptide List:</TD>
    <TD valign="top" width="75%">
-     <html:link href="/yrc/viewYatesResult.do" paramId="id" paramName="result" paramProperty="id">
+     <html:link action="viewYatesResult.do" paramId="id" paramName="result" paramProperty="id">
      View Peptide List</html:link></TD>
   </yrcwww:colorrow>
 

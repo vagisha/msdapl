@@ -5,7 +5,7 @@
 
 <HTML>
 	 <head><title>Mini Project Searcher</title>
-	 <link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+	 <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css'/>">
 
 	<script>
 

@@ -40,7 +40,7 @@
 			<td style="font-size:8pt;">
 				<html:hidden name="grant" property="grantPI.ID" indexed="true" />
 				<html:hidden name="grant" property="grantPI.lastName" indexed="true" />
-				<html:link href="/yrc/viewResearcher.do" paramId="id" paramName="grant" paramProperty="grantPI.ID">
+				<html:link action="viewResearcher.do" paramId="id" paramName="grant" paramProperty="grantPI.ID">
 					<bean:write name="grant" property="grantPI.lastName" />
 				</html:link>
 			</td>
@@ -159,7 +159,7 @@ function addGrant(grantID, grantTitle, piID, PI, sourceType, sourceName, grantNu
 		// grant PI
 		var html = '<input type="hidden" name="grant['+sourceIdx+'].grantPI.ID" value="'+piID+'"/> ';
 		html += '<input type="hidden" name="grant['+sourceIdx+'].grantPI.lastName" value="'+PI+'"/> ';
-		html += '<a href="/yrc/viewResearcher.do?id='+piID+'">'+PI+'</a>';
+		html += '<a href="<yrcwww:link path='viewResearcher.do?id='/>'+piID+'">'+PI+'</a>';
 		grantPICell.innerHTML = html;
 		grantPICell.style.fontSize = "8pt";
 		// funding source type	
@@ -262,7 +262,7 @@ function addFundingSource() {
 	
 	var winHeight = 500
 	var winWidth = 700;
-	var doc = "/yrc/viewGrants.do?PIs="+PIs+"&selectedGrants="+selectedGrants;
+	var doc = "<yrcwww:link path='viewGrants.do?PIs='/>"+PIs+"&selectedGrants="+selectedGrants;
 	//alert(doc);
 	window.open(doc, "GRANT_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }
@@ -296,7 +296,7 @@ function editGrant(grantID) {
 	EDIT_CLICKED = true;
 	var winHeight = 500;
 	var winWidth = 700;
-	var doc = "/yrc/editGrant.do?grantID="+grantID;
+	var doc = "<yrcwww:link path='editGrant.do?grantID='/>"+grantID;
 	window.open(doc, "GRANT_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }
 
@@ -351,7 +351,7 @@ function updatePIColumn(cell, piID, piLastName) {
 			cell.childNodes[i].value = piID;
 		}
 		if (cell.childNodes[i].href) {
-			cell.childNodes[i].href = '/yrc/viewResearcher.do?id='+piID;
+			cell.childNodes[i].href = "<yrcwww:link path='viewResearcher.do?id='/>"+piID;
 			cell.childNodes[i].firstChild.data = piLastName;
 		}
 	}

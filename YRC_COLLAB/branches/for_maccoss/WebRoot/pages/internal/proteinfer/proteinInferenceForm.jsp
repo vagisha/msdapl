@@ -14,7 +14,7 @@
 <%@ include file="/includes/errors.jsp" %>
 
 
-<link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
+<link rel="stylesheet" href="<yrcwww:link path='css/proteinfer.css'/>" type="text/css" >
 <script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
 <script src="/yrc/js/jquery.blockUI.js"></script>
 <script src="/yrc/js/tooltip.js"></script>

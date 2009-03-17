@@ -19,7 +19,7 @@
 
   <UL>
    <logic:iterate id="name" name="groupList">
-     <LI><html:link href="/yrc/manageGroupMembers.do" paramId="groupName" paramName="name"><bean:write name="name"/></html:link>
+     <LI><html:link action="manageGroupMembers.do" paramId="groupName" paramName="name"><bean:write name="name"/></html:link>
    </logic:iterate>
   </UL>
 

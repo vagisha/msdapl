@@ -11,7 +11,7 @@
 <html>
    <head>
     <title></title>
-	<link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css' />">
 	
 	<script type="text/javascript">
 	
@@ -59,7 +59,7 @@
 				window.close();
 			}
 			else {
-				var url = '/yrc/viewGrants.do?PIs=<%=PIs%>&selectedGrants=<%=selectedGrants%>';
+				var url = "<yrcwww:link path='viewGrants.do?PIs=<%=PIs%>&selectedGrants=<%=selectedGrants%>'/>";
 				document.location = url;
 			}
 		}

@@ -24,7 +24,7 @@
    <yrcwww:colorrow scheme="ms">
     <TD valign="top" width="25%">Bait Protein:</TD>
     <TD valign="top" width="75%">
-     <html:link href="/yrc/viewProtein.do" paramId="id" paramName="run" paramProperty="baitProtein.id">
+     <html:link action="viewProtein.do" paramId="id" paramName="run" paramProperty="baitProtein.id">
      <bean:write name="run" property="baitProtein.listing"/></html:link>
     </TD>
    </yrcwww:colorrow>
@@ -51,7 +51,7 @@
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">Project:</TD>
    <TD valign="top" width="75%">
-     <html:link href="/yrc/viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
+     <html:link action="viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
      <bean:write name="run" property="project.title"/></html:link></TD>
   </yrcwww:colorrow>
 
@@ -59,16 +59,16 @@
    <TD valign="top" width="25%">DTA SELECT:</TD>
    <TD valign="top" width="75%">
    	
-   	<html:link href="/yrc/viewDTASelectFilter.do" paramId="id" paramName="run" paramProperty="id">
+   	<html:link action="viewDTASelectFilter.do" paramId="id" paramName="run" paramProperty="id">
      Download DTASelect Filter text</html:link>
 	
 	<logic:equal name="run" property="containsDTASelectHTML" value="true">
-		   	<br><html:link href="/yrc/viewDTASelectHTML.do" paramId="id" paramName="run" paramProperty="id">
+		   	<br><html:link action="viewDTASelectHTML.do" paramId="id" paramName="run" paramProperty="id">
 		     Download DTASelect HTML file</html:link>
 	</logic:equal>
 
 	<logic:equal name="run" property="containsDTASelectTXT" value="true">
-		   	<br><html:link href="/yrc/viewDTASelect.do" paramId="id" paramName="run" paramProperty="id">
+		   	<br><html:link action="viewDTASelect.do" paramId="id" paramName="run" paramProperty="id">
 		     Download Unfiltered DTASelect text file</html:link>
 	</logic:equal>
     
@@ -142,7 +142,7 @@
 					params.put( "id", new Integer (  ((org.yeastrc.yates.YatesRun)(request.getAttribute("run"))).getId() ));
 					params.put( "sortby", request.getAttribute("sortby"));
 				%>
-		   [<html:link href="/yrc/viewYatesRun.do" name="params">unfilter</html:link>]<BR><BR></TD>
+		   [<html:link action="viewYatesRun.do" name="params">unfilter</html:link>]<BR><BR></TD>
 		</yrcwww:colorrow>
 	</logic:equal>
 	<logic:equal name="filter" value="no">
@@ -153,7 +153,7 @@
 					params.put( "id", new Integer (  ((org.yeastrc.yates.YatesRun)(request.getAttribute("run"))).getId() ));
 					params.put( "sortby", request.getAttribute("sortby"));
 				%>
-		   [<html:link href="/yrc/viewYatesRun.do" name="params">filter</html:link>]
+		   [<html:link action="viewYatesRun.do" name="params">filter</html:link>]
 
 			   
 			   </TD>
@@ -168,7 +168,7 @@
 		 		params.put( "id", new Integer (  ((org.yeastrc.yates.YatesRun)(request.getAttribute("run"))).getId() ));
 		 		params.put( "sortby", "proteinListing");
 		 	%>
-		   <html:link href="/yrc/viewYatesRun.do" name="params"><b>Hit Protein</b></html:link>
+		   <html:link action="viewYatesRun.do" name="params"><b>Hit Protein</b></html:link>
 		</TD>
 		<TD width="35%">
 		   <u><b>Protein Desc</b></u>
@@ -179,7 +179,7 @@
 		 		params.put( "id", new Integer (  ((org.yeastrc.yates.YatesRun)(request.getAttribute("run"))).getId() ));
 		 		params.put( "sortby", "sequenceCount");
 		 	%>
-		   <html:link href="/yrc/viewYatesRun.do" name="params"><b>Sequence Count</b></html:link>
+		   <html:link action="viewYatesRun.do" name="params"><b>Sequence Count</b></html:link>
 		</TD>
 		<TD width="9%">
 			<%
@@ -187,7 +187,7 @@
 		 		params.put( "id", new Integer (  ((org.yeastrc.yates.YatesRun)(request.getAttribute("run"))).getId() ));
 		 		params.put( "sortby", "spectrumCount");
 		 	%>
-		   <html:link href="/yrc/viewYatesRun.do" name="params"><b>Spectrum Count</b></html:link>
+		   <html:link action="viewYatesRun.do" name="params"><b>Spectrum Count</b></html:link>
 		</TD>
 		<TD width="8%">
 			<%
@@ -195,7 +195,7 @@
 		 		params.put( "id", new Integer (  ((org.yeastrc.yates.YatesRun)(request.getAttribute("run"))).getId() ));
 		 		params.put( "sortby", "sequenceCoverage");
 		 	%>
-		   <html:link href="/yrc/viewYatesRun.do" name="params"><b>Sequence Coverage</b></html:link>
+		   <html:link action="viewYatesRun.do" name="params"><b>Sequence Coverage</b></html:link>
 		</TD>
 		<TD width="7%">
 			<%
@@ -203,17 +203,17 @@
 		 		params.put( "id", new Integer (  ((org.yeastrc.yates.YatesRun)(request.getAttribute("run"))).getId() ));
 		 		params.put( "sortby", "molecularWeight");
 		 	%>
-		   <html:link href="/yrc/viewYatesRun.do" name="params"><b>Mol. Wt.</b></html:link>
+		   <html:link action="viewYatesRun.do" name="params"><b>Mol. Wt.</b></html:link>
 		</TD>
 
 	</yrcwww:colorrow>
 
 		<logic:iterate id="result" name="yatesResults">
 			<yrcwww:colorrow scheme="ms">
-				<TD width="16%" valign="top">[<html:link href="/yrc/viewYatesResult.do" paramId="id" paramName="result" paramProperty="id">
+				<TD width="16%" valign="top">[<html:link action="viewYatesResult.do" paramId="id" paramName="result" paramProperty="id">
 				 <nobr>View Peptides</nobr></html:link>]&nbsp;&nbsp;</TD>
 				<TD width="16%" valign="top">
-				 <html:link href="/yrc/viewProtein.do" paramId="id" paramName="result" paramProperty="hitProtein.id">				 
+				 <html:link action="viewProtein.do" paramId="id" paramName="result" paramProperty="hitProtein.id">				 
 				  <bean:write name="result" property="hitProtein.listing"/></html:link>
 				</TD>
 				<TD width="35%" valign="top"><font style="font-size:8pt;"><bean:write name="result" property="hitProtein.description"/></font></TD>

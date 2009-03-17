@@ -15,8 +15,8 @@
 <yrcwww:contentbox title="View Upload Job" centered="true" width="1000" scheme="upload">
 	<center>
 	
-	<a href="/yrc/listUploadJobs.do?status=pending"><b>View Pending Jobs</b></a> ||
-	<a href="/yrc/listUploadJobs.do?status=complete"><b>View Completed Jobs</b></a>
+	<a href="<yrcwww:link path='listUploadJobs.do?status=pending'/>"><b>View Pending Jobs</b></a> ||
+	<a href="<yrcwww:link path='listUploadJobs.do?status=complete'/>"><b>View Completed Jobs</b></a>
 	<br><br><br>
 	
 	<table border="0" width="85%">
@@ -28,7 +28,7 @@
 		<yrcwww:colorrow scheme="upload">
 			<td width="20%" align="left" valign="top">Submitted By:</td>
 			<td width="80%" align="left" valign="top">
-				<a href="/yrc/viewResearcher.do?id=<bean:write name="job" property="submitter" />">
+				<a href="<yrcwww:link path='viewResearcher.do?'/>id=<bean:write name="job" property="submitter" />">
 					<bean:write name="job" property="researcher.firstName" /> <bean:write name="job" property="researcher.lastName" /></a>
 			</td>
 		</yrcwww:colorrow>	
@@ -47,18 +47,18 @@
 			<td width="20%" align="left" valign="top">Status:</td>
 			<td width="80%" align="left" valign="top">
 				<logic:equal name="job" property="status" value="4">
-					<bean:write name="job" property="statusDescription" /> <a href="/yrc/viewYatesRun.do?id=<bean:write name="job" property="runID" />"><span style="color:red;">[View Run]</span></a>
+					<bean:write name="job" property="statusDescription" /> <a href="<yrcwww:link path='viewYatesRun.do?'/>id=<bean:write name="job" property="runID" />"><span style="color:red;">[View Run]</span></a>
 				</logic:equal>
 				<logic:notEqual name="job" property="status" value="4"><!-- not completed -->
 					<bean:write name="job" property="statusDescription" />
 					
 					<logic:notEqual name="job" property="status" value="1"><!-- not running -->
-						[<a style="color:red;" href="/yrc/deleteJob.do?id=<bean:write name="job" property="id" scope="request"/>">Delete</a>]
+						[<a style="color:red;" href="<yrcwww:link path='deleteJob.do?'/>id=<bean:write name="job" property="id" scope="request"/>">Delete</a>]
 						
 					<logic:notEqual name="job" property="status" value="0"><!-- not waiting to run -->
 					
 					
-						[<a style="color:red;" href="/yrc/resetJob.do?id=<bean:write name="job" property="id" scope="request"/>">Retry</a>]
+						[<a style="color:red;" href="<yrcwww:link path='resetJob.do?'/>id=<bean:write name="job" property="id" scope="request"/>">Retry</a>]
 						
 					
 					</logic:notEqual>
@@ -90,7 +90,7 @@
 		<yrcwww:colorrow scheme="upload">
 			<td width="20%" align="left" valign="top">Project:</td>
 			<td width="80%" align="left" valign="top">
-				<a href="/yrc/viewProject.do?ID=<bean:write name="job" property="projectID" />">
+				<a href="<yrcwww:link path='viewProject.do?'/>ID=<bean:write name="job" property="projectID" />">
 					<bean:write name="job" property="project.title" /></a>
 			</td>
 		</yrcwww:colorrow>

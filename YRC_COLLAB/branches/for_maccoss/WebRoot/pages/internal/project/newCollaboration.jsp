@@ -18,16 +18,13 @@
  <P align="center"><B>Your collaboration was successfully requested.</B>
 </logic:present>
 
-<script type="text/javascript" src="/yrc/js/grants.js" ></script>
+<script type="text/javascript" src="<yrcwww:link path='js/grants.js'/>" ></script>
 
 <yrcwww:contentbox title="Create a New Collaboration" centered="true" width="750" scheme="search">
 
-<P>To request a new collaboration with the YRC, please fill out the form below.
-Please review our <html:link href="/yrc/pages/internal/project/collaborationPolicies.jsp">collaboration policies</html:link> first.
-The appropriate members of the YRC will automatically be notified of your request, and you should followup with you shortly.
 
 <P><B>NOTE:</B>  If an individual you are listing as the PI, researcher B, C or D is not currently in the database, you must add them to the database first.
-Go <html:link href="/yrc/newResearcher.do">here</html:link> to add a new researcher to our database.
+Go <html:link action="newResearcher.do">here</html:link> to add a new researcher to our database.
 
  <CENTER>
 

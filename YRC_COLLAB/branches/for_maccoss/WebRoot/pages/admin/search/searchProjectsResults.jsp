@@ -4,7 +4,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <logic:notPresent name="projectsSearch" scope="session">
-  <logic:redirect href="/yrc/pages/admin/search/sortProjectSearch.jsp" />
+  <logic:redirect forward="projectSearchForm" />
 </logic:notPresent>
 
 <%@ include file="/includes/adminHeader.jsp" %>
@@ -18,19 +18,19 @@
 <logic:notEmpty name="projectsSearch" scope="session">
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
  <yrcwww:colorrow scheme="adminSearch">
-  <td><b><html:link href="/yrc/sortProjectSearch.do?sortby=id">ID</html:link></b></td>
-  <td><b><html:link href="/yrc/sortProjectSearch.do?sortby=pi">PI</html:link></b></td>
-  <td><b><html:link href="/yrc/sortProjectSearch.do?sortby=title">Title</html:link></b></td>
-  <td><b><html:link href="/yrc/sortProjectSearch.do?sortby=type">Type</html:link></b></td>
-  <td><b><html:link href="/yrc/sortProjectSearch.do?sortby=submit"><font style="font-size:8pt;">Submit Date</font></html:link></b></td>
-  <td><b><html:link href="/yrc/sortProjectSearch.do?sortby=change"><font style="font-size:8pt;">Changed</font></html:link></b></td>
+  <td><b><html:link action="sortProjectSearch.do?sortby=id">ID</html:link></b></td>
+  <td><b><html:link action="sortProjectSearch.do?sortby=pi">PI</html:link></b></td>
+  <td><b><html:link action="sortProjectSearch.do?sortby=title">Title</html:link></b></td>
+  <td><b><html:link action="sortProjectSearch.do?sortby=type">Type</html:link></b></td>
+  <td><b><html:link action="sortProjectSearch.do?sortby=submit"><font style="font-size:8pt;">Submit Date</font></html:link></b></td>
+  <td><b><html:link action="sortProjectSearch.do?sortby=change"><font style="font-size:8pt;">Changed</font></html:link></b></td>
  </yrcwww:colorrow>
  
 <logic:iterate id="project" name="projectsSearch" scope="session">
  <yrcwww:colorrow scheme="adminSearch">
   <TD valign="top" width="5%">
    <NOBR>
-    <html:link href="/yrc/viewProject.do" paramId="ID" paramName="project" paramProperty="ID">
+    <html:link action="viewProject.do" paramId="ID" paramName="project" paramProperty="ID">
      <bean:write name="project" property="ID"/></html:link>
    </NOBR>
   </TD>

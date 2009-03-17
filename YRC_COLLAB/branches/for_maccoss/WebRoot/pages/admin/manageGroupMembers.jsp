@@ -35,7 +35,7 @@
 	    params.put( "groupName", request.getAttribute("groupName"));
 	    params.put( "researcherID", new Integer(((org.yeastrc.project.Researcher)(researcher)).getID()) );
        %>
-       <html:link href="/yrc/manageGroupMembers.do" name="params">Remove from Group</html:link>
+       <html:link action="manageGroupMembers.do" name="params">Remove from Group</html:link>
      </TD>
     </TR>
 

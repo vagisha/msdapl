@@ -36,11 +36,11 @@
 	   		
 	  <yrcwww:colorrow scheme="ms">
 	   <TD valign="top" width="20%">
-	   	<html:link href="/yrc/viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">View Run</html:link>
+	   	<html:link action="viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">View Run</html:link>
 	   	<yrcwww:member group="any">
 	   	<% if(searchId != null && searchId > 0) {%>
 	   	<div style="font-size:8pt; font-weight: bold;"><b>
-	   	<a href="/yrc/newProteinInference.do?searchId=<%=searchId %>&projectId=<bean:write name="projectId" />">
+	   	<a href="<yrcwww:link path='newProteinInference.do?searchId=<%=searchId %>&projectId='/><bean:write name="projectId" />">
 	   	[Run Protein Inference]
 	   	</a></b></div>
 	   	<%} %>

@@ -8,10 +8,10 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<script type="text/javascript" src="/yrc/js/wz_jsgraphics.js"></script>
-<script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.slider.js"></script>
+<script type="text/javascript" src="<yrcwww:link path='js/wz_jsgraphics.js'/>"></script>
+<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='js/jquery.ui-1.6rc2/ui/ui.core.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='js/jquery.ui-1.6rc2/ui/ui.slider.js'/>"></script>
 
 <logic:present name="alignedProteins">
 

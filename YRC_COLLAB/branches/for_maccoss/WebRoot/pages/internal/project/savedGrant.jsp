@@ -10,7 +10,7 @@
 <html>
    <head>
     <title></title>
-	<link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css'/>">
 	
 <script type="text/javascript">
 	function updateGrant(grantID, grantTitle, piID, PI, sourceType, sourceName, grantNumber, grantAmount) {

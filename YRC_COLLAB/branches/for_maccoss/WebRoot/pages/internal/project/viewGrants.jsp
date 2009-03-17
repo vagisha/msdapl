@@ -10,7 +10,7 @@
 <html>
   <head>
     <title>Grants</title>
-	<link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css'/>">
   </head>
   
   <body>
@@ -33,7 +33,7 @@
 	<% String PIs = request.getParameter("PIs"); %>
 	
 	function sortGrants(sortCrit) {
-		var url = '/yrc/viewGrants.do?PIs=<%=PIs%>&sortby='+sortCrit;
+		var url = "<yrcwww:link path='viewGrants.do?PIs='/><%=PIs%>&sortby="+sortCrit;
 		var selectedGrants = getSelectedGrants();
 		if (selectedGrants.length > 0) {
 			url += '&selectedGrants='+selectedGrants;
@@ -43,7 +43,7 @@
 	}
 	
 	function addNewGrant() {
-		var url = '/yrc/editGrant.do?PIs=<%=PIs%>';
+		var url = "<yrcwww:link path='editGrant.do?PIs='/><%=PIs%>";
 		var selectedGrants = getSelectedGrants();
 		if (selectedGrants.length > 0) {
 			url += '&selectedGrants='+selectedGrants;

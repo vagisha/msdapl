@@ -152,7 +152,7 @@
 
 <script type="text/javascript">
 	function onCancel(projectID) {
-		document.location = "/yrc/viewProject.do?ID="+projectID;
+		document.location = "<yrcwww:link path='viewProject.do?ID=' />"+projectID;
 	}
 </script>
 

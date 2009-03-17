@@ -9,14 +9,14 @@
 <html>
   <head>
     <title>Available Searches</title>
-	<link REL="stylesheet" TYPE="text/css" HREF="/yrc/css/global.css">
+	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css'/>">
   </head>
   
   <body>
   
 <%@ include file="/includes/errors.jsp" %>
 
-<script src="/yrc/js/jquery.ui-1.6rc2/jquery-1.2.6.js"></script>
+<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>></script>
 <script type="text/javascript">
 	
 	$(document).ready(function() {

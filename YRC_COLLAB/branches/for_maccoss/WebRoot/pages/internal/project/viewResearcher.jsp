@@ -81,7 +81,7 @@
 		<yrcwww:colorrow>
 			<TD valign="top" align="center" colspan="2" width="100%">
 				<br><br>
-				[ <html:link href="/yrc/editResearcher.do" paramId="id" paramName="researcher" paramProperty="ID">
+				[ <html:link action="editResearcher.do" paramId="id" paramName="researcher" paramProperty="ID">
 				Edit Researcher Information</html:link>
 				]
 
@@ -109,7 +109,7 @@
      <yrcwww:colorrow>
 	  <TD valign="top" width="15%">
 	   <NOBR>
-		<html:link href="/yrc/viewProject.do" paramId="ID" paramName="project" paramProperty="ID">
+		<html:link action="viewProject.do" paramId="ID" paramName="project" paramProperty="ID">
 		 <bean:write name="project" property="ID"/></html:link>
 	   </NOBR>
 	  </TD>

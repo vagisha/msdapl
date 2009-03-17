@@ -20,9 +20,9 @@
 <p><b>The Run was successfully uploaded to the YRC Database!</b>
 
 <p>Below is a summary of the run from the database.  To view the run itself 
-<html:link href="/yrc/viewYatesRun.do" paramId="id" paramName="run" paramProperty="id"><b>click here</b></html:link>.
+<html:link action="viewYatesRun.do" paramId="id" paramName="run" paramProperty="id"><b>click here</b></html:link>.
 
-<p>To upload another run, <html:link href="/yrc/uploadYatesFormAction.do">click here</html:link>.
+<p>To upload another run, <html:link action="uploadYatesFormAction.do">click here</html:link>.
 
 
 <p><B>Run Information:</B><BR><BR>
@@ -34,7 +34,7 @@
      N/A
     </logic:empty>
     <logic:notEmpty name="run" property="baitProtein">
-      <html:link href="/yrc/viewProtein.do" paramId="id" paramName="run" paramProperty="baitProtein.id">
+      <html:link action="viewProtein.do" paramId="id" paramName="run" paramProperty="baitProtein.id">
      <bean:write name="run" property="baitProtein.listing"/></html:link>
     </logic:notEmpty>
    </TD>
@@ -61,7 +61,7 @@
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">Project:</TD>
    <TD valign="top" width="75%">
-     <html:link href="/yrc/viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
+     <html:link action="viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
      <bean:write name="run" property="project.title"/></html:link></TD>
   </yrcwww:colorrow>
 

@@ -15,7 +15,7 @@
       id="protseqbutton_<bean:write name="protein" property="protein.id" />">[View Sequence]</span>
 &nbsp; &nbsp;
 <span style="font-size: 8pt; color: red;">
-<a  style="color:red;" href="/yrc/viewProtein.do?id=<bean:write name="protein" property="protein.nrseqProteinId" />">[Protein Details]</a></span>
+<a  style="color:red;" href="<yrcwww:link path='viewProtein.do?id='/><bean:write name="protein" property="protein.nrseqProteinId" />">[Protein Details]</a></span>
 <br><br>
 
 

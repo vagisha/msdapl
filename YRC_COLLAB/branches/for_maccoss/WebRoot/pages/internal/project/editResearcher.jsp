@@ -99,7 +99,7 @@
 
   <div>
   	<html:submit value="SAVE" />
-  	<input type="button" value="CANCEL" onClick="document.location.href='/yrc/viewResearcher.do?id=<bean:write name="editInformationForm" property="id" scope="request" />'">
+  	<input type="button" value="CANCEL" onClick="document.location.href='<yrcwww:link path='viewResearcher.do?id='/><bean:write name="editInformationForm" property="id" scope="request" />'">
   </div>
   
   </html:form>

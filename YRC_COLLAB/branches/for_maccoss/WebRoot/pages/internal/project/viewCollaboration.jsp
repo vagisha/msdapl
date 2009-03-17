@@ -23,7 +23,7 @@
  function confirmDelete(ID) {
     if(confirm("Are you sure you want to delete this project?")) {
        if(confirm("Are you ABSOLUTELY sure you want to delete this project?")) {
-          document.location.href="/yrc/deleteProject.do?ID=" + ID;
+          document.location.href="<yrcwww:link path='deleteProject.do?ID='/>" + ID;
           return 1;
        }
     }
@@ -99,10 +99,8 @@
  
 <script>
 
-	function goYates() { document.location.href = "/yrc/uploadYatesFormAction.do?projectID=<bean:write name="project" property="ID" scope="request" />"; }
-	function goMacCoss() { document.location.href = "/yrc/uploadMacCossFormAction.do?projectID=<bean:write name="project" property="ID" scope="request" />"; }
-	function goMicroscopy() { document.location.href = "/yrc/uploadMicroscopyFormAction.do?projectID=<bean:write name="project" property="ID" scope="request" />"; }
-	function goEdit() { document.location.href = "/yrc/editProject.do?ID=<bean:write name="project" property="ID" scope="request" />"; }
+	function goMacCoss() { document.location.href = "<yrcwww:link path='uploadMacCossFormAction.do?'/>projectID=<bean:write name="project" property="ID" scope="request" />"; }
+	function goEdit() { document.location.href = "<yrcwww:link path='editProject.do?ID='/><bean:write name="project" property="ID" scope="request" />"; }
 </script>
 
  

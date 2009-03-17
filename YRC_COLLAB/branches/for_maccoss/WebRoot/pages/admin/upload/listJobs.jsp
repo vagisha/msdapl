@@ -23,11 +23,11 @@
 
 	<logic:equal name="status" scope="request" value="pending">
 		<p align="center">Listed below are the <b>pending</b> MS uploads.</p>
-		<p align="center"><a href="/yrc/listUploadJobs.do?status=complete">View Completed Jobs</a></p>
+		<p align="center"><a href="<yrcwww:link path='listUploadJobs.do?status=complete' />">View Completed Jobs</a></p>
 	</logic:equal>
 	<logic:notEqual name="status" scope="request" value="pending">
 		<p align="center">Listed below are the <b>completed</b> MS uploads.</p>
-		<p align="center"><a href="/yrc/listUploadJobs.do?status=pending">View Pending Jobs</a></p>
+		<p align="center"><a href="<yrcwww:link path='listUploadJobs.do?status=pending' />">View Pending Jobs</a></p>
 	</logic:notEqual>
 	
 	
@@ -35,10 +35,10 @@
 	
 	<p align="center">
 		<logic:present name="previousIndex" scope="request">
-			<a href="/yrc/listUploadJobs.do?status=<bean:write name="status" scope="request" />&index=<bean:write name="previousIndex" scope="request" />">View Previous 50</a>
+			<a href="<yrcwww:link path='listUploadJobs.do?'/>status=<bean:write name="status" scope="request" />&index=<bean:write name="previousIndex" scope="request" />">View Previous 50</a>
 		</logic:present>
 		<logic:present name="nextIndex" scope="request">
-			<a href="/yrc/listUploadJobs.do?status=<bean:write name="status" scope="request" />&index=<bean:write name="nextIndex" scope="request" />">View Next 50</a>
+			<a href="<yrcwww:link path='listUploadJobs.do?'/>status=<bean:write name="status" scope="request" />&index=<bean:write name="nextIndex" scope="request" />">View Next 50</a>
 		</logic:present>
 	</p>
 		
@@ -58,19 +58,19 @@
 	
 		<logic:iterate name="jobs" scope="request" id="job">
 			<yrcwww:colorrow scheme="upload">
-				<td align="left" valign="top" style="width:8%;font-size:8pt;"><a href="/yrc/viewUploadJob.do?id=<bean:write name="job" property="id" />">View Job</td>
+				<td align="left" valign="top" style="width:8%;font-size:8pt;"><a href="<yrcwww:link path='viewUploadJob.do?'/>id=<bean:write name="job" property="id" />">View Job</td>
 
 				<td align="left" valign="top" style="width:8%;font-size:8pt;">
 
 					<logic:equal name="job" property="status" value="4">
-						<a href="/yrc/viewYatesRun.do?id=<bean:write name="job" property="runID" />"><bean:write name="job" property="statusDescription" /></a>
+						<a href="<yrcwww:link path='viewYatesRun.do?'/>id=<bean:write name="job" property="runID" />"><bean:write name="job" property="statusDescription" /></a>
 					</logic:equal>
 					<logic:notEqual name="job" property="status" value="4">
 						<bean:write name="job" property="statusDescription" />
 					</logic:notEqual>
 				</td>
 
-				<td align="left" valign="top" style="width:10%;font-size:8pt;"><a href="/yrc/viewResearcher.do?id=<bean:write name="job" property="submitter" />">
+				<td align="left" valign="top" style="width:10%;font-size:8pt;"><a href="<yrcwww:link path='viewResearcher.do?'/>id=<bean:write name="job" property="submitter" />">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<bean:write name="job" property="researcher.lastName" />, <bean:write name="job" property="researcher.firstName" /></td>
 					</div>
@@ -109,10 +109,10 @@
 
 	<p align="center">
 		<logic:present name="previousIndex" scope="request">
-			<a href="/yrc/listUploadJobs.do?status=<bean:write name="status" scope="request" />&index=<bean:write name="previousIndex" scope="request" />">View Previous 50</a>
+			<a href="<yrcwww:link path='listUploadJobs.do?'/>status=<bean:write name="status" scope="request" />&index=<bean:write name="previousIndex" scope="request" />">View Previous 50</a>
 		</logic:present>
 		<logic:present name="nextIndex" scope="request">
-			<a href="/yrc/listUploadJobs.do?status=<bean:write name="status" scope="request" />&index=<bean:write name="nextIndex" scope="request" />">View Next 50</a>
+			<a href="<yrcwww:link path='listUploadJobs.do?'/>status=<bean:write name="status" scope="request" />&index=<bean:write name="nextIndex" scope="request" />">View Next 50</a>
 		</logic:present>
 	</p>
 

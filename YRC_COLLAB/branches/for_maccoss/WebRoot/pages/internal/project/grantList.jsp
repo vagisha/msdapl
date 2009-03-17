@@ -17,7 +17,7 @@
 			<tr>
 				<td style="font-size:8pt;padding: 3px;padding-left:0px;"><bean:write name="grant" property="title" /></td>
 				<td style="font-size:8pt;padding: 3px;">
-				<html:link href="/yrc/viewResearcher.do" paramId="id" paramName="grant" paramProperty="grantPI.ID"><bean:write name="grant" property="grantPI.lastName" /></html:link>
+				<html:link action="viewResearcher.do" paramId="id" paramName="grant" paramProperty="grantPI.ID"><bean:write name="grant" property="grantPI.lastName" /></html:link>
 				</td>
 				<td style="font-size:8pt;padding: 3px;"><bean:write name="grant" property="fundingSource.sourceType.displayName" /></td>
 				<td style="font-size:8pt;padding: 3px;"><bean:write name="grant" property="fundingSource.sourceName.displayName" /></td>

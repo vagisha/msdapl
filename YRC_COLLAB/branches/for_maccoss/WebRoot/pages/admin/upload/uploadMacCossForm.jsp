@@ -14,7 +14,7 @@ var currentProjectField;
 
 function projectSearcherPopUp(field) {
 	currentProjectField = field;
-	var doc = "/yrc/pages/admin/upload/uploadProjectSearch.jsp";
+	var doc = "<yrcwww:link path='pages/admin/upload/uploadProjectSearch.jsp'/>";
 
 	var winHeight = 500
 	var winWidth = 600;

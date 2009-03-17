@@ -29,7 +29,7 @@
      N/A
     </logic:empty>
     <logic:notEmpty name="run" property="baitProtein">
-      <html:link href="/yrc/viewProtein.do" paramId="id" paramName="run" paramProperty="baitProtein.id">
+      <html:link action="viewProtein.do" paramId="id" paramName="run" paramProperty="baitProtein.id">
      <bean:write name="run" property="baitProtein.listing"/></html:link>
     </logic:notEmpty>
    </TD>
@@ -47,7 +47,7 @@
 
    <TD>
 				<nobr>
-				 <html:link href="/yrc/viewProtein.do" paramId="id" paramName="result" paramProperty="hitProtein.id">				 
+				 <html:link action="viewProtein.do" paramId="id" paramName="result" paramProperty="hitProtein.id">				 
 				  <bean:write name="result" property="hitProtein.listing"/></html:link>
 				</nobr>
    </TD>
@@ -71,13 +71,13 @@
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">MS Run:</TD>
    <TD valign="top" width="75%">
-     <html:link href="/yrc/viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">
+     <html:link action="viewYatesRun.do" paramId="id" paramName="run" paramProperty="id">
      View Run</html:link></TD>
   </yrcwww:colorrow>
   <yrcwww:colorrow scheme="ms">
    <TD valign="top" width="25%">Project:</TD>
    <TD valign="top" width="75%">
-     <html:link href="/yrc/viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
+     <html:link action="viewProject.do" paramId="ID" paramName="run" paramProperty="projectID">
      <bean:write name="result" property="project.title"/></html:link></TD>
   </yrcwww:colorrow>
  </TABLE>
@@ -87,7 +87,7 @@
  <TABLE CELLPADDING="no" CELLSPACING="0" width="90%"> 
 
   <yrcwww:colorrow scheme="ms">
-   <TD valign="top" width="100%" colspan="2" align="center"><font style="font-size:12pt;"><b>Sequence Coverage:</b></font><br>[<a href="/yrc/pages/internal/data/yates/aboutSequenceCoverageMap.jsp">What do the colors mean?</a>]<br><br></TD>
+   <TD valign="top" width="100%" colspan="2" align="center"><font style="font-size:12pt;"><b>Sequence Coverage:</b></font><br>[<a href="<yrcwww:link path='pages/internal/data/yates/aboutSequenceCoverageMap.jsp'/>">What do the colors mean?</a>]<br><br></TD>
   </yrcwww:colorrow>
   
   <yrcwww:colorrow scheme="ms">
@@ -131,12 +131,12 @@
 		<yrcwww:colorrow scheme="ms">
 			<TD>
 			 <logic:equal name="peptide" property="isSpectraAvailable" value="true">
-			 	<html:link href="/yrc/viewSpectra.do" paramId="id" paramName="peptide" paramProperty="id">
+			 	<html:link action="viewSpectra.do" paramId="id" paramName="peptide" paramProperty="id">
  			  	Spectra</html:link>
 			 </logic:equal>
 			 <logic:notEqual name="peptide" property="isSpectraAvailable" value="true">
 			 	<logic:present name="hasYatesCycles">
-			 		<html:link href="/yrc/viewSpectra.do" paramId="id" paramName="peptide" paramProperty="id">
+			 		<html:link action="viewSpectra.do" paramId="id" paramName="peptide" paramProperty="id">
  			  		Spectra</html:link>
 			 	</logic:present>
 			 </logic:notEqual>
