@@ -1,23 +1,15 @@
 /* These are my global styling rules */
 
-#dhtmltooltip{
-	position: absolute;
-	width: 150px;
-	border: 2px solid black;
-	padding: 2px;
-	background-color: lightyellow;
-	visibility: hidden;
-	z-index: 100;
-}
-
-
 BODY    {
-                background-color: #FFFFFF;
-                color: #000000;
-                font-family: verdana, helvetica, arial;
-                font-size:10pt;
-                font-style:normal;
-                font-weight:500;
+           background-color: #FFFFFF;
+           color: #000000;
+           height: 100%;
+           margin:0;
+           padding:0;
+           font-family: verdana,arial,helvetica,sans-serif;
+           font-size:10pt;
+           font-style: normal;
+           font-weight:500;
         }
 
 PRE	{
@@ -30,36 +22,54 @@ TD	{
 		font-size:10pt;
 	}
 TH	{
-		font-size:12pt;
+		font-size:10pt;
+		font-weight:bold;
 	}
 
 A:link  {
-                color: #323232;
+                color: #006699;
         }
 
 A:visited {
-                color: #232323;
+                color: #666666;
         }
 
 A:active {
                 color: #FF0000;
         }
 
-DIV.footer {
-        width:350;
+DIV.header {
+        width:100%;
         border-width: 0;
-        padding: 10px;
-        background-color: #ffffff;
+        padding: 0px;
+        background-color: #0075B2;
         z-index:1;
-        color: #000000;
-        font-family: verdana, helvetica, arial;
+        color: #FFFFFF;
+        font-family: verdana,arial,helvetica,sans-serif;
         font-size:8pt;
         font-style:normal;
         font-weight:300;
-        margin:0px;
+        margin-top:0px;
 }
 
-DIV.localization, DIV.ms, DIV.pinfer, DIV.y2h, DIV.progress, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.about, DIV.account {
+DIV.footer {
+        width:100%;
+        border-width: 0;
+        border-style:none;
+        padding:2px 0px 2px 0px;
+        background-color: #0075B2	;
+        background-position: 0 0;
+        z-index:1;
+        color: #FFFFFF;
+        font-family: verdana,arial,helvetica,sans-serif;
+        font-size:8pt;
+        font-style:normal;
+        font-weight:bold;
+        text-align:center;
+        margin:10px 0px 0px 0px;
+}
+
+DIV.ms, DIV.pinfer, DIV.y2h, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.about, DIV.account {
         border-width: 1;
         border-style: solid;
         padding: 10px;

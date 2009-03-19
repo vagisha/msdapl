@@ -17,6 +17,8 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <body>
 
+<div style="position: relative; min-height: 100%;"> 
+<div class="header">
 
 <table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
 
@@ -24,18 +26,20 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
   <td WIDTH="478" VALIGN="BOTTOM" COLSPAN="2">
    <nobr>
-   <span style="font-size:14px; font-weight:bold; color:red;">repoman@maccosslab</span>&nbsp;&nbsp;&nbsp;
    <yrcwww:authenticated>
-   	<a href="<yrcwww:link path='pages/internal/front.jsp' />">HOME</a> &nbsp
-   	
+   
+    <img src="<yrcwww:link path='images/MSDAPL_logo_small.png'/>" />
+    <span style="background-color:#0A90D0; color:white;">HOME</span>
+    <span style="background-color:#0A90D0; color:white;">ACCOUNT</span>
+   	<a href="<yrcwww:link path='pages/internal/front.jsp' />">HOME</a>
    	<html:link action="editInformation.do">ACCOUNT</html:link>
-   	
    	<yrcwww:member group="any">
    		<html:link forward="adminSearch">SEARCH</html:link>
    	</yrcwww:member>
    	
    	<yrcwww:member group="administrators">
    		<html:link action="manageGroups.do">GROUPS</html:link>
+   		<span style="background-color:#0A90D0; color:white;">ACCOUNT</span>
    	</yrcwww:member>
    	   
    	</yrcwww:authenticated>
@@ -54,11 +58,10 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
    </yrcwww:notauthenticated>
   </td>
  </tr>
+</table>
+</div>
 
- <tr>
-  <td VALIGN="CENTER" WIDTH="236" COLSPAN="3"><hr></td>
- </tr>
-
+<table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
  <tr BGCOLOR="#FFFFFF">
   <td BGCOLOR="#FFFFFF" COLSPAN="3" ALIGN="LEFT" VALIGN="top"><NOBR>&nbsp;&nbsp;&nbsp;
    <logic:equal name="dir" scope="request" value="account">
