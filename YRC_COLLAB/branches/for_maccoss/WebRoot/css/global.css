@@ -83,7 +83,9 @@ ul#main-menu li a:hover{background:#2E4560;}
 ul#main-menu li a.current{color:#2E4560;background:#fff;}
 ul#main-menu li a.current:hover{color:#2E4560;background:#fff;}
 
-
+<!-- =============================================================================== -->
+<!-- MENU ITEMS                                                                      -->
+<!-- =============================================================================== -->
 span.menu_base {
 	font-size: 10pt;
 	font-weight: bold;
@@ -92,6 +94,11 @@ span.menu_base {
 
 .menu_base a {
 	text-decoration:none;padding:0 17px 0 18px;height:27px;
+}
+
+.menu_base a:link {
+	text-decoration:none;padding:0 17px 0 18px;height:27px;
+	color:white;
 }
 
 .menu_base a:visited {
@@ -110,6 +117,10 @@ span.main_menu:hover {
 
 span.main_menu_selected {
 	background-color:white;
+	color: #0075B2;
+}
+
+.main_menu_selected a:link {
 	color: #0075B2;
 }
 
