@@ -43,27 +43,13 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
  <tr>
   <td WIDTH="478" VALIGN="bottom" COLSPAN="2">
    <nobr>
-   <yrcwww:notauthenticated>
-   		<img src="<yrcwww:link path='images/MSDAPL_logo_big.png'/>" />
-   </yrcwww:notauthenticated>
-   
-   <yrcwww:authenticated>
-    <img src="<yrcwww:link path='images/MSDAPL_logo_small.png'/>" />
-    <a href="<yrcwww:link path='pages/internal/front.jsp' />"><span class="main_menu">Home</span></a>
-    <html:link action="editInformation.do"><span class="main_menu">Account</span></html:link>
-   	<yrcwww:member group="any">
-   		<html:link forward="adminSearch">Search</html:link>
-   	</yrcwww:member>
-   	
-   	<yrcwww:member group="administrators">
-   		<html:link action="manageGroups.do">Admin</html:link>
-   		<span style="background-color:#0A90D0; color:white;">ACCOUNT</span>
-   	</yrcwww:member>
-   	   
-   	</yrcwww:authenticated>
-   	
-   	</nobr>
-   	</td>
+    <img src="<yrcwww:link path='images/MSDAPL_logo_small.png'/>" /> &nbsp;&nbsp;&nbsp;
+    
+	<span class="menu_base main_menu_selected"><a href="http://www.13styles.com/css-menus/simple-menu/" title="Home" class="current">Home</a></span>
+	<span class="menu_base main_menu"><a href="http://www.13styles.com/css-menus/simple-menu/" title="Account">Account</a></span>
+	<span class="menu_base main_menu"><a href="http://www.13styles.com/css-menus/simple-menu/" title="Home">Admin</a></span>
+	</nobr>
+  </td>
 
   <td WIDTH="100%" ALIGN="RIGHT" style="padding-right: 10;">
     <jsp:useBean id="user" class="org.yeastrc.www.user.User" scope="session"/>

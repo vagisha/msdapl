@@ -1,12 +1,12 @@
 /* These are my global styling rules */
 
 BODY    {
-           background-color: #FFFFFF;
+           background-color: #F2F2F2;
            color: #000000;
            height: 100%;
            margin: 0;
            padding: 0;
-           font-family: verdana,arial,helvetica,sans-serif;
+           font-family: "Trebuchet MS",Arial,sans-serif;
            font-size: 10pt;
            font-style: normal;
            font-weight: 500;
@@ -46,33 +46,14 @@ DIV.mainContainer {
 DIV#header {
         width:100%;
         border-width: 0;
-        padding: 0;
+        padding: 0 0 0 5;
         background-color: #0075B2;
         z-index:1;
         color: #FFFFFF;
-        font-family: verdana,arial,helvetica,sans-serif;
         font-size:8pt;
         font-style:normal;
         font-weight:300;
         margin-top:0px;
-}
-
-DIV#header a:link {
-	color: white;
-	font-size: 10pt;
-	font-weight: bold;
-}
-
-DIV#header a:visited {
-	color: white;
-	font-size: 10pt;
-	font-weight: bold;
-}
-
-DIV#header a:active {
-	color: white;
-	font-size: 12pt
-	font-weight: bold;
 }
 
 
@@ -81,35 +62,59 @@ DIV#footer {
         position: absolute;
         bottom:0;
         padding: 1 0 1 0;
-        margin-top: 10;
+        margin:0;
         border-width: 0;
         border-style:none;
         z-index:1;
-        background-color: #0075B2	;
+        background-color: #0075B2;
         color: #FFFFFF;
-        font-family: verdana,arial,helvetica,sans-serif;
         font-size:8pt;
         font-style:normal;
         font-weight:bold;
         text-align:center;
 }
 
-.main_menu {
-	background-color: #0075B2;
-	color: white;
+ul#main-menu{list-style-type:none;width:100%;position:relative;height:27px;font-family:"Trebuchet MS",Arial,sans-serif;font-size:13px;font-weight:bold;margin:0;padding:11px 0 0 0;}
+ul#main-menu li{display:block;float:left;margin:0 0 0 4px;height:27px;}
+ul#main-menu li.left{margin:0;}
+ul#main-menu li a{display:block;float:left;color:#fff;background:#4A6867;line-height:27px;text-decoration:none;padding:0 17px 0 18px;height:27px;}
+ul#main-menu li a.right{padding-right:19px;}
+ul#main-menu li a:hover{background:#2E4560;}
+ul#main-menu li a.current{color:#2E4560;background:#fff;}
+ul#main-menu li a.current:hover{color:#2E4560;background:#fff;}
+
+
+span.menu_base {
 	font-size: 10pt;
 	font-weight: bold;
 	padding: 4 4 0 4;
 }
 
-.main_menu_hover {
-	background-color: #a4c2db;
+.menu_base a {
+	text-decoration:none;padding:0 17px 0 18px;height:27px;
+}
+
+.menu_base a:visited {
+	text-decoration:none;padding:0 17px 0 18px;height:27px;
+	color:white;
+}
+
+span.main_menu {
+	background-color: #0A90D0;
+	color: white;
+}
+
+span.main_menu:hover {
+	background-color: #A4C2DB;
+}
+
+span.main_menu_selected {
+	background-color:white;
 	color: #0075B2;
 }
 
-.main_menu_selected {
-	background-color:white;
-	color: #0a90D0;
+.main_menu_selected a:visited {
+	color: #0075B2;
 }
 
 .sub_menu {
@@ -127,7 +132,8 @@ DIV#footer {
 }
 
 DIV #history {
-	border: 1px solid #8CACBB;	
+	border: 1px dashed #8CACBB;
+	background-color: white;	
 	margin: 2 5 2 5;
 	padding: 0;
 }
@@ -135,15 +141,15 @@ DIV #history {
 DIV.ms, DIV.pinfer, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.account {
         border-width: 1;
         border-style: solid;
-        padding: 5px;
+        padding: 2 5 2 5;
         z-index:1;
         font-family: verdana, helvetica, arial;
         font-size:10pt;
         font-style:normal;
         font-weight:500;
         margin:0px;
-        border-color: #8CACBB;
-        background-color: #DEE7EC;
+        border-color: #0075B2;
+        background-color: #FFFFFF;
         color: black;
 }
 
@@ -157,9 +163,9 @@ DIV.ms_header, DIV.pinfer_header, DIV.upload_header, DIV.adminSearch_header, DIV
         font-style:normal;
         font-weight:900;
         margin:0px;
-        border-color: #8CACBB;
-        background-color: #8CACBB;
-        color: black;
+        border-color: #0075B2;
+        background-color: #0075B2;
+        color: white;
 }
 
 
