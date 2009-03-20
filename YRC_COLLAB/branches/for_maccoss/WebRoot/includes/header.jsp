@@ -10,6 +10,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 %>
 
 <html>
+
 <head>
  <yrcwww:title />
  <link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='/css/global.css' />">
@@ -17,28 +18,45 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <body>
 
-<div style="position: relative; min-height: 100%;"> 
-<div class="header">
+<div class="mainContainer"> 
+
+
+<yrcwww:notauthenticated>
+<div id="header" align="center">
+	<table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
+	<tr>
+	<td width="33%">&nbsp;</td>
+	<td width="34%" align="center"><img src="<yrcwww:link path='images/MSDAPL_logo_big.png'/>" /></td>
+	<td width="33%" align="right" valign="bottom">
+		<div align="right" style="padding:0 10 5 0;"><html:link forward="authenticate">Login</html:link>
+	</div></td>
+	</tr>
+	</table>
+</div>
+</yrcwww:notauthenticated>
+   
+<yrcwww:authenticated>
+
+<div id="header">
 
 <table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
-
  <tr>
-
-  <td WIDTH="478" VALIGN="BOTTOM" COLSPAN="2">
+  <td WIDTH="478" VALIGN="bottom" COLSPAN="2">
    <nobr>
-   <yrcwww:authenticated>
+   <yrcwww:notauthenticated>
+   		<img src="<yrcwww:link path='images/MSDAPL_logo_big.png'/>" />
+   </yrcwww:notauthenticated>
    
+   <yrcwww:authenticated>
     <img src="<yrcwww:link path='images/MSDAPL_logo_small.png'/>" />
-    <span style="background-color:#0A90D0; color:white;">HOME</span>
-    <span style="background-color:#0A90D0; color:white;">ACCOUNT</span>
-   	<a href="<yrcwww:link path='pages/internal/front.jsp' />">HOME</a>
-   	<html:link action="editInformation.do">ACCOUNT</html:link>
+    <a href="<yrcwww:link path='pages/internal/front.jsp' />"><span class="main_menu">Home</span></a>
+    <html:link action="editInformation.do"><span class="main_menu">Account</span></html:link>
    	<yrcwww:member group="any">
-   		<html:link forward="adminSearch">SEARCH</html:link>
+   		<html:link forward="adminSearch">Search</html:link>
    	</yrcwww:member>
    	
    	<yrcwww:member group="administrators">
-   		<html:link action="manageGroups.do">GROUPS</html:link>
+   		<html:link action="manageGroups.do">Admin</html:link>
    		<span style="background-color:#0A90D0; color:white;">ACCOUNT</span>
    	</yrcwww:member>
    	   
@@ -47,19 +65,15 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
    	</nobr>
    	</td>
 
-  <td WIDTH="100%" ALIGN="RIGHT">
-   <yrcwww:authenticated>
+  <td WIDTH="100%" ALIGN="RIGHT" style="padding-right: 10;">
     <jsp:useBean id="user" class="org.yeastrc.www.user.User" scope="session"/>
     <FONT STYLE="font-size:8pt;">Welcome <yrcwww:user attribute="firstname"/> <yrcwww:user attribute="lastname"/>!<BR></FONT>
     <div><html:link action="logout.do">Logout</html:link></div>
-   </yrcwww:authenticated>
-   <yrcwww:notauthenticated>
-    Not logged in.&nbsp;&nbsp;
-   </yrcwww:notauthenticated>
   </td>
  </tr>
 </table>
 </div>
+
 
 <table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
  <tr BGCOLOR="#FFFFFF">
@@ -82,12 +96,10 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
    		</yrcwww:member>
    </logic:equal>
   </NOBR></td>
-
-
  </tr>
-
 </table>
 
-   <yrcwww:authenticated><div style="background:#F0F8FF"><yrcwww:history/></div></yrcwww:authenticated>
+<div id="history"><yrcwww:history/></div>
+</yrcwww:authenticated>
 
-<br>
+<br><br>

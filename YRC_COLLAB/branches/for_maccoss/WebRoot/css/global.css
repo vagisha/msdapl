@@ -4,12 +4,12 @@ BODY    {
            background-color: #FFFFFF;
            color: #000000;
            height: 100%;
-           margin:0;
-           padding:0;
+           margin: 0;
+           padding: 0;
            font-family: verdana,arial,helvetica,sans-serif;
-           font-size:10pt;
+           font-size: 10pt;
            font-style: normal;
-           font-weight:500;
+           font-weight: 500;
         }
 
 PRE	{
@@ -38,10 +38,15 @@ A:active {
                 color: #FF0000;
         }
 
-DIV.header {
+DIV.mainContainer {
+	position: relative;
+	min-height: 100%;	
+}
+
+DIV#header {
         width:100%;
         border-width: 0;
-        padding: 0px;
+        padding: 0;
         background-color: #0075B2;
         z-index:1;
         color: #FFFFFF;
@@ -52,60 +57,149 @@ DIV.header {
         margin-top:0px;
 }
 
-DIV.footer {
+DIV#header a:link {
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+}
+
+DIV#header a:visited {
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+}
+
+DIV#header a:active {
+	color: white;
+	font-size: 12pt
+	font-weight: bold;
+}
+
+
+DIV#footer {
         width:100%;
+        position: absolute;
+        bottom:0;
+        padding: 1 0 1 0;
+        margin-top: 10;
         border-width: 0;
         border-style:none;
-        padding:2px 0px 2px 0px;
-        background-color: #0075B2	;
-        background-position: 0 0;
         z-index:1;
+        background-color: #0075B2	;
         color: #FFFFFF;
         font-family: verdana,arial,helvetica,sans-serif;
         font-size:8pt;
         font-style:normal;
         font-weight:bold;
         text-align:center;
-        margin:10px 0px 0px 0px;
 }
 
-DIV.ms, DIV.pinfer, DIV.y2h, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.about, DIV.account {
+.main_menu {
+	background-color: #0075B2;
+	color: white;
+	font-size: 10pt;
+	font-weight: bold;
+	padding: 4 4 0 4;
+}
+
+.main_menu_hover {
+	background-color: #a4c2db;
+	color: #0075B2;
+}
+
+.main_menu_selected {
+	background-color:white;
+	color: #0a90D0;
+}
+
+.sub_menu {
+	font-size: 10pt;
+	font-weight: bold;
+	padding: 4 4 4 4;
+}
+
+.sub_menu_hover {
+	
+}
+
+.sub_menu_selected {
+
+}
+
+DIV #history {
+	border: 1px solid #8CACBB;	
+	margin: 2 5 2 5;
+	padding: 0;
+}
+
+DIV.ms, DIV.pinfer, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.account {
         border-width: 1;
         border-style: solid;
-        padding: 10px;
+        padding: 5px;
         z-index:1;
         font-family: verdana, helvetica, arial;
         font-size:10pt;
         font-style:normal;
         font-weight:500;
         margin:0px;
+        border-color: #8CACBB;
+        background-color: #DEE7EC;
+        color: black;
 }
 
-DIV.localization_header, DIV.ms_header, DIV.pinfer_header, DIV.y2h_header, DIV.progress_header, DIV.upload_header, DIV.adminSearch_header, DIV.groups_header, DIV.search_header, DIV.register_header, DIV.error_header, DIV.login_header, DIV.project_header, DIV.about_header, DIV.account_header {
+DIV.ms_header, DIV.pinfer_header, DIV.upload_header, DIV.adminSearch_header, DIV.groups_header, DIV.search_header, DIV.register_header, DIV.error_header, DIV.login_header, DIV.project_header, DIV.account_header {
         border-width: 1;
         border-style: solid;
-        padding: 10px;
+        padding: 5px;
         z-index:1;
         font-family: verdana, helvetica, arial;
         font-size:12pt;
         font-style:normal;
         font-weight:900;
         margin:0px;
+        border-color: #8CACBB;
+        background-color: #8CACBB;
+        color: black;
 }
+
+
+/* Login color definitions */
+DIV.login_header {
+}
+
+DIV.login {
+}
+
+
+/* Register color definitions */
+DIV.register {
+}
+
+DIV.register_header {
+	width: 600;
+}
+
+/* Error color definitions */
+DIV.error_header {
+        border-color: #B20A23;
+        background-color: #B20A23;
+        color: #FFD3DA;
+}
+DIV.error {
+        border-color: #B20A23;
+        background-color: #FFD3DA;
+        color: #B20A23;
+}
+
+
 
 /* Search color definitions */
 DIV.search {
 	width: 600;
-        border-color: #000960;
-        background-color: #E8EAFF;
-        color: #000960;
 }
 
 DIV.search_header {
 	width: 600;
-        border-color: #000960;
-        background-color: #000960;
-        color: #E8EAFF;
 }
 TR.search_A {
 	background-color: #E8EAFF;
@@ -123,64 +217,11 @@ DIV.search .button {
 
 
 
-/* Register color definitions */
-DIV.register {
-	width: 600;
-        border-color: #000960;
-        background-color: #E8EAFF;
-        color: #000960;
-}
-
-DIV.register_header {
-	width: 600;
-        border-color: #000960;
-        background-color: #000960;
-        color: #E8EAFF;
-}
-TR.register_A {
-	background-color: #E8EAFF;
-}
-TR.register_B {
-	background-color: #D8DBFE;
-}
-
-
-/* Error color definitions */
-DIV.error_header {
-        border-color: #B20A23;
-        background-color: #B20A23;
-        color: #FFD3DA;
-}
-DIV.error {
-        border-color: #B20A23;
-        background-color: #FFD3DA;
-        color: #B20A23;
-}
-
-
-/* Login color definitions */
-DIV.login_header {
-        border-color: #156009;
-        background-color: #156009;
-        color: #A7E5A0;
-}
-DIV.login {
-        border-color: #156009;
-        background-color: #A7E5A0;
-        color: #156009;
-}
-
 
 /* Project color definitions */
 DIV.project {
-        border-color: #1d0047;
-        background-color: #e5d3ff;
-        color: #1d0047;
 }
 DIV.project_header {
-        border-color: #1d0047;
-        background-color: #1d0047;
-        color: #e5d3ff;
 }
 TR.project_A {
 	background-color: #e5d3ff;
@@ -206,34 +247,13 @@ INPUT.project_button {
 
 
 
-/* About YRC page color definitions */
-DIV.about {
-        width: 600;
-        border-color: #003037;
-        background-color: #E9FCFF;
-        color: #003037;
-}
-
-DIV.about_header {
-        width: 600;
-        border-color: #003037;
-        background-color: #003037;
-        color: #E9FCFF;
-}
-
 /* account color definitions */
 DIV.account {
         width: 600;
-        border-color: #326000;
-        background-color: #E7FCD2;
-        color: #326000;
 }
 
 DIV.account_header {
         width: 600;
-        border-color: #326000;
-        background-color: #326000;
-        color: #E7FCD2;
 }
 
 /* admin group management color definitions */
@@ -274,16 +294,10 @@ TR.adminSearch_B {
 /* data upload color definitions */
 DIV.upload {
         width: 600;
-        border-color: #FFBF59;
-        background-color: #FFF0D8;
-        color: #000000;
 }
 
 DIV.upload_header {
         width: 600;
-        border-color: #FFBF59;
-        background-color: #FFBF59;
-        color: #000000;
 }
 TR.upload_A {
 	background-color: #FFF0D8;
@@ -292,57 +306,13 @@ TR.upload_B {
 	background-color: #E9E6E2;
 }
 
-/* progress report color definitions */
-DIV.progress {
-        width: 600;
-        border-color: #AF00AD;
-        background-color: #FFE5FF;
-        color: #000000;
-}
-DIV.progress_header {
-        width: 600;
-        border-color: #AF00AD;
-        background-color: #AF00AD;
-        color: #FFE5FF;
-}
-TR.progress_A {
-	background-color: #FFB4FE;
-}
-TR.progress_B {
-	background-color: #FFE5FF;
-}
 
-/* yeast two-hybrid color definitions */
-DIV.y2h {
-        width: 600;
-        border-color: #AF00AD;
-        background-color: #FFE5FF;
-        color: #000000;
-}
-DIV.y2h_header {
-        width: 600;
-        border-color: #AF00AD;
-        background-color: #AF00AD;
-        color: #FFE5FF;
-}
-TR.y2h_A {
-	background-color: #FFB4FE;
-}
-TR.y2h_B {
-	background-color: #FFE5FF;
-}
 
 DIV.ms {
         width: 600;
-        border-color: #3D902A;
-        background-color: #EBFFE6;
-        color: #3D902A;
 }
 DIV.ms_header {
         width: 600;
-        border-color: #3D902A;
-        background-color: #3D902A;
-        color: #EBFFE6;
 }
 TR.ms_A {
 	background-color: #D4FECA;
@@ -387,24 +357,7 @@ DIV.pinfer .button {
 	margin-top:20px;	
 }
 
-DIV.localization {
-        width: 600;
-        border-color: #BE0000;
-        background-color: #FFE1E1;
-        color: #BE0000;
-}
-DIV.localization_header {
-        width: 600;
-        border-color: #BE0000;
-        background-color: #BE0000;
-        color: #FFE1E1;
-}
-TR.localization_A {
-	background-color: #FFD5D5;
-}
-TR.localization_B {
-	background-color: #FFE1E1;
-}
+
 
 /* MS-specific styling rules */
 SPAN.covered_peptide {
