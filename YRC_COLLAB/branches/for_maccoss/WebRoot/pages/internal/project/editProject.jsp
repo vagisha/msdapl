@@ -7,7 +7,7 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:notPresent name="editCollaborationForm">
+<logic:notPresent name="editProjectForm">
 	<logic:forward name="editProject" />
 </logic:notPresent>
  
@@ -15,21 +15,60 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="Edit Collaboration Details" centered="true" width="750">
+
+
+
+<script type="text/javascript" src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>" ></script>
+<script type="text/javascript">
+
+<bean:size name="editProjectForm" property="researcherList" id="researchers_size"/>
+var lastResearcherIndex = <bean:write name="researchers_size" />
+var researcherList = "<option value='0'>None</option>";
+<logic:iterate name="researchers" id="researcher">
+	var id = <bean:write name="researcher" property="ID"/>;
+	var name = "<bean:write name='researcher' property='listing' />"
+	researcherList += "<option value='"+id+"'>"+name+"</option>";
+</logic:iterate>
+
+function removeResearcher(rowIdx) {
+	//alert("removing researcher at index "+rowIdx);
+	$("#researcherRow_"+rowIdx).hide();
+	$("#researcherRow_"+rowIdx+" select").val(0);
+}
+
+function confirmRemoveResearcher(rowIdx) {
+	if(confirm("Are you sure you want to remove this researcher from the project?")) {
+		removeResearcher(rowIdx);
+	}
+}
+
+function addResearcher() {
+	
+	//alert("last researcher: "+lastResearcherIndex);
+	var newRow = "<tr id='researcherRow_"+lastResearcherIndex+"'>";
+	newRow += "<td width='25%' valign='top'>Researcher: </td>";
+	newRow += "<td width='25%' valign='top'>";
+	newRow += "<select name='researcher["+lastResearcherIndex+"].ID'>";
+	newRow += researcherList;
+	newRow += "</select>";
+	newRow += " <a href='javascript:confirmRemoveResearcher("+lastResearcherIndex+")' style='color:red; font-size:8pt;'>[Remove]</a>";
+	newRow += "</td>";
+	newRow +="</tr>";
+	$("#researcherRow_"+(lastResearcherIndex-1)).after(newRow);
+	lastResearcherIndex++;
+}
+
+</script>
+
+
+<yrcwww:contentbox title="Edit Project Details" centered="true" width="750">
 
  <CENTER>
-  <html:form action="saveCollaboration" method="post" styleId="form1">
-  <html:hidden name="editCollaborationForm" property="ID"/>
-  <yrcwww:notmember group="any">
-   <html:hidden name="editCollaborationForm" property="BTA"/>
-  </yrcwww:notmember>
+  <html:form action="saveProject" method="post" styleId="form1">
+  <html:hidden name="editProjectForm" property="ID"/>
   
-  <TABLE CELLPADDING="no" CELLSPACING="0">
   
-   <TR>
-    <TD WIDTH="25%" VALIGN="top"><B>Submit Date:</B></TD>
-    <TD WIDTH="75%" VALIGN="top"><B><bean:write name="editCollaborationForm" property="submitDate"/></B></TD>
-   </TR>
+  <TABLE CELLPADDING="no" CELLSPACING="0" width="90%" align="center">
 
    <TR>
     <TD WIDTH="25%" VALIGN="top">PI:</TD>
@@ -42,71 +81,35 @@
     
     </TD>
    </TR>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Researcher B:</TD>
-    <TD WIDTH="75%" VALIGN="top">
-    
-    	<html:select property="researcherB">
-    		<html:option value="0">None</html:option>
+   
+   <logic:iterate id="researcher" property="researcherList" name="editProjectForm" indexId="cnt">
+   <tr id="researcherRow_<%=cnt%>" >
+   	<TD WIDTH="25%" VALIGN="top">Researcher:</TD>
+   	<td WIDTH="25%" VALIGN="top">
+   		<html:select name="researcher" property="ID" indexed="true">
+   			<html:option value="0">None</html:option>
 			<html:options collection="researchers" property="ID" labelProperty="listing"/>
-    	</html:select>
-    
-    </TD>
-   </TR>
+   		</html:select>
+   		<a href="javascript:confirmRemoveResearcher('<%=(cnt)%>')" style="color:red; font-size:8pt;">[Remove]</a>
+   	</td>
+   </tr>
+   </logic:iterate>
+
+	<tr>
+   		<td colspan="2" align="center"><a href="javascript:addResearcher()">Add Researcher</a></td>
+   	</tr>
+	<tr><td colspan="2"><hr width="100%"></td></tr>
+
+   
 
    <TR>
-    <TD WIDTH="25%" VALIGN="top">Researcher C:</TD>
-    <TD WIDTH="75%" VALIGN="top">
-    
-    	<html:select property="researcherC">
-    		<html:option value="0">None</html:option>
-			<html:options collection="researchers" property="ID" labelProperty="listing"/>
-    	</html:select>
-    
-    </TD>
-   </TR>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Researcher D:</TD>
-    <TD WIDTH="75%" VALIGN="top">
-    
-    	<html:select property="researcherD">
-    		<html:option value="0">None</html:option>
-			<html:options collection="researchers" property="ID" labelProperty="listing"/>
-    	</html:select>
-    
-    </TD>
-   </TR>
-
-	<tr><td colspan="2"><hr width="85%"></td></tr>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Collaborating with:</TD>
-    <TD WIDTH="75%" VALIGN="top">	
-     <NOBR><html:multibox property="groups" value="Noble"/>Computational Biology</NOBR>
-     <NOBR><html:multibox property="groups" value="Informatics"/>Informatics</NOBR>    
-     <NOBR><html:multibox property="groups" value="MacCoss"/>Mass Spectrometry (MacCoss)</NOBR>
-     <NOBR><html:multibox property="groups" value="Yates"/>Mass Spectrometry (Yates)</NOBR>
-     <NOBR><html:multibox property="groups" value="Microscopy"/>Microscopy</NOBR>
-     <NOBR><html:multibox property="groups" value="PSP"/>Protein Structure Prediction</NOBR>
-     <NOBR><html:multibox property="groups" value="TwoHybrid"/>Yeast Two-Hybrid</NOBR> 
-    </TD>
+    <TD WIDTH="25%" VALIGN="top">Project Title: </TD>
+    <TD WIDTH="75%" VALIGN="top"><html:text property="title" size="60" maxlength="80"/></TD>
    </TR>
    
    <TR>
-    <TD WIDTH="25%" VALIGN="top">Title: <font style="font-size:8pt;color:red;">(Appears in NIH CRISP database)</font></TD>
-    <TD WIDTH="75%" VALIGN="top"><html:text property="title" size="60" maxlength="80"/></TD>
-   </TR>
-
-   <TR>
     <TD WIDTH="25%" VALIGN="top">Abstract:</TD>
     <TD WIDTH="75%" VALIGN="top"><html:textarea property="abstract" rows="7" cols="50"/></TD>
-   </TR>
-
-   <TR>
-    <TD WIDTH="25%" VALIGN="top">Public Abstract:<br><font style="font-size:8pt;color:red;">To appear in NIH CRISP database.</font></TD>
-    <TD WIDTH="75%" VALIGN="top"><html:textarea property="publicAbstract" rows="7" cols="50"/></TD>
    </TR>
 
    <TR>
@@ -115,7 +118,7 @@
    </TR>
 
    <TR>
-    <TD WIDTH="25%" VALIGN="top">Publications:<br><font style="font-size:8pt;color:red;">ONLY publications resulting<br>from this collaboration</font></TD>
+    <TD WIDTH="25%" VALIGN="top">Publications: </TD>
     <TD WIDTH="75%" VALIGN="top"><html:textarea property="publications" rows="5" cols="50"/></TD>
    </TR>
 
@@ -124,28 +127,22 @@
     <TD WIDTH="75%" VALIGN="top"><html:textarea property="comments" rows="5" cols="50"/></TD>
    </TR>
 
-	<tr><td colspan="2"><hr width="85%"></td></tr>
-	
+	<tr><td colspan="2"><hr width="100%"></td></tr>
+
 	<!-- ===================================================================================== -->
 	<!--  List grants here -->
 	<%@ include file="grantListForm.jsp" %>
 	<!-- ===================================================================================== -->
-
-   <yrcwww:member group="any">
-
-	<tr><td colspan="2"><hr width="85%"></td></tr>
 	
-    <TR>
-     <TD WIDTH="25%" VALIGN="top">BTA:</TD>
-     <TD WIDTH="75%" VALIGN="top"><html:text property="BTA" size="5" maxlength="6"/>%</TD>
-    </TR>
-   </yrcwww:member>
+	<tr><td colspan="2"><hr width="100%"></td></tr>
 
   </TABLE>
+  
+
 
  <P><NOBR>
- <html:submit value="Save Changes" styleClass="button" />
- <input type="button" class="button" onclick="javascript:onCancel(<bean:write name="editCollaborationForm" property="ID"/>);" value="Cancel"/>
+ <html:submit value="Save Changes" styleClass="plain_button" />
+ <input type="button" class="plain_button" onclick="javascript:onCancel(<bean:write name="editProjectForm" property="ID"/>);" value="Cancel"/>
  </NOBR>
  
   </html:form>

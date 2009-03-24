@@ -69,7 +69,7 @@
 </script>
 
 <center>
-<div class="project_header" style="width:90%">
+<div class="project_header" style="width:90%; margin-top:40px;">
 	<center>Grants</center>
 </div>
 <div class="project" style="width:90%">
@@ -114,7 +114,7 @@
 	</logic:empty>
 	
 	<br><br><br>
-	<div class="project_header" style="width: 120px; padding: 5px;"><a href="javascript:addNewGrant();" style="text-decoration: none; color:#e5d3ff; font-weight: bold; font-size: 12px;">Add New Grant</a></div>
+	<div class="project_header" style="width: 120px; padding: 5px;"><a href="javascript:addNewGrant();" style="text-decoration: none; color:white; font-weight: bold; font-size: 12px;">Add New Grant</a></div>
 </div>
 
 </center> 	

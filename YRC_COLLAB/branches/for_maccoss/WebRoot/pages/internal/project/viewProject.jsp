@@ -11,13 +11,13 @@
   <logic:forward name="viewProject" />
 </logic:empty>
  
-<jsp:useBean id="project" class="org.yeastrc.project.Collaboration" scope="request"/>
+<jsp:useBean id="project" class="org.yeastrc.project.Project" scope="request"/>
 
 <%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="View Collaboration Details" centered="true" width="750">
+<yrcwww:contentbox title="Project Details" centered="true" width="750">
 
 <SCRIPT LANGUAGE="JavaScript">
  function confirmDelete(ID) {
@@ -31,7 +31,7 @@
 </SCRIPT>
 
  <CENTER>
- <TABLE CELLPADDING="no" CELLSPACING="0">
+ <TABLE CELLPADDING="no" CELLSPACING="0" width="90%">
   
   <yrcwww:colorrow>
    <TD valign="top" width="25%">ID:</TD>
@@ -43,14 +43,29 @@
    <TD valign="top" width="75%"><bean:write name="project" property="title"/></TD>
   </yrcwww:colorrow>
 
-  <yrcwww:colorrow>
-   <TD valign="top" width="25%">YRC Groups:</TD>
-   <TD valign="top" width="75%"><bean:write name="project" property="groupsString"/></TD>
-  </yrcwww:colorrow>
-
   <!-- List the Researchers here: -->
-  <%@ include file="researcherList.jsp" %>
 
+	<bean:define id="pi" name="project" property="PI" scope="request"/>
+
+	<yrcwww:colorrow>
+		<TD valign="top" width="25%">PI:</TD>
+		<TD valign="top" width="75%">
+		<html:link action="viewResearcher.do" paramId="id" paramName="pi" paramProperty="ID">
+		    <bean:write name="pi" property="firstName"/> <bean:write name="pi" property="lastName"/>, <bean:write name="pi" property="degree"/></html:link>
+		</TD>
+	</yrcwww:colorrow>
+	
+	<logic:iterate name="project" property="researchers" id="researcher">
+		<yrcwww:colorrow>
+			<TD valign="top" width="25%">Researcher :</TD>
+			<TD valign="top" width="75%">
+			<html:link action="viewResearcher.do" paramId="id" paramName="researcher" paramProperty="ID">
+				<bean:write name="researcher" property="firstName"/> <bean:write name="researcher" property="lastName"/>, <bean:write name="researcher" property="degree"/></html:link>
+			</TD>
+		</yrcwww:colorrow>
+	</logic:iterate>
+	
+	
 	<!-- ========================================================================================= -->
 	<!-- List Grants here -->
 	<%@ include file="grantList.jsp" %>
@@ -59,11 +74,6 @@
   <yrcwww:colorrow>
    <TD valign="top" width="25%">Abstract:</TD>
    <TD valign="top" width="75%"><bean:write name="project" property="abstractAsHTML" filter="false"/></TD>
-  </yrcwww:colorrow>
-
-  <yrcwww:colorrow>
-   <TD valign="top" width="25%">Public Abstract:</TD>
-   <TD valign="top" width="75%"><bean:write name="project" property="publicAbstractAsHTML" filter="false"/></TD>
   </yrcwww:colorrow>
 
   <yrcwww:colorrow>
@@ -105,18 +115,10 @@
 
  
   <div>
-  	<input type="button" class="project_button" value="EDIT PROJECT" onClick="goEdit()">
-
-	<logic:equal name="showYatesUpload" value="true" scope="request">
-	  	<input type="button" class="project_button" value="UPLOAD MS/MS DATA (Yates)" onClick="goYates()">
-	</logic:equal>
+  	<input type="button" class="plain_button" value="EDIT PROJECT" onClick="goEdit()">
 
 	<logic:equal name="showMacCossUpload" value="true" scope="request">
-	  	<input type="button" class="project_button" value="UPLOAD MS/MS DATA (MacCoss)" onClick="goMacCoss()">
-	</logic:equal>
-
-	<logic:equal name="showMicroUpload" value="true" scope="request">
-	  	<input type="button" class="project_button" value="UPLOAD MICROSCOPY DATA" onClick="goMicroscopy()">
+	  	<input type="button" class="plain_button" value="UPLOAD MS/MS DATA (MacCoss)" onClick="goMacCoss()">
 	</logic:equal>
 
 	<yrcwww:member group="administrators">
@@ -127,13 +129,7 @@
  </CENTER>
 </yrcwww:contentbox>
 
-<!-- List the Y2H Data here: -->
-<%@ include file="listY2HData.jsp" %>
+<!-- List the YATES Data here: include file="listYatesData.jsp" -->
 
-<!-- List the YATES Data here: -->
-<%@ include file="listYatesData.jsp" %>
-
-<!-- List the LOCALIZATION Data here: -->
-<%@ include file="listLocalizationData.jsp" %>
 
 <%@ include file="/includes/footer.jsp" %>

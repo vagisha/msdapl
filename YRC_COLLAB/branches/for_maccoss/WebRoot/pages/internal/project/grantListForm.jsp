@@ -66,46 +66,6 @@
 		<input type="button" value="Add" onclick="javascript:addFundingSource();" class="button"/>
 </tr>
 
-<tr>
-	<logic:equal name="numGrants" value="0">
-	<logic:present name="project">
-		<table id="oldFundingSources" style="border: 1px solid #999999; width:80%; margin-top: 10px;" cellpadding="3px">
-		<tr>
-			<td style="font-size:8pt;color:red;" colspan=2>
-				<b>NOTE:</b>	 
-				We have updated our system for managing project grants. The information below was entered using the old system and can no longer be edited.
-			  	To enter this grant information into the new system, or to add new grants to the project please click on the "Add" button above. 
-			  	Once you have saved a grant for the project using the new system, any information entered using the old system will no longer be displayed. 
-			  	</td>
-		</tr>
-		<tr>
-   			<TD valign="top" width="25%" style="font-size:8pt;">Funding Source(s):</TD>
-   			<TD valign="top" width="75%" style="font-size:8pt;"><bean:write name="project" property="fundingTypes"/></TD>
-  		</tr>
-  		<tr>
-   			<TD valign="top" width="25%" style="font-size:8pt;">Federal Funding:</TD>
-   			<TD valign="top" width="75%" style="font-size:8pt;"><bean:write name="project" property="federalFundingTypes"/></TD>
-  		</tr>
-
-  		<logic:notEmpty name="project" property="foundationName">
-	  		<tr>
-	   			<TD valign="top" width="25%" style="font-size:8pt;">Foundation Name:</TD>
-	   			<TD valign="top" width="75%" style="font-size:8pt;"><bean:write name="project" property="foundationName"/></TD>
-	  		</tr>
-  		</logic:notEmpty>
-  		<tr>
-   			<TD valign="top" width="25%" style="font-size:8pt;">Grant number:</TD>
-   			<TD valign="top" width="75%" style="font-size:8pt;"><bean:write name="project" property="grantNumber"/></TD>
-  		</tr>
-  		<tr>
-   			<TD valign="top" width="25%" style="font-size:8pt;">Annual Budget:</TD>
-   			<TD valign="top" width="75%" style="font-size:8pt;"><bean:write name="project" property="grantAmount"/></TD>
-  		</tr>
-  		</table>
-	</logic:present>
-	</logic:equal>
-</tr>
-
 <script>
 
 // value of this variable will be used by pop-up to determine what action to take when

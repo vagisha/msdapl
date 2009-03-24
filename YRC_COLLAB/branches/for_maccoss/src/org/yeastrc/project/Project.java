@@ -121,34 +121,33 @@ public class Project implements Comparable<Project> {
 	    
 	    // TODO write access to entire group should be made an option in the interface.
 	    // Till then only read access is given to the group
-	    return checkReadAccess(researcher);
-//		if (researcher == null) { return false; }
-//		
-//		// First check if this is a researcher directly affiliated with the project
-//		if(this.PI != null && this.PI.equals(researcher))
-//            return true;
-//        
-//        for(Researcher r: this.researchers) {
-//            if(r != null && r.equals(researcher))
-//                return true;
-//        }
-//		
-//		// Now check whether or not this is a site administrator with access to this project.
-//		Groups groupsMan = Groups.getInstance();
-//		
-//		// Admins have access to all projects.
-//		if (groupsMan.isMember(researcher.getID(), "administrators"))
-//			return true;
-//		
-//		// Now check for access to the actual groups with which this project is affiliated
+		if (researcher == null) { return false; }
+		
+		// First check if this is a researcher directly affiliated with the project
+		if(this.PI != null && this.PI.equals(researcher))
+            return true;
+        
+        for(Researcher r: this.researchers) {
+            if(r != null && r.equals(researcher))
+                return true;
+        }
+		
+		// Now check whether or not this is a site administrator with access to this project.
+		Groups groupsMan = Groups.getInstance();
+		
+		// Admins have access to all projects.
+		if (groupsMan.isMember(researcher.getID(), "administrators"))
+			return true;
+		
+		// Now check for access to the actual groups with which this project is affiliated
 //		String[] tGroups = this.getGroupsArray();
 //		for (int i = 0; i < tGroups.length; i++) {
 //			if (groupsMan.isMember(researcher.getID(), tGroups[i]))
 //				return true;
 //		}
-//		
-//		// Access -DENIED-
-//		return false;
+		
+		// Access -DENIED-
+		return false;
 	}
 
 

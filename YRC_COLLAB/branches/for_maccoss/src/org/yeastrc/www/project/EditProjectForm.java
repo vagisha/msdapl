@@ -58,7 +58,25 @@ public class EditProjectForm extends ActionForm {
 		if (this.getPI() == 0) {
 			errors.add("PI", new ActionMessage("error.project.nopi"));
 		}
+		
+		// need at least one researcher
+		if (validResearcherCount() < 1) {
+            errors.add("researchers", new ActionMessage("error.project.noresearchers"));
+    }
 
+		if (this.getTitle() == null || this.getTitle().length() < 1) {
+            errors.add("title", new ActionMessage("error.project.notitle"));
+        }
+        
+        if (this.getAbstract() == null || this.getAbstract().length() < 1) {
+            errors.add("project", new ActionMessage("error.project.noabstract"));
+        }
+        
+//        String[] groups = this.getGroups();
+//        if (groups == null || groups.length < 1) {
+//            errors.add("groups", new ActionMessage("error.collaboration.nogroups"));
+//        }
+        
 		// we need atleast one grant
         if (validGrantCount() < 1) {
                 errors.add("grants", new ActionMessage("error.grant.nogrants"));
@@ -128,7 +146,7 @@ public class EditProjectForm extends ActionForm {
 		this.grants = grants;
 	}
 	
-	public int validGrantCount() {
+	private int validGrantCount() {
 		int i = 0;
 		for (Grant grant: grants) {
 			if (grant != null && grant.getID() > 0)	i++;
@@ -160,6 +178,14 @@ public class EditProjectForm extends ActionForm {
 	    System.out.println("Setting researcher");
 	    this.researchers = researchers;
 	}
+	
+	private int validResearcherCount() {
+        int i = 0;
+        for (Researcher researcher: researchers) {
+            if (researcher != null && researcher.getID() > 0) i++;
+        }
+        return i;
+    }
 	
 	//----------------------------------------------------------------
     // Groups

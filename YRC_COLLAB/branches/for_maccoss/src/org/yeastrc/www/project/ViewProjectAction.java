@@ -26,6 +26,7 @@ import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
+import org.yeastrc.project.Researcher;
 import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.Groups;
@@ -102,10 +103,6 @@ public class ViewProjectAction extends Action {
 		// Set this project in the request, as a bean to be displayed on the view
 		request.setAttribute("project", project);
 		
-		// get the grants for this project and set them in the request
-		List<Grant> grants = GrantDAO.getInstance().getGrantsForProject(project.getID());
-		request.setAttribute("grants", grants);
-		
 		// Check for experiment data for this project
 
 		// Check for yates MS data
@@ -137,22 +134,27 @@ public class ViewProjectAction extends Action {
 
 
 		Groups groupMan = Groups.getInstance();
-		if ( project.getGroups().contains( Projects.YATES ) &&
-		        ( groupMan.isMember( user.getResearcher().getID(), Projects.YATES ) || groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) )
-		    request.setAttribute( "showYatesUpload", new Boolean( true ) );
-		else
-		    request.setAttribute( "showYatesUpload", new Boolean( false ) );
+		boolean showUpload = false;
+		if(groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) {
+		    showUpload = true;
+		}
+		else {
+		    int userId = user.getResearcher().getID();
+		    for(Researcher researcher: project.getResearchers()) {
+		        
+		        if(researcher.getID() == userId) {
+		            showUpload = true; 
+		            break;
+		        }
+		    }
+		}
 
-		if ( project.getGroups().contains( Projects.MACCOSS ) && 
-		        ( groupMan.isMember( user.getResearcher().getID(), Projects.MACCOSS ) || groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) )
-		    request.setAttribute( "showMacCossUpload", new Boolean( true ) );
-		else
-		    request.setAttribute( "showMacCossUpload", new Boolean( false ) );
+		if(showUpload)
+		    request.setAttribute( "showMacCossUpload", true );
 
-		
 
 		// Forward them on to the happy success view page!
-		return mapping.findForward("Collaboration");
+		return mapping.findForward("Success");
 
 
 	}

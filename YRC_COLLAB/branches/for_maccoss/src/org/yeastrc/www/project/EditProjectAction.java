@@ -9,7 +9,6 @@
 package org.yeastrc.www.project;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,8 +19,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
@@ -96,48 +93,20 @@ public class EditProjectAction extends Action {
 		}
 
 
-		// get the grants for this project
-		List<Grant> grants = GrantDAO.getInstance().getGrantsForProject(project.getID());
-		
-		// Where do you want to go from here?
-		String forwardStr = "";
+		request.setAttribute("project", project);
 
+		EditProjectForm newForm = new EditProjectForm();			
+		request.setAttribute("editProjectForm", newForm);
 
-		EditProjectForm newForm = null;
-
-
-		// Forward them on to the happy success view page!		
-		newForm = new EditCollaborationForm();			
-		request.setAttribute("editCollaborationForm", newForm);
-		forwardStr = "Collaboration";
-
-		String[] groups = project.getGroupsArray();
-		((EditCollaborationForm)(newForm)).setGroups(groups);
-
-		newForm.setGrantList(grants);
-
-		// Set this project in the session. Needed to display any old grant information
-		// We have to set it in the session and not the request so that it is available 
-		// if the user omits some required information on the form and is redirected back 
-		// to the form. 
-		// This should be removed in the saveCollaborationAction and newCollaborationAction classes
-		if (project.getFundingTypes() != null || !project.getFundingTypes().equalsIgnoreCase("None"))
-		    request.getSession().setAttribute("project", project);
-		
+		newForm.setGrantList(project.getGrants());
 
 		// Set the parameters available to all project types
 		newForm.setTitle(project.getTitle());
 		newForm.setAbstract(project.getAbstract());
-		newForm.setPublicAbstract(project.getPublicAbstract());
 		newForm.setProgress(project.getProgress());
-		//newForm.setKeywords(project.getKeywords());
 		newForm.setComments(project.getComments());
 		newForm.setPublications(project.getPublications());
 		
-		// Set the admin parameters
-		newForm.setBTA(project.getBTA());
-		//newForm.setAxisI(project.getAxisI());
-		//newForm.setAxisII(project.getAxisII());
 
 		newForm.setID(project.getID());
 		newForm.setSubmitDate(project.getSubmitDate());
@@ -146,23 +115,15 @@ public class EditProjectAction extends Action {
 		Researcher res = project.getPI();
 		if (res != null) newForm.setPI(res.getID());
 		
-		res = project.getResearcherB();
-		if (res != null) newForm.setResearcherB(res.getID());
-
-		res = project.getResearcherC();
-		if (res != null) newForm.setResearcherC(res.getID());
-
-		res = project.getResearcherD();
-		if (res != null) newForm.setResearcherD(res.getID());
-
+		newForm.setResearcherList(project.getResearchers());
 
 		// Set up a Collection of all the Researchers to use in the form as a pull-down menu for researchers
-		Collection researchers = Projects.getAllResearchers();
+		Collection<Researcher> researchers = Projects.getAllResearchers();
 		request.getSession().setAttribute("researchers", researchers);
 
 
 		// Go!
-		return mapping.findForward(forwardStr);
+		return mapping.findForward("Success");
 
 	}
 	

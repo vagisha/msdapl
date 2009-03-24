@@ -8,6 +8,7 @@
 
 package org.yeastrc.www.project;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.*;
@@ -34,19 +35,12 @@ public class SaveProjectAction extends Action {
 		// The form elements we're after
 		String title = null;
 		int pi = 0;
-		int researcherB = 0;
-		int researcherC = 0;
-		int researcherD = 0;
-		String[] groups = null;
+		List<Researcher> researchers;
+		List<Grant> grants;
 		String projectAbstract = null;
-		String publicAbstract = null;
 		String progress = null;
-		//String keywords = null;
 		String publications = null;
 		String comments;
-		float bta = (float)0.0;
-		String axisI = null;
-		String axisII = null;
 
 		
 		// User making this request
@@ -79,10 +73,10 @@ public class SaveProjectAction extends Action {
 		}
 
 		// Load our project
-		Collaboration project;
+		Project project;
 		
 		try {
-			project = (Collaboration)(ProjectFactory.getProject(projectID));
+			project = ProjectFactory.getProject(projectID);
 			if (!project.checkAccess(user.getResearcher())) {
 				
 				// This user doesn't have access to this project.
@@ -104,56 +98,41 @@ public class SaveProjectAction extends Action {
 		//request.setAttribute("project", project);
 
 		// We're saving!
-		title = ((EditCollaborationForm)(form)).getTitle();
-		pi = ((EditCollaborationForm)(form)).getPI();
-		researcherB = ((EditCollaborationForm)(form)).getResearcherB();
-		researcherC = ((EditCollaborationForm)(form)).getResearcherC();
-		researcherD = ((EditCollaborationForm)(form)).getResearcherD();
-		groups = ((EditCollaborationForm)(form)).getGroups();
-		projectAbstract = ((EditCollaborationForm)(form)).getAbstract();
-		publicAbstract = ((EditCollaborationForm)(form)).getPublicAbstract();
-		//keywords = ((EditCollaborationForm)(form)).getKeywords();
-		progress = ((EditCollaborationForm)(form)).getProgress();
-		publications = ((EditCollaborationForm)(form)).getPublications();
-		comments = ((EditCollaborationForm)(form)).getComments();
-		bta = ((EditCollaborationForm)(form)).getBTA();
-		axisI = ((EditCollaborationForm)(form)).getAxisI();
-		axisII = ((EditCollaborationForm)(form)).getAxisII();
+		title = ((EditProjectForm)(form)).getTitle();
+		pi = ((EditProjectForm)(form)).getPI();
+		researchers = ((EditProjectForm)(form)).getResearcherList();
+		grants = ((EditProjectForm)(form)).getGrantList();
+		projectAbstract = ((EditProjectForm)(form)).getAbstract();
+		progress = ((EditProjectForm)(form)).getProgress();
+		publications = ((EditProjectForm)(form)).getPublications();
+		comments = ((EditProjectForm)(form)).getComments();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
 		if (projectAbstract.equals("")) projectAbstract = null;
-		//if (keywords.equals("")) keywords = null;
 		if (progress.equals("")) progress = null;
 		if (publications.equals("")) publications = null;
 		if (comments.equals("")) comments = null;
-		if (axisI != null && axisI.equals("")) axisI = null;
-		if (axisII != null && axisII.equals("")) axisII = null;
+		if(researchers == null) {
+		    researchers = new ArrayList<Researcher>(0);
+		}
+		if(grants == null) {
+		    grants = new ArrayList<Grant>(0);
+		}
 		
 		// Set up our researchers
-		Researcher oPI = null;
-		Researcher orB = null;
-		Researcher orC = null;
-		Researcher orD = null;		
 		try {
 			if (pi != 0) {
-				oPI = new Researcher();
-				oPI.load(pi);
+				Researcher piR = new Researcher();
+				piR.load(pi);
+				project.setPI(piR);
 			}			
-			if (researcherB != 0) {
-				orB = new Researcher();
-				orB.load(researcherB);
+			for(Researcher r: researchers) {
+			    if(r == null || r.getID() <= 0)
+			        continue;
+			    r.load(r.getID());
 			}
-			
-			if (researcherC != 0) {
-				orC = new Researcher();
-				orC.load(researcherC);
-			}
-			
-			if (researcherD != 0) {
-				orD = new Researcher();
-				orD.load(researcherD);
-			}
+			project.setResearchers(researchers);
 		} catch (InvalidIDException iie) {
 
 			// Couldn't load the researcher.
@@ -162,51 +141,39 @@ public class SaveProjectAction extends Action {
 			saveErrors( request, errors );
 			return mapping.findForward("Failure");
 		}
-
-		// Set up the groups
-		project.clearGroups();
 		
-		if (groups != null) {
-			if (groups.length > 0) {
-				for (int i = 0; i < groups.length; i++) {
-					try { project.setGroup(groups[i]); }
-					catch (InvalidIDException iie) {
-					
-						// Somehow got an invalid group...
-						ActionErrors errors = new ActionErrors();
-						errors.add("project", new ActionMessage("error.project.invalidgroup"));
-						saveErrors( request, errors );
-						return mapping.findForward("Failure");					
-					}
-				}
-			}
-		}
+		
+
+//		// Set up the groups
+//		project.clearGroups();
+//		if (groups != null) {
+//			if (groups.length > 0) {
+//				for (int i = 0; i < groups.length; i++) {
+//					try { project.setGroup(groups[i]); }
+//					catch (InvalidIDException iie) {
+//					
+//						// Somehow got an invalid group...
+//						ActionErrors errors = new ActionErrors();
+//						errors.add("project", new ActionMessage("error.project.invalidgroup"));
+//						saveErrors( request, errors );
+//						return mapping.findForward("Failure");					
+//					}
+//				}
+//			}
+//		}
 
 		// Set all of the new values in the project
 		project.setTitle(title);
-		project.setPI(oPI);
-		project.setResearcherB(orB);
-		project.setResearcherC(orC);
-		project.setResearcherD(orD);
 		project.setAbstract(projectAbstract);
-		project.setPublicAbstract(publicAbstract);
-		//project.setKeywords(keywords);
 		project.setProgress(progress);
 		project.setPublications(publications);
 		project.setComments(comments);
-		project.setBTA(bta);
+		project.setGrants(grants);
 		
 		
 		// Save the project
-		project.save();
+		ProjectDAO.instance().save(project);
 
-		// save the project grants
-		List<Grant> grants = ((EditCollaborationForm)(form)).getGrantList();
-		ProjectGrantDAO.getInstance().saveProjectGrants(project.getID(), grants);
-		
-		// remove the project, if it exists in the session
-        request.getSession().removeAttribute("project");
-        
 		// Go!
 		return mapping.findForward("viewProject");
 

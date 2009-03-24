@@ -233,10 +233,10 @@ DIV.project {
 DIV.project_header {
 }
 TR.project_A {
-	background-color: #e5d3ff;
+	background-color: #F2F2F2;
 }
 TR.project_B {
-	background-color: #eee2ff;
+	background-color: white;
 }
 DIV.project .button {
 	background-color:#3d4960;
@@ -245,10 +245,25 @@ DIV.project .button {
 	font-weight:bold;
 	margin-top:20px;	
 }
-INPUT.project_button {
-	background-color:#1d0047;
+INPUT.plain_button {
+	background-color:#939cb0; 
 	color:#ffffff;
-	font-size:12pt;
+	border-color: #939cb0; 
+	border-width: 1px; 
+	border-style: outset;
+	font-size:10pt;
+	font-weight:bold;
+	margin-top:15px;
+	text-decoration:none;
+}
+
+INPUT.error_button {
+	background-color:#D74D2D; 
+	color:#ffffff;
+	border-color: #D74D2D; 
+	border-width: 1px; 
+	border-style: outset;
+	font-size:10pt;
 	font-weight:bold;
 	margin-top:15px;
 	text-decoration:none;
@@ -401,13 +416,4 @@ SPAN.multiple_hash_residue {
 	color: #BCB7FF;
 	font-weight: bold;
 	background-color: #FF0000;
-}
-
-INPUT.error_button {
-	background-color:#ff0000;
-	color:#ffffff;
-	font-size:12pt;
-	font-weight:bold;
-	margin-top:15px;
-	text-decoration:none;
 }

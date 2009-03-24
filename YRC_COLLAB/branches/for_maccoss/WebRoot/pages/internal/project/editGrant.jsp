@@ -81,7 +81,7 @@
   	</logic:present>
 	 
 	<center>
-	<div class="project_header" style="width:90%">
+	<div class="project_header" style="width:90%; margin-top:40px;">
 	<center><%=title%></center>
 	</div>
 	

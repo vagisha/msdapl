@@ -12,7 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.db.DBConnectionManager;
@@ -340,50 +342,33 @@ public class ProjectDAO {
         
         Connection conn = null;
         Statement stmt = null;
-        ResultSet rs = null;
         
         try {
             conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
-            stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt = conn.createStatement();
 
-            // Our SQL statement
-            String sqlStr = "SELECT * FROM projectResearcher WHERE projectID = " + projectId;
-
-            // Our results
-            rs = stmt.executeQuery(sqlStr);
-
-            while(rs.next()) {
-                int researcherId = rs.getInt("researcherID");
-                int idx = researcherIds.indexOf(researcherId);
-                // if this researcher is no longer involved in the project remove this entry.
-                if(idx == -1) {
-                    rs.deleteRow();
-                }
-                // remove this researcher from the list so that we know
-                // we have seen this entry.
-                else {
-                    researcherIds.remove(idx);
-                }
+            
+            // delete old entries
+            String sqlStr = "DELETE FROM projectResearcher WHERE projectID = " + projectId;
+            stmt.executeUpdate(sqlStr);
+            stmt.close();
+            
+            // add new ones
+            stmt = conn.createStatement();
+            Set<Integer> uniqIds = new HashSet<Integer>(researcherIds);
+            if(uniqIds.size() == 0)
+                return;
+            sqlStr = "INSERT INTO projectResearcher (projectID, researcherID) VALUES ";
+            for(Integer id: uniqIds) {
+                sqlStr += "("+projectId+","+id+"),";
             }
-
-            // If there are new researchers added to this project save them
-            if(researcherIds.size() > 0) {
-                for(Integer rId: researcherIds) {
-                    rs.moveToInsertRow();
-                    rs.updateInt("projectID", projectId);
-                    rs.updateInt("researcherID", rId);
-                    rs.insertRow();
-                }
-            }
+            sqlStr = sqlStr.substring(0, sqlStr.length() - 1); // remove last comma
+            stmt.executeUpdate(sqlStr);
 
         } finally {
 
             // Always make sure result sets and statements are closed,
             // and the connection is returned to the pool
-            if (rs != null) {
-                try { rs.close(); } catch (SQLException e) { ; }
-                rs = null;
-            }
             if (stmt != null) {
                 try { stmt.close(); } catch (SQLException e) { ; }
                 stmt = null;

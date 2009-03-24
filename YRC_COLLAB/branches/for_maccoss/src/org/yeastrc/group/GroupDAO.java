@@ -12,7 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.db.DBConnectionManager;
@@ -124,50 +126,34 @@ public class GroupDAO {
         
         Connection conn = null;
         Statement stmt = null;
-        ResultSet rs = null;
         
         try {
             conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-
-            // Our SQL statement
-            String sqlStr = "SELECT * FROM projectGroup WHERE projectID = " + projectId;
-
-            // Our results
-            rs = stmt.executeQuery(sqlStr);
-
-            while(rs.next()) {
-                int groupId = rs.getInt("groupID");
-                int idx = groupIds.indexOf(groupId);
-                // if this project is no longer part of this group remove this entry.
-                if(idx == -1) {
-                    rs.deleteRow();
-                }
-                // project is part of the group, remove it from the list so that we know
-                // we have seen this entry.
-                else {
-                    groupIds.remove(idx);
-                }
+            
+            
+            // delete old entries
+            String sqlStr = "DELETE FROM projectGroup WHERE projectID = " + projectId;
+            stmt.executeUpdate(sqlStr);
+            stmt.close();
+            
+            // add new ones
+            stmt = conn.createStatement();
+            Set<Integer> uniqIds = new HashSet<Integer>(groupIds);
+            if(uniqIds.size() == 0)
+                return;
+            sqlStr = "INSERT INTO projectGroup (projectID, groupID) VALUES ";
+            for(Integer id: uniqIds) {
+                sqlStr += "("+projectId+","+id+"),";
             }
-
-            // If there are new groups this project is a part of save them
-            if(groupIds.size() > 0) {
-                for(Integer grpId: groupIds) {
-                    rs.moveToInsertRow();
-                    rs.updateInt("projectID", projectId);
-                    rs.updateInt("groupID", grpId);
-                    rs.insertRow();
-                }
-            }
+            sqlStr = sqlStr.substring(0, sqlStr.length() - 1); // remove last comma
+            stmt.executeUpdate(sqlStr);
+            
 
         } finally {
 
             // Always make sure result sets and statements are closed,
             // and the connection is returned to the pool
-            if (rs != null) {
-                try { rs.close(); } catch (SQLException e) { ; }
-                rs = null;
-            }
             if (stmt != null) {
                 try { stmt.close(); } catch (SQLException e) { ; }
                 stmt = null;
