@@ -14,13 +14,13 @@ import org.yeastrc.project.Project;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.user.User;
 
-public class GrantRecord {
+public class GrantDAO {
 
-	private static GrantRecord instance = new GrantRecord();
+	private static GrantDAO instance = new GrantDAO();
 	
-	private GrantRecord(){}
+	private GrantDAO(){}
 
-	public static GrantRecord getInstance() {
+	public static GrantDAO getInstance() {
 		return instance;
 	}
 	
@@ -40,7 +40,7 @@ public class GrantRecord {
 
 			String sql = "SELECT * FROM grants WHERE id = " + grant.getID();
 
-			conn = DBConnectionManager.getConnection("yrc");
+			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			rs = stmt.executeQuery( sql );
 
@@ -101,7 +101,7 @@ public class GrantRecord {
 
 			String sql = "SELECT * FROM grants WHERE id="+grantID;
 
-			conn = DBConnectionManager.getConnection("yrc");
+			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			
@@ -151,7 +151,7 @@ public class GrantRecord {
 			"ORDER BY grants.id";
 
 			System.out.println(sql);
-			conn = DBConnectionManager.getConnection("yrc");
+			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 
@@ -224,7 +224,7 @@ public class GrantRecord {
 			sql.append("ORDER BY grants.id");
 
 			System.out.println(sql);
-			conn = DBConnectionManager.getConnection("yrc");
+			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.prepareStatement(sql.toString());
 			rs = stmt.executeQuery();
 			

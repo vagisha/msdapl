@@ -16,7 +16,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.FundingSourceType;
 import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.GrantRecord;
+import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.grant.FundingSourceName;
 import org.yeastrc.project.Projects;
 import org.yeastrc.project.Researcher;
@@ -110,7 +110,7 @@ public class EditGrantAction extends Action {
 		}
 		
 		// get the grant for the given ID;
-		Grant grant = GrantRecord.getInstance().load(grantID);
+		Grant grant = GrantDAO.getInstance().load(grantID);
 		if (grant == null) {
 			ActionErrors errors = new ActionErrors();
 			errors.add("grant", new ActionMessage("error.grant.notfound"));

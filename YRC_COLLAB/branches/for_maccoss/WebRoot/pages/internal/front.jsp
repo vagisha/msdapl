@@ -16,19 +16,16 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="Welcome" centered="true" width="750">
-
-<P>Welcome to the MacCoss lab data repository.
-
-<P>From here you can view and update your existing projects.
-You can also <b><html:link action="newProject.do">create a new project</html:link></b>,
-
-<P>To get started, select a project from the list below to navigate to that project's page, or create a new project using the main menu.
-
 
 <!-- SHOW ALL PROJECTS, FOR WHICH THIS USER IS LISTED AS A RESEARCHER -->
-<p><yrcwww:contentbox title="Your Projects" centered="true" width="650">
+<p><yrcwww:contentbox title="Your Projects" centered="true" width="700">
 
+ <logic:empty name="userProjects">
+ 	<p>You do not have any projects at this time.  
+ 	Click <b><html:link action="newProject.do">here</html:link></b> to create a new project.</p>
+ </logic:empty>
+ 
+ <logic:notEmpty name="userProjects">
  <TABLE BORDER="0" WIDTH="100%">
   <TR>
    <TD>&nbsp;</TD>
@@ -52,11 +49,13 @@ You can also <b><html:link action="newProject.do">create a new project</html:lin
 </logic:iterate>
 
  </TABLE>
+ </logic:notEmpty>
 </yrcwww:contentbox>
 
+<br>
 <!-- SHOW ANY RECENT SUBMISSIONS TO THIS USER'S GROUP -->
 <yrcwww:member group="any">
-	<yrcwww:contentbox title="Recent Submissions" centered="true" width="650">
+	<yrcwww:contentbox title="Recent Submissions" centered="true" width="700">
 	 	<logic:notEmpty name="newProjects" scope="request">
 		 <p>Below are projects submitted by researchers to your group(s) within the last month.
 	 
@@ -103,7 +102,5 @@ You can also <b><html:link action="newProject.do">create a new project</html:lin
 
 </yrcwww:member>
 
-
-</yrcwww:contentbox>
 
 <%@ include file="/includes/footer.jsp" %>

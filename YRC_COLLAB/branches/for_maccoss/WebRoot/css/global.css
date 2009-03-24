@@ -43,11 +43,15 @@ DIV.mainContainer {
 	min-height: 100%;	
 }
 
-DIV#header {
-        width:100%;
+/*  background-color: #0075B2; */
+#top_header {
+		display:block;
         border-width: 0;
-        padding: 0 0 0 5;
-        background-color: #0075B2;
+        padding:20 0 0 170;
+        background-image: url("../images/MSDAPL_logo_small.png");
+        background-repeat: no-repeat;
+        background-position:bottom left;
+        background-color: #3d4960;
         z-index:1;
         color: #FFFFFF;
         font-size:8pt;
@@ -55,6 +59,48 @@ DIV#header {
         font-weight:300;
         margin-top:0px;
 }
+
+/* Menu Items */
+#main_menu{
+	position:relative;
+	display:block;
+	height:24px;
+	font-size:11px;
+	font-weight:bold;
+}
+
+/* #0A90D0; */
+#main_menu a, #main_menu a:hover #main_menu a:visited {
+	font-weight:bold; color:white;text-decoration:none;padding:3;background-color:gray; border: solid 1px white;
+}
+#main_menu ul{margin:0px;padding:0;list-style-type:none;width:auto;font-size:9pt;}
+#main_menu ul li{display:block;float:left;margin:0 1px 0 0;}
+#main_menu ul li a{display:block;float:left;color:white;text-decoration:none;padding:5px 20px 0 20px;height:19px;
+background-color:#ed9a2e;border:0;}
+#main_menu ul li a:hover{color:white;background-color: black;}
+#main_menu ul li a.current,#main_menu ul li a.current:hover{color:white;background:#D74D2D;
+border-style: outset none outset outset; border-width: 1px 0px 0px 1px; border-color: #D74D2D;}
+
+#sub_header {
+		display:block;
+		border-top: solid 5px #D74D2D;
+        padding:5 0 5 10;
+        z-index:1;
+        font-style:normal;
+        font-weight:300;
+        margin-top:0px;
+}
+#sub_menu{
+	display:block;
+	height:20px;
+	font-size:11pt;
+	font-weight:bold;	
+}
+#sub_menu ul{margin:0px;padding:0;list-style-type:none;width:auto;font-size:9pt;}
+#sub_menu ul li{display:block;float:left;margin:0 5px 0 0;}
+#sub_menu ul li a{display:block;float:left;color:white;text-decoration:none;padding:3px 15px 3px 15px;height:15px;
+background-color:#939cb0; border-color: #939cb0; border-width: 1px; border-style: outset;}
+#sub_menu ul li a:hover{color:white;background-color: black;}
 
 
 DIV#footer {
@@ -66,7 +112,7 @@ DIV#footer {
         border-width: 0;
         border-style:none;
         z-index:1;
-        background-color: #0075B2;
+        background-color: #3d4960;
         color: #FFFFFF;
         font-size:8pt;
         font-style:normal;
@@ -74,92 +120,25 @@ DIV#footer {
         text-align:center;
 }
 
-ul#main-menu{list-style-type:none;width:100%;position:relative;height:27px;font-family:"Trebuchet MS",Arial,sans-serif;font-size:13px;font-weight:bold;margin:0;padding:11px 0 0 0;}
-ul#main-menu li{display:block;float:left;margin:0 0 0 4px;height:27px;}
-ul#main-menu li.left{margin:0;}
-ul#main-menu li a{display:block;float:left;color:#fff;background:#4A6867;line-height:27px;text-decoration:none;padding:0 17px 0 18px;height:27px;}
-ul#main-menu li a.right{padding-right:19px;}
-ul#main-menu li a:hover{background:#2E4560;}
-ul#main-menu li a.current{color:#2E4560;background:#fff;}
-ul#main-menu li a.current:hover{color:#2E4560;background:#fff;}
-
-<!-- =============================================================================== -->
-<!-- MENU ITEMS                                                                      -->
-<!-- =============================================================================== -->
-span.menu_base {
-	font-size: 10pt;
-	font-weight: bold;
-	padding: 4 4 0 4;
-}
-
-.menu_base a {
-	text-decoration:none;padding:0 17px 0 18px;height:27px;
-}
-
-.menu_base a:link {
-	text-decoration:none;padding:0 17px 0 18px;height:27px;
-	color:white;
-}
-
-.menu_base a:visited {
-	text-decoration:none;padding:0 17px 0 18px;height:27px;
-	color:white;
-}
-
-span.main_menu {
-	background-color: #0A90D0;
-	color: white;
-}
-
-span.main_menu:hover {
-	background-color: #A4C2DB;
-}
-
-span.main_menu_selected {
-	background-color:white;
-	color: #0075B2;
-}
-
-.main_menu_selected a:link {
-	color: #0075B2;
-}
-
-.main_menu_selected a:visited {
-	color: #0075B2;
-}
-
-.sub_menu {
-	font-size: 10pt;
-	font-weight: bold;
-	padding: 4 4 4 4;
-}
-
-.sub_menu_hover {
-	
-}
-
-.sub_menu_selected {
-
-}
 
 DIV #history {
 	border: 1px dashed #8CACBB;
 	background-color: white;	
 	margin: 2 5 2 5;
-	padding: 0;
+	padding: 3;
 }
 
 DIV.ms, DIV.pinfer, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.account {
         border-width: 1;
         border-style: solid;
-        padding: 2 5 2 5;
+        padding: 5 8 5 8;
         z-index:1;
-        font-family: verdana, helvetica, arial;
+        font-family: "Trebuchet MS",Arial,sans-serif;
         font-size:10pt;
         font-style:normal;
         font-weight:500;
         margin:0px;
-        border-color: #0075B2;
+        border-color: #939cb0;
         background-color: #FFFFFF;
         color: black;
 }
@@ -167,15 +146,15 @@ DIV.ms, DIV.pinfer, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.reg
 DIV.ms_header, DIV.pinfer_header, DIV.upload_header, DIV.adminSearch_header, DIV.groups_header, DIV.search_header, DIV.register_header, DIV.error_header, DIV.login_header, DIV.project_header, DIV.account_header {
         border-width: 1;
         border-style: solid;
-        padding: 5px;
+        padding: 2 8 2 8;
         z-index:1;
-        font-family: verdana, helvetica, arial;
-        font-size:12pt;
+        font-family: "Trebuchet MS",Arial,sans-serif;
+        font-size:11pt;
         font-style:normal;
         font-weight:900;
         margin:0px;
-        border-color: #0075B2;
-        background-color: #0075B2;
+        border-color: #939cb0;
+        background-color: #939cb0;
         color: white;
 }
 
@@ -225,8 +204,8 @@ TR.search_B {
 	background-color: #D8DBFE;
 }
 DIV.search .button {
-	background-color:#000960;
-	color:#E8EAFF;
+	background-color:#3d4960;
+	color:white;
 	font-size:10pt;
 	font-weight:bold;
 	margin-top:20px;	
@@ -247,8 +226,8 @@ TR.project_B {
 	background-color: #eee2ff;
 }
 DIV.project .button {
-	background-color:#1d0047;
-	color:#e5d3ff;
+	background-color:#3d4960;
+	color:white;
 	font-size:10pt;
 	font-weight:bold;
 	margin-top:20px;	

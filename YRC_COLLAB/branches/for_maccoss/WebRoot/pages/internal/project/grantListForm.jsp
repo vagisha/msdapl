@@ -1,14 +1,8 @@
-<tr><td colspan="2" align="center" style="font-size: 12pt; font-weight: bold;">Funding Sources&nbsp;&nbsp;&nbsp;</td></tr>
-<tr><td colspan="2" align="center" style="font-size: 8pt;"><div style="width: 70%;">The following funding information is used by us when filing our annual report
-									with NCRR and NIH, and is used to derive summary statistics only.</div></td></tr>
+<tr><td colspan="2" align="center" style="font-size: 10pt; font-weight: bold;">Funding Sources&nbsp;&nbsp;&nbsp;</td></tr>
 <tr><td colspan="2" align="center">
 	
-	<logic:present name="editCollaborationForm">
-		<bean:define name="editCollaborationForm" id="form" />
-	</logic:present>
-	
-	<logic:present name="editTechnologyForm">
-		<bean:define name="editTechnologyForm" id="form" />
+	<logic:present name="editProjectForm">
+		<bean:define name="editProjectForm" id="form" />
 	</logic:present>
 	
 	<bean:size name="form" property="grantList" id="numGrants" />

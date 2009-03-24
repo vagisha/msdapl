@@ -9,36 +9,20 @@
 package org.yeastrc.www.project;
 
 import java.util.List;
-import java.util.Properties;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
+import org.apache.struts.action.*;
 
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.util.MessageResources;
-import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.project.*;
+import org.yeastrc.www.user.*;
+import org.yeastrc.data.*;
 import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.ProjectGrantRecord;
-import org.yeastrc.project.Collaboration;
-import org.yeastrc.project.Project;
-import org.yeastrc.project.Researcher;
-import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.grant.ProjectGrantDAO;
 
 /**
- * Controller class for saving a new collaboration or technology development project.
+ * Controller class for saving a project.
  */
-public class SaveNewCollaborationAction extends Action {
+public class SaveProjectAction extends Action {
 
 	public ActionForward execute( ActionMapping mapping,
 								  ActionForm form,
@@ -60,8 +44,9 @@ public class SaveNewCollaborationAction extends Action {
 		//String keywords = null;
 		String publications = null;
 		String comments;
-		boolean sendEmail;
-		boolean isTech;
+		float bta = (float)0.0;
+		String axisI = null;
+		String axisII = null;
 
 		
 		// User making this request
@@ -73,6 +58,50 @@ public class SaveNewCollaborationAction extends Action {
 			return mapping.findForward("authenticate");
 		}
 
+
+		try {
+			String strID = request.getParameter("ID");
+
+			if (strID == null || strID.equals("")) {
+				ActionErrors errors = new ActionErrors();
+				errors.add("username", new ActionMessage("error.project.noprojectid"));
+				saveErrors( request, errors );
+				return mapping.findForward("Failure");
+			}
+
+			projectID = Integer.parseInt(strID);
+
+		} catch (NumberFormatException nfe) {
+			ActionErrors errors = new ActionErrors();
+			errors.add("username", new ActionMessage("error.project.invalidprojectid"));
+			saveErrors( request, errors );
+			return mapping.findForward("Failure");
+		}
+
+		// Load our project
+		Collaboration project;
+		
+		try {
+			project = (Collaboration)(ProjectFactory.getProject(projectID));
+			if (!project.checkAccess(user.getResearcher())) {
+				
+				// This user doesn't have access to this project.
+				ActionErrors errors = new ActionErrors();
+				errors.add("username", new ActionMessage("error.project.noaccess"));
+				saveErrors( request, errors );
+				return mapping.findForward("Failure");
+			}
+		} catch (Exception e) {
+			
+			// Couldn't load the project.
+			ActionErrors errors = new ActionErrors();
+			errors.add("username", new ActionMessage("error.project.projectnotfound"));
+			saveErrors( request, errors );
+			return mapping.findForward("Failure");	
+		}
+
+		// Set this project in the request, as a bean to be displayed on the view
+		//request.setAttribute("project", project);
 
 		// We're saving!
 		title = ((EditCollaborationForm)(form)).getTitle();
@@ -87,8 +116,9 @@ public class SaveNewCollaborationAction extends Action {
 		progress = ((EditCollaborationForm)(form)).getProgress();
 		publications = ((EditCollaborationForm)(form)).getPublications();
 		comments = ((EditCollaborationForm)(form)).getComments();
-		sendEmail = ((EditCollaborationForm)(form)).getSendEmail();
-		isTech = ((EditCollaborationForm)(form)).getIsTech();
+		bta = ((EditCollaborationForm)(form)).getBTA();
+		axisI = ((EditCollaborationForm)(form)).getAxisI();
+		axisII = ((EditCollaborationForm)(form)).getAxisII();
 		
 		// Set blank items to null
 		if (title.equals("")) title = null;
@@ -97,12 +127,8 @@ public class SaveNewCollaborationAction extends Action {
 		if (progress.equals("")) progress = null;
 		if (publications.equals("")) publications = null;
 		if (comments.equals("")) comments = null;
-
-		// Load our project
-		Project project = new Collaboration();
-
-		// Set this project in the request, as a bean to be displayed on the view
-		//request.setAttribute("project", project);
+		if (axisI != null && axisI.equals("")) axisI = null;
+		if (axisII != null && axisII.equals("")) axisII = null;
 		
 		// Set up our researchers
 		Researcher oPI = null;
@@ -168,74 +194,22 @@ public class SaveNewCollaborationAction extends Action {
 		project.setProgress(progress);
 		project.setPublications(publications);
 		project.setComments(comments);
+		project.setBTA(bta);
 		
-		// Send email to the groups they're collaboration with
-		if (sendEmail) {
-			try {
-				// set the SMTP host property value
-				Properties properties = System.getProperties();
-				properties.put("mail.smtp.host", "localhost");
-			
-				// create a JavaMail session
-				javax.mail.Session mSession = javax.mail.Session.getInstance(properties, null);
-			
-				// create a new MIME message
-				MimeMessage message = new MimeMessage(mSession);
-			
-				// set the from address
-				Address fromAddress = new InternetAddress(((Researcher)(user.getResearcher())).getEmail());
-				message.setFrom(fromAddress);
-			
-				// set the to address by assembling a comma delimited list of addresses associated with the groups selected
-				String emailStr = "";
-				MessageResources mr = getResources(request);
-				for (int i = 0; i < groups.length; i++) {
-					if (i > 0) { emailStr = emailStr + ","; }
-					
-					emailStr = emailStr + mr.getMessage("email.groups." + groups[i]);
-				}
-				
-				Address[] toAddress = InternetAddress.parse(emailStr);
-				message.setRecipients(Message.RecipientType.TO, toAddress);
-			
-				// set the subject
-				message.setSubject("New Collaboration Request");
-			
-				// set the message body
-				String text = ((Researcher)(user.getResearcher())).getFirstName() + " ";
-				text += ((Researcher)(user.getResearcher())).getLastName() + " ";
-				text += "has requested a new collaboration with your group.  Replying to this email should reply directly to the researcher.\n\n";
-				text += "Details:\n\n";
-				
-				if (oPI != null)
-					text += "PI: " + oPI.getListing() + "\n\n";
-	
-				text += "Groups: " + project.getGroupsString() + "\n\n";
-				text += "Title: " + project.getTitle() + "\n\n";
-				text += "Abstract: " + project.getAbstract() + "\n\n";
-				text += "Comments: " + project.getComments() + "\n\n";
-			
-				message.setText(text);
-			
-				// send the message
-				Transport.send(message);
-			
-			}
-			catch (Exception e) { ; }
-		}
 		
 		// Save the project
 		project.save();
-		
+
 		// save the project grants
 		List<Grant> grants = ((EditCollaborationForm)(form)).getGrantList();
-		ProjectGrantRecord.getInstance().saveProjectGrants(project.getID(), grants);
+		ProjectGrantDAO.getInstance().saveProjectGrants(project.getID(), grants);
 		
-
+		// remove the project, if it exists in the session
+        request.getSession().removeAttribute("project");
+        
 		// Go!
-		ActionForward success = mapping.findForward("Success") ;
-		success = new ActionForward( success.getPath() + "?ID=" + project.getID(), success.getRedirect() ) ;
-		return success ;
+		return mapping.findForward("viewProject");
+
 	}
 	
 }

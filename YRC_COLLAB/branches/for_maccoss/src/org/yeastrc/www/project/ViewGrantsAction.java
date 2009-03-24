@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.GrantRecord;
+import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.grant.GrantSorter;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -40,7 +40,7 @@ public class ViewGrantsAction extends Action {
 		List<Integer> piIdList = piIDs(piIDStr);
 		
 		// get all the grants associated with this user and given PI
-		List<Grant> grants = GrantRecord.getInstance().getGrantForUserAndPIs(user, piIdList);
+		List<Grant> grants = GrantDAO.getInstance().getGrantForUserAndPIs(user, piIdList);
 		if (request.getParameter("sortby") != null) {
 			sortGrantsBy(grants, request.getParameter("sortby"));
 		}

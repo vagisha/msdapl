@@ -22,7 +22,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 
 <yrcwww:notauthenticated>
-<div id="header" align="center">
+<div id="top_header" align="center">
 	<table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
 	<tr>
 	<td width="33%">&nbsp;</td>
@@ -37,53 +37,73 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
    
 <yrcwww:authenticated>
 
-<div id="header">
+<div id="top_header">
 
-<table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
- <tr>
-  <td WIDTH="478" VALIGN="bottom" COLSPAN="2">
-   <nobr>
-    <img src="<yrcwww:link path='images/MSDAPL_logo_small.png'/>" /> &nbsp;&nbsp;&nbsp;
-    
-	<span class="menu_base main_menu_selected"><a href="http://www.13styles.com/css-menus/simple-menu/" title="Home" class="current">Home</a></span>
-	<span class="menu_base main_menu"><a href="http://www.13styles.com/css-menus/simple-menu/" title="Account">Account</a></span>
-	<span class="menu_base main_menu"><a href="http://www.13styles.com/css-menus/simple-menu/" title="Home">Admin</a></span>
-	</nobr>
-  </td>
-
-  <td WIDTH="100%" ALIGN="RIGHT" style="padding-right: 10;">
-    <jsp:useBean id="user" class="org.yeastrc.www.user.User" scope="session"/>
-    <FONT STYLE="font-size:8pt;">Welcome <yrcwww:user attribute="firstname"/> <yrcwww:user attribute="lastname"/>!<BR></FONT>
-    <div><html:link action="logout.do">Logout</html:link></div>
-  </td>
- </tr>
-</table>
+<div id="main_menu">
+	<ul>
+		<logic:equal name="dir" scope="request" value="internal">
+			<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home" class="current"><span>Home</span></a></li>
+		</logic:equal>
+		<logic:notEqual name="dir" scope="request" value="internal">
+		
+			<logic:equal name="dir" scope="request" value="project">
+				<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home" class="current"><span>Home</span></a></li>
+			</logic:equal>
+			
+			<logic:notEqual name="dir" scope="request" value="project">
+				<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home"><span>Home</span></a></li>
+			</logic:notEqual>
+		</logic:notEqual>
+		
+		<logic:equal name="dir" scope="request" value="account">
+			<li><html:link  action="editInformation.do" styleClass="current"><span>Account</span></html:link></li>
+		</logic:equal>
+		<logic:notEqual name="dir" scope="request" value="account">
+			<li><html:link  action="editInformation.do"><span>Account</span></html:link></li>
+		</logic:notEqual>
+		
+		<logic:equal name="dir" scope="request" value="admin">
+			<li><html:link action="" styleClass="current"><span>Admin</span></html:link></li>
+		</logic:equal>
+		<logic:notEqual name="dir" scope="request" value="admin">
+			<li><html:link action="" ><span>Admin</span></html:link></li>
+		</logic:notEqual>
+	
+	</ul>
+	
+	<div align="right" style="padding-right:20;color:white; font-size:8pt">
+		<jsp:useBean id="user" class="org.yeastrc.www.user.User" scope="session"/>
+    	Welcome <yrcwww:user attribute="firstname"/> <yrcwww:user attribute="lastname"/>!&nbsp;&nbsp;
+    	<html:link action="logout.do">Logout</html:link>
+	</div>
+	
 </div>
 
+</div>
 
-<table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
- <tr BGCOLOR="#FFFFFF">
-  <td BGCOLOR="#FFFFFF" COLSPAN="3" ALIGN="LEFT" VALIGN="top"><NOBR>&nbsp;&nbsp;&nbsp;
+<div id="sub_header">
+<div id="sub_menu">
+	<ul>
    <logic:equal name="dir" scope="request" value="account">
-    <html:link href="/yrc/editInformation.do">information</html:link>
-    <html:link href="/yrc/editPassword.do">password</html:link>
-    <html:link href="/yrc/editUsername.do">username</html:link>
+    <li><html:link href="/yrc/editInformation.do"><span>My Information</span></html:link>
+    <li><html:link href="/yrc/editPassword.do"><span>Password</span></html:link></li>
+    <li><html:link href="/yrc/editUsername.do"><span>Username</span></html:link></li>
    </logic:equal>
    <logic:equal name="dir" scope="request" value="internal">
-        <html:link action="newCollaboration.do">New Project</html:link>
+        <li><html:link action="newProject.do"><span>New Project</span></html:link></li>
         <yrcwww:member group="any">
-   			<html:link action="uploadMacCossFormAction.do">Upload Data</html:link>
+   			<li><html:link action="uploadMacCossFormAction.do"><span>Upload Data</span></html:link></li>
    		</yrcwww:member>
    </logic:equal>
    <logic:equal name="dir" scope="request" value="project">
-        <html:link action="newCollaboration.do">New Project</html:link>
+       <li><html:link action="newProject.do"><span>New Project</span></html:link></li>
         <yrcwww:member group="any">
-   			<html:link action="uploadMacCossFormAction.do">Upload Data</html:link>
+   			<li><html:link action="uploadMacCossFormAction.do"><span>Upload Data</span></html:link></li>
    		</yrcwww:member>
    </logic:equal>
-  </NOBR></td>
- </tr>
-</table>
+  </ul>
+</div>
+</div>
 
 <div id="history"><yrcwww:history/></div>
 </yrcwww:authenticated>

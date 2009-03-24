@@ -14,8 +14,13 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import org.apache.struts.action.*;
+
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.yeastrc.grant.Grant;
+import org.yeastrc.project.Researcher;
 
 /**
  * @author Michael Riffle <mriffle@u.washington.edu>
@@ -23,6 +28,23 @@ import org.yeastrc.grant.Grant;
  */
 public class EditProjectForm extends ActionForm {
 
+    // The form variables we'll be tracking
+    private String title = null;
+    private String projectAbstract = null;
+    private String progress = null;
+    private String comments = null;
+    private String publications = null;
+    
+    private int pi = 0;
+    private List<Researcher> researchers = new ArrayList<Researcher>();
+    private List<Integer> groups = new ArrayList<Integer>();
+
+    private List<Grant> grants = new ArrayList<Grant>();
+    
+    private int ID = 0;
+    
+    private Date submitDate = null;
+    
 
 	/**
 	 * Validate the properties that have been sent from the HTTP request,
@@ -37,6 +59,10 @@ public class EditProjectForm extends ActionForm {
 			errors.add("PI", new ActionMessage("error.project.nopi"));
 		}
 
+		// we need atleast one grant
+        if (validGrantCount() < 1) {
+                errors.add("grants", new ActionMessage("error.grant.nogrants"));
+        }
 		return errors;
 	}
 	
@@ -46,14 +72,8 @@ public class EditProjectForm extends ActionForm {
 	/** Set the abstract */
 	public void setAbstract(String arg) { this.projectAbstract = arg; }
 	
-	/** Set the public abstract */
-	public void setPublicAbstract(String arg) { this.publicAbstract = arg; }
-
 	/** Set the progress */
 	public void setProgress(String arg) { this.progress = arg; }
-
-	/** Set the keywords */
-	public void setKeywords(String arg) { this.keywords = arg; }
 
 	/** Set the comments */
 	public void setComments(String arg) { this.comments = arg; }
@@ -61,26 +81,9 @@ public class EditProjectForm extends ActionForm {
 	/** Set the publications */
 	public void setPublications(String arg) { this.publications = arg; }
 
-	/** Set the BTA */
-	public void setBTA(float arg) { this.bta = arg; }
-
-	/** Set the AXIS I */
-	public void setAxisI(String arg) { this.axisi = arg; }
-
-	/** Set the AXIS II */
-	public void setAxisII(String arg) { this.axisii = arg; }
-
 	/** Set the PI ID */
 	public void setPI(int arg) { this.pi = arg; }
-
-	/** Set Researcher B ID */
-	public void setResearcherB(int arg) { this.researcherB = arg; }
-
-	/** Set Researcher C ID */
-	public void setResearcherC(int arg) { this.researcherC = arg; }
-
-	/** Set Researcher D ID */
-	public void setResearcherD(int arg) { this.researcherD = arg; }
+	
 
 
 
@@ -90,14 +93,8 @@ public class EditProjectForm extends ActionForm {
 	/** Get the abstract */
 	public String getAbstract() { return this.projectAbstract; }
 	
-	/** Get the public abstract */
-	public String getPublicAbstract() { return this.publicAbstract; }
-
 	/** Get the progress */
 	public String getProgress() { return this.progress; }
-
-	/** Get the keywords */
-	public String getKeywords() { return this.keywords; }
 
 	/** Get the comments */
 	public String getComments() { return this.comments; }
@@ -105,52 +102,15 @@ public class EditProjectForm extends ActionForm {
 	/** Get the publications */
 	public String getPublications() { return this.publications; }
 
-	/** Get the BTA */
-	public float getBTA() { return this.bta; }
-
-	/** Get the AXIS I */
-	public String getAxisI() { return this.axisi; }
-
-	/** Get the AXIS II */
-	public String getAxisII() { return this.axisii; }
-
 	/** Get the PI ID */
 	public int getPI() { return this.pi; }
 	
-	/** Get the Researcher B ID */
-	public int getResearcherB() { return this.researcherB; }
-
-	/** Get the Researcher C ID */
-	public int getResearcherC() { return this.researcherC; }
-
-	/** Get the Researcher D ID */
-	public int getResearcherD() { return this.researcherD; }
-
-
-	// The form variables we'll be tracking
-	private String title = null;
-	private String projectAbstract = null;
-	private String publicAbstract = null;
-	private String progress = null;
-	private String keywords = null;
-	private String comments = null;
-	private String publications = null;
-	private float bta = (float)0;
-	private String axisi = null;
-	private String axisii = null;
 	
-	private int pi = 0;
-	private int researcherB = 0;
-	private int researcherC = 0;
-	private int researcherD = 0;
-
-	private List<Grant> grants = new ArrayList<Grant>();
-	
-	private int ID = 0;
-	
-	private Date submitDate = null;
-	
+	//----------------------------------------------------------------
+	// Grants
+	//----------------------------------------------------------------
 	public Grant getGrant(int index) {
+	    System.out.println("Getting grant id at index: "+index);
 		while(index >= grants.size())
 			grants.add(new Grant());
 		return grants.get(index);
@@ -176,6 +136,55 @@ public class EditProjectForm extends ActionForm {
 		return i;
 	}
 	
+	//----------------------------------------------------------------
+    // Researchers
+    //----------------------------------------------------------------
+	public Researcher getResearcher(int index) {
+	    System.out.println("Getting researcher id at index: "+index);
+	    while(index >= researchers.size())
+	        researchers.add(new Researcher());
+	    return researchers.get(index);
+	}
+	
+	public List<Researcher> getResearcherList() {
+	    System.out.println("Getting researcher list");
+	    List<Researcher> rList = new ArrayList<Researcher>();
+	    for(Researcher r: researchers) {
+	        if(r != null && r.getID() > 0)
+	            rList.add(r);
+	    }
+	    return rList;
+	}
+	
+	public void setResearcherList(List<Researcher> researchers) {
+	    System.out.println("Setting researcher");
+	    this.researchers = researchers;
+	}
+	
+	//----------------------------------------------------------------
+    // Groups
+    //----------------------------------------------------------------
+    public int getGroupId(int index) {
+        while(index > groups.size())
+            groups.add(0);
+        return groups.get(index);
+    }
+    
+    public List<Integer> getGroups() {
+        List<Integer> ids = new ArrayList<Integer>();
+        for(Integer id: groups) {
+            if(id != null && id > 0)
+                ids.add(id);
+        }
+        return ids;
+    }
+    
+    public void setGroups(List<Integer> groups) {
+        this.groups = groups;
+    }
+	
+	
+    
 	public int getID() {
 		return ID;
 	}

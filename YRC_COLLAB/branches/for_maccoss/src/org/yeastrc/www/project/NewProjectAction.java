@@ -15,7 +15,7 @@ import org.yeastrc.www.user.*;
 /**
  * Controller class for creating a new Collaboration.
  */
-public class NewCollaborationAction extends Action {
+public class NewProjectAction extends Action {
 
 	public ActionForward execute( ActionMapping mapping,
 								  ActionForm form,
@@ -38,11 +38,19 @@ public class NewCollaborationAction extends Action {
 
 		
 		// Create our ActionForm
-		EditCollaborationForm newForm = new EditCollaborationForm();
-		request.setAttribute("editCollaborationForm", newForm);
+		EditProjectForm newForm = new EditProjectForm();
+		request.setAttribute("editProjectForm", newForm);
 		
 		// Set the default PI to this user.
-		newForm.setPI(researcher.getID());
+		// TODO  we are setting MacCoss as the default PI. Fix this.
+		newForm.setPI(1763);
+		List<Researcher> researcherIds = new ArrayList<Researcher>();
+		Researcher tempR = new Researcher();
+		tempR = new Researcher();
+		tempR.load(researcher.getID());
+		researcherIds.add(tempR);
+		newForm.setResearcherList(researcherIds);
+		
 
 		// Set up a Collection of all the Researchers to use in the form as a pull-down menu for researchers
 		Collection researchers = Projects.getAllResearchers();

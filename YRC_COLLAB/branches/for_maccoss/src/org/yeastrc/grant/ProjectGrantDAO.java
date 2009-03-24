@@ -8,13 +8,13 @@ import java.util.List;
 
 import org.yeastrc.db.DBConnectionManager;
 
-public class ProjectGrantRecord {
+public class ProjectGrantDAO {
 
-	private static ProjectGrantRecord instance = new ProjectGrantRecord();
+	private static ProjectGrantDAO instance = new ProjectGrantDAO();
 	
-	private ProjectGrantRecord(){}
+	private ProjectGrantDAO(){}
 	
-	public static ProjectGrantRecord getInstance() {
+	public static ProjectGrantDAO getInstance() {
 		return instance;
 	}
 	
@@ -26,8 +26,8 @@ public class ProjectGrantRecord {
 		
 		try {
 			// first clear all the existing grants for the project
-			String sql = "DELETE FROM projectGrant WHERE projectID=" + projectID+" order by id";
-			conn = DBConnectionManager.getConnection("yrc");
+			String sql = "DELETE FROM projectGrant WHERE projectID=" + projectID;
+			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.createStatement();
 			int deleted = stmt.executeUpdate(sql);
 			if (deleted == 0) {
@@ -38,7 +38,7 @@ public class ProjectGrantRecord {
 			conn.close(); conn = null;
 			
 			// now save the given grants
-			conn = DBConnectionManager.getConnection("yrc");
+			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.createStatement();
 			for(Grant grant: grants) {
 				if (grant.getID() <= 0)	continue;

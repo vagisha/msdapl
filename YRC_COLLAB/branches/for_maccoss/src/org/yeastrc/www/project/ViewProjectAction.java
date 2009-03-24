@@ -8,7 +8,6 @@
 
 package org.yeastrc.www.project;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +22,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.GrantRecord;
-import org.yeastrc.microscopy.ExperimentBaitComparator;
-import org.yeastrc.microscopy.ExperimentSearcher;
+import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
@@ -106,7 +103,7 @@ public class ViewProjectAction extends Action {
 		request.setAttribute("project", project);
 		
 		// get the grants for this project and set them in the request
-		List<Grant> grants = GrantRecord.getInstance().getGrantsForProject(project.getID());
+		List<Grant> grants = GrantDAO.getInstance().getGrantsForProject(project.getID());
 		request.setAttribute("grants", grants);
 		
 		// Check for experiment data for this project
@@ -138,12 +135,6 @@ public class ViewProjectAction extends Action {
 		request.setAttribute("projectId", projectID);
 
 
-
-		ExperimentSearcher es = ExperimentSearcher.getInstance();
-		es.setProjectID(project.getID());
-		List tmpList = es.search();
-		Collections.sort(tmpList, new ExperimentBaitComparator());
-		request.setAttribute("locdata", tmpList);
 
 		Groups groupMan = Groups.getInstance();
 		if ( project.getGroups().contains( Projects.YATES ) &&

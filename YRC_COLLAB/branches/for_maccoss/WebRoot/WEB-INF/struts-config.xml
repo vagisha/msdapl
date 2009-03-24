@@ -44,7 +44,7 @@
 	<form-bean name="loginForm" type="org.yeastrc.www.login.LoginForm"/>
 	<form-bean name="registerForm" type="org.yeastrc.register.RegisterForm"/>
 	<form-bean name="forgotPasswordForm" type="org.yeastrc.www.login.ForgotPasswordForm"/>
-	<form-bean name="editCollaborationForm" type="org.yeastrc.www.project.EditCollaborationForm"/>
+	<form-bean name="editProjectForm" type="org.yeastrc.www.project.EditProjectForm"/>
 	<form-bean name="editInformationForm" type="org.yeastrc.www.account.EditInformationForm"/>
 	<form-bean name="editUsernameForm" type="org.yeastrc.www.account.EditUsernameForm"/>
 	<form-bean name="editPasswordForm" type="org.yeastrc.www.account.EditPasswordForm"/>
@@ -76,7 +76,7 @@
 	<forward name="editProject" path="/editProject.do" />
 	<forward name="editInformation" path="/editInformation.do" />
 	<forward name="newResearcher" path="/newResearcher.do" />
-	<forward name="newCollaboration" path="/newCollaboration.do" />
+	<forward name="newProject" path="/newProject.do" />
 	<forward name="viewRegister" path="/viewRegister.do" />
 	<forward name="manageGroups" path="/manageGroups.do" />
 	<forward name="manageGroupMembers" path="/manageGroupMembers.do" />
@@ -149,32 +149,6 @@
 	  validate="true">
 	  <forward name="Success" path="/pages/login/passwordSent.jsp" redirect="true"/>
 	  <forward name="Failure" path="/pages/login/forgotPassword.jsp" redirect="false"/>
-	</action>
-
-	<action
-	  path="/viewProject"
-	  type="org.yeastrc.www.project.ViewProjectAction"
-	  validate="false">
-	  <forward name="Collaboration" path="/pages/internal/project/viewCollaboration.jsp" redirect="false"/>
-	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
-	</action>
-
-	<action
-	  path="/editProject"
-	  type="org.yeastrc.www.project.EditProjectAction"
-	  validate="false">
-	  <forward name="Collaboration" path="/pages/internal/project/editCollaboration.jsp" redirect="false"/>
-	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
-	</action>
-
-	<action
-	  path="/saveCollaboration"
-	  input="/pages/internal/project/editCollaboration.jsp"
-	  name="editCollaborationForm"
-	  scope="request"
-	  type="org.yeastrc.www.project.SaveCollaborationAction"
-	  validate="true">
-	  <forward name="Failure" path="/pages/internal/project/editCollaboration.jsp" redirect="false"/>
 	</action>
 
 	<!-- Edit account information -->
@@ -276,26 +250,67 @@
 	  <forward name="Failure" path="/pages/internal/project/newResearcher.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/newResearcher.jsp" redirect="false"/>
 	</action>
-
+	
+	
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to projects -->
+	<!-- ================================================================================== -->
 	<action
-	  path="/newCollaboration"
-	  type="org.yeastrc.www.project.NewCollaborationAction"
+	  path="/newProject"
+	  type="org.yeastrc.www.project.NewProjectAction"
 	  validate="false">
-	  <forward name="Success" path="/pages/internal/project/newCollaboration.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/newProject.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/viewProject"
+	  type="org.yeastrc.www.project.ViewProjectAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/project/viewProject.jsp" redirect="false"/>
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 
 	<action
-	  path="/saveNewCollaboration"
-	  input="/pages/internal/project/newCollaboration.jsp"
-	  name="editCollaborationForm"
+	  path="/editProject"
+	  type="org.yeastrc.www.project.EditProjectAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/project/editProject.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
+
+	<action
+	  path="/saveProject"
+	  input="/pages/internal/project/editProject.jsp"
+	  name="editProjectForm"
 	  scope="request"
-	  type="org.yeastrc.www.project.SaveNewCollaborationAction"
+	  type="org.yeastrc.www.project.SaveProjectAction"
 	  validate="true">
-	  <forward name="Failure" path="/pages/internal/project/newCollaboration.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/project/editProject.jsp" redirect="false"/>
+	</action>
+
+	
+
+	<action
+	  path="/saveNewProject"
+	  input="/pages/internal/project/newProject.jsp"
+	  name="editProjectForm"
+	  scope="request"
+	  type="org.yeastrc.www.project.SaveNewProjectAction"
+	  validate="true">
+	  <forward name="Failure" path="/pages/internal/project/newProject.jsp" redirect="false"/>
 	  <forward name="Success" path="/viewProject.do" redirect="true"/>
 	</action>
 
+	<action
+	  path="/deleteProject"
+	  type="org.yeastrc.www.project.DeleteProjectAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/project/projectDeleted.jsp" redirect="true"/>
+	</action>
+	
+	
 	
 	<action
 	  path="/manageGroups"
@@ -316,12 +331,7 @@
 	  <forward name="Failure" path="/manageGroups.do" redirect="false"/>
 	</action>
 
-	<action
-	  path="/deleteProject"
-	  type="org.yeastrc.www.project.DeleteProjectAction"
-	  validate="false">
-	  <forward name="Success" path="/pages/internal/project/projectDeleted.jsp" redirect="true"/>
-	</action>
+	
 
 	<action
 	  path="/searchProjects"

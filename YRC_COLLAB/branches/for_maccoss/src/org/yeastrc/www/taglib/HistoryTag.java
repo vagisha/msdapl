@@ -105,7 +105,7 @@ public final class HistoryTag extends TagSupport {
 				retString = "<A HREF=\"" + response.encodeURL(hisNode.getURL()) + "\">" + hisNode.getTitle() + "</A> -> " + retString;
 			}
 
-			retString = "<P><font style=\"font-size:10pt;\"><NOBR>Recent pages: " + retString + "</NOBR></font>";
+			retString = "<font style=\"font-size:10pt;\"><NOBR>Recent pages: " + retString + "</NOBR></font>";
 			writ.print(retString);
 
 		}

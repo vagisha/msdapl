@@ -21,7 +21,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.GrantRecord;
+import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Projects;
@@ -97,7 +97,7 @@ public class EditProjectAction extends Action {
 
 
 		// get the grants for this project
-		List<Grant> grants = GrantRecord.getInstance().getGrantsForProject(project.getID());
+		List<Grant> grants = GrantDAO.getInstance().getGrantsForProject(project.getID());
 		
 		// Where do you want to go from here?
 		String forwardStr = "";

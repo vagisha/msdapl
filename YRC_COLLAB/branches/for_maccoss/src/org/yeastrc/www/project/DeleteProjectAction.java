@@ -6,6 +6,7 @@ package org.yeastrc.www.project;
 import javax.servlet.http.*;
 import org.apache.struts.action.*;
 
+import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.project.*;
 import org.yeastrc.www.user.*;
 
@@ -60,15 +61,10 @@ public class DeleteProjectAction extends Action {
 			return mapping.findForward("standardHome");
 		}
 
-		// Load our project
-		Project project;
-		
 		try {
-			project = ProjectFactory.getProject(projectID);
-			project.delete();
-		} catch (Exception e) {
+			ProjectDAO.instance().delete(projectID);
+		} catch (InvalidIDException e) {
 			
-			// Couldn't load the project.
 			ActionErrors errors = new ActionErrors();
 			errors.add("username", new ActionMessage("error.project.projectnotfound"));
 			saveErrors( request, errors );

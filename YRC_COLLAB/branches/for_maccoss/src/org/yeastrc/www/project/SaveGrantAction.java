@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.grant.FundingSource;
 import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.GrantRecord;
+import org.yeastrc.grant.GrantDAO;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -47,7 +47,7 @@ public class SaveGrantAction extends Action {
 		grant.setGrantAmount(grantForm.getGrantAmount());
 		
 		// save the grant in the database
-		GrantRecord.getInstance().save(grant);
+		GrantDAO.getInstance().save(grant);
 		
 		//if the grant id in the form is 0, it means this is a new grant.
 		if (grantForm.getGrantID() <= 0) {

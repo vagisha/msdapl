@@ -123,8 +123,8 @@ public class Projects {
 	 * @param researcherID The researcher ID to use
 	 * @return An list of populated Project objects
 	 */
-	public static ArrayList getProjectsByResearcher(int researcherID) throws SQLException, InvalidProjectTypeException {
-		ArrayList retList = new ArrayList();
+	public static List<Project> getProjectsByResearcher(int researcherID) throws SQLException {
+		List<Project> retList = new ArrayList<Project>();
 
 		// Get our connection to the database.
 		Connection conn = DBConnectionManager.getConnection("yrc");
@@ -133,18 +133,15 @@ public class Projects {
 
 		try{
 			// Our SQL statement
-			String sqlStr =  "SELECT DISTINCT projectID, projectType FROM tblProjects WHERE ";
-				   sqlStr += "projectPI = ? OR ";
-				   sqlStr += "projectResearcherB = ? OR ";
-				   sqlStr += "projectResearcherC = ? OR ";
-				   sqlStr += "projectResearcherD = ? ";
-				   sqlStr += "ORDER BY projectID";
+		    String sqlStr = "SELECT DISTINCT  p.projectID "+
+		    "FROM tblProjects AS p, projectResearcher AS pr "+
+		    "WHERE p.projectID = pr.projectID "+
+		    "AND (p.projectID = ? OR pr.researcherID = ?) "+
+		    "ORDER BY p.projectID";
 			
 			stmt = conn.prepareStatement(sqlStr);
 			stmt.setInt(1, researcherID);
 			stmt.setInt(2, researcherID);
-			stmt.setInt(3, researcherID);
-			stmt.setInt(4, researcherID);
 
 			// Our results
 			rs = stmt.executeQuery();
@@ -152,32 +149,15 @@ public class Projects {
 			// Iterate over list and populate our return list
 			while (rs.next()) {
 				int projectID = rs.getInt("projectID");
-				String type = rs.getString("projectType");
-				Project proj;
-				
-				if (type.equals("C")) {
-					proj = new Collaboration();
-				} else {
-					throw new InvalidProjectTypeException("Type wasn't C, D, T or Tech...");
-				}
 				
 				try {
-					proj.load(projectID);
-				} catch(InvalidIDException iie) {
+				    Project proj = ProjectDAO.instance().load(projectID);
+				    retList.add(proj);
+				} 
+				catch(InvalidIDException iie) {
 					continue;
 				}
-				
-				retList.add(proj);
 			}
-
-			rs.close();
-			rs = null;
-			
-			stmt.close();
-			stmt = null;
-			
-			conn.close();
-			conn = null;
 		}
 		finally {
 
