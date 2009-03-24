@@ -20,15 +20,16 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <div class="mainContainer"> 
 
-
 <yrcwww:notauthenticated>
-<div id="top_header" align="center">
+<div id="login_header" align="center">
 	<table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
 	<tr>
 	<td width="33%">&nbsp;</td>
-	<td width="34%" align="center"><img src="<yrcwww:link path='images/MSDAPL_logo_big.png'/>" /></td>
-	<td width="33%" align="right" valign="bottom">
-		<div align="right" style="padding:0 10 5 0;"><html:link forward="authenticate">Login</html:link>
+	<td width="34%" align="center"><img src="<yrcwww:link path='../images/MSDAPL_logo_big.png'/>" /></td>
+	<td width="33%" align="right" valign="middle">
+	<div align="right" style="padding-right:20;color:white; font-size:8pt">
+    	<html:link forward="authenticate">Login</html:link>
+	</div>
 	</div></td>
 	</tr>
 	</table>

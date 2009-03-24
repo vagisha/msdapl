@@ -43,6 +43,19 @@ DIV.mainContainer {
 	min-height: 100%;	
 }
 
+#login_header {
+        border-width: 0;
+        background-color: #3d4960;
+        color: #FFFFFF;
+        font-size:10pt;
+        font-style:normal;
+        font-weight:300;
+        margin-top:0px;
+}
+#login_header a, #login_header a:hover #login_header a:visited {
+	font-weight:bold; color:white;text-decoration:none;padding:3;background-color:gray; border: solid 1px white;
+}
+
 /*  background-color: #0075B2; */
 #top_header {
 		display:block;
