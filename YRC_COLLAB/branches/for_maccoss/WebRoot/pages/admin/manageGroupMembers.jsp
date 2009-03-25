@@ -11,7 +11,7 @@
   <logic:forward name="manageGroupMembers" />
 </logic:notPresent>
  
-<%@ include file="/includes/adminHeader.jsp" %>
+<%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
 

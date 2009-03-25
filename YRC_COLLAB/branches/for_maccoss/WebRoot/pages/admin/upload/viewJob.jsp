@@ -3,7 +3,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<%@ include file="/includes/adminHeader.jsp" %>
+<%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
 

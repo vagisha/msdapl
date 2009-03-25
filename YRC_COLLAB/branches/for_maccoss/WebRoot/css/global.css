@@ -283,16 +283,10 @@ DIV.account_header {
 /* admin group management color definitions */
 DIV.groups {
         width: 600;
-        border-color: #2F4A00;
-        background-color: #D4FF8B;
-        color: #000000;
 }
 
 DIV.groups_header {
         width: 600;
-        border-color: #2F4A00;
-        background-color: #2F4A00;
-        color: #D4FF8B;
 }
 
 /* admin search color definitions */

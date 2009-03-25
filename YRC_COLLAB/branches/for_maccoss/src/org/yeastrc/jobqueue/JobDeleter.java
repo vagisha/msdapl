@@ -41,8 +41,8 @@ public class JobDeleter {
 		
 		try {
 			
-			String sql = "DELETE FROM YRC_JOB_QUEUE.tblJobs WHERE id = ?";
-			conn = DBConnectionManager.getConnection( "yrc" );
+			String sql = "DELETE FROM tblJobs WHERE id = ?";
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
 			stmt = conn.prepareStatement( sql );
 			stmt.setInt( 1, job.getId() );
 			stmt.executeUpdate();

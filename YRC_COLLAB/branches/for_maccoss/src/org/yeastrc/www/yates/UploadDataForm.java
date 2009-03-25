@@ -34,7 +34,7 @@ public class UploadDataForm extends ActionForm {
     private String year;
     private String directory;
     private int species;
-    private int otherSpecies;
+//    private int otherSpecies;
     private String comments;
     
     
@@ -122,14 +122,14 @@ public class UploadDataForm extends ActionForm {
     }
 
 
-    public int getOtherSpecies() {
-        return otherSpecies;
-    }
-
-
-    public void setOtherSpecies(int otherSpecies) {
-        this.otherSpecies = otherSpecies;
-    }
+//    public int getOtherSpecies() {
+//        return otherSpecies;
+//    }
+//
+//
+//    public void setOtherSpecies(int otherSpecies) {
+//        this.otherSpecies = otherSpecies;
+//    }
 
 
     public String getComments() {

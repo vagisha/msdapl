@@ -42,7 +42,7 @@ public class JobSearcher {
 		
 		try {
 			
-			String sql = "SELECT COUNT(*) FROM YRC_JOB_QUEUE.tblJobs";
+			String sql = "SELECT COUNT(*) FROM tblJobs";
 			if (this.status != null && this.status.size() > 0) {
 				sql += " WHERE status IN (";
 				int cnt = 0;
@@ -55,7 +55,7 @@ public class JobSearcher {
 				sql += ")";
 			}
 			
-			conn = DBConnectionManager.getConnection( "yrc" );
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
 			stmt = conn.prepareStatement( sql );
 			rs = stmt.executeQuery();
 			
@@ -101,7 +101,7 @@ public class JobSearcher {
 		
 		try {
 			
-			String sql = "SELECT id FROM YRC_JOB_QUEUE.tblJobs";
+			String sql = "SELECT id FROM tblJobs";
 			if (this.status != null && this.status.size() > 0) {
 				sql += " WHERE status IN (";
 				int cnt = 0;
@@ -114,7 +114,7 @@ public class JobSearcher {
 				sql += ") ORDER BY id DESC LIMIT " + this.index + ", 50";
 			}
 			
-			conn = DBConnectionManager.getConnection( "yrc" );
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
 			stmt = conn.prepareStatement( sql );
 			rs = stmt.executeQuery();
 			

@@ -40,8 +40,8 @@ public class MSJobFactory {
 		
 		try {
 			
-			conn = DBConnectionManager.getConnection( "yrc" );
-			String sql = "SELECT submitter, type, submitDate, lastUpdate, status, attempts, log FROM YRC_JOB_QUEUE.tblJobs WHERE id = ?";
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
+			String sql = "SELECT submitter, type, submitDate, lastUpdate, status, attempts, log FROM tblJobs WHERE id = ?";
 			stmt = conn.prepareStatement( sql );
 			stmt.setInt( 1, jobID );
 			rs = stmt.executeQuery();
@@ -62,7 +62,7 @@ public class MSJobFactory {
 			rs.close(); rs = null;
 			stmt.close(); stmt = null;
 			
-			sql = "SELECT * FROM YRC_JOB_QUEUE.tblMSJobs WHERE jobID = ?";
+			sql = "SELECT * FROM tblMSJobs WHERE jobID = ?";
 			stmt = conn.prepareStatement( sql );
 			stmt.setInt( 1, jobID );
 			rs = stmt.executeQuery();

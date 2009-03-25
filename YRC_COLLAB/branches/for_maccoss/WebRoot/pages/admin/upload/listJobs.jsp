@@ -3,7 +3,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<%@ include file="/includes/adminHeader.jsp" %>
+<%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
 
@@ -42,7 +42,7 @@
 		</logic:present>
 	</p>
 		
-	<table border="0" cellpadding="5" cellspacing="5" width="95%">
+	<table border="0" cellpadding="3" cellspacing="2" width="95%">
 	
 		<yrcwww:colorrow scheme="upload">
 			<td align="left" width="8%">&nbsp;</td>
@@ -70,10 +70,13 @@
 					</logic:notEqual>
 				</td>
 
-				<td align="left" valign="top" style="width:10%;font-size:8pt;"><a href="<yrcwww:link path='viewResearcher.do?'/>id=<bean:write name="job" property="submitter" />">
+				<td align="left" valign="top" style="width:10%;font-size:8pt;">
 					<div style="width:100%;height:auto;overflow:auto;">
-						<bean:write name="job" property="researcher.lastName" />, <bean:write name="job" property="researcher.firstName" /></td>
+						<a href="<yrcwww:link path='viewResearcher.do?'/>id=<bean:write name="job" property="submitter" />">
+							<bean:write name="job" property="researcher.lastName" />, <bean:write name="job" property="researcher.firstName" />
+						</a>
 					</div>
+				</td>
 					
 				<td align="left" valign="top" style="width:10%;font-size:8pt;"><bean:write name="job" property="submitDate" /></td>
 

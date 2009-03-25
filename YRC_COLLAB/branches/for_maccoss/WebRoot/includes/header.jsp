@@ -67,7 +67,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<ul>
 		<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home" class="<%=home_class %>"><span>Home</span></a></li>
 		<li><html:link  action="editInformation.do" styleClass="<%=account_class %>"><span>Account</span></html:link></li>
-		<li><html:link action="" styleClass="<%=admin_class %>"><span>Admin</span></html:link></li>
+		<li><html:link action="manageGroups.do" styleClass="<%=admin_class %>"><span>Admin</span></html:link></li>
 	
 	</ul>
 	
@@ -85,15 +85,21 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 <div id="sub_menu">
 	<ul>
    <%if(account_menus) { %>
-    <li><html:link href="/yrc/editInformation.do"><span>My Information</span></html:link>
-    <li><html:link href="/yrc/editPassword.do"><span>Password</span></html:link></li>
-    <li><html:link href="/yrc/editUsername.do"><span>Username</span></html:link></li>
+    <li><html:link action="editInformation.do"><span>My Information</span></html:link>
+    <li><html:link action="editPassword.do"><span>Password</span></html:link></li>
+    <li><html:link action="editUsername.do"><span>Username</span></html:link></li>
    <%} %>
    <%if(home_menus) { %>
         <li><html:link action="newProject.do"><span>New Project</span></html:link></li>
         <yrcwww:member group="any">
    			<li><html:link action="uploadMacCossFormAction.do"><span>Upload Data</span></html:link></li>
+   			<li><html:link action="listUploadJobs.do"><span>List Uploads</span></html:link></li>
    		</yrcwww:member>
+   <%} %>
+   <%if(admin_menus) { %>
+      <yrcwww:member group="administrators">
+        <li><html:link action="manageGroups.do"><span>Manage Groups</span></html:link></li>
+      </yrcwww:member>
    <%} %>
   </ul>
 </div>

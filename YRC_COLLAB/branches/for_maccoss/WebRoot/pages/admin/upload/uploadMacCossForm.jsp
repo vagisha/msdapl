@@ -36,7 +36,7 @@ function projectSearcherPopUp(field) {
 
 <yrcwww:contentbox title="Upload Data" centered="true" width="700" scheme="upload">
 
-<html:form action="uploadMacCoss" method="POST">
+<html:form action="uploadData" method="POST">
  <html:hidden property="group" value="MacCoss"/>
 
  <CENTER>
@@ -159,12 +159,6 @@ function projectSearcherPopUp(field) {
     </td>
    </tr>
    
-   <tr>
-    <td valign="top">If target species is not listed<br>
-    enter the <a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/">NCBI Taxonomy</a> ID number:<br><br></td>
-    <td valign="top"><html:text property="otherSpecies" size="5" maxlength="7"/><br><br></td>
-   </tr>
-
    <tr>
     <td valign="top"><b>Comments:</b></td>
     <td><html:textarea property="comments" cols="40" rows="5"/></td>

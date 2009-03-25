@@ -37,8 +37,8 @@ public class JobResetter {
 		
 		try {
 			
-			String sql = "UPDATE YRC_JOB_QUEUE.tblJobs SET status = ? WHERE id = ?";
-			conn = DBConnectionManager.getConnection( "yrc" );
+			String sql = "UPDATE tblJobs SET status = ? WHERE id = ?";
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
 			stmt = conn.prepareStatement( sql );
 			stmt.setInt( 1, JobUtils.STATUS_QUEUED );
 			stmt.setInt( 2, job.getId() );

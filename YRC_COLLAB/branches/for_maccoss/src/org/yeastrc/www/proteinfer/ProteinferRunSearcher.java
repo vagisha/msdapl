@@ -110,10 +110,10 @@ public class ProteinferRunSearcher {
         
         try {
             
-            String sql = "SELECT * FROM YRC_JOB_QUEUE.tblJobs AS j, YRC_JOB_QUEUE.tblProteinInferJobs AS pj "+
+            String sql = "SELECT * FROM tblJobs AS j, tblProteinInferJobs AS pj "+
                         "WHERE j.id = pj.jobID AND pj.piRunID="+pinferRunId;
             
-            conn = DBConnectionManager.getConnection( "yrc" );
+            conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
             stmt = conn.prepareStatement( sql );
             rs = stmt.executeQuery();
             

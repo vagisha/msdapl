@@ -7,7 +7,7 @@
   <logic:redirect forward="projectSearchForm" />
 </logic:notPresent>
 
-<%@ include file="/includes/adminHeader.jsp" %>
+<%@ include file="/includes/header.jsp" %>
 
 
 <%@ include file="/includes/errors.jsp" %>

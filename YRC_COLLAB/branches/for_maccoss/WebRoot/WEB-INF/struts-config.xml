@@ -423,11 +423,11 @@
 	</action>
 
 	<action
-	  path="/uploadMacCoss"
+	  path="/uploadData"
 	  input="/pages/admin/upload/uploadMacCossForm.jsp"
 	  name="uploadDataForm"
 	  scope="request"
-	  type="org.yeastrc.www.yates.UploadYatesAction"
+	  type="org.yeastrc.www.yates.UploadDataAction"
 	  validate="true">
 	  <forward name="Failure" path="/pages/admin/upload/uploadMacCossForm.jsp" redirect="false"/>
 	  <forward name="Success" path="/listUploadJobs.do" redirect="true"/>
@@ -437,43 +437,17 @@
 	  path="/uploadRedirect"
 	  type="org.yeastrc.www.misc.UploadRedirectAction"
 	  validate="false">
-	  <forward name="Y2H" path="uploadY2HFormAction.do" redirect="true"/>
 	  <forward name="Yates" path="uploadYatesFormAction.do" redirect="true"/>
 	  <forward name="MacCoss" path="uploadMacCossFormAction.do" redirect="true"/>
-	  <forward name="Microscopy" path="uploadMicroscopyFormAction.do" redirect="true"/>
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 
-	<action
-	  path="/viewSpectra"
-	  type="org.yeastrc.www.yates.ViewSpectraAction"
-	  validate="false">
-	  <forward name="Success" path="/pages/internal/data/yates/viewSpectra.jsp" redirect="false"/>
-	  <forward name="Failure" path="/pages/internal/data/yates/viewYatesResult.jsp" redirect="false"/>
-	</action>
-	
-	<action
-	  path="/viewGOTreeImage"
-	  type="org.yeastrc.www.go.ViewGOTreeAction"
-	  validate="false">
-	  <forward name="Success" path="/pages/utils/showImage.jsp" redirect="false"/>
-	</action>
-
-	<action
-	  path="/viewResearcher"
-	  type="org.yeastrc.www.project.ViewResearcher"
-	  validate="false">
-	  <forward name="Success" path="/pages/internal/project/viewResearcher.jsp" redirect="false"/>
-	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
-	</action>
-
-	
-	<action
-	  path="/listUploadJobs"
-	  type="org.yeastrc.www.jobqueue.ListJobsAction"
-	  validate="false">
-		<forward name="Success" path="/pages/admin/upload/listJobs.jsp" redirect="false"/>
-		<forward name="Failure" path="/pages/internal/front.jsp" redirect="true"/>
+	<action path="/listUploadJobs"
+		type="org.yeastrc.www.jobqueue.ListJobsAction" validate="false">
+		<forward name="Success" path="/pages/admin/upload/listJobs.jsp"
+			redirect="false" />
+		<forward name="Failure" path="/pages/internal/front.jsp"
+			redirect="true" />
 	</action>
 
 	<action
@@ -499,6 +473,41 @@
 		<forward name="Success" path="/pages/admin/upload/viewJob.jsp" redirect="false"/>
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="true"/>
 	</action>
+
+
+
+
+
+
+
+
+	<action
+	  path="/viewSpectra"
+	  type="org.yeastrc.www.yates.ViewSpectraAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/data/yates/viewSpectra.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/data/yates/viewYatesResult.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/viewGOTreeImage"
+	  type="org.yeastrc.www.go.ViewGOTreeAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/utils/showImage.jsp" redirect="false"/>
+	</action>
+
+	<action
+	  path="/viewResearcher"
+	  type="org.yeastrc.www.project.ViewResearcher"
+	  validate="false">
+	  <forward name="Success" path="/pages/internal/project/viewResearcher.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	</action>
+
+	
+	
+	
+	
 
 	<action
 	  path="/miniProjectSearch"

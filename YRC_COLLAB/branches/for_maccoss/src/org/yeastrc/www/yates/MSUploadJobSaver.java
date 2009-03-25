@@ -24,8 +24,8 @@ public class MSUploadJobSaver {
 		
 		try {
 			
-			conn = DBConnectionManager.getConnection("yrc");
-			String sql = "SELECT * FROM YRC_JOB_QUEUE.tblJobs WHERE id = 0";
+			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
+			String sql = "SELECT * FROM tblJobs WHERE id = 0";
 			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			
 			rs = stmt.executeQuery( sql );
@@ -45,7 +45,7 @@ public class MSUploadJobSaver {
 			rs.close(); rs = null;
 			stmt.close(); stmt = null;
 			
-			sql = "SELECT * FROM YRC_JOB_QUEUE.tblMSJobs WHERE jobID = 0";
+			sql = "SELECT * FROM tblMSJobs WHERE jobID = 0";
 			stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			
 			rs = stmt.executeQuery( sql );
@@ -55,8 +55,8 @@ public class MSUploadJobSaver {
 			rs.updateInt( "projectID", this.projectID );
 			rs.updateString( "serverDirectory", this.serverDirectory );
 			rs.updateDate( "runDate", new java.sql.Date( this.runDate.getTime() ) );
-			rs.updateInt( "baitProtein", this.baitProtein );
-			rs.updateString( "baitDescription", this.baitDescription );
+//			rs.updateInt( "baitProtein", this.baitProtein );
+//			rs.updateString( "baitDescription", this.baitDescription );
 			rs.updateInt( "targetSpecies", this.targetSpecies );
 			rs.updateString( "comments", this.comments );
 			rs.updateInt( "groupID", this.groupID );
@@ -83,42 +83,42 @@ public class MSUploadJobSaver {
 		}
 		
 	}
-	
+
 	private int submitter;
 	private int projectID;
 	private String serverDirectory;
 	private java.util.Date runDate;
-	private int baitProtein;
-	private String baitDescription;
+//	private int baitProtein;
+//	private String baitDescription;
 	private int targetSpecies;
 	private String comments;
 	private int groupID;
 	
 	
-	/**
-	 * @return the baitDescription
-	 */
-	public String getBaitDescription() {
-		return baitDescription;
-	}
-	/**
-	 * @param baitDescription the baitDescription to set
-	 */
-	public void setBaitDescription(String baitDescription) {
-		this.baitDescription = baitDescription;
-	}
-	/**
-	 * @return the baitProtein
-	 */
-	public int getBaitProtein() {
-		return baitProtein;
-	}
-	/**
-	 * @param baitProtein the baitProtein to set
-	 */
-	public void setBaitProtein(int baitProtein) {
-		this.baitProtein = baitProtein;
-	}
+//	/**
+//	 * @return the baitDescription
+//	 */
+//	public String getBaitDescription() {
+//		return baitDescription;
+//	}
+//	/**
+//	 * @param baitDescription the baitDescription to set
+//	 */
+//	public void setBaitDescription(String baitDescription) {
+//		this.baitDescription = baitDescription;
+//	}
+//	/**
+//	 * @return the baitProtein
+//	 */
+//	public int getBaitProtein() {
+//		return baitProtein;
+//	}
+//	/**
+//	 * @param baitProtein the baitProtein to set
+//	 */
+//	public void setBaitProtein(int baitProtein) {
+//		this.baitProtein = baitProtein;
+//	}
 	/**
 	 * @return the comments
 	 */
@@ -203,8 +203,5 @@ public class MSUploadJobSaver {
 	public void setTargetSpecies(int targetSpecies) {
 		this.targetSpecies = targetSpecies;
 	}
-	
-	
-	
 	
 }

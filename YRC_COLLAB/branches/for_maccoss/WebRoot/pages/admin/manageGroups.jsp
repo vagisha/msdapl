@@ -11,7 +11,7 @@
   <logic:forward name="manageGroups" />
 </logic:empty>
  
-<%@ include file="/includes/adminHeader.jsp" %>
+<%@ include file="/includes/header.jsp" %>
 
 <yrcwww:contentbox title="Manage Groups" centered="true" width="600" scheme="groups">
 

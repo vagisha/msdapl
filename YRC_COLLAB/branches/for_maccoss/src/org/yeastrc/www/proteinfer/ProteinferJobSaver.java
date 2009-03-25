@@ -130,8 +130,8 @@ public class ProteinferJobSaver {
         
         try {
             
-            conn = DBConnectionManager.getConnection("yrc");
-            String sql = "SELECT * FROM YRC_JOB_QUEUE.tblJobs WHERE id = 0";
+            conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
+            String sql = "SELECT * FROM tblJobs WHERE id = 0";
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             
             rs = stmt.executeQuery( sql );
@@ -179,10 +179,10 @@ public class ProteinferJobSaver {
         
         try {
             
-            conn = DBConnectionManager.getConnection("yrc");
+            conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             
-            String sql = "SELECT * FROM YRC_JOB_QUEUE.tblProteinInferJobs WHERE jobID = " + jobId;
+            String sql = "SELECT * FROM tblProteinInferJobs WHERE jobID = " + jobId;
             rs = stmt.executeQuery( sql );
             
             if (!rs.next()) {
