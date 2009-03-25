@@ -83,12 +83,12 @@ public class MS2DataUploadService {
         lastUploadedRunId = 0;
     }
     
-    public void deleteLastUploadedRun() {
+    private void deleteLastUploadedRun() {
         if (lastUploadedRunId != 0)
             deleteRun(lastUploadedRunId);
     }
     
-    public static void deleteRun(Integer runId) {
+    private static void deleteRun(Integer runId) {
         MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         runDao.delete(runId);
     }
@@ -160,7 +160,7 @@ public class MS2DataUploadService {
         }
         
         // this is a new file so we will upload it.
-        MS2RunDataProvider ms2Provider = getMS2DataProvider(filePath, sha1Sum, format);
+        MS2RunDataProvider ms2Provider = getMS2DataProvider(format);
         try {
             ms2Provider.open(filePath, sha1Sum);
             runId = uploadMS2Run(ms2Provider, serverDirectory);
@@ -183,7 +183,7 @@ public class MS2DataUploadService {
         }
     }
 
-    private MS2RunDataProvider getMS2DataProvider(String filePath, String sha1sum, RunFileFormat format) {
+    private MS2RunDataProvider getMS2DataProvider(RunFileFormat format) {
         if(format == RunFileFormat.MS2) {
             return new Ms2FileReader();
         }

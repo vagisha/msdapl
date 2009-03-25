@@ -1,10 +1,4 @@
-/**
- * MS2FileValidator.java
- * @author Vagisha Sharma
- * Jul 23, 2008
- * @version 1.0
- */
-package org.yeastrc.ms.service.ms2file;
+
 
 import java.io.File;
 import java.io.IOException;
