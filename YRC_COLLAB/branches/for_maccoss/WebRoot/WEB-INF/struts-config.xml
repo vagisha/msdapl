@@ -51,6 +51,7 @@
 	<form-bean name="editResearcherForm" type="org.yeastrc.www.project.EditResearcherForm"/>
 	<form-bean name="manageGroupMembersForm" type="org.yeastrc.www.admin.ManageGroupMembersForm"/>
 	<form-bean name="searchProjectsForm" type="org.yeastrc.www.project.SearchProjectsForm"/>
+	<form-bean name="uploadDataForm" type="org.yeastrc.www.yates.UploadDataForm"/>
 	<form-bean name="GOAnnotationForm" type="org.yeastrc.www.microscopy.GOAnnotationForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
@@ -290,8 +291,6 @@
 	  <forward name="Failure" path="/pages/internal/project/editProject.jsp" redirect="false"/>
 	</action>
 
-	
-
 	<action
 	  path="/saveNewProject"
 	  input="/pages/internal/project/newProject.jsp"
@@ -309,6 +308,28 @@
 	  validate="false">
 	  <forward name="Success" path="/pages/internal/project/projectDeleted.jsp" redirect="true"/>
 	</action>
+	
+	
+	
+	<action
+	  path="/searchProjects"
+	  input="/pages/admin/search/searchProjects.jsp"
+	  name="searchProjectsForm"
+	  scope="request"
+	  type="org.yeastrc.www.project.SearchProjectsAction"
+	  validate="true">
+	  <forward name="Failure" path="/pages/admin/search/searchProjects.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/admin/search/searchProjectsResults.jsp" redirect="false"/>
+	</action>
+
+	<action
+	  path="/sortProjectSearch"
+	  type="org.yeastrc.www.project.SortProjectSearchAction"
+	  validate="true">
+	  <forward name="Failure" path="/pages/admin/search/searchProjects.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/admin/search/searchProjectsResults.jsp" redirect="false"/>
+	</action>
+	
 	
 	
 	
@@ -333,24 +354,7 @@
 
 	
 
-	<action
-	  path="/searchProjects"
-	  input="/pages/admin/search/searchProjects.jsp"
-	  name="searchProjectsForm"
-	  scope="request"
-	  type="org.yeastrc.www.project.SearchProjectsAction"
-	  validate="true">
-	  <forward name="Failure" path="/pages/admin/search/searchProjects.jsp" redirect="false"/>
-	  <forward name="Success" path="/pages/admin/search/searchProjectsResults.jsp" redirect="false"/>
-	</action>
-
-	<action
-	  path="/sortProjectSearch"
-	  type="org.yeastrc.www.project.SortProjectSearchAction"
-	  validate="true">
-	  <forward name="Failure" path="/pages/admin/search/searchProjects.jsp" redirect="false"/>
-	  <forward name="Success" path="/pages/admin/search/searchProjectsResults.jsp" redirect="false"/>
-	</action>
+	
 
 	<action
 	  path="/viewFrontPage"
@@ -407,6 +411,10 @@
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 
+
+	<!-- ================================================================================== -->
+	<!-- Actions related to data upload -->
+	<!-- ================================================================================== -->
 	<action
 	  path="/uploadMacCossFormAction"
 	  type="org.yeastrc.www.yates.UploadMacCossFormAction"
@@ -417,7 +425,7 @@
 	<action
 	  path="/uploadMacCoss"
 	  input="/pages/admin/upload/uploadMacCossForm.jsp"
-	  name="uploadYatesForm"
+	  name="uploadDataForm"
 	  scope="request"
 	  type="org.yeastrc.www.yates.UploadYatesAction"
 	  validate="true">

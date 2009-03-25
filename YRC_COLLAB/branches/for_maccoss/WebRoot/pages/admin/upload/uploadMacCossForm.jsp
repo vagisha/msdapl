@@ -3,7 +3,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<%@ include file="/includes/adminHeader.jsp" %>
+<%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
 
@@ -34,9 +34,7 @@ function projectSearcherPopUp(field) {
  </center>
 </logic:equal>
 
-<yrcwww:contentbox title="Upload MacCoss MS Data" centered="true" width="700" scheme="upload">
-
-<P align="center">To upload MacCoss Lab MS data, please fill out the simple form below.
+<yrcwww:contentbox title="Upload Data" centered="true" width="700" scheme="upload">
 
 <html:form action="uploadMacCoss" method="POST">
  <html:hidden property="group" value="MacCoss"/>
@@ -46,30 +44,31 @@ function projectSearcherPopUp(field) {
    <tr>
     <td colspan="2">Select the project to which this data belongs:</td>
    </tr>
-
 			<tr>
 				<td valign="top">
-					<span style="font-size:12pt;font-weight:bold;">Project Number:</span><br>
+					<span><b>Project:</b></span><br>
 					<span style="font-size:8pt;color:red;">IMPORTANT: This <span style="text-decoration:underline;">must</span> be the project<br>
 							       to which this data belongs.</span>
 				</td>
 				<td valign="top">
-					<html:text property="projectID" style="font-size:12pt;font-weight:bold;" size="10" maxlength="10" /><br>
-						<a href="javascript:projectSearcherPopUp(document.uploadYatesForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a>
-						<!--<br><a href="javascript:projectListerPopUp(document.uploadYatesForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[PULLDOWN LIST]</span></a>-->
+					
+				
+				
+					<html:text property="projectID" size="10" maxlength="10" /><br>
+						<a href="javascript:projectSearcherPopUp(document.uploadDataForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a>
 				</td>
 			</tr>
 
    <tr>
-    <td valign="top">Server directory:<br>
+    <td valign="top"><b>Data directory:</b><br>
     <font style="font-size:8pt;">e.g.: /home/maccoss/Davis/121005-digest</font></td>
-    <td valign="top"><html:text property="directoryName1" size="40" maxlength="255"/></td>
+    <td valign="top"><html:text property="directory" size="40" maxlength="255"/></td>
    </tr>
 
    <tr>
-    <td>Run date:</td>
+    <td><b>Experiment date:</b></td>
     <td>
-     <html:select property="year1">
+     <html:select property="year">
       <html:option value="0">Year</html:option>
       <html:option value="2003">2003</html:option>
       <html:option value="2004">2004</html:option>
@@ -79,11 +78,12 @@ function projectSearcherPopUp(field) {
       <html:option value="2008">2008</html:option>
       <html:option value="2009">2009</html:option>
       <html:option value="2010">2010</html:option>
+      <html:option value="2010">2011</html:option>
      </html:select>
      
      <b> - </b>
       
-     <html:select property="month1">
+     <html:select property="month">
       <html:option value="0">Month</html:option>
       <html:option value="01">01</html:option>
       <html:option value="02">02</html:option>
@@ -101,7 +101,7 @@ function projectSearcherPopUp(field) {
      
      <b> - </b>
      
-     <html:select property="day1">
+     <html:select property="day">
       <html:option value="0">Day</html:option>
       <html:option value="01">01</html:option>
       <html:option value="02">02</html:option>
@@ -140,16 +140,10 @@ function projectSearcherPopUp(field) {
    </tr>
 
    <tr>
-    <td valign="top"><br>Bait Protein:<br>
-     <font style="font-size:8pt;">(Name of purified protein,<br> leave blank if none)</font></td>
-    <td valign="top"><br><html:text property="baitDesc1" size="10" maxlength="20"/></td>
-   </tr>
-
-   <tr>
-    <td valign="top"><br>Target Species:<br>
+    <td valign="top"><br><b>Species:</b><br>
      <font style="font-size:8pt;">(Species of sample)</font></td>
     <td valign="top"><br>
-     <html:select property="targetSpecies1">
+     <html:select property="species">
       <html:option value="9913">B. taurus (cow)</html:option>
       <html:option value="6239">C. elegans</html:option>
       <html:option value="7227">D. melanogaster (fruit fly)</html:option>
@@ -167,12 +161,12 @@ function projectSearcherPopUp(field) {
    <tr>
     <td valign="top">If target species is not listed<br>
     enter the <a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/">NCBI Taxonomy</a> ID number:<br><br></td>
-    <td valign="top"><html:text property="otherSpecies1" size="5" maxlength="7"/><br><br></td>
+    <td valign="top"><html:text property="otherSpecies" size="5" maxlength="7"/><br><br></td>
    </tr>
 
    <tr>
-    <td valign="top">Comments:</td>
-    <td><html:textarea property="comments1" cols="40" rows="5"/></td>
+    <td valign="top"><b>Comments:</b></td>
+    <td><html:textarea property="comments" cols="40" rows="5"/></td>
    </tr>
 
   </table> 

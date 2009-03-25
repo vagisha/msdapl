@@ -50,8 +50,8 @@ public class UploadYatesAction extends Action {
 			return mapping.findForward("authenticate");
 		}
 		
-		String group = ((UploadYatesForm)form).getGroup();
-		int projectID = ((UploadYatesForm)form).getProjectID();
+		String group = ((UploadDataForm)form).getGroup();
+		int projectID = ((UploadDataForm)form).getProjectID();
 		
 		// Restrict access to administrators
 		Groups groupMan = Groups.getInstance();
@@ -73,17 +73,17 @@ public class UploadYatesAction extends Action {
 		for (int i = 1; i <= 10; i++) {
 
 			// dynamically call these methods, so I don't ahve to test for 10 different states
-			Method runDateM = UploadYatesForm.class.getMethod( "getRunDate" + i, new Class[] { } );
-			Method baitDescM = UploadYatesForm.class.getMethod( "getBaitDesc" + i, new Class[] { } );
-			Method speciesM = UploadYatesForm.class.getMethod( "getTargetSpecies" + i, new Class[] { } );
-			Method commentsM = UploadYatesForm.class.getMethod( "getComments" + i, new Class[] { } );
-			Method directoryM = UploadYatesForm.class.getMethod( "getDirectoryName" + i, new Class[] { } );
+			Method runDateM = UploadDataForm.class.getMethod( "getRunDate" + i, new Class[] { } );
+			Method baitDescM = UploadDataForm.class.getMethod( "getBaitDesc" + i, new Class[] { } );
+			Method speciesM = UploadDataForm.class.getMethod( "getTargetSpecies" + i, new Class[] { } );
+			Method commentsM = UploadDataForm.class.getMethod( "getComments" + i, new Class[] { } );
+			Method directoryM = UploadDataForm.class.getMethod( "getDirectoryName" + i, new Class[] { } );
 			
-			runDate = (Date)runDateM.invoke( (UploadYatesForm)form, new Object[] { } );
-			baitDesc = (String)baitDescM.invoke( (UploadYatesForm)form, new Object[] { } );
-			targetSpecies = (Integer)speciesM.invoke( (UploadYatesForm)form, new Object[] { } );
-			comments = (String)commentsM.invoke( (UploadYatesForm)form, new Object[] { } );
-			directoryName = (String)directoryM.invoke( (UploadYatesForm)form, new Object[] { } );
+			runDate = (Date)runDateM.invoke( (UploadDataForm)form, new Object[] { } );
+			baitDesc = (String)baitDescM.invoke( (UploadDataForm)form, new Object[] { } );
+			targetSpecies = (Integer)speciesM.invoke( (UploadDataForm)form, new Object[] { } );
+			comments = (String)commentsM.invoke( (UploadDataForm)form, new Object[] { } );
+			directoryName = (String)directoryM.invoke( (UploadDataForm)form, new Object[] { } );
 
 			if (directoryName == null || directoryName.equals( "" ) )
 				continue;

@@ -6,12 +6,10 @@
 
 package org.yeastrc.www.yates;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
@@ -19,9 +17,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.project.ProjectPIComparator;
+import org.yeastrc.project.ProjectLite;
+import org.yeastrc.project.ProjectLiteDAO;
 import org.yeastrc.project.Projects;
-import org.yeastrc.project.ProjectsSearcher;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -57,29 +55,19 @@ public class UploadMacCossFormAction extends Action {
 			ActionErrors errors = new ActionErrors();
 			errors.add("access", new ActionMessage("error.access.invalidgroup"));
 			saveErrors( request, errors );
-			return mapping.findForward("adminHome");
+			return mapping.findForward("standardHome");
 		}
 
-		/*
-		// Create a list of collaborations and technology dev projects for two hybrid
-		ProjectsSearcher ps = new ProjectsSearcher();
-		ps.addGroup(Projects.MACCOSS);
-		ps.addType(Projects.COLLABORATION);
-		ps.addType(Projects.TECHNOLOGY);
-		
-		List projects = ps.search();
-		Collections.sort(projects, new ProjectPIComparator());
-		
-		HttpSession session = request.getSession();
-		session.setAttribute("MacCossProjects", projects);
-		*/
-		
 		try {
 			int projectID = Integer.parseInt( request.getParameter( "projectID" ) );
-			UploadYatesForm newForm = new UploadYatesForm();
+			UploadDataForm newForm = new UploadDataForm();
 			newForm.setProjectID( projectID );
-			request.setAttribute( "uploadYatesForm", newForm );
+			request.setAttribute( "uploadDataForm", newForm );
 		} catch (Exception e ) { ; }
+		
+		// get a list of projects on which this researcher is listed
+		List<ProjectLite> projects = ProjectLiteDAO.instance().getResearcherWritableProjects(user.getResearcher().getID());
+		request.setAttribute("projects", projects);
 		
 		// Kick it to the view page
 		return mapping.findForward("Success");

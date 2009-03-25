@@ -27,6 +27,25 @@ import org.yeastrc.db.DBConnectionManager;
  */
 public class ProjectsSearcher {
 
+    // The Strings we are using to conduct the search
+    private Set searchTokens;
+    
+    // The project types to include in the results
+    private Set types;
+    
+    // The groups to which the projects belong to include in the results
+    private Set groups;
+    
+    // The researcher requesting the list, or just the researcher who's access privledges are taken into account when making the list
+    private Researcher researcher;
+    
+    // The earliest submission date of included projects (project submitted before this date are not returned)
+    private Date startDate;
+    
+    // The latest submission date of included project (project submitted after this date are not returned)
+    private Date endDate;
+    
+    
     /**
      * Get a new ProjectSearch
      */
@@ -40,7 +59,7 @@ public class ProjectsSearcher {
         ArrayList retList = new ArrayList();
         
         // Get our connection to the database.
-        Connection conn = DBConnectionManager.getConnection("yrc");
+        Connection conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
         PreparedStatement stmt = null;
         ResultSet rs = null;
         
@@ -264,23 +283,4 @@ public class ProjectsSearcher {
     public void setEndDate(Date date) {
         this.endDate = date;
     }
-
-    // The Strings we are using to conduct the search
-    private Set searchTokens;
-    
-    // The project types to include in the results
-    private Set types;
-    
-    // The groups to which the projects belong to include in the results
-    private Set groups;
-    
-    // The researcher requesting the list, or just the researcher who's access privledges are taken into account when making the list
-    private Researcher researcher;
-    
-    // The earliest submission date of included projects (project submitted before this date are not returned)
-    private Date startDate;
-    
-    // The latest submission date of included project (project submitted after this date are not returned)
-    private Date endDate;
-
 }

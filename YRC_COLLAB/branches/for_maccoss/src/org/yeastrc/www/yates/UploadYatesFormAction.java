@@ -76,7 +76,7 @@ public class UploadYatesFormAction extends Action {
 		
 		try {
 			int projectID = Integer.parseInt( request.getParameter( "projectID" ) );
-			UploadYatesForm newForm = new UploadYatesForm();
+			UploadDataForm newForm = new UploadDataForm();
 			newForm.setProjectID( projectID );
 			request.setAttribute( "uploadYatesForm", newForm );
 		} catch (Exception e ) { ; }

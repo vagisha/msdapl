@@ -40,35 +40,34 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <div id="top_header">
 
+<%
+	String home_class = ""; boolean home_menus = false;
+	String account_class = ""; boolean account_menus = false;
+	String admin_class = ""; boolean admin_menus = false;
+ %>
+ 
+ <logic:equal name="dir" scope="request" value="internal">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
+ <logic:equal name="dir" scope="request" value="project">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
+ <logic:equal name="dir" scope="request" value="upload">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
+ 
+ <logic:equal name="dir" scope="request" value="account">
+ 	<%account_class = "current"; account_menus = true;%>
+ </logic:equal>
+ <logic:equal name="dir" scope="request" value="admin">
+ 	<%admin_class = "current"; admin_menus = true;%>
+ </logic:equal>
+		
 <div id="main_menu">
 	<ul>
-		<logic:equal name="dir" scope="request" value="internal">
-			<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home" class="current"><span>Home</span></a></li>
-		</logic:equal>
-		<logic:notEqual name="dir" scope="request" value="internal">
-		
-			<logic:equal name="dir" scope="request" value="project">
-				<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home" class="current"><span>Home</span></a></li>
-			</logic:equal>
-			
-			<logic:notEqual name="dir" scope="request" value="project">
-				<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home"><span>Home</span></a></li>
-			</logic:notEqual>
-		</logic:notEqual>
-		
-		<logic:equal name="dir" scope="request" value="account">
-			<li><html:link  action="editInformation.do" styleClass="current"><span>Account</span></html:link></li>
-		</logic:equal>
-		<logic:notEqual name="dir" scope="request" value="account">
-			<li><html:link  action="editInformation.do"><span>Account</span></html:link></li>
-		</logic:notEqual>
-		
-		<logic:equal name="dir" scope="request" value="admin">
-			<li><html:link action="" styleClass="current"><span>Admin</span></html:link></li>
-		</logic:equal>
-		<logic:notEqual name="dir" scope="request" value="admin">
-			<li><html:link action="" ><span>Admin</span></html:link></li>
-		</logic:notEqual>
+		<li><a href="<yrcwww:link path='pages/internal/front.jsp'/>" title="Home" class="<%=home_class %>"><span>Home</span></a></li>
+		<li><html:link  action="editInformation.do" styleClass="<%=account_class %>"><span>Account</span></html:link></li>
+		<li><html:link action="" styleClass="<%=admin_class %>"><span>Admin</span></html:link></li>
 	
 	</ul>
 	
@@ -85,23 +84,17 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 <div id="sub_header">
 <div id="sub_menu">
 	<ul>
-   <logic:equal name="dir" scope="request" value="account">
+   <%if(account_menus) { %>
     <li><html:link href="/yrc/editInformation.do"><span>My Information</span></html:link>
     <li><html:link href="/yrc/editPassword.do"><span>Password</span></html:link></li>
     <li><html:link href="/yrc/editUsername.do"><span>Username</span></html:link></li>
-   </logic:equal>
-   <logic:equal name="dir" scope="request" value="internal">
+   <%} %>
+   <%if(home_menus) { %>
         <li><html:link action="newProject.do"><span>New Project</span></html:link></li>
         <yrcwww:member group="any">
    			<li><html:link action="uploadMacCossFormAction.do"><span>Upload Data</span></html:link></li>
    		</yrcwww:member>
-   </logic:equal>
-   <logic:equal name="dir" scope="request" value="project">
-       <li><html:link action="newProject.do"><span>New Project</span></html:link></li>
-        <yrcwww:member group="any">
-   			<li><html:link action="uploadMacCossFormAction.do"><span>Upload Data</span></html:link></li>
-   		</yrcwww:member>
-   </logic:equal>
+   <%} %>
   </ul>
 </div>
 </div>
