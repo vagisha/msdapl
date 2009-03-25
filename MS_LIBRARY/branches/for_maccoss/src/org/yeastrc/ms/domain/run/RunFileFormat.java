@@ -10,20 +10,24 @@ public enum RunFileFormat {
     
     MS2, CMS2, MZXML, MZDATA, MZML, UNKNOWN;
     
-    public static RunFileFormat instance(String extString) {
-        if(extString.startsWith("."))
-            extString = extString.substring(1);
-        if (extString.equalsIgnoreCase(RunFileFormat.MS2.name()))
+    public static RunFileFormat instance(String fmtString) {
+        if(fmtString.startsWith("."))
+            fmtString = fmtString.substring(1);
+        if (fmtString.equalsIgnoreCase(RunFileFormat.MS2.name()))
             return RunFileFormat.MS2;
-        if (extString.equalsIgnoreCase(RunFileFormat.CMS2.name()))
+        if (fmtString.equalsIgnoreCase(RunFileFormat.CMS2.name()))
             return RunFileFormat.CMS2;
-        else if (extString.equals(RunFileFormat.MZXML.name()))
+        else if (fmtString.equals(RunFileFormat.MZXML.name()))
             return RunFileFormat.MZXML;
-        else if (extString.equalsIgnoreCase(RunFileFormat.MZDATA.name()))
+        else if (fmtString.equalsIgnoreCase(RunFileFormat.MZDATA.name()))
             return RunFileFormat.MZDATA;
-        else if (extString.equalsIgnoreCase(RunFileFormat.MZML.name()))
+        else if (fmtString.equalsIgnoreCase(RunFileFormat.MZML.name()))
             return RunFileFormat.MZML;
         else return RunFileFormat.UNKNOWN;
+    }
+    
+    public static RunFileFormat forFileExtension(String extString) {
+        return instance(extString);
     }
     
     public static boolean isSupportedFormat(String extString) {

@@ -7,8 +7,10 @@
 package org.yeastrc.ms.domain.search;
 
 
+
 public enum SearchFileFormat {
 
+    SQT("SQT: GENERIC"),
     SQT_SEQ("SQT: "+Program.SEQUEST.displayName()), 
     SQT_NSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
     SQT_PLUCID("SQT: "+Program.PROLUCID.displayName()), 
@@ -26,18 +28,28 @@ public enum SearchFileFormat {
         return typeName;
     }
     
-    public static SearchFileFormat instance(String extString) {
-        if (SearchFileFormat.SQT_SEQ.name().equalsIgnoreCase(extString))
+    public static SearchFileFormat instance(String fmtString) {
+        if (SearchFileFormat.SQT_SEQ.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_SEQ;
-        else if (SearchFileFormat.SQT_NSEQ.name().equalsIgnoreCase(extString))
+        else if (SearchFileFormat.SQT_NSEQ.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_NSEQ;
-        else if (SearchFileFormat.SQT_PLUCID.name().equalsIgnoreCase(extString))
+        else if (SearchFileFormat.SQT_PLUCID.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_PLUCID;
-        else if (SearchFileFormat.SQT_PERC.name().equalsIgnoreCase(extString))
+        else if (SearchFileFormat.SQT_PERC.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_PERC;
-        else if (SearchFileFormat.SQT_PPROBE.name().equalsIgnoreCase(extString))
+        else if (SearchFileFormat.SQT_PPROBE.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_PPROBE;
-        else if (SearchFileFormat.PEPXML.name().equalsIgnoreCase(extString))
+        else if (SearchFileFormat.PEPXML.name().equalsIgnoreCase(fmtString))
+            return SearchFileFormat.PEPXML;
+        else return SearchFileFormat.UNKNOWN;
+    }
+    
+    public static SearchFileFormat forFileExtension(String extString) {
+        if(extString.startsWith("."))
+            extString = extString.substring(1);
+        if (extString.equalsIgnoreCase(SearchFileFormat.SQT.name()))
+            return SearchFileFormat.SQT;
+        else if (extString.equalsIgnoreCase(SearchFileFormat.PEPXML.name()))
             return SearchFileFormat.PEPXML;
         else return SearchFileFormat.UNKNOWN;
     }

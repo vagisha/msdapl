@@ -42,10 +42,11 @@ import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
+import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
-public abstract class AbstractSQTDataUploadService {
+public abstract class AbstractSQTDataUploadService implements SearchDataUploadService{
 
     static final Logger log = Logger.getLogger(AbstractSQTDataUploadService.class);
 

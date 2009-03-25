@@ -34,6 +34,7 @@ import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
 import org.yeastrc.ms.parser.ms2File.Cms2FileReader;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
+import org.yeastrc.ms.service.RawDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.util.Sha1SumCalculator;
@@ -41,7 +42,7 @@ import org.yeastrc.ms.util.Sha1SumCalculator;
 /**
  * 
  */
-public class MS2DataUploadService {
+public class MS2DataUploadService implements RawDataUploadService {
 
     private static final Logger log = Logger.getLogger(MS2DataUploadService.class);
 
