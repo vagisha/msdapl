@@ -6,6 +6,8 @@
 
 package org.yeastrc.www.yates;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,16 +60,22 @@ public class UploadMacCossFormAction extends Action {
 			return mapping.findForward("standardHome");
 		}
 
+		UploadDataForm newForm = new UploadDataForm();
 		try {
 			int projectID = Integer.parseInt( request.getParameter( "projectID" ) );
-			UploadDataForm newForm = new UploadDataForm();
 			newForm.setProjectID( projectID );
 			request.setAttribute( "uploadDataForm", newForm );
-		} catch (Exception e ) { ; }
+		} catch (Exception e ) { newForm.setProjectID(0); }
 		
 		// get a list of projects on which this researcher is listed
 		List<ProjectLite> projects = ProjectLiteDAO.instance().getResearcherWritableProjects(user.getResearcher().getID());
-		request.setAttribute("projects", projects);
+		Collections.sort(projects, new Comparator<ProjectLite>() {
+            @Override
+            public int compare(ProjectLite o1, ProjectLite o2) {
+                return Integer.valueOf(o2.getId()).compareTo(o1.getId());
+            }});
+		
+		request.getSession().setAttribute("researcherProjects", projects);
 		
 		// Kick it to the view page
 		return mapping.findForward("Success");

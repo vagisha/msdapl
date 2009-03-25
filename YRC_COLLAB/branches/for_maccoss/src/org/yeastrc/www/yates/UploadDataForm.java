@@ -56,7 +56,7 @@ public class UploadDataForm extends ActionForm {
 		if (this.projectID == 0)
 			errors.add("upload", new ActionMessage("error.upload.noproject"));
 		
-		if (this.directory == null) {
+		if (this.directory == null || directory.trim().length() == 0) {
 			errors.add("upload", new ActionMessage("error.upload.nodirectoryname"));
 		}
 		

@@ -115,14 +115,14 @@
 
  
   <div>
-  	<input type="button" class="plain_button" value="EDIT PROJECT" onClick="goEdit()">
+  	<input type="button" class="plain_button" value="Edit Project" onClick="goEdit()">
 
 	<logic:equal name="showMacCossUpload" value="true" scope="request">
-	  	<input type="button" class="plain_button" value="UPLOAD MS/MS DATA (MacCoss)" onClick="goMacCoss()">
+	  	<input type="button" class="plain_button" value="Upload Data" onClick="goMacCoss()">
 	</logic:equal>
 
 	<yrcwww:member group="administrators">
-	  	<input type="button" class="error_button" value="DELETE PROJECT" onClick="confirmDelete('<bean:write name="project" property="ID"/>')">
+	  	<input type="button" class="error_button" value="Delete Project" onClick="confirmDelete('<bean:write name="project" property="ID"/>')">
 	</yrcwww:member>
  </div>
 

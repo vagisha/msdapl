@@ -51,11 +51,12 @@ function projectSearcherPopUp(field) {
 							       to which this data belongs.</span>
 				</td>
 				<td valign="top">
-					
-				
-				
-					<html:text property="projectID" size="10" maxlength="10" /><br>
-						<a href="javascript:projectSearcherPopUp(document.uploadDataForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a>
+					<html:select property="projectID">
+						<html:option value="0">None</html:option>
+						<html:options collection="researcherProjects" property="id" labelProperty="title"/>
+   					</html:select>
+					<!--<html:text property="projectID" size="10" maxlength="10" /><br>-->
+					<!--  <a href="javascript:projectSearcherPopUp(document.uploadDataForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a> -->
 				</td>
 			</tr>
 

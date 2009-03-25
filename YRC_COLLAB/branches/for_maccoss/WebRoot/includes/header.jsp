@@ -25,7 +25,7 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 	<table BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
 	<tr>
 	<td width="33%">&nbsp;</td>
-	<td width="34%" align="center"><img src="<yrcwww:link path='../images/MSDAPL_logo_big.png'/>" /></td>
+	<td width="34%" align="center"><img src="<yrcwww:link path='images/MSDAPL_logo_big.png'/>" /></td>
 	<td width="33%" align="right" valign="middle">
 	<div align="right" style="padding-right:20;color:white; font-size:8pt">
     	<html:link forward="authenticate">Login</html:link>
