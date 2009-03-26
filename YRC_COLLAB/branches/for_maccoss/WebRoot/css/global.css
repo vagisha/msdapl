@@ -190,14 +190,14 @@ DIV.register_header {
 
 /* Error color definitions */
 DIV.error_header {
-        border-color: #B20A23;
-        background-color: #B20A23;
-        color: #FFD3DA;
+        border-color: #A52A2A;
+        background-color: #A52A2A;
+        color: #FFFFF0;
 }
 DIV.error {
-        border-color: #B20A23;
-        background-color: #FFD3DA;
-        color: #B20A23;
+        border-color: #A52A2A;
+        background-color: #FFFFF0;
+        color: #A52A2A;
 }
 
 
