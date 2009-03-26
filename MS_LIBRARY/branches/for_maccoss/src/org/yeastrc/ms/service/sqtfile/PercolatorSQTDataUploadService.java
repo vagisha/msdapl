@@ -43,13 +43,14 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.percolator.PercolatorSQTFileReader;
+import org.yeastrc.ms.service.AnalysisDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 /**
  * 
  */
-public class PercolatorSQTDataUploadService {
+public class PercolatorSQTDataUploadService implements AnalysisDataUploadService{
     
     
     private static final Logger log = Logger.getLogger(PercolatorSQTDataUploadService.class);

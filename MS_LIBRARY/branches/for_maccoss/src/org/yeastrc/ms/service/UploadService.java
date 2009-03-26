@@ -13,6 +13,8 @@ public interface UploadService {
 
     public void setDirectory(String directory);
     
+    public void setRemoteDirectory(String remoteDirectory);
+    
     public boolean preUploadCheckPassed();
     
     public String getPreUploadCheckMsg();

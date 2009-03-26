@@ -7,10 +7,10 @@
 package org.yeastrc.ms.service.ms2file;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -57,24 +57,22 @@ public class MS2DataUploadService implements RawDataUploadService {
     private int lastUploadedRunId = 0;
     private List<UploadException> uploadExceptionList;
     
-    private int numRunsToUpload = 0;
     private int numRunsUploaded = 0;
+    
+    private int experimentId;
+    private String dataDirectory;
+    private String remoteDirectory;
+    private StringBuilder preUploadCheckMsg;
+    private RunFileFormat format;
+    private List<String> filenames;
     
     public MS2DataUploadService() {
         dAnalysisList = new ArrayList<MS2ChargeDependentAnalysisWId>();
         iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisWId>();
         
         uploadExceptionList = new ArrayList<UploadException>();
-    }
-
-    private void reset() {
-        // clean up any cached data
-        resetCaches();
-        
-        uploadExceptionList.clear();
-        
-        numRunsToUpload = 0;
-        numRunsUploaded = 0;
+        preUploadCheckMsg = new StringBuilder();
+        filenames = new ArrayList<String>();
     }
 
     private void resetCaches() {
@@ -98,38 +96,20 @@ public class MS2DataUploadService implements RawDataUploadService {
         return uploadExceptionList;
     }
     
-    public int getNumRunsToUpload() {
-        return numRunsToUpload;
-    }
-    
-    public int getNumRunsUploaded() {
-        return numRunsUploaded;
-    }
-    
     /**
-     * Uploaded the ms2 files in the directory to the database.  Returns a mapping of uploaded filenames to database runIds. 
-     * @param fileDirectory
-     * @param filenames
-     * @param serverDirectory
-     * @return
+     * Uploaded the ms2 files in the directory to the database.
+     * This method returns the experimentId that was set for this uploader via the 
+     * setExperimentId method.
      * @throws UploadException
      */
-    public Map<String, Integer> uploadRuns(int experimentId, String fileDirectory, Set<String> filenames, RunFileFormat format,
-                    String serverDirectory) throws UploadException {
+    @Override
+    public int upload() throws UploadException {
         
-        reset(); // reset all caches etc. 
-        
-        this.numRunsToUpload = filenames.size();
-        
-        Map<String, Integer> runIdMap = new HashMap<String, Integer>(filenames.size());
         for (String filename: filenames) {
-            int runId = 0;
             try {
-                String filepath = fileDirectory+File.separator+filename+"."+format.name().toLowerCase();
-                if(!(new File(filepath).exists()))
-                    filepath = fileDirectory+File.separator+filename+"."+format.name().toUpperCase();
+                String filepath = dataDirectory+File.separator+filename;
                 
-                runId = uploadMS2Run(experimentId, filepath, format, serverDirectory);
+                int runId = uploadMS2Run(experimentId, filepath, format, remoteDirectory);
                 // link experiment and run
                 linkExperimentAndRun(experimentId, runId);
                 numRunsUploaded++;
@@ -138,9 +118,8 @@ public class MS2DataUploadService implements RawDataUploadService {
                 deleteLastUploadedRun();
                 throw e;
             }
-            runIdMap.put(filename, runId);
         }
-        return runIdMap;
+        return experimentId;
     }
     
     private int uploadMS2Run(int experimentId, String filePath, RunFileFormat format, String serverDirectory) throws UploadException {
@@ -224,6 +203,7 @@ public class MS2DataUploadService implements RawDataUploadService {
     
     int getMatchingRunId(String fileName, String sha1Sum) {
 
+        fileName = removeExtension(fileName);
         MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
         List <Integer> runIds = runDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
 
@@ -233,6 +213,14 @@ public class MS2DataUploadService implements RawDataUploadService {
         return 0;
     }
     
+    private String removeExtension(String filename) {
+        if(filename == null)
+            return null;
+        int idx = filename.lastIndexOf('.');
+        if (idx != -1)
+            filename = filename.substring(0, idx);
+        return filename;
+    }
     /**
      * provider should be closed after this method returns
      * @param provider
@@ -367,5 +355,94 @@ public class MS2DataUploadService implements RawDataUploadService {
         uploadExceptionList.add(ex);
         log.error(ex.getMessage(), ex);
         return ex;
+    }
+
+    
+    
+    @Override
+    public void setExperimentId(int experimentId) {
+        this.experimentId = experimentId;
+    }
+
+    @Override
+    public void setDirectory(String directory) {
+        this.dataDirectory = directory;
+    }
+    
+    @Override
+    public void setRemoteDirectory(String remoteDirectory) {
+        this.remoteDirectory = remoteDirectory;
+    }
+    
+    @Override
+    public boolean preUploadCheckPassed() {
+        
+        // checks for
+        // 1. valid data directory
+        File dir = new File(dataDirectory);
+        if(!dir.exists()) {
+            appendToMsg("Data directory does not exist: "+dataDirectory);
+            return false;
+        }
+        if(!dir.isDirectory()) {
+            appendToMsg(dataDirectory+" is not a directory");
+            return false;
+        }
+        
+        // 2. valid and supported raw data format
+        // 3. consistent data format 
+        File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String name_uc = name.toUpperCase();
+                return name_uc.endsWith("."+RunFileFormat.MS2) || name_uc.endsWith("."+RunFileFormat.CMS2);
+            }});
+        
+        Set<RunFileFormat> formats = new HashSet<RunFileFormat>();
+        for (int i = 0; i < files.length; i++) {
+            if(files[i].isDirectory())
+                continue;
+            String fileName = files[i].getName();
+            int idx = fileName.lastIndexOf(".");
+            if(idx == -1)   continue;
+            
+            String ext = fileName.substring(idx);
+            RunFileFormat format = RunFileFormat.forFileExtension(ext);
+            if(format == RunFileFormat.UNKNOWN) 
+                continue;
+            
+            formats.add(format);
+            filenames.add(fileName);
+        }
+        
+        if(formats.size() == 0) {
+            appendToMsg("No valid MS2 format found in directory: "+dataDirectory);
+            return false;
+        }
+        
+        if(formats.size() > 1) {
+            appendToMsg("Multiple MS2 formats found in directory: "+dataDirectory);
+            return false;
+        }
+        
+        this.format = formats.iterator().next();
+        
+        return true;
+        
+    }
+    
+    private void appendToMsg(String msg) {
+        preUploadCheckMsg.append(msg+"\n");
+    }
+    
+    @Override
+    public String getPreUploadCheckMsg() {
+        return preUploadCheckMsg.toString();
+    }
+
+    @Override
+    public String getUploadSummary() {
+        return "\tRun file format: "+format.name()+
+        "\n\t#Runs in Directory: "+filenames.size()+"; #Uploaded: "+numRunsUploaded;
     }
 }

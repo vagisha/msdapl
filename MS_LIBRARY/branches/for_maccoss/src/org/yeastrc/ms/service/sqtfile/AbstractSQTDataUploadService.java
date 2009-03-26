@@ -529,4 +529,47 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         searchDao.deleteSearch(searchId);
     }
+    
+    @Override
+    public void setExperimentId(int experimentId) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String getPreUploadCheckMsg() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getUploadSummary() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean preUploadCheckPassed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void setDirectory(String directory) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setRemoteDirectory(String remoteDirectory) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public int upload() throws UploadException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 }

@@ -26,6 +26,7 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
@@ -54,9 +55,9 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     
     private final Program program;
     
-    public SequestSQTDataUploadService(Program program) {
+    public SequestSQTDataUploadService(SearchFileFormat format) {
         super();
-        this.program = program;
+        program = Program.programForFileFormat(format);
         this.sequestResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
@@ -363,8 +364,9 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
         
         // $JAVA_HOME/bin/java -classpath .:bin/:lib/'*' org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService
-        SequestSQTDataUploadService uploader = new SequestSQTDataUploadService(Program.SEQUEST);
+        SequestSQTDataUploadService uploader = new SequestSQTDataUploadService(SearchFileFormat.SQT_SEQ);
         uploader.uploadSearch(experimentID, dir, fileNames, runIdMap, "local", dir, new Date(new java.util.Date().getTime()));
     }
 
+    
 }

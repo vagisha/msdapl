@@ -42,7 +42,7 @@
 	
 	
 	<parameterMap class="MsRunIn" id="msRunParam">
-		<parameter property="fileName" jdbcType="VARCHAR"/>
+		<parameter property="fileNameNoExt" jdbcType="VARCHAR"/>
 		<parameter property="sha1Sum" jdbcType="CHAR"/>
 		<parameter property="creationDate" jdbcType="VARCHAR"/>
 		<parameter property="conversionSW" jdbcType="VARCHAR"/>
@@ -74,6 +74,13 @@
     	WHERE s.searchID=#searchId#
     	AND r.filename=#fileName#
     	AND s.runID = r.id
+    </select>
+    
+    <select id="selectRunIdForExperimentAndFileName" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT r.id from msRun as r, msExperimentRun as er
+    	WHERE er.experimentID=#experimentId#
+    	AND r.filename=#fileName#
+    	AND er.runID = r.id
     </select>
     
     <select id="selectRunIdsForFileName" resultClass="Integer" parameterClass="String">

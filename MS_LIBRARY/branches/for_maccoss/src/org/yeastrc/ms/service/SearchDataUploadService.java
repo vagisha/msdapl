@@ -11,5 +11,10 @@ package org.yeastrc.ms.service;
  */
 public interface SearchDataUploadService extends UploadService {
 
+    public void setExperimentId(int experimentId);
+    
+    public void setDecoyDirectory(String directory);
+    
+    public void setRemoteDecoyDirectory(String directory);
     
 }

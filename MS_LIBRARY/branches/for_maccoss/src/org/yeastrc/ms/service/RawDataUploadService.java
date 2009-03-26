@@ -8,4 +8,5 @@ package org.yeastrc.ms.service;
 
 public interface RawDataUploadService extends UploadService {
 
+    public void setExperimentId(int experimentId);
 }

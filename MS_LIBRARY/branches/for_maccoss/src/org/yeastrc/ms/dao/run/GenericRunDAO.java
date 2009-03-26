@@ -68,6 +68,17 @@ public interface GenericRunDAO <I extends MsRunIn, O extends MsRun> {
      */
     public abstract List<Integer> loadRunIdsForFileName(String fileName);
     
+    
+    /**
+     * Returns the runID for a run with the given file name that is associated with
+     * the given experimentId.
+     * @param experimentId
+     * @param runFileName
+     * @return
+     */
+    public abstract Integer loadRunIdForExperimentAndFileName(int experimentId, String runFileName);
+    
+    
     /**
      * Returns the runID for a run with the given file name that was searched in a
      * search group represented by the given searchId.
@@ -114,13 +125,5 @@ public interface GenericRunDAO <I extends MsRunIn, O extends MsRun> {
      * @return
      */
     public abstract String loadFilenameForRun(int runId);
-    
-    /**
-     * Returns the filename for the run (If there is an extension, it is removed). 
-     * e.g. If the filename is yeast_001.ms2, this method will return yeast_001
-     * @param runId
-     * @return
-     */
-    public abstract String loadFilenameNoExtForRun(int runId);
     
 }

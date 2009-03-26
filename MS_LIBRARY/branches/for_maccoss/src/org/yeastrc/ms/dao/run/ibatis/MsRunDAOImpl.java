@@ -87,22 +87,24 @@ public class MsRunDAOImpl extends BaseSqlMapDAO implements MsRunDAO {
         return (String) queryForObject("MsRun.selectFileNameForRunId", runId);
     }
     
-    public String loadFilenameNoExtForRun(int runId) {
-        String filename = loadFilenameForRun(runId);
-        if(filename == null)
-            return null;
-        int idx = filename.lastIndexOf('.');
-        if (idx != -1)
-            filename = filename.substring(0, idx);
-        return filename;
-    }
-    
     @Override
     public int loadRunIdForSearchAndFileName(int searchId, String runFileName) {
-        Map<String, Object> map = new HashMap<String, Object>(2);
+        Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("fileName", runFileName);
         map.put("searchId", searchId);
         Integer runId = (Integer)queryForObject("MsRun.selectRunIdForSearchAndFileName", map);
+        if (runId == null)
+            return 0;
+        return runId;
+    }
+    
+    @Override
+    public Integer loadRunIdForExperimentAndFileName(int experimentId,
+            String runFileName) {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("fileName", runFileName);
+        map.put("experimentId", experimentId);
+        Integer runId = (Integer)queryForObject("MsRun.selectRunIdForExperimentAndFileName", map);
         if (runId == null)
             return 0;
         return runId;

@@ -474,8 +474,7 @@ public class MsDataUploader {
     private int uploadSequestSearch(Set<String> filenames, Map<String, Integer> runIdMap, 
             SearchFileFormat sqtType, final Date searchDate) {
         
-        Program program = Program.programForFileFormat(sqtType);
-        SequestSQTDataUploadService service = new SequestSQTDataUploadService(program);
+        SequestSQTDataUploadService service = new SequestSQTDataUploadService(sqtType);
         // If this is data from the MacCoss lab we will check for "duplicate" results for
         // a scan+charge combination.
         if(isMacCossData)

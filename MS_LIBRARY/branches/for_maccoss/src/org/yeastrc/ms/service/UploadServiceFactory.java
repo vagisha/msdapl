@@ -10,12 +10,18 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.omg.CORBA.UNKNOWN;
 import org.yeastrc.ms.domain.run.RunFileFormat;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.parser.SearchParamsDataProvider;
+import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
+import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService;
+import org.yeastrc.ms.service.sqtfile.BaseSQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService;
 
 /**
@@ -76,6 +82,7 @@ public class UploadServiceFactory {
         if(format == RunFileFormat.MS2 || format == RunFileFormat.CMS2) {
             RawDataUploadService service = new MS2DataUploadService();
             service.setDirectory(dataDirectory);
+            return service;
         }
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
@@ -131,13 +138,86 @@ public class UploadServiceFactory {
             // now figure out which program generated these files.
             SearchFileFormat sqtFormat = getSqtType(dataDirectory, filenames);
             if (sqtFormat == SearchFileFormat.SQT_SEQ || sqtFormat == SearchFileFormat.SQT_NSEQ) {
-                SearchDataUploadService service = new SequestSQTDataUploadService();
+                SearchDataUploadService service = new SequestSQTDataUploadService(sqtFormat);
                 service.setDirectory(dataDirectory);
+                return service;
             }
             else if (sqtFormat == SearchFileFormat.SQT_PLUCID) {
-                return uploadProlucidSearch(filenames, runIdMap, searchDate);
+                SearchDataUploadService service = new ProlucidSQTDataUploadService();
+                service.setDirectory(dataDirectory);
+                return service;
             }
+            else if (sqtFormat == SearchFileFormat.SQT_PERC) {
+                SearchParamsDataProvider paramsProvider = new SequestParamsParser();
+                PeptideResultBuilder peptbuilder = SequestResultPeptideBuilder.instance();
+                BaseSQTDataUploadService service = new BaseSQTDataUploadService(paramsProvider, peptbuilder, Program.PERCOLATOR);
+                return service;
+            }
+            else {
+                throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+            }
+        }
+        else {
+            throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+        }
+    }
+    
+    public AnalysisDataUploadService getAnalysisDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
+        
+        if(dataDirectory == null) {
+            throw new UploadServiceFactoryException("dataDirectory is null");
+        }
+        
+        File dir = new File(dataDirectory);
+        if(!dir.exists()) {
+            throw new UploadServiceFactoryException("dataDirectory does not exist: "+dataDirectory);
+        }
+        
+        if(!dir.isDirectory()) {
+            throw new UploadServiceFactoryException(dataDirectory+" is not a directory");
+        }
+        
+        File[] files = dir.listFiles();
+        String name = null;
+        Set<SearchFileFormat> formats = new HashSet<SearchFileFormat>();
+        Set<String> filenames = new HashSet<String>();
+        for (int i = 0; i < files.length; i++) {
+            if(files[i].isDirectory())
+                continue;
+            String fileName = files[i].getName();
+            int idx = fileName.lastIndexOf(".");
+            if(idx == -1)   continue;
             
+            String ext = fileName.substring(idx);
+            SearchFileFormat format = SearchFileFormat.forFileExtension(ext);
+            if(format == SearchFileFormat.UNKNOWN) 
+                continue;
+            
+            filenames.add(fileName);
+            formats.add(format);
+        }
+        
+        if(formats.size() == 0) {
+            throw new UploadServiceFactoryException("No valid search data file format found in directory: "+dataDirectory);
+        }
+        
+        if(formats.size() > 1) {
+            throw new UploadServiceFactoryException("Multiple search data file formats found in directory: "+dataDirectory);
+        }
+        
+        SearchFileFormat format = formats.iterator().next();
+        if(format ==  SearchFileFormat.SQT) {
+            // we know that we have SQT files in this directory
+            // now figure out which program generated these files.
+            SearchFileFormat sqtFormat = getSqtType(dataDirectory, filenames);
+            if (sqtFormat == SearchFileFormat.SQT_PERC) {
+                AnalysisDataUploadService service = new PercolatorSQTDataUploadService();
+                service.setDirectory(dataDirectory);
+                return service;
+            }
+            else {
+                throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+            }
         }
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
@@ -176,25 +256,5 @@ public class UploadServiceFactory {
         }
         
         return sqtType;
-    }
-    
-    
-    private Set<String> getFileNamesInDirectory(File directory) {
-
-        Set<String> filenames = new HashSet<String>();
-        File[] files = directory.listFiles();
-        String name = null;
-        for (int i = 0; i < files.length; i++) {
-            if(files[i].isDirectory())
-                continue;
-            String fileName = files[i].getName();
-            String fileName_LC = fileName.toLowerCase();
-            if (fileName_LC.endsWith(".ms2") || fileName_LC.endsWith(".cms2") || fileName_LC.endsWith(".sqt")) {
-                name = files[i].getName();
-                name = name.substring(0, name.indexOf('.'));
-                filenames.add(name);
-            }
-        }
-        return filenames;
     }
 }

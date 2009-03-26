@@ -106,7 +106,8 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
     }
 
     @Override
-    public String loadFilenameNoExtForRun(int runId) {
-        return msRunDao.loadFilenameNoExtForRun(runId);
+    public Integer loadRunIdForExperimentAndFileName(int experimentId,
+            String runFileName) {
+        return msRunDao.loadRunIdForExperimentAndFileName(experimentId, runFileName);
     }
 }
