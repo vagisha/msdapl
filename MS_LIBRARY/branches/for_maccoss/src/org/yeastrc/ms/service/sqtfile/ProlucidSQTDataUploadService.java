@@ -213,7 +213,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
 
     
     static ProlucidSearchIn makeSearchObject(final ProlucidParamsParser parser, 
-                    final String remoteDirectory, final Date searchDate) {
+                    final String remoteDirectory, final java.util.Date searchDate) {
         return new ProlucidSearchIn() {
             @Override
             public List<ProlucidParamIn> getProlucidParams() {return parser.getParamList();}
@@ -238,7 +238,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
             public Program getSearchProgram() {return parser.getSearchProgram();}
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in search.xml
-            public Date getSearchDate() {return searchDate;}
+            public Date getSearchDate() {return new java.sql.Date(searchDate.getTime());}
             public String getServerDirectory() {return remoteDirectory;}
         };
     }

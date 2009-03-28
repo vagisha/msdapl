@@ -1,7 +1,7 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
-import java.sql.Date;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +21,7 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
@@ -31,6 +32,7 @@ import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
 import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
 import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
@@ -41,9 +43,11 @@ import org.yeastrc.ms.domain.search.sqtfile.impl.SQTRunSearchWrap;
 import org.yeastrc.ms.domain.search.sqtfile.impl.SQTSearchScanWrap;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
+import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
+import org.yeastrc.ms.service.UploadServiceFactoryException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 public abstract class AbstractSQTDataUploadService implements SearchDataUploadService{
@@ -56,8 +60,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
     static final int BUF_SIZE = 500;
     
-    //private static final double HYDROGEN = 1.00794;
-
     // these are the things we will cache and do bulk-inserts
     List<MsSearchResultProtein> proteinMatchList;
     List<MsResultResidueModIds> resultResidueModList;
@@ -67,17 +69,31 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
 
-    private int numSearchesToUpload = 0;
     private int numSearchesUploaded = 0;
     
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
     private String programVersion = "uninit";
 
+    private int experimentId;
+    private java.util.Date searchDate;
+    private String dataDirectory;
+    private String remoteServer;
+    private String remoteDirectory;
+    private StringBuilder preUploadCheckMsg;
+    private boolean preUploadCheckDone = false;
+    
+    private List<String> filenames;
+    private List<String> rawDataFileNames;
+    
     int lastUploadedRunSearchId;
     int searchId;
     int sequenceDatabaseId; // nrseq database id
+
     
     boolean doScanChargeMassCheck = false; // for data from MacCoss lab
+
+    
+    
     
     public AbstractSQTDataUploadService() {
         this.proteinMatchList = new ArrayList<MsSearchResultProtein>(BUF_SIZE);
@@ -85,6 +101,10 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         this.resultTerminalModList = new ArrayList<MsResultTerminalModIds>(BUF_SIZE);
         this.searchScanMap = new HashMap<String, SQTSearchScan>((int) (BUF_SIZE*1.5));
         this.uploadExceptionList = new ArrayList<UploadException>();
+        
+        preUploadCheckMsg = new StringBuilder();
+        filenames = new ArrayList<String>();
+        rawDataFileNames = new ArrayList<String>();
     }
     
     public void doScanChargeMassCheck(boolean doCheck) {
@@ -96,7 +116,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         // RESET THE DYNAMIC MOD LOOKUP UTILITY
         dynaModLookup = null;
 
-        numSearchesToUpload = 0;
         numSearchesUploaded = 0;
 
         resetCaches();
@@ -105,6 +124,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         searchId = 0;
         sequenceDatabaseId = 0;
         programVersion = "uninit";
+        
+        preUploadCheckMsg = new StringBuilder();
     }
 
     // called before uploading each sqt file and in the reset() method.
@@ -120,10 +141,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
     public final List<UploadException> getUploadExceptionList() {
         return this.uploadExceptionList;
-    }
-
-    public final int getNumSearchesToUpload() {
-        return numSearchesToUpload;
     }
 
     public final int getNumSearchesUploaded() {
@@ -175,12 +192,14 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     //--------------------------------------------------------------------------------------------------
     // To be implemented by subclasses
     abstract int uploadSearchParameters(int experimentId, String paramFileDirectory, 
-            String remoteServer, String remoteDirectory, Date searchDate) throws UploadException;
+            String remoteServer, String remoteDirectory, java.util.Date searchDate) throws UploadException;
     
     // NOTE: this method should be called AFTER uploadSearchParameters.
     abstract MsSearchDatabaseIn getSearchDatabase();
     
     abstract Program getSearchProgram();
+    
+    abstract SearchFileFormat getSearchFileFormat();
     
     abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
     
@@ -194,18 +213,16 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
      * @param remoteDirectory 
      * @param searchDate 
      */
-    public int uploadSearch(int experimentId, String fileDirectory, Set<String> fileNames,
-            Map<String,Integer> runIdMap, 
-            String remoteServer, String remoteDirectory, Date searchDate) {
+    public int uploadSearch(Set<String> fileNames, Map<String,Integer> runIdMap) {
 
         reset();// reset all caches etc.
         
         // get the number of sqt file in the directory
-        this.numSearchesToUpload = getNumFilesToUpload(fileDirectory, fileNames);
+        this.numSearchesToUpload = getNumFilesToUpload(dataDirectory, fileNames);
         
         // parse and upload the search parameters
         try {
-            searchId = uploadSearchParameters(experimentId, fileDirectory, 
+            searchId = uploadSearchParameters(experimentId, dataDirectory, 
                     remoteServer, remoteDirectory, searchDate);
         }
         catch (UploadException e) {
@@ -221,7 +238,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         // now upload the individual sqt files
         for (String file: fileNames) {
-            String filePath = fileDirectory+File.separator+file+".sqt";
+            String filePath = dataDirectory+File.separator+file+".sqt";
             // if the file does not exist skip over to the next
             if (!(new File(filePath).exists()))
                 continue;
@@ -322,7 +339,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     }
     
     /**
-     * 
      * @param scan
      * @param runSearchId
      * @param scanId
@@ -530,40 +546,115 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         searchDao.deleteSearch(searchId);
     }
     
+    
     @Override
     public void setExperimentId(int experimentId) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public String getPreUploadCheckMsg() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getUploadSummary() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean preUploadCheckPassed() {
-        // TODO Auto-generated method stub
-        return false;
+        this.experimentId = experimentId;
     }
 
     @Override
     public void setDirectory(String directory) {
-        // TODO Auto-generated method stub
-        
+        this.dataDirectory = directory;
+    }
+    
+    @Override
+    public void setSearchDate(java.util.Date date) {
+        this.searchDate = date;
     }
 
     @Override
+    public void setRemoteServer(String remoteServer) {
+        this.remoteServer = remoteServer;
+    }
+    
+    @Override
     public void setRemoteDirectory(String remoteDirectory) {
-        // TODO Auto-generated method stub
+        this.remoteDirectory = remoteDirectory;
+    }
+    
+    @Override
+    public void setDecoyDirectory(String directory) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public void setRemoteDecoyDirectory(String directory) {
+        throw new UnsupportedOperationException();
+    }
+    
+    private void appendToMsg(String msg) {
+        this.preUploadCheckMsg.append(msg+"\n");
+    }
+    
+    @Override
+    public boolean preUploadCheckPassed() {
         
+        preUploadCheckMsg = new StringBuilder();
+        
+        // checks for
+        // 1. valid data directory
+        File dir = new File(dataDirectory);
+        if(!dir.exists()) {
+            appendToMsg("Data directory does not exist: "+dataDirectory);
+            return false;
+        }
+        if(!dir.isDirectory()) {
+            appendToMsg(dataDirectory+" is not a directory");
+            return false;
+        }
+        
+        // 2. valid and supported search data format
+        // 3. consistent data format 
+        File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String name_uc = name.toUpperCase();
+                return name_uc.endsWith(".SQT");
+            }});
+        for (int i = 0; i < files.length; i++) {
+            filenames.add(files[i].getName());
+        }
+        
+        // make sure all files are of the same type
+        for (String file: filenames) {
+            String sqtFile = dataDirectory+File.separator+file;
+            SearchFileFormat myType = SQTFileReader.getSearchFileType(sqtFile);
+            
+            if (myType == null) {
+                appendToMsg("Cannot determine SQT type for file: "+file);
+                return false;
+            }
+            
+            // For now we support only sequest, ee-normalized sequest and ProLuCID sqt files. 
+            if(myType != getSearchFileFormat()) {
+                appendToMsg("Unsupported SQT type for uploader. Expected: "+getSearchFileFormat()+"; Found: "+myType+". File: "+file);
+                return false;
+            }
+        }
+        
+        // 4. If we know the raw data file names that will be uploaded match them with up with the SQT files
+        //    and make sure there is a raw data file for each SQT file
+        
+        preUploadCheckDone = true;
+        
+        return true;
+    }
+    
+
+    @Override
+    public void setRawDataFileNames(List<String> rawDataFileNames) {
+        this.rawDataFileNames = rawDataFileNames;
+    }
+    
+    @Override
+    public String getPreUploadCheckMsg() {
+        return preUploadCheckMsg.toString();
+    }
+
+    @Override
+    public String getUploadSummary() {
+        return "\tSearch file format: "+getSearchFileFormat()+
+        "\n\t#Search files in Directory: "+filenames.size()+"; #Uploaded: "+numSearchesUploaded;
     }
 
     @Override

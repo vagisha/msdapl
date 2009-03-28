@@ -17,6 +17,8 @@ public class UploadException extends Exception {
     private static int ERROR = 1;
     
     public static enum ERROR_CODE {
+        
+        PREUPLOAD_CHECK_FALIED  ("Pre-upload check failed", ERROR),
         EXPT_NOT_FOUND          ("Experiment not found in the database", ERROR),
         DIRECTORY_NOT_FOUND     ("Directory not found.", ERROR),
         EMPTY_DIRECTORY         ("No files found to upload.", ERROR),

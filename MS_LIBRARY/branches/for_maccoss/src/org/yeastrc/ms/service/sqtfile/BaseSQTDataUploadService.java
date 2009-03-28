@@ -7,7 +7,6 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
-import java.sql.Date;
 import java.util.List;
 
 import org.yeastrc.ms.dao.DAOFactory;
@@ -18,6 +17,7 @@ import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
@@ -36,6 +36,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
     private final SearchParamsDataProvider paramsProvider;
     private final PeptideResultBuilder peptideResultBuilder;
     private final Program searchProgram;
+    private final SearchFileFormat sqtType;
     
     private MsSearchDatabaseIn db = null;
     private List<MsResidueModificationIn> dynaResidueMods;
@@ -44,15 +45,16 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
 
     public BaseSQTDataUploadService(SearchParamsDataProvider paramsProvider, 
             PeptideResultBuilder peptideResultBuilder,
-            Program searchProgram) {
+            Program searchProgram, SearchFileFormat sqtType) {
         this.paramsProvider = paramsProvider;
         this.peptideResultBuilder = peptideResultBuilder;
         this.searchProgram = searchProgram;
+        this.sqtType = sqtType;
     }
 
     @Override
     int uploadSearchParameters(int experimentId, String paramFileDirectory,
-            String remoteServer, String remoteDirectory, Date searchDate)
+            String remoteServer, String remoteDirectory, java.util.Date searchDate)
     throws UploadException {
 
         SearchParamsDataProvider parser = parseParams(paramFileDirectory, remoteServer);
@@ -220,4 +222,9 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
         super.uploadBaseSearchResult(result, runSearchId, scanId);
     }
 
+    @Override
+    SearchFileFormat getSearchFileFormat() {
+        return this.sqtType;
+    }
+    
 }

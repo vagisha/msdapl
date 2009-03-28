@@ -8,7 +8,6 @@ package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -228,7 +227,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     }
 
     static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final Program searchProgram,
-                final String remoteDirectory, final Date searchDate) {
+                final String remoteDirectory, final java.util.Date searchDate) {
         return new SequestSearchIn() {
             @Override
             public List<SequestParam> getSequestParams() {return parser.getParamList();}
@@ -254,7 +253,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
 //            public Program getSearchProgram() {return parser.getSearchProgram();}
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in sequest.params
-            public Date getSearchDate() {return searchDate;}
+            public Date getSearchDate() {return new java.sql.Date(searchDate.getTime());}
             public String getServerDirectory() {return remoteDirectory;}
         };
     }

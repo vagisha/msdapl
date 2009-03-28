@@ -65,13 +65,14 @@ public class MS2DataUploadService implements RawDataUploadService {
     private StringBuilder preUploadCheckMsg;
     private RunFileFormat format;
     private List<String> filenames;
+    private boolean preUploadCheckDone = false;
     
     public MS2DataUploadService() {
         dAnalysisList = new ArrayList<MS2ChargeDependentAnalysisWId>();
         iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisWId>();
         
         uploadExceptionList = new ArrayList<UploadException>();
-        preUploadCheckMsg = new StringBuilder();
+        
         filenames = new ArrayList<String>();
     }
 
@@ -105,6 +106,13 @@ public class MS2DataUploadService implements RawDataUploadService {
     @Override
     public int upload() throws UploadException {
         
+        if(!preUploadCheckDone) {
+            if(!preUploadCheckPassed()) {
+                UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+                ex.setErrorMessage(this.getPreUploadCheckMsg());
+                throw ex;
+            }
+        }
         for (String filename: filenames) {
             try {
                 String filepath = dataDirectory+File.separator+filename;
@@ -377,6 +385,8 @@ public class MS2DataUploadService implements RawDataUploadService {
     @Override
     public boolean preUploadCheckPassed() {
         
+        preUploadCheckMsg = new StringBuilder();
+        
         // checks for
         // 1. valid data directory
         File dir = new File(dataDirectory);
@@ -427,6 +437,8 @@ public class MS2DataUploadService implements RawDataUploadService {
         
         this.format = formats.iterator().next();
         
+        preUploadCheckDone = true;
+        
         return true;
         
     }
@@ -444,5 +456,10 @@ public class MS2DataUploadService implements RawDataUploadService {
     public String getUploadSummary() {
         return "\tRun file format: "+format.name()+
         "\n\t#Runs in Directory: "+filenames.size()+"; #Uploaded: "+numRunsUploaded;
+    }
+
+    @Override
+    public void setRemoteServer(String remoteServer) {
+        throw new UnsupportedOperationException();
     }
 }
