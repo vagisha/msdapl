@@ -6,10 +6,11 @@
  */
 package org.yeastrc.ms.dao.search;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 
 /**
  * 
@@ -21,6 +22,8 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
     public abstract List<Integer> loadResultIdsForRunSearch(int runSearchId);
     
     public abstract List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge);
+    
+    public abstract int numResultsForRunSearchScanChargeMass(int runSearchId, int scanId, int charge, BigDecimal mass);
     
     public abstract List<Integer> loadResultIdsForSearchScan(int runSearchId, int scanId);
     
@@ -61,12 +64,12 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
      */
     public abstract void delete(int resultId);
     
-    /**
-     * Deletes the search results (msRunSearchResult table) with the 
-     * given runSearchId, scanId and charge, 
-     * along with any associated protein matches (msProteinMatch)
-     * and modifications.
-     * @param resultId
-     */
-    public abstract void deleteResults(int runSearchId, int scanId, int charge);
+//    /**
+//     * Deletes the search results (msRunSearchResult table) with the 
+//     * given runSearchId, scanId and charge, 
+//     * along with any associated protein matches (msProteinMatch)
+//     * and modifications.
+//     * @param resultId
+//     */
+//    public abstract void deleteResults(int runSearchId, int scanId, int charge);
 }

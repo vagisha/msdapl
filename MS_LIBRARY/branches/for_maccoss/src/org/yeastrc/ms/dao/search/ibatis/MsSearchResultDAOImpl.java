@@ -1,5 +1,6 @@
 package org.yeastrc.ms.dao.search.ibatis;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +65,20 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForRunSearchScanCharge", map);
     }
     
+    @Override
+    public int numResultsForRunSearchScanChargeMass(int runSearchId, int scanId,
+            int charge, BigDecimal mass) {
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        map.put("runSearchId", runSearchId);
+        map.put("scanId", scanId);
+        map.put("charge", charge);
+        map.put("observedMass", mass);
+        Integer count = (Integer) queryForObject("MsSearchResult.countResultsForRunSearchScanChargeMass", map);
+        if(count == null)
+            return 0;
+        return count;
+    }
+    
     public List<Integer> loadResultIdsForSearchScan(int runSearchId, int scanId) {
         Map<String, Integer> map = new HashMap<String, Integer>(3);
         map.put("runSearchId", runSearchId);
@@ -122,14 +137,14 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         delete("MsSearchResult.delete", resultId);
     }
 
-    @Override
-    public void deleteResults(int runSearchId, int scanId, int charge) {
-        Map<String, Integer> map = new HashMap<String, Integer>(3);
-        map.put("runSearchId", runSearchId);
-        map.put("scanId", scanId);
-        map.put("charge", charge);
-        delete("MsSearchResult.deleteForRunSearchScanCharge", map);
-    }
+//    @Override
+//    public void deleteResults(int runSearchId, int scanId, int charge) {
+//        Map<String, Integer> map = new HashMap<String, Integer>(3);
+//        map.put("runSearchId", runSearchId);
+//        map.put("scanId", scanId);
+//        map.put("charge", charge);
+//        delete("MsSearchResult.deleteForRunSearchScanCharge", map);
+//    }
 
     /**
      * Type handler for converting between ValidationType and SQL's CHAR type.

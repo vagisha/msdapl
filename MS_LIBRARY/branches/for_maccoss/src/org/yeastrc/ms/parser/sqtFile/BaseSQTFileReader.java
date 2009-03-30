@@ -32,7 +32,7 @@ public class BaseSQTFileReader extends SQTFileReader<SQTSearchScanIn<MsSearchRes
     }
     
     @Override
-    public SQTSearchScanIn<MsSearchResultIn> getNextSearchScan() throws DataProviderException {
+    protected SQTSearchScanIn<MsSearchResultIn> nextSearchScan() throws DataProviderException {
         
         BaseSearchScan scan = new BaseSearchScan(parseScan(currentLine));
         advanceLine();
@@ -86,8 +86,8 @@ public class BaseSQTFileReader extends SQTFileReader<SQTSearchScanIn<MsSearchRes
                 break;
             advanceLine();
         }
-//        if (result.getProteinMatchList().size() == 0)
-//            throw new DataProviderException(currentLineNum-1, "Invalid 'M' line.  No locus matches found." , null);
+        if (result.getProteinMatchList().size() == 0)
+            throw new DataProviderException(currentLineNum-1, "Invalid 'M' line.  No locus matches found." , null);
         if(isPlaceholder)   result = null;
         return result;
     }

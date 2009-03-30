@@ -55,7 +55,6 @@ public class MS2DataUploadService implements RawDataUploadService {
     private List<MS2ChargeIndependentAnalysisWId> iAnalysisList;
     
     private int lastUploadedRunId = 0;
-    private List<UploadException> uploadExceptionList;
     
     private int numRunsUploaded = 0;
     
@@ -70,8 +69,6 @@ public class MS2DataUploadService implements RawDataUploadService {
     public MS2DataUploadService() {
         dAnalysisList = new ArrayList<MS2ChargeDependentAnalysisWId>();
         iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisWId>();
-        
-        uploadExceptionList = new ArrayList<UploadException>();
         
         filenames = new ArrayList<String>();
     }
@@ -93,10 +90,6 @@ public class MS2DataUploadService implements RawDataUploadService {
         runDao.delete(runId);
     }
     
-    public List<UploadException> getUploadExceptionList() {
-        return uploadExceptionList;
-    }
-    
     /**
      * Uploaded the ms2 files in the directory to the database.
      * This method returns the experimentId that was set for this uploader via the 
@@ -109,7 +102,8 @@ public class MS2DataUploadService implements RawDataUploadService {
         if(!preUploadCheckDone) {
             if(!preUploadCheckPassed()) {
                 UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
-                ex.setErrorMessage(this.getPreUploadCheckMsg());
+                ex.appendErrorMessage(this.getPreUploadCheckMsg());
+                ex.appendErrorMessage("\n\tMS2 FILES WILL NOT BE UPLOADED\n");
                 throw ex;
             }
         }
@@ -155,11 +149,11 @@ public class MS2DataUploadService implements RawDataUploadService {
             return runId;
         }
         catch (DataProviderException e) {
-            UploadException ex = logAndAddUploadException(ERROR_CODE.READ_ERROR_MS2, e, filePath, null, e.getMessage());
+            UploadException ex = makeUploadException(ERROR_CODE.READ_ERROR_MS2, e, filePath, null, e.getMessage());
             throw ex;
         }
         catch (RuntimeException e) { // most likely due to SQL exception
-            UploadException ex = logAndAddUploadException(ERROR_CODE.RUNTIME_MS2_ERROR, e, filePath, null, e.getMessage());
+            UploadException ex = makeUploadException(ERROR_CODE.RUNTIME_MS2_ERROR, e, filePath, null, e.getMessage());
             throw ex;
         }
         catch(UploadException e) {
@@ -203,7 +197,7 @@ public class MS2DataUploadService implements RawDataUploadService {
             sha1Sum = Sha1SumCalculator.instance().sha1SumFor(new File(filePath));
         }
         catch (Exception e) {
-            UploadException ex = logAndAddUploadException(ERROR_CODE.SHA1SUM_CALC_ERROR, e, filePath, null, e.getMessage());
+            UploadException ex = makeUploadException(ERROR_CODE.SHA1SUM_CALC_ERROR, e, filePath, null, e.getMessage());
             throw ex;
         }
         return sha1Sum;
@@ -351,7 +345,7 @@ public class MS2DataUploadService implements RawDataUploadService {
             saveChargeDependentAnalysis();
     }
     
-    private UploadException logAndAddUploadException(ERROR_CODE errCode, Exception sourceException, String file, String directory, String message) {
+    private UploadException makeUploadException(ERROR_CODE errCode, Exception sourceException, String file, String directory, String message) {
         UploadException ex = null;
         if (sourceException == null)
             ex = new UploadException(errCode);
@@ -360,8 +354,7 @@ public class MS2DataUploadService implements RawDataUploadService {
         ex.setFile(file);
         ex.setDirectory(directory);
         ex.setErrorMessage(message);
-        uploadExceptionList.add(ex);
-        log.error(ex.getMessage(), ex);
+//        log.error(ex.getMessage(), ex);
         return ex;
     }
 
@@ -461,5 +454,15 @@ public class MS2DataUploadService implements RawDataUploadService {
     @Override
     public void setRemoteServer(String remoteServer) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public RunFileFormat getFileFormat() {
+        return this.format;
+    }
+
+    @Override
+    public List<String> getFileNames() {
+        return this.filenames;
     }
 }

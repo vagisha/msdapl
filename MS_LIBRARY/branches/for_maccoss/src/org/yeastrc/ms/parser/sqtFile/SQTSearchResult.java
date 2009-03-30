@@ -1,5 +1,6 @@
 package org.yeastrc.ms.parser.sqtFile;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public abstract class SQTSearchResult implements MsSearchResultIn {
     private String sequence;
     private char validationStatus;
     private int charge;
+    private BigDecimal observedMass;
     private int scanNumber;
     private List<MsSearchResultProteinIn> matchingLoci;
     private MsSearchResultPeptide resultPeptide = null;
@@ -39,6 +41,14 @@ public abstract class SQTSearchResult implements MsSearchResultIn {
 
     public int getCharge() {
         return charge;
+    }
+    
+    public void setObservedMass(BigDecimal observedMass) {
+        this.observedMass = observedMass;
+    }
+    
+    public BigDecimal getObservedMass() {
+        return this.observedMass;
     }
 
     public void addMatchingLocus(String accession, String description) {

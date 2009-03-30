@@ -46,7 +46,7 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
     
     @Override
     public int loadIdForRunAndSearch(int runId, int searchId) {
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
         map.put("runId", runId);
         map.put("searchId", searchId);
         Integer runSearchId = (Integer)queryForObject("MsRunSearch.selectIdForRunAndSearch", map);
@@ -54,6 +54,18 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
             return runSearchId;
         return 0;
     }
+    
+    @Override
+    public int loadIdForSearchAndFileName(int searchId, String filename) {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("searchId", searchId);
+        map.put("filename", filename);
+        Integer runSearchId = (Integer)queryForObject("MsRunSearch.selectIdForSearchAndFile", map);
+        if (runSearchId != null)
+            return runSearchId;
+        return 0;
+    }
+    
     
     @Override
     public String loadFilenameForRunSearch(int runSearchId) {
@@ -106,6 +118,7 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
             return SearchFileFormat.instance(s);
         }
     }
+
 
     //---------------------------------------------------------------------------------------
 }

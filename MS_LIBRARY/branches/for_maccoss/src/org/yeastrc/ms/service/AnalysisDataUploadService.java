@@ -6,10 +6,21 @@
  */
 package org.yeastrc.ms.service;
 
+import java.util.List;
+
+import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
+
 /**
  * 
  */
 public interface AnalysisDataUploadService extends UploadService {
 
     public void setSearchId(int searchId);
+    
+    public SearchFileFormat getAnalysisFileFormat();
+    
+    public void setSearchProgram(Program searchProgram);
+    
+    public void setSearchDataFileNames(List<String> searchDataFileNames);
 }

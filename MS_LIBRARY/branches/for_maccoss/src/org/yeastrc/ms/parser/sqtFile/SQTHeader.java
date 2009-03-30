@@ -174,8 +174,8 @@ public class SQTHeader implements SQTRunSearchIn {
         }
         if (sqtGenerator.equalsIgnoreCase(Program.SEQUEST.displayName()))
             sqtType = SearchFileFormat.SQT_SEQ;
-        else if (sqtGenerator.equalsIgnoreCase(Program.EE_NORM_SEQUEST.displayName()))
-            sqtType = SearchFileFormat.SQT_NSEQ;
+//        else if (sqtGenerator.equalsIgnoreCase(Program.EE_NORM_SEQUEST.displayName()))
+//            sqtType = SearchFileFormat.SQT_NSEQ;
         else if (sqtGenerator.equalsIgnoreCase(Program.PERCOLATOR.displayName()))
             sqtType = SearchFileFormat.SQT_PERC;
         else if (sqtGenerator.equalsIgnoreCase(Program.PROLUCID.displayName()))

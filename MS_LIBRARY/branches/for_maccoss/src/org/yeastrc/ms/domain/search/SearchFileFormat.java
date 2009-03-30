@@ -12,7 +12,7 @@ public enum SearchFileFormat {
 
     SQT("SQT: GENERIC"),
     SQT_SEQ("SQT: "+Program.SEQUEST.displayName()), 
-    SQT_NSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
+    //SQT_NSEQ("SQT: "+Program.EE_NORM_SEQUEST.displayName()), 
     SQT_PLUCID("SQT: "+Program.PROLUCID.displayName()), 
     SQT_PPROBE("SQT: "+Program.PEPPROBE), 
     SQT_PERC("SQT: "+Program.PERCOLATOR.displayName()), 
@@ -31,8 +31,8 @@ public enum SearchFileFormat {
     public static SearchFileFormat instance(String fmtString) {
         if (SearchFileFormat.SQT_SEQ.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_SEQ;
-        else if (SearchFileFormat.SQT_NSEQ.name().equalsIgnoreCase(fmtString))
-            return SearchFileFormat.SQT_NSEQ;
+//        else if (SearchFileFormat.SQT_NSEQ.name().equalsIgnoreCase(fmtString))
+//            return SearchFileFormat.SQT_NSEQ;
         else if (SearchFileFormat.SQT_PLUCID.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.SQT_PLUCID;
         else if (SearchFileFormat.SQT_PERC.name().equalsIgnoreCase(fmtString))

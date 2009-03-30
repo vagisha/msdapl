@@ -42,7 +42,7 @@
 	
 	
 	<parameterMap class="MsRunIn" id="msRunParam">
-		<parameter property="fileNameNoExt" jdbcType="VARCHAR"/>
+		<parameter property="fileName" jdbcType="VARCHAR"/>
 		<parameter property="sha1Sum" jdbcType="CHAR"/>
 		<parameter property="creationDate" jdbcType="VARCHAR"/>
 		<parameter property="conversionSW" jdbcType="VARCHAR"/>

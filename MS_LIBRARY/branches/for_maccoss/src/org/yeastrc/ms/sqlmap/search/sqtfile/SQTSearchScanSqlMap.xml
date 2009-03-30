@@ -14,7 +14,6 @@
 		<result property="processTime" column="processTime" nullValue="0"/>
 		<result property="serverName" column="serverName"/>
 		<result property="totalIntensity" column="totalIntensity"/>
-		<result property="observedMass" column="observedMass"/>
 		<result property="lowestSp" column="lowestSp"/>
 		<result property="sequenceMatches" column="sequenceMatches" nullValue="-1"/>
 	</resultMap>
@@ -27,7 +26,6 @@
 		<parameter property="processTime" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="serverName" jdbcType="VARCHAR" />
 		<parameter property="totalIntensity" jdbcType="DECIMAL"/>
-		<parameter property="observedMass" jdbcType="DECIMAL"/>
 		<parameter property="lowestSp" jdbcType="DECIMAL"/>
 		<parameter property="sequenceMatches" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
@@ -48,10 +46,9 @@
     	processTime, 
     	serverName,
     	totalIntensity,
-    	observedMass,
     	lowestSp,
     	sequenceMatches) 
-    	VALUES (?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
@@ -62,7 +59,6 @@
     	processTime, 
     	serverName,
     	totalIntensity,
-    	observedMass,
     	lowestSp,
     	sequenceMatches) 
     	VALUES $values$

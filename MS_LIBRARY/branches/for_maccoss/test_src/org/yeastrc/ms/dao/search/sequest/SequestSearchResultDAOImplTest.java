@@ -31,7 +31,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertNull(res);
         
         // insert one result in to the table
-        SequestSearchResultTest result = makeSequestResult(3, "PEPTIDE", false); // charge = 3;
+        SequestSearchResultTest result = makeSequestResult(3, "PEPTIDE", new BigDecimal("1024.5"), false); // charge = 3;
         
         // we have not yet set any of the SQT file specific values. Saving the 
         // result at this point should fail
@@ -70,7 +70,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public final void testLoadTopResultsWProteinsForRunSearchN() {
         super.resetDatabase();
         // insert some result in to the table
-        SequestSearchResultTest result1 = makeSequestResult(3, "PEPTIDEA", true); // charge = 3;
+        SequestSearchResultTest result1 = makeSequestResult(3, "PEPTIDEA", new BigDecimal("1024.5"), true); // charge = 3;
         result1.setXCorrRank(1);
         result1.setXCorr(new BigDecimal("0.50"));
         result1.setSpRank(1);
@@ -78,7 +78,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         result1.setDeltaCN(new BigDecimal("0.001"));
         result1.setMatchingIons(200);
         
-        SequestSearchResultTest result2 = makeSequestResult(3, "PEPTIDEB", true); // charge = 3;
+        SequestSearchResultTest result2 = makeSequestResult(3, "PEPTIDEB", new BigDecimal("512.5"),true); // charge = 3;
         result2.setXCorrRank(2);
         result2.setXCorr(new BigDecimal("0.10"));
         result2.setSpRank(3);
@@ -86,7 +86,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         result2.setDeltaCN(new BigDecimal("0.001"));
         result2.setMatchingIons(200);
         
-        SequestSearchResultTest result3 = makeSequestResult(3, "PEPTIDEC", true); // charge = 3;
+        SequestSearchResultTest result3 = makeSequestResult(3, "PEPTIDEC", new BigDecimal("256.5"),true); // charge = 3;
         result3.setXCorrRank(1);
         result3.setXCorr(new BigDecimal("0.10"));
         result3.setSpRank(1);
@@ -123,7 +123,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
     public final void testLoadTopResultsForRunSearchN() {
         super.resetDatabase();
         // insert some results in to the table.
-        SequestSearchResultTest result1 = makeSequestResult(3, "PEPTIDEA", true); // charge = 3;
+        SequestSearchResultTest result1 = makeSequestResult(3, "PEPTIDEA", new BigDecimal("1024.5"),true); // charge = 3;
         result1.setXCorrRank(1);
         result1.setXCorr(new BigDecimal("0.50"));
         result1.setSpRank(1);
@@ -131,7 +131,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         result1.setDeltaCN(new BigDecimal("0.001"));
         result1.setMatchingIons(200);
         
-        SequestSearchResultTest result2 = makeSequestResult(3, "PEPTIDEB", true); // charge = 3;
+        SequestSearchResultTest result2 = makeSequestResult(3, "PEPTIDEB", new BigDecimal("512.5"), true); // charge = 3;
         result2.setXCorrRank(2);
         result2.setXCorr(new BigDecimal("0.10"));
         result2.setSpRank(3);
@@ -139,7 +139,7 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         result2.setDeltaCN(new BigDecimal("0.001"));
         result2.setMatchingIons(200);
         
-        SequestSearchResultTest result3 = makeSequestResult(3, "PEPTIDEC", true); // charge = 3;
+        SequestSearchResultTest result3 = makeSequestResult(3, "PEPTIDEC", new BigDecimal("256.5"), true); // charge = 3;
         result3.setXCorrRank(1);
         result3.setXCorr(new BigDecimal("0.10"));
         result3.setSpRank(1);
@@ -190,9 +190,10 @@ public class SequestSearchResultDAOImplTest extends SQTBaseDAOTestCase {
         assertEquals(iData.getPredictedIons(), oData.getPredictedIons());
     }
     
-    private SequestSearchResultTest makeSequestResult(int charge,String peptide, boolean addProteins) {
+    private SequestSearchResultTest makeSequestResult(int charge,String peptide, BigDecimal mass, boolean addProteins) {
         SequestSearchResultTest result = new SequestSearchResultTest();
         result.setCharge(charge);
+        result.setObservedMass(mass);
         SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
         resultPeptide.setPeptideSequence(peptide);
         result.setResultPeptide(resultPeptide);

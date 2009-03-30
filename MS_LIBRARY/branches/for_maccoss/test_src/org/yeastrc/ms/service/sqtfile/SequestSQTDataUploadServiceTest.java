@@ -17,8 +17,8 @@ import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
@@ -28,7 +28,6 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.service.MsDataUploader;
-import org.yeastrc.ms.service.UploadException;
 
 public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
 
@@ -44,22 +43,18 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
     public void testUploadSequestData() {
         String dir = "test_resources/validSequestData_dir";
         MsDataUploader uploader = new MsDataUploader();
+        uploader.doUploadSearch(true);
         java.util.Date experimentDate = new java.util.Date();
         
         int experimentId = 0;
-        try {
-            experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
-            assertNotSame(0, experimentId);
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("Data is valid");
-        }
+        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
+        experimentId = uploader.getUploadedExperimentId();
+        assertNotSame(0, experimentId);
         assertEquals(0, uploader.getUploadExceptionList().size());
         
         // make sure all the data got uploaded
-        int runId1 = getRunId("1.ms2");
-        int runId2 = getRunId("2.ms2");
+        int runId1 = getRunId("1");
+        int runId2 = getRunId("2");
         
         checkSearch(uploader.getUploadedSearchId(), experimentDate);
         
@@ -288,7 +283,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(runSearchId, scan.getRunSearchId());
         assertEquals(22, scan.getProcessTime());
         assertEquals("shamu048", scan.getServerName());
-        assertEquals(866.46, scan.getObservedMass().doubleValue());
+//        assertEquals(866.46, scan.getObservedMass().doubleValue());
         assertEquals(1892.2, scan.getTotalIntensity().doubleValue());
         assertEquals(56.4, scan.getLowestSp().doubleValue());
         assertEquals(4716510, scan.getSequenceMatches());
@@ -300,6 +295,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         SequestSearchResult res = seqResDao.load(resultIds.get(0));
         assertEquals(1, res.getCharge());
         assertEquals(scanId, res.getScanId());
+        assertEquals(866.46, res.getObservedMass().doubleValue());
         assertEquals(runSearchId, res.getRunSearchId());
         assertEquals(1, res.getSequestResultData().getxCorrRank());
         assertEquals(4, res.getSequestResultData().getSpRank());
@@ -344,6 +340,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         res = seqResDao.load(resultIds.get(1));
         assertEquals(1, res.getCharge());
         assertEquals(scanId, res.getScanId());
+        assertEquals(866.46, res.getObservedMass().doubleValue());
         assertEquals(runSearchId, res.getRunSearchId());
         assertEquals(2, res.getSequestResultData().getxCorrRank());
         assertEquals(200, res.getSequestResultData().getSpRank());
@@ -388,26 +385,29 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(runSearchId, scan.getRunSearchId());
         assertEquals(22, scan.getProcessTime());
         assertEquals("shamu049", scan.getServerName());
-        assertEquals(807.67, scan.getObservedMass().doubleValue());
+//        assertEquals(807.67, scan.getObservedMass().doubleValue());
         assertEquals(2681.7, scan.getTotalIntensity().doubleValue());
         assertEquals(95.3, scan.getLowestSp().doubleValue());
         assertEquals(5138490, scan.getSequenceMatches());
         
+        // NOTE (03/29/09)  NO LONGER ACCEPTING SCANS WITH NO RESULTS
+        // THIS LINE HAS BEEN REMOVED FROM THE SQT
         // S       00010   00010   1       23      shamu050        717.62000       4000.6  111.6   5928764
         scanId = this.scanDao.loadScanIdForScanNumRun(10, runId);
         assertEquals(10, this.scanDao.load(scanId).getStartScanNum());
         assertEquals(0, seqResDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, 1).size()); // number of results for this scan + charge combination
         scan = searchScanDao.load(runSearchId, scanId, 1);
-        assertNotNull(scan);
-        assertEquals(scanId, scan.getScanId());
-        assertEquals(1, scan.getCharge());
-        assertEquals(runSearchId, scan.getRunSearchId());
-        assertEquals(23, scan.getProcessTime());
-        assertEquals("shamu050", scan.getServerName());
-        assertEquals(717.62, scan.getObservedMass().doubleValue());
-        assertEquals(4000.6, scan.getTotalIntensity().doubleValue());
-        assertEquals(111.6, scan.getLowestSp().doubleValue());
-        assertEquals(5928764, scan.getSequenceMatches());
+        assertNull(scan);
+//        assertNotNull(scan);
+//        assertEquals(scanId, scan.getScanId());
+//        assertEquals(1, scan.getCharge());
+//        assertEquals(runSearchId, scan.getRunSearchId());
+//        assertEquals(23, scan.getProcessTime());
+//        assertEquals("shamu050", scan.getServerName());
+////        assertEquals(717.62, scan.getObservedMass().doubleValue());
+//        assertEquals(4000.6, scan.getTotalIntensity().doubleValue());
+//        assertEquals(111.6, scan.getLowestSp().doubleValue());
+//        assertEquals(5928764, scan.getSequenceMatches());
 
         // S       00026   00026   1       23      shamu048        817.33000       2044.4  69.6    5697304
         scanId = this.scanDao.loadScanIdForScanNumRun(26, runId);
@@ -420,7 +420,7 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(runSearchId, scan.getRunSearchId());
         assertEquals(23, scan.getProcessTime());
         assertEquals("shamu048", scan.getServerName());
-        assertEquals(817.33, scan.getObservedMass().doubleValue());
+//        assertEquals(817.33, scan.getObservedMass().doubleValue());
         assertEquals(2044.4, scan.getTotalIntensity().doubleValue());
         assertEquals(69.6, scan.getLowestSp().doubleValue());
         assertEquals(5697304, scan.getSequenceMatches());

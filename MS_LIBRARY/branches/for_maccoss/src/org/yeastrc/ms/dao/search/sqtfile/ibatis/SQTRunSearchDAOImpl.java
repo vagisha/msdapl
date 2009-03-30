@@ -53,6 +53,11 @@ public class SQTRunSearchDAOImpl extends BaseSqlMapDAO
     }
     
     @Override
+    public int loadIdForSearchAndFileName(int searchId, String filename) {
+        return runSearchDao.loadIdForSearchAndFileName(searchId, filename);
+    }
+    
+    @Override
     public String loadFilenameForRunSearch(int runSearchId) {
         return runSearchDao.loadFilenameForRunSearch(runSearchId);
     }

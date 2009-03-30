@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.domain.search.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class SearchResultBean implements MsSearchResult {
     private int scanId; // id (database) of the scan with which this result is associated
 
     private int charge; 
+    private BigDecimal observedMass;
     private ValidationStatus validationStatus = ValidationStatus.UNKNOWN;
 
     private List<MsSearchResultProtein> proteinMatchList;
@@ -89,6 +91,15 @@ public class SearchResultBean implements MsSearchResult {
      */
     public void setCharge(int charge) {
         this.charge = charge;
+    }
+    
+    @Override
+    public BigDecimal getObservedMass() {
+        return observedMass;
+    }
+    
+    public void setObservedMass(BigDecimal mass) {
+        this.observedMass = mass;
     }
 
     // ----------------------------------------------------------------------------------------

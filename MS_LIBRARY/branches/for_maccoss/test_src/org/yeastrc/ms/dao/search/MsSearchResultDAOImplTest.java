@@ -1,6 +1,7 @@
 package org.yeastrc.ms.dao.search;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +68,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         assertNull(resultDao.load(runSearchId_1));
         
         // insert a search result with NO extra information
-        MsSearchResultIn result1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", false);
+        MsSearchResultIn result1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", new BigDecimal("1024.5"), false);
         int resultId_1 = resultDao.save(searchId_1, result1,  runSearchId_1, 123);// scanId = 123
         
         // read it back
@@ -79,7 +80,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
        
         
         // save another result this time save protein matches
-        MsSearchResultTest result2 = (MsSearchResultTest)makeSearchResult(searchId_1, 3, "PEPTIDE2", false);
+        MsSearchResultTest result2 = (MsSearchResultTest)makeSearchResult(searchId_1, 3, "PEPTIDE2", new BigDecimal("512.5"), false);
         addProteinMatches(result2);
         int resultId_2 = resultDao.save(searchId_1, result2, runSearchId_1, 123); // scanId = 123
         
@@ -93,7 +94,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         // save another result this time save dynamic mods
         // this time use runSearchId_2
-        MsSearchResultIn result3 = makeSearchResult(searchId_1, 3, "PEPTIDE3", true);
+        MsSearchResultIn result3 = makeSearchResult(searchId_1, 3, "PEPTIDE3", new BigDecimal("256.5"), true);
         int resultId_3 = resultDao.save(searchId_1, result3,  runSearchId_2, 321);
         
         // read it back
@@ -158,6 +159,7 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         private List<MsSearchResultProteinIn> proteinMatchList = new ArrayList<MsSearchResultProteinIn>();
         private int charge;
         private int scanNumber;
+        private BigDecimal observedMass;
 
         
         public int getCharge() {
@@ -199,6 +201,14 @@ public class MsSearchResultDAOImplTest extends BaseDAOTestCase {
         
         public void setScanNumber(int scanNum) {
             this.scanNumber = scanNum;
+        }
+
+        @Override
+        public BigDecimal getObservedMass() {
+            return observedMass;
+        }
+        public void setObservedMass(BigDecimal mass) {
+            this.observedMass = mass;
         }
     }
 }

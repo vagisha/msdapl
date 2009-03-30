@@ -71,6 +71,13 @@
     	SELECT id FROM msRunSearch WHERE runID = #runId# AND searchID=#searchId#
     </select>
     
+    <select id="selectIdForSearchAndFile" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msRunSearch AS rs, msRun AS run
+    	WHERE rs.runID = run.id
+    	AND rs.searchID=#searchId#
+    	AND run.filename=#filename#
+    </select>
+    
     <select id="selectFileNameForRunSearchId" resultClass="String" parameterClass="Integer">
     	SELECT filename FROM msRunSearch AS rs, msRun AS run
     	WHERE rs.runID = run.id

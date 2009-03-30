@@ -12,8 +12,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
@@ -47,10 +47,9 @@ import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
-import org.yeastrc.ms.service.UploadServiceFactoryException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
-public abstract class AbstractSQTDataUploadService implements SearchDataUploadService{
+public abstract class AbstractSQTDataUploadService implements SearchDataUploadService {
 
     static final Logger log = Logger.getLogger(AbstractSQTDataUploadService.class);
 
@@ -66,8 +65,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     List<MsResultTerminalModIds> resultTerminalModList;
     Map<String, SQTSearchScan> searchScanMap;
 
-
-    private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
 
     private int numSearchesUploaded = 0;
     
@@ -85,7 +82,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     private List<String> filenames;
     private List<String> rawDataFileNames;
     
-    int lastUploadedRunSearchId;
     int searchId;
     int sequenceDatabaseId; // nrseq database id
 
@@ -93,18 +89,14 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     boolean doScanChargeMassCheck = false; // for data from MacCoss lab
 
     
-    
-    
     public AbstractSQTDataUploadService() {
         this.proteinMatchList = new ArrayList<MsSearchResultProtein>(BUF_SIZE);
         this.resultResidueModList = new ArrayList<MsResultResidueModIds>(BUF_SIZE);
         this.resultTerminalModList = new ArrayList<MsResultTerminalModIds>(BUF_SIZE);
         this.searchScanMap = new HashMap<String, SQTSearchScan>((int) (BUF_SIZE*1.5));
-        this.uploadExceptionList = new ArrayList<UploadException>();
         
         preUploadCheckMsg = new StringBuilder();
         filenames = new ArrayList<String>();
-        rawDataFileNames = new ArrayList<String>();
     }
     
     public void doScanChargeMassCheck(boolean doCheck) {
@@ -120,7 +112,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
         resetCaches();
 
-        uploadExceptionList.clear();
         searchId = 0;
         sequenceDatabaseId = 0;
         programVersion = "uninit";
@@ -136,12 +127,12 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         resultTerminalModList.clear();
         searchScanMap.clear();
 
-        lastUploadedRunSearchId = 0;
+//        lastUploadedRunSearchId = 0;
     }
 
-    public final List<UploadException> getUploadExceptionList() {
-        return this.uploadExceptionList;
-    }
+//    public final List<UploadException> getUploadExceptionList() {
+//        return this.uploadExceptionList;
+//    }
 
     public final int getNumSearchesUploaded() {
         return numSearchesUploaded;
@@ -160,15 +151,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         return scanId;
     }
 
-    static int getNumFilesToUpload(String fileDirectory, Set<String> fileNames) {
-        int num = 0;
-        for (String file: fileNames) {
-            if ((new File(fileDirectory+File.separator+file+".sqt")).exists())
-                num++;
-        }
-        return num;
-    }
-
     static void updateProgramVersion(int searchId, String programVersion) {
         try {
             MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
@@ -179,18 +161,21 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
     }
 
-    static void updateProgram(int searchId, Program program) {
-        try {
-            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-            searchDao.updateSearchProgram(searchId, program);
-        }
-        catch(RuntimeException e) {
-            log.warn("Error updating search program for searchID: "+searchId, e);
-        }
-    }
+//    static void updateProgram(int searchId, Program program) {
+//        try {
+//            MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+//            searchDao.updateSearchProgram(searchId, program);
+//        }
+//        catch(RuntimeException e) {
+//            log.warn("Error updating search program for searchID: "+searchId, e);
+//        }
+//    }
     
     //--------------------------------------------------------------------------------------------------
     // To be implemented by subclasses
+    
+    abstract String searchParamsFile();
+    
     abstract int uploadSearchParameters(int experimentId, String paramFileDirectory, 
             String remoteServer, String remoteDirectory, java.util.Date searchDate) throws UploadException;
     
@@ -204,21 +189,30 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
     
     //--------------------------------------------------------------------------------------------------
-    
-    /**
-     * @param fileDirectory 
-     * @param fileNames names of sqt files (without the .sqt extension)
-     * @param runIdMap map mapping file names to runIds in database
-     * @param remoteServer 
-     * @param remoteDirectory 
-     * @param searchDate 
-     */
-    public int uploadSearch(Set<String> fileNames, Map<String,Integer> runIdMap) {
+    @Override
+    public int upload() throws UploadException {
 
         reset();// reset all caches etc.
         
-        // get the number of sqt file in the directory
-        this.numSearchesToUpload = getNumFilesToUpload(dataDirectory, fileNames);
+        if(!preUploadCheckDone) {
+            if(!preUploadCheckPassed()) {
+                UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+                ex.appendErrorMessage(this.getPreUploadCheckMsg());
+                ex.appendErrorMessage("\n\t!!!SEARCH WILL NOT BE UPLOADED\n");
+                throw ex;
+            }
+        }
+        
+        // get the runIds corresponding to the files we will be uploading
+        Map<String, Integer> runIdMap;
+        try {
+           runIdMap = createRunIdMap();
+        }
+        catch(UploadException e) {
+            e.appendErrorMessage("\n\t!!!SEARCH WILL NOT BE UPLOADED\n");
+            throw e;
+        }
+        
         
         // parse and upload the search parameters
         try {
@@ -227,9 +221,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
         catch (UploadException e) {
             e.appendErrorMessage("\n\t!!!SEARCH WILL NOT BE UPLOADED\n");
-            uploadExceptionList.add(e);
-            log.error(e.getMessage(), e);
-            return 0;
+            throw e;
         }
         
         // initialize the Modification lookup map; will be used when uploading modifications for search results
@@ -237,45 +229,33 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         
         // now upload the individual sqt files
-        for (String file: fileNames) {
-            String filePath = dataDirectory+File.separator+file+".sqt";
+        for (String file: filenames) {
+            String filePath = dataDirectory+File.separator+file;
             // if the file does not exist skip over to the next
             if (!(new File(filePath).exists()))
                 continue;
             Integer runId = runIdMap.get(file); 
-            if (runId == null) {
-                UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SQT);
-                ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
-                uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
-                deleteSearch(searchId);
-                numSearchesUploaded = 0;
-                return 0;
-            }
+            
             resetCaches();
             try {
                 uploadSqtFile(filePath, runId);
                 numSearchesUploaded++;
             }
             catch (UploadException ex) {
-                uploadExceptionList.add(ex);
                 ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
-                log.error(ex.getMessage(), ex);
                 deleteSearch(searchId);
                 numSearchesUploaded = 0;
-                return 0;
+                throw ex;
             }
         }
         
         // if no sqt files were uploaded delete the top level search
         if (numSearchesUploaded == 0) {
             UploadException ex = new UploadException(ERROR_CODE.NO_RUN_SEARCHES_UPLOADED);
-            uploadExceptionList.add(ex);
             ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
-            log.error(ex.getMessage(), ex);
             deleteSearch(searchId);
             numSearchesUploaded = 0;
-            return 0;
+            throw ex;
         }
         
         // Update the "analysisProgramVersion" in the msSearch table
@@ -284,6 +264,23 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
         
         return searchId;
+    }
+
+    private Map<String, Integer> createRunIdMap() throws UploadException {
+        
+        Map<String, Integer> runIdMap = new HashMap<String, Integer>(filenames.size()*2);
+        MsRunDAO runDao = daoFactory.getMsRunDAO();
+        for(String file: filenames) {
+            String filenoext = removeFileExtension(file);
+            int runId = runDao.loadRunIdForExperimentAndFileName(experimentId, filenoext);
+            if(runId == 0) {
+                UploadException ex = new UploadException(ERROR_CODE.NO_RUNID_FOR_SQT);
+                ex.appendErrorMessage("File: "+filenoext);
+                throw ex;
+            }
+            runIdMap.put(file, runId);
+        }
+        return runIdMap;
     }
     
     // get the id of the search database used (will be used to look up protein ids later)
@@ -303,7 +300,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     }
     
     // RUN SEARCH
-    final int uploadSearchHeader(SQTSearchDataProvider provider, int runId, int searchId)
+    final int uploadSearchHeader(SQTSearchDataProvider<?> provider, int runId, int searchId)
         throws DataProviderException {
 
         SQTRunSearchIn search = provider.getSearchHeader();
@@ -345,7 +342,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
      * @return true if the search scan got uploaded, false otherwise
      * @throws UploadException 
      */
-    final boolean uploadSearchScan(SQTSearchScanIn scan, int runSearchId, int scanId) throws UploadException {
+    final boolean uploadSearchScan(SQTSearchScanIn<?> scan, int runSearchId, int scanId) throws UploadException {
         
         // NOTE: Added some changes to deal with duplicate results in MacCoss lab data
         // This will not work if the raw data was not MS2 or CMS2
@@ -532,13 +529,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
     }
 
-    final void deleteLastUploadedRunSearch() {
-        if (lastUploadedRunSearchId == 0)
-            return;
-        MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
-        runSearchDao.deleteRunSearch(lastUploadedRunSearchId);
-    }
-
     public static void deleteSearch(int searchId) {
         if (searchId == 0)
             return;
@@ -582,6 +572,11 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         throw new UnsupportedOperationException();
     }
     
+    @Override
+    public void checkResultChargeMass(boolean check) {
+        this.doScanChargeMassCheck = check;
+    }
+    
     private void appendToMsg(String msg) {
         this.preUploadCheckMsg.append(msg+"\n");
     }
@@ -608,8 +603,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                String name_uc = name.toUpperCase();
-                return name_uc.endsWith(".SQT");
+                String name_uc = name.toLowerCase();
+                return name_uc.endsWith(".sqt");
             }});
         for (int i = 0; i < files.length; i++) {
             filenames.add(files[i].getName());
@@ -625,7 +620,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
                 return false;
             }
             
-            // For now we support only sequest, ee-normalized sequest and ProLuCID sqt files. 
+            // For now we support only sequest and ProLuCID sqt files. 
             if(myType != getSearchFileFormat()) {
                 appendToMsg("Unsupported SQT type for uploader. Expected: "+getSearchFileFormat()+"; Found: "+myType+". File: "+file);
                 return false;
@@ -634,16 +629,49 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         // 4. If we know the raw data file names that will be uploaded match them with up with the SQT files
         //    and make sure there is a raw data file for each SQT file
+        if(rawDataFileNames != null) {
+            for(String file:filenames) {
+                String filenoext = removeFileExtension(file);
+                if(!rawDataFileNames.contains(filenoext)) {
+                    appendToMsg("No corresponding raw data file found for: "+filenoext);
+                    return false;
+                }
+            }
+        }
+        
+        // 5. Make sure the search parameters file is present
+        File paramsFile = new File(dataDirectory+File.separator+searchParamsFile());
+        if(!paramsFile.exists()) {
+            appendToMsg("Cannot fild search parameters file: "+paramsFile.getAbsolutePath());
+            return false;
+        }
         
         preUploadCheckDone = true;
         
         return true;
     }
-    
+
+    private String removeFileExtension(String file) {
+        int idx = file.lastIndexOf(".sqt");
+        if(idx == -1)
+            idx = file.lastIndexOf(".SQT");
+        if(idx != -1)
+            return file.substring(0, idx);
+        else
+            return file;
+    }    
 
     @Override
-    public void setRawDataFileNames(List<String> rawDataFileNames) {
+    public void setRawDataFileNames(List<String> rawDataFileNames, RunFileFormat format) {
         this.rawDataFileNames = rawDataFileNames;
+        // remove extensions from the file names
+        for(String name: rawDataFileNames) {
+            int idx = name.lastIndexOf("."+format.name().toLowerCase());
+            if(idx == -1) 
+                idx = name.lastIndexOf("."+format.name());
+            if(idx != -1)
+                name = name.substring(0, idx);
+        }
     }
     
     @Override
@@ -655,12 +683,6 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     public String getUploadSummary() {
         return "\tSearch file format: "+getSearchFileFormat()+
         "\n\t#Search files in Directory: "+filenames.size()+"; #Uploaded: "+numSearchesUploaded;
-    }
-
-    @Override
-    public int upload() throws UploadException {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
 }

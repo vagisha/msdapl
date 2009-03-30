@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.dao.search.ibatis;
 
+import java.math.BigDecimal;
+
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
@@ -31,6 +33,9 @@ public class MsSearchResultWrap {
     }
     public int getCharge() {
         return result.getCharge();
+    }
+    public BigDecimal getObservedMass() {
+        return result.getObservedMass();
     }
     public ValidationStatus getValidationStatus() {
         return result.getValidationStatus();

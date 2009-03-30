@@ -67,8 +67,7 @@ public class DbToSqtFileConverter {
             printSqtHeader(runSearch);
             outFile.write("\n");
             SearchFileFormat origFileType = runSearch.getSearchFileFormat();
-            if (origFileType == SearchFileFormat.SQT_SEQ || 
-                origFileType == SearchFileFormat.SQT_NSEQ) {
+            if (origFileType == SearchFileFormat.SQT_SEQ) {
                 printSequestSQTData(runSearch, searchDatabaseId, outFile);
             }
             else if (origFileType == SearchFileFormat.SQT_PLUCID) {
@@ -122,6 +121,7 @@ public class DbToSqtFileConverter {
             SequestResult peptResult = new SequestResult(dynaResidueMods);
             SequestResultData data = result.getSequestResultData();
             peptResult.setCharge(result.getCharge());
+            peptResult.setObservedMass(result.getObservedMass());
             peptResult.setDeltaCN(data.getDeltaCN());
             peptResult.setMass(data.getCalculatedMass());
             peptResult.setNumMatchingIons(data.getMatchingIons());

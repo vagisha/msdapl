@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS msData;
-CREATE DATABASE msData;
-USE msData;
+DROP DATABASE IF EXISTS msData_junit;
+CREATE DATABASE msData_junit;
+USE msData_junit;
 
 
 # EXPERIMENT
@@ -185,6 +185,7 @@ CREATE TABLE msRunSearchResult (
    runSearchID INT UNSIGNED NOT NULL,
    scanID INT UNSIGNED NOT NULL,
    charge TINYINT NOT NULL,
+   observedMass DECIMAL(18,9),
    peptide VARCHAR(500) NOT NULL,
    preResidue CHAR(1),
    postResidue CHAR(1),
@@ -214,7 +215,6 @@ CREATE TABLE SQTSpectrumData (
    processTime INT UNSIGNED,
    serverName VARCHAR(50),
    totalIntensity DECIMAL(18,9),
-   observedMass DECIMAL(18,9),
    lowestSp DECIMAL(10,5),
    sequenceMatches INT UNSIGNED
 );

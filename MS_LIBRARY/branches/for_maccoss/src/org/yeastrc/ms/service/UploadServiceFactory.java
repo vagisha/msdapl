@@ -53,7 +53,6 @@ public class UploadServiceFactory {
         }
         
         File[] files = dir.listFiles();
-        String name = null;
         Set<RunFileFormat> formats = new HashSet<RunFileFormat>();
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory())
@@ -105,7 +104,6 @@ public class UploadServiceFactory {
         }
         
         File[] files = dir.listFiles();
-        String name = null;
         Set<SearchFileFormat> formats = new HashSet<SearchFileFormat>();
         Set<String> filenames = new HashSet<String>();
         for (int i = 0; i < files.length; i++) {
@@ -137,7 +135,7 @@ public class UploadServiceFactory {
             // we know that we have SQT files in this directory
             // now figure out which program generated these files.
             SearchFileFormat sqtFormat = getSqtType(dataDirectory, filenames);
-            if (sqtFormat == SearchFileFormat.SQT_SEQ || sqtFormat == SearchFileFormat.SQT_NSEQ) {
+            if (sqtFormat == SearchFileFormat.SQT_SEQ) {
                 SearchDataUploadService service = new SequestSQTDataUploadService(sqtFormat);
                 service.setDirectory(dataDirectory);
                 return service;
@@ -150,7 +148,8 @@ public class UploadServiceFactory {
             else if (sqtFormat == SearchFileFormat.SQT_PERC) {
                 SearchParamsDataProvider paramsProvider = new SequestParamsParser();
                 PeptideResultBuilder peptbuilder = SequestResultPeptideBuilder.instance();
-                BaseSQTDataUploadService service = new BaseSQTDataUploadService(paramsProvider, peptbuilder, Program.PERCOLATOR);
+                BaseSQTDataUploadService service = new BaseSQTDataUploadService(paramsProvider, peptbuilder, 
+                        Program.SEQUEST, SearchFileFormat.SQT_PERC);
                 return service;
             }
             else {
@@ -238,7 +237,7 @@ public class UploadServiceFactory {
             
             // For now we support only sequest, ee-normalized sequest and ProLuCID sqt files. 
             if (SearchFileFormat.SQT_SEQ != myType && 
-                    SearchFileFormat.SQT_NSEQ != myType &&
+//                    SearchFileFormat.SQT_NSEQ != myType &&
                     SearchFileFormat.SQT_PLUCID != myType &&
                     SearchFileFormat.SQT_PERC != myType) {
                 throw new UploadServiceFactoryException("We do not currently have support for the SQT format: "+myType);

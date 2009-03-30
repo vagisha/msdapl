@@ -26,8 +26,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParam;
@@ -40,7 +40,6 @@ import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.service.MsDataUploader;
-import org.yeastrc.ms.service.UploadException;
 
 public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 
@@ -64,15 +63,12 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 //      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
+        uploader.doUploadSearch(true);
         int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
-        try {
-            experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("Data is valid");
-        }
+        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
+        experimentId = uploader.getUploadedExperimentId();
+        
         assertEquals(0, uploader.getUploadExceptionList().size());
         assertNotSame(0, experimentId);
         checkUploadedSearch(uploader.getUploadedSearchId(), searchDate, dir);
@@ -83,15 +79,11 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 //      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
+        uploader.doUploadSearch(true);
         int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
-        try {
-            experimentId = uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("Data is valid");
-        }
+        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
+        experimentId = uploader.getUploadedExperimentId();
         assertEquals(0, uploader.getUploadExceptionList().size());
         assertNotSame(0, experimentId);
         checkUploadedSearch(uploader.getUploadedSearchId(), searchDate, dir);
@@ -101,8 +93,8 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
     private void checkUploadedSearch(int searchId, java.util.Date searchDate, String dir) {
 
         // make sure all the data got uploaded
-        int runId1 = getRunId("1.ms2");
-        int runId2 = getRunId("2.ms2");
+        int runId1 = getRunId("1");
+        int runId2 = getRunId("2");
         assertNotSame(0, runId1);
         assertNotSame(0, runId2);
 
@@ -122,7 +114,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(3, scan.getCharge());
         assertEquals(22, scan.getProcessTime());
         assertEquals("shamu048", scan.getServerName());
-        assertEquals(866.46, scan.getObservedMass().doubleValue());
+//        assertEquals(866.46, scan.getObservedMass().doubleValue());
         assertEquals(1892.2, scan.getTotalIntensity().doubleValue());
         assertEquals(56.4, scan.getLowestSp().doubleValue());
         assertEquals(4716510, scan.getSequenceMatches());
@@ -134,7 +126,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, scan.getCharge());
         assertEquals(22, scan.getProcessTime());
         assertEquals("shamu049", scan.getServerName());
-        assertEquals(807.67000, scan.getObservedMass().doubleValue());
+//        assertEquals(807.67000, scan.getObservedMass().doubleValue());
         assertEquals(2681.7, scan.getTotalIntensity().doubleValue());
         assertEquals(95.3, scan.getLowestSp().doubleValue());
         assertEquals(5138490, scan.getSequenceMatches());
@@ -146,7 +138,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, scan.getCharge());
         assertEquals(23, scan.getProcessTime());
         assertEquals("shamu050", scan.getServerName());
-        assertEquals(717.62000, scan.getObservedMass().doubleValue());
+//        assertEquals(717.62000, scan.getObservedMass().doubleValue());
         assertEquals(4000.6, scan.getTotalIntensity().doubleValue());
         assertEquals(111.6, scan.getLowestSp().doubleValue());
         assertEquals(5928764, scan.getSequenceMatches());
@@ -158,7 +150,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, scan.getCharge());
         assertEquals(23, scan.getProcessTime());
         assertEquals("shamu048", scan.getServerName());
-        assertEquals(817.33, scan.getObservedMass().doubleValue());
+//        assertEquals(817.33, scan.getObservedMass().doubleValue());
         assertEquals(2044.4, scan.getTotalIntensity().doubleValue());
         assertEquals(69.6, scan.getLowestSp().doubleValue());
         assertEquals(5697304, scan.getSequenceMatches());
@@ -174,6 +166,7 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
         ProlucidSearchResult res = presDao.load(ids.get(0));
         assertEquals(getScanId(runId, 23), res.getScanId());
         assertEquals(3, res.getCharge());
+        assertEquals(866.46, res.getObservedMass().doubleValue());
         assertEquals("SDMSASRI", res.getResultPeptide().getPeptideSequence());
         assertEquals('L', res.getResultPeptide().getPreResidue());
         assertEquals('T', res.getResultPeptide().getPostResidue());

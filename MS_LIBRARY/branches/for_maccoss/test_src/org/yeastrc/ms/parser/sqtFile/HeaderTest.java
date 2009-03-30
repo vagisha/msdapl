@@ -156,7 +156,7 @@ public class HeaderTest extends TestCase {
     
     public void testParseHeader() {
         SQTFileReader reader = new SQTFileReader(){
-            public SQTSearchScanIn getNextSearchScan()
+            protected SQTSearchScanIn nextSearchScan()
                     throws DataProviderException {
                 throw new UnsupportedOperationException();
             }};

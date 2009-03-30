@@ -91,8 +91,14 @@ public class MS2Header implements MS2RunIn {
         this.sha1Sum = sha1Sum;
     }
     
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setFileName(String fileName, RunFileFormat format) {
+        int idx = fileName.lastIndexOf("."+format.name().toLowerCase());
+        if(idx == -1)
+            idx = fileName.lastIndexOf("."+format.name());
+        if(idx == -1)
+            this.fileName = fileName;
+        else
+            this.fileName = fileName.substring(0, idx);
     }
     
     public String getSha1Sum() {
@@ -101,17 +107,6 @@ public class MS2Header implements MS2RunIn {
     
     public String getFileName() {
         return fileName;
-    }
-   
-    @Override
-    public String getFileNameNoExt() {
-        String fn = fileName;
-        if(fn == null)
-            return null;
-        int idx = fn.lastIndexOf('.');
-        if (idx != -1)
-            fn = fn.substring(0, idx);
-        return fn;
     }
     
     public String getCreationDate() {

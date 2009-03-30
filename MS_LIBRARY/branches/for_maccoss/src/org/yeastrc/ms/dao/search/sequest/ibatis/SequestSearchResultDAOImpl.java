@@ -246,6 +246,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         result.setRunSearchId(rs.getInt("runSearchID"));
         result.setScanId(rs.getInt("scanID"));
         result.setCharge(rs.getInt("charge"));
+        result.setObservedMass(rs.getBigDecimal("observedMass"));
         result.setPeptideSequence(rs.getString("peptide"));
         String preRes = rs.getString("preResidue");
         if(preRes != null)
@@ -273,6 +274,12 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     @Override
     public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge) {
         return resultDao.loadResultIdsForSearchScanCharge(runSearchId, scanId, charge);
+    }
+    
+    @Override
+    public int numResultsForRunSearchScanChargeMass(int runSearchId,
+            int scanId, int charge, BigDecimal mass) {
+        return resultDao.numResultsForRunSearchScanChargeMass(runSearchId, scanId, charge, mass);
     }
     
     @Override
@@ -349,10 +356,10 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         resultDao.delete(resultId);
     }
 
-    @Override
-    public void deleteResults(int runSearchId, int scanId, int charge) {
-        resultDao.deleteResults(runSearchId, scanId, charge);
-    }
+//    @Override
+//    public void deleteResults(int runSearchId, int scanId, int charge) {
+//        resultDao.deleteResults(runSearchId, scanId, charge);
+//    }
     
     public static final class SequestResultDataSqlMapParam implements SequestResultDataWId {
         

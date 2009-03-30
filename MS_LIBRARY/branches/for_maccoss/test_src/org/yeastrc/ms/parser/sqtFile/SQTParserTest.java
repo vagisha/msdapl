@@ -107,8 +107,8 @@ public class SQTParserTest extends TestCase {
         reader = new StringReader(sequestHeader());
         assertEquals(SearchFileFormat.SQT_SEQ, SQTFileReader.getSearchFileType("dummy", reader));
 
-        reader = new StringReader(normSequestHeader());
-        assertEquals(SearchFileFormat.SQT_NSEQ, SQTFileReader.getSearchFileType("dummy", reader));
+//        reader = new StringReader(normSequestHeader());
+//        assertEquals(SearchFileFormat.SQT_NSEQ, SQTFileReader.getSearchFileType("dummy", reader));
     }
 
     private String percolatorHeader() {
@@ -247,7 +247,7 @@ public class SQTParserTest extends TestCase {
         return new SQTFileReader(){
 
             @Override
-            public SQTSearchScanIn getNextSearchScan()
+            protected SQTSearchScanIn nextSearchScan()
                     throws DataProviderException {
                 throw new UnsupportedOperationException();
             }};

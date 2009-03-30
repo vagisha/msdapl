@@ -1,5 +1,6 @@
 package org.yeastrc.ms.dao.analysis.percolator.ibatis;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +73,7 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
 
         List<PercolatorResultDataWId> dataList = new ArrayList<PercolatorResultDataWId>(3);
         for(int i = 1; i < 4; i++) {
-            MsSearchResultIn result = this.makeSearchResult(1, 2, "PEPTIDE", true); // searchId = 1; charge = 2;
+            MsSearchResultIn result = this.makeSearchResult(1, 2, "PEPTIDE", new BigDecimal("1024.5"), true); // searchId = 1; charge = 2;
             int id = resultDao.save(1, result, 2, 3); // searchId= 1; runsearchId=2; scanId = 3
             PercolatorResultDataBean data = new PercolatorResultDataBean();
             data.setResultId(id);
@@ -91,7 +92,7 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
     public final void testLoadResultIdsWithQvalueThreshold() {
         List<PercolatorResultDataWId> dataList = new ArrayList<PercolatorResultDataWId>(3);
         for(int i = 1; i < 4; i++) {
-            MsSearchResultIn result = this.makeSearchResult(1, 2, "PEPTIDE", true); // searchId = 1; charge = 2;
+            MsSearchResultIn result = this.makeSearchResult(1, 2, "PEPTIDE", new BigDecimal("1024.5"), true); // searchId = 1; charge = 2;
             int id = resultDao.save(1, result, 2, 3); // searchId= 1; runsearchId=2; scanId = 3
             PercolatorResultDataBean data = new PercolatorResultDataBean();
             data.setResultId(id);
@@ -113,10 +114,10 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
         int searchId = searchDao.saveSearch(search, 2, 56);
         
         // save a couple of search results
-        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", false);
+        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", new BigDecimal("1024.5"), false);
         int resultId1 = resultDao.save(searchId, result1, 12, 999);
         
-        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", false);
+        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", new BigDecimal("1024.5"), false);
         int resultId2 = resultDao.save(searchId, result2, 13, 1999);
         
         // save percolator results for each search result
@@ -172,13 +173,13 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
         int searchId = searchDao.saveSearch(search, 2, 56);
         
         // save some of search results
-        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", false);
+        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", new BigDecimal("1024.5"), false);
         int resultId1 = resultDao.save(searchId, result1, 12, 999); // runSearchId = 12
         
-        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", false);
+        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", new BigDecimal("1024.5"), false);
         int resultId2 = resultDao.save(searchId, result2, 13, 1999); // runSearchId = 13
         
-        MsSearchResultIn result3 = super.makeSearchResult(searchId, 3, "PEPTIDE2", false);
+        MsSearchResultIn result3 = super.makeSearchResult(searchId, 3, "PEPTIDE2", new BigDecimal("1024.5"), false);
         int resultId3 = resultDao.save(searchId, result3, 13, 2000); // runSearchId = 13
         
         // save percolator results for each search result
@@ -219,13 +220,13 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
         int searchId = searchDao.saveSearch(search, 2, 56);
         
         // save some of search results
-        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", false);
+        MsSearchResultIn result1 = super.makeSearchResult(searchId, 3, "PEPTIDE", new BigDecimal("1024.5"), false);
         int resultId1 = resultDao.save(searchId, result1, 12, 999); // runSearchId = 12; scanID=999
         
-        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", false);
+        MsSearchResultIn result2 = super.makeSearchResult(searchId, 2, "EDITPEP", new BigDecimal("1024.5"), false);
         int resultId2 = resultDao.save(searchId, result2, 13, 1999); // runSearchId = 13; scanID=1999
         
-        MsSearchResultIn result3 = super.makeSearchResult(searchId, 3, "PEPTIDE2", false);
+        MsSearchResultIn result3 = super.makeSearchResult(searchId, 3, "PEPTIDE2", new BigDecimal("1024.5"), false);
         int resultId3 = resultDao.save(searchId, result3, 13, 2000); // runSearchId = 13; scanID=2000
         
         
@@ -278,7 +279,7 @@ public class PercolatorResultDAOImplTest extends BaseDAOTestCase {
         List<PercolatorResultDataWId> dataList = new ArrayList<PercolatorResultDataWId>(3);
         for(int i = 1; i < 4; i++) {
             
-            MsSearchResultIn result = super.makeSearchResult(1, i, "PEPTIDE", false); // searchID = 1; charge = i
+            MsSearchResultIn result = super.makeSearchResult(1, i, "PEPTIDE", new BigDecimal("1024.5"), false); // searchID = 1; charge = i
             int resultId = resultDao.save(1, result, 12, 111*i); // searchID = 1; // runSearchID = 12; scanID=111*i
             
             PercolatorResultDataBean data = new PercolatorResultDataBean();

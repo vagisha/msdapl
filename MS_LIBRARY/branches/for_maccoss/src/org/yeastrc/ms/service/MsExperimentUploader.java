@@ -17,7 +17,7 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 /**
  * 
  */
-public class MsExperimentUploader implements UploadService {
+public class MsExperimentUploader {
 
     private static final Logger log = Logger.getLogger(MsExperimentUploader.class);
     
@@ -65,12 +65,10 @@ public class MsExperimentUploader implements UploadService {
         this.do_adupload = true;
     }
 
-    @Override
     public void setDirectory(String directory) {
         this.uploadDirectory = directory;
     }
     
-    @Override
     public boolean preUploadCheckPassed() {
         boolean passed = true;
         
@@ -78,6 +76,10 @@ public class MsExperimentUploader implements UploadService {
         // Raw data uploader check
         if(rdus == null) {
             appendToMsg("RawDataUploader was null");
+            passed = false;
+        }
+        else if(!rdus.preUploadCheckPassed())  {
+            appendToMsg(rdus.getPreUploadCheckMsg());
             passed = false;
         }
         if(!passed) log.info("...FAILED");
@@ -125,7 +127,6 @@ public class MsExperimentUploader implements UploadService {
         return passed;
     }
     
-    @Override
     public String getPreUploadCheckMsg() {
         return preUploadCheckMsg.toString();
     }
@@ -137,8 +138,10 @@ public class MsExperimentUploader implements UploadService {
         summary.append("\tRemote server: "+remoteServer+"\n");
         summary.append("\tRemote directory: "+remoteDirectory+"\n");
         summary.append(rdus.getUploadSummary()+"\n");
-        summary.append(sdus.getUploadSummary()+"\n");
-        summary.append(adus.getUploadSummary()+"\n");
+        if(do_sdupload)
+            summary.append(sdus.getUploadSummary()+"\n");
+        if(do_adupload)
+            summary.append(adus.getUploadSummary()+"\n");
         summary.append("\n");
         return summary.toString();
     }
@@ -147,16 +150,19 @@ public class MsExperimentUploader implements UploadService {
         preUploadCheckMsg.append(msg+"\n");
     }
     
-    @Override
-    public int upload() throws UploadException {
-       
-        logBeginExperimentUpload();
-        long start = System.currentTimeMillis();
+    public int uploadRawData() throws UploadException {
         
         // first create an entry in the msExperiment table
         experimentId = saveExperiment();
         log.info("\n\nAdded entry for experiment ID: "+experimentId+"\n\n");
         
+        uploadRawData(experimentId);
+        return experimentId;
+    }
+    
+    public void uploadRawData(int experimentId) throws UploadException {
+        
+        this.experimentId = experimentId;
         
         // upload raw data
         rdus.setExperimentId(experimentId);
@@ -167,25 +173,38 @@ public class MsExperimentUploader implements UploadService {
             deleteExperiment(experimentId);
             throw ex;
         }
-        
+    }
+    
+    public int uploadSearchData() throws UploadException {
         
         // if we have search data upload that next
+        int searchId;
         if(do_sdupload) {
             sdus.setExperimentId(experimentId);
+            sdus.setRawDataFileNames(rdus.getFileNames(), rdus.getFileFormat());
             searchId = sdus.upload();
         }
+        else {
+            log.error("No SearchDataUploadService found");
+            return 0;
+        }
+        return searchId;
         
+    }
+    
+    public int uploadAnalysisData() throws UploadException {
+        
+        int analysisId;
         // if we have post-search analysis data upload that next
-        int searchAnalysisId = 0;
         if(do_adupload) {
             adus.setSearchId(searchId);
-            searchAnalysisId = adus.upload();
+            analysisId = adus.upload();
         }
-        
-        long end = System.currentTimeMillis();
-        logEndExperimentUpload(start, end);
-        
-        return experimentId;
+        else {
+            log.error("No AnalysisDataUploadService found");
+            return 0;
+        }
+        return analysisId;
     }
     
     private int saveExperiment() throws UploadException {
@@ -224,6 +243,5 @@ public class MsExperimentUploader implements UploadService {
                 "\n\tRAW DATA UPLOAD: "+do_rdupload+
                 "\n\tSEARCH DATA UPLOAD: "+do_sdupload+
                 "\n\tANALYSIS DATA UPLOAD: "+do_adupload);
-                
     }
 }

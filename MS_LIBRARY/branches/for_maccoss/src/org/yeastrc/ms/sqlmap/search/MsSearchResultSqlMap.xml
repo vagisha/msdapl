@@ -28,6 +28,7 @@
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="scanId" column="scanID" nullValue="0"/>
 		<result property="charge" column="charge" nullValue="0"/>
+		<result property="observedMass" column="observedMass"/>
 		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
 		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
 		<result property="proteinMatchList" 
@@ -40,6 +41,7 @@
 		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="charge" jdbcType="TINYINT" nullValue="0"/>
+		<parameter property="observedMass" jdbcType="DECIMAL"/>
 		<parameter property="peptideSequence" jdbcType="VARCHAR"/>
 		<parameter property="preResidueString" jdbcType="CHAR" nullValue=""/>
 		<parameter property="postResidueString" jdbcType="CHAR" nullValue=""/>
@@ -70,6 +72,14 @@
     	AND charge = #charge#
     </select>
     
+    <select id="countResultsForRunSearchScanChargeMass" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(id) FROM msRunSearchResult 
+    	WHERE runSearchID = #runSearchId# 
+    	AND scanID = #scanId#
+    	AND charge = #charge#
+    	AND observedMass = #observedMass#
+    </select>
+    
     <select id="selectResultIdsForRunSearchScan" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msRunSearchResult 
     	WHERE runSearchID = #runSearchId# 
@@ -81,11 +91,12 @@
     	runSearchID,
     	scanID,
     	charge,
+    	observedMass,
     	peptide,
     	preResidue,
     	postResidue,
     	validationStatus) 
-    	VALUES (?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?)
     	<selectKey resultClass="int" >
       		select last_insert_id() as id
     	</selectKey>

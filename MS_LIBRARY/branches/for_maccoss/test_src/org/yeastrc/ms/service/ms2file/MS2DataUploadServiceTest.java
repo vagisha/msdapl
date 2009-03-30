@@ -7,18 +7,12 @@ import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsRunLocation;
-import org.yeastrc.ms.domain.run.RunFileFormat;
-import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
-import org.yeastrc.ms.domain.run.ms2file.MS2Run;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.service.MsDataUploader;
-import org.yeastrc.ms.service.UploadException;
 
 public class MS2DataUploadServiceTest extends BaseDAOTestCase {
 
@@ -37,22 +31,21 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // -------------------------------------------------------------------------------------------
         // UPLOAD 1
         MsDataUploader uploader = new MsDataUploader();
+        uploader.doUploadSearch(true);
         int experimentId1 = 0;
-        try {
-            experimentId1 = uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("directory has valid data");
-        }
+        uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
+        experimentId1 = uploader.getUploadedExperimentId();
+        assertNotSame(0, experimentId1);
+        assertEquals(0, uploader.getUploadExceptionList().size());
+        
         
         assertTrue(experimentId1 > 0);
-        List<Integer> runIds = runDao.loadRunIdsForFileName("1.ms2");
+        List<Integer> runIds = runDao.loadRunIdsForFileName("1");
         assertEquals(1, runIds.size());
         int runId1 = runIds.get(0);
         assertNotSame(0, runId1);
 
-        runIds = runDao.loadRunIdsForFileName("2.ms2");
+        runIds = runDao.loadRunIdsForFileName("2");
         assertEquals(1, runIds.size());
         int runId2 = runIds.get(0);
         assertNotSame(0, runId2);
@@ -76,14 +69,14 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // -------------------------------------------------------------------------------------------
         // UPLOAD 2
         // upload with different values for serverAddress and serverDirectory
+        uploader = new MsDataUploader();
+        uploader.doUploadSearch(true);
         int experimentId2 = 0;
-        try {
-            experimentId2 = uploader.uploadExperimentToDb("remote.server.again", "remote/directory/2", dir, new Date());
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("directory has valid data");
-        }
+        uploader.uploadExperimentToDb("remote.server.again", "remote/directory/2", dir, new Date());
+        experimentId2 = uploader.getUploadedExperimentId();
+        assertNotSame(0, experimentId2);
+        assertEquals(0, uploader.getUploadExceptionList().size());
+        
         assertTrue(experimentId2 > 0);
         // make sure there in an entry in the msExperimentRun table for the two runs;
         assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId1));
@@ -117,22 +110,22 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // UPLOAD 3
         // upload again but this time use the same values for serverAddress and serverDirectory
         // as the first upload
+        uploader = new MsDataUploader();
+        uploader.doUploadSearch(true);
         int experimentId3 = 0;
-        try {
-            experimentId3 = uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-            fail("directory has valid data");
-        }
+        uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
+        experimentId3 = uploader.getUploadedExperimentId();
+        assertNotSame(0, experimentId3);
+        assertEquals(0, uploader.getUploadExceptionList().size());
+        
         assertTrue(experimentId3 > 0);
         // make sure there in an entry in the msExperimentRun table for the two runs;
         assertEquals(1, exptDao.getMatchingExptRunCount(experimentId3, runId1));
         assertEquals(1, exptDao.getMatchingExptRunCount(experimentId3, runId2));
         
         // no additional entries should be created 
-        assertEquals(1, runDao.loadRunIdsForFileName("1.ms2").size());
-        assertEquals(1, runDao.loadRunIdsForFileName("2.ms2").size());
+        assertEquals(1, runDao.loadRunIdsForFileName("1").size());
+        assertEquals(1, runDao.loadRunIdsForFileName("2").size());
         locs = runDao.loadLocationsForRun(runId1);
         assertEquals(2, locs.size());
         locs = runDao.loadLocationsForRun(runId2);
@@ -150,13 +143,10 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         int oldSearchId = searchIds.get(0);
         assertEquals(1, searchIds.size());
         assertEquals(2, runSearchDao.loadRunSearchIdsForSearch(oldSearchId).size());
-        try {
-            uploader.uploadExperimentToDb(experimentId2, dir, new Date());
-        }
-        catch(UploadException e) {
-            e.printStackTrace();
-            fail("directory has valid data");
-        }
+        uploader = new MsDataUploader();
+        uploader.doUploadSearch(true);
+        uploader.uploadExperimentToDb(experimentId2, dir, new Date());
+        
         // make sure the lastUpdate date is > the upload date
         MsExperiment expt = exptDao.loadExperiment(experimentId2);
         assertEquals("remote.server.again", expt.getServerAddress());
@@ -169,11 +159,12 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // in the msExperimentRun table
         assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId1));
         assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId2));
+        // NOTE(03/29/09) old searches are no longer deleted
         // any old searches for the experiment should have been deleted; we should still 
         // have the same number of search as before
         searchIds = searchDao.getSearchIdsForExperiment(experimentId2);
-        int newSearchId = searchIds.get(0);
-        assertEquals(1, searchIds.size());
+        int newSearchId = searchIds.get(1);
+        assertEquals(2, searchIds.size()); // see NOTE(03/29/09)
         assertTrue(oldSearchId != newSearchId);
         assertEquals(2, runSearchDao.loadRunSearchIdsForSearch(newSearchId).size());
     }
@@ -207,112 +198,112 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
 //        }
 //    }
     
-    private int checkRun(String runFileName, String sha1sum) {
-        List<Integer> runIds = runDao.loadRunIdsForFileName(runFileName);
-        assertEquals(1, runIds.size());
-        int runId = runIds.get(0);
-        assertNotSame(0, runId);
-        
-        MS2RunDAO ms2runDao = DAOFactory.instance().getMS2FileRunDAO();
-        MS2Run run = ms2runDao.loadRun(runId);
-        assertNotNull(run);
-        
-        // check values from msRun table
-        assertEquals(runFileName, run.getFileName());
-        assertEquals(sha1sum, run.getSha1Sum());
-        if (runFileName.equals("1.ms2")) {
-            assertEquals("3/22/2005 9:46:00 AM", run.getCreationDate());
-            assertEquals("MakeMS2", run.getConversionSW());
-            assertEquals("1.0", run.getConversionSWVersion());
-            assertEquals("MS2", run.getConversionSWOptions());
-            assertNull(run.getInstrumentModel());
-            assertNull(run.getInstrumentVendor());
-            assertNull(run.getInstrumentSN());
-            assertNull(run.getAcquisitionMethod());
-            assertEquals(RunFileFormat.MS2, run.getRunFileFormat());
-            assertEquals("MakeMS2 written by Michael J. MacCoss, 2004", run.getComment());
-        }
-        else { 
-            assertEquals("12/20/2007 2:29:19 PM", run.getCreationDate());
-            assertEquals("RAWXtract", run.getConversionSW());
-            assertEquals("1.8", run.getConversionSWVersion());
-            assertEquals("MS2", run.getConversionSWOptions());
-            assertEquals("ITMS", run.getInstrumentModel());
-            assertNull(run.getInstrumentVendor());
-            assertNull(run.getInstrumentSN());
-            assertEquals("Data-Dependent", run.getAcquisitionMethod());
-            assertEquals(RunFileFormat.MS2, run.getRunFileFormat());
-            assertEquals("RawXtract written by John Venable, 2003", run.getComment());
-        }
-        
-        // check values from msRunEnzyme table
-        assertEquals(0, enzymeDao.loadEnzymesForRun(runId).size());
-        
-        // check values from msRunLocation table
-        List<MsRunLocation> locs = runDao.loadLocationsForRun(runId);
-        assertEquals(1, locs.size());
-        assertEquals("remoteDirectory", locs.get(0).getServerDirectory());
-        assertEquals(runId, locs.get(0).getRunId());
-        // testting the other method: should really be in test class for runDao
-        int locs2 = runDao.loadMatchingRunLocations(runId, "remoteDirectory");
-        assertEquals(1, locs2);
-       
-        
-        // check values in MS2FileHeaders table
-        MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
-        List<MS2NameValuePair> headers = headerDao.loadHeadersForRun(runId);
-        
-        if (runFileName.equals("1.ms2")) {
-            assertEquals(5, headers.size());
-            int i = 0;
-            assertEquals("CreationDate", headers.get(i).getName());
-            assertEquals("3/22/2005 9:46:00 AM", headers.get(i++).getValue());
-            assertEquals("Extractor", headers.get(i).getName());
-            assertEquals("MakeMS2", headers.get(i++).getValue());
-            assertEquals("ExtractorVersion", headers.get(i).getName());
-            assertEquals("1.0", headers.get(i++).getValue());
-            assertEquals("Comments", headers.get(i).getName());
-            assertEquals("MakeMS2 written by Michael J. MacCoss, 2004", headers.get(i++).getValue());
-            assertEquals("ExtractorOptions", headers.get(i).getName());
-            assertEquals("MS2", headers.get(i++).getValue());
-        }
-        else {
-            assertEquals(13, headers.size());
-            int i = 0;
-            assertEquals("FilteringProgram", headers.get(i).getName());
-            assertEquals("Parc", headers.get(i++).getValue());
-            assertEquals("CreationDate", headers.get(i).getName());
-            assertEquals("12/20/2007 2:29:19 PM", headers.get(i++).getValue());
-            assertEquals("Extractor", headers.get(i).getName());
-            assertEquals("RAWXtract", headers.get(i++).getValue());
-            assertEquals("ExtractorVersion", headers.get(i).getName());
-            assertEquals("1.8", headers.get(i++).getValue());
-            assertEquals("Comments", headers.get(i).getName());
-            assertEquals("RawXtract written by John Venable, 2003", headers.get(i++).getValue());
-            assertEquals("ExtractorOptions", headers.get(i).getName());
-            assertEquals("MS2", headers.get(i++).getValue());
-            assertEquals("AcquisitionMethod", headers.get(i).getName());
-            assertEquals("Data-Dependent", headers.get(i++).getValue());
-            assertEquals("InstrumentType", headers.get(i).getName());
-            assertEquals("ITMS", headers.get(i++).getValue());
-            assertEquals("ScanType", headers.get(i).getName());
-            assertEquals("MS2", headers.get(i++).getValue());
-            assertEquals("DataType", headers.get(i).getName());
-            assertEquals("Centroid", headers.get(i++).getValue());
-            assertEquals("IsolationWindow", headers.get(i).getName());
-            assertNull(headers.get(i++).getValue());
-            assertEquals("FirstScan", headers.get(i).getName());
-            assertEquals("1", headers.get(i++).getValue());            
-            assertEquals("LastScan", headers.get(i).getName());
-            assertEquals("17903", headers.get(i++).getValue());
-        }
-        
-        // check values in msScan table and related tables (for each scan in the ms2 file)
-        if (runFileName.equals("1.ms2")) checkScansFor_1ms2(runId);
-        else checkScansFor_2ms2(runId);
-        
-        return runId;
-    }
+//    private int checkRun(String runFileName, String sha1sum) {
+//        List<Integer> runIds = runDao.loadRunIdsForFileName(runFileName);
+//        assertEquals(1, runIds.size());
+//        int runId = runIds.get(0);
+//        assertNotSame(0, runId);
+//        
+//        MS2RunDAO ms2runDao = DAOFactory.instance().getMS2FileRunDAO();
+//        MS2Run run = ms2runDao.loadRun(runId);
+//        assertNotNull(run);
+//        
+//        // check values from msRun table
+//        assertEquals(runFileName, run.getFileName()+".ms2");
+//        assertEquals(sha1sum, run.getSha1Sum());
+//        if (runFileName.equals("1.ms2")) {
+//            assertEquals("3/22/2005 9:46:00 AM", run.getCreationDate());
+//            assertEquals("MakeMS2", run.getConversionSW());
+//            assertEquals("1.0", run.getConversionSWVersion());
+//            assertEquals("MS2", run.getConversionSWOptions());
+//            assertNull(run.getInstrumentModel());
+//            assertNull(run.getInstrumentVendor());
+//            assertNull(run.getInstrumentSN());
+//            assertNull(run.getAcquisitionMethod());
+//            assertEquals(RunFileFormat.MS2, run.getRunFileFormat());
+//            assertEquals("MakeMS2 written by Michael J. MacCoss, 2004", run.getComment());
+//        }
+//        else { 
+//            assertEquals("12/20/2007 2:29:19 PM", run.getCreationDate());
+//            assertEquals("RAWXtract", run.getConversionSW());
+//            assertEquals("1.8", run.getConversionSWVersion());
+//            assertEquals("MS2", run.getConversionSWOptions());
+//            assertEquals("ITMS", run.getInstrumentModel());
+//            assertNull(run.getInstrumentVendor());
+//            assertNull(run.getInstrumentSN());
+//            assertEquals("Data-Dependent", run.getAcquisitionMethod());
+//            assertEquals(RunFileFormat.MS2, run.getRunFileFormat());
+//            assertEquals("RawXtract written by John Venable, 2003", run.getComment());
+//        }
+//        
+//        // check values from msRunEnzyme table
+//        assertEquals(0, enzymeDao.loadEnzymesForRun(runId).size());
+//        
+//        // check values from msRunLocation table
+//        List<MsRunLocation> locs = runDao.loadLocationsForRun(runId);
+//        assertEquals(1, locs.size());
+//        assertEquals("remoteDirectory", locs.get(0).getServerDirectory());
+//        assertEquals(runId, locs.get(0).getRunId());
+//        // testting the other method: should really be in test class for runDao
+//        int locs2 = runDao.loadMatchingRunLocations(runId, "remoteDirectory");
+//        assertEquals(1, locs2);
+//       
+//        
+//        // check values in MS2FileHeaders table
+//        MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
+//        List<MS2NameValuePair> headers = headerDao.loadHeadersForRun(runId);
+//        
+//        if (runFileName.equals("1.ms2")) {
+//            assertEquals(5, headers.size());
+//            int i = 0;
+//            assertEquals("CreationDate", headers.get(i).getName());
+//            assertEquals("3/22/2005 9:46:00 AM", headers.get(i++).getValue());
+//            assertEquals("Extractor", headers.get(i).getName());
+//            assertEquals("MakeMS2", headers.get(i++).getValue());
+//            assertEquals("ExtractorVersion", headers.get(i).getName());
+//            assertEquals("1.0", headers.get(i++).getValue());
+//            assertEquals("Comments", headers.get(i).getName());
+//            assertEquals("MakeMS2 written by Michael J. MacCoss, 2004", headers.get(i++).getValue());
+//            assertEquals("ExtractorOptions", headers.get(i).getName());
+//            assertEquals("MS2", headers.get(i++).getValue());
+//        }
+//        else {
+//            assertEquals(13, headers.size());
+//            int i = 0;
+//            assertEquals("FilteringProgram", headers.get(i).getName());
+//            assertEquals("Parc", headers.get(i++).getValue());
+//            assertEquals("CreationDate", headers.get(i).getName());
+//            assertEquals("12/20/2007 2:29:19 PM", headers.get(i++).getValue());
+//            assertEquals("Extractor", headers.get(i).getName());
+//            assertEquals("RAWXtract", headers.get(i++).getValue());
+//            assertEquals("ExtractorVersion", headers.get(i).getName());
+//            assertEquals("1.8", headers.get(i++).getValue());
+//            assertEquals("Comments", headers.get(i).getName());
+//            assertEquals("RawXtract written by John Venable, 2003", headers.get(i++).getValue());
+//            assertEquals("ExtractorOptions", headers.get(i).getName());
+//            assertEquals("MS2", headers.get(i++).getValue());
+//            assertEquals("AcquisitionMethod", headers.get(i).getName());
+//            assertEquals("Data-Dependent", headers.get(i++).getValue());
+//            assertEquals("InstrumentType", headers.get(i).getName());
+//            assertEquals("ITMS", headers.get(i++).getValue());
+//            assertEquals("ScanType", headers.get(i).getName());
+//            assertEquals("MS2", headers.get(i++).getValue());
+//            assertEquals("DataType", headers.get(i).getName());
+//            assertEquals("Centroid", headers.get(i++).getValue());
+//            assertEquals("IsolationWindow", headers.get(i).getName());
+//            assertNull(headers.get(i++).getValue());
+//            assertEquals("FirstScan", headers.get(i).getName());
+//            assertEquals("1", headers.get(i++).getValue());            
+//            assertEquals("LastScan", headers.get(i).getName());
+//            assertEquals("17903", headers.get(i++).getValue());
+//        }
+//        
+//        // check values in msScan table and related tables (for each scan in the ms2 file)
+//        if (runFileName.equals("1.ms2")) checkScansFor_1ms2(runId);
+//        else checkScansFor_2ms2(runId);
+//        
+//        return runId;
+//    }
     
     private void checkScansFor_1ms2(int runId) {
         List<Integer> scanIds = scanDao.loadScanIdsForRun(runId);

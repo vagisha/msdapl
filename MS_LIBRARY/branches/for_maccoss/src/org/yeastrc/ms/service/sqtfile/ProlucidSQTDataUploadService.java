@@ -20,6 +20,7 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidParamIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultDataWId;
@@ -76,7 +77,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
     @Override
     int uploadSearchParameters(int experimentId, String paramFileDirectory, 
             String remoteServer, String remoteDirectory,
-            Date searchDate) throws UploadException {
+            java.util.Date searchDate) throws UploadException {
         
         // parse the parameter file 
         ProlucidParamsParser parser = parseProlucidParams(paramFileDirectory, remoteServer);
@@ -126,7 +127,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
     void uploadSqtFile(String filePath, int runId) throws UploadException {
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
-        lastUploadedRunSearchId = 0;
+        
         long startTime = System.currentTimeMillis();
         ProlucidSQTFileReader provider = new ProlucidSQTFileReader();
         
@@ -169,6 +170,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
     // parse and upload a sqt file
     private void uploadProlucidSqtFile(ProlucidSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
+        int lastUploadedRunSearchId;
         try {
             lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
             log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
@@ -272,5 +274,16 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         if (prolucidResultDataList.size() > 0) {
             uploadProlucidResultBuffer();
         }
+    }
+
+    @Override
+    SearchFileFormat getSearchFileFormat() {
+        return SearchFileFormat.SQT_PLUCID;
+    }
+
+    @Override
+    String searchParamsFile() {
+        ProlucidParamsParser parser = new ProlucidParamsParser();
+        return parser.paramsFileName();
     }
 }

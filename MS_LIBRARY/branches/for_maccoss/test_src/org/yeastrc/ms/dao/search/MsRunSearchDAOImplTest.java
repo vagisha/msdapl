@@ -1,5 +1,6 @@
 package org.yeastrc.ms.dao.search;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
@@ -9,8 +10,8 @@ import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
 import org.yeastrc.ms.domain.search.impl.MsRunSearchWrap;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
@@ -78,8 +79,8 @@ public class MsRunSearchDAOImplTest extends BaseDAOTestCase {
         assertEquals(87, runSearchDb_2.getSearchId());
 
         // add results for the searches
-        MsSearchResultIn r1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", true); // charge = 3
-        MsSearchResultIn r2 = makeSearchResult(searchId_1, 3, "PEPTIDE1", true); // charge = 3;
+        MsSearchResultIn r1 = makeSearchResult(searchId_1, 3, "PEPTIDE1", new BigDecimal("1024.5"), true); // charge = 3
+        MsSearchResultIn r2 = makeSearchResult(searchId_1, 3, "PEPTIDE1", new BigDecimal("1024.5"), true); // charge = 3;
         int r1_id = resultDao.save(searchId_1, r1, runSearchId_2, 2);
         int r2_id = resultDao.save(searchId_1, r2, runSearchId_2, 3);
         assertEquals(2, resultDao.loadResultIdsForRunSearch(runSearchId_2).size());

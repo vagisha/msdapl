@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.search.prolucid.ibatis;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,6 +63,12 @@ ProlucidSearchResultDAO {
     public MsSearchResult loadResultForSearchScanChargePeptide(int runSearchId,
             int scanId, int charge, String peptide) {
         return resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, charge, peptide);
+    }
+    
+    @Override
+    public int numResultsForRunSearchScanChargeMass(int runSearchId,
+            int scanId, int charge, BigDecimal mass) {
+        return resultDao.numResultsForRunSearchScanChargeMass(runSearchId, scanId, charge, mass);
     }
     
     @Override
@@ -253,6 +260,7 @@ ProlucidSearchResultDAO {
         result.setRunSearchId(rs.getInt("runSearchID"));
         result.setScanId(rs.getInt("scanID"));
         result.setCharge(rs.getInt("charge"));
+        result.setObservedMass(rs.getBigDecimal("observedMass"));
         SearchResultPeptideBean peptide = new SearchResultPeptideBean();
         peptide.setPeptideSequence(rs.getString("peptide"));
         String preRes = rs.getString("preResidue");
@@ -359,8 +367,8 @@ ProlucidSearchResultDAO {
         resultDao.delete(resultId);
     }
     
-    @Override
-    public void deleteResults(int runSearchId, int scanId, int charge) {
-        resultDao.deleteResults(runSearchId, scanId, charge);
-    }
+//    @Override
+//    public void deleteResults(int runSearchId, int scanId, int charge) {
+//        resultDao.deleteResults(runSearchId, scanId, charge);
+//    }
 }

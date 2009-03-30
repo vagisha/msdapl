@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
@@ -37,7 +38,7 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
         
         SQTFileReader reader = new SQTFileReader(){
             @Override
-            public SQTSearchScanIn getNextSearchScan()
+            public SQTSearchScanIn nextSearchScan()
             throws DataProviderException {
                 throw new UnsupportedOperationException("");
             }};
@@ -60,7 +61,7 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
         
         SQTFileReader reader = new SQTFileReader(){
             @Override
-            public SQTSearchScanIn getNextSearchScan()
+            public SQTSearchScanIn nextSearchScan()
                     throws DataProviderException {
                 throw new UnsupportedOperationException("");
             }};
@@ -147,6 +148,26 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
         return currentLine != null;
     }
 
+    @Override
+    public T getNextSearchScan() throws DataProviderException {
+         T scan = nextSearchScan();
+         if(scan.getScanResults().size() == 0) {
+             throw new DataProviderException(currentLineNum-1, "Invalid 'S' line.  No results found." , null);
+         }
+         
+         for(int i = 0; i < scan.getScanResults().size(); i++) {
+             if(scan.getScanResults().get(i).getProteinMatchList().size() == 0) {
+                 throw new DataProviderException(currentLineNum-1,
+                         "Invalid 'M' line for scan "+
+                         scan.getScanNumber()+"; charge: "+scan.getCharge()+
+                         ".  No locus matches found.", null);
+             }
+         }
+         return scan;
+    }
+    
+    protected abstract T nextSearchScan() throws DataProviderException;
+    
     protected SearchScan parseScan(String line) throws DataProviderException {
 
         // make sure we have a scan line

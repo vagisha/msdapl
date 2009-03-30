@@ -1,5 +1,6 @@
 package org.yeastrc.ms.domain.search;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -28,6 +29,11 @@ interface MsRunSearchResultBase {
      * @return the charge
      */
     public abstract int getCharge();
+    
+    /**
+     * @return the observedMass
+     */
+    public abstract BigDecimal getObservedMass();
 
     /**
      * @return the validationStatus

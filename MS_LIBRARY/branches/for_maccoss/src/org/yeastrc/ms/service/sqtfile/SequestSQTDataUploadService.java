@@ -10,6 +10,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,9 +54,11 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     private List<MsTerminalModificationIn> dynaTermMods;
     
     private final Program program;
+    private final SearchFileFormat format;
     
     public SequestSQTDataUploadService(SearchFileFormat format) {
         super();
+        this.format = format;
         program = Program.programForFileFormat(format);
         this.sequestResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
@@ -138,7 +141,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     void uploadSqtFile(String filePath, int runId) throws UploadException {
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
-        lastUploadedRunSearchId = 0;
+//        lastUploadedRunSearchId = 0;
         long startTime = System.currentTimeMillis();
         SequestSQTFileReader provider = new SequestSQTFileReader();
         
@@ -173,12 +176,13 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         long endTime = System.currentTimeMillis();
         
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
-        
+            
     }
     
     // parse and upload a sqt file
     private void uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
+        int lastUploadedRunSearchId;
         try {
             lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
             log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
@@ -208,12 +212,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
                 // save all the search results for this scan
                 for (SequestSearchResultIn result: scan.getScanResults()) {
-                    // TODO This is temporary for MacCoss Data.  We need only the top hit for a scan
-                    // upload results with XCorr rank = 1
-                    //if(result.getSequestResultData().getxCorrRank() == 1) {
-                        uploadSearchResult(result, lastUploadedRunSearchId, scanId);
-                        numResults++;
-                    //}
+                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                    numResults++;
                 }
             }
             else {
@@ -253,7 +253,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
 //            public Program getSearchProgram() {return parser.getSearchProgram();}
             @Override
             public String getSearchProgramVersion() {return null;} // we don't have this information in sequest.params
-            public Date getSearchDate() {return new java.sql.Date(searchDate.getTime());}
+            public java.sql.Date getSearchDate() {return new java.sql.Date(searchDate.getTime());}
             public String getServerDirectory() {return remoteDirectory;}
         };
     }
@@ -364,8 +364,28 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         
         // $JAVA_HOME/bin/java -classpath .:bin/:lib/'*' org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService
         SequestSQTDataUploadService uploader = new SequestSQTDataUploadService(SearchFileFormat.SQT_SEQ);
-        uploader.uploadSearch(experimentID, dir, fileNames, runIdMap, "local", dir, new Date(new java.util.Date().getTime()));
+        uploader.setExperimentId(experimentID);
+        uploader.setDirectory(dir);
+        uploader.setRemoteDirectory(dir);
+        uploader.setRemoteServer("local");
+        uploader.setSearchDate(new Date(new java.util.Date().getTime()));
+        try {
+            uploader.upload();
+        }
+        catch (UploadException e) {
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    SearchFileFormat getSearchFileFormat() {
+        return this.format;
+    }
+
+    @Override
+    String searchParamsFile() {
+        SequestParamsParser parser = new SequestParamsParser();
+        return parser.paramsFileName();
+    }
     
 }

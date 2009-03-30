@@ -282,6 +282,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         result.setRunSearchAnalysisId(rs.getInt("runSearchAnalysisID"));
         result.setScanId(rs.getInt("scanID"));
         result.setCharge(rs.getInt("charge"));
+        result.setObservedMass(rs.getBigDecimal("observedMass"));
         String vStatus = rs.getString("validationStatus");
         if(vStatus != null)
             result.setValidationStatus(ValidationStatus.instance(vStatus.charAt(0)));

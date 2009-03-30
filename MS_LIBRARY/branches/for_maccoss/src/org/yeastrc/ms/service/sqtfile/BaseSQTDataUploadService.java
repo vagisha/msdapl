@@ -124,7 +124,6 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
     void uploadSqtFile(String filePath, int runId) throws UploadException {
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
-        lastUploadedRunSearchId = 0;
         long startTime = System.currentTimeMillis();
         BaseSQTFileReader provider = new BaseSQTFileReader(peptideResultBuilder); 
         
@@ -171,6 +170,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
     // parse and upload a sqt file
     private void uploadBaseSqtFile(BaseSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
+        int lastUploadedRunSearchId;
         try {
             lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
             log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
@@ -200,12 +200,8 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
             if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
                 // save all the search results for this scan
                 for (MsSearchResultIn result: scan.getScanResults()) {
-                    // upload results with XCorr rank = 1
-                    // TODO This is temporary for MacCoss Data.  We need only the top hit for a scan
-                    //if(result.getSequestResultData().getxCorrRank() == 1) {
-                        uploadSearchResult(result, lastUploadedRunSearchId, scanId);
-                        numResults++;
-                    //}
+                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                    numResults++;
                 }
             }
             else {
@@ -225,6 +221,11 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
     @Override
     SearchFileFormat getSearchFileFormat() {
         return this.sqtType;
+    }
+
+    @Override
+    String searchParamsFile() {
+        return this.paramsProvider.paramsFileName();
     }
     
 }

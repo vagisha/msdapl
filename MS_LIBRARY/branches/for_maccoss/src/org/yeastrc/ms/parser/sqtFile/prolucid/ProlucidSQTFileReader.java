@@ -34,14 +34,14 @@ public class ProlucidSQTFileReader extends SQTFileReader<ProlucidSearchScan> {
      * @throws DataProviderException if the scan or any of its associated results were invalid
      */
     @Override
-    public ProlucidSearchScan getNextSearchScan() throws DataProviderException {
+    protected ProlucidSearchScan nextSearchScan() throws DataProviderException {
         PlucidSearchScan scan = new PlucidSearchScan(parseScan(currentLine));
         advanceLine();
 
         while(currentLine != null) {
             // is this one of the results for the scan ('M' line)
             if (isResultLine(currentLine)) {
-                ProlucidSearchResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
+                ProlucidSearchResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge(), scan.getObservedMass());
                 if (result != null) 
                     scan.addSearchResult(result);
             }
@@ -59,9 +59,9 @@ public class ProlucidSQTFileReader extends SQTFileReader<ProlucidSearchScan> {
      * @return
      * @throws DataProviderException 
      */
-    private ProlucidSearchResultIn parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
+    private ProlucidSearchResultIn parsePeptideResult(int scanNumber, int charge, BigDecimal observedMass) throws DataProviderException {
 
-        ProlucidResult result = parsePeptideResult(currentLine, scanNumber, charge);
+        ProlucidResult result = parsePeptideResult(currentLine, scanNumber, charge, observedMass);
 
         advanceLine();
 
@@ -91,7 +91,7 @@ public class ProlucidSQTFileReader extends SQTFileReader<ProlucidSearchScan> {
      *                         there was an error parsing numbers in the line OR
      *                         there was an error parsing the peptide sequence in this 'M' line.
      */
-    ProlucidResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
+    ProlucidResult parsePeptideResult(String line, int scanNumber, int charge, BigDecimal observedMass) throws DataProviderException {
 
         String[] tokens = line.split("\\s+");
         if (tokens.length != 11) {
@@ -124,6 +124,7 @@ public class ProlucidSQTFileReader extends SQTFileReader<ProlucidSearchScan> {
         result.setValidationStatus(tokens[10].charAt(0));
         result.setCharge(charge);
         result.setScanNumber(scanNumber);
+        result.setObservedMass(observedMass);
 
         // parse the peptide sequence
         try {

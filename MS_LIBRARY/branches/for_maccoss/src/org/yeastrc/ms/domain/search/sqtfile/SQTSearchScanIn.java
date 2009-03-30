@@ -8,6 +8,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultIn;
 public interface SQTSearchScanIn <T extends MsSearchResultIn> extends SQTSearchScanBase {
 
     public abstract int getScanNumber();
+    
+    public abstract BigDecimal getObservedMass();
 
     public abstract List<T> getScanResults();
 }
@@ -33,11 +35,6 @@ interface SQTSearchScanBase {
      */
     public abstract BigDecimal getTotalIntensity();
 
-    /**
-     * @return the observedMass
-     */
-    public abstract BigDecimal getObservedMass();
-    
     /**
      * @return the lowestSp
      */

@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -73,7 +74,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             advanceLine();
         }
         
-        header.setFileName(fileName);
+        header.setFileName(fileName, RunFileFormat.MS2);
         header.setSha1Sum(sha1Sum);
         this.dataConversionType = header.getDataConversionType();
         return header;

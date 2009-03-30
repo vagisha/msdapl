@@ -86,14 +86,14 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
      * @throws DataProviderException if the scan or any of its associated results were invalid
      */
     @Override
-    public PercolatorSearchScan getNextSearchScan() throws DataProviderException {
+    protected PercolatorSearchScan nextSearchScan() throws DataProviderException {
         PercSearchScan scan = new PercSearchScan(parseScan(currentLine));
         advanceLine();
 
         while(currentLine != null) {
             // is this one of the results for the scan ('M' line)
             if (isResultLine(currentLine)) {
-                PercolatorResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge());
+                PercolatorResultIn result = parsePeptideResult(scan.getScanNumber(), scan.getCharge(), scan.getObservedMass());
                 if (result != null) 
                     scan.addSearchResult(result);
             }
@@ -111,9 +111,9 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
      * @return
      * @throws DataProviderException 
      */
-    private PercolatorResultIn parsePeptideResult(int scanNumber, int charge) throws DataProviderException {
+    private PercolatorResultIn parsePeptideResult(int scanNumber, int charge, BigDecimal observedMass) throws DataProviderException {
 
-        PercolatorAnalysisResult result = parsePeptideResult(currentLine, scanNumber, charge);
+        PercolatorAnalysisResult result = parsePeptideResult(currentLine, scanNumber, charge, observedMass);
 
         advanceLine();
 
@@ -138,8 +138,8 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
                 break;
             advanceLine();
         }
-//        if (result.getProteinMatchList().size() == 0)
-//            throw new DataProviderException(currentLineNum-1, "Invalid 'M' line.  No locus matches found." , null);
+        if (result.getProteinMatchList().size() == 0)
+            throw new DataProviderException(currentLineNum-1, "Invalid 'M' line.  No locus matches found." , null);
         if(isPlaceholder) result = null;
         return result;
     }
@@ -154,7 +154,7 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
      *                         there was an error parsing numbers in the line OR
      *                         there was an error parsing the peptide sequence in this 'M' line.
      */
-    PercolatorAnalysisResult parsePeptideResult(String line, int scanNumber, int charge) throws DataProviderException {
+    PercolatorAnalysisResult parsePeptideResult(String line, int scanNumber, int charge, BigDecimal observedMass) throws DataProviderException {
 
         String[] tokens = line.split("\\s+");
         if (tokens.length != 11) {
@@ -201,6 +201,7 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
         result.setValidationStatus(tokens[10].charAt(0));
         result.setCharge(charge);
         result.setScanNumber(scanNumber);
+        result.setObservedMass(observedMass);
 
         // parse the peptide sequence
         try {

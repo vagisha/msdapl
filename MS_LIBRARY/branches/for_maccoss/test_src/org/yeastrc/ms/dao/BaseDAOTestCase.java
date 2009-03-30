@@ -155,13 +155,14 @@ public class BaseDAOTestCase extends TestCase {
     //-----------------------------------------------------------------------------------------------------
     // SEARCH RESULT
     //-----------------------------------------------------------------------------------------------------
-    protected MsSearchResultIn makeSearchResult(int searchId, int charge,String peptide, boolean addDynaResMod) {
+    protected MsSearchResultIn makeSearchResult(int searchId, int charge,String peptide, BigDecimal observedMass,
+            boolean addDynaResMod) {
 
         //!!------------ RESET the dynamic mod lookup table --------------------------------
 //        DynamicModLookupUtil.instance().reset();
         //!!------------ RESET the dynamic mod lookup table --------------------------------
         
-        MsSearchResultTest result = makeSearchResult(charge, peptide);
+        MsSearchResultTest result = makeSearchResult(charge, peptide, observedMass);
         SearchResultPeptideBean resultPeptide = new SearchResultPeptideBean();
         resultPeptide.setPeptideSequence(peptide);
         result.setResultPeptide(resultPeptide);
@@ -172,9 +173,10 @@ public class BaseDAOTestCase extends TestCase {
         return result;
     }
 
-    protected MsSearchResultTest makeSearchResult(int charge, String peptide) {
+    protected MsSearchResultTest makeSearchResult(int charge, String peptide, BigDecimal observedMass) {
         MsSearchResultTest result = new MsSearchResultTest();
         result.setCharge(charge);
+        result.setObservedMass(observedMass);
         return result;
     }
 
@@ -200,6 +202,7 @@ public class BaseDAOTestCase extends TestCase {
     
     protected void checkSearchResult(MsSearchResultIn input, MsSearchResult output, boolean checkProteins) {
         assertEquals(input.getCharge(), output.getCharge());
+        assertEquals(input.getObservedMass().doubleValue(), output.getObservedMass().doubleValue());
         if (input.getValidationStatus() == null)
             assertEquals(ValidationStatus.UNKNOWN, output.getValidationStatus());
         else {

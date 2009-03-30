@@ -22,8 +22,6 @@ interface MsRunBase {
 
     public abstract String getFileName();
     
-    public abstract String getFileNameNoExt();
-
     public abstract String getCreationDate();
 
     public abstract String getConversionSW();

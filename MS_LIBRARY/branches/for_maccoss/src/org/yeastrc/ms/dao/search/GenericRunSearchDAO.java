@@ -44,6 +44,16 @@ public interface GenericRunSearchDAO <O extends MsRunSearch> {
     
     
     /**
+     * Returns the database id of a search on the given filename and belonging 
+     * to the given search group.
+     * @param searchId
+     * @param filename
+     * @return
+     */
+    public abstract int loadIdForSearchAndFileName(int searchId, String filename);
+    
+    
+    /**
      * Returns the base name of the original file for this run search
      * @param runSearchId
      * @return
