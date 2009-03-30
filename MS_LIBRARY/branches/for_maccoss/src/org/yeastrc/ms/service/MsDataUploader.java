@@ -14,6 +14,8 @@ import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 
 public class MsDataUploader {
@@ -22,16 +24,19 @@ public class MsDataUploader {
     
     private int uploadedSearchId;
     private int uploadedExptId;
-    private String remoteServer;
-    private String remoteDirectory;
-    private String uploadDirectory;
+    private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
-    private boolean isMacCossData = false;
+    private String remoteServer;
+    private String rawDataDirectory;
+    private String remoteRawDataDirectory;
+    private String searchDirectory;
+    private String remoteSearchDataDirectory;
+    private java.util.Date searchDate;
+    private String analysisDirectory;
+    private boolean doScanChargeMassCheck = false; // For MacCoss lab data
+    
     private boolean uploadSearch = false;
     private boolean uploadAnalysis = false;
-    
-    
-    private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
     
     private static final Pattern fileNamePattern = Pattern.compile("(\\S+)\\.(\\d+)\\.(\\d+)\\.(\\d{1})");
@@ -40,21 +45,42 @@ public class MsDataUploader {
         uploadExceptionList.clear();
         uploadedSearchId = 0;
         uploadedExptId = 0;
-        remoteServer = null;
-        remoteDirectory = null;
-        uploadDirectory = null;
     }
     
-    public void doUploadSearch(boolean upload) {
-        this.uploadSearch = upload;
+    public void setRemoteServer(String remoteServer) {
+        this.remoteServer = remoteServer;
+    }
+
+    public void setRawDataDirectory(String rawDataDirectory) {
+        this.rawDataDirectory = rawDataDirectory;
+    }
+
+    public void setRemoteRawDataDirectory(String remoteRawDataDirectory) {
+        this.remoteRawDataDirectory = remoteRawDataDirectory;
+    }
+
+    public void setSearchDirectory(String searchDirectory) {
+        this.searchDirectory = searchDirectory;
+        if(searchDirectory != null)
+            this.uploadSearch = true;
+    }
+
+    public void setRemoteSearchDataDirectory(String remoteSearchDataDirectory) {
+        this.remoteSearchDataDirectory = remoteSearchDataDirectory;
+    }
+
+    public void setSearchDate(java.util.Date searchDate) {
+        this.searchDate = searchDate;
+    }
+
+    public void setAnalysisDirectory(String analysisDirectory) {
+        this.analysisDirectory = analysisDirectory;
+        if(analysisDirectory != null)
+            this.uploadAnalysis = true;
     }
     
-    public void doUploadAnalysis(boolean upload) {
-        this.uploadAnalysis = upload;
-    }
-    
-    public void setIsMaccossData(boolean isMaccossData) {
-        this.isMacCossData = isMaccossData;
+    public void checkResultChargeMass(boolean doScanChargeMassCheck) {
+        this.doScanChargeMassCheck = doScanChargeMassCheck;
     }
     
     public List<UploadException> getUploadExceptionList() {
@@ -84,13 +110,9 @@ public class MsDataUploader {
      * @return database id for experiment if it was uploaded successfully, 0 otherwise
      * @throws UploadException 
      */
-    public void uploadExperimentToDb(String remoteServer, String remoteDirectory, 
-            String fileDirectory, Date searchDate) {
+    public void uploadData() {
 
         resetUploader();
-        this.remoteServer = remoteServer;
-        this.remoteDirectory = remoteDirectory;
-        this.uploadDirectory = fileDirectory;
         
         log.info("INITIALIZING EXPERIMENT UPLOAD"+
                 "\n\tTime: "+(new Date().toString()));
@@ -99,7 +121,7 @@ public class MsDataUploader {
         // ----- INITIALIZE THE EXPERIMENT UPLOADER
         MsExperimentUploader exptUploader = null;
         try {
-            exptUploader = initializeExperimentUploader(remoteServer, remoteDirectory, fileDirectory, searchDate);
+            exptUploader = initializeExperimentUploader();
         }
         catch (UploadException e) {
             uploadExceptionList.add(e);
@@ -120,7 +142,7 @@ public class MsDataUploader {
         
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
-        logBeginExperimentUpload(true, true, false);
+        logBeginExperimentUpload();
         long start = System.currentTimeMillis();
         
         try {
@@ -132,14 +154,31 @@ public class MsDataUploader {
             log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
             return;
         }
-        try {
-            this.uploadedSearchId = exptUploader.uploadSearchData();
+        
+        // ----- UPLOAD SEARCH DATA
+        if(uploadSearch) {
+            try {
+                this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
+            }
+            catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
         }
-        catch (UploadException ex) {
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-            return;
+        
+        // ----- UPLOAD ANALYSIS DATA
+        if(uploadAnalysis) {
+            try {
+                exptUploader.uploadAnalysisData(this.uploadedSearchId);
+            }
+            catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
         }
         
         long end = System.currentTimeMillis();
@@ -147,38 +186,65 @@ public class MsDataUploader {
         
     }
 
-    private MsExperimentUploader initializeExperimentUploader(
-            String remoteServer, String remoteDirectory, String fileDirectory,
-            Date searchDate) throws UploadException  {
+    private MsExperimentUploader initializeExperimentUploader() throws UploadException  {
         
         MsExperimentUploader exptUploader = new MsExperimentUploader();
-        exptUploader.setDirectory(fileDirectory);
-        exptUploader.setRemoteDirectory(remoteDirectory);
+        exptUploader.setDirectory(rawDataDirectory);
+        exptUploader.setRemoteDirectory(remoteRawDataDirectory);
         exptUploader.setRemoteServer(remoteServer);
         
         // Get the raw data uploader
         log.info("Initializing RawDataUploadService");
-        RawDataUploadService rdus = getRawDataUploader(remoteServer,remoteDirectory);
+        RawDataUploadService rdus = getRawDataUploader(rawDataDirectory, remoteRawDataDirectory);
         exptUploader.setRawDataUploader(rdus);
+        
+        // We cannot upload analysis data without uploading search data first.
+        if(uploadAnalysis && !uploadSearch) {
+            UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+            ex.appendErrorMessage("Cannot upload analysis results without serach results");
+            throw ex;
+        }
         
         // Get the search data uploader
         if(uploadSearch) {
             log.info("Initializing SearchDataUploadService");
-            SearchDataUploadService sdus = getSearchDataUploader(remoteServer, remoteDirectory, searchDate);
+            SearchDataUploadService sdus = getSearchDataUploader(searchDirectory, 
+                    remoteServer, remoteSearchDataDirectory, searchDate);
             exptUploader.setSearchDataUploader(sdus);
         }
+        // Get the analysis data uploader
+        if(uploadAnalysis) {
+            log.info("Initializing AnalysisDataUploadService");
+            AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory);
+            exptUploader.setAnalysisDataUploader(adus);
+        }
+        
         return exptUploader;
     }
 
-    private SearchDataUploadService getSearchDataUploader(String remoteServer,
-            String remoteDirectory, Date searchDate) throws UploadException {
+    private AnalysisDataUploadService getAnalysisDataUploader(String dataDirectory) throws UploadException {
+        AnalysisDataUploadService adus = null;
+        try {
+            adus = UploadServiceFactory.instance().getAnalysisDataUploadService(dataDirectory);
+            adus.setSearchProgram(Program.SEQUEST);
+        }
+        catch (UploadServiceFactoryException e1) {
+            UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+            ex.appendErrorMessage("Error getting AnalysisDataUploadService: "+e1.getMessage());
+            throw ex;
+        }
+        return adus;
+    }
+    
+    private SearchDataUploadService getSearchDataUploader(String dataDirectory,
+            String remoteServer, String remoteDirectory, Date searchDate) throws UploadException {
         SearchDataUploadService sdus = null;
         try {
-            sdus = UploadServiceFactory.instance().getSearchDataUploadService(uploadDirectory);
-            sdus.setDirectory(uploadDirectory);
+            sdus = UploadServiceFactory.instance().getSearchDataUploadService(dataDirectory);
             sdus.setRemoteServer(remoteServer);
             sdus.setRemoteDirectory(remoteDirectory);
             sdus.setSearchDate(searchDate);
+            sdus.checkResultChargeMass(doScanChargeMassCheck);
         }
         catch (UploadServiceFactoryException e1) {
             UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
@@ -188,13 +254,11 @@ public class MsDataUploader {
         return sdus;
     }
 
-    private RawDataUploadService getRawDataUploader(String remoteServer,
-            String remoteDirectory) throws UploadException {
+    private RawDataUploadService getRawDataUploader(String dataDirectory, String remoteDirectory) throws UploadException {
         
         RawDataUploadService rdus = null;
         try {
-            rdus = UploadServiceFactory.instance().getRawDataUploadService(uploadDirectory);
-            rdus.setDirectory(uploadDirectory);
+            rdus = UploadServiceFactory.instance().getRawDataUploadService(dataDirectory);
             rdus.setRemoteDirectory(remoteDirectory);
         }
         catch(UploadServiceFactoryException e1) {
@@ -205,7 +269,7 @@ public class MsDataUploader {
         return rdus;
     }
     
-    public void uploadExperimentToDb(int experimentId, String fileDirectory, Date searchDate) {
+    public void uploadData(int experimentId) {
         
         resetUploader();
         MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
@@ -219,8 +283,6 @@ public class MsDataUploader {
             return;
         }
         this.remoteServer = expt.getServerAddress();
-        this.remoteDirectory = expt.getServerDirectory();
-        this.uploadDirectory = fileDirectory;
         this.uploadedExptId = experimentId;
         
         
@@ -231,7 +293,7 @@ public class MsDataUploader {
         // ----- INITIALIZE THE EXPERIMENT UPLOADER
         MsExperimentUploader exptUploader = null;
         try {
-            exptUploader = initializeExperimentUploader(remoteServer, remoteDirectory, fileDirectory, searchDate);
+            exptUploader = initializeExperimentUploader();
         }
         catch (UploadException e) {
             uploadExceptionList.add(e);
@@ -252,12 +314,13 @@ public class MsDataUploader {
         
         
         // ----- NOW WE CAN BEGIN THE UPLOAD -----
-        logBeginExperimentUpload(true, true, false);
+        logBeginExperimentUpload();
         long start = System.currentTimeMillis();
         
         // ----- UPDATE THE LAST UPDATE DATE FOR THE EXPERIMENT
         updateLastUpdateDate(experimentId);
         
+        // ----- UPLOAD SCAN DATA
         try {
             exptUploader.uploadRawData(experimentId);
         }
@@ -267,19 +330,74 @@ public class MsDataUploader {
             log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
             return;
         }
-        try {
-            this.uploadedSearchId = exptUploader.uploadSearchData();
+        
+        // ----- UPLOAD SEARCH DATA
+        if(uploadSearch) {
+            // If the search is already uploaded, don't re-upload it.
+            int searchId = 0;
+            try {
+                searchId = getExperimentSequestSearchId(this.uploadedExptId);
+            }
+            catch (Exception e) {
+                UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+                ex.appendErrorMessage(e.getMessage());
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage());
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+            }
+            if(searchId == 0) {
+                try {
+                    this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
+                }
+                catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+                }
+            }
+            else {
+                this.uploadedSearchId = searchId;
+                log.info("Search was uploaded previously. SearchID: "+uploadedSearchId);
+            }
         }
-        catch (UploadException ex) {
-            uploadExceptionList.add(ex);
-            log.error(ex.getMessage(), ex);
-            log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-            return;
+        
+        // ----- UPLOAD ANALYSIS DATA
+        if(uploadAnalysis) {
+            try {
+                exptUploader.uploadAnalysisData(this.uploadedSearchId);
+            }
+            catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
         }
         
         long end = System.currentTimeMillis();
         logEndExperimentUpload(exptUploader, start, end);
        
+    }
+
+    private int getExperimentSequestSearchId(int uploadedExptId2) throws Exception {
+       
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        List<Integer> searchIds = searchDao.getSearchIdsForExperiment(uploadedExptId2);
+        
+        if(searchIds.size() == 0)
+            return 0;
+        
+        int sequestSearchId = 0;
+        for(Integer id: searchIds) {
+            MsSearch search = searchDao.loadSearch(id);
+            if(search.getSearchProgram() == Program.SEQUEST) {
+                if(sequestSearchId != 0)
+                    throw new Exception("Multiple sequest search ids found for experimentID: "+uploadedExptId2);
+                sequestSearchId = id;
+            }
+        }
+        return sequestSearchId;
     }
 
     private void updateLastUpdateDate(int experimentId) {
@@ -304,15 +422,26 @@ public class MsDataUploader {
                 uploader.getUploadSummary());
     }
 
-    private void logBeginExperimentUpload(boolean rawData, boolean searchData, boolean analysisData) {
-        log.info("BEGIN EXPERIMENT UPLOAD"+
-                "\n\tRemote server: "+remoteServer+
-                "\n\tRemote directory: "+remoteDirectory+
-                "\n\tDirectory: "+uploadDirectory+
-                "\n\tTime: "+(new Date().toString())+
-                "\n\tRAW DATA UPLOAD: "+rawData+
-                "\n\tSEARCH DATA UPLOAD: "+searchData+
-                "\n\tANALYSIS DATA UPLOAD: "+analysisData);
+    private void logBeginExperimentUpload() {
+        
+        StringBuilder msg = new StringBuilder();
+        msg.append("BEGIN EXPERIMENT UPLOAD");
+        msg.append("\n\tRemote server: "+remoteServer);
+        msg.append("\n\tRAW DATA ");
+        msg.append("\n\t\t Directory: "+rawDataDirectory);
+        msg.append("\n\t\t Remote Directory: "+remoteRawDataDirectory);
+        if(uploadSearch) {
+            msg.append("\n\tSEARCH DATA");
+            msg.append("\n\t\t Directory: "+searchDirectory);
+            msg.append("\n\t\t Remote Directory: "+remoteSearchDataDirectory);
+        }
+        if(uploadAnalysis) {
+            msg.append("\n\tANALYSIS DATA");
+            msg.append("\n\t\t Directory: "+analysisDirectory);
+            msg.append("\n\tTime: "+(new Date().toString()));
+        }
+        
+        log.info(msg.toString());
     }
 
    
@@ -390,22 +519,27 @@ public class MsDataUploader {
     public static void main(String[] args) throws UploadException {
         long start = System.currentTimeMillis();
 
-//        for(int i = 0; i < 10; i++) {
-        MsDataUploader uploader = new MsDataUploader();
         
+//        for(int i = 0; i < 10; i++) {
         String directory = args[0];
+        
         if(directory == null || directory.length() == 0 || !(new File(directory).exists()))
             System.out.println("Invalid directory: "+directory);
         
         boolean maccossData = Boolean.parseBoolean(args[1]);
-        uploader.setIsMaccossData(maccossData);
         
         System.out.println("Directory: "+directory+"; Maccoss Data: "+maccossData);
         
-        uploader.uploadExperimentToDb("local",
-                directory,
-                directory,
-                new Date());
+        MsDataUploader uploader = new MsDataUploader();
+        uploader.setRemoteServer("local");
+        uploader.setRawDataDirectory(directory);
+        uploader.setSearchDirectory(directory);
+        uploader.setRemoteRawDataDirectory(directory);
+        uploader.setRemoteSearchDataDirectory(directory);
+        uploader.setSearchDate(new Date());
+        uploader.checkResultChargeMass(maccossData);
+        
+        uploader.uploadData();
 //        }
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");

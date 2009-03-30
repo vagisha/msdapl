@@ -96,6 +96,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         this.params = new HashMap<String, String>();
         
         uploadedResultIds = new HashSet<Integer>();
+        filenames = new ArrayList<String>();
     }
     
     void reset() {
@@ -236,6 +237,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             if(runSearchId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_SQT);
                 ex.appendErrorMessage("File: "+filenoext);
+                ex.appendErrorMessage("; SearchID: "+searchId);
                 throw ex;
             }
             runSearchIdMap.put(file, runSearchId);
@@ -564,8 +566,6 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     
     @Override
     public boolean preUploadCheckPassed() {
-        
-        log.info("Doing pre-upload check.");
         
         preUploadCheckMsg = new StringBuilder();
         

@@ -72,7 +72,7 @@
     </select>
     
     <select id="selectIdForSearchAndFile" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT id FROM msRunSearch AS rs, msRun AS run
+    	SELECT rs.id FROM msRunSearch AS rs, msRun AS run
     	WHERE rs.runID = run.id
     	AND rs.searchID=#searchId#
     	AND run.filename=#filename#

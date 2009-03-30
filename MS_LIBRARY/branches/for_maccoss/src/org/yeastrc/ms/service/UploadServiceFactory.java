@@ -150,6 +150,7 @@ public class UploadServiceFactory {
                 PeptideResultBuilder peptbuilder = SequestResultPeptideBuilder.instance();
                 BaseSQTDataUploadService service = new BaseSQTDataUploadService(paramsProvider, peptbuilder, 
                         Program.SEQUEST, SearchFileFormat.SQT_PERC);
+                service.setDirectory(dataDirectory);
                 return service;
             }
             else {

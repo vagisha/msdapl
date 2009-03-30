@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScanIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SQTSearchDataProvider;
@@ -152,7 +151,9 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
     public T getNextSearchScan() throws DataProviderException {
          T scan = nextSearchScan();
          if(scan.getScanResults().size() == 0) {
-             throw new DataProviderException(currentLineNum-1, "Invalid 'S' line.  No results found." , null);
+             // This will not cause an UploadException
+             DataProviderException ex = new DataProviderException(currentLineNum-1, "Invalid 'S' line.  No results found." , null);
+             log.warn(ex.getMessage());
          }
          
          for(int i = 0; i < scan.getScanResults().size(); i++) {

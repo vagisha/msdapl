@@ -175,7 +175,7 @@ public class MsExperimentUploader {
         }
     }
     
-    public int uploadSearchData() throws UploadException {
+    public int uploadSearchData(int experimentId) throws UploadException {
         
         // if we have search data upload that next
         int searchId;
@@ -192,7 +192,7 @@ public class MsExperimentUploader {
         
     }
     
-    public int uploadAnalysisData() throws UploadException {
+    public int uploadAnalysisData(int searchId) throws UploadException {
         
         int analysisId;
         // if we have post-search analysis data upload that next
