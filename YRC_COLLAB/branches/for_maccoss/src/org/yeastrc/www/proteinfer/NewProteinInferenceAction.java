@@ -166,7 +166,8 @@ public class NewProteinInferenceAction extends Action {
         // This form should be created ONLY if search program for this search was either 
         // Sequest or Percolator
         Program program = search.getSearchProgram();
-        if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST || program == Program.PROLUCID) {
+        if(program == Program.SEQUEST // || program == Program.EE_NORM_SEQUEST 
+                || program == Program.PROLUCID) {
             
             ProteinInferInputGetter inputGetter = ProteinInferInputGetter.instance();
             
@@ -177,7 +178,7 @@ public class NewProteinInferenceAction extends Action {
             formForSearch.setProjectId(projectId);
             // set the IDPicker parameters
             ProgramParameters params = null;
-            if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST)
+            if(program == Program.SEQUEST ) //|| program == Program.EE_NORM_SEQUEST)
                 params = new ProgramParameters(ProteinInferenceProgram.PROTINFER_SEQ);
             else if(program == Program.PROLUCID)
                 params = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PLCID);

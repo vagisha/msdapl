@@ -117,7 +117,7 @@ public class ViewSpectrumAction extends Action {
         request.setAttribute("peptideSeq", Sq);
         
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-        String filename = runDao.loadFilenameNoExtForRun(runSearch.getRunId());
+        String filename = runDao.loadFilenameForRun(runSearch.getRunId());
 
         MsScanDAO msScanDao = DAOFactory.instance().getMsScanDAO();
         int scanNumber = msScanDao.load(result.getScanId()).getStartScanNum();
@@ -188,7 +188,7 @@ public class ViewSpectrumAction extends Action {
         MassType fragMassType = null;
         MassType parentMassType = null;
         if (search.getSearchProgram() == Program.SEQUEST || 
-            search.getSearchProgram() == Program.EE_NORM_SEQUEST ||
+            //search.getSearchProgram() == Program.EE_NORM_SEQUEST ||
             search.getSearchProgram() == Program.PERCOLATOR) { // NOTE: Percolator in run on Sequest results so we will 
                                                                // look at the sequest parameters. 
             SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();

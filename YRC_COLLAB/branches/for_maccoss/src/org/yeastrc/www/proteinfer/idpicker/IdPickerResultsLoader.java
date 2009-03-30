@@ -641,7 +641,7 @@ public class IdPickerResultsLoader {
     }
     
     private static MsSearchResult getOriginalResult(int msRunSearchResultId, Program inputGenerator) {
-        if(inputGenerator == Program.SEQUEST || inputGenerator == Program.EE_NORM_SEQUEST) {
+        if(inputGenerator == Program.SEQUEST) {//|| inputGenerator == Program.EE_NORM_SEQUEST) {
             return seqResDao.load(msRunSearchResultId);
         }
         else if (inputGenerator == Program.PROLUCID) {

@@ -269,8 +269,8 @@ public class ViewSpectraAction extends Action {
         // Need these values from the search parameters 
         MassType fragMassType = null;
         MassType parentMassType = null;
-        if (search.getSearchProgram() == Program.SEQUEST || 
-            search.getSearchProgram() == Program.EE_NORM_SEQUEST) {
+        if (search.getSearchProgram() == Program.SEQUEST) {
+//            || search.getSearchProgram() == Program.EE_NORM_SEQUEST) {
             SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();
             fragMassType = seqSearchDao.getFragmentMassType(searchId);
             parentMassType = seqSearchDao.getParentMassType(searchId);

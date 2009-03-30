@@ -79,10 +79,12 @@ public class UploadDataAction extends Action {
 		// TODO assuming that the data server will be mounted on repoman
 		jobSaver.setServerDirectory( "local:"+directory );
 
-//		if (group.equals( Projects.YATES ))
-//		    jobSaver.setGroupID( 0 );
-//		else
-//		    jobSaver.setGroupID( 1 );
+		boolean maccoss = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.MACCOSS);
+		boolean yates = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.YATES);
+		if (yates)
+		    jobSaver.setGroupID( 0 );
+		else if (maccoss)
+		    jobSaver.setGroupID( 1 );
 
 		jobSaver.setSubmitter( user.getID() );
 
