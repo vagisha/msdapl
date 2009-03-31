@@ -85,7 +85,7 @@ public class ReadMS2Comp implements ReadMS2Interface{
 			result.setprecursor((float)fragmass);
 			result.addIfield("RTime\t"+rtime);
 			for (int i=0; i<numz;i++){
-				result.addchargemass(chargearray[i],(float)mpharray[i]);
+				result.addchargemass(chargearray[i],mpharray[i]);
 			}
 			
 			mzinflater.reset();

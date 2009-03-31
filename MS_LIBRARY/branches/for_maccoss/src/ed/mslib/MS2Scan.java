@@ -8,7 +8,7 @@ public class MS2Scan implements java.lang.Cloneable {
 
 	public MS2Scan(){
 		charges = new ArrayList<Integer>();
-		masses = new ArrayList<Float>();
+		masses = new ArrayList<Double>();
 		dfield = new ArrayList<String>();
 		ifield = new ArrayList<String>();
 		mzint = new ArrayList<MzInt>();
@@ -25,7 +25,7 @@ public class MS2Scan implements java.lang.Cloneable {
 	/**
 	 * Z FIELD - mass (M+H)
 	 */
-	private List<Float> masses;
+	private List<Double> masses;
 	
 	/**
 	 * D FIELD - Charge dependent data
@@ -57,7 +57,7 @@ public class MS2Scan implements java.lang.Cloneable {
 	 * @param chrg
 	 * @param mass
 	 */
-	public void addchargemass(int chrg, float mass){
+	public void addchargemass(int chrg, double mass){
 		charges.add(chrg);
 		masses.add(mass);
 	}
@@ -76,7 +76,7 @@ public class MS2Scan implements java.lang.Cloneable {
 	 * @param position
 	 * @return
 	 */
-	public float getmass(int position){
+	public double getmass(int position){
 		return masses.get(position);
 	}
 	
@@ -171,7 +171,7 @@ public class MS2Scan implements java.lang.Cloneable {
 	 * Z FIELD - Mass (M+H)
 	 * @return Z Field Mass List
 	 */
-	public List<Float> getmasseslist(){return masses;}
+	public List<Double> getmasseslist(){return masses;}
 	
 	public void setmzintlist(List<MzInt> list){mzint = list;}
 	
