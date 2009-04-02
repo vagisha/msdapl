@@ -40,8 +40,6 @@ public class MsDataUploader {
     private boolean uploadAnalysis = false;
     
     
-    private static final Pattern fileNamePattern = Pattern.compile("(\\S+)\\.(\\d+)\\.(\\d+)\\.(\\d{1})");
-    
     private void resetUploader() {
         uploadExceptionList.clear();
         uploadedSearchId = 0;
@@ -521,35 +519,6 @@ public class MsDataUploader {
 //        
 //        return searchId;
 //    }
-    
-    
-    public static int getScanIdFor(String runFileScanString, int searchId) {
-        // parse the filename to get the filename, scan number and charge
-        // e.g. NE063005ph8s02.17247.17247.2
-        Matcher match = fileNamePattern.matcher(runFileScanString);
-        if (!match.matches()) {
-            log.error("!!!INVALID FILENAME FROM DTASELECT RESULT: "+runFileScanString);
-            return 0;
-        }
-        String runFileName = match.group(1)+".ms2";
-        int scanNum = Integer.parseInt(match.group(2));
-        
-        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
-        int runId = runDao.loadRunIdForSearchAndFileName(searchId, runFileName);
-        if (runId == 0) {
-            log.error("!!!NO RUN FOUND FOR SearchId: "+searchId+"; fileName: "+runFileName);
-            return 0;
-        }
-        
-        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
-        int scanId = scanDao.loadScanIdForScanNumRun(scanNum, runId);
-        if (scanId == 0) {
-            log.error("!!!NO SCAN FOUND FOR SCAN NUMBER: "+scanNum+"; runId: "+runId+"; fileName: "+runFileName);
-            return 0;
-        }
-        
-        return scanId;
-    }
     
     public static void main(String[] args) throws UploadException {
         long start = System.currentTimeMillis();
