@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
@@ -211,6 +212,7 @@ public class MsDataUploader {
             SearchDataUploadService sdus = getSearchDataUploader(searchDirectory, 
                     remoteServer, remoteSearchDataDirectory, searchDate);
             exptUploader.setSearchDataUploader(sdus);
+            //sdus.setRawDataFileNames(rdus.getFileNames(), rdus.getFileFormat());
         }
         // Get the analysis data uploader
         if(uploadAnalysis) {
@@ -336,6 +338,9 @@ public class MsDataUploader {
             // If the search is already uploaded, don't re-upload it.
             int searchId = 0;
             try {
+                // TODO We are looking for a Sequest search ID
+                // An experiment can have multiple searches, even multiple Sequest searches. 
+                // Need to think about how to handle this.
                 searchId = getExperimentSequestSearchId(this.uploadedExptId);
             }
             catch (Exception e) {
@@ -364,20 +369,50 @@ public class MsDataUploader {
         
         // ----- UPLOAD ANALYSIS DATA
         if(uploadAnalysis) {
+            // If the search analysis is already uploaded, don't re-upload it.
+            int searchAnalysisID = 0;
+            // TODO We are looking for a Analysis id for our search ID. 
+            // However, we can have multiple entries in the msSearchAnalysis for each searchId
+            // Need to think about how to handle this.
             try {
-                exptUploader.uploadAnalysisData(this.uploadedSearchId);
+                searchAnalysisID = getSearchAnalysisId(uploadedSearchId);
             }
-            catch (UploadException ex) {
+            catch (Exception e) {
+                UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+                ex.appendErrorMessage(e.getMessage());
                 uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
+                log.error(ex.getMessage());
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                return;
+            }
+            if(searchAnalysisID == 0) {
+                try {
+                    searchAnalysisID = exptUploader.uploadAnalysisData(this.uploadedSearchId);
+                }
+                catch (UploadException ex) {
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
+                }
+            }
+            else {
+                log.info("Search Analysis was uploaded previously. SearchAnalysisID: "+searchAnalysisID);
             }
         }
         
         long end = System.currentTimeMillis();
         logEndExperimentUpload(exptUploader, start, end);
        
+    }
+
+    private int getSearchAnalysisId(int searchId) throws Exception {
+        MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+        List<Integer> analysisIds = analysisDao.getAnalysisIdsForSearch(searchId);
+        if(analysisIds.size() > 0) {
+            throw new Exception("Multiple analysis ids for found for searchID: "+searchId);
+        }
+        if(analysisIds.size() == 0) return 0;
+        return analysisIds.get(0);
     }
 
     private int getExperimentSequestSearchId(int uploadedExptId2) throws Exception {
