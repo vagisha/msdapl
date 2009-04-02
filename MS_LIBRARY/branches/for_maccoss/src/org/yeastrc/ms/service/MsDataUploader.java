@@ -408,7 +408,7 @@ public class MsDataUploader {
     private int getSearchAnalysisId(int searchId) throws Exception {
         MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
         List<Integer> analysisIds = analysisDao.getAnalysisIdsForSearch(searchId);
-        if(analysisIds.size() > 0) {
+        if(analysisIds.size() > 1) {
             throw new Exception("Multiple analysis ids for found for searchID: "+searchId);
         }
         if(analysisIds.size() == 0) return 0;
