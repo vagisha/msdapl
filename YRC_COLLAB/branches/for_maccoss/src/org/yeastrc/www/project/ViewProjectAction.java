@@ -8,9 +8,15 @@
 
 package org.yeastrc.www.project;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,11 +27,23 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.grant.Grant;
-import org.yeastrc.grant.GrantDAO;
+import org.yeastrc.experiment.AnalysisFile;
+import org.yeastrc.experiment.ExperimentSearch;
+import org.yeastrc.experiment.ProjectExperiment;
+import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.experiment.SearchAnalysis;
+import org.yeastrc.experiment.SearchFile;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.general.MsExperiment;
+import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
-import org.yeastrc.project.Projects;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
@@ -41,6 +59,9 @@ import org.yeastrc.yates.YatesRunSearcher;
  */
 public class ViewProjectAction extends Action {
 
+    
+    private static DAOFactory daoFactory = DAOFactory.instance();
+    
 	public ActionForward execute( ActionMapping mapping,
 								  ActionForm form,
 								  HttpServletRequest request,
@@ -103,36 +124,29 @@ public class ViewProjectAction extends Action {
 		// Set this project in the request, as a bean to be displayed on the view
 		request.setAttribute("project", project);
 		
+		
+		
 		// Check for experiment data for this project
-
+		List<ProjectExperiment> experiments = getProjectExperiments(projectID);
+		
+		
+		// load the dtaselect results;
 		// Check for yates MS data
-		YatesRunSearcher yrs = new YatesRunSearcher();
-		yrs.setProjectID(project.getID());
-		yrs.setMostRecent( true );
+        YatesRunSearcher yrs = new YatesRunSearcher();
+        yrs.setProjectID(project.getID());
+        yrs.setMostRecent( true );
+        List<YatesRun> yatesRuns = yrs.search();
+        
+        
+        // Associate the runs with the respective experiments
+        linkExperimentsAndDtaSelect(experiments, yatesRuns);
+		
+		
+		
+		// TODO Check uploads for a project
 
-		List<YatesRun> yatesRuns = yrs.search();
-		request.setAttribute("yatesdata", yatesRuns);
-
-		// Associate yatesRunIds with msData searchIds where possible AND
-		// Associate yatesRunIds with already saved Protein Inference Runs
-		Map<Integer, Integer> yatesRunToMsSearchMap = new HashMap<Integer, Integer>(yatesRuns.size());
-		Map<Integer, List<ProteinferJob>> yatesRunToProteinferRunMap = new HashMap<Integer, List<ProteinferJob>>();
-		for(YatesRun run: yatesRuns) {
-		    int runId = run.getId();
-		    int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
-
-		    yatesRunToMsSearchMap.put(runId, searchId);
-		    if(searchId > 0) {
-		        List<ProteinferJob> proteinferRunIds = ProteinferRunSearcher.getProteinferJobsForMsSearch(searchId);
-		        yatesRunToProteinferRunMap.put(searchId, proteinferRunIds);
-		    }
-		}
-		request.setAttribute("yatesRunToMsSearchMap", yatesRunToMsSearchMap);
-		request.setAttribute("yatesRunToProteinferRunMap", yatesRunToProteinferRunMap);
-		request.setAttribute("projectId", projectID);
-
-
-
+		
+		// Should the user be able to upload data to this project.
 		Groups groupMan = Groups.getInstance();
 		boolean showUpload = false;
 		if(groupMan.isMember( user.getResearcher().getID(), "administrators" ) ) {
@@ -158,5 +172,130 @@ public class ViewProjectAction extends Action {
 
 
 	}
-	
+
+
+    private List<ProjectExperiment> getProjectExperiments(int projectId) throws Exception {
+        
+        List<Integer> experimentIds = ProjectExperimentDAO.instance().getProjectExperimentIds(projectId);
+        Collections.sort(experimentIds);
+        
+        if(experimentIds.size() == 0)
+            return new ArrayList<ProjectExperiment>(0);
+        
+        
+        List<ProjectExperiment> experiments = new ArrayList<ProjectExperiment>(experimentIds.size());
+        
+        for(int experimentId: experimentIds) {
+            MsExperiment expt = daoFactory.getMsExperimentDAO().loadExperiment(experimentId);
+            ProjectExperiment pExpt = new ProjectExperiment(expt);
+            
+            // load the searches
+            List<Integer> searchIds = daoFactory.getMsSearchDAO().getSearchIdsForExperiment(experimentId);
+            List<ExperimentSearch> searches = new ArrayList<ExperimentSearch>(searchIds.size());
+            for(int searchId: searchIds) {
+                searches.add(getExperimentSearch(searchId));
+            }
+            pExpt.setSearches(searches);
+            
+            // load the analyses
+            Set<Integer> analysisIds = new HashSet<Integer>();
+            MsSearchAnalysisDAO saDao = daoFactory.getMsSearchAnalysisDAO();
+            for(int searchId: searchIds) {
+                List<Integer> aIds = saDao.getAnalysisIdsForSearch(searchId);
+                analysisIds.addAll(aIds);
+            }
+            List<SearchAnalysis> analyses = new ArrayList<SearchAnalysis>(analysisIds.size());
+            for(int analysisId: analysisIds) {
+                analyses.add(getSearchAnalysis(analysisId));
+            }
+            pExpt.setAnalyses(analyses);
+            
+            
+            
+            experiments.add(pExpt);
+        }
+        return experiments;
+    }
+    
+    
+    private ExperimentSearch getExperimentSearch(int searchId) {
+        
+        MsSearch search = daoFactory.getMsSearchDAO().loadSearch(searchId);
+        ExperimentSearch eSearch = new ExperimentSearch(search);
+        
+        MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
+        
+        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
+        List<SearchFile> files = new ArrayList<SearchFile>(runSearchIds.size());
+        
+        for(int runSearchId: runSearchIds) {
+            MsRunSearch rs = rsDao.loadRunSearch(runSearchId);
+            String filename = rsDao.loadFilenameForRunSearch(runSearchId);
+            SearchFile file = new SearchFile(rs, filename);
+            files.add(file);
+        }
+        eSearch.setFiles(files);
+        return eSearch;
+    }
+    
+    private SearchAnalysis getSearchAnalysis(int searchAnalysisId) {
+        
+        MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
+        SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
+        
+        MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
+        
+        List<Integer> rsAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
+        List<AnalysisFile> files = new ArrayList<AnalysisFile>(rsAnalysisIds.size());
+        for(int id: rsAnalysisIds) {
+            MsRunSearchAnalysis rsa = rsaDao.load(id);
+            String filename = rsaDao.loadFilenameForRunSearchAnalysis(id);
+            AnalysisFile file = new AnalysisFile(rsa, filename);
+            files.add(file);
+        }
+        
+        sAnalysis.setFiles(files);
+        return sAnalysis;
+    }
+    
+    private void linkExperimentsAndDtaSelect(List<ProjectExperiment> experiments, List<YatesRun> yatesRuns) throws SQLException {
+        
+        // We will get the searchIds from the tblYatesRun* tables
+        // Create a map of searchId and experimentId
+        Map<Integer, Integer> searchIdToExperimentId = new HashMap<Integer, Integer>();
+        for(ProjectExperiment experiment: experiments) {
+            for(ExperimentSearch search: experiment.getSearches())
+                searchIdToExperimentId.put(search.getId(), experiment.getId());
+        }
+        
+        List<Integer> experimentIds = new ArrayList<Integer>(experiments.size());
+        
+        
+        // put the DTASelect results in the appropriate experiments
+        ExptComparator comparator = new ExptComparator();
+        for(YatesRun run: yatesRuns) {
+            int runId = run.getId();
+            int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
+
+            if(searchId > 0) {
+                Integer experimentId = searchIdToExperimentId.get(searchId);
+                if(experimentId != null) {
+                    
+                    int idx = Collections.binarySearch(experimentIds, experimentId);
+                    if(idx != -1) {
+                        ProjectExperiment pe = experiments.get(idx);
+                        pe.setDtaSelect(run);
+                    }
+                }
+            }
+        }
+    }
+    
+    private static class ExptComparator implements Comparator<ProjectExperiment> {
+
+        @Override
+        public int compare(ProjectExperiment o1, ProjectExperiment o2) {
+            return Integer.valueOf(o1.getId()).compareTo(o2.getId());
+        }
+    }
 }
