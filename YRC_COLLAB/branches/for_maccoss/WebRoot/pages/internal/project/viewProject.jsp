@@ -157,6 +157,7 @@
 					<th>Program</th>
 					<th>Version</th>
 				</thead>
+				<tbody>
 					<logic:iterate name="experiment" property="searches" id="search">
 						<tr>
 							<td><bean:write name="search" property="id"/></td>
@@ -165,7 +166,15 @@
 							<td><bean:write name="search" property="searchProgram"/></td>
 							<td><bean:write name="search" property="searchProgramVersion"/></td>
 						</tr>
+						<tr>
+							<td colspan="5" style="border: 1px solid gray">
+								<logic:iterate name="search" property="files" id="file">
+									<bean:write name="file" property="fileName"/> &nbsp; <bean:write name="file" property="searchFileFormat"/><br>
+								</logic:iterate>
+							</td>
+						</tr>
 					</logic:iterate>
+				</tbody>
 				</table>
 			</logic:notEmpty>
 			
