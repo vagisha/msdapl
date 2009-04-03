@@ -138,9 +138,10 @@ public class ViewProjectAction extends Action {
         List<YatesRun> yatesRuns = yrs.search();
         
         
-        // Associate the runs with the respective experiments
+        // Associate the DTASelect runs with the respective experiments
         linkExperimentsAndDtaSelect(experiments, yatesRuns);
 		
+        request.setAttribute("experiments", experiments);
 		
 		
 		// TODO Check uploads for a project

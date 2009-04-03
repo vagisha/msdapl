@@ -62,6 +62,10 @@ function addResearcher() {
 	lastResearcherIndex++;
 }
 
+function onCancel() {
+	document.location = "<yrcwww:link path='viewFrontPage.do' />"
+}
+
 </script>
 
 <yrcwww:contentbox title="Create a New Project" centered="true" width="750" scheme="search">
@@ -145,6 +149,7 @@ Go <html:link action="newResearcher.do">here</html:link> to add a new researcher
 
  <P><NOBR>
  <html:submit value="Save Project" styleClass="button"/>
+ <input type="button" class="button" onclick="javascript:onCancel();" value="Cancel" />
  </NOBR>
  
   </html:form>

@@ -22,6 +22,16 @@ function projectSearcherPopUp(field) {
 	window.open(doc, "PROJECT_SELECTION_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }
 
+
+function onCancel(projectId) {
+	if(projectId == 0) {
+		document.location = "<yrcwww:link path='viewFrontPage.do' />";
+	}
+	else {
+		document.location = "<yrcwww:link path='viewProject.do?ID=' />"+projectId;
+	}
+		
+}
 </script>
 
 
@@ -168,7 +178,12 @@ function projectSearcherPopUp(field) {
  
  <P>Depending on the size of the data, <u>the upload process may take several minutes</u>.
 
- <p><html:submit value="Upload Data"/>
+ <p>
+<nobr>
+<html:submit styleClass="button" value="Upload Data"/>
+<input type="button" class="button" onclick="javascript:onCancel(<bean:write name='uploadDataForm' property='projectID' />);" value="Cancel" />
+ </nobr>
+ </p>
  </CENTER>
 
 </html:form>

@@ -17,16 +17,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.bio.taxonomy.Species;
-import org.yeastrc.nr_seq.NRDatabaseUtils;
-import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import java.lang.reflect.Method;
 /**
  * Description of class goes here.
  * 
@@ -54,6 +50,18 @@ public class UploadDataAction extends Action {
 		
 		UploadDataForm uform = (UploadDataForm)form;
 		int projectID = uform.getProjectID();
+		
+		// User has to be a member of a group.
+		// TODO Restricting access to MacCoss group members 
+		Groups groupMan = Groups.getInstance();
+        if (!groupMan.isMember(user.getResearcher().getID(), "administrators") && 
+            !groupMan.isMember(user.getResearcher().getID(), "MacCoss")) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("access", new ActionMessage("error.access.invalidgroup"));
+            saveErrors( request, errors );
+            return mapping.findForward("standardHome");
+        }
+        
 		
 		// Restrict access to administrators and researchers associated with the project
 		Project project = ProjectDAO.instance().load(projectID);
@@ -88,17 +96,6 @@ public class UploadDataAction extends Action {
 
 		jobSaver.setSubmitter( user.getID() );
 
-
-		// Attempt to find the exact protein they're talking about for the bait
-//		Species tSpecies = new Species();
-//		tSpecies.setId(species);
-//		try {
-//		    NRProtein baitProtein = NRDatabaseUtils.getInstance().findProteinByName(baitDesc, tSpecies);
-//		    if (baitProtein != null)
-//		        jobSaver.setBaitProtein( baitProtein.getId() );
-//		} catch (Exception e) { ; }
-
-
 		try {
 		    // Save data to the queue database
 		    jobSaver.savetoDatabase();
@@ -110,13 +107,9 @@ public class UploadDataAction extends Action {
 		    return mapping.findForward("Failure");
 		}
 			
-
-		
 		request.setAttribute( "queued", new Boolean( true ) );
 		
 		// Kick it to the view page
 		return mapping.findForward( "Success" );
-
 	}
-
 }

@@ -15,9 +15,19 @@
 
 <logic:empty name="jobs" scope="request">
 
-	<p align="center">There are no pending MS upload jobs.</p>
-
+	<logic:equal name="status" scope="request" value="pending">
+		<p align="center">There are no pending MS upload jobs.</p>
+		<p align="center"><a href="<yrcwww:link path='listUploadJobs.do?status=complete' />">View Completed Jobs</a></p>
+	</logic:equal>
+	
+	<logic:notEqual name="status" scope="request" value="pending">
+		<p align="center">There are no completed MS upload jobs.</p>
+		<p align="center"><a href="<yrcwww:link path='listUploadJobs.do?status=pending' />">View Pending Jobs</a></p>
+	</logic:notEqual>
+	
 </logic:empty>
+
+
 <logic:notEmpty name="jobs" scope="request">
 
 
@@ -25,6 +35,7 @@
 		<p align="center">Listed below are the <b>pending</b> MS uploads.</p>
 		<p align="center"><a href="<yrcwww:link path='listUploadJobs.do?status=complete' />">View Completed Jobs</a></p>
 	</logic:equal>
+	
 	<logic:notEqual name="status" scope="request" value="pending">
 		<p align="center">Listed below are the <b>completed</b> MS uploads.</p>
 		<p align="center"><a href="<yrcwww:link path='listUploadJobs.do?status=pending' />">View Pending Jobs</a></p>
@@ -51,7 +62,6 @@
 			<td align="left" style="width:10%;font-size:8pt;text-decoration:underline;">Sub. Date</td>
 			<td align="left" style="width:32%;font-size:8pt;text-decoration:underline;">Directory</td>
 			<td align="left" style="width:7%;font-size:8pt;text-decoration:underline;">PI</td>
-			<td align="left" style="width:5%;font-size:8pt;text-decoration:underline;">Bait</td>
 			<td align="left" style="width:15%;font-size:8pt;text-decoration:underline;">Comments</td>
 		</yrcwww:colorrow>
 	
@@ -92,12 +102,6 @@
 					</div>
 				</td>
 
-				<td align="left" valign="top" style="width:5%;font-size:8pt;">
-					<div style="width:100%;height:auto;overflow:auto;">
-						<bean:write name="job" property="baitProteinDescription" />
-					</div>
-				</td>
-				
 				<td align="left" valign="top" style="width:15%;font-size:8pt;">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<bean:write name="job" property="comments" />
