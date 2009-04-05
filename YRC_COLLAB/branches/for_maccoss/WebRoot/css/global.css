@@ -112,7 +112,7 @@ border-style: outset none outset outset; border-width: 1px 0px 0px 1px; border-c
 #sub_menu ul{margin:0px;padding:0;list-style-type:none;width:auto;font-size:9pt;}
 #sub_menu ul li{display:block;float:left;margin:0 5px 0 0;}
 #sub_menu ul li a{display:block;float:left;color:white;text-decoration:none;padding:3px 15px 3px 15px;height:15px;
-background-color:#3d4960; border-color: #3d4960; border-width: 1px; border-style: outset;}
+background-color:#939cb0; border-color: #939cb0; border-width: 1px; border-style: outset;}
 #sub_menu ul li a:hover{color:white;background-color: black;}
 
 
