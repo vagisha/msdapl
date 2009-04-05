@@ -164,6 +164,7 @@ public class ProjectsSearcher {
                 sqlStr += " P.projectSubmitDate <= '" + year + month + day + "'";
             }
             
+            sqlStr +=" GROUP BY P.projectID ";
             sqlStr += " ORDER BY P.projectSubmitDate";
             
             stmt = conn.prepareStatement(sqlStr);

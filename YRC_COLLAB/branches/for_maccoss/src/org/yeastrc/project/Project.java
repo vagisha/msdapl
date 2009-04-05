@@ -368,10 +368,12 @@ public class Project implements Comparable<Project> {
     public String[] getGroupsArray() {
         if (this.getGroups() == null) { return null; }
         
-        Object[] tmp = new String[0];       
-        String[] groups = (String[])(this.getGroups().toArray(tmp));
-        
-        return groups;
+        String[] grpNames = new String[groups.size()];
+        int i = 0;
+        for(Group group: groups) {
+            grpNames[i++] = group.getName();
+        }
+        return grpNames;
     }
     
 	/**

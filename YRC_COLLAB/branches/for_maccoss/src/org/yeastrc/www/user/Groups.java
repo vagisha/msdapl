@@ -95,7 +95,7 @@ public class Groups {
 	 * @param groupName the name of the group
 	 * @return The id of the group, 0 if not found
 	 */
-	private int getGroupID(String groupName) throws SQLException {
+	public int getGroupID(String groupName) throws SQLException {
 		int groupID = 0;
 		if (groupName == null) return 0;
 		

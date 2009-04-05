@@ -22,9 +22,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.grant.Grant;
+import org.yeastrc.group.Group;
+import org.yeastrc.group.GroupDAO;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.project.Researcher;
+import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -128,6 +131,14 @@ public class SaveNewProjectAction extends Action {
 		project.setProgress(progress);
 		project.setPublications(publications);
 		project.setComments(comments);
+		
+		// TODO Add checkboxes for grops on the project page. 
+		// For now we add all projects to the MacCoss groups
+		int groupId = Groups.getInstance().getGroupID("MacCoss");
+		List<Group> groups = new ArrayList<Group>(1);
+		Group grp = GroupDAO.instance().load(groupId);
+		groups.add(grp);
+		project.setGroups(groups);
 		
 		// project grants
 		List<Grant> grants = ((EditProjectForm)(form)).getGrantList();

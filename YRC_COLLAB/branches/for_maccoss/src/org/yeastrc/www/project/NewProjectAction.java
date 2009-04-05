@@ -33,6 +33,17 @@ public class NewProjectAction extends Action {
 			return mapping.findForward("authenticate");
 		}
 
+		
+		// Make sure this user is in the MacCoss group
+		Groups groupMan = Groups.getInstance();
+		if (!groupMan.isMember(user.getResearcher().getID(), "MacCoss") &&
+		    !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("access", new ActionMessage("error.access.invalidgroup"));
+            saveErrors( request, errors );
+            return mapping.findForward("Failure");
+        }
+		
 		// The Researcher
 		Researcher researcher = user.getResearcher();
 
