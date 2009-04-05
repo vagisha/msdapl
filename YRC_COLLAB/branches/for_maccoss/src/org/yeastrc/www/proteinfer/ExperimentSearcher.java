@@ -6,16 +6,13 @@
  */
 package org.yeastrc.www.proteinfer;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
@@ -41,7 +38,7 @@ public class ExperimentSearcher {
     }
     
     public List<Integer> getSearchIdsForProjects(List<Project> projects) throws SQLException {
-        List<Integer> experimentIds = getExperimentIdsForProjects(projects);
+        List<Integer> experimentIds = ProjectExperimentDAO.instance().getExperimentIdsForProjects(projects);
         // get all the searches for the experiments
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         Set<Integer> searchIds = new HashSet<Integer>();
@@ -58,7 +55,7 @@ public class ExperimentSearcher {
     }
     
     public List<Integer> getSearchAnalysisIdsForProjects(List<Project> projects) throws SQLException {
-        List<Integer> experimentIds = getExperimentIdsForProjects(projects);
+        List<Integer> experimentIds = ProjectExperimentDAO.instance().getExperimentIdsForProjects(projects);
         // get all the search analyses for the experiments
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         MsSearchAnalysisDAO saDao = DAOFactory.instance().getMsSearchAnalysisDAO();
@@ -72,49 +69,5 @@ public class ExperimentSearcher {
             }
         }
         return new ArrayList<Integer>(searchAnalysisIds);
-    }
-    
-    private List<Integer> getExperimentIdsForProjects(List<Project> projects) throws SQLException {
-        if(projects == null || projects.size() == 0) 
-            return new ArrayList<Integer>(0);
-        
-        String projIdStr = "";
-        for(Project proj: projects) {
-            projIdStr += ","+proj.getID();
-        }
-        projIdStr = projIdStr.substring(1); // remove first comma
-        
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        
-        try {
-            
-            String sql = "SELECT experimentID FROM tblProjectExperiment WHERE projectID in ("+projIdStr+")";
-                    
-            conn = DBConnectionManager.getConnection( "yrc" );
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            
-            List<Integer> experimentIds = new ArrayList<Integer>();
-            while (rs.next()) {
-                experimentIds.add( rs.getInt("experimentID"));
-            }
-            return experimentIds;
-            
-        } finally {
-            
-            if (rs != null) {
-                try { rs.close(); rs = null; } catch (Exception e) { ; }
-            }
-
-            if (stmt != null) {
-                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
-            }
-            
-            if (conn != null) {
-                try { conn.close(); conn = null; } catch (Exception e) { ; }
-            }           
-        }
     }
 }

@@ -12,11 +12,20 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 /**
  * 
  */
-public class AnalysisFile implements MsRunSearchAnalysis {
+public class AnalysisFile implements MsRunSearchAnalysis, File {
 
     private final String filename;
     private final MsRunSearchAnalysis runSearchAnalysis;
+    private int numResults;
     
+    public int getNumResults() {
+        return numResults;
+    }
+
+    public void setNumResults(int numResults) {
+        this.numResults = numResults;
+    }
+
     public AnalysisFile(MsRunSearchAnalysis runSearchAnalysis, String filename) {
         this.runSearchAnalysis = runSearchAnalysis;
         this.filename = filename;

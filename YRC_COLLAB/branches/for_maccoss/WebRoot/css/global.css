@@ -112,7 +112,7 @@ border-style: outset none outset outset; border-width: 1px 0px 0px 1px; border-c
 #sub_menu ul{margin:0px;padding:0;list-style-type:none;width:auto;font-size:9pt;}
 #sub_menu ul li{display:block;float:left;margin:0 5px 0 0;}
 #sub_menu ul li a{display:block;float:left;color:white;text-decoration:none;padding:3px 15px 3px 15px;height:15px;
-background-color:#939cb0; border-color: #939cb0; border-width: 1px; border-style: outset;}
+background-color:#3d4960; border-color: #3d4960; border-width: 1px; border-style: outset;}
 #sub_menu ul li a:hover{color:white;background-color: black;}
 
 
@@ -246,12 +246,12 @@ DIV.project .button {
 	margin-top:20px;	
 }
 INPUT.plain_button {
-	background-color:#939cb0; 
+	background-color:#3d4960; 
 	color:#ffffff;
-	border-color: #939cb0; 
+	border-color: #3d4960; 
 	border-width: 1px; 
 	border-style: outset;
-	font-size:10pt;
+	font-size:9pt;
 	font-weight:bold;
 	margin-top:15px;
 	text-decoration:none;
@@ -263,7 +263,7 @@ INPUT.error_button {
 	border-color: #D74D2D; 
 	border-width: 1px; 
 	border-style: outset;
-	font-size:10pt;
+	font-size:9pt;
 	font-weight:bold;
 	margin-top:15px;
 	text-decoration:none;

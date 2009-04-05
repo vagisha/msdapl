@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.db.DBConnectionManager;
+import org.yeastrc.project.Project;
 
 /**
  * 
@@ -63,6 +64,50 @@ public class ProjectExperimentDAO {
             }
         }
         return experimentIds;
+    }
+    
+    public List<Integer> getExperimentIdsForProjects(List<Project> projects) throws SQLException {
+        if(projects == null || projects.size() == 0) 
+            return new ArrayList<Integer>(0);
+        
+        String projIdStr = "";
+        for(Project proj: projects) {
+            projIdStr += ","+proj.getID();
+        }
+        projIdStr = projIdStr.substring(1); // remove first comma
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String sql = "SELECT experimentID FROM tblProjectExperiment WHERE projectID in ("+projIdStr+")";
+                    
+            conn = DBConnectionManager.getConnection( "yrc" );
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            List<Integer> experimentIds = new ArrayList<Integer>();
+            while (rs.next()) {
+                experimentIds.add( rs.getInt("experimentID"));
+            }
+            return experimentIds;
+            
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
     }
     
 }

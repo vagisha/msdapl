@@ -6,6 +6,7 @@
  */
 package org.yeastrc.experiment;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -46,6 +47,16 @@ public class ExperimentSearch implements MsSearch{
         return search.getDynamicResidueMods();
     }
 
+    public String getDynamicModifications() {
+        String mods = "";
+        for(MsResidueModification mod: getDynamicResidueMods()) {
+            mods = mods + ", "+mod.getModifiedResidue()+" ("+round(mod.getModificationMass())+")";
+        }
+        if(mods.length() > 0)
+            mods = mods.substring(1);
+        return mods;
+    }
+    
     @Override
     public List<MsTerminalModification> getDynamicTerminalMods() {
         return search.getDynamicTerminalMods();
@@ -54,6 +65,16 @@ public class ExperimentSearch implements MsSearch{
     @Override
     public List<MsEnzyme> getEnzymeList() {
         return search.getEnzymeList();
+    }
+    
+    public String getEnzymes() {
+        String enzymes = "";
+        for(MsEnzyme enzyme: getEnzymeList()) {
+            enzymes = enzymes + ", "+enzyme.getName();
+        }
+        if(enzymes.length() > 0)
+            enzymes = enzymes.substring(1);
+        return enzymes;
     }
 
     @Override
@@ -65,10 +86,35 @@ public class ExperimentSearch implements MsSearch{
     public List<MsSearchDatabase> getSearchDatabases() {
         return search.getSearchDatabases();
     }
+    
+    public String getSearchDatabase() {
+        String dbs = "";
+        for(MsSearchDatabase db: getSearchDatabases()) {
+            dbs = dbs + ", "+db.getDatabaseFileName();
+        }
+        if(dbs.length() > 0)
+            dbs = dbs.substring(1);
+        return dbs;
+    }
 
     @Override
     public List<MsResidueModification> getStaticResidueMods() {
         return search.getStaticResidueMods();
+    }
+    
+    public String getStaticModifications() {
+        String mods = "";
+        for(MsResidueModification mod: getStaticResidueMods()) {
+            mods = mods + ", "+mod.getModifiedResidue()+" ("+round(mod.getModificationMass())+")";
+        }
+        if(mods.length() > 0)
+            mods = mods.substring(1);
+        return mods;
+    }
+    
+    private static double round(BigDecimal number) {
+        double num = number.doubleValue();
+        return Math.round(num*100.0)/100.0;
     }
 
     @Override

@@ -14,11 +14,20 @@ import org.yeastrc.ms.domain.search.SearchFileFormat;
 /**
  * 
  */
-public class SearchFile {
+public class SearchFile implements File{
 
     private final String filename;
     private final MsRunSearch runSearch;
+    private int numResults;
     
+    public int getNumResults() {
+        return numResults;
+    }
+
+    public void setNumResults(int numResults) {
+        this.numResults = numResults;
+    }
+
     public SearchFile(MsRunSearch runSearch, String filename) {
         this.runSearch = runSearch;
         this.filename = filename;

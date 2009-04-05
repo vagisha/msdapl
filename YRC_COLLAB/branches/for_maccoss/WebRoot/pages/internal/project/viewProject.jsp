@@ -17,7 +17,7 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<yrcwww:contentbox title="Project Details" centered="true" width="750">
+<yrcwww:contentbox title="Project Details" centered="true" width="850">
 
 <SCRIPT LANGUAGE="JavaScript">
  function confirmDelete(ID) {
@@ -129,80 +129,9 @@
  </CENTER>
 </yrcwww:contentbox>
 
-<!-- List the YATES Data here: include file="listYatesData.jsp" -->
 <br><br>
-<yrcwww:contentbox title="Experiments" centered="true" width="750">
-
-	<logic:empty name="experiments">
-		There are no experiments for this project. To upload an experiment for this project click <a href="" onClick="javascript:goMacCoss(); return false;">here</a>
-	</logic:empty>
-
-	<logic:notEmpty name="experiments">
-		
-		<logic:iterate name="experiments" id="experiment">
-			<table cellspacing="0" cellpadding="0">		
-				<tr><td><b>Experiment ID: </b></td><td style="padding-left:10"><b><bean:write name="experiment" property="id"/></b></td></tr>
-				<tr><td><b>Location: </b></td><td style="padding-left:10"><bean:write name="experiment" property="serverDirectory"/></td></tr>
-				<tr><td><b>Date Uploaded: </b></td><td style="padding-left:10"><bean:write name="experiment" property="uploadDate"/></td></tr>
-			</table>
-			
-			<br>
-			<!-- SEARCHES FOR THE EXPERIMENT -->
-			<logic:notEmpty name="experiment" property="searches">
-				<table style="border:1px dashed gray;" width="90%" align="center">
-				<thead>
-					<th>SearchID</th>
-					<th>Search Date</th>
-					<th>Upload Date</th>
-					<th>Program</th>
-					<th>Version</th>
-				</thead>
-				<tbody>
-					<logic:iterate name="experiment" property="searches" id="search">
-						<tr>
-							<td><bean:write name="search" property="id"/></td>
-							<td><bean:write name="search" property="searchDate"/></td>
-							<td><bean:write name="search" property="uploadDate"/></td>
-							<td><bean:write name="search" property="searchProgram"/></td>
-							<td><bean:write name="search" property="searchProgramVersion"/></td>
-						</tr>
-						<tr>
-							<td colspan="5" style="border: 1px solid gray">
-								<logic:iterate name="search" property="files" id="file">
-									<bean:write name="file" property="fileName"/> &nbsp; <bean:write name="file" property="searchFileFormat"/><br>
-								</logic:iterate>
-							</td>
-						</tr>
-					</logic:iterate>
-				</tbody>
-				</table>
-			</logic:notEmpty>
-			
-			<br>
-			<!-- SEARCH ANALYSES FOR THE EXPERIMENT -->
-			<logic:notEmpty name="experiment" property="analyses">
-				<table style="border:1px dashed gray;" width="90%" align="center">
-				<thead>
-					<th>AnalysisID</th>
-					<th>Upload Date</th>
-					<th>Program</th>
-					<th>Version</th>
-				</thead>
-					<logic:iterate name="experiment" property="analyses" id="analysis">
-						<tr>
-							<td><bean:write name="analysis" property="id"/></td>
-							<td><bean:write name="analysis" property="uploadDate"/></td>
-							<td><bean:write name="analysis" property="analysisProgram"/></td>
-							<td><bean:write name="analysis" property="analysisProgramVersion"/></td>
-						</tr>
-					</logic:iterate>
-				</table>
-			</logic:notEmpty>
-			
-		</logic:iterate>
-	</logic:notEmpty>
-
-</yrcwww:contentbox>
-
+<!-- List experiment data here -->
+<%@ include file="listExperiments.jsp" %>
+<br>
 
 <%@ include file="/includes/footer.jsp" %>

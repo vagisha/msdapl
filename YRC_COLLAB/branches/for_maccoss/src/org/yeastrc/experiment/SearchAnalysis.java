@@ -29,7 +29,7 @@ public class SearchAnalysis implements MsSearchAnalysis {
         this.files = files;
     }
     
-    public List<AnalysisFile> getfiles() {
+    public List<AnalysisFile> getFiles() {
         return files;
     }
     
