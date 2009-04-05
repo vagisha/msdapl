@@ -73,7 +73,7 @@
     </select>
     
     <select id="countResultsForRunSearchScanChargeMass" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT count(id) FROM msRunSearchResult 
+    	SELECT count(*) FROM msRunSearchResult 
     	WHERE runSearchID = #runSearchId# 
     	AND scanID = #scanId#
     	AND charge = #charge#
