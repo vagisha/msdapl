@@ -71,11 +71,11 @@ public class TableTag extends TagSupport {
             // start table
             String tblAttrib = "";
             if(tableId != null)
-                tblAttrib = tblAttrib + "id="+tableId+" ";
+                tblAttrib = tblAttrib + "id=\""+tableId+"\" ";
             if(tableClass != null)
-                tblAttrib = tblAttrib + "class="+tableClass+" ";
+                tblAttrib = tblAttrib + "class=\""+tableClass+"\" ";
             if(center) 
-                tblAttrib = tblAttrib + "center=true ";
+                tblAttrib = tblAttrib + "align=\"center\" ";
             writer.print("<table "+tblAttrib+">\n");
             
             

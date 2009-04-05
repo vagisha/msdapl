@@ -59,7 +59,7 @@
 				window.close();
 			}
 			else {
-				var url = "<yrcwww:link path='viewGrants.do?PIs=<%=PIs%>&selectedGrants=<%=selectedGrants%>'/>";
+				var url = "<yrcwww:link path='<%="viewGrants.do?PIs="+PIs+"&selectedGrants="+selectedGrants%>'/>";
 				document.location = url;
 			}
 		}
