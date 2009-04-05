@@ -84,6 +84,11 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
         return Program.instance(progName);
     }
     
+    @Override
+    public int numResults(int runSearchId) {
+        return (Integer) queryForObject("MsRunSearch.countResults", runSearchId);
+    }
+    
     public int saveRunSearch(MsRunSearch search) {
         return saveAndReturnId("MsRunSearch.insert", search);
     }
@@ -118,7 +123,6 @@ public class MsRunSearchDAOImpl extends BaseSqlMapDAO implements MsRunSearchDAO 
             return SearchFileFormat.instance(s);
         }
     }
-
 
     //---------------------------------------------------------------------------------------
 }

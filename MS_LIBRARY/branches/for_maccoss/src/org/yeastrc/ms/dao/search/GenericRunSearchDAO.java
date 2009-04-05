@@ -81,4 +81,11 @@ public interface GenericRunSearchDAO <O extends MsRunSearch> {
      * @param runSearchId
      */
     public abstract void deleteRunSearch(int runSearchId);
+    
+    /**
+     * Returns the number of results for this run search
+     * @param runSearchId
+     * @return
+     */
+    public abstract int numResults(int runSearchId);
 }

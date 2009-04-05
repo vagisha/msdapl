@@ -4,15 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
-import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.MsSearch;
@@ -27,6 +23,7 @@ public class MsDataUploader {
     private int uploadedExptId;
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
+    private String comments;
     private String remoteServer;
     private String rawDataDirectory;
     private String remoteRawDataDirectory;
@@ -46,6 +43,10 @@ public class MsDataUploader {
         uploadedExptId = 0;
     }
     
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
     public void setRemoteServer(String remoteServer) {
         this.remoteServer = remoteServer;
     }
@@ -191,6 +192,7 @@ public class MsDataUploader {
         exptUploader.setDirectory(rawDataDirectory);
         exptUploader.setRemoteDirectory(remoteRawDataDirectory);
         exptUploader.setRemoteServer(remoteServer);
+        exptUploader.setComments(comments);
         
         // Get the raw data uploader
         log.info("Initializing RawDataUploadService");

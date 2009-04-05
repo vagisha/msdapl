@@ -51,6 +51,10 @@
     	rsa.searchAnalysisID = #analysisId# 
     </select>
     
+   	<select id="countResults" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM PercolatorResult WHERE runSearchAnalysisID=#runSearchAnalysisId# 
+    </select>
+    
     <insert id="insert" parameterMap="percolatorResultParam">
     	INSERT INTO PercolatorResult 
     	(resultID, 

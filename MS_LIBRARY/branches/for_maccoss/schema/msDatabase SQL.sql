@@ -10,7 +10,8 @@ CREATE TABLE msExperiment (
 	serverAddress VARCHAR(500),
 	serverDirectory VARCHAR(500),
 	uploadDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	lastUpdate TIMESTAMP NOT NULL
+	lastUpdate TIMESTAMP NOT NULL,
+	comments TEXT
 );
 
 

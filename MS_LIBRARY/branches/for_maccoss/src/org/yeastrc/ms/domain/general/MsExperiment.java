@@ -23,4 +23,6 @@ public interface MsExperiment {
     public abstract Date getUploadDate();
     
     public abstract Timestamp getLastUpdateDate();
+    
+    public abstract String getComments();
 }

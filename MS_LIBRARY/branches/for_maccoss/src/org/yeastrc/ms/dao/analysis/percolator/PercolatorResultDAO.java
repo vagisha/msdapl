@@ -27,4 +27,5 @@ public interface PercolatorResultDAO {
     
     public abstract void saveAllPercolatorResultData(List<PercolatorResultDataWId> dataList);
     
+    public abstract int numResults(int runSearchAnalysisId);
 }

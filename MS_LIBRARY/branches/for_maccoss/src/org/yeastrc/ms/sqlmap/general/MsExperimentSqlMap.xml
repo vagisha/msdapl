@@ -11,11 +11,13 @@
 		<result property="serverAddress" column="serverAddress" />
 		<result property="serverDirectory" column="serverDirectory" />
 		<result property="lastUpdateDate" column="lastUpdate" />
+		<result property="comments" column="comments" />
 	</resultMap>
 	
 	<parameterMap class="MsExperiment" id="msExperimentParam">
 		<parameter property="serverAddress" jdbcType="VARCHAR"/>
 		<parameter property="serverDirectory" jdbcType="VARCHAR" />
+		<parameter property="comments" jdbcType="TEXT" />
 	</parameterMap>
 	
     
@@ -40,8 +42,8 @@
     </select>
     
     <insert id="insertExperiment" parameterMap="msExperimentParam">
-    	INSERT INTO msExperiment (serverAddress, serverDirectory, lastUpdate) 
-    	VALUES (?, ?, CURRENT_TIMESTAMP)
+    	INSERT INTO msExperiment (serverAddress, serverDirectory, comments, lastUpdate) 
+    	VALUES (?, ?, ?, CURRENT_TIMESTAMP)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

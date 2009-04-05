@@ -59,6 +59,10 @@
         SELECT id FROM msScan WHERE runID = #id#
     </select> 
     
+    <select id="selectScanCountForRun" resultClass="Integer" parameterClass="Integer"> 
+        SELECT count(*) FROM msScan WHERE runID = #id#
+    </select> 
+    
     <!-- Peak data is not lazy loaded since lazy-loading of 1:1 relationships is not supported 
 	     without an external library
 	 -->

@@ -90,6 +90,10 @@
     	WHERE rs.id=#id# AND rs.searchID= s.id
     </select>
     
+    <select id="countResults" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM msRunSearchResult WHERE runSearchID=#runSearchId# 
+    </select>
+    
     <insert id="insert" parameterMap="msRunSearchParam">
     	INSERT INTO msRunSearch (
     	searchID,

@@ -24,6 +24,7 @@ public class MsExperimentUploader {
     private String remoteServer;
     private String remoteDirectory;
     private String uploadDirectory;
+    private String comments;
     
     private RawDataUploadService rdus;
     private SearchDataUploadService sdus;
@@ -49,6 +50,10 @@ public class MsExperimentUploader {
 
     public void setRemoteDirectory(String remoteDirectory) {
         this.remoteDirectory = remoteDirectory;
+    }
+    
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
     public void setRawDataUploader(RawDataUploadService rdus) {
@@ -212,6 +217,7 @@ public class MsExperimentUploader {
         ExperimentBean experiment = new ExperimentBean();
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);
+        experiment.setComments(comments);
         experiment.setUploadDate(new java.sql.Date(new Date().getTime()));
         try { return experimentDao.saveExperiment(experiment);}
         catch(RuntimeException e) {

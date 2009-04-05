@@ -21,6 +21,7 @@ public class ExperimentBean implements MsExperiment {
     private String serverDirectory;
     private Date uploadDate;
     private Timestamp lastUpdateDate;
+    private String comments;
     
     
     public void setId(int id) {
@@ -43,6 +44,14 @@ public class ExperimentBean implements MsExperiment {
         this.lastUpdateDate = lastUpdateDate;
     }
 
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+    
     @Override
     public int getId() {
         return id;

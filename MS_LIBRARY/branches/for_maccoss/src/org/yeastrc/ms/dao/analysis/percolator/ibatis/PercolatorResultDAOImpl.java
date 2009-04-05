@@ -67,6 +67,11 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
     
     @Override
+    public int numResults(int runSearchAnalysisId) {
+        return (Integer)queryForObject(namespace+".countResults", runSearchAnalysisId);
+    }
+    
+    @Override
     public void save(PercolatorResultDataWId data) {
         save(namespace+".insert", data);
     }

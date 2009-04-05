@@ -54,6 +54,11 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
         return msScanDao.loadScanIdsForRun(runId);
     }
     
+    @Override
+    public int numScans(int runId) {
+        return msScanDao.numScans(runId);
+    }
+    
     public int loadScanIdForScanNumRun(int scanNum, int runId) {
         return msScanDao.loadScanIdForScanNumRun(scanNum, runId);
     }
@@ -89,5 +94,4 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     public void delete(int scanId) {
         msScanDao.delete(scanId);
     }
-
 }
