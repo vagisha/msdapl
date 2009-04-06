@@ -76,14 +76,14 @@
     
     <select id="selectEnzymesForRun" resultMap="msEnzymeResult" parameterClass="Integer">
     	SELECT e.id, e.name, e.sense, e.cut, e.nocut, e.description 
-    	FROM MsDigestionEnzyme as e, msRunEnzyme
+    	FROM msDigestionEnzyme as e, msRunEnzyme
     	WHERE e.id = msRunEnzyme.enzymeID AND
     	msRunEnzyme.runID = #id#
     </select>
     
     <select id="selectEnzymesForSearch" resultMap="msEnzymeResult" parameterClass="Integer">
     	SELECT e.id, e.name, e.sense, e.cut, e.nocut, e.description 
-    	FROM MsDigestionEnzyme as e, msSearchEnzyme
+    	FROM msDigestionEnzyme as e, msSearchEnzyme
     	WHERE e.id = msSearchEnzyme.enzymeID AND
     	msSearchEnzyme.searchID = #id#
     </select>
