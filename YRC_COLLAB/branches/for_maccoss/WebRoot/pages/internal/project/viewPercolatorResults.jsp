@@ -18,6 +18,7 @@ $(document).ready(function() {
    		$('th', $table).attr("align", "left");
    		$('th', $table).css("background-color", "#D74D2D").css('color', '#FFFFFF');
    		$("tbody > tr:even", $table).addClass("project_A");
+   		//$('tbody > tr:odd', $table).css("background-color", "F0FFF0");
    });
 });
 

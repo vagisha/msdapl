@@ -215,5 +215,10 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     public TableRow getRow(int row) {
         return rows.get(row);
     }
+
+    @Override
+    public String sortedColumn() {
+        throw new UnsupportedOperationException();
+    }
     
 }

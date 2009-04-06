@@ -13,6 +13,10 @@ public class TableCell {
     
     public TableCell(){}
     
+    public TableCell(String data) {
+        this.data = data;
+    }
+    
     public TableCell(String data, String hyperlink) {
         this.data = data;
         this.hyperlink = hyperlink;

@@ -20,10 +20,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.PercolatorResultPlus;
 import org.yeastrc.experiment.TabularPercolatorResults;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
+import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -84,6 +87,8 @@ public class ViewPercolatorResults extends Action {
             pageNum = 1;
         }
         
+        String sortBy = request.getParameter("sortBy");
+        
         // TODO Does the user have access to look at these results? 
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
         List<Integer> resultIds = presDao.loadResultIdsForRunSearchAnalysis(runSearchAnalysisId);
@@ -94,11 +99,13 @@ public class ViewPercolatorResults extends Action {
         ResultsPager pager = ResultsPager.instance();
         List<Integer> forPage = pager.page(resultIds, pageNum, numResultsPerPage, false);
         
-        List<PercolatorResult> results = new ArrayList<PercolatorResult>(numResultsPerPage);
+        List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
         
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         for(Integer resultId: forPage) {
             PercolatorResult result = presDao.load(resultId);
-            results.add(result);
+            MsScan scan = scanDao.loadScanLite(result.getScanId());
+            results.add(new PercolatorResultPlus(result, scan));
         }
 
         TabularPercolatorResults tabResults = new TabularPercolatorResults(results);

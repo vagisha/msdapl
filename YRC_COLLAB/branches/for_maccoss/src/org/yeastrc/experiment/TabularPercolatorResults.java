@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableRow;
@@ -19,15 +18,16 @@ import org.yeastrc.www.misc.Tabular;
 public class TabularPercolatorResults implements Tabular, Pageable {
 
     
-    private static String[] columns = new String[]{"ID", "Scan", "Charge", "Obs.Mass", "RT", "q-value", "PEP", "Peptide"}; 
+    private static String[] columns = new String[]{"Scan", "Charge", "Obs.Mass", "RT", "Predit. RT", "q-value", "PEP", "Peptide"}; 
+    private String sortColumn;
     
-    private List<PercolatorResult> results;
+    private List<PercolatorResultPlus> results;
     
     private int currentPage;
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
-    public TabularPercolatorResults(List<PercolatorResult> results) {
+    public TabularPercolatorResults(List<PercolatorResultPlus> results) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
@@ -47,14 +47,24 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public TableRow getRow(int index) {
         if(index >= results.size())
             return null;
-        PercolatorResult result = results.get(index);
+        PercolatorResultPlus result = results.get(index);
         TableRow row = new TableRow();
         
-        row.addCell(new TableCell(String.valueOf(result.getId()), null));
-        row.addCell(new TableCell(String.valueOf(result.getScanId()), null));
-        row.addCell(new TableCell(String.valueOf(result.getCharge()), null));
-        row.addCell(new TableCell(String.valueOf(round(result.getObservedMass())), null));
-        BigDecimal temp = result.getPredictedRetentionTime();
+        // row.addCell(new TableCell(String.valueOf(result.getId())));
+        row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
+        row.addCell(new TableCell(String.valueOf(result.getCharge())));
+        row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
+        
+        // Retention time
+        BigDecimal temp = result.getRetentionTime();
+        if(temp == null) {
+            row.addCell(new TableCell("", null));
+        }
+        else
+            row.addCell(new TableCell(String.valueOf(round(temp)), null));
+        
+        // Predicted retention time
+        temp = result.getPredictedRetentionTime();
         if(temp == null) {
             row.addCell(new TableCell("", null));
         }
@@ -116,4 +126,14 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     public int getPageCount() {
         return lastPage;
     }
+
+    @Override
+    public String sortedColumn() {
+        return sortColumn;
+    }
+    
+    public void setSortedColumn(String column) {
+        this.sortColumn = column;
+    }
+    
 }

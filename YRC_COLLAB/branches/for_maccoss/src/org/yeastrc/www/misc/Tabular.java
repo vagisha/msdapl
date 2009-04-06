@@ -23,5 +23,7 @@ public interface Tabular {
     
     public String[] columnNames();
     
+    public String sortedColumn();
+    
     public TableRow getRow(int row);
 }
