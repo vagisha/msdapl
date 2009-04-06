@@ -331,7 +331,21 @@
 	</action>
 	
 	
+	<!-- ================================================================================== -->
+	<!-- Actions related to experiment results -->
+	<!-- ================================================================================== -->
+	<action
+	  path="/viewPercolatorResults"
+	  type="org.yeastrc.www.project.experiment.ViewPercolatorResults"
+	  validate="false">
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/viewPercolatorResults.jsp" redirect="false"/>
+	</action>
 	
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to groups -->
+	<!-- ================================================================================== -->
 	
 	<action
 	  path="/manageGroups"

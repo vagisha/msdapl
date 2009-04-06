@@ -115,7 +115,7 @@ public class ViewProteinInferenceResultAction extends Action {
         
         
         // limit to the proteins that will be displayed on this page
-        List<Integer> proteinIdsPage = ProteinferResultsPager.instance().page(proteinIds, pageNum,
+        List<Integer> proteinIdsPage = ResultsPager.instance().page(proteinIds, pageNum,
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups 
@@ -130,8 +130,8 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("proteinGroups", proteinGroups);
         
         // get the list of page numbers to display
-        int pageCount = ProteinferResultsPager.instance().getPageCount(proteinIds.size());
-        List<Integer> pages = ProteinferResultsPager.instance().getPageList(proteinIds.size(), pageNum);
+        int pageCount = ResultsPager.instance().getPageCount(proteinIds.size());
+        List<Integer> pages = ResultsPager.instance().getPageList(proteinIds.size(), pageNum);
         
         
         request.setAttribute("currentPage", pageNum);

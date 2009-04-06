@@ -168,7 +168,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         
         
         // limit to the proteins that will be displayed on this page
-        List<Integer> proteinIds = ProteinferResultsPager.instance().page(storedProteinIds, pageNum, 
+        List<Integer> proteinIds = ResultsPager.instance().page(storedProteinIds, pageNum, 
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups 
@@ -179,8 +179,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         request.setAttribute("proteinGroups", proteinGroups);
         
         // get the list of page numbers to display
-        int pageCount = ProteinferResultsPager.instance().getPageCount(storedProteinIds.size());
-        List<Integer> pages = ProteinferResultsPager.instance().getPageList(storedProteinIds.size(), pageNum);
+        int pageCount = ResultsPager.instance().getPageCount(storedProteinIds.size());
+        List<Integer> pages = ResultsPager.instance().getPageList(storedProteinIds.size(), pageNum);
         
         request.setAttribute("currentPage", pageNum);
         request.setAttribute("onFirst", pageNum == 1);

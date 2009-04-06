@@ -12,55 +12,55 @@ import java.util.List;
 /**
  * 
  */
-public class ProteinferResultsPager {
+public class ResultsPager {
 
-    private static final ProteinferResultsPager instance = new ProteinferResultsPager();
+    private static final ResultsPager instance = new ResultsPager();
     
-    private ProteinferResultsPager() {}
+    private ResultsPager() {}
     
-    public static ProteinferResultsPager instance() {
+    public static ResultsPager instance() {
         return instance;
     }
     
     /**
      * page numbers start with 1
-     * @param proteinIds
+     * @param ids
      * @param pageNum
      * @param numPerPage
      * @param descending
      * @return
      */
-    public List<Integer> page(List<Integer> proteinIds, int pageNum, int numPerPage, boolean descending) {
+    public List<Integer> page(List<Integer> ids, int pageNum, int numPerPage, boolean descending) {
         
         List<Integer> sublist = new ArrayList<Integer>(numPerPage);
         if(!descending) {
             int s = (pageNum - 1) * numPerPage;
-            if(s >= proteinIds.size())
+            if(s >= ids.size())
                 return new ArrayList<Integer>(0);
-            int e = Math.min(proteinIds.size(), s+numPerPage);
+            int e = Math.min(ids.size(), s+numPerPage);
             for(int i = s; i < e; i++)
-                sublist.add(proteinIds.get(i));
+                sublist.add(ids.get(i));
         }
         else {
-            int s = proteinIds.size() - ((pageNum - 1) * numPerPage) - 1;
+            int s = ids.size() - ((pageNum - 1) * numPerPage) - 1;
             if(s < 0)
                 return new ArrayList<Integer>(0);
             int e = Math.max(0, (s - numPerPage -1));
             for(int i = s; i >= e; i--) 
-                sublist.add(proteinIds.get(i));
+                sublist.add(ids.get(i));
         }
         return sublist;
     }
     
     /**
      * Page numbers start with 1; Default number of results per page is 50.
-     * @param proteinIds
+     * @param ids
      * @param pageNum
      * @param descending
      * @return
      */
-    public List<Integer> page(List<Integer> proteinIds, int pageNum, boolean descending) {
-        return page(proteinIds, pageNum, 50, descending);
+    public List<Integer> page(List<Integer> ids, int pageNum, boolean descending) {
+        return page(ids, pageNum, 50, descending);
     }
     
     

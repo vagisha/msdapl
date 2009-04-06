@@ -143,7 +143,7 @@ public class SortProteinferResultsAjaxAction extends Action{
 
 
         // determine the list of proteins we will be displaying
-        ProteinferResultsPager pager = ProteinferResultsPager.instance();
+        ResultsPager pager = ResultsPager.instance();
         List<Integer> proteinIds = pager.page(storedProteinIds, pageNum, 
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
 
@@ -155,8 +155,8 @@ public class SortProteinferResultsAjaxAction extends Action{
 
 
         // get the list of page numbers to display
-        int pageCount = ProteinferResultsPager.instance().getPageCount(storedProteinIds.size());
-        List<Integer> pages = ProteinferResultsPager.instance().getPageList(storedProteinIds.size(), pageNum);
+        int pageCount = ResultsPager.instance().getPageCount(storedProteinIds.size());
+        List<Integer> pages = ResultsPager.instance().getPageList(storedProteinIds.size(), pageNum);
 
         request.setAttribute("currentPage", pageNum);
         request.setAttribute("onFirst", pageNum == 1);

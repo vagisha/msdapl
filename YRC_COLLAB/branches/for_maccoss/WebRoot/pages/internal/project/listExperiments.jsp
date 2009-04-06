@@ -3,6 +3,22 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<script>
+
+$(document).ready(function() {
+   $(".search_files").each(function() {
+   		var $table = $(this);
+   		$table.attr('width', "100%");
+   		$('th', $table).attr("align", "left");
+   		//$("tbody > tr:even", $table).css("background-color", "#FFFFFF");
+   		$("tbody > tr:even", $table).addClass("project_A");
+   });
+});
+
+</script>
+
+
 <yrcwww:contentbox title="Experiments" centered="true" width="850">
 
 	<logic:empty name="experiments">
@@ -98,10 +114,10 @@
 			</logic:notEmpty>
 			
 			<!-- Files for this experiment -->
-			<!-- <div style="background-color: #FFFAF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > -->
+			<div style="background-color: #FFFAF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
 			<bean:define name="experiment" property="id" id="experimentId" />
-			<!--  <yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="search_files" center="true" /> -->
-			<!--  </div> -->
+			<yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="search_files" center="true" />
+			</div>
 			</div>
 		</div> <!-- End of one experiment -->
 		</logic:iterate>
