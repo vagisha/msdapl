@@ -14,7 +14,25 @@ public class ResultSortCriteria {
 
     private final SORT_BY sortBy;
     private final SORT_ORDER sortOrder;
+    private Integer limitCount;
+    private Integer offset;
     
+    public Integer getLimitCount() {
+        return limitCount;
+    }
+
+    public void setLimitCount(Integer limitCount) {
+        this.limitCount = limitCount;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
+
     public ResultSortCriteria(SORT_BY sortBy, SORT_ORDER sortOrder) {
         this.sortBy = sortBy;
         this.sortOrder = sortOrder;

@@ -23,6 +23,7 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.ResultSortCriteria;
+import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
@@ -53,6 +54,15 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     @Override
     public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId) {
         return queryForList(namespace+".selectResultIdsForRunSearchAnalysis", runSearchAnalysisId);
+    }
+    
+    @Override
+    public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset) {
+        Map<String, Integer> map = new HashMap<String, Integer>(5);
+        map.put("runSearchAnalysisId", runSearchAnalysisId);
+        map.put("limit", limit);
+        map.put("offset", offset);
+        return queryForList(namespace+".selectResultIdsLimitedForRunSearchAnalysis", map);
     }
 
     @Override
@@ -111,18 +121,69 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             PercolatorResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
-//        // If we don't have filters and nothing to sort by use the simple method
-//        if((filterCriteria == null || !filterCriteria.hasFilters()) && sortCriteria == null) 
-//            return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId);
-//        
-//        
-//        
-//        // If we don't have any filters on the msRunSearchResult and modifications tables use a simpler query
-//        if(!filterCriteria.superHasFilters()) {
-//            if(sortCriteria == null)
-//                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId);
-//            
-//        }
+        int offset = sortCriteria.getOffset() == null ? 0 : sortCriteria.getOffset();
+        
+        // If we don't have filters and nothing to sort by use the simple method
+        if((filterCriteria == null || !filterCriteria.hasFilters()) && sortCriteria == null) {
+            return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId); 
+        }
+        
+        
+        boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
+        boolean useResultsTable = filterCriteria.superHasFilters() || SORT_BY.isSearchRelated(sortCriteria.getSortBy());
+        boolean useModsTable = filterCriteria.hasMofificationFilter();
+        
+        // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
+        if(!useScanTable && !useResultsTable && !useModsTable) {
+            if(sortCriteria.getLimitCount() != null)
+                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId, sortCriteria.getLimitCount(), offset);
+            else 
+                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId); 
+        }
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT pres.id FROM ( ");
+        sql.append("PercolatorResult as pres, msRunSearchResult AS res");
+        if(useScanTable)
+            sql.append(", msScan AS scan");
+        sql.append(" ) ");
+        
+        if(useModsTable) {
+            sql.append("LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) ");
+        }
+        
+        sql.append("WHERE pres.runSearchAnalysisID = "+runSearchAnalysisId+" ");
+        sql.append("AND res.id = pres.resultID ");
+        if(useScanTable) {
+            sql.append("AND res.scanID = scan.id ");
+        }
+        
+        // filter of scan number
+        if(filterCriteria.hasScanFilter()) {
+            sql.append("AND "+filterCriteria.makeScanFilterSql());
+        }
+        // filter on retention time
+        if(filterCriteria.hasRTFilter()) {
+            sql.append("AND "+filterCriteria.makeRTFilterSql());
+        }
+        // filter on charge
+        if(filterCriteria.hasChargeFilter()) {
+            sql.append("AND "+filterCriteria.makeChargeFilterSql());
+        }
+        // observed mass filter
+        if(filterCriteria.hasMassFilter()) {
+            sql.append("AND "+filterCriteria.makeMassFilterSql());
+        }
+        if(filterCriteria.hasPeptideFilter()) {
+            sql.append("AND "+filterCriteria.makePeptideSql());
+        }
+        if(filterCriteria.hasMofificationFilter()) {
+            sql.append("AND "+filterCriteria.makeModificationFilter());
+        }
+        
+        
+        
+        
 //        String sql = "SELECT * FROM (msRunSearchResult AS res, PercolatorResult AS pres) "+
 //        "LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) "+
 //        "WHERE res.id = pres.resultID "+
@@ -153,8 +214,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
 //                if(sortCriteria)
 //            }
 //        }
-        
-        return null;
+//        
+//        return null;
     }
 
     

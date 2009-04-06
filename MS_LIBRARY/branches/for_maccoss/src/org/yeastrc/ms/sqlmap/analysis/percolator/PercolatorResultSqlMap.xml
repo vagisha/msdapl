@@ -36,7 +36,13 @@
     	SELECT resultID FROM PercolatorResult WHERE runSearchAnalysisID=#runSearchAnalysisId#
     </select>
     
-    <select id="selectResultIdsForRunSearchAnalysisScan" resultClass="Integer" parameterClass="Integer">
+    <select id="selectResultIdsLimitedForRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT resultID FROM PercolatorResult 
+    	WHERE runSearchAnalysisID=#runSearchAnalysisId# 
+    	ORDER BY id LIMIT #offset#, #limit#
+    </select>
+    
+    <select id="selectResultIdsForRunSearchAnalysisScan" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT pres.resultID
     	FROM msRunSearchResult AS res, PercolatorResult AS pres 
     	WHERE pres.runSearchAnalysisID=#runSearchAnalysisId#

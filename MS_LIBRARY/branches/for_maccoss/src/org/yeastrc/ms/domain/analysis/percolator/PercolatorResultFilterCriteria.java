@@ -27,12 +27,22 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
         return super.hasFilters();
     }
     
+    //-------------------------------------------------------------
+    // QVALUE FILTER
+    //-------------------------------------------------------------
     public Double getQValue() {
         return qValue;
     }
     public void setQValue(Double value) {
         qValue = value;
     }
+    public boolean hasQValueFilter() {
+        return (qValue != null);
+    }
+    public String makeMassFilterSql() {
+        return return " (qvalue = "+qValue) ";;
+    }
+    
     
     public Double getPep() {
         return pep;
@@ -40,6 +50,8 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
     public void setPep(Double pep) {
         this.pep = pep;
     }
-    
+    public boolean hasPepFilter() {
+        return (pep != null);
+    }
     
 }

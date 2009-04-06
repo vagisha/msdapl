@@ -18,6 +18,8 @@ public interface PercolatorResultDAO {
     
     public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId);
     
+    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset);
+    
     public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, 
                             PercolatorResultFilterCriteria filterCriteria, 
                             ResultSortCriteria sortCriteria);

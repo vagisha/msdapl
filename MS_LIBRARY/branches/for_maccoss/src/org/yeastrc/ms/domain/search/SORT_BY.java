@@ -8,13 +8,24 @@ package org.yeastrc.ms.domain.search;
 
 
 public enum SORT_BY {
-
-    ID("ID"), 
+    
+    ID("ID"),
     SCAN("Scan"), 
     CHARGE("Charge"), 
     MASS("Obs. Mass"), 
     RT("RT"), 
-    PEPTIDE("Peptide");
+    PEPTIDE("Peptide"),
+    
+    // Sequest specific
+    XCORR("XCorr"),
+    SP("Sp"),
+    DELTACN("DeltaCN"),
+    EVAL("e-value"),
+    
+    // Percolator specific
+    QVAL("q-value"),
+    PEP("PEP"),
+    P_RT("Predict. RT");
 
     private String displayName;
 
@@ -40,5 +51,13 @@ public enum SORT_BY {
 
     public static SORT_BY defaultSortBy() {
         return ID;
+    }
+    
+    public static boolean isScanRelated(SORT_BY sortBy) {
+        return sortBy == SCAN || sortBy == RT;
+    }
+    
+    public static boolean isSearchRelated(SORT_BY sortBy) {
+        return sortBy == CHARGE || sortBy == MASS || sortBy == PEPTIDE;
     }
 }

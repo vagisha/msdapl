@@ -40,6 +40,10 @@ public class ResultFilterCriteria {
                 hasMofificationFilter());
     }
     
+    protected boolean hasScanFilters() {
+        return (hasScanFilter() || hasRTFilter());
+    }
+    
     protected String makeFilterSql(String columnName, Number min, Number max) {
         if(columnName == null || columnName.length() == 0)
             return "";
@@ -112,7 +116,6 @@ public class ResultFilterCriteria {
     public void setMinObservedMass(BigDecimal minObservedMass) {
         this.minObservedMass = minObservedMass;
     }
-    
     public BigDecimal getMaxObservedMass() {
         return maxObservedMass;
     }
