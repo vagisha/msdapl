@@ -85,6 +85,10 @@
     			AND id= #id#
     </select>
     
+    <select id="selectScanNumber" resultClass="Integer" parameterClass="Integer"> 
+        SELECT startScanNumber FROM msScan WHERE id=#id#
+    </select> 
+    
     <select id="selectScanIdForScanNumRun" parameterClass="java.util.Map" resultClass="Integer">
     	SELECT id from msScan where runId=#runId# AND startScanNumber=#scanNum#
     </select>

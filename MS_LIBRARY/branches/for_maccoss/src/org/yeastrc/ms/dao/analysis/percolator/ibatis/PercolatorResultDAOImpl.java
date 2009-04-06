@@ -17,10 +17,12 @@ import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
 import org.yeastrc.ms.domain.analysis.percolator.impl.PercolatorResultBean;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
+import org.yeastrc.ms.domain.search.ResultSortCriteria;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
@@ -100,6 +102,59 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
         values.deleteCharAt(0);
         save(namespace+".insertAll", values.toString());
+    }
+
+    
+    @Override
+    public List<Integer> loadResultIdsForRunSearchAnalysis(
+            int runSearchAnalysisId,
+            PercolatorResultFilterCriteria filterCriteria,
+            ResultSortCriteria sortCriteria) {
+        
+//        // If we don't have filters and nothing to sort by use the simple method
+//        if((filterCriteria == null || !filterCriteria.hasFilters()) && sortCriteria == null) 
+//            return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId);
+//        
+//        
+//        
+//        // If we don't have any filters on the msRunSearchResult and modifications tables use a simpler query
+//        if(!filterCriteria.superHasFilters()) {
+//            if(sortCriteria == null)
+//                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId);
+//            
+//        }
+//        String sql = "SELECT * FROM (msRunSearchResult AS res, PercolatorResult AS pres) "+
+//        "LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) "+
+//        "WHERE res.id = pres.resultID "+
+//        "AND pres.runSearchAnalysisID = ? ";
+//if(qvalue != null)
+//sql +=   " AND qvalue <= "+qvalue;
+//if(pep != null && pep < 1.0) 
+//sql +=   " AND pep <= "+pep;
+//if(discriminantScore != null)
+//sql +=   " AND discriminantScore <= "+discriminantScore;
+//
+//sql +=       " ORDER BY res.id";
+//
+//
+//        StringBuilder sql = new StringBuilder();
+//        sql.append("SELECT pres.id ");
+//        sql.append("FROM PercolatorResult AS pres,  msRunSearchResult AS res ");
+//        sql.append("LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) ");
+//        sql.append("WHERE res.id = pres.resultID ");
+//        sql.append("AND pres.runSearchAnalysisID = "+runSearchAnalysisId+" ");
+//        
+//        
+//        List<Integer> resultIds;
+//        
+//            resultIds = loadResultIdsForRunSearchAnalysis(runSearchAnalysisId);
+//            if(sortCriteria == null)    return resultIds;
+//            else {
+//                if(sortCriteria)
+//            }
+//        }
+        
+        return null;
     }
 
     

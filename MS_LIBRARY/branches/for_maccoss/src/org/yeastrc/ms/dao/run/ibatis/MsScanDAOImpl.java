@@ -50,6 +50,15 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         return (MsScan) queryForObject("MsScan.select", scanId);
     }
 
+    @Override
+    public int loadScanNumber(int scanId) {
+        Integer scanNum = (Integer)queryForObject("MsScan.selectScanNumber", scanId);
+        if(scanNum != null)
+            return scanNum;
+        else
+            return 0;
+    }
+    
     public List<Integer> loadScanIdsForRun(int runId) {
         return queryForList("MsScan.selectScanIdsForRun", runId);
     }
@@ -221,4 +230,5 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
                 throw new IllegalArgumentException("Cannot convert "+val+" to DataConversionType");
         }
     }
+    
 }

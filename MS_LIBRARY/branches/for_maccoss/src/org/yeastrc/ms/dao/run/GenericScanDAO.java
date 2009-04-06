@@ -39,6 +39,13 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      */
     public abstract O load(int scanId);
     
+    /**
+     * Returns the scan number for the given scanID
+     * @param scanId
+     * @return
+     */
+    public abstract int loadScanNumber(int scanId);
+    
     
     /**
      * Returns a list of scan ID's for the given run

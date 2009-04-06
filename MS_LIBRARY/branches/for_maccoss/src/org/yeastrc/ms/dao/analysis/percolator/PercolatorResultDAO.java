@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultDataWId;
+import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
+import org.yeastrc.ms.domain.search.ResultSortCriteria;
 
 public interface PercolatorResultDAO {
 
@@ -15,6 +17,10 @@ public interface PercolatorResultDAO {
                                 Double qvalue, Double pep, Double discriminantScore, boolean getDynaResMods);
     
     public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId);
+    
+    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, 
+                            PercolatorResultFilterCriteria filterCriteria, 
+                            ResultSortCriteria sortCriteria);
     
     public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
     
