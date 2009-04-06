@@ -12,6 +12,9 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.struts.util.RequestUtils;
+import org.yeastrc.www.misc.TableCell;
+import org.yeastrc.www.misc.TableRow;
+import org.yeastrc.www.misc.Tabular;
 
 /**
  * 

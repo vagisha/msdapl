@@ -15,9 +15,9 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.www.taglib.TableCell;
-import org.yeastrc.www.taglib.TableRow;
-import org.yeastrc.www.taglib.Tabular;
+import org.yeastrc.www.misc.TableCell;
+import org.yeastrc.www.misc.TableRow;
+import org.yeastrc.www.misc.Tabular;
 import org.yeastrc.yates.YatesRun;
 
 

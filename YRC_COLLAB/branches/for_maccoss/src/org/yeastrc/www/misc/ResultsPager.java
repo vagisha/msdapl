@@ -4,7 +4,7 @@
  * Jan 7, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.misc;
 
 import java.util.ArrayList;
 import java.util.List;

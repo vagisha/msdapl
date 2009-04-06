@@ -4,7 +4,7 @@
  * Apr 4, 2009
  * @version 1.0
  */
-package org.yeastrc.www.taglib;
+package org.yeastrc.www.misc;
 
 /**
  * 

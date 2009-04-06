@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
-import org.yeastrc.www.taglib.TableCell;
-import org.yeastrc.www.taglib.TableRow;
-import org.yeastrc.www.taglib.Tabular;
+import org.yeastrc.www.misc.Pageable;
+import org.yeastrc.www.misc.TableCell;
+import org.yeastrc.www.misc.TableRow;
+import org.yeastrc.www.misc.Tabular;
 
 public class TabularPercolatorResults implements Tabular, Pageable {
 
@@ -23,14 +24,13 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     private List<PercolatorResult> results;
     
     private int currentPage;
-    private int firstPage = 1;
-    private int lastPage = firstPage;
+    private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
     public TabularPercolatorResults(List<PercolatorResult> results) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
-        displayPageNumbers.add(firstPage);
+        displayPageNumbers.add(currentPage);
     }
     
     @Override
@@ -104,20 +104,16 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     }
 
     @Override
-    public int getFirstPage() {
-        return this.firstPage;
-    }
-    
-    public void setFirstPage(int pageNum) {
-        this.firstPage = pageNum;
-    }
-
-    @Override
     public int getLastPage() {
         return this.lastPage;
     }
     
     public void setLastPage(int pageNum) {
         this.lastPage = pageNum;
+    }
+
+    @Override
+    public int getPageCount() {
+        return lastPage;
     }
 }
