@@ -12,9 +12,6 @@
 	<!-- Peak data is not lazy loaded since lazy-loading of 1:1 relationships is not supported 
 	     without an external library
 	 -->
-	<resultMap class="MsScanOut" id="msScanResult" extends="MsScan.msScanNoDataResult">
-		<result property="peakData" column="data" />
-	</resultMap>
 	
 	<resultMap class="MsScanOut" id="msScanNoDataResult">
 		<result property="id" column="id" />
@@ -32,6 +29,10 @@
 				typeHandler="DataConversionTypeHandler"
 				/>
 		<result property="peakCount" column="peakCount" nullValue="-1" />
+	</resultMap>
+	
+	<resultMap class="MsScanOut" id="msScanResult" extends="MsScan.msScanNoDataResult">
+		<result property="peakData" column="data" />
 	</resultMap>
 	
 	
