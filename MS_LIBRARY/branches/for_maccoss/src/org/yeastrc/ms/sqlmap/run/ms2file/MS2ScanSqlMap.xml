@@ -14,6 +14,15 @@
 				select="MS2ChgIAnalysis.selectAnalysisForScan"/>
 	</resultMap>
 	
+	<resultMap class="MS2ScanOut" id="MS2ScanNoDataResult" extends="MsScan.msScanNoDataResult">
+		<result property="scanChargeList" 
+				column="id" 
+				select="MS2ScanCharge.selectForScan"/>
+		<result property="chargeIndependentAnalysisList" 
+				column="id" 
+				select="MS2ChgIAnalysis.selectAnalysisForScan"/>
+	</resultMap>
+	
 	
 	<select id="select" resultMap="MS2ScanResult" parameterClass="Integer">
 		SELECT id, 
@@ -32,6 +41,23 @@
     			FROM msScan, msScanData
     			WHERE msScan.id = msScanData.scanID
     			AND id= #id#
+    </select>
+    
+    <select id="selectScanNoData" resultMap="MS2ScanNoDataResult" parameterClass="Integer">
+		SELECT id, 
+    			runID, 
+    			startScanNumber, 
+    			endScanNumber, 
+    			level, 
+    			preMZ, 
+    			preScanID, 
+    			prescanNumber, 
+    			retentionTime,
+    			fragmentationType,
+    			isCentroid,
+    			peakCount
+    			FROM msScan
+    			WHERE id= #id#
     </select>
     
 </sqlMap>

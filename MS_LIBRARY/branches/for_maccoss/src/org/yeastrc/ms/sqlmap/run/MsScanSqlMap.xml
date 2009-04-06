@@ -12,7 +12,11 @@
 	<!-- Peak data is not lazy loaded since lazy-loading of 1:1 relationships is not supported 
 	     without an external library
 	 -->
-	<resultMap class="MsScanOut" id="msScanResult">
+	<resultMap class="MsScanOut" id="msScanResult" extends="MsScan.msScanNoDataResult">
+		<result property="peakData" column="data" />
+	</resultMap>
+	
+	<resultMap class="MsScanOut" id="msScanNoDataResult">
 		<result property="id" column="id" />
 		<result property="runId" column="runID" nullValue="0" />
 		<result property="startScanNum" column="startScanNumber" nullValue="-1"/>
@@ -28,7 +32,6 @@
 				typeHandler="DataConversionTypeHandler"
 				/>
 		<result property="peakCount" column="peakCount" nullValue="-1" />
-		<result property="peakData" column="data" />
 	</resultMap>
 	
 	
@@ -83,6 +86,23 @@
     			FROM msScan, msScanData
     			WHERE msScan.id = msScanData.scanID
     			AND id= #id#
+    </select>
+    
+    <select id="selectScanNoData" resultMap="msScanNoDataResult" parameterClass="Integer">
+    	SELECT id, 
+    			runID, 
+    			startScanNumber, 
+    			endScanNumber, 
+    			level, 
+    			preMZ, 
+    			preScanID, 
+    			prescanNumber, 
+    			retentionTime,
+    			fragmentationType,
+    			isCentroid,
+    			peakCount
+    			FROM msScan
+    			WHERE id= #id#
     </select>
     
     <select id="selectScanNumber" resultClass="Integer" parameterClass="Integer"> 

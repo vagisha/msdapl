@@ -40,6 +40,13 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
     public abstract O load(int scanId);
     
     /**
+     * Returns a scan with the givenID.  Peak data for the scan is not loaded.
+     * @param scanId
+     * @return
+     */
+    public abstract O loadScanLite(int scanId);
+    
+    /**
      * Returns the scan number for the given scanID
      * @param scanId
      * @return

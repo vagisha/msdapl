@@ -46,6 +46,11 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     }
     
     @Override
+    public MS2Scan loadScanLite(int scanId) {
+        return (MS2Scan) queryForObject("MS2Scan.selectScanNoData", scanId);
+    }
+    
+    @Override
     public int loadScanNumber(int scanId) {
         return msScanDao.loadScanNumber(scanId);
     }
