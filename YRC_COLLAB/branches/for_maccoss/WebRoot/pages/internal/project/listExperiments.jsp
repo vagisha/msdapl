@@ -98,10 +98,10 @@
 			</logic:notEmpty>
 			
 			<!-- Files for this experiment -->
-			<div style="background-color: #FFFAF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+			<!-- <div style="background-color: #FFFAF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > -->
 			<bean:define name="experiment" property="id" id="experimentId" />
-			<yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="search_files" center="true" />
-			</div>
+			<!--  <yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="search_files" center="true" /> -->
+			<!--  </div> -->
 			</div>
 		</div> <!-- End of one experiment -->
 		</logic:iterate>
