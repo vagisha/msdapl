@@ -2,6 +2,8 @@ package org.yeastrc.ms.dao;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
@@ -16,6 +18,7 @@ import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl;
 import org.yeastrc.ms.dao.general.ibatis.MsExperimentDAOImpl;
+import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl;
@@ -66,6 +69,8 @@ import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 public class DAOFactory {
 
     private static final Logger log = Logger.getLogger(DAOFactory.class);
+    
+    public static final boolean BINARY_PEAK_DATA = false;
     
     // initialize the SqlMapClient
     private static SqlMapClient sqlMap;
@@ -147,7 +152,7 @@ public class DAOFactory {
         enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
         
         // Run related
-        scanDAO = new MsScanDAOImpl(sqlMap);
+        scanDAO = new MsScanDAOImpl(sqlMap, BINARY_PEAK_DATA); // peak data is stored as String
         runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO);
         
         // ms2 file related
@@ -193,6 +198,9 @@ public class DAOFactory {
         return instance;
     }
     
+    public Connection getConnection() throws SQLException {
+        return new BaseSqlMapDAO(sqlMap).getConnection();
+    }
     //-------------------------------------------------------------------------------------------
     // EXPERIMENT related
     //-------------------------------------------------------------------------------------------

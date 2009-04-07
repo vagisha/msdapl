@@ -10,13 +10,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.run.DataConversionType;
+import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.ms2file.MS2NameValuePair;
-import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
+import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
@@ -25,6 +25,10 @@ import org.yeastrc.ms.util.PeakStringBuilder;
  */
 public class Scan implements MS2ScanIn {
 
+    public static enum PEAK_TYPE{
+        STRING, NUMBER;
+    }
+    
     public static final String PRECURSOR_SCAN = "PrecursorScan"; // precursor scan number
     public static final String ACTIVATION_TYPE = "ActivationType";
     public static final String RET_TIME = "RetTime";
@@ -41,16 +45,26 @@ public class Scan implements MS2ScanIn {
     private DataConversionType dataConversionType = DataConversionType.UNKNOWN;
     
     private List<String[]> peakList;
-
+    
+    private List<Peak> peakNList;
+    
     private List<MS2ScanCharge> chargeStates;
 
     private List<MS2NameValuePair> analysisItems;
 
+    private PEAK_TYPE peakType;
 
-    public Scan() {
+    public Scan(PEAK_TYPE peakType) {
         chargeStates = new ArrayList<MS2ScanCharge>();
         analysisItems = new ArrayList<MS2NameValuePair>();
-        peakList = new ArrayList<String[]>();
+        this.peakType = peakType;
+        
+        if(peakType == PEAK_TYPE.STRING) {
+            peakList = new ArrayList<String[]>();
+        }
+        else {
+            peakNList = new ArrayList<Peak>();
+        }
     }
 
 //    public boolean isValid() {
@@ -129,12 +143,42 @@ public class Scan implements MS2ScanIn {
         this.precursorMz = new BigDecimal(precursorMz);
     }
 
-
-    public Iterator<String[]> peakIterator() {
-        return peakList.iterator();
+    public List<String[]> getPeaksString() {
+        if(peakList != null)
+            return peakList;
+        else {
+            peakList = new ArrayList<String[]>(peakNList.size());
+            for(Peak peak: peakNList) {
+                peakList.add(new String[]{String.valueOf(peak.getMz()), String.valueOf(peak.getIntensity())});
+            }
+            return peakList;
+        }
     }
-    public void addPeak(String mz, String rt) {
-        peakList.add(new String[]{mz, rt});
+    
+    public List<Peak> getPeaks() {
+        if(peakNList != null)
+            return peakNList;
+        else {
+            peakNList = new ArrayList<Peak>(peakList.size());
+            for(String[] peakArr: peakList) {
+                double mz = Double.parseDouble(peakArr[0]);
+                float intensity = Float.parseFloat(peakArr[1]);
+                peakNList.add(new Peak(mz, intensity));
+            }
+            return peakNList;
+        }
+    }
+    
+    public void addPeak(String mz, String intensity) {
+        if(this.peakType == PEAK_TYPE.NUMBER)
+            throw new IllegalArgumentException("Scan does not accept peak data as String.");
+        peakList.add(new String[]{mz, intensity});
+    }
+    
+    public void addPeak(double mz, float intensity) {
+        if(this.peakType == PEAK_TYPE.STRING)
+            throw new IllegalArgumentException("Scan does not accept peak data as numbers.");
+        peakNList.add(new Peak(mz, intensity));
     }
 
     public String getFragmentationType() {
@@ -162,7 +206,11 @@ public class Scan implements MS2ScanIn {
     }
     
     public int getPeakCount() {
-        return peakList.size();
+        if(peakList != null)
+            return peakList.size();
+        else if(peakNList != null)
+            return peakNList.size();
+        return 0;
     }
     
     public int getMsLevel() {
@@ -207,7 +255,8 @@ public class Scan implements MS2ScanIn {
         }
         
         // peak data
-        for (String[] peak: peakList){
+        List<String[]> peaksStr = getPeaksString();
+        for (String[] peak: peaksStr){
             String mass = PeakStringBuilder.trimTrailingZerosKeepDecimalPoint(peak[0]);
             String inten = PeakStringBuilder.trimTrailingZerosKeepDecimalPoint(peak[1]);
             buf.append(mass);

@@ -6,10 +6,16 @@
  */
 package org.yeastrc.ms.domain.run.impl;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.Peak;
+import org.yeastrc.ms.util.PeakConverterNumber;
+import org.yeastrc.ms.util.PeakConverterString;
 
 /**
  * 
@@ -35,10 +41,12 @@ public class ScanBean implements MsScan {
     
     private int peakCount;
     
-    private String peakString;
+//    private String peakString;
+    
+    private byte[] peakData;
     
     public ScanBean() {
-        //peaks = new ArrayList<double[]>();
+        peakData = new byte[0];
     }
 
     public int getId() {
@@ -137,12 +145,23 @@ public class ScanBean implements MsScan {
         this.peakCount = peakCount;
     }
     
-    public void setPeakData(String peaks) {
-        this.peakString = peaks;
+//    public void setPeakData(String peaks) {
+//        this.peakString = peaks;
+//    }
+    
+    public void setPeakData(byte[] peakData) {
+        this.peakData = peakData;
     }
 
     @Override
-    public String peakDataString() {
-        return peakString;
+    public List<Peak> getPeaks() throws IOException {
+        return PeakConverterNumber.instance().convert(peakData, DAOFactory.BINARY_PEAK_DATA);
     }
+
+    @Override
+    public List<String[]> getPeaksString() throws IOException {
+        return PeakConverterString.instance().convert(peakData, DAOFactory.BINARY_PEAK_DATA);
+    }
+
+    
 }

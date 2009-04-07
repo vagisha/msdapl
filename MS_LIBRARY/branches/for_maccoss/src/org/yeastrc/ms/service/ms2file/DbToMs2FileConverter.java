@@ -16,7 +16,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 import org.yeastrc.ms.parser.ms2File.MS2Header;
 import org.yeastrc.ms.parser.ms2File.Scan;
-import org.yeastrc.ms.util.PeakConverterString;
+import org.yeastrc.ms.parser.ms2File.Scan.PEAK_TYPE;
 
 public class DbToMs2FileConverter {
 
@@ -56,7 +56,7 @@ public class DbToMs2FileConverter {
     }
     
     private void printMs2Scan(MS2Scan scan) throws IOException {
-       Scan ms2scan = new Scan();
+       Scan ms2scan = new Scan(PEAK_TYPE.STRING);
        ms2scan.setStartScan(scan.getStartScanNum());
        ms2scan.setEndScan(scan.getEndScanNum());
        ms2scan.setPrecursorMz(scan.getPrecursorMz().toString());
@@ -78,8 +78,7 @@ public class DbToMs2FileConverter {
        }
        
        // finally, the peak data!
-       PeakConverterString converter = new PeakConverterString();
-       List<String[]> peaks = converter.convert(scan.peakDataString());
+       List<String[]> peaks = scan.getPeaksString();
        for(String[] peak: peaks) {
            ms2scan.addPeak(String.valueOf(peak[0]), String.valueOf(peak[1]));
        }

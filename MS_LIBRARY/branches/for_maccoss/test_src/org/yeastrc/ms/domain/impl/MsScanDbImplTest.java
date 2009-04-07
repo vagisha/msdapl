@@ -8,7 +8,7 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.domain.run.impl.ScanBean;
-import org.yeastrc.ms.util.PeakConverterDouble;
+import org.yeastrc.ms.util.PeakConverterNumber;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 public class MsScanDbImplTest extends TestCase {
@@ -34,7 +34,7 @@ public class MsScanDbImplTest extends TestCase {
             builder.addPeak(peak[0], peak[1]);
         }
         scanDb.setPeakData(builder.getPeaksAsString());
-        List<double[]> peakList = new PeakConverterDouble().convert(scanDb.peakDataString());
+        List<double[]> peakList = new PeakConverterNumber().convert(scanDb.peakDataString());
         int i = 0;
         for (double[] peak: peakList) {
             String[] peakStr = peaks.get(i);

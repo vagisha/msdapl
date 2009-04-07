@@ -7,7 +7,7 @@
 package org.yeastrc.ms.domain.run;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
+import java.util.List;
 
 
 
@@ -17,7 +17,9 @@ public interface MsScanIn extends MsScanBase {
      * String[0] = m/z; String[1] = RT
      * @return
      */
-    public Iterator<String[]> peakIterator();
+    public abstract List<String[]> getPeaksString();
+    
+    public abstract List<Peak> getPeaks();
 
 }
 

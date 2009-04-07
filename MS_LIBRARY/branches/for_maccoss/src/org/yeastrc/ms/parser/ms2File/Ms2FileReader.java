@@ -18,6 +18,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
+import org.yeastrc.ms.parser.ms2File.Scan.PEAK_TYPE;
 import org.yeastrc.ms.parser.sqtFile.AbstractReader;
 
 
@@ -133,7 +134,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
             throw new DataProviderException(currentLineNum, "Invalid 'S' line. Expected 4 fields.", line);
         }
 
-        Scan scan = new Scan();
+        Scan scan = new Scan(PEAK_TYPE.STRING);
         try {
             scan.setStartScan(Integer.parseInt(tokens[1]));
             scan.setEndScan(Integer.parseInt(tokens[2]));

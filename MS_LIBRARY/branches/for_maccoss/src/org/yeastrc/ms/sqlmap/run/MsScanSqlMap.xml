@@ -52,11 +52,15 @@
 		<parameter property="peakCount" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
-	<parameterMap class="MsScanDataIn" id="msScanDataParam">
+	<parameterMap class="MsScanDataIn" id="msScanDataBinParam">
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0" />
-		<parameter property="peakData" jdbcType="LONGBLOB" />
+		<parameter property="peakDataBin" jdbcType="LONGBLOB" />
 	</parameterMap>
 	
+	<parameterMap class="MsScanDataIn" id="msScanDataStringParam">
+		<parameter property="scanId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="peakDataString" jdbcType="LONGBLOB" />
+	</parameterMap>
 	
 	
     <select id="selectScanIdsForRun" resultClass="Integer" parameterClass="Integer"> 
@@ -132,7 +136,12 @@
     	</selectKey>
     </insert>
     
-    <insert id="insertPeakData" parameterMap="msScanDataParam">
+    <insert id="insertPeakDataString" parameterMap="msScanDataStringParam">
+    	INSERT INTO msScanData (scanID,data) 
+    	VALUES (?,COMPRESS(?))
+    </insert>
+    
+    <insert id="insertPeakDataBin" parameterMap="msScanDataBinParam">
     	INSERT INTO msScanData (scanID,data) 
     	VALUES (?,COMPRESS(?))
     </insert>

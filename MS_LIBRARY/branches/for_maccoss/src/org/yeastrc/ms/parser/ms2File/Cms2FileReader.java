@@ -21,6 +21,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
 import org.yeastrc.ms.domain.run.ms2file.impl.ScanChargeBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
+import org.yeastrc.ms.parser.ms2File.Scan.PEAK_TYPE;
 
 import ed.mslib.MS2Scan;
 import ed.mslib.ReadMS2Comp;
@@ -115,7 +116,7 @@ public class Cms2FileReader implements MS2RunDataProvider {
             return null;
         
         
-        Scan scan = new Scan();
+        Scan scan = new Scan(PEAK_TYPE.NUMBER);
         scan.setStartScan(ms2Scan.getscan());
         scan.setEndScan(ms2Scan.getendscan());
         scan.setPrecursorMz(String.valueOf(ms2Scan.getprecursor()));
@@ -145,7 +146,7 @@ public class Cms2FileReader implements MS2RunDataProvider {
         int peakCount = ms2Scan.getmzintlist().size();
         for(int i = 0; i < peakCount; i++) {
             ed.mslib.MzInt mzInt = ms2Scan.getmzint(i);
-            scan.addPeak(String.valueOf(mzInt.getmz()), String.valueOf(mzInt.getint())); 
+            scan.addPeak(mzInt.getmz(), mzInt.getint()); 
         }
     }
 

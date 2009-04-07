@@ -1,7 +1,7 @@
 /**
- * PeakConverterString.java
+ * PeakConverterDouble.java
  * @author Vagisha Sharma
- * Jul 28, 2008
+ * Jul 15, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.util;
@@ -18,28 +18,30 @@ import org.yeastrc.ms.domain.run.Peak;
 /**
  * 
  */
-public class PeakConverterString {
+public class PeakConverterNumber  {
 
-    private static PeakConverterString instance;
-    private PeakConverterString(){}
+    private static PeakConverterNumber instance;
     
-    public static PeakConverterString instance() {
+    private PeakConverterNumber(){}
+    
+    public static PeakConverterNumber instance() {
         if(instance == null)
-            instance = new PeakConverterString();
+            instance = new PeakConverterNumber();
         return instance;
     }
     
-    public List<String[]> convert(String peakString) {
-
-        List<String[]> peakList = new ArrayList<String[]>();
-
+    public List<Peak> convert(String peakString) {
+        
+        List<Peak> peakList = new ArrayList<Peak>();
+        
         if (peakString == null || peakString.length() == 0)
             return peakList;
-
+        
         String[] peaksStr = peakString.split("\\n");
-        for (String peak: peaksStr) {
-            String [] peakVals = splitPeakVals(peak);
-            peakList.add(peakVals);
+        for (String peakStr: peaksStr) {
+            String [] peakVals = splitPeakVals(peakStr);
+            Peak peak = new Peak(Double.parseDouble(peakVals[0]), Float.parseFloat(peakVals[1]));
+            peakList.add(peak);
         }
         return peakList;
     }
@@ -48,28 +50,27 @@ public class PeakConverterString {
         int i = peak.indexOf(" ");
         String[] vals = new String[2];
         vals[0] = peak.substring(0, i);
-        if (vals[0].lastIndexOf('.') == -1) vals[0] = vals[0]+".0";
         vals[1] = peak.substring(i+1, peak.length());
-        if (vals[1].lastIndexOf('.') == -1) vals[1] = vals[1]+".0";
         return vals;
     }
     
-    public List<String[]> convert(byte[] peakData, boolean hasNumbers) throws IOException {
+    public List<Peak> convert(byte[] peakData, boolean hasNumbers) throws IOException {
+        
         if(!hasNumbers) {
             return convert(new String(peakData));
         }
         else {
             ByteArrayInputStream bis = null;
             DataInputStream dis = null;
-            List<String[]> peaks = new ArrayList<String[]>();
+            List<Peak> peaks = new ArrayList<Peak>();
             try {
                 bis = new ByteArrayInputStream(peakData);
                 dis = new DataInputStream(bis);
                 while(true) {
                     try {
-                        String mz = String.valueOf(dis.readDouble());
-                        String intensity = String.valueOf(dis.readFloat());
-                        peaks.add(new String[]{mz, intensity});
+                        double mz = dis.readDouble();
+                        float intensity = dis.readFloat();
+                        peaks.add(new Peak(mz, intensity));
                     }
                     catch (EOFException e) {
                         break;

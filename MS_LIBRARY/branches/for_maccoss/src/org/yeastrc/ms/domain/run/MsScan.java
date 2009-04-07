@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.domain.run;
 
+import java.io.IOException;
+import java.util.List;
+
 
 
 /**
@@ -30,6 +33,8 @@ public interface MsScan extends MsScanBase {
     public abstract int getPrecursorScanId();
     
 
-    public abstract String peakDataString();
+    public abstract List<String[]> getPeaksString() throws IOException;
+    
+    public abstract List<Peak> getPeaks() throws IOException;
     
 }

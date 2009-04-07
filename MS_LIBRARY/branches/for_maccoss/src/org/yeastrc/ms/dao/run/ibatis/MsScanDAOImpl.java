@@ -6,10 +6,12 @@
  */
 package org.yeastrc.ms.dao.run.ibatis;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanIn;
+import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -30,15 +33,28 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
  */
 public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
 
-    public MsScanDAOImpl(SqlMapClient sqlMap) {
+    private boolean binScanData = false;
+    
+    public MsScanDAOImpl(SqlMapClient sqlMap, boolean binaryScanData) {
         super(sqlMap);
+        this.binScanData = binaryScanData;
     }
 
     public int save(MsScanIn scan, int runId, int precursorScanId) {
         MsScanSqlMapParam scanDb = new MsScanSqlMapParam(runId, precursorScanId, scan);
         int scanId = saveAndReturnId("MsScan.insert", scanDb);
+        
         // save the peak data
-        save("MsScan.insertPeakData", new MsScanDataSqlMapParam(scanId, scan));
+        MsScanDataSqlMapParam param;
+        String statementName = binScanData == true ? "insertPeakDataBin" : "insertPeakDataString";
+        try {
+            param = new MsScanDataSqlMapParam(scanId, scan, binScanData);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+        
+        save("MsScan."+statementName, param);
         return scanId;
     }
 
@@ -139,8 +155,12 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             return scan.getStartScanNum();
         }
 
-        public Iterator<String[]> peakIterator() {
-            return scan.peakIterator();
+        public List<String[]> getPeaksString() {
+            throw new UnsupportedOperationException();
+        }
+        
+        public List<Peak> getPeaks() {
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -157,11 +177,6 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         public int getId() {
             throw new UnsupportedOperationException("getId() not supported by MsScanSqlMapParam");
         }
-
-        @Override
-        public String peakDataString() {
-            throw new UnsupportedOperationException("peakDataString() not supported by MsScanSqlMapParam");
-        }
     }
     
     /**
@@ -170,25 +185,56 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
     public static class MsScanDataSqlMapParam {
         private int scanId;
         private String peakData;
-        public MsScanDataSqlMapParam(int scanId, MsScanIn scan) {
+        private byte[] peakDataBin;
+        public MsScanDataSqlMapParam(int scanId, MsScanIn scan, boolean binaryScanData) throws IOException {
             this.scanId = scanId;
-            this.peakData = getPeakDataString(scan);
+            
+            if(binaryScanData)
+                this.peakDataBin = getPeakBinaryData(scan);
+            else
+                this.peakData = getPeakDataString(scan);
         }
+        
         public int getScanId() {
             return scanId;
         }
-        public String getPeakData() {
+        public String getPeakDataString() {
             return peakData;
         }
+        public byte[] getPeakDataBin() {
+            return peakDataBin;
+        }
+        
         private String getPeakDataString(MsScanIn scan) {
-            Iterator<String[]> peakIterator = scan.peakIterator();
-            String[] peak = null;
+            List<String[]> peaksStr = scan.getPeaksString();
             PeakStringBuilder builder = new PeakStringBuilder();
-            while(peakIterator.hasNext()) {
-                peak = peakIterator.next();
+            for(String[] peak: peaksStr) {
                 builder.addPeak(peak[0], peak[1]);
             }
             return builder.getPeaksAsString();
+        }
+        
+        private byte[] getPeakBinaryData(MsScanIn scan) throws IOException {
+            
+            ByteArrayOutputStream bos = null;
+            DataOutputStream dos = null;
+            
+            List<Peak> peaks = scan.getPeaks();
+            try {
+                bos = new ByteArrayOutputStream();
+                dos = new DataOutputStream(bos);
+                for(Peak peak: peaks) {
+                    dos.writeDouble(peak.getMz());
+                    dos.writeFloat(peak.getIntensity());
+                }
+                dos.flush();
+            }
+            finally {
+                if(dos != null) dos.close();
+                if(bos != null) bos.close();
+            }
+            byte [] data = bos.toByteArray();
+            return data;
         }
     }
   
