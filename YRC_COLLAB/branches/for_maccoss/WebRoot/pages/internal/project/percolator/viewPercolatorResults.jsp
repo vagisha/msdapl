@@ -19,7 +19,7 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <%@ include file="/pages/internal/project/resultsTableJS.jsp" %>
-<yrcwww:contentbox title="Percolator Results" centered="true" width="900">
+<yrcwww:contentbox title="Percolator Results" centered="true" width="95" widthRel="true">
 <center>
 
 	<!-- SUMMARY -->

@@ -52,6 +52,21 @@ public class SequestResultPlus implements SequestSearchResult {
     public List<MsSearchResultProtein> getProteinMatchList() {
         return result.getProteinMatchList();
     }
+    
+    public String getProteins() {
+        if(result.getProteinMatchList() == null)
+            return null;
+        else {
+            StringBuilder buf = new StringBuilder();
+            for(MsSearchResultProtein protein: result.getProteinMatchList()) {
+                buf.append(", "+protein.getAccession());
+            }
+            if(buf.length() > 0)
+                buf.deleteCharAt(0);
+            return buf.toString();
+        }
+    }
+    
     @Override
     public int getRunSearchId() {
         return result.getRunSearchId();

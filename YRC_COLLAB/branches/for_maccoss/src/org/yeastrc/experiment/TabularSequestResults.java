@@ -30,7 +30,8 @@ public class TabularSequestResults implements Tabular, Pageable {
         SORT_BY.XCORR, 
         SORT_BY.DELTACN, 
         SORT_BY.SP, 
-        SORT_BY.PEPTIDE
+        SORT_BY.PEPTIDE,
+        SORT_BY.PROTEIN
     };
     
     private SORT_BY sortColumn;
@@ -80,8 +81,8 @@ public class TabularSequestResults implements Tabular, Pageable {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
-//            if(col == SORT_BY.FILE_PERC)
-//                header.setSortable(false);
+            if(col == SORT_BY.PROTEIN)
+                header.setSortable(false);
             headers.add(header);
         }
         return headers;
@@ -103,19 +104,20 @@ public class TabularSequestResults implements Tabular, Pageable {
         // Retention time
         BigDecimal temp = result.getRetentionTime();
         if(temp == null) {
-            row.addCell(new TableCell("", null));
+            row.addCell(new TableCell(""));
         }
         else
-            row.addCell(new TableCell(String.valueOf(round(temp)), null));
+            row.addCell(new TableCell(String.valueOf(round(temp))));
         
         
-        row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getxCorr())), null));
-        row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN()), null));
-        row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getSp()), null));
+        row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getxCorr()))));
+        row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN())));
+        row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getSp())));
         
         String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
         row.addCell(new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true));
         
+        row.addCell(new TableCell(String.valueOf(result.getProteins())));
         return row;
     }
     

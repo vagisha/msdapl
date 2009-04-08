@@ -30,7 +30,8 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         SORT_BY.P_RT, 
         SORT_BY.QVAL, 
         SORT_BY.PEP, 
-        SORT_BY.PEPTIDE
+        SORT_BY.PEPTIDE,
+        SORT_BY.PROTEIN
     };
     
     private SORT_BY sortColumn;
@@ -78,8 +79,8 @@ public class TabularPercolatorResults implements Tabular, Pageable {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
-//            if(col == SORT_BY.FILE_PERC)
-//                header.setSortable(false);
+            if(col == SORT_BY.PROTEIN)
+                header.setSortable(false);
             headers.add(header);
         }
         return headers;
@@ -101,10 +102,10 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         // Retention time
         BigDecimal temp = result.getRetentionTime();
         if(temp == null) {
-            row.addCell(new TableCell("", null));
+            row.addCell(new TableCell(""));
         }
         else
-            row.addCell(new TableCell(String.valueOf(round(temp)), null));
+            row.addCell(new TableCell(String.valueOf(round(temp))));
         
         // Predicted retention time
         temp = result.getPredictedRetentionTime();
@@ -112,12 +113,14 @@ public class TabularPercolatorResults implements Tabular, Pageable {
             row.addCell(new TableCell("", null));
         }
         else
-            row.addCell(new TableCell(String.valueOf(round(temp)), null));
-        row.addCell(new TableCell(String.valueOf(result.getQvalueRounded()), null));
-        row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded()), null));
+            row.addCell(new TableCell(String.valueOf(round(temp))));
+        row.addCell(new TableCell(String.valueOf(result.getQvalueRounded())));
+        row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded())));
         
         String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
         row.addCell(new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true));
+        
+        row.addCell(new TableCell(String.valueOf(result.getProteins())));
         
         return row;
     }
