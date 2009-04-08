@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,20 +122,31 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             PercolatorResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
-        int offset = sortCriteria.getOffset() == null ? 0 : sortCriteria.getOffset();
+        if(filterCriteria == null)
+            filterCriteria = new PercolatorResultFilterCriteria();
+        
+        if(sortCriteria == null)
+            sortCriteria = new ResultSortCriteria(null, null);
+        
+        int offset =  sortCriteria.getOffset() == null ? 0 : sortCriteria.getOffset();
         
         // If we don't have filters and nothing to sort by use the simple method
-        if((filterCriteria == null || !filterCriteria.hasFilters()) && sortCriteria == null) {
+        if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
             return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId); 
         }
         
         
         boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
-        boolean useResultsTable = filterCriteria.superHasFilters() || SORT_BY.isSearchRelated(sortCriteria.getSortBy());
         boolean useModsTable = filterCriteria.hasMofificationFilter();
+        boolean useResultsTable = filterCriteria.superHasFilters() 
+                                || SORT_BY.isSearchRelated(sortCriteria.getSortBy())
+                                || useScanTable
+                                || useModsTable;
+        
+        boolean userPercTable = filterCriteria.hasFilters() || SORT_BY.isPercolatorRelated(sortCriteria.getSortBy());
         
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
-        if(!useScanTable && !useResultsTable && !useModsTable) {
+        if(!useScanTable && !useResultsTable && !useModsTable && !userPercTable) {
             if(sortCriteria.getLimitCount() != null)
                 return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId, sortCriteria.getLimitCount(), offset);
             else 
@@ -142,8 +154,10 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.id FROM ( ");
-        sql.append("PercolatorResult as pres, msRunSearchResult AS res");
+        sql.append("SELECT pres.resultID FROM ( ");
+        sql.append("PercolatorResult as pres");
+        if(useResultsTable)
+            sql.append(", msRunSearchResult AS res");
         if(useScanTable)
             sql.append(", msScan AS scan");
         sql.append(" ) ");
@@ -153,7 +167,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
         
         sql.append("WHERE pres.runSearchAnalysisID = "+runSearchAnalysisId+" ");
-        sql.append("AND res.id = pres.resultID ");
+        if(useResultsTable)
+            sql.append("AND res.id = pres.resultID ");
         if(useScanTable) {
             sql.append("AND res.scanID = scan.id ");
         }
@@ -174,48 +189,71 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         if(filterCriteria.hasMassFilter()) {
             sql.append("AND "+filterCriteria.makeMassFilterSql());
         }
+        // peptide filter
         if(filterCriteria.hasPeptideFilter()) {
             sql.append("AND "+filterCriteria.makePeptideSql());
         }
+        // modifications filter
         if(filterCriteria.hasMofificationFilter()) {
             sql.append("AND "+filterCriteria.makeModificationFilter());
         }
+        // QValue filter
+        if(filterCriteria.hasQValueFilter()) {
+            sql.append("AND "+filterCriteria.makeQValueFilterSql());
+        }
+        // PEP filter
+        if(filterCriteria.hasPepFilter()) {
+            sql.append("AND "+filterCriteria.makePepFilterSql());
+        }
         
         
+        if(sortCriteria != null) {
+            if(sortCriteria.getSortBy() != null) {
+                sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
+            }
+            else {
+                sql.append("ORDER BY pres.resultID ");
+            }
+        }
+        
+        if(sortCriteria.getLimitCount() != null) {
+            sql.append("LIMIT "+sortCriteria.getLimitCount()+", "+offset);
+        }
+        
+        System.out.println(sql.toString());
         
         
-//        String sql = "SELECT * FROM (msRunSearchResult AS res, PercolatorResult AS pres) "+
-//        "LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) "+
-//        "WHERE res.id = pres.resultID "+
-//        "AND pres.runSearchAnalysisID = ? ";
-//if(qvalue != null)
-//sql +=   " AND qvalue <= "+qvalue;
-//if(pep != null && pep < 1.0) 
-//sql +=   " AND pep <= "+pep;
-//if(discriminantScore != null)
-//sql +=   " AND discriminantScore <= "+discriminantScore;
-//
-//sql +=       " ORDER BY res.id";
-//
-//
-//        StringBuilder sql = new StringBuilder();
-//        sql.append("SELECT pres.id ");
-//        sql.append("FROM PercolatorResult AS pres,  msRunSearchResult AS res ");
-//        sql.append("LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) ");
-//        sql.append("WHERE res.id = pres.resultID ");
-//        sql.append("AND pres.runSearchAnalysisID = "+runSearchAnalysisId+" ");
-//        
-//        
-//        List<Integer> resultIds;
-//        
-//            resultIds = loadResultIdsForRunSearchAnalysis(runSearchAnalysisId);
-//            if(sortCriteria == null)    return resultIds;
-//            else {
-//                if(sortCriteria)
-//            }
-//        }
-//        
-//        return null;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = super.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql.toString());
+            
+            List<Integer> resultIds = new ArrayList<Integer>();
+            
+            while ( rs.next() ) {
+                resultIds.add(rs.getInt("resultID"));
+            }
+            return resultIds;
+        }
+        catch (Exception e) {
+            log.error("Failed to execute query: "+sql.toString(), e);
+            throw new RuntimeException("Failed to execute query: "+sql, e);
+        }
+        finally {
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }     
+        }
     }
 
     

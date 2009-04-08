@@ -36,10 +36,22 @@ public interface MsSearchResultPeptide {
     public abstract String getModifiedPeptide();
     
     /**
+     * Returns the modified peptide along with the pre and post residues
+     * @return
+     */
+    public abstract String getFullModifiedPeptide();
+    
+    /**
      * Returns the modified peptide in a program specific format
      * @return
      */
     public abstract String getModifiedPeptidePS();
+    
+    /**
+     * Returns the modified peptide along with the pre and post residues
+     * @return
+     */
+    public abstract String getFullModifiedPeptidePS();
     
     public abstract char getPreResidue();
     

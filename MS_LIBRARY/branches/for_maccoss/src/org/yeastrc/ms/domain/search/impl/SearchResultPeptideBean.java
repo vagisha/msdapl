@@ -171,4 +171,16 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
                 return Integer.valueOf(o1.getModifiedPosition()).compareTo(Integer.valueOf(o2.getModifiedPosition()));
             }});
     }
+
+    @Override
+    public String getFullModifiedPeptide() {
+        String pept = getModifiedPeptide();
+        return preResidue+"."+pept+"."+postResidue;
+    }
+
+    @Override
+    public String getFullModifiedPeptidePS() {
+        String pept = getModifiedPeptidePS();
+        return preResidue+"."+pept+"."+postResidue;
+    }
 }

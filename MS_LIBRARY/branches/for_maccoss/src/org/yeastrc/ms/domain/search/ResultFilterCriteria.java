@@ -6,26 +6,27 @@
  */
 package org.yeastrc.ms.domain.search;
 
-import java.math.BigDecimal;
 
 /**
  * 
  */
 public class ResultFilterCriteria {
 
+    
     private Integer minScan;
     private Integer maxScan;
     
     private Integer minCharge;
     private Integer maxCharge;
     
-    private BigDecimal minObservedMass;
-    private BigDecimal maxObservedMass;
+    private Double minObservedMass;
+    private Double maxObservedMass;
     
-    private BigDecimal minRetentionTime;
-    private BigDecimal maxRetentionTime;
+    private Double minRetentionTime;
+    private Double maxRetentionTime;
     
     private String peptide;
+    private boolean exactMatch = true;
     
     private boolean showOnlyModified;
     private boolean showOnlyUnmodified;
@@ -51,12 +52,12 @@ public class ResultFilterCriteria {
         if(min == null && max == null)
             return "";
         
-        if(minScan != null && maxScan != null)
-            return " ("+columnName+" BETWEEN "+minScan+" AND "+maxScan+") ";
-        if(minScan != null && maxScan == null) 
-            return " ("+columnName+" >= "+minScan+") ";
-        if(minScan == null && maxScan != null)
-            return " ("+columnName+" <= "+maxScan+") ";
+        if(min != null && max != null)
+            return " ("+columnName+" BETWEEN "+min+" AND "+max+") ";
+        if(min != null && max == null) 
+            return " ("+columnName+" >= "+min+") ";
+        if(min == null && max != null)
+            return " ("+columnName+" <= "+max+") ";
         
         return "";
         
@@ -110,16 +111,16 @@ public class ResultFilterCriteria {
     //-------------------------------------------------------------
     // OBSERVED MASS FILTER
     //-------------------------------------------------------------
-    public BigDecimal getMinObservedMass() {
+    public Double getMinObservedMass() {
         return minObservedMass;
     }
-    public void setMinObservedMass(BigDecimal minObservedMass) {
+    public void setMinObservedMass(Double minObservedMass) {
         this.minObservedMass = minObservedMass;
     }
-    public BigDecimal getMaxObservedMass() {
+    public Double getMaxObservedMass() {
         return maxObservedMass;
     }
-    public void setMaxObservedMass(BigDecimal maxObservedMass) {
+    public void setMaxObservedMass(Double maxObservedMass) {
         this.maxObservedMass = maxObservedMass;
     }
     public boolean hasMassFilter() {
@@ -133,17 +134,17 @@ public class ResultFilterCriteria {
     //-------------------------------------------------------------
     // RETENTION TIME FILTER
     //-------------------------------------------------------------
-    public BigDecimal getMinRetentionTime() {
+    public Double getMinRetentionTime() {
         return minRetentionTime;
     }
-    public void setMinRetentionTime(BigDecimal minRetentionTime) {
+    public void setMinRetentionTime(Double minRetentionTime) {
         this.minRetentionTime = minRetentionTime;
     }
     
-    public BigDecimal getMaxRetentionTime() {
+    public Double getMaxRetentionTime() {
         return maxRetentionTime;
     }
-    public void setMaxRetentionTime(BigDecimal maxRetentionTime) {
+    public void setMaxRetentionTime(Double maxRetentionTime) {
         this.maxRetentionTime = maxRetentionTime;
     }
     public boolean hasRTFilter() {
@@ -165,11 +166,19 @@ public class ResultFilterCriteria {
     public boolean hasPeptideFilter() {
         return peptide != null && peptide.length() > 0;
     }
+    public void setExactPeptideMatch(boolean exact) {
+        this.exactMatch = exact;
+    }
     public String makePeptideSql() {
-        if(hasPeptideFilter())
-            return " (peptide LIKE '%"+peptide+"%') ";
+        if(hasPeptideFilter()) {
+            if(exactMatch)
+                return " (peptide = '"+peptide+"') ";
+            else
+                return " (peptide LIKE '%"+peptide+"%') ";
+        }
         return "";
     }
+    
     
     
     //-------------------------------------------------------------
@@ -196,7 +205,7 @@ public class ResultFilterCriteria {
             if(showOnlyModified)
                 return " (modID != 0) ";
             if(showOnlyUnmodified)
-                return " (modID = 0) ";
+                return " (modID IS NULL) ";
         }
         return "";
     }
