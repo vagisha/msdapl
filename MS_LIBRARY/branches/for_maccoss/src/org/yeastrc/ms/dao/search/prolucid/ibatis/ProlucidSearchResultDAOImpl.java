@@ -77,6 +77,33 @@ ProlucidSearchResultDAO {
     }
 
     @Override
+    public List<Integer> loadResultIdsForRunSearch(int runSearchId, int limit,
+            int offset) {
+        return resultDao.loadResultIdsForRunSearch(runSearchId, limit, offset);
+    }
+
+    @Override
+    public List<Integer> loadResultIdsForSearch(int searchId) {
+        return resultDao.loadResultIdsForSearch(searchId);
+    }
+
+    @Override
+    public List<Integer> loadResultIdsForSearch(int searchId, int limit,
+            int offset) {
+        return resultDao.loadResultIdsForSearch(searchId, limit, offset);
+    }
+
+    @Override
+    public int numRunSearchResults(int runSearchId) {
+        return resultDao.numRunSearchResults(runSearchId);
+    }
+
+    @Override
+    public int numSearchResults(int searchId) {
+        return resultDao.numSearchResults(searchId);
+    }
+    
+    @Override
     public List<Integer> loadTopResultIdsForRunSearch(int runSearchId) {
         return queryForList("ProlucidResult.selectTopResultIdsForRunSearch", runSearchId);
     }
@@ -366,7 +393,7 @@ ProlucidSearchResultDAO {
     public void delete(int resultId) {
         resultDao.delete(resultId);
     }
-    
+
 //    @Override
 //    public void deleteResults(int runSearchId, int scanId, int charge) {
 //        resultDao.deleteResults(runSearchId, scanId, charge);

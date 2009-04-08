@@ -15,6 +15,7 @@ public enum SORT_BY {
     MASS("Obs. Mass", "observedMass"), 
     RT("RT", "retentionTime"), 
     PEPTIDE("Peptide", "peptide"),
+    FILE_SEARCH("File", "runSearchID"),
     
     // Sequest specific
     XCORR("XCorr", "XCorr"),

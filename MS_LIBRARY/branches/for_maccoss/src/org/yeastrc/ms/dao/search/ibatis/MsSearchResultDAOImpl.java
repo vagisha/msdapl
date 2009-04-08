@@ -57,6 +57,39 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForRunSearch", runSearchId);
     }
     
+    @Override
+    public List<Integer> loadResultIdsForRunSearch(int runSearchId, int limit, int offset) {
+        Map<String, Integer> map = new HashMap<String, Integer>(5);
+        map.put("runSearchId", runSearchId);
+        map.put("limit", limit);
+        map.put("offset", offset);
+        return queryForList("MsSearchResult.selectResultIdsLimitedForRunSearch", map);
+    }
+
+    @Override
+    public List<Integer> loadResultIdsForSearch(int searchId) {
+        return queryForList("MsSearchResult.selectResultIdsForSearch", searchId);
+    }
+
+    @Override
+    public List<Integer> loadResultIdsForSearch(int searchId, int limit, int offset) {
+        Map<String, Integer> map = new HashMap<String, Integer>(5);
+        map.put("searchId", searchId);
+        map.put("limit", limit);
+        map.put("offset", offset);
+        return queryForList("MsSearchResult.selectResultIdsLimitedForSearch", map);
+    }
+
+    @Override
+    public int numRunSearchResults(int runSearchId) {
+        return (Integer)queryForObject("MsSearchResult.countRunSearchResults", runSearchId);
+    }
+
+    @Override
+    public int numSearchResults(int searchId) {
+        return (Integer)queryForObject("MsSearchResult.countSearchResults", searchId);
+    }
+    
     public List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge) {
         Map<String, Integer> map = new HashMap<String, Integer>(3);
         map.put("runSearchId", runSearchId);

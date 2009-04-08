@@ -39,7 +39,7 @@
     <select id="selectResultIdsLimitedForRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT resultID FROM PercolatorResult 
     	WHERE runSearchAnalysisID=#runSearchAnalysisId# 
-    	ORDER BY id LIMIT #offset#, #limit#
+    	ORDER BY resultID LIMIT #offset#, #limit#
     </select>
     
     <select id="selectResultIdsForRunSearchAnalysisScan" resultClass="Integer" parameterClass="java.util.Map">
@@ -62,7 +62,7 @@
     	FROM PercolatorResult AS pres, msRunSearchAnalysis as rsa 
     	WHERE pres.runSearchAnalysisID = rsa.id AND
     	rsa.searchAnalysisID = #searchAnalyisId# 
-    	ORDER BY id LIMIT #offset#, #limit#
+    	ORDER BY resultID LIMIT #offset#, #limit#
     </select>
     
    	<select id="countRunSearchAnalysisResults" resultClass="Integer" parameterClass="Integer">

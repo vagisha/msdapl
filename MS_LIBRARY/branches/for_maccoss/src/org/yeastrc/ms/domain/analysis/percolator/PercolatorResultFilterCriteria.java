@@ -7,6 +7,7 @@
 package org.yeastrc.ms.domain.analysis.percolator;
 
 import org.yeastrc.ms.domain.search.ResultFilterCriteria;
+import org.yeastrc.ms.domain.search.SORT_BY;
 
 /**
  * 
@@ -54,7 +55,7 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
     }
     
     public String makeQValueFilterSql() {
-        return makeFilterSql("qvalue", minQValue, maxQValue);
+        return makeFilterSql(SORT_BY.QVAL.getColumnName(), minQValue, maxQValue);
     }
     
     //-------------------------------------------------------------
@@ -81,6 +82,6 @@ public class PercolatorResultFilterCriteria extends ResultFilterCriteria {
     }
     
     public String makePepFilterSql() {
-        return makeFilterSql("pep", minPep, maxPep);
+        return makeFilterSql(SORT_BY.PEP.getColumnName(), minPep, maxPep);
     }
 }

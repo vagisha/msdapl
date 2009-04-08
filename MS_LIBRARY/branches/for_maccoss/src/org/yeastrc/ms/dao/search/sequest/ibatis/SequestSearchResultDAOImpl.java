@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +26,13 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.ResultSortCriteria;
+import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
+import org.yeastrc.ms.domain.search.sequest.SequestResultFilterCriteria;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean;
@@ -68,6 +72,33 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
 
     @Override
+    public List<Integer> loadResultIdsForRunSearch(int runSearchId, int limit,
+            int offset) {
+        return resultDao.loadResultIdsForRunSearch(runSearchId, limit, offset);
+    }
+
+    @Override
+    public List<Integer> loadResultIdsForSearch(int searchId) {
+        return resultDao.loadResultIdsForSearch(searchId);
+    }
+
+    @Override
+    public List<Integer> loadResultIdsForSearch(int searchId, int limit,
+            int offset) {
+        return resultDao.loadResultIdsForSearch(searchId, limit, offset);
+    }
+
+    @Override
+    public int numRunSearchResults(int runSearchId) {
+        return resultDao.numRunSearchResults(runSearchId);
+    }
+
+    @Override
+    public int numSearchResults(int searchId) {
+        return resultDao.numSearchResults(searchId);
+    }
+    
+    @Override
     public List<Integer> loadTopResultIdsForRunSearch(int runSearchId) {
         return queryForList("SequestResult.selectTopResultIdsForRunSearch", runSearchId);
     }
@@ -76,6 +107,292 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
 //    public List<SequestSearchResult> loadTopResultsForRunSearchN(int runSearchId, boolean getDynaResMods) {
 //        return queryForList("SequestResult.selectTopResultsForRunSearchN", runSearchId);
 //    }
+    
+    
+    @Override
+    public List<Integer> loadResultIdsForRunSearch(int runSearchId,
+            SequestResultFilterCriteria filterCriteria,
+            ResultSortCriteria sortCriteria) {
+        
+        if(filterCriteria == null)
+            filterCriteria = new SequestResultFilterCriteria();
+        
+        if(sortCriteria == null)
+            sortCriteria = new ResultSortCriteria(null, null);
+        
+        int offset =  sortCriteria.getOffset() == null ? 0 : sortCriteria.getOffset();
+        
+        // If we don't have filters and nothing to sort by use the simple method
+        if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
+            return loadResultIdsForRunSearch(runSearchId);
+        }
+        
+        boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
+        boolean useModsTable = filterCriteria.hasMofificationFilter();
+        boolean useResultsTable = filterCriteria.superHasFilters() 
+                                || SORT_BY.isSearchRelated(sortCriteria.getSortBy())
+                                || useScanTable
+                                || useModsTable;
+        
+        boolean useSeqTable = filterCriteria.hasFilters() || SORT_BY.isSequestRelated(sortCriteria.getSortBy());
+        
+        // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
+        if(!useScanTable && !useResultsTable && !useModsTable && !useSeqTable) {
+            if(sortCriteria.getLimitCount() != null)
+                return loadResultIdsForRunSearch(runSearchId, sortCriteria.getLimitCount(), offset);
+            else 
+                return loadResultIdsForRunSearch(runSearchId); 
+        }
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT res.id FROM ( ");
+        sql.append("msRunSearchResult AS res ");
+        if(useSeqTable)
+            sql.append(", SQTSearchResult AS sres");
+        if(useScanTable)
+            sql.append(", msScan AS scan");
+        sql.append(" ) ");
+        
+        if(useModsTable) {
+            sql.append("LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) ");
+        }
+        
+        sql.append("WHERE res.runSearchID = "+runSearchId+" ");
+        if(useSeqTable)
+            sql.append("AND res.id = sres.resultID ");
+        if(useScanTable) {
+            sql.append("AND res.scanID = scan.id ");
+        }
+        
+        // filter of scan number
+        if(filterCriteria.hasScanFilter()) {
+            sql.append("AND "+filterCriteria.makeScanFilterSql());
+        }
+        // filter on retention time
+        if(filterCriteria.hasRTFilter()) {
+            sql.append("AND "+filterCriteria.makeRTFilterSql());
+        }
+        // filter on charge
+        if(filterCriteria.hasChargeFilter()) {
+            sql.append("AND "+filterCriteria.makeChargeFilterSql());
+        }
+        // observed mass filter
+        if(filterCriteria.hasMassFilter()) {
+            sql.append("AND "+filterCriteria.makeMassFilterSql());
+        }
+        // peptide filter
+        if(filterCriteria.hasPeptideFilter()) {
+            sql.append("AND "+filterCriteria.makePeptideSql());
+        }
+        // modifications filter
+        if(filterCriteria.hasMofificationFilter()) {
+            sql.append("AND "+filterCriteria.makeModificationFilter());
+        }
+        // XCorr filter
+        if(filterCriteria.hasXCorrFilter()) {
+            sql.append("AND "+filterCriteria.makeXCorrFilterSql());
+        }
+        // DeltaCN filter
+        if(filterCriteria.hasDeltaCnFilter()) {
+            sql.append("AND "+filterCriteria.makeDeltaCnFilterSql());
+        }
+        // Sp filter
+        if(filterCriteria.hasSpFilter()) {
+            sql.append("AND "+filterCriteria.makeSpFilterSql());
+        }
+        
+        
+        if(sortCriteria != null) {
+            if(sortCriteria.getSortBy() != null) {
+                sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
+            }
+            else {
+                sql.append("ORDER BY res.id ");
+            }
+        }
+        
+        if(sortCriteria.getLimitCount() != null) {
+            sql.append("LIMIT "+sortCriteria.getLimitCount()+", "+offset);
+        }
+        
+        System.out.println(sql.toString());
+        
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = super.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql.toString());
+            
+            List<Integer> resultIds = new ArrayList<Integer>();
+            
+            while ( rs.next() ) {
+                resultIds.add(rs.getInt("id"));
+            }
+            return resultIds;
+        }
+        catch (Exception e) {
+            log.error("Failed to execute query: "+sql.toString(), e);
+            throw new RuntimeException("Failed to execute query: "+sql, e);
+        }
+        finally {
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }     
+        }
+    }
+
+    @Override
+    public List<Integer> loadResultIdsForSearch(int searchId,
+            SequestResultFilterCriteria filterCriteria,
+            ResultSortCriteria sortCriteria) {
+        
+        if(filterCriteria == null)
+            filterCriteria = new SequestResultFilterCriteria();
+        
+        if(sortCriteria == null)
+            sortCriteria = new ResultSortCriteria(null, null);
+        
+        int offset =  sortCriteria.getOffset() == null ? 0 : sortCriteria.getOffset();
+        
+        // If we don't have filters and nothing to sort by use the simple method
+        if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
+            return loadResultIdsForSearch(searchId);
+        }
+        
+        boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
+        boolean useModsTable = filterCriteria.hasMofificationFilter();
+        boolean useResultsTable = filterCriteria.superHasFilters() 
+                                || SORT_BY.isSearchRelated(sortCriteria.getSortBy())
+                                || useScanTable
+                                || useModsTable;
+        
+        boolean useSeqTable = filterCriteria.hasFilters() || SORT_BY.isSequestRelated(sortCriteria.getSortBy());
+        
+        // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
+        if(!useScanTable && !useResultsTable && !useModsTable && !useSeqTable) {
+            if(sortCriteria.getLimitCount() != null)
+                return loadResultIdsForSearch(searchId, sortCriteria.getLimitCount(), offset);
+            else 
+                return loadResultIdsForSearch(searchId); 
+        }
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT res.id FROM ( ");
+        sql.append("msRunSearchResult AS res, msRunSearch AS rs");
+        if(useSeqTable)
+            sql.append(", SQTSearchResult AS sres");
+        if(useScanTable)
+            sql.append(", msScan AS scan");
+        sql.append(" ) ");
+        
+        if(useModsTable) {
+            sql.append("LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) ");
+        }
+        
+        sql.append("WHERE rs.searchID = "+searchId+" ");
+        sql.append("AND rs.id = res.runSearchID ");
+        if(useSeqTable)
+            sql.append("AND res.id = sres.resultID ");
+        if(useScanTable) {
+            sql.append("AND res.scanID = scan.id ");
+        }
+        
+        // filter of scan number
+        if(filterCriteria.hasScanFilter()) {
+            sql.append("AND "+filterCriteria.makeScanFilterSql());
+        }
+        // filter on retention time
+        if(filterCriteria.hasRTFilter()) {
+            sql.append("AND "+filterCriteria.makeRTFilterSql());
+        }
+        // filter on charge
+        if(filterCriteria.hasChargeFilter()) {
+            sql.append("AND "+filterCriteria.makeChargeFilterSql());
+        }
+        // observed mass filter
+        if(filterCriteria.hasMassFilter()) {
+            sql.append("AND "+filterCriteria.makeMassFilterSql());
+        }
+        // peptide filter
+        if(filterCriteria.hasPeptideFilter()) {
+            sql.append("AND "+filterCriteria.makePeptideSql());
+        }
+        // modifications filter
+        if(filterCriteria.hasMofificationFilter()) {
+            sql.append("AND "+filterCriteria.makeModificationFilter());
+        }
+        // XCorr filter
+        if(filterCriteria.hasXCorrFilter()) {
+            sql.append("AND "+filterCriteria.makeXCorrFilterSql());
+        }
+        // DeltaCN filter
+        if(filterCriteria.hasDeltaCnFilter()) {
+            sql.append("AND "+filterCriteria.makeDeltaCnFilterSql());
+        }
+        // Sp filter
+        if(filterCriteria.hasSpFilter()) {
+            sql.append("AND "+filterCriteria.makeSpFilterSql());
+        }
+        
+        
+        if(sortCriteria != null) {
+            if(sortCriteria.getSortBy() != null) {
+                sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
+            }
+            else {
+                sql.append("ORDER BY res.id ");
+            }
+        }
+        
+        if(sortCriteria.getLimitCount() != null) {
+            sql.append("LIMIT "+sortCriteria.getLimitCount()+", "+offset);
+        }
+        
+        System.out.println(sql.toString());
+        
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = super.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql.toString());
+            
+            List<Integer> resultIds = new ArrayList<Integer>();
+            
+            while ( rs.next() ) {
+                resultIds.add(rs.getInt("id"));
+            }
+            return resultIds;
+        }
+        catch (Exception e) {
+            log.error("Failed to execute query: "+sql.toString(), e);
+            throw new RuntimeException("Failed to execute query: "+sql, e);
+        }
+        finally {
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }     
+        }
+    }
     
     
     /**

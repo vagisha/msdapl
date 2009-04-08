@@ -57,6 +57,26 @@
     	SELECT id FROM msRunSearchResult WHERE runSearchID = #id#
     </select>
     
+    <select id="selectResultIdsLimitedForRunSearch" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msRunSearchResult WHERE runSearchID = #runSearchId#
+    	ORDER BY id LIMIT #offset#, #limit#
+    </select>
+    
+    <select id="selectResultIdsForSearch" resultClass="Integer" parameterClass="Integer">
+    	SELECT res.id 
+    	FROM msRunSearchResult AS res, msRunSearch AS rs
+    	WHERE rs.searchID = #searchId#
+    	AND rs.id = res.runSearchID
+    </select>
+    
+    <select id="selectResultIdsLimitedForSearch" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT res.id 
+    	FROM msRunSearchResult AS res, msRunSearch AS rs
+    	WHERE rs.searchID = #searchId#
+    	AND rs.id = res.runSearchID
+    	ORDER BY res.id LIMIT #offset#, #limit#
+    </select>
+    
     <select id="selectResultForRunSearchScanChargePeptide" resultMap="msSearchResult" parameterClass="java.util.Map">
     	SELECT * FROM msRunSearchResult 
     	WHERE runSearchID = #runSearchId# 
@@ -64,6 +84,18 @@
     	AND charge = #charge#
     	AND peptide = #peptide#
     </select>
+    
+    <select id="countRunSearchResults" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM msRunSearchResult WHERE runSearchID=#runSearchId# 
+    </select>
+    
+    <select id="countSearchResults" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) 
+    	FROM msRunSearchResult AS res, msRunSearch AS rs
+    	WHERE rs.searchID = #searchId#
+    	AND rs.id = res.runSearchID
+    </select>
+    
     
     <select id="selectResultIdsForRunSearchScanCharge" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msRunSearchResult 

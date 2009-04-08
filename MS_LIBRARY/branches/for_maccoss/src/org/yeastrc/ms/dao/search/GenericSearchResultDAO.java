@@ -19,7 +19,17 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
 
     public abstract O load(int resultId);
 
+    public abstract int numRunSearchResults(int runSearchId);
+    
+    public abstract int numSearchResults(int searchId);
+    
+    public abstract List<Integer> loadResultIdsForSearch(int searchId);
+    
+    public abstract List<Integer> loadResultIdsForSearch(int searchId, int limit, int offset);
+    
     public abstract List<Integer> loadResultIdsForRunSearch(int runSearchId);
+    
+    public abstract List<Integer> loadResultIdsForRunSearch(int runSearchId, int limit, int offset);
     
     public abstract List<Integer> loadResultIdsForSearchScanCharge(int runSearchId, int scanId, int charge);
     
