@@ -36,10 +36,7 @@
      	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
      	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">XCorr</th>
      </logic:equal>
-     <logic:equal name="inputGenerator" value="<%=Program.EE_NORM_SEQUEST.name() %>">
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">XCorr</th>
-     </logic:equal>
+     
      <logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
      	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
      	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">Primary Score</th>
@@ -81,12 +78,6 @@
      			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
      		</logic:equal>
      		
-     		<logic:equal name="inputGenerator" value="<%=Program.EE_NORM_SEQUEST.name() %>">
-     			<bean:define name="ion" property="bestSpectrumMatch" id="psm_seq" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult"/>
-     			<td><bean:write name="psm_seq" property="sequestResultData.deltaCN" /></td>
-     			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
-     		</logic:equal>
-     
      		<logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_plc" type="org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult"/>
      		 	<td><bean:write name="psm_plc" property="prolucidResultData.primaryScore" /></td>

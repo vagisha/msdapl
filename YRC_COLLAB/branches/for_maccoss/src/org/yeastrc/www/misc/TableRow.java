@@ -15,6 +15,16 @@ import java.util.List;
 public class TableRow {
 
     private List<TableCell> cells;
+    private boolean rowHighighted;
+
+
+    public boolean isRowHighighted() {
+        return rowHighighted;
+    }
+
+    public void setRowHighighted(boolean rowHighighted) {
+        this.rowHighighted = rowHighighted;
+    }
 
     public TableRow() {
         this.cells = new ArrayList<TableCell>();

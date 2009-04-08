@@ -16,6 +16,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.www.misc.TableCell;
+import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
 import org.yeastrc.yates.YatesRun;
@@ -197,28 +198,21 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     }
     
     @Override
-    public String[] columnNames() {
-        String[] names = new String[columnCount()];
-        int i = 0;
-        names[i++] = "File";
-        names[i++] = "# MS2 Scans";
-        for(ExperimentSearch search: searches){
-            names[i++] = search.getSearchProgram().displayName();
-        }
-        for(SearchAnalysis analysis: analyses) {
-            names[i++] = analysis.getAnalysisProgram().displayName();
-        }
-        return names;
-    }
-
-    @Override
     public TableRow getRow(int row) {
         return rows.get(row);
     }
 
     @Override
-    public String sortedColumn() {
-        throw new UnsupportedOperationException();
+    public List<TableHeader> tableHeaders() {
+        List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
+        headers.add(new TableHeader("File"));
+        headers.add(new TableHeader("# MS2 Scans"));
+        for(ExperimentSearch search: searches){
+            headers.add(new TableHeader(search.getSearchProgram().displayName()));
+        }
+        for(SearchAnalysis analysis: analyses) {
+            headers.add(new TableHeader(analysis.getAnalysisProgram().displayName()));
+        }
+        return headers;
     }
-    
 }

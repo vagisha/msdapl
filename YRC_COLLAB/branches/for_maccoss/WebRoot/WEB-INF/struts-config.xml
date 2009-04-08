@@ -54,6 +54,8 @@
 	<form-bean name="uploadDataForm" type="org.yeastrc.www.yates.UploadDataForm"/>
 	<form-bean name="GOAnnotationForm" type="org.yeastrc.www.microscopy.GOAnnotationForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
+	<form-bean name="filterPercolatorResultsForm" type="org.yeastrc.www.project.experiment.PercolatorFilterResultsForm" />
+	<form-bean name="filterSequestResultsForm" type="org.yeastrc.www.project.experiment.SequestFilterResultsForm" />
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
@@ -337,7 +339,10 @@
 	<action
 	  path="/viewPercolatorResults"
 	  type="org.yeastrc.www.project.experiment.ViewPercolatorResults"
-	  validate="false">
+	  name="filterPercolatorResultsForm"
+	  validate="true"
+	  scope="request"
+	  input="/pages/internal/project/viewPercolatorResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/viewPercolatorResults.jsp" redirect="false"/>
 	</action>

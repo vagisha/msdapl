@@ -6,6 +6,8 @@
  */
 package org.yeastrc.www.misc;
 
+import java.util.List;
+
 /**
  * 
  */
@@ -21,9 +23,7 @@ public interface Tabular {
     
     public abstract int rowCount();
     
-    public String[] columnNames();
+    public abstract List<TableHeader> tableHeaders();
     
-    public String sortedColumn();
-    
-    public TableRow getRow(int row);
+    public abstract TableRow getRow(int row);
 }

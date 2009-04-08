@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 public final class ContentBoxTag extends TagSupport {
 	// Declare + initialize width w/ our default
 	private int width = 0;
+	
+	private boolean useRelativeWidth = false;
 
 	// Declare + initialize scheme w/ our default scheme
 	private String scheme = null;
@@ -21,6 +23,10 @@ public final class ContentBoxTag extends TagSupport {
 	// Set the width of this content area
 	public void setWidth(int width) {
 		this.width = width;
+	}
+	
+	public void setWidthRel(String val) {
+	    useRelativeWidth = Boolean.valueOf(val);
 	}
 
 	// Set the title to display for this text area
@@ -74,7 +80,9 @@ public final class ContentBoxTag extends TagSupport {
 			if (this.title != null) {
 				writ.print("<DIV CLASS=\"" + scheme + "_header\"");
 				if (this.width > 0) {
-					writ.print(" STYLE=\"WIDTH:" + this.width + "\"");
+				    String w = String.valueOf(this.width);
+				    if(useRelativeWidth)    w = w + "%";
+					writ.print(" STYLE=\"WIDTH:" + w + "\"");
 				}
 				writ.print(">");
 				writ.print("<CENTER>" + this.title + "</CENTER>");
@@ -84,7 +92,9 @@ public final class ContentBoxTag extends TagSupport {
 			
 			writ.print("<DIV CLASS=\"" + scheme + "\"");
 			if (this.width > 0) {
-				writ.print(" STYLE=\"WIDTH:" + this.width + "\"");
+			    String w = String.valueOf(this.width);
+                if(useRelativeWidth)    w = w + "%";
+				writ.print(" STYLE=\"WIDTH:" + w + "\"");
 			}
 			writ.print(" ALIGN=\"left\">");
 

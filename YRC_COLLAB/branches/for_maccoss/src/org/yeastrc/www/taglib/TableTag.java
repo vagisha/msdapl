@@ -12,7 +12,9 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.struts.util.RequestUtils;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.misc.TableCell;
+import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
 
@@ -85,8 +87,19 @@ public class TableTag extends TagSupport {
             // print header
             writer.print("<thead>\n");
             writer.print("<tr>\n");
-            for(String header: tabular.columnNames()) {
-                writer.print("<th>"+header+"</th>\n");
+            for(TableHeader header: tabular.tableHeaders()) {
+                writer.print("<th");
+                if(header.getHeaderId() != null) {
+                    writer.print(" id=\""+header.getHeaderId()+"\" ");
+                }
+                if(header.isSortable()) {
+                    if(header.isSorted()) {
+                        String headerClass = header.getSortOrder() == SORT_ORDER.ASC ? "sorted-asc" : "sorted-desc";
+                        headerClass += " sortable ";
+                        writer.write(" class=\""+headerClass+"\" ");
+                    }
+                }
+                writer.print(">"+header.getHeaderName()+"</th>\n");
             }
             writer.print("</tr>\n");
             writer.print("</thead>\n");
@@ -95,11 +108,31 @@ public class TableTag extends TagSupport {
             writer.print("<tbody>\n");
             for(int i = 0; i < tabular.rowCount(); i++) {
                 TableRow row = tabular.getRow(i);
-                writer.print("<tr>\n");
+                
+                if(row.isRowHighighted()) {
+                    writer.print("<tr class='tr_highlight'>\n");
+                }
+                else {
+                    writer.print("<tr>\n");
+                }
+                
                 for(TableCell cell: row.getCells()) {
                     writer.print("<td>");
                     if(cell.getHyperlink() != null) {
-                        writer.print("<a href=\""+contextPath+cell.getHyperlink()+"\">");
+                        String url = contextPath+cell.getHyperlink();
+                        if(!cell.openLinkInNewWindow())
+                            writer.print("<a href=\""+url+"\" >"); 
+                        else {
+//                            String windowName = context.getContextPath()+"_WINDOW";
+//                            int winHeight = 600;
+//                            int winWidth = 800;
+//                            String js = "javascript:window.open('"+url+"', '"+windowName+"'"+
+//                                        ", 'status=no,resizable=yes,scrollbars=yes, width="+winWidth+", height="+winHeight+"'"+
+//                                        "); return false;";
+//                            writer.print("<a href=\"\" onClick=\""+js+"\">");
+                            writer.print("<a href=\""+url+"\" target='YRC_APPLET' >"); 
+                            //window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
+                        }
                     }
                     if(cell.getData() != null) {
                         writer.write(cell.getData());

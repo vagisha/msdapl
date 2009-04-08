@@ -10,16 +10,30 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.SORT_BY;
+import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.TableCell;
+import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
 
 public class TabularPercolatorResults implements Tabular, Pageable {
 
     
-    private static String[] columns = new String[]{"Scan", "Charge", "Obs.Mass", "RT", "Predit. RT", "q-value", "PEP", "Peptide"}; 
-    private String sortColumn;
+    private static SORT_BY[] columns = new SORT_BY[] {
+        SORT_BY.SCAN, 
+        SORT_BY.CHARGE, 
+        SORT_BY.MASS, 
+        SORT_BY.RT, 
+        SORT_BY.P_RT, 
+        SORT_BY.QVAL, 
+        SORT_BY.PEP, 
+        SORT_BY.PEPTIDE
+    };
+    
+    private SORT_BY sortColumn;
+    private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
     private List<PercolatorResultPlus> results;
     
@@ -38,9 +52,34 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         return columns.length;
     }
 
+    public SORT_BY getSortedColumn() {
+        return sortColumn;
+    }
+    
+    public void setSortedColumn(SORT_BY column) {
+        this.sortColumn = column;
+    }
+    
+    public SORT_ORDER getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(SORT_ORDER sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
     @Override
-    public String[] columnNames() {
-        return columns;
+    public List<TableHeader> tableHeaders() {
+        List<TableHeader> headers = new ArrayList<TableHeader>(columns.length);
+        for(SORT_BY col: columns) {
+            TableHeader header = new TableHeader(col.getDisplayName(), col.name());
+            if(col == sortColumn) {
+                header.setSorted(true);
+                header.setSortOrder(sortOrder);
+            }
+            headers.add(header);
+        }
+        return headers;
     }
 
     @Override
@@ -73,7 +112,8 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         row.addCell(new TableCell(String.valueOf(result.getQvalueRounded()), null));
         row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded()), null));
         
-        row.addCell(new TableCell(String.valueOf(result.getResultPeptide().getModifiedPeptidePS()), null));
+        String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+        row.addCell(new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true));
         
         return row;
     }
@@ -95,6 +135,8 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         // nothing to do here?
     }
 
+    
+    
     @Override
     public int getCurrentPage() {
         return currentPage;
@@ -127,13 +169,4 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         return lastPage;
     }
 
-    @Override
-    public String sortedColumn() {
-        return sortColumn;
-    }
-    
-    public void setSortedColumn(String column) {
-        this.sortColumn = column;
-    }
-    
 }

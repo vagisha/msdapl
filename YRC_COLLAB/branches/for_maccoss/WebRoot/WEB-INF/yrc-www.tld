@@ -81,6 +81,11 @@
 <rtexprvalue>false</rtexprvalue>
 </attribute>
 <attribute>
+<name>widthRel</name>
+<required>false</required>
+<rtexprvalue>false</rtexprvalue>
+</attribute>
+<attribute>
 <name>title</name>
 <required>false</required>
 <rtexprvalue>true</rtexprvalue>

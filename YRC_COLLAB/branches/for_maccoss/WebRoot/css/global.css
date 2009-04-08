@@ -172,6 +172,32 @@ DIV.ms_header, DIV.pinfer_header, DIV.upload_header, DIV.adminSearch_header, DIV
 }
 
 
+
+.th_normal {
+	background-color: #ED9A2E;
+	color: #FFFFFF;
+	padding-left: 3;
+}
+.th_hover {
+	background-color: #000000;
+	color: #FFFFFF;
+	padding-left: 3;
+	cursor: pointer;
+}
+.th_selected {
+	background-color: #D74D2D;
+	color: #FFFFFF;
+	padding-left: 3;
+}
+.tr_highlight {
+	background-color: #939CB0;
+	font-weight: bold;
+}
+.tr_highlight a:visited {
+	color:	#D74D2D;
+}
+
+
 /* Login color definitions */
 DIV.login_header {
 }
