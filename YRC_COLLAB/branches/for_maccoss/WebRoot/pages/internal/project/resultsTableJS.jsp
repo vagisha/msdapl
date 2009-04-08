@@ -1,12 +1,12 @@
-
-<%@page import="org.yeastrc.ms.domain.search.SORT_ORDER"%><script src="<yrcwww:link path='js/jquery-1.3.2.min.js'/>"></script>
+<%@page import="org.yeastrc.ms.domain.search.SORT_ORDER"%>
+<script src="<yrcwww:link path='js/jquery-1.3.2.min.js'/>"></script>
 
 <script>
 // ---------------------------------------------------------------------------------------
 // SETUP THE TABLE
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
-   $(".perc_results").each(function() {
+   $(".sortable_table").each(function() {
    		var $table = $(this);
    		$table.attr('width', "100%");
    		$table.attr('align', 'center');

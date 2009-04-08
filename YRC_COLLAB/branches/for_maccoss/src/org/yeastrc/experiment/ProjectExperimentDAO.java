@@ -156,4 +156,39 @@ public class ProjectExperimentDAO {
         }
     }
     
+    public int getProjectIdForExperiment(int experimentId) throws SQLException {
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String sql = "SELECT projectID FROM tblProjectExperiment WHERE experimentID = "+experimentId+" ";
+                    
+            conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                return rs.getInt("projectID");
+            }
+            
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+        return 0;
+    }
+    
 }

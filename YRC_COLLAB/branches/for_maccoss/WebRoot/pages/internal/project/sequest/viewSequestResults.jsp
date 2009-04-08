@@ -19,7 +19,7 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <%@ include file="/pages/internal/project/resultsTableJS.jsp" %>
-<yrcwww:contentbox title="Percolator Results" centered="true" width="900">
+<yrcwww:contentbox title="Sequest Results" centered="true" width="900">
 <center>
 
 	<!-- SUMMARY -->
@@ -27,14 +27,10 @@
 		<table width="80%">
 			<tr>
 				<td align="center"><b>Project ID:</b>
-					<logic:iterate name="projectIds" id="projId">
-						<html:link action="viewProject.do" paramId="ID" paramName="projId"><bean:write name="projId" /></html:link>&nbsp;
-					</logic:iterate>
+					<html:link action="viewProject.do" paramId="ID" paramName="projectId"><bean:write name="projectId" /></html:link>&nbsp;
 				</td>
 				<td align="center"><b>Experiment ID:</b>
-					<logic:iterate name="experimentIds" id="exptId">
-						<bean:write name="exptId" />&nbsp;
-					</logic:iterate>
+					<bean:write name="experimentId" />&nbsp;
 				</td>
 				
 				<td align="center"><b>Program: </b><bean:write name="program" /></td>
@@ -44,7 +40,7 @@
 	
 	
 	<!-- FILTER FORM -->
-	<%@ include file="percolatorFilterForm.jsp" %>
+	<%@ include file="sequestFilterForm.jsp" %>
 
 
 
@@ -56,7 +52,7 @@
 				
 	<!-- RESULTS TABLE -->
 	<div style="background-color: #FFFAF0; margin:5 0 5 0; padding:5; border: 1px dashed gray;" > 
-	<yrcwww:table name="results" tableId='perc_results' tableClass="sortable_table" center="true" />
+	<yrcwww:table name="results" tableId='seq_results' tableClass="sortable_table" center="true" />
 	</div>
 	
 </center>	
