@@ -15,6 +15,7 @@ public enum SORT_BY {
     MASS("Obs. Mass", "observedMass"), 
     RT("RT", "retentionTime"), 
     PEPTIDE("Peptide", "peptide"),
+    PROTEIN("Protein", "accession"),
     FILE_SEARCH("File", "runSearchID"),
     
     // Sequest specific
@@ -49,21 +50,12 @@ public enum SORT_BY {
     public static SORT_BY getSortByForName(String name) {
         if(name == null)
             return null;
-        else if (name.equalsIgnoreCase(ID.name())) return ID;
-        else if (name.equalsIgnoreCase(SCAN.name())) return SCAN;
-        else if (name.equalsIgnoreCase(CHARGE.name())) return CHARGE;
-        else if (name.equalsIgnoreCase(MASS.name())) return MASS;
-        else if (name.equalsIgnoreCase(RT.name())) return RT;
-        else if (name.equalsIgnoreCase(PEPTIDE.name())) return PEPTIDE;
-        else if (name.equalsIgnoreCase(XCORR.name())) return XCORR;
-        else if (name.equalsIgnoreCase(SP.name())) return SP;
-        else if (name.equalsIgnoreCase(DELTACN.name())) return DELTACN;
-        else if (name.equalsIgnoreCase(EVAL.name())) return EVAL;
-        else if (name.equalsIgnoreCase(CALC_MASS_SEQ.name())) return CALC_MASS_SEQ;
-        else if (name.equalsIgnoreCase(QVAL.name())) return QVAL;
-        else if (name.equalsIgnoreCase(PEP.name())) return PEP;
-        else if (name.equalsIgnoreCase(P_RT.name())) return P_RT;
-        else    return null;
+        SORT_BY[] arr = SORT_BY.values();
+        for(SORT_BY sortBy: arr) {
+            if(sortBy.name().equalsIgnoreCase(name)) 
+                return sortBy;
+        }
+        return null;
     }
 
     public static SORT_BY defaultSortBy() {
