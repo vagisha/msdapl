@@ -129,8 +129,8 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             Collections.sort(files, comparator);
             
             String action = null;
-            if(search.getSearchProgram() == Program.SEQUEST)
-                action = "viewSequestResults.do";
+            //if(search.getSearchProgram() == Program.SEQUEST)
+                //action = "viewSequestResults.do";
             
             int j = 0;
             for(int r = 0; r < rows.size(); r++) {
@@ -154,8 +154,8 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             Collections.sort(files, comparator);
             
             String action = null;
-            if(analysis.getAnalysisProgram() == Program.PERCOLATOR)
-                action = "viewPercolatorResults.do";
+            //if(analysis.getAnalysisProgram() == Program.PERCOLATOR)
+             //   action = "viewPercolatorResults.do";
             
             int j = 0;
             for(int r = 0; r < rows.size(); r++) {
