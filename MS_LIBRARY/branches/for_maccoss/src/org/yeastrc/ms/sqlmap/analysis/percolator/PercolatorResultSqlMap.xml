@@ -57,8 +57,23 @@
     	rsa.searchAnalysisID = #analysisId# 
     </select>
     
-   	<select id="countResults" resultClass="Integer" parameterClass="Integer">
+    <select id="selectResultIdsLimitedForAnalysis" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT pres.resultID 
+    	FROM PercolatorResult AS pres, msRunSearchAnalysis as rsa 
+    	WHERE pres.runSearchAnalysisID = rsa.id AND
+    	rsa.searchAnalysisID = #searchAnalyisId# 
+    	ORDER BY id LIMIT #offset#, #limit#
+    </select>
+    
+   	<select id="countRunSearchAnalysisResults" resultClass="Integer" parameterClass="Integer">
     	SELECT count(*) FROM PercolatorResult WHERE runSearchAnalysisID=#runSearchAnalysisId# 
+    </select>
+    
+    <select id="countSearchAnalysisResults" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) 
+    	FROM PercolatorResult AS pres, msRunSearchAnalysis AS rsa
+    	WHERE rsa.searchAnalysisID=#searchAnalysisId# 
+    	AND  pres.runSearchAnalysisID = rsa.id
     </select>
     
     <insert id="insert" parameterMap="percolatorResultParam">

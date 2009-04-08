@@ -21,9 +21,10 @@ public enum SORT_BY {
     SP("Sp", "sp"),
     DELTACN("DeltaCN", "deltaCN"),
     EVAL("e-value", "evalue"),
-    CALC_MASS_SEQ("Calc. Mass", "calcMass"),
+    CALC_MASS_SEQ("Calc. Mass", "calculatedMass"),
     
     // Percolator specific
+    FILE_PERC("File", "runSearchAnalysisID"),
     QVAL("q-value", "qvalue"),
     PEP("PEP", "pep"),
     P_RT("Predict. RT", "predictedRetentionTime");

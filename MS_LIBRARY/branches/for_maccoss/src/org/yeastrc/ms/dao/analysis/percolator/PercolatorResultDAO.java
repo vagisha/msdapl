@@ -24,10 +24,16 @@ public interface PercolatorResultDAO {
                             PercolatorResultFilterCriteria filterCriteria, 
                             ResultSortCriteria sortCriteria);
     
+    public abstract List<Integer> loadResultIdsForSearchAnalysis(int searchAnalysisId, 
+            PercolatorResultFilterCriteria filterCriteria, 
+            ResultSortCriteria sortCriteria);
+    
     public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
     
     
     public abstract List<Integer> loadResultIdsForAnalysis(int analysisId);
+    
+    public abstract List<Integer> loadResultIdsForAnalysis(int analysisId, int limit, int offset);
     
     
     public abstract void save(PercolatorResultDataWId data);
@@ -35,5 +41,7 @@ public interface PercolatorResultDAO {
     
     public abstract void saveAllPercolatorResultData(List<PercolatorResultDataWId> dataList);
     
-    public abstract int numResults(int runSearchAnalysisId);
+    public abstract int numRunAnalysisResults(int runSearchAnalysisId);
+    
+    public abstract int numAnalysisResults(int searchAnalysisId);
 }
