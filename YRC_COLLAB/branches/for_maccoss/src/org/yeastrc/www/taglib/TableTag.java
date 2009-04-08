@@ -98,6 +98,9 @@ public class TableTag extends TagSupport {
                         headerClass += " sortable ";
                         writer.write(" class=\""+headerClass+"\" ");
                     }
+                    else {
+                        writer.write(" class=\"sortable\" ");
+                    }
                 }
                 writer.print(">"+header.getHeaderName()+"</th>\n");
             }

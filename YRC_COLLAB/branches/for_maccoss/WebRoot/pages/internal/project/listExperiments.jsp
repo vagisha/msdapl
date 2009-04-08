@@ -63,7 +63,9 @@ $(document).ready(function() {
 					<table width="90%">
 						<tr>
 							<td width="25%"><b>Search ID:</b></td> 
-							<td width="25%"><bean:write name="search" property="id"/></td>
+							<td width="25%"><bean:write name="search" property="id"/>
+								<html:link action="viewSequestResults.do" paramId="ID" paramName="search" paramProperty="id">[View Results]</html:link>
+							</td>
 							<td width="25%"><b>Program: </b></td>
 							<td width="25%"><b><bean:write name="search" property="searchProgram"/>
 							&nbsp;
@@ -98,7 +100,9 @@ $(document).ready(function() {
 					<table width="90%">
 					<tr>
 						<td width="25%"><b>Analysis ID:</b>
-						<td width="25%"><bean:write name="analysis" property="id"/></td>
+						<td width="25%"><bean:write name="analysis" property="id"/>
+							<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
+						</td>
 						<td width="25%"><b>Program: </b></td>
 						<td width="25%"><b><bean:write name="analysis" property="analysisProgram"/>
 						&nbsp;

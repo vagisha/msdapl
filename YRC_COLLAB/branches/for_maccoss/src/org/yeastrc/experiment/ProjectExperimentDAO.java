@@ -21,11 +21,13 @@ import org.yeastrc.project.Project;
  */
 public class ProjectExperimentDAO {
 
-    private static ProjectExperimentDAO instance = new ProjectExperimentDAO();
+    private static ProjectExperimentDAO instance;
     
     private ProjectExperimentDAO() {}
     
     public static ProjectExperimentDAO instance() {
+        if(instance == null)
+            instance = new ProjectExperimentDAO();
         return instance;
     }
     
@@ -84,7 +86,7 @@ public class ProjectExperimentDAO {
             
             String sql = "SELECT experimentID FROM tblProjectExperiment WHERE projectID in ("+projIdStr+")";
                     
-            conn = DBConnectionManager.getConnection( "yrc" );
+            conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             
@@ -93,6 +95,50 @@ public class ProjectExperimentDAO {
                 experimentIds.add( rs.getInt("experimentID"));
             }
             return experimentIds;
+            
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+    }
+    
+    public List<Integer> getProjectIdsForExperiments(List<Integer> experimentIds) throws SQLException {
+        if(experimentIds == null || experimentIds.size() == 0) 
+            return new ArrayList<Integer>(0);
+        
+        String exptIdStr = "";
+        for(Integer exptId: experimentIds) {
+            exptIdStr += ","+exptId;
+        }
+        exptIdStr = exptIdStr.substring(1); // remove first comma
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String sql = "SELECT distinct(projectID) FROM tblProjectExperiment WHERE experimentID in ("+exptIdStr+")";
+                    
+            conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            List<Integer> projectIds = new ArrayList<Integer>();
+            while (rs.next()) {
+                projectIds.add( rs.getInt("projectID"));
+            }
+            return projectIds;
             
         } finally {
             

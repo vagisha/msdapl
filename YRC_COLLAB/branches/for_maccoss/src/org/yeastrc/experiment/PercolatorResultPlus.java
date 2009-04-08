@@ -23,13 +23,23 @@ public class PercolatorResultPlus implements PercolatorResult {
     private final PercolatorResult result;
     private final int scanNumber;
     private final BigDecimal retentionTime;
+    private String filename;
     
+   
     public PercolatorResultPlus(PercolatorResult result, MsScan scan) {
         this.result = result;
         this.scanNumber = scan.getStartScanNum();
         this.retentionTime = scan.getRetentionTime();
     }
     
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
     public int getScanNumber() {
         return scanNumber;
     }

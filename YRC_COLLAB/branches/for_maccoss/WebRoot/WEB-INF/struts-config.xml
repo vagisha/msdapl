@@ -342,9 +342,9 @@
 	  name="filterPercolatorResultsForm"
 	  validate="true"
 	  scope="request"
-	  input="/pages/internal/project/viewPercolatorResults.jsp">
+	  input="/pages/internal/project/percolator/viewPercolatorResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
-	  <forward name="Success" path="/pages/internal/project/viewPercolatorResults.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
 	</action>
 	
 	

@@ -22,6 +22,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
 
     
     private static SORT_BY[] columns = new SORT_BY[] {
+        SORT_BY.FILE_PERC,
         SORT_BY.SCAN, 
         SORT_BY.CHARGE, 
         SORT_BY.MASS, 
@@ -77,6 +78,8 @@ public class TabularPercolatorResults implements Tabular, Pageable {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
+//            if(col == SORT_BY.FILE_PERC)
+//                header.setSortable(false);
             headers.add(header);
         }
         return headers;
@@ -90,6 +93,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         TableRow row = new TableRow();
         
         // row.addCell(new TableCell(String.valueOf(result.getId())));
+        row.addCell(new TableCell(result.getFilename()));
         row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
         row.addCell(new TableCell(String.valueOf(result.getCharge())));
         row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));

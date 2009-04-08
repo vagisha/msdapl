@@ -21,11 +21,6 @@ import org.yeastrc.ms.domain.search.SORT_ORDER;
  */
 public class FilterResultsForm extends ActionForm {
 
-    private String experimentId;
-    private String program;
-    private String filename;
-    private int numResults;
-    private int numResultsFiltered;
     
     private Integer minScan;
     private Integer maxScan;
@@ -219,43 +214,51 @@ public class FilterResultsForm extends ActionForm {
         return criteria;
     }
 
-    public String getExperimentId() {
-        return experimentId;
-    }
+//    public List<Integer> getExperimentIds() {
+//        return experimentIds;
+//    }
+//
+//    public void setExperimentIds(List<Integer> experimentIds) {
+//        this.experimentIds = experimentIds;
+//    }
+//
+//    public String getProgram() {
+//        return program;
+//    }
+//
+//    public void setProgram(String program) {
+//        this.program = program;
+//    }
 
-    public void setExperimentId(String experimentId) {
-        this.experimentId = experimentId;
-    }
+//    public String getFilename() {
+//        return filename;
+//    }
+//
+//    public void setFilename(String filename) {
+//        this.filename = filename;
+//    }
 
-    public String getProgram() {
-        return program;
-    }
-
-    public void setProgram(String program) {
-        this.program = program;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public int getNumResults() {
-        return numResults;
-    }
-
-    public void setNumResults(int numResults) {
-        this.numResults = numResults;
-    }
-
-    public int getNumResultsFiltered() {
-        return numResultsFiltered;
-    }
-
-    public void setNumResultsFiltered(int numResultsFiltered) {
-        this.numResultsFiltered = numResultsFiltered;
-    }
+//    public int getNumResults() {
+//        return numResults;
+//    }
+//
+//    public void setNumResults(int numResults) {
+//        this.numResults = numResults;
+//    }
+//
+//    public int getNumResultsFiltered() {
+//        return numResultsFiltered;
+//    }
+//
+//    public void setNumResultsFiltered(int numResultsFiltered) {
+//        this.numResultsFiltered = numResultsFiltered;
+//    }
+//
+//    public String getProjectIdString() {
+//        return projectIdString;
+//    }
+//
+//    public void setProjectIdString(String projectIdString) {
+//        this.projectIdString = projectIdString;
+//    }
 }

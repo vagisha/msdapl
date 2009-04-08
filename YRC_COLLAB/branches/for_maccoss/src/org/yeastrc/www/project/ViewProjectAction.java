@@ -278,7 +278,7 @@ public class ViewProjectAction extends Action {
         if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
             PercolatorResultDAO prDao = daoFactory.getPercolatorResultDAO();
             for(AnalysisFile file: files) {
-                file.setNumResults(prDao.numResults(file.getId()));
+                file.setNumResults(prDao.numRunAnalysisResults(file.getId()));
             }
         }
         

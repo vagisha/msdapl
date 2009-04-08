@@ -17,7 +17,8 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
  */
 public class PercolatorFilterResultsForm extends FilterResultsForm {
 
-    private int runSearchAnalysisId;
+//    private int runSearchAnalysisId;
+    private int searchAnalysisId;
     
     private Double minQValue = null;
     private Double maxQValue = null;
@@ -100,11 +101,19 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
         return criteria;
     }
 
-    public int getRunSearchAnalysisId() {
-        return runSearchAnalysisId;
+    public int getSearchAnalysisId() {
+        return searchAnalysisId;
     }
 
-    public void setRunSearchAnalysisId(int runSearchAnalysisId) {
-        this.runSearchAnalysisId = runSearchAnalysisId;
+    public void setSearchAnalysisId(int searchAnalysisId) {
+        this.searchAnalysisId = searchAnalysisId;
     }
+
+//    public int getRunSearchAnalysisId() {
+//        return runSearchAnalysisId;
+//    }
+//
+//    public void setRunSearchAnalysisId(int runSearchAnalysisId) {
+//        this.runSearchAnalysisId = runSearchAnalysisId;
+//    }
 }

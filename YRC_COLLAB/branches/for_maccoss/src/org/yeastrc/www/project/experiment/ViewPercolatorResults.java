@@ -7,7 +7,9 @@
 package org.yeastrc.www.project.experiment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,20 +22,23 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.PercolatorResultPlus;
+import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.TabularPercolatorResults;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
-import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+
 
 /**
  * 
@@ -41,14 +46,14 @@ import org.yeastrc.www.user.UserUtils;
 public class ViewPercolatorResults extends Action {
 
     private static final Logger log = Logger.getLogger(ViewPercolatorResults.class.getName());
-    
+
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response )
     throws Exception {
-        
-        
+
+
 
         // User making this request
         User user = UserUtils.getUser(request);
@@ -61,120 +66,152 @@ public class ViewPercolatorResults extends Action {
 
         // Get the form
         PercolatorFilterResultsForm myForm = (PercolatorFilterResultsForm)form;
-        
-        int runSearchAnalysisId = myForm.getRunSearchAnalysisId();
-        if(runSearchAnalysisId == 0) {
+
+        int searchAnalysisId = myForm.getSearchAnalysisId();
+        if(searchAnalysisId == 0) {
             try {
                 String strID = request.getParameter("ID");
                 if(strID != null)
-                    runSearchAnalysisId = Integer.parseInt(strID);
-                
+                    searchAnalysisId = Integer.parseInt(strID);
+
 
             } catch (NumberFormatException nfe) {
                 ActionErrors errors = new ActionErrors();
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator Output"));
+                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator analysis"));
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
         }
         // If we still don't have a valid id, return an error
-        if(runSearchAnalysisId == 0) {
+        if(searchAnalysisId == 0) {
             ActionErrors errors = new ActionErrors();
-            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator Output"));
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.invalid.id", "Percolator analysis"));
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
-        
+
         // If this is a brand new form
-        if(myForm.getRunSearchAnalysisId() == 0) {
-            myForm.setRunSearchAnalysisId(runSearchAnalysisId);
+        if(myForm.getSearchAnalysisId() == 0) {
+            myForm.setSearchAnalysisId(searchAnalysisId);
             myForm.setShowModified(true);
             myForm.setShowUnmodified(true);
             myForm.setExactPeptideMatch(true);
+            myForm.setMaxQValue(0.05);
+            myForm.setSortBy(SORT_BY.QVAL);
+            myForm.setSortOrder(SORT_ORDER.ASC);
         }
-        
+
 
         // TODO Does the user have access to look at these results? 
-        
-        // First get the experiment and Percolator level details
-        String filename = DAOFactory.instance().getMsRunSearchAnalysisDAO().loadFilenameForRunSearchAnalysis(runSearchAnalysisId);
-        myForm.setFilename(filename);
-        
-        MsRunSearchAnalysis rsAnalysis = DAOFactory.instance().getMsRunSearchAnalysisDAO().load(runSearchAnalysisId);
-        int analysisId = rsAnalysis.getAnalysisId();
-        MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(analysisId);
-        myForm.setProgram(analysis.getAnalysisProgram()+" "+analysis.getAnalysisProgramVersion());
-        
-       List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(analysisId);
-       MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-       String exptIds = "";
-       for(int searchId: searchIds) {
-           MsSearch search = searchDao.loadSearch(searchId);
-           exptIds += ", "+search.getExperimentId();
-       }
-       if(exptIds.length() > 0)     exptIds = exptIds.substring(1); // remove first comma
-       myForm.setExperimentId(exptIds);
-        
-        
+
+        // GET THE SUMMARY 
+        List<Integer> projectIds = new ArrayList<Integer>();
+        List<Integer> experimentIds = new ArrayList<Integer>();
+        String program = null;
+        int numResults = 0;
+        int numResultsFiltered = 0;
+
+
+        MsSearchAnalysis analysis = DAOFactory.instance().getMsSearchAnalysisDAO().load(searchAnalysisId);
+        program = analysis.getAnalysisProgram()+" "+analysis.getAnalysisProgramVersion();
+
+        List<Integer> searchIds = DAOFactory.instance().getMsSearchAnalysisDAO().getSearchIdsForAnalysis(searchAnalysisId);
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+
+
+        for(int searchId: searchIds) {
+            MsSearch search = searchDao.loadSearch(searchId);
+            experimentIds.add(search.getExperimentId());
+        }
+        if(experimentIds.size() > 0) {
+            // Get the projects for these experiments
+            ProjectExperimentDAO projExpDao = ProjectExperimentDAO.instance();
+            projectIds = projExpDao.getProjectIdsForExperiments(experimentIds);
+        }
+
+
+
+
+        // Get ALL the filtered and sorted resultIds
+        PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
+        numResults = presDao.numAnalysisResults(searchAnalysisId);
+        List<Integer> resultIds = presDao.loadResultIdsForSearchAnalysis(searchAnalysisId,
+                myForm.getFilterCriteria(), myForm.getSortCriteria());
+        numResultsFiltered = resultIds.size();
+
+
+
+
+        // Extract the ones we will display
+        int numResultsPerPage = 50;
         int pageNum = myForm.getPageNum();
         if(pageNum <= 0) {
             pageNum = 1;
             myForm.setPageNum(pageNum);
         }
-        
-        int numResultsPerPage = 50;
-        
-        PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
-        int totalResults = presDao.numResults(runSearchAnalysisId);
-        myForm.setNumResults(totalResults);
-        
-        List<Integer> resultIds = presDao.loadResultIdsForRunSearchAnalysis(runSearchAnalysisId,
-                myForm.getFilterCriteria(), myForm.getSortCriteria());
-        myForm.setNumResultsFiltered(resultIds.size());
-        
-        
         ResultsPager pager = ResultsPager.instance();
         boolean desc = false;
         if(myForm.getSortOrder() != null)
             desc = myForm.getSortOrder() == SORT_ORDER.DESC ? true : false;
         // TODO if the pageNum is out of range .....
         List<Integer> forPage = pager.page(resultIds, pageNum, numResultsPerPage, desc);
-        
+
+
+
+        // Get details for the result we will display
+        Map<Integer, String> filenameMap = getFileNames(searchAnalysisId);
         List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
-        
+
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
         for(Integer resultId: forPage) {
             PercolatorResult result = presDao.load(resultId);
             MsScan scan = scanDao.loadScanLite(result.getScanId());
-            results.add(new PercolatorResultPlus(result, scan));
+            PercolatorResultPlus resPlus = new PercolatorResultPlus(result, scan);
+            resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
+            results.add(resPlus);
         }
 
-        
+
+        // Set up for tabular display
         TabularPercolatorResults tabResults = new TabularPercolatorResults(results);
         tabResults.setCurrentPage(pageNum);
         int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
         tabResults.setLastPage(pageCount);
         List<Integer> pageList = pager.getPageList(resultIds.size(), pageNum, numResultsPerPage);
         tabResults.setDisplayPageNumbers(pageList);
-        
-//        if(myForm.getSortBy() == null) {
-//            myForm.setSortBy(SORT_BY.SCAN);
-//            myForm.setSortOrder(SORT_ORDER.ASC);
-//        }
-        
         tabResults.setSortedColumn(myForm.getSortBy());
         tabResults.setSortOrder(myForm.getSortOrder());
-        
-        
+
+
+        // required attributes in the request
+        request.setAttribute("projectIds", projectIds);
+        request.setAttribute("experimentIds", experimentIds);
+        request.setAttribute("program", program);
+        request.setAttribute("numResults", numResults);
+        request.setAttribute("numResultsFiltered", numResultsFiltered);
 
         request.setAttribute("filterForm", myForm);
         request.setAttribute("results", tabResults);
-        request.setAttribute("runSearchAnalysisId", runSearchAnalysisId);
+        request.setAttribute("searchAnalysisId", searchAnalysisId);
 
 
-//      Forward them on to the happy success view page!
+        // Forward them on to the happy success view page!
         return mapping.findForward("Success");
 
+
+    }
+
+    private Map<Integer, String> getFileNames(int searchAnalysisId) {
+
+        MsRunSearchAnalysisDAO saDao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
+        List<Integer> runSearchAnalysisIds = saDao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
+
+        Map<Integer, String> filenameMap = new HashMap<Integer, String>(runSearchAnalysisIds.size()*2);
+        for(int runSearchAnalysisId: runSearchAnalysisIds) {
+            String filename = saDao.loadFilenameForRunSearchAnalysis(runSearchAnalysisId);
+            filenameMap.put(runSearchAnalysisId, filename);
+        }
+        return filenameMap;
 
     }
 }
