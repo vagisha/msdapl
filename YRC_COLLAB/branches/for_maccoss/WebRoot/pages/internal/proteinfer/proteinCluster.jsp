@@ -6,7 +6,7 @@
 
 <!-- PROTEINS TABLE -->
 <br>
-<div style="background-color: #2E8B57; color: #EBFFE6; padding: 2px; cursor: pointer" class="protgrplist">
+<div style="padding: 2px; cursor: pointer;" class="pinfer_header_small protgrplist">
  <b>Proteins in  Cluster <bean:write name="clusterId" /></b>
 </div>
 <br>
@@ -48,7 +48,7 @@
 <br>
 
 <!-- PEPTIDES TABLE -->
-<div style="background-color: #2E8B57; color: #EBFFE6; padding: 2px; cursor: pointer;" class="peptgrplist" ><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
+<div style="padding: 2px; cursor: pointer;" class="peptgrplist pinfer_header_small" ><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
 <table cellpadding="4" cellspacing="2" align="center" width="90%" id="pept_grp_table_<bean:write name="clusterId" />">
         
         <tr>
@@ -72,7 +72,7 @@
 <!-- PROTEINS-PEPTIDE ASSOCIATION TABLE -->
 <bean:size name="cluster" property="proteinGroups" id="protGroupsSize"/>
 <logic:greaterEqual name="protGroupsSize" value="2">
-<br><div style="background-color: #2E8B57; color: #EBFFE6; padding: 2px" ><b>Protein - Peptide Association</b></div><br>
+<br><div style="padding: 2px" class="pinfer_header_small" ><b>Protein - Peptide Association</b></div><br>
 <table id="assoctable_<bean:write name="clusterId" />"
        cellpadding="4" cellspacing="2" align="center">
        

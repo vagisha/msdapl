@@ -19,7 +19,7 @@ with the YRC, we are required to collect the following information.
 requesting future collaborations.
 
 <P><B>Note:</B> If you have previously collaborated with the YRC, you are already in our database and do not need to register.  Please proceed
-to our <html:link href="/yrc/pages/login/forgotPassword.jsp">forgot password page</html:link>, and enter your email address.  A username and password will
+to our <a href="<yrcwww:link path='/pages/login/forgotPassword.jsp'/>">forgot password page</a>, and enter your email address.  A username and password will
 be sent to you.
 
 <%@ include file="/includes/errors.jsp" %>

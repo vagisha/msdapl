@@ -133,7 +133,12 @@ public class TableTag extends TagSupport {
 //                                        ", 'status=no,resizable=yes,scrollbars=yes, width="+winWidth+", height="+winHeight+"'"+
 //                                        "); return false;";
 //                            writer.print("<a href=\"\" onClick=\""+js+"\">");
-                            writer.print("<a href=\""+url+"\" target='YRC_APPLET' >"); 
+                            if(cell.getTargetName() == null) {
+                                writer.print("<a href=\""+url+"\" target='_blank' >");
+                            }
+                            else {
+                                writer.print("<a href=\""+url+"\" target='"+cell.getTargetName()+"' >");
+                            }
                             //window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
                         }
                     }

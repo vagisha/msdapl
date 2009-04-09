@@ -1,31 +1,31 @@
 
-
+/* #ED9A2E */
 TH.pinfer_A {
-	background-color: #2E8B57;
+	background-color: #ED9A2E;
     color: #FFFFFF;
 }
 
 TH.pinfer_A_small {
-	background-color: #a2c9a2;
+	background-color: #ED9A2E;
     color: #FFFFFF;
 }
 
  /* background-color: #D4FECA; */
 TH.pinfer_hover {
-	color: 2E8B57;
-	background-color: #a2c9a2;
+	color: #ED9A2E;
+	background-color: #FFFAF0;
     cursor: pointer;
 }
 
 TH.pinfer_selected_header_small {
-	color: 2E8B57;
-	background-color: #a2c9a2;
+	color: #D74D2D;
+	background-color: #FFFAF0;
 }
 
 
 TH.pinfer_selected_header {
 	color: white;
-	background-color: #2F5F4F;
+	background-color: #D74D2D;
 }
 
 
@@ -68,7 +68,7 @@ TH.pinfer_selected_header {
 .ui-slider-handle { position: absolute; z-index: 1; height: 23px; width: 12px; top: 0px; left: 0px; background-image: url(../images/proteinfer/slider-handle.gif);  }
 .ui-slider-handle-active { border: 1px dotted black;  }
 .ui-slider-disabled .ui-slider-handle { opacity: 0.5; filter: alpha(opacity=50); }
-.ui-slider-range { position: absolute; background: #50A029; opacity: 0.3; filter: alpha(opacity=30); width: 100%; height: 100%; }
+.ui-slider-range { position: absolute; background: #F5FFFA; opacity: 0.3; filter: alpha(opacity=30); width: 100%; height: 100%; }
 
 /* Default slider backgrounds */
 .ui-slider, .ui-slider-1 { background-image: url(../images/proteinfer/slider-bg-1.png); }
@@ -77,7 +77,7 @@ TH.pinfer_selected_header {
 
 
 /* COPIED FROM JQUERY UI's flora.tabs.css */
-.ui-wrapper { border: 1px solid #50A029; }
+.ui-wrapper { border: 1px solid #F5FFFA; }
 .ui-wrapper input, .ui-wrapper textarea { border: 0; }
 
 /* Caution! Ensure accessibility in print and other media types... */
@@ -166,9 +166,9 @@ TH.pinfer_selected_header {
     color: #000;
 }
 .ui-tabs-panel {
-    border: 1px solid #2E8B57;
+    border: 1px solid gray;
     padding: 10px;
-    background: #EBFFE6; /* declare background color for container to avoid distorted fonts in IE while fading */
+    background: #FFFAF0; /* declare background color for container to avoid distorted fonts in IE while fading */
 }
 /*.ui-tabs-loading em {
     padding: 0 0 0 20px;
@@ -187,13 +187,13 @@ TH.pinfer_selected_header {
 
 .flora .ui-dialog,
 .flora.ui-dialog {
-	background-color: #e6f7d4;
+	background-color: #F2F2F2;
 }
 
 .flora .ui-dialog .ui-dialog-titlebar,
 .flora.ui-dialog .ui-dialog-titlebar {
-	border-bottom: 1px solid #d8d2aa;
-	background: #2E8B57 ;
+	border-bottom: 1px solid #000000;
+	background: #3D4960 ;
 	padding: 0px;
 	height: 28px;
 	_height: 29px;

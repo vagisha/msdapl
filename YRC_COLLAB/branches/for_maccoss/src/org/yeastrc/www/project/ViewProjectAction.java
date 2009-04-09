@@ -233,7 +233,7 @@ public class ViewProjectAction extends Action {
             
             // load the protein inference jobs, if any
             List<ProteinferJob> piJobs = ProteinferRunSearcher.getProteinferJobsForMsExperiment(experimentId);
-            pExpt.set
+            pExpt.setProtInferRuns(piJobs);
             
             experiments.add(pExpt);
         }

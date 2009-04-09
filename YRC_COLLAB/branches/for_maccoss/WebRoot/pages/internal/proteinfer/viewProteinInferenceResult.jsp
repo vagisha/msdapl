@@ -6,22 +6,22 @@
 
 <script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.core.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.tabs.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.dialog.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.draggable.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.ui-1.6rc2/ui/ui.resizable.js"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.core.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.tabs.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.dialog.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.draggable.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.resizable.js'/>"></script>
 
-<script type="text/javascript" src="/yrc/js/jquery.history.js"></script>
-<script type="text/javascript" src="/yrc/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.history.js'/>"></script>
+<script type="text/javascript" src="<yrcwww:link path='/js/jquery.cookie.js'/>"></script>
 
-<script src="/yrc/js/tooltip.js"></script>
+<script src="<yrcwww:link path='/js/tooltip.js'/>"></script>
 
-<script src="/yrc/js/jquery.form.js"></script>
+<script src="<yrcwww:link path='/js/jquery.form.js'/>"></script>
 
-<script src="/yrc/js/jquery.blockUI.js"></script>
+<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 
-<link rel="stylesheet" href="/yrc/css/proteinfer.css" type="text/css" >
+<link rel="stylesheet" href="<yrcwww:link path='/css/proteinfer.css'/>" type="text/css" >
 
 <yrcwww:notauthenticated>
  <logic:forward name="authenticate" />
@@ -233,7 +233,7 @@ function viewSpectrum (scanId, hitId) {
 	//alert("View spectrum for "+scanId+"; hit: "+hitId);
 	var winHeight = 500
 	var winWidth = 970;
-	var doc = "/yrc/viewSpectrum.do?scanID="+scanId+"&runSearchResultID="+hitId;
+	var doc = "<yrcwww:link path='/viewSpectrum.do'/>?scanID="+scanId+"&runSearchResultID="+hitId;
 	//alert(doc);
 	window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }
@@ -369,7 +369,8 @@ function highlightProteinAndPeptides() {
  	removeProteinAndPeptideHighlights();
  	
  	// select the PROTEIN group cells the user wants to select
- 	$("#protGrp_"+proteinGroupId).css("background-color","#EEE8AA");
+ 	// $("#protGrp_"+proteinGroupId).css("background-color","#EEE8AA");
+ 	$("#protGrp_"+proteinGroupId).css("background-color","#E0E0E0");
  	
  	
  	// now select the PEPTIDE group cells we want AND the PROTEIN-PEPTIDE association cells
@@ -377,8 +378,8 @@ function highlightProteinAndPeptides() {
 		var j = 0;
 		// peptide groups NOT unique to protein
 		for(var i = 0; i < peptGrpIds.length; i++) {
-			$(".peptGrp_"+peptGrpIds[i]).each(function() {$(this).css("background-color","#EEE8AA");});
-			$("#peptEvFor_"+proteinGroupId+"_"+peptGrpIds[i]).css("background-color","#EEE8AA");
+			$(".peptGrp_"+peptGrpIds[i]).each(function() {$(this).css("background-color","#E0E0E0");});
+			$("#peptEvFor_"+proteinGroupId+"_"+peptGrpIds[i]).css("background-color","#E0E0E0");
 			lastSelectedPeptGrpIds[j] = peptGrpIds[i];
 			j++;
 		}
@@ -908,7 +909,7 @@ function toggleDivVisibility(mydiv) {
 
 <CENTER>
 
-<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="950" scheme="pinfer">
+<yrcwww:contentbox title="Protein Inference* Results" centered="true" width="90" widthRel="true" scheme="pinfer" >
   
   <div id="results" class="flora">
       <ul>

@@ -31,9 +31,9 @@
 
 </html:form>
 
-<P align="center">Forgot your password? <html:link href="/yrc/pages/login/forgotPassword.jsp">Click here.</html:link>
+<P align="center">Forgot your password? <a href="<yrcwww:link path='pages/login/forgotPassword.jsp'/>">Click here.</a>
 
-<P align="center">Not registered? <html:link href="/yrc/viewRegister.do">Click here.</html:link>
+<P align="center">Not registered? <html:link action="viewRegister.do">Click here.</html:link>
 
 </yrcwww:contentbox>
 <%@ include file="/includes/footer.jsp" %>

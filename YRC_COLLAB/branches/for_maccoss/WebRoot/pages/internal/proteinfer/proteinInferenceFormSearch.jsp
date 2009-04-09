@@ -36,7 +36,7 @@ function requestSearchList() {
 	}
 	var winHeight = 500
 	var winWidth = 700;
-	var doc = "/yrc/listInputGroups.do?excludeInputGroups="+haveSearches+"&inputGenerator="+searchProgram;
+	var doc = <yrcwww:link path='/listInputGroups.do?'/>+"excludeInputGroups="+haveSearches+"&inputGenerator="+searchProgram;
 	//alert(doc);
 	window.open(doc, "ADD_PROTINFER_INPUT", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }

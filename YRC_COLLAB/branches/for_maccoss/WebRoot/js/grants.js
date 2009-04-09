@@ -33,7 +33,7 @@ function addGrant(grantID, grantTitle, piID, PI, sourceType, sourceName, grantNu
 	sourceNameCell.style.fontSize = "8pt";
 	grantTitleCell.innerHTML = grantTitle;
 	grantTitleCell.style.fontSize = "8pt";
-	grantPICell.innerHTML = '<a href="/yrc/viewResearcher.do?id='+piID+'">'+PI+'</a>';
+	grantPICell.innerHTML = '<a href="'+<yrcwww:link path='viewResearcher.do?'/>+'id='+piID+'">'+PI+'</a>';
 	grantPICell.style.fontSize = "8pt";
 	grantNumberCell.style.fontSize = "8pt";
 	grantNumberCell.innerHTML = grantNumber;
@@ -95,7 +95,7 @@ function addFundingSource() {
 	
 	var winHeight = 500
 	var winWidth = 700;
-	var doc = "/yrc/viewGrants.do?PI="+PI;
+	var doc = "<yrcwww:link path='viewGrants.do'/>?PI="+PI;
 	window.open(doc, "GRANT_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }
 
@@ -103,7 +103,7 @@ function addFundingSource() {
 function editGrant(grantID) {
 	var winHeight = 500
 	var winWidth = 600;
-	var doc = "/yrc/editGrant.do?grantID="+grantID;
+	var doc = "<yrcwww:link path='editGrant.do?grantID='/>"+grantID;
 	window.open(doc, "GRANT_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }
 
@@ -115,7 +115,7 @@ function updateGrant(grantID, grantTitle, piID, PI, sourceType, sourceName, gran
 		var idCell = cells[0];
 		if (idCell.childNodes[0].value == grantID) {
 			cells[1].innerHTML = grantTitle;
-			cells[2].innerHTML = '<a href="/yrc/viewResearcher.do?id='+piID+'">'+PI+'</a>';
+			cells[2].innerHTML = '<a href="'+<yrcwww:link path='viewResearcher.do'/>+'?id='+piID+'">'+PI+'</a>';
 			cells[3].innerHTML = sourceType;
 			cells[4].innerHTML = sourceName;
 			cells[5].innerHTML = grantNumber;

@@ -222,7 +222,9 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getSp())), null));
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-            row.addCell(new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true));
+            TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
+            cell.setTargetName("SPECTRUM_WINDOW");
+            row.addCell(cell);
             
             if(highlightedRow == index)
                 row.setRowHighighted(true);

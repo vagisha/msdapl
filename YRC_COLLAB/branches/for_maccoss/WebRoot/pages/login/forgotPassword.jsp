@@ -43,7 +43,7 @@
 
 </html:form>
 
-<P align="center">Need to register? <html:link href="/yrc/pages/register/register.jsp">Click here.</html:link>
+<P align="center">Need to register? <html:link href="<yrcwww:link path='pages/register/register.jsp'/>">Click here.</html:link>
 
 </yrcwww:contentbox>
 

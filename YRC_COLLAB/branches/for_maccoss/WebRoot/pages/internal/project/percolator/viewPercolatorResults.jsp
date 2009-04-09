@@ -24,7 +24,7 @@
 
 	<!-- SUMMARY -->
 	<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #FFFAF0;">
-		<table width="80%">
+		<table>
 			<tr>
 				<td align="center"><b>Project ID:</b>
 					<logic:iterate name="projectIds" id="projId">

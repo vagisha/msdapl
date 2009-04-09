@@ -7,7 +7,7 @@
 <SCRIPT LANGUAGE="JavaScript">
  function confirmDelete() {
     if(confirm("Are you sure you want to delete this protein inference job?")) {
-        document.location.href="/yrc/deleteProteinInferJob.do?pinferId=<bean:write name='pinferJob' property='pinferId'/>&projectId=<bean:write name='projectId'/>";
+        document.location.href="<yrcwww:link path='deleteProteinInferJob.do?'/>pinferId=<bean:write name='pinferJob' property='pinferId'/>&projectId=<bean:write name='projectId'/>";
         return 1;
     }
  }

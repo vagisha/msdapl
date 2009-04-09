@@ -18,6 +18,7 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
@@ -33,7 +34,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     private List<ExperimentSearch> searches;
     private List<SearchAnalysis> analyses;
     private YatesRun dtaSelect;
-    private List<ProteinferRun> protInferRuns;
+    private List<ProteinferJob> protInferRuns;
     
     private List<TableRow> rows;
     
@@ -218,11 +219,11 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         return headers;
     }
 
-    public List<ProteinferRun> getProtInferRuns() {
+    public List<ProteinferJob> getProtInferRuns() {
         return protInferRuns;
     }
 
-    public void setProtInferRuns(List<ProteinferRun> protInferRuns) {
+    public void setProtInferRuns(List<ProteinferJob> protInferRuns) {
         this.protInferRuns = protInferRuns;
     }
     

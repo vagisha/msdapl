@@ -11,7 +11,16 @@ public class TableCell {
     private String data;
     private String hyperlink;
     private boolean newWindow = false;
+    private String targetName = null;
     
+    public String getTargetName() {
+        return targetName;
+    }
+
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
+    }
+
     public TableCell(){}
     
     public TableCell(String data) {

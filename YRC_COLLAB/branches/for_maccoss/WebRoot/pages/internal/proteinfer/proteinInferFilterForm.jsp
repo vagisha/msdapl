@@ -104,7 +104,7 @@
   		<tr>
   			<td valign="top">Fasta ID(s): </td>
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
-  				<span style="font-size:8pt; color:#006400;">Enter a comma-separated list of complete or partial identifiers</span>
+  				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
   			</td>
   			<td valign="top">Description: </td>
   			<td valign="top">
@@ -119,9 +119,9 @@
   
   <tr>
     	<td colspan="3" align="center">
-    		<html:submit styleClass="button" style="margin-top:2px;">Update</html:submit>
+    		<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>
     		&nbsp;&nbsp;
-    		<a href="/yrc/downloadProtInferResults.do?pinferId=<bean:write name="proteinInferFilterForm" property="pinferId" />">Download Results</a>
+    		<a href="<yrcwww:link path='downloadProtInferResults.do'/>?pinferId=<bean:write name="proteinInferFilterForm" property="pinferId" />">Download Results</a>
     	</td>
   </tr>
   

@@ -15,10 +15,8 @@
       id="protseqbutton_<bean:write name="protein" property="protein.id" />">[View Sequence]</span>
 &nbsp; &nbsp;
 <span style="font-size: 8pt; color: red;">
-<a  style="color:red;" href="<yrcwww:link path='viewProtein.do?id='/><bean:write name="protein" property="protein.nrseqProteinId" />">[Protein Details]</a></span>
+<a  style="color:red;" href="viewProtein.do?id=<bean:write name='protein' property='protein.nrseqProteinId' />">[Protein Details]</a></span>
 <br><br>
-
-
 
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
 <tr class="pinfer_A">
@@ -63,7 +61,7 @@
 
 <!--  placeholder for protein sequence -->
 <table  align="center" width="90%" id="protseqtbl_<bean:write name="protein" property="protein.id"/>" style="display: none;"">
-	<tr><td style="background-color: #D4FECA;padding-left: 130px;" id="protsequence_<bean:write name="protein" property="protein.id"/>" ></td></tr>
+	<tr><td style="padding-left: 130px;" id="protsequence_<bean:write name="protein" property="protein.id"/>" ></td></tr>
 </table>
 
 <br><br>
@@ -86,10 +84,7 @@
      	<th align="left" class="main" style="font-size:10pt;">DeltaCN</th>
      	<th align="left" class="main" style="font-size:10pt;">XCorr</th>
      </logic:equal>
-     <logic:equal name="inputGenerator" value="<%=Program.EE_NORM_SEQUEST.name() %>">
-     	<th align="left" class="main" style="font-size:10pt;">DeltaCN</th>
-     	<th align="left" class="main" style="font-size:10pt;">XCorr</th>
-     </logic:equal>
+     
      <logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
      	<th align="left" class="main" style="font-size:10pt;">DeltaCN</th>
      	<th align="left" class="main" style="font-size:10pt;">Primary Score</th>
@@ -112,7 +107,7 @@
      		<td><bean:write name="ion" property="charge" /></td>
      		<td>
      			<bean:write name="ion" property="spectrumCount" />
-     			<span class="showAllIonHits" style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #006400;" 
+     			<span class="showAllIonHits" style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 				  id="showhitsforion_<bean:write name="ion" property="ion.id" />"
 				  onclick="toggleHitsForIon(<bean:write name="ion" property="ion.id" />)"
 				  >[Show]</span>
@@ -134,12 +129,6 @@
      			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
      		</logic:equal>
      		
-     		<logic:equal name="inputGenerator" value="<%=Program.EE_NORM_SEQUEST.name() %>">
-     			<bean:define name="ion" property="bestSpectrumMatch" id="psm_seq" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult"/>
-     			<td><bean:write name="psm_seq" property="sequestResultData.deltaCN" /></td>
-     			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
-     		</logic:equal>
-     
      		<logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_plc" type="org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult"/>
      		 	<td><bean:write name="psm_plc" property="prolucidResultData.primaryScore" /></td>

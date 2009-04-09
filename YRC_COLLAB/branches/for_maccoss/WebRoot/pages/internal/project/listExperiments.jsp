@@ -1,3 +1,4 @@
+
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -123,9 +124,46 @@ $(document).ready(function() {
 				</div>
 			</logic:present>
 			<logic:present name="experiment" property="protInferRuns">
-				<div style="background-color: #F5FFFA; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
-					<b>DTASelect ID:</b> <bean:write name="experiment" property="dtaSelect.id"/>&nbsp;
-					<html:link action="viewYatesRun.do" paramId="id" paramName="experiment" paramProperty="dtaSelect.id">[Results]</html:link>
+				<div style="background-color: #F5FFFA; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+					<div><b>Protein Inference Results</b></div> 
+					<table width="90%">
+					<thead>
+					<tr align="left"><th>ID</th><th>Date</th><th>Submitted By</th><th>Comments</th><th>Status</th></tr>
+					</thead>
+					<tbody>
+					<logic:iterate name="experiment" property="protInferRuns" id="piJob" type="org.yeastrc.www.proteinfer.ProteinferJob">
+						<tr>
+						<td><b><bean:write name="piJob" property="pinferId"/></b></td>
+						<td><bean:write name="piJob" property="submitDate"/></td>
+						<td><bean:write name="piJob" property="researcher.lastName"/></td>
+						<td><bean:write name="piJob" property="comments"/></td>
+						
+						<td>
+						
+						<!-- Job COMPLETE -->
+						<logic:equal name="piJob" property="complete" value="true">
+							<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>">
+							<b><font color="green"><bean:write name="piJob" property="statusDescription"/></font></b>
+							</a>
+						</logic:equal>
+						<!-- Job FAILED -->
+						<logic:equal name="piJob" property="failed" value="true">
+							<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
+							<b><font color="red"><bean:write name="piJob" property="statusDescription"/></font></b>
+							</a>
+						</logic:equal>
+						<!-- Job RUNNING -->
+						<logic:equal name="piJob" property="running" value="true">
+							<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
+							<b><font color="#000000"><bean:write name="piJob" property="statusDescription"/></font></b>
+							</a>
+						</logic:equal>
+						
+	   		 			</td>
+						</tr>
+					</logic:iterate>
+					</tbody>
+					</table>
 				</div>
 			</logic:present>
 			</logic:equal>

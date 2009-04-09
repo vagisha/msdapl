@@ -192,7 +192,8 @@ function validateFloat(value, fieldName, min, max) {
 
 <script type="text/javascript">
 	function onCancel(projectID) {
-		document.location = "/yrc/viewProject.do?ID="+projectID;
+		alert("hello");
+		document.location = "<yrcwww:link path='viewProject.do' />?ID="+projectID;
 	}
 </script>
 

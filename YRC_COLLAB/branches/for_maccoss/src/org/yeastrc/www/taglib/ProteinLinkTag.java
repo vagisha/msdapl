@@ -6,6 +6,7 @@
 
 package org.yeastrc.www.taglib;
 
+import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
@@ -78,8 +79,10 @@ public class ProteinLinkTag extends TagSupport {
         String output = "";
         
         try {
- 
-        	output =  "<a href=\"/yrc/viewProtein.do?id=" + protein.getId() + "\" ";
+            
+            ServletContext context = pageContext.getServletContext();
+            String contextPath = context.getContextPath();
+        	output =  "<a href=\""+contextPath+"/viewProtein.do?id=" + protein.getId() + "\" ";
         	output += "onMouseover=\"ddrivetip('" + protein.getDescription() + "')\" ";
         	output += "onMouseout=\"hideddrivetip()\">";
         	output += protein.getListing() + "</a>";

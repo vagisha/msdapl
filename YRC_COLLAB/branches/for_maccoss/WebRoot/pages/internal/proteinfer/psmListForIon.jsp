@@ -22,10 +22,6 @@
 	     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
 	     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">XCorr</th>
 	     </logic:equal>
-	     <logic:equal name="inputGenerator" value="<%=Program.EE_NORM_SEQUEST.name() %>">
-	     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
-	     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">XCorr</th>
-	     </logic:equal>
 	     <logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
 	     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
 	     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">Primary Score</th>
@@ -55,12 +51,6 @@
      		</logic:equal>
      		
      		<logic:equal name="inputGenerator" value="<%=Program.SEQUEST.name() %>">
-     			<bean:define name="psm" property="spectrumMatch" id="psm_seq" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult"/>
-     			<td><bean:write name="psm_seq" property="sequestResultData.deltaCN" /></td>
-     			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
-     		</logic:equal>
-     		
-     		<logic:equal name="inputGenerator" value="<%=Program.EE_NORM_SEQUEST.name() %>">
      			<bean:define name="psm" property="spectrumMatch" id="psm_seq" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult"/>
      			<td><bean:write name="psm_seq" property="sequestResultData.deltaCN" /></td>
      			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>

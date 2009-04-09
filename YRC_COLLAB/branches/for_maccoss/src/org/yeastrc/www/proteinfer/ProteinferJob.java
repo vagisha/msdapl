@@ -1,6 +1,7 @@
 package org.yeastrc.www.proteinfer;
 
 import org.yeastrc.jobqueue.Job;
+import org.yeastrc.jobqueue.JobUtils;
 
 public class ProteinferJob extends Job {
 
@@ -25,5 +26,14 @@ public class ProteinferJob extends Job {
     }
     public void setProgram(String program) {
         this.program = program;
+    }
+    public boolean isRunning() {
+        return this.getStatus() == JobUtils.STATUS_QUEUED || this.getStatus() == JobUtils.STATUS_OUT_FOR_WORK;
+    }
+    public boolean isFailed() {
+        return this.getStatus() == JobUtils.STATUS_SOFT_ERROR || this.getStatus() == JobUtils.STATUS_HARD_ERROR;
+    }
+    public boolean isComplete() {
+        return this.getStatus() == JobUtils.STATUS_COMPLETE;
     }
 }

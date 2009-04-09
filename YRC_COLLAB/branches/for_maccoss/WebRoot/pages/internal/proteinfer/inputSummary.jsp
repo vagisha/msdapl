@@ -25,7 +25,7 @@
 	<thead>
 	<tr>
 	<th class="sort-alpha" align="left"><b><font size="2pt">File Name</font></b></th>
-	<th class="sort-int" align="left"><b><font size="2pt">Decoy Hits</font></b></th>
+	<!-- <th class="sort-int" align="left"><b><font size="2pt">Decoy Hits</font></b></th> -->
 	<th class="sort-int" align="left"><b><font size="2pt">Target Hits</font></b></th>
 	<th class="sort-int" align="left"><b><font size="2pt">Filtered Target Hits</font></b></th>
 	</tr>
@@ -41,14 +41,14 @@
  					<bean:write name="input" property="fileName" />
  					<!-- </span> -->
  				</td>
- 				<td><bean:write name="input" property="input.numDecoyHits" /></td>
+ 				<!--  <td><bean:write name="input" property="input.numDecoyHits" /></td> -->
  				<td><bean:write name="input" property="input.numTargetHits" /></td>
  				<td><bean:write name="input" property="input.numFilteredTargetHits" /></td>
  			</tr>
 	 	</logic:iterate>
 	 	<tr>
 	 		<td><b>TOTAL</b></td>
-	 		<td><b><bean:write name="totalDecoyHits" /></b></td>
+	 		<!-- <td><b><bean:write name="totalDecoyHits" /></b></td> -->
 	 		<td><b><bean:write name="totalTargetHits" /></b></td>
 	 		<td><b><bean:write name="filteredTargetHits"  /></b></td>
 	 	</tr>
