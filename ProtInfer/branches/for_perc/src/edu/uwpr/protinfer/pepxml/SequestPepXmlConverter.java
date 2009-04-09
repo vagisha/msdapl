@@ -124,7 +124,7 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
         }
         startMsmsRunSummary(run, writer);
         writeEnzymes(search, writer);
-        String basefile = run.getFileNameNoExt();
+        String basefile = run.getFileName();
         
         // write search summary; "search_summary" element
         writeSearchSummary(search, writer, basefile);
@@ -254,8 +254,11 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
     
     public static void main(String[] args) {
         int runSearchId = 7; // PARC_1_ip_01_itms.sqt
+        int searchId = 2;
         String outDir = "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375/pepxml";
+        String outFile = "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375/pepxml/msData_test_search2.pep.xml";
         SequestPepXmlConverter converter = new SequestPepXmlConverter();
-        converter.convertRunSearch(runSearchId, outDir);
+        //converter.convertRunSearch(runSearchId, outDir);
+         converter.convertSearch(searchId, outFile);
     }
 }

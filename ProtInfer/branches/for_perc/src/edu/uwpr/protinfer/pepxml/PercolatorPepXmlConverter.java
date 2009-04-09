@@ -145,7 +145,7 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
         }
         startMsmsRunSummary(run, writer);
         writeEnzymes(search, writer);
-        String basefile = run.getFileNameNoExt();
+        String basefile = run.getFileName();
         
         // write search summary; "search_summary" element
         writeSearchSummary(search, writer, basefile);

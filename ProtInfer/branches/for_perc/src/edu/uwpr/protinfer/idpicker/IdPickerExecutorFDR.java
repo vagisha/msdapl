@@ -112,7 +112,7 @@ public class IdPickerExecutorFDR {
         }
         
         // IDPicker separates charge states for calculating FDR using XCorr scores
-        if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST) {
+        if(program == Program.SEQUEST ) { //|| program == Program.EE_NORM_SEQUEST) {
             if(params.getScoreForFDR() == SCORE.XCorr)
                 calculator.separateChargeStates(true);
         }
@@ -144,7 +144,7 @@ public class IdPickerExecutorFDR {
 
     private Comparator<PeptideSpectrumMatchIDP> getScoreComparator(Program program, IDPickerParams params) {
         
-        if(program == Program.SEQUEST || program == Program.EE_NORM_SEQUEST) {
+        if(program == Program.SEQUEST ) { //|| program == Program.EE_NORM_SEQUEST) {
             // we will be comparing XCorr
             if(params.getScoreForFDR() == SCORE.XCorr) {
                 return new Comparator<PeptideSpectrumMatchIDP>() {

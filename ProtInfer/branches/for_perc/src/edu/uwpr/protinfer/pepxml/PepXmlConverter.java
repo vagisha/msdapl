@@ -127,7 +127,7 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
     //-------------------------------------------------------------------------------------------
     void startMsmsRunSummary(MsRun run, XMLStreamWriter writer) throws XMLStreamException {
 
-        String basefile = run.getFileNameNoExt();
+        String basefile = run.getFileName();
         writer.writeStartElement("msms_run_summary");
         writer.writeAttribute("base_name", basefile);
 
