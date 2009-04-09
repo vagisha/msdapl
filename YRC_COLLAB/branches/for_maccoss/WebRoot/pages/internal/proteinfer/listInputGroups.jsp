@@ -8,7 +8,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <title>Available Searches</title>
+    <title>Available Results</title>
 	<link REL="stylesheet" TYPE="text/css" HREF="<yrcwww:link path='css/global.css'/>">
   </head>
   
@@ -16,10 +16,12 @@
   
 <%@ include file="/includes/errors.jsp" %>
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>></script>
+<script src="<yrcwww:link path='js/jquery-1.3.2.min.js'/>" > </script>
+
 <script type="text/javascript">
 	
 	$(document).ready(function() {
+	
 		$("#addInputButton").click(function() {
 			var selectedInputGroups = getSelectedInputGroups();
 			//alert(selectedInputGroups);
@@ -73,19 +75,17 @@
 
 <center>
 
-<bean:define id="title" value="Available Searches"/>
-<logic:equal name="inputType" value="<%=InputType.ANALYSIS.name() %>">
-	<bean:define id="title" value="Available Search Analyses"/>
-</logic:equal>
-		
-<yrcwww:contentbox scheme="pinfer" title="<%=title %>">
+<bean:define id="title" name="program"/>
+
+<div style="margin:10;">	
+<yrcwww:contentbox scheme="project" title='<%="Available " +title+ " results" %>'>
 
 <center>
 <logic:notEmpty name="projectInputGroups">
 	
 	<table cellpadding="0" cellspacing="0" width="80%">
 	<thead>
-		<yrcwww:colorrow scheme="pinfer">
+		<yrcwww:colorrow scheme="project">
 		<th width="5%"></th>
 		<th style="font-size:9pt;" width="25%" align="left">Project ID</th>
 		
@@ -103,7 +103,7 @@
 	</thead>
 	<tbody>
 	<logic:iterate name="projectInputGroups" id="inputGroup">
-		<yrcwww:colorrow scheme="pinfer">
+		<yrcwww:colorrow scheme="project">
 			<td><input type="checkbox" name="search_cb" id="<bean:write name="inputGroup" property="inputGroupId" />" /></td>
 			<td><bean:write name="inputGroup" property="projectId" /></td>
 			<td><bean:write name="inputGroup" property="inputGroupId" /></td>
@@ -112,7 +112,7 @@
 			    class="fileViewer" 
 			    id="<bean:write name="inputGroup" property="inputGroupId" />">Hide Files</td>
 		</yrcwww:colorrow>
-		<yrcwww:colorrow scheme="pinfer" repeat="true">
+		<yrcwww:colorrow scheme="project" repeat="true">
 			<td colspan=5">
 				<div id="files_<bean:write name="inputGroup" property="inputGroupId" />">
 				<table style="margin-top: 3px; margin-bottom: 3px; margin-left:25px;" width="95%"/>
@@ -148,8 +148,8 @@
 
 </center>
 </yrcwww:contentbox>
-
+</div>
 </center> 	
     
-    
-<%@ include file="/includes/footer.jsp" %>
+</body>
+</html>

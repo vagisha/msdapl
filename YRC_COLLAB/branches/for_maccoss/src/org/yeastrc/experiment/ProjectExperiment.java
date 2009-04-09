@@ -14,12 +14,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.yeastrc.ms.domain.general.MsExperiment;
-import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
 import org.yeastrc.yates.YatesRun;
+
+import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 
 /**
@@ -32,6 +33,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     private List<ExperimentSearch> searches;
     private List<SearchAnalysis> analyses;
     private YatesRun dtaSelect;
+    private List<ProteinferRun> protInferRuns;
     
     private List<TableRow> rows;
     
@@ -214,5 +216,17 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             headers.add(new TableHeader(analysis.getAnalysisProgram().displayName()));
         }
         return headers;
+    }
+
+    public List<ProteinferRun> getProtInferRuns() {
+        return protInferRuns;
+    }
+
+    public void setProtInferRuns(List<ProteinferRun> protInferRuns) {
+        this.protInferRuns = protInferRuns;
+    }
+    
+    public boolean getHasProtInferResults() {
+        return dtaSelect != null || protInferRuns != null;
     }
 }

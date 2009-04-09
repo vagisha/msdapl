@@ -58,7 +58,12 @@ function addResearcher() {
 	newRow += " <a href='javascript:confirmRemoveResearcher("+lastResearcherIndex+")' style='color:red; font-size:8pt;'>[Remove]</a>";
 	newRow += "</td>";
 	newRow +="</tr>";
-	$("#researcherRow_"+(lastResearcherIndex-1)).after(newRow);
+	if(lastResearcherIndex == 0) {
+		$("#piRow").after(newRow);
+	}
+	else {
+		$("#researcherRow_"+(lastResearcherIndex-1)).after(newRow);
+	}
 	lastResearcherIndex++;
 }
 
@@ -79,7 +84,7 @@ Go <html:link action="newResearcher.do">here</html:link> to add a new researcher
   <P><html:form action="saveNewProject" method="post">
   <TABLE CELLPADDING="no" CELLSPACING="0" width="90%" align="center">
 
-   <TR>
+   <TR id="piRow">
     <TD WIDTH="25%" VALIGN="top">PI:</TD>
     <TD WIDTH="75%" VALIGN="top">
     

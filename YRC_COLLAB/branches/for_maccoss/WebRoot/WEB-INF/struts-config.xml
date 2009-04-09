@@ -96,7 +96,7 @@
 	<forward name="listUploadJobs" path="/listUploadJobs.do" />
 	<forward name="viewUploadJob" path="/viewUploadJob.do" />
 	<forward name="editResearcher" path="/editResearcher.do" />
-	<forward name="newProteinInference" path="/newProteinInference.do" />
+	<forward name="newPercolatorProteinInference" path="/newPercolatorProteinInference.do" />
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
 
     </global-forwards>
@@ -587,10 +587,10 @@
 	<!-- Actions related to protein inference -->
 	<!-- ================================================================================== -->
 	<action 
-		path="/newProteinInference"
-		type="org.yeastrc.www.proteinfer.NewProteinInferenceAction"
+		path="/newPercolatorProteinInference"
+		type="org.yeastrc.www.proteinfer.NewPercolatorProteinInferenceAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/proteinInferenceForm.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/percolatorProteinInferenceForm.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
 	</action>
 	

@@ -97,6 +97,7 @@ public class ListProteinInferInputGroupAction extends Action {
             request.setAttribute("projectInputGroups", inputGroups);
             request.setAttribute("inputType", InputType.ANALYSIS.name());
         }
+        request.setAttribute("program", prog.displayName());
         
         // Go!
         return mapping.findForward("Success");

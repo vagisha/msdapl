@@ -11,7 +11,6 @@ package org.yeastrc.www.project;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +50,8 @@ import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Researcher;
+import org.yeastrc.www.proteinfer.ProteinferJob;
+import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -145,6 +146,7 @@ public class ViewProjectAction extends Action {
         // Associate the DTASelect runs with the respective experiments
         linkExperimentsAndDtaSelect(experiments, yatesRuns);
 		
+        
         request.setAttribute("experiments", experiments);
 		
 		
@@ -229,6 +231,9 @@ public class ViewProjectAction extends Action {
             pExpt.setAnalyses(analyses);
             
             
+            // load the protein inference jobs, if any
+            List<ProteinferJob> piJobs = ProteinferRunSearcher.getProteinferJobsForMsExperiment(experimentId);
+            pExpt.set
             
             experiments.add(pExpt);
         }
@@ -297,10 +302,11 @@ public class ViewProjectAction extends Action {
         }
         
         List<Integer> experimentIds = new ArrayList<Integer>(experiments.size());
+        for(ProjectExperiment pe: experiments)
+            experimentIds.add(pe.getId());
         
         
         // put the DTASelect results in the appropriate experiments
-        ExptComparator comparator = new ExptComparator();
         for(YatesRun run: yatesRuns) {
             int runId = run.getId();
             int searchId = YatesRunMsSearchLinker.linkYatesRunToMsSearch(runId);
@@ -316,14 +322,6 @@ public class ViewProjectAction extends Action {
                     }
                 }
             }
-        }
-    }
-    
-    private static class ExptComparator implements Comparator<ProjectExperiment> {
-
-        @Override
-        public int compare(ProjectExperiment o1, ProjectExperiment o2) {
-            return Integer.valueOf(o1.getId()).compareTo(o2.getId());
         }
     }
 }

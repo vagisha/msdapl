@@ -1,4 +1,3 @@
-
 <%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
 <%@page import="edu.uwpr.protinfer.ProgramParam"%>
 <%@page import="edu.uwpr.protinfer.ProgramParam.ParamValidator"%>
@@ -38,7 +37,7 @@ function requestAnalysisList() {
 	//alert(haveAnalyses);
 	var winHeight = 500
 	var winWidth = 700;
-	var doc = "/yrc/listInputGroups.do?excludeInputGroups="+haveAnalyses+"&inputGenerator="+analysisProgram;
+	var doc = "<yrcwww:link path='listInputGroups.do?excludeInputGroups='/>"+haveAnalyses+"&inputGenerator="+analysisProgram;
 	//alert(doc);
 	window.open(doc, "ADD_PROTINFER_INPUT", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
 }
@@ -159,7 +158,7 @@ function validateFormForAnalysisInput() {
   
   <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
    
-    <yrcwww:colorrow scheme="pinfer">
+    <yrcwww:colorrow scheme="project">
     <td WIDTH="20%" VALIGN="top">
   		<B>Parameters:</B>
   		<html:hidden name="proteinInferenceFormAnalysis" property="programParams.programName" />
@@ -169,7 +168,7 @@ function validateFormForAnalysisInput() {
   	
   	<logic:iterate name="proteinInferenceFormAnalysis" property="programParams.paramList" id="param"
   			type="org.yeastrc.www.proteinfer.ProgramParameters.Param">
-    <yrcwww:colorrow scheme="pinfer" repeat="true">
+    <yrcwww:colorrow scheme="project" repeat="true">
     
     <td WIDTH="20%" VALIGN="top">
     	<span class="tooltip" title="<bean:write name="param" property="tooltip" />" style="cursor: pointer;">
@@ -201,22 +200,22 @@ function validateFormForAnalysisInput() {
    </logic:iterate>
    
    
-   <yrcwww:colorrow scheme="pinfer">
+   <yrcwww:colorrow scheme="project">
     <td VALIGN="top" colspan="2">
     <B>Select Input Files:</B>
     
     </td>
    </yrcwww:colorrow>
    
-   <yrcwww:colorrow scheme="pinfer" repeat="true">
+   <yrcwww:colorrow scheme="project" repeat="true">
    
     <td VALIGN="top" colspan="2">
-    	<div style="border: solid 1px #2E8B57; padding-bottom: 5px;">
+    	<div style="border: solid 1px #939CB0; padding-bottom: 5px;">
     	
     	<div id="analysisInputList">
     	
     	<div id="analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
-    	<div style="background-color: #2E8B57; color: white; font-weight: bold;" 
+    	<div style="background-color: #939CB0; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
     		 id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
     		Analysis ID: <bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>
@@ -246,7 +245,7 @@ function validateFormForAnalysisInput() {
     
 		<table width="100%">
  		<logic:iterate name="proteinInferenceFormAnalysis" property="inputSummary.inputFiles" id="inputFile" >
-		<yrcwww:colorrow scheme="pinfer" repeat="true">
+		<tr class="project_A">
 			<td WIDTH="20%" VALIGN="top"> 
 				<html:checkbox name="inputFile" property="isSelected" value="true" indexed="true" 
 				styleId="<%=checkboxId%>" />
@@ -256,10 +255,10 @@ function validateFormForAnalysisInput() {
 				<html:hidden name="inputFile" property="runName" indexed="true" />
 				<bean:write  name="inputFile" property="runName" />
 			</td>
-		</yrcwww:colorrow>
+		</tr>
 		</logic:iterate>
  		</table>
-		<div class="clickable toggle_selection" style="font-size: 7pt; color: #006400;" 
+		<div class="clickable toggle_selection" style="font-size: 7pt; color: #000000;" 
 		     id="<%=toggleIdDiv%>">Deselect All</div>
 		</div>
 		</div>
@@ -269,13 +268,13 @@ function validateFormForAnalysisInput() {
     </td>
    </yrcwww:colorrow>
    
-   <yrcwww:colorrow scheme="pinfer" repeat="true">
+   <yrcwww:colorrow scheme="project" repeat="true">
     	<td colspan="2" align="center">Comments<br>
-    	<html:textarea name="proteinInferenceFormAnalysis" property="comments" rows="3" cols="50"/>
+    	<html:textarea name="proteinInferenceFormAnalysis" property="comments" rows="3" cols="70"/>
     	</td>
     </yrcwww:colorrow>
     
-   <yrcwww:colorrow scheme="pinfer" repeat="true">
+   <yrcwww:colorrow scheme="project" repeat="true">
    <td colspan="2" align="center">
    	<NOBR>
  		<html:submit value="Run Protein Inference" styleClass="button" />

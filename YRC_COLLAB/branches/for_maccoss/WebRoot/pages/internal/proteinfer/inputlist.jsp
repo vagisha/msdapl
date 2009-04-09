@@ -69,10 +69,10 @@
 <logic:iterate name="inputList" id="inputSummary">
 
 	<div id="<bean:write name="inputSummary" property="inputGroupId"/>">
-    	<div style="background-color: #2E8B57; color: white; font-weight: bold;" 
+    	<div style="background-color: #939CB0; color: white; font-weight: bold;" 
     		 class="foldable fold-open"
     		 id="foldable_analysis_<bean:write name="inputSummary" property="inputGroupId"/>">
-    		Search Analysis ID: <bean:write name="inputSummary" property="inputGroupId"/>
+    		Analysis ID: <bean:write name="inputSummary" property="inputGroupId"/>
     	</div>
     	
     	
@@ -91,7 +91,7 @@
     
 		<table width="100%">
  		<logic:iterate name="inputSummary" property="inputFiles" id="inputFile" >
-		<yrcwww:colorrow scheme="pinfer" repeat="true">
+		<tr class="project_A">
 			<td WIDTH="20%" VALIGN="top"> 
 				<input type="checkbox" checked="checked" 
 					   id="toggle_analysis_<bean:write name="inputSummary" property="inputGroupId"/>_file"
@@ -106,10 +106,10 @@
 				<bean:write  name="inputFile" property="runName" />
 			</td>
 			<%index++; %>
-		</yrcwww:colorrow>
+		</tr>
 		</logic:iterate>
  		</table>
-		<div class="clickable toggle_selection" style="font-size: 7pt; color: #006400;" 
+		<div class="clickable toggle_selection" style="font-size: 7pt; color: #000000;" 
 		     id="toggle_analysis_<bean:write name="inputSummary" property="inputGroupId"/>">Deselect All</div>
 		</div>
 		</div>

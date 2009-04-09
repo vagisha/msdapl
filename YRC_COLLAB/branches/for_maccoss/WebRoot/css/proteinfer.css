@@ -1,35 +1,4 @@
-.clickable {
-	text-decoration: underline; 
-	cursor: pointer;
-}
 
-.foldable {
-	cursor: pointer;
-}
-
-.fold-open{
-	background-image:url(../images/proteinfer/asc.gif);
-	background-position:center right;
-	background-repeat:no-repeat;
-}
-.fold-close{
-	background-image:url(../images/proteinfer/desc.gif);
-	background-position:center right;
-	background-repeat:no-repeat;
-}
-
-
-TH.sorted-asc {
-	background-image:url(../images/proteinfer/asc.gif);
-	background-position:bottom center;
-	background-repeat:no-repeat;
-}
-
-TH.sorted-desc {
-	background-image:url(../images/proteinfer/desc.gif);
-	background-position:bottom center;
-	background-repeat:no-repeat;
-}
 
 TH.pinfer_A {
 	background-color: #2E8B57;
@@ -59,20 +28,6 @@ TH.pinfer_selected_header {
 	background-color: #2F5F4F;
 }
 
-/* FOR TOOLTIPS */
-p.tooltip {
-	clear:both;
-	margin:0;
-	padding:.5em 0;
-}
-#tooltip{
-	position:absolute;
-	border:1px solid #333;
-	background:#f7f5d1;
-	padding:2px 5px;
-	color:#333;
-	display:none;
-}
 
 .prot_annot_U {
 	display:block;

@@ -197,6 +197,56 @@ DIV.ms_header, DIV.pinfer_header, DIV.upload_header, DIV.adminSearch_header, DIV
 	color:	#D74D2D;
 }
 
+TH.sorted-asc {
+	background-image:url(../images/proteinfer/asc.gif);
+	background-position:bottom center;
+	background-repeat:no-repeat;
+}
+
+TH.sorted-desc {
+	background-image:url(../images/proteinfer/desc.gif);
+	background-position:bottom center;
+	background-repeat:no-repeat;
+}
+
+.clickable {
+	text-decoration: underline; 
+	cursor: pointer;
+}
+
+.foldable {
+	cursor: pointer;
+}
+
+/* FOR TOOLTIPS */
+p.tooltip {
+	clear:both;
+	margin:0;
+	padding:.5em 0;
+}
+#tooltip{
+	position:absolute;
+	border:1px solid #333;
+	background:#f7f5d1;
+	padding:2px 5px;
+	color:#333;
+	display:none;
+}
+
+.fold-open{
+	background-image:url(../images/proteinfer/asc.gif);
+	background-position:center right;
+	background-repeat:no-repeat;
+}
+.fold-close{
+	background-image:url(../images/proteinfer/desc.gif);
+	background-position:center right;
+	background-repeat:no-repeat;
+}
+
+
+
+
 
 /* Login color definitions */
 DIV.login_header {

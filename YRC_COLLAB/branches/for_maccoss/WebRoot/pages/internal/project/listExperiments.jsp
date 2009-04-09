@@ -62,32 +62,30 @@ $(document).ready(function() {
 					<div style="background-color: #FFFFE0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 					<table width="90%">
 						<tr>
-							<td width="25%"><b>Search ID:</b></td> 
-							<td width="25%"><bean:write name="search" property="id"/>
-								<html:link action="viewSequestResults.do" paramId="ID" paramName="search" paramProperty="id">[View Results]</html:link>
+							<td width="33%"><b>Search ID:</b>&nbsp; 
+							<bean:write name="search" property="id"/>
+								<html:link action="viewSequestResults.do" paramId="ID" paramName="search" paramProperty="id">[Results]</html:link>
 							</td>
-							<td width="25%"><b>Program: </b></td>
-							<td width="25%"><b><bean:write name="search" property="searchProgram"/>
+							<td width="33%"><b>Program: </b>&nbsp;
+							<b><bean:write name="search" property="searchProgram"/>
 							&nbsp;
 							<bean:write name="search" property="searchProgramVersion"/></b></td>
+							<td width="33%"><b>Search Date: </b>&nbsp;
+							<bean:write name="search" property="searchDate"/></td>
 						</tr>
 						<tr>
-							<td width="25%"><b>Search Date: </b></td>
-							<td width="25%"><bean:write name="search" property="searchDate"/></td>
-							<td width="25%"><b>Upload Date: </b></td>
-							<td width="25%"><bean:write name="search" property="uploadDate"/></td>
+							<td width="33%"><b>Enzyme: </b>&nbsp;
+							<bean:write name="search" property="enzymes"/></td>
+							<td width="33%"><b>Static Modifications: </b>
+							<bean:write name="search" property="staticModifications"/></td>
+							<td width="33%"><b>Dynamic Modifications: </b>
+							<bean:write name="search" property="dynamicModifications"/></td>
 						</tr>
 						<tr>
-							<td width="25%"><b>Search Database: </b></td>
-							<td width="25%"><bean:write name="search" property="searchDatabase"/></td>
-							<td width="25%"><b>Enzyme: </b></td>
-							<td width="25%"><bean:write name="search" property="enzymes"/></td>
+							<td colspan="3"><b>Search Database: </b>&nbsp;
+							<bean:write name="search" property="searchDatabase"/></td>
+							
 						</tr>
-						<tr>
-							<td width="25%"><b>Static Modifications: </b></td>
-							<td width="25%"><bean:write name="search" property="staticModifications"/></td>
-							<td width="25%"><b>Dynamic Modifications: </b></td>
-							<td width="25%"><bean:write name="search" property="dynamicModifications"/></td></tr>
 					</table>
 					</div>	
 				</logic:iterate>
@@ -99,25 +97,41 @@ $(document).ready(function() {
 				<div style="background-color: #F0FFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 					<table width="90%">
 					<tr>
-						<td width="25%"><b>Analysis ID:</b>
-						<td width="25%"><bean:write name="analysis" property="id"/>
-							<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
+						<td width="25%"><b>Analysis ID:</b>&nbsp;
+						<bean:write name="analysis" property="id"/>
+							<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[Results]</html:link>
+							<a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='project' property='ID'/>"> 
+							[Infer Proteins]</a>
 						</td>
-						<td width="25%"><b>Program: </b></td>
-						<td width="25%"><b><bean:write name="analysis" property="analysisProgram"/>
+						<td width="25%"><b>Program: </b>&nbsp;
+						<b><bean:write name="analysis" property="analysisProgram"/>
 						&nbsp;
 						<bean:write name="analysis" property="analysisProgramVersion"/></b></td>
 					</tr>
-					<tr>
-						<td width="25%"><b>Upload Date: </b></td>
-						<td width="25%"><bean:write name="analysis" property="uploadDate"/></td>
-					</tr>
+					
 					</table>
 				</div>
 				</logic:iterate>
 			</logic:notEmpty>
 			
-			<!-- Files for this experiment -->
+			<!-- PROTEIN INFERENCE RESULTS FOR THE EXPERIMENT -->
+			<logic:equal name="experiment" property="hasProtInferResults" value="true" >
+			<logic:present name="experiment" property="dtaSelect">
+				<div style="background-color: #F5FFFA; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+					<b>DTASelect ID:</b> <bean:write name="experiment" property="dtaSelect.id"/>&nbsp;
+					<html:link action="viewYatesRun.do" paramId="id" paramName="experiment" paramProperty="dtaSelect.id">[Results]</html:link>
+				</div>
+			</logic:present>
+			<logic:present name="experiment" property="protInferRuns">
+				<div style="background-color: #F5FFFA; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+					<b>DTASelect ID:</b> <bean:write name="experiment" property="dtaSelect.id"/>&nbsp;
+					<html:link action="viewYatesRun.do" paramId="id" paramName="experiment" paramProperty="dtaSelect.id">[Results]</html:link>
+				</div>
+			</logic:present>
+			</logic:equal>
+			
+			
+			<!-- FILES FOR THE EXPERIMENT -->
 			<div style="background-color: #FFFAF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
 			<bean:define name="experiment" property="id" id="experimentId" />
 			<yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="search_files" center="true" />
