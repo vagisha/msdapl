@@ -59,6 +59,10 @@
     	AND nrseqProteinID IN $nrseqIds$
     </select>
     
+    <select id="selectNrseqIdsForProteinferRun" resultMap="pinferProteinResult" parameterClass="Integer">
+    	SELECT DISTINCT(nrseqProteinID) FROM msProteinInferProtein WHERE piRunID = #id#
+    </select>
+    
     <update id="updateUserAnnotation" parameterClass="java.util.Map">
     	UPDATE msProteinInferProtein SET userAnnotation=#annotation# where id=#pinferProteinId#
     </update>

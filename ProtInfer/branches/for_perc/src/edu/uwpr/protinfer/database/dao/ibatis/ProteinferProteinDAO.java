@@ -106,6 +106,10 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
         return queryForList(sqlMapNameSpace+".selectProteinIdsForNrseqIds", map);
     }
     
+    public List<Integer> getNrseqIdsForRun(int proteinferId) {
+        return queryForList(sqlMapNameSpace+".selectNrseqIdsForProteinferRun", proteinferId);
+    }
+    
 //    public List<ProteinferProtein> loadProteinsN(int pinferId) {
 //        Connection conn = null;
 //        PreparedStatement stmt = null;

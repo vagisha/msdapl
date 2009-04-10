@@ -161,6 +161,17 @@
     
     
     
+    <select id="idPickerNrseqProteinIds" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID 
+    	FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    </select>
+    
+    
     <!-- =========================================================================== -->
     <!-- QUERIES FOR FILTERING AND SORTING PROTEINS                                  -->
     
