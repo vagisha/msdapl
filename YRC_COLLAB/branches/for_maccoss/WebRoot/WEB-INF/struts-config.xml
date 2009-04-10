@@ -53,6 +53,7 @@
 	<form-bean name="searchProjectsForm" type="org.yeastrc.www.project.SearchProjectsForm"/>
 	<form-bean name="uploadDataForm" type="org.yeastrc.www.yates.UploadDataForm"/>
 	<form-bean name="GOAnnotationForm" type="org.yeastrc.www.microscopy.GOAnnotationForm"/>
+	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
 	<form-bean name="filterPercolatorResultsForm" type="org.yeastrc.www.project.experiment.PercolatorFilterResultsForm" />
 	<form-bean name="filterSequestResultsForm" type="org.yeastrc.www.project.experiment.SequestFilterResultsForm" />
@@ -516,6 +517,16 @@
 	  validate="false">
 	  <forward name="Success" path="/pages/internal/data/yates/viewSpectra.jsp" redirect="false"/>
 	  <forward name="Failure" path="/pages/internal/data/yates/viewYatesResult.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/saveMSComments"
+	  input="/pages/internal/data/yates/viewYatesRun.jsp"
+	  name="MSCommentsForm"
+	  scope="request"
+	  type="org.yeastrc.www.yates.SaveMSCommentsAction"
+	  validate="true">
+	  <forward name="Success" path="/viewYatesRun.do" redirect="true"/>
 	</action>
 	
 	<action
