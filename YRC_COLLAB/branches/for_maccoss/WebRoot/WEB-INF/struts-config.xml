@@ -60,6 +60,7 @@
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
+	<form-bean name="proteinferRunComparisonForm" type="org.yeastrc.www.proteinfer.compare.ProteinferRunComparisonForm"></form-bean>
     </form-beans>
 
 
@@ -99,6 +100,7 @@
 	<forward name="editResearcher" path="/editResearcher.do" />
 	<forward name="newPercolatorProteinInference" path="/newPercolatorProteinInference.do" />
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
+	<forward name="newProteinInferenceComparison" path="/newProteinInferenceComparison.do" />
 
     </global-forwards>
 
@@ -796,6 +798,35 @@
 		<forward name="Success" path="/pages/internal/proteinfer/inputlist.jsp" redirect="false" />
 		
 	</action>
+	
+	
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to comparing protein inference runs -->
+	<!-- ================================================================================== -->
+	
+	<action 
+		path="/newProteinInferenceComparison"
+		type="org.yeastrc.www.proteinfer.compare.CompareProInferResultsFormAction"
+		validate="false"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/compare/proteinInferenceComparisonForm.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/doProteinInferenceComparison"
+		type="org.yeastrc.www.proteinfer.compare.CompareProtInferResultsAction"
+		name="proteinferRunComparisonForm"
+		input="/pages/internal/proteinfer/compare/proteinInferenceComparisonForm.jsp"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/compare/viewProteinInferenceComparison.jsp" redirect="false" />
+		<forward name="Failure" path="/newProteinInferenceComparison.do" redirect="false" />
+	</action>
+	
+	
 	
 	<!-- ================================================================================== -->
 	

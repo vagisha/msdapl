@@ -33,14 +33,7 @@ public class ProteinferRunSearcher {
     
     public static List<ProteinferJob> getProteinferJobsForMsExperiment(int experimentId) {
         
-        Set<Integer> pinferRunIds = new HashSet<Integer>();
-        
-        // Get the searchIds for this experiment
-        List<Integer> searchIds = DAOFactory.instance().getMsSearchDAO().getSearchIdsForExperiment(experimentId);
-        for(int searchId: searchIds) {
-            Set<Integer> piRunIds = getPinferRunIdsForSearch(searchId);
-            pinferRunIds.addAll(piRunIds);
-        }
+        List<Integer> pinferRunIds = getProteinferIdsForMsExperiment(experimentId);
         
         if(pinferRunIds == null || pinferRunIds.size() == 0)
             return new ArrayList<ProteinferJob>(0);
@@ -61,6 +54,23 @@ public class ProteinferRunSearcher {
                 return Integer.valueOf(o1.getPinferId()).compareTo(o2.getPinferId());
             }});
         return jobs;
+    }
+    
+    public static List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
+        
+        Set<Integer> pinferRunIds = new HashSet<Integer>();
+        
+        // Get the searchIds for this experiment
+        List<Integer> searchIds = DAOFactory.instance().getMsSearchDAO().getSearchIdsForExperiment(experimentId);
+        for(int searchId: searchIds) {
+            Set<Integer> piRunIds = getPinferRunIdsForSearch(searchId);
+            pinferRunIds.addAll(piRunIds);
+        }
+        
+        if(pinferRunIds == null || pinferRunIds.size() == 0)
+            return new ArrayList<Integer>(0);
+        
+        return new ArrayList<Integer>(pinferRunIds);
     }
 
     public static List<ProteinferJob> getProteinferJobsForMsSearch(int msSearchId) {

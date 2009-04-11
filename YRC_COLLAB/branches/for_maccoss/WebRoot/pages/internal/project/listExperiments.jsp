@@ -143,8 +143,9 @@ $(document).ready(function() {
 						<!-- Job COMPLETE -->
 						<logic:equal name="piJob" property="complete" value="true">
 							<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>">
-							<b><font color="green"><bean:write name="piJob" property="statusDescription"/></font></b>
-							</a>
+							<b><font color="green"><bean:write name="piJob" property="statusDescription"/></font></b></a>
+							&nbsp;
+							<a href="<yrcwww:link path='newProteinInferenceComparison.do?'/>piRunId=<bean:write name='piJob' property='pinferId'/>">Compare</a>
 						</logic:equal>
 						<!-- Job FAILED -->
 						<logic:equal name="piJob" property="failed" value="true">

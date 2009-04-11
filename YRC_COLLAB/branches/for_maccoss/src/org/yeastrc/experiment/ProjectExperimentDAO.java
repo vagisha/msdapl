@@ -112,6 +112,42 @@ public class ProjectExperimentDAO {
         }
     }
     
+    public List<Integer> getExperimentIdsForProject(int projectId) throws SQLException {
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String sql = "SELECT experimentID FROM tblProjectExperiment WHERE projectID="+projectId;
+                    
+            conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            List<Integer> experimentIds = new ArrayList<Integer>();
+            while (rs.next()) {
+                experimentIds.add( rs.getInt("experimentID"));
+            }
+            return experimentIds;
+            
+        } finally {
+            
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+    }
+    
     public List<Integer> getProjectIdsForExperiments(List<Integer> experimentIds) throws SQLException {
         if(experimentIds == null || experimentIds.size() == 0) 
             return new ArrayList<Integer>(0);

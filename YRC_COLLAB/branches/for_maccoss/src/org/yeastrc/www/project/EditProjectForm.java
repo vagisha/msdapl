@@ -158,14 +158,14 @@ public class EditProjectForm extends ActionForm {
     // Researchers
     //----------------------------------------------------------------
 	public Researcher getResearcher(int index) {
-	    System.out.println("Getting researcher id at index: "+index);
+	    //System.out.println("Getting researcher id at index: "+index);
 	    while(index >= researchers.size())
 	        researchers.add(new Researcher());
 	    return researchers.get(index);
 	}
 	
 	public List<Researcher> getResearcherList() {
-	    System.out.println("Getting researcher list");
+	    //System.out.println("Getting researcher list");
 	    List<Researcher> rList = new ArrayList<Researcher>();
 	    for(Researcher r: researchers) {
 	        if(r != null && r.getID() > 0)
@@ -175,7 +175,7 @@ public class EditProjectForm extends ActionForm {
 	}
 	
 	public void setResearcherList(List<Researcher> researchers) {
-	    System.out.println("Setting researcher");
+	    //System.out.println("Setting researcher");
 	    this.researchers = researchers;
 	}
 	
