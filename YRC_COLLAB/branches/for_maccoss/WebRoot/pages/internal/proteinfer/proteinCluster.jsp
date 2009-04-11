@@ -101,7 +101,7 @@
 </table>
 </logic:greaterEqual>
 <br>
-<div align="center" style="font-weight:bold;"><a href="<yrcwww:link path='viewAlignedClusterProteins.do?pinferId='><bean:write name='pinferId' />&clusterId=<bean:write name='clusterId' />" >View Alignment</></div>
+<div align="center" style="font-weight:bold;"><a href="viewAlignedClusterProteins.do?pinferId=<bean:write name='pinferId' />&clusterId=<bean:write name='clusterId' />" >View Alignment</></div>
 
 
 

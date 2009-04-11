@@ -37,7 +37,7 @@ import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.ms.util.PeakConverterString;
+import org.yeastrc.ms.util.PeakConverter;
 import org.yeastrc.project.Project;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -301,7 +301,7 @@ public class ViewSpectraAction extends Action {
         
         // set the m/z intensity pairs
         String peaks = scan.peakDataString();
-        PeakConverterString converter = new PeakConverterString();
+        PeakConverter converter = new PeakConverter();
         List<String[]> peakList = converter.convert(peaks);
         i = 0;
         for (String[] peak: peakList) {
