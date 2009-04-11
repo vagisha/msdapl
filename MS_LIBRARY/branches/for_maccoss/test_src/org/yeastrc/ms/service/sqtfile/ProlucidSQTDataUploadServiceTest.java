@@ -63,10 +63,14 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 //      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
-        uploader.doUploadSearch(true);
         int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(searchDate);
+        uploader.setRemoteServer("remoteServer");
+        uploader.setRemoteSearchDataDirectory("remoteDirectory");
+        uploader.uploadData();
         experimentId = uploader.getUploadedExperimentId();
         
         assertEquals(0, uploader.getUploadExceptionList().size());
@@ -79,10 +83,14 @@ public class ProlucidSQTDataUploadServiceTest extends BaseDAOTestCase {
 //      String dir = "/Users/vagisha/WORK/MS_LIBRARY/ProlucidData_dir/2985/RE/forTest";
 
         MsDataUploader uploader = new MsDataUploader();
-        uploader.doUploadSearch(true);
         int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, searchDate);
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(searchDate);
+        uploader.setRemoteServer("remoteServer");
+        uploader.setRemoteSearchDataDirectory("remoteDirectory");
+        uploader.uploadData();
         experimentId = uploader.getUploadedExperimentId();
         assertEquals(0, uploader.getUploadExceptionList().size());
         assertNotSame(0, experimentId);

@@ -62,8 +62,8 @@ import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
@@ -71,7 +71,6 @@ import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.impl.SearchDatabase;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.impl.TerminalModification;
-import org.yeastrc.ms.util.PeakConverterString;
 
 /**
  * 
@@ -462,7 +461,7 @@ public class BaseDAOTestCase extends TestCase {
         for (int i = 0; i < 10; i++) {
             String[] peak = new String[2];
             peak[0] = Double.toString(r.nextDouble());
-            peak[1] = Double.toString(r.nextDouble());
+            peak[1] = Float.toString(r.nextFloat());
             peaks.add(peak);
         }
         scan.setPeaks(peaks);
@@ -489,9 +488,16 @@ public class BaseDAOTestCase extends TestCase {
         assertEquals(input.getEndScanNum(), output.getEndScanNum());
         assertEquals(input.getDataConversionType(), output.getDataConversionType());
         assertEquals(input.getPeakCount(), output.getPeakCount());
-        Iterator<String[]> ipiter = input.peakIterator();
-        List<String[]> peakList = new PeakConverterString().convert(output.peakDataString());
-        Iterator<String[]> opiter = peakList.iterator();
+        List<String[]> iPeaks = input.getPeaksString();
+        List<String[]> oPeaks = null;
+        try {
+            oPeaks = output.getPeaksString();
+        }
+        catch (IOException e) {
+            fail("Error reading peaks from output scan "+e.getMessage());
+        }
+        Iterator<String[]> ipiter = iPeaks.iterator();
+        Iterator<String[]> opiter = oPeaks.iterator();
         while(ipiter.hasNext()) {
             String[] ipeak = ipiter.next();
             String[] opeak = opiter.next();

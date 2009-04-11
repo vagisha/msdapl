@@ -1,9 +1,11 @@
 package org.yeastrc.ms.dao;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
@@ -61,6 +63,7 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTRunSearchDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTSearchScanDAOImpl;
+import org.yeastrc.ms.domain.run.PeakStorageType;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -70,10 +73,24 @@ public class DAOFactory {
 
     private static final Logger log = Logger.getLogger(DAOFactory.class);
     
-    public static final boolean BINARY_PEAK_DATA = false;
+    private static PeakStorageType peakStorageType;
     
     // initialize the SqlMapClient
     private static SqlMapClient sqlMap;
+    
+    static {
+        Properties props = new Properties();
+        try {
+            Reader reader = Resources.getResourceAsReader("msDataDB.properties");
+            props.load(reader);
+        }
+        catch (IOException e) {
+            log.error("Error reading properties file msDataDB.properties", e);
+        }
+        String value = props.getProperty("db.peakdata.storage");
+        peakStorageType = PeakStorageType.instance(value);
+        log.info("PeakStorageType is "+peakStorageType.name());
+    }
     
     static {
         Reader reader = null;
@@ -152,7 +169,7 @@ public class DAOFactory {
         enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
         
         // Run related
-        scanDAO = new MsScanDAOImpl(sqlMap, BINARY_PEAK_DATA); // peak data is stored as String
+        scanDAO = new MsScanDAOImpl(sqlMap, peakStorageType);
         runDAO = new MsRunDAOImpl(sqlMap, enzymeDAO);
         
         // ms2 file related

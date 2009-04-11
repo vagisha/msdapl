@@ -8,6 +8,7 @@
 	<typeAlias alias="MsScanDataIn" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$MsScanDataSqlMapParam"/>
 	
 	<typeAlias alias="DataConversionTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$DataConversionTypeHandler"/>
+	<typeAlias alias="PeakStorageTypeHandler" type="org.yeastrc.ms.dao.run.ibatis.MsScanDAOImpl$PeakStorageTypeHandler"/>
 	
 	<!-- Peak data is not lazy loaded since lazy-loading of 1:1 relationships is not supported 
 	     without an external library
@@ -32,6 +33,9 @@
 	</resultMap>
 	
 	<resultMap class="MsScanOut" id="msScanResult" extends="MsScan.msScanNoDataResult">
+		<result property="peakStorageType" column="type"
+		        typeHandler="PeakStorageTypeHandler" 
+		        />
 		<result property="peakData" column="data" />
 	</resultMap>
 	
@@ -52,14 +56,10 @@
 		<parameter property="peakCount" jdbcType="INTEGER" nullValue="-1"/>
 	</parameterMap>
 	
-	<parameterMap class="MsScanDataIn" id="msScanDataBinParam">
+	<parameterMap class="MsScanDataIn" id="msScanDataParam">
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0" />
-		<parameter property="peakDataBin" jdbcType="LONGBLOB" />
-	</parameterMap>
-	
-	<parameterMap class="MsScanDataIn" id="msScanDataStringParam">
-		<parameter property="scanId" jdbcType="INTEGER" nullValue="0" />
-		<parameter property="peakDataString" jdbcType="LONGBLOB" />
+		<parameter property="peakStorageType" jdbcType="CHAR" typeHandler="PeakStorageTypeHandler" />
+		<parameter property="peakData" jdbcType="LONGBLOB" />
 	</parameterMap>
 	
 	
@@ -87,6 +87,7 @@
     			fragmentationType,
     			isCentroid,
     			peakCount,
+    			type,
     			UNCOMPRESS(data) as data 
     			FROM msScan, msScanData
     			WHERE msScan.id = msScanData.scanID
@@ -136,14 +137,9 @@
     	</selectKey>
     </insert>
     
-    <insert id="insertPeakDataString" parameterMap="msScanDataStringParam">
-    	INSERT INTO msScanData (scanID,data) 
-    	VALUES (?,COMPRESS(?))
-    </insert>
-    
-    <insert id="insertPeakDataBin" parameterMap="msScanDataBinParam">
-    	INSERT INTO msScanData (scanID,data) 
-    	VALUES (?,COMPRESS(?))
+    <insert id="insertPeakData" parameterMap="msScanDataParam">
+    	INSERT INTO msScanData (scanID,type,data) 
+    	VALUES (?,?,COMPRESS(?))
     </insert>
     
     <delete id="delete" parameterClass="Integer">

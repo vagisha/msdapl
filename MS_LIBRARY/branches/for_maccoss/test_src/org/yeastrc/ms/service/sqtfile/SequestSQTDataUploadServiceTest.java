@@ -43,11 +43,15 @@ public class SequestSQTDataUploadServiceTest extends BaseDAOTestCase {
     public void testUploadSequestData() {
         String dir = "test_resources/validSequestData_dir";
         MsDataUploader uploader = new MsDataUploader();
-        uploader.doUploadSearch(true);
         java.util.Date experimentDate = new java.util.Date();
         
         int experimentId = 0;
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, experimentDate);
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(experimentDate);
+        uploader.setRemoteServer("remoteServer");
+        uploader.setRemoteSearchDataDirectory("remoteDirectory");
+        uploader.uploadData();
         experimentId = uploader.getUploadedExperimentId();
         assertNotSame(0, experimentId);
         assertEquals(0, uploader.getUploadExceptionList().size());

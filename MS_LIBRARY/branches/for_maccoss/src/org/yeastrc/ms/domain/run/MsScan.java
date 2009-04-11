@@ -37,4 +37,6 @@ public interface MsScan extends MsScanBase {
     
     public abstract List<Peak> getPeaks() throws IOException;
     
+    public abstract PeakStorageType getPeakStorageType();
+    
 }

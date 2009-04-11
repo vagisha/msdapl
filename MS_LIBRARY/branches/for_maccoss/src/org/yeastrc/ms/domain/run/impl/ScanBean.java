@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.Peak;
-import org.yeastrc.ms.util.PeakConverterNumber;
-import org.yeastrc.ms.util.PeakConverterString;
+import org.yeastrc.ms.domain.run.PeakStorageType;
+import org.yeastrc.ms.util.PeakConverter;
 
 /**
  * 
@@ -44,6 +43,7 @@ public class ScanBean implements MsScan {
 //    private String peakString;
     
     private byte[] peakData;
+    private PeakStorageType storageType;
     
     public ScanBean() {
         peakData = new byte[0];
@@ -155,13 +155,21 @@ public class ScanBean implements MsScan {
 
     @Override
     public List<Peak> getPeaks() throws IOException {
-        return PeakConverterNumber.instance().convert(peakData, DAOFactory.BINARY_PEAK_DATA);
+        return PeakConverter.instance().convert(peakData, this.storageType);
     }
 
     @Override
     public List<String[]> getPeaksString() throws IOException {
-        return PeakConverterString.instance().convert(peakData, DAOFactory.BINARY_PEAK_DATA);
+        return PeakConverter.instance().convertToStringPeaks(peakData, this.storageType);
     }
 
+    @Override
+    public PeakStorageType getPeakStorageType() {
+        return this.storageType;
+    }
+
+    public void setPeakStorageType(PeakStorageType type) {
+        this.storageType = type;
+    }
     
 }

@@ -23,10 +23,13 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     }
    
     public void testUploadNoResultsForScan() {
-        uploader.doUploadSearch(true);
         String dir = "test_resources/invalidSQT_noResultsForScan_dir";
 //        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+            uploader.setRawDataDirectory(dir);
+            uploader.setSearchDirectory(dir);
+            uploader.setSearchDate(new Date());
+            uploader.setRemoteServer("remoteServer");
+            uploader.uploadData();
             assertEquals(1, uploader.getUploadExceptionList().size());
             assertEquals(ERROR_CODE.INVALID_SQT_SCAN, uploader.getUploadExceptionList().get(0).getErrorCode());
 //        }
@@ -36,10 +39,13 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     }
     
     public void testUploadNoProteinsForResult() {
-        uploader.doUploadSearch(true);
         String dir = "test_resources/invalidSQT_noProteinsForResult_dir";
 //        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
             // will not fail since the exception will not be propagated all the way up
 //        }
 //        catch(UploadException e) {
@@ -53,7 +59,11 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadDataToDbInvalidDirectory() {
         String dir = "dummy/directory";
 //        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date()); 
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
             //fail("Directory "+dir+" does not exist");
 //        }
 //        catch(UploadException e) {
@@ -67,7 +77,11 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/empty_dir";
         int expId = 0;
 //        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
             expId = uploader.getUploadedExperimentId();
             //fail("Upload directory is empty");
 //        }
@@ -81,12 +95,14 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
 
     public void testUploadExperimentToDbMissingMS2Files() {
         
-        uploader.doUploadSearch(true);
-        
         String dir = "test_resources/missingMS2_dir";
         int expId = 0;
 //        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
             expId = uploader.getUploadedExperimentId();
 //            fail("Upload directory has missing ms2 files");
 //        }
@@ -101,7 +117,9 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidMS2_S() {
         String dir = "test_resources/invalid_ms2_S_dir";
 //        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
 //            fail("2.ms2 is invalid");
 //        }
 //        catch (UploadException e1) {
@@ -119,7 +137,11 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidMS2_peak() {
         String dir = "test_resources/invalid_ms2_peak_dir";
 //        try {
-            uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
             // fail("1.ms2 is invalid");
 //        }
 //        catch (UploadException e1) {
@@ -133,12 +155,16 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
 //        }
         assertEquals(1, runDao.loadRunIdsForFileName("1").size());
         assertEquals(1, runDao.loadRunIdsForFileName("2").size());
-        assertNull(searchDao.loadSearch(1));
+        assertNotNull(searchDao.loadSearch(1));
     }
     
     public void testUploadInvalidMS2_Z() {
         String dir = "test_resources/invalid_ms2_Z_dir";
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
         //fail("1.ms2 is invalid");
         assertEquals(1, uploader.getUploadExceptionList().size());
         UploadException e1 = uploader.getUploadExceptionList().get(0);
@@ -149,16 +175,19 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         assertTrue(e1.getMessage().contains(msg));
         
         assertEquals(0, runDao.loadRunIdsForFileName("1").size());
-        assertEquals(1, runDao.loadRunIdsForFileName("2").size());
+        assertEquals(0, runDao.loadRunIdsForFileName("2").size()); // If 2.ms2 is uploaded first this will be 1
         assertNull(searchDao.loadSearch(1));
     }
     
     public void testUploadInvalidSQTFiles() {
         
-      uploader.doUploadSearch(true);
         
       String dir = "test_resources/invalid_sqt_dir";
-      uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+      uploader.setRawDataDirectory(dir);
+      uploader.setSearchDirectory(dir);
+      uploader.setSearchDate(new Date());
+      uploader.setRemoteServer("remoteServer");
+      uploader.uploadData();
       List<UploadException> exceptionList = uploader.getUploadExceptionList();
       assertEquals(1, exceptionList.size());
       assertEquals(ERROR_CODE.UNSUPPORTED_SQT, exceptionList.get(0).getErrorCode());
@@ -182,7 +211,6 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     
     public void testUploadSequestData() throws DataProviderException {
         
-        uploader.doUploadSearch(true);
         
         String dir = "test_resources/validSequestData_dir";
         
@@ -270,7 +298,11 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         
         
         MsDataUploader uploader = new MsDataUploader();
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new java.util.Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
         assertEquals(0, uploader.getUploadExceptionList().size());
         
         // make sure all the data got uploaded
@@ -385,17 +417,20 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     
     public void testUploadExperimntNoScanIdFound() {
         
-        uploader.doUploadSearch(true);
         
         String dir = "test_resources/noScanIdFound_dir";
-        uploader.uploadExperimentToDb("remoteServer", "remoteDirectory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.uploadData();
         
         List<UploadException> exceptions = uploader.getUploadExceptionList();
         assertEquals(1, exceptions.size());
 //        System.out.println(uploader.getUploadWarnings());
         assertEquals(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN, exceptions.get(0).getErrorCode());
         
-        assertEquals(1, runDao.loadRunIdsForFileName("771_5489.ms2").size());
+        assertEquals(1, runDao.loadRunIdsForFileName("771_5489").size());
         assertNull(searchDao.loadSearch(1));
     }
 

@@ -3,13 +3,13 @@ package org.yeastrc.ms.dao.run;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.yeastrc.ms.dao.BaseDAOTestCase;
 import org.yeastrc.ms.domain.run.DataConversionType;
-import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.MsScanIn;
+import org.yeastrc.ms.domain.run.Peak;
 
 public class MsScanDAOImplTest extends BaseDAOTestCase {
 
@@ -151,10 +151,22 @@ public class MsScanDAOImplTest extends BaseDAOTestCase {
             return this.msLevel;
         }
 
-        public Iterator<String[]> peakIterator() {
-            return this.peakList.iterator();
+        @Override
+        public List<Peak> getPeaks() {
+            List<Peak> peakNList = new ArrayList<Peak>(peakList.size());
+            for(String[] peakArr: peakList) {
+                double mz = Double.parseDouble(peakArr[0]);
+                float intensity = Float.parseFloat(peakArr[1]);
+                peakNList.add(new Peak(mz, intensity));
+            }
+            return peakNList;
         }
 
+        @Override
+        public List<String[]> getPeaksString() {
+            return peakList;
+        }
+        
         public BigDecimal getPrecursorMz() {
             return this.precursorMz;
         }

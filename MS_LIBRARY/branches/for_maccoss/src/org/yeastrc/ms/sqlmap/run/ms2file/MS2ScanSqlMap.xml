@@ -37,6 +37,7 @@
     			fragmentationType,
     			isCentroid,
     			peakCount,
+    			type,
     			UNCOMPRESS(data) as data 
     			FROM msScan, msScanData
     			WHERE msScan.id = msScanData.scanID

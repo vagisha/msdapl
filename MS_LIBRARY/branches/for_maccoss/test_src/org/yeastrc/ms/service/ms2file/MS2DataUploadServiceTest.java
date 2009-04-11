@@ -31,9 +31,13 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // -------------------------------------------------------------------------------------------
         // UPLOAD 1
         MsDataUploader uploader = new MsDataUploader();
-        uploader.doUploadSearch(true);
         int experimentId1 = 0;
-        uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remoteServer");
+        uploader.setRemoteRawDataDirectory("remote/directory");
+        uploader.uploadData();
         experimentId1 = uploader.getUploadedExperimentId();
         assertNotSame(0, experimentId1);
         assertEquals(0, uploader.getUploadExceptionList().size());
@@ -70,9 +74,13 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // UPLOAD 2
         // upload with different values for serverAddress and serverDirectory
         uploader = new MsDataUploader();
-        uploader.doUploadSearch(true);
         int experimentId2 = 0;
-        uploader.uploadExperimentToDb("remote.server.again", "remote/directory/2", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remote.server.again");
+        uploader.setRemoteRawDataDirectory("remote/directory/2");
+        uploader.uploadData();
         experimentId2 = uploader.getUploadedExperimentId();
         assertNotSame(0, experimentId2);
         assertEquals(0, uploader.getUploadExceptionList().size());
@@ -111,9 +119,13 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // upload again but this time use the same values for serverAddress and serverDirectory
         // as the first upload
         uploader = new MsDataUploader();
-        uploader.doUploadSearch(true);
         int experimentId3 = 0;
-        uploader.uploadExperimentToDb("remote.server", "remote/directory", dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.setRemoteServer("remote.server");
+        uploader.setRemoteRawDataDirectory("remote/directory");
+        uploader.uploadData();
         experimentId3 = uploader.getUploadedExperimentId();
         assertNotSame(0, experimentId3);
         assertEquals(0, uploader.getUploadExceptionList().size());
@@ -144,8 +156,10 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, searchIds.size());
         assertEquals(2, runSearchDao.loadRunSearchIdsForSearch(oldSearchId).size());
         uploader = new MsDataUploader();
-        uploader.doUploadSearch(true);
-        uploader.uploadExperimentToDb(experimentId2, dir, new Date());
+        uploader.setRawDataDirectory(dir);
+        uploader.setSearchDirectory(dir);
+        uploader.setSearchDate(new Date());
+        uploader.uploadData(experimentId2);
         
         // make sure the lastUpdate date is > the upload date
         MsExperiment expt = exptDao.loadExperiment(experimentId2);
@@ -160,12 +174,13 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId1));
         assertEquals(1, exptDao.getMatchingExptRunCount(experimentId2, runId2));
         // NOTE(03/29/09) old searches are no longer deleted
+        // NOTE (04/10/09) if a searchId exists the search is NOT uploaded again.
         // any old searches for the experiment should have been deleted; we should still 
         // have the same number of search as before
         searchIds = searchDao.getSearchIdsForExperiment(experimentId2);
-        int newSearchId = searchIds.get(1);
-        assertEquals(2, searchIds.size()); // see NOTE(03/29/09)
-        assertTrue(oldSearchId != newSearchId);
+        int newSearchId = searchIds.get(0);
+        assertEquals(1, searchIds.size()); 
+        assertTrue(oldSearchId == newSearchId);// see NOTE(03/29/09)
         assertEquals(2, runSearchDao.loadRunSearchIdsForSearch(newSearchId).size());
     }
     

@@ -21,6 +21,7 @@ import org.yeastrc.ms.domain.run.DataConversionType;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.Peak;
+import org.yeastrc.ms.domain.run.PeakStorageType;
 import org.yeastrc.ms.util.PeakStringBuilder;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -33,11 +34,11 @@ import com.ibatis.sqlmap.client.extensions.TypeHandlerCallback;
  */
 public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
 
-    private boolean binScanData = false;
+    private PeakStorageType peakStorageType;
     
-    public MsScanDAOImpl(SqlMapClient sqlMap, boolean binaryScanData) {
+    public MsScanDAOImpl(SqlMapClient sqlMap, PeakStorageType peakStorageType) {
         super(sqlMap);
-        this.binScanData = binaryScanData;
+        this.peakStorageType = peakStorageType;
     }
 
     public int save(MsScanIn scan, int runId, int precursorScanId) {
@@ -46,9 +47,9 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         
         // save the peak data
         MsScanDataSqlMapParam param;
-        String statementName = binScanData == true ? "insertPeakDataBin" : "insertPeakDataString";
+        String statementName = "insertPeakData";
         try {
-            param = new MsScanDataSqlMapParam(scanId, scan, binScanData);
+            param = new MsScanDataSqlMapParam(scanId, scan, peakStorageType);
         }
         catch (IOException e) {
             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
@@ -162,6 +163,10 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         public List<Peak> getPeaks() {
             throw new UnsupportedOperationException();
         }
+        
+        public PeakStorageType getPeakStorageType() {
+            throw new UnsupportedOperationException();
+        }
 
         @Override
         public int getPeakCount() {
@@ -177,6 +182,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         public int getId() {
             throw new UnsupportedOperationException("getId() not supported by MsScanSqlMapParam");
         }
+        
     }
     
     /**
@@ -184,34 +190,39 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
      */
     public static class MsScanDataSqlMapParam {
         private int scanId;
-        private String peakData;
-        private byte[] peakDataBin;
-        public MsScanDataSqlMapParam(int scanId, MsScanIn scan, boolean binaryScanData) throws IOException {
+        private byte[] peakData;
+        private PeakStorageType peakStorageType;
+        
+        public MsScanDataSqlMapParam(int scanId, MsScanIn scan, PeakStorageType storageType) throws IOException {
             this.scanId = scanId;
             
-            if(binaryScanData)
-                this.peakDataBin = getPeakBinaryData(scan);
-            else
+            if(storageType == PeakStorageType.DOUBLE_FLOAT)
+                this.peakData = getPeakBinaryData(scan);
+            else if(storageType == PeakStorageType.STRING)
                 this.peakData = getPeakDataString(scan);
+            
+            this.peakStorageType = storageType;
         }
         
         public int getScanId() {
             return scanId;
         }
-        public String getPeakDataString() {
-            return peakData;
-        }
-        public byte[] getPeakDataBin() {
-            return peakDataBin;
+        
+        public PeakStorageType getPeakStorageType() {
+            return peakStorageType;
         }
         
-        private String getPeakDataString(MsScanIn scan) {
+        public byte[] getPeakData() {
+            return peakData;
+        }
+        
+        private byte[] getPeakDataString(MsScanIn scan) {
             List<String[]> peaksStr = scan.getPeaksString();
             PeakStringBuilder builder = new PeakStringBuilder();
             for(String[] peak: peaksStr) {
                 builder.addPeak(peak[0], peak[1]);
             }
-            return builder.getPeaksAsString();
+            return builder.getPeaksAsString().getBytes();
         }
         
         private byte[] getPeakBinaryData(MsScanIn scan) throws IOException {
@@ -281,5 +292,37 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
                 throw new IllegalArgumentException("Cannot convert "+val+" to DataConversionType");
         }
     }
+    
+    //---------------------------------------------------------------------------------------
+    /** 
+     * Type handler for converting between PeakStorageType to CHAR stored in the database
+     */
+    public static class PeakStorageTypeHandler implements TypeHandlerCallback {
+
+        
+        public Object getResult(ResultGetter getter) throws SQLException {
+            return stringToPeakStorageType(getter.getString());
+        }
+
+        public void setParameter(ParameterSetter setter, Object parameter)
+                throws SQLException {
+            if (parameter == null || !(parameter instanceof PeakStorageType))
+                setter.setNull(java.sql.Types.CHAR);
+            else 
+                setter.setString(((PeakStorageType)parameter).getCode());
+        }
+
+        public Object valueOf(String s) {
+            return stringToPeakStorageType(s);
+        }
+
+        private PeakStorageType stringToPeakStorageType(String val) {
+            PeakStorageType type = PeakStorageType.instance(val);
+            if(type == null)
+                throw new IllegalArgumentException("Cannot convert "+val+" to PeakStorageType");
+            return type;
+        }
+    }
+
     
 }
