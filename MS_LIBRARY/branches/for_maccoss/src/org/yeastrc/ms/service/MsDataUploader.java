@@ -422,14 +422,46 @@ public class MsDataUploader {
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
             }
             if(searchId == 0) {
+                
+                // disable keys
+                try {
+                    disableSearchTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
+                }
+                    
                 try {
                     this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
                 }
                 catch (UploadException ex) {
-                uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
-                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                return;
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    
+                    // enable keys
+                    try {
+                        enableSearchTableKeys();
+                    }
+                    catch(SQLException e){log.error("Error enabling keys");}
+                    
+                    return;
+                }
+                
+                // enable keys
+                try {
+                    enableSearchTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
                 }
             }
             else {
