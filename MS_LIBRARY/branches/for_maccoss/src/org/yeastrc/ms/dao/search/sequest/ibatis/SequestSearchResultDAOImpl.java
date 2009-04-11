@@ -678,6 +678,42 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
 //        resultDao.deleteResults(runSearchId, scanId, charge);
 //    }
     
+    @Override
+    public void disableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE SQTSearchResult DISABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+
+    @Override
+    public void enableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE SQTSearchResult ENABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+    
     public static final class SequestResultDataSqlMapParam implements SequestResultDataWId {
         
         private int resultId;

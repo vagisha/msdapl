@@ -69,8 +69,11 @@ public class UploadException extends Exception {
         NOT_MATCHING_SEARCH_SCAN("No matching search scan was found for the Percolator search scan", WARN),
         
         // General
-        RUNTIME_SQT_ERROR       ("Runtime exception.", WARN)
+        RUNTIME_SQT_ERROR       ("Runtime exception.", WARN),
         
+        // Error disabling/enabling keys
+        ERROR_SQL_DISABLE_KEYS  ("Error disabling keys", ERROR),
+        ERROR_SQL_ENABLE_KEYS  ("Error enabling keys", ERROR)
         ;
       
         private String message = "";

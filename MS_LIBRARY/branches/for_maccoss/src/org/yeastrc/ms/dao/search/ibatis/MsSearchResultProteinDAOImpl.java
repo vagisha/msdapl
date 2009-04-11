@@ -7,21 +7,15 @@
 package org.yeastrc.ms.dao.search.ibatis;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
-import org.yeastrc.ms.domain.search.ValidationStatus;
-import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
-import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -116,6 +110,42 @@ public class MsSearchResultProteinDAOImpl extends BaseSqlMapDAO implements MsSea
     
     public void delete(int resultId) {
         delete("MsResultProtein.deleteForResultId", resultId);
+    }
+    
+    @Override
+    public void disableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE msProteinMatch DISABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+
+    @Override
+    public void enableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE msProteinMatch ENABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
     }
 }
 

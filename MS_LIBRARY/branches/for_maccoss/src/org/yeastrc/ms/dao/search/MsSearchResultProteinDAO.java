@@ -1,5 +1,6 @@
 package org.yeastrc.ms.dao.search;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
@@ -18,5 +19,9 @@ public interface MsSearchResultProteinDAO {
     public abstract void delete(int resultId);
 
     public abstract void saveAll(List<MsSearchResultProtein> proteinMatchList);
+    
+    public abstract void disableKeys() throws SQLException;
+    
+    public abstract void enableKeys() throws SQLException;
 
 }

@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.dao.search.sqtfile.ibatis;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,5 +94,41 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
         
         save("SqtSpectrum.insertAll", values.toString());
         
+    }
+    
+    @Override
+    public void disableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE SQTSpectrumData DISABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+
+    @Override
+    public void enableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE SQTSpectrumData ENABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
     }
 }

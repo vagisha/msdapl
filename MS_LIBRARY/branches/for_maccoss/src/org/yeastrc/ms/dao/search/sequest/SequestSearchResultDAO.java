@@ -1,5 +1,6 @@
 package org.yeastrc.ms.dao.search.sequest;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.dao.search.GenericSearchResultDAO;
@@ -34,4 +35,8 @@ public interface SequestSearchResultDAO extends GenericSearchResultDAO<SequestSe
     public abstract List<Integer> loadResultIdsForSearch(int searchId, 
             SequestResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
+    
+    public abstract void disableKeys() throws SQLException;
+    
+    public abstract void enableKeys() throws SQLException;
 }

@@ -1,6 +1,7 @@
 package org.yeastrc.ms.service;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -157,6 +158,19 @@ public class MsDataUploader {
         
         // ----- UPLOAD SEARCH DATA
         if(uploadSearch) {
+            
+            // disable keys
+            try {
+                disableSearchTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
+            
             try {
                 this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
             }
@@ -166,10 +180,23 @@ public class MsDataUploader {
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 return;
             }
+            
+            // enable keys
+            try {
+                enableSearchTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
         }
         
         // ----- UPLOAD ANALYSIS DATA
         if(uploadAnalysis) {
+            
             try {
                 exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
@@ -184,6 +211,44 @@ public class MsDataUploader {
         long end = System.currentTimeMillis();
         logEndExperimentUpload(exptUploader, start, end);
         
+    }
+    
+    private void disableSearchTableKeys() throws SQLException {
+        
+        // disable keys on msRunSearchResult table
+        log.info("Disabling keys on msRunSearchResult table");
+        DAOFactory.instance().getMsSearchResultDAO().disableKeys();
+        
+        // disable keys on SQTSearchResult
+        log.info("Disabling keys on SQTSearchResult table");
+        DAOFactory.instance().getSequestResultDAO().disableKeys();
+        
+        // disable keys on SQTSpectrumData
+        log.info("Disabling keys on SQTSpectrumData table");
+        DAOFactory.instance().getSqtSpectrumDAO().disableKeys();
+        
+        // disable keys on msProteinMatch
+        log.info("Disabling keys on msProteinMatch table");
+        DAOFactory.instance().getMsProteinMatchDAO().disableKeys();
+    }
+    
+    private void enableSearchTableKeys() throws SQLException {
+        
+        // enable keys on msRunSearchResult table
+        log.info("Enabling keys on msRunSearchResult table");
+        DAOFactory.instance().getMsSearchResultDAO().enableKeys();
+        
+        // enable keys on SQTSearchResult
+        log.info("Enabling keys on SQTSearchResult table");
+        DAOFactory.instance().getSequestResultDAO().enableKeys();
+        
+        // enable keys on SQTSpectrumData
+        log.info("Enabling keys on SQTSpectrumData table");
+        DAOFactory.instance().getSqtSpectrumDAO().enableKeys();
+        
+        // enable keys on msProteinMatch
+        log.info("Enabling keys on msProteinMatch table");
+        DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
     }
 
     private MsExperimentUploader initializeExperimentUploader() throws UploadException  {

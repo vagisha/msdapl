@@ -1,7 +1,9 @@
 package org.yeastrc.ms.dao.search.ibatis;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,7 +171,7 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
     public void delete(int resultId) {
         delete("MsSearchResult.delete", resultId);
     }
-
+    
 //    @Override
 //    public void deleteResults(int runSearchId, int scanId, int charge) {
 //        Map<String, Integer> map = new HashMap<String, Integer>(3);
@@ -178,6 +180,43 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
 //        map.put("charge", charge);
 //        delete("MsSearchResult.deleteForRunSearchScanCharge", map);
 //    }
+    
+    @Override
+    public void disableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE msRunSearchResult DISABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+
+    @Override
+    public void enableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE msRunSearchResult ENABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+    
 
     /**
      * Type handler for converting between ValidationType and SQL's CHAR type.
