@@ -178,6 +178,12 @@ public class MsDataUploader {
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                
+                // enable keys
+                try {
+                    enableSearchTableKeys();
+                }
+                catch(SQLException e){log.error("Error enabling keys");}
                 return;
             }
             
