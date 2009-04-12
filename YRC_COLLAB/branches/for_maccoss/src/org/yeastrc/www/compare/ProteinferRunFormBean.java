@@ -4,7 +4,7 @@
  * Apr 10, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer.compare;
+package org.yeastrc.www.compare;
 
 import java.sql.Date;
 

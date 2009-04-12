@@ -48,14 +48,17 @@
 <br>
 
 <!-- PEPTIDES TABLE -->
+
 <div style="padding: 2px; cursor: pointer;" class="peptgrplist pinfer_header_small" ><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
 <table cellpadding="4" cellspacing="2" align="center" width="90%" id="pept_grp_table_<bean:write name="clusterId" />">
         
         <tr>
+        <thead>
         <th><b><font size="2pt">Peptide<br>Group ID</font></b></th>
         <th><b><font size="2pt">Sequence(s)</font></b></th>
         <th><b><font size="2pt"># Spectra</font></b></th>
         </tr>
+        </thead>
         
         <logic:iterate name="cluster" property="peptideGroups" id="peptGrp">
         	<logic:iterate name="peptGrp" property="peptides" id="pept">
@@ -74,14 +77,16 @@
 <logic:greaterEqual name="protGroupsSize" value="2">
 <br><div style="padding: 2px" class="pinfer_header_small" ><b>Protein - Peptide Association</b></div><br>
 <table id="assoctable_<bean:write name="clusterId" />"
-       cellpadding="4" cellspacing="2" align="center">
-       
+       cellpadding="4" cellspacing="2" align="center" class="draggable">
+    
+    <thead> 
     <tr>
       <th><b><font size="2pt">Group ID <br>(Peptide / Protein)</font></b></th>
       <logic:iterate name="cluster" property="proteinGroups" id="protGrp" >
             <th><b><font size="2pt"><bean:write name="protGrp" property="groupId" /></font></b></th>
        </logic:iterate>
     </tr>
+    </thead>
 
 	<%
 	    WIdPickerCluster cluster = (WIdPickerCluster)request.getAttribute("cluster");

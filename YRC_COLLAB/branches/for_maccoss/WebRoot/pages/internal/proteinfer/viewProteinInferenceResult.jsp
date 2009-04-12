@@ -4,6 +4,8 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
+<script src="<yrcwww:link path='/js/dragtable.js'/>"></script>
+
 <script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.core.js'/>"></script>
@@ -20,6 +22,7 @@
 <script src="<yrcwww:link path='/js/jquery.form.js'/>"></script>
 
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
+
 
 <link rel="stylesheet" href="<yrcwww:link path='/css/proteinfer.css'/>" type="text/css" >
 
@@ -302,6 +305,8 @@ function selectProteinCluster(clusterId, block, showDiv) {
 								      function(responseText, status, request) {				// callback
  								  		
  								  		if(block) $.unblockUI();
+ 								  		
+ 								  		dragtable.makeDraggable($("#assoctable_"+clusterId).get(0));
  								  		
  								  		$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
  										$("#assoctable_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');

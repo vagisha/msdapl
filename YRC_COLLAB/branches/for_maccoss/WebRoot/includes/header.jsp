@@ -64,6 +64,9 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
  <logic:equal name="dir" scope="request" value="proteinfer">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
+ <logic:equal name="dir" scope="request" value="compare">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
  <logic:equal name="dir" scope="request" value="upload">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>

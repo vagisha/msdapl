@@ -60,7 +60,7 @@
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
-	<form-bean name="proteinferRunComparisonForm" type="org.yeastrc.www.proteinfer.compare.ProteinferRunComparisonForm"></form-bean>
+	<form-bean name="proteinferRunComparisonForm" type="org.yeastrc.www.compare.ProteinferRunComparisonForm"></form-bean>
     </form-beans>
 
 
@@ -806,23 +806,23 @@
 	<!-- ================================================================================== -->
 	
 	<action 
-		path="/newProteinInferenceComparison"
-		type="org.yeastrc.www.proteinfer.compare.CompareProInferResultsFormAction"
+		path="/newProteinSetComparison"
+		type="org.yeastrc.www.compare.CompareProteinSetsFormAction"
 		validate="false"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/compare/proteinInferenceComparisonForm.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/compare/proteinSetComparisonForm.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
 	</action>
 	
 	<action 
-		path="/doProteinInferenceComparison"
-		type="org.yeastrc.www.proteinfer.compare.CompareProtInferResultsAction"
+		path="/doProteinSetComparison"
+		type="org.yeastrc.www.proteinfer.CompareProtInferResultsAction"
 		name="proteinferRunComparisonForm"
-		input="/pages/internal/proteinfer/compare/proteinInferenceComparisonForm.jsp"
+		input="/pages/internal/compare/proteinInferenceComparisonForm.jsp"
 		scope="request"
 		validate="true"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/compare/viewProteinInferenceComparison.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/compare/viewProteinInferenceComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinInferenceComparison.do" redirect="false" />
 	</action>
 	
