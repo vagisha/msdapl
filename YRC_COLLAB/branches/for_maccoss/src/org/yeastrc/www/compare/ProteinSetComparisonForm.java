@@ -19,7 +19,7 @@ import org.apache.struts.action.ActionMessage;
 /**
  * 
  */
-public class ProteinferRunComparisonForm extends ActionForm {
+public class ProteinSetComparisonForm extends ActionForm {
 
     private int test = 1000;
     

@@ -33,9 +33,9 @@ import edu.uwpr.protinfer.database.dto.ProteinferRun;
 /**
  * 
  */
-public class CompareProInferResultsFormAction extends org.apache.struts.action.Action {
+public class CompareProteinSetsFormAction extends org.apache.struts.action.Action {
 
-    private static final Logger log = Logger.getLogger(CompareProInferResultsFormAction.class);
+    private static final Logger log = Logger.getLogger(CompareProteinSetsFormAction.class);
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -97,9 +97,9 @@ public class CompareProInferResultsFormAction extends org.apache.struts.action.A
             }
         }
         
-        ProteinferRunComparisonForm myForm = new ProteinferRunComparisonForm();
+        ProteinSetComparisonForm myForm = new ProteinSetComparisonForm();
         myForm.setProteinferRunList(piRuns);
-        request.setAttribute("proteinferRunComparisonForm", myForm);
+        request.setAttribute("proteinSetComparisonForm", myForm);
         
         
         return mapping.findForward("Success");

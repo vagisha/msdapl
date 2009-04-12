@@ -30,9 +30,9 @@ import edu.uwpr.protinfer.database.dto.ProteinferRun;
 /**
  * 
  */
-public class CompareProtInferResultsAction extends Action {
+public class CompareProteinSetsAction extends Action {
 
-    private static final Logger log = Logger.getLogger(CompareProtInferResultsAction.class);
+    private static final Logger log = Logger.getLogger(CompareProteinSetsAction.class);
 
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -51,7 +51,7 @@ public class CompareProtInferResultsAction extends Action {
 
         
         // get the protein inference ids to compare
-        ProteinferRunComparisonForm myForm = (ProteinferRunComparisonForm) form;
+        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
         List<ProteinferRunFormBean> runs = myForm.getPiRuns();
         
         List<Integer> piRunIds = myForm.getSelectedProteinferRunIds();

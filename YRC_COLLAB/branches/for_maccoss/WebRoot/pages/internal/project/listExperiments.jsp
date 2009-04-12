@@ -145,7 +145,7 @@ $(document).ready(function() {
 							<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>">
 							<b><font color="green"><bean:write name="piJob" property="statusDescription"/></font></b></a>
 							&nbsp;
-							<a href="<yrcwww:link path='newProteinInferenceComparison.do?'/>piRunId=<bean:write name='piJob' property='pinferId'/>">Compare</a>
+							<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='pinferId'/>">Compare</a>
 						</logic:equal>
 						<!-- Job FAILED -->
 						<logic:equal name="piJob" property="failed" value="true">

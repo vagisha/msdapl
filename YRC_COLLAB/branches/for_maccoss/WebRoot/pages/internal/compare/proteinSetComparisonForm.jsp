@@ -10,8 +10,8 @@
 </yrcwww:notauthenticated>
 
 
-<logic:notPresent name="proteinferRunComparisonForm" scope="request">
-	<logic:forward  name="newProteinInferenceComparison" />
+<logic:notPresent name="proteinSetComparisonForm" scope="request">
+	<logic:forward  name="newProteinSetComparison" />
 </logic:notPresent>
 
 
@@ -24,16 +24,16 @@
 <yrcwww:contentbox centered="true" title="Available Experiments" width="700">
 
 
-<logic:empty name="proteinferRunComparisonForm" property="proteinferRunList">
+<logic:empty name="proteinSetComparisonForm" property="proteinferRunList">
 <div><b>There are no available protein inference experiments at this time.</b></div>
 </logic:empty>
 
 
-<logic:notEmpty name="proteinferRunComparisonForm" property="proteinferRunList">
+<logic:notEmpty name="proteinSetComparisonForm" property="proteinferRunList">
 
 <div><b>Please select 2 or 3 experiment from the list below</b></div>
 
-<html:form action="doProteinInferenceComparison" method="POST">
+<html:form action="doProteinSetComparison" method="POST">
 
 	<table width="90%">
 	<thead>
@@ -46,7 +46,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<logic:iterate name="proteinferRunComparisonForm" property="proteinferRunList" id="proteinferRun">
+		<logic:iterate name="proteinSetComparisonForm" property="proteinferRunList" id="proteinferRun">
 		<yrcwww:colorrow>
 			<td>
 				<html:checkbox name="proteinferRun" property="selected" indexed="true"/>

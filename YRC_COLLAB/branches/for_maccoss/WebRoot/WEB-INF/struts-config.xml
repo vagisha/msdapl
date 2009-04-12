@@ -60,7 +60,7 @@
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
-	<form-bean name="proteinferRunComparisonForm" type="org.yeastrc.www.compare.ProteinferRunComparisonForm"></form-bean>
+	<form-bean name="proteinSetComparisonForm" type="org.yeastrc.www.compare.ProteinSetComparisonForm"></form-bean>
     </form-beans>
 
 
@@ -100,7 +100,7 @@
 	<forward name="editResearcher" path="/editResearcher.do" />
 	<forward name="newPercolatorProteinInference" path="/newPercolatorProteinInference.do" />
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
-	<forward name="newProteinInferenceComparison" path="/newProteinInferenceComparison.do" />
+	<forward name="newProteinSetComparison" path="/newProteinSetComparison.do" />
 
     </global-forwards>
 
@@ -816,14 +816,14 @@
 	
 	<action 
 		path="/doProteinSetComparison"
-		type="org.yeastrc.www.proteinfer.CompareProtInferResultsAction"
-		name="proteinferRunComparisonForm"
-		input="/pages/internal/compare/proteinInferenceComparisonForm.jsp"
+		type="org.yeastrc.www.compare.CompareProteinSetsAction"
+		name="proteinSetComparisonForm"
+		input="/pages/internal/compare/proteinSetComparisonForm.jsp"
 		scope="request"
 		validate="true"
 	>
-		<forward name="Success" path="/pages/internal/compare/viewProteinInferenceComparison.jsp" redirect="false" />
-		<forward name="Failure" path="/newProteinInferenceComparison.do" redirect="false" />
+		<forward name="Success" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
+		<forward name="Failure" path="/newProteinSetComparison.do" redirect="false" />
 	</action>
 	
 	
