@@ -26,27 +26,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.experiment.AnalysisFile;
 import org.yeastrc.experiment.ExperimentSearch;
-import org.yeastrc.experiment.MsFile;
 import org.yeastrc.experiment.ProjectExperiment;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.SearchAnalysis;
-import org.yeastrc.experiment.SearchFile;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
-import org.yeastrc.ms.domain.run.MsRun;
-import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
-import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Researcher;
@@ -197,17 +185,17 @@ public class ViewProjectAction extends Action {
             ProjectExperiment pExpt = new ProjectExperiment(expt);
             
             // load the ms2 file names and the number of spectra in each file
-            List<Integer> runIds = daoFactory.getMsExperimentDAO().getRunIdsForExperiment(experimentId);
-            List<MsFile> files = new ArrayList<MsFile>(runIds.size());
-            MsRunDAO runDao = daoFactory.getMsRunDAO();
-            MsScanDAO scanDao = daoFactory.getMsScanDAO();
-            for(Integer runId: runIds) {
-                MsRun run = runDao.loadRun(runId);
-                int numScans = scanDao.numScans(runId);
-                MsFile file = new MsFile(run, numScans);
-                files.add(file);
-            }
-            pExpt.setMs2Files(files);
+//            List<Integer> runIds = daoFactory.getMsExperimentDAO().getRunIdsForExperiment(experimentId);
+//            List<MsFile> files = new ArrayList<MsFile>(runIds.size());
+//            MsRunDAO runDao = daoFactory.getMsRunDAO();
+//            MsScanDAO scanDao = daoFactory.getMsScanDAO();
+//            for(Integer runId: runIds) {
+//                MsRun run = runDao.loadRun(runId);
+//                int numScans = scanDao.numScans(runId);
+//                MsFile file = new MsFile(run, numScans);
+//                files.add(file);
+//            }
+//            pExpt.setMs2Files(files);
             
             // load the searches
             List<Integer> searchIds = daoFactory.getMsSearchDAO().getSearchIdsForExperiment(experimentId);
@@ -246,19 +234,19 @@ public class ViewProjectAction extends Action {
         MsSearch search = daoFactory.getMsSearchDAO().loadSearch(searchId);
         ExperimentSearch eSearch = new ExperimentSearch(search);
         
-        MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
-        
-        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
-        List<SearchFile> files = new ArrayList<SearchFile>(runSearchIds.size());
-        
-        for(int runSearchId: runSearchIds) {
-            MsRunSearch rs = rsDao.loadRunSearch(runSearchId);
-            String filename = rsDao.loadFilenameForRunSearch(runSearchId);
-            SearchFile file = new SearchFile(rs, filename);
-            file.setNumResults(rsDao.numResults(runSearchId));
-            files.add(file);
-        }
-        eSearch.setFiles(files);
+//        MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
+//        
+//        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
+//        List<SearchFile> files = new ArrayList<SearchFile>(runSearchIds.size());
+//        
+//        for(int runSearchId: runSearchIds) {
+//            MsRunSearch rs = rsDao.loadRunSearch(runSearchId);
+//            String filename = rsDao.loadFilenameForRunSearch(runSearchId);
+//            SearchFile file = new SearchFile(rs, filename);
+//            file.setNumResults(rsDao.numResults(runSearchId));
+//            files.add(file);
+//        }
+//        eSearch.setFiles(files);
         return eSearch;
     }
     
@@ -267,27 +255,27 @@ public class ViewProjectAction extends Action {
         MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
         SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
         
-        MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
-        
-        List<Integer> rsAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
-        List<AnalysisFile> files = new ArrayList<AnalysisFile>(rsAnalysisIds.size());
-        for(int id: rsAnalysisIds) {
-            MsRunSearchAnalysis rsa = rsaDao.load(id);
-            String filename = rsaDao.loadFilenameForRunSearchAnalysis(id);
-            AnalysisFile file = new AnalysisFile(rsa, filename);
-            files.add(file);
-        }
-        
-        // If this is Percolator analysis we know how to get the number of 
-        // results for each file.
-        if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
-            PercolatorResultDAO prDao = daoFactory.getPercolatorResultDAO();
-            for(AnalysisFile file: files) {
-                file.setNumResults(prDao.numRunAnalysisResults(file.getId()));
-            }
-        }
-        
-        sAnalysis.setFiles(files);
+//        MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
+//        
+//        List<Integer> rsAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
+//        List<AnalysisFile> files = new ArrayList<AnalysisFile>(rsAnalysisIds.size());
+//        for(int id: rsAnalysisIds) {
+//            MsRunSearchAnalysis rsa = rsaDao.load(id);
+//            String filename = rsaDao.loadFilenameForRunSearchAnalysis(id);
+//            AnalysisFile file = new AnalysisFile(rsa, filename);
+//            files.add(file);
+//        }
+//        
+//        // If this is Percolator analysis we know how to get the number of 
+//        // results for each file.
+//        if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
+//            PercolatorResultDAO prDao = daoFactory.getPercolatorResultDAO();
+//            for(AnalysisFile file: files) {
+//                file.setNumResults(prDao.numRunAnalysisResults(file.getId()));
+//            }
+//        }
+//        
+//        sAnalysis.setFiles(files);
         return sAnalysis;
     }
     

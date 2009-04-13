@@ -5,17 +5,74 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 <script>
 
-$(document).ready(function() {
-   $(".search_files").each(function() {
-   		var $table = $(this);
-   		$table.attr('width', "100%");
-   		$('th', $table).attr("align", "left");
-   		//$("tbody > tr:even", $table).css("background-color", "#FFFFFF");
-   		$("tbody > tr:even", $table).addClass("project_A");
-   });
-});
+// ---------------------------------------------------------------------------------------
+// AJAX DEFAULTS
+// ---------------------------------------------------------------------------------------
+  $.ajaxSetup({
+  	type: 'POST',
+  	//timeout: 5000,
+  	dataType: 'html',
+  	error: function(xhr) {
+  			
+  				var statusCode = xhr.status;
+		  		// status code returned if user is not logged in
+		  		// reloading this page will redirect to the login page
+		  		if(statusCode == 303)
+ 					window.location.reload();
+ 				
+ 				// otherwise just display an alert
+ 				else {
+ 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText);
+ 				}
+  			}
+  });
+  
+  $.blockUI.defaults.message = '<b>Loading...</b>'; 
+  $.blockUI.defaults.css.padding = 20;
+  $.blockUI.defaults.fadeIn = 0;
+  $.blockUI.defaults.fadeOut = 0;
+  //$().ajaxStart($.blockUI).ajaxStop($.unblockUI);
+  $().ajaxStop($.unblockUI);
+
+
+// ---------------------------------------------------------------------------------------
+// SHOW/HIDE FILES FOR AN EXPERIMENT
+// --------------------------------------------------------------------------------------- 
+// View all the files for an experiment
+function toggleFilesForExperiment (experimentId) {
+
+	//alert("experimentID: "+experimentId);
+	var button = $("#listfileslink_"+experimentId);
+	
+	if(button.text() == "[List Files]") {
+		//alert("View");
+		if($("#listfileslink_"+experimentId+"_target").html().length == 0) {
+			//alert("Getting...");
+			// load data in the appropriate div
+			$.blockUI(); 
+			$("#listfileslink_"+experimentId+"_target").load("<yrcwww:link path='getFilesForExperiment.do' />",  	// url
+							                        {'experimentId': experimentId}, 		// data
+							                        function(responseText, status, xhr) {	// callback
+								  						$.unblockUI();
+								  						// make table sortable
+														var $table = $("#search_files_"+experimentId);
+														$table.attr('width', "100%");
+														$('tbody > tr:odd', $table).addClass("tr_odd");
+   														$('tbody > tr:even', $table).addClass("tr_even");
+														//makeSortable(table);
+								  					});
+		}
+		button.text("[Hide Files]");
+		$("#listfileslink_"+experimentId+"_target").show();
+	}
+	else {
+		button.text("[List Files]");
+		$("#listfileslink_"+experimentId+"_target").hide();
+	}
+}
 
 </script>
 
@@ -189,16 +246,17 @@ $(document).ready(function() {
 			</logic:equal>
 			
 			
-			<!-- FILES FOR THE EXPERIMENT -->
-			<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:0;" > 
-			<bean:define name="experiment" property="id" id="experimentId" />
-			<yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="table_basic search_files" center="true" />
-			</div>
-			</div>
+			<!-- FILES FOR THE EXPERIMENT (Placeholder)-->
+			<div align="center"
+				id="listfileslink_<bean:write name='experiment' property='id'/>"  
+				class="clickable" style="font-weight:bold; color:#D74D2D;" 
+				onclick="javascript:toggleFilesForExperiment(<bean:write name='experiment' property='id'/>);">[List Files]</div>
+			<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:0;" id="listfileslink_<bean:write name='experiment' property='id'/>_target"></div>
 			
 			</div> <!-- end of collapsible div -->
 			
 		</div> <!-- End of one experiment -->
+		<br>
 		</logic:iterate>
 	</logic:notEmpty>
 

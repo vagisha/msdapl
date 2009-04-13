@@ -278,6 +278,12 @@
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 
+	<action path="/getFilesForExperiment"
+		type="org.yeastrc.www.project.experiment.ViewExperimentFilesAjaxAction">
+		<forward name="Success" path="/pages/internal/project/experimentFiles.jsp" redirect="false" />
+	</action>
+
+	
 	<action
 	  path="/editProject"
 	  type="org.yeastrc.www.project.EditProjectAction"

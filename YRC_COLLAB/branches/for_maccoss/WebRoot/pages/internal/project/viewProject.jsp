@@ -7,9 +7,9 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:empty name="project">
-  <logic:forward name="viewProject" />
-</logic:empty>
+<logic:notPresent name="project">
+  <logic:forward name="viewProject"  />
+</logic:notPresent>
  
 <jsp:useBean id="project" class="org.yeastrc.project.Project" scope="request"/>
 
