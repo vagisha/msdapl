@@ -4,10 +4,13 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<div  align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;" >
+<center>
+<div align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;">
+
+<div style="background-color:#F8F8FF; border: 1px solid #F5F5F5; width:100%" align="center">
 <b><bean:write name="protein" property="accession"/></b>
 <br>
-<span style="color: #888888; font-size: 9pt"><bean:write name="protein" property="description" /></span>
+<span style="color: #888888; font-size: 9pt;"><bean:write name="protein" property="description" /></span>
 
 <br>
 <span style="text-decoration: underline; cursor: pointer; font-size: 8pt; color: red;"
@@ -16,7 +19,9 @@
 &nbsp; &nbsp;
 <span style="font-size: 8pt; color: red;">
 <a  style="color:red;" href="viewProtein.do?id=<bean:write name='protein' property='protein.nrseqProteinId' />">[Protein Details]</a></span>
-<br><br>
+<br>
+</div>
+<br>
 
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
 <tr class="pinfer_A">
@@ -57,45 +62,48 @@
 </tr>
 </table>
 </div>
+
 <br><br>
 
 <!--  placeholder for protein sequence -->
-<table  align="center" width="90%" id="protseqtbl_<bean:write name="protein" property="protein.id"/>" style="display: none;"">
-	<tr><td style="padding-left: 130px;" id="protsequence_<bean:write name="protein" property="protein.id"/>" ></td></tr>
+<div align="center">
+<table  align="center" width="90%" id="protseqtbl_<bean:write name='protein' property='protein.id'/>" style="display: none;border:1px solid gray;">
+	<tr><td align="center" id="protsequence_<bean:write name="protein" property="protein.id"/>" ></td></tr>
 </table>
-
+</div>
 <br><br>
 
 	
-<table width="95%" id="protdetailstbl_<bean:write name="protein" property="protein.id"/>" >
+<table align="center" width="95%" id="protdetailstbl_<bean:write name="protein" property="protein.id"/>" class="table_pinfer">
 	<thead>
     <tr class="main">
-    <th align="left" class="main" style="font-size:10pt;"><b>Uniq</b></th>
-    <th align="left" class="main" style="font-size:10pt;"><b>Peptide</b></th>
+    <th class="main" style="font-size:10pt;"><b>Uniq</b></th>
+    <th class="main" style="font-size:10pt;"><b>Peptide</b></th>
     <th width="10%" align="left" class="main" style="font-size:10pt;"><b>Charge</b></th>
     <th width="10%" align="left" class="main" style="font-size:10pt;"><b># Spectra</b></th>
     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
-     	<th align="left" class="main" style="font-size:10pt;">Best FDR</th>
+     	<th class="main" style="font-size:10pt;">Best FDR</th>
      </logic:equal>
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_PLCID.name()%>">
-     	<th align="left" class="main" style="font-size:10pt;">Best FDR</th>
+     	<th class="main" style="font-size:10pt;">Best FDR</th>
      </logic:equal>
      <logic:equal name="inputGenerator" value="<%=Program.SEQUEST.name() %>">
-     	<th align="left" class="main" style="font-size:10pt;">DeltaCN</th>
-     	<th align="left" class="main" style="font-size:10pt;">XCorr</th>
+     	<th class="main" style="font-size:10pt;">DeltaCN</th>
+     	<th class="main" style="font-size:10pt;">XCorr</th>
      </logic:equal>
      
      <logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
-     	<th align="left" class="main" style="font-size:10pt;">DeltaCN</th>
-     	<th align="left" class="main" style="font-size:10pt;">Primary Score</th>
+     	<th class="main" style="font-size:10pt;">DeltaCN</th>
+     	<th class="main" style="font-size:10pt;">Primary Score</th>
      </logic:equal>
      <logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
-     	<th align="left" class="main" style="font-size:10pt;">qValue</th>
-     	<th align="left" class="main" style="font-size:10pt;">PEP</th>
+     	<th class="main" style="font-size:10pt;">qValue</th>
+     	<th class="main" style="font-size:10pt;">PEP</th>
      </logic:equal>
-     <th align="left" class="main" style="font-size:10pt;">Spectrum</th>
+     <th class="main" style="font-size:10pt;">Spectrum</th>
     </tr>
     </thead>
+    
    	<tbody>
        <logic:iterate name="ionList" id="ion">
             <tr class="main">
@@ -157,4 +165,4 @@
         </logic:iterate>
         </tbody>
         </table>
-    
+</center>

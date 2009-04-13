@@ -21,7 +21,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.project.Project;
+import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -81,15 +83,17 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
             List<Integer> experimentIds = prExpDao.getExperimentIdsForProject(project.getID());
             
             for(int experimentId: experimentIds) {
-                List<Integer> runIds = ProteinferRunSearcher.getProteinferIdsForMsExperiment(experimentId);
                 
-                for(int runId: runIds) {
-                    if(!piRunIds.contains(runId)) {
-                        piRunIds.add(runId);
+                List<ProteinferJob> piJobs = ProteinferRunSearcher.getProteinferJobsForMsExperiment(experimentId);
+                
+                for(ProteinferJob job: piJobs) {
+                    if(job.getStatus() != JobUtils.STATUS_COMPLETE)
+                        continue;
+                    if(!piRunIds.contains(job.getPinferId())) {
+                        piRunIds.add(job.getPinferId());
                         
-                        ProteinferRun run = runDao.loadProteinferRun(runId);
-                        ProteinferRunFormBean bean = new ProteinferRunFormBean(run, project.getID());
-                        if(runId == pinferRunId)
+                        ProteinferRunFormBean bean = new ProteinferRunFormBean(job, project.getID());
+                        if(job.getPinferId() == pinferRunId)
                             bean.setSelected(true);
                         piRuns.add(bean);
                     }

@@ -55,25 +55,8 @@
 			toggleSelection($(this));
 		});
 		
-		$(".foldable").click(function() {
-			fold($(this));
-		});
-		
 	});
 
-function fold(foldable) {
-	var id = foldable.attr("id");
-	if(foldable.is('.fold-open')) {
-		foldable.removeClass('fold-open');
-		foldable.addClass('fold-close');
-		$("#"+id+"_div").hide();
-	}
-	else if(foldable.is('.fold-close')) {
-		foldable.removeClass('fold-close');
-		foldable.addClass('fold-open');
-		$("#"+id+"_div").show();
-	}
-}
 
 function toggleSelection(button) {
 	var id = button.attr("id");

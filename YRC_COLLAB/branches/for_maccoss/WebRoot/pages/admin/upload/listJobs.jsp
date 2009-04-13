@@ -53,21 +53,23 @@
 		</logic:present>
 	</p>
 		
-	<table border="0" cellpadding="3" cellspacing="2" width="95%">
+	<table border="0" cellpadding="3" cellspacing="2" width="95%" class="table_basic" align="center">
 	
-		<yrcwww:colorrow scheme="upload">
-			<td align="left" width="8%">&nbsp;</td>
-			<td align="left" style="width:8%;font-size:8pt;text-decoration:underline;">Status</td>
-			<td align="left" style="width:10%;font-size:8pt;text-decoration:underline;">Submitter</td>
-			<td align="left" style="width:10%;font-size:8pt;text-decoration:underline;">Sub. Date</td>
-			<td align="left" style="width:32%;font-size:8pt;text-decoration:underline;">Directory</td>
-			<td align="left" style="width:7%;font-size:8pt;text-decoration:underline;">PI</td>
-			<td align="left" style="width:15%;font-size:8pt;text-decoration:underline;">Comments</td>
-		</yrcwww:colorrow>
+		<thead>
+		<tr>
+			<th width="8%">&nbsp;</th>
+			<th width="8%">Status</th>
+			<th width="8%">Submitter</th>
+			<th width="8%">Sub. Date</th>
+			<th width="8%">Directory</th>
+			<th width="8%">PI</th>
+			<th width="8%">Comments</th>
+		</tr>
+		</thead>
 	
-	
+		<tbody>
 		<logic:iterate name="jobs" scope="request" id="job">
-			<yrcwww:colorrow scheme="upload">
+			<tr>
 				<td align="left" valign="top" style="width:8%;font-size:8pt;"><a href="<yrcwww:link path='viewUploadJob.do?'/>id=<bean:write name="job" property="id" />">View Job</td>
 
 				<td align="left" valign="top" style="width:8%;font-size:8pt;">
@@ -109,9 +111,9 @@
 				</td>
 				
 				
-			</yrcwww:colorrow>
+			</tr>
 		</logic:iterate>
-	
+		</tbody>
 	</table>
 
 	<p align="center">

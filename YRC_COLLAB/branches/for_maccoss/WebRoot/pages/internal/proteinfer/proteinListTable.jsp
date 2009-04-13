@@ -42,11 +42,11 @@
  SORT_BY sortBy = (SORT_BY)request.getAttribute("sortBy");
  SORT_ORDER sortOrder = (SORT_ORDER)request.getAttribute("sortOrder");
  String sortedClass = "";
- if(sortOrder == SORT_ORDER.ASC)	sortedClass = "sorted-asc pinfer_selected_header";
- else sortedClass = "sorted-desc pinfer_selected_header";
+ if(sortOrder == SORT_ORDER.ASC)	sortedClass = "sorted-asc";
+ else sortedClass = "sorted-desc";
  %>
 
-<table cellpadding="4" cellspacing="2" align="center" width="99%"  id="protlisttable">
+<table cellpadding="0" cellspacing="0" align="center" width="99%"  id="protlisttable" class="table_pinfer" style="margin-top:10;">
 
 	<logic:notEmpty name="proteinGroups">
 		<thead>
@@ -221,13 +221,13 @@
 		
 		<!-- Display the View Peptides link for each protein in the group -->
 		<tr class="pept_row linked_row">
-		<td valign="top" colspan="2"><nobr>
+		<td valign="top" colspan="2" class="no-border"><nobr>
 			<span class="showpeptForProt" 
 				  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 				  id="<bean:write name="protein" property="protein.id" />"
 				  title="<bean:write name="proteinGroup" property="groupId" />"
 				  >Show Peptides</span></nobr></td>
-		<td colspan="8">
+		<td colspan="8" class="no-border">
 			<!--  peptides table will go here: proteinPeptides.jsp -->
 			<div id="peptforprot_<bean:write name="protein" property="protein.id" />_<bean:write name="proteinGroup" property="groupId" />"></div>
 		</td>
@@ -341,12 +341,12 @@
 		
 		<!-- List the peptides and the best match for each peptide -->
 		<tr class="pept_row linked_row">
-			<td valign="top" colspan="2"><nobr>
+			<td valign="top" colspan="2" class="no-border"><nobr>
 				<span class="showpeptForProtGrp" 
 					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 					  id="<bean:write name="proteinGroup" property="groupId" />"
 					  >Show Peptides</span></nobr></td>
-			<td colspan="8">
+			<td colspan="8" class="no-border">
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="proteinGroup" property="groupId" />"></div>
 			</td>

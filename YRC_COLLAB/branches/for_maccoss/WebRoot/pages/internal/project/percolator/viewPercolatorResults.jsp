@@ -19,11 +19,12 @@
 <%@ include file="/includes/errors.jsp" %>
 
 <%@ include file="/pages/internal/project/resultsTableJS.jsp" %>
+
 <yrcwww:contentbox title="Percolator Results" centered="true" width="95" widthRel="true">
 <center>
 
 	<!-- SUMMARY -->
-	<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #FFFAF0;">
+	<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0FFF0;">
 		<table>
 			<tr>
 				<td align="center"><b>Project ID:</b>
@@ -55,8 +56,8 @@
 	
 				
 	<!-- RESULTS TABLE -->
-	<div style="background-color: #FFFAF0; margin:5 0 5 0; padding:5; border: 1px dashed gray;" > 
-	<yrcwww:table name="results" tableId='perc_results' tableClass="sortable_table" center="true" />
+	<div style="background-color: #FFFFFF; margin:5 0 5 0; padding:5;" > 
+	<yrcwww:table name="results" tableId='perc_results' tableClass="table_basic sortable_table" center="true" />
 	</div>
 	
 </center>	

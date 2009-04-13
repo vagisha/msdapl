@@ -4,23 +4,23 @@
 
 	<bean:define name="idpickerRun" property="program" id="program" type="edu.uwpr.protinfer.ProteinInferenceProgram"/>
 	
-	<table cellpadding="2" align="center" style="font-family: Trebuchet MS,Trebuchet,Verdana,Helvetica,Arial,sans-serif;font-size:12px; border: 1px solid gray; border-spacing: 3px">
+	<table align="center" class="table_pinfer_small">
   		<tr>
-  			<th colspan="2" class="pinfer_A" style="font-size: 10pt;">IDPicker Parameters</th>
+  			<th colspan="2" style="font-size: 10pt;">Parameters</th>
   		</tr>
   		<logic:iterate name="idpickerRun" property="sortedParams" id="param" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam">
   		<tr>
-    	<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;">
+    	<td VALIGN="top" align="center" style="border: 1px #F2F2F2 solid;">
     		<%=program.getDisplayNameForParam(param.getName()) %>
     	</td>
-    	<td VALIGN="top" align="center" style="border: 1px #CCCCCC dotted;">
+    	<td VALIGN="top" align="center" style="border: 1px #F2F2F2 solid;">
     		<bean:write name="param" property="value" />
     	</td>
    		</tr>
    		</logic:iterate>
 	</table>
 	    <br><br>
-	<table cellpadding="4" cellspacing="2" align="center" width="90%" class="sortable stripe_table">
+	<table cellpadding="4" cellspacing="2" align="center" width="90%" class="sortable stripe_table table_basic">
 	<logic:notEmpty name="inputSummary" >
 	<thead>
 	<tr>

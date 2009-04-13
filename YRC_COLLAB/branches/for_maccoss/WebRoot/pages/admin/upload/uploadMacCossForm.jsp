@@ -176,12 +176,12 @@ function onCancel(projectId) {
 
   </table> 
  
- <P>Depending on the size of the data, <u>the upload process may take several minutes</u>.
+ <!--  <P>Depending on the size of the data, <u>the upload process may take several minutes</u>. -->
 
  <p>
 <nobr>
-<html:submit styleClass="button" value="Upload Data"/>
-<input type="button" class="button" onclick="javascript:onCancel(<bean:write name='uploadDataForm' property='projectID' />);" value="Cancel" />
+<html:submit styleClass="plain_button" value="Upload Data"/>
+<input type="button" class="plain_button" onclick="javascript:onCancel(<bean:write name='uploadDataForm' property='projectID' />);" value="Cancel" />
  </nobr>
  </p>
  </CENTER>

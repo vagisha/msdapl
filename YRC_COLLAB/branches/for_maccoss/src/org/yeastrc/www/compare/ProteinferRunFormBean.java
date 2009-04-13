@@ -8,7 +8,7 @@ package org.yeastrc.www.compare;
 
 import java.sql.Date;
 
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
+import org.yeastrc.www.proteinfer.ProteinferJob;
 
 /**
  * 
@@ -25,12 +25,12 @@ public class ProteinferRunFormBean {
 
     public ProteinferRunFormBean() {}
     
-    public ProteinferRunFormBean(ProteinferRun run, int projectId) {
+    public ProteinferRunFormBean(ProteinferJob job, int projectId) {
         this.projectId = projectId;
-        this.runId = run.getId();
-        this.runDate = run.getDate();
-        this.comments = run.getComments();
-        this.inputGeneratorProgram = run.getInputGeneratorString();
+        this.runId = job.getPinferId();
+        this.runDate = job.getDateRun();
+        this.comments = job.getComments();
+        this.inputGeneratorProgram = job.getProgram();
     }
     
     
@@ -77,7 +77,6 @@ public class ProteinferRunFormBean {
     public String getInputGeneratorProgram() {
         return inputGeneratorProgram;
     }
-    
     
     public String getComments() {
         return comments;

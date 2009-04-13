@@ -64,25 +64,11 @@
 			toggleSelection($(this));
 		});
 		
-		$(".foldable").click(function() {
-			fold($(this));
-		});
+		//$(".foldable").click(function() {
+		//	fold($(this));
+		//});
 		
 	});
-
-function fold(foldable) {
-	var id = foldable.attr("id");
-	if(foldable.is('.fold-open')) {
-		foldable.removeClass('fold-open');
-		foldable.addClass('fold-close');
-		$("#"+id+"_div").hide();
-	}
-	else if(foldable.is('.fold-close')) {
-		foldable.removeClass('fold-close');
-		foldable.addClass('fold-open');
-		$("#"+id+"_div").show();
-	}
-}
 
 function toggleSelection(button) {
 	var id = button.attr("id");
@@ -140,7 +126,6 @@ function validateFloat(value, fieldName, min, max) {
 <!-- Form when using search results -->
 <logic:present name="proteinInferenceFormSearch">
 <div id="inputType_search">
-	<%@include file="proteinInferenceFormSearch.jsp" %>
 </div>
 </logic:present>
 <logic:notPresent name="proteinInferenceFormSearch">

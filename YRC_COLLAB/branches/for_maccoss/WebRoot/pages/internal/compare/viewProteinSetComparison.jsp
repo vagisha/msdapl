@@ -17,6 +17,23 @@
 <CENTER>
 
 <br>
+
+<table cellspacing="2">
+<tr>
+<td></td>
+<logic:iterate name="comparison" property="datasets" id="dataset">
+<td><bean:write name="dataset" property="datasetId"/></td>
+</logic:iterate>
+</tr>
+
+<logic:iterate name="comparison" property="datasets" id="dataset">
+<tr>
+<td><bean:write name="dataset" property="datasetId"/></td>
+</tr>
+</logic:iterate>
+
+</table>
+
 <img src="<bean:write name='chart' />" align="top" alt="Comparison" style="padding-right:20px;"></img>
 
 </CENTER>

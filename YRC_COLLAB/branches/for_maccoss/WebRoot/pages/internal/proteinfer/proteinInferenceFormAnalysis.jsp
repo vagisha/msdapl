@@ -74,6 +74,9 @@ function addAnalyses(selectedAnalyses) {
   					$("#foldable_"+id).click(function() {
 						fold($(this));
 					});
+  					//$("#foldable_"+id).click(function() {
+					//	fold($(this));
+					//});
 					
   					$("#toggle_"+id).click(function() {
 						toggleSelection($(this));
@@ -156,19 +159,24 @@ function validateFormForAnalysisInput() {
   <html:hidden name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId" />
   <html:hidden name="proteinInferenceFormAnalysis" property="inputTypeChar" />
   
-  <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%">
-   
-    <yrcwww:colorrow scheme="project">
-    <td WIDTH="20%" VALIGN="top">
-  		<B>Parameters:</B>
+  
+  
+  
+  <!-- ########### PARAMETERS TABLE ############################ -->
+  <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%" class="table_same_color_row" style="margin:10 0 10 0;">
+   <thead>
+    <tr>
+    <th colspan="2">
+  		Parameters
   		<html:hidden name="proteinInferenceFormAnalysis" property="programParams.programName" />
-  	</td>
-  	<td></td>
-  	</yrcwww:colorrow>
+  	</th>
+  	</tr>
+  	</thead>
   	
+  	<tbody>
   	<logic:iterate name="proteinInferenceFormAnalysis" property="programParams.paramList" id="param"
   			type="org.yeastrc.www.proteinfer.ProgramParameters.Param">
-    <yrcwww:colorrow scheme="project" repeat="true">
+    <tr>
     
     <td WIDTH="20%" VALIGN="top">
     	<span class="tooltip" title="<bean:write name="param" property="tooltip" />" style="cursor: pointer;">
@@ -196,18 +204,28 @@ function validateFormForAnalysisInput() {
     	</logic:equal>
     </td>
     
-   	</yrcwww:colorrow>
+   	</tr>
    </logic:iterate>
+   </tbody>
+   </table>
+   
+   <br>
    
    
-   <yrcwww:colorrow scheme="project">
-    <td VALIGN="top" colspan="2">
-    <B>Select Input Files:</B>
+   <!-- ########### INPUT FILES TABLE ############################ -->
+   <TABLE CELLPADDING="4px" CELLSPACING="0px" width="90%" class="table_same_color_row">
+   
+   <thead>
+   <tr>
+    <th VALIGN="top" colspan="2">
+    Select Input Files
     
-    </td>
-   </yrcwww:colorrow>
+    </th>
+   </tr>
+   </thead>
    
-   <yrcwww:colorrow scheme="project" repeat="true">
+   <tbody>
+   <tr>
    
     <td VALIGN="top" colspan="2">
     	<div style="border: solid 1px #939CB0; padding-bottom: 5px;">
@@ -215,14 +233,18 @@ function validateFormForAnalysisInput() {
     	<div id="analysisInputList">
     	
     	<div id="analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
-    	<div style="background-color: #939CB0; color: white; font-weight: bold;" 
-    		 class="foldable fold-open"
+    	<div style="background-color: #939CB0; color: white; font-weight: bold;">
+    	
+    		<span style="margin-left:10;" class="foldable fold-open"
     		 id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>">
-    		Analysis ID: <bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>
+    		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    		 <span>
+    		 	Analysis ID: <bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>
+    		 </span>
     	</div>
     	
     	
-    	<div id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>_div">
+    	<div id="foldable_analysis_<bean:write name="proteinInferenceFormAnalysis" property="inputSummary.inputGroupId"/>_target">
     	
     	<div style="color: black;">
     		Analysis Program: 
@@ -263,26 +285,25 @@ function validateFormForAnalysisInput() {
 		</div>
 		</div>
 		</div>
-		<center><button class="button" id="addAnalysesButton" >Add</button></center>
 	</div>
     </td>
-   </yrcwww:colorrow>
+   </tr>
+   <tr><td><center><button class="plain_button" id="addAnalysesButton" >Add</button></center></td></tr>
+   </tbody>
+   </table>
    
-   <yrcwww:colorrow scheme="project" repeat="true">
-    	<td colspan="2" align="center">Comments<br>
-    	<html:textarea name="proteinInferenceFormAnalysis" property="comments" rows="3" cols="70"/>
-    	</td>
-    </yrcwww:colorrow>
-    
-   <yrcwww:colorrow scheme="project" repeat="true">
-   <td colspan="2" align="center">
+   <br>
+   
+   	<div align="center">
+    	<b>Comments</b><br>
+		<html:textarea name="proteinInferenceFormAnalysis" property="comments" rows="3" cols="70"/>
+	</div>
+	
+	<div>
    	<NOBR>
- 		<html:submit value="Run Protein Inference" styleClass="button" />
- 		<input type="button" class="button" onclick="javascript:onCancel(<bean:write name="proteinInferenceFormAnalysis" property="projectId" />);" value="Cancel"/>
+ 		<html:submit value="Run Protein Inference" styleClass="plain_button" />
+ 		<input type="button" class="plain_button" onclick="javascript:onCancel(<bean:write name="proteinInferenceFormAnalysis" property="projectId" />);" value="Cancel"/>
  	</NOBR>
-   </td>
-   </yrcwww:colorrow>
-  </TABLE>
-
+	</div>
  
 </html:form>

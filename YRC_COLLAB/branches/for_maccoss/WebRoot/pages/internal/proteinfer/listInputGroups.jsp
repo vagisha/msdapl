@@ -137,13 +137,13 @@
 		No searches found.
 	</logic:equal>
 	<br>
-	<input type="button" class="button" value="Cancel" id="cancel"/>
+	<input type="button" class="plain_button" value="Cancel" id="cancel"/>
 </logic:empty>
 
 <br>
 <logic:notEmpty name="projectInputGroups">
-<input type="button" class="button" value="Add" id="addInputButton" />
-<input type="button" class="button" value="Cancel" id="cancel" />
+<input type="button" class="plain_button" value="Add" id="addInputButton" />
+<input type="button" class="plain_button" value="Cancel" id="cancel" />
 </logic:notEmpty>
 
 </center>

@@ -10,23 +10,12 @@ $(document).ready(function() {
    		var $table = $(this);
    		$table.attr('width', "100%");
    		$table.attr('align', 'center');
-   		$('th', $table).attr("align", "left");
+   		//$('tbody > tr:odd', $table).addClass("tr_odd");
+   		//$('tbody > tr:even', $table).addClass("tr_even");
    		
-   		// #ED9A2E #D74D2D
-   		$('th', $table).each(function() {
-   			if($(this).is('.sorted-asc') || $(this).is('.sorted-desc')) {
-   				$(this).addClass('th_selected');
-   			}
-   			else
-   			$(this).addClass('th_normal');
-   		});
    		$('th', $table).each(function() {
    		
    				if($(this).is('.sortable')) {
-   					$(this).hover(
-   						function() {$(this).addClass('th_hover');} , 
-      					function() {$(this).removeClass('th_hover');}
-      				);
       					
       				$(this).click(function() {
 						var sortBy = $(this).attr('id');
@@ -42,9 +31,6 @@ $(document).ready(function() {
       			});
       		}
       	});
-   		
-   		$("tbody > tr:even", $table).addClass('project_A');
-   		//$('tbody > tr:odd', $table).css("background-color", "F0FFF0");
    });
 });
 

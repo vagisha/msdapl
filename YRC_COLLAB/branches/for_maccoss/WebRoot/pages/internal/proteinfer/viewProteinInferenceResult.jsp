@@ -4,9 +4,14 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<script src="<yrcwww:link path='/js/dragtable.js'/>"></script>
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+ 
+<%@ include file="/includes/header.jsp" %>
+
+<%@ include file="/includes/errors.jsp" %>
+
+
+<script src="<yrcwww:link path='/js/dragtable.js'/>"></script>
 
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.core.js'/>"></script>
 <script type="text/javascript" src="<yrcwww:link path='/js/jquery.ui-1.6rc2/ui/ui.tabs.js'/>"></script>
@@ -308,17 +313,20 @@ function selectProteinCluster(clusterId, block, showDiv) {
  								  		
  								  		dragtable.makeDraggable($("#assoctable_"+clusterId).get(0));
  								  		
+ 								  		$("#assoctable_"+clusterId).addClass("table_pinfer_small");
  								  		$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
  										$("#assoctable_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#assoctable_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("pinfer_A_small");
+								  		$("#assoctable_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
 								  	
+								  		$("#prot_grp_table_"+clusterId).addClass("table_pinfer_small");
 								  		$("#prot_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
 								  		$("#prot_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#prot_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("pinfer_A_small");
+								  		$("#prot_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
 								  	
+								  		$("#pept_grp_table_"+clusterId).addClass("table_pinfer_small");
 								  		$("#pept_grp_table_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');
 								  		$("#pept_grp_table_"+clusterId+"  td").css('border', '1px #CCCCCC dashed').css('padding', '4px');
-								  		$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px').addClass("pinfer_A_small");
+								  		$("#pept_grp_table_"+clusterId+"  th").css('border', '1px #CCCCCC dashed').css('padding', '4px');
  										
  										$(".protgrplist").click(function(){
  											if($("#prot_grp_table_"+clusterId).is(':visible'))
@@ -450,7 +458,6 @@ function setupProteinListTable() {
   
   	// stripe table rows
   	$("#protlisttable tbody tr.protgrp_row").addClass("pinfer_A");
-  	$("#protlisttable > thead > tr > th").addClass("pinfer_A");
   	
   	setupShowPeptidesLinks();
   	
@@ -666,9 +673,9 @@ function makeProteinListSortable() {
   			var $header = $(this);
   			var sortBy = $(this).attr('id');
   			
-      		$(this).addClass('clickable').hover(
-      			function() {$(this).addClass('pinfer_hover');} , 
-      			function() {$(this).removeClass('pinfer_hover');}).click(function() {
+      		$(this).hover(
+      			function() {$(this).addClass('pinfer_small_hover');} , 
+      			function() {$(this).removeClass('pinfer_small_hover');}).click(function() {
 				
 					// alert("sorting by "+sortBy);
 					// sorting direction
@@ -906,11 +913,6 @@ function toggleDivVisibility(mydiv) {
 </script>
 
 
-
- 
-<%@ include file="/includes/header.jsp" %>
-
-<%@ include file="/includes/errors.jsp" %>
 
 <CENTER>
 

@@ -8,45 +8,45 @@
 
 
 <logic:present name="proteinId">
-<table align="center" width="98%"
-  			style="border: 1px dashed gray; border-spacing: 4px; margin-top: 6px; margin-bottom: 6px;" 
-  			class="sortable peptlist"
+<table align="center" width="98%" 
+  			style="margin-top: 6px; margin-bottom: 6px;" 
+  			class="sortable peptlist table_pinfer_small"
   			id="peptforprottbl_<bean:write name="proteinId" />_<bean:write name="proteinGroupId" />">
 </logic:present>
 
 <logic:notPresent name="proteinId">
 <table align="center" width="98%"
   			style="border: 1px dashed gray; border-spacing: 4px; margin-top: 6px; margin-bottom: 6px;" 
-  			class="sortable peptlist"
+  			class="sortable peptlist table_pinfer_small"
   			id="peptforprottbl_<bean:write name="proteinGroupId" />">
 </logic:notPresent>
 
   	 <thead><tr>
-  	 <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Uniq</th>
-     <th style="text-decoration: underline;font-size: 10pt;" class="sort-alpha" align="left">Peptide</th>
-     <th style="text-decoration: underline;font-size: 10pt;" class="sort-int" align="left">Charge</th>
-     <th style="text-decoration: underline;font-size: 10pt;" class="sort-int" align="left"># Spectra</th>
+  	 <th class="sort-alpha" align="left">Uniq</th>
+     <th class="sort-alpha" align="left">Peptide</th>
+     <th class="sort-int" align="left">Charge</th>
+     <th class="sort-int" align="left"># Spectra</th>
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">Best FDR</th>
+     	<th class="sort-float" align="left">Best FDR</th>
      </logic:equal>
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_PLCID.name()%>">
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">Best FDR</th>
+     	<th class="sort-float" align="left">Best FDR</th>
      </logic:equal>
      <logic:equal name="inputGenerator" value="<%=Program.SEQUEST.name() %>">
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">XCorr</th>
+     	<th class="sort-float" align="left">DeltaCN</th>
+     	<th class="sort-float" align="left">XCorr</th>
      </logic:equal>
      
      <logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">DeltaCN</th>
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">Primary Score</th>
+     	<th class="sort-float" align="left">DeltaCN</th>
+     	<th class="sort-float" align="left">Primary Score</th>
      </logic:equal>
      <logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">qValue</th>
-     	<th style="text-decoration: underline;font-size: 10pt;" class="sort-float" align="left">PEP</th>
+     	<th class="sort-float" align="left">qValue</th>
+     	<th class="sort-float" align="left">PEP</th>
      </logic:equal>
      
-     <th style="text-decoration: underline;font-size: 10pt;" align="left">Spectrum</th>
+     <th align="left">Spectrum</th>
      </tr></thead>
      
      

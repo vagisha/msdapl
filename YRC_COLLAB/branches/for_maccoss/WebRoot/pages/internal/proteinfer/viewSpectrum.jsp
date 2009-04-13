@@ -88,9 +88,9 @@ $(document).ready(function() {
 </table>
 
 <!-- OTHER RESULTS FOR THIS SCAN -->
-	<div style="background-color: #FFFAF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+	<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
 	<logic:present name="results">
-		<yrcwww:table name="results" tableId='other_results' tableClass="other_results" center="true" />
+		<yrcwww:table name="results" tableId='other_results' tableClass=" table_basic other_results" center="true" />
 	</logic:present>
 	<logic:notPresent name="results">
 		No other results for for this scan.

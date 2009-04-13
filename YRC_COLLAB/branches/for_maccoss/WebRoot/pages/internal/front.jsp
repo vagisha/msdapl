@@ -26,15 +26,18 @@
  </logic:empty>
  
  <logic:notEmpty name="userProjects">
- <TABLE BORDER="0" WIDTH="100%">
+ <div style="margin: 10 10 10 10;">
+ <TABLE BORDER="0" WIDTH="100%" class="table_basic">
+ <thead>
   <TR>
-   <TD>&nbsp;</TD>
-   <TD><U>ID</U></TD>
-   <TD><U>Title</U></TD>
-   <TD><U>Submit Date</U></TD>
+   <TH>&nbsp;</TH>
+   <TH>ID</TH>
+   <TH>Title</TH>
+   <TH>Submit Date</TH>
   </TR>
+  </thead>
 
-
+<tbody>
 <logic:iterate id="project" name="userProjects" scope="request">
  <TR>
   <TD valign="top">
@@ -47,8 +50,9 @@
   <TD valign="top"><bean:write name="project" property="submitDate"/></TD>
  </TR>
 </logic:iterate>
-
+</tbody>
  </TABLE>
+ </div>
  </logic:notEmpty>
 </yrcwww:contentbox>
 
@@ -59,15 +63,19 @@
 	 	<logic:notEmpty name="newProjects" scope="request">
 		 <p>Below are projects submitted by researchers to your group(s) within the last month.
 	 
-		 <p><table border="0" width="100%">
+		 <p>
+		 <div style="margin: 10 10 10 10;">
+		 <table border="0" width="100%" class="table_basic">
+		 <thead>
 		  <tr>
-		   <td>&nbsp;</td>
-		   <td><u>ID</u></td>
-		   <td><u>PI</u></td>
-		   <td><u>Title</u></td>
-		   <td><u>Submit Date</u></td>
+		   <th>&nbsp;</th>
+		   <th>ID</th>
+		   <th>PI</th>
+		   <th>Title</th>
+		   <th>Submit Date</th>
 		  </tr>
-	 
+	 	</thead>
+	 	<tbody>
 		<logic:iterate id="project" name="newProjects" scope="request">
 		 <TR>
 		  <TD valign="top">
@@ -81,8 +89,9 @@
 		  <TD valign="top"><bean:write name="project" property="submitDate"/></TD>
 		 </TR>
 		</logic:iterate>
-
+		</tbody>
 		</table>
+		</div>
    		</logic:notEmpty>
    		<logic:empty name="newProjects" scope="request">
    		 <p>There have been no projects submitted to your group in the last month.

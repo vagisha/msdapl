@@ -180,22 +180,66 @@ DIV.pinfer_header_small {
 }
 
 
-.th_normal {
-	background-color: #ED9A2E;
-	color: #FFFFFF;
-	padding-left: 3;
+/****************************************************************************************************/*
+/* BEGIN  TABLE STYLING
+/****************************************************************************************************/*
+.table_basic {
+	border: 1px solid #7F7F7F;
+	border-collapse: separate;
+	border-spacing: 0;
 }
-.th_hover {
-	background-color: #939CB0;
-	color: #FFFFFF;
-	padding-left: 3;
-	cursor: pointer;
+
+.table_same_color_row {
+	border: 1px solid #7F7F7F;
+	border-collapse: separate;
+	border-spacing: 0;
 }
-.th_selected {
-	background-color: #D74D2D;
-	color: #FFFFFF;
-	padding-left: 3;
+
+/* url(../images/sprite.png) repeat-x scroll 0 -100px; */
+.table_basic TH , .table_same_color_row TH {
+	background: #bec1c2 url(../images/sprite.png) repeat-x scroll 0 0; 
+	color: #3D4960;
+	padding: 3 5 3 5;
+	text-align: center;
+	border-style: none solid solid none;
+	border-color: #CBCBCB;
+	border-width: medium 1px 1px medium;
+	border-collapse: separate;
 }
+.table_basic TH.sortable:hover {
+	color:#D74D2D;
+	cursor:pointer;
+}
+.table_basic TH.sorted-asc {
+	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -200px;
+	color: #FFFFFF;
+}
+.table_basic TH.sorted-asc:hover {
+	color: #FFFFFF;
+}
+.table_basic TH.sorted-desc {
+	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -200px;
+	color: #FFFFFF;
+}
+.table_basic TH.sorted-desc:hover {
+	color: #FFFFFF;
+}
+
+.table_basic .tr_odd {
+	background-color: #F2F2F2;
+}
+.table_basic .tr_even {
+	background-color: #FFFFFF;
+}
+
+.table_basic td {
+	border-style: none solid none none;
+	border-width: medium 1px medium medium;
+	border-color: #CBCBCB;
+	padding: 3 3 3 3;
+}
+
+
 .tr_highlight {
 	background-color: #939CB0;
 	font-weight: bold;
@@ -204,20 +248,38 @@ DIV.pinfer_header_small {
 	color:	#D74D2D;
 }
 
-TH.sorted-asc {
-	background-image:url(../images/proteinfer/asc.gif);
-	background-position:bottom center;
-	background-repeat:no-repeat;
+/****************************************************************************************************/*
+/* BUTTONS
+/****************************************************************************************************/*
+INPUT.plain_button, .plain_button {
+	background: transparent url(../images/sprite.png) repeat-x scroll 0 -1502px;;
+	color:#ffffff;
+	border-color: #3d4960; 
+	border-width: 1px; 
+	font-size:9pt;
+	font-weight:bold;
+	margin-top:15px;
+	padding: 2 5 2 5;
+	text-decoration:none;
 }
 
-TH.sorted-desc {
-	background-image:url(../images/proteinfer/desc.gif);
-	background-position:bottom center;
-	background-repeat:no-repeat;
+INPUT.error_button, .error_button {
+	background-color:#D74D2D; 
+	color:#ffffff;
+	border-color: #D74D2D; 
+	border-width: 1px; 
+	font-size:9pt;
+	font-weight:bold;
+	margin-top:15px;
+	padding: 2 5 2 5;
+	text-decoration:none;
 }
+
+/****************************************************************************************************/*
+/* FOLDABLE 
+/****************************************************************************************************/*
 
 .clickable {
-	text-decoration: underline; 
 	cursor: pointer;
 }
 
@@ -225,7 +287,22 @@ TH.sorted-desc {
 	cursor: pointer;
 }
 
-/* FOR TOOLTIPS */
+.fold-open{
+	background-image: url(../images/sprite.png);
+	background-position: 0 -400px;
+	background-repeat:no-repeat;
+}
+.fold-close{
+	background-image: url(../images/sprite.png);
+	background-position: 0 -350px;
+	background-repeat:no-repeat;
+}
+
+
+
+/****************************************************************************************************/*
+/* FOR TOOLTIPS
+/****************************************************************************************************/*
 p.tooltip {
 	clear:both;
 	margin:0;
@@ -240,16 +317,7 @@ p.tooltip {
 	display:none;
 }
 
-.fold-open{
-	background-image:url(../images/proteinfer/asc.gif);
-	background-position:center right;
-	background-repeat:no-repeat;
-}
-.fold-close{
-	background-image:url(../images/proteinfer/desc.gif);
-	background-position:center right;
-	background-repeat:no-repeat;
-}
+
 
 
 
@@ -328,52 +396,9 @@ DIV.project .button {
 	font-weight:bold;
 	margin-top:20px;	
 }
-INPUT.plain_button {
-	background-color:#3d4960; 
-	color:#ffffff;
-	border-color: #3d4960; 
-	border-width: 1px; 
-	border-style: outset;
-	font-size:9pt;
-	font-weight:bold;
-	margin-top:15px;
-	text-decoration:none;
-}
-
-INPUT.error_button {
-	background-color:#D74D2D; 
-	color:#ffffff;
-	border-color: #D74D2D; 
-	border-width: 1px; 
-	border-style: outset;
-	font-size:9pt;
-	font-weight:bold;
-	margin-top:15px;
-	text-decoration:none;
-}
 
 
-DIV.pinfer {
-        width: 600;
-}
-DIV.pinfer_header {
-        width: 600;
-}
-/* I really liked FAEBD7 but it looks pink on my windows laptop */
-TR.pinfer_A {
-	background-color: #F5DEB3; 
-}
-TR.pinfer_B {
-	background-color: #EBFFE6;
-}
 
-DIV.pinfer .button {
-	background-color:#2F5F4F;
-	color: #EBFFE6;
-	font-size:10pt;
-	font-weight:bold;
-	margin-top:20px;	
-}
 
 
 /* account color definitions */

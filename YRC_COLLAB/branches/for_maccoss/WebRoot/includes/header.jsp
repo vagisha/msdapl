@@ -18,6 +18,45 @@ response.addHeader("Cache-control", "max-age=0"); // stale right away
 
 <body>
 
+<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<script>
+// ---------------------------------------------------------------------------------------
+// SETUP ANY BASIC TABLES
+// ---------------------------------------------------------------------------------------
+$(document).ready(function() {
+   $(".table_basic").each(function() {
+   		var $table = $(this);
+   		//$table.attr('width', "100%");
+   		//$table.attr('align', 'center');
+   		$('tbody > tr:odd', $table).addClass("tr_odd");
+   		$('tbody > tr:even', $table).addClass("tr_even");
+   });
+   
+   $(".foldable").each(function() {
+   		$(this).click(function() {
+   			fold($(this));
+   		});
+   });
+});
+  
+function fold(foldable) {
+	//alert("foldable clicked");
+	var target_id = foldable.attr('id')+"_target";
+   	//alert("target is: "+target_id);
+	if(foldable.is('.fold-open')) {
+		foldable.removeClass('fold-open');
+		foldable.addClass('fold-close');
+		$("#"+target_id).hide();
+ 	}
+	else if(foldable.is('.fold-close')) {
+		foldable.removeClass('fold-close');
+		foldable.addClass('fold-open');
+		$("#"+target_id).show();
+	}
+}
+
+</script>
+
 <div class="mainContainer"> 
 
 <yrcwww:notauthenticated>

@@ -3,6 +3,7 @@
   June 26, 2008
   Dan Vanderkam, http://danvk.org/dragtable/
                  http://code.google.com/p/dragtable/
+                 http://www.danvk.org/wp/dragtable/
 
   Instructions:
     - Download this file

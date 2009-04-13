@@ -23,7 +23,7 @@
 <center>
 
 	<!-- SUMMARY -->
-	<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #FFFAF0;">
+	<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #FFFFE0;">
 		<table>
 			<tr>
 				<td align="center"><b>Project ID:</b>
@@ -51,8 +51,8 @@
 	
 				
 	<!-- RESULTS TABLE -->
-	<div style="background-color: #FFFAF0; margin:5 0 5 0; padding:5; border: 1px dashed gray;" > 
-	<yrcwww:table name="results" tableId='seq_results' tableClass="sortable_table" center="true" />
+	<div style="background-color: #FFFFFF; margin:5 0 5 0; padding:5;" > 
+	<yrcwww:table name="results" tableId='seq_results' tableClass="table_basic sortable_table" center="true" />
 	</div>
 	
 </center>	

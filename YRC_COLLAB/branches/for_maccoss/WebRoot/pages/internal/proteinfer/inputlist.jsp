@@ -13,14 +13,17 @@
 <logic:iterate name="inputList" id="inputSummary">
 
 	<div id="<bean:write name="inputSummary" property="inputGroupId"/>">
-    	<div style="background-color: #2E8B57; color: white; font-weight: bold;" 
-    		 class="foldable fold-open"
-    		 id="foldable_search_<bean:write name="inputSummary" property="inputGroupId"/>">
+    	<div style="background-color: #2E8B57; color: white; font-weight: bold;">
+    	
+    		<span style="margin-left:10;" class="foldable fold-open"
+    		 id="foldable_search_<bean:write name="inputSummary" property="inputGroupId"/>_target"></span>
+    		 <span>
     		 Search ID: <bean:write name="inputSummary" property="inputGroupId"/>
+    		 </span>
     	</div>
     	
     	
-    	<div id="foldable_search_<bean:write name="inputSummary" property="inputGroupId"/>_div">
+    	<div id="foldable_search_<bean:write name="inputSummary" property="inputGroupId"/>_target">
     	
     	<div style="color: black;">
     		Search Program: 
@@ -69,14 +72,19 @@
 <logic:iterate name="inputList" id="inputSummary">
 
 	<div id="<bean:write name="inputSummary" property="inputGroupId"/>">
-    	<div style="background-color: #939CB0; color: white; font-weight: bold;" 
-    		 class="foldable fold-open"
+	
+    	<div style="background-color: #939CB0; color: white; font-weight: bold;">
+    	
+    		<span style="margin-left:10;" class="foldable fold-open"
     		 id="foldable_analysis_<bean:write name="inputSummary" property="inputGroupId"/>">
-    		Analysis ID: <bean:write name="inputSummary" property="inputGroupId"/>
+    		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    		 <span>
+    		 	Analysis ID: <bean:write name="inputSummary" property="inputGroupId"/>
+    		 </span>
     	</div>
     	
     	
-    	<div id="foldable_analysis_<bean:write name="inputSummary" property="inputGroupId"/>_div">
+    	<div id="foldable_analysis_<bean:write name="inputSummary" property="inputGroupId"/>_target">
     	
     	<div style="color: black;">
     		Analysis Program: 

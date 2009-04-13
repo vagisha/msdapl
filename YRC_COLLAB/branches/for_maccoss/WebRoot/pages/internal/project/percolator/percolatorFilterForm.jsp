@@ -3,7 +3,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<div style="padding:7 7 0 7; margin-bottom:30; border: 1px dashed gray;">
+<div style="padding:7 7 0 7; margin-bottom:30;">
 
 		<html:form action="viewPercolatorResults" method="POST">
 		

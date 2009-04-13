@@ -6,7 +6,7 @@
  */
 package org.yeastrc.www.compare;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,8 +24,6 @@ import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 /**
  * 
@@ -61,46 +59,56 @@ public class CompareProteinSetsAction extends Action {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or 3 experiments to compare."));
             saveErrors( request, errors );
-            return mapping.findForward("authenticate");
+            return mapping.findForward("Failure");
         }
         
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
         ProteinferRunDAO runDao = fact.getProteinferRunDao();
-        IdPickerProteinBaseDAO protDao = fact.getIdPickerProteinBaseDao();
         
-        ProteinferRun run1 = runDao.loadProteinferRun(piRunIds.get(0));
-        ProteinferRun run2 = runDao.loadProteinferRun(piRunIds.get(1));
-        List<Integer> nrseqIds1 = protDao.getNrseqProteinIds(run1.getId(), true); // get only parsimonious proteins
-        List<Integer> nrseqIds2 = protDao.getNrseqProteinIds(run2.getId(), true);
+        List<Dataset> datasets = new ArrayList<Dataset>(piRunIds.size());
+        for(int piRunId: piRunIds) {
+            if(runDao.loadProteinferRun(piRunId) == null) {
+                ActionErrors errors = new ActionErrors();
+                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
+                        "No protein inference run found with ID: "+piRunId+"."));
+                saveErrors( request, errors );
+                return mapping.findForward("Failure");
+            }
+            Dataset dataset = new Dataset(piRunId, DatasetSource.PROT_INFER);
+            datasets.add(dataset);
+        }
         
-        // sort by nrseq ids
-        Collections.sort(nrseqIds1);
-        Collections.sort(nrseqIds2);
+        ComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, true);
+        request.setAttribute("comparison", comparison);
         
-        if(piRunIds.size() == 2) {
+        if(comparison.getDatasetCount() == 2) {
             
-            int common1_2 = commonIds(nrseqIds1, nrseqIds2);
+            int ds1 = comparison.getProteinCount(0);
+            int ds2 = comparison.getProteinCount(1);
+            int common1_2 = comparison.getCommonProteinCount(0, 1);
             
-            StringBuilder googleChartUrl = createChartUrl(nrseqIds1.size(), nrseqIds2.size(),
-                    common1_2, new String[]{"ID"+run1.getId(), "ID"+run2.getId()});
+            StringBuilder googleChartUrl = createChartUrl(ds1, ds2,
+                    common1_2, new String[]{"ID"+comparison.getDatasets().get(0).getDatasetId(), 
+                                            "ID"+comparison.getDatasets().get(1).getDatasetId()});
             request.setAttribute("chart", googleChartUrl);
         }
         else if(piRunIds.size() == 3) {
             
-            ProteinferRun run3 = runDao.loadProteinferRun(piRunIds.get(2));
-            List<Integer> nrseqIds3 = protDao.getNrseqProteinIds(piRunIds.get(2), true);
-            // sort by nrseq ids
-            Collections.sort(nrseqIds3);
+            int ds1 = comparison.getProteinCount(0);
+            int ds2 = comparison.getProteinCount(1);
+            int ds3 = comparison.getProteinCount(2);
             
-            int common1_2 = commonIds(nrseqIds1, nrseqIds2);
-            int common1_3 = commonIds(nrseqIds1, nrseqIds3);
-            int common2_3 = commonIds(nrseqIds2, nrseqIds3);
-            int common1_2_3 = commonIds(nrseqIds1, nrseqIds2, nrseqIds3);
+            int common1_2 = comparison.getCommonProteinCount(0, 1);
+            int common1_3 = comparison.getCommonProteinCount(0, 2);
+            int common2_3 = comparison.getCommonProteinCount(1, 2);
+            int common1_2_3 = 0; // commonIds(nrseqIds1, nrseqIds2, nrseqIds3);
             
             
-            StringBuilder googleChartUrl = createChartUrl(nrseqIds1.size(), nrseqIds2.size(), nrseqIds3.size(),
+            StringBuilder googleChartUrl = createChartUrl(ds1, ds2, ds3,
                     common1_2, common1_3, common2_3, common1_2_3,
-                    new String[]{"ID"+run1.getId(), "ID"+run2.getId(), "ID"+run3.getId()});
+                    new String[]{"ID"+comparison.getDatasets().get(0).getDatasetId(), 
+                                 "ID"+comparison.getDatasets().get(1).getDatasetId(), 
+                                 "ID"+comparison.getDatasets().get(2).getDatasetId()});
             
             request.setAttribute("chart", googleChartUrl.toString());
         }
@@ -152,7 +160,7 @@ public class CompareProteinSetsAction extends Action {
         if(legends.length == 3) {
             url.append(num1+": "+legends[0]);
             url.append("|"+num2+": "+legends[1]);
-            url.append("|"+num3+": "+legends[1]);
+            url.append("|"+num3+": "+legends[2]);
             url.append("|"+common1_2+": "+legends[0]+" AND "+legends[1]);
             url.append("|"+common1_3+": "+legends[0]+" AND "+legends[2]);
             url.append("|"+common2_3+": "+legends[1]+" AND "+legends[2]);
@@ -170,50 +178,6 @@ public class CompareProteinSetsAction extends Action {
 
     private static StringBuilder createChartUrl(int A, int B, int AB, String[] legends) {
         return createChartUrl(A, B, 0, AB, 0, 0, 0, legends);
-    }
-    
-    /**
-     * Find the number of common ids in two sorted lists of integers
-     * @param list1
-     * @param list2
-     * @return
-     */
-    private static int commonIds(List<Integer> list1, List<Integer> list2) {
-        
-        if(list1 == null || list1.size() ==0)
-            return 0;
-        if(list2 == null || list2.size() == 0)
-            return 0;
-        
-        int commonNum = 0;
-        for(int id: list1) {
-            if(Collections.binarySearch(list2, id) >= 0)
-                commonNum++;
-        }
-        return commonNum;
-    }
-    
-    /**
-     * Find the number of common ids in three sorted lists of integers
-     * @param list1
-     * @param list2
-     * @return
-     */
-    private static int commonIds(List<Integer> list1, List<Integer> list2, List<Integer> list3) {
-        
-        if(list1 == null || list1.size() ==0)
-            return 0;
-        if(list2 == null || list2.size() == 0)
-            return 0;
-        if(list3 == null || list3.size() == 0)
-            return 0;
-        
-        int commonNum = 0;
-        for(int id: list1) {
-            if((Collections.binarySearch(list2, id) >= 0) && (Collections.binarySearch(list3, id) >= 0))
-                commonNum++;
-        }
-        return commonNum;
     }
     
     
@@ -240,6 +204,5 @@ public class CompareProteinSetsAction extends Action {
         legends = new String[]{"ID1", "ID2"};
         url = createChartUrl(A, B, C, AB, AC, BC, ABC, legends).toString();
         System.out.println(url);
-        
     }
 }

@@ -12,13 +12,16 @@
 <br>
 
 <table cellpadding="2" cellspacing="2" align="center" width="90%"  id="prot_grp_table_<bean:write name="clusterId" />">
+ <thead>
  <tr>
  <th><b><font size="2pt">Protein<br>Group ID</font></b></th>
  <th><b><font size="2pt">Accession(s)</font></b></th>
  <th><b><font size="2pt"># Peptides<br>(Unique)</font></b></th>
  <th><b><font size="2pt"># Spectra</font></b></th>
  </tr>
+ </thead>
  
+ <tbody>
  <logic:iterate name="cluster" property="proteinGroups" id="protGrp">
   <tr id="protGrp_<bean:write name="protGrp" property="groupId" />">
      <td valign="middle">
@@ -42,7 +45,7 @@
      <td><bean:write name="protGrp" property="spectrumCount" /></td>
  </tr>
  </logic:iterate>
-
+ </tbody>
         
 </table>
 <br>
@@ -51,15 +54,16 @@
 
 <div style="padding: 2px; cursor: pointer;" class="peptgrplist pinfer_header_small" ><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
 <table cellpadding="4" cellspacing="2" align="center" width="90%" id="pept_grp_table_<bean:write name="clusterId" />">
-        
-        <tr>
+
         <thead>
+        <tr>
         <th><b><font size="2pt">Peptide<br>Group ID</font></b></th>
         <th><b><font size="2pt">Sequence(s)</font></b></th>
         <th><b><font size="2pt"># Spectra</font></b></th>
         </tr>
         </thead>
         
+        <tbody>
         <logic:iterate name="cluster" property="peptideGroups" id="peptGrp">
         	<logic:iterate name="peptGrp" property="peptides" id="pept">
         	<tr class="peptGrp_<bean:write name="pept" property="groupId" />">
@@ -69,6 +73,7 @@
         	</tr>
        		</logic:iterate>
         </logic:iterate>
+        </tbody>
 
 </table>
 
@@ -91,6 +96,7 @@
 	<%
 	    WIdPickerCluster cluster = (WIdPickerCluster)request.getAttribute("cluster");
 	%>
+	<tbody>
 	<logic:iterate name="cluster" property="peptideGroups" id="peptGrp" type="org.yeastrc.www.proteinfer.idpicker.WIdPickerPeptideGroup">
     <tr>
        	<th><b><font size="2pt"><bean:write name="peptGrp" property="groupId" /></font></b></th>
@@ -103,6 +109,7 @@
 		</logic:iterate>
     </tr>
     </logic:iterate>
+    </tbody>
 </table>
 </logic:greaterEqual>
 <br>

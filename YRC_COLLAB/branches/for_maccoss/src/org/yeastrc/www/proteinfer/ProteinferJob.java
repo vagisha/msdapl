@@ -1,5 +1,8 @@
 package org.yeastrc.www.proteinfer;
 
+
+import java.sql.Date;
+
 import org.yeastrc.jobqueue.Job;
 import org.yeastrc.jobqueue.JobUtils;
 
@@ -8,7 +11,14 @@ public class ProteinferJob extends Job {
     private int pinferId;
     private String program;
     private String comments;
+    private Date dateRun;
     
+    public Date getDateRun() {
+        return dateRun;
+    }
+    public void setDateRun(Date dateRun) {
+        this.dateRun = dateRun;
+    }
     public String getComments() {
         return comments;
     }

@@ -40,13 +40,9 @@ public class ProteinferRunSearcher {
         
         List<ProteinferJob> jobs = new ArrayList<ProteinferJob>(pinferRunIds.size());
         for(int pid: pinferRunIds) {
-            ProteinferRun run = runDao.loadProteinferRun(pid);
-            if(run != null) {
-                
-                ProteinferJob job = getJobForPinferRunId(run.getId());
-                if(job != null)
-                    jobs.add(job);
-            }
+            ProteinferJob job = getJobForPinferRunId(pid);
+            if(job != null)
+                jobs.add(job);
         }
         // sort jobs by id
         Collections.sort(jobs, new Comparator<ProteinferJob>() {
@@ -56,7 +52,7 @@ public class ProteinferRunSearcher {
         return jobs;
     }
     
-    public static List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
+    private static List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
         
         Set<Integer> pinferRunIds = new HashSet<Integer>();
         
@@ -146,6 +142,7 @@ public class ProteinferRunSearcher {
             }
             job.setProgram(run.getProgramString());
             job.setComments(run.getComments());
+            job.setDateRun(run.getDate());
             return job;
         }
         return null;

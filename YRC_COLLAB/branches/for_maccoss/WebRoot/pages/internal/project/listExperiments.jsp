@@ -35,7 +35,9 @@ $(document).ready(function() {
 		
 		
 			<div style="border:1px dotted gray;margin:5 5 5 5; padding:0 0 5 0;">
-			<div style="background-color:#ED9A2E;width:100%; margin:0; padding:3 0 3 0; color:white;">
+			<div style="background-color:#ED9A2E;width:100%; margin:0; padding:3 0 3 0; color:white;" >
+				<span style="margin-left:10;" class="foldable fold-open" id="expt_fold_<bean:write name="experiment" property="id"/>" >
+				&nbsp;&nbsp;&nbsp;&nbsp;</span>
 				<span style="padding-left:10;"><b>Experiment ID: <bean:write name="experiment" property="id"/></b></span>
 			</div>
 			
@@ -57,22 +59,33 @@ $(document).ready(function() {
 			</table>
 			</div>
 			
+			<div id="expt_fold_<bean:write name="experiment" property="id"/>_target"> <!-- begin collapsible div -->
+			
 			<!-- SEARCHES FOR THE EXPERIMENT -->
 			<logic:notEmpty name="experiment" property="searches">
 				<logic:iterate name="experiment" property="searches" id="search">
 					<div style="background-color: #FFFFE0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 					<table width="90%">
 						<tr>
-							<td width="33%"><b>Search ID:</b>&nbsp; 
-							<bean:write name="search" property="id"/>
-								<html:link action="viewSequestResults.do" paramId="ID" paramName="search" paramProperty="id">[Results]</html:link>
-							</td>
 							<td width="33%"><b>Program: </b>&nbsp;
 							<b><bean:write name="search" property="searchProgram"/>
 							&nbsp;
 							<bean:write name="search" property="searchProgramVersion"/></b></td>
+							<td width="33%">
+							<b>
+								<html:link action="viewSequestResults.do" 
+											paramId="ID" 
+											paramName="search" paramProperty="id">[View Results]</html:link>
+							</b>
+							</td>
 							<td width="33%"><b>Search Date: </b>&nbsp;
 							<bean:write name="search" property="searchDate"/></td>
+							
+						</tr>
+						<tr>
+							<td><b>Search Database: </b></td>
+							<td><bean:write name="search" property="searchDatabase"/></td>
+							
 						</tr>
 						<tr>
 							<td width="33%"><b>Enzyme: </b>&nbsp;
@@ -81,11 +94,6 @@ $(document).ready(function() {
 							<bean:write name="search" property="staticModifications"/></td>
 							<td width="33%"><b>Dynamic Modifications: </b>
 							<bean:write name="search" property="dynamicModifications"/></td>
-						</tr>
-						<tr>
-							<td colspan="3"><b>Search Database: </b>&nbsp;
-							<bean:write name="search" property="searchDatabase"/></td>
-							
 						</tr>
 					</table>
 					</div>	
@@ -98,18 +106,18 @@ $(document).ready(function() {
 				<div style="background-color: #F0FFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 					<table width="90%">
 					<tr>
-						<td width="25%"><b>Analysis ID:</b>&nbsp;
-						<bean:write name="analysis" property="id"/>
-							<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[Results]</html:link>
-							<a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='project' property='ID'/>"> 
-							[Infer Proteins]</a>
-						</td>
-						<td width="25%"><b>Program: </b>&nbsp;
+						<td width="33%"><b>Program: </b>&nbsp;
 						<b><bean:write name="analysis" property="analysisProgram"/>
 						&nbsp;
 						<bean:write name="analysis" property="analysisProgramVersion"/></b></td>
+						<td width="33%">
+							<b><html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
+						</td>
+						<td width="33%">
+							<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='project' property='ID'/>"> 
+							[Infer Proteins]</a></b>
+						</td>
 					</tr>
-					
 					</table>
 				</div>
 				</logic:iterate>
@@ -118,13 +126,24 @@ $(document).ready(function() {
 			<!-- PROTEIN INFERENCE RESULTS FOR THE EXPERIMENT -->
 			<logic:equal name="experiment" property="hasProtInferResults" value="true" >
 			<logic:present name="experiment" property="dtaSelect">
-				<div style="background-color: #F5FFFA; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
-					<b>DTASelect ID:</b> <bean:write name="experiment" property="dtaSelect.id"/>&nbsp;
-					<html:link action="viewYatesRun.do" paramId="id" paramName="experiment" paramProperty="dtaSelect.id">[Results]</html:link>
+				<div style="background-color: #FFFFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+				
+					<table width="90%">
+					<tr>
+						<td width="33%"><b>Program: </b>&nbsp;
+						<b>DTASelect</b>
+						&nbsp;
+						<td width="33%">
+							<b><html:link action="viewYatesRun.do" paramId="id" paramName="experiment" paramProperty="dtaSelect.id">[View Results]</html:link></b>
+						</td>
+						<td width="33%">&nbsp;
+						</td>
+					</tr>
+					</table>
 				</div>
 			</logic:present>
-			<logic:present name="experiment" property="protInferRuns">
-				<div style="background-color: #F5FFFA; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+			<logic:notEmpty name="experiment" property="protInferRuns">
+				<div style="background-color: #F0F8FF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 					<div><b>Protein Inference Results</b></div> 
 					<table width="90%">
 					<thead>
@@ -166,16 +185,19 @@ $(document).ready(function() {
 					</tbody>
 					</table>
 				</div>
-			</logic:present>
+			</logic:notEmpty>
 			</logic:equal>
 			
 			
 			<!-- FILES FOR THE EXPERIMENT -->
-			<div style="background-color: #FFFAF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+			<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:0;" > 
 			<bean:define name="experiment" property="id" id="experimentId" />
-			<yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="search_files" center="true" />
+			<yrcwww:table name="experiment" tableId='<%="search_files_"+experimentId %>' tableClass="table_basic search_files" center="true" />
 			</div>
 			</div>
+			
+			</div> <!-- end of collapsible div -->
+			
 		</div> <!-- End of one experiment -->
 		</logic:iterate>
 	</logic:notEmpty>

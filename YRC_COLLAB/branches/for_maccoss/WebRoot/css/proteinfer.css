@@ -1,33 +1,108 @@
 
-/* #ED9A2E */
-TH.pinfer_A {
-	background-color: #ED9A2E;
-    color: #FFFFFF;
+.table_pinfer {
+	border: 1px solid #7F7F7F;
+	border-collapse: separate;
+	border-spacing: 0;
 }
+
+.table_pinfer TH {
+	background: #bec1c2 url(../images/sprite.png) repeat-x scroll 0 0; 
+	color: #3D4960;
+	padding: 3 5 3 5;
+	text-align: center;
+	border-style: none solid solid none;
+	border-color: #CBCBCB;
+	border-width: medium 1px 1px medium;
+	border-collapse: separate;
+}
+
+.table_pinfer TH.sortable:hover {
+	color:#D74D2D;
+	cursor:pointer;
+}
+.table_pinfer TH.sorted-asc {
+	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -200px;
+	color: #FFFFFF;
+}
+.table_pinfer TH.sorted-asc:hover {
+	color: #FFFFFF;
+}
+.table_pinfer TH.sorted-desc {
+	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -200px;
+	color: #FFFFFF;
+}
+.table_pinfer TH.sorted-desc:hover {
+	color: #FFFFFF;
+}
+
+.table_pinfer td {
+	border-style: none solid none none;
+	border-width: medium 1px medium medium;
+	border-color: #CBCBCB;
+	padding: 3 3 3 3;
+}
+
+.table_pinfer TD.no-border {
+	border-style: none none none none;
+	border-width: medium medium medium medium;
+	border-color: #CBCBCB;
+	padding: 3 3 3 3;
+}
+
+
+/* I really liked FAEBD7 but it looks pink on my windows laptop */
+TR.pinfer_A {
+	background-color: #F8F8FF; 
+}
+TR.pinfer_B {
+	background-color: #FFFFFF;
+}
+
+
+/* Small tables */
+.table_pinfer_small {
+	border: 1px dashed #7F7F7F;
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
+.table_pinfer_small TH {
+	background: #F2F2F2; 
+	color: #3D4960;
+	padding: 2 3 2 3;
+	text-align: center;
+	border-style: none solid solid none;
+	border-color: #CBCBCB;
+	border-width: medium 1px 1px medium;
+	border-collapse: separate;
+}
+.pinfer_small_hover {
+	color:#D74D2D;
+}
+
+.table_pinfer_small TD {
+	border-style: none solid none none;
+	border-width: 0 1px 0 0;
+	border-color: #CBCBCB;
+	padding: 3 3 3 3;
+}
+
+
+
+
+
+
 
 TH.pinfer_A_small {
 	background-color: #ED9A2E;
     color: #FFFFFF;
 }
 
- /* background-color: #D4FECA; */
-TH.pinfer_hover {
-	color: #ED9A2E;
-	background-color: #FFFAF0;
-    cursor: pointer;
-}
 
 TH.pinfer_selected_header_small {
 	color: #D74D2D;
 	background-color: #FFFAF0;
 }
-
-
-TH.pinfer_selected_header {
-	color: white;
-	background-color: #D74D2D;
-}
-
 
 .prot_annot_U {
 	display:block;
@@ -168,7 +243,7 @@ TH.pinfer_selected_header {
 .ui-tabs-panel {
     border: 1px solid gray;
     padding: 10px;
-    background: #FFFAF0; /* declare background color for container to avoid distorted fonts in IE while fading */
+    background: #FFFFFF; /* declare background color for container to avoid distorted fonts in IE while fading */
 }
 /*.ui-tabs-loading em {
     padding: 0 0 0 20px;

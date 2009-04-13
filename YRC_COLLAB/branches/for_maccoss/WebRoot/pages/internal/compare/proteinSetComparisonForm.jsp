@@ -25,13 +25,13 @@
 
 
 <logic:empty name="proteinSetComparisonForm" property="proteinferRunList">
-<div><b>There are no available protein inference experiments at this time.</b></div>
+<div><b>There are no available protein datasets at this time.</b></div>
 </logic:empty>
 
 
 <logic:notEmpty name="proteinSetComparisonForm" property="proteinferRunList">
 
-<div><b>Please select 2 or 3 experiment from the list below</b></div>
+<div><b>Please select 2 or 3 datasets from the list below</b></div>
 
 <html:form action="doProteinSetComparison" method="POST">
 
