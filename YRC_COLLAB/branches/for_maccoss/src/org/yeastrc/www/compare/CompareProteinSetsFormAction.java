@@ -30,7 +30,6 @@ import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 /**
  * 

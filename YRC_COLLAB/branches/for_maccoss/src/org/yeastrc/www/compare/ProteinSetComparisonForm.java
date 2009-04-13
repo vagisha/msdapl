@@ -21,9 +21,17 @@ import org.apache.struts.action.ActionMessage;
  */
 public class ProteinSetComparisonForm extends ActionForm {
 
-    private int test = 1000;
-    
     private List<ProteinferRunFormBean> piRuns = new ArrayList<ProteinferRunFormBean>();
+
+    private int pageNum = 1;
+    
+    public int getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(int pageNum) {
+        this.pageNum = pageNum;
+    }
 
     public List<ProteinferRunFormBean> getPiRuns() {
         return piRuns;
@@ -53,14 +61,6 @@ public class ProteinSetComparisonForm extends ActionForm {
         return errors;
     }
 
-    public int getTest() {
-        return test;
-    }
-
-    public void setTest(int test) {
-        this.test = test;
-    }
-    
     public ProteinferRunFormBean getProteinferRun(int index) {
         while(index >= piRuns.size())
             piRuns.add(new ProteinferRunFormBean());

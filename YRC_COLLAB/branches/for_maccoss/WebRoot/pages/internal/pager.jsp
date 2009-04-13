@@ -39,5 +39,5 @@
 		<span style="text-decoration: underline; cursor: pointer;" onclick="pageResults(<bean:write name='lastPage' />)">
 			Last</span>
 	</logic:notEqual>
-	&nbsp; &nbsp; <span style="font-size:8pt;">Page <bean:write name="results" property="currentPage" /> of <bean:write name="results" property="pageCount" /></span>
+	&nbsp; &nbsp; <span style="font-size:8pt;">Page <bean:write name="currentPage"/> of <bean:write name="pagecount" /></span>
 </div>

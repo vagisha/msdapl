@@ -12,6 +12,8 @@ public class TableCell {
     private String hyperlink;
     private boolean newWindow = false;
     private String targetName = null;
+    private String className = null;
+    private String id = null;
     
     public String getTargetName() {
         return targetName;
@@ -78,5 +80,21 @@ public class TableCell {
     
     public boolean openLinkInNewWindow() {
         return this.newWindow;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -120,7 +120,15 @@ public class TableTag extends TagSupport {
                 }
                 
                 for(TableCell cell: row.getCells()) {
-                    writer.print("<td>");
+                    writer.print("<td ");
+                    if(cell.getClassName() != null && cell.getClassName().length() > 0) {
+                        writer.print(" class=\""+cell.getClassName()+"\"");
+                    }
+                    if(cell.getId() != null && cell.getId().length() > 0) {
+                        writer.print(" id=\""+cell.getId()+"\"");
+                    }
+                    writer.print(">");
+                    
                     if(cell.getHyperlink() != null) {
                         String url = contextPath+cell.getHyperlink();
                         if(!cell.openLinkInNewWindow())
@@ -142,8 +150,11 @@ public class TableTag extends TagSupport {
                             //window.open(doc, "SPECTRUM_WINDOW", "width=" + winWidth + ",height=" + winHeight + ",status=no,resizable=yes,scrollbars=yes");
                         }
                     }
-                    if(cell.getData() != null) {
+                    if(cell.getData() != null && cell.getData().trim().length() > 0) {
                         writer.write(cell.getData());
+                    }
+                    else {
+                        writer.write("&nbsp;");
                     }
                     if(cell.getHyperlink() != null) {
                         writer.print("</a>");

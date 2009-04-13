@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.bio.protein.CommonNameLookupUtil;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 
@@ -52,8 +51,7 @@ public class ProteinDatasetComparer {
             for(int nrseqId: nrseqProteinIds) {
                 ComparisonProtein protein = proteinMap.get(nrseqId);
                 if(protein == null) {
-                    String[] nameDescr = getProteinAccessionDescription(nrseqId, false);
-                    protein = new ComparisonProtein(nrseqId, nameDescr[0], nameDescr[1]);
+                    protein = new ComparisonProtein(nrseqId);
                     proteinMap.put(nrseqId, protein);
                 }
                 DatasetProteinInformation dpi = new DatasetProteinInformation(dataset);
@@ -103,21 +101,21 @@ public class ProteinDatasetComparer {
         }
     }
 
-    private static String[] getProteinAccessionDescription(int nrseqProteinId, boolean fullLookup) {
+    static String[] getProteinAccessionDescription(int nrseqProteinId, boolean fullLookup) {
         
-//        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-//        NRProtein nrseqProt = null;
+        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+        NRProtein nrseqProt = null;
         try {
-//            nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-//            String commonName = nrseqProt.getListing();
-//            String description = nrseqProt.getDescription();
+            nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
+            String commonName = nrseqProt.getListing();
+            String description = nrseqProt.getDescription();
             
 //            String commonName = CommonNameLookupUtil.instance().getCommonNames(nrseqProteinId, fullLookup);
 //           if(commonName.equals("UNKNOWN"))
 //              commonName = "";
             
-//            return new String[] {commonName, description};
-            return new String[]{"commonName", "description"};
+            return new String[] {commonName, description};
+//            return new String[]{"commonName", "description"};
         }
         catch (Exception e) {
             log.error("Exception getting accession/description for protein Id: "+nrseqProteinId, e);

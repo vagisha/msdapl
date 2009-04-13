@@ -15,10 +15,14 @@ import java.util.List;
 public class ComparisonProtein {
 
     private final int nrseqId;
-    private final String name;
-    private final String description;
+    private String name;
+    private String description;
     
     private List<DatasetProteinInformation> datasetInfo;
+    
+    public ComparisonProtein(int nrseqId) {
+        this(nrseqId, null, null);
+    }
     
     public ComparisonProtein(int nrseqId, String name, String description) {
         this.nrseqId = nrseqId;
@@ -29,10 +33,6 @@ public class ComparisonProtein {
 
     public int getNrseqId() {
         return nrseqId;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public List<DatasetProteinInformation> getDatasetInfo() {
@@ -62,5 +62,21 @@ public class ComparisonProtein {
         if(dpi != null)
             return dpi.isPresent();
         return false;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

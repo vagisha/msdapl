@@ -50,6 +50,7 @@ public class CompareProteinSetsAction extends Action {
         
         // get the protein inference ids to compare
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
+        
         List<ProteinferRunFormBean> runs = myForm.getPiRuns();
         
         List<Integer> piRunIds = myForm.getSelectedProteinferRunIds();
@@ -78,8 +79,12 @@ public class CompareProteinSetsAction extends Action {
             datasets.add(dataset);
         }
         
-        ComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, true);
+        ComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
+        comparison.setCurrentPage(myForm.getPageNum());
         request.setAttribute("comparison", comparison);
+        request.setAttribute("proteinSetComparisonForm", myForm);
+        
+        
         
         if(comparison.getDatasetCount() == 2) {
             
@@ -168,6 +173,7 @@ public class CompareProteinSetsAction extends Action {
             
             url.append("&chco=ff0000,00ff00,0000ff,AAAA00,AA00AA,00AAAA,AAAAFF");
         }
+        //url.append("&chf=bg,s,F2F2F2");
 //        return url.toString();
         return url;
     }
