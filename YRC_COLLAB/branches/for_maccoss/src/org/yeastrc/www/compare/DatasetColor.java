@@ -34,9 +34,23 @@ public enum DatasetColor {
         B = b;
     }
     
+    public String hexValue() {
+        String red = Integer.toHexString(R);
+        if(red.length() == 1)
+            red = "0"+red;
+        String blue = Integer.toHexString(B);
+        if(blue.length() == 1)
+            blue = "0"+blue;
+        String green = Integer.toHexString(G);
+        if(green.length() == 1)
+            green = "0"+green;
+        return red+green+blue;
+    }
+    
     public static DatasetColor get(int index) {
         DatasetColor[] colorArr = DatasetColor.values();
         index = index % colorArr.length;
         return colorArr[index];
     }
+    
 }

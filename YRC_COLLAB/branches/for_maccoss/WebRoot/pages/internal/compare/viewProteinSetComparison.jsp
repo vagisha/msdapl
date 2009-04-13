@@ -73,6 +73,13 @@ function pageResults(pageNum) {
 <td colspan="2" style="background-color:#F2F2F2; font-weight:bold; text-align: center; padding:5 5 5 5;" >
 Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 </td>
+
+<logic:present name="chart">
+<td rowspan="5">
+	<img src="<bean:write name='chart' />" align="top" alt="Comparison"></img>
+</td>
+</logic:present>
+
 </tr>
 
 <tr valign="top">
@@ -138,6 +145,8 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 </table>
 </td>
 </tr>
+
+
 </table>
 
 <br>
@@ -219,8 +228,6 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <div > 
 <yrcwww:table name="comparison" tableId='compare_results' tableClass="table_basic sortable_table" center="true" />
 </div>
-
-<img src="<bean:write name='chart' />" align="top" alt="Comparison" style="padding-right:20px;"></img>
 
 </yrcwww:contentbox>
 

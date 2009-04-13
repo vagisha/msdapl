@@ -26,13 +26,16 @@ public class ProteinferRunFormBean {
     public ProteinferRunFormBean() {}
     
     public ProteinferRunFormBean(ProteinferJob job, int projectId) {
-        this.projectId = projectId;
-        this.runId = job.getPinferId();
-        this.runDate = job.getDateRun();
-        this.comments = job.getComments();
-        this.inputGeneratorProgram = job.getProgram();
+        this(projectId, job.getPinferId(), job.getDateRun(), job.getComments(), job.getProgram());
     }
     
+    public ProteinferRunFormBean(int projectId, int runId, Date runDate, String comments, String inputGeneratorProgram) {
+        this.projectId = projectId;
+        this.runId = runId;
+        this.runDate = runDate;
+        this.comments = comments;
+        this.inputGeneratorProgram = inputGeneratorProgram;
+    }
     
     public boolean isSelected() {
         return isSelected;

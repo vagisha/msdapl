@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
@@ -51,14 +52,18 @@ public class CompareProteinSetsAction extends Action {
         // get the protein inference ids to compare
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
         
-        List<ProteinferRunFormBean> runs = myForm.getPiRuns();
         
+        // Get the selected protein inference run ids
         List<Integer> piRunIds = myForm.getSelectedProteinferRunIds();
+        
+        List<Integer> dtaRunIds = myForm.getSelectedDtaRunIds();
 
+        int total = piRunIds.size() + dtaRunIds.size();
+        
         // get the protein inference ids to compare
-        if(piRunIds == null || piRunIds.size() < 2 || piRunIds.size() > 3) {
+        if(total < 2) {
             ActionErrors errors = new ActionErrors();
-            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or 3 experiments to compare."));
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more datasets to compare."));
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
@@ -66,7 +71,9 @@ public class CompareProteinSetsAction extends Action {
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
         ProteinferRunDAO runDao = fact.getProteinferRunDao();
         
-        List<Dataset> datasets = new ArrayList<Dataset>(piRunIds.size());
+        List<Dataset> datasets = new ArrayList<Dataset>(total);
+        
+        // Protein inference datasets
         for(int piRunId: piRunIds) {
             if(runDao.loadProteinferRun(piRunId) == null) {
                 ActionErrors errors = new ActionErrors();
@@ -78,6 +85,23 @@ public class CompareProteinSetsAction extends Action {
             Dataset dataset = new Dataset(piRunId, DatasetSource.PROT_INFER);
             datasets.add(dataset);
         }
+        
+        // DTASelect datasets
+        for(int dtaRunId: dtaRunIds) {
+            YatesRun run = new YatesRun();
+            try {
+                run.load(dtaRunId);
+            }
+            catch(Exception e) {
+                ActionErrors errors = new ActionErrors();
+                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Error loading DTASelect dataset with ID: "+dtaRunId+"."));
+                saveErrors( request, errors );
+                return mapping.findForward("Failure");
+            }
+            Dataset dataset = new Dataset(dtaRunId, DatasetSource.DTA_SELECT);
+            datasets.add(dataset);
+        }
+        
         
         ComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
         comparison.setCurrentPage(myForm.getPageNum());
@@ -97,7 +121,7 @@ public class CompareProteinSetsAction extends Action {
                                             "ID"+comparison.getDatasets().get(1).getDatasetId()});
             request.setAttribute("chart", googleChartUrl);
         }
-        else if(piRunIds.size() == 3) {
+        else if(comparison.getDatasetCount() == 3) {
             
             int ds1 = comparison.getProteinCount(0);
             int ds2 = comparison.getProteinCount(1);
@@ -138,7 +162,7 @@ public class CompareProteinSetsAction extends Action {
         // http://chart.apis.google.com/chart?cht=v&chs=200x100&chd=t:100,80,0,30,0,0,0
         StringBuilder url = new StringBuilder();
         url.append("http://chart.apis.google.com/chart?cht=v");
-        url.append("&chs=300x200");
+        url.append("&chs=170x100");
         url.append("&chd=t:");
         url.append(A+",");      // A
         url.append(B+",");      // B
@@ -147,32 +171,36 @@ public class CompareProteinSetsAction extends Action {
         url.append(AC+",");     // A & C
         url.append(BC+",");     // B & C
         url.append(ABC);        // A & B & C
+        
+        // chart colors
+        url.append("&chco="+DatasetColor.get(0).hexValue()+","+DatasetColor.get(1).hexValue()+","+DatasetColor.get(2).hexValue());
+        
         // Chart legend
         // chdl=First|Second|Third
         // chco=ff0000,00ff00,0000ff
         // chdlp=t
-        url.append("&chdpl=t");
-        url.append("&chdl=");
-        
-        if(legends.length == 2) {
-            url.append(num1+": "+legends[0]);
-            url.append("|"+num2+": "+legends[1]);
-            url.append("|"+common1_2+": "+legends[0]+" AND "+legends[1]);
-            
-            url.append("&chco=ff0000,00ff00,AAAA00");
-        }
-        
-        if(legends.length == 3) {
-            url.append(num1+": "+legends[0]);
-            url.append("|"+num2+": "+legends[1]);
-            url.append("|"+num3+": "+legends[2]);
-            url.append("|"+common1_2+": "+legends[0]+" AND "+legends[1]);
-            url.append("|"+common1_3+": "+legends[0]+" AND "+legends[2]);
-            url.append("|"+common2_3+": "+legends[1]+" AND "+legends[2]);
-            url.append("|"+common1_2_3+": "+legends[0]+" AND "+legends[1]+" AND "+legends[2]);
-            
-            url.append("&chco=ff0000,00ff00,0000ff,AAAA00,AA00AA,00AAAA,AAAAFF");
-        }
+//        url.append("&chdpl=t");
+//        url.append("&chdl=");
+//        
+//        if(legends.length == 2) {
+//            url.append(num1+": "+legends[0]);
+//            url.append("|"+num2+": "+legends[1]);
+//            url.append("|"+common1_2+": "+legends[0]+" AND "+legends[1]);
+//            
+//            url.append("&chco=ff0000,00ff00,AAAA00");
+//        }
+//        
+//        if(legends.length == 3) {
+//            url.append(num1+": "+legends[0]);
+//            url.append("|"+num2+": "+legends[1]);
+//            url.append("|"+num3+": "+legends[2]);
+//            url.append("|"+common1_2+": "+legends[0]+" AND "+legends[1]);
+//            url.append("|"+common1_3+": "+legends[0]+" AND "+legends[2]);
+//            url.append("|"+common2_3+": "+legends[1]+" AND "+legends[2]);
+//            url.append("|"+common1_2_3+": "+legends[0]+" AND "+legends[1]+" AND "+legends[2]);
+//            
+//            url.append("&chco=ff0000,00ff00,0000ff,AAAA00,AA00AA,00AAAA,AAAAFF");
+//        }
         //url.append("&chf=bg,s,F2F2F2");
 //        return url.toString();
         return url;

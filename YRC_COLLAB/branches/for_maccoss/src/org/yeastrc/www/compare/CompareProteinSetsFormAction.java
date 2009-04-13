@@ -27,6 +27,8 @@ import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.yates.YatesRun;
+import org.yeastrc.yates.YatesRunSearcher;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
@@ -66,19 +68,37 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
             pinferRunId = 0;
         }
         
+        // If a DTASelect run id was sent with the request get it now
+        int dtaRunId = 0;
+        try {
+            String idStr = request.getParameter("dtaRunId");
+            if(idStr != null) {
+                dtaRunId = Integer.parseInt(idStr);
+            }
+        }
+        catch(Exception e) {
+            dtaRunId = 0;
+        }
+        
         
         // Get a list of the user's projects
         List<Project> projects = user.getProjects();
         
         // For each experiment in the project get a list of the protein inference id
+        // and DTASelect IDs
         
         Set<Integer> piRunIds = new HashSet<Integer>();
+        
         List<ProteinferRunFormBean> piRuns = new ArrayList<ProteinferRunFormBean>();
+        List<DTASelectRunFormBean> dtaRuns = new ArrayList<DTASelectRunFormBean>();
         
         ProjectExperimentDAO prExpDao = ProjectExperimentDAO.instance();
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
         
         for(Project project: projects) {
+            
+            
+            // Get the protein inference runs for this project
             List<Integer> experimentIds = prExpDao.getExperimentIdsForProject(project.getID());
             
             for(int experimentId: experimentIds) {
@@ -98,10 +118,22 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
                     }
                 }
             }
+            
+            // Get the DTASelect runs for this project
+            YatesRunSearcher searcher = new YatesRunSearcher();
+            searcher.setProjectID(project.getID());
+            List<YatesRun> yatesRuns = searcher.search();
+            for(YatesRun run: yatesRuns) {
+                DTASelectRunFormBean bean = new DTASelectRunFormBean(run);
+                if(run.getId() == dtaRunId)
+                    bean.setSelected(true);
+                dtaRuns.add(bean);
+            }
         }
         
         ProteinSetComparisonForm myForm = new ProteinSetComparisonForm();
         myForm.setProteinferRunList(piRuns);
+        myForm.setDtaRunList(dtaRuns);
         request.setAttribute("proteinSetComparisonForm", myForm);
         
         
