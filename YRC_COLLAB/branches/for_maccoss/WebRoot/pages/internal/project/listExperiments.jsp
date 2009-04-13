@@ -253,8 +253,9 @@ function toggleFilesForExperiment (experimentId) {
 				onclick="javascript:toggleFilesForExperiment(<bean:write name='experiment' property='id'/>);">[List Files]</div>
 			<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:0;" id="listfileslink_<bean:write name='experiment' property='id'/>_target"></div>
 			
-			</div> <!-- end of collapsible div -->
+			</div> 
 			
+		</div> <!-- end of collapsible div -->
 		</div> <!-- End of one experiment -->
 		<br>
 		</logic:iterate>
