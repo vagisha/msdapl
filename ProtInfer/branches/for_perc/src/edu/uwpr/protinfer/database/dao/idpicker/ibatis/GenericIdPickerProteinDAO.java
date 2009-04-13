@@ -53,7 +53,9 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract List<Integer> getIdPickerProteinIds(int pinferId, boolean isParsimonious);
     
-    public abstract List<Integer> getNrseqProteinIds(int pinferId, boolean isParsimonious);
+    public  abstract List<Integer> getNrseqProteinIds(int pinferId);
+    
+    public abstract List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious);
     
     public abstract Map<Integer, Integer> getProteinGroupIds(int pinferId, boolean parsimonious);
     

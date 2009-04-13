@@ -517,10 +517,16 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return queryForList(sqlMapNameSpace+".idPickerProteinIds", map);
     }
     
-    public List<Integer> getNrseqProteinIds(int pinferId, boolean isParsimonious) {
+    
+    public  List<Integer> getNrseqProteinIds(int pinferId) {
+        return getNrseqProteinIds(pinferId, true, true);
+    }
+    
+    public List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious) {
         Map<String, Number> map = new HashMap<String, Number>(4);
         map.put("pinferId", pinferId);
-        if(isParsimonious)          map.put("isParsimonious", 1);
+        if(parsimonious && !nonParsimonious)            map.put("isParsimonious", 1);
+        else if(!parsimonious && nonParsimonious)       map.put("isParsimonious", 0);
         return queryForList(sqlMapNameSpace+".idPickerNrseqProteinIds", map);
     }
     
