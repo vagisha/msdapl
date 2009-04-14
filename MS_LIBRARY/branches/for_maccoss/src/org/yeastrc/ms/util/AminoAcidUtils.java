@@ -13,6 +13,7 @@ public class AminoAcidUtils {
 
     public static final double HYDROGEN = 1.00794;
     public static final double OXYGEN = 15.9994;
+    public static final double PROTON = 1.007276;
     
     private AminoAcidUtils() {}
     
