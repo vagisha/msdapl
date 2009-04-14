@@ -144,6 +144,9 @@ public class CompareProteinSetsAction extends Action {
         return mapping.findForward("Success");
     }
 
+    // -------------------------------------------------------------------------------------------------
+    // CREATE CHART
+    // -------------------------------------------------------------------------------------------------
     private static StringBuilder createChartUrl(int num1, int num2, int num3, 
                     int common1_2, int common1_3, int common2_3, int common1_2_3, String[] legends) {
         

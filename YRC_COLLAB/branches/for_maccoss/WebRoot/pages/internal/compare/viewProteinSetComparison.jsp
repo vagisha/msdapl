@@ -162,6 +162,14 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 			<html:hidden name="proteinferRun" property="selected" indexed="true" />
 		</logic:equal>
 	</logic:iterate>
+	
+	<logic:iterate name="proteinSetComparisonForm" property="dtaRunList" id="dtaRun">
+		<logic:equal name="dtaRun" property="selected" value="true">
+			<html:hidden name="dtaRun" property="runId" indexed="true" />
+			<html:hidden name="dtaRun" property="selected" indexed="true" />
+		</logic:equal>
+	</logic:iterate>
+	
 	<html:hidden name="proteinSetComparisonForm" property="pageNum" styleId="pageNum" />
 </html:form>
 

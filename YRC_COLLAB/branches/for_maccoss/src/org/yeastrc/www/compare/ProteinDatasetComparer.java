@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataSource;
-
 import org.apache.log4j.Logger;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.nr_seq.NRProtein;
