@@ -205,7 +205,7 @@ public class ComparisonDataset implements Tabular, Pageable {
 
     @Override
     public int rowCount() {
-        return rowCount;
+        return Math.min(rowCount, this.getTotalProteinCount() - this.getOffset());
     }
 
     @Override
@@ -230,7 +230,6 @@ public class ComparisonDataset implements Tabular, Pageable {
             protein.setName(nameDescr[0]);
             protein.setDescription(nameDescr[1]);
         }
-        
     }
 
     public void setCurrentPage(int page) {
