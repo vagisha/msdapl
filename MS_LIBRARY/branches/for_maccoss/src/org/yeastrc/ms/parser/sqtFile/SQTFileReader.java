@@ -186,7 +186,9 @@ public abstract class SQTFileReader <T extends SQTSearchScanIn<?>> extends Abstr
             scan.setStartScan(Integer.parseInt(tokens[1]));
             scan.setEndScan(Integer.parseInt(tokens[2]));
             scan.setCharge(Integer.parseInt(tokens[3]));
-            scan.setProcessingTime(Integer.parseInt(tokens[4]));
+            int procTime = Integer.parseInt(tokens[4]);
+            if(procTime < 0) procTime = Integer.MAX_VALUE; // flag this.
+            scan.setProcessingTime(procTime);
             scan.setObservedMass(new BigDecimal(tokens[6]));
             scan.setTotalIntensity(new BigDecimal(tokens[7]));
             scan.setLowestSp(new BigDecimal(tokens[8]));
