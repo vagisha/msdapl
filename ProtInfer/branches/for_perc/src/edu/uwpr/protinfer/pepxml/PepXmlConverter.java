@@ -341,7 +341,7 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
     void writeResultsForScan(List<T> results, List<MsResidueModification> staticMods, String basefile, XMLStreamWriter writer) throws XMLStreamException {
         
         if(results.size() == 0) {
-            log.info("No search results found");
+            log.warn("No search results found");
             return;
         }
         
@@ -396,12 +396,11 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         
         MsSearchResultPeptide peptide = result.getResultPeptide();
         List<MsSearchResultProtein> proteins = result.getProteinMatchList();
-        // accession strings may be separated by ^A; Calculate the number of proteins
-        int numProteins = 0;
-        for(MsSearchResultProtein protein: proteins) {
-            String[] accessionStrings = protein.getAccession().split("\\cA");
-            numProteins += accessionStrings.length;
-        }
+//        // accession strings may be separated by ^A; Calculate the number of proteins
+//        int numProteins = 0;
+//        for(MsSearchResultProtein protein: proteins) {
+//            numProteins += protein.getAccession().split("\\cA").length;
+//        }
         writer.writeStartElement("search_result");
         writer.writeStartElement("search_hit");
         writer.writeAttribute("hit_rank", String.valueOf(getResultRankInList(resForScanCharge, result)));
@@ -409,12 +408,17 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         writer.writeAttribute("peptide_prev_aa", String.valueOf(peptide.getPreResidue()));
         writer.writeAttribute("peptide_next_aa", String.valueOf(peptide.getPostResidue()));
         writer.writeAttribute("protein", proteins.get(0).getAccession());
-        writer.writeAttribute("num_tot_proteins", String.valueOf(numProteins));
-        double peptNeutralMass = calculatePeptideNeutralMass(peptide, staticMods);
+        writer.writeAttribute("num_tot_proteins", String.valueOf(proteins.size()));
+        
+        //double peptNeutralMass = calculatePeptideNeutralMass(peptide, staticMods);
+        double peptNeutralMass = getNeutralMass(getCalculatedPeptideMassPlusH(result));
         writer.writeAttribute("calc_neutral_pep_mass", String.valueOf(peptNeutralMass));
-        double massdiff = this.getNeutralPrecursorMass(scan.getPrecursorMz().doubleValue(), result.getCharge()) - peptNeutralMass;
+        
+        
+        double massdiff = result.getObservedMass().doubleValue() - getCalculatedPeptideMassPlusH(result);
         writer.writeAttribute("massdiff", String.valueOf(massdiff));
         newLine(writer);
+        
         
         // write all the other proteins
         writeAlternativeProteins(proteins, writer);
@@ -538,9 +542,7 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
         
         int scanNumber = scan.getStartScanNum();
         int charge = resForScanCharge.get(0).getCharge();
-        BigDecimal mass = scan.getPrecursorMz();
-        //TODO Is this correct?
-        double neutralMass = getNeutralPrecursorMass(mass.doubleValue(), charge);
+        double neutralMass = getNeutralMass(resForScanCharge.get(0).getObservedMass().doubleValue());
         
         BigDecimal rt = scan.getRetentionTime();
         
@@ -559,14 +561,15 @@ public abstract class PepXmlConverter <T extends MsSearchResult> {
     }
     
     // TODO Is this correct?
-    private double getNeutralPrecursorMass(double preMz, int charge) {
-        return (preMz - AminoAcidUtils.HYDROGEN)*charge;
+    private double getNeutralMass(double mPlusH) {
+        return mPlusH - AminoAcidUtils.PROTON;
     }
-
     
     //-------------------------------------------------------------------------------------------
     // TO BE IMPLEMENTED BY SUBCLASSES
     //-------------------------------------------------------------------------------------------
+    abstract double getCalculatedPeptideMassPlusH(T result);
+    
     abstract MassType getPrecursorMassType(int searchId);
     
     abstract MassType getFragmentMassType(int searchId);

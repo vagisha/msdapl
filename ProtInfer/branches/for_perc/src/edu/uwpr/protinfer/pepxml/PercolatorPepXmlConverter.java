@@ -23,6 +23,7 @@ import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.search.GenericSearchDAO.MassType;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
@@ -32,6 +33,7 @@ import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 
 /**
@@ -45,6 +47,7 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
     private static final MsRunSearchAnalysisDAO rsaDao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
     private static final SQTRunSearchDAO runSearchDao = daofactory.getSqtRunSearchDAO();
     private static final SequestSearchDAO seqSearchDao = daofactory.getSequestSearchDAO();
+    private static final SequestSearchResultDAO seqResDao = daofactory.getSequestResultDAO();
     private static final PercolatorResultDAO resultDao = daofactory.getPercolatorResultDAO();
     
     private static final Logger log = Logger.getLogger(PercolatorPepXmlConverter.class);
@@ -64,6 +67,41 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
             for(int runSearchAnalysisId: runSearchAnalysisIds) {
                 
                 MsRunSearchAnalysis rsa = rsaDao.load(runSearchAnalysisId);
+                writeRunSearchAnalysis(rsa, writer);
+            }
+            endMsmsPipelineAnalysis(writer);
+        }
+        catch (FileNotFoundException e) {
+            log.error("", e);
+        }
+        catch (XMLStreamException e) {
+            log.error("",e);
+        }
+        finally {
+            if(writer != null) try {
+                writer.close();
+            }
+            catch (XMLStreamException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void convertRunSearchAnalyses(List<Integer> runSearchAnalysisIds, String outfile) {
+        
+        XMLStreamWriter writer = null;
+        try {
+            writer = initDocument(outfile);
+            startMsmsPipelineAnalysis(writer, outfile);
+            
+            // Write analysis_summary element
+            // TODO make sure all IDs come from the same percolator analysis
+            MsRunSearchAnalysis rsa = rsaDao.load(runSearchAnalysisIds.get(0));
+            writeAnalysisSummary(rsa.getAnalysisId(), writer);
+            
+            for(int runSearchAnalysisId: runSearchAnalysisIds) {
+                
+                rsa = rsaDao.load(runSearchAnalysisId);
                 writeRunSearchAnalysis(rsa, writer);
             }
             endMsmsPipelineAnalysis(writer);
@@ -133,7 +171,7 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
         
         SequestSearch search = seqSearchDao.loadSearch(runSearch.getSearchId());
         if(search == null) {
-            log.error("Search with ID "+runSearch.getSearchId()+" not foune!");
+            log.error("Search with ID "+runSearch.getSearchId()+" not found!");
             throw new IllegalArgumentException("Search with ID "+runSearch.getSearchId()+" not foune!");
         }
         List<MsResidueModification> staticMods = search.getStaticResidueMods();
@@ -309,5 +347,12 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
         
         writer.writeEndElement();
         newLine(writer);
+    }
+
+    @Override
+    double getCalculatedPeptideMassPlusH(PercolatorResult result) {
+        // NOTE: Assuming Percolator was run on Sequest data.
+        SequestSearchResult seqRes = seqResDao.load(result.getId());
+        return seqRes.getSequestResultData().getCalculatedMass().doubleValue();
     }
 }

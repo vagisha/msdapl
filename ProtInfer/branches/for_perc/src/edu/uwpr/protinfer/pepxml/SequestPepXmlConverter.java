@@ -74,6 +74,33 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
         }
     }
     
+    public void convertRunSearches(List<Integer> runSearchIds, String outfile) {
+        
+        XMLStreamWriter writer = null;
+        try {
+            writer = initDocument(outfile);
+            startMsmsPipelineAnalysis(writer, outfile);
+            
+            for(int runSearchId: runSearchIds) {
+                writeRunSearch(runSearchId, writer);
+            }
+            endMsmsPipelineAnalysis(writer);
+        }
+        catch (FileNotFoundException e) {
+            log.error("", e);
+        }
+        catch (XMLStreamException e) {
+            log.error("",e);
+        }
+        finally {
+            if(writer != null) try {
+                writer.close();
+            }
+            catch (XMLStreamException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     
     public void convertRunSearch(int runSearchId, String outdir) {
         
@@ -199,6 +226,11 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
     }
 
     @Override
+    double getCalculatedPeptideMassPlusH(SequestSearchResult result) {
+        return result.getSequestResultData().getCalculatedMass().doubleValue();
+    }
+    
+    @Override
     int getResultRankInList(List<SequestSearchResult> resultList,
             SequestSearchResult result) {
         return result.getSequestResultData().getxCorrRank();
@@ -261,4 +293,5 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
         //converter.convertRunSearch(runSearchId, outDir);
          converter.convertSearch(searchId, outFile);
     }
+
 }
