@@ -133,6 +133,9 @@ function toggleFilesForExperiment (experimentId) {
 								<html:link action="viewSequestResults.do" 
 											paramId="ID" 
 											paramName="search" paramProperty="id">[View Results]</html:link>
+								<html:link action="newSequestPepXmlDownload.do" 
+											paramId="ID" 
+											paramName="search" paramProperty="id">[PepXML]</html:link>
 							</b>
 							</td>
 							<td width="33%"><b>Search Date: </b>&nbsp;
@@ -168,7 +171,12 @@ function toggleFilesForExperiment (experimentId) {
 						&nbsp;
 						<bean:write name="analysis" property="analysisProgramVersion"/></b></td>
 						<td width="33%">
-							<b><html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link></b>
+							<b>
+								<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
+								<html:link action="percolatorPepXmlDownloadForm.do" 
+											paramId="ID" 
+											paramName="search" paramProperty="id">[PepXML]</html:link>
+							</b>
 						</td>
 						<td width="33%">
 							<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='project' property='ID'/>"> 

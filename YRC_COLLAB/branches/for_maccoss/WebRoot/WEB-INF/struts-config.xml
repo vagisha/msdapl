@@ -61,6 +61,7 @@
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
 	<form-bean name="proteinSetComparisonForm" type="org.yeastrc.www.compare.ProteinSetComparisonForm"></form-bean>
+	<form-bean name="sequestPepxmlDownloadForm" type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadForm"></form-bean>
     </form-beans>
 
 
@@ -101,7 +102,7 @@
 	<forward name="newPercolatorProteinInference" path="/newPercolatorProteinInference.do" />
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
 	<forward name="newProteinSetComparison" path="/newProteinSetComparison.do" />
-
+	<forward name="sequestPepxmlDownload" path="/newSequestPepXmlDownload.do" />
     </global-forwards>
 
 
@@ -833,6 +834,30 @@
 	</action>
 	
 	
+	
+	<!-- ================================================================================== -->
+	<!-- Actions related to downloading PepXML files -->
+	<!-- ================================================================================== -->
+	<action 
+		path="/newSequestPepXmlDownload"
+		type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadFormAction"
+		validate="false"
+	>
+		<forward name="Success" path="/pages/internal/project/sequest/sequestPepxmlDownloadForm.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/sequestPepXmlDownload"
+		type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadAction"
+		name="sequestPepxmlDownloadForm"
+		input="/pages/internal/project/sequest/sequestPepxmlDownloadForm.jsp"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/project/sequest/sequestPepxmlDownloadSubmitted.jsp" redirect="false" />
+		<forward name="Failure" path="/newSequestPepXmlDownload.do" redirect="false" />
+	</action>
 	
 	<!-- ================================================================================== -->
 	
