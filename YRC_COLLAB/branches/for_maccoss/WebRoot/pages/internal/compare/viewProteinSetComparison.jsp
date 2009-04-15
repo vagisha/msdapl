@@ -58,6 +58,55 @@ function pageResults(pageNum) {
   	$("form").submit();
 }
 
+// ---------------------------------------------------------------------------------------
+// TOGGLE AND, OR, NOT FILTERS
+// ---------------------------------------------------------------------------------------
+var colors = [];
+<%
+	int datasetCount = comparison.getDatasetCount();
+	for(int i = 0; i < datasetCount; i++) {
+%>
+	colors[<%=i%>] = '<%="rgb("+DatasetColor.get(i).R+","+DatasetColor.get(i).G+","+DatasetColor.get(i).B+")"%>';
+<%
+}
+%>
+function toggleAndSelect(dsIndex) {
+	var id = "AND_"+dsIndex+"_select";
+	var value = $("input#"+id).val();
+	
+	if(value == "true") {
+		$("input#"+id).val("false");	
+		$("td#AND_"+dsIndex+"_td").css("background-color", "#FFFFFF");
+	}
+	else {
+		$("input#"+id).val("true");	
+		$("td#AND_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+	}
+}
+function toggleOrSelect(dsIndex) {
+	var id = "OR_"+dsIndex+"_select";
+	var value = $("input#"+id).val();
+	if(value == "true") {
+		$("input#"+id).val("false");	
+		$("td#OR_"+dsIndex+"_td").css("background-color", "#FFFFFF");
+	}
+	else {
+		$("input#"+id).val("true");	
+		$("td#OR_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+	}
+}
+function toggleNotSelect(dsIndex) {
+	var id = "NOT_"+dsIndex+"_select";
+	var value = $("input#"+id).val();
+	if(value == "true") {
+		$("input#"+id).val("false");	
+		$("td#NOT_"+dsIndex+"_td").css("background-color", "#FFFFFF");
+	}
+	else {
+		$("input#"+id).val("true");	
+		$("td#NOT_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+	}
+}
 </script>
 
 <CENTER>
@@ -97,7 +146,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <tbody>
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
 <tr>
-<th>Dataset ID <bean:write name="dataset" property="datasetId"/></th>
+<th style="padding-right:10;" >Dataset ID <bean:write name="dataset" property="datasetId"/></th>
 
 
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="column">
@@ -108,13 +157,9 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 	</td>
 	</logic:equal>
 	
-	<logic:lessThan name="column" value="<%=String.valueOf(row)%>">
-		<td>&nbsp;</td>
-	</logic:lessThan>
-	
-	<logic:greaterThan name="column" value="<%=String.valueOf(row)%>">
+	<logic:notEqual name="column" value="<%=String.valueOf(row)%>">
 		<td>(<%=comparison.getCommonProteinCount(row, column) %>)&nbsp;<%=comparison.getCommonProteinsPerc(row, column) %>%</td>
-	</logic:greaterThan>
+	</logic:notEqual>
 </logic:iterate>
 
 </tr>
@@ -171,7 +216,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 	</logic:iterate>
 	
 	<html:hidden name="proteinSetComparisonForm" property="pageNum" styleId="pageNum" />
-</html:form>
+
 
 <center>
 <br>
@@ -179,34 +224,75 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
 <table>
 	<tr>
-		<td><b>Limit:</b></td>
+		<td><b>Filter:</b></td>
 		<td><b>AND</b></td>
 		<td>
-			<table style="border: 1px solid #F2F2F2;">
+			<table cellpadding="0" cellspacing="0">
 			<tr>
-				<logic:iterate name="comparison" property="datasets" id="dataset" indexId="dsIndex">
-					<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>)">&nbsp;&nbsp;</td>
+				<logic:iterate name="proteinSetComparisonForm" property="andList" id="andDataset" indexId="dsIndex">
+					
+					<logic:equal name="andDataset" property="selected" value="true">
+						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
+							id="<%="AND_"+dsIndex+"_td"%>"
+						>
+					</logic:equal>
+					<logic:notEqual name="andDataset" property="selected" value="true">
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="<%="AND_"+dsIndex+"_td"%>" >
+					</logic:notEqual>
+					<span style="cursor:pointer;" onclick="javascript:toggleAndSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<html:hidden name="andDataset" property="datasetId" indexed="true" />
+					<html:hidden name="andDataset" property="sourceString" indexed="true" />
+					<html:hidden name="andDataset" property="selected" indexed="true" styleId="<%="AND_"+dsIndex+"_select"%>" />
+					</td>
 				</logic:iterate>
 			</tr>
 			</table>
 		</td>
+		<td>&nbsp;&nbsp;&nbsp;</td>
 		<td><b>OR</b></td>
 		<td>
-			<table style="border: 1px solid #F2F2F2;">
+			<table  cellpadding="0" cellspacing="0">
 			<tr>
-				<logic:iterate name="comparison" property="datasets" id="dataset" indexId="dsIndex">
-					<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>)">&nbsp;&nbsp;</td>
+				<logic:iterate name="proteinSetComparisonForm" property="orList" id="orDataset" indexId="dsIndex">
+					
+					<logic:equal name="orDataset" property="selected" value="true">
+						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
+							id="<%="OR_"+dsIndex+"_td"%>"
+						>
+					</logic:equal>
+					<logic:notEqual name="orDataset" property="selected" value="true">
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="<%="OR_"+dsIndex+"_td"%>">
+					</logic:notEqual>
+					<span style="cursor:pointer;" onclick="javascript:toggleOrSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<html:hidden name="orDataset" property="datasetId" indexed="true" />
+					<html:hidden name="orDataset" property="sourceString" indexed="true" />
+					<html:hidden name="orDataset" property="selected" indexed="true" styleId="<%="OR_"+dsIndex+"_select"%>" />
+					</td>
 				</logic:iterate>
 			</tr>
 			</table>
 		</td>
-		
+		<td>&nbsp;&nbsp;&nbsp;</td>
 		<td><b>NOT</b></td>
 		<td>
-			<table style="border: 1px solid #F2F2F2;">
+			<table  cellpadding="0" cellspacing="0">
 			<tr>
-				<logic:iterate name="comparison" property="datasets" id="dataset" indexId="dsIndex">
-					<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>)">&nbsp;&nbsp;</td>
+				<logic:iterate name="proteinSetComparisonForm" property="notList" id="notDataset" indexId="dsIndex">
+					
+					<logic:equal name="notDataset" property="selected" value="true">
+						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
+							id="<%="NOT_"+dsIndex+"_td"%>"
+						>
+					</logic:equal>
+					<logic:notEqual name="notDataset" property="selected" value="true">
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="<%="NOT_"+dsIndex+"_td"%>">
+					</logic:notEqual>
+					<span style="cursor:pointer;" onclick="javascript:toggleNotSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<html:hidden name="notDataset" property="datasetId" indexed="true" />
+					<html:hidden name="notDataset" property="sourceString" indexed="true" />
+					<html:hidden name="notDataset" property="selected" indexed="true" styleId="<%="NOT_"+dsIndex+"_select"%>" />
+					</td>
+					
 				</logic:iterate>
 			</tr>
 			</table>
@@ -219,6 +305,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 </table>
 </div>
 </center>
+</html:form>
 
 <br>
 

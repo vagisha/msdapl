@@ -24,6 +24,10 @@ public class ProteinSetComparisonForm extends ActionForm {
     private List<ProteinferRunFormBean> piRuns = new ArrayList<ProteinferRunFormBean>();
     private List<DTASelectRunFormBean> dtaRuns = new ArrayList<DTASelectRunFormBean>();
 
+    private List<SelectableDataset> andList = new ArrayList<SelectableDataset>();
+    private List<SelectableDataset> orList  = new ArrayList<SelectableDataset>();
+    private List<SelectableDataset> notList = new ArrayList<SelectableDataset>();
+    
     private int pageNum = 1;
     
     public int getPageNum() {
@@ -69,8 +73,9 @@ public class ProteinSetComparisonForm extends ActionForm {
         return i;
     }
     
-    
+    //-----------------------------------------------------------------------------
     // Protein inference datasets
+    //-----------------------------------------------------------------------------
     public ProteinferRunFormBean getProteinferRun(int index) {
         while(index >= piRuns.size())
             piRuns.add(new ProteinferRunFormBean());
@@ -95,8 +100,9 @@ public class ProteinSetComparisonForm extends ActionForm {
     }
     
     
-    
+    //-----------------------------------------------------------------------------
     // DTASelect datasets
+    //-----------------------------------------------------------------------------
     public DTASelectRunFormBean getDtaRun(int index) {
         while(index >= dtaRuns.size())
             dtaRuns.add(new DTASelectRunFormBean());
@@ -119,5 +125,58 @@ public class ProteinSetComparisonForm extends ActionForm {
         }
         return ids;
     }
-   
+    
+    //-----------------------------------------------------------------------------
+    // AND list
+    //-----------------------------------------------------------------------------
+    public SelectableDataset getAndDataset(int index) {
+        while(index >= andList.size()) {
+            andList.add(new SelectableDataset());
+        }
+        return andList.get(index);
+    }
+    
+    public void setAndList(List<SelectableDataset> andList) {
+        this.andList = andList;
+    }
+    
+    public List<SelectableDataset> getAndList() {
+        return andList;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // OR list
+    //-----------------------------------------------------------------------------
+    public SelectableDataset getOrDataset(int index) {
+        while(index >= orList.size()) {
+            orList.add(new SelectableDataset());
+        }
+        return orList.get(index);
+    }
+    
+    public void setOrList(List<SelectableDataset> orList) {
+        this.orList = orList;
+    }
+    
+    public List<SelectableDataset> getOrList() {
+        return orList;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // NOT list
+    //-----------------------------------------------------------------------------
+    public SelectableDataset getNotDataset(int index) {
+        while(index >= notList.size()) {
+            notList.add(new SelectableDataset());
+        }
+        return notList.get(index);
+    }
+    
+    public void setNotList(List<SelectableDataset> notList) {
+        this.notList = orList;
+    }
+    
+    public List<SelectableDataset> getNotList() {
+        return notList;
+    }
 }

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -143,6 +144,75 @@ public class ProteinDatasetComparer {
         return null;
     }
 
+    public void applyFilters(ComparisonDataset dataset, ProteinDatasetComparisonFilters filters) {
+        
+        List<ComparisonProtein> proteins = dataset.getProteins();
+        // Apply the AND filters
+        applyAndFilter(proteins, filters.getAndFilters());
+        
+        // Apply the OR filters
+        applyOrFilter(proteins, filters.getOrFilters());
+        
+        // Apply the NOT filters
+        applyNotFilter(proteins, filters.getNotFilters());
+        
+    }
+    
+    private void applyAndFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+        
+        if(datasets.size() ==0)
+            return;
+        
+        Iterator<ComparisonProtein> iter = proteins.iterator();
+        while(iter.hasNext()) {
+            ComparisonProtein protein = iter.next();
+            
+            for(Dataset dataset: datasets) {
+                if(!protein.isInDataset(dataset)) {
+                    iter.remove();
+                    break;
+                }
+            }
+        }
+    }
+    
+    private void applyOrFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+        
+        if(datasets.size() ==0)
+            return;
+        
+        Iterator<ComparisonProtein> iter = proteins.iterator();
+        while(iter.hasNext()) {
+            ComparisonProtein protein = iter.next();
+            
+            boolean reject = true;
+            for(Dataset dataset: datasets) {
+                if(protein.isInDataset(dataset)) {
+                    reject = false;
+                    break;
+                }
+            }
+            if(reject)  iter.remove();
+        }
+    }
+    
+    private void applyNotFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+        
+        if(datasets.size() ==0)
+            return;
+        
+        Iterator<ComparisonProtein> iter = proteins.iterator();
+        while(iter.hasNext()) {
+            ComparisonProtein protein = iter.next();
+            
+            for(Dataset dataset: datasets) {
+                if(protein.isInDataset(dataset)) {
+                    iter.remove();
+                    break;
+                }
+            }
+        }
+    }
 
     /**
      * Find the number of common ids in two sorted lists of integers

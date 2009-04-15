@@ -11,6 +11,7 @@
 	<bean:define name="pageable" property="pageCount" id="pagecount" />
 	<bean:define name="pageable" property="displayPageNumbers" id="displayPageNumbers" />
 	
+	<logic:greaterThan name="pagecount" value="0">
 	<%int nextPage = Integer.valueOf(currentPage.toString()) + 1; int prevPage = Integer.valueOf(currentPage.toString()) - 1; %>
 	
 	<logic:notEqual name="currentPage" value="1">
@@ -40,4 +41,6 @@
 			Last</span>
 	</logic:notEqual>
 	&nbsp; &nbsp; <span style="font-size:8pt;">Page <bean:write name="currentPage"/> of <bean:write name="pagecount" /></span>
+	
+	</logic:greaterThan>
 </div>

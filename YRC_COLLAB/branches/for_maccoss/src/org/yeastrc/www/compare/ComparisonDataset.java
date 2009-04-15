@@ -73,7 +73,7 @@ public class ComparisonDataset implements Tabular, Pageable {
         proteinCounts = new int[datasets.size()][datasets.size()];
         for(int i = 0; i < datasets.size(); i++) {
             for(int j = 0; j < datasets.size(); j++)
-                proteinCounts[i][j]++;
+                proteinCounts[i][j] = 0;
         }
         
         for(ComparisonProtein protein: proteins) {
@@ -115,21 +115,24 @@ public class ComparisonDataset implements Tabular, Pageable {
     }
     
 
+    /**
+     * Fraction of dataset_1 proteins that were also found in dataset_2
+     * @param datasetIndex1
+     * @param datasetIndex2
+     * @return
+     */
     public int getCommonProteinsPerc(int datasetIndex1, int datasetIndex2) {
         
         if(proteinCounts == null) {
             initProteinCounts();
         }
         
-        int ds1Count = proteinCounts[datasetIndex1][datasetIndex2];
-        int ds2Count = proteinCounts[datasetIndex2][datasetIndex2];
-        if(ds1Count > ds2Count && ds1Count > 0) {
-            return calculatePercent(proteinCounts[datasetIndex1][datasetIndex2], ds1Count);
-        }
-        else if(ds2Count > 0) {
-            return calculatePercent(proteinCounts[datasetIndex1][datasetIndex2], ds2Count);
-        }
-        return 0;
+        int ds1Count = proteinCounts[datasetIndex1][datasetIndex1];
+        int commonCount = proteinCounts[datasetIndex1][datasetIndex2];
+        
+        if(ds1Count <= 0)
+            return 0;
+        return calculatePercent(commonCount, ds1Count);
     }
     
     private static int calculatePercent(int num1, int num2) {

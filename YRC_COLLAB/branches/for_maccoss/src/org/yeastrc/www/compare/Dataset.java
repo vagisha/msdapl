@@ -11,8 +11,10 @@ package org.yeastrc.www.compare;
  */
 public class Dataset {
 
-    private final int datasetId;
-    private final DatasetSource source;
+    private int datasetId;
+    private DatasetSource source;
+    
+    public Dataset() {}
     
     public Dataset(int datasetId, DatasetSource source) {
         this.datasetId = datasetId;
@@ -22,9 +24,14 @@ public class Dataset {
     public int getDatasetId() {
         return datasetId;
     }
+    
     public DatasetSource getSource() {
         return source;
     }
+    public String getSourceString() {
+        return source.name();
+    }
+    
     
     public boolean equals(Object o) {
         if(this == o)
@@ -40,5 +47,17 @@ public class Dataset {
     
     public int hashCode() {
         return source.hashCode() + Integer.valueOf(datasetId).hashCode();
+    }
+
+    public void setDatasetId(int datasetId) {
+        this.datasetId = datasetId;
+    }
+
+    public void setSource(DatasetSource source) {
+        this.source = source;
+    }
+    
+    public void setSourceString(String sourceStr) {
+        this.source = DatasetSource.instance(sourceStr);
     }
 }
