@@ -233,16 +233,16 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 					
 					<logic:equal name="andDataset" property="selected" value="true">
 						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
-							id="<%="AND_"+dsIndex+"_td"%>"
+							id='<%="AND_"+dsIndex+"_td"%>'
 						>
 					</logic:equal>
 					<logic:notEqual name="andDataset" property="selected" value="true">
-						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="<%="AND_"+dsIndex+"_td"%>" >
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="AND_"+dsIndex+"_td"%>' >
 					</logic:notEqual>
 					<span style="cursor:pointer;" onclick="javascript:toggleAndSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
 					<html:hidden name="andDataset" property="datasetId" indexed="true" />
 					<html:hidden name="andDataset" property="sourceString" indexed="true" />
-					<html:hidden name="andDataset" property="selected" indexed="true" styleId="<%="AND_"+dsIndex+"_select"%>" />
+					<html:hidden name="andDataset" property="selected" indexed="true" styleId='<%="AND_"+dsIndex+"_select"%>' />
 					</td>
 				</logic:iterate>
 			</tr>
@@ -257,16 +257,16 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 					
 					<logic:equal name="orDataset" property="selected" value="true">
 						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
-							id="<%="OR_"+dsIndex+"_td"%>"
+							id='<%="OR_"+dsIndex+"_td"%>'
 						>
 					</logic:equal>
 					<logic:notEqual name="orDataset" property="selected" value="true">
-						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="<%="OR_"+dsIndex+"_td"%>">
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="OR_"+dsIndex+"_td"%>'>
 					</logic:notEqual>
 					<span style="cursor:pointer;" onclick="javascript:toggleOrSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
 					<html:hidden name="orDataset" property="datasetId" indexed="true" />
 					<html:hidden name="orDataset" property="sourceString" indexed="true" />
-					<html:hidden name="orDataset" property="selected" indexed="true" styleId="<%="OR_"+dsIndex+"_select"%>" />
+					<html:hidden name="orDataset" property="selected" indexed="true" styleId='<%="OR_"+dsIndex+"_select"%>' />
 					</td>
 				</logic:iterate>
 			</tr>
@@ -281,16 +281,16 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 					
 					<logic:equal name="notDataset" property="selected" value="true">
 						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
-							id="<%="NOT_"+dsIndex+"_td"%>"
+							id='<%="NOT_"+dsIndex+"_td"%>'
 						>
 					</logic:equal>
 					<logic:notEqual name="notDataset" property="selected" value="true">
-						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="<%="NOT_"+dsIndex+"_td"%>">
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="NOT_"+dsIndex+"_td"%>'>
 					</logic:notEqual>
 					<span style="cursor:pointer;" onclick="javascript:toggleNotSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
 					<html:hidden name="notDataset" property="datasetId" indexed="true" />
 					<html:hidden name="notDataset" property="sourceString" indexed="true" />
-					<html:hidden name="notDataset" property="selected" indexed="true" styleId="<%="NOT_"+dsIndex+"_select"%>" />
+					<html:hidden name="notDataset" property="selected" indexed="true" styleId='<%="NOT_"+dsIndex+"_select"%>' />
 					</td>
 					
 				</logic:iterate>
