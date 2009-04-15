@@ -17,6 +17,7 @@ public class ComparisonProtein {
     private final int nrseqId;
     private String name;
     private String description;
+    private int maxPeptideCount;
     
     private List<DatasetProteinInformation> datasetInfo;
     
@@ -78,5 +79,13 @@ public class ComparisonProtein {
     
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getMaxPeptideCount() {
+        return maxPeptideCount;
+    }
+
+    public void setMaxPeptideCount(int maxPeptideCount) {
+        this.maxPeptideCount = maxPeptideCount;
     }
 }

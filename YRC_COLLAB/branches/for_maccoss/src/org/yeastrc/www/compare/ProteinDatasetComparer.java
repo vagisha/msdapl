@@ -43,7 +43,7 @@ public class ProteinDatasetComparer {
         return instance;
     }
     
-    public ComparisonDataset compareDatasets(List<Dataset> datasets, boolean parsimoniousOnly) throws Exception {
+    public ProteinComparisonDataset compareDatasets(List<Dataset> datasets, boolean parsimoniousOnly) throws Exception {
         
         Map<Integer, ComparisonProtein> proteinMap = new HashMap<Integer, ComparisonProtein>();
         
@@ -97,7 +97,7 @@ public class ProteinDatasetComparer {
             }
         }
         
-        ComparisonDataset comparison = new ComparisonDataset();
+        ProteinComparisonDataset comparison = new ProteinComparisonDataset();
         comparison.setDatasets(datasets);
         for(ComparisonProtein protein: proteinMap.values())
             comparison.addProtein(protein);
@@ -144,7 +144,7 @@ public class ProteinDatasetComparer {
         return null;
     }
 
-    public void applyFilters(ComparisonDataset dataset, ProteinDatasetComparisonFilters filters) {
+    public void applyFilters(ProteinComparisonDataset dataset, ProteinDatasetComparisonFilters filters) {
         
         List<ComparisonProtein> proteins = dataset.getProteins();
         // Apply the AND filters

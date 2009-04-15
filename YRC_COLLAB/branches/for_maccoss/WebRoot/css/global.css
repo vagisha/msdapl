@@ -283,6 +283,10 @@ INPUT.error_button, .error_button {
 	cursor: pointer;
 }
 
+.underline {
+	text-decoration: underline;
+}
+
 .foldable {
 	cursor: pointer;
 }

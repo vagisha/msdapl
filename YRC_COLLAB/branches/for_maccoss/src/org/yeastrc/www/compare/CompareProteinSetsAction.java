@@ -142,7 +142,7 @@ public class CompareProteinSetsAction extends Action {
         filters.setNotFilters(notFilters);
         
         // Do the comparison
-        ComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
+        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
         comparison.initPreFilteringSummary(); // initialize the summary (totalProteinCount, # common proteins)
         ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
         comparison.setCurrentPage(myForm.getPageNum());

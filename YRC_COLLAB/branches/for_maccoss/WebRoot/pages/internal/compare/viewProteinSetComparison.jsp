@@ -1,5 +1,5 @@
 
-<%@page import="org.yeastrc.www.compare.ComparisonDataset"%>
+<%@page import="org.yeastrc.www.compare.ProteinComparisonDataset"%>
 <%@page import="org.yeastrc.www.compare.DatasetColor"%>
 <%@page import="org.yeastrc.www.compare.Dataset"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -17,21 +17,55 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ComparisonDataset"></bean:define>
+<bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinComparisonDataset"></bean:define>
 
 <script>
 // ---------------------------------------------------------------------------------------
 // SETUP THE TABLE
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
-
+	
    $("#compare_results_pager").attr('width', "80%").attr('align', 'center');
    
+   var colCount = <%=comparison.tableHeaders().size()%>
    $("#compare_results").each(function() {
    		var $table = $(this);
    		$table.attr('width', "80%");
    		$table.attr('align', 'center');
    		$('.prot_descr', $table).css("font-size", "8pt");
+   		
+   		
+   		$('.pept_count', $table).each(function() {
+   			var nrseqId = $(this).attr('id');
+   			$(this).addClass('pept_closed');
+   			$(this).click(function() {
+   				// append a row for the peptide list to go into
+   				var row = $(this).parent();
+   				if($(this).is('.pept_closed')) {
+   					$(this).removeClass('pept_closed');
+   					$(this).addClass('pept_open');
+   					
+   					if($(this).is('.has_peptides')) {
+   						$(row).next().show();
+   					}
+   					else {
+   					
+   						// send a request for the peptides
+   						
+   						$(row).after("<tr><td colspan='"+colCount+"'> <div align='center' width='90%' style='border:1px dashed gray;'>"+nrseqId+"</div></td></tr>");
+   						
+   						
+   						$(this).addClass('has_peptides');
+   					}
+   				}
+   				else {
+   					$(this).removeClass('pept_open');
+   					$(this).addClass('pept_closed');
+   					$(row).next().hide();
+   				}
+   			});
+   			
+   		});
    		
    		
    		<%for(int i = 0; i < comparison.getDatasetCount(); i++) {

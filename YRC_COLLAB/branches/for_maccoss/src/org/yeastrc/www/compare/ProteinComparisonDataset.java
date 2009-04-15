@@ -19,7 +19,7 @@ import org.yeastrc.www.misc.Tabular;
 /**
  * 
  */
-public class ComparisonDataset implements Tabular, Pageable {
+public class ProteinComparisonDataset implements Tabular, Pageable {
 
     private List<Dataset> datasets;
     
@@ -43,7 +43,7 @@ public class ComparisonDataset implements Tabular, Pageable {
         this.rowCount = count;
     }
 
-    public ComparisonDataset() {
+    public ProteinComparisonDataset() {
         this.datasets = new ArrayList<Dataset>();
         this.proteins = new ArrayList<ComparisonProtein>();
         this.displayPageNumbers = new ArrayList<Integer>();
@@ -164,9 +164,18 @@ public class ComparisonDataset implements Tabular, Pageable {
         ComparisonProtein protein = proteins.get(index + this.getOffset());
         
         TableRow row = new TableRow();
+        
+        // Protein name
         TableCell protName = new TableCell(protein.getName());
         row.addCell(protName);
         
+        // Peptide count
+        TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
+        peptCount.setClassName("pept_count clickable underline");
+        peptCount.setId(String.valueOf(protein.getNrseqId()));
+        row.addCell(peptCount);
+        
+        // Protein description
         TableCell protDescr = new TableCell();
         protDescr.setClassName("prot_descr");
         String descr = protein.getDescription();
@@ -194,7 +203,7 @@ public class ComparisonDataset implements Tabular, Pageable {
         }
         row.addCell(protDescr);
         
-        
+        // Present / not present in each dataset
         int dsIndex = 0;
         for(Dataset dataset: datasets) {
             DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
@@ -229,6 +238,7 @@ public class ComparisonDataset implements Tabular, Pageable {
     public List<TableHeader> tableHeaders() {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
         headers.add(new TableHeader("Protein"));
+        headers.add(new TableHeader("#Pept"));
         headers.add(new TableHeader("Description"));
         for(Dataset dataset: datasets) {
             headers.add(new TableHeader(String.valueOf(dataset.getDatasetId())));
@@ -246,6 +256,9 @@ public class ComparisonDataset implements Tabular, Pageable {
             String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
             protein.setName(nameDescr[0]);
             protein.setDescription(nameDescr[1]);
+            
+            // get the (max)number of peptides identified for this protein
+            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
         }
     }
 

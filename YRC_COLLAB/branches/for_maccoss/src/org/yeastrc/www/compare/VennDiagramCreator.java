@@ -12,7 +12,7 @@ public class VennDiagramCreator {
         return instance;
     }
 
-    public String getChartUrl(ComparisonDataset comparison) {
+    public String getChartUrl(ProteinComparisonDataset comparison) {
 
         if(comparison.getDatasetCount() == 2) {
 

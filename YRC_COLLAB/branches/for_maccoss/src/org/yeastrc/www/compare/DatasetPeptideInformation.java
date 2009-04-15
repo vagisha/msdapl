@@ -1,7 +1,7 @@
 /**
- * DataSetInformation.java
+ * DatasetPeptideInformation.java
  * @author Vagisha Sharma
- * Apr 11, 2009
+ * Apr 15, 2009
  * @version 1.0
  */
 package org.yeastrc.www.compare;
@@ -9,13 +9,14 @@ package org.yeastrc.www.compare;
 /**
  * 
  */
-public class DatasetProteinInformation {
+public class DatasetPeptideInformation {
 
     private boolean present;
-    private boolean parsimonious;
+    private boolean unique;
+    private int spectrumCount;
     private final Dataset dataset;
     
-    public DatasetProteinInformation(Dataset dataset) {
+    public DatasetPeptideInformation(Dataset dataset) {
         this.dataset = dataset;
     }
     
@@ -37,10 +38,19 @@ public class DatasetProteinInformation {
     public void setPresent(boolean present) {
         this.present = present;
     }
-    public boolean isParsimonious() {
-        return parsimonious;
+    
+    public boolean isUnique() {
+        return unique;
     }
-    public void setParsimonious(boolean parsimonious) {
-        this.parsimonious = parsimonious;
+    public void setUnique(boolean unique) {
+        this.unique = unique;
+    }
+
+    public int getSpectrumCount() {
+        return spectrumCount;
+    }
+
+    public void setSpectrumCount(int spectrumCount) {
+        this.spectrumCount = spectrumCount;
     }
 }

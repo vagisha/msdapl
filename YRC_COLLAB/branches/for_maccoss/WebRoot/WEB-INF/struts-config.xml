@@ -61,7 +61,9 @@
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
 	<form-bean name="proteinSetComparisonForm" type="org.yeastrc.www.compare.ProteinSetComparisonForm"></form-bean>
+	<form-bean name="peptideComparisonForm" type="org.yeastrc.www.compare.ComparePeptidesForm"></form-bean>
 	<form-bean name="sequestPepxmlDownloadForm" type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadForm"></form-bean>
+	
     </form-beans>
 
 
@@ -809,7 +811,7 @@
 	
 	
 	<!-- ================================================================================== -->
-	<!-- Actions related to comparing protein inference runs -->
+	<!-- Actions related to comparing protein datasets -->
 	<!-- ================================================================================== -->
 	
 	<action 
@@ -831,6 +833,17 @@
 	>
 		<forward name="Success" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinSetComparison.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/doPeptidesComparison"
+		type="org.yeastrc.www.compare.ComparePeptidesAjaxAction"
+		name="peptideComparisonForm"
+		input="/pages/internal/compare/proteinSetComparisonForm.jsp"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/compare/viewPeptidesComparison.jsp" redirect="false" />
 	</action>
 	
 	
