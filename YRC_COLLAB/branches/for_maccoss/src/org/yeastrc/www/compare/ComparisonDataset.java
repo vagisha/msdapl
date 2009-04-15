@@ -22,8 +22,13 @@ import org.yeastrc.www.misc.Tabular;
 public class ComparisonDataset implements Tabular, Pageable {
 
     private List<Dataset> datasets;
+    
+    // FILTERED proteins
     private List<ComparisonProtein> proteins;
+    
+    // counts BEFORE filtering
     private int[][] proteinCounts;
+    private int totalProteinCount;
     
     private int rowCount = 50;
     private int currentPage = 1;
@@ -65,7 +70,16 @@ public class ComparisonDataset implements Tabular, Pageable {
     }
     
     public int getTotalProteinCount() {
+        return totalProteinCount;
+    }
+    
+    public int getFilteredProteinCount() {
         return proteins.size();
+    }
+    
+    public void initPreFilteringSummary() {
+        initProteinCounts();
+        this.totalProteinCount = proteins.size();
     }
     
     private void initProteinCounts() {
@@ -208,7 +222,7 @@ public class ComparisonDataset implements Tabular, Pageable {
 
     @Override
     public int rowCount() {
-        return Math.min(rowCount, this.getTotalProteinCount() - this.getOffset());
+        return Math.min(rowCount, this.getFilteredProteinCount() - this.getOffset());
     }
 
     @Override
@@ -225,7 +239,7 @@ public class ComparisonDataset implements Tabular, Pageable {
     @Override
     public void tabulate() {
         
-        int max = Math.min((this.getOffset() + rowCount), this.getTotalProteinCount());
+        int max = Math.min((this.getOffset() + rowCount), this.getFilteredProteinCount());
         
         for(int i = this.getOffset(); i < max; i++) {
             ComparisonProtein protein = proteins.get(i);

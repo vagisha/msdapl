@@ -224,7 +224,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <div style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
 <table>
 	<tr>
-		<td><b>Filter:</b></td>
+		<td style="padding-right:10;"><b>Filter:</b></td>
 		<td><b>AND</b></td>
 		<td>
 			<table cellpadding="0" cellspacing="0">
@@ -297,8 +297,11 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 			</tr>
 			</table>
 		</td>
-		<td>
+		<td style="padding-left:10">
 			<html:submit value="Update"></html:submit>
+		</td>
+		<td style="padding-left:20">
+			# Filtered Proteins: <bean:write name="comparison" property="filteredProteinCount"/>
 		</td>
 		
 	</tr>
