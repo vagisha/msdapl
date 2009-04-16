@@ -27,9 +27,12 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         SORT_BY.CHARGE, 
         SORT_BY.MASS, 
         SORT_BY.RT, 
-        SORT_BY.P_RT, 
+        //SORT_BY.P_RT, 
         SORT_BY.QVAL, 
-        SORT_BY.PEP, 
+        SORT_BY.PEP,
+        SORT_BY.XCORR_RANK,
+        SORT_BY.XCORR,
+//        SORT_BY.DELTACN,
         SORT_BY.PEPTIDE,
         SORT_BY.PROTEIN
     };
@@ -75,17 +78,21 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         List<TableHeader> headers = new ArrayList<TableHeader>(columns.length);
         for(SORT_BY col: columns) {
             TableHeader header = new TableHeader(col.getDisplayName(), col.name());
+            
+            if(col == SORT_BY.XCORR_RANK || col == SORT_BY.XCORR || col == SORT_BY.DELTACN)
+                header.setSortable(false);
+            if(col == SORT_BY.PROTEIN)
+                header.setSortable(false);
+            
             if(col == sortColumn) {
                 header.setSorted(true);
                 header.setSortOrder(sortOrder);
             }
-            if(col == SORT_BY.PROTEIN)
-                header.setSortable(false);
             headers.add(header);
         }
         return headers;
     }
-
+    
     @Override
     public TableRow getRow(int index) {
         if(index >= results.size())
@@ -108,14 +115,20 @@ public class TabularPercolatorResults implements Tabular, Pageable {
             row.addCell(new TableCell(String.valueOf(round(temp))));
         
         // Predicted retention time
-        temp = result.getPredictedRetentionTime();
-        if(temp == null) {
-            row.addCell(new TableCell("", null));
-        }
-        else
-            row.addCell(new TableCell(String.valueOf(round(temp))));
+//        temp = result.getPredictedRetentionTime();
+//        if(temp == null) {
+//            row.addCell(new TableCell("", null));
+//        }
+//        else
+//            row.addCell(new TableCell(String.valueOf(round(temp))));
+        
         row.addCell(new TableCell(String.valueOf(result.getQvalueRounded())));
         row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded())));
+        
+        // Sequest data
+        row.addCell(new TableCell(String.valueOf(result.getSequestData().getxCorrRank())));
+        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getxCorr()))));
+//        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
         
         String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
         row.addCell(new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true));

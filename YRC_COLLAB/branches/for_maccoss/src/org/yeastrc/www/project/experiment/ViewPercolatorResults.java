@@ -29,6 +29,7 @@ import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
 import org.yeastrc.ms.domain.run.MsScan;
@@ -141,7 +142,6 @@ public class ViewPercolatorResults extends Action {
 
 
 
-
         // Extract the ones we will display
         int numResultsPerPage = 50;
         int pageNum = myForm.getPageNum();
@@ -163,11 +163,13 @@ public class ViewPercolatorResults extends Action {
         List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
 
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
         for(Integer resultId: forPage) {
             PercolatorResult result = presDao.load(resultId);
             MsScan scan = scanDao.loadScanLite(result.getScanId());
             PercolatorResultPlus resPlus = new PercolatorResultPlus(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
+            resPlus.setSequestData(seqResDao.load(resultId).getSequestResultData());
             results.add(resPlus);
         }
 

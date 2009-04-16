@@ -311,7 +311,9 @@ function selectProteinCluster(clusterId, block, showDiv) {
  								  		
  								  		if(block) $.unblockUI();
  								  		
- 								  		dragtable.makeDraggable($("#assoctable_"+clusterId).get(0));
+ 								  		if($("#assoctable_"+clusterId).length) { // make sure the DOM element exists
+ 								  			dragtable.makeDraggable($("#assoctable_"+clusterId).get(0));
+ 								  		}
  								  		
  								  		$("#assoctable_"+clusterId).addClass("table_pinfer_small");
  								  		$("#assoctable_"+clusterId).css('border', '1px dashed gray').css('border-spacing', '2px');

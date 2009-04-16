@@ -102,6 +102,12 @@ public class TableTag extends TagSupport {
                         writer.write(" class=\"sortable\" ");
                     }
                 }
+                if(header.getColspan() > 0) {
+                    writer.print(" colspan=\""+header.getColspan()+"\" ");
+                }
+                if(header.getWidth() > 0) {
+                    writer.print(" width=\""+header.getWidth()+"%\" ");
+                }
                 writer.print(">"+header.getHeaderName()+"</th>\n");
             }
             writer.print("</tr>\n");

@@ -18,7 +18,25 @@ public class TableHeader {
     private boolean sortable = true;
     private boolean isSorted;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
+    private int width;
+    private int colspan = 0;
     
+    public int getColspan() {
+        return colspan;
+    }
+
+    public void setColspan(int colspan) {
+        this.colspan = colspan;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     public TableHeader() {}
     
     public TableHeader(String headerName) {

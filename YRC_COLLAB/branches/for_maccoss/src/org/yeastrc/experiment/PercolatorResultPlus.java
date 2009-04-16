@@ -14,6 +14,7 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
+import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 
 /**
  * 
@@ -21,6 +22,7 @@ import org.yeastrc.ms.domain.search.ValidationStatus;
 public class PercolatorResultPlus implements PercolatorResult {
 
     private final PercolatorResult result;
+    private SequestResultData sequestData;
     private final int scanNumber;
     private final BigDecimal retentionTime;
     private String filename;
@@ -38,6 +40,10 @@ public class PercolatorResultPlus implements PercolatorResult {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public SequestResultData getSequestData() {
+        return sequestData;
     }
 
     public int getScanNumber() {
@@ -108,6 +114,10 @@ public class PercolatorResultPlus implements PercolatorResult {
             }
             if(buf.length() > 0)
                 buf.deleteCharAt(0);
+            if(buf.length() > 15) {
+                buf.delete(15, buf.length());
+                buf.append("...");
+            }
             return buf.toString();
         }
     }
@@ -140,6 +150,10 @@ public class PercolatorResultPlus implements PercolatorResult {
     @Override
     public ValidationStatus getValidationStatus() {
         return result.getValidationStatus();
+    }
+
+    public void setSequestData(SequestResultData sequestData) {
+        this.sequestData = sequestData;
     }
 
 }
