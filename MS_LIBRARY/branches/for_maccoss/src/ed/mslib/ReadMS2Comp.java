@@ -96,6 +96,8 @@ public class ReadMS2Comp implements ReadMS2Interface{
 			byte[] intb = new byte[4];
 			
 			try {
+			
+				/* old code. removed in favor of inflating all data in scan at once
 				for (int i=0; i<numdatapts; i++){
 					mzinflater.inflate(mzb);
 					intinflater.inflate(intb);
@@ -103,6 +105,28 @@ public class ReadMS2Comp implements ReadMS2Interface{
 					float inten = PrimitiveTools.LEbyteArrayToFloat(intb);
 					result.addscan(mz,inten);
 				}
+				*/
+				
+				//read all data at once
+				byte[] mzbbig = new byte[8*numdatapts];
+				byte[] intbbig = new byte[4*numdatapts];
+				mzinflater.inflate(mzbbig);
+				intinflater.inflate(intbbig);
+				
+				//then read data into smaller byte arrays and translate values
+				for (int i=0; i<numdatapts; i++){
+					for (int j=0; j<8; j++){
+						mzb[j] = mzbbig[i*8 + j];
+					}
+					for (int j=0; j<4; j++){
+						intb[j] = intbbig[i*4 + j];
+					}
+				
+					double mz = PrimitiveTools.LEbyteArrayToDouble(mzb);
+					float inten = PrimitiveTools.LEbyteArrayToFloat(intb);
+					result.addscan(mz,inten);
+				}
+			
 			} catch (DataFormatException e) {
 				return null;
 			}
@@ -149,7 +173,6 @@ public class ReadMS2Comp implements ReadMS2Interface{
 	private long endofheader=0;
 	
 	
-    @Override
     public void closeReader() {
         if(raf != null) try {
             raf.close();

@@ -1,7 +1,5 @@
 package ed.mslib;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.*;
 
 public class MS2Scan implements java.lang.Cloneable {
@@ -17,6 +15,7 @@ public class MS2Scan implements java.lang.Cloneable {
 	private int scan;
 	private int endscan;
 	private float precursor = -1;
+	private float rtime = -1;
 	
 	/**
 	 * Z FIELD - charge
@@ -98,10 +97,6 @@ public class MS2Scan implements java.lang.Cloneable {
 		return dfield.get(position);
 	}
 	
-	public int numberOfDLines() {
-	    return dfield.size();
-	}
-	
 	/**
 	 * I FIELD
 	 * add String to ifield List
@@ -175,6 +170,22 @@ public class MS2Scan implements java.lang.Cloneable {
 	
 	public void setmzintlist(List<MzInt> list){mzint = list;}
 	
+	public float getRTime(){
+		if (rtime == -1){
+			for (int i=0; i<ifield.size(); i++){
+				StringTokenizer st = new StringTokenizer(ifield.get(i));
+				while (st.hasMoreTokens()){
+					String token = st.nextToken();
+					if (token.equals("RTime")){
+						rtime = Float.parseFloat(st.nextToken());
+						return rtime;
+					}
+				}
+			}
+		}
+		return rtime;
+	}
+	
 	public void outputall(){	
 		if (precursor != -1){
 			System.out.println("S\t"+ scan + "\t" + endscan + "\t" + precursor);
@@ -193,25 +204,6 @@ public class MS2Scan implements java.lang.Cloneable {
 			System.out.println();
 		}		
 	}
-	
-	public void outputall(BufferedWriter writer) throws IOException{   
-        if (precursor != -1){
-            writer.write("S\t"+ scan + "\t" + endscan + "\t" + precursor+"\n");
-            for (int i=0; i<ifield.size();i++){
-                writer.write("I\t"+ifield.get(i)+"\n");
-            }
-            for (int i=0; i<charges.size(); i++){
-                writer.write("Z\t" + charges.get(i) + "\t" + masses.get(i)+"\n");
-                if (dfield.size() != 0 && dfield.get(i) != ""){
-                    writer.write("D\t" + dfield.get(i)+"\n");
-                }
-            }
-            for (int i=0; i<mzint.size(); i++){
-                writer.write("" + mzint.get(i).getmz() + "\t" + mzint.get(i).getint()+"\n");
-            }
-//            System.out.println();
-        }       
-    }
 	
 	/**
 	 * calls cloneNoData, then also adds mz/int data

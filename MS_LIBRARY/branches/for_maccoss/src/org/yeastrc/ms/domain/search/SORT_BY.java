@@ -20,8 +20,9 @@ public enum SORT_BY {
     
     // Sequest specific
     XCORR("XCorr", "XCorr"),
+    XCORR_RANK("XCr", "XCorrRank"),
     SP("Sp", "sp"),
-    DELTACN("DeltaCN", "deltaCN"),
+    DELTACN("dCN", "deltaCN"),
     EVAL("e-value", "evalue"),
     CALC_MASS_SEQ("Calc. Mass", "calculatedMass"),
     

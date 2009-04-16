@@ -185,24 +185,26 @@ public class Cms2FileReader implements MS2RunDataProvider {
         // According to the MS2Format D lines should be associated with Z lines -- S(I)[Z(D)]^k[m/z intensity]^n
         // However the .cms2 format lists all D lines after Z lines.  
         if(sc != null) {
-            int numDLines = ms2Scan.numberOfDLines();
-            for(int i = 0; i < numDLines; i++) {
-                String dField = ms2Scan.getDField(i).trim();
-                String[] nameAndVal = parseNameValue(dField, nameValPattern);
-                if (nameAndVal.length == 2) {
-                    scan.addAnalysisItem(nameAndVal[0], nameAndVal[1]);
-                }
-                else if (nameAndVal.length == 1) {
-                    scan.addAnalysisItem(nameAndVal[0], null);
-                    DataProviderException e = new DataProviderException("Missing value in 'D' line. Setting value to null -- "+dField);
-                    log.warn(e.getMessage());
-                }
-                else {
-                    // ignore if both label and value for this analysis item are missing
-                    DataProviderException e = new DataProviderException("Invalid 'D' line. Expected 2 fields. Ignoring -- "+dField);
-                    log.warn(e.getMessage());
-                }
-            }
+            
+              // NOTE: It appears .cms2 files do hot have any 'D' lines. 
+//            int numDLines = ms2Scan.numberOfDLines();
+//            for(int i = 0; i < numDLines; i++) {
+//                String dField = ms2Scan.getDField(i).trim();
+//                String[] nameAndVal = parseNameValue(dField, nameValPattern);
+//                if (nameAndVal.length == 2) {
+//                    scan.addAnalysisItem(nameAndVal[0], nameAndVal[1]);
+//                }
+//                else if (nameAndVal.length == 1) {
+//                    scan.addAnalysisItem(nameAndVal[0], null);
+//                    DataProviderException e = new DataProviderException("Missing value in 'D' line. Setting value to null -- "+dField);
+//                    log.warn(e.getMessage());
+//                }
+//                else {
+//                    // ignore if both label and value for this analysis item are missing
+//                    DataProviderException e = new DataProviderException("Invalid 'D' line. Expected 2 fields. Ignoring -- "+dField);
+//                    log.warn(e.getMessage());
+//                }
+//            }
         }
     }
     
