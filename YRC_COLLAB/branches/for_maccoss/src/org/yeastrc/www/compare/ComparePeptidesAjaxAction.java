@@ -6,6 +6,7 @@
  */
 package org.yeastrc.www.compare;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,11 +41,20 @@ public class ComparePeptidesAjaxAction extends Action {
 
         
         // get the protein inference ids to compare
-        ComparePeptidesForm myForm = (ComparePeptidesForm) form;
+        String piDatasetIdStr = request.getParameter("piDatasetIds");
+        List<Dataset> piDatasets = getDatasets(piDatasetIdStr, DatasetSource.PROT_INFER);
+        
+        // get the DTASelect ids to compare
+        String dtaDatasetIdStr = request.getParameter("dtaDatasetIds");
+        List<Dataset> dtaDatasets = getDatasets(dtaDatasetIdStr, DatasetSource.DTA_SELECT);
         
         
         // Get the selected nrseqProteinId
-        int nrseqProteinId = myForm.getNrseqProteinId();
+        int nrseqProteinId = 0;
+        if(request.getParameter("nrseqProteinId") != null) {
+            try {nrseqProteinId = Integer.parseInt(request.getParameter("nrseqProteinId"));}
+            catch(NumberFormatException e){}
+        }
         if(nrseqProteinId <= 0) {
             response.setContentType("text/html");
             response.getWriter().write("<b>Invalid protein ID in request</b>");
@@ -52,8 +62,10 @@ public class ComparePeptidesAjaxAction extends Action {
         }
         
         
-        // Get the datasets being compared
-        List<Dataset> datasets = myForm.getDatasetList();
+        // Combine the datasets
+        List<Dataset> datasets = new ArrayList<Dataset>(piDatasets.size() + dtaDatasets.size());
+        datasets.addAll(piDatasets);
+        datasets.addAll(dtaDatasets);
         if(datasets.size() == 0) {
             response.setContentType("text/html");
             response.getWriter().write("<b>No datasets found to compare</b>");
@@ -66,5 +78,23 @@ public class ComparePeptidesAjaxAction extends Action {
         request.setAttribute("pept_comparison", comparison);
         
         return mapping.findForward("Success");
+    }
+
+    private List<Integer> parseCommaSeparated(String idString) {
+        String[] tokens = idString.split(",");
+        List<Integer> ids = new ArrayList<Integer>(tokens.length);
+        for(String tok: tokens) {
+            String trimTok = tok.trim();
+            if(trimTok.length() > 0)
+                ids.add(Integer.parseInt(trimTok));
+        }
+        return ids;
+    }
+    private List<Dataset> getDatasets(String idString, DatasetSource source) {
+        List<Integer> ids = parseCommaSeparated(idString);
+        List<Dataset> datasets = new ArrayList<Dataset>(ids.size());
+        for(int id: ids)
+            datasets.add(new Dataset(id, source));
+        return datasets;
     }
 }

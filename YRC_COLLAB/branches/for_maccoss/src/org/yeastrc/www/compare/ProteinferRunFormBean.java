@@ -6,6 +6,8 @@
  */
 package org.yeastrc.www.compare;
 
+
+
 import java.sql.Date;
 
 import org.yeastrc.www.proteinfer.ProteinferJob;
@@ -32,7 +34,17 @@ public class ProteinferRunFormBean {
     public ProteinferRunFormBean(int projectId, int runId, Date runDate, String comments, String inputGeneratorProgram) {
         this.projectId = projectId;
         this.runId = runId;
-        this.runDate = runDate;
+        if(runDate != null)
+            this.runDate = new Date(runDate.getTime());
+        this.comments = comments;
+        this.inputGeneratorProgram = inputGeneratorProgram;
+    }
+    
+    public ProteinferRunFormBean(int projectId, int runId, java.util.Date runDate, String comments, String inputGeneratorProgram) {
+        this.projectId = projectId;
+        this.runId = runId;
+        if(runDate != null)
+            this.runDate = new Date(runDate.getTime());
         this.comments = comments;
         this.inputGeneratorProgram = inputGeneratorProgram;
     }

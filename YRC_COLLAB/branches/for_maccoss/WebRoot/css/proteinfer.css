@@ -60,7 +60,7 @@ TR.pinfer_B {
 
 
 /* Small tables */
-.table_pinfer_small {
+TABLE.table_pinfer_small {
 	border: 1px dashed #7F7F7F;
 	border-collapse: separate;
 	border-spacing: 0;

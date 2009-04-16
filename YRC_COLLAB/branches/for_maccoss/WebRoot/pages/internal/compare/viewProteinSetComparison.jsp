@@ -6,7 +6,6 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 
 <yrcwww:notauthenticated>
  <logic:forward name="authenticate" />
@@ -19,12 +18,45 @@
 
 <bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinComparisonDataset"></bean:define>
 
+<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
+<script src="<yrcwww:link path='js/jquery.form.js'/>"></script>
+<script src="<yrcwww:link path='js/jquery.blockUI.js'/>"></script>
+
 <script>
+// ---------------------------------------------------------------------------------------
+// AJAX DEFAULTS
+// ---------------------------------------------------------------------------------------
+  $.ajaxSetup({
+  	type: 'POST',
+  	//timeout: 5000,
+  	dataType: 'html',
+  	error: function(xhr) {
+  			
+  				var statusCode = xhr.status;
+		  		// status code returned if user is not logged in
+		  		// reloading this page will redirect to the login page
+		  		if(statusCode == 303)
+ 					window.location.reload();
+ 				
+ 				// otherwise just display an alert
+ 				else {
+ 					alert("Request Failed: "+statusCode+"\n"+xhr.statusText);
+ 				}
+  			}
+  });
+  
+  $.blockUI.defaults.message = '<b>Loading...</b>'; 
+  $.blockUI.defaults.css.padding = 20;
+  $.blockUI.defaults.fadeIn = 0;
+  $.blockUI.defaults.fadeOut = 0;
+  $().ajaxStop($.unblockUI);
+  
 // ---------------------------------------------------------------------------------------
 // SETUP THE TABLE
 // ---------------------------------------------------------------------------------------
 $(document).ready(function() {
 	
+    
    $("#compare_results_pager").attr('width', "80%").attr('align', 'center');
    
    var colCount = <%=comparison.tableHeaders().size()%>
@@ -36,8 +68,10 @@ $(document).ready(function() {
    		
    		
    		$('.pept_count', $table).each(function() {
+   		
    			var nrseqId = $(this).attr('id');
    			$(this).addClass('pept_closed');
+   			
    			$(this).click(function() {
    				// append a row for the peptide list to go into
    				var row = $(this).parent();
@@ -49,26 +83,24 @@ $(document).ready(function() {
    						$(row).next().show();
    					}
    					else {
-   					
    						// append a row
-   						$(row).after("<tr><td colspan='"+colCount+"'> <div align='center' width='90%' style='border:1px dashed gray;'> SOON !"+nrseqId+"</div></td></tr>");
+   						var newRow = "<tr><td colspan='"+colCount+"'>";
+   						newRow += "<div align='center' width='90%' id='peptides_"+nrseqId+"'></div></td></tr>"
+   						$(row).after(newRow);
    						
    						// send a request for the peptides
    						$.blockUI();
-  						$("#peptforprot_"+protId+"_"+grpId).load("getProteinPeptides.do", 	//url
-  									{'pinferId': <%=pinferId%>,				// data
-  									 'proteinGroupId': grpId,
-  									 'proteinId': protId
+  						$("#peptides_"+nrseqId).load("doPeptidesComparison.do", 	//url
+  											{'piDatasetIds': 	'<bean:write name="piDatasetIds"/>', 	// data
+  									 		 'dtaDatasetIds':   '<bean:write name="dtaDatasetIds"/>',
+  									 		 'nrseqProteinId': 		nrseqId
   									 },
   									 function(responseText, status, xhr) {			// callback
   									 	$.unblockUI();
-  										$(this).show();
-  										makeSortable($("#peptforprottbl_"+protId+"_"+grpId));
+  									 	$("#peptides_"+nrseqId).addClass('has_peptides');
+  									 	// make the table sortable
+  									 	setupPeptidesTable($('#peptides_table_'+nrseqId));
   								   });
-  								   
-  								   
-   						
-   						$(this).addClass('has_peptides');
    					}
    				}
    				else {
@@ -97,12 +129,39 @@ $(document).ready(function() {
 });
 
 // ---------------------------------------------------------------------------------------
+// SETUP THE PEPTIDES TABLE
+// ---------------------------------------------------------------------------------------
+function  setupPeptidesTable(table){
+		var $table = $(table);
+   		$table.attr('width', "60%");
+   		$table.attr('align', 'center');
+   		$table.css("margin", "5 5 5 5");
+   		
+   		<%for(int i = 0; i < comparison.getDatasetCount(); i++) {
+   			String color = DatasetColor.get(i).R+", "+DatasetColor.get(i).G+","+DatasetColor.get(i).B;
+   		%>
+   			$("td.pept-found[id="+<%=String.valueOf(i)%>+"]", $table).css('background-color', "rgb(<%=color%>)");
+   		<%}%>
+   		
+   		$('td.pept-unique', $table).css('color', 'white').css('font-weight', '#FFFFFF');
+   		
+}
+
+// ---------------------------------------------------------------------------------------
 // PAGE RESULTS
 // ---------------------------------------------------------------------------------------
 function pageResults(pageNum) {
   	$("input#pageNum").val(pageNum);
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
-  	$("form").submit();
+  	$("form[name='proteinSetComparisonForm']").submit();
+}
+
+// ---------------------------------------------------------------------------------------
+// UPDATE RESULTS
+// ---------------------------------------------------------------------------------------
+function updateResults() {
+  	$("input#pageNum").val(1);
+  	$("form[name='proteinSetComparisonForm']").submit();
 }
 
 // ---------------------------------------------------------------------------------------
@@ -244,8 +303,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <br>
 
 
-
-<!-- ################## FORM  ########################################### -->
+<!-- ################## FILTER FORM  ########################################### -->
 <html:form action="doProteinSetComparison" method="POST">
 
 	<logic:iterate name="proteinSetComparisonForm" property="proteinferRunList" id="proteinferRun">
@@ -345,7 +403,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 			</table>
 		</td>
 		<td style="padding-left:10">
-			<html:submit value="Update"></html:submit>
+			<html:submit value="Update" onclick="javascript:updateResults();"></html:submit>
 		</td>
 		<td style="padding-left:20">
 			# Filtered Proteins: <bean:write name="comparison" property="filteredProteinCount"/>

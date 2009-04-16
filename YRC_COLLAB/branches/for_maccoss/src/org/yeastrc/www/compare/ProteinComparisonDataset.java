@@ -216,8 +216,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             }
             else {
                 if(dpi.isParsimonious()) {
-                    cell.setData("P");
-                    cell.setClassName("prot-found prot-parsim");
+                    cell.setData("*");
+                    cell.setClassName("prot-found prot-parsim centered");
                 }
                 else {
                     cell.setClassName("prot-found");

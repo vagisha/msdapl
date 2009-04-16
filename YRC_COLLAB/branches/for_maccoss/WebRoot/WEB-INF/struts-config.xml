@@ -838,8 +838,6 @@
 	<action 
 		path="/doPeptidesComparison"
 		type="org.yeastrc.www.compare.ComparePeptidesAjaxAction"
-		name="peptideComparisonForm"
-		input="/pages/internal/compare/proteinSetComparisonForm.jsp"
 		scope="request"
 		validate="true"
 	>

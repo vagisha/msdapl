@@ -149,6 +149,9 @@ public class CompareProteinSetsAction extends Action {
         request.setAttribute("comparison", comparison);
         request.setAttribute("proteinSetComparisonForm", myForm);
         
+        // create a list of they dataset ids being compared
+        request.setAttribute("piDatasetIds", makeCommaSeparated(piRunIds));
+        request.setAttribute("dtaDatasetIds", makeCommaSeparated(dtaRunIds));
         
         
         // Create Venn Diagram only if 2 or 3 datasets are being compared
@@ -158,6 +161,15 @@ public class CompareProteinSetsAction extends Action {
         }
         
         return mapping.findForward("Success");
+    }
+
+    private Object makeCommaSeparated(List<Integer> ids) {
+        StringBuilder buf = new StringBuilder();
+        for(int id: ids)
+            buf.append(","+id);
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        return buf.toString();
     }
     
 }

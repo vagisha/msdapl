@@ -22,8 +22,10 @@ public class PeptideComparisonDataset implements Tabular {
     
     private List<Dataset> datasets;
     private List<ComparisonPeptide> peptides = new ArrayList<ComparisonPeptide>();
+    private final int nrseqProteinId;
     
-    public PeptideComparisonDataset() {
+    public PeptideComparisonDataset(int nrseqProteinId) {
+        this.nrseqProteinId = nrseqProteinId;
         datasets = new ArrayList<Dataset>(0);
         peptides = new ArrayList<ComparisonPeptide>(0);
     }
@@ -60,8 +62,11 @@ public class PeptideComparisonDataset implements Tabular {
         TableRow row = new TableRow();
         
         row.addCell(new TableCell(peptide.getSequence()));
+        int dsIndex = 0;
         for(Dataset ds: datasets) {
             TableCell cell = new TableCell();
+            cell.setId(String.valueOf(dsIndex));
+            dsIndex++;
             
             DatasetPeptideInformation dpi = peptide.getDatasetPeptideInformation(ds);
             if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
@@ -70,8 +75,8 @@ public class PeptideComparisonDataset implements Tabular {
             else {
                 cell.setClassName("pept-found");
                 if(dpi.isUnique()) {
-                    cell.setData("U");
-                    cell.setClassName("pept-found pept-parsim");
+                    cell.setData("*");
+                    cell.setClassName("pept-found pept-parsim centered");
                 }
             }
             row.addCell(cell);
@@ -97,6 +102,10 @@ public class PeptideComparisonDataset implements Tabular {
     @Override
     public void tabulate() {
         // nothing to do here
+    }
+
+    public int getNrseqProteinId() {
+        return nrseqProteinId;
     }
 
 }

@@ -21,7 +21,7 @@
 
 <CENTER>
 
-<yrcwww:contentbox centered="true" title="Available Experiments" width="700">
+<yrcwww:contentbox centered="true" title="Available Datasets" width="700">
 
 
 <!-- Proceed only if we have available datasets -->

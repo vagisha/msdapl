@@ -19,7 +19,7 @@ public class DTASelectRunFormBean extends ProteinferRunFormBean {
     public DTASelectRunFormBean(YatesRun dtasRun) {
         super(dtasRun.getProjectID(), 
               dtasRun.getId(), 
-              new java.sql.Date(dtasRun.getRunDate().getTime()), 
+              dtasRun.getRunDate(), 
               dtasRun.getComments(), 
               Program.SEQUEST.displayName());
     }

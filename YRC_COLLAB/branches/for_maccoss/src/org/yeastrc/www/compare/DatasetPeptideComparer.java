@@ -85,7 +85,7 @@ public class DatasetPeptideComparer {
                     
                     for(ProteinferPeptide pept: peptides) {
                         ComparisonPeptide compPept = peptSeqMap.get(pept.getSequence());
-                        if(compPept != null) {
+                        if(compPept == null) {
                            compPept = new ComparisonPeptide(nrseqProteinId, pept.getSequence());
                            peptSeqMap.put(pept.getSequence(), compPept);
                         }
@@ -93,12 +93,13 @@ public class DatasetPeptideComparer {
                         dpi.setPresent(true);
                         dpi.setSpectrumCount(pept.getSpectrumCount());
                         dpi.setUnique(pept.isUniqueToProtein());
+                        compPept.addDatasetInformation(dpi);
                     }
                 }
             }
         }
         
-        PeptideComparisonDataset pd = new PeptideComparisonDataset();
+        PeptideComparisonDataset pd = new PeptideComparisonDataset(nrseqProteinId);
         pd.setDatasets(datasets);
         pd.setPeptides(new ArrayList<ComparisonPeptide>(peptSeqMap.values()));
         return pd;
