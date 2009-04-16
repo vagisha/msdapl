@@ -50,10 +50,23 @@ $(document).ready(function() {
    					}
    					else {
    					
+   						// append a row
+   						$(row).after("<tr><td colspan='"+colCount+"'> <div align='center' width='90%' style='border:1px dashed gray;'> SOON !"+nrseqId+"</div></td></tr>");
+   						
    						// send a request for the peptides
-   						
-   						$(row).after("<tr><td colspan='"+colCount+"'> <div align='center' width='90%' style='border:1px dashed gray;'>"+nrseqId+"</div></td></tr>");
-   						
+   						$.blockUI();
+  						$("#peptforprot_"+protId+"_"+grpId).load("getProteinPeptides.do", 	//url
+  									{'pinferId': <%=pinferId%>,				// data
+  									 'proteinGroupId': grpId,
+  									 'proteinId': protId
+  									 },
+  									 function(responseText, status, xhr) {			// callback
+  									 	$.unblockUI();
+  										$(this).show();
+  										makeSortable($("#peptforprottbl_"+protId+"_"+grpId));
+  								   });
+  								   
+  								   
    						
    						$(this).addClass('has_peptides');
    					}
