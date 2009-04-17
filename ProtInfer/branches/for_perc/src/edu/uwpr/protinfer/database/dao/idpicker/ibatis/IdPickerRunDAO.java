@@ -53,4 +53,9 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     public void update(GenericProteinferRun<?> run) {
         runDao.update(run);
     }
+
+    @Override
+    public int getMaxProteinHitCount(int proteinferId) {
+        return runDao.getMaxProteinHitCount(proteinferId);
+    }
 }

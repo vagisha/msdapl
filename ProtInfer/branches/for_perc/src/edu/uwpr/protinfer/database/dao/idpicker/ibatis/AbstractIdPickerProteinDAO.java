@@ -530,6 +530,19 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return queryForList(sqlMapNameSpace+".idPickerNrseqProteinIds", map);
     }
     
+    @Override
+    public boolean isNrseqProteinGrouped(int pinferId, int nrseqId) {
+        ProteinferProtein protein = this.loadProtein(pinferId, nrseqId);
+        return isProteinGrouped(protein.getId());
+    }
+
+    @Override
+    public boolean isProteinGrouped(int pinferProteinId) {
+        P idpProt = this.loadProtein(pinferProteinId);
+        int groupId = idpProt.getGroupId();
+        return (this.getIdPickerGroupProteinIds(idpProt.getProteinferId(), groupId).size() > 1);
+    }
+    
     /**
      * Returns a map of proteinIds and proteinGroupIds.
      * Keys in the map are proteinIds and Values are proteinGroupIds

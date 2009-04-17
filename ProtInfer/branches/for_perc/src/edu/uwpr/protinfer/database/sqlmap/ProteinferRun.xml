@@ -58,6 +58,21 @@
     	AND   ra.runSearchID = rs.id
     </select>
     
+    <select id="getMaxProteinHitCount" resultClass="Integer" parameterClass="Integer">
+    	SELECT COUNT(psm.id) AS hitCount 
+    	FROM msProteinInferProtein AS prot, msProteinInferProteinPeptideMatch AS m, 
+    	msProteinInferPeptide AS pept, msProteinInferIon AS ion, 
+    	msProteinInferSpectrumMatch AS psm 
+    	WHERE prot.piRunID=#id# 
+    	AND prot.id = m.piProteinID 
+    	AND m.piPeptideID = pept.id 
+    	AND pept.id = ion.piPeptideID 
+    	AND ion.id = psm.piIonID 
+    	GROUP BY prot.id 
+    	ORDER BY hitCount DESC LIMIT 1;
+    </select>
+    
+    
     <insert id="insert" parameterMap="pinferRunParam">
     	INSERT INTO msProteinInferRun (
     	program,

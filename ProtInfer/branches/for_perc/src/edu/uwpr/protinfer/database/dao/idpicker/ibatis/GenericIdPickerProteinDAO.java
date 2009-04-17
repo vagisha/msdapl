@@ -59,4 +59,8 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract Map<Integer, Integer> getProteinGroupIds(int pinferId, boolean parsimonious);
     
+    public abstract boolean isNrseqProteinGrouped(int pinferId, int nrseqId);
+    
+    public abstract boolean isProteinGrouped(int pinferProteinId);
+    
 }

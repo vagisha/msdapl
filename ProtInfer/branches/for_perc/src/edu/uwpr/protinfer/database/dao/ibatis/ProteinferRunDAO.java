@@ -43,6 +43,13 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         return (ProteinferRun) super.queryForObject(sqlMapNameSpace+".select", proteinferId);
     }
     
+    @Override
+    public int getMaxProteinHitCount(int proteinferId) {
+        Integer count = (Integer)queryForObject(sqlMapNameSpace+".getMaxProteinHitCount", proteinferId);
+        if(count != null)   return count;
+        return 0;
+    }
+    
     public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, InputType inputType) {
         if(inputIds.size() == 0) 
             return new ArrayList<Integer>(0);

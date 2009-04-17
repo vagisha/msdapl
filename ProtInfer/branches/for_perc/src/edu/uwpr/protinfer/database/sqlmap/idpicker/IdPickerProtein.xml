@@ -130,9 +130,9 @@
 	
 	<select id="selectProteinIdsForGroup" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
-    	WHERE prot.id = idpProt.piProteinID
-    	AND prot.piRunID = #pinferId#
+    	WHERE prot.piRunID = #pinferId#
     	AND idpProt.groupID = #groupId#
+    	AND prot.id = idpProt.piProteinID
     </select>
     
     <resultMap class="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinAndGroup" 
