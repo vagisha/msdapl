@@ -2,6 +2,7 @@
 .table_pinfer {
 	border: 1px solid #7F7F7F;
 	border-collapse: separate;
+	empty-cells: show;
 	border-spacing: 0;
 }
 
@@ -21,14 +22,14 @@
 	cursor:pointer;
 }
 .table_pinfer TH.sorted-asc {
-	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -200px;
+	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -1502px;
 	color: #FFFFFF;
 }
 .table_pinfer TH.sorted-asc:hover {
 	color: #FFFFFF;
 }
 .table_pinfer TH.sorted-desc {
-	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -200px;
+	background: #D8D8DA url(../images/sprite.png) repeat-x scroll 0 -1502px;
 	color: #FFFFFF;
 }
 .table_pinfer TH.sorted-desc:hover {
@@ -64,6 +65,7 @@ TR.pinfer_B {
 TABLE.table_pinfer_small {
 	border: 1px dashed #7F7F7F;
 	border-collapse: separate;
+	empty-cells: show;
 	border-spacing: 0;
 }
 
@@ -82,9 +84,9 @@ TABLE.table_pinfer_small {
 }
 
 .table_pinfer_small TD {
-	border-style: none solid none none;
-	border-width: 0 1px 0 0;
-	border-color: #CBCBCB;
+	border-style: none solid solid none;
+	border-width: 0 1px 1px 0;
+	border-color: #FFFFFF #CBCBCB #F2F2F2 #FFFFFF;
 	padding: 3 3 3 3;
 }
 

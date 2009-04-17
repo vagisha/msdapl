@@ -16,7 +16,7 @@
 
 <logic:notPresent name="proteinId">
 <table align="center" width="98%"
-  			style="border: 1px dashed gray; border-spacing: 4px; margin-top: 6px; margin-bottom: 6px;" 
+  			style="border: 1px dashed gray;margin-top: 6px; margin-bottom: 6px;" 
   			class="sortable peptlist table_pinfer_small"
   			id="peptforprottbl_<bean:write name="proteinGroupId" />">
 </logic:notPresent>

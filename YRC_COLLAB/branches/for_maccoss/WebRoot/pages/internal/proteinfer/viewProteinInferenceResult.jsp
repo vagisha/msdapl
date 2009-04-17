@@ -824,8 +824,8 @@ function makeSortable(table) {
   		
   			var $header = $(this);
       		$(this).addClass('clickable').hover(
-      			function() {$(this).addClass('pinfer_hover');} , 
-      			function() {$(this).removeClass('pinfer_hover');}).click(function() {
+      			function() {$(this).addClass('pinfer_small_hover');} , 
+      			function() {$(this).removeClass('pinfer_small_hover');}).click(function() {
 
 				
 				// remove row striping

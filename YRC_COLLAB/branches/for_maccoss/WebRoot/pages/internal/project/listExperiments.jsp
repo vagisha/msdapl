@@ -62,7 +62,7 @@ function toggleFilesForExperiment (experimentId) {
 														$table.attr('width', "100%");
 														$('tbody > tr:odd', $table).addClass("tr_odd");
    														$('tbody > tr:even', $table).addClass("tr_even");
-														//makeSortable(table);
+														makeSortableTable($table);
 								  					});
 		}
 		button.text("[Hide Files]");

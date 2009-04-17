@@ -93,13 +93,14 @@ public class TableTag extends TagSupport {
                     writer.print(" id=\""+header.getHeaderId()+"\" ");
                 }
                 if(header.isSortable()) {
+                    String sortClass = header.getSortClass().getCssClass();
                     if(header.isSorted()) {
                         String headerClass = header.getSortOrder() == SORT_ORDER.ASC ? "sorted-asc" : "sorted-desc";
                         headerClass += " sortable ";
-                        writer.write(" class=\""+headerClass+"\" ");
+                        writer.write(" class=\""+headerClass+" "+sortClass+"\" ");
                     }
                     else {
-                        writer.write(" class=\"sortable\" ");
+                        writer.write(" class=\"sortable"+" "+sortClass+"\" ");
                     }
                 }
                 if(header.getColspan() > 0) {

@@ -7,6 +7,7 @@
 package org.yeastrc.www.misc;
 
 import org.yeastrc.ms.domain.search.SORT_ORDER;
+import org.yeastrc.www.project.SORT_CLASS;
 
 /**
  * 
@@ -20,7 +21,16 @@ public class TableHeader {
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     private int width;
     private int colspan = 0;
+    private SORT_CLASS sortClass = SORT_CLASS.SORT_ALPHA;
     
+    public SORT_CLASS getSortClass() {
+        return sortClass;
+    }
+
+    public void setSortClass(SORT_CLASS sortClass) {
+        this.sortClass = sortClass;
+    }
+
     public int getColspan() {
         return colspan;
     }

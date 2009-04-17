@@ -18,10 +18,9 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.project.SORT_CLASS;
 import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.yates.YatesRun;
-
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 
 /**
@@ -208,13 +207,24 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     @Override
     public List<TableHeader> tableHeaders() {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
-        headers.add(new TableHeader("File"));
-        headers.add(new TableHeader("# MS2 Scans"));
+        
+        TableHeader header = new TableHeader("File");
+        header.setSortClass(SORT_CLASS.SORT_ALPHA);
+        headers.add(header);
+        
+        header = new TableHeader("# MS2 Scans");
+        header.setSortClass(SORT_CLASS.SORT_INT);
+        headers.add(header);
+        
         for(ExperimentSearch search: searches){
-            headers.add(new TableHeader(search.getSearchProgram().displayName()));
+            header = new TableHeader(search.getSearchProgram().displayName());
+            header.setSortClass(SORT_CLASS.SORT_INT);
+            headers.add(header);
         }
         for(SearchAnalysis analysis: analyses) {
-            headers.add(new TableHeader(analysis.getAnalysisProgram().displayName()));
+            header = new TableHeader(analysis.getAnalysisProgram().displayName());
+            header.setSortClass(SORT_CLASS.SORT_INT);
+            headers.add(header);
         }
         return headers;
     }
