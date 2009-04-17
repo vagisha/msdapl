@@ -60,7 +60,7 @@ public class CompareProteinSetsAction extends Action {
 
         int total = piRunIds.size() + dtaRunIds.size();
         
-        // get the protein inference ids to compare
+        // Need atleast two datasets to compare.
         if(total < 2) {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more datasets to compare."));
@@ -82,7 +82,7 @@ public class CompareProteinSetsAction extends Action {
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
-            Dataset dataset = new Dataset(piRunId, DatasetSource.PROT_INFER);
+            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, DatasetSource.PROT_INFER);
             datasets.add(dataset);
         }
         
@@ -98,7 +98,7 @@ public class CompareProteinSetsAction extends Action {
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
-            Dataset dataset = new Dataset(dtaRunId, DatasetSource.DTA_SELECT);
+            Dataset dataset = DatasetBuilder.instance().buildDataset(dtaRunId, DatasetSource.DTA_SELECT);
             datasets.add(dataset);
         }
         

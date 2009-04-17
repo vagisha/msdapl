@@ -9,12 +9,18 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.activation.DataSource;
+
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
 
 /**
  * 
@@ -215,12 +221,16 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
                 cell.setClassName("prot-not-found");
             }
             else {
+                String className = "prot-found";
+                if(dpi.isParsimonious())
+                    className += "  prot-parsim centered ";
+                if(dpi.isGrouped())
+                    className += " faded ";
+                
+                cell.setClassName(className);
+                
                 if(dpi.isParsimonious()) {
                     cell.setData("*");
-                    cell.setClassName("prot-found prot-parsim centered");
-                }
-                else {
-                    cell.setClassName("prot-found");
                 }
             }
             row.addCell(cell);
@@ -249,13 +259,25 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     @Override
     public void tabulate() {
         
+        IdPickerProteinBaseDAO idpProtDao = ProteinferDAOFactory.instance().getIdPickerProteinBaseDao();
+        
         int max = Math.min((this.getOffset() + rowCount), this.getFilteredProteinCount());
         
         for(int i = this.getOffset(); i < max; i++) {
             ComparisonProtein protein = proteins.get(i);
+            
+            // Get the common name and description
             String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
             protein.setName(nameDescr[0]);
             protein.setDescription(nameDescr[1]);
+            
+            // Get the group information for the different datasets
+            for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+                if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
+                    boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
+                    dpi.setGrouped(grouped);
+                }
+            }
             
             // get the (max)number of peptides identified for this protein
             protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));

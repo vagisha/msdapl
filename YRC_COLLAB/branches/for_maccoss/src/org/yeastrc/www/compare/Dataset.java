@@ -13,6 +13,8 @@ public class Dataset {
 
     private int datasetId;
     private DatasetSource source;
+    private int spectrumCount;
+    private int maxPeptideSpectrumCount;
     
     public Dataset() {}
     
@@ -59,5 +61,21 @@ public class Dataset {
     
     public void setSourceString(String sourceStr) {
         this.source = DatasetSource.instance(sourceStr);
+    }
+
+    public int getSpectrumCount() {
+        return spectrumCount;
+    }
+
+    public void setSpectrumCount(int spectrumCount) {
+        this.spectrumCount = spectrumCount;
+    }
+
+    public int getMaxPeptideSpectrumCount() {
+        return maxPeptideSpectrumCount;
+    }
+
+    public void setMaxPeptideSpectrumCount(int maxPeptideSpectrumCount) {
+        this.maxPeptideSpectrumCount = maxPeptideSpectrumCount;
     }
 }

@@ -47,7 +47,6 @@ public class ProteinDatasetComparer {
         
         Map<Integer, ComparisonProtein> proteinMap = new HashMap<Integer, ComparisonProtein>();
         
-        
         // First get the parsimonious proteins
         for(Dataset dataset: datasets) {
             

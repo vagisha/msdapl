@@ -13,6 +13,8 @@ public class DatasetProteinInformation {
 
     private boolean present;
     private boolean parsimonious;
+    private boolean grouped;
+    private int normalizedSpectrumCount;
     private final Dataset dataset;
     
     public DatasetProteinInformation(Dataset dataset) {
@@ -42,5 +44,21 @@ public class DatasetProteinInformation {
     }
     public void setParsimonious(boolean parsimonious) {
         this.parsimonious = parsimonious;
+    }
+
+    public int getNormalizedSpectrumCount() {
+        return normalizedSpectrumCount;
+    }
+
+    public void setNormalizedSpectrumCount(int normalizedSpectrumCount) {
+        this.normalizedSpectrumCount = normalizedSpectrumCount;
+    }
+
+    public boolean isGrouped() {
+        return grouped;
+    }
+
+    public void setGrouped(boolean grouped) {
+        this.grouped = grouped;
     }
 }
