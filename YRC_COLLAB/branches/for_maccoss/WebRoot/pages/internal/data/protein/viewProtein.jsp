@@ -177,13 +177,10 @@
  </CENTER>
 </yrcwww:contentbox>
 
-<!-- List the Y2H Data here: -->
-<%@ include file="../../project/listY2HData.jsp" %>
 
 <!-- List the YATES Data here: -->
 <%@ include file="../../project/listYatesData.jsp" %>
 
-<!-- List the LOCALIZATION Data here: -->
-<%@ include file="../../project/listLocalizationData.jsp" %>
+<!-- List Protein Inference runs here -->
 
 <%@ include file="/includes/footer.jsp" %>

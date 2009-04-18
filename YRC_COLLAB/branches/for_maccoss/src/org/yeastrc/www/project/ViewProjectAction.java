@@ -184,19 +184,6 @@ public class ViewProjectAction extends Action {
             MsExperiment expt = daoFactory.getMsExperimentDAO().loadExperiment(experimentId);
             ProjectExperiment pExpt = new ProjectExperiment(expt);
             
-            // load the ms2 file names and the number of spectra in each file
-//            List<Integer> runIds = daoFactory.getMsExperimentDAO().getRunIdsForExperiment(experimentId);
-//            List<MsFile> files = new ArrayList<MsFile>(runIds.size());
-//            MsRunDAO runDao = daoFactory.getMsRunDAO();
-//            MsScanDAO scanDao = daoFactory.getMsScanDAO();
-//            for(Integer runId: runIds) {
-//                MsRun run = runDao.loadRun(runId);
-//                int numScans = scanDao.numScans(runId);
-//                MsFile file = new MsFile(run, numScans);
-//                files.add(file);
-//            }
-//            pExpt.setMs2Files(files);
-            
             // load the searches
             List<Integer> searchIds = daoFactory.getMsSearchDAO().getSearchIdsForExperiment(experimentId);
             List<ExperimentSearch> searches = new ArrayList<ExperimentSearch>(searchIds.size());
@@ -220,7 +207,7 @@ public class ViewProjectAction extends Action {
             
             
             // load the protein inference jobs, if any
-            List<ProteinferJob> piJobs = ProteinferRunSearcher.getProteinferJobsForMsExperiment(experimentId);
+            List<ProteinferJob> piJobs = ProteinferRunSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
             pExpt.setProtInferRuns(piJobs);
             
             experiments.add(pExpt);
@@ -233,20 +220,6 @@ public class ViewProjectAction extends Action {
         
         MsSearch search = daoFactory.getMsSearchDAO().loadSearch(searchId);
         ExperimentSearch eSearch = new ExperimentSearch(search);
-        
-//        MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
-//        
-//        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
-//        List<SearchFile> files = new ArrayList<SearchFile>(runSearchIds.size());
-//        
-//        for(int runSearchId: runSearchIds) {
-//            MsRunSearch rs = rsDao.loadRunSearch(runSearchId);
-//            String filename = rsDao.loadFilenameForRunSearch(runSearchId);
-//            SearchFile file = new SearchFile(rs, filename);
-//            file.setNumResults(rsDao.numResults(runSearchId));
-//            files.add(file);
-//        }
-//        eSearch.setFiles(files);
         return eSearch;
     }
     
@@ -254,28 +227,6 @@ public class ViewProjectAction extends Action {
         
         MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
         SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
-        
-//        MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
-//        
-//        List<Integer> rsAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
-//        List<AnalysisFile> files = new ArrayList<AnalysisFile>(rsAnalysisIds.size());
-//        for(int id: rsAnalysisIds) {
-//            MsRunSearchAnalysis rsa = rsaDao.load(id);
-//            String filename = rsaDao.loadFilenameForRunSearchAnalysis(id);
-//            AnalysisFile file = new AnalysisFile(rsa, filename);
-//            files.add(file);
-//        }
-//        
-//        // If this is Percolator analysis we know how to get the number of 
-//        // results for each file.
-//        if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
-//            PercolatorResultDAO prDao = daoFactory.getPercolatorResultDAO();
-//            for(AnalysisFile file: files) {
-//                file.setNumResults(prDao.numRunAnalysisResults(file.getId()));
-//            }
-//        }
-//        
-//        sAnalysis.setFiles(files);
         return sAnalysis;
     }
     

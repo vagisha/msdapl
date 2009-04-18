@@ -28,10 +28,17 @@ public class ProteinferRunSearcher {
     private static final ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
     private static final ProteinferRunDAO runDao = factory.getProteinferRunDao();
     
+    private static ProteinferRunSearcher instance;
+    
     private ProteinferRunSearcher() {}
     
+    public static ProteinferRunSearcher instance() {
+        if(instance == null)
+            instance = new ProteinferRunSearcher();
+        return instance;
+    }
     
-    public static List<ProteinferJob> getProteinferJobsForMsExperiment(int experimentId) {
+    public List<ProteinferJob> getProteinferJobsForMsExperiment(int experimentId) {
         
         List<Integer> pinferRunIds = getProteinferIdsForMsExperiment(experimentId);
         
@@ -52,7 +59,7 @@ public class ProteinferRunSearcher {
         return jobs;
     }
     
-    private static List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
+    private List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
         
         Set<Integer> pinferRunIds = new HashSet<Integer>();
         
@@ -69,7 +76,7 @@ public class ProteinferRunSearcher {
         return new ArrayList<Integer>(pinferRunIds);
     }
 
-    public static List<ProteinferJob> getProteinferJobsForMsSearch(int msSearchId) {
+    public List<ProteinferJob> getProteinferJobsForMsSearch(int msSearchId) {
         
         Set<Integer> pinferRunIds = getPinferRunIdsForSearch(msSearchId);
         
@@ -95,7 +102,7 @@ public class ProteinferRunSearcher {
     }
 
 
-    private static Set<Integer> getPinferRunIdsForSearch(int msSearchId) {
+    private Set<Integer> getPinferRunIdsForSearch(int msSearchId) {
         
         Set<Integer> pinferRunIds = new HashSet<Integer>();
         // first check if search results were used to do protein inference
@@ -119,7 +126,8 @@ public class ProteinferRunSearcher {
         return pinferRunIds;
     }
     
-    public static ProteinferJob getJobForPinferRunId(int pinferRunId) {
+    
+    public ProteinferJob getJobForPinferRunId(int pinferRunId) {
         
         ProteinferRun run = runDao.loadProteinferRun(pinferRunId);
         if(run != null) {
@@ -149,7 +157,7 @@ public class ProteinferRunSearcher {
     }
     
     
-    private static ProteinferJob getJob(int pinferRunId) throws SQLException {
+    private ProteinferJob getJob(int pinferRunId) throws SQLException {
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -195,18 +203,18 @@ public class ProteinferRunSearcher {
         return null;
     }
 
-    private static List<Integer> getRunSearchIdsForMsSearch(int msSearchId) {
+    private List<Integer> getRunSearchIdsForMsSearch(int msSearchId) {
         org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
         MsRunSearchDAO runSearchDao = factory.getMsRunSearchDAO();
         return runSearchDao.loadRunSearchIdsForSearch(msSearchId);
     }
     
-    private static List<Integer> getAnalysisIdsForMsSearch(int msSearchId) {
+    private List<Integer> getAnalysisIdsForMsSearch(int msSearchId) {
         org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
         return factory.getMsSearchAnalysisDAO().getAnalysisIdsForSearch(msSearchId);
     }
     
-    private static List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId) {
+    private List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId) {
         org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
         return factory.getMsRunSearchAnalysisDAO().getRunSearchAnalysisIdsForAnalysis(analysisId);
     }

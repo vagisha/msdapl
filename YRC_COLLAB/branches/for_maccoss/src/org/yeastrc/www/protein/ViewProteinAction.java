@@ -6,8 +6,8 @@
 
 package org.yeastrc.www.protein;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +21,22 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.microscopy.Experiment;
-import org.yeastrc.microscopy.ExperimentBaitComparator;
-import org.yeastrc.microscopy.ExperimentSearcher;
+import org.yeastrc.experiment.ProjectExperiment;
+import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
-import org.yeastrc.project.ProjectFactory;
+import org.yeastrc.project.Project;
+import org.yeastrc.www.proteinfer.ProteinferJob;
+import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
 import org.yeastrc.yates.YatesRunSearcher;
+
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 /**
  * Description of class goes here.
@@ -118,21 +124,36 @@ public class ViewProteinAction extends Action {
 			request.setAttribute("yatesdata", runs);
 		}
 		
-		ExperimentSearcher es = ExperimentSearcher.getInstance();
-		es.setProteinID(protein.getId());
-		List tmpList = es.search();
-		Collections.sort(tmpList, new ExperimentBaitComparator());
-
-		// Make sure only experiments belonging to projects to which this user has access are listed
-		if (tmpList != null && tmpList.size() > 0) {
-			Iterator iter = tmpList.iterator();
-			while ( iter.hasNext() ) {
-				Experiment exp = (Experiment)(iter.next());
-				if (!ProjectFactory.getProject(exp.getProjectID()).checkReadAccess(user.getResearcher()))
-					iter.remove();
-			}
-			request.setAttribute("locdata", tmpList);
+		
+		// Get the protein inference runs where this protein was listed as parsimonious
+		// This is a bit convoluted
+		// First get all the users' projects
+		List<Project> projects = user.getProjects();
+		List<Integer> pinferIds = new ArrayList<Integer>();
+		for(Project project: projects) {
+		    List<Integer> experimentIds = ProjectExperimentDAO.instance().getProjectExperimentIds(project.getID());
+		    
+	        for(int experimentId: experimentIds) {
+	            List<ProteinferJob> piJobs = ProteinferRunSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
+	            for(ProteinferJob job: piJobs) {
+	                pinferIds.add(job.getPinferId());
+	            }
+	        }
 		}
+		// We now have the protein inference runs for this user.
+		// Find out which ones listed the given protein as parsimonious
+		List<ProteinferRun> piRuns = new ArrayList<ProteinferRun>(pinferIds.size());
+		ProteinferRunDAO piRunDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+		ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
+		ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
+		nrseqIds.add(proteinID);
+		for(int pinferId: pinferIds) {
+		    if(protDao.getProteinIdsForNrseqIds(pinferId, nrseqIds).size() > 0) {
+		        ProteinferRun piRun = piRunDao.loadProteinferRun(pinferId);
+		        piRuns.add(piRun);
+		    }
+		}
+		request.setAttribute("piRuns", piRuns);
 		
 		
 		// Set this project in the request, as a bean to be displayed on the view
