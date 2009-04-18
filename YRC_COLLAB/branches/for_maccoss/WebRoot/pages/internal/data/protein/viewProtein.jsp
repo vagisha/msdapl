@@ -177,9 +177,40 @@
  </CENTER>
 </yrcwww:contentbox>
 
+<!-- List Protein Inference Runs here -->
+<logic:notEmpty name="yatesdata" scope="request">
+
+	<p><yrcwww:contentbox title="Protein Inference Results" centered="true" width="750">
+	
+		<table width="90%" class="table_basic" align="center">
+		<thead>
+		<tr align="left"><th>ID</th><th>Date</th><th>Comments</th></tr>
+		</thead>
+		<tbody>
+		<logic:iterate name="piRuns" id="piRun">
+			<tr>
+			<td>
+				<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piRun' property='id'/>">
+				View Results</a>
+			</td>
+			<td><bean:write name="piRun" property="date"/></td>
+			<td><bean:write name="piRun" property="comments"/></td>
+			</tr>
+		</logic:iterate>
+		</tbody>
+		</table>
+
+	 <logic:iterate id="run" name="yatesdata">
+	 </logic:iterate>
+	</yrcwww:contentbox>
+	
+</logic:notEmpty>
+
 
 <!-- List the YATES Data here: -->
 <%@ include file="../../project/listYatesData.jsp" %>
+
+
 
 <!-- List Protein Inference runs here -->
 
