@@ -174,6 +174,9 @@ function fold(foldable) {
  <logic:equal name="dir" scope="request" value="project">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
+ <logic:equal name="dir" scope="request" value="protein">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
  <logic:equal name="dir" scope="request" value="percolator">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
