@@ -8,8 +8,10 @@ package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferPeptideDAO;
@@ -37,15 +39,17 @@ public class DatasetPeptideComparer {
     
     public int getMaxPeptidesForProtein(ComparisonProtein protein) {
         
-        int max = 0;
+        Set<String> peptides = new HashSet<String>();
         for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
             
             // If this dataset does not contain this protein move on.
             if(!dpi.isPresent()) continue;
             
-            max = Math.max(max, getPeptideCount(protein.getNrseqId(), dpi.getDataset()));
+            List<String> protPeptides = getPeptideSequences(protein.getNrseqId(), dpi.getDataset());
+            peptides.addAll(protPeptides);
+//            max = Math.max(max, getPeptideCount(protein.getNrseqId(), dpi.getDataset()));
         }
-        return max;
+        return peptides.size();
     }
     
     private int getPeptideCount(int nrseqProteinId, Dataset dataset) {
@@ -66,6 +70,28 @@ public class DatasetPeptideComparer {
             return count;
         }
         return 0;
+    }
+    
+    private List<String> getPeptideSequences(int nrseqProteinId, Dataset dataset) {
+        
+        List<String> peptides = new ArrayList<String>();
+        if(dataset.getSource() == DatasetSource.DTA_SELECT) {
+            
+            // TODO
+        }
+        else if(dataset.getSource() == DatasetSource.PROT_INFER) {
+            
+            ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
+            nrseqIds.add(nrseqProteinId);
+            List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dataset.getDatasetId(), nrseqIds);
+            for(int piProteinId: piProteinIds) {
+                List<ProteinferPeptide> piPeptides = peptDao.loadPeptidesForProteinferProtein(piProteinId);
+                for(ProteinferPeptide pept: piPeptides) {
+                    peptides.add(pept.getSequence());
+                }
+            }
+        }
+        return peptides;
     }
     
     public PeptideComparisonDataset getComparisonPeptides(int nrseqProteinId, List<Dataset> datasets) {

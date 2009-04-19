@@ -91,7 +91,7 @@ public class ViewProteinInferenceJob extends Action {
             return mapping.findForward("Failure");
         }
         
-        ProteinferJob job = ProteinferRunSearcher.getJobForPinferRunId(pinferId);
+        ProteinferJob job = ProteinferRunSearcher.instance().getJobForPinferRunId(pinferId);
         if(job == null) {
             log.error("No Protein Inference Job found with protein inference ID: "+pinferId);
             ActionErrors errors = new ActionErrors();

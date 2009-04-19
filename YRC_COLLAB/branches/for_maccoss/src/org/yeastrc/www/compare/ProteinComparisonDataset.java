@@ -9,8 +9,6 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.activation.DataSource;
-
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.TableCell;
@@ -20,7 +18,6 @@ import org.yeastrc.www.misc.Tabular;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
 
 /**
  * 
@@ -161,7 +158,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 
     @Override
     public int columnCount() {
-        return datasets.size() + 2;
+        return datasets.size() + 4;
     }
 
     @Override
@@ -170,6 +167,11 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         ComparisonProtein protein = proteins.get(index + this.getOffset());
         
         TableRow row = new TableRow();
+        
+        // Protein ID
+        TableCell protId = new TableCell(String.valueOf(protein.getNrseqId()));
+        protId.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+        row.addCell(protId);
         
         // Protein name
         TableCell protName = new TableCell(protein.getName());
@@ -224,8 +226,10 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
                 String className = "prot-found";
                 if(dpi.isParsimonious())
                     className += "  prot-parsim centered ";
-                if(dpi.isGrouped())
-                    className += " faded ";
+                if(dpi.isGrouped()) {
+                    className += " faded prot-group clickable ";
+                    cell.setName(String.valueOf(protein.getNrseqId()));
+                }
                 
                 cell.setClassName(className);
                 
@@ -239,6 +243,17 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return row;
     }
 
+    private String getCommaSeparatedDatasetIds() {
+        StringBuilder buf = new StringBuilder();
+        for(Dataset dataset: datasets) {
+            if(dataset.getSource() == DatasetSource.PROT_INFER)
+                buf.append(","+dataset.getDatasetId());
+        }
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        return buf.toString();
+    }
+    
     @Override
     public int rowCount() {
         return Math.min(rowCount, this.getFilteredProteinCount() - this.getOffset());
@@ -247,11 +262,31 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     @Override
     public List<TableHeader> tableHeaders() {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
-        headers.add(new TableHeader("Protein"));
-        headers.add(new TableHeader("#Pept"));
-        headers.add(new TableHeader("Description"));
+        TableHeader header = new TableHeader("ID");
+        header.setWidth(5);
+        header.setSortable(false);
+        headers.add(header);
+        
+        header = new TableHeader("Name");
+        header.setWidth(10);
+        header.setSortable(false);
+        headers.add(header);
+        
+        header = new TableHeader("#Pept");
+        header.setWidth(5);
+        header.setSortable(false);
+        headers.add(header);
+        
+        header = new TableHeader("Description");
+        header.setWidth(100 - (15 + datasets.size()*2));
+        header.setSortable(false);
+        headers.add(header);
+        
         for(Dataset dataset: datasets) {
-            headers.add(new TableHeader(String.valueOf(dataset.getDatasetId())));
+            header = new TableHeader(String.valueOf(dataset.getDatasetId()));
+            header.setWidth(2);
+            header.setSortable(false);
+            headers.add(header);
         }
         return headers;
     }
@@ -267,9 +302,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             ComparisonProtein protein = proteins.get(i);
             
             // Get the common name and description
-            String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
-            protein.setName(nameDescr[0]);
-            protein.setDescription(nameDescr[1]);
+//            String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
+//            protein.setName(nameDescr[0]);
+//            protein.setDescription(nameDescr[1]);
             
             // Get the group information for the different datasets
             for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {

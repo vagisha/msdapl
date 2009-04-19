@@ -10,9 +10,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.data.InvalidIDException;
@@ -213,6 +215,36 @@ public class ProteinDatasetComparer {
         }
     }
 
+    public void applySearchNameFilter(ProteinComparisonDataset dataset, String searchString) throws SQLException {
+        
+        if(searchString == null || searchString.trim().length() == 0)
+            return;
+        
+        // get the protein ids for the names the user is searching for
+        Set<Integer> proteinIds = new HashSet<Integer>();
+        String tokens[] = searchString.split(",");
+        for(String token: tokens) {
+            String name = token.trim();
+            if(name.length() > 0) {
+                List<Integer> ids = CommonNameLookupUtil.instance().getProteinIds(name);
+                proteinIds.addAll(ids);
+            }
+        }
+        
+        // sort the matching protein ids.
+        List<Integer> sortedIds = new ArrayList<Integer>(proteinIds.size());
+        sortedIds.addAll(proteinIds);
+        Collections.sort(sortedIds);
+        
+        // Remove the ones that do not match
+        Iterator<ComparisonProtein> iter = dataset.getProteins().iterator();
+        while(iter.hasNext()) {
+            ComparisonProtein prot = iter.next();
+            if(Collections.binarySearch(sortedIds, prot.getNrseqId()) < 0)
+                iter.remove();
+        }
+    }
+    
     /**
      * Find the number of common ids in two sorted lists of integers
      * @param list1

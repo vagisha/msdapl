@@ -103,7 +103,7 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
             
             for(int experimentId: experimentIds) {
                 
-                List<ProteinferJob> piJobs = ProteinferRunSearcher.getProteinferJobsForMsExperiment(experimentId);
+                List<ProteinferJob> piJobs = ProteinferRunSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
                 
                 for(ProteinferJob job: piJobs) {
                     if(job.getStatus() != JobUtils.STATUS_COMPLETE)

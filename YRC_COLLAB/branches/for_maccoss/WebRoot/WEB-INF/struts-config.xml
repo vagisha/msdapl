@@ -104,6 +104,7 @@
 	<forward name="newPercolatorProteinInference" path="/newPercolatorProteinInference.do" />
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
 	<forward name="newProteinSetComparison" path="/newProteinSetComparison.do" />
+	<forward name="doProteinSetComparison" path="/doProteinSetComparison.do" />
 	<forward name="sequestPepxmlDownload" path="/newSequestPepXmlDownload.do" />
     </global-forwards>
 
@@ -844,6 +845,14 @@
 		<forward name="Success" path="/pages/internal/compare/viewPeptidesComparison.jsp" redirect="false" />
 	</action>
 	
+	<action 
+		path="/doProteinGroupComparison"
+		type="org.yeastrc.www.compare.CompareProteinGroupsAjaxAction"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/compare/viewProteinGroupComparison.jsp" redirect="false" />
+	</action>
 	
 	
 	<!-- ================================================================================== -->

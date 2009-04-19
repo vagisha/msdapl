@@ -30,6 +30,16 @@ public class ProteinSetComparisonForm extends ActionForm {
     
     private int pageNum = 1;
     
+    private String searchString;
+    
+    public String getSearchString() {
+        return searchString;
+    }
+
+    public void setSearchString(String searchString) {
+        this.searchString = searchString;
+    }
+
     public int getPageNum() {
         return pageNum;
     }

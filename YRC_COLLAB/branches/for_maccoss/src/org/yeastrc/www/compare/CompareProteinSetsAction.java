@@ -25,6 +25,7 @@ import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
+import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
  * 
@@ -142,10 +143,36 @@ public class CompareProteinSetsAction extends Action {
         filters.setNotFilters(notFilters);
         
         // Do the comparison
+        long s = System.currentTimeMillis();
         ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
-        comparison.initPreFilteringSummary(); // initialize the summary (totalProteinCount, # common proteins)
+        //comparison.initPreFilteringSummary(); // initialize the summary (totalProteinCount, # common proteins)
+        long e = System.currentTimeMillis();
+        log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        // If the user is searching for some proteins by name, filter the list
+        String searchString = myForm.getSearchString();
+        if(searchString != null && searchString.trim().length() > 0) {
+            ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
+        }
+        
+        // Apply AND, OR, NOT filters
+        s = System.currentTimeMillis();
         ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
+        e = System.currentTimeMillis();
+        log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        // Sort by protein name
+        s = System.currentTimeMillis();
+        ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
+        sorter.sort(comparison);
+        e = System.currentTimeMillis();
+        log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        
+        // Set the page number
         comparison.setCurrentPage(myForm.getPageNum());
+        
+        
         request.setAttribute("comparison", comparison);
         request.setAttribute("proteinSetComparisonForm", myForm);
         
@@ -163,7 +190,7 @@ public class CompareProteinSetsAction extends Action {
         return mapping.findForward("Success");
     }
 
-    private Object makeCommaSeparated(List<Integer> ids) {
+    private String makeCommaSeparated(List<Integer> ids) {
         StringBuilder buf = new StringBuilder();
         for(int id: ids)
             buf.append(","+id);

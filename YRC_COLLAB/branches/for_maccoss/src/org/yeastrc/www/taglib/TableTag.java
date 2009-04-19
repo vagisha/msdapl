@@ -134,6 +134,9 @@ public class TableTag extends TagSupport {
                     if(cell.getId() != null && cell.getId().length() > 0) {
                         writer.print(" id=\""+cell.getId()+"\"");
                     }
+                    if(cell.getName() != null && cell.getName().length() > 0) {
+                        writer.print(" name=\""+cell.getName()+"\"");
+                    }
                     writer.print(">");
                     
                     if(cell.getHyperlink() != null) {

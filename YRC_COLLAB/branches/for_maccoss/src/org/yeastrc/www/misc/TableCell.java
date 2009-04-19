@@ -14,7 +14,16 @@ public class TableCell {
     private String targetName = null;
     private String className = null;
     private String id = null;
+    private String name = null;
     
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getTargetName() {
         return targetName;
     }

@@ -13,6 +13,7 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
+import org.yeastrc.www.project.SORT_CLASS;
 
 /**
  * 
@@ -76,7 +77,10 @@ public class PeptideComparisonDataset implements Tabular {
                 cell.setClassName("pept-found");
                 if(dpi.isUnique()) {
                     cell.setData("*");
-                    cell.setClassName("pept-found pept-parsim centered");
+                    cell.setClassName("pept-found pept-unique centered");
+                }
+                else {
+                    cell.setData("-");
                 }
             }
             row.addCell(cell);
@@ -92,9 +96,14 @@ public class PeptideComparisonDataset implements Tabular {
     @Override
     public List<TableHeader> tableHeaders() {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
-        headers.add(new TableHeader("Sequence"));
+        TableHeader header = new TableHeader("Sequence");
+        header.setSortClass(SORT_CLASS.SORT_ALPHA);
+        headers.add(header);
         for(Dataset ds: datasets) {
-            headers.add(new TableHeader(String.valueOf(ds.getDatasetId())));
+            header = new TableHeader(String.valueOf(ds.getDatasetId()));
+            header.setWidth(2);
+            header.setSortClass(SORT_CLASS.SORT_ALPHA);
+            headers.add(header);
         }
         return headers;
     }

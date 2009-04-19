@@ -11,6 +11,9 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
+<logic:notPresent name="comparison">
+	<logic:forward name="newProteinSetComparison" />
+</logic:notPresent>
 
 <%@ include file="/includes/header.jsp" %>
 
@@ -67,26 +70,88 @@ $(document).ready(function() {
    		$('.prot_descr', $table).css("font-size", "8pt");
    		
    		
-   		$('.pept_count', $table).each(function() {
+   		// ---------------------------------------------------------------
+   		// LINK TO GROUP PROTEINS
+   		$('.prot-group', $table).each(function() {
    		
-   			var nrseqId = $(this).attr('id');
-   			$(this).addClass('pept_closed');
+   			var nrseqId = $(this).attr('name');
+   			var row = $(this).parent();
+   			$(row).addClass('prot_closed');
    			
    			$(this).click(function() {
-   				// append a row for the peptide list to go into
-   				var row = $(this).parent();
-   				if($(this).is('.pept_closed')) {
-   					$(this).removeClass('pept_closed');
-   					$(this).addClass('pept_open');
+   				
+   				var cell = $(this);
+   				if($(row).is('.prot_closed')) {
+   					$(row).removeClass('prot_closed');
+   					$(row).addClass('prot_open');
    					
-   					if($(this).is('.has_peptides')) {
+   					if($(row).is('.has_proteins')) {
    						$(row).next().show();
    					}
    					else {
-   						// append a row
+   						// append a row for the peptide list to go into
+   						var newRow = "<tr><td colspan='"+colCount+"'>";
+   						newRow += "<div align='center' width='90%' id='proteins_"+nrseqId+"'></div></td></tr>"
+   						$(row).after(newRow);
+   						
+   						// send a request for the peptides
+   						$.blockUI();
+  						$("#proteins_"+nrseqId).load("doProteinGroupComparison.do", 	//url
+  											{'piDatasetIds': 	'<bean:write name="piDatasetIds"/>', 	// data
+  									 		 'dtaDatasetIds':   '<bean:write name="dtaDatasetIds"/>',
+  									 		 'nrseqProteinId': 		nrseqId
+  									 },
+  									 function(responseText, status, xhr) {			// callback
+  									 	$.unblockUI();
+  									 	$(row).addClass('has_proteins');
+  								   });
+   					}
+   				}
+   				else {
+   					$(row).removeClass('prot_open');
+   					$(row).addClass('prot_closed');
+   					$(row).next().hide();
+   				}
+   			});
+   		});
+   		                    //cell.setHyperlink("doProteinGroupComparison.do?piDatasetIds="+getCommaSeparatedDatasetIds()+"&nrseqProteinId="+protein.getNrseqId());
+   		
+   		
+   		// ---------------------------------------------------------------
+   		// LINK TO PEPTIDES
+   		$('.pept_count', $table).each(function() {
+   		
+   			var nrseqId = $(this).attr('id');
+   			var row = $(this).parent();
+   			$(row).addClass('pept_closed');
+   			
+   			$(this).click(function() {
+   				
+   				var cell = $(this);
+   				if($(row).is('.pept_closed')) {
+   					$(row).removeClass('pept_closed');
+   					$(row).addClass('pept_open');
+   					
+   					if($(row).is('.has_peptides')) {
+   						if($(row).is('.has_proteins')) {
+   							$(row).next().next().show();
+   						}
+   						else {
+   							$(row).next().show();
+   						}
+   					}
+   					else {
+   						// append a row for the peptide list to go into
    						var newRow = "<tr><td colspan='"+colCount+"'>";
    						newRow += "<div align='center' width='90%' id='peptides_"+nrseqId+"'></div></td></tr>"
-   						$(row).after(newRow);
+   						
+   						if($(row).is('.has_proteins')) {
+   							$(row).next().after(newRow);
+   						}
+   						else {
+   							$(row).after(newRow);
+   						}
+   						
    						
    						// send a request for the peptides
    						$.blockUI();
@@ -97,16 +162,21 @@ $(document).ready(function() {
   									 },
   									 function(responseText, status, xhr) {			// callback
   									 	$.unblockUI();
-  									 	$("#peptides_"+nrseqId).addClass('has_peptides');
+  									 	$(row).addClass('has_peptides');
   									 	// make the table sortable
   									 	setupPeptidesTable($('#peptides_table_'+nrseqId));
   								   });
    					}
    				}
    				else {
-   					$(this).removeClass('pept_open');
-   					$(this).addClass('pept_closed');
-   					$(row).next().hide();
+   					$(row).removeClass('pept_open');
+   					$(row).addClass('pept_closed');
+   					if($(row).is('.has_proteins')) {
+						$(row).next().next().hide();
+					}
+					else {
+						$(row).next().hide();
+					}
    				}
    			});
    			
@@ -119,12 +189,8 @@ $(document).ready(function() {
    			$("td.prot-found[id="+<%=String.valueOf(i)%>+"]", $table).css('background-color', "rgb(<%=color%>)");
    		<%}%>
    		
-   		$('td.prot-parsim', $table).css('color', 'white').css('font-weight', '#FFFFFF');
+   		$('td.prot-parsim', $table).css('color', '#FFFFFF').css('font-weight', 'bold');
    		
-   		//$('td.prot-parsim', $table).css('background-color', 'red');
-   		
-   		//$('tbody > tr:odd', $table).addClass("tr_odd");
-   		//$('tbody > tr:even', $table).addClass("tr_even");
    });
 });
 
@@ -140,10 +206,12 @@ function  setupPeptidesTable(table){
    		<%for(int i = 0; i < comparison.getDatasetCount(); i++) {
    			String color = DatasetColor.get(i).R+", "+DatasetColor.get(i).G+","+DatasetColor.get(i).B;
    		%>
-   			$("td.pept-found[id="+<%=String.valueOf(i)%>+"]", $table).css('background-color', "rgb(<%=color%>)");
+   			$("td.pept-found[id="+<%=String.valueOf(i)%>+"]", $table).css('background-color', "rgb(<%=color%>)").css('color', "rgb(<%=color%>)");
    		<%}%>
    		
-   		$('td.pept-unique', $table).css('color', 'white').css('font-weight', '#FFFFFF');
+   		$('td.pept-unique', $table).css('color', '#FFFFFF').css('font-weight', 'bold');
+   		makeSortableTable($table);
+   		
    		
 }
 
@@ -238,13 +306,36 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 </tr>
 
 <tr valign="top">
+
+<td>
+<table class="table_basic">
+<thead>
+	<tr>
+		<th>Dataset</th>
+		<th># Proteins</th>
+	</tr>
+</thead>
+<tbody>
+<logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
+	<tr>
+		<th align="center">
+			<span><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></span>
+		</th>
+		<td style="color:#FFFFFF; background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> ); padding: 3 5 3 5;">
+			<%=comparison.getProteinCount(row)%>
+		</td>
+	</tr>
+</logic:iterate>
+</tbody>
+</table>
+</td>
+
 <td>
 <table  class="table_basic">
 <thead>
 <tr>
-<th>&nbsp;</th>
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="column">
-	<th>Dataset ID<bean:write name="dataset" property="datasetId"/></th>
+	<th>ID<bean:write name="dataset" property="datasetId"/></th>
 </logic:iterate>
 </tr>
 </thead>
@@ -252,8 +343,6 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <tbody>
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
 <tr>
-<th style="padding-right:10;" >Dataset ID <bean:write name="dataset" property="datasetId"/></th>
-
 
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="column">
 	
@@ -274,27 +363,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 </table>
 
 </td>
-<td>
-<table class="table_basic">
-<thead>
-	<tr>
-		<th>Dataset</th>
-		<th># Proteins</th>
-	</tr>
-</thead>
-<tbody>
-<logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
-	<tr>
-		<td align="center"
-		    style="color:#FFFFFF; background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> ); padding: 4 5 3 5;">
-			<span>ID <bean:write name="dataset" property="datasetId" /></span>
-		</td>
-		<td><%=comparison.getProteinCount(row)%></td>
-	</tr>
-</logic:iterate>
-</tbody>
-</table>
-</td>
+
 </tr>
 
 
@@ -412,10 +481,25 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 	</tr>
 </table>
 </div>
+
+
+
+<!-- ################## SEARCH BOX	  ########################################### -->
+<div style="padding: 5 0 0 0; width:80%">
+ <table cellspacing="0" cellpadding="0">
+ <tr><td>
+ <html:text name="proteinSetComparisonForm" property="searchString" size="40"></html:text><br>
+ <span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
+ </td>
+ <td valign="top">
+ <html:submit value="Search" onclick="javascript:updateResults();"></html:submit>
+ </td>
+ </tr></table>
+</div>
+
 </center>
 </html:form>
 
-<br>
 
 <!-- PAGE RESULTS -->
 <bean:define name="comparison" id="pageable" />
