@@ -6,6 +6,7 @@
 
 package org.yeastrc.www.yates;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -181,7 +182,7 @@ public class ViewSpectraAction extends Action {
 	}
 
 	private List<String> useMsData(YatesRun run, YatesPeptide resPeptide,
-            ActionMapping mapping, HttpServletRequest request) {
+            ActionMapping mapping, HttpServletRequest request) throws IOException {
 	    
         String Sq = resPeptide.getSequence();
         String filename = resPeptide.getFilename();
@@ -300,9 +301,7 @@ public class ViewSpectraAction extends Action {
         }
         
         // set the m/z intensity pairs
-        String peaks = scan.peakDataString();
-        PeakConverter converter = new PeakConverter();
-        List<String[]> peakList = converter.convert(peaks);
+        List<String[]> peakList = scan.getPeaksString();
         i = 0;
         for (String[] peak: peakList) {
             params.add("<PARAM NAME=\"MZ" + i + "\" VALUE=\"" + peak[0] + "\">");
