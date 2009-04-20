@@ -105,22 +105,33 @@ public class CompareProteinGroupsAjaxAction extends Action{
             List<IdPickerProteinBase> groupProteins = protDao.loadIdPickerGroupProteins(dataset.getDatasetId(), 
                     idpProtein.getGroupId());
             
-            // get the common names of all the proteins in the group
+            // get the systematic names of all the proteins in the group
             Set<Integer> groupNrseqIds = new HashSet<Integer>();
             for(IdPickerProteinBase gprot: groupProteins) {
                 groupNrseqIds.add(gprot.getNrseqProteinId());
             }
-            ArrayList<Integer> list = new ArrayList<Integer>(groupNrseqIds);
-            List<CommonListing> listings = CommonNameLookupUtil.instance().getCommonListings(list);
             
             StringBuilder buf = new StringBuilder();
-            for(CommonListing listing: listings) {
-                String name = listing.getOneName();
-                if(name != null)
-                    buf.append(", "+name);
+            for(int nrseqId: groupNrseqIds) {
+                String systematicName = ProteinDatasetComparer.getSystematicName(nrseqId);
+                if(systematicName != null)
+                    buf.append(", "+systematicName);
             }
             if(buf.length() > 0) buf.deleteCharAt(0);
             groupProteinNames.add(buf.toString());
+            
+            
+//            ArrayList<Integer> list = new ArrayList<Integer>(groupNrseqIds);
+//            List<CommonListing> listings = CommonNameLookupUtil.instance().getCommonListings(list);
+//            
+//            StringBuilder buf = new StringBuilder();
+//            for(CommonListing listing: listings) {
+//                String name = listing.getOneName();
+//                if(name != null)
+//                    buf.append(", "+name);
+//            }
+//            if(buf.length() > 0) buf.deleteCharAt(0);
+//            groupProteinNames.add(buf.toString());
         }
         
         request.setAttribute("datasets", datasets);

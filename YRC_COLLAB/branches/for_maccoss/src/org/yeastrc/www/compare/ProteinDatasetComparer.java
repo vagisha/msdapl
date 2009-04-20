@@ -151,7 +151,15 @@ public class ProteinDatasetComparer {
         return null;
     }
 
-    private static String getSystematicName(NRProtein nrseqProt)
+    
+    public static String getSystematicName(int nrseqProteinId)
+        throws Exception {
+        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+        NRProtein nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
+        return getSystematicName(nrseqProt);
+    }
+    
+    public static String getSystematicName(NRProtein nrseqProt)
             throws Exception {
         Set<String> systNames = nrseqProt.getSystematicNames();
         if(systNames == null || systNames.size() == 0)
