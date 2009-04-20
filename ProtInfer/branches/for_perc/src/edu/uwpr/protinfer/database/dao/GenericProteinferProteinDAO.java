@@ -26,6 +26,8 @@ public interface GenericProteinferProteinDAO  <P extends GenericProteinferProtei
     public abstract List<Integer> getProteinferProteinIds(int proteinferId);
     
     public abstract List<Integer> getNrseqIdsForRun(int proteinferId);
+    
+    public abstract int getPeptideCountForProtein(int nrseqId, List<Integer> pinferIds);
 
     public abstract List<P> loadProteins(int proteinferId);
     

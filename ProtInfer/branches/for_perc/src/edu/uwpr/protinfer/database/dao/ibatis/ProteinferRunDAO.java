@@ -156,5 +156,5 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
             return program;
         }
     }
-   
+
 }

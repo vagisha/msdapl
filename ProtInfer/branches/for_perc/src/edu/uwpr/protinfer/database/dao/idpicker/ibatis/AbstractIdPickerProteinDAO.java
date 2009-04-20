@@ -146,6 +146,10 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return queryForList(sqlMapNameSpace+".selectProteinIdsForGroup", map);
     }
     
+    @Override
+    public int getPeptideCountForProtein(int nrseqId, List<Integer> pinferIds) {
+        return protDao.getPeptideCountForProtein(nrseqId, pinferIds);
+    }
     
     @Override
     public void updateUserAnnotation(int pinferProteinId, String annotation) {

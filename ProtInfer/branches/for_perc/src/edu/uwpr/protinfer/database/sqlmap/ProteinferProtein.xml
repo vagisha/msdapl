@@ -59,8 +59,19 @@
     	AND nrseqProteinID IN $nrseqIds$
     </select>
     
-    <select id="selectNrseqIdsForProteinferRun" resultMap="pinferProteinResult" parameterClass="Integer">
+    <select id="selectNrseqIdsForProteinferRun" resultClass="Integer" parameterClass="Integer">
     	SELECT DISTINCT(nrseqProteinID) FROM msProteinInferProtein WHERE piRunID = #id#
+    </select>
+    
+    <select id="peptideCountForProteinInRuns" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT COUNT(DISTINCT(sequence))
+    	FROM msProteinInferPeptide AS pept, 
+    	msProteinInferProtein AS prot, 
+    	msProteinInferProteinPeptideMatch AS m 
+    	WHERE prot.piRunID IN $pinferIds$ 
+    	AND prot.nrseqProteinID=#nrseqId# 
+    	AND prot.id = m.piProteinID 
+    	AND m.piPeptideID = pept.id;
     </select>
     
     <update id="updateUserAnnotation" parameterClass="java.util.Map">
