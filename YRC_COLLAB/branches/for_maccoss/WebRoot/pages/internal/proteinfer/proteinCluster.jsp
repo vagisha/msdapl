@@ -50,32 +50,7 @@
 </table>
 <br>
 
-<!-- PEPTIDES TABLE -->
 
-<div style="padding: 2px; cursor: pointer;" class="peptgrplist pinfer_header_small" ><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
-<table cellpadding="4" cellspacing="2" align="center" width="90%" id="pept_grp_table_<bean:write name="clusterId" />">
-
-        <thead>
-        <tr>
-        <th><b><font size="2pt">Peptide<br>Group ID</font></b></th>
-        <th><b><font size="2pt">Sequence(s)</font></b></th>
-        <th><b><font size="2pt"># Spectra</font></b></th>
-        </tr>
-        </thead>
-        
-        <tbody>
-        <logic:iterate name="cluster" property="peptideGroups" id="peptGrp">
-        	<logic:iterate name="peptGrp" property="peptides" id="pept">
-        	<tr class="peptGrp_<bean:write name="pept" property="groupId" />">
-        		<td><bean:write name="pept" property="groupId" /></td>
-        		<td><bean:write name="pept" property="sequence" /></td>
-        		<td><bean:write name="pept" property="spectrumCount" /></td>
-        	</tr>
-       		</logic:iterate>
-        </logic:iterate>
-        </tbody>
-
-</table>
 
 <!-- PROTEINS-PEPTIDE ASSOCIATION TABLE -->
 <bean:size name="cluster" property="proteinGroups" id="protGroupsSize"/>
@@ -113,6 +88,34 @@
 </table>
 </logic:greaterEqual>
 <br>
+
+<!-- PEPTIDES TABLE -->
+
+<div style="padding: 2px; cursor: pointer;" class="peptgrplist pinfer_header_small" ><b>Peptides in Cluster <bean:write name="clusterId" /></b></div><br>
+<table cellpadding="4" cellspacing="2" align="center" width="90%" id="pept_grp_table_<bean:write name="clusterId" />">
+
+        <thead>
+        <tr>
+        <th><b><font size="2pt">Peptide<br>Group ID</font></b></th>
+        <th><b><font size="2pt">Sequence(s)</font></b></th>
+        <th><b><font size="2pt"># Spectra</font></b></th>
+        </tr>
+        </thead>
+        
+        <tbody>
+        <logic:iterate name="cluster" property="peptideGroups" id="peptGrp">
+        	<logic:iterate name="peptGrp" property="peptides" id="pept">
+        	<tr class="peptGrp_<bean:write name="pept" property="groupId" />">
+        		<td><bean:write name="pept" property="groupId" /></td>
+        		<td><bean:write name="pept" property="sequence" /></td>
+        		<td><bean:write name="pept" property="spectrumCount" /></td>
+        	</tr>
+       		</logic:iterate>
+        </logic:iterate>
+        </tbody>
+
+</table>
+
 <div align="center" style="font-weight:bold;"><a href="viewAlignedClusterProteins.do?pinferId=<bean:write name='pinferId' />&clusterId=<bean:write name='clusterId' />" >View Alignment</></div>
 
 

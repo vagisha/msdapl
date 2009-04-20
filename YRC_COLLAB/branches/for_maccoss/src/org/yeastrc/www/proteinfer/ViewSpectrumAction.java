@@ -175,6 +175,7 @@ public class ViewSpectrumAction extends Action {
             SORT_BY.CALC_MASS_SEQ,
             SORT_BY.CHARGE, 
             SORT_BY.RT, 
+            SORT_BY.XCORR_RANK,
             SORT_BY.XCORR, 
             SORT_BY.DELTACN,
             SORT_BY.SP,
@@ -205,8 +206,8 @@ public class ViewSpectrumAction extends Action {
             TableRow row = new TableRow();
             
             row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
-            row.addCell(new TableCell(String.valueOf(result.getCharge())));
             row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getCalculatedMass())), null));
+            row.addCell(new TableCell(String.valueOf(result.getCharge())));
             
             // Retention time
             BigDecimal temp = result.getRetentionTime();
@@ -216,7 +217,7 @@ public class ViewSpectrumAction extends Action {
             else
                 row.addCell(new TableCell(String.valueOf(round(temp)), null));
             
-            // Predicted retention time
+            row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getxCorrRank()), null));
             row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getxCorr())), null));
             row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN()), null));
             row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getSp())), null));

@@ -80,7 +80,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return proteins.size();
     }
     
-    public void initPreFilteringSummary() {
+    public void initSummary() {
         initProteinCounts();
         this.totalProteinCount = proteins.size();
     }
@@ -302,9 +302,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             ComparisonProtein protein = proteins.get(i);
             
             // Get the common name and description
-//            String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
-//            protein.setName(nameDescr[0]);
-//            protein.setDescription(nameDescr[1]);
+            String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
+            protein.setName(nameDescr[0]);
+            protein.setDescription(nameDescr[1]);
             
             // Get the group information for the different datasets
             for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
@@ -314,8 +314,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
                 }
             }
             
-            // get the (max)number of peptides identified for this protein
-            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+//            // get the (max)number of peptides identified for this protein
+//            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
         }
     }
 

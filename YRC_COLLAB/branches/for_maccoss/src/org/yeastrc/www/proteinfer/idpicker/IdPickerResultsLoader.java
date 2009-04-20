@@ -27,6 +27,7 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
+import org.yeastrc.www.compare.CommonNameLookupUtil;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.ProteinInferenceProgram;
@@ -464,11 +465,13 @@ public class IdPickerResultsLoader {
         String commonName = "";
         
         if(getCommonName) {
-            NRProteinFactory nrpf = NRProteinFactory.getInstance();
-            NRProtein nrseqProt = null;
+            
+//            NRProteinFactory nrpf = NRProteinFactory.getInstance();
+//            NRProtein nrseqProt = null;
             try {
-                nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-                commonName = nrseqProt.getListing();
+                commonName = CommonNameLookupUtil.instance().getCommonListing(nrseqProteinId).getName();
+//                nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
+//                commonName = nrseqProt.getListing();
 //                commonName = CommonNameLookupUtil.instance().getCommonNames(nrseqProteinId, fullLookup);
 //                if(commonName.equals("UNKNOWN"))
 //                    commonName = "";

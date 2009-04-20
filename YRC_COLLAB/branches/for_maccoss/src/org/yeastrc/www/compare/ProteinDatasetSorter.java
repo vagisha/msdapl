@@ -26,7 +26,7 @@ public class ProteinDatasetSorter {
         return instance;
     }
     
-    public void sort(ProteinComparisonDataset dataset) throws SQLException {
+    public void sortByName(ProteinComparisonDataset dataset) throws SQLException {
         List<ComparisonProtein> proteins = dataset.getProteins();
         
         List<Integer> nrseqProteinIds = new ArrayList<Integer>(proteins.size());
@@ -45,6 +45,15 @@ public class ProteinDatasetSorter {
         Collections.sort(proteins, new NameCompartor());
     }
     
+    public void sortByPeptideCount(ProteinComparisonDataset dataset) throws SQLException {
+        List<ComparisonProtein> proteins = dataset.getProteins();
+        for(ComparisonProtein protein: proteins) {
+         // get the (max)number of peptides identified for this protein
+            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+        }
+        Collections.sort(proteins, new PeptideCountCompartor());
+    }
+    
     private static class NameCompartor implements Comparator<ComparisonProtein> {
 
         @Override
@@ -57,6 +66,14 @@ public class ProteinDatasetSorter {
                 return -1;
             
             return o1.getName().compareTo(o2.getName());
+        }
+        
+    }
+    
+    private static class PeptideCountCompartor implements Comparator<ComparisonProtein> {
+        @Override
+        public int compare(ComparisonProtein o1, ComparisonProtein o2) {
+            return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
         }
         
     }

@@ -830,7 +830,8 @@ function makeSortable(table) {
 				
 				// remove row striping
 				if($table.is('.stripe_table')) {
-					$("tbody > tr:odd", $table).removeClass("pinfer_A");
+					$("tbody > tr:odd", $table).removeClass("tr_odd");
+					$("tbody > tr:even", $table).removeClass("tr_even");
 				}
 				
 				// sorting direction
@@ -895,7 +896,8 @@ function makeSortable(table) {
         		
         		// add row striping back
         		if($table.is('.stripe_table')) {
-					$("tbody > tr:odd", $table).addClass("pinfer_A");
+					$("tbody > tr:odd", $table).addClass("tr_odd");
+					$("tbody > tr:even", $table).addClass("tr_even");
         		}
       		});
 	}

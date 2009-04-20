@@ -145,7 +145,6 @@ public class CompareProteinSetsAction extends Action {
         // Do the comparison
         long s = System.currentTimeMillis();
         ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
-        //comparison.initPreFilteringSummary(); // initialize the summary (totalProteinCount, # common proteins)
         long e = System.currentTimeMillis();
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
@@ -164,10 +163,11 @@ public class CompareProteinSetsAction extends Action {
         // Sort by protein name
         s = System.currentTimeMillis();
         ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
-        sorter.sort(comparison);
+        sorter.sortByPeptideCount(comparison);
         e = System.currentTimeMillis();
         log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
+        comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
         
         // Set the page number
         comparison.setCurrentPage(myForm.getPageNum());

@@ -26,8 +26,8 @@
 	<tr>
 	<th class="sort-alpha" align="left"><b><font size="2pt">File Name</font></b></th>
 	<!-- <th class="sort-int" align="left"><b><font size="2pt">Decoy Hits</font></b></th> -->
-	<th class="sort-int" align="left"><b><font size="2pt">Target Hits</font></b></th>
-	<th class="sort-int" align="left"><b><font size="2pt">Filtered Target Hits</font></b></th>
+	<th class="sort-int" align="left"><b><font size="2pt"># Hits</font></b></th>
+	<th class="sort-int" align="left"><b><font size="2pt"># Filtered Hits</font></b></th>
 	</tr>
 	</thead>
 	</logic:notEmpty>

@@ -67,8 +67,8 @@
 
 <!--  placeholder for protein sequence -->
 <div align="center">
-<table  align="center" width="90%" id="protseqtbl_<bean:write name='protein' property='protein.id'/>" style="display: none;border:1px solid gray;">
-	<tr><td align="center" id="protsequence_<bean:write name="protein" property="protein.id"/>" ></td></tr>
+<table  align="center" width="60%" id="protseqtbl_<bean:write name='protein' property='protein.id'/>" style="display: none;border:1px solid gray;">
+	<tr><td align="left" id="protsequence_<bean:write name="protein" property="protein.id"/>" ></td></tr>
 </table>
 </div>
 <br><br>

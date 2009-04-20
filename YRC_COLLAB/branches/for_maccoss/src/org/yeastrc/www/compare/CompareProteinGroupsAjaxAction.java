@@ -111,7 +111,6 @@ public class CompareProteinGroupsAjaxAction extends Action{
                 groupNrseqIds.add(gprot.getNrseqProteinId());
             }
             ArrayList<Integer> list = new ArrayList<Integer>(groupNrseqIds);
-            list.addAll(groupNrseqIds);
             List<CommonListing> listings = CommonNameLookupUtil.instance().getCommonListings(list);
             
             StringBuilder buf = new StringBuilder();

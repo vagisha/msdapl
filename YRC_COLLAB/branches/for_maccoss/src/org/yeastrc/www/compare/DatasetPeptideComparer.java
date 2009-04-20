@@ -39,17 +39,25 @@ public class DatasetPeptideComparer {
     
     public int getMaxPeptidesForProtein(ComparisonProtein protein) {
         
-        Set<String> peptides = new HashSet<String>();
+        List<Integer> datasetIds = new ArrayList<Integer>(protein.getDatasetInfo().size());
         for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
-            
             // If this dataset does not contain this protein move on.
             if(!dpi.isPresent()) continue;
-            
-            List<String> protPeptides = getPeptideSequences(protein.getNrseqId(), dpi.getDataset());
-            peptides.addAll(protPeptides);
-//            max = Math.max(max, getPeptideCount(protein.getNrseqId(), dpi.getDataset()));
+            datasetIds.add(dpi.getDatasetId());
         }
-        return peptides.size();
+        return protDao.getPeptideCountForProtein(protein.getNrseqId(), datasetIds);
+        
+//        Set<String> peptides = new HashSet<String>();
+//        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+//            
+//            // If this dataset does not contain this protein move on.
+//            if(!dpi.isPresent()) continue;
+//            
+//            List<String> protPeptides = getPeptideSequences(protein.getNrseqId(), dpi.getDataset());
+//            peptides.addAll(protPeptides);
+////            max = Math.max(max, getPeptideCount(protein.getNrseqId(), dpi.getDataset()));
+//        }
+//        return peptides.size();
     }
     
     private int getPeptideCount(int nrseqProteinId, Dataset dataset) {

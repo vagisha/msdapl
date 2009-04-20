@@ -37,14 +37,14 @@ public class CommonListing {
         for(CommonNameDescription cnd: nameDescr) {
             buf.append(", ");
             buf.append(cnd.getName());
-            if(buf.length() > 50)
+            if(buf.length() > 15)
                 break;
         }
         if(buf.length() > 0)
             buf.deleteCharAt(0);
         
-        if(buf.length() > 50) {
-            buf.delete(50, buf.length());
+        if(buf.length() > 15) {
+            buf.delete(15, buf.length());
             buf.append("...");
         }
         
