@@ -326,7 +326,8 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         String statementName = "NrSeq.selectDbProteinIdsForAccession";
         Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("databaseIds", dbIdStr);
-        map.put("accession", "%"+accession+"%");
+//        map.put("accession", "%"+accession+"%");
+        map.put("accession", accession+"%");
         
         try {
             return sqlMap.queryForList(statementName, map);
@@ -336,4 +337,19 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
         }
     }
+    
+    public static List<Integer> getProteinIdsForAccession(String accession) {
+        
+        String statementName = "NrSeq.selectProteinIdsForAccession";
+        String acc = accession+"%";
+        
+        try {
+            return sqlMap.queryForList(statementName, acc);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
 }

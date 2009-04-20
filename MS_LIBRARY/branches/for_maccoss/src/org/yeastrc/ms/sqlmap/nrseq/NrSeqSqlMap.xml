@@ -131,4 +131,10 @@
     	AND accessionString LIKE #accession#
     </select>
     
+    <select id="selectProteinIdsForAccession" resultClass="Integer" parameterClass="String">
+    	SELECT DISTINCT(proteinID) 
+    	FROM tblProteinDatabase 
+    	WHERE accessionString LIKE #accession#
+    </select>
+    
 </sqlMap>
