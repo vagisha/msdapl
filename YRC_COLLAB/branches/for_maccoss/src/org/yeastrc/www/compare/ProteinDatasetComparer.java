@@ -17,7 +17,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.bio.protein.ProteinNamerFactory;
+import org.yeastrc.bio.protein.ProteinNamerUtils;
 import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.yates.YatesRun;
@@ -129,20 +132,47 @@ public class ProteinDatasetComparer {
         NRProtein nrseqProt = null;
         try {
             nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-            String commonName = nrseqProt.getListing();
-            String description = nrseqProt.getDescription();
+            String systName = getSystematicName(nrseqProt);
             
-//            String commonName = CommonNameLookupUtil.instance().getCommonNames(nrseqProteinId, fullLookup);
-//           if(commonName.equals("UNKNOWN"))
-//              commonName = "";
+//            String commonName = nrseqProt.getListing();
+//            String description = nrseqProt.getDescription();
+//          if(commonName.equals("UNKNOWN"))
+//          commonName = "";
             
-            return new String[] {commonName, description};
-//            return new String[]{"commonName", "description"};
+            CommonListing listing = CommonNameLookupUtil.instance().getCommonListing(nrseqProteinId);
+            String commonName = listing.getName();
+            String description = listing.getDescription();
+            
+            return new String[] {commonName, description, systName};
         }
         catch (Exception e) {
             log.error("Exception getting accession/description for protein Id: "+nrseqProteinId, e);
         }
         return null;
+    }
+
+    private static String getSystematicName(NRProtein nrseqProt)
+            throws Exception {
+        Set<String> systNames = nrseqProt.getSystematicNames();
+        if(systNames == null || systNames.size() == 0)
+            return "";
+        
+        StringBuilder buf = new StringBuilder();
+        for(String sname: systNames) {
+            buf.append(", ");
+            buf.append(sname);
+            if(buf.length() > 15)
+                break;
+        }
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        
+        if(buf.length() > 15) {
+            buf.delete(15, buf.length());
+            buf.append("...");
+        }
+        String systName = buf.toString();
+        return systName;
     }
 
     public void applyFilters(ProteinComparisonDataset dataset, ProteinDatasetComparisonFilters filters) {
@@ -223,11 +253,28 @@ public class ProteinDatasetComparer {
         // get the protein ids for the names the user is searching for
         Set<Integer> proteinIds = new HashSet<Integer>();
         String tokens[] = searchString.split(",");
+        
+        List<String> notFound = new ArrayList<String>();
+        
+        // Do a common name lookup first
         for(String token: tokens) {
             String name = token.trim();
             if(name.length() > 0) {
                 List<Integer> ids = CommonNameLookupUtil.instance().getProteinIds(name);
                 proteinIds.addAll(ids);
+                
+                if(ids.size() == 0) {
+                    notFound.add(name);
+                }
+            }
+        }
+        
+        // No look at the accession strings in tblProteinDatabase;
+        if(notFound.size() > 0) {
+            for(String name: notFound) {
+                List<Integer> ids = NrSeqLookupUtil.getProteinIdsForAccession(name);
+                if(ids != null)
+                    proteinIds.addAll(ids);
             }
         }
         

@@ -169,13 +169,18 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         TableRow row = new TableRow();
         
         // Protein ID
-        TableCell protId = new TableCell(String.valueOf(protein.getNrseqId()));
-        protId.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
-        row.addCell(protId);
+//        TableCell protId = new TableCell(String.valueOf(protein.getNrseqId()));
+//        protId.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+//        row.addCell(protId);
         
-        // Protein name
-        TableCell protName = new TableCell(protein.getName());
+        // Protein systematic name
+        TableCell protName = new TableCell(protein.getSystematicName());
+        protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
         row.addCell(protName);
+        
+        // Protein common name
+        TableCell protCommonName = new TableCell(protein.getName());
+        row.addCell(protCommonName);
         
         // Peptide count
         TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
@@ -262,12 +267,19 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     @Override
     public List<TableHeader> tableHeaders() {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
-        TableHeader header = new TableHeader("ID");
-        header.setWidth(5);
+        TableHeader header = null;
+        
+//        header = new TableHeader("ID");
+//        header.setWidth(5);
+//        header.setSortable(false);
+//        headers.add(header);
+        
+        header = new TableHeader("Name");
+        header.setWidth(10);
         header.setSortable(false);
         headers.add(header);
         
-        header = new TableHeader("Name");
+        header = new TableHeader("Common Name");
         header.setWidth(10);
         header.setSortable(false);
         headers.add(header);
@@ -305,6 +317,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
             protein.setName(nameDescr[0]);
             protein.setDescription(nameDescr[1]);
+            protein.setSystematicName(nameDescr[2]);
             
             // Get the group information for the different datasets
             for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {

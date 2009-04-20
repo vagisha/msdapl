@@ -149,7 +149,7 @@ public class IdPickerResultsLoader {
         return filtered;
     }
     
-    private static List<Integer> getDatabaseIdsForProteinInference(int pinferId) {
+    public static List<Integer> getDatabaseIdsForProteinInference(int pinferId) {
         
         List<Integer> searchIds = idpRunDao.loadSearchIdsForProteinferRun(pinferId);
         if(searchIds.size() == 0) {

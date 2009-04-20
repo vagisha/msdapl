@@ -15,6 +15,7 @@ import java.util.List;
 public class ComparisonProtein {
 
     private final int nrseqId;
+    private String systematicName;
     private String name;
     private String description;
     private int maxPeptideCount;
@@ -87,5 +88,13 @@ public class ComparisonProtein {
 
     public void setMaxPeptideCount(int maxPeptideCount) {
         this.maxPeptideCount = maxPeptideCount;
+    }
+
+    public String getSystematicName() {
+        return systematicName;
+    }
+
+    public void setSystematicName(String systematicName) {
+        this.systematicName = systematicName;
     }
 }
