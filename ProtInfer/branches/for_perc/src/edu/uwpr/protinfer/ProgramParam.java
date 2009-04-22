@@ -122,7 +122,7 @@ public final class ProgramParam {
         public static ProgramParam makePeptideDefParam() {
             return new ProgramParam(TYPE.CHOICE,
                   "PeptDef", "Peptide Definition",
-                  "Sequence", new String[]{"Sequence", 
+                  "Sequence + Modifications + Charge", new String[]{"Sequence", 
                                            "Sequence + Modifications", 
                                            "Sequence + Charge",
                                            "Sequence + Modifications + Charge"},
