@@ -21,7 +21,6 @@ import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTRunSearchDAO;
 import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.util.DynamicModLookupUtil;
-import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
@@ -80,7 +79,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     private boolean preUploadCheckDone = false;
     
     private List<String> filenames;
-    private List<String> rawDataFileNames;
+    private List<String> spectrumFileNames;
     
     int searchId;
     int sequenceDatabaseId; // nrseq database id
@@ -630,10 +629,10 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         
         // 4. If we know the raw data file names that will be uploaded match them with up with the SQT files
         //    and make sure there is a raw data file for each SQT file
-        if(rawDataFileNames != null) {
+        if(spectrumFileNames != null) {
             for(String file:filenames) {
                 String filenoext = removeFileExtension(file);
-                if(!rawDataFileNames.contains(filenoext)) {
+                if(!spectrumFileNames.contains(filenoext)) {
                     appendToMsg("No corresponding raw data file found for: "+filenoext);
                     return false;
                 }
@@ -663,16 +662,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     }    
 
     @Override
-    public void setRawDataFileNames(List<String> rawDataFileNames, RunFileFormat format) {
-        this.rawDataFileNames = rawDataFileNames;
-        // remove extensions from the file names
-        for(String name: rawDataFileNames) {
-            int idx = name.lastIndexOf("."+format.name().toLowerCase());
-            if(idx == -1) 
-                idx = name.lastIndexOf("."+format.name());
-            if(idx != -1)
-                name = name.substring(0, idx);
-        }
+    public void setSpectrumFileNames(List<String> fileNames) {
+        this.spectrumFileNames = fileNames;
     }
     
     @Override

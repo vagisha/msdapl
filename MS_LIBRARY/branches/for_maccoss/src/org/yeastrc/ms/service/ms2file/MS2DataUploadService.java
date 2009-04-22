@@ -34,7 +34,7 @@ import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MS2RunDataProvider;
 import org.yeastrc.ms.parser.ms2File.Cms2FileReader;
 import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
-import org.yeastrc.ms.service.RawDataUploadService;
+import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.util.Sha1SumCalculator;
@@ -42,7 +42,7 @@ import org.yeastrc.ms.util.Sha1SumCalculator;
 /**
  * 
  */
-public class MS2DataUploadService implements RawDataUploadService {
+public class MS2DataUploadService implements SpectrumDataUploadService {
 
     private static final Logger log = Logger.getLogger(MS2DataUploadService.class);
 
@@ -62,8 +62,8 @@ public class MS2DataUploadService implements RawDataUploadService {
     private String dataDirectory;
     private String remoteDirectory;
     private StringBuilder preUploadCheckMsg;
-    private RunFileFormat format;
-    private List<String> filenames;
+    private List<String> filenames; // filenames WITH extension
+    private List<RunFileFormat> fileFormats;
     private boolean preUploadCheckDone = false;
     
     public MS2DataUploadService() {
@@ -71,6 +71,7 @@ public class MS2DataUploadService implements RawDataUploadService {
         iAnalysisList = new ArrayList<MS2ChargeIndependentAnalysisWId>();
         
         filenames = new ArrayList<String>();
+        fileFormats = new ArrayList<RunFileFormat>();
     }
 
     private void resetCaches() {
@@ -103,7 +104,7 @@ public class MS2DataUploadService implements RawDataUploadService {
             if(!preUploadCheckPassed()) {
                 UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
                 ex.appendErrorMessage(this.getPreUploadCheckMsg());
-                ex.appendErrorMessage("\n\tMS2 FILES WILL NOT BE UPLOADED\n");
+                ex.appendErrorMessage("\n\tMS2/CMS2 FILES WILL NOT BE UPLOADED\n");
                 throw ex;
             }
         }
@@ -111,7 +112,7 @@ public class MS2DataUploadService implements RawDataUploadService {
             try {
                 String filepath = dataDirectory+File.separator+filename;
                 
-                int runId = uploadMS2Run(experimentId, filepath, format, remoteDirectory);
+                int runId = uploadMS2Run(experimentId, filepath, remoteDirectory);
                 // link experiment and run
                 linkExperimentAndRun(experimentId, runId);
                 numRunsUploaded++;
@@ -124,7 +125,7 @@ public class MS2DataUploadService implements RawDataUploadService {
         return experimentId;
     }
     
-    private int uploadMS2Run(int experimentId, String filePath, RunFileFormat format, String serverDirectory) throws UploadException {
+    private int uploadMS2Run(int experimentId, String filePath, String serverDirectory) throws UploadException {
         
         // first check if the file in already in the database. If it is, return its database id
         // If a run with the same file name and SHA-1 hash code already exists in the 
@@ -135,13 +136,14 @@ public class MS2DataUploadService implements RawDataUploadService {
         if (runId > 0) {
             // If this run was uploaded from a different location, upload the location
             saveRunLocation(serverDirectory, runId);
-            log.info("Run with name: "+fileName+" and sha1Sum: "+sha1Sum+
+            log.info("Run with name: "+removeExtension(fileName)+" and sha1Sum: "+sha1Sum+
                     " found in the database; runID: "+runId);
-            log.info("END MS2 FILE UPLOAD: "+fileName+"\n");
+            log.info("END MS2/CMS2 FILE UPLOAD: "+fileName+"\n");
             return runId;
         }
         
         // this is a new file so we will upload it.
+        RunFileFormat format = RunFileFormat.forFile(fileName); // get the format for this file
         MS2RunDataProvider ms2Provider = getMS2DataProvider(format);
         try {
             ms2Provider.open(filePath, sha1Sum);
@@ -393,7 +395,6 @@ public class MS2DataUploadService implements RawDataUploadService {
         }
         
         // 2. valid and supported raw data format
-        // 3. consistent data format 
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -405,35 +406,34 @@ public class MS2DataUploadService implements RawDataUploadService {
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory())
                 continue;
-            String fileName = files[i].getName();
-            int idx = fileName.lastIndexOf(".");
-            if(idx == -1)   continue;
-            
-            String ext = fileName.substring(idx);
-            RunFileFormat format = RunFileFormat.forFileExtension(ext);
+            RunFileFormat format = RunFileFormat.forFile(files[i].getName());
             if(format == RunFileFormat.UNKNOWN) 
                 continue;
             
             formats.add(format);
-            filenames.add(fileName);
+            filenames.add(files[i].getName()); // storing filename WITH extension
         }
         
         if(formats.size() == 0) {
-            appendToMsg("No valid MS2 format found in directory: "+dataDirectory);
+            appendToMsg("No valid MS2 / CMS2 files found in directory: "+dataDirectory);
             return false;
         }
+        this.fileFormats = new ArrayList<RunFileFormat>(formats);
         
-        if(formats.size() > 1) {
-            appendToMsg("Multiple MS2 formats found in directory: "+dataDirectory);
-            return false;
+        // 3. Make sure we do not have a .ms2 and a .cms2 file with the same name
+        Set<String> uniqFiles = new HashSet<String>(filenames.size());
+        for(String filename: filenames) {
+            String fileNoExt = removeExtension(filename);
+            if(uniqFiles.contains(fileNoExt)) {
+                appendToMsg("Found two files with the same name: "+fileNoExt);
+                return false;
+            }
+            uniqFiles.add(fileNoExt);
         }
-        
-        this.format = formats.iterator().next();
         
         preUploadCheckDone = true;
         
         return true;
-        
     }
     
     private void appendToMsg(String msg) {
@@ -447,8 +447,13 @@ public class MS2DataUploadService implements RawDataUploadService {
 
     @Override
     public String getUploadSummary() {
-        return "\tRun file format: "+format.name()+
-        "\n\t#Runs in Directory: "+filenames.size()+"; #Uploaded: "+numRunsUploaded;
+        StringBuilder buf = new StringBuilder("\tRun file format: ");
+        for(RunFileFormat fmt: fileFormats)
+            buf.append(fmt.name()+" ");
+        buf.append("\n\t#Runs in Directory: ");
+        buf.append(filenames.size());
+        buf.append("; #Uploaded: "+numRunsUploaded);
+        return buf.toString();
     }
 
     @Override
@@ -457,12 +462,10 @@ public class MS2DataUploadService implements RawDataUploadService {
     }
 
     @Override
-    public RunFileFormat getFileFormat() {
-        return this.format;
-    }
-
-    @Override
     public List<String> getFileNames() {
-        return this.filenames;
+        List<String> filesNoExt = new ArrayList<String>(filenames.size());
+        for(String filename: filenames)
+            filesNoExt.add(removeExtension(filename));
+        return filesNoExt;
     }
 }

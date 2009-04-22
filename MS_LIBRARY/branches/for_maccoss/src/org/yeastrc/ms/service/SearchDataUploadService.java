@@ -8,8 +8,6 @@ package org.yeastrc.ms.service;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.run.RunFileFormat;
-
 /**
  * 
  */
@@ -19,7 +17,7 @@ public interface SearchDataUploadService extends UploadService {
     
     public void setSearchDate(java.util.Date date);
     
-    public void setRawDataFileNames(List<String> rawDataFileNames, RunFileFormat format);
+    public void setSpectrumFileNames(List<String> fileNames);
     
     public void setDecoyDirectory(String directory);
     

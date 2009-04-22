@@ -147,7 +147,7 @@ public class MsDataUploader {
         long start = System.currentTimeMillis();
         
         try {
-            this.uploadedExptId = exptUploader.uploadRawData();
+            this.uploadedExptId = exptUploader.uploadSpectrumData();
         }
         catch (UploadException ex) {
             uploadExceptionList.add(ex);
@@ -267,8 +267,8 @@ public class MsDataUploader {
         
         // Get the raw data uploader
         log.info("Initializing RawDataUploadService");
-        RawDataUploadService rdus = getRawDataUploader(rawDataDirectory, remoteRawDataDirectory);
-        exptUploader.setRawDataUploader(rdus);
+        SpectrumDataUploadService rdus = getRawDataUploader(rawDataDirectory, remoteRawDataDirectory);
+        exptUploader.setSpectrumDataUploader(rdus);
         
         // We cannot upload analysis data without uploading search data first.
         if(uploadAnalysis && !uploadSearch) {
@@ -327,9 +327,9 @@ public class MsDataUploader {
         return sdus;
     }
 
-    private RawDataUploadService getRawDataUploader(String dataDirectory, String remoteDirectory) throws UploadException {
+    private SpectrumDataUploadService getRawDataUploader(String dataDirectory, String remoteDirectory) throws UploadException {
         
-        RawDataUploadService rdus = null;
+        SpectrumDataUploadService rdus = null;
         try {
             rdus = UploadServiceFactory.instance().getRawDataUploadService(dataDirectory);
             rdus.setRemoteDirectory(remoteDirectory);
@@ -395,7 +395,7 @@ public class MsDataUploader {
         
         // ----- UPLOAD SCAN DATA
         try {
-            exptUploader.uploadRawData(experimentId);
+            exptUploader.uploadSpectrumData(experimentId);
         }
         catch (UploadException ex) {
             uploadExceptionList.add(ex);

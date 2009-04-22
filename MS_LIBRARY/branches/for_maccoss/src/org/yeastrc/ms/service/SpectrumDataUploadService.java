@@ -8,13 +8,15 @@ package org.yeastrc.ms.service;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.run.RunFileFormat;
-
-public interface RawDataUploadService extends UploadService {
+public interface SpectrumDataUploadService extends UploadService {
 
     public void setExperimentId(int experimentId);
     
+    /**
+     * Returns the filenames WITHOUT extensions
+     * @return
+     */
     public List<String> getFileNames();
     
-    public RunFileFormat getFileFormat();
+//    public RunFileFormat getFileFormat();
 }

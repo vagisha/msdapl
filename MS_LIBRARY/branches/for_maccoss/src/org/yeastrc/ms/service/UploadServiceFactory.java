@@ -37,7 +37,7 @@ public class UploadServiceFactory {
         return instance;
     }
     
-    public RawDataUploadService getRawDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
+    public SpectrumDataUploadService getRawDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
             throw new UploadServiceFactoryException("dataDirectory is null");
@@ -57,12 +57,7 @@ public class UploadServiceFactory {
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory())
                 continue;
-            String fileName = files[i].getName();
-            int idx = fileName.lastIndexOf(".");
-            if(idx == -1)   continue;
-            
-            String ext = fileName.substring(idx);
-            RunFileFormat format = RunFileFormat.forFileExtension(ext);
+            RunFileFormat format = RunFileFormat.forFile(files[i].getName());
             if(format == RunFileFormat.UNKNOWN) 
                 continue;
             
@@ -79,7 +74,7 @@ public class UploadServiceFactory {
         
         RunFileFormat format = formats.iterator().next();
         if(format == RunFileFormat.MS2 || format == RunFileFormat.CMS2) {
-            RawDataUploadService service = new MS2DataUploadService();
+            SpectrumDataUploadService service = new MS2DataUploadService();
             service.setDirectory(dataDirectory);
             return service;
         }

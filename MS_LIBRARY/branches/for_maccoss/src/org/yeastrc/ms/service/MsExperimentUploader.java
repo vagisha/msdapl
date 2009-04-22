@@ -26,7 +26,7 @@ public class MsExperimentUploader {
     private String uploadDirectory;
     private String comments;
     
-    private RawDataUploadService rdus;
+    private SpectrumDataUploadService rdus;
     private SearchDataUploadService sdus;
     private AnalysisDataUploadService adus;
     
@@ -56,7 +56,7 @@ public class MsExperimentUploader {
         this.comments = comments;
     }
 
-    public void setRawDataUploader(RawDataUploadService rdus) {
+    public void setSpectrumDataUploader(SpectrumDataUploadService rdus) {
         this.rdus = rdus;
     }
 
@@ -77,10 +77,10 @@ public class MsExperimentUploader {
     public boolean preUploadCheckPassed() {
         boolean passed = true;
         
-        log.info("Doing pre-upload check for raw data uploader....");
+        log.info("Doing pre-upload check for spectrum data uploader....");
         // Raw data uploader check
         if(rdus == null) {
-            appendToMsg("RawDataUploader was null");
+            appendToMsg("SpectrumDataUploader was null");
             passed = false;
         }
         else if(!rdus.preUploadCheckPassed())  {
@@ -155,17 +155,17 @@ public class MsExperimentUploader {
         preUploadCheckMsg.append(msg+"\n");
     }
     
-    public int uploadRawData() throws UploadException {
+    public int uploadSpectrumData() throws UploadException {
         
         // first create an entry in the msExperiment table
         experimentId = saveExperiment();
         log.info("\n\nAdded entry for experiment ID: "+experimentId+"\n\n");
         
-        uploadRawData(experimentId);
+        uploadSpectrumData(experimentId);
         return experimentId;
     }
     
-    public void uploadRawData(int experimentId) throws UploadException {
+    public void uploadSpectrumData(int experimentId) throws UploadException {
         
         this.experimentId = experimentId;
         
@@ -186,7 +186,7 @@ public class MsExperimentUploader {
         int searchId;
         if(do_sdupload) {
             sdus.setExperimentId(experimentId);
-            sdus.setRawDataFileNames(rdus.getFileNames(), rdus.getFileFormat());
+            sdus.setSpectrumFileNames(rdus.getFileNames());
             searchId = sdus.upload();
         }
         else {
@@ -246,7 +246,7 @@ public class MsExperimentUploader {
                 "\n\tRemote directory: "+remoteDirectory+
                 "\n\tDirectory: "+uploadDirectory+
                 "\n\tTime: "+(new Date().toString())+
-                "\n\tRAW DATA UPLOAD: "+do_rdupload+
+                "\n\tSPECTRUM DATA UPLOAD: "+do_rdupload+
                 "\n\tSEARCH DATA UPLOAD: "+do_sdupload+
                 "\n\tANALYSIS DATA UPLOAD: "+do_adupload);
     }

@@ -11,6 +11,9 @@ public enum RunFileFormat {
     MS2, CMS2, MZXML, MZDATA, MZML, UNKNOWN;
     
     public static RunFileFormat instance(String fmtString) {
+        
+        if(fmtString == null)
+            return RunFileFormat.UNKNOWN;
         if(fmtString.startsWith("."))
             fmtString = fmtString.substring(1);
         if (fmtString.equalsIgnoreCase(RunFileFormat.MS2.name()))
@@ -28,6 +31,15 @@ public enum RunFileFormat {
     
     public static RunFileFormat forFileExtension(String extString) {
         return instance(extString);
+    }
+    
+    public static RunFileFormat forFile(String fileName) {
+        if(fileName == null)
+            return instance(fileName);
+        int idx = fileName.lastIndexOf(".");
+        if(idx == -1)
+            return instance(null);
+        return forFileExtension(fileName.substring(idx));
     }
     
     public static boolean isSupportedFormat(String extString) {
