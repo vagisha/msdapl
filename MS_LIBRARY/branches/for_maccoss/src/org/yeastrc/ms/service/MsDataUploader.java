@@ -52,11 +52,11 @@ public class MsDataUploader {
         this.remoteServer = remoteServer;
     }
 
-    public void setRawDataDirectory(String rawDataDirectory) {
+    public void setSpectrumDataDirectory(String rawDataDirectory) {
         this.rawDataDirectory = rawDataDirectory;
     }
 
-    public void setRemoteRawDataDirectory(String remoteRawDataDirectory) {
+    public void setRemoteSpectrumDataDirectory(String remoteRawDataDirectory) {
         this.remoteRawDataDirectory = remoteRawDataDirectory;
     }
 
@@ -641,9 +641,9 @@ public class MsDataUploader {
         
         MsDataUploader uploader = new MsDataUploader();
         uploader.setRemoteServer("local");
-        uploader.setRawDataDirectory(directory);
+        uploader.setSpectrumDataDirectory(directory);
         uploader.setSearchDirectory(directory);
-        uploader.setRemoteRawDataDirectory(directory);
+        uploader.setRemoteSpectrumDataDirectory(directory);
         uploader.setRemoteSearchDataDirectory(directory);
         uploader.setSearchDate(new Date());
         uploader.checkResultChargeMass(maccossData);

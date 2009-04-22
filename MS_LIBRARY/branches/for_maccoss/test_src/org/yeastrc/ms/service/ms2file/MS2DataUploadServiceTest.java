@@ -32,11 +32,11 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // UPLOAD 1
         MsDataUploader uploader = new MsDataUploader();
         int experimentId1 = 0;
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
-        uploader.setRemoteRawDataDirectory("remote/directory");
+        uploader.setRemoteSpectrumDataDirectory("remote/directory");
         uploader.uploadData();
         experimentId1 = uploader.getUploadedExperimentId();
         assertNotSame(0, experimentId1);
@@ -75,11 +75,11 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // upload with different values for serverAddress and serverDirectory
         uploader = new MsDataUploader();
         int experimentId2 = 0;
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remote.server.again");
-        uploader.setRemoteRawDataDirectory("remote/directory/2");
+        uploader.setRemoteSpectrumDataDirectory("remote/directory/2");
         uploader.uploadData();
         experimentId2 = uploader.getUploadedExperimentId();
         assertNotSame(0, experimentId2);
@@ -120,11 +120,11 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         // as the first upload
         uploader = new MsDataUploader();
         int experimentId3 = 0;
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remote.server");
-        uploader.setRemoteRawDataDirectory("remote/directory");
+        uploader.setRemoteSpectrumDataDirectory("remote/directory");
         uploader.uploadData();
         experimentId3 = uploader.getUploadedExperimentId();
         assertNotSame(0, experimentId3);
@@ -156,7 +156,7 @@ public class MS2DataUploadServiceTest extends BaseDAOTestCase {
         assertEquals(1, searchIds.size());
         assertEquals(2, runSearchDao.loadRunSearchIdsForSearch(oldSearchId).size());
         uploader = new MsDataUploader();
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.uploadData(experimentId2);

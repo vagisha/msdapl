@@ -62,7 +62,7 @@ public class SequestSQTDataUploadServiceTest2 extends BaseDAOTestCase {
         MsDataUploader uploader = new MsDataUploader();
         int experimentId = 0;
         java.util.Date searchDate = new java.util.Date();
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(searchDate);
         uploader.setRemoteServer("remoteServer");

@@ -25,7 +25,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadNoResultsForScan() {
         String dir = "test_resources/invalidSQT_noResultsForScan_dir";
 //        try {
-            uploader.setRawDataDirectory(dir);
+            uploader.setSpectrumDataDirectory(dir);
             uploader.setSearchDirectory(dir);
             uploader.setSearchDate(new Date());
             uploader.setRemoteServer("remoteServer");
@@ -41,7 +41,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadNoProteinsForResult() {
         String dir = "test_resources/invalidSQT_noProteinsForResult_dir";
 //        try {
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
@@ -59,7 +59,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadDataToDbInvalidDirectory() {
         String dir = "dummy/directory";
 //        try {
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
@@ -77,7 +77,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/empty_dir";
         int expId = 0;
 //        try {
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
@@ -98,7 +98,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         String dir = "test_resources/missingMS2_dir";
         int expId = 0;
 //        try {
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
@@ -117,7 +117,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidMS2_S() {
         String dir = "test_resources/invalid_ms2_S_dir";
 //        try {
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setRemoteServer("remoteServer");
         uploader.uploadData();
 //            fail("2.ms2 is invalid");
@@ -137,7 +137,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     public void testUploadInvalidMS2_peak() {
         String dir = "test_resources/invalid_ms2_peak_dir";
 //        try {
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
@@ -160,7 +160,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
     
     public void testUploadInvalidMS2_Z() {
         String dir = "test_resources/invalid_ms2_Z_dir";
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
@@ -183,7 +183,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         
         
       String dir = "test_resources/invalid_sqt_dir";
-      uploader.setRawDataDirectory(dir);
+      uploader.setSpectrumDataDirectory(dir);
       uploader.setSearchDirectory(dir);
       uploader.setSearchDate(new Date());
       uploader.setRemoteServer("remoteServer");
@@ -298,7 +298,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         
         
         MsDataUploader uploader = new MsDataUploader();
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
@@ -419,7 +419,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         
         
         String dir = "test_resources/noScanIdFound_dir";
-        uploader.setRawDataDirectory(dir);
+        uploader.setSpectrumDataDirectory(dir);
         uploader.setSearchDirectory(dir);
         uploader.setSearchDate(new Date());
         uploader.setRemoteServer("remoteServer");
