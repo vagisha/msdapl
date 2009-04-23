@@ -136,7 +136,7 @@ public class Projects {
 		    String sqlStr = "SELECT DISTINCT  p.projectID "+
 		    "FROM tblProjects AS p, projectResearcher AS pr "+
 		    "WHERE p.projectID = pr.projectID "+
-		    "AND (p.projectID = ? OR pr.researcherID = ?) "+
+		    "AND (p.projectPI = ? OR pr.researcherID = ?) "+
 		    "ORDER BY p.projectID";
 			
 			stmt = conn.prepareStatement(sqlStr);
