@@ -77,7 +77,7 @@ public class ViewAlignedGroupProteins extends Action {
             return mapping.findForward("Failure");
         }
         
-        List<WIdPickerProtein> proteins = IdPickerResultsLoader.getGroupProteins(pinferId, groupId, new PeptideDefinition(), false);
+        List<WIdPickerProtein> proteins = IdPickerResultsLoader.getGroupProteins(pinferId, groupId, new PeptideDefinition());
         AlignedProteins aligned = SequenceAligner.instance().alignProteins(proteins);
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("groupId", groupId);

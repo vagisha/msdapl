@@ -5,17 +5,17 @@
 
 
   <html:form action="/downloadProtInferResults" method="post" styleId="downloadForm" target="_blank" >
-  <table>
-  <tr><td>
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
-  <html:text name="proteinInferFilterForm" property="minPeptides" />
-  <html:text name="proteinInferFilterForm" property="minUniquePeptides" />
-  <html:text name="proteinInferFilterForm" property="minCoverage" />
-  <html:text name="proteinInferFilterForm" property="minSpectrumMatches" />
-  <html:text name="proteinInferFilterForm" property="showAllProteins" />
-  <html:text name="proteinInferFilterForm" property="validationStatus" /> 	
-  <html:text name="proteinInferFilterForm" property="accessionLike" />
-  <html:text name="proteinInferFilterForm" property="descriptionLike" />
-  </td></tr></table>
+  <html:hidden name="proteinInferFilterForm" property="minPeptides" />
+  <html:hidden name="proteinInferFilterForm" property="minUniquePeptides" />
+  <html:hidden name="proteinInferFilterForm" property="minCoverage" />
+  <html:hidden name="proteinInferFilterForm" property="minSpectrumMatches" />
+  <html:hidden name="proteinInferFilterForm" property="showAllProteins" />
+  <html:hidden name="proteinInferFilterForm" property="validationStatusString" /> 	
+  <html:hidden name="proteinInferFilterForm" property="accessionLike" />
+  <html:hidden name="proteinInferFilterForm" property="descriptionLike" />
+  <div align="center">
+   	<a href="" onclick="javascript:downloadResults();return false;" >Download Results</a>
+  </div>
+  </html:form>
   
-</html:form>

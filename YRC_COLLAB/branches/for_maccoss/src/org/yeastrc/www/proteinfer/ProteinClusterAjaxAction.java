@@ -73,7 +73,7 @@ public class ProteinClusterAjaxAction extends Action{
         request.setAttribute("clusterId", clusterId);
         
         
-        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(pinferId, clusterId, peptideDef, false);
+        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(pinferId, clusterId, peptideDef);
         request.setAttribute("cluster", cluster);
         
         return mapping.findForward("Success");

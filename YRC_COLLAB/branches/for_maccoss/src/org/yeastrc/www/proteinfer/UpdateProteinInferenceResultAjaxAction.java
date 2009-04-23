@@ -98,7 +98,6 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
-        filterCriteria.setExhaustiveCommonNameLookup(filterForm.isExhaustiveCommonNameLookup());
         
         
         // Get the protein IDs from the session
@@ -173,9 +172,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups 
-        boolean fullLookup = filterCriteria.doExhaustiveCommonNameLookup();
         List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
-                                                        filterCriteria.isGroupProteins(), peptideDef, fullLookup);
+                                                        filterCriteria.isGroupProteins(), peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
         

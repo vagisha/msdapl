@@ -78,13 +78,13 @@ public class ProteinDetailsAjaxAction extends Action {
         long s = System.currentTimeMillis();
         
         // get the protein 
-        WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef, false);
+        WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
         request.setAttribute("protein", iProt);
         
         // get other proteins in this group
         List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, 
                                                     iProt.getProtein().getGroupId(), 
-                                                    peptideDef, false);
+                                                    peptideDef);
         if(groupProteins.size() == 1)
             groupProteins.clear();
         else {

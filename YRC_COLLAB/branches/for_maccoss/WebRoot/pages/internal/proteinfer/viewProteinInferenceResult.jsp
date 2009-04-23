@@ -722,7 +722,7 @@ function validateForm() {
 	// fieldValue is a Form Plugin method that can be invoked to find the 
     // current value of a field 
     
-    var value = $("form#filterForm input[@name='minPeptides']").fieldValue();
+    var value = $("form#filterForm input[name='minPeptides']").fieldValue();
     var valid = validateInt(value, "Min. Peptides", 1);
     if(!valid)	return false;
     var minPept = parseInt(value);
@@ -773,6 +773,9 @@ function updateResults(responseText, statusText) {
 	$.unblockUI();
   	setupProteinListTable();
 }
+// ---------------------------------------------------------------------------------------
+// DOWNLOAD RESULTS
+// ---------------------------------------------------------------------------------------
 function downloadResults() {
 
 	// validate the current entries in the form
@@ -780,17 +783,24 @@ function downloadResults() {
 	if(!validated)	return false;
 	
 	// copy the values from the filter form to the download form
-	
 	$("#downloadForm  input[name='minPeptides']").val($("#filterForm  input[name='minPeptides']").val());
 	$("#downloadForm  input[name='minUniquePeptides']").val($("#filterForm input[name='minUniquePeptides']").val());
 	$("#downloadForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
-	$("#downloadForm > input[name='minSpectrumMatches']").val($("#filterForm > input[name='minSpectrumMatches']").val());
-	$("#downloadForm > input[name='showAllProteins']").val($("#filterForm > input[name='showAllProteins']").val());
-	$("#downloadForm > input[name='validationStatus']").val($("#filterForm > input[name='validationStatus']").val());
-	$("#downloadForm > input[name='accessionLike']").val($("#filterForm > input[name='accessionLike']").val());
-	$("#downloadForm > input[name='descriptionLike']").val($("#filterForm > input[name='descriptionLike']").val());
+	$("#downloadForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
+	$("#downloadForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
+
+	$("#downloadForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
+	$("#downloadForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
 	
-	//$("#downloadForm").submit();
+	var validationStatus = "";
+	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
+	if(validationStatus.length) {
+		validationStatus = validationStatus.substring(1); // remove first comma
+	}
+	$("#downloadForm  input[name='validationStatusString']").val(validationStatus);
+	
+	
+	$("#downloadForm").submit();
 	
 }
 

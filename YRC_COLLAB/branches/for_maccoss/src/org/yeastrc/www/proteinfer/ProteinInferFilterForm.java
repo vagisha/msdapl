@@ -18,8 +18,6 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean joinGroupProteins = true;
     private boolean showAllProteins = true;
     
-    private boolean exhaustiveCommonNameLookup = false;
-    
     private String accessionLike = null;
     private String descriptionLike = null;
     private String[] validationStatus = new String[]{"All"};
@@ -133,17 +131,32 @@ public class ProteinInferFilterForm extends ActionForm {
     }
 
     public void setValidationStatus(String[] validationStatus) {
-        for(String vs: validationStatus)
-            System.out.println(vs);
         this.validationStatus = validationStatus;
     }
-
-    public boolean isExhaustiveCommonNameLookup() {
-        return exhaustiveCommonNameLookup;
+    
+    public void setValidationStatusString(String validationStatus) {
+        if(validationStatus == null)
+            this.validationStatus = new String[0];
+        validationStatus = validationStatus.trim();
+        String tokens[] = validationStatus.split(",");
+        this.validationStatus = new String[tokens.length];
+        int idx = 0;
+        for(String tok: tokens) {
+            this.validationStatus[idx++] = tok.trim();
+        }
     }
-
-    public void setExhaustiveCommonNameLookup(boolean exhaustiveCommonNameLookup) {
-        this.exhaustiveCommonNameLookup = exhaustiveCommonNameLookup;
+    
+    public String getValidationStatusString() {
+        if(this.validationStatus == null)
+            return null;
+        StringBuilder buf = new StringBuilder();
+        for(String status: validationStatus) {
+            buf.append(",");
+            buf.append(status);
+        }
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        return buf.toString();
     }
    
 }

@@ -49,10 +49,9 @@ public class DownloadProteinferResultsAction extends Action {
             return mapping.findForward("authenticate");
         }
         
+        ProteinInferFilterForm filterForm = (ProteinInferFilterForm) form;
         // get the protein inference id
-        int pinferId = 0;
-        try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
-        catch(NumberFormatException e){};
+        int pinferId = filterForm.getPinferId();
         // if we  do not have a valid protein inference run id
         // return an error.
         if(pinferId <= 0) {
@@ -63,35 +62,42 @@ public class DownloadProteinferResultsAction extends Action {
             return mapping.findForward("Failure");
         }
         
+        
         long s = System.currentTimeMillis();
         response.setContentType("text/plain");
         response.setHeader("Content-Disposition","inline; filename=\"ProtInfer_"+pinferId+".txt\"");
         response.setHeader("cache-control", "no-cache");
         PrintWriter writer = response.getWriter();
-        writeResults(writer, pinferId);
+        writeResults(writer, pinferId, filterForm);
         writer.close();
         long e = System.currentTimeMillis();
         log.info("DownloadProteinferResultsAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
         return null;
     }
 
-    private void writeResults(PrintWriter writer, int pinferId) {
+    private void writeResults(PrintWriter writer, int pinferId, ProteinInferFilterForm filterForm) {
         
         IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
         IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
         PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
         
+        // Get the filtering criteria
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-        filterCriteria.setNumPeptides(1);
+        filterCriteria.setCoverage(filterForm.getMinCoverage());
+        filterCriteria.setNumPeptides(filterForm.getMinPeptides());
+        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
+        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(SORT_BY.defaultSortBy());
         filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
         filterCriteria.setGroupProteins(true);
-        filterCriteria.setShowParsimonious(false);
+        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        filterCriteria.setValidationStatus(filterForm.getValidationStatus());
+        filterCriteria.setAccessionLike(filterForm.getAccessionLike());
+        filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
-        
         
         // print summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);
@@ -135,7 +141,7 @@ public class DownloadProteinferResultsAction extends Action {
         
         for(int i = proteinIds.size() - 1; i >=0; i--) {
             int proteinId = proteinIds.get(i);
-            WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, proteinId, peptideDef, false);
+            WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, proteinId, peptideDef);
             writer.write(wProt.getProtein().getGroupId()+"\t");
             if(wProt.getProtein().getIsParsimonious())
                 writer.write("P\t");

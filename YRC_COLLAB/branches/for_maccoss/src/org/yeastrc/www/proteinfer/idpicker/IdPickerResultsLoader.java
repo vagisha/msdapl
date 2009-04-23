@@ -270,7 +270,7 @@ public class IdPickerResultsLoader {
         s = System.currentTimeMillis();
         
         for(ProteinferProtein protein: proteins) {
-            String[] acc_descr = getProteinAccessionDescription(dbIds, protein.getNrseqProteinId(), false, false);
+            String[] acc_descr = getProteinAccessionDescription(dbIds, protein.getNrseqProteinId(), false);
             map.put(protein.getId(), acc_descr[0]);
         }
         e = System.currentTimeMillis();
@@ -311,28 +311,28 @@ public class IdPickerResultsLoader {
     // Get a list of proteins
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerProtein> getProteins(int pinferId, List<Integer> proteinIds, 
-            PeptideDefinition peptideDef, boolean fullNrSeqLookup) {
+            PeptideDefinition peptideDef) {
         long s = System.currentTimeMillis();
         List<WIdPickerProtein> proteins = new ArrayList<WIdPickerProtein>(proteinIds.size());
         for(int id: proteinIds) 
-            proteins.add(getIdPickerProtein(pinferId, id, peptideDef, fullNrSeqLookup));
+            proteins.add(getIdPickerProtein(pinferId, id, peptideDef));
         long e = System.currentTimeMillis();
         log.info("Time to get WIdPickerProteins: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         return proteins;
     }
     
     public static WIdPickerProtein getIdPickerProtein(int pinferId, int pinferProteinId, 
-            PeptideDefinition peptideDef, boolean fullLookup) {
+            PeptideDefinition peptideDef) {
         IdPickerProteinBase protein = idpProtBaseDao.loadProtein(pinferProteinId);
         protein.setPeptideDefinition(peptideDef);
-        return getWIdPickerProtein(protein, fullLookup);
+        return getWIdPickerProtein(protein);
     }
     
-    private static WIdPickerProtein getWIdPickerProtein(IdPickerProteinBase protein, boolean fullLookup) {
+    private static WIdPickerProtein getWIdPickerProtein(IdPickerProteinBase protein) {
         WIdPickerProtein wProt = new WIdPickerProtein(protein);
         // set the accession and description for the proteins.  
         // This requires querying the NRSEQ database
-        assignProteinAccessionDescription(protein.getProteinferId(), wProt, fullLookup);
+        assignProteinAccessionDescription(protein.getProteinferId(), wProt);
         return wProt;
     }
     
@@ -340,7 +340,7 @@ public class IdPickerResultsLoader {
     // Get all the proteins in a group
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerProtein> getGroupProteins(int pinferId, int groupId, 
-            PeptideDefinition peptideDef, boolean fullNrSeqLookup) {
+            PeptideDefinition peptideDef) {
         
         long s = System.currentTimeMillis();
         
@@ -350,7 +350,7 @@ public class IdPickerResultsLoader {
         
         for(IdPickerProteinBase prot: groupProteins) {
             prot.setPeptideDefinition(peptideDef);
-            proteins.add(getWIdPickerProtein(prot, fullNrSeqLookup));
+            proteins.add(getWIdPickerProtein(prot));
         }
         
         long e = System.currentTimeMillis();
@@ -363,14 +363,14 @@ public class IdPickerResultsLoader {
     // Get a list of protein groups
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, 
-            PeptideDefinition peptideDef, boolean fullNrSeqLookup) {
-        return getProteinGroups(pinferId, proteinIds, true, peptideDef, fullNrSeqLookup);
+            PeptideDefinition peptideDef) {
+        return getProteinGroups(pinferId, proteinIds, true, peptideDef);
     }
     
     public static List<WIdPickerProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, boolean append, 
-            PeptideDefinition peptideDef, boolean fullNrSeqLookup) {
+            PeptideDefinition peptideDef) {
         long s = System.currentTimeMillis();
-        List<WIdPickerProtein> proteins = getProteins(pinferId, proteinIds, peptideDef, fullNrSeqLookup);
+        List<WIdPickerProtein> proteins = getProteins(pinferId, proteinIds, peptideDef);
         
         if(proteins.size() == 0) {
             return new ArrayList<WIdPickerProteinGroup>(0);
@@ -384,7 +384,7 @@ public class IdPickerResultsLoader {
             for(IdPickerProteinBase prot: groupProteins) {
                 if(!proteinIds.contains(prot.getId())) {
                     prot.setPeptideDefinition(peptideDef);
-                    proteins.add(0, getWIdPickerProtein(prot, fullNrSeqLookup));
+                    proteins.add(0, getWIdPickerProtein(prot));
                 }
             }
 
@@ -396,7 +396,7 @@ public class IdPickerResultsLoader {
                 for(IdPickerProteinBase prot: groupProteins) {
                     if(!proteinIds.contains(prot.getId())) {
                         prot.setPeptideDefinition(peptideDef);
-                        proteins.add(getWIdPickerProtein(prot, fullNrSeqLookup));
+                        proteins.add(getWIdPickerProtein(prot));
                     }
                 }
             }
@@ -433,22 +433,21 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // NR_SEQ lookup 
     //---------------------------------------------------------------------------------------------------
-    private static void assignProteinAccessionDescription(int pinferId, WIdPickerProtein wProt, boolean fullLookup) {
+    private static void assignProteinAccessionDescription(int pinferId, WIdPickerProtein wProt) {
         
-        String[] acc_descr = getProteinAccessionDescription(pinferId, wProt.getProtein().getNrseqProteinId(),
-                fullLookup);
+        String[] acc_descr = getProteinAccessionDescription(pinferId, wProt.getProtein().getNrseqProteinId());
         wProt.setAccession(acc_descr[0]);
         wProt.setDescription(acc_descr[1]);
         wProt.setCommonName(acc_descr[2]);
     }
     
     private static String[] getProteinAccessionDescription(int pinferId, int nrseqProteinId, 
-            boolean getCommonName, boolean fullLookup) {
+            boolean getCommonName) {
         List<Integer> dbIds = getDatabaseIdsForProteinInference(pinferId);
-        return getProteinAccessionDescription(dbIds, nrseqProteinId, getCommonName, fullLookup);
+        return getProteinAccessionDescription(dbIds, nrseqProteinId, getCommonName);
     }
     
-    private static String[] getProteinAccessionDescription(List<Integer> dbIds, int nrseqProteinId, boolean getCommonName, boolean fullLookup) {
+    private static String[] getProteinAccessionDescription(List<Integer> dbIds, int nrseqProteinId, boolean getCommonName) {
         
         List<NrDbProtein> nrDbProtList = NrSeqLookupUtil.getProtein(nrseqProteinId, dbIds);
         String acc = "";
@@ -483,10 +482,9 @@ public class IdPickerResultsLoader {
         return new String[] {acc, descr, commonName};
     }
     
-    private static String[] getProteinAccessionDescription(int pinferId, int nrseqProteinId,
-            boolean fullLookup) {
+    private static String[] getProteinAccessionDescription(int pinferId, int nrseqProteinId) {
         
-        return getProteinAccessionDescription(pinferId, nrseqProteinId, true, fullLookup);
+        return getProteinAccessionDescription(pinferId, nrseqProteinId, true);
     }
     
     //---------------------------------------------------------------------------------------------------
@@ -798,7 +796,7 @@ public class IdPickerResultsLoader {
     // Protein and Peptide groups for a cluster
     //--------------------------------------------------------------------------------------------------- 
     public static WIdPickerCluster getIdPickerCluster(int pinferId, int clusterId, 
-            PeptideDefinition peptideDef, boolean fullNrSeqLookup) {
+            PeptideDefinition peptideDef) {
        
         List<Integer> protGroupIds = idpProtBaseDao.getGroupIdsForCluster(pinferId, clusterId);
         
@@ -809,7 +807,7 @@ public class IdPickerResultsLoader {
         
         // get a list of protein groups
         for(int protGrpId: protGroupIds) {
-            List<WIdPickerProtein> grpProteins = getGroupProteins(pinferId, protGrpId, peptideDef, fullNrSeqLookup);
+            List<WIdPickerProtein> grpProteins = getGroupProteins(pinferId, protGrpId, peptideDef);
             WIdPickerProteinGroup grp = new WIdPickerProteinGroup(grpProteins);
             proteinGroups.put(protGrpId, grp);
             

@@ -235,7 +235,7 @@ public class SequenceAligner {
     
     public static void main(String[] args) throws AlignmentException {
 
-        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(14, 1, new PeptideDefinition(), false);
+        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(14, 1, new PeptideDefinition());
 
         SequenceAligner aligner = SequenceAligner.instance();
         AlignedProteins aligned = aligner.alignCluster(cluster);

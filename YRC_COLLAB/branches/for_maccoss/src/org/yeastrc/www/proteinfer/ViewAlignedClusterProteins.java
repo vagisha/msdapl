@@ -79,7 +79,7 @@ public class ViewAlignedClusterProteins extends Action{
             return mapping.findForward("Failure");
         }
         
-        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(pinferId, clusterId, new PeptideDefinition(), false);
+        WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(pinferId, clusterId, new PeptideDefinition());
         AlignedProteins aligned = SequenceAligner.instance().alignCluster(cluster);
         // sort the aligned proteins by groupId
         final int anchorGrpId = aligned.getAnchorProtein().getPinferProteinGroupId();

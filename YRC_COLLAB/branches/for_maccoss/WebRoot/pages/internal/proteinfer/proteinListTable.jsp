@@ -220,14 +220,14 @@
 		</tr>
 		
 		<!-- Display the View Peptides link for each protein in the group -->
-		<tr class="pept_row linked_row">
-		<td valign="top" colspan="2" class="no-border"><nobr>
+		<tr class="pept_row linked_row pinfer_filler">
+		<td valign="top" colspan="2" class="pinfer_filler"><nobr>
 			<span class="showpeptForProt" 
 				  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 				  id="<bean:write name="protein" property="protein.id" />"
 				  title="<bean:write name="proteinGroup" property="groupId" />"
 				  >Show Peptides</span></nobr></td>
-		<td colspan="8" class="no-border">
+		<td colspan="9" class="pinfer_filler">
 			<!--  peptides table will go here: proteinPeptides.jsp -->
 			<div id="peptforprot_<bean:write name="protein" property="protein.id" />_<bean:write name="proteinGroup" property="groupId" />"></div>
 		</td>
@@ -341,12 +341,12 @@
 		
 		<!-- List the peptides and the best match for each peptide -->
 		<tr class="pept_row linked_row">
-			<td valign="top" colspan="2" class="no-border"><nobr>
+			<td valign="top" colspan="2" class="pinfer_filler"><nobr>
 				<span class="showpeptForProtGrp" 
 					  style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
 					  id="<bean:write name="proteinGroup" property="groupId" />"
 					  >Show Peptides</span></nobr></td>
-			<td colspan="8" class="no-border">
+			<td colspan="9" class="pinfer_filler">
 				<!--  peptides table will go here: proteinPeptides.jsp -->
 				<div id="peptforprot_<bean:write name="proteinGroup" property="groupId" />"></div>
 			</td>

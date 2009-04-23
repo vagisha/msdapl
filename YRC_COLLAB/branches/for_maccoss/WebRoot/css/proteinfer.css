@@ -45,17 +45,20 @@
 }
 
 .table_pinfer TD.no-border {
-	border-style: none none none none;
-	border-width: medium medium medium medium;
-	border-color: #CBCBCB;
-	padding: 3 3 3 3;
+	border-style: none;
+	border-width: 0;
 }
-
+.table_pinfer TD.pinfer_filler {
+	border-style: solid none solid none;
+	border-width: 1px medium 1px medium;
+	border-color: #CBCBCB;
+}
 
 /* I really liked FAEBD7 but it looks pink on my windows laptop */
 TR.pinfer_A {
 	background-color: #F8F8FF; 
 }
+
 TR.pinfer_B {
 	background-color: #FFFFFF;
 }

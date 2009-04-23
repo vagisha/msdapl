@@ -19,16 +19,12 @@
 	});
 </script>
 
-  
   <html:form action="/updateProteinInferenceResult" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
-  
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
   <!-- Filtering options -->
-  
-  
   <tr>
   
   <td><table>
@@ -113,17 +109,8 @@
     	<td colspan="3" align="center">
     		<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>
     	</td>
+    	 
+    	 
   </tr>
-  
-  
-  
  </TABLE>
- </html:form>
- <table>
- <tr>
-  <td colspan="3" align="center">
-   		<a href="" onclick="javascript:downloadResults();return false;" >Download Results</a>
-  </td>
-  </tr>
- </table>
-
+</html:form>
