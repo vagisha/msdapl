@@ -464,16 +464,18 @@ public class IdPickerResultsLoader {
         String commonName = "";
         
         if(getCommonName) {
-            
-//            NRProteinFactory nrpf = NRProteinFactory.getInstance();
-//            NRProtein nrseqProt = null;
+
             try {
                 commonName = CommonNameLookupUtil.instance().getCommonListing(nrseqProteinId).getName();
-//                nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-//                commonName = nrseqProt.getListing();
-//                commonName = CommonNameLookupUtil.instance().getCommonNames(nrseqProteinId, fullLookup);
-//                if(commonName.equals("UNKNOWN"))
-//                    commonName = "";
+                
+                if(commonName == null || commonName.trim().length() == 0) {
+                  NRProteinFactory nrpf = NRProteinFactory.getInstance();
+                  NRProtein nrseqProt = null;
+                  nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
+                  commonName = nrseqProt.getListing();
+                  if(commonName.equals("UNKNOWN"))
+                      commonName = "";
+                }
             }
             catch (Exception e) {
                 log.error("Exception getting accession/description for protein Id: "+nrseqProteinId, e);
