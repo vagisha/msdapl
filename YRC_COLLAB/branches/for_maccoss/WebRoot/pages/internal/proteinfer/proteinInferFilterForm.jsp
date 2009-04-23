@@ -19,14 +19,15 @@
 	});
 </script>
 
+  
   <html:form action="/updateProteinInferenceResult" method="post" styleId="filterForm" >
   
   <html:hidden name="proteinInferFilterForm" property="pinferId" />
   
-  
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
   <!-- Filtering options -->
+  
   
   <tr>
   
@@ -74,15 +75,6 @@
   </table></td>
   </tr>
   
-  <!--  
-  <tr>
-  	<td colspan="2">
-  		All-inclusive Common Name Lookup: 
-  		<html:checkbox name="proteinInferFilterForm" property="exhaustiveCommonNameLookup" value="true"/>
-  	</td>
-  </tr>
-  -->
-  
   <tr>
   	<td colspan="2">
   		Validation Status: 
@@ -120,11 +112,18 @@
   <tr>
     	<td colspan="3" align="center">
     		<html:submit styleClass="plain_button" style="margin-top:2px;">Update</html:submit>
-    		&nbsp;&nbsp;
-    		<a href="<yrcwww:link path='downloadProtInferResults.do'/>?pinferId=<bean:write name="proteinInferFilterForm" property="pinferId" />">Download Results</a>
     	</td>
   </tr>
   
+  
+  
  </TABLE>
- 
-</html:form>
+ </html:form>
+ <table>
+ <tr>
+  <td colspan="3" align="center">
+   		<a href="" onclick="javascript:downloadResults();return false;" >Download Results</a>
+  </td>
+  </tr>
+ </table>
+

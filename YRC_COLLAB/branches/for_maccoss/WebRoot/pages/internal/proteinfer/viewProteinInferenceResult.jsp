@@ -712,30 +712,37 @@ $(document).ready(function() {
 });
 // validate the form parameters before submit.
 function beforeSubmit() {
+	
+    if(!validateForm())
+    	return false;
+	$.blockUI();
+}
+function validateForm() {
+
 	// fieldValue is a Form Plugin method that can be invoked to find the 
     // current value of a field 
     
-    var value = $('input[@name=minPeptides]').fieldValue();
+    var value = $("form#filterForm input[@name='minPeptides']").fieldValue();
     var valid = validateInt(value, "Min. Peptides", 1);
     if(!valid)	return false;
     var minPept = parseInt(value);
-    $('input[@name=minPeptides]').val(minPept);
+    $('form#filterForm input[name=minPeptides]').val(minPept);
     
-    value = $('input[@name=minUniquePeptides]').fieldValue();
+    value = $('form#filterForm input[@name=minUniquePeptides]').fieldValue();
     valid = validateInt(value, "Min. Unique Peptides", 0, minPept);
     if(!valid)	return false;
-    $('input[@name=minUniquePeptides]').val(parseInt(value));
+    $('form#filterForm input[@name=minUniquePeptides]').val(parseInt(value));
     
-    value = $('input[@name=minCoverage]').fieldValue();
+    value = $('form#filterForm input[@name=minCoverage]').fieldValue();
     valid = validateFloat(value, "Min. Coverage", 0.0, 100.0);
     if(!valid)	return false;
     
-    value = $('input[@name=minSpectrumMatches]').fieldValue();
+    value = $('form#filterForm input[@name=minSpectrumMatches]').fieldValue();
     valid = validateInt(value, "Min. Spectrum Matches", 1);
     if(!valid)	return false;
-    $('input[@name=minSpectrumMatches]').val(parseInt(value));
+    $('form#filterForm input[@name=minSpectrumMatches]').val(parseInt(value));
     
-	$.blockUI();
+    return true;
 }
 function validateInt(value, fieldName, min, max) {
 	var intVal = parseInt(value);
@@ -765,6 +772,26 @@ function validateFloat(value, fieldName, min, max) {
 function updateResults(responseText, statusText) {
 	$.unblockUI();
   	setupProteinListTable();
+}
+function downloadResults() {
+
+	// validate the current entries in the form
+	var validated = validateForm();
+	if(!validated)	return false;
+	
+	// copy the values from the filter form to the download form
+	
+	$("#downloadForm  input[name='minPeptides']").val($("#filterForm  input[name='minPeptides']").val());
+	$("#downloadForm  input[name='minUniquePeptides']").val($("#filterForm input[name='minUniquePeptides']").val());
+	$("#downloadForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
+	$("#downloadForm > input[name='minSpectrumMatches']").val($("#filterForm > input[name='minSpectrumMatches']").val());
+	$("#downloadForm > input[name='showAllProteins']").val($("#filterForm > input[name='showAllProteins']").val());
+	$("#downloadForm > input[name='validationStatus']").val($("#filterForm > input[name='validationStatus']").val());
+	$("#downloadForm > input[name='accessionLike']").val($("#filterForm > input[name='accessionLike']").val());
+	$("#downloadForm > input[name='descriptionLike']").val($("#filterForm > input[name='descriptionLike']").val());
+	
+	//$("#downloadForm").submit();
+	
 }
 
 // ---------------------------------------------------------------------------------------
@@ -951,6 +978,7 @@ function toggleDivVisibility(mydiv) {
 		<CENTER>
 		<table><tr><td>
 		<%@ include file="proteinInferFilterForm.jsp" %>
+		<%@include file="proteinInferDownloadForm.jsp" %>
 		</td></tr></table>
 		</CENTER>
 		

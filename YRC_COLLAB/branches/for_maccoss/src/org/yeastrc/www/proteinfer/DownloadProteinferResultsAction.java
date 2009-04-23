@@ -65,7 +65,7 @@ public class DownloadProteinferResultsAction extends Action {
         
         long s = System.currentTimeMillis();
         response.setContentType("text/plain");
-        response.setHeader("Content-Disposition","attachment; filename=\"ProtInfer_"+pinferId+".txt\"");
+        response.setHeader("Content-Disposition","inline; filename=\"ProtInfer_"+pinferId+".txt\"");
         response.setHeader("cache-control", "no-cache");
         PrintWriter writer = response.getWriter();
         writeResults(writer, pinferId);
@@ -104,22 +104,22 @@ public class DownloadProteinferResultsAction extends Action {
         
         // print input summary
         List<WIdPickerInputSummary> inputSummary = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
-        writer.write("File\tNumDecoyHits\tNumTargetHits\tNumFilteredTarget\n");
+        writer.write("File\tNumHits\tNumFilteredHits\n");
         int totalDecoyHits = 0;
         int totalTargetHits = 0;
         int filteredTargetHits = 0;
         for(WIdPickerInputSummary input: inputSummary) {
             writer.write(input.getFileName()+"\t");
-            writer.write(input.getInput().getNumDecoyHits()+"\t");
+//            writer.write(input.getInput().getNumDecoyHits()+"\t");
             writer.write(input.getInput().getNumTargetHits()+"\t");
             writer.write(input.getInput().getNumFilteredTargetHits()+"\n");
             
-            totalDecoyHits += input.getInput().getNumDecoyHits();
+//            totalDecoyHits += input.getInput().getNumDecoyHits();
             totalTargetHits += input.getInput().getNumTargetHits();
             filteredTargetHits += input.getInput().getNumFilteredTargetHits();
         }
         writer.write("TOTAL\t");
-        writer.write(totalDecoyHits+"\t");
+//        writer.write(totalDecoyHits+"\t");
         writer.write(totalTargetHits+"\t");
         writer.write(filteredTargetHits+"\n");
         writer.write("\n\n");

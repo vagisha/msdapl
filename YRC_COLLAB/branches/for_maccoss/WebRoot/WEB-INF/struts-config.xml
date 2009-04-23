@@ -670,6 +670,9 @@
 	
 	<action 
 		path="/downloadProtInferResults"
+		name="proteinInferFilterForm"
+		scope="request"
+		validate="true"
 		type="org.yeastrc.www.proteinfer.DownloadProteinferResultsAction"
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
