@@ -463,8 +463,17 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             else if(matchingResults.size() > 1) { // this can happen if we have the same sequence with different mods
                 String myPeptide = result.getResultPeptide().getModifiedPeptidePS();
                 for(MsSearchResult res: matchingResults) {
-                    if(myPeptide.equals(res.getResultPeptide().getModifiedPeptidePS()))
+                    if(myPeptide.equals(res.getResultPeptide().getModifiedPeptidePS())) {
+                        if(searchResult != null) {
+                            UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
+                            ex.setErrorMessage("Multiple matching search results were found for runSearchId: "+runSearchId+
+                                    " scanId: "+scanId+"; charge: "+result.getCharge()+
+                                    "; peptide: "+result.getResultPeptide().getPeptideSequence()+
+                                    "; modified peptide: "+result.getResultPeptide().getModifiedPeptidePS());
+                            throw ex;
+                        }
                         searchResult = res;
+                    }
                 }
             }
         }
@@ -475,7 +484,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         }
         if(searchResult == null) {
             numResultsNotFound++;
-            UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_RESULT);
+            UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_RESULT);
             ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
                     " scanId: "+scanId+"; charge: "+result.getCharge()+
                     "; peptide: "+result.getResultPeptide().getPeptideSequence()+
