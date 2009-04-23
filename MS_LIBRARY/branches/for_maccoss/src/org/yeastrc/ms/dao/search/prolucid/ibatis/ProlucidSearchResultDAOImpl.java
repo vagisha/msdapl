@@ -60,7 +60,7 @@ ProlucidSearchResultDAO {
     }
 
     @Override
-    public MsSearchResult loadResultForSearchScanChargePeptide(int runSearchId,
+    public List<MsSearchResult> loadResultForSearchScanChargePeptide(int runSearchId,
             int scanId, int charge, String peptide) {
         return resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, charge, peptide);
     }

@@ -37,7 +37,7 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
     
     public abstract List<Integer> loadResultIdsForSearchScan(int runSearchId, int scanId);
     
-    public abstract MsSearchResult loadResultForSearchScanChargePeptide(int runSearchId, int scanId, int charge, String peptide);
+    public abstract List<MsSearchResult> loadResultForSearchScanChargePeptide(int runSearchId, int scanId, int charge, String peptide);
     
     
     /**

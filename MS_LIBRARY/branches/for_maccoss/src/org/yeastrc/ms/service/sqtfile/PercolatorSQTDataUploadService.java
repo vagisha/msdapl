@@ -453,9 +453,20 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         
         MsSearchResult searchResult = null;
         try {
-            searchResult = resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
+            List<MsSearchResult> matchingResults = resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
                         result.getCharge(), 
                         result.getResultPeptide().getPeptideSequence());
+            
+            if(matchingResults.size() == 1) 
+                searchResult = matchingResults.get(0);
+            
+            else if(matchingResults.size() > 1) { // this can happen if we have the same sequence with different mods
+                String myPeptide = result.getResultPeptide().getModifiedPeptidePS();
+                for(MsSearchResult res: matchingResults) {
+                    if(myPeptide.equals(res.getResultPeptide().getModifiedPeptidePS()))
+                        searchResult = res;
+                }
+            }
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_SQT_ERROR, e);
@@ -467,7 +478,8 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_RESULT);
             ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
                     " scanId: "+scanId+"; charge: "+result.getCharge()+
-                    "; peptide: "+result.getResultPeptide().getPeptideSequence());
+                    "; peptide: "+result.getResultPeptide().getPeptideSequence()+
+                    "; modified peptide: "+result.getResultPeptide().getModifiedPeptidePS());
             throw ex;
             //log.warn(ex.getErrorMessage());
             //return false;
