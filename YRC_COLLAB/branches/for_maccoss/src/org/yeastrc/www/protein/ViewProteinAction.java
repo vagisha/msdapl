@@ -27,7 +27,7 @@ import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.www.proteinfer.ProteinferJob;
-import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
+import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
@@ -134,7 +134,7 @@ public class ViewProteinAction extends Action {
 		    List<Integer> experimentIds = ProjectExperimentDAO.instance().getProjectExperimentIds(project.getID());
 		    
 	        for(int experimentId: experimentIds) {
-	            List<ProteinferJob> piJobs = ProteinferRunSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
+	            List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
 	            for(ProteinferJob job: piJobs) {
 	                pinferIds.add(job.getPinferId());
 	            }

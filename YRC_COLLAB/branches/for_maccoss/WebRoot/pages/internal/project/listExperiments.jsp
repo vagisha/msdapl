@@ -113,6 +113,14 @@ function toggleFilesForExperiment (experimentId) {
 					<td><b>Comments: </b></td>
 					<td style="padding-left:10"><bean:write name="experiment" property="comments"/></td>
 				</tr>
+				<logic:equal name="experiment" property="uploadSuccess" value="false">
+					<tr>
+						<td style="font-color:red; font-weight:bold;">Upload Failed</td>
+						<td><html:link action="viewSequestResults.do" 
+									   paramId="ID" 
+									   paramName="search" paramProperty="id">View Log</html:link></td>
+					</tr>
+				</logic:equal>
 			</table>
 			</div>
 			

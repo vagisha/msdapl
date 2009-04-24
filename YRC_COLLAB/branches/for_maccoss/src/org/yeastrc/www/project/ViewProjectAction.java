@@ -30,6 +30,10 @@ import org.yeastrc.experiment.ExperimentSearch;
 import org.yeastrc.experiment.ProjectExperiment;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.SearchAnalysis;
+import org.yeastrc.jobqueue.JobUtils;
+import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.jobqueue.MsJobSearcher;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
@@ -39,7 +43,7 @@ import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.proteinfer.ProteinferJob;
-import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
+import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -182,7 +186,23 @@ public class ViewProjectAction extends Action {
         
         for(int experimentId: experimentIds) {
             MsExperiment expt = daoFactory.getMsExperimentDAO().loadExperiment(experimentId);
+            
+            // First check if this experiment is still getting uploaded
+            // Add to list only if the upload is failed or complete.
+            MSJob job = null;
+            int status = 0;
+            try {
+                job = MSJobFactory.getInstance().getJobForExperiment(experimentId);
+                status = job.getStatus();
+                if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK)
+                    continue;
+            }
+            catch(Exception e) {continue;} // because job with experimentID does not exist. Should not really happen.
+            
             ProjectExperiment pExpt = new ProjectExperiment(expt);
+            pExpt.setUploadJobId(job.getId());
+            if(status != JobUtils.STATUS_COMPLETE)
+                pExpt.setUploadSuccess(false);
             
             // load the searches
             List<Integer> searchIds = daoFactory.getMsSearchDAO().getSearchIdsForExperiment(experimentId);
@@ -207,7 +227,7 @@ public class ViewProjectAction extends Action {
             
             
             // load the protein inference jobs, if any
-            List<ProteinferJob> piJobs = ProteinferRunSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
+            List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
             pExpt.setProtInferRuns(piJobs);
             
             experiments.add(pExpt);

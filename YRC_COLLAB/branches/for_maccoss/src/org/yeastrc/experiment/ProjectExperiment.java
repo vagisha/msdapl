@@ -37,6 +37,25 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     
     private List<TableRow> rows;
     
+    private boolean uploadSuccess = true;
+    private int uploadJobId;
+    
+    public int getUploadJobId() {
+        return uploadJobId;
+    }
+
+    public void setUploadJobId(int uploadJobId) {
+        this.uploadJobId = uploadJobId;
+    }
+
+    public boolean isUploadSuccess() {
+        return uploadSuccess;
+    }
+
+    public void setUploadSuccess(boolean uploadSuccess) {
+        this.uploadSuccess = uploadSuccess;
+    }
+
     public ProjectExperiment(MsExperiment experiment) {
         this.experiment = experiment;
     }

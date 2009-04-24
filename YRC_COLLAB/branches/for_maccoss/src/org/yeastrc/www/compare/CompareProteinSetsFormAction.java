@@ -24,7 +24,7 @@ import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.www.proteinfer.ProteinferJob;
-import org.yeastrc.www.proteinfer.ProteinferRunSearcher;
+import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
@@ -103,7 +103,7 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
             
             for(int experimentId: experimentIds) {
                 
-                List<ProteinferJob> piJobs = ProteinferRunSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
+                List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
                 
                 for(ProteinferJob job: piJobs) {
                     if(job.getStatus() != JobUtils.STATUS_COMPLETE)

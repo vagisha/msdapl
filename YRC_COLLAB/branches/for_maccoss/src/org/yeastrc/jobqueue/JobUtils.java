@@ -11,6 +11,7 @@ public class JobUtils {
 
 	// job types:
 	public static final int TYPE_MASS_SPEC_DOWNLOAD = 0;
+	public static final int TYPE_PROTEINFER_RUN = 1;
 	
 	// job statuses:
 	public static final int STATUS_QUEUED = 0;

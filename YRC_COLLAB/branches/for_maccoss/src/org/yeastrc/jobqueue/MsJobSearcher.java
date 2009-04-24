@@ -15,19 +15,8 @@ import org.yeastrc.db.DBConnectionManager;
  * @author Mike
  *
  */
-public class JobSearcher {
+public class MsJobSearcher {
 
-	// private constructor
-	private JobSearcher() { }
-
-	/**
-	 * Get an instance of this class
-	 * @return
-	 */
-	public static JobSearcher getInstance() {
-		return new JobSearcher();
-	}
-	
 	/**
 	 * Get the number of jobs in the queue
 	 * @return
@@ -43,8 +32,9 @@ public class JobSearcher {
 		try {
 			
 			String sql = "SELECT COUNT(*) FROM tblJobs";
+			sql += " WHERE type="+JobUtils.TYPE_MASS_SPEC_DOWNLOAD;
 			if (this.status != null && this.status.size() > 0) {
-				sql += " WHERE status IN (";
+				sql += " AND status IN (";
 				int cnt = 0;
 				for (int st : this.status) {
 					if (cnt != 0) sql += ",";
@@ -101,9 +91,9 @@ public class JobSearcher {
 		
 		try {
 			
-			String sql = "SELECT id FROM tblJobs";
+			String sql = "SELECT id FROM tblJobs WHERE type="+JobUtils.TYPE_MASS_SPEC_DOWNLOAD;
 			if (this.status != null && this.status.size() > 0) {
-				sql += " WHERE status IN (";
+				sql += " AND status IN (";
 				int cnt = 0;
 				for (int st : this.status) {
 					if (cnt != 0) sql += ",";
@@ -111,7 +101,7 @@ public class JobSearcher {
 					
 					sql += st;
 				}
-				sql += ") ORDER BY id DESC LIMIT " + this.index + ", 50";
+				sql += ") ORDER BY id DESC LIMIT " + this.offset + ", 50";
 			}
 			
 			conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
@@ -166,15 +156,15 @@ public class JobSearcher {
 	/**
 	 * @return the index
 	 */
-	public int getIndex() {
-		return index;
+	public int getOffset() {
+		return offset;
 	}
 
 	/**
 	 * @param index the index to set
 	 */
-	public void setIndex(int index) {
-		this.index = index;
+	public void setOffset(int index) {
+		this.offset = index;
 	}
 
 	/**
@@ -184,5 +174,6 @@ public class JobSearcher {
 	public List<Integer> getStatus() { return this.status; }
 	
 	private List<Integer> status;
-	private int index;
+	private int offset;
+
 }

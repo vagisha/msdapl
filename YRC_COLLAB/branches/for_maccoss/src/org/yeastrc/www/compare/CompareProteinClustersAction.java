@@ -97,7 +97,7 @@ public class CompareProteinClustersAction extends Action {
             IdPickerProteinBase idpProtein = protDao.loadProtein(pinferProteinId);
             
             WIdPickerCluster cluster = IdPickerResultsLoader.getIdPickerCluster(dataset.getDatasetId(), 
-                    idpProtein.getClusterId(), peptDef, false);
+                    idpProtein.getClusterId(), peptDef);
         }
         
         

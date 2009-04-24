@@ -89,7 +89,7 @@ public class DeleteProteinInferenceAction extends Action {
         }
         
         // first delete the job from the job queue database
-        ProteinferJob job = ProteinferRunSearcher.instance().getJobForPinferRunId(pinferId);
+        ProteinferJob job = ProteinInferJobSearcher.instance().getJob(pinferId);
         
         if(job != null) {
             JobDeleter.getInstance().deleteJob(job);

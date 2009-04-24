@@ -21,20 +21,20 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
 import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 
-public class ProteinferRunSearcher {
+public class ProteinInferJobSearcher {
 
-    private static final Logger log = Logger.getLogger(ProteinferRunSearcher.class);
+    private static final Logger log = Logger.getLogger(ProteinInferJobSearcher.class.getName());
     
     private static final ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
     private static final ProteinferRunDAO runDao = factory.getProteinferRunDao();
     
-    private static ProteinferRunSearcher instance;
+    private static ProteinInferJobSearcher instance;
     
-    private ProteinferRunSearcher() {}
+    private ProteinInferJobSearcher() {}
     
-    public static ProteinferRunSearcher instance() {
+    public static ProteinInferJobSearcher instance() {
         if(instance == null)
-            instance = new ProteinferRunSearcher();
+            instance = new ProteinInferJobSearcher();
         return instance;
     }
     
@@ -47,7 +47,7 @@ public class ProteinferRunSearcher {
         
         List<ProteinferJob> jobs = new ArrayList<ProteinferJob>(pinferRunIds.size());
         for(int pid: pinferRunIds) {
-            ProteinferJob job = getJobForPinferRunId(pid);
+            ProteinferJob job = getJob(pid);
             if(job != null)
                 jobs.add(job);
         }
@@ -88,7 +88,7 @@ public class ProteinferRunSearcher {
             ProteinferRun run = runDao.loadProteinferRun(pid);
             if(run != null) {
                 
-                ProteinferJob job = getJobForPinferRunId(run.getId());
+                ProteinferJob job = getJob(run.getId());
                 if(job != null)
                     jobs.add(job);
             }
@@ -127,7 +127,7 @@ public class ProteinferRunSearcher {
     }
     
     
-    public ProteinferJob getJobForPinferRunId(int pinferRunId) {
+    public ProteinferJob getJob(int pinferRunId) {
         
         ProteinferRun run = runDao.loadProteinferRun(pinferRunId);
         if(run != null) {
@@ -138,7 +138,7 @@ public class ProteinferRunSearcher {
 //                continue;
             ProteinferJob job = null;
             try {
-                job = getJob(run.getId());
+                job = getPiJob(run.getId());
             }
             catch (SQLException e) {
                log.error("Exception getting ProteinferJob", e);
@@ -157,7 +157,7 @@ public class ProteinferRunSearcher {
     }
     
     
-    private ProteinferJob getJob(int pinferRunId) throws SQLException {
+    private ProteinferJob getPiJob(int pinferRunId) throws SQLException {
         
         Connection conn = null;
         PreparedStatement stmt = null;

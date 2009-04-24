@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.jobqueue.JobSearcher;
+import org.yeastrc.jobqueue.MsJobSearcher;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
@@ -62,8 +62,8 @@ public class ListJobsAction extends Action {
 		
 		request.setAttribute( "status", status );
 
-		JobSearcher js = JobSearcher.getInstance();
-		js.setIndex( index );
+		MsJobSearcher js = new MsJobSearcher();
+		js.setOffset( index );
 		
 		if (status.equals( "pending" ) ) {
 			js.addStatus( JobUtils.STATUS_HARD_ERROR );
