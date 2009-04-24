@@ -40,7 +40,7 @@ public class VennDiagramCreator {
                 ds1 = comparison.getProteinCount(1);
                 ds2 = comparison.getProteinCount(0);
                 label1 = "ID"+comparison.getDatasets().get(1).getDatasetId();
-                label2 = "ID"+comparison.getDatasets().get(2).getDatasetId();
+                label2 = "ID"+comparison.getDatasets().get(0).getDatasetId();
                 colors[0] = DatasetColor.get(1).hexValue();
                 colors[1] = DatasetColor.get(0).hexValue();
                 colors[2] = DatasetColor.get(2).hexValue();

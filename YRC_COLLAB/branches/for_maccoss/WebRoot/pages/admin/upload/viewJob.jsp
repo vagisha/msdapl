@@ -12,7 +12,7 @@
 </logic:notPresent>
 
 
-<yrcwww:contentbox title="View Upload Job" centered="true" width="1000" scheme="upload">
+<yrcwww:contentbox title="View Upload Job" centered="true" width="80" widthRel="true" scheme="upload">
 	<center>
 	
 	<a href="<yrcwww:link path='listUploadJobs.do?status=pending'/>"><b>View Pending Jobs</b></a> ||

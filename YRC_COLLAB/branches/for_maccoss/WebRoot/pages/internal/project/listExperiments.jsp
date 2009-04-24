@@ -115,10 +115,10 @@ function toggleFilesForExperiment (experimentId) {
 				</tr>
 				<logic:equal name="experiment" property="uploadSuccess" value="false">
 					<tr>
-						<td style="font-color:red; font-weight:bold;">Upload Failed</td>
-						<td><html:link action="viewSequestResults.do" 
-									   paramId="ID" 
-									   paramName="search" paramProperty="id">View Log</html:link></td>
+						<td style="color:red; font-weight:bold;">Upload Failed</td>
+						<td><html:link action="viewUploadJob.do" 
+									   paramId="id" 
+									   paramName="experiment" paramProperty="uploadJobId">View Log</html:link></td>
 					</tr>
 				</logic:equal>
 			</table>
