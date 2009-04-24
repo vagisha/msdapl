@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectsSearcher;
 import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
 import org.yeastrc.www.user.User;
@@ -82,7 +83,12 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
         
         
         // Get a list of the user's projects
-        List<Project> projects = user.getProjects();
+        // if the user is an admin get ALL projects
+        ProjectsSearcher projSearcher = new ProjectsSearcher();
+        projSearcher.setResearcher(user.getResearcher());
+        List<Project> projects = projSearcher.search();
+//        List<Project> projects = user.getProjects();
+        
         
         // For each experiment in the project get a list of the protein inference id
         // and DTASelect IDs
