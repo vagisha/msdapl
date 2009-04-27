@@ -57,4 +57,12 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
     private int saveDatabase(MsSearchDatabase database) {
         return saveAndReturnId("MsDatabase.insertDatabase", database);
     }
+
+    @Override
+    public int getSequenceDatabaseId(String serverPath) {
+        List<Integer> ids = queryForList("MsDatabase.getNrseqDbId", serverPath);
+        if(ids.size() == 1) // return an id only if there is a unique entry with this filepath
+            return ids.get(0);
+        return 0;
+    }
 }

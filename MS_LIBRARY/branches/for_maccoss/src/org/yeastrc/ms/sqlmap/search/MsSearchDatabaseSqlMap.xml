@@ -48,6 +48,12 @@
     	AND sequenceDatabaseID = #sequenceDatabaseId#
     </select>
     
+    <select id="getNrseqDbId" resultClass="Integer" parameterClass="String">
+    	SELECT sequenceDatabaseID FROM msSequenceDatabaseDetail WHERE 
+    	serverPath = #serverPath#
+    </select>
+
+
     <insert id="insertDatabase" parameterMap="msDatabaseParam">
     	INSERT INTO msSequenceDatabaseDetail (
     	sequenceDatabaseID,

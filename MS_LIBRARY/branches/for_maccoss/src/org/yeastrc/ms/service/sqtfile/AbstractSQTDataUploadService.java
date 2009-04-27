@@ -287,8 +287,14 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         String searchDbName = null;
         int dbId = 0;
         if (db != null) {
-            searchDbName = getSearchDatabase().getDatabaseFileName();
-            dbId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+            
+            // look in the msSequenceDatabaseDetail table first. We might already have this 
+            // database in there
+            dbId = daoFactory.getMsSequenceDatabaseDAO().getSequenceDatabaseId(db.getServerPath());
+            if(dbId == 0) {
+                searchDbName = db.getDatabaseFileName();
+                dbId = NrSeqLookupUtil.getDatabaseId(searchDbName);
+            }
         }
         if (dbId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.SEARCHDB_NOT_FOUND);

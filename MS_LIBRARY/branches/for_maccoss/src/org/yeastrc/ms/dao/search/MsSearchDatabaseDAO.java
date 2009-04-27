@@ -20,4 +20,11 @@ public interface MsSearchDatabaseDAO {
      */
     public abstract int saveSearchDatabase(MsSearchDatabase database, int searchId);
 
+    /**
+     * Returns the stored nrseq database ID for a fasta database with the given filepath.
+     * @param serverPath
+     * @return
+     */
+    public abstract int getSequenceDatabaseId(String serverPath);
+    
 }
