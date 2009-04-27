@@ -30,6 +30,7 @@ public enum SORT_BY {
     FILE_PERC("File", "runSearchAnalysisID"),
     QVAL("q-value", "qvalue"),
     PEP("PEP", "pep"),
+    DS("DS", "discriminantScore"),
     P_RT("Predict. RT", "predictedRetentionTime");
 
     private String displayName;
