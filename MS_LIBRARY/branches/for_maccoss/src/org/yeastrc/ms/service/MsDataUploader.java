@@ -160,16 +160,16 @@ public class MsDataUploader {
         if(uploadSearch) {
             
             // disable keys
-            try {
-                disableSearchTableKeys();
-            }
-            catch (SQLException e) {
-                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
-                uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
-                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                return;
-            }
+//            try {
+//                disableSearchTableKeys();
+//            }
+//            catch (SQLException e) {
+//                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+//                uploadExceptionList.add(ex);
+//                log.error(ex.getMessage(), ex);
+//                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+//                return;
+//            }
             
             try {
                 this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
@@ -236,6 +236,8 @@ public class MsDataUploader {
         // disable keys on msProteinMatch
         log.info("Disabling keys on msProteinMatch table");
         DAOFactory.instance().getMsProteinMatchDAO().disableKeys();
+        
+        log.info("Disabled keys");
     }
     
     private void enableSearchTableKeys() throws SQLException {
@@ -255,6 +257,8 @@ public class MsDataUploader {
         // enable keys on msProteinMatch
         log.info("Enabling keys on msProteinMatch table");
         DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
+        
+        log.info("Enabled keys");
     }
 
     private MsExperimentUploader initializeExperimentUploader() throws UploadException  {
