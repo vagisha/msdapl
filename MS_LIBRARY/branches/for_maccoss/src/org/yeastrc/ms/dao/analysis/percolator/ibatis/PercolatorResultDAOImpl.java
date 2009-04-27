@@ -217,6 +217,10 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         if(filterCriteria.hasPepFilter()) {
             sql.append("AND "+filterCriteria.makePepFilterSql());
         }
+        // Discriminant Score (SVM score filter)
+        if(filterCriteria.hasDsFilter()) {
+            sql.append("AND "+filterCriteria.makeDsFilterSql());
+        }
         
         
         if(sortCriteria != null) {
@@ -356,6 +360,10 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         // PEP filter
         if(filterCriteria.hasPepFilter()) {
             sql.append("AND "+filterCriteria.makePepFilterSql());
+        }
+        // Discriminant Score (SVM score filter)
+        if(filterCriteria.hasDsFilter()) {
+            sql.append("AND "+filterCriteria.makeDsFilterSql());
         }
         
         

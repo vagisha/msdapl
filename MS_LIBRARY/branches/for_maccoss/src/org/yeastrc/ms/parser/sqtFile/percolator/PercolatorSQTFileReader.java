@@ -173,7 +173,7 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
             // TODO Same here. Found "nan" in column 6 -- causes an exception. 
             try {
                 double val = Double.parseDouble(tokens[5]);
-                if(percolatorVersion >= 1.07) {
+                if(percolatorVersion >= 1.06) {
                     result.setPosteriorErrorProbability( 1 - val); // column has 1 - PEP
                 }
                 else {
@@ -181,7 +181,7 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
                 }
             }
             catch(NumberFormatException ex) {
-                if(percolatorVersion >= 1.07) {
+                if(percolatorVersion >= 1.06) {
                     result.setPosteriorErrorProbability(-1.0); // will set it to null
                 }
                 else {
