@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="MsSearchResult"> 
+
+	
+	<typeAlias alias="MsSearchResultOut" type="org.yeastrc.ms.domain.search.impl.SearchResultBean" />
+	<typeAlias alias="MsSearchResultPeptideOut" type="org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean" />
+	<typeAlias alias="MsSearchResultIn" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultWrap" />
+	
+	<typeAlias alias="VStatusHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl$ValidationStatusTypeHandler" />
+	
+	
+	<resultMap class="MsSearchResultPeptideOut" id="msSearchResultPeptideResult">
+		<result property="peptideSequence" column="peptide" />
+		<result property="preResidue" column="preResidue" typeHandler="CharTypeHandler" />
+		<result property="postResidue" column="postResidue" typeHandler="CharTypeHandler" />
+		<result property="dynamicResidueModifications"
+				select="MsSearchMod.selectDynamicResidueModsForResult"
+				column="id" />
+		<result property="dynamicTerminalModifications"
+				select="MsSearchMod.selectDynamicTerminalModsForResult"
+				column="id" />
+	</resultMap>
+	
+	<resultMap class="MsSearchResultOut" id="msSearchResult">
+		<result property="id" column="id" />
+		<result property="runSearchId" column="runSearchID" nullValue="0"/>
+		<result property="scanId" column="scanID" nullValue="0"/>
+		<result property="charge" column="charge" nullValue="0"/>
+		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
+		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
+		<result property="proteinMatchList" 
+				select="MsResultProtein.selectResultProteins" 
+				column="id"/>
+	</resultMap>
+	
+	
+	<parameterMap class="MsSearchResultIn" id="msSearchResultParam">
+		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="charge" jdbcType="TINYINT" nullValue="0"/>
+		<parameter property="peptideSequence" jdbcType="VARCHAR"/>
+		<parameter property="preResidueString" jdbcType="CHAR" nullValue=""/>
+		<parameter property="postResidueString" jdbcType="CHAR" nullValue=""/>
+		<parameter property="validationStatus" jdbcType="CHAR" typeHandler="VStatusHandler"/>
+	</parameterMap>
+	
+	
+    <select id="select" resultMap="msSearchResult" parameterClass="Integer">
+    	SELECT * FROM msRunSearchResult WHERE id = #id#
+    </select>
+    
+     <select id="selectResultIdsForRunSearch" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msRunSearchResult WHERE runSearchID = #id#
+    </select>
+    
+    <select id="selectResultIdsForRunSearchScanCharge" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msRunSearchResult 
+    	WHERE runSearchID = #runSearchId# 
+    	AND scanID = #scanId#
+    	AND charge = #charge#
+    </select>
+    
+    <insert id="insert" parameterMap="msSearchResultParam">
+    	INSERT INTO msRunSearchResult (
+    	runSearchID,
+    	scanID,
+    	charge,
+    	peptide,
+    	preResidue,
+    	postResidue,
+    	validationStatus) 
+    	VALUES (?,?,?,?,?,?,?)
+    	<selectKey resultClass="int" >
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM msRunSearchResult WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>
