@@ -37,6 +37,7 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
+import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
@@ -141,8 +142,15 @@ public class ViewSpectrumAction extends Action {
         
         // load the results for the appropriate program
         if(search.getSearchProgram() == Program.SEQUEST) {
-            SequestSearchResultDAO seqDao = DAOFactory.instance().getSequestResultDAO();
+            
             TabularSequestResults tabRes = new TabularSequestResults();
+            SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();
+            String eValValue = seqSearchDao.getSearchParamValue(searchId, "print_expect_score");
+            if(eValValue.trim().equals("1"))
+                tabRes.useEValue();
+            
+            SequestSearchResultDAO seqDao = DAOFactory.instance().getSequestResultDAO();
+            
             for(int resultId: resultIds) {
                 SequestSearchResult sres = seqDao.load(resultId);
                 MsScan scan = scanDao.load(sres.getScanId());
@@ -183,12 +191,29 @@ public class ViewSpectrumAction extends Action {
         };
         
         private int highlightedRow = -1;
+        private boolean useEvalue = false;
         
         private final List<SequestResultPlus> results;
         
         public TabularSequestResults() {
             this.results = new ArrayList<SequestResultPlus>();
         }
+        
+        public void useEValue() {
+            this.useEvalue = true;
+            columns = new SORT_BY[] {
+                    SORT_BY.MASS, 
+                    SORT_BY.CALC_MASS_SEQ,
+                    SORT_BY.CHARGE, 
+                    SORT_BY.RT, 
+                    SORT_BY.XCORR_RANK,
+                    SORT_BY.XCORR, 
+                    SORT_BY.DELTACN,
+                    SORT_BY.EVAL,
+                    SORT_BY.PEPTIDE
+                };
+        }
+        
         public void addResult(SequestResultPlus result, boolean highlight) {
             if(highlight)
                 highlightedRow = results.size();
@@ -220,7 +245,10 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getxCorrRank()), null));
             row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getxCorr())), null));
             row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN()), null));
-            row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getSp())), null));
+            if(!useEvalue)
+                row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getSp())), null));
+            else
+                row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getEvalue())), null));
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
             TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
