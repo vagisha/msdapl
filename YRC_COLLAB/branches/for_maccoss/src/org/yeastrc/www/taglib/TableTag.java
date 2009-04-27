@@ -11,6 +11,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.util.RequestUtils;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.misc.TableCell;
@@ -27,6 +28,8 @@ public class TableTag extends TagSupport {
     private String tableId;
     private String tableClass; 
     private boolean center = false;
+    
+    private static final Logger log = Logger.getLogger(TableTag.class.getName());
     
     public String getName() {
         return (this.name);
@@ -184,7 +187,8 @@ public class TableTag extends TagSupport {
 
         }
         catch (Exception e) {
-            throw new JspException("Error: Exception while writing to client" + e.getMessage());
+            log.error("Exception in TableTag", e);
+            throw new JspException("Error: Exception while writing to client: " + e.getMessage());
         }
     }
 
