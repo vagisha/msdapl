@@ -74,9 +74,13 @@ public class DTARunSaver {
 			if (run.getDirectoryName() == null) { rs.updateNull("directoryName"); }
 			else { rs.updateString("directoryName", run.getDirectoryName() ); }
 			
+			/*
+			 * We're not going to save this any more.
+			 * Mike Riffle, April 2009
 			if (run.hasDTASelectTXT()) {
 				rs.updateBytes( "DTASelectTXT", run.getDTASelectTXTData() );
 			}
+			*/
 			
 			if (run.getDTASelectFilterTXT() == null) { rs.updateNull("DTASelectFilterTXT"); }
 			else { rs.updateString("DTASelectFilterTXT", run.getDTASelectFilterTXT()); }
