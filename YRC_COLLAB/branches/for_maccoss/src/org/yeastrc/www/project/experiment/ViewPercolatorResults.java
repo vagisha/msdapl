@@ -173,9 +173,23 @@ public class ViewPercolatorResults extends Action {
             results.add(resPlus);
         }
 
+        // Which version of Percolator are we using
+        String version = analysis.getAnalysisProgramVersion();
+        boolean hasPEP = true;
+        try {
+            float vf = Float.parseFloat(version.trim());
+            if(vf < 1.06)   hasPEP = false;
+        }
+        catch(NumberFormatException e){
+            log.error("Cannot detrmine if this version of Percolator prints PEP. Version: "+version);
+        }
 
+        // Will we display the PEP or the Discriminant Score filters in the form
+        myForm.setUsePEP(hasPEP);
+        
+        
         // Set up for tabular display
-        TabularPercolatorResults tabResults = new TabularPercolatorResults(results);
+        TabularPercolatorResults tabResults = new TabularPercolatorResults(results, hasPEP);
         tabResults.setCurrentPage(pageNum);
         int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
         tabResults.setLastPage(pageCount);

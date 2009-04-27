@@ -26,9 +26,23 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
     private Double minPep = null;
     private Double maxPep = null;
     
+    private Double minDs = null;
+    private Double maxDs = null;
     
+    private boolean usePEP = true;
+    
+    
+
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         return super.validate(mapping, request);
+    }
+    
+    public boolean isUsePEP() {
+        return usePEP;
+    }
+
+    public void setUsePEP(boolean usePEP) {
+        this.usePEP = usePEP;
     }
     
     public Double getMinQValue() {
@@ -71,6 +85,22 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
             this.maxPep = maxPep;
     }
     
+    public Double getMinDs() {
+        return minDs;
+    }
+
+    public void setMinDs(Double minDs) {
+        this.minDs = minDs;
+    }
+
+    public Double getMaxDs() {
+        return maxDs;
+    }
+
+    public void setMaxDs(Double maxDs) {
+        this.maxDs = maxDs;
+    }
+    
     public PercolatorResultFilterCriteria getFilterCriteria() {
         PercolatorResultFilterCriteria criteria = new PercolatorResultFilterCriteria();
         
@@ -97,6 +127,9 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
         
         criteria.setMinPep(getMinPep());
         criteria.setMaxPep(getMaxPep());
+        
+        criteria.setMinDs(getMinDs());
+        criteria.setMaxDs(getMaxDs());
         
         return criteria;
     }

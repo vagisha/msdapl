@@ -21,7 +21,7 @@ import org.yeastrc.www.misc.Tabular;
 public class TabularPercolatorResults implements Tabular, Pageable {
 
     
-    private static SORT_BY[] columns = new SORT_BY[] {
+    private SORT_BY[] columns = new SORT_BY[] {
         SORT_BY.FILE_PERC,
         SORT_BY.SCAN, 
         SORT_BY.CHARGE, 
@@ -40,16 +40,38 @@ public class TabularPercolatorResults implements Tabular, Pageable {
     private SORT_BY sortColumn;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
+    private boolean hasPEP = true;
+    
     private List<PercolatorResultPlus> results;
     
     private int currentPage;
     private int lastPage = currentPage;
     private List<Integer> displayPageNumbers;
     
-    public TabularPercolatorResults(List<PercolatorResultPlus> results) {
+    public TabularPercolatorResults(List<PercolatorResultPlus> results, boolean hasPEP) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
+        
+        this.hasPEP = hasPEP;
+        // Report Percolator Discriminant Score instead of PEP
+        if(!hasPEP) {
+            columns = new SORT_BY[] {
+                    SORT_BY.FILE_PERC,
+                    SORT_BY.SCAN, 
+                    SORT_BY.CHARGE, 
+                    SORT_BY.MASS, 
+                    SORT_BY.RT, 
+                    //SORT_BY.P_RT, 
+                    SORT_BY.QVAL, 
+                    SORT_BY.DS,
+                    SORT_BY.XCORR_RANK,
+                    SORT_BY.XCORR,
+//                    SORT_BY.DELTACN,
+                    SORT_BY.PEPTIDE,
+                    SORT_BY.PROTEIN
+                };
+        }
     }
     
     @Override
@@ -123,7 +145,10 @@ public class TabularPercolatorResults implements Tabular, Pageable {
 //            row.addCell(new TableCell(String.valueOf(round(temp))));
         
         row.addCell(new TableCell(String.valueOf(result.getQvalueRounded())));
-        row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded())));
+        if(this.hasPEP)
+            row.addCell(new TableCell(String.valueOf(result.getPosteriorErrorProbabilityRounded())));
+        else
+            row.addCell(new TableCell(String.valueOf(result.getDiscriminantScoreRounded())));
         
         // Sequest data
         row.addCell(new TableCell(String.valueOf(result.getSequestData().getxCorrRank())));

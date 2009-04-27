@@ -17,6 +17,7 @@
 		<html:hidden name="filterForm" property="pageNum" styleId="pageNum"/>
 		<html:hidden name="filterForm" property="sortByString" styleId="sortBy"/>
 		<html:hidden name="filterForm" property="sortOrderString" styleId="sortOrder"/>
+		<html:hidden name="filterForm" property="usePEP" />
 		
 			<table cellspacing="0" cellpadding="2" >
 				<tr>
@@ -39,8 +40,16 @@
 					<td>Min. q-value</td> <td> <html:text name="filterForm" property="minQValue" size="5"/> </td>
 					<td>Max. q-value</td> <td> <html:text name="filterForm" property="maxQValue" size="5" /> </td>
 					<td></td>
-					<td>Min. PEP</td><td> <html:text name="filterForm" property="minPep" size="5" /> </td>
-					<td>Max. PEP</td><td> <html:text name="filterForm" property="maxPep" size="5" /> </td>
+					
+					<logic:equal name="filterForm" property="usePEP" value="true">
+						<td>Min. PEP</td><td> <html:text name="filterForm" property="minPep" size="5" /> </td>
+						<td>Max. PEP</td><td> <html:text name="filterForm" property="maxPep" size="5" /> </td>
+					</logic:equal>
+					
+					<logic:equal name="filterForm" property="usePEP" value="false">
+						<td>Min. Discriminant Score</td><td> <html:text name="filterForm" property="minDs" size="5" /> </td>
+						<td>Max. Discriminant Score</td><td> <html:text name="filterForm" property="maxDs" size="5" /> </td>
+					</logic:equal>
 				</tr>
 				
 				<tr>

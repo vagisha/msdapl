@@ -146,7 +146,7 @@ public class ViewSpectrumAction extends Action {
             TabularSequestResults tabRes = new TabularSequestResults();
             SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();
             String eValValue = seqSearchDao.getSearchParamValue(searchId, "print_expect_score");
-            if(eValValue.trim().equals("1"))
+            if(eValValue != null && eValValue.trim().equals("1"))
                 tabRes.useEValue();
             
             SequestSearchResultDAO seqDao = DAOFactory.instance().getSequestResultDAO();
