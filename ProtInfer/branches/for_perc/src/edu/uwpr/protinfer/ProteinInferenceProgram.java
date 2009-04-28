@@ -58,6 +58,10 @@ public class ProteinInferenceProgram {
                 program == PROTINFER_PLCID);
     }
     
+    public static boolean isIdPicker(ProteinInferenceProgram program) {
+        return isSupported(program); // for now all are IDPicker.
+    }
+    
     public static ProteinInferenceProgram getProgramForName(String name) {
         if("PROTINFER_SEQ".equalsIgnoreCase(name))
             return PROTINFER_SEQ;
@@ -166,8 +170,8 @@ public class ProteinInferenceProgram {
             this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             
             DoubleValidator validator = new DoubleValidator();
-            validator.setMinVal(0.0);
-            validator.setMaxVal(1.0);
+            validator.setMinVal(-100.0);
+            validator.setMaxVal(100.0);
             
             ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
                     "qval_percolator", "Max. q-value", 
@@ -176,10 +180,10 @@ public class ProteinInferenceProgram {
             qvalParam.setValidator(validator);
             
             ProgramParam dsParam = new ProgramParam(TYPE.DOUBLE, 
-                        "discrScore_percolator", "Min. Discriminant Score", 
+                        "discriminantScore_percolator", "Min. Discriminant Score", 
                         null, null,
                         "Discriminant (SVM) score threshold for filtering search hits");
-            dsParam.setValidator(new DoubleValidator());
+            dsParam.setValidator(validator);
             
             this.setProgramParams(new ProgramParam[]{
                     qvalParam,
