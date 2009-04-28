@@ -15,8 +15,10 @@ public class ProteinInferenceProgram {
     
     
     public static final ProteinInferenceProgram PROTINFER_SEQ = new PISequestProgram();
-    public static final ProteinInferenceProgram PROTINFER_PLCID = new PIPickerProlucidProgram();
-    public static final ProteinInferenceProgram PROTINFER_PERC = new PIPickerPercolatorProgram();
+    public static final ProteinInferenceProgram PROTINFER_PLCID = new PIProlucidProgram();
+    public static final ProteinInferenceProgram PROTINFER_PERC = new PIPercolatorProgram();
+    public static final ProteinInferenceProgram PROTINFER_PERC_OLD = new PIPercolatorProgramOld();
+    
     
     private ProteinInferenceProgram(String name, String displayName) {
         this.name = name;
@@ -50,7 +52,8 @@ public class ProteinInferenceProgram {
     }
     
     public static boolean isSupported(ProteinInferenceProgram program) {
-        return (program == PROTINFER_PERC || 
+        return (program == PROTINFER_PERC ||
+                program == PROTINFER_PERC_OLD ||
                 program == PROTINFER_SEQ || 
                 program == PROTINFER_PLCID);
     }
@@ -62,6 +65,8 @@ public class ProteinInferenceProgram {
             return PROTINFER_PLCID;
         else if ("PROTINFER_PERC".equalsIgnoreCase(name))
             return PROTINFER_PERC;
+        else if ("PROTINFER_PERC_OLD".equalsIgnoreCase(name))
+            return PROTINFER_PERC_OLD;
         else 
             return null;
     }
@@ -85,7 +90,7 @@ public class ProteinInferenceProgram {
     static class PISequestProgram extends ProteinInferenceProgram {
         private PISequestProgram() {
             super("PROTINFER_SEQ", "ProtInfer");
-            this.setDescription("This protein inference program is base on the IDPicker program developed in David Tabb's lab.");
+            this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             this.setProgramParams(new ProgramParam[]{
                         ParamMaker.makeMaxFDRParam(),
                         ParamMaker.makeFDRScoreParam(SCORE.XCorr, new SCORE[]{SCORE.XCorr}),
@@ -101,10 +106,10 @@ public class ProteinInferenceProgram {
         }
     }
     
-    static class PIPickerProlucidProgram extends ProteinInferenceProgram {
-        private PIPickerProlucidProgram() {
+    static class PIProlucidProgram extends ProteinInferenceProgram {
+        private PIProlucidProgram() {
             super("PROTINFER_PLCID", "ProtInfer");
-            this.setDescription("This protein inference program is base on the IDPicker program developed in David Tabb's lab.");
+            this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             this.setProgramParams(new ProgramParam[]{
                         ParamMaker.makeMaxFDRParam(),
                         ParamMaker.makeFDRScoreParam(SCORE.PrimaryScore, 
@@ -121,10 +126,10 @@ public class ProteinInferenceProgram {
         }
     }
     
-    static class PIPickerPercolatorProgram extends ProteinInferenceProgram {
-        private PIPickerPercolatorProgram() {
+    static class PIPercolatorProgram extends ProteinInferenceProgram {
+        private PIPercolatorProgram() {
             super("PROTINFER_PERC", "ProtInfer");
-            this.setDescription("This protein inference program is base on the IDPicker program developed in David Tabb's lab.");
+            this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             
             DoubleValidator validator = new DoubleValidator();
             validator.setMinVal(0.0);
@@ -140,11 +145,45 @@ public class ProteinInferenceProgram {
                     "pep_percolator", "Max. PEP", 
                     "0.05", null,
                     "Posterior Error Probability threshold for filtering search hits");
-            pepParam.setValidator(validator);
+                pepParam.setValidator(validator);
             
             this.setProgramParams(new ProgramParam[]{
                     qvalParam,
                     pepParam,
+                    ParamMaker.makeMinPeptParam(),
+                    ParamMaker.makeMinUniqPeptParam(),
+                    ParamMaker.makePeptideDefParam(),
+                    ParamMaker.makeMinCoverageParam(),
+                    ParamMaker.makeMinPeptLengthParam(),
+                    ParamMaker.makeRemoveAmbigSpectraParam()
+            });
+        }
+    }
+    
+    static class PIPercolatorProgramOld extends ProteinInferenceProgram {
+        private PIPercolatorProgramOld() {
+            super("PROTINFER_PERC_OLD", "ProtInfer");
+            this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
+            
+            DoubleValidator validator = new DoubleValidator();
+            validator.setMinVal(0.0);
+            validator.setMaxVal(1.0);
+            
+            ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
+                    "qval_percolator", "Max. q-value", 
+                    "0.05", null,
+                    "Qvalue threshold for filtering search hits");
+            qvalParam.setValidator(validator);
+            
+            ProgramParam dsParam = new ProgramParam(TYPE.DOUBLE, 
+                        "discrScore_percolator", "Min. Discriminant Score", 
+                        null, null,
+                        "Discriminant (SVM) score threshold for filtering search hits");
+            dsParam.setValidator(new DoubleValidator());
+            
+            this.setProgramParams(new ProgramParam[]{
+                    qvalParam,
+                    dsParam,
                     ParamMaker.makeMinPeptParam(),
                     ParamMaker.makeMinUniqPeptParam(),
                     ParamMaker.makePeptideDefParam(),
