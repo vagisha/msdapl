@@ -461,7 +461,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         if(pep != null && pep < 1.0) 
             sql +=   " AND pep <= "+pep;
         if(discriminantScore != null)
-            sql +=   " AND discriminantScore <= "+discriminantScore;
+            sql +=   " AND discriminantScore >= "+discriminantScore;
 
         sql +=       " ORDER BY res.id";
 
@@ -553,7 +553,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         if(pep != null)
             buf.append(" AND pep <= "+pep);
         if(discriminantScore != null)
-            buf.append(" AND discriminantScore <= "+discriminantScore);
+            buf.append(" AND discriminantScore >= "+discriminantScore);
         buf.append(" ORDER BY res.id");
         String sql = buf.toString();
         
