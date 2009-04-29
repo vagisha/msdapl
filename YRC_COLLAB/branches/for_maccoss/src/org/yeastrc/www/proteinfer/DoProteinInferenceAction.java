@@ -63,7 +63,8 @@ public class DoProteinInferenceAction extends Action {
         ProteinInferInputSummary inputSummary = prinferForm.getInputSummary();
         ProgramParameters params = prinferForm.getProgramParams();
         
-        // If "remove ambiguous spectrm" was unchecked it will not be in the parameters list. Add it
+        // If "remove ambiguous spectrum" was unchecked it may not be in the parameters list
+        // or its value will be empty. Set it to false.
         boolean found = false;
         ProgramParam progParam = ParamMaker.makeRemoveAmbigSpectraParam();
         for(Param param: params.getParamList()) {
