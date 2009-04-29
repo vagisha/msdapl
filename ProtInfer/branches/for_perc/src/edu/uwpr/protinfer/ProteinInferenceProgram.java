@@ -169,21 +169,24 @@ public class ProteinInferenceProgram {
             super("PROTINFER_PERC_OLD", "ProtInfer");
             this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             
-            DoubleValidator validator = new DoubleValidator();
-            validator.setMinVal(-100.0);
-            validator.setMaxVal(100.0);
+            DoubleValidator qValValidator = new DoubleValidator();
+            qValValidator.setMinVal(0.0);
+            qValValidator.setMaxVal(1.0);            
             
             ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
                     "qval_percolator", "Max. q-value", 
                     "0.05", null,
                     "Qvalue threshold for filtering search hits");
-            qvalParam.setValidator(validator);
+            qvalParam.setValidator(qValValidator);
             
             ProgramParam dsParam = new ProgramParam(TYPE.DOUBLE, 
                         "discriminantScore_percolator", "Min. Discriminant Score", 
                         null, null,
                         "Discriminant (SVM) score threshold for filtering search hits");
-            dsParam.setValidator(validator);
+            DoubleValidator dsValidator = new DoubleValidator();
+            dsValidator.setMinVal(-100);
+            dsValidator.setMaxVal(100); 
+            dsParam.setValidator(dsValidator);
             
             this.setProgramParams(new ProgramParam[]{
                     qvalParam,

@@ -115,6 +115,9 @@ public final class ProgramParam {
             param.setValidator(new ParamValidator() {
                 public boolean validate(String value) {
                     return (value != null && value.length() > 0);
+                }
+                public boolean allowsNull() {
+                    return false;
                 }});
             return param;
         }
@@ -181,11 +184,13 @@ public final class ProgramParam {
     
     public static abstract class ParamValidator {
         public abstract boolean validate(String value);
+        public abstract boolean allowsNull();
     }
     
     public static class DoubleValidator extends ParamValidator {
         private double minVal = Double.MIN_VALUE;
         private double maxVal = Double.MAX_VALUE;
+        private boolean allowNull = false;
         public void setMinVal(double minVal) {this.minVal = minVal;}
         public double getMinVal() {return this.minVal;}
         public double getMaxVal() {return this.maxVal;}
@@ -198,11 +203,18 @@ public final class ProgramParam {
             catch(NumberFormatException e) {return false;}
             return val >= minVal && val <= maxVal;
         }
+        public boolean allowsNull() {
+            return allowNull;
+        }
+        public void setAllowsNull(boolean allowNull) {
+            this.allowNull = allowNull;
+        }
     }
     
     public static class IntegerValidator extends ParamValidator {
         private int minVal = Integer.MIN_VALUE;
         private int maxVal = Integer.MAX_VALUE;
+        private boolean allowNull = false;
         public void setMinVal(int minVal) {this.minVal = minVal;}
         public void setMaxVal(int maxVal) {this.maxVal = maxVal;}
         public int getMinVal() {return this.minVal;}
@@ -214,6 +226,12 @@ public final class ProgramParam {
             }
             catch(NumberFormatException e) {return false;}
             return val >= minVal && val <= maxVal;
+        }
+        public boolean allowsNull() {
+            return allowNull;
+        }
+        public void setAllowsNull(boolean allowNull) {
+            this.allowNull = allowNull;
         }
     }
 }
