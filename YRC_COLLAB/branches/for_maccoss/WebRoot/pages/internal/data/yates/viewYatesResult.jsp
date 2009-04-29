@@ -16,7 +16,7 @@
 <%@ include file="/includes/errors.jsp" %>
 
 
-<yrcwww:contentbox title="View MS Result Peptides" centered="true" width="850" scheme="ms">
+<yrcwww:contentbox title="DTASelect Result Peptides" centered="true" width="850" scheme="ms">
 
  <CENTER>
   <B>Run Information:</B><BR><BR>

@@ -15,7 +15,7 @@
 
 <%@ include file="/includes/header.jsp" %>
 
-<yrcwww:contentbox title="View Mass Spectrometry Run" centered="true" width="1000" scheme="ms">
+<yrcwww:contentbox title="DTASelect Results" centered="true" width="1000" scheme="ms">
 
  <CENTER>
   <B>Run Information:</B><BR><BR>
