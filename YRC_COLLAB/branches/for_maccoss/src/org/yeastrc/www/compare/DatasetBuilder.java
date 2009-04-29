@@ -9,9 +9,6 @@ package org.yeastrc.www.compare;
 import java.util.List;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerInputDAO;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerRunDAO;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
@@ -51,12 +48,12 @@ public class DatasetBuilder {
         IdPickerRun idpRun = idpRunDao.loadProteinferRun(datasetId);
         
         // Get the total number of hits in this dataset
-        List<IdPickerInput> inputs = idpRun.getInputList();
-        int totalHitCount = 0;
-        for(IdPickerInput input: inputs) {
-            totalHitCount += input.getNumFilteredTargetHits();
-        }
-        dataset.setSpectrumCount(totalHitCount);
+//        List<IdPickerInput> inputs = idpRun.getInputList();
+//        int totalHitCount = 0;
+//        for(IdPickerInput input: inputs) {
+//            totalHitCount += input.getNumFilteredTargetHits();
+//        }
+//        dataset.setSpectrumCount(totalHitCount);
         
         
         // Get the maximum number of hits for a protein in this dataset

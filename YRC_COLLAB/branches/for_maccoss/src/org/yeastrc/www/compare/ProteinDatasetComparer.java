@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.bio.protein.ProteinNamerFactory;
-import org.yeastrc.bio.protein.ProteinNamerUtils;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.nr_seq.NRProtein;
@@ -277,7 +275,7 @@ public class ProteinDatasetComparer {
             }
         }
         
-        // No look at the accession strings in tblProteinDatabase;
+        // Now look at the accession strings in tblProteinDatabase;
         if(notFound.size() > 0) {
             for(String name: notFound) {
                 List<Integer> ids = NrSeqLookupUtil.getProteinIdsForAccession(name);
