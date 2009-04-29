@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.yeastrc.ms.domain.search.ResultSortCriteria;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
@@ -56,7 +58,59 @@ public class FilterResultsForm extends ActionForm {
 
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = new ActionErrors();
-        try{Integer.parseInt(minScan);}catch(NumberFormatException e){errors.add(messages)
+        
+        if(minScan != null) {
+            try{Integer.parseInt(minScan.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. Scan"));}
+        }
+        if(maxScan != null) {
+            try{Integer.parseInt(maxScan.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Max. Scan"));}
+        }
+        
+        if(minCharge != null) {
+            try{Integer.parseInt(minCharge.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. Charge"));}
+        }
+        if(maxCharge != null) {
+            try{Integer.parseInt(maxCharge.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Max. Charge"));}
+        }
+        
+        if(minRT != null) {
+            try{Double.parseDouble(minRT.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. RT"));}
+        }
+        if(maxRT != null) {
+            try{Double.parseDouble(maxRT.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Max. RT"));}
+        }
+        
+        if(minObsMass != null) {
+            try{Double.parseDouble(minObsMass.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. Observed Mass"));}
+        }
+        if(maxObsMass != null) {
+            try{Double.parseDouble(maxObsMass.trim());}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Max. Observed Mass"));}
+        }
+        
         return errors;
     }
     
@@ -104,33 +158,81 @@ public class FilterResultsForm extends ActionForm {
         return minScan;
     }
     
+    public Integer getMinScanInt() {
+        if(minScan != null && minScan.trim().length() > 0)
+            return Integer.parseInt(minScan);
+        return null;
+    }
+    
     public String getMaxScan() {
         return maxScan;
     }
    
+    public Integer getMaxScanInt() {
+        if(maxScan != null && maxScan.trim().length() > 0)
+            return Integer.parseInt(maxScan);
+        return null;
+    }
+    
     public String getMinCharge() {
         return minCharge;
     }
+    public Integer getMinChargeInt() {
+        if(minCharge != null && minCharge.trim().length() > 0)
+            return Integer.parseInt(minCharge);
+        return null;
+    }
+    
     
     public String getMaxCharge() {
         return maxCharge;
     }
+    public Integer getMaxChargeInt() {
+        if(maxCharge != null && maxCharge.trim().length() > 0)
+            return Integer.parseInt(maxCharge);
+        return null;
+    }
+    
     
     public String getMinRT() {
         return minRT;
     }
+    public Double getMinRTDouble() {
+        if(minRT != null && minRT.trim().length() > 0)
+            return Double.parseDouble(minRT);
+        return null;
+    }
+    
     
     public String getMaxRT() {
         return maxRT;
     }
+    public Double getMaxRTDouble() {
+        if(maxRT != null && maxRT.trim().length() > 0)
+            return Double.parseDouble(maxRT);
+        return null;
+    }
+    
     
     public String getMinObsMass() {
         return minObsMass;
     }
+    public Double getMinObsMassDouble() {
+        if(minObsMass != null && minObsMass.trim().length() > 0)
+            return Double.parseDouble(minObsMass);
+        return null;
+    }
+    
     
     public String getMaxObsMass() {
         return maxObsMass;
     }
+    public Double getMaxObsMassDouble() {
+        if(maxObsMass != null && maxObsMass.trim().length() > 0)
+            return Double.parseDouble(maxObsMass);
+        return null;
+    }
+    
     
     public String getPeptide() {
         return peptide;
@@ -194,5 +296,4 @@ public class FilterResultsForm extends ActionForm {
     public void setMaxObsMass(String maxObsMass) {
         this.maxObsMass = maxObsMass;
     }
-
 }

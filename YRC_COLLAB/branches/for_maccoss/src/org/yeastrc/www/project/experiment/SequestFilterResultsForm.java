@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.yeastrc.ms.domain.search.sequest.SequestResultFilterCriteria;
 
 /**
@@ -19,18 +21,63 @@ public class SequestFilterResultsForm extends FilterResultsForm {
 
     private int searchId;
     
-    private Double minXCorr_1;
-    private Double minXCorr_2;
-    private Double minXCorr_3;
-    private Double minXCorr_H;
+    private String minXCorr_1;
+    private String minXCorr_2;
+    private String minXCorr_3;
+    private String minXCorr_H;
     
-    private Double minDeltaCN;
+    private String minDeltaCN;
     
-    private Double minSp;
+    private String minSp;
     
     
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
-        return super.validate(mapping, request);
+        ActionErrors errors =  super.validate(mapping, request);
+        
+        if(minXCorr_1 != null) {
+            try{Double.parseDouble(minXCorr_1);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge 1)"));}
+        }
+        
+        if(minXCorr_2 != null) {
+            try{Double.parseDouble(minXCorr_2);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge 2)"));}
+        }
+        
+        if(minXCorr_3 != null) {
+            try{Double.parseDouble(minXCorr_3);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge 3)"));}
+        }
+        
+        if(minXCorr_H != null) {
+            try{Double.parseDouble(minXCorr_H);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge > 3)"));}
+        }
+        
+        if(minDeltaCN != null) {
+            try{Double.parseDouble(minDeltaCN);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. DeltaCN"));}
+        }
+        
+        if(minSp != null) {
+            try{Double.parseDouble(minSp);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. Sp"));}
+        }
+        
+        
+        return errors;
     }
     
     public int getSearchId() {
@@ -41,70 +88,95 @@ public class SequestFilterResultsForm extends FilterResultsForm {
         this.searchId = searchId;
     }
 
-    public Double getMinXCorr_1() {
+    
+    public String getMinXCorr_1() {
         return minXCorr_1;
     }
 
-    public void setMinXCorr_1(Double minXCorr_1) {
-        if(minXCorr_1 != null && minXCorr_1 == 0)
-            this.minXCorr_1 = null;
-        else
-            this.minXCorr_1 = minXCorr_1;
+    public Double getMinXCorr_1Double() {
+        if(minXCorr_1 != null && minXCorr_1.trim().length() > 0)
+            return Double.parseDouble(minXCorr_1);
+        return null;
+    }
+    
+    public void setMinXCorr_1(String minXCorr_1) {
+        this.minXCorr_1 = minXCorr_1;
     }
 
-    public Double getMinXCorr_2() {
+    
+    public String getMinXCorr_2() {
         return minXCorr_2;
     }
 
-    public void setMinXCorr_2(Double minXCorr_2) {
-        if(minXCorr_2 != null && minXCorr_2 == 0)
-            this.minXCorr_2 = null;
-        else
-            this.minXCorr_2 = minXCorr_2;
+    public Double getMinXCorr_2Double() {
+        if(minXCorr_2 != null && minXCorr_2.trim().length() > 0)
+            return Double.parseDouble(minXCorr_2);
+        return null;
+    }
+    
+    public void setMinXCorr_2(String minXCorr_2) {
+        this.minXCorr_2 = minXCorr_2;
     }
 
-    public Double getMinXCorr_3() {
+    
+    public String getMinXCorr_3() {
         return minXCorr_3;
     }
-
-    public void setMinXCorr_3(Double minXCorr_3) {
-        if(minXCorr_3 != null && minXCorr_3 == 0)
-            this.minXCorr_3 = null;
-        else
-            this.minXCorr_3 = minXCorr_3;
+    
+    public Double getMinXCorr_3Double() {
+        if(minXCorr_3 != null && minXCorr_3.trim().length() > 0)
+            return Double.parseDouble(minXCorr_3);
+        return null;
     }
 
-    public Double getMinXCorr_H() {
+    public void setMinXCorr_3(String minXCorr_3) {
+        this.minXCorr_3 = minXCorr_3;
+    }
+
+    
+    public String getMinXCorr_H() {
         return minXCorr_H;
     }
 
-    public void setMinXCorr_H(Double minXCorr_H) {
-        if(minXCorr_H != null && minXCorr_H == 0)
-            this.minXCorr_H = null;
-        else
-            this.minXCorr_H = minXCorr_H;
+    public Double getMinXCorr_HDouble() {
+        if(minXCorr_H != null && minXCorr_H.trim().length() > 0)
+            return Double.parseDouble(minXCorr_H);
+        return null;
+    }
+    
+    public void setMinXCorr_H(String minXCorr_H) {
+        this.minXCorr_H = minXCorr_H;
     }
 
-    public Double getMinDeltaCN() {
+    
+    
+    public String getMinDeltaCN() {
         return minDeltaCN;
     }
 
-    public void setMinDeltaCN(Double minDeltaCN) {
-        if(minDeltaCN != null && minDeltaCN == 0)
-            this.minDeltaCN = null;
-        else
-            this.minDeltaCN = minDeltaCN;
+    public Double getMinDeltaCNDouble() {
+        if(minDeltaCN != null && minDeltaCN.trim().length() > 0)
+            return Double.parseDouble(minDeltaCN);
+        return null;
     }
     
-    public Double getMinSp() {
+    public void setMinDeltaCN(String minDeltaCN) {
+        this.minDeltaCN = minDeltaCN;
+    }
+    
+    
+    public String getMinSp() {
         return minSp;
     }
 
-    public void setMinSp(Double minSp) {
-        if(minSp != null && minSp == 0)
-            this.minSp = null;
-        else
-            this.minSp = minSp;
+    public Double getMinSpDouble() {
+        if(minSp != null && minSp.trim().length() > 0)
+            return Double.parseDouble(minSp);
+        return null;
+    }
+    
+    public void setMinSp(String minSp) {
+        this.minSp = minSp;
     }
 
 
@@ -112,17 +184,17 @@ public class SequestFilterResultsForm extends FilterResultsForm {
     public SequestResultFilterCriteria getFilterCriteria() {
         SequestResultFilterCriteria criteria = new SequestResultFilterCriteria();
         
-        criteria.setMinScan(getMinScan());
-        criteria.setMaxScan(getMaxScan());
+        criteria.setMinScan(getMinScanInt());
+        criteria.setMaxScan(getMaxScanInt());
         
-        criteria.setMinCharge(getMinCharge());
-        criteria.setMaxCharge(getMaxCharge());
+        criteria.setMinCharge(getMinChargeInt());
+        criteria.setMaxCharge(getMaxChargeInt());
         
-        criteria.setMinObservedMass(getMinObsMass());
-        criteria.setMaxObservedMass(getMaxObsMass());
+        criteria.setMinObservedMass(getMinObsMassDouble());
+        criteria.setMaxObservedMass(getMaxObsMassDouble());
         
-        criteria.setMinRetentionTime(getMinRT());
-        criteria.setMaxRetentionTime(getMaxRT());
+        criteria.setMinRetentionTime(getMinRTDouble());
+        criteria.setMaxRetentionTime(getMaxRTDouble());
         
         criteria.setPeptide(getPeptide());
         criteria.setExactPeptideMatch(getExactPeptideMatch());
@@ -130,13 +202,13 @@ public class SequestFilterResultsForm extends FilterResultsForm {
         criteria.setShowOnlyModified(isShowModified() && !isShowUnmodified());
         criteria.setShowOnlyUnmodified(isShowUnmodified() && !isShowModified());
         
-        criteria.setMinXCorr_1(getMinXCorr_1());
-        criteria.setMinXCorr_2(getMinXCorr_2());
-        criteria.setMinXCorr_3(getMinXCorr_3());
-        criteria.setMinXCorr_H(getMinXCorr_H());
+        criteria.setMinXCorr_1(getMinXCorr_1Double());
+        criteria.setMinXCorr_2(getMinXCorr_2Double());
+        criteria.setMinXCorr_3(getMinXCorr_3Double());
+        criteria.setMinXCorr_H(getMinXCorr_HDouble());
         
-        criteria.setMinDeltaCn(getMinDeltaCN());
-        criteria.setMinSp(getMinSp());
+        criteria.setMinDeltaCn(getMinDeltaCNDouble());
+        criteria.setMinSp(getMinSpDouble());
         
         return criteria;
     }

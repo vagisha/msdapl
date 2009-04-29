@@ -95,10 +95,10 @@ public class ViewSequestResults extends Action {
             myForm.setExactPeptideMatch(true);
             myForm.setSortBy(SORT_BY.FILE_SEARCH);
             myForm.setSortOrder(SORT_ORDER.ASC);
-            myForm.setMinXCorr_1(1.5);
-            myForm.setMinXCorr_2(2.0);
-            myForm.setMinXCorr_3(2.5);
-            myForm.setMinXCorr_H(3.0);
+            myForm.setMinXCorr_1("1.5");
+            myForm.setMinXCorr_2("2.0");
+            myForm.setMinXCorr_3("2.5");
+            myForm.setMinXCorr_H("3.0");
         }
 
 

@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
 
 /**
@@ -17,24 +19,64 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
  */
 public class PercolatorFilterResultsForm extends FilterResultsForm {
 
-//    private int runSearchAnalysisId;
     private int searchAnalysisId;
     
-    private Double minQValue = null;
-    private Double maxQValue = null;
+    private String minQValue = null;
+    private String maxQValue = null;
     
-    private Double minPep = null;
-    private Double maxPep = null;
+    private String minPep = null;
+    private String maxPep = null;
     
-    private Double minDs = null;
-    private Double maxDs = null;
+    private String minDs = null;
+    private String maxDs = null;
     
     private boolean usePEP = true;
     
     
 
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
-        return super.validate(mapping, request);
+        ActionErrors errors = super.validate(mapping, request);
+        
+        if(minQValue != null) {
+            try{Double.parseDouble(minQValue);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. q-value"));}
+        }
+        if(maxQValue != null) {
+            try{Double.parseDouble(maxQValue);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Max. q-value"));}
+        }
+        
+        if(minPep != null) {
+            try{Double.parseDouble(minPep);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. PEP"));}
+        }
+        if(minPep != null) {
+            try{Double.parseDouble(minPep);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Max. PEP"));}
+        }
+        
+        if(minDs != null) {
+            try{Double.parseDouble(minDs);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Min. Discriminant Score"));}
+        }
+        if(minDs != null) {
+            try{Double.parseDouble(minDs);}
+            catch(NumberFormatException e){
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for Max. Discriminant Score"));}
+        }
+        
+        return errors;
     }
     
     public boolean isUsePEP() {
@@ -45,80 +87,98 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
         this.usePEP = usePEP;
     }
     
-    public Double getMinQValue() {
+    public String getMinQValue() {
         return minQValue;
     }
+    public Double getMinQValueDouble() {
+        if(minQValue != null && minQValue.trim().length() > 0)
+            return Double.parseDouble(minQValue);
+        return null;
+    }
     public void setMinQValue(String minQValue) {
-        if(minQValue != null && minQValue.trim().length() > 0) {
-            this.minQValue = Double.parseDouble(minQValue.trim());
-        }
+        this.minQValue = minQValue;
     }
     
-    public Double getMaxQValue() {
+    
+    public String getMaxQValue() {
         return maxQValue;
     }
-//    public String getMaxQValue() {
-//        return String.valueOf(maxQValue);
-//    }
+    public Double getMaxQValueDouble() {
+        if(maxQValue != null && maxQValue.trim().length() > 0)
+            return Double.parseDouble(maxQValue);
+        return null;
+    }
     public void setMaxQValue(String maxQValue) {
-//        this.maxQValue = maxQValue;
-        if(maxQValue != null && maxQValue.trim().length() > 0) {
-            this.maxQValue = Double.parseDouble(maxQValue.trim());
-        }
+        this.maxQValue = maxQValue;
     }
     
-    public Double getMinPep() {
+    
+    public String getMinPep() {
         return minPep;
     }
+    public Double getMinPepDouble() {
+        if(minPep != null && minPep.trim().length() > 0)
+            return Double.parseDouble(minPep);
+        return null;
+    }
     public void setMinPep(String minPep) {
-        if(minPep != null && minPep.trim().length() > 0) {
-            this.minPep = Double.parseDouble(minPep.trim());
-        }
+        this.minPep = minPep;
     }
     
-    public Double getMaxPep() {
+    
+    public String getMaxPep() {
         return maxPep;
     }
+    public Double getMaxPepDouble() {
+        if(maxPep != null && maxPep.trim().length() > 0)
+            return Double.parseDouble(maxPep);
+        return null;
+    }
     public void setMaxPep(String maxPep) {
-        if(maxPep != null && maxPep.trim().length() > 0) {
-            this.maxPep = Double.parseDouble(maxPep.trim());
-        }
+        this.maxPep = maxPep;
     }
     
-    public Double getMinDs() {
+    
+    public String getMinDs() {
         return minDs;
     }
-
+    public Double getMinDsDouble() {
+        if(minDs != null && minDs.trim().length() > 0)
+            return Double.parseDouble(minDs);
+        return null;
+    }
     public void setMinDs(String minDs) {
-        if(minDs != null && minDs.trim().length() > 0) {
-            this.minDs = Double.parseDouble(minDs.trim());
-        }
+        this.minDs = minDs;
     }
 
-    public Double getMaxDs() {
+    
+    public String getMaxDs() {
         return maxDs;
     }
-
-    public void setMaxDs(String maxDs) {
-        if(maxDs != null && maxDs.trim().length() > 0) {
-            this.maxDs = Double.parseDouble(maxDs.trim());
-        }
+    public Double getMaxDsDouble() {
+        if(maxDs != null && maxDs.trim().length() > 0)
+            return Double.parseDouble(maxDs);
+        return null;
     }
+    public void setMaxDs(String maxDs) {
+        this.maxDs = maxDs;
+    }
+    
     
     public PercolatorResultFilterCriteria getFilterCriteria() {
         PercolatorResultFilterCriteria criteria = new PercolatorResultFilterCriteria();
         
-        criteria.setMinScan(getMinScan());
-        criteria.setMaxScan(getMaxScan());
+        criteria.setMinScan(getMinScanInt());
+        criteria.setMaxScan(getMaxScanInt());
         
-        criteria.setMinCharge(getMinCharge());
-        criteria.setMaxCharge(getMaxCharge());
+        criteria.setMinCharge(getMinChargeInt());
+        criteria.setMaxCharge(getMaxChargeInt());
         
-        criteria.setMinObservedMass(getMinObsMass());
-        criteria.setMaxObservedMass(getMaxObsMass());
+        criteria.setMinObservedMass(getMinObsMassDouble());
+        criteria.setMaxObservedMass(getMaxObsMassDouble());
         
-        criteria.setMinRetentionTime(getMinRT());
-        criteria.setMaxRetentionTime(getMaxRT());
+        criteria.setMinRetentionTime(getMinRTDouble());
+        criteria.setMaxRetentionTime(getMaxRTDouble());
         
         criteria.setPeptide(getPeptide());
         criteria.setExactPeptideMatch(getExactPeptideMatch());
@@ -126,14 +186,14 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
         criteria.setShowOnlyModified(isShowModified() && !isShowUnmodified());
         criteria.setShowOnlyUnmodified(isShowUnmodified() && !isShowModified());
         
-        criteria.setMinQValue(getMinQValue());
-        criteria.setMaxQValue(getMaxQValue());
+        criteria.setMinQValue(getMinQValueDouble());
+        criteria.setMaxQValue(getMaxQValueDouble());
         
-        criteria.setMinPep(getMinPep());
-        criteria.setMaxPep(getMaxPep());
+        criteria.setMinPep(getMinPepDouble());
+        criteria.setMaxPep(getMaxPepDouble());
         
-        criteria.setMinDs(getMinDs());
-        criteria.setMaxDs(getMaxDs());
+        criteria.setMinDs(getMinDsDouble());
+        criteria.setMaxDs(getMaxDsDouble());
         
         return criteria;
     }
@@ -146,11 +206,4 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
         this.searchAnalysisId = searchAnalysisId;
     }
 
-//    public int getRunSearchAnalysisId() {
-//        return runSearchAnalysisId;
-//    }
-//
-//    public void setRunSearchAnalysisId(int runSearchAnalysisId) {
-//        this.runSearchAnalysisId = runSearchAnalysisId;
-//    }
 }

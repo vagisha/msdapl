@@ -74,10 +74,10 @@ public class SequestPepxmlDownloadFormAction extends Action {
         SequestPepxmlDownloadForm myForm =  new SequestPepxmlDownloadForm();
         
         myForm.setSearchId(searchId);
-        myForm.setMinXCorr_1(0.0);
-        myForm.setMinXCorr_2(0.0);
-        myForm.setMinXCorr_3(0.0);
-        myForm.setMinXCorr_H(0.0);
+        myForm.setMinXCorr_1("0.0");
+        myForm.setMinXCorr_2("0.0");
+        myForm.setMinXCorr_3("0.0");
+        myForm.setMinXCorr_H("0.0");
 
         myForm.setFileList(getFiles(searchId));
 

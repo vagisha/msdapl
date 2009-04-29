@@ -37,7 +37,6 @@ import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
-import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
