@@ -104,6 +104,7 @@ function validateFormForAnalysisInput() {
 	var min;
 	var max;
 	var valid;
+	var allowNull;
 	var errorMessage = "";
 	
 	<%
@@ -118,18 +119,32 @@ function validateFormForAnalysisInput() {
 	%>
 		fieldName = '<%=param.getDisplayName()%>';
 		value = $("form[id='form_a'] input:text[id='<%=param.getName()%>']").val();
-		//alert(value);
+		// alert(value);
 		
 		<%if(validator != null && validator instanceof DoubleValidator) {%>
 			min = <%=((DoubleValidator)validator).getMinVal()%>;
 			max = <%=((DoubleValidator)validator).getMaxVal()%>;
-			valid = validateFloat(value, fieldName, min, max);
+			allowNull = new Boolean("<%=((DoubleValidator)validator).allowsNull()%>");
+			
+			if(allowNull && value.length == 0) {
+				valid = true;
+			}
+			else {
+				valid = validateFloat(value, fieldName, min, max);
+			}
 			if(!valid)
 				errorMessage += "-- "+fieldName+" should be between "+min+" and "+max+"\n";
 		<%} else if(validator != null && validator instanceof IntegerValidator) {%>
 			min = <%=((IntegerValidator)validator).getMinVal()%>;
 			max = <%=((IntegerValidator)validator).getMaxVal()%>;
-			valid = validateInt(value, fieldName, min, max);
+			allowNull = new Boolean("<%=((IntegerValidator)validator).allowsNull()%>");
+			
+			if(allowNull && value.length == 0) {
+				valid = true;
+			}
+			else {
+				valid = validateInt(value, fieldName, min, max);
+			}
 			if(!valid)
 				errorMessage += "-- "+fieldName+" should be between "+min+" and "+max+"\n";
 		<%}else {%>

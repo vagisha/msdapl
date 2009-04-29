@@ -11,6 +11,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -35,6 +36,8 @@ import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
  */
 public class NewProteinInferenceAction extends Action {
 
+    private static final Logger log = Logger.getLogger(NewProteinInferenceAction.class.getName());
+    
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
@@ -153,8 +156,19 @@ public class NewProteinInferenceAction extends Action {
             ProteinInferInputSummary inputSummary = inputGetter.getInputAnalysisSummary(analysis);
             formForAnalysis.setInputSummary(inputSummary);
             // set the IDPicker parameters
-            ProgramParameters params2 = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC);
-            formForAnalysis.setProgramParams(params2);
+            // get the percolator version
+            String version = analysis.getAnalysisProgramVersion();
+            ProgramParameters progParams = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC);
+            try {
+                float fv = Float.parseFloat(version);
+                if(fv < 1.06)
+                    progParams = new ProgramParameters(ProteinInferenceProgram.PROTINFER_PERC_OLD);
+                    
+            }
+            catch(NumberFormatException ex) {
+                log.error("Cannot determine version of Percolator. Version: "+version);
+            }
+            formForAnalysis.setProgramParams(progParams);
             return formForAnalysis;
         }
         else

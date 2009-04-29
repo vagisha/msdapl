@@ -97,7 +97,7 @@ public class ViewPercolatorResults extends Action {
             myForm.setShowModified(true);
             myForm.setShowUnmodified(true);
             myForm.setExactPeptideMatch(true);
-            myForm.setMaxQValue(0.05);
+            myForm.setMaxQValue("0.05");
             myForm.setSortBy(SORT_BY.QVAL);
             myForm.setSortOrder(SORT_ORDER.ASC);
         }

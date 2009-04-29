@@ -22,17 +22,17 @@ import org.yeastrc.ms.domain.search.SORT_ORDER;
 public class FilterResultsForm extends ActionForm {
 
     
-    private Integer minScan;
-    private Integer maxScan;
+    private String minScan;
+    private String maxScan;
     
-    private Integer minCharge;
-    private Integer maxCharge;
+    private String minCharge;
+    private String maxCharge;
     
-    private Double minRT;
-    private Double maxRT;
+    private String minRT;
+    private String maxRT;
     
-    private Double minObsMass;
-    private Double maxObsMass;
+    private String minObsMass;
+    private String maxObsMass;
     
     private String peptide = null;
     private boolean exactMatch = true;
@@ -56,6 +56,7 @@ public class FilterResultsForm extends ActionForm {
 
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = new ActionErrors();
+        try{Integer.parseInt(minScan);}catch(NumberFormatException e){errors.add(messages)
         return errors;
     }
     
@@ -99,84 +100,36 @@ public class FilterResultsForm extends ActionForm {
         this.sortOrder = SORT_ORDER.getSortByForName(sortOrder);
     }
     
-    public Integer getMinScan() {
+    public String getMinScan() {
         return minScan;
     }
-    public void setMinScan(Integer minScan) {
-        if(minScan != null && minScan == 0)
-            this.minScan = null;
-        else
-            this.minScan = minScan;
-    }
     
-    public Integer getMaxScan() {
+    public String getMaxScan() {
         return maxScan;
     }
-    public void setMaxScan(Integer maxScan) {
-        if(maxScan != null && maxScan == 0)
-            this.maxScan = null;
-        else
-            this.maxScan = maxScan;
-    }
-    
-    public Integer getMinCharge() {
+   
+    public String getMinCharge() {
         return minCharge;
     }
-    public void setMinCharge(Integer minCharge) {
-        if(minCharge != null && minCharge == 0)
-            this.minCharge = null;
-        else
-            this.minCharge = minCharge;
-    }
     
-    public Integer getMaxCharge() {
+    public String getMaxCharge() {
         return maxCharge;
     }
-    public void setMaxCharge(Integer maxCharge) {
-        if(maxCharge != null && maxCharge == 0)
-            this.maxCharge = null;
-        else
-            this.maxCharge = maxCharge;
-    }
     
-    public Double getMinRT() {
+    public String getMinRT() {
         return minRT;
     }
-    public void setMinRT(Double minRT) {
-        if(minRT != null && minRT == 0)
-            this.minRT = null;
-        else
-            this.minRT = minRT;
-    }
     
-    public Double getMaxRT() {
+    public String getMaxRT() {
         return maxRT;
     }
-    public void setMaxRT(Double maxRT) {
-        if(maxRT != null && maxRT == 0)
-            this.maxRT = null;
-        else
-            this.maxRT = maxRT;
-    }
     
-    public Double getMinObsMass() {
+    public String getMinObsMass() {
         return minObsMass;
     }
-    public void setMinObsMass(Double minObsMass) {
-        if(minObsMass != null && minObsMass == 0)
-            this.minObsMass = null;
-        else
-            this.minObsMass = minObsMass;
-    }
     
-    public Double getMaxObsMass() {
+    public String getMaxObsMass() {
         return maxObsMass;
-    }
-    public void setMaxObsMass(Double maxObsMass) {
-        if(maxObsMass != null && maxObsMass == 0)
-            this.maxObsMass = null;
-        else
-            this.maxObsMass = maxObsMass;
     }
     
     public String getPeptide() {
@@ -214,51 +167,32 @@ public class FilterResultsForm extends ActionForm {
         return criteria;
     }
 
-//    public List<Integer> getExperimentIds() {
-//        return experimentIds;
-//    }
-//
-//    public void setExperimentIds(List<Integer> experimentIds) {
-//        this.experimentIds = experimentIds;
-//    }
-//
-//    public String getProgram() {
-//        return program;
-//    }
-//
-//    public void setProgram(String program) {
-//        this.program = program;
-//    }
+    public void setMinScan(String minScan) {
+        this.minScan = minScan;
+    }
 
-//    public String getFilename() {
-//        return filename;
-//    }
-//
-//    public void setFilename(String filename) {
-//        this.filename = filename;
-//    }
+    public void setMaxScan(String maxScan) {
+        this.maxScan = maxScan;
+    }
 
-//    public int getNumResults() {
-//        return numResults;
-//    }
-//
-//    public void setNumResults(int numResults) {
-//        this.numResults = numResults;
-//    }
-//
-//    public int getNumResultsFiltered() {
-//        return numResultsFiltered;
-//    }
-//
-//    public void setNumResultsFiltered(int numResultsFiltered) {
-//        this.numResultsFiltered = numResultsFiltered;
-//    }
-//
-//    public String getProjectIdString() {
-//        return projectIdString;
-//    }
-//
-//    public void setProjectIdString(String projectIdString) {
-//        this.projectIdString = projectIdString;
-//    }
+    public void setMinCharge(String minCharge) {
+        this.minCharge = minCharge;
+    }
+
+    public void setMinRT(String minRT) {
+        this.minRT = minRT;
+    }
+
+    public void setMaxRT(String maxRT) {
+        this.maxRT = maxRT;
+    }
+
+    public void setMinObsMass(String minObsMass) {
+        this.minObsMass = minObsMass;
+    }
+
+    public void setMaxObsMass(String maxObsMass) {
+        this.maxObsMass = maxObsMass;
+    }
+
 }

@@ -101,8 +101,7 @@ public class ProteinferJobSaver {
         }
         
         // save the parameters
-        if(program == ProteinInferenceProgram.PROTINFER_SEQ || program == ProteinInferenceProgram.PROTINFER_PLCID ||
-           program == ProteinInferenceProgram.PROTINFER_PERC) {
+        if(ProteinInferenceProgram.isIdPicker(program)) {
             saveIdPickerParams(pinferId, params);
         }
         
@@ -115,6 +114,8 @@ public class ProteinferJobSaver {
 
     private void saveIdPickerParams(int pinferId, ProgramParameters params) {
         for(Param param: params.getParamList()) {
+            if(param.getValue() == null || param.getValue().trim().length() == 0)
+                continue;
             IdPickerParam idpParam = new IdPickerParam();
             idpParam.setProteinferId(pinferId);
             idpParam.setName(param.getName());

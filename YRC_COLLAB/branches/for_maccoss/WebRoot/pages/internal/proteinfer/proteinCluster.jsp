@@ -116,7 +116,8 @@
 
 </table>
 
+<!--
 <div align="center" style="font-weight:bold;"><a href="viewAlignedClusterProteins.do?pinferId=<bean:write name='pinferId' />&clusterId=<bean:write name='clusterId' />" >View Alignment</></div>
-
+-->
 
 
