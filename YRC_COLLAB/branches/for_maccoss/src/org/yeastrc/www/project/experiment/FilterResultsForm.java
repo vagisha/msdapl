@@ -59,52 +59,52 @@ public class FilterResultsForm extends ActionForm {
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = new ActionErrors();
         
-        if(minScan != null) {
+        if(minScan != null && minScan.trim().length() > 0) {
             try{Integer.parseInt(minScan.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. Scan"));}
         }
-        if(maxScan != null) {
+        if(maxScan != null && maxScan.trim().length() > 0) {
             try{Integer.parseInt(maxScan.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Max. Scan"));}
         }
         
-        if(minCharge != null) {
+        if(minCharge != null && minCharge.trim().length() > 0) {
             try{Integer.parseInt(minCharge.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. Charge"));}
         }
-        if(maxCharge != null) {
+        if(maxCharge != null && maxCharge.trim().length() > 0) {
             try{Integer.parseInt(maxCharge.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Max. Charge"));}
         }
         
-        if(minRT != null) {
+        if(minRT != null && minRT.trim().length() > 0) {
             try{Double.parseDouble(minRT.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. RT"));}
         }
-        if(maxRT != null) {
+        if(maxRT != null && maxRT.trim().length() > 0) {
             try{Double.parseDouble(maxRT.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Max. RT"));}
         }
         
-        if(minObsMass != null) {
+        if(minObsMass != null && minObsMass.trim().length() > 0) {
             try{Double.parseDouble(minObsMass.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. Observed Mass"));}
         }
-        if(maxObsMass != null) {
+        if(maxObsMass != null && maxObsMass.trim().length() > 0) {
             try{Double.parseDouble(maxObsMass.trim());}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 

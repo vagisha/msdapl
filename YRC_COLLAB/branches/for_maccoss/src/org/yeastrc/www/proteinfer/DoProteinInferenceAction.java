@@ -17,9 +17,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.project.Projects;
+import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+
+import edu.uwpr.protinfer.ProgramParam;
+import edu.uwpr.protinfer.ProgramParam.ParamMaker;
 
 /**
  * 
@@ -58,6 +62,23 @@ public class DoProteinInferenceAction extends Action {
         ProteinInferenceForm prinferForm = (ProteinInferenceForm) form;
         ProteinInferInputSummary inputSummary = prinferForm.getInputSummary();
         ProgramParameters params = prinferForm.getProgramParams();
+        
+        // If "remove ambiguous spectrm" was unchecked it will not be in the parameters list. Add it
+        boolean found = false;
+        ProgramParam progParam = ParamMaker.makeRemoveAmbigSpectraParam();
+        for(Param param: params.getParamList()) {
+            if(param.getName().equals(progParam.getName())) {
+                if(param.getValue() == null || param.getValue().trim().length() == 0)
+                    param.setValue("false");
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            Param myParam = new Param(progParam);
+            myParam.setValue("false");
+            params.addParam(myParam);
+        }
         
         ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), inputSummary, params, 
                 prinferForm.getInputType(), prinferForm.getComments());

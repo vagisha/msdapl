@@ -80,10 +80,11 @@ function validateInt(value, fieldName, min, max) {
 	return valid;
 }
 function validateFloat(value, fieldName, min, max) {
+	
 	var floatVal = parseFloat(value);
 	var valid = true;
 	if(isNaN(floatVal))						valid = false;
-	if(valid && floatVal < min)			valid = false;
+	if(valid && floatVal < min)				valid = false;
 	if(max && (valid && floatVal > max))	valid = false;
 	return valid;
 }

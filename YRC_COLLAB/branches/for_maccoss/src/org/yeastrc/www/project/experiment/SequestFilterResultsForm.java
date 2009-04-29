@@ -34,42 +34,42 @@ public class SequestFilterResultsForm extends FilterResultsForm {
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors =  super.validate(mapping, request);
         
-        if(minXCorr_1 != null) {
+        if(minXCorr_1 != null && minXCorr_1.trim().length() > 0) {
             try{Double.parseDouble(minXCorr_1);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge 1)"));}
         }
         
-        if(minXCorr_2 != null) {
+        if(minXCorr_2 != null && minXCorr_2.trim().length() > 0) {
             try{Double.parseDouble(minXCorr_2);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge 2)"));}
         }
         
-        if(minXCorr_3 != null) {
+        if(minXCorr_3 != null && minXCorr_3.trim().length() > 0) {
             try{Double.parseDouble(minXCorr_3);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge 3)"));}
         }
         
-        if(minXCorr_H != null) {
+        if(minXCorr_H != null && minXCorr_H.trim().length() > 0) {
             try{Double.parseDouble(minXCorr_H);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. XCorr (charge > 3)"));}
         }
         
-        if(minDeltaCN != null) {
+        if(minDeltaCN != null && minDeltaCN.trim().length() > 0) {
             try{Double.parseDouble(minDeltaCN);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. DeltaCN"));}
         }
         
-        if(minSp != null) {
+        if(minSp != null && minSp.trim().length() > 0) {
             try{Double.parseDouble(minSp);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 

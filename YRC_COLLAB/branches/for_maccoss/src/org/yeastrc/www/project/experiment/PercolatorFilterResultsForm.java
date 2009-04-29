@@ -37,40 +37,40 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
         
-        if(minQValue != null) {
+        if(minQValue != null && minQValue.trim().length() > 0) {
             try{Double.parseDouble(minQValue);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. q-value"));}
         }
-        if(maxQValue != null) {
+        if(maxQValue != null && maxQValue.trim().length() > 0) {
             try{Double.parseDouble(maxQValue);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Max. q-value"));}
         }
         
-        if(minPep != null) {
+        if(minPep != null && minPep.trim().length() > 0) {
             try{Double.parseDouble(minPep);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. PEP"));}
         }
-        if(minPep != null) {
+        if(minPep != null && minPep.trim().length() > 0) {
             try{Double.parseDouble(minPep);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Max. PEP"));}
         }
         
-        if(minDs != null) {
+        if(minDs != null && minDs.trim().length() > 0) {
             try{Double.parseDouble(minDs);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Min. Discriminant Score"));}
         }
-        if(minDs != null) {
-            try{Double.parseDouble(minDs);}
+        if(maxDs != null && maxDs.trim().length() > 0) {
+            try{Double.parseDouble(maxDs);}
             catch(NumberFormatException e){
                 errors.add(ActionMessages.GLOBAL_MESSAGE, 
                         new ActionMessage("error.general.errorMessage", "Invalid value for Max. Discriminant Score"));}
