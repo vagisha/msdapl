@@ -4,9 +4,72 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
 <script>
+
+// ---------------------------------------------------------------------------------------
+// SAVE COMMENTS FOR AN EXPERIMENT
+// --------------------------------------------------------------------------------------- 
+$(document).ready(function() {
+  	makeEditable();
+});
+
+var projectId = <bean:write name="project" property="ID"/>;
+
+function makeEditable() {
+	$(".editableExptComment").click(function() {
+		var id = $(this).attr('id');
+		var currentComments = $.trim($("#"+id+"_text").text());
+		$("#"+id+"_text").hide();
+		$("#"+id+"_edit .edit_text").val(currentComments);
+		$("#"+id+"_edit").show();
+	});
+	
+	$(".saveExptComments").click(function() {
+		var id = $(this).attr('id');
+		// can also use $(my_element).text().replace(/(^\s*)|(\s*$)/g, '');
+		var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
+		saveExperimentComments(id, comments);
+	});
+	
+	$(".cancelExptComments").click(function() {
+		var id = $(this).attr('id');
+		$("#experiment_"+id+"_text").show();
+		$("#experiment_"+id+"_edit .edit_text").text("");
+		$("#experiment_"+id+"_edit").hide();
+	});
+}
+
+function saveExperimentComments(exptId, comments) {
+
+	var oldComments = $.trim($("#experiment_"+exptId+"_text").text());
+	var newComments = $.trim($("#experiment_"+exptId+"_edit .edit_text").val());
+	
+	$.ajax({
+		url:      'saveExperimentComments.do',
+		dataType: "text",
+		data:     {'experimentId': 	exptId, 
+		           'projectId': 	projectId,
+		           'comments': 		newComments},
+		beforeSend: function(xhr) {
+						//$("#experiment_"+exptId+"_text").text("Saving....");
+						$("#experiment_"+exptId+"_text").show();
+						$("#experiment_"+exptId+"_edit").hide();
+					},
+		success:  function(data) {
+			        if(data == 'OK') {
+			        	$("#experiment_"+exptId+"_text").text(newComments);
+			        }
+			        else {
+			        	$("#experiment_"+exptId+"_text").text(oldComments);
+			        	alert("Error saving comments: "+data);
+			        }
+		          },
+		complete:  function(xhr, textStatus) {}
+		
+	});
+	
+}
 
 // ---------------------------------------------------------------------------------------
 // AJAX DEFAULTS
@@ -110,8 +173,17 @@ function toggleFilesForExperiment (experimentId) {
 					<td style="padding-left:10"><bean:write name="experiment" property="serverDirectory"/></td>
 				</tr>
 				<tr>
-					<td><b>Comments: </b></td>
-					<td style="padding-left:10"><bean:write name="experiment" property="comments"/></td>
+					<td valign="top"><b>Comments </b><span class="editableExptComment clickable" id="experiment_<bean:write name='experiment' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span><b>: </b></td>
+					<td style="padding-left:10">
+						<div id="experiment_<bean:write name='experiment' property='id'/>_text"><bean:write name="experiment" property="comments"/></div>
+						<div id="experiment_<bean:write name='experiment' property='id'/>_edit" align="center"
+						     style="display:none;">
+						     <textarea rows="5" cols="60" class="edit_text"></textarea>
+						     <br>
+						     <button class="saveExptComments" id="<bean:write name='experiment' property='id'/>">Save</button>
+						     <button class="cancelExptComments" id="<bean:write name='experiment' property='id'/>">Cancel</button>
+						</div>
+					</td>
 				</tr>
 				<logic:equal name="experiment" property="uploadSuccess" value="false">
 					<tr>

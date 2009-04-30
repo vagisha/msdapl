@@ -350,6 +350,12 @@
 	<!-- Actions related to experiment results -->
 	<!-- ================================================================================== -->
 	<action
+	  path="/saveExperimentComments"
+	  type="org.yeastrc.www.project.experiment.SaveExperimentCommentsAjaxAction"
+	  >
+	</action>
+	
+	<action
 	  path="/viewPercolatorResults"
 	  type="org.yeastrc.www.project.experiment.ViewPercolatorResults"
 	  name="filterPercolatorResultsForm"
