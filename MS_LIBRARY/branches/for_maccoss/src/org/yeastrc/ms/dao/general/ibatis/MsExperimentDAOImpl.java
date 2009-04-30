@@ -65,6 +65,14 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
        update("MsExperiment.updateLastUpdate", experimentId); 
     }
     
+    @Override
+    public void updateComments(int experimentId, String comments) {
+        Map<Object, Object> map = new HashMap<Object, Object>(4);
+        map.put("experimentId", experimentId);
+        map.put("comments", comments);
+        update("MsExperiment.updateComments", map);
+    }
+    
     public int getMatchingExptRunCount(int experimentId, int runId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("experimentId", experimentId);

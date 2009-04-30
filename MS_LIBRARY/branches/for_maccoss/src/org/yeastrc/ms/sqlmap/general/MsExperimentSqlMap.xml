@@ -54,6 +54,11 @@
     	WHERE id=#experimentId#
     </update>
     
+    <update id="updateComments" parameterClass="java.util.Map">
+    	UPDATE msExperiment SET comments=#comments# 
+    	WHERE id=#experimentId#
+    </update>
+    
     <insert id="insertExperimentRun" parameterClass="java.util.Map">
     	INSERT INTO msExperimentRun (experimentID, runID) VALUES (#experimentId#, #runId#)
     </insert>

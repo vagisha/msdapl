@@ -31,5 +31,7 @@ public interface MsExperimentDAO {
     
     public abstract void updateLastUpdateDate(int experimentId);
     
+    public abstract void updateComments(int experimentId, String comments);
+    
     public abstract void deleteExperiment(int experimentId);
 }
