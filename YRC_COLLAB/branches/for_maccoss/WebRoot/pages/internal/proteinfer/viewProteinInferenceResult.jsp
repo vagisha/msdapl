@@ -1053,7 +1053,7 @@ function toggleDivVisibility(mydiv) {
 		
 		<!-- SUMMARY -->
 		<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0F8FF;">
-		<table align="center" width="100%">
+		<table align="center">
 			<tr>
 				<td>
 					<b>Protein Inference ID:</b>
