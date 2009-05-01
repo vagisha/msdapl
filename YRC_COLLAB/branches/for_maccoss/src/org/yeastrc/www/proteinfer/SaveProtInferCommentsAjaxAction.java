@@ -1,10 +1,10 @@
 /**
- * SaveExperimentCommentsAjaxAction.java
+ * SaveCommentsAjaxAction.java
  * @author Vagisha Sharma
  * Apr 30, 2009
  * @version 1.0
  */
-package org.yeastrc.www.project.experiment;
+package org.yeastrc.www.proteinfer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,15 +13,17 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
+
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 /**
  * 
  */
-public class SaveExperimentCommentsAjaxAction extends Action {
+public class SaveProtInferCommentsAjaxAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -36,27 +38,31 @@ public class SaveExperimentCommentsAjaxAction extends Action {
             return null;
         }
         
-        int experimentId = 0;
-        try {experimentId = Integer.parseInt(request.getParameter("experimentId"));}
+        int piRunId = 0;
+        try {piRunId = Integer.parseInt(request.getParameter("piRunId"));}
         catch(NumberFormatException e) {}
 
-        if(experimentId == 0) {
+        if(piRunId == 0) {
             response.setContentType("text/html");
-            response.getWriter().write("<b>Invalid Experiment ID: "+experimentId+"</b>");
+            response.getWriter().write("<b>Invalid Protein inference ID: "+piRunId+"</b>");
             return null;
         }
 
         String comments = request.getParameter("comments");
-        if(comments == null) {
-            response.setContentType("text/html");
-            response.getWriter().write("<b>No comments found.</b>");
-            return null;
-        }
+        if(comments == null)
+            comments = "";
         
         // Save
         try {
-            MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
-            exptDao.updateComments(experimentId, comments);
+            ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+            ProteinferRun run = runDao.loadProteinferRun(piRunId);
+            if(run == null) {
+                response.setContentType("text/html");
+                response.getWriter().write("<b>No protein inference run found with ID: "+piRunId+"</b>");
+                return null;
+            }
+            run.setComments(comments);
+            runDao.update(run);
         }
         catch(Exception e) {
             response.setContentType("text/html");
@@ -70,5 +76,4 @@ public class SaveExperimentCommentsAjaxAction extends Action {
         return null;
        
     }
-
 }

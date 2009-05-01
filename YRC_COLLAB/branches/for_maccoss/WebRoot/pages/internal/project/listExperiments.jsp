@@ -14,8 +14,6 @@ $(document).ready(function() {
   	makeEditable();
 });
 
-var projectId = <bean:write name="project" property="ID"/>;
-
 function makeEditable() {
 	$(".editableExptComment").click(function() {
 		var id = $(this).attr('id');
@@ -49,7 +47,6 @@ function saveExperimentComments(exptId, comments) {
 		url:      'saveExperimentComments.do',
 		dataType: "text",
 		data:     {'experimentId': 	exptId, 
-		           'projectId': 	projectId,
 		           'comments': 		newComments},
 		beforeSend: function(xhr) {
 						//$("#experiment_"+exptId+"_text").text("Saving....");
