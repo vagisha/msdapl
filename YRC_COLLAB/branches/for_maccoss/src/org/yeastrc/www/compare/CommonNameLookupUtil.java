@@ -78,6 +78,9 @@ public class CommonNameLookupUtil {
           CommonNameDescription cnd = new CommonNameDescription();
           cnd.setName(nrseqProt.getListing());
           cnd.setDescription(nrseqProt.getDescription());
+          List<CommonNameDescription> list = new ArrayList<CommonNameDescription>();
+          list.add(cnd);
+          listing.setCommonNameDescription(list);
         }
         
         return listing;
