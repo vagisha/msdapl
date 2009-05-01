@@ -8,14 +8,14 @@
 <script>
 
 // ---------------------------------------------------------------------------------------
-// SAVE COMMENTS FOR AN EXPERIMENT
+// SAVE COMMENTS FOR AN EXPERIMENT / PROTEIN INFERENCE RUN
 // --------------------------------------------------------------------------------------- 
 $(document).ready(function() {
   	makeEditable();
 });
 
 function makeEditable() {
-	$(".editableExptComment").click(function() {
+	$(".editableComment").click(function() {
 		var id = $(this).attr('id');
 		var currentComments = $.trim($("#"+id+"_text").text());
 		$("#"+id+"_text").hide();
@@ -27,7 +27,7 @@ function makeEditable() {
 		var id = $(this).attr('id');
 		// can also use $(my_element).text().replace(/(^\s*)|(\s*$)/g, '');
 		var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
-		saveExperimentComments(id, comments);
+		saveExptComments(id, comments);
 	});
 	
 	$(".cancelExptComments").click(function() {
@@ -36,36 +36,27 @@ function makeEditable() {
 		$("#experiment_"+id+"_edit .edit_text").text("");
 		$("#experiment_"+id+"_edit").hide();
 	});
-}
-
-function saveExperimentComments(exptId, comments) {
-
-	var oldComments = $.trim($("#experiment_"+exptId+"_text").text());
-	var newComments = $.trim($("#experiment_"+exptId+"_edit .edit_text").val());
 	
-	$.ajax({
-		url:      'saveExperimentComments.do',
-		dataType: "text",
-		data:     {'experimentId': 	exptId, 
-		           'comments': 		newComments},
-		beforeSend: function(xhr) {
-						//$("#experiment_"+exptId+"_text").text("Saving....");
-						$("#experiment_"+exptId+"_text").show();
-						$("#experiment_"+exptId+"_edit").hide();
-					},
-		success:  function(data) {
-			        if(data == 'OK') {
-			        	$("#experiment_"+exptId+"_text").text(newComments);
-			        }
-			        else {
-			        	$("#experiment_"+exptId+"_text").text(oldComments);
-			        	alert("Error saving comments: "+data);
-			        }
-		          },
-		complete:  function(xhr, textStatus) {}
-		
+	$(".savePiRunComments").click(function() {
+		var id = $(this).attr('id');
+		var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
+		savePiRunComments(id, comments);
 	});
 	
+	$(".cancelPiRunComments").click(function() {
+		var id = $(this).attr('id');
+		$("#piRun_"+id+"_text").show();
+		$("#piRun_"+id+"_edit .edit_text").text("");
+		$("#piRun_"+id+"_edit").hide();
+	});
+}
+
+function saveExptComments(exptId, comments) {
+	saveComments('saveExperimentComments.do', 'experiment', exptId, comments);
+}
+
+function savePiRunComments(piRunId, comments) {
+	saveComments('saveProtInferComments.do', 'piRun', piRunId, comments);
 }
 
 function saveComments(url, idName, id, comments) {
@@ -73,23 +64,24 @@ function saveComments(url, idName, id, comments) {
 	var newComments = $.trim($("#"+idName+"_"+id+"_edit .edit_text").val());
 	
 	var textFieldId = "#"+idName+"_"+id+"_text";
-	var textBoxId   = "#"+idName+"_"+id+"_edit"
+	var textBoxId   = "#"+idName+"_"+id+"_edit";
+	
 	$.ajax({
 		url:      url,
 		dataType: "text",
-		data:     {idName+'Id': 	exptId, 
+		data:     {'id': 			id, 
 		           'comments': 		newComments},
 		beforeSend: function(xhr) {
-						$("#"+textFieldId).text("Saving....");
-						$("#"+textFieldId).show();
-						$("#"+textBoxId).hide();
+						$(textFieldId).text("Saving....");
+						$(textFieldId).show();
+						$(textBoxId).hide();
 					},
 		success:  function(data) {
 			        if(data == 'OK') {
-			        	$("#"+textFieldId).text(newComments);
+			        	$(textFieldId).text(newComments);
 			        }
 			        else {
-			        	$("#"+textFieldId).text(oldComments);
+			        	$(textFieldId).text(oldComments);
 			        	alert("Error saving comments: "+data);
 			        }
 		          },
@@ -200,7 +192,7 @@ function toggleFilesForExperiment (experimentId) {
 					<td style="padding-left:10"><bean:write name="experiment" property="serverDirectory"/></td>
 				</tr>
 				<tr>
-					<td valign="top"><b>Comments </b><span class="editableExptComment clickable" id="experiment_<bean:write name='experiment' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span><b>: </b></td>
+					<td valign="top"><b>Comments </b><span class="editableComment clickable" id="experiment_<bean:write name='experiment' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span><b>: </b></td>
 					<td style="padding-left:10">
 						<div id="experiment_<bean:write name='experiment' property='id'/>_text"><bean:write name="experiment" property="comments"/></div>
 						<div id="experiment_<bean:write name='experiment' property='id'/>_edit" align="center"
@@ -317,19 +309,21 @@ function toggleFilesForExperiment (experimentId) {
 			<logic:notEmpty name="experiment" property="protInferRuns">
 				<div style="background-color: #F0F8FF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 					<div><b>Protein Inference Results</b></div> 
-					<table width="90%">
+					<table width="100%">
 					<thead>
 					<tr align="left"><th>ID</th><th>Date</th><th>Submitted By</th><th>Comments</th><th>Status</th></tr>
 					</thead>
 					<tbody>
 					<logic:iterate name="experiment" property="protInferRuns" id="piJob" type="org.yeastrc.www.proteinfer.ProteinferJob">
 						<tr>
-						<td><b><bean:write name="piJob" property="pinferId"/></b></td>
-						<td><bean:write name="piJob" property="submitDate"/></td>
-						<td><bean:write name="piJob" property="researcher.lastName"/></td>
-						<td><bean:write name="piJob" property="comments"/></td>
-						
-						<td>
+						<td valign="top"><b><bean:write name="piJob" property="pinferId"/></b></td>
+						<td valign="top"><bean:write name="piJob" property="submitDate"/></td>
+						<td valign="top"><bean:write name="piJob" property="researcher.lastName"/></td>
+						<td valign="top">
+							<span id="piRun_<bean:write name='piJob' property='pinferId'/>_text"><bean:write name="piJob" property="comments"/></span>
+							<span class="editableComment clickable" id="piRun_<bean:write name='piJob' property='pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
+						</td>
+						<td valign="top">
 						
 						<!-- Job COMPLETE -->
 						<logic:equal name="piJob" property="complete" value="true">
@@ -352,6 +346,17 @@ function toggleFilesForExperiment (experimentId) {
 						</logic:equal>
 						
 	   		 			</td>
+						</tr>
+						<tr>
+							<td colspan="5" valign="top">
+							<div id="piRun_<bean:write name='piJob' property='pinferId'/>_edit" align="center"
+						     style="display:none;">
+						     <textarea rows="5" cols="60" class="edit_text"></textarea>
+						     <br>
+						     <button class="savePiRunComments" id="<bean:write name='piJob' property='pinferId'/>">Save</button>
+						     <button class="cancelPiRunComments" id="<bean:write name='piJob' property='pinferId'/>">Cancel</button>
+							</div>
+							</td>
 						</tr>
 					</logic:iterate>
 					</tbody>

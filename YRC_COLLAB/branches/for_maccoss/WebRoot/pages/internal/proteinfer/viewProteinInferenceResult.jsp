@@ -141,7 +141,10 @@ $(document).ready(function() {
     	var $table = $(this);
     	makeSortable($table);
   	});
-  	
+
+	// Make the comments for this protein inference run editable
+	makeCommentsEditable();
+	  	
   	// If the protein details cookie is saved load the protein details
 	var cookie = $.cookie("protdetails");
 	if(cookie) {
@@ -170,7 +173,67 @@ $(document).ready(function() {
 	}	
 });
   
-  
+// ---------------------------------------------------------------------------------------
+// SAVE COMMENTS FOR AN EXPERIMENT / PROTEIN INFERENCE RUN
+// --------------------------------------------------------------------------------------- 
+function makeCommentsEditable() {
+	$(".editableComment").click(function() {
+		var id = $(this).attr('id');
+		var currentComments = $.trim($("#"+id+"_text").text());
+		$("#"+id+"_text").hide();
+		$("#"+id+"_edit .edit_text").val(currentComments);
+		$("#"+id+"_edit").show();
+	});
+	
+	$(".savePiRunComments").click(function() {
+		var id = $(this).attr('id');
+		var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
+		savePiRunComments(id, comments);
+	});
+	
+	$(".cancelPiRunComments").click(function() {
+		var id = $(this).attr('id');
+		$("#piRun_"+id+"_text").show();
+		$("#piRun_"+id+"_edit .edit_text").text("");
+		$("#piRun_"+id+"_edit").hide();
+	});
+}
+
+function savePiRunComments(piRunId, comments) {
+	saveComments('saveProtInferComments.do', 'piRun', piRunId, comments);
+}
+
+function saveComments(url, idName, id, comments) {
+	var oldComments = $.trim($("#"+idName+"_"+id+"_text").text());
+	var newComments = $.trim($("#"+idName+"_"+id+"_edit .edit_text").val());
+	
+	var textFieldId = "#"+idName+"_"+id+"_text";
+	var textBoxId   = "#"+idName+"_"+id+"_edit";
+	
+	$.ajax({
+		url:      url,
+		dataType: "text",
+		data:     {'id': 			id, 
+		           'comments': 		newComments},
+		beforeSend: function(xhr) {
+						$(textFieldId).text("Saving....");
+						$(textFieldId).show();
+						$(textBoxId).hide();
+					},
+		success:  function(data) {
+			        if(data == 'OK') {
+			        	$(textFieldId).text(newComments);
+			        }
+			        else {
+			        	$(textFieldId).text(oldComments);
+			        	alert("Error saving comments: "+data);
+			        }
+		          },
+		complete:  function(xhr, textStatus) {}
+		
+	});
+}
+
 // ---------------------------------------------------------------------------------------
 // SHOW/HIDE PROTEIN SEQUENCE
 // --------------------------------------------------------------------------------------- 
@@ -987,6 +1050,48 @@ function toggleDivVisibility(mydiv) {
 	<div id="protlist">
 		<CENTER>
 		<table><tr><td>
+		
+		<!-- SUMMARY -->
+		<div style="padding:0 7 0 7; margin-bottom:5; border: 1px dashed gray;background-color: #F0F8FF;">
+		<table align="center" width="100%">
+			<tr>
+				<td>
+					<b>Protein Inference ID:</b>
+				</td>
+				<td>
+					<bean:write name="idpickerRun" property="id"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<b>Date:</b>
+				</td>
+				<td>
+					<bean:write name="idpickerRun" property="date"/>&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td><b>Comments </b>
+					<span class="editableComment clickable" id="piRun_<bean:write name='idpickerRun' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span>
+				</td>
+				<td>
+					<span id="piRun_<bean:write name='idpickerRun' property='id'/>_text"><bean:write name="idpickerRun" property="comments"/></span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top">
+				<div id="piRun_<bean:write name='idpickerRun' property='id'/>_edit" align="center"
+			     style="display:none;">
+			     <textarea rows="5" cols="60" class="edit_text"></textarea>
+			     <br>
+			     <button class="savePiRunComments" id="<bean:write name='idpickerRun' property='id'/>">Save</button>
+			     <button class="cancelPiRunComments" id="<bean:write name='idpickerRun' property='id'/>">Cancel</button>
+				</div>
+				</td>
+			</tr>
+		</table>
+		</div>
+	
 		<%@ include file="proteinInferFilterForm.jsp" %>
 		<%@include file="proteinInferDownloadForm.jsp" %>
 		</td></tr></table>

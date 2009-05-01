@@ -39,7 +39,7 @@ public class SaveProtInferCommentsAjaxAction extends Action {
         }
         
         int piRunId = 0;
-        try {piRunId = Integer.parseInt(request.getParameter("piRunId"));}
+        try {piRunId = Integer.parseInt(request.getParameter("id"));}
         catch(NumberFormatException e) {}
 
         if(piRunId == 0) {

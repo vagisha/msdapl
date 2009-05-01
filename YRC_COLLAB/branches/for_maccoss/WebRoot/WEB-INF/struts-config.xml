@@ -674,6 +674,12 @@
 		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 	</action>
 	
+	<action
+	  path="/saveProtInferComments"
+	  type="org.yeastrc.www.proteinfer.SaveProtInferCommentsAjaxAction"
+	  >
+	</action>
+	
 	<action 
 		path="/downloadProtInferResults"
 		name="proteinInferFilterForm"

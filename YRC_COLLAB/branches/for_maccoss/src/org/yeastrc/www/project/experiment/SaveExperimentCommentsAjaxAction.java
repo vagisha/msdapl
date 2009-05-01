@@ -37,7 +37,7 @@ public class SaveExperimentCommentsAjaxAction extends Action {
         }
         
         int experimentId = 0;
-        try {experimentId = Integer.parseInt(request.getParameter("experimentId"));}
+        try {experimentId = Integer.parseInt(request.getParameter("id"));}
         catch(NumberFormatException e) {}
 
         if(experimentId == 0) {
