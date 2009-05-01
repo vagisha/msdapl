@@ -68,6 +68,36 @@ function saveExperimentComments(exptId, comments) {
 	
 }
 
+function saveComments(url, idName, id, comments) {
+	var oldComments = $.trim($("#"+idName+"_"+id+"_text").text());
+	var newComments = $.trim($("#"+idName+"_"+id+"_edit .edit_text").val());
+	
+	var textFieldId = "#"+idName+"_"+id+"_text";
+	var textBoxId   = "#"+idName+"_"+id+"_edit"
+	$.ajax({
+		url:      url,
+		dataType: "text",
+		data:     {idName+'Id': 	exptId, 
+		           'comments': 		newComments},
+		beforeSend: function(xhr) {
+						$("#"+textFieldId).text("Saving....");
+						$("#"+textFieldId).show();
+						$("#"+textBoxId).hide();
+					},
+		success:  function(data) {
+			        if(data == 'OK') {
+			        	$("#"+textFieldId).text(newComments);
+			        }
+			        else {
+			        	$("#"+textFieldId).text(oldComments);
+			        	alert("Error saving comments: "+data);
+			        }
+		          },
+		complete:  function(xhr, textStatus) {}
+		
+	});
+}
+
 // ---------------------------------------------------------------------------------------
 // AJAX DEFAULTS
 // ---------------------------------------------------------------------------------------
