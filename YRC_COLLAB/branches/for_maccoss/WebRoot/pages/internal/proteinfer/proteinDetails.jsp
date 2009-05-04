@@ -1,8 +1,10 @@
 
 <%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
-<%@page import="org.yeastrc.ms.domain.search.Program"%><%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@page import="org.yeastrc.ms.domain.search.Program"%>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 
 <center>
 <div align="center" style="padding:5px;font-size: 10pt;width: 90%; color: black;">
@@ -18,7 +20,8 @@
       id="protseqbutton_<bean:write name="protein" property="protein.id" />">[View Sequence]</span>
 &nbsp; &nbsp;
 <span style="font-size: 8pt; color: red;">
-<a  style="color:red;" href="viewProtein.do?id=<bean:write name='protein' property='protein.nrseqProteinId' />">[Protein Details]</a></span>
+<a  style="color:red;"   href="<yrcwww:link path='viewProtein.do?id'/>=<bean:write name='protein' property='protein.nrseqProteinId'/>">[Protein Details]</a>
+</span>
 <br>
 </div>
 <br>

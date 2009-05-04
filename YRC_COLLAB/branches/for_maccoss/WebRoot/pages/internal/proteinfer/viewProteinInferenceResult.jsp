@@ -35,7 +35,6 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-
 <logic:notPresent name="proteinInferFilterForm">
 	<logic:forward  name="viewProteinInferenceResult" />
 </logic:notPresent>
@@ -200,7 +199,7 @@ function makeCommentsEditable() {
 }
 
 function savePiRunComments(piRunId, comments) {
-	saveComments('saveProtInferComments.do', 'piRun', piRunId, comments);
+	saveComments("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun', piRunId, comments);
 }
 
 function saveComments(url, idName, id, comments) {
@@ -249,7 +248,7 @@ function toggleProteinSequence (pinferProteinId) {
 			//alert("Getting...");
 			// load data in the appropriate div
 			$.blockUI(); 
-			$("#protsequence_"+pinferProteinId).load("proteinSequence.do",   				// url
+			$("#protsequence_"+pinferProteinId).load("<yrcwww:link path='proteinSequence.do'/>",   				// url
 							                        {'pinferProteinId': pinferProteinId}, 	// data
 							                        function(responseText, status, xhr) {	// callback
 								  						$.unblockUI();
@@ -279,7 +278,7 @@ function toggleHitsForIon (pinferIonId) {
 			//alert("Getting...");
 			// load data in the appropriate div
 			$.blockUI(); 
-			$("#hitsforion_"+pinferIonId).load("psmListForIon.do",   					// url
+			$("#hitsforion_"+pinferIonId).load("<yrcwww:link path='psmListForIon.do'/>",   					// url
 							                        {'pinferId': <%=pinferId%>, 'pinferIonId': pinferIonId}, 		// data
 							                        function(responseText, status, xhr) {	// callback
 								  						$.unblockUI();
@@ -321,7 +320,7 @@ function showProteinDetails(proteinId, display, block) {
 	
 	// load content in the appropriate div
 	if(block)	$.blockUI();
-	$("#protein_div").load("proteinDetails.do",   									// url
+	$("#protein_div").load("<yrcwww:link path='proteinDetails.do'/>",   			    // url
 								  {'pinferId': <%=pinferId%>, 'pinferProtId': proteinId}, 	// data
 								  function(responseText, status, xhr) {						// callback
 								  		
@@ -368,7 +367,7 @@ function selectProteinCluster(clusterId, block, showDiv) {
 	// get data from the server and put it in the appropriate div
 	if(block == undefined)   block = true;
 	if(block)	$.blockUI();
-	$("#protcluster_div").load("proteinCluster.do",   								// url
+	$("#protcluster_div").load("<yrcwww:link path='proteinCluster.do'/>",   								// url
 								  	  {'pinferId': <%=pinferId%>, 'clusterId': clusterId}, 	// data
 								      function(responseText, status, request) {				// callback
  								  		
@@ -503,7 +502,7 @@ function showSpectrumMatches(runSearchId, runName) {
 	
 	if($("#psm_"+runSearchId).html().length == 0) {
 		$("#psm_"+runSearchId).html("<b>Loading Peptide Spectrum Matches for: "+runName+"...</b>");
-		$("#psm_"+runSearchId).load("psmMatches.do", //url
+		$("#psm_"+runSearchId).load("<yrcwww:link path='psmMatches.do'/>", //url
 								{'pinferId': <%=pinferId%>, 'runSearchId': runSearchId},
 								function(responseText, status, xhr) {						// callback
 							  		// stripe the table
@@ -546,7 +545,7 @@ function setupShowPeptidesLinks() {
   			if($("#peptforprot_"+id).html().length == 0) {
   				//alert("Sending request for proteinGroup: "+id);
   				$.blockUI();
-  				$("#peptforprot_"+id).load("getProteinPeptides.do", 	//url
+  				$("#peptforprot_"+id).load("<yrcwww:link path='getProteinPeptides.do'/>", 	//url
   									{'pinferId': <%=pinferId%>, 		// data
   									 'proteinGroupId': id
   									 },
@@ -577,7 +576,7 @@ function setupShowPeptidesLinks() {
   			if($("#peptforprot_"+protId+"_"+grpId).html().length == 0) {
   				//alert("Sending request");
   				$.blockUI();
-  				$("#peptforprot_"+protId+"_"+grpId).load("getProteinPeptides.do", 	//url
+  				$("#peptforprot_"+protId+"_"+grpId).load("<yrcwww:link path='getProteinPeptides.do'/>", 	//url
   									{'pinferId': <%=pinferId%>, 					// data
   									 'proteinGroupId': grpId,
   									 'proteinId': protId
@@ -627,7 +626,7 @@ function setupAnnotationsLinks() {
     			if(notsure) validation = 'N';
     			
     			// send a request to update the annotation for this protein
-    			$.post("saveProteinAnnotation.do",
+    			$.post("<yrcwww:link path='saveProteinAnnotation.do'/>",
     					{'pinferProtId': protid,
     					 'comments': comments,
     					 'validation': validation
@@ -664,7 +663,7 @@ function setupAnnotationsLinks() {
     		},
     		"Delete": function() {
     			var protid = $("#prot_id").val();
-    			$.post("deleteProteinAnnotation.do",
+    			$.post("<yrcwww:link path='deleteProteinAnnotation.do'/>",
     					{'pinferProtId': protid},
     					function(data) {
     						if(data == "OK") {
@@ -881,7 +880,7 @@ function sortResults(pinferId, sortBy, sortOrder) {
 	var sortOrderStr  = sortOrder == 1 ? 'ASC' : 'DESC';
 	// get data from the server and put it in the appropriate div
 	$.blockUI();
-	$("#proteinListTable").load("sortProteinInferenceResult.do",   			// url
+	$("#proteinListTable").load("<yrcwww:link path='sortProteinInferenceResult.do'/>",   			// url
 							{'inferId': 		pinferId, 
 							 'sortBy': 			sortBy,
 							 'sortOrder': 		sortOrderStr}, 	            // data
@@ -900,7 +899,7 @@ function pageResults(pageNum) {
   
   	// get data from the server and put it in the appropriate div
   	$.blockUI();
-  	$("#proteinListTable").load("pageProteinInferenceResult.do",   			// url
+  	$("#proteinListTable").load("<yrcwww:link path='pageProteinInferenceResult.do'/>",   			// url
   							{'inferId': 		<%=pinferId%>, 
   							 'pageNum': 		pageNum}, 	            	// data
   							function(responseText, status, xhr) {			// callback
