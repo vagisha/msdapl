@@ -271,7 +271,7 @@ public class MsDataUploader {
         
         // Get the raw data uploader
         log.info("Initializing RawDataUploadService");
-        SpectrumDataUploadService rdus = getRawDataUploader(rawDataDirectory, remoteRawDataDirectory);
+        SpectrumDataUploadService rdus = getSpectrumDataUploader(rawDataDirectory, remoteRawDataDirectory);
         exptUploader.setSpectrumDataUploader(rdus);
         
         // We cannot upload analysis data without uploading search data first.
@@ -331,16 +331,16 @@ public class MsDataUploader {
         return sdus;
     }
 
-    private SpectrumDataUploadService getRawDataUploader(String dataDirectory, String remoteDirectory) throws UploadException {
+    private SpectrumDataUploadService getSpectrumDataUploader(String dataDirectory, String remoteDirectory) throws UploadException {
         
         SpectrumDataUploadService rdus = null;
         try {
-            rdus = UploadServiceFactory.instance().getRawDataUploadService(dataDirectory);
+            rdus = UploadServiceFactory.instance().getSpectrumDataUploadService(dataDirectory);
             rdus.setRemoteDirectory(remoteDirectory);
         }
         catch(UploadServiceFactoryException e1) {
             UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
-            ex.appendErrorMessage("Error getting RawDataUploadService: "+e1.getMessage());
+            ex.appendErrorMessage("Error getting SpectrumDataUploadService: "+e1.getMessage());
             throw ex;
         }
         return rdus;

@@ -37,7 +37,7 @@ public class UploadServiceFactory {
         return instance;
     }
     
-    public SpectrumDataUploadService getRawDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
+    public SpectrumDataUploadService getSpectrumDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
             throw new UploadServiceFactoryException("dataDirectory is null");
@@ -65,11 +65,11 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() == 0) {
-            throw new UploadServiceFactoryException("No valid raw data file format found in directory: "+dataDirectory);
+            throw new UploadServiceFactoryException("No valid spectrum data file format found in directory: "+dataDirectory);
         }
         
         if(formats.size() > 1) {
-            throw new UploadServiceFactoryException("Multiple raw data file formats found in directory: "+dataDirectory);
+            throw new UploadServiceFactoryException("Multiple spectrum data file formats found in directory: "+dataDirectory);
         }
         
         RunFileFormat format = formats.iterator().next();

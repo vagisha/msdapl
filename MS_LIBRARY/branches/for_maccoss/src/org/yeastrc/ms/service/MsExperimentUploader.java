@@ -78,7 +78,7 @@ public class MsExperimentUploader {
         boolean passed = true;
         
         log.info("Doing pre-upload check for spectrum data uploader....");
-        // Raw data uploader check
+        // Spectrum data uploader check
         if(rdus == null) {
             appendToMsg("SpectrumDataUploader was null");
             passed = false;
