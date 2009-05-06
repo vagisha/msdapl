@@ -7,6 +7,5 @@ public interface ReadMS2Interface {
 	public MS2Scan getNextScan() throws IOException;
 	public String getheader();
 	public String getfilename();
-	
 	public void closeReader();
 }

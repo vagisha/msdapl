@@ -16,6 +16,12 @@ public class MS2Scan implements java.lang.Cloneable {
 	private int endscan;
 	private float precursor = -1;
 	private float rtime = -1;
+	private float bpi = -1; //base peak intensity
+	private double bpm = -1;//base peak mass
+	private double convA = -1; //conversion factor A
+	private double convB = -1; //conversion factor B
+	private double tic = -1; //total ion current
+	private float iit = -1; //ion injection time
 	
 	/**
 	 * Z FIELD - charge
@@ -97,6 +103,10 @@ public class MS2Scan implements java.lang.Cloneable {
 		return dfield.get(position);
 	}
 	
+	public int getDFieldSize(){
+		return dfield.size();
+	}
+	
 	/**
 	 * I FIELD
 	 * add String to ifield List
@@ -172,18 +182,105 @@ public class MS2Scan implements java.lang.Cloneable {
 	
 	public float getRTime(){
 		if (rtime == -1){
-			for (int i=0; i<ifield.size(); i++){
-				StringTokenizer st = new StringTokenizer(ifield.get(i));
-				while (st.hasMoreTokens()){
-					String token = st.nextToken();
-					if (token.equals("RTime")){
-						rtime = Float.parseFloat(st.nextToken());
-						return rtime;
-					}
-				}
+			String temp = getIfieldValue("RTime");
+			if (temp == ""){
+				rtime = 0.0f;
+			}else{
+				rtime = Float.parseFloat(temp);
 			}
 		}
 		return rtime;
+	}
+	
+	public float getBPI(){
+		if (bpi == -1){
+			String temp = getIfieldValue("BPI");
+			if (temp == ""){
+				bpi = 0.0f;
+			}else{
+				bpi = Float.parseFloat(temp);
+			}
+		}
+		return bpi;
+	}
+	
+	public double getBPM(){
+		if (bpm == -1){
+			String temp = getIfieldValue("BPM");
+			if (temp == ""){
+				bpm = 0.0;
+			}else{
+				bpm = Double.parseDouble(temp);
+			}
+		}
+		return bpm;
+	}
+	
+	public double getConvA(){
+		if (convA == -1){
+			String temp = getIfieldValue("ConvA");
+			if (temp == ""){
+				convA = 0.0;
+			}
+			else{
+				convA = Double.parseDouble(temp);
+			}
+			
+		}
+		return convA;
+	}
+	
+	public double getConvB(){
+		if (convB == -1){
+			String temp = getIfieldValue("ConvB");
+			if (temp == ""){
+				convB = 0.0;
+			}
+			else{
+				convB = Double.parseDouble(temp);
+			}
+		}
+		return convB;
+	}
+	
+	public double getTIC(){
+		if (tic == -1){
+			String temp = getIfieldValue("TIC");
+			if (temp == ""){
+				tic = 0.0;
+			}else{
+				tic = Double.parseDouble(temp);
+			}
+		}
+		return tic;
+	}
+	
+	public float getIIT(){
+		if (iit == -1){
+			String temp = getIfieldValue("IIT");
+			if (temp == ""){
+				iit = 0.0f;
+			}else{
+				iit = Float.parseFloat(temp);
+			}
+		}
+		return iit;
+	}
+	
+	/**
+	 * method to get a value from I lines. Looks for value, and returns the token that occurs after.
+	 */
+	private String getIfieldValue(String value){
+		for (int i=0; i<ifield.size(); i++){
+			StringTokenizer st = new StringTokenizer(ifield.get(i));
+			while (st.hasMoreTokens()){
+				String token = st.nextToken();
+				if (token.equals(value)){
+					return st.nextToken();
+				}
+			}
+		}
+		return "";
 	}
 	
 	public void outputall(){	

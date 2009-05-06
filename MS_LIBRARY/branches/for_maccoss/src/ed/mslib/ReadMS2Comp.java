@@ -1,7 +1,6 @@
 package ed.mslib;
 
 import java.io.*;
-
 import ed.javatools.BufferedRaf;
 import ed.javatools.PrimitiveTools;
 import java.util.zip.*;
@@ -53,6 +52,20 @@ public class ReadMS2Comp implements ReadMS2Interface{
 		int scan2 = raf.readLEInt();
 		double fragmass = raf.readLEDouble();
 		float rtime = raf.readLEFloat();
+		float bpi = -1; //base peak intensity
+		double bpm = -1;//base peak mass
+		double convA = -1; //conversion factor A
+		double convB = -1; //conversion factor B
+		double tic = -1; //total ion current
+		float iit = -1; //ion injection time
+		if (version == 2){
+			bpi = raf.readLEFloat();
+			bpm = raf.readLEDouble();
+			convA = raf.readLEDouble();
+			convB = raf.readLEDouble();
+			tic = raf.readLEDouble();
+			iit = raf.readLEFloat();
+		}
 		int numz = raf.readLEInt();
 		int numdatapts = raf.readLEInt();
 
@@ -84,6 +97,16 @@ public class ReadMS2Comp implements ReadMS2Interface{
 			result.setendscan(scan2);
 			result.setprecursor((float)fragmass);
 			result.addIfield("RTime\t"+rtime);
+			
+			if (version == 2){
+				result.addIfield("BPI\t"+bpi);
+				result.addIfield("BPM\t"+bpm);
+				result.addIfield("ConvA\t"+convA);
+				result.addIfield("ConvB\t"+convB);
+				result.addIfield("TIC\t"+tic);
+				result.addIfield("IIT\t"+iit);
+			}
+			
 			for (int i=0; i<numz;i++){
 				result.addchargemass(chargearray[i],mpharray[i]);
 			}
@@ -97,16 +120,6 @@ public class ReadMS2Comp implements ReadMS2Interface{
 			
 			try {
 			
-				/* old code. removed in favor of inflating all data in scan at once
-				for (int i=0; i<numdatapts; i++){
-					mzinflater.inflate(mzb);
-					intinflater.inflate(intb);
-					double mz = PrimitiveTools.LEbyteArrayToDouble(mzb);
-					float inten = PrimitiveTools.LEbyteArrayToFloat(intb);
-					result.addscan(mz,inten);
-				}
-				*/
-				
 				//read all data at once
 				byte[] mzbbig = new byte[8*numdatapts];
 				byte[] intbbig = new byte[4*numdatapts];
@@ -162,6 +175,17 @@ public class ReadMS2Comp implements ReadMS2Interface{
 		return file.getName();
 	}
 
+	public void closeReader(){
+		if (raf != null){
+			try{
+				raf.close();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	private String header;
 	private File file;
 	BufferedRaf raf;
@@ -171,16 +195,5 @@ public class ReadMS2Comp implements ReadMS2Interface{
 	private Inflater intinflater;
 	private int lastscan=0;
 	private long endofheader=0;
-	
-	
-    public void closeReader() {
-        if(raf != null) try {
-            raf.close();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
 	
 }
