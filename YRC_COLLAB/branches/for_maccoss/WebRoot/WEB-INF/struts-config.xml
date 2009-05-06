@@ -849,6 +849,7 @@
 	>
 		<forward name="Success" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinSetComparison.do" redirect="false" />
+		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
 	</action>
 	
 	<action 
@@ -869,6 +870,16 @@
 		<forward name="Success" path="/pages/internal/compare/viewProteinGroupComparison.jsp" redirect="false" />
 	</action>
 	
+	<action 
+		path="/downloadProteinComparisonResults"
+		name="proteinSetComparisonForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.compare.DownloadComparisonResults"
+	>
+		<forward name="Success" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
+	</action>
 	
 	<!-- ================================================================================== -->
 	<!-- Actions related to downloading PepXML files -->

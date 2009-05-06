@@ -306,30 +306,60 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     @Override
     public void tabulate() {
         
-        IdPickerProteinBaseDAO idpProtDao = ProteinferDAOFactory.instance().getIdPickerProteinBaseDao();
         
         int max = Math.min((this.getOffset() + rowCount), this.getFilteredProteinCount());
         
-        for(int i = this.getOffset(); i < max; i++) {
+        initializeInfo(this.getOffset(), max);
+        
+//        for(int i = this.getOffset(); i < max; i++) {
+//            ComparisonProtein protein = proteins.get(i);
+//            
+//            // Get the common name and description
+//            String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
+//            protein.setName(nameDescr[0]);
+//            protein.setDescription(nameDescr[1]);
+//            protein.setSystematicName(nameDescr[2]);
+//            
+//            // Get the group information for the different datasets
+//            for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+//                if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
+//                    boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
+//                    dpi.setGrouped(grouped);
+//                }
+//            }
+//            
+////            // get the (max)number of peptides identified for this protein
+////            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+//        }
+    }
+    
+    public void initializeInfo(int startIndex, int endIndex) {
+        
+        for(int i = startIndex; i < endIndex; i++) {
             ComparisonProtein protein = proteins.get(i);
-            
-            // Get the common name and description
-            String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
-            protein.setName(nameDescr[0]);
-            protein.setDescription(nameDescr[1]);
-            protein.setSystematicName(nameDescr[2]);
-            
-            // Get the group information for the different datasets
-            for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
-                if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
-                    boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
-                    dpi.setGrouped(grouped);
-                }
+            initializeProteinInfo(protein);
+        }
+    }
+
+    public void initializeProteinInfo(ComparisonProtein protein) {
+        
+        IdPickerProteinBaseDAO idpProtDao = ProteinferDAOFactory.instance().getIdPickerProteinBaseDao();
+        // Get the common name and description
+        String[] nameDescr = ProteinDatasetComparer.getProteinAccessionDescription(protein.getNrseqId(), true);
+        protein.setName(nameDescr[0]);
+        protein.setDescription(nameDescr[1]);
+        protein.setSystematicName(nameDescr[2]);
+        
+        // Get the group information for the different datasets
+        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+            if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
+                boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
+                dpi.setGrouped(grouped);
             }
-            
+        }
+        
 //            // get the (max)number of peptides identified for this protein
 //            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
-        }
     }
 
     public void setCurrentPage(int page) {

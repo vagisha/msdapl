@@ -30,6 +30,8 @@ public class ProteinSetComparisonForm extends ActionForm {
     
     private int pageNum = 1;
     
+    private boolean download = false;
+    
     private String searchString;
     
     public String getSearchString() {
@@ -188,5 +190,16 @@ public class ProteinSetComparisonForm extends ActionForm {
     
     public List<SelectableDataset> getNotList() {
         return notList;
+    }
+
+    //-----------------------------------------------------------------------------
+    // Download
+    //-----------------------------------------------------------------------------
+    public boolean isDownload() {
+        return download;
+    }
+
+    public void setDownload(boolean download) {
+        this.download = download;
     }
 }

@@ -220,6 +220,7 @@ function  setupPeptidesTable(table){
 // ---------------------------------------------------------------------------------------
 function pageResults(pageNum) {
   	$("input#pageNum").val(pageNum);
+  	$("input#download").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -229,6 +230,15 @@ function pageResults(pageNum) {
 // ---------------------------------------------------------------------------------------
 function updateResults() {
   	$("input#pageNum").val(1);
+  	$("input#download").val("false");
+  	$("form[name='proteinSetComparisonForm']").submit();
+}
+
+// ---------------------------------------------------------------------------------------
+// DOWNLOAD RESULTS
+// ---------------------------------------------------------------------------------------
+function downloadResults() {
+  	$("input#download").val("true");
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
@@ -374,7 +384,9 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 
 <!-- ################## FILTER FORM  ########################################### -->
 <html:form action="doProteinSetComparison" method="POST">
-
+	<!-- Does the user want to download the results -->
+	<html:hidden name="proteinSetComparisonForm" property="download" value="false" styleId="download" />
+	
 	<logic:iterate name="proteinSetComparisonForm" property="proteinferRunList" id="proteinferRun">
 		<logic:equal name="proteinferRun" property="selected" value="true">
 			<html:hidden name="proteinferRun" property="runId" indexed="true" />
@@ -476,6 +488,9 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 		</td>
 		<td style="padding-left:20">
 			# Filtered Proteins: <bean:write name="comparison" property="filteredProteinCount"/>
+		</td>
+		<td style="padding-left:20">
+			<span style="color:red; font-size:8pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
 		</td>
 		
 	</tr>

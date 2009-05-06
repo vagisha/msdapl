@@ -1,12 +1,14 @@
 /**
- * CompareProtInferResultsAction.java
+ * DownloadComparisonResults.java
  * @author Vagisha Sharma
- * Apr 9, 2009
+ * May 4, 2009
  * @version 1.0
  */
 package org.yeastrc.www.compare;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,16 +32,17 @@ import edu.uwpr.protinfer.util.TimeUtils;
 /**
  * 
  */
-public class CompareProteinSetsAction extends Action {
+public class DownloadComparisonResults extends Action {
 
-    private static final Logger log = Logger.getLogger(CompareProteinSetsAction.class);
-
-    public ActionForward execute( ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response )
-    throws Exception {
-
+    private static final Logger log = Logger.getLogger(DownloadComparisonResults.class.getName());
+    
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        
+        System.out.println("IN DownloadComparisonResults");
+        
         // User making this request
         User user = UserUtils.getUser(request);
         if (user == null) {
@@ -48,16 +51,10 @@ public class CompareProteinSetsAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("authenticate");
         }
-
         
-        // get the protein inference ids to compare
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
         
-        // IS THER USER DOWNLOADING?
-        if(myForm.isDownload()) {
-            log.info("DOWNLOADING......");
-            return mapping.findForward("Download");
-        }
+        
         
         // Get the selected protein inference run ids
         List<Integer> piRunIds = myForm.getSelectedProteinferRunIds();
@@ -147,6 +144,15 @@ public class CompareProteinSetsAction extends Action {
         filters.setOrFilters(orFilters);
         filters.setNotFilters(notFilters);
         
+        
+        response.setContentType("text/plain");
+        response.setHeader("Content-Disposition","attachment; filename=\"ProteinSetComparison.txt\"");
+        response.setHeader("cache-control", "no-cache");
+        PrintWriter writer = response.getWriter();
+        writer.write("\n\n");
+        writer.write("Date: "+new Date()+"\n\n");
+        
+        
         // Do the comparison
         long s = System.currentTimeMillis();
         ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
@@ -174,34 +180,84 @@ public class CompareProteinSetsAction extends Action {
         
         comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
         
-        // Set the page number
-        comparison.setCurrentPage(myForm.getPageNum());
-        
-        
-        request.setAttribute("comparison", comparison);
-        request.setAttribute("proteinSetComparisonForm", myForm);
-        
-        // create a list of they dataset ids being compared
-        request.setAttribute("piDatasetIds", makeCommaSeparated(piRunIds));
-        request.setAttribute("dtaDatasetIds", makeCommaSeparated(dtaRunIds));
-        
-        
-        // Create Venn Diagram only if 2 or 3 datasets are being compared
-        if(comparison.getDatasetCount() == 2 || comparison.getDatasetCount() == 3) {
-            String googleChartUrl = VennDiagramCreator.instance().getChartUrl(comparison);
-            request.setAttribute("chart", googleChartUrl);
-        }
-        
-        return mapping.findForward("Success");
+        s = System.currentTimeMillis();
+        writeResults(writer, comparison, myForm);
+        writer.close();
+        e = System.currentTimeMillis();
+        log.info("DownloadComparisonResults results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+        return null;
     }
 
-    private String makeCommaSeparated(List<Integer> ids) {
-        StringBuilder buf = new StringBuilder();
-        for(int id: ids)
-            buf.append(","+id);
-        if(buf.length() > 0)
-            buf.deleteCharAt(0);
-        return buf.toString();
-    }
     
+    private void writeResults(PrintWriter writer, ProteinComparisonDataset comparison, ProteinSetComparisonForm form) {
+        
+        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
+        writer.write("Filtered protein count: "+comparison.getFilteredProteinCount()+"\n");
+        writer.write("\n\n");
+        
+        // Datasets
+        writer.write("Datasets: \n");
+        int idx = 0;
+        for(Dataset dataset: comparison.getDatasets()) {
+            writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+": "+comparison.getProteinCount(idx++)+"\n");
+        }
+        writer.write("\n\n");
+        
+        
+        
+        // legend
+        // *  Present and Parsimonious
+        // =  Present and NOT parsimonious
+        // g  group protein
+        // -  NOT present
+        writer.write("\n\n");
+        writer.write("*  Protein present and parsimonious\n");
+        writer.write("=  Protein present and NOT parsimonious\n");
+        writer.write("-  Protein NOT present\n");
+        writer.write("g  Group protein\n");
+        writer.write("\n\n");
+        
+
+        // print each protein
+        writer.write("ProteinID\t");
+        writer.write("Name\t");
+        writer.write("CommonName\t");
+        writer.write("NumPept\t");
+        for(Dataset dataset: comparison.getDatasets()) {
+            writer.write(dataset.getSourceString()+"_"+dataset.getDatasetId()+"\t");
+        }
+        writer.write("Description\n");
+        
+        for(ComparisonProtein protein: comparison.getProteins()) {
+            
+            comparison.initializeProteinInfo(protein);
+            
+            writer.write(protein.getNrseqId()+"\t");
+            writer.write(protein.getSystematicName()+"\t");
+            writer.write(protein.getName()+"\t");
+            writer.write(protein.getMaxPeptideCount()+"\t");
+           
+            for(Dataset dataset: comparison.getDatasets()) {
+                DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                if(dpi == null || !dpi.isPresent()) {
+                    writer.write("-");
+                }
+                else {
+                    if(dpi.isParsimonious()) {
+                        writer.write("*");
+                    }
+                    else {
+                        writer.write("=");
+                    }
+                    if(dpi.isGrouped())
+                        writer.write("g");
+                }
+                writer.write("\t");
+            }
+            
+            writer.write(protein.getDescription()+"\n");
+        }
+        
+        writer.write("\n\n");
+    }
 }
