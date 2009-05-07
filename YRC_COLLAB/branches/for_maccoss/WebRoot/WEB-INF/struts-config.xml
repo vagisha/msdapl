@@ -502,7 +502,7 @@
 	  path="/resetJob"
 	  type="org.yeastrc.www.jobqueue.ResetJobAction"
 	  validate="false">
-		<forward name="Success" path="/pages/admin/upload/listJobs.jsp" redirect="false"/>
+		<forward name="Success" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
 		<forward name="Failure" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
 	</action>
 
@@ -510,7 +510,7 @@
 	  path="/deleteJob"
 	  type="org.yeastrc.www.jobqueue.DeleteJobAction"
 	  validate="false">
-		<forward name="Success" path="/pages/admin/upload/listJobs.jsp" redirect="false"/>
+		<forward name="Success" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
 		<forward name="Failure" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
 	</action>
 
