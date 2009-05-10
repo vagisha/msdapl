@@ -231,6 +231,7 @@ function pageResults(pageNum) {
 function updateResults() {
   	$("input#pageNum").val(1);
   	$("input#download").val("false");
+  	$("form[name='proteinSetComparisonForm']").attr('target', '');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
@@ -239,6 +240,7 @@ function updateResults() {
 // ---------------------------------------------------------------------------------------
 function downloadResults() {
   	$("input#download").val("true");
+  	$("form[name='proteinSetComparisonForm']").attr('target', '_blank');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
