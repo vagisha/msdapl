@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.jobqueue.JobResetter;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.project.Project;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -54,7 +55,16 @@ public class ResetJobAction extends Action {
 			
 			try {
 				MSJob job = MSJobFactory.getInstance().getJob( Integer.parseInt( request.getParameter( "id" ) ) );
-				
+			
+				Project project = job.getProject();
+	            if(!project.checkAccess(user.getResearcher())) {
+	                 ActionErrors errors = new ActionErrors();
+	                 errors.add("username", new ActionMessage("error.general.errorMessage", 
+	                         "You may reset upload jobs only for projects to which you are affiliated"));
+	                 saveErrors( request, errors );
+	                 return mapping.findForward( "Failure" );
+	            }
+	            
 				if (job == null)
 					return mapping.findForward( "Failure" );
 

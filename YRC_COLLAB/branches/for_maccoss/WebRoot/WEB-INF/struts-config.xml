@@ -503,7 +503,7 @@
 	  type="org.yeastrc.www.jobqueue.ResetJobAction"
 	  validate="false">
 		<forward name="Success" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
-		<forward name="Failure" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
+		<forward name="Failure" path="/pages/admin/upload/listJobs.jsp" redirect="false"/>
 	</action>
 
 	<action
@@ -511,7 +511,7 @@
 	  type="org.yeastrc.www.jobqueue.DeleteJobAction"
 	  validate="false">
 		<forward name="Success" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
-		<forward name="Failure" path="/pages/admin/upload/listJobs.jsp" redirect="true"/>
+		<forward name="Failure" path="/pages/admin/upload/listJobs.jsp" redirect="false"/>
 	</action>
 
 	<action
@@ -620,7 +620,7 @@
 		type="org.yeastrc.www.proteinfer.NewPercolatorProteinInferenceAction"
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/percolatorProteinInferenceForm.jsp" redirect="false" />
-		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
+		<forward name="Failure" path="/viewProject.do" redirect="false" />
 	</action>
 	
 	<action 

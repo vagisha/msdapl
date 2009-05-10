@@ -1,5 +1,6 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
@@ -73,6 +80,32 @@ public class ViewProteinInferenceResultAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
+        
+        // Get a list of projects for this protein inference run.  If the user making the request to view this
+        // protein inference run is not affiliated with the projects, they should not be able to edit any of 
+        // the editable fields
+        List<Integer> searchIds = ProteinferDAOFactory.instance().getProteinferRunDao().loadSearchIdsForProteinferRun(pinferId);
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        ProjectExperimentDAO projExptDao = ProjectExperimentDAO.instance();
+        List<Integer> projectIds = new ArrayList<Integer>();
+        for(int searchId: searchIds) {
+            MsSearch search = searchDao.loadSearch(searchId);
+            int experimentId = search.getExperimentId();
+            int projectId = projExptDao.getProjectIdForExperiment(experimentId);
+            if(projectId > 0)
+                projectIds.add(projectId);
+        }
+        boolean writeAccess = false;
+        ProjectDAO projDao = ProjectDAO.instance();
+        for(int projectId: projectIds) {
+            Project project = projDao.load(projectId);
+            if(project.checkAccess(user.getResearcher())) {
+                writeAccess = true;
+                break;
+            }
+        }
+        request.setAttribute("writeAccess", writeAccess);
+        
         
         long s = System.currentTimeMillis();
         

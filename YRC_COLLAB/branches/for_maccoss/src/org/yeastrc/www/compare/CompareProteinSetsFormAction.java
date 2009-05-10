@@ -82,7 +82,7 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
         }
         
         
-        // Get a list of the user's projects
+        // Get a list of the user's projects (all projects to which user has READ access)
         // if the user is an admin get ALL projects
         ProjectsSearcher projSearcher = new ProjectsSearcher();
         projSearcher.setResearcher(user.getResearcher());

@@ -17,6 +17,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.jobqueue.JobDeleter;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -72,6 +74,14 @@ public class DeleteProteinInferenceAction extends Action {
             return mapping.findForward("standardHome");
         }
         
+        Project project = ProjectDAO.instance().load(projectId);
+        if(!project.checkAccess(user.getResearcher())) {
+             ActionErrors errors = new ActionErrors();
+             errors.add("username", new ActionMessage("error.general.errorMessage", 
+                     "You may delete protein inference jobs only for projects to which you are affiliated"));
+             saveErrors( request, errors );
+             return mapping.findForward( "Failure" );
+        }
         
         // get the protein inference id
         int pinferId = 0;

@@ -74,6 +74,10 @@ public class ProteinPeptidesAjaxAction extends Action {
         IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
         request.setAttribute("protInferProgram", run.getProgram().name());
         request.setAttribute("inputGenerator", run.getInputGenerator().name());
+        if(run.getProgram() == ProteinInferenceProgram.PROTINFER_PERC_OLD) {
+            request.setAttribute("oldPercolator", true);
+        }
+        
         
         List<WIdPickerIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
         request.setAttribute("proteinPeptideIons", ionList);

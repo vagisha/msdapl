@@ -80,10 +80,14 @@ public class ViewProjectAction extends Action {
 			String strID = request.getParameter("ID");
 
 			if (strID == null || strID.equals("")) {
-				ActionErrors errors = new ActionErrors();
-				errors.add("username", new ActionMessage("error.project.noprojectid"));
-				saveErrors( request, errors );
-				return mapping.findForward("Failure");
+			    strID = request.getParameter("projectId");
+			    
+			    if(strID == null || strID.equals("")) {
+			        ActionErrors errors = new ActionErrors();
+			        errors.add("username", new ActionMessage("error.project.noprojectid"));
+			        saveErrors( request, errors );
+			        return mapping.findForward("Failure");
+			    }
 			}
 
 			projectID = Integer.parseInt(strID);
@@ -120,7 +124,10 @@ public class ViewProjectAction extends Action {
 		// Set this project in the request, as a bean to be displayed on the view
 		request.setAttribute("project", project);
 		
-		
+		boolean writeAccess = false;
+		if(project.checkAccess(user.getResearcher()))
+		    writeAccess = true;
+		request.setAttribute("writeAccess", writeAccess);
 		
 		// Check for experiment data for this project
 		List<ProjectExperiment> experiments = getProjectExperiments(projectID);

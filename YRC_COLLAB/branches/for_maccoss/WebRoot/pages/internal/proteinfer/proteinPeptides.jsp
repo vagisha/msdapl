@@ -43,7 +43,12 @@
      </logic:equal>
      <logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      	<th class="sort-float" align="left">qValue</th>
-     	<th class="sort-float" align="left">PEP</th>
+     	<logic:notPresent name="oldPercolator">
+     		<th class="sort-float" align="left">PEP</th>
+     	</logic:notPresent>
+     	<logic:present name="oldPercolator">
+     		<th class="sort-float" align="left">DS</th>
+     	</logic:present>
      </logic:equal>
      
      <th align="left">Spectrum</th>
@@ -87,7 +92,12 @@
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
      		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
-     			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
+     		 	<logic:notPresent name="oldPercolator">
+	     			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
+	     		</logic:notPresent>
+	     		<logic:present name="oldPercolator">
+	     			<td><bean:write name="psm_perc" property="discriminantScoreRounded" /></td>
+	     		</logic:present>
      		</logic:equal>
      		 
      		<td><span style="text-decoration: underline; cursor: pointer;" 

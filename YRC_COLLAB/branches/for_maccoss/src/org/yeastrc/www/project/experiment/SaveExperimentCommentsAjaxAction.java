@@ -13,8 +13,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -46,6 +49,17 @@ public class SaveExperimentCommentsAjaxAction extends Action {
             return null;
         }
 
+        // Get the project for this experiment.  If the user making the request is not listed 
+        // as a researcher on the project they should not be able to edit comments
+        int projectId = ProjectExperimentDAO.instance().getProjectIdForExperiment(experimentId);
+        Project project = ProjectDAO.instance().load(projectId);
+        if(!project.checkAccess(user.getResearcher())) {
+            response.setContentType("text/html");
+            response.getWriter().write("FAIL You may edit experiment comments only for project to which you are affiliated");
+            return null;
+        }
+        
+        
         String comments = request.getParameter("comments");
         if(comments == null) {
             response.setContentType("text/html");

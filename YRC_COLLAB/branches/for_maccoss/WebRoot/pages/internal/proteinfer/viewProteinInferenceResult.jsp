@@ -173,29 +173,34 @@ $(document).ready(function() {
 });
   
 // ---------------------------------------------------------------------------------------
-// SAVE COMMENTS FOR AN EXPERIMENT / PROTEIN INFERENCE RUN
-// --------------------------------------------------------------------------------------- 
+// SAVE COMMENTS FOR A PROTEIN INFERENCE RUN
+// ---------------------------------------------------------------------------------------
+var writeAccess = <bean:write name='writeAccess'/>;
+ 
 function makeCommentsEditable() {
-	$(".editableComment").click(function() {
-		var id = $(this).attr('id');
-		var currentComments = $.trim($("#"+id+"_text").text());
-		$("#"+id+"_text").hide();
-		$("#"+id+"_edit .edit_text").val(currentComments);
-		$("#"+id+"_edit").show();
-	});
-	
-	$(".savePiRunComments").click(function() {
-		var id = $(this).attr('id');
-		var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
-		savePiRunComments(id, comments);
-	});
-	
-	$(".cancelPiRunComments").click(function() {
-		var id = $(this).attr('id');
-		$("#piRun_"+id+"_text").show();
-		$("#piRun_"+id+"_edit .edit_text").text("");
-		$("#piRun_"+id+"_edit").hide();
-	});
+
+	if(writeAccess == true) {
+		$(".editableComment").click(function() {
+			var id = $(this).attr('id');
+			var currentComments = $.trim($("#"+id+"_text").text());
+			$("#"+id+"_text").hide();
+			$("#"+id+"_edit .edit_text").val(currentComments);
+			$("#"+id+"_edit").show();
+		});
+		
+		$(".savePiRunComments").click(function() {
+			var id = $(this).attr('id');
+			var comments = $.trim($("#experiment_"+id+"_edit .edit_text").val());
+			savePiRunComments(id, comments);
+		});
+		
+		$(".cancelPiRunComments").click(function() {
+			var id = $(this).attr('id');
+			$("#piRun_"+id+"_text").show();
+			$("#piRun_"+id+"_edit .edit_text").text("");
+			$("#piRun_"+id+"_edit").hide();
+		});
+	}
 }
 
 function savePiRunComments(piRunId, comments) {
@@ -603,6 +608,7 @@ function setupShowPeptidesLinks() {
 // ---------------------------------------------------------------------------------------
 function setupAnnotationsLinks() {
 
+	if(writeAccess) {
 	$("#prot_annot_dialog").dialog({
     	autoOpen: false,
     	modal: true,
@@ -681,6 +687,18 @@ function setupAnnotationsLinks() {
     		"Cancel": 	function() {$(this).dialog("close");}
     	}
     });
+    }
+    else {
+    	$("#prot_annot_dialog").dialog({
+    	autoOpen: false,
+    	modal: true,
+    	width: 400,
+    	height: 200,
+    	overlay: { 
+        	opacity: 0.5, 
+        	background: "black" 
+    	}});
+    }
   	
   	$(".editprotannot").click(function(e){
   		
@@ -1071,7 +1089,9 @@ function toggleDivVisibility(mydiv) {
 			</tr>
 			<tr>
 				<td><b>Comments </b>
+					<logic:equal name="writeAccess" value="true">
 					<span class="editableComment clickable" id="piRun_<bean:write name='idpickerRun' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span>
+					</logic:equal>
 				</td>
 				<td>
 					<span id="piRun_<bean:write name='idpickerRun' property='id'/>_text"><bean:write name="idpickerRun" property="comments"/></span>

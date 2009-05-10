@@ -19,6 +19,8 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
@@ -80,7 +82,7 @@ public class NewPercolatorProteinInferenceAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
-        // make sure this is a Percolator analyssi
+        // make sure this is a Percolator analysis
         if(searchAnalysis.getAnalysisProgram() != Program.PERCOLATOR) {
             ActionErrors errors = new ActionErrors();
             errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.analysisId", 
@@ -89,7 +91,8 @@ public class NewPercolatorProteinInferenceAction extends Action {
         }
         
         
-        // We need the projectID so we can redirect back to the project page after
+        // We need the projectID so we can check this user's access rights and 
+        // redirect back to the project page after
         // the protein inference job has been submitted.
         int projectId = -1;
         if (request.getParameter("projectId") != null) {
@@ -105,6 +108,17 @@ public class NewPercolatorProteinInferenceAction extends Action {
         }
         request.setAttribute("projectId", projectId);
         
+        // User making the request to run protein inference should be affiliated with the project
+        Project project = ProjectDAO.instance().load(projectId);
+        if(!project.checkAccess(user.getResearcher())) {
+             ActionErrors errors = new ActionErrors();
+             errors.add("username", new ActionMessage("error.general.errorMessage", 
+                     "You may run protein inference only for projects to which you are affiliated"));
+             saveErrors( request, errors );
+             return mapping.findForward( "Failure" );
+        }
+        
+        
         
         // Create our ActionForm
         ProteinInferenceForm formForAnalysis = createFormForAnalysisInput(searchAnalysis, projectId);
@@ -112,7 +126,6 @@ public class NewPercolatorProteinInferenceAction extends Action {
         if(formForAnalysis != null)
             request.setAttribute("proteinInferenceFormAnalysis", formForAnalysis);
             
-        
         
         // Go!
         return mapping.findForward("Success");

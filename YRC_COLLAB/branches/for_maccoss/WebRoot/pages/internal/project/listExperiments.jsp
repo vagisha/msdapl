@@ -192,7 +192,11 @@ function toggleFilesForExperiment (experimentId) {
 					<td style="padding-left:10"><bean:write name="experiment" property="serverDirectory"/></td>
 				</tr>
 				<tr>
-					<td valign="top"><b>Comments </b><span class="editableComment clickable" id="experiment_<bean:write name='experiment' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span><b>: </b></td>
+					<td valign="top"><b>Comments </b>
+						<logic:equal name="writeAccess" value="true">
+						<span class="editableComment clickable" id="experiment_<bean:write name='experiment' property='id'/>" style="font-size:8pt; color:red;">[Edit]</span>
+						</logic:equal>
+						<b>: </b></td>
 					<td style="padding-left:10">
 						<div id="experiment_<bean:write name='experiment' property='id'/>_text"><bean:write name="experiment" property="comments"/></div>
 						<div id="experiment_<bean:write name='experiment' property='id'/>_edit" align="center"
@@ -321,7 +325,9 @@ function toggleFilesForExperiment (experimentId) {
 						<td valign="top"><bean:write name="piJob" property="researcher.lastName"/></td>
 						<td valign="top">
 							<span id="piRun_<bean:write name='piJob' property='pinferId'/>_text"><bean:write name="piJob" property="comments"/></span>
+							<logic:equal name="writeAccess" value="true">
 							<span class="editableComment clickable" id="piRun_<bean:write name='piJob' property='pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
+							</logic:equal>
 						</td>
 						<td valign="top">
 						
