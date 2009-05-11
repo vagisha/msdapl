@@ -150,7 +150,7 @@ public class GrantDAO {
 			"AND projectGrant.grantID=grants.id "+
 			"ORDER BY grants.id";
 
-			System.out.println(sql);
+//			System.out.println(sql);
 			conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
 			stmt = conn.prepareStatement(sql);
 			rs = stmt.executeQuery();

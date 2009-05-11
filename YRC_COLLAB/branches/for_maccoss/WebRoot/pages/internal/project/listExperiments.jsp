@@ -52,11 +52,11 @@ function makeEditable() {
 }
 
 function saveExptComments(exptId, comments) {
-	saveComments('saveExperimentComments.do', 'experiment', exptId, comments);
+	saveComments("<yrcwww:link path='saveExperimentComments.do'/>", 'experiment', exptId, comments);
 }
 
 function savePiRunComments(piRunId, comments) {
-	saveComments('saveProtInferComments.do', 'piRun', piRunId, comments);
+	saveComments("<yrcwww:link path='saveProtInferComments.do'/>", 'piRun', piRunId, comments);
 }
 
 function saveComments(url, idName, id, comments) {
@@ -65,6 +65,7 @@ function saveComments(url, idName, id, comments) {
 	
 	var textFieldId = "#"+idName+"_"+id+"_text";
 	var textBoxId   = "#"+idName+"_"+id+"_edit";
+	var success = false;
 	
 	$.ajax({
 		url:      url,
@@ -84,8 +85,14 @@ function saveComments(url, idName, id, comments) {
 			        	$(textFieldId).text(oldComments);
 			        	alert("Error saving comments: "+data);
 			        }
+			        success = true;
 		          },
-		complete:  function(xhr, textStatus) {}
+		complete:  function(xhr, textStatus) {
+			if(!success) {
+				$(textFieldId).text(oldComments);
+				alert("Error saving comments");
+			}
+		}
 		
 	});
 }
