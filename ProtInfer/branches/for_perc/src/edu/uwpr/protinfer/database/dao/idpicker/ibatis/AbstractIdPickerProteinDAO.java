@@ -173,7 +173,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     
     
     public List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins) {
-        return proteinIdsByCoverage(pinferId, 0.0, true, groupProteins);
+        return proteinIdsByCoverage(pinferId, 0.0, 100.0, true, groupProteins);
     }
     
     public static class ProteinGroupCoverage {
@@ -192,11 +192,14 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
     }
     
-    private List<Integer> proteinIdsByCoverage(int pinferId, double minCoverage, boolean sort, boolean groupProteins) {
+    private List<Integer> proteinIdsByCoverage(int pinferId, 
+            double minCoverage, double maxCoverage,
+            boolean sort, boolean groupProteins) {
         
-        Map<String, Number> map = new HashMap<String, Number>(6);
+        Map<String, Number> map = new HashMap<String, Number>(10);
         map.put("pinferId", pinferId);
-        map.put("coverage", minCoverage);
+        map.put("minCoverage", minCoverage);
+        map.put("maxCoverage", maxCoverage);
         
         if(!groupProteins || (groupProteins && !sort)) {
             if(sort)    map.put("sort", 1);
@@ -324,41 +327,53 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     }
     
     public List<Integer> sortProteinIdsBySpectrumCount(int pinferId, boolean groupProteins) {
-        return proteinIdsBySpectrumCount(pinferId, 1, true, groupProteins);
+        return proteinIdsBySpectrumCount(pinferId, 1, Integer.MAX_VALUE, true, groupProteins);
     }
     
-    private List<Integer> proteinIdsBySpectrumCount(int pinferId, int minSpecCount, boolean sort, boolean groupProteins) {
-        Map<String, Number> map = new HashMap<String, Number>(6);
+    private List<Integer> proteinIdsBySpectrumCount(int pinferId, int minSpecCount, int maxSpecCount,
+            boolean sort, boolean groupProteins) {
+        Map<String, Number> map = new HashMap<String, Number>(10);
         map.put("pinferId", pinferId);
-        map.put("numSpectra", minSpecCount);
+        map.put("minSpectra", minSpecCount);
+        map.put("maxSpectra", maxSpecCount);
         if(sort)                    map.put("sort", 1);
         if(sort && groupProteins)   map.put("groupProteins", 1);
         return queryForList(sqlMapNameSpace+".filterBySpecCount", map);
     }
     
     public List<Integer> sortProteinIdsByPeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins) {
-        return proteinIdsByPeptideCount(pinferId, 1, peptideDef, true, groupProteins, false, false);
+        return proteinIdsByPeptideCount(pinferId, 1, Integer.MAX_VALUE, peptideDef, true, groupProteins, false, false);
     }
     
     public List<Integer> sortProteinIdsByUniquePeptideCount(int pinferId, PeptideDefinition peptideDef, boolean groupProteins) {
-        return proteinIdsByPeptideCount(pinferId, 0, peptideDef, true, groupProteins, false, true);
+        return proteinIdsByPeptideCount(pinferId, 0, Integer.MAX_VALUE, peptideDef, true, groupProteins, false, true);
     }
     
-    private List<Integer> proteinIdsByUniquePeptideCount(int pinferId, int minUniqPeptideCount, PeptideDefinition peptDef,
+    private List<Integer> proteinIdsByUniquePeptideCount(int pinferId, 
+            int minUniqPeptideCount, int maxUniqPeptideCount, 
+            PeptideDefinition peptDef,
             boolean sort, boolean groupProteins, boolean isParsimonious) {
-        return proteinIdsByPeptideCount(pinferId, minUniqPeptideCount, peptDef, sort, groupProteins, isParsimonious, true);
+        return proteinIdsByPeptideCount(pinferId, 
+                minUniqPeptideCount, maxUniqPeptideCount, 
+                peptDef, sort, groupProteins, isParsimonious, true);
     }
     
-    private List<Integer> proteinIdsByAllPeptideCount(int pinferId, int minUniqPeptideCount, PeptideDefinition peptDef,
+    private List<Integer> proteinIdsByAllPeptideCount(int pinferId, 
+            int minUniqPeptideCount, int maxUniqPeptideCount,
+            PeptideDefinition peptDef,
             boolean sort, boolean groupProteins, boolean isParsimonious) {
-        return proteinIdsByPeptideCount(pinferId, minUniqPeptideCount, peptDef, sort, groupProteins, isParsimonious, false);
+        return proteinIdsByPeptideCount(pinferId, 
+                minUniqPeptideCount, maxUniqPeptideCount,
+                peptDef, sort, groupProteins, isParsimonious, false);
     }
     
-    private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, PeptideDefinition peptDef,
+    private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
+            PeptideDefinition peptDef,
             boolean sort, boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein) {
-        Map<String, Number> map = new HashMap<String, Number>(8);
+        Map<String, Number> map = new HashMap<String, Number>(12);
         map.put("pinferId", pinferId);
-        map.put("numPeptides", minPeptideCount);
+        map.put("minPeptides", minPeptideCount);
+        map.put("maxPeptides", maxPeptideCount);
         if(uniqueToProtein) map.put("uniqueToProtein", 1);
         if(isParsimonious)          map.put("isParsimonious", 1);
         if(sort)                    map.put("sort", 1);
@@ -375,36 +390,44 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
         // peptide uniquely defined by sequence and charge
         if(peptDef.isUseCharge() && !peptDef.isUseMods()) {
-            peptideIds = peptideIdsByPeptideCount_SM_OR_SC(pinferId, minPeptideCount, 
+            peptideIds = peptideIdsByPeptideCount_SM_OR_SC(pinferId, minPeptideCount, maxPeptideCount,
                     sort, groupProteins, isParsimonious, uniqueToProtein, "charge");
         }
         // peptide uniquely defined by sequence and mods
         if(peptDef.isUseMods() && !peptDef.isUseCharge()) {
-            peptideIds = peptideIdsByPeptideCount_SM_OR_SC(pinferId, minPeptideCount, 
+            peptideIds = peptideIdsByPeptideCount_SM_OR_SC(pinferId, minPeptideCount, maxPeptideCount,
                     sort, groupProteins, isParsimonious, uniqueToProtein, "modificationStateID");
         }
         
         // If we are looking for unique peptides the query will only return proteins with >= 1 unique peptides.
         // If our unique peptide count is 0 we need to add back the missing peptides to the end of the list
-        if(uniqueToProtein && minPeptideCount == 0) {
-            System.out.println("Adding more peptides");
-            List<Integer> allPeptideIds = this.getIdPickerProteinIds(pinferId, isParsimonious, groupProteins);
-            Set<Integer> found = new HashSet<Integer>((int) (allPeptideIds.size() * 1.5));
-            found.addAll(peptideIds);
-            int added = 0;
-            for(int id: allPeptideIds) {
-                if(!found.contains(id)) { 
-                    added++;
-                    peptideIds.add(0,id);
-                }
-            }
-            System.out.println("Added: "+added);
-        }
+//        if(uniqueToProtein && minPeptideCount == 0) {
+//            System.out.println("Adding more peptides");
+//            List<Integer> allPeptideIds = this.getIdPickerProteinIds(pinferId, isParsimonious, groupProteins);
+//            Set<Integer> found = new HashSet<Integer>((int) (allPeptideIds.size() * 1.5));
+//            found.addAll(peptideIds);
+//            int added = 0;
+//            for(int id: allPeptideIds) {
+//                if(!found.contains(id)) { 
+//                    added++;
+//                    peptideIds.add(0,id);
+//                }
+//            }
+//            System.out.println("Added: "+added);
+//        }
         return peptideIds;
     }
     
+    private List<Integer> getProteinIdsWithNoUniquePeptides(int pinferId, boolean isParsimonious) {
+        Map<String, Number> map = new HashMap<String, Number>(8);
+        map.put("pinferId", pinferId);
+        if(isParsimonious)          map.put("isParsimonious", 1);
+        return queryForList(sqlMapNameSpace+".idPickerProteinIdsNoUniquePeptides", map);
+    }
+    
     private List<Integer> peptideIdsByPeptideCount_SM_OR_SC(int pinferId,
-            int minPeptideCount, boolean sort, boolean groupProteins,
+            int minPeptideCount, int maxPeptideCount, 
+            boolean sort, boolean groupProteins,
             boolean isParsimonious, boolean uniqueToProtein, String ionTableColumn) {
         
         Connection conn = null;
@@ -437,12 +460,13 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
            stmt.close();
            
            
-           // no run the query we are interested in
-           sql = prepareSql(pinferId, minPeptideCount, isParsimonious, 
+           // now run the query we are interested in
+           sql = prepareSql(pinferId, isParsimonious, 
                    uniqueToProtein, sort, groupProteins);
            pstmt = conn.prepareStatement(sql);
            pstmt.setInt(1, pinferId);
            pstmt.setInt(2, minPeptideCount);
+           pstmt.setInt(3, maxPeptideCount);
            
            List<Integer> proteinIds = new ArrayList<Integer>();
            rs = pstmt.executeQuery();
@@ -476,24 +500,23 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
     }
 
-    private String prepareSql(int pinferId, int minPeptideCount,
-                boolean isParsimonious, boolean uniqueToProtein, boolean sort, boolean groupProteins) {
-        String sql = "SELECT prot.id, count(*) AS cnt "+
-                    "FROM msProteinInferProtein AS prot, "+ 
-                    "IDPickerProtein as idpProt, "+
-                    "msProteinInferProteinPeptideMatch AS m, "+ 
-                    "msProteinInferPeptide AS pept, "+   
-                    "ion_temp AS ion "+
-                    "WHERE prot.id = idpProt.piProteinID "+
-                    "AND idpProt.piProteinID = m.piProteinID "+
-                    "AND m.piPeptideID = pept.id "+ 
-                    "AND pept.id = ion.piPeptideID "+ 
-                    "AND prot.piRunID = ? ";
+    private String prepareSql(int pinferId, boolean isParsimonious, boolean uniqueToProtein, 
+            boolean sort, boolean groupProteins) {
+        
+        String sql = "SELECT prot.id, count(ion.piIonID) AS cnt "+
+                    "FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m) "+
+                    "LEFT JOIN ( msProteinInferPeptide AS pept, ion_temp AS ion  ) "+
+                    "ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID ";
+                    if(uniqueToProtein)
+                        sql += "AND pept.uniqueToProtein = 1 ";
+                    sql += ") ";
+                    
+                    sql += "WHERE prot.piRunID = ? "+
+                    "AND prot.id = idpProt.piProteinID "+
+                    "AND prot.id = m.piProteinID ";
         if(isParsimonious)
             sql += "AND idpProt.isParsimonious = 1 ";
-        if(uniqueToProtein)
-            sql += "AND pept.uniqueToProtein = 1 ";
-        sql += "GROUP BY prot.id HAVING cnt >= ? ";
+        sql += "GROUP BY prot.id HAVING cnt BETWEEN ? AND ?";
         if(sort) {
             sql += "ORDER BY cnt ";
             if(groupProteins) {
@@ -591,29 +614,38 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         
         // Get a list of protein ids filtered by sequence coverage
         boolean sort = filterCriteria.getSortBy() == SORT_BY.COVERAGE;
-        List<Integer> ids_cov = proteinIdsByCoverage(pinferId, filterCriteria.getCoverage(), sort, filterCriteria.isGroupProteins());
+        List<Integer> ids_cov = proteinIdsByCoverage(pinferId, 
+                filterCriteria.getCoverage(), filterCriteria.getMaxCoverage(),
+                sort, filterCriteria.isGroupProteins());
         
         // Get a list of protein ids filtered by spectrum count
         sort = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA;
-        List<Integer> ids_spec_count = proteinIdsBySpectrumCount(pinferId, filterCriteria.getNumSpectra(), sort, filterCriteria.isGroupProteins());
+        List<Integer> ids_spec_count = proteinIdsBySpectrumCount(pinferId, 
+                filterCriteria.getNumSpectra(), filterCriteria.getNumMaxSpectra(),
+                sort, filterCriteria.isGroupProteins());
         
         // Get a list of protein ids filtered by peptide count
         sort = filterCriteria.getSortBy() == SORT_BY.NUM_PEPT;
-        List<Integer> ids_pept = proteinIdsByAllPeptideCount(pinferId, filterCriteria.getNumPeptides(), 
+        List<Integer> ids_pept = proteinIdsByAllPeptideCount(pinferId, 
+                                            filterCriteria.getNumPeptides(), filterCriteria.getNumMaxPeptides(),
                                             filterCriteria.getPeptideDefinition(),
                                             sort, 
                                             filterCriteria.isGroupProteins(), 
                                             filterCriteria.showParsimonious()
                                             );
         
-        // Get a list of protein ids filtered by unique peptide count
+        // Get a list of protein ids filtered by UNIQUE peptide count
         List<Integer> ids_uniq_pept = null;
-        if(filterCriteria.getNumUniquePeptides() == 0 && filterCriteria.getSortBy() != SORT_BY.NUM_UNIQ_PEPT) {
+        if(filterCriteria.getNumUniquePeptides() == 0  &&
+           filterCriteria.getNumMaxUniquePeptides() == Integer.MAX_VALUE
+           && filterCriteria.getSortBy() != SORT_BY.NUM_UNIQ_PEPT) {
             ids_uniq_pept = ids_pept;
         }
         else {
             sort = filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT;
-            ids_uniq_pept = proteinIdsByUniquePeptideCount(pinferId, filterCriteria.getNumUniquePeptides(),
+            ids_uniq_pept = proteinIdsByUniquePeptideCount(pinferId, 
+                                               filterCriteria.getNumUniquePeptides(),
+                                               filterCriteria.getNumMaxUniquePeptides(),
                                                filterCriteria.getPeptideDefinition(),
                                                sort,
                                                filterCriteria.isGroupProteins(),

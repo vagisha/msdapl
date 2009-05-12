@@ -60,7 +60,9 @@ public class ProteinFilterCriteria {
       }
     
     private int numPeptides;
+    private int numMaxPeptides;
     private int numUniquePeptides;
+    private int numMaxUniquePeptides;
     private PeptideDefinition peptideDefinition = new PeptideDefinition();
     
     private boolean showParsimonious = false;
@@ -70,7 +72,9 @@ public class ProteinFilterCriteria {
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
     private int numSpectra;
+    private int numMaxSpectra;
     private double coverage;
+    private double maxCoverage;
     
     private String accessionLike;
     private String descriptionLike;
@@ -184,6 +188,38 @@ public class ProteinFilterCriteria {
         }
     }
 
+    public int getNumMaxPeptides() {
+        return numMaxPeptides;
+    }
+
+    public void setNumMaxPeptides(int numMaxPeptides) {
+        this.numMaxPeptides = numMaxPeptides;
+    }
+
+    public int getNumMaxUniquePeptides() {
+        return numMaxUniquePeptides;
+    }
+
+    public void setNumMaxUniquePeptides(int numMaxUniquePeptides) {
+        this.numMaxUniquePeptides = numMaxUniquePeptides;
+    }
+
+    public int getNumMaxSpectra() {
+        return numMaxSpectra;
+    }
+
+    public void setNumMaxSpectra(int numMaxSpectra) {
+        this.numMaxSpectra = numMaxSpectra;
+    }
+
+    public double getMaxCoverage() {
+        return maxCoverage;
+    }
+
+    public void setMaxCoverage(double maxCoverage) {
+        this.maxCoverage = maxCoverage;
+    }
+    
     public boolean equals(ProteinFilterCriteria o) {
         if(this == o)
             return true;
@@ -191,9 +227,13 @@ public class ProteinFilterCriteria {
             return false;
         ProteinFilterCriteria that = (ProteinFilterCriteria)o;
         if(this.numPeptides != that.numPeptides)                return false;
+        if(this.numMaxPeptides != that.numMaxPeptides)          return false;
         if(this.numUniquePeptides != that.numUniquePeptides)    return false;
+        if(this.numMaxUniquePeptides != that.numMaxUniquePeptides)  return false;
         if(this.numSpectra != that.numSpectra)                  return false;
+        if(this.numMaxSpectra != that.numMaxSpectra)            return false;
         if(this.coverage != that.coverage)                      return false;
+        if(this.maxCoverage != that.maxCoverage)                return false;
 //        if(this.groupProteins != that.groupProteins)            return false;
         if(this.showParsimonious != that.showParsimonious)      return false;
         

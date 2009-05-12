@@ -205,7 +205,7 @@
     <select id="filterByCoverage" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 
     	WHERE piRunID=#pinferId#
-    	AND coverage >=#coverage# 
+    	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
     	<isPropertyAvailable property="sort">
     		ORDER BY coverage ASC
     	</isPropertyAvailable>
@@ -218,7 +218,7 @@
     	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot 
     	WHERE prot.id = iprot.piProteinID 
     	AND prot.piRunID = #pinferId# 
-    	AND prot.coverage >=#coverage# 
+    	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
     	ORDER BY proteinGroupId, coverage DESC
     </select>
     
@@ -268,7 +268,7 @@
     	AND pept.id = ion.piPeptideID 
     	AND ion.id = psm.piIonID
     	AND prot.piRunID = #pinferId# 
-    	GROUP BY prot.id HAVING cnt >=#numSpectra#
+    	GROUP BY prot.id HAVING cnt BETWEEN #minSpectra# AND #maxSpectra#
     	<isPropertyAvailable property="sort">
     		ORDER BY cnt
 			<isPropertyAvailable property="groupProteins">
@@ -279,22 +279,22 @@
     </select>
     
     <select id="filterByPeptideCount_S" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT prot.id, count(*) AS cnt 
-    	FROM msProteinInferProtein AS prot,
-    		 IDPickerProtein as idpProt, 
-    	     msProteinInferProteinPeptideMatch AS m, 
-    		 msProteinInferPeptide AS pept
-    	WHERE prot.id = idpProt.piProteinID
-    	AND idpProt.piProteinID = m.piProteinID
-    	AND m.piPeptideID = pept.id 
-    	AND prot.piRunID = #pinferId# 
+    	SELECT prot.id, count(pept.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept )
+    	ON  (m.piPeptideID = pept.id 
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID 
+    	AND prot.id = m.piProteinID 
     	<isPropertyAvailable property="isParsimonious">
     		AND idpProt.isParsimonious = #isParsimonious#
     	</isPropertyAvailable>
-    	<isPropertyAvailable property="uniqueToProtein">
-    		AND pept.uniqueToProtein = #uniqueToProtein#
-    	</isPropertyAvailable>
-    	GROUP BY prot.id HAVING cnt >=#numPeptides#
+    	GROUP BY prot.id
+    	HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
     	<isPropertyAvailable property="sort">
     		ORDER BY cnt
 			<isPropertyAvailable property="groupProteins">
@@ -305,24 +305,21 @@
     </select>
     
     <select id="filterByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT prot.id, count(*) AS cnt 
-    	FROM msProteinInferProtein AS prot, 
-    		 IDPickerProtein as idpProt, 
-    	     msProteinInferProteinPeptideMatch AS m, 
-    		 msProteinInferPeptide AS pept, 
-    		 msProteinInferIon AS ion
-    	WHERE prot.id = idpProt.piProteinID
-    	AND idpProt.piProteinID = m.piProteinID
-    	AND m.piPeptideID = pept.id 
-    	AND pept.id = ion.piPeptideID 
-    	AND prot.piRunID = #pinferId# 
+    	SELECT prot.id, count(ion.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
+    	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID 
+    	AND prot.id = m.piProteinID 
     	<isPropertyAvailable property="isParsimonious">
     		AND idpProt.isParsimonious = #isParsimonious#
     	</isPropertyAvailable>
-    	<isPropertyAvailable property="uniqueToProtein">
-    		AND pept.uniqueToProtein = #uniqueToProtein#
-    	</isPropertyAvailable>
-    	GROUP BY prot.id HAVING cnt >=#numPeptides#
+    	GROUP BY prot.id HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
     	<isPropertyAvailable property="sort">
     		ORDER BY cnt
 			<isPropertyAvailable property="groupProteins">
