@@ -72,10 +72,6 @@ public class DownloadProteinferResultsAction extends Action {
         response.setHeader("cache-control", "no-cache");
         PrintWriter writer = response.getWriter();
         writer.write("Date: "+new Date()+"\n\n");
-        // print the filtering options being used
-        writer.write("Filtering Options: \n");
-        writeFilteringOptions(writer, filterForm);
-        writer.write("\n\n");
         writeResults(writer, pinferId, filterForm);
         writer.close();
         long e = System.currentTimeMillis();
@@ -101,6 +97,7 @@ public class DownloadProteinferResultsAction extends Action {
 
     private void writeResults(PrintWriter writer, int pinferId, ProteinInferFilterForm filterForm) {
         
+        
         IdPickerRun idpRun = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
         IDPickerParams idpParams = IdPickerParamsMaker.makeIdPickerParams(idpRun.getParams());
         PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
@@ -116,7 +113,10 @@ public class DownloadProteinferResultsAction extends Action {
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
         filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
         filterCriteria.setPeptideDefinition(peptideDef);
-        filterCriteria.setSortBy(SORT_BY.defaultSortBy());
+        if(filterForm.isCollapseGroups()) 
+            filterCriteria.setSortBy(SORT_BY.GROUP_ID);
+        else
+            filterCriteria.setSortBy(SORT_BY.defaultSortBy());
         filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
         filterCriteria.setGroupProteins(true);
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
@@ -128,12 +128,19 @@ public class DownloadProteinferResultsAction extends Action {
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
         
         // print the parameters used for the protein inference run
+        writer.write("Program Version: "+idpRun.getProgramVersion()+"\n");
         writer.write("Parameters used for Protein Inference ID: "+idpRun.getId()+"\n");
         ProteinInferenceProgram program = idpRun.getProgram();
         for(IdPickerParam param: idpRun.getSortedParams()) {
             writer.write(program.getDisplayNameForParam(param.getName())+": "+param.getValue()+"\n");
         }
         writer.write("\n\n");
+        
+        // print the filtering options being used
+        writer.write("Filtering Options: \n");
+        writeFilteringOptions(writer, filterForm);
+        writer.write("\n\n");
+        
         
         // print summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);
@@ -166,31 +173,89 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write(filteredTargetHits+"\n");
         writer.write("\n\n");
         
-
-        // print each protein
-        writer.write("ProteinGroupID\t");
-        writer.write("Parsimonious\t");
-        writer.write("FastaID\tCommonName\t");
-        writer.write("Coverage\tNumSpectra\tNSAF\t");
-        writer.write("NumPeptides\tNumUniquePeptides\t");
-        writer.write("Description\n");
         
-        for(int i = proteinIds.size() - 1; i >=0; i--) {
-            int proteinId = proteinIds.get(i);
-            WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, proteinId, peptideDef);
-            writer.write(wProt.getProtein().getGroupId()+"\t");
-            if(wProt.getProtein().getIsParsimonious())
+        if(!filterForm.isCollapseGroups()) {
+            // print each protein
+            writer.write("ProteinGroupID\t");
+            writer.write("Parsimonious\t");
+            writer.write("FastaID\tCommonName\t");
+            writer.write("Coverage\tNumSpectra\tNSAF\t");
+            writer.write("NumPeptides\tNumUniquePeptides\t");
+            writer.write("Description\n");
+
+            for(int i = proteinIds.size() - 1; i >=0; i--) {
+                int proteinId = proteinIds.get(i);
+                WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, proteinId, peptideDef);
+                writer.write(wProt.getProtein().getGroupId()+"\t");
+                if(wProt.getProtein().getIsParsimonious())
+                    writer.write("P\t");
+                else
+                    writer.write("\t");
+                writer.write(wProt.getAccession()+"\t");
+                writer.write(wProt.getCommonName()+"\t");
+                writer.write(wProt.getProtein().getCoverage()+"\t");
+                writer.write(wProt.getProtein().getSpectrumCount()+"\t");
+                writer.write(wProt.getProtein().getNsafFormatted()+"\t");
+                writer.write(wProt.getProtein().getPeptideCount()+"\t");
+                writer.write(wProt.getProtein().getUniquePeptideCount()+"\t");
+                writer.write(wProt.getDescription()+"\n");
+            }
+        }
+        
+        // user wants to see only one line for each protein group; all members of the group will be displayed comma-separated
+        else {
+            writer.write("ProteinGroupID\t");
+            writer.write("Parsimonious\t");
+            writer.write("FastaID(s)\t");
+            writer.write("NumSpectra\t");
+            writer.write("NumPeptides\tNumUniquePeptides\t");
+            writer.write("\n");
+            
+            int currentGroupId = -1;
+            boolean parsimonious = false;
+            String fastaIds = "";
+            int spectrumCount = 0;
+            int numPept = 0;
+            int numUniqPept = 0;
+            
+            for(int i = 0; i < proteinIds.size();  i++) {
+                int proteinId = proteinIds.get(i);
+                WIdPickerProtein wProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, proteinId, peptideDef);
+                if(wProt.getProtein().getGroupId() != currentGroupId) {
+                    if(currentGroupId != -1) {
+                        writer.write(currentGroupId+"\t");
+                        if(parsimonious)
+                            writer.write("P\t");
+                        else
+                            writer.write("\t");
+                        if(fastaIds.length() > 0)
+                            fastaIds = fastaIds.substring(1); // remove first comma
+                        writer.write(fastaIds+"\t");
+                        writer.write(spectrumCount+"\t");
+                        writer.write(numPept+"\t");
+                        writer.write(numUniqPept+"\n");
+                    }
+                    fastaIds = "";
+                    currentGroupId = wProt.getProtein().getGroupId();
+                    parsimonious = wProt.getProtein().getIsParsimonious();
+                    spectrumCount = wProt.getProtein().getSpectrumCount();
+                    numPept = wProt.getProtein().getPeptideCount();
+                    numUniqPept = wProt.getProtein().getUniquePeptideCount();
+                }
+                fastaIds += ","+wProt.getAccession();
+            }
+            // write the last one
+            writer.write(currentGroupId+"\t");
+            if(parsimonious)
                 writer.write("P\t");
             else
                 writer.write("\t");
-            writer.write(wProt.getAccession()+"\t");
-            writer.write(wProt.getCommonName()+"\t");
-            writer.write(wProt.getProtein().getCoverage()+"\t");
-            writer.write(wProt.getProtein().getSpectrumCount()+"\t");
-            writer.write(wProt.getProtein().getNsafFormatted()+"\t");
-            writer.write(wProt.getProtein().getPeptideCount()+"\t");
-            writer.write(wProt.getProtein().getUniquePeptideCount()+"\t");
-            writer.write(wProt.getDescription()+"\n");
+            if(fastaIds.length() > 0)
+                fastaIds = fastaIds.substring(1); // remove first comma
+            writer.write(fastaIds+"\t");
+            writer.write(spectrumCount+"\t");
+            writer.write(numPept+"\t");
+            writer.write(numUniqPept+"\n");
         }
     }
 }

@@ -34,6 +34,16 @@ public class ProteinSetComparisonForm extends ActionForm {
     
     private String searchString;
     
+    private boolean onlyParsimonious = false;
+    
+    public boolean isOnlyParsimonious() {
+        return onlyParsimonious;
+    }
+
+    public void setOnlyParsimonious(boolean onlyParsimonious) {
+        this.onlyParsimonious = onlyParsimonious;
+    }
+
     public String getSearchString() {
         return searchString;
     }

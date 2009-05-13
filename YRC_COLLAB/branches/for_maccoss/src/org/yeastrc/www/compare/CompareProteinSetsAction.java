@@ -154,7 +154,7 @@ public class CompareProteinSetsAction extends Action {
         
         // Do the comparison
         long s = System.currentTimeMillis();
-        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
+        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, myForm.isOnlyParsimonious());
         long e = System.currentTimeMillis();
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         

@@ -21,6 +21,7 @@ public class ProteinInferFilterForm extends ActionForm {
     
     private boolean joinGroupProteins = true;
     private boolean showAllProteins = true;
+    private boolean collapseGroups = false; // Used for downloads only
     
     private String accessionLike = null;
     private String descriptionLike = null;
@@ -239,6 +240,14 @@ public class ProteinInferFilterForm extends ActionForm {
         if(buf.length() > 0)
             buf.deleteCharAt(0);
         return buf.toString();
+    }
+
+    public boolean isCollapseGroups() {
+        return collapseGroups;
+    }
+
+    public void setCollapseGroups(boolean collapseGroups) {
+        this.collapseGroups = collapseGroups;
     }
    
 }

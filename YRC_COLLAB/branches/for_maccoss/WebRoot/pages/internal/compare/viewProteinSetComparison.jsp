@@ -516,9 +516,15 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
  <td valign="top">
  <html:submit value="Search" onclick="javascript:updateResults();"></html:submit>
  </td>
- </tr></table>
-</div>
+ 
 
+<!-- ################## PARSIMONIOUS ONLY CHECKBOX	  ########################### -->
+<td valign="top" style="padding-left: 30px;padding-right:5px;"><html:checkbox name="proteinSetComparisonForm" property="onlyParsimonious">Only Parsimonious</html:checkbox> </td>
+<td valign="top">
+ <html:submit value="Update" onclick="javascript:updateResults();"></html:submit>
+</td>
+</tr></table>
+</div>
 </center>
 </html:form>
 
