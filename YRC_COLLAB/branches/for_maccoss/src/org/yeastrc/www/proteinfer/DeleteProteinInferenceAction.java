@@ -31,7 +31,7 @@ import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
  */
 public class DeleteProteinInferenceAction extends Action {
 
-    private static final Logger log = Logger.getLogger(DeleteProteinInferenceAction.class);
+    private static final Logger log = Logger.getLogger(DeleteProteinInferenceAction.class.getName());
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,

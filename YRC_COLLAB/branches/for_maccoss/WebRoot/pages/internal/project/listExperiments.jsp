@@ -163,6 +163,15 @@ function toggleFilesForExperiment (experimentId) {
 	}
 }
 
+// ---------------------------------------------------------------------------------------
+// DELETE PROTEIN INFERENCE RUN
+// --------------------------------------------------------------------------------------- 
+function deleteProtInferRun(pinferId) {
+	if(confirm("Are you sure you want to delete protein inference ID "+pinferId+"?")) {
+          document.location.href="<yrcwww:link path='deleteProteinInferJob.do?pinferId='/>"+pinferId+"&projectId=<bean:write name='project' property='ID'/>";
+        return 1;
+    }
+}
 </script>
 
 
@@ -344,6 +353,9 @@ function toggleFilesForExperiment (experimentId) {
 							<b><font color="green"><bean:write name="piJob" property="statusDescription"/></font></b></a>
 							&nbsp;
 							<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='pinferId'/>">Compare</a>
+							&nbsp;
+							<span class="clickable" style="text-decoration: underline;" 
+							      onclick="javascript:deleteProtInferRun(<bean:write name='piJob' property='pinferId'/>);">Delete</span>
 						</logic:equal>
 						<!-- Job FAILED -->
 						<logic:equal name="piJob" property="failed" value="true">

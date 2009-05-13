@@ -650,7 +650,7 @@
 	<action
 	  path="/deleteProteinInferJob"
 	  type="org.yeastrc.www.proteinfer.DeleteProteinInferenceAction"
-	  validate="false">
+	  >
 		<forward name="Success" path="/viewProject.do" redirect="true" />
 		<forward name="Failure" path="/viewProject.do" redirect="false" />
 	</action>
