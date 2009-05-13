@@ -331,12 +331,13 @@ function deleteProtInferRun(pinferId) {
 					<div><b>Protein Inference Results</b></div> 
 					<table width="100%">
 					<thead>
-					<tr align="left"><th>ID</th><th>Date</th><th>Submitted By</th><th>Comments</th><th>Status</th></tr>
+					<tr align="left"><th>ID</th><th>Version</th><th>Date</th><th>Submitted By</th><th>Comments</th><th>Status</th></tr>
 					</thead>
 					<tbody>
 					<logic:iterate name="experiment" property="protInferRuns" id="piJob" type="org.yeastrc.www.proteinfer.ProteinferJob">
 						<tr>
 						<td valign="top"><b><bean:write name="piJob" property="pinferId"/></b></td>
+						<td valign="top" align="center"><b><bean:write name="piJob" property="version"/></b></td>
 						<td valign="top"><bean:write name="piJob" property="submitDate"/></td>
 						<td valign="top"><bean:write name="piJob" property="researcher.lastName"/></td>
 						<td valign="top">

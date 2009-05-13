@@ -30,11 +30,11 @@ public class JobDeleter {
 	 * @param job
 	 * @throws Exception
 	 */
-	public void deleteJob( Job job ) throws Exception {
+	public boolean deleteJob( Job job ) throws Exception {
 		
 		// do not delete jobs that are being processed
 		if (job.getStatus() == JobUtils.STATUS_OUT_FOR_WORK)
-			return;
+			return false;
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -50,6 +50,8 @@ public class JobDeleter {
 			stmt.close(); stmt = null;
 			conn.close(); conn = null;
 			
+			return true;
+			
 		} finally {
 
 			if (stmt != null) {
@@ -60,7 +62,6 @@ public class JobDeleter {
 				try { conn.close(); conn = null; } catch (Exception e) { ; }
 			}			
 		}
-		
 	}
 	
 }

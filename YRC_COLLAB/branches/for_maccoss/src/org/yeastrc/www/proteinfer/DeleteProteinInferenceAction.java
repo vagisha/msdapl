@@ -94,25 +94,31 @@ public class DeleteProteinInferenceAction extends Action {
             ActionErrors errors = new ActionErrors();
             errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.pinferId", pinferId));
             saveErrors( request, errors );
-            ActionForward failure = mapping.findForward( "Failure" ) ;
-            failure = new ActionForward( failure.getPath() + "?ID="+projectId, failure.getRedirect() ) ;
-            return failure;
+            return mapping.findForward( "Failure" );
         }
         
         // first delete the job from the job queue database
         ProteinferJob job = ProteinInferJobSearcher.instance().getJob(pinferId);
         
+        boolean deleted = false;
         if(job != null) {
-            JobDeleter.getInstance().deleteJob(job);
+            deleted = JobDeleter.getInstance().deleteJob(job);
         }
         else {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.proteinfer.deletejob", "Could not get job for protein inference ID: "+pinferId));
             saveErrors(request, errors);
-            ActionForward failure = mapping.findForward( "Failure" ) ;
-            failure = new ActionForward( failure.getPath() + "?ID="+projectId, failure.getRedirect() ) ;
-            return failure;
+            return mapping.findForward( "Failure" );
         }
+        
+        // If the entry in jobQueue was not deleted stop here.
+        if(!deleted) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("proteinfer", new ActionMessage("error.proteinfer.deletejob", "Could not delete protein inference ID: "+pinferId));
+            saveErrors(request, errors);
+            return mapping.findForward( "Failure" );
+        }
+        
         
         // now delete the protein inference run from the mass spec database.
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
@@ -123,14 +129,10 @@ public class DeleteProteinInferenceAction extends Action {
             ActionErrors errors = new ActionErrors();
             errors.add("proteinfer", new ActionMessage("error.proteinfer.deletejob", "Error deleting protein inference ID: "+pinferId));
             saveErrors(request, errors);
-            ActionForward failure = mapping.findForward( "Failure" ) ;
-            failure = new ActionForward( failure.getPath() + "?ID="+projectId, failure.getRedirect() ) ;
-            return failure;
+            return mapping.findForward( "Failure" );
         }
         
         // Go!
-        ActionForward success = mapping.findForward( "Success" ) ;
-        success = new ActionForward( success.getPath() + "?ID="+projectId, success.getRedirect() ) ;
-        return success;
+        return mapping.findForward( "Success" ) ;
     }
 }

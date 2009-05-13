@@ -1095,7 +1095,7 @@ function toggleDivVisibility(mydiv) {
 					<b>Protein Inference ID:</b>
 				</td>
 				<td>
-					<bean:write name="idpickerRun" property="id"/>
+					<bean:write name="idpickerRun" property="id"/> &nbsp; (Program Version: <b> <bean:write name="idpickerRun" property="programVersion"/> </b>)
 				</td>
 			</tr>
 			<tr>

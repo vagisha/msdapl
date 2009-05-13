@@ -149,6 +149,7 @@ public class ProteinInferJobSearcher {
                 return null;
             }
             job.setProgram(run.getProgramString());
+            job.setVersion(run.getProgramVersion());
             job.setComments(run.getComments());
             job.setDateRun(run.getDate());
             return job;

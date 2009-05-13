@@ -10,6 +10,7 @@ public class ProteinferJob extends Job {
 
     private int pinferId;
     private String program;
+    private String version;
     private String comments;
     private Date dateRun;
     
@@ -45,5 +46,11 @@ public class ProteinferJob extends Job {
     }
     public boolean isComplete() {
         return this.getStatus() == JobUtils.STATUS_COMPLETE;
+    }
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
     }
 }
