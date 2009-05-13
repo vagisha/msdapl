@@ -79,4 +79,9 @@ public class ProteinVertex extends Vertex<ProteinVertex> {
         buf.deleteCharAt(buf.length() - 1);
         return buf.toString();
     }
+    
+    @Override
+    public int getMemberCount() {
+        return proteins.size();
+    }
 }

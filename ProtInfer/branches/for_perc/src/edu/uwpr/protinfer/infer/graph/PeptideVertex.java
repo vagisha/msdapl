@@ -65,4 +65,9 @@ public class PeptideVertex extends Vertex<PeptideVertex> {
         buf.deleteCharAt(buf.length() - 1);
         return buf.toString();
     }
+
+    @Override
+    public int getMemberCount() {
+        return peptides.size();
+    }
 }

@@ -35,4 +35,11 @@ public abstract class Vertex<T extends Vertex<?>> implements IVertex <T>{
     public void setVisited(boolean visited) {
         this.isVisited = visited;
     }
+    
+    /**
+     * If this vertex is a collapsed vertex with several members return the member 
+     * count, otherwise return 1.
+     * @return
+     */
+    public abstract int getMemberCount();
 }

@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 
 public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
 
+    private static final Logger log = Logger.getLogger(SetCoverFinder.class.getName());
+    
     // map of R vertex labels and adjacent L vertex labels
     private Map<String, Set<String>> rToLMap;
     
@@ -194,9 +198,9 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
                 CoverVertex<L, R> qv1 = qVerticesMap.get(vlabel1);
                 CoverVertex<L, R> qv2 = qVerticesMap.get(vlabel2);
                 // first look at the unique adjacent count
-                if(qv1.origUniqAdjCount > qv2.getAdjacentCount())
+                if(qv1.origUniqAdjCount > qv2.origUniqAdjCount)
                     return -1;
-                if(qv1.origUniqAdjCount < qv2.getAdjacentCount())
+                if(qv1.origUniqAdjCount < qv2.origUniqAdjCount)
                     return 1;
                 
                 // now look at the number of vertices that were
@@ -205,7 +209,19 @@ public class SetCoverFinder <L extends Vertex<L>, R extends Vertex<R>>{
                     return -1;
                 if(qv1.origAdjCount < qv2.origAdjCount)
                     return 1;
-                return 0;
+                
+                // if there is still a tie return the vertex with fewer member proteins
+                if(qv1.getVertex().getMemberCount() < qv2.getVertex().getMemberCount())
+                    return -1;
+                if(qv1.getVertex().getMemberCount() > qv2.getVertex().getMemberCount())
+                    return 1;
+                
+                // if there is still a tie compare the labels (this should be the
+                // concatenation of the nrseq protein ids for protein vertices
+                log.warn("Looking at vertex labels to resolve ties!!! Labels: "
+                        +qv1.getVertex().getLabel()+" AND "+qv2.getVertex().getLabel());
+                return qv1.getVertex().getLabel().compareTo(qv2.getVertex().getLabel());
+                
             }});
         return qvWithAdjCount.get(0);
     }
