@@ -92,6 +92,9 @@
 
 <logic:notEmpty name="proteinSetComparisonForm" property="dtaRunList">
 
+<p style="color:red; font-weight: bold;" align="center">
+WARNING:  Comparison with DTASelect results is not yet fully supported. 
+</p>
 	<div align="center">Available DTASelect Datasets</div>
 	<table width="90%" class="table_basic" align="center">
 	<thead>
