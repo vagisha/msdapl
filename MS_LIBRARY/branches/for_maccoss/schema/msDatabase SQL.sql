@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS msData_junit;
-CREATE DATABASE msData_junit;
-USE msData_junit;
+DROP DATABASE IF EXISTS msData;
+CREATE DATABASE msData;
+USE msData;
 
 
 # EXPERIMENT
@@ -197,7 +197,7 @@ CREATE TABLE msRunSearchResult (
 ALTER TABLE msRunSearchResult ADD INDEX(runSearchID);
 ALTER TABLE msRunSearchResult ADD INDEX(scanID);
 ALTER TABLE msRunSearchResult ADD INDEX(charge);
-ALTER TABLE msRunSearchResult ADD INDEX(peptide);
+ALTER TABLE msRunSearchResult ADD INDEX(peptide(10));
 # DO I WANT ALL THESE INDICES?
 
 CREATE TABLE msProteinMatch (
@@ -384,6 +384,7 @@ ALTER TABLE PercolatorResult ADD INDEX(discriminantScore);
 CREATE TABLE msProteinInferRun (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	program VARCHAR(255) NOT NULL,
+	programVersion VARCHAR(10) NOT NULL,
 	inputGenerator VARCHAR(255) NOT NULL,
 	dateRun DATETIME,
 	comments TEXT(10)
