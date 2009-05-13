@@ -89,7 +89,7 @@
 	
 <br>
 
-<!--  
+
 <logic:notEmpty name="proteinSetComparisonForm" property="dtaRunList">
 
 	<div align="center">Available DTASelect Datasets</div>
@@ -137,7 +137,7 @@
 	</tbody>
 	</table>
 </logic:notEmpty>
--->
+
 	
 	<div align="center">
 		<html:submit value="Submit" styleClass="plain_button"/>

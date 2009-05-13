@@ -44,9 +44,9 @@ public class DatasetBuilder {
         Dataset dataset = new Dataset(datasetId, DatasetSource.PROT_INFER);
         
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
-        IdPickerRunDAO idpRunDao = fact.getIdPickerRunDao();
-        IdPickerRun idpRun = idpRunDao.loadProteinferRun(datasetId);
-        
+//        IdPickerRunDAO idpRunDao = fact.getIdPickerRunDao();
+//        IdPickerRun idpRun = idpRunDao.loadProteinferRun(datasetId);
+//        
         // Get the total number of hits in this dataset
 //        List<IdPickerInput> inputs = idpRun.getInputList();
 //        int totalHitCount = 0;

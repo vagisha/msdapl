@@ -383,6 +383,11 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 
 <br>
 
+<logic:present name="dtasWarning">
+<p style="color:red; font-weight: bold;" align="center">
+WARNING:  Comparison with DTASelect results is not yet fully supported. 
+</p>
+</logic:present>
 
 <!-- ################## FILTER FORM  ########################################### -->
 <html:form action="doProteinSetComparison" method="POST">

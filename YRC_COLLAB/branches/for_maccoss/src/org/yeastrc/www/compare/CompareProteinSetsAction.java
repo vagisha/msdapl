@@ -53,7 +53,7 @@ public class CompareProteinSetsAction extends Action {
         // get the protein inference ids to compare
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
         
-        // IS THER USER DOWNLOADING?
+        // IS THE USER DOWNLOADING?
         if(myForm.isDownload()) {
             log.info("DOWNLOADING......");
             return mapping.findForward("Download");
@@ -106,6 +106,11 @@ public class CompareProteinSetsAction extends Action {
             }
             Dataset dataset = DatasetBuilder.instance().buildDataset(dtaRunId, DatasetSource.DTA_SELECT);
             datasets.add(dataset);
+        }
+
+        // TODO this is temporary till results from DTASelect are fully supported.
+        if(dtaRunIds.size() > 0) {
+            request.setAttribute("dtasWarning", true);
         }
         
         // ANY AND, OR, NOT filters

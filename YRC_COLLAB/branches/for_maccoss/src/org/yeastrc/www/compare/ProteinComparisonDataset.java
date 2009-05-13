@@ -356,6 +356,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
                 boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
                 dpi.setGrouped(grouped);
             }
+            // TODO for DTASelect
         }
         
 //            // get the (max)number of peptides identified for this protein
