@@ -133,6 +133,8 @@ public class DeleteProteinInferenceAction extends Action {
         }
         
         // Go!
-        return mapping.findForward( "Success" ) ;
+        ActionForward success = mapping.findForward( "Success" ) ;
+        success = new ActionForward( success.getPath() + "?ID="+projectId, success.getRedirect() ) ;
+        return success;
     }
 }
