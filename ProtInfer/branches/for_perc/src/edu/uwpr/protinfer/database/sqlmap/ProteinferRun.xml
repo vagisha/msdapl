@@ -16,6 +16,7 @@
 	
 	<resultMap class="GenericProteinferRun" id="pinferRunBaseResult">
 		<result property="id" column="id" />
+		<result property="programVersion" column="programVersion" />
 		<result property="program" column="program" typeHandler="ProteinferProgramTypeHandler"/>
 		<result property="inputGenerator" column="inputGenerator" typeHandler="ProgramTypeHandler"/>
 		<result property="comments" column="comments" />
@@ -31,6 +32,7 @@
 	
 	<parameterMap class="GenericProteinferRun" id="pinferRunParam">
 		<parameter property="program" jdbcType="VARCHAR" typeHandler="ProteinferProgramTypeHandler"/>
+		<parameter property="programVersion" jdbcType="VARCHAR" />
 		<parameter property="inputGenerator" jdbcType="VARCHAR" typeHandler="ProgramTypeHandler"/>
 		<parameter property="comments" jdbcType="TEXT" />
 	</parameterMap>
@@ -76,9 +78,10 @@
     <insert id="insert" parameterMap="pinferRunParam">
     	INSERT INTO msProteinInferRun (
     	program,
+    	programVersion,
     	inputGenerator,
     	comments)
-    	VALUES(?,?,?)
+    	VALUES(?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
@@ -87,6 +90,7 @@
     <update id="update" parameterClass="GenericProteinferRun">
     	UPDATE msProteinInferRun 
     	SET program = #programString#,
+    	programVersion = #programVersion#,
     	inputGenerator = #inputGeneratorString#,
     	comments = #comments#
     	<isNotNull property="date">

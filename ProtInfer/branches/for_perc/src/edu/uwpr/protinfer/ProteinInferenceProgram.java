@@ -10,9 +10,11 @@ public class ProteinInferenceProgram {
 
     private final String name;
     private final String displayName;
+    private String version;
     private String description;
     private ProgramParam[] params;
     
+    public static final String programVersion = "0.1.1";
     
     public static final ProteinInferenceProgram PROTINFER_SEQ = new PISequestProgram();
     public static final ProteinInferenceProgram PROTINFER_PLCID = new PIProlucidProgram();
@@ -20,13 +22,22 @@ public class ProteinInferenceProgram {
     public static final ProteinInferenceProgram PROTINFER_PERC_OLD = new PIPercolatorProgramOld();
     
     
-    private ProteinInferenceProgram(String name, String displayName) {
+    private ProteinInferenceProgram(String name, String displayName, String version) {
         this.name = name;
         this.displayName = displayName;
+        this.version = version;
     }
     
     public String getDisplayName(){
         return displayName;
+    }
+    
+    public String getVersion() {
+        return version;
+    }
+    
+    public void setVersion(String version) {
+        this.version = version;
     }
     
     public String name() {
@@ -93,7 +104,7 @@ public class ProteinInferenceProgram {
     
     static class PISequestProgram extends ProteinInferenceProgram {
         private PISequestProgram() {
-            super("PROTINFER_SEQ", "ProtInfer");
+            super("PROTINFER_SEQ", "ProtInfer", programVersion);
             this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             this.setProgramParams(new ProgramParam[]{
                         ParamMaker.makeMaxFDRParam(),
@@ -112,7 +123,7 @@ public class ProteinInferenceProgram {
     
     static class PIProlucidProgram extends ProteinInferenceProgram {
         private PIProlucidProgram() {
-            super("PROTINFER_PLCID", "ProtInfer");
+            super("PROTINFER_PLCID", "ProtInfer", programVersion);
             this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             this.setProgramParams(new ProgramParam[]{
                         ParamMaker.makeMaxFDRParam(),
@@ -132,7 +143,7 @@ public class ProteinInferenceProgram {
     
     static class PIPercolatorProgram extends ProteinInferenceProgram {
         private PIPercolatorProgram() {
-            super("PROTINFER_PERC", "ProtInfer");
+            super("PROTINFER_PERC", "ProtInfer", programVersion);
             this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             
             DoubleValidator validator = new DoubleValidator();
@@ -166,7 +177,7 @@ public class ProteinInferenceProgram {
     
     static class PIPercolatorProgramOld extends ProteinInferenceProgram {
         private PIPercolatorProgramOld() {
-            super("PROTINFER_PERC_OLD", "ProtInfer");
+            super("PROTINFER_PERC_OLD", "ProtInfer", programVersion);
             this.setDescription("This protein inference program is based on the IDPicker program developed in David Tabb's lab.");
             
             DoubleValidator qValValidator = new DoubleValidator();

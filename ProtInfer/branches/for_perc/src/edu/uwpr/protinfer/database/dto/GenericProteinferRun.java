@@ -15,6 +15,7 @@ public class GenericProteinferRun<T extends ProteinferInput> {
     private Date date;
 //    private ProteinferStatus status;
     private ProteinInferenceProgram program;
+    private String programVersion;
     private Program inputGenerator;
     private String comments;
     private List<T> inputSummaryList;
@@ -40,22 +41,6 @@ public class GenericProteinferRun<T extends ProteinferInput> {
         this.date = date;
     }
 
-//    public ProteinferStatus getStatus() {
-//        return status;
-//    }
-//    
-//    public String getStatusString() {
-//        return String.valueOf(status.getStatusChar());
-//    }
-//
-//    public boolean isComplete() {
-//        return status == ProteinferStatus.COMPLETE;
-//    }
-//
-//    public void setStatus(ProteinferStatus status) {
-//        this.status = status;
-//    }
-
     public List<T> getInputList() {
         return inputSummaryList;
     }
@@ -65,11 +50,24 @@ public class GenericProteinferRun<T extends ProteinferInput> {
     }
 
     public ProteinInferenceProgram getProgram() {
+        if(this.programVersion != null)
+            program.setVersion(this.programVersion);
         return this.program;
     }
 
     public String getProgramString() {
         return program.name();
+    }
+    
+    public String getProgramVersion() {
+        if(this.programVersion == null)
+            return program.getVersion();
+        else
+            return this.programVersion;
+    }
+    
+    public void setProgramVersion(String programVersion) {
+        this.programVersion = programVersion;
     }
     
     public void setProgram(ProteinInferenceProgram program) {

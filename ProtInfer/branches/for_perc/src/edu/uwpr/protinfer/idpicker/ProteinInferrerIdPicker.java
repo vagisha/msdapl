@@ -79,7 +79,7 @@ public class ProteinInferrerIdPicker implements ProteinInferrer {
         }
         
         // mark proteins un-accepted by min unique peptides
-        if(params.getMinUniquePeptides() > 1) {
+        if(params.getMinUniquePeptides() > 0) {
             markProteinsUnacceptedByMinUniquePeptides(graph, params.getMinUniquePeptides());
         }
         
