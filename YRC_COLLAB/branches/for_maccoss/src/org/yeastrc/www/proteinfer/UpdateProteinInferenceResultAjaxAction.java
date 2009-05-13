@@ -72,9 +72,10 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         if(pinferId_session == null || pinferId_session != pinferId) {
             // redirect to the /viewProteinInferenceResult action if this different from the
             // protein inference ID stored in the session
-            ActionForward newResults = mapping.findForward( "ViewNewResults" ) ;
-            newResults = new ActionForward( newResults.getPath() + "inferId="+pinferId, newResults.getRedirect() ) ;
-            return newResults;
+            log.error("Stale protein inference ID: "+pinferId);
+            response.setContentType("text/html");
+            response.getWriter().write("STALE_ID");
+            return null;
         }
         
         long s = System.currentTimeMillis();
@@ -86,10 +87,14 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         // Get the filtering criteria from the request
         PeptideDefinition peptideDef = filterCritSession.getPeptideDefinition();
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-        filterCriteria.setCoverage(filterForm.getMinCoverage());
-        filterCriteria.setNumPeptides(filterForm.getMinPeptides());
-        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
-        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
+        filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
+        filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
+        filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
+        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
+        filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
+        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
+        filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(filterCritSession == null ? SORT_BY.defaultSortBy() : filterCritSession.getSortBy());
         filterCriteria.setSortOrder(filterCritSession == null ? SORT_ORDER.defaultSortOrder() : filterCritSession.getSortOrder());

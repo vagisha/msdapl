@@ -851,7 +851,18 @@ function validateFloat(value, fieldName, min, max) {
 }
 function updateResults(responseText, statusText) {
 	$.unblockUI();
-  	setupProteinListTable();
+  	refreshProteinList(responseText);
+}
+
+function refreshProteinList(responseText) {
+	if(responseText != "STALE_ID") {
+		setupProteinListTable();
+	}
+	else {
+		alert("Got stale Protein Inference ID. Please refresh the page.");
+		document.loca
+	}
+	//setupProteinListTable();
 }
 // ---------------------------------------------------------------------------------------
 // DOWNLOAD RESULTS
@@ -864,9 +875,17 @@ function downloadResults() {
 	
 	// copy the values from the filter form to the download form
 	$("#downloadForm  input[name='minPeptides']").val($("#filterForm  input[name='minPeptides']").val());
+	$("#downloadForm  input[name='maxPeptides']").val($("#filterForm  input[name='maxPeptides']").val());
+	
 	$("#downloadForm  input[name='minUniquePeptides']").val($("#filterForm input[name='minUniquePeptides']").val());
+	$("#downloadForm  input[name='maxUniquePeptides']").val($("#filterForm input[name='maxUniquePeptides']").val());
+	
 	$("#downloadForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
+	$("#downloadForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
+	
 	$("#downloadForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
+	$("#downloadForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
+	
 	$("#downloadForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
 
 	$("#downloadForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
@@ -904,7 +923,7 @@ function sortResults(pinferId, sortBy, sortOrder) {
 							 'sortOrder': 		sortOrderStr}, 	            // data
 							function(responseText, status, xhr) {			// callback
 										$.unblockUI();
-										setupProteinListTable();
+										refreshProteinList(responseText);
 								   });	
 	
 	return false;
@@ -922,7 +941,7 @@ function pageResults(pageNum) {
   							 'pageNum': 		pageNum}, 	            	// data
   							function(responseText, status, xhr) {			// callback
   										$.unblockUI();
-  										setupProteinListTable();
+  										refreshProteinList(responseText);
   								   });	
   	
   	return false;

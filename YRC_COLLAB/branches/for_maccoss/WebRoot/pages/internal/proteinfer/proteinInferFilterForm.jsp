@@ -29,23 +29,35 @@
   
   <td><table>
   <tr>
-  <td>Min. Peptides: </td>
-  <td><html:text name="proteinInferFilterForm" property="minPeptides" size="3"></html:text></td>
+  <td>Peptides: </td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minPeptides" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxPeptides" size="3"></html:text>
+  </td>
   </tr>
   <tr>
-  <td>Min. Unique Peptides: </td>
-  <td><html:text name="proteinInferFilterForm" property="minUniquePeptides" size="3"></html:text></td>
+  <td>Unique Peptides: </td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minUniquePeptides" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxUniquePeptides" size="3"></html:text>
+  </td>
   </tr>
   </table></td>
   
   <td><table>
   <tr>
-  <td>Min. Coverage:</td>
-  <td><html:text name="proteinInferFilterForm" property="minCoverage" size="3"></html:text>(%)</td>
+  <td>Coverage(%):</td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minCoverage" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxCoverage" size="3"></html:text>
+  </td>
   </tr>
   <tr>
-  <td>Min. Spectrum Matches: </td>
-  <td><html:text name="proteinInferFilterForm" property="minSpectrumMatches" size="3"></html:text></td>
+  <td>Spectrum Matches: </td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minSpectrumMatches" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxSpectrumMatches" size="3"></html:text>
+  </td>
   </tr>
   </table></td>
   

@@ -118,17 +118,21 @@ public class ViewProteinInferenceResultAction extends Action {
         PeptideDefinition peptideDef = idpParams.getPeptideDefinition();
         
         // update the form with the parameters that were used to run protein inference
-        filterForm.setMinPeptides(idpParams.getMinPeptides());
-        filterForm.setMinUniquePeptides(idpParams.getMinUniquePeptides());
-        filterForm.setMinCoverage(idpParams.getMinCoverage());
+        filterForm.setMinPeptides(String.valueOf(idpParams.getMinPeptides()));
+        filterForm.setMinUniquePeptides(String.valueOf(idpParams.getMinUniquePeptides()));
+        filterForm.setMinCoverage(String.valueOf(idpParams.getMinCoverage()));
         
         
         // Get the filtering criteria
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-        filterCriteria.setCoverage(filterForm.getMinCoverage());
-        filterCriteria.setNumPeptides(filterForm.getMinPeptides());
-        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
-        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
+        filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
+        filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
+        filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
+        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
+        filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
+        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
+        filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(SORT_BY.defaultSortBy());
         filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());

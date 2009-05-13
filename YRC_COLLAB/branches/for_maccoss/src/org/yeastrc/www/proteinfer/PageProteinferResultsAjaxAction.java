@@ -65,9 +65,10 @@ public class PageProteinferResultsAjaxAction extends Action {
         if(pinferId_session == null || pinferId_session != pinferId) {
             // redirect to the /viewProteinInferenceResult action if this different from the
             // protein inference ID stored in the session
-            ActionForward newResults = mapping.findForward( "ViewNewResults" ) ;
-            newResults = new ActionForward( newResults.getPath() + "inferId="+pinferId, newResults.getRedirect() ) ;
-            return newResults;
+            log.error("Stale protein inference ID: "+pinferId);
+            response.setContentType("text/html");
+            response.getWriter().write("STALE_ID");
+            return null;
         }
         
         

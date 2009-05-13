@@ -41,7 +41,7 @@ public class DownloadComparisonResults extends Action {
             HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         
-        System.out.println("IN DownloadComparisonResults");
+        log.info("Downloading comparison results");
         
         // User making this request
         User user = UserUtils.getUser(request);
@@ -146,7 +146,7 @@ public class DownloadComparisonResults extends Action {
         
         
         response.setContentType("text/plain");
-        response.setHeader("Content-Disposition","inline; filename=\"ProteinSetComparison.txt\"");
+        response.setHeader("Content-Disposition","attachment; filename=\"ProteinSetComparison.txt\"");
         response.setHeader("cache-control", "no-cache");
         PrintWriter writer = response.getWriter();
         writer.write("\n\n");

@@ -74,6 +74,7 @@ public class DeleteProteinInferenceAction extends Action {
             return mapping.findForward("standardHome");
         }
         
+        // User making the request to delete protein inference should be affiliated with the project
         Project project = ProjectDAO.instance().load(projectId);
         if(!project.checkAccess(user.getResearcher())) {
              ActionErrors errors = new ActionErrors();

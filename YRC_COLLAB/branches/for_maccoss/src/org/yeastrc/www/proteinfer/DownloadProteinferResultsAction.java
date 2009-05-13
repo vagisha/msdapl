@@ -1,6 +1,7 @@
 package org.yeastrc.www.proteinfer;
 
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,10 +22,12 @@ import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.PeptideDefinition;
+import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
@@ -65,14 +68,35 @@ public class DownloadProteinferResultsAction extends Action {
         
         long s = System.currentTimeMillis();
         response.setContentType("text/plain");
-        response.setHeader("Content-Disposition","inline; filename=\"ProtInfer_"+pinferId+".txt\"");
+        response.setHeader("Content-Disposition","attachment; filename=\"ProtInfer_"+pinferId+".txt\"");
         response.setHeader("cache-control", "no-cache");
         PrintWriter writer = response.getWriter();
+        writer.write("Date: "+new Date()+"\n\n");
+        // print the filtering options being used
+        writer.write("Filtering Options: \n");
+        writeFilteringOptions(writer, filterForm);
+        writer.write("\n\n");
         writeResults(writer, pinferId, filterForm);
         writer.close();
         long e = System.currentTimeMillis();
         log.info("DownloadProteinferResultsAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
         return null;
+    }
+
+    private void writeFilteringOptions(PrintWriter writer, ProteinInferFilterForm filterForm) {
+        
+        writer.write("Min. Peptides: "+filterForm.getMinPeptides()+"\n");
+        writer.write("Max. Peptides: "+filterForm.getMaxPeptides()+"\n");
+        writer.write("Min. Unique Peptides: "+filterForm.getMinUniquePeptides()+"\n");
+        writer.write("Max. Unique Peptides: "+filterForm.getMaxUniquePeptides()+"\n");
+        writer.write("Min. Spectrum Matches: "+filterForm.getMinSpectrumMatches()+"\n");
+        writer.write("Max. Spectrum Matches: "+filterForm.getMaxSpectrumMatches()+"\n");
+        writer.write("Min. Coverage(%): "+filterForm.getMinCoverage()+"\n");
+        writer.write("Max. Coverage(%): "+filterForm.getMaxCoverage()+"\n");
+        writer.write("Show all Proteins: "+filterForm.isShowAllProteins()+"\n");
+        writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
+        writer.write("Fasta ID filter: "+filterForm.getAccessionLike()+"\n");
+        writer.write("Description filter: "+filterForm.getDescriptionLike()+"\n");
     }
 
     private void writeResults(PrintWriter writer, int pinferId, ProteinInferFilterForm filterForm) {
@@ -83,10 +107,14 @@ public class DownloadProteinferResultsAction extends Action {
         
         // Get the filtering criteria
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
-        filterCriteria.setCoverage(filterForm.getMinCoverage());
-        filterCriteria.setNumPeptides(filterForm.getMinPeptides());
-        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptides());
-        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatches());
+        filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
+        filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
+        filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
+        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
+        filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
+        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
+        filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(SORT_BY.defaultSortBy());
         filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
@@ -98,6 +126,14 @@ public class DownloadProteinferResultsAction extends Action {
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
+        
+        // print the parameters used for the protein inference run
+        writer.write("Parameters used for Protein Inference ID: "+idpRun.getId()+"\n");
+        ProteinInferenceProgram program = idpRun.getProgram();
+        for(IdPickerParam param: idpRun.getSortedParams()) {
+            writer.write(program.getDisplayNameForParam(param.getName())+": "+param.getValue()+"\n");
+        }
+        writer.write("\n\n");
         
         // print summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);

@@ -10,10 +10,14 @@ public class ProteinInferFilterForm extends ActionForm {
 
     private int pinferId;
     
-    private double minCoverage = 0.0;
-    private int minPeptides = 1;
-    private int minUniquePeptides = 0;
-    private int minSpectrumMatches = 1;
+    private String minCoverage = "0.0";
+    private String maxCoverage = "100.0";
+    private String minPeptides = "1";
+    private String maxPeptides;
+    private String minUniquePeptides = "0";
+    private String maxUniquePeptides;
+    private String minSpectrumMatches = "1";
+    private String maxSpectrumMatches;
     
     private boolean joinGroupProteins = true;
     private boolean showAllProteins = true;
@@ -25,10 +29,10 @@ public class ProteinInferFilterForm extends ActionForm {
     public ProteinInferFilterForm () {}
     
     public void reset() {
-        minCoverage = 0.0;
-        minPeptides = 1;
-        minUniquePeptides = 0;
-        minSpectrumMatches = 1;
+        minCoverage = "0.0";
+        minPeptides = "1";
+        minUniquePeptides = "0";
+        minSpectrumMatches = "1";
         joinGroupProteins = true;
         showAllProteins = true;
         accessionLike = null;
@@ -54,37 +58,115 @@ public class ProteinInferFilterForm extends ActionForm {
         this.pinferId = pinferId;
     }
 
-    public double getMinCoverage() {
+    // MIN COVERAGE
+    public String getMinCoverage() {
         return minCoverage;
     }
-
-    public void setMinCoverage(double inCoverage) {
-        this.minCoverage = inCoverage;
+    public double getMinCoverageDouble() {
+        if(minCoverage == null || minCoverage.trim().length() == 0)
+            return 0.0;
+        else
+            return Double.parseDouble(minCoverage);
     }
-
-    public int getMinPeptides() {
+    public void setMinCoverage(String minCoverage) {
+        this.minCoverage = minCoverage;
+    }
+    
+    // MAX COVERAGE
+    public String getMaxCoverage() {
+        return maxCoverage;
+    }
+    public double getMaxCoverageDouble() {
+        if(maxCoverage == null || maxCoverage.trim().length() == 0)
+            return 100.0;
+        else
+            return Double.parseDouble(maxCoverage);
+    }
+    public void setMaxCoverage(String maxCoverage) {
+        this.maxCoverage = maxCoverage;
+    }
+    
+    // MIN PEPTIDES
+    public String getMinPeptides() {
         return minPeptides;
     }
-
-    public void setMinPeptides(int minPeptides) {
+    public int getMinPeptidesInteger() {
+        if(minPeptides == null || minPeptides.trim().length() == 0)
+            return 1;
+        return Integer.parseInt(minPeptides);
+    }
+    public void setMinPeptides(String minPeptides) {
         this.minPeptides = minPeptides;
     }
 
-    public int getMinUniquePeptides() {
+    // MAX PEPTIDES
+    public String getMaxPeptides() {
+        return maxPeptides;
+    }
+    public int getMaxPeptidesInteger() {
+        if(maxPeptides == null || maxPeptides.trim().length() == 0)
+            return Integer.MAX_VALUE;
+        return Integer.parseInt(maxPeptides);
+    }
+    public void setMaxPeptides(String maxPeptides) {
+        this.maxPeptides = maxPeptides;
+    }
+    
+    // MIN UNIQUE PEPTIDES
+    public String getMinUniquePeptides() {
         return minUniquePeptides;
     }
-
-    public void setMinUniquePeptides(int minUniquePeptides) {
+    public int getMinUniquePeptidesInteger() {
+        if(minUniquePeptides == null || minUniquePeptides.trim().length() == 0)
+            return 0;
+        else
+            return Integer.parseInt(minUniquePeptides);
+    }
+    public void setMinUniquePeptides(String minUniquePeptides) {
         this.minUniquePeptides = minUniquePeptides;
     }
 
-    public int getMinSpectrumMatches() {
-        return minSpectrumMatches;
+    // MAX UNIQUE PEPTIDES
+    public String getMaxUniquePeptides() {
+        return maxUniquePeptides;
+    }
+    public int getMaxUniquePeptidesInteger() {
+        if(maxUniquePeptides == null || maxUniquePeptides.trim().length() == 0)
+            return Integer.MAX_VALUE;
+        else
+            return Integer.parseInt(maxUniquePeptides);
+    }
+    public void setMaxUniquePeptides(String maxUniquePeptides) {
+        this.maxUniquePeptides = maxUniquePeptides;
     }
 
-    public void setMinSpectrumMatches(int minSpectrumMatches) {
+    // MIN SPECTRUM MATCHES
+    public String getMinSpectrumMatches() {
+        return minSpectrumMatches;
+    }
+    public int getMinSpectrumMatchesInteger() {
+        if(minSpectrumMatches == null || minSpectrumMatches.trim().length() == 0)
+            return 1;
+        else
+            return Integer.parseInt(minSpectrumMatches);
+    }
+    public void setMinSpectrumMatches(String minSpectrumMatches) {
         this.minSpectrumMatches = minSpectrumMatches;
     }
+    
+    // MAX SPECTRUM MATCHES
+    public String getMaxSpectrumMatches() {
+        return maxSpectrumMatches;
+    }
+    public int getMaxSpectrumMatchesInteger() {
+        if(maxSpectrumMatches == null || maxSpectrumMatches.trim().length() == 0)
+            return Integer.MAX_VALUE;
+        return Integer.parseInt(maxSpectrumMatches);
+    }
+    public void setMaxSpectrumMatches(String maxSpectrumMatches) {
+        this.maxSpectrumMatches = maxSpectrumMatches;
+    }
+
 
     public boolean isJoinGroupProteins() {
         return joinGroupProteins;
