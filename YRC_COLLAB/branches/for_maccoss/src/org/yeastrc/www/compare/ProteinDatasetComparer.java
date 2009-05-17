@@ -19,8 +19,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
-import org.yeastrc.nr_seq.NRProtein;
-import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
@@ -124,36 +122,36 @@ public class ProteinDatasetComparer {
         }
     }
 
-    public static String getSystematicName(int nrseqProteinId)
-        throws Exception {
-        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-        NRProtein nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-        return getSystematicName(nrseqProt);
-    }
-    
-    public static String getSystematicName(NRProtein nrseqProt)
-            throws Exception {
-        Set<String> systNames = nrseqProt.getSystematicNames();
-        if(systNames == null || systNames.size() == 0)
-            return "";
-        
-        StringBuilder buf = new StringBuilder();
-        for(String sname: systNames) {
-            buf.append(", ");
-            buf.append(sname);
-            if(buf.length() > 15)
-                break;
-        }
-        if(buf.length() > 0)
-            buf.deleteCharAt(0);
-        
-        if(buf.length() > 15) {
-            buf.delete(15, buf.length());
-            buf.append("...");
-        }
-        String systName = buf.toString();
-        return systName;
-    }
+//    public static String getSystematicName(int nrseqProteinId)
+//        throws Exception {
+//        NRProteinFactory nrpf = NRProteinFactory.getInstance();
+//        NRProtein nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
+//        return getSystematicName(nrseqProt);
+//    }
+//    
+//    public static String getSystematicName(NRProtein nrseqProt)
+//            throws Exception {
+//        Set<String> systNames = nrseqProt.getSystematicNames();
+//        if(systNames == null || systNames.size() == 0)
+//            return "";
+//        
+//        StringBuilder buf = new StringBuilder();
+//        for(String sname: systNames) {
+//            buf.append(", ");
+//            buf.append(sname);
+//            if(buf.length() > 15)
+//                break;
+//        }
+//        if(buf.length() > 0)
+//            buf.deleteCharAt(0);
+//        
+//        if(buf.length() > 15) {
+//            buf.delete(15, buf.length());
+//            buf.append("...");
+//        }
+//        String systName = buf.toString();
+//        return systName;
+//    }
 
     public void applyFilters(ProteinComparisonDataset dataset, ProteinDatasetComparisonFilters filters) {
         

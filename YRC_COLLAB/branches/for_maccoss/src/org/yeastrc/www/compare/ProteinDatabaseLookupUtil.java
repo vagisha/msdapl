@@ -65,7 +65,7 @@ public class ProteinDatabaseLookupUtil {
         Set<Integer> searchIds = new HashSet<Integer>();
         for(int pinferId: pinferIds) {
             List<Integer> ids = runDao.loadSearchIdsForProteinferRun(pinferId);
-            if(searchIds.size() == 0) {
+            if(ids.size() == 0) {
                 log.error("No search Ids found for protein inference ID: "+pinferId);
             }
             searchIds.addAll(ids);

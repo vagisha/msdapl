@@ -105,20 +105,20 @@ public class CompareProteinGroupsAjaxAction extends Action{
             List<IdPickerProteinBase> groupProteins = protDao.loadIdPickerGroupProteins(dataset.getDatasetId(), 
                     idpProtein.getGroupId());
             
-            // get the systematic names of all the proteins in the group
             Set<Integer> groupNrseqIds = new HashSet<Integer>();
             for(IdPickerProteinBase gprot: groupProteins) {
                 groupNrseqIds.add(gprot.getNrseqProteinId());
             }
             
-            StringBuilder buf = new StringBuilder();
-            for(int nrseqId: groupNrseqIds) {
-                String systematicName = ProteinDatasetComparer.getSystematicName(nrseqId);
-                if(systematicName != null)
-                    buf.append(", "+systematicName);
-            }
-            if(buf.length() > 0) buf.deleteCharAt(0);
-            groupProteinNames.add(buf.toString());
+            // get the systematic names of all the proteins in the group
+//            StringBuilder buf = new StringBuilder();
+//            for(int nrseqId: groupNrseqIds) {
+//                String systematicName = ProteinDatasetComparer.getSystematicName(nrseqId);
+//                if(systematicName != null)
+//                    buf.append(", "+systematicName);
+//            }
+//            if(buf.length() > 0) buf.deleteCharAt(0);
+//            groupProteinNames.add(buf.toString());
             
             
 //            ArrayList<Integer> list = new ArrayList<Integer>(groupNrseqIds);
