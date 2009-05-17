@@ -142,7 +142,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
      * @param datasetIndex2
      * @return
      */
-    public int getCommonProteinsPerc(int datasetIndex1, int datasetIndex2) {
+    public float getCommonProteinsPerc(int datasetIndex1, int datasetIndex2) {
         
         if(proteinCounts == null) {
             initProteinCounts();
@@ -156,8 +156,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return calculatePercent(commonCount, ds1Count);
     }
     
-    private static int calculatePercent(int num1, int num2) {
-        return (int)((num1*100.0)/num2);
+    private static float calculatePercent(int num1, int num2) {
+        return (float) (Math.round(((float)(num1*100.0)/(float)num2) * 10.0)/10.0);
     }
 
     @Override
