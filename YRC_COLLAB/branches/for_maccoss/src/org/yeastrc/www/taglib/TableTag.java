@@ -95,16 +95,21 @@ public class TableTag extends TagSupport {
                 if(header.getHeaderId() != null) {
                     writer.print(" id=\""+header.getHeaderId()+"\" ");
                 }
+                String styleClass = "";
+                if(header.getStyleClass() != null)
+                    styleClass = header.getStyleClass()+" ";
+                
                 if(header.isSortable()) {
-                    String sortClass = header.getSortClass().getCssClass();
+                    
+                    styleClass += "sortable "+header.getSortClass().getCssClass()+" ";
                     if(header.isSorted()) {
                         String headerClass = header.getSortOrder() == SORT_ORDER.ASC ? "sorted-asc" : "sorted-desc";
-                        headerClass += " sortable ";
-                        writer.write(" class=\""+headerClass+" "+sortClass+"\" ");
+                        styleClass += headerClass;
                     }
-                    else {
-                        writer.write(" class=\"sortable"+" "+sortClass+"\" ");
-                    }
+                    
+                }
+                if(styleClass.length() > 0) {
+                    writer.write(" class=\""+styleClass+"\" ");
                 }
                 if(header.getColspan() > 0) {
                     writer.print(" colspan=\""+header.getColspan()+"\" ");
@@ -122,15 +127,27 @@ public class TableTag extends TagSupport {
             for(int i = 0; i < tabular.rowCount(); i++) {
                 TableRow row = tabular.getRow(i);
                 
+                writer.print("<tr ");
+                
+                String styleClass = "";
+                
                 if(row.isRowHighighted()) {
-                    writer.print("<tr class='tr_highlight'>\n");
+                    styleClass += "tr_highlight ";
                 }
-                else {
-                    writer.print("<tr>\n");
+                if(row.getStyleClass() != null) {
+                    styleClass += row.getStyleClass()+" ";
                 }
+                if(styleClass.length() > 0) {
+                    writer.print(" class=\""+styleClass+"\" ");
+                }
+                writer.print(">\n");
                 
                 for(TableCell cell: row.getCells()) {
                     writer.print("<td ");
+                    
+                    if(cell.getRowSpan() > 0) {
+                        writer.print("rowspan=\""+cell.getRowSpan()+"\" ");
+                    }
                     if(cell.getClassName() != null && cell.getClassName().length() > 0) {
                         writer.print(" class=\""+cell.getClassName()+"\"");
                     }

@@ -847,7 +847,8 @@
 		scope="request"
 		validate="true"
 	>
-		<forward name="Success" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
+		<forward name="ProteinList" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
+		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinSetComparison.do" redirect="false" />
 		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
 	</action>

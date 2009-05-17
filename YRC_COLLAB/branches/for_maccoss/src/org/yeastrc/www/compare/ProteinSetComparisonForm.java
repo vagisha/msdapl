@@ -36,6 +36,16 @@ public class ProteinSetComparisonForm extends ActionForm {
     
     private boolean onlyParsimonious = false;
     
+    private boolean groupProteins = false;
+    
+    public boolean isGroupProteins() {
+        return groupProteins;
+    }
+
+    public void setGroupProteins(boolean groupProteins) {
+        this.groupProteins = groupProteins;
+    }
+
     public boolean isOnlyParsimonious() {
         return onlyParsimonious;
     }

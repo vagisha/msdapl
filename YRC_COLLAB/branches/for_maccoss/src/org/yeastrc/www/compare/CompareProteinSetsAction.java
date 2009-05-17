@@ -7,6 +7,9 @@
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +22,17 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
+import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
+import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
+import edu.uwpr.protinfer.infer.graph.GraphCollapser;
+import edu.uwpr.protinfer.infer.graph.PeptideVertex;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -170,20 +178,7 @@ public class CompareProteinSetsAction extends Action {
         e = System.currentTimeMillis();
         log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        // Sort by peptide count
-        s = System.currentTimeMillis();
-        ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
-        sorter.sortByPeptideCount(comparison);
-        e = System.currentTimeMillis();
-        log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
-        
-        // Set the page number
-        comparison.setCurrentPage(myForm.getPageNum());
-        
-        
-        request.setAttribute("comparison", comparison);
         request.setAttribute("proteinSetComparisonForm", myForm);
         
         // create a list of they dataset ids being compared
@@ -191,13 +186,86 @@ public class CompareProteinSetsAction extends Action {
         request.setAttribute("dtaDatasetIds", makeCommaSeparated(dtaRunIds));
         
         
-        // Create Venn Diagram only if 2 or 3 datasets are being compared
-        if(comparison.getDatasetCount() == 2 || comparison.getDatasetCount() == 3) {
-            String googleChartUrl = VennDiagramCreator.instance().getChartUrl(comparison);
-            request.setAttribute("chart", googleChartUrl);
+        if(!myForm.isGroupProteins()) {
+            // Sort by peptide count
+            s = System.currentTimeMillis();
+            ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
+            sorter.sortByPeptideCount(comparison);
+            e = System.currentTimeMillis();
+            log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            // Set the page number
+            comparison.setCurrentPage(myForm.getPageNum());
+            
+            comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+            
+            // Create Venn Diagram only if 2 or 3 datasets are being compared
+            if(comparison.getDatasetCount() == 2 || comparison.getDatasetCount() == 3) {
+                String googleChartUrl = VennDiagramCreator.instance().getChartUrl(comparison);
+                request.setAttribute("chart", googleChartUrl);
+            }
+            
+            request.setAttribute("comparison", comparison);
+            return mapping.findForward("ProteinList");
         }
         
-        return mapping.findForward("Success");
+        else {
+            s = System.currentTimeMillis();
+            GraphBuilder graphBuilder = new GraphBuilder();
+            BipartiteGraph<ComparisonProteinGroup, PeptideVertex> graph = 
+                graphBuilder.buildGraph(comparison.getProteins(), piRunIds);
+            log.info("BEFORE collapsing graph: "+graph.getLeftVertices().size());
+            GraphCollapser<ComparisonProteinGroup, PeptideVertex> collapser = new GraphCollapser<ComparisonProteinGroup, PeptideVertex>();
+            collapser.collapseGraph(graph);
+            
+            List<ComparisonProteinGroup> proteinGroups = graph.getLeftVertices();
+            log.info("AFTER collapsing graph: "+proteinGroups.size());
+            
+            
+            // assign group IDs
+            int groupId = 1;
+            for(ComparisonProteinGroup group: proteinGroups)
+                group.setGroupId(groupId++);
+            // sort
+            Collections.sort(proteinGroups, new Comparator<ComparisonProteinGroup>() {
+                @Override
+                public int compare(ComparisonProteinGroup o1,
+                        ComparisonProteinGroup o2) {
+                    return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
+                }});
+            
+            // remove protein groups that do not have any parsimonious proteins
+            Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
+            while(iter.hasNext()) {
+                ComparisonProteinGroup proteinGroup = iter.next();
+                if(!proteinGroup.hasParsimoniousProtein())
+                    iter.remove();
+            }
+            log.info("AFTER removing non-parsimonious groups: "+proteinGroups.size());
+            
+            e = System.currentTimeMillis();
+            log.info("Time to do graph analysis: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            ProteinGroupComparisonDataset grpComparison = new ProteinGroupComparisonDataset();
+            for(ComparisonProteinGroup grp: proteinGroups)
+                grpComparison.addProteinGroup(grp);
+            
+            grpComparison.setDatasets(datasets);
+            
+            // Set the page number
+            grpComparison.setCurrentPage(myForm.getPageNum());
+            
+            grpComparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+            
+            // Create Venn Diagram only if 2 or 3 datasets are being compared
+            if(grpComparison.getDatasetCount() == 2 || grpComparison.getDatasetCount() == 3) {
+                String googleChartUrl = VennDiagramCreator.instance().getChartUrl(grpComparison);
+                request.setAttribute("chart", googleChartUrl);
+            }
+            
+            request.setAttribute("comparison", grpComparison);
+            return mapping.findForward("ProteinGroupList");
+        }
     }
 
     private String makeCommaSeparated(List<Integer> ids) {

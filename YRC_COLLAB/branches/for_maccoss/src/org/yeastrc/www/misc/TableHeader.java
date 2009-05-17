@@ -22,6 +22,7 @@ public class TableHeader {
     private int width;
     private int colspan = 0;
     private SORT_CLASS sortClass = SORT_CLASS.SORT_ALPHA;
+    private String styleClass = null;
     
     public SORT_CLASS getSortClass() {
         return sortClass;
@@ -93,6 +94,14 @@ public class TableHeader {
 
     public void setSortable(boolean sortable) {
         this.sortable = sortable;
+    }
+
+    public String getStyleClass() {
+        return styleClass;
+    }
+
+    public void setStyleClass(String styleClass) {
+        this.styleClass = styleClass;
     }
     
 }

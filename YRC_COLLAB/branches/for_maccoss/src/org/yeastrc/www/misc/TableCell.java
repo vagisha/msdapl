@@ -15,7 +15,16 @@ public class TableCell {
     private String className = null;
     private String id = null;
     private String name = null;
+    private int rowSpan = 0;
     
+    public int getRowSpan() {
+        return rowSpan;
+    }
+
+    public void setRowSpan(int rowSpan) {
+        this.rowSpan = rowSpan;
+    }
+
     public String getName() {
         return name;
     }

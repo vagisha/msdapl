@@ -110,28 +110,18 @@ public class CompareProteinGroupsAjaxAction extends Action{
                 groupNrseqIds.add(gprot.getNrseqProteinId());
             }
             
-            // get the systematic names of all the proteins in the group
-//            StringBuilder buf = new StringBuilder();
-//            for(int nrseqId: groupNrseqIds) {
-//                String systematicName = ProteinDatasetComparer.getSystematicName(nrseqId);
-//                if(systematicName != null)
-//                    buf.append(", "+systematicName);
-//            }
-//            if(buf.length() > 0) buf.deleteCharAt(0);
-//            groupProteinNames.add(buf.toString());
-            
-            
-//            ArrayList<Integer> list = new ArrayList<Integer>(groupNrseqIds);
-//            List<CommonListing> listings = CommonNameLookupUtil.instance().getCommonListings(list);
-//            
-//            StringBuilder buf = new StringBuilder();
-//            for(CommonListing listing: listings) {
-//                String name = listing.getOneName();
-//                if(name != null)
-//                    buf.append(", "+name);
-//            }
-//            if(buf.length() > 0) buf.deleteCharAt(0);
-//            groupProteinNames.add(buf.toString());
+            // get the names of all the proteins in the group
+            if(dataset.getSource() == DatasetSource.PROT_INFER) {
+                List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(dataset.getDatasetId());
+                
+                StringBuilder buf = new StringBuilder();
+                for(int nrseqId: groupNrseqIds) {
+                    ProteinListing listing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqId, dbIds);
+                    buf.append(", "+listing.getOneName());
+                }
+                if(buf.length() > 0) buf.deleteCharAt(0);
+                groupProteinNames.add(buf.toString());
+            }
         }
         
         request.setAttribute("datasets", datasets);

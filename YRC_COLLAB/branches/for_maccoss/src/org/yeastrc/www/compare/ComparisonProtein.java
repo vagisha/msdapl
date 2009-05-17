@@ -15,6 +15,7 @@ import java.util.List;
 public class ComparisonProtein {
 
     private final int nrseqId;
+    private int groupId;
     private String fastaName;
     private String commonName;
     private String description;
@@ -90,5 +91,21 @@ public class ComparisonProtein {
 
     public void setFastaName(String systematicName) {
         this.fastaName = systematicName;
+    }
+    
+    public boolean isParsimonious() {
+        for(DatasetProteinInformation dpi: this.datasetInfo) {
+            if(dpi.isParsimonious())
+                return true;
+        }
+        return false;
+    }
+
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 }

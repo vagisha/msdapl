@@ -143,6 +143,8 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 
 	
 	<div align="center">
+		<br>
+		<html:checkbox property="groupProteins">Group Indistinguishable Proteins</html:checkbox><br>
 		<html:submit value="Submit" styleClass="plain_button"/>
 	</div>
 </html:form>

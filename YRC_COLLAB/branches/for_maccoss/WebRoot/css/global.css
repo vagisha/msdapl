@@ -183,7 +183,7 @@ DIV.pinfer_header_small {
 /****************************************************************************************************/*
 /* BEGIN  TABLE STYLING
 /****************************************************************************************************/*
-.table_basic {
+.table_basic, .table_compare_grp {
 	border: 1px solid #7F7F7F;
 	border-collapse: separate;
 	empty-cells: show;
@@ -197,7 +197,7 @@ DIV.pinfer_header_small {
 }
 
 /* url(../images/sprite.png) repeat-x scroll 0 -100px; */
-.table_basic TH , .table_same_color_row TH {
+.table_basic TH , .table_same_color_row TH, .table_compare_grp TH {
 	background: #bec1c2 url(../images/sprite.png) repeat-x scroll 0 0; 
 	color: #3D4960;
 	padding: 3 5 3 5;
@@ -226,17 +226,24 @@ DIV.pinfer_header_small {
 	color: #FFFFFF;
 }
 
-.table_basic .tr_odd {
+.table_basic .tr_odd, .table_compare_grp .tr_odd {
 	background-color: #F2F2F2;
 }
-.table_basic .tr_even {
+.table_basic .tr_even, .table_compare_grp .tr_even {
 	background-color: #FFFFFF;
 }
 
-.table_basic td {
+.table_basic td, .table_compare_grp td {
 	border-style: none solid solid none;
 	border-width: medium 1px 1px medium;
 	border-color: #FFFFFF #CBCBCB #F2F2F2 #FFFFFF;
+	padding: 3 3 3 3;
+}
+
+.table_compare_grp td {
+	border-style: none solid solid none;
+	border-width: medium 1px 1px medium;
+	border-color: #FFFFFF #CBCBCB #CBCBCB #FFFFFF;
 	padding: 3 3 3 3;
 }
 

@@ -90,6 +90,79 @@ public class VennDiagramCreator {
         return null;
     }
     
+    public String getChartUrl(ProteinGroupComparisonDataset comparison) {
+
+        if(comparison.getDatasetCount() == 2) {
+
+            int ds1 = 0;
+            int ds2 = 0;
+            String label1 = null;
+            String label2 = null;
+            String[] colors = new String[3];
+            
+            if(comparison.getProteinCount(0) > comparison.getProteinCount(1)) {
+                ds1 = comparison.getProteinCount(0);
+                ds2 = comparison.getProteinCount(1);
+                label1 = "ID"+comparison.getDatasets().get(0).getDatasetId();
+                label2 = "ID"+comparison.getDatasets().get(1).getDatasetId();
+                colors[0] = DatasetColor.get(0).hexValue();
+                colors[1] = DatasetColor.get(1).hexValue();
+                colors[2] = DatasetColor.get(2).hexValue();
+            }
+            else {
+                ds1 = comparison.getProteinCount(1);
+                ds2 = comparison.getProteinCount(0);
+                label1 = "ID"+comparison.getDatasets().get(1).getDatasetId();
+                label2 = "ID"+comparison.getDatasets().get(0).getDatasetId();
+                colors[0] = DatasetColor.get(1).hexValue();
+                colors[1] = DatasetColor.get(0).hexValue();
+                colors[2] = DatasetColor.get(2).hexValue();
+            }
+            
+            int common1_2 = comparison.getCommonProteinCount(0, 1);
+            
+            
+            StringBuilder googleChartUrl = createChartUrl(ds1, ds2,
+                    common1_2, new String[]{label1, label2}, colors);
+            return googleChartUrl.toString();
+        }
+        else if(comparison.getDatasetCount() == 3) {
+
+            List<DatasetProteinCount> protCountRanks = new ArrayList<DatasetProteinCount>(3);
+            for(int index = 0; index < comparison.getDatasetCount(); index++) {
+                protCountRanks.add(new DatasetProteinCount(index, comparison.getProteinCount(index)));
+            }
+            Collections.sort(protCountRanks, new Comparator<DatasetProteinCount>() {
+                public int compare(DatasetProteinCount o1,DatasetProteinCount o2) {
+                    return Integer.valueOf(o2.proteinCount).compareTo(o1.proteinCount);
+                }});
+            
+            int ds1 = comparison.getProteinCount(protCountRanks.get(0).datasetIndex);
+            int ds2 = comparison.getProteinCount(protCountRanks.get(1).datasetIndex);
+            int ds3 = comparison.getProteinCount(protCountRanks.get(2).datasetIndex);
+
+            int common1_2 = comparison.getCommonProteinCount(protCountRanks.get(0).datasetIndex, protCountRanks.get(1).datasetIndex);
+            int common1_3 = comparison.getCommonProteinCount(protCountRanks.get(0).datasetIndex, protCountRanks.get(2).datasetIndex);
+            int common2_3 = comparison.getCommonProteinCount(protCountRanks.get(1).datasetIndex, protCountRanks.get(2).datasetIndex);
+            int common1_2_3 = 0; // commonIds(nrseqIds1, nrseqIds2, nrseqIds3);
+
+            String[] colors = new String[3];
+            colors[0] = DatasetColor.get(protCountRanks.get(0).datasetIndex).hexValue();
+            colors[1] = DatasetColor.get(protCountRanks.get(1).datasetIndex).hexValue();
+            colors[2] = DatasetColor.get(protCountRanks.get(2).datasetIndex).hexValue();
+            
+            StringBuilder googleChartUrl = createChartUrl(ds1, ds2, ds3,
+                    common1_2, common1_3, common2_3, common1_2_3,
+                    new String[]{"ID"+comparison.getDatasets().get(protCountRanks.get(0).datasetIndex).getDatasetId(), 
+                    "ID"+comparison.getDatasets().get(protCountRanks.get(1).datasetIndex).getDatasetId(), 
+                    "ID"+comparison.getDatasets().get(protCountRanks.get(2).datasetIndex).getDatasetId()},
+                    colors);
+
+            return googleChartUrl.toString();
+        }
+        return null;
+    }
+    
     private static class DatasetProteinCount {
         private int datasetIndex;
         private int proteinCount;

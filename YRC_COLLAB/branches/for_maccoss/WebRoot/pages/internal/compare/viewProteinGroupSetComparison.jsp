@@ -1,5 +1,5 @@
 
-<%@page import="org.yeastrc.www.compare.ProteinComparisonDataset"%>
+<%@page import="org.yeastrc.www.compare.ProteinGroupComparisonDataset"%>
 <%@page import="org.yeastrc.www.compare.DatasetColor"%>
 <%@page import="org.yeastrc.www.compare.Dataset"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -19,7 +19,7 @@
 
 <%@ include file="/includes/errors.jsp" %>
 
-<bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinComparisonDataset"></bean:define>
+<bean:define name="comparison" id="comparison" type="org.yeastrc.www.compare.ProteinGroupComparisonDataset"></bean:define>
 
 <script src="<yrcwww:link path='js/jquery.ui-1.6rc2/jquery-1.2.6.js'/>"></script>
 <script src="<yrcwww:link path='js/jquery.form.js'/>"></script>
@@ -86,13 +86,12 @@ $(document).ready(function() {
    					$(row).addClass('prot_open');
    					
    					if($(row).is('.has_proteins')) {
-   						$(row).next().show();
+   						$(row).children(".prot_descr").children(".prot_groups").show();
    					}
    					else {
-   						// append a row for the protein groups to go into
-   						var newRow = "<tr><td colspan='"+colCount+"'>";
-   						newRow += "<div align='center' width='90%' id='proteins_"+nrseqId+"'></div></td></tr>"
-   						$(row).after(newRow);
+   						// append a div to the description cell for the protein groups to go into
+   						var newDiv = "<div align='center' width='90%' id='proteins_"+nrseqId+"' class='prot_groups'></div></td></tr>"
+   						$(row).children(".prot_descr").append(newDiv);
    						
    						// send a request for the peptides
    						$.blockUI();
@@ -110,7 +109,7 @@ $(document).ready(function() {
    				else {
    					$(row).removeClass('prot_open');
    					$(row).addClass('prot_closed');
-   					$(row).next().hide();
+   					$(row).children(".prot_descr").children(".prot_groups").hide();
    				}
    			});
    		});
@@ -133,24 +132,16 @@ $(document).ready(function() {
    					$(row).addClass('pept_open');
    					
    					if($(row).is('.has_peptides')) {
-   						if($(row).is('.has_proteins')) {
-   							$(row).next().next().show();
-   						}
-   						else {
-   							$(row).next().show();
-   						}
+   						var nextTopRow = $(row).nextAll('.top_row').get(0);
+   						$(nextTopRow).prev().show();
    					}
    					else {
    						// append a row for the peptide list to go into
    						var newRow = "<tr><td colspan='"+colCount+"'>";
    						newRow += "<div align='center' width='90%' id='peptides_"+nrseqId+"'></div></td></tr>"
    						
-   						if($(row).is('.has_proteins')) {
-   							$(row).next().after(newRow);
-   						}
-   						else {
-   							$(row).after(newRow);
-   						}
+ 						var nextTopRow = $(row).nextAll('.top_row').get(0);
+ 						$(nextTopRow).before(newRow);
    						
    						
    						// send a request for the peptides
@@ -171,12 +162,8 @@ $(document).ready(function() {
    				else {
    					$(row).removeClass('pept_open');
    					$(row).addClass('pept_closed');
-   					if($(row).is('.has_proteins')) {
-						$(row).next().next().hide();
-					}
-					else {
-						$(row).next().hide();
-					}
+   					var nextTopRow = $(row).nextAll('.top_row').get(0);
+   					$(nextTopRow).prev().hide();
    				}
    			});
    			
@@ -306,7 +293,7 @@ function toggleNotSelect(dsIndex) {
 
 <tr>
 <td colspan="2" style="background-color:#F2F2F2; font-weight:bold; text-align: center; padding:5 5 5 5;" >
-Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
+Total Protein Groups (Total Proteins): <bean:write name="comparison" property="totalProteinGroupCount" /> (<bean:write name="comparison" property="totalProteinCount" />)
 </td>
 
 <logic:present name="chart">
@@ -324,7 +311,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <thead>
 	<tr>
 		<th>Dataset</th>
-		<th># Proteins</th>
+		<th># Protein Groups (# Proteins)</th>
 	</tr>
 </thead>
 <tbody>
@@ -334,7 +321,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 			<span><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></span>
 		</th>
 		<td style="color:#FFFFFF; background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> ); padding: 3 5 3 5;">
-			<%=comparison.getProteinCount(row)%>
+			<%=comparison.getProteinGroupCount(row)%> (<%=comparison.getProteinCount(row) %>)
 		</td>
 	</tr>
 </logic:iterate>
@@ -365,7 +352,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 	</logic:equal>
 	
 	<logic:notEqual name="column" value="<%=String.valueOf(row)%>">
-		<td>(<%=comparison.getCommonProteinCount(row, column) %>)&nbsp;<%=comparison.getCommonProteinsPerc(row, column) %>%</td>
+		<td><%=comparison.getCommonProteinGroupCount(row, column) %>&nbsp;(<%=comparison.getCommonProteinGroupsPerc(row, column) %>%)</td>
 	</logic:notEqual>
 </logic:iterate>
 
@@ -405,7 +392,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 		
 <!-- RESULTS TABLE -->
 <div > 
-<yrcwww:table name="comparison" tableId='compare_results' tableClass="table_basic sortable_table" center="true" />
+<yrcwww:table name="comparison" tableId='compare_results' tableClass="table_compare_grp" center="true" />
 </div>
 
 </yrcwww:contentbox>

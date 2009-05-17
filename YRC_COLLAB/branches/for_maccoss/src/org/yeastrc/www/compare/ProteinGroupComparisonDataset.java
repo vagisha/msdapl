@@ -1,15 +1,18 @@
 /**
- * ComparisonDataset.java
+ * ProteinGroupComparisonDataset.java
  * @author Vagisha Sharma
- * Apr 11, 2009
+ * May 16, 2009
  * @version 1.0
  */
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.TableCell;
@@ -23,22 +26,29 @@ import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
 /**
  * 
  */
-public class ProteinComparisonDataset implements Tabular, Pageable {
+public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     private List<Dataset> datasets;
     private List<Integer> fastaDatabaseIds; // for protein name lookup
     
     // FILTERED proteins
+    private List<ComparisonProteinGroup> proteinGroups;
+    
     private List<ComparisonProtein> proteins;
     
     // counts BEFORE filtering
     private int[][] proteinCounts;
-    private int totalProteinCount;
+    private int[][] proteinGroupCounts;
     
     private int rowCount = 50;
     private int currentPage = 1;
     private int pageCount = 1;
     private List<Integer> displayPageNumbers;
+    
+    private int currentGroupId = -1;  // used in the getRow method
+    private Map<Integer, Integer> groupMemberCount;
+    
+    private String rowCssClass = "tr_even";
     
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
@@ -50,9 +60,11 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         this.rowCount = count;
     }
 
-    public ProteinComparisonDataset() {
+    public ProteinGroupComparisonDataset() {
         this.datasets = new ArrayList<Dataset>();
+        this.proteinGroups = new ArrayList<ComparisonProteinGroup>();
         this.proteins = new ArrayList<ComparisonProtein>();
+        groupMemberCount = new HashMap<Integer, Integer>();
         this.displayPageNumbers = new ArrayList<Integer>();
     }
 
@@ -60,16 +72,19 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return datasets;
     }
 
-    public List<ComparisonProtein> getProteins() {
-        return proteins;
+    public List<ComparisonProteinGroup> getProteinsGroups() {
+        return proteinGroups;
     }
     
     public void setDatasets(List<Dataset> datasets) {
         this.datasets = datasets;
     }
     
-    public void addProtein(ComparisonProtein protein) {
-        this.proteins.add(protein);
+    public void addProteinGroup(ComparisonProteinGroup proteinGroup) {
+        this.proteinGroups.add(proteinGroup);
+        for(ComparisonProtein protein: proteinGroup.getProteins())
+            proteins.add(protein);
+        groupMemberCount.put(proteinGroup.getGroupId(), proteinGroup.getProteins().size());
     }
     
     public int getDatasetCount() {
@@ -77,16 +92,16 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     }
     
     public int getTotalProteinCount() {
-        return totalProteinCount;
+        return proteins.size();
     }
     
-    public int getFilteredProteinCount() {
-        return proteins.size();
+    public int getTotalProteinGroupCount() {
+        return proteinGroups.size();
     }
     
     public void initSummary() {
         initProteinCounts();
-        this.totalProteinCount = proteins.size();
+        initProteinGroupCounts();
     }
     
     private void initProteinCounts() {
@@ -119,14 +134,40 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         }
     }
     
-    public int getProteinCount(int datasetIndex) {
+    private void initProteinGroupCounts() {
         
-        if(proteinCounts == null) {
-            initProteinCounts();
+        proteinGroupCounts = new int[datasets.size()][datasets.size()];
+        for(int i = 0; i < datasets.size(); i++) {
+            for(int j = 0; j < datasets.size(); j++)
+                proteinGroupCounts[i][j] = 0;
         }
-        return proteinCounts[datasetIndex][datasetIndex];
-    }
+        
+        for(ComparisonProteinGroup proteinGroup: proteinGroups) {
+            
+            for(int i = 0; i < datasets.size(); i++) {
+                
+                Dataset dsi = datasets.get(i);
+                
+                for(ComparisonProtein protein: proteinGroup.getProteins()) {
+                    if(protein.isInDataset(dsi)) {
 
+                        proteinGroupCounts[i][i]++;
+
+                        for(int j = i+1; j < datasets.size(); j++) {
+
+                            Dataset dsj = datasets.get(j);
+                            if(protein.isInDataset(dsj)) {
+                                proteinGroupCounts[i][j]++;
+                                proteinGroupCounts[j][i]++;
+                            }
+                        }
+                        break; 
+                    }
+                }
+            }
+        }
+    }
+    
     public int getCommonProteinCount(int datasetIndex1, int datasetIndex2) {
         
         if(proteinCounts == null) {
@@ -135,6 +176,30 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return proteinCounts[datasetIndex1][datasetIndex2];
     }
     
+    public int getCommonProteinGroupCount(int datasetIndex1, int datasetIndex2) {
+        
+        if(proteinGroupCounts == null) {
+            initProteinGroupCounts();
+        }
+        return proteinGroupCounts[datasetIndex1][datasetIndex2];
+    }
+    
+
+    public int getProteinGroupCount(int datasetIndex) {
+        
+        if(proteinGroupCounts == null) {
+            initProteinGroupCounts();
+        }
+        return proteinGroupCounts[datasetIndex][datasetIndex];
+    }
+
+    public int getProteinCount(int datasetIndex) {
+        
+        if(proteinCounts == null) {
+            initProteinCounts();
+        }
+        return proteinCounts[datasetIndex][datasetIndex];
+    }
 
     /**
      * Fraction of dataset_1 proteins that were also found in dataset_2
@@ -155,6 +220,21 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             return 0;
         return calculatePercent(commonCount, ds1Count);
     }
+    
+    public int getCommonProteinGroupsPerc(int datasetIndex1, int datasetIndex2) {
+        
+        if(proteinGroupCounts == null) {
+            initProteinGroupCounts();
+        }
+        
+        int ds1Count = proteinGroupCounts[datasetIndex1][datasetIndex1];
+        int commonCount = proteinGroupCounts[datasetIndex1][datasetIndex2];
+        
+        if(ds1Count <= 0)
+            return 0;
+        return calculatePercent(commonCount, ds1Count);
+    }
+
     
     private static int calculatePercent(int num1, int num2) {
         return (int)((num1*100.0)/num2);
@@ -177,7 +257,28 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 //        protId.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
 //        row.addCell(protId);
         
-        // Protein 
+        if(currentGroupId == -1 || currentGroupId != protein.getGroupId()) {
+            currentGroupId = protein.getGroupId();
+            
+            TableCell groupId = new TableCell(String.valueOf(currentGroupId));
+            groupId.setRowSpan(groupMemberCount.get(currentGroupId));
+            row.addCell(groupId);
+            
+            // Peptide count
+            TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
+            peptCount.setRowSpan(groupMemberCount.get(currentGroupId));
+            peptCount.setClassName("pept_count clickable underline");
+            peptCount.setId(String.valueOf(protein.getNrseqId()));
+            row.addCell(peptCount);
+            
+            rowCssClass = rowCssClass.equals("tr_even") ? "tr_odd" : "tr_even";
+            
+            row.setStyleClass(rowCssClass+" top_row ");
+        }
+        else
+            row.setStyleClass(rowCssClass);
+        
+        // Protein name
         TableCell protName = new TableCell(protein.getFastaName());
         protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
         row.addCell(protName);
@@ -185,12 +286,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         // Protein common name
         TableCell protCommonName = new TableCell(protein.getCommonName());
         row.addCell(protCommonName);
-        
-        // Peptide count
-        TableCell peptCount = new TableCell(String.valueOf(protein.getMaxPeptideCount()));
-        peptCount.setClassName("pept_count clickable underline");
-        peptCount.setId(String.valueOf(protein.getNrseqId()));
-        row.addCell(peptCount);
         
         // Protein description
         TableCell protDescr = new TableCell();
@@ -265,7 +360,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     
     @Override
     public int rowCount() {
-        return Math.min(rowCount, this.getFilteredProteinCount() - this.getOffset());
+        return Math.min(rowCount, this.getTotalProteinCount() - this.getOffset());
     }
 
     @Override
@@ -278,6 +373,17 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 //        header.setSortable(false);
 //        headers.add(header);
         
+        
+        header = new TableHeader("GroupID");
+        header.setWidth(10);
+        header.setSortable(false);
+        headers.add(header);
+        
+        header = new TableHeader("#Pept");
+        header.setWidth(5);
+        header.setSortable(false);
+        headers.add(header);
+        
         header = new TableHeader("Name");
         header.setWidth(10);
         header.setSortable(false);
@@ -285,11 +391,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         
         header = new TableHeader("Common Name");
         header.setWidth(10);
-        header.setSortable(false);
-        headers.add(header);
-        
-        header = new TableHeader("#Pept");
-        header.setWidth(5);
         header.setSortable(false);
         headers.add(header);
         
@@ -310,7 +411,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     @Override
     public void tabulate() {
         
-        int max = Math.min((this.getOffset() + rowCount), this.getFilteredProteinCount());
+        int max = Math.min((this.getOffset() + rowCount), this.getTotalProteinCount());
         initializeInfo(this.getOffset(), max);
     }
     
@@ -330,7 +431,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         protein.setFastaName(nameDescr[0]);
         protein.setCommonName(nameDescr[2]);
         protein.setDescription(nameDescr[1]);
-        
+
         // Get the group information for the different datasets
         for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
             if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
@@ -339,8 +440,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             }
             // TODO for DTASelect
         }
-//            // get the (max)number of peptides identified for this protein
-//            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
     }
     
     private String[] getProteinNames(int nrseqProteinId) {
@@ -380,8 +479,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     public void setCurrentPage(int page) {
         this.currentPage = page;
         ResultsPager pager = ResultsPager.instance();
-        this.pageCount = pager.getPageCount(this.proteins.size(), rowCount);
-        this.displayPageNumbers = pager.getPageList(this.proteins.size(), currentPage, rowCount);
+        this.pageCount = pager.getPageCount(this.proteinGroups.size(), rowCount);
+        this.displayPageNumbers = pager.getPageList(this.proteinGroups.size(), currentPage, rowCount);
     }
     
     @Override
