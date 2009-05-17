@@ -90,7 +90,7 @@ $(document).ready(function() {
    					}
    					else {
    						// append a div to the description cell for the protein groups to go into
-   						var newDiv = "<div align='center' width='90%' id='proteins_"+nrseqId+"' class='prot_groups'></div></td></tr>"
+   						var newDiv = "<div align='center' width='90%' style='margin-top:5px; margin-bottom:5px' id='proteins_"+nrseqId+"' class='prot_groups'></div></td></tr>"
    						$(row).children(".prot_descr").append(newDiv);
    						
    						// send a request for the peptides
