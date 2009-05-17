@@ -15,24 +15,18 @@ import java.util.List;
 public class ComparisonProtein {
 
     private final int nrseqId;
-    private String systematicName;
-    private String name;
+    private String fastaName;
+    private String commonName;
     private String description;
     private int maxPeptideCount;
     
     private List<DatasetProteinInformation> datasetInfo;
     
     public ComparisonProtein(int nrseqId) {
-        this(nrseqId, null, null);
-    }
-    
-    public ComparisonProtein(int nrseqId, String name, String description) {
         this.nrseqId = nrseqId;
-        this.name = name;
-        this.description = description;
         datasetInfo = new ArrayList<DatasetProteinInformation>();
     }
-
+    
     public int getNrseqId() {
         return nrseqId;
     }
@@ -66,12 +60,12 @@ public class ComparisonProtein {
         return false;
     }
 
-    public String getName() {
-        return name;
+    public String getCommonName() {
+        return commonName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCommonName(String name) {
+        this.commonName = name;
     }
 
     public String getDescription() {
@@ -90,11 +84,11 @@ public class ComparisonProtein {
         this.maxPeptideCount = maxPeptideCount;
     }
 
-    public String getSystematicName() {
-        return systematicName;
+    public String getFastaName() {
+        return fastaName;
     }
 
-    public void setSystematicName(String systematicName) {
-        this.systematicName = systematicName;
+    public void setFastaName(String systematicName) {
+        this.fastaName = systematicName;
     }
 }

@@ -9,7 +9,7 @@ package org.yeastrc.www.compare;
 /**
  * 
  */
-public class CommonNameDescription {
+public class ProteinNameDescription {
 
     private String name;
     private String description;

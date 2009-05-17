@@ -124,32 +124,6 @@ public class ProteinDatasetComparer {
         }
     }
 
-    static String[] getProteinAccessionDescription(int nrseqProteinId, boolean fullLookup) {
-        
-        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-        NRProtein nrseqProt = null;
-        try {
-            nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-            String systName = getSystematicName(nrseqProt);
-            
-//            String commonName = nrseqProt.getListing();
-//            String description = nrseqProt.getDescription();
-//          if(commonName.equals("UNKNOWN"))
-//          commonName = "";
-            
-            CommonListing listing = CommonNameLookupUtil.instance().getCommonListing(nrseqProteinId);
-            String commonName = listing.getName();
-            String description = listing.getDescription();
-            
-            return new String[] {commonName, description, systName};
-        }
-        catch (Exception e) {
-            log.error("Exception getting accession/description for protein Id: "+nrseqProteinId, e);
-        }
-        return null;
-    }
-
-    
     public static String getSystematicName(int nrseqProteinId)
         throws Exception {
         NRProteinFactory nrpf = NRProteinFactory.getInstance();
@@ -266,7 +240,7 @@ public class ProteinDatasetComparer {
         for(String token: tokens) {
             String name = token.trim();
             if(name.length() > 0) {
-                List<Integer> ids = CommonNameLookupUtil.instance().getProteinIds(name);
+                List<Integer> ids = CommonNameLookupUtil.getInstance().getProteinIds(name);
                 proteinIds.addAll(ids);
                 
                 if(ids.size() == 0) {

@@ -27,19 +27,19 @@ public class CommonNameLookupUtil {
     
     private CommonNameLookupUtil() {}
     
-    public static CommonNameLookupUtil instance() {
+    public static CommonNameLookupUtil getInstance() {
         if(instance == null)
             instance = new CommonNameLookupUtil();
         return instance;
     }
 
-    public CommonListing getCommonListing(int nrseqProteinId) throws Exception {
+    public ProteinListing getProteinListing(int nrseqProteinId) throws Exception {
         
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         
-        CommonListing listing = new CommonListing();
+        ProteinListing listing = new ProteinListing();
         listing.setNrseqProteinId(nrseqProteinId);
         
         try {
@@ -48,12 +48,12 @@ public class CommonNameLookupUtil {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             
-            List<CommonNameDescription> cndList = new ArrayList<CommonNameDescription>();
+            List<ProteinNameDescription> cndList = new ArrayList<ProteinNameDescription>();
             
             while(rs.next()) {
                 String name = rs.getString("name");
                 String description = rs.getString("description");
-                CommonNameDescription cnd = new CommonNameDescription();
+                ProteinNameDescription cnd = new ProteinNameDescription();
                 cnd.setName(name);
                 cnd.setDescription(description);
                 cndList.add(cnd);
@@ -75,10 +75,10 @@ public class CommonNameLookupUtil {
           NRProteinFactory nrpf = NRProteinFactory.getInstance();
           NRProtein nrseqProt = null;
           nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-          CommonNameDescription cnd = new CommonNameDescription();
+          ProteinNameDescription cnd = new ProteinNameDescription();
           cnd.setName(nrseqProt.getListing());
           cnd.setDescription(nrseqProt.getDescription());
-          List<CommonNameDescription> list = new ArrayList<CommonNameDescription>();
+          List<ProteinNameDescription> list = new ArrayList<ProteinNameDescription>();
           list.add(cnd);
           listing.setCommonNameDescription(list);
         }
@@ -86,13 +86,13 @@ public class CommonNameLookupUtil {
         return listing;
     }
     
-    public List<CommonListing> getCommonListings(List<Integer> nrseqProteinIds) throws SQLException {
+    public List<ProteinListing> getCommonListings(List<Integer> nrseqProteinIds) throws SQLException {
         
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         
-        List<CommonListing> listings = new ArrayList<CommonListing>(nrseqProteinIds.size());
+        List<ProteinListing> listings = new ArrayList<ProteinListing>(nrseqProteinIds.size());
         
         try {
             conn = DAOFactory.instance().getConnection();
@@ -103,16 +103,16 @@ public class CommonNameLookupUtil {
             for(int nrseqProteinId: nrseqProteinIds) {
                 stmt.setInt(1, nrseqProteinId);
                 rs = stmt.executeQuery();
-                CommonListing listing = new CommonListing();
+                ProteinListing listing = new ProteinListing();
                 listing.setNrseqProteinId(nrseqProteinId);
                 listings.add(listing);
                 
-                List<CommonNameDescription> cndList = new ArrayList<CommonNameDescription>();
+                List<ProteinNameDescription> cndList = new ArrayList<ProteinNameDescription>();
                 
                 while(rs.next()) {
                     String name = rs.getString("name");
                     String description = rs.getString("description");
-                    CommonNameDescription cnd = new CommonNameDescription();
+                    ProteinNameDescription cnd = new ProteinNameDescription();
                     cnd.setName(name);
                     cnd.setDescription(description);
                     cndList.add(cnd);
@@ -145,7 +145,7 @@ public class CommonNameLookupUtil {
         
         try {
             conn = DAOFactory.instance().getConnection();
-            String sql = "SELECT proteinID FROM nrseqProteinCache WHERE name LIKE '"+commonName+"%'";
+            String sql = "SELECT proteinID FROM YRC_NRSEQ.tblProteinDatabase WHERE accessionString LIKE '"+commonName+"%'";
             stmt = conn.createStatement();
             
             rs = stmt.executeQuery(sql);

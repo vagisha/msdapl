@@ -233,8 +233,8 @@ public class DownloadComparisonResults extends Action {
             comparison.initializeProteinInfo(protein);
             
             writer.write(protein.getNrseqId()+"\t");
-            writer.write(protein.getSystematicName()+"\t");
-            writer.write(protein.getName()+"\t");
+            writer.write(protein.getFastaName()+"\t");
+            writer.write(protein.getCommonName()+"\t");
             writer.write(protein.getMaxPeptideCount()+"\t");
            
             for(Dataset dataset: comparison.getDatasets()) {

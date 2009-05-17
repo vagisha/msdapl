@@ -33,12 +33,12 @@ public class ProteinDatasetSorter {
         for(ComparisonProtein protein: proteins)
             nrseqProteinIds.add(protein.getNrseqId());
         
-        CommonNameLookupUtil lookup = CommonNameLookupUtil.instance();
-        List<CommonListing> listings = lookup.getCommonListings(nrseqProteinIds);
+        CommonNameLookupUtil lookup = CommonNameLookupUtil.getInstance();
+        List<ProteinListing> listings = lookup.getCommonListings(nrseqProteinIds);
         for(int i = 0; i < nrseqProteinIds.size(); i++) {
             ComparisonProtein protein = proteins.get(i);
-            CommonListing listing = listings.get(i);
-            protein.setName(listing.getName());
+            ProteinListing listing = listings.get(i);
+            protein.setCommonName(listing.getName());
             protein.setDescription(listing.getDescription());
         }
         
@@ -58,14 +58,14 @@ public class ProteinDatasetSorter {
 
         @Override
         public int compare(ComparisonProtein o1, ComparisonProtein o2) {
-            if(o1.getName() == null && o2.getName() == null)
+            if(o1.getCommonName() == null && o2.getCommonName() == null)
                 return 0;
-            if(o1.getName() == null || o1.getName().length() == 0)
+            if(o1.getCommonName() == null || o1.getCommonName().length() == 0)
                 return 1;
-            if(o2.getName() == null || o2.getName().length() == 0)
+            if(o2.getCommonName() == null || o2.getCommonName().length() == 0)
                 return -1;
             
-            return o1.getName().compareTo(o2.getName());
+            return o1.getCommonName().compareTo(o2.getCommonName());
         }
         
     }
