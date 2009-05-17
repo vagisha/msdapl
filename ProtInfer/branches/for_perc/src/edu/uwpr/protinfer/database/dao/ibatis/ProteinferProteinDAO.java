@@ -131,6 +131,24 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
         return 0;
     }
     
+    public List<String> getPeptidesForProtein(int nrseqId, List<Integer> pinferIds) {
+        if(pinferIds == null || pinferIds.size() == 0)
+            return new ArrayList<String>(0);
+        
+        StringBuilder buf = new StringBuilder("(");
+        for(int id: pinferIds) {
+            buf.append(id+",");
+        }
+        buf.deleteCharAt(buf.length() - 1);
+        buf.append(")");
+        
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("nrseqId", nrseqId);
+        map.put("pinferIds", buf.toString());
+        
+        return queryForList(sqlMapNameSpace+".peptidesForProteinInRuns", map);
+    }
+    
 //    public List<ProteinferProtein> loadProteinsN(int pinferId) {
 //        Connection conn = null;
 //        PreparedStatement stmt = null;

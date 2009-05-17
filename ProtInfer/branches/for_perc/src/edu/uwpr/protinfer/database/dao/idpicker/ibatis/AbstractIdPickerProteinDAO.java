@@ -152,6 +152,11 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     }
     
     @Override
+    public List<String> getPeptidesForProtein(int nrseqId, List<Integer> pinferIds) {
+        return protDao.getPeptidesForProtein(nrseqId, pinferIds);
+    }
+    
+    @Override
     public void updateUserAnnotation(int pinferProteinId, String annotation) {
         protDao.updateUserAnnotation(pinferProteinId, annotation);
     }
