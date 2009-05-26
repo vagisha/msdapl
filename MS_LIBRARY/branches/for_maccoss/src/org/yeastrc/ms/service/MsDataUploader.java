@@ -188,16 +188,16 @@ public class MsDataUploader {
             }
             
             // enable keys
-            try {
-                enableSearchTableKeys();
-            }
-            catch (SQLException e) {
-                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
-                uploadExceptionList.add(ex);
-                log.error(ex.getMessage(), ex);
-                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                return;
-            }
+//            try {
+//                enableSearchTableKeys();
+//            }
+//            catch (SQLException e) {
+//                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+//                uploadExceptionList.add(ex);
+//                log.error(ex.getMessage(), ex);
+//                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+//                return;
+//            }
         }
         
         // ----- UPLOAD ANALYSIS DATA
@@ -457,16 +457,16 @@ public class MsDataUploader {
                 }
                 
                 // enable keys
-                try {
-                    enableSearchTableKeys();
-                }
-                catch (SQLException e) {
-                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
-                    uploadExceptionList.add(ex);
-                    log.error(ex.getMessage(), ex);
-                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-                    return;
-                }
+//                try {
+//                    enableSearchTableKeys();
+//                }
+//                catch (SQLException e) {
+//                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+//                    uploadExceptionList.add(ex);
+//                    log.error(ex.getMessage(), ex);
+//                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+//                    return;
+//                }
             }
             else {
                 this.uploadedSearchId = searchId;
