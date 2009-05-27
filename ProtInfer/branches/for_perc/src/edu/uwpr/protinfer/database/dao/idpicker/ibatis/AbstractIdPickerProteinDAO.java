@@ -337,6 +337,13 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     
     private List<Integer> proteinIdsBySpectrumCount(int pinferId, int minSpecCount, int maxSpecCount,
             boolean sort, boolean groupProteins) {
+        
+        // If we are NOT filtering anything AND NOT sorting on spectrum count just return all the protein Ids
+        // for this protein inference run
+        if(minSpecCount <= 1 && maxSpecCount == Integer.MAX_VALUE && !sort) {
+            return getIdPickerProteinIds(pinferId, false);
+        }
+        
         Map<String, Number> map = new HashMap<String, Number>(10);
         map.put("pinferId", pinferId);
         map.put("minSpectra", minSpecCount);
@@ -375,6 +382,13 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
     private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
             PeptideDefinition peptDef,
             boolean sort, boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein) {
+        
+        // If we are NOT filtering anything AND NOT sorting on peptide count just return all the protein Ids
+        // for this protein inference run
+        if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
+            return getIdPickerProteinIds(pinferId, isParsimonious);
+        }
+        
         Map<String, Number> map = new HashMap<String, Number>(12);
         map.put("pinferId", pinferId);
         map.put("minPeptides", minPeptideCount);
