@@ -60,6 +60,10 @@
     	SELECT id FROM msProteinInferPeptide WHERE piRunID=#id#
     </select>
     
+    <select id="selectUniqPeptSeqForRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT COUNT(DISTINCT(sequence)) FROM msProteinInferPeptide WHERE piRunID=#id#
+    </select>
+    
     <select id="selectPeptidesForProteinferRun" resultMap="pinferPeptideResult" parameterClass="Integer">
     	SELECT * FROM msProteinInferPeptide WHERE piRunID=#id#
     </select>

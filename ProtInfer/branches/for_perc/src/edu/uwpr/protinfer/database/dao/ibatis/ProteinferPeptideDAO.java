@@ -67,4 +67,9 @@ public class ProteinferPeptideDAO extends BaseSqlMapDAO implements
     public int update(GenericProteinferPeptide<?,?> peptide) {
         return update(sqlMapNameSpace+".update", peptide);
     }
+
+    @Override
+    public int getUniquePeptideSequenceCountForRun(int proteinferId) {
+        return (Integer)super.queryForObject(sqlMapNameSpace+".selectUniqPeptSeqForRun", proteinferId);
+    }
 }

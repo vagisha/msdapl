@@ -36,10 +36,6 @@ public class ProteinInferenceProgram {
         return version;
     }
     
-    public void setVersion(String version) {
-        this.version = version;
-    }
-    
     public String name() {
         return name;
     }

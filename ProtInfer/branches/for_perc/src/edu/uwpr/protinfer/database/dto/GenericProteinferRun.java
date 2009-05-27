@@ -50,8 +50,6 @@ public class GenericProteinferRun<T extends ProteinferInput> {
     }
 
     public ProteinInferenceProgram getProgram() {
-        if(this.programVersion != null)
-            program.setVersion(this.programVersion);
         return this.program;
     }
 
