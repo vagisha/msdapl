@@ -331,43 +331,66 @@ function deleteProtInferRun(pinferId) {
 					<div><b>Protein Inference Results</b></div> 
 					<table width="100%">
 					<thead>
-					<tr align="left"><th>ID</th><th>Version</th><th>Date</th><th>Submitted By</th><th>Comments</th><th>Status</th></tr>
+					<tr align="left">
+						<th valign="top">ID</th>
+						<th valign="top">Version</th>
+						<th valign="top">Date</th>
+						<th valign="top">User</th>
+						<th valign="top">#Groups<br>(#Proteins)</th>
+						<th valign="top">#Peptides</th>
+						<th valign="top">Comments</th>
+						<th valign="top">Status</th></tr>
 					</thead>
 					<tbody>
-					<logic:iterate name="experiment" property="protInferRuns" id="piJob" type="org.yeastrc.www.proteinfer.ProteinferJob">
+					<logic:iterate name="experiment" property="protInferRuns" id="piJob" type="org.yeastrc.experiment.ExperimentProteinferRun">
 						<tr>
-						<td valign="top"><b><bean:write name="piJob" property="pinferId"/></b></td>
-						<td valign="top" align="center"><b><bean:write name="piJob" property="version"/></b></td>
-						<td valign="top"><bean:write name="piJob" property="submitDate"/></td>
-						<td valign="top"><bean:write name="piJob" property="researcher.lastName"/></td>
+						<td valign="top"><b><bean:write name="piJob" property="job.pinferId"/></b></td>
+						<td valign="top" align="center"><b><bean:write name="piJob" property="job.version"/></b></td>
+						<td valign="top"><bean:write name="piJob" property="job.submitDate"/></td>
+						<td valign="top"><bean:write name="piJob" property="job.researcher.lastName"/></td>
+						
+						<logic:equal name="piJob" property="job.complete" value="true">
+						<td valign="top"><nobr><bean:write name="piJob" property="numParsimoniousProteinGroups"/>(<bean:write name="piJob" property="numParsimoniousProteins"/>)</nobr></td>
+						<td valign="top"><bean:write name="piJob" property="uniqPeptideSequenceCount"/></td>
+						</logic:equal>
+						
+						<logic:equal name="piJob" property="job.complete" value="false">
+						<td valign="top">&nbsp;</td>
+						<td valign="top">&nbsp;</td>
+						</logic:equal>
+						
+						
+						
 						<td valign="top">
-							<span id="piRun_<bean:write name='piJob' property='pinferId'/>_text"><bean:write name="piJob" property="comments"/></span>
+							<span id="piRun_<bean:write name='piJob' property='job.pinferId'/>_text"><bean:write name="piJob" property="job.comments"/></span>
 							<logic:equal name="writeAccess" value="true">
-							<span class="editableComment clickable" id="piRun_<bean:write name='piJob' property='pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
+							<span class="editableComment clickable" id="piRun_<bean:write name='piJob' property='job.pinferId'/>" style="font-size:8pt; color:red;">[Edit]</span>
 							</logic:equal>
 						</td>
 						<td valign="top">
 						
 						<!-- Job COMPLETE -->
-						<logic:equal name="piJob" property="complete" value="true">
-							<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>">
-							<b><font color="green"><bean:write name="piJob" property="statusDescription"/></font></b></a>
+						<logic:equal name="piJob" property="job.complete" value="true">
+							<nobr>
+							<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>">
+							<b><font color="green">View</font></b></a>
 							&nbsp;
-							<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='pinferId'/>">Compare</a>
+							<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='job.pinferId'/>">Compare</a>
 							&nbsp;
-							<span class="clickable" style="text-decoration: underline;" 
-							      onclick="javascript:deleteProtInferRun(<bean:write name='piJob' property='pinferId'/>);">Delete</span>
+							<span class="clickable" style="text-decoration: underline; color:red;" 
+							      onclick="javascript:deleteProtInferRun(<bean:write name='piJob' property='job.pinferId'/>);">Del</span>
+							</nobr>
 						</logic:equal>
 						<!-- Job FAILED -->
-						<logic:equal name="piJob" property="failed" value="true">
-							<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
-							<b><font color="red"><bean:write name="piJob" property="statusDescription"/></font></b>
+						<logic:equal name="piJob" property="job.failed" value="true">
+							<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
+							<b><font color="red"><bean:write name="piJob" property="job.statusDescription"/></font></b>
 							</a>
 						</logic:equal>
 						<!-- Job RUNNING -->
-						<logic:equal name="piJob" property="running" value="true">
-							<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
-							<b><font color="#000000"><bean:write name="piJob" property="statusDescription"/></font></b>
+						<logic:equal name="piJob" property="job.running" value="true">
+							<a href="<yrcwww:link path='viewProteinInferenceJob.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>&projectId=<bean:write name='project' property='ID'/>">
+							<b><font color="#000000"><bean:write name="piJob" property="job.statusDescription"/></font></b>
 							</a>
 						</logic:equal>
 						
@@ -375,12 +398,12 @@ function deleteProtInferRun(pinferId) {
 						</tr>
 						<tr>
 							<td colspan="5" valign="top">
-							<div id="piRun_<bean:write name='piJob' property='pinferId'/>_edit" align="center"
+							<div id="piRun_<bean:write name='piJob' property='job.pinferId'/>_edit" align="center"
 						     style="display:none;">
 						     <textarea rows="5" cols="60" class="edit_text"></textarea>
 						     <br>
-						     <button class="savePiRunComments" id="<bean:write name='piJob' property='pinferId'/>">Save</button>
-						     <button class="cancelPiRunComments" id="<bean:write name='piJob' property='pinferId'/>">Cancel</button>
+						     <button class="savePiRunComments" id="<bean:write name='piJob' property='job.pinferId'/>">Save</button>
+						     <button class="cancelPiRunComments" id="<bean:write name='piJob' property='job.pinferId'/>">Cancel</button>
 							</div>
 							</td>
 						</tr>

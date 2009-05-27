@@ -26,6 +26,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.ExperimentProteinferRun;
 import org.yeastrc.experiment.ExperimentSearch;
 import org.yeastrc.experiment.ProjectExperiment;
 import org.yeastrc.experiment.ProjectExperimentDAO;
@@ -43,12 +44,16 @@ import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Researcher;
 import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.ProteinferJob;
+import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
 import org.yeastrc.yates.YatesRunMsSearchLinker;
 import org.yeastrc.yates.YatesRunSearcher;
+
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
 
 /**
  * Implements the logic to register a user
@@ -234,7 +239,17 @@ public class ViewProjectAction extends Action {
             
             // load the protein inference jobs, if any
             List<ProteinferJob> piJobs = ProteinInferJobSearcher.instance().getProteinferJobsForMsExperiment(experimentId);
-            pExpt.setProtInferRuns(piJobs);
+            List<ExperimentProteinferRun> piRuns = new ArrayList<ExperimentProteinferRun>(piJobs.size());
+            IdPickerProteinDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinDao();
+            for(ProteinferJob piJob: piJobs) {
+                ExperimentProteinferRun piRun = new ExperimentProteinferRun(piJob);
+                piRun.setNumParsimoniousProteins(protDao.getIdPickerProteinIds(piJob.getPinferId(), true).size());
+                piRun.setNumParsimoniousProteinGroups(protDao.getIdPickerGroupCount(piJob.getPinferId(), true));
+                piRun.setUniqPeptideSequenceCount(IdPickerResultsLoader.getUniquePeptideCount(piJob.getPinferId()));
+                
+                piRuns.add(piRun);
+            }
+            pExpt.setProtInferRuns(piRuns);
             
             experiments.add(pExpt);
         }
