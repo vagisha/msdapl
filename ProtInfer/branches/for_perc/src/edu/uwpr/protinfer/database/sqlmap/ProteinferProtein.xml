@@ -70,8 +70,9 @@
     	msProteinInferProteinPeptideMatch AS m 
     	WHERE prot.nrseqProteinID=#nrseqId#  
     	AND prot.piRunID IN $pinferIds$ 
+    	AND pept.piRunID = prot.piRunID
     	AND prot.id = m.piProteinID 
-    	AND m.piPeptideID = pept.id;
+    	AND m.piPeptideID = pept.id
     </select>
     
     <select id="peptideCountForProteinInRuns" resultClass="Integer" parameterClass="java.util.Map">
@@ -81,8 +82,9 @@
     	msProteinInferProteinPeptideMatch AS m 
     	WHERE prot.nrseqProteinID=#nrseqId#  
     	AND prot.piRunID IN $pinferIds$ 
+    	AND pept.piRunID = prot.piRunID 
     	AND prot.id = m.piProteinID 
-    	AND m.piPeptideID = pept.id;
+    	AND m.piPeptideID = pept.id
     </select>
     
     <update id="updateUserAnnotation" parameterClass="java.util.Map">
