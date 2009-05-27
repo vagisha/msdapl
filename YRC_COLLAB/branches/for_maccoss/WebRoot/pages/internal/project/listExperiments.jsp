@@ -336,8 +336,8 @@ function deleteProtInferRun(pinferId) {
 						<th valign="top">Version</th>
 						<th valign="top">Date</th>
 						<th valign="top">User</th>
-						<th valign="top">#Groups<br>(#Proteins)</th>
-						<th valign="top">#Peptides</th>
+						<th valign="top" align="center">#Groups<br>(#Proteins)</th>
+						<th valign="top" align="center">#Peptides</th>
 						<th valign="top">Comments</th>
 						<th valign="top">Status</th></tr>
 					</thead>
