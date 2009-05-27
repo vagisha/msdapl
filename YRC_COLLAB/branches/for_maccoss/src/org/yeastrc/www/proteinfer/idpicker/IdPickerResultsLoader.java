@@ -484,6 +484,9 @@ public class IdPickerResultsLoader {
         return wInputList;
     }
     
+    public static int getUniquePeptideCount(int pinferId) {
+        return idpPeptBaseDao.getUniquePeptideSequenceCountForRun(pinferId);
+    }
     //---------------------------------------------------------------------------------------------------
     // IDPicker result summary
     //---------------------------------------------------------------------------------------------------

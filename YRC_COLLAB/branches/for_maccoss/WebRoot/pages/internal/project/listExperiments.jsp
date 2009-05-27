@@ -393,10 +393,13 @@ function deleteProtInferRun(pinferId) {
 			
 			
 			<!-- FILES FOR THE EXPERIMENT (Placeholder)-->
-			<div align="center"
+			<div align="center">
+			<span
 				id="listfileslink_<bean:write name='experiment' property='id'/>"  
 				class="clickable" style="font-weight:bold; color:#D74D2D;" 
-				onclick="javascript:toggleFilesForExperiment(<bean:write name='experiment' property='id'/>);">[List Files]</div>
+				onclick="javascript:toggleFilesForExperiment(<bean:write name='experiment' property='id'/>);">[List Files]
+			</span>
+			</div>
 			<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:0;" id="listfileslink_<bean:write name='experiment' property='id'/>_target"></div>
 			
 			</div> 

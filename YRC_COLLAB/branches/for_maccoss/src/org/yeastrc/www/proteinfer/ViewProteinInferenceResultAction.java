@@ -194,6 +194,7 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("totalDecoyHits", totalDecoyHits);
         request.setAttribute("totalTargetHits", totalTargetHits);
         request.setAttribute("filteredTargetHits", filteredTargetHits);
+        request.setAttribute("filteredUniquePeptideCount", IdPickerResultsLoader.getUniquePeptideCount(pinferId));
         
         // Results summary
         WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, proteinIds);

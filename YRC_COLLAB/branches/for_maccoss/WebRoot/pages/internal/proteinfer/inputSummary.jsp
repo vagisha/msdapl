@@ -20,6 +20,12 @@
    		</logic:iterate>
 	</table>
 	    <br><br>
+	<table cellpadding="4" cellspacing="2" align="center" width="90%" style="border:1px dashed #7F7F7F;">
+	<tr><td style="background-color:#F2F2F2; font-weight:bold;">
+		# Unique peptide sequences: <bean:write name="filteredUniquePeptideCount"/>
+	</td></tr>
+	</table>
+	
 	<table cellpadding="4" cellspacing="2" align="center" width="90%" class="sortable stripe_table table_basic">
 	<logic:notEmpty name="inputSummary" >
 	<thead>
