@@ -350,8 +350,8 @@ function deleteProtInferRun(pinferId) {
 						<td valign="top"><bean:write name="piJob" property="job.researcher.lastName"/></td>
 						
 						<logic:equal name="piJob" property="job.complete" value="true">
-						<td valign="top"><nobr><bean:write name="piJob" property="numParsimoniousProteinGroups"/>(<bean:write name="piJob" property="numParsimoniousProteins"/>)</nobr></td>
-						<td valign="top"><bean:write name="piJob" property="uniqPeptideSequenceCount"/></td>
+						<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><nobr><bean:write name="piJob" property="numParsimoniousProteinGroups"/>(<bean:write name="piJob" property="numParsimoniousProteins"/>)</nobr></td>
+						<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="piJob" property="uniqPeptideSequenceCount"/></td>
 						</logic:equal>
 						
 						<logic:equal name="piJob" property="job.complete" value="false">
