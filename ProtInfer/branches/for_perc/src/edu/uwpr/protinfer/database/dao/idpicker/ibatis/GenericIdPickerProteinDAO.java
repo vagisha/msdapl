@@ -31,7 +31,7 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract int getFilteredParsimoniousProteinCount(int proteinferId);
     
-    public abstract int getIdPickerGroupCount(int pinferId);
+    public abstract int getIdPickerGroupCount(int pinferId, boolean parsimonious);
     
     public abstract List<Integer> getFilteredSortedProteinIds(int pinferId, ProteinFilterCriteria filterCriteria);
 

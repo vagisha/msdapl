@@ -91,11 +91,14 @@
     	AND idpProt.groupID = #groupId#
     </select>
     
-    <select id="selectGroupCount" resultClass="Integer" parameterClass="Integer">
-    	SELECT count(DISTINCT idprot.groupID) 
+    <select id="selectGroupCount" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(DISTINCT(idprot.groupID)) 
     	FROM IDPickerProtein AS idprot, msProteinInferProtein as prot
     	WHERE prot.piRunID=#pinferId#
     	AND prot.id = idprot.piProteinID
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idprot.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
     </select>
     
     <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">

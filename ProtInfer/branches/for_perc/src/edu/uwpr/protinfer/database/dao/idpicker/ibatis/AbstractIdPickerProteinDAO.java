@@ -172,8 +172,13 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
        protDao.saveProteinferProteinPeptideMatch(pinferProteinId, pinferPeptideId);
     }
     
-    public int getIdPickerGroupCount(int pinferId) {
-        return (Integer)queryForObject(sqlMapNameSpace+".selectGroupCount", pinferId);
+    public int getIdPickerGroupCount(int pinferId, boolean parsimonious) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        if(parsimonious) {
+            map.put("isParsimonious", 1);
+        }
+        return (Integer)queryForObject(sqlMapNameSpace+".selectGroupCount", map);
     }
     
     
