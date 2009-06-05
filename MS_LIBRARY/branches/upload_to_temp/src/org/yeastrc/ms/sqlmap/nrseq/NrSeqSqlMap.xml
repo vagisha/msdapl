@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="NrSeq"> 
+
+	<typeAlias alias="NrDbProtein" type="org.yeastrc.ms.domain.nrseq.NrDbProtein"/>
+
+	<resultMap class="NrDbProtein" id="nrDbProtResult">
+		<result property="id" column="id" />
+		<result property="proteinId" column="proteinID" />
+		<result property="databaseId" column="databaseID" />
+		<result property="accessionString" column="accessionString" />
+		<result property="description" column="description" />
+	</resultMap>
+	
+	
+    <select id="selectProteinAccession" resultClass="String" parameterClass="java.util.Map"> 
+        SELECT accessionString FROM tblProteinDatabase 
+        WHERE databaseID = #databaseId# 
+        AND proteinID=#proteinId#
+    </select> 
+    
+    <select id="selectDatabaseId" resultClass="Integer" parameterClass="String"> 
+        SELECT id FROM tblDatabase WHERE name = #name#
+    </select>
+    
+    <select id="selectDbProteinIdForDbNameExactMatch" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT pr.id
+        FROM tblDatabase as db, tblProteinDatabase as pr 
+        WHERE db.name = #dbName#
+        AND pr.accessionString = #accession#
+        AND db.id = pr.databaseID
+    </select>
+    
+    <select id="selectDbProteinForDbNameExactMatch" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblDatabase as db, tblProteinDatabase as pr 
+        WHERE db.name = #dbName#
+        AND pr.accessionString = #accession#
+        AND db.id = pr.databaseID
+    </select>
+    
+    <select id="selectDbProteinForDbIdProteinId" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND proteinID = #proteinId#
+    </select>
+    
+    
+    <select id="selectDbProteinIdForDbName" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT pr.id
+        FROM tblDatabase as db, tblProteinDatabase as pr 
+        WHERE db.name = #dbName#
+        AND pr.accessionString LIKE #accession#
+        AND db.id = pr.databaseID
+    </select>
+    
+    <select id="selectDbProteinIdForDbIdExactMatch" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT id
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND accessionString = #accession#
+    </select>
+    
+    <select id="selectDbProteinForDbIdExactMatch" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND accessionString = #accession#
+    </select>
+    
+    <select id="selectDbProteinIdForDbIdPartialAcc" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT id
+        FROM tblProteinDatabase 
+        WHERE databaseID = #dbId#
+        AND accessionString LIKE #accession#
+    </select>
+    
+    <select id="selectDbProteinIdForDbIdAndPeptideAndPartialAcc" resultClass="Integer" parameterClass="java.util.Map"> 
+        SELECT pd.id
+        FROM tblProteinSequence as seq, tblProtein as pr, tblProteinDatabase as pd 
+        WHERE pd.databaseID = #dbId#
+        AND pd.accessionString LIKE #accession#
+        AND seq.sequence LIKE #sequence#
+        AND seq.id = pr.sequenceID
+        AND pr.id = pd.proteinID
+    </select>
+    
+    <select id="selectDbProtein" resultMap="nrDbProtResult" parameterClass="Integer"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE id = #id#
+    </select>
+    
+    <select id="selectProtein" resultMap="nrDbProtResult" parameterClass="java.util.Map"> 
+        SELECT *
+        FROM tblProteinDatabase 
+        WHERE databaseID IN $databaseIds$ 
+        AND proteinID = #proteinId#
+    </select>
+    
+    <select id="selectProteinSequence" resultClass="String" parameterClass="Integer">
+    	SELECT seq.sequence 
+    	FROM tblProtein AS prot 
+    	INNER JOIN tblProteinSequence AS seq ON prot.sequenceID = seq.id 
+    	WHERE prot.id = #id#
+    </select>
+    
+    <select id="selectProteinSequenceForNrDbProt" resultClass="String" parameterClass="Integer">
+    	SELECT seq.sequence 
+    	FROM tblProteinSequence as seq,
+    	tblProtein AS prot, 
+    	tblProteinDatabase AS dbProt
+    	WHERE seq.id = prot.sequenceID
+    	AND prot.id = dbProt.proteinID
+    	AND dbProt.id = #id#
+    </select>
+    
+    <select id="selectDbProteinIdsForDescription" resultMap="nrDbProtResult" parameterClass="java.util.Map">
+    	SELECT * 
+    	FROM tblProteinDatabase 
+    	WHERE databaseID in $databaseIds$ 
+    	AND description LIKE #description#
+    </select>
+    
+    <select id="selectDbProteinIdsForAccession" resultMap="nrDbProtResult" parameterClass="java.util.Map">
+    	SELECT * 
+    	FROM tblProteinDatabase 
+    	WHERE databaseID in $databaseIds$ 
+    	AND accessionString LIKE #accession#
+    </select>
+    
+    <select id="selectProteinIdsForAccession" resultClass="Integer" parameterClass="String">
+    	SELECT DISTINCT(proteinID) 
+    	FROM tblProteinDatabase 
+    	WHERE accessionString LIKE #accession#
+    </select>
+    
+</sqlMap>
