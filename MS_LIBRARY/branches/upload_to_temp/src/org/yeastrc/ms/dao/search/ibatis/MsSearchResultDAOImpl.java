@@ -172,14 +172,10 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         delete("MsSearchResult.delete", resultId);
     }
     
-//    @Override
-//    public void deleteResults(int runSearchId, int scanId, int charge) {
-//        Map<String, Integer> map = new HashMap<String, Integer>(3);
-//        map.put("runSearchId", runSearchId);
-//        map.put("scanId", scanId);
-//        map.put("charge", charge);
-//        delete("MsSearchResult.deleteForRunSearchScanCharge", map);
-//    }
+    @Override
+    public void deleteResultsForRunSearch(int runSearchId) {
+        delete("MsSearchResult.deleteForRunSearch", runSearchId);
+    }
     
     @Override
     public void disableKeys() throws SQLException {

@@ -3,7 +3,6 @@ package org.yeastrc.ms.dao.run.ms2file.ibatis;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2HeaderDAO;
@@ -19,10 +18,12 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
 
     private MsRunDAO msRunDao;
+    private MS2HeaderDAO ms2HeaderDao;
     
-    public MS2RunDAOImpl(SqlMapClient sqlMap, MsRunDAO msRunDao) {
+    public MS2RunDAOImpl(SqlMapClient sqlMap, MsRunDAO msRunDao, MS2HeaderDAO ms2headerDao) {
         super(sqlMap);
         this.msRunDao = msRunDao;
+        this.ms2HeaderDao = ms2headerDao;
     }
 
     public RunFileFormat getRunFileFormat(int runId) throws Exception {
@@ -37,9 +38,8 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
         // save the run and location
         int runId = msRunDao.saveRun(run, serverDirectory);
         try {
-            MS2HeaderDAO headerDao = DAOFactory.instance().getMS2FileRunHeadersDAO();
             for (MS2NameValuePair header: run.getHeaderList()) {
-                headerDao.save(header, runId);
+                ms2HeaderDao.save(header, runId);
             }
         }
         catch(RuntimeException e) {
@@ -87,8 +87,8 @@ public class MS2RunDAOImpl extends BaseSqlMapDAO implements MS2RunDAO {
         return msRunDao.loadRunIdsForFileName(fileName);
     }
     
-    public List<Integer> loadRunIdsForFileNameAndSha1Sum(String fileName, String sha1Sum) {
-        return msRunDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
+    public int loadRunIdForFileNameAndSha1Sum(String fileName, String sha1Sum) {
+        return msRunDao.loadRunIdForFileNameAndSha1Sum(fileName, sha1Sum);
     }
 
     @Override

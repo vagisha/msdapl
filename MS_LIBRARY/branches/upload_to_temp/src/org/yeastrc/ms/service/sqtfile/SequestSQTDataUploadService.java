@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.UploadDAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
@@ -45,6 +45,8 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 public final class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
 
     
+    private final SequestSearchResultDAO sqtResultDao;
+    
     // these are the things we will cache and do bulk-inserts
     List<SequestResultDataWId> sequestResultDataList; // sequest scores
     
@@ -63,6 +65,10 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         this.sequestResultDataList = new ArrayList<SequestResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
+        
+        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        
+        this.sqtResultDao = daoFactory.getSequestResultDAO();
     }
 
     void reset() {
@@ -104,7 +110,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
+            SequestSearchDAO searchDAO = UploadDAOFactory.getInstance().getSequestSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, getSearchProgram(),
                     remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }
@@ -277,7 +283,6 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     }
     
     private void uploadSequestResultBuffer() {
-        SequestSearchResultDAO sqtResultDao = daoFactory.getSequestResultDAO();
         sqtResultDao.saveAllSequestResultData(sequestResultDataList);
         sequestResultDataList.clear();
     }
@@ -352,7 +357,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             fileNames.add(file);
         }
         Map<String, Integer> runIdMap = new HashMap<String, Integer>(fileNames.size());
-        MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
+        MsRunDAO runDao = UploadDAOFactory.getInstance().getMsRunDAO();
         for(String filename: fileNames) {
             List<Integer> runIds = runDao.loadRunIdsForFileName(filename+".ms2");
             if(runIds.size() > 1) {

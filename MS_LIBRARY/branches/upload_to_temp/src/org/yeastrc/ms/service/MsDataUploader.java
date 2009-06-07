@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.UploadDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
@@ -26,8 +26,8 @@ public class MsDataUploader {
     
     private String comments;
     private String remoteServer;
-    private String rawDataDirectory;
-    private String remoteRawDataDirectory;
+    private String spectrumDataDirectory;
+    private String remoteSpectrumDataDirectory;
     private String searchDirectory;
     private String remoteSearchDataDirectory;
     private java.util.Date searchDate;
@@ -53,11 +53,11 @@ public class MsDataUploader {
     }
 
     public void setSpectrumDataDirectory(String rawDataDirectory) {
-        this.rawDataDirectory = rawDataDirectory;
+        this.spectrumDataDirectory = rawDataDirectory;
     }
 
     public void setRemoteSpectrumDataDirectory(String remoteRawDataDirectory) {
-        this.remoteRawDataDirectory = remoteRawDataDirectory;
+        this.remoteSpectrumDataDirectory = remoteRawDataDirectory;
     }
 
     public void setSearchDirectory(String searchDirectory) {
@@ -160,16 +160,16 @@ public class MsDataUploader {
         if(uploadSearch) {
             
             // disable keys
-//            try {
-//                disableSearchTableKeys();
-//            }
-//            catch (SQLException e) {
-//                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
-//                uploadExceptionList.add(ex);
-//                log.error(ex.getMessage(), ex);
-//                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                return;
-//            }
+            try {
+                disableSearchTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
             
             try {
                 this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
@@ -188,16 +188,16 @@ public class MsDataUploader {
             }
             
             // enable keys
-//            try {
-//                enableSearchTableKeys();
-//            }
-//            catch (SQLException e) {
-//                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
-//                uploadExceptionList.add(ex);
-//                log.error(ex.getMessage(), ex);
-//                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                return;
-//            }
+            try {
+                enableSearchTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
         }
         
         // ----- UPLOAD ANALYSIS DATA
@@ -223,19 +223,19 @@ public class MsDataUploader {
         
         // disable keys on msRunSearchResult table
         log.info("Disabling keys on msRunSearchResult table");
-        DAOFactory.instance().getMsSearchResultDAO().disableKeys();
+        UploadDAOFactory.getInstance().getMsSearchResultDAO().disableKeys();
         
         // disable keys on SQTSearchResult
         log.info("Disabling keys on SQTSearchResult table");
-        DAOFactory.instance().getSequestResultDAO().disableKeys();
+        UploadDAOFactory.getInstance().getSequestResultDAO().disableKeys();
         
         // disable keys on SQTSpectrumData
         log.info("Disabling keys on SQTSpectrumData table");
-        DAOFactory.instance().getSqtSpectrumDAO().disableKeys();
+        UploadDAOFactory.getInstance().getSqtSpectrumDAO().disableKeys();
         
         // disable keys on msProteinMatch
         log.info("Disabling keys on msProteinMatch table");
-        DAOFactory.instance().getMsProteinMatchDAO().disableKeys();
+        UploadDAOFactory.getInstance().getMsProteinMatchDAO().disableKeys();
         
         log.info("Disabled keys");
     }
@@ -244,19 +244,19 @@ public class MsDataUploader {
         
         // enable keys on msRunSearchResult table
         log.info("Enabling keys on msRunSearchResult table");
-        DAOFactory.instance().getMsSearchResultDAO().enableKeys();
+        UploadDAOFactory.getInstance().getMsSearchResultDAO().enableKeys();
         
         // enable keys on SQTSearchResult
         log.info("Enabling keys on SQTSearchResult table");
-        DAOFactory.instance().getSequestResultDAO().enableKeys();
+        UploadDAOFactory.getInstance().getSequestResultDAO().enableKeys();
         
         // enable keys on SQTSpectrumData
         log.info("Enabling keys on SQTSpectrumData table");
-        DAOFactory.instance().getSqtSpectrumDAO().enableKeys();
+        UploadDAOFactory.getInstance().getSqtSpectrumDAO().enableKeys();
         
         // enable keys on msProteinMatch
         log.info("Enabling keys on msProteinMatch table");
-        DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
+        UploadDAOFactory.getInstance().getMsProteinMatchDAO().enableKeys();
         
         log.info("Enabled keys");
     }
@@ -264,14 +264,14 @@ public class MsDataUploader {
     private MsExperimentUploader initializeExperimentUploader() throws UploadException  {
         
         MsExperimentUploader exptUploader = new MsExperimentUploader();
-        exptUploader.setDirectory(rawDataDirectory);
-        exptUploader.setRemoteDirectory(remoteRawDataDirectory);
+        exptUploader.setDirectory(spectrumDataDirectory);
+        exptUploader.setRemoteDirectory(remoteSpectrumDataDirectory);
         exptUploader.setRemoteServer(remoteServer);
         exptUploader.setComments(comments);
         
-        // Get the raw data uploader
-        log.info("Initializing RawDataUploadService");
-        SpectrumDataUploadService rdus = getSpectrumDataUploader(rawDataDirectory, remoteRawDataDirectory);
+        // Get the spectrum data uploader
+        log.info("Initializing SpectrumDataUploadService");
+        SpectrumDataUploadService rdus = getSpectrumDataUploader(spectrumDataDirectory, remoteSpectrumDataDirectory);
         exptUploader.setSpectrumDataUploader(rdus);
         
         // We cannot upload analysis data without uploading search data first.
@@ -349,7 +349,7 @@ public class MsDataUploader {
     public void uploadData(int experimentId) {
         
         resetUploader();
-        MsExperimentDAO exptDao = DAOFactory.instance().getMsExperimentDAO();
+        MsExperimentDAO exptDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
         MsExperiment expt = exptDao.loadExperiment(experimentId);
         if (expt == null) {
             UploadException ex = new UploadException(ERROR_CODE.EXPT_NOT_FOUND);
@@ -424,20 +424,21 @@ public class MsDataUploader {
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage());
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
             }
             if(searchId == 0) {
                 
                 // disable keys
-//                try {
-//                    disableSearchTableKeys();
-//                }
-//                catch (SQLException e) {
-//                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
-//                    uploadExceptionList.add(ex);
-//                    log.error(ex.getMessage(), ex);
-//                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                    return;
-//                }
+                try {
+                    disableSearchTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
+                }
                     
                 try {
                     this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
@@ -457,16 +458,16 @@ public class MsDataUploader {
                 }
                 
                 // enable keys
-//                try {
-//                    enableSearchTableKeys();
-//                }
-//                catch (SQLException e) {
-//                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
-//                    uploadExceptionList.add(ex);
-//                    log.error(ex.getMessage(), ex);
-//                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                    return;
-//                }
+                try {
+                    enableSearchTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
+                }
             }
             else {
                 this.uploadedSearchId = searchId;
@@ -513,7 +514,7 @@ public class MsDataUploader {
     }
 
     private int getSearchAnalysisId(int searchId) throws Exception {
-        MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+        MsSearchAnalysisDAO analysisDao = UploadDAOFactory.getInstance().getMsSearchAnalysisDAO();
         List<Integer> analysisIds = analysisDao.getAnalysisIdsForSearch(searchId);
         if(analysisIds.size() > 1) {
             throw new Exception("Multiple analysis ids for found for searchID: "+searchId);
@@ -524,7 +525,7 @@ public class MsDataUploader {
 
     private int getExperimentSequestSearchId(int uploadedExptId2) throws Exception {
        
-        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearchDAO searchDao = UploadDAOFactory.getInstance().getMsSearchDAO();
         List<Integer> searchIds = searchDao.getSearchIdsForExperiment(uploadedExptId2);
         
         if(searchIds.size() == 0)
@@ -543,19 +544,19 @@ public class MsDataUploader {
     }
 
     private void updateLastUpdateDate(int experimentId) {
-        MsExperimentDAO experimentDao = DAOFactory.instance().getMsExperimentDAO();
+        MsExperimentDAO experimentDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
         experimentDao.updateLastUpdateDate(experimentId);
         
     }
 
-    private void deleteOldSearchesForExperiment(int experimentId) {
-        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
-        List<Integer> searchIds = searchDao.getSearchIdsForExperiment(experimentId);
-        for (Integer id: searchIds) {
-            if (id != null)
-                searchDao.deleteSearch(id);
-        }
-    }
+//    private void deleteOldSearchesForExperiment(int experimentId) {
+//        MsSearchDAO searchDao = UploadDAOFactory.getInstance().getMsSearchDAO();
+//        List<Integer> searchIds = searchDao.getSearchIdsForExperiment(experimentId);
+//        for (Integer id: searchIds) {
+//            if (id != null)
+//                searchDao.deleteSearch(id);
+//        }
+//    }
 
     
     private void logEndExperimentUpload(MsExperimentUploader uploader, long start, long end) {
@@ -570,8 +571,8 @@ public class MsDataUploader {
         msg.append("BEGIN EXPERIMENT UPLOAD");
         msg.append("\n\tRemote server: "+remoteServer);
         msg.append("\n\tRAW DATA ");
-        msg.append("\n\t\t Directory: "+rawDataDirectory);
-        msg.append("\n\t\t Remote Directory: "+remoteRawDataDirectory);
+        msg.append("\n\t\t Directory: "+spectrumDataDirectory);
+        msg.append("\n\t\t Remote Directory: "+remoteSpectrumDataDirectory);
         if(uploadSearch) {
             msg.append("\n\tSEARCH DATA");
             msg.append("\n\t\t Directory: "+searchDirectory);

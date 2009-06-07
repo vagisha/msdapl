@@ -58,7 +58,7 @@ public interface GenericRunDAO <I extends MsRunIn, O extends MsRun> {
      * @param sha1Sum
      * @return
      */
-    public abstract List<Integer> loadRunIdsForFileNameAndSha1Sum(String fileName, String sha1Sum);
+    public abstract int loadRunIdForFileNameAndSha1Sum(String fileName, String sha1Sum);
     
     
     /**

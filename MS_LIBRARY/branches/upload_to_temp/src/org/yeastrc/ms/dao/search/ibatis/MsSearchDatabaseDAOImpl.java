@@ -35,26 +35,34 @@ public class MsSearchDatabaseDAOImpl extends BaseSqlMapDAO implements MsSearchDa
     
     public int saveSearchDatabase(MsSearchDatabase database, int searchId) {
         
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("searchId", searchId);
-        
-        List<Integer> dbIds = loadMatchingDatabaseIds(database);
-        if (dbIds.size() > 0) {
-            map.put("databaseId", dbIds.get(0));
+        int databaseId = 0;
+        try {databaseId = database.getId();}
+        catch(Exception e){}
+        if(databaseId == 0) {
+            List<Integer> dbIds = loadMatchingDatabaseIds(database);
+            if (dbIds.size() > 0) {
+                databaseId = dbIds.get(0);
+            }
+            else {
+                databaseId = saveDatabase(database);
+            }
         }
-        else {
-            map.put("databaseId", saveDatabase(database));
-        }
-        save("MsDatabase.insertSearchDatabase", map);
-        return map.get("databaseId");
+        linkDatabaseAndSearch(databaseId, searchId);
+        return databaseId;
     }
     
+    public void linkDatabaseAndSearch(int databaseId, int searchId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("searchId", searchId);
+        map.put("databaseId", databaseId);
+        save("MsDatabase.insertSearchDatabase", map);
+    }
     
-    private List<Integer> loadMatchingDatabaseIds(MsSearchDatabase database) {
+    public List<Integer> loadMatchingDatabaseIds(MsSearchDatabase database) {
         return queryForList("MsDatabase.selectDatabaseIdMatchAllCols", database);
     }
     
-    private int saveDatabase(MsSearchDatabase database) {
+    public int saveDatabase(MsSearchDatabase database) {
         return saveAndReturnId("MsDatabase.insertDatabase", database);
     }
 

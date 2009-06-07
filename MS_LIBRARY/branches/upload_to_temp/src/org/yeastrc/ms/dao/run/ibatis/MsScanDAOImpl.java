@@ -52,7 +52,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             param = new MsScanDataSqlMapParam(scanId, scan, peakStorageType);
         }
         catch (IOException e) {
-            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+            throw new RuntimeException("Failed to execute statement: "+statementName, e);
         }
         
         save("MsScan."+statementName, param);

@@ -104,6 +104,11 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
+    public void deleteResultsForRunSearchAnalysis(int runSearchAnalysisId) {
+        delete(namespace+".deleteForRunSearchAnalysis", runSearchAnalysisId);
+    }
+    
+    @Override
     public void saveAllPercolatorResultData(List<PercolatorResultDataWId> dataList) {
         if(dataList == null || dataList.size() == 0)
             return;

@@ -138,11 +138,9 @@
 		DELETE FROM msRunSearchResult WHERE id=#id#		    
     </delete>
     
-    <delete id="deleteForRunSearchScanCharge" parameterClass="java.util.Map">
+    <delete id="deleteForRunSearch" parameterClass="Integer">
 		DELETE FROM msRunSearchResult 
 		WHERE runSearchID = #runSearchId#
-		AND scanID = #scanId#
-		AND charge = #charge#
     </delete>
     
 </sqlMap>

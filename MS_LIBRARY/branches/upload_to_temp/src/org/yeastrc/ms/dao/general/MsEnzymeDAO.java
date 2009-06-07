@@ -66,6 +66,8 @@ public interface MsEnzymeDAO {
     public int saveEnzymeforRun(MsEnzymeIn enzyme, int runId, List<EnzymeProperties> properties);
     
     
+    public void saveEnzymeForRun(int enzymeId, int runId);
+    
     /**
      * Deletes the enzyme to run association from the msRunEnzyme table. The actual enzyme is NOT deleted.
      * @param runId
@@ -104,6 +106,7 @@ public interface MsEnzymeDAO {
      */
     public int saveEnzymeforSearch(MsEnzymeIn enzyme, int searchId, List<EnzymeProperties> properties);
     
+    public void saveEnzymeForSearch(int enzymeId, int searchId);
     
     /**
      * Deletes the enzyme to search association from the msSearchEnzyme table. The actual enzyme is NOT deleted.

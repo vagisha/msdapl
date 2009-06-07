@@ -16,13 +16,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.UploadDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
@@ -55,8 +56,13 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     
     private static final Logger log = Logger.getLogger(PercolatorSQTDataUploadService.class);
 
-    private static final DAOFactory daoFactory = DAOFactory.instance();
-    private static final MsSearchResultDAO resultDao = daoFactory.getMsSearchResultDAO();
+    private final MsSearchResultDAO resultDao;
+    private final MsSearchAnalysisDAO analysisDao;
+    private final MsRunSearchDAO runSearchDao;
+    private final PercolatorParamsDAO paramDao;
+    private final MsSearchDAO searchDao;
+    private final MsRunSearchAnalysisDAO runSearchAnalysisDao;
+    private final PercolatorResultDAO percResultDao;
 
     private static final int BUF_SIZE = 1000;
 
@@ -97,6 +103,17 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         
         uploadedResultIds = new HashSet<Integer>();
         filenames = new ArrayList<String>();
+        
+        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        this.analysisDao = daoFactory.getMsSearchAnalysisDAO();
+        this.runSearchDao = daoFactory.getMsRunSearchDAO();
+        this.paramDao  = daoFactory.getPercoltorParamsDAO();
+        this.searchDao = daoFactory.getMsSearchDAO();
+        this.runSearchAnalysisDao  = daoFactory.getMsRunSearchAnalysisDAO();
+        
+        this.resultDao = daoFactory.getMsSearchResultDAO();
+        this.percResultDao = daoFactory.getPercolatorResultDAO();
+        
     }
     
     void reset() {
@@ -124,9 +141,8 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     }
 
 
-    private static void updateProgramVersion(int analysisId, String programVersion) {
+    private void updateProgramVersion(int analysisId, String programVersion) {
         try {
-            MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
             analysisDao.updateAnalysisProgramVersion(analysisId, programVersion);
         }
         catch(RuntimeException e) {
@@ -230,7 +246,6 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         
         Map<String, Integer> runSearchIdMap = new HashMap<String, Integer>(filenames.size()*2);
         
-        MsRunSearchDAO runSearchDao = daoFactory.getMsRunSearchDAO();
         for(String file: filenames) {
             String filenoext = removeFileExtension(file);
             int runSearchId = runSearchDao.loadIdForSearchAndFileName(searchId, filenoext);
@@ -247,7 +262,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
 
 
     private void addPercolatorParams(Map<String, String> params, int analysisId) throws UploadException {
-        PercolatorParamsDAO paramDao = daoFactory.getPercoltorParamsDAO();
+        
         for (String name: params.keySet()) {
             String val = params.get(name);
             PercolatorParamBean param = new PercolatorParamBean();
@@ -265,13 +280,13 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     }
 
     private void getSearchModifications(int searchId) {
-       MsSearch search = daoFactory.getMsSearchDAO().loadSearch(searchId);
+       MsSearch search = searchDao.loadSearch(searchId);
        this.dynaResidueMods = search.getDynamicResidueMods();
        this.dynaTermMods = search.getDynamicTerminalMods();
     }
 
     private int saveTopLevelAnalysis() throws UploadException {
-        MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
+        
         SearchAnalysisBean analysis = new SearchAnalysisBean();
 //        analysis.setSearchId(searchId);
         analysis.setAnalysisProgram(Program.PERCOLATOR);
@@ -396,8 +411,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     }
     
     private int getRunIdForRunSearch(int runSearchId) {
-        MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
-        MsRunSearch rs = rsDao.loadRunSearch(runSearchId);
+        MsRunSearch rs = runSearchDao.loadRunSearch(runSearchId);
         if(rs != null)
             return rs.getRunId();
         else
@@ -441,7 +455,6 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             }
         }
         // save the run search analysis and return the database id
-        MsRunSearchAnalysisDAO runSearchAnalysisDao = daoFactory.getMsRunSearchAnalysisDAO();
         RunSearchAnalysisBean rsa = new RunSearchAnalysisBean();
         rsa.setAnalysisFileFormat(SearchFileFormat.SQT_PERC);
         rsa.setAnalysisId(analysisId);
@@ -525,7 +538,6 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     }
     
     private void uploadPercolatorResultBuffer() {
-        PercolatorResultDAO percResultDao = daoFactory.getPercolatorResultDAO();
         percResultDao.saveAllPercolatorResultData(percolatorResultDataList);
         percolatorResultDataList.clear();
     }
@@ -538,7 +550,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
 
     static int getScanId(int runId, int scanNumber) throws UploadException {
 
-        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        MsScanDAO scanDao = UploadDAOFactory.getInstance().getMsScanDAO();
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
         if (scanId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN);
@@ -548,10 +560,18 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         return scanId;
     }
     
-    public static void deleteAnalysis(int analysisId) {
+    public void deleteAnalysis(int analysisId) {
         if (analysisId == 0)
             return;
-        MsSearchAnalysisDAO analysisDao = daoFactory.getMsSearchAnalysisDAO();
+        
+        // First delete the results for each individual runSearchAnalysis
+        // We do this first because data might be split between the 
+        // main database and the temporary database.
+        List<Integer> runSearchAnalysisIds = this.runSearchAnalysisDao.getRunSearchAnalysisIdsForAnalysis(analysisId);
+        for(int id: runSearchAnalysisIds) {
+            log.info("Deleting results for runSearchAnalysisID: "+id);
+            percResultDao.deleteResultsForRunSearchAnalysis(id);
+        }
         analysisDao.delete(analysisId);
     }
     
@@ -683,6 +703,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     
     public static void main(String[] args) {
         int searchId = 3;
+        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
         MsRunSearchDAO runSearchDao = daoFactory.getMsRunSearchDAO();
         List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
         Map<String, Integer> runSearchIdMap = new HashMap<String, Integer>(runSearchIds.size());

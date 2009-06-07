@@ -23,4 +23,5 @@ public interface AnalysisDataUploadService extends UploadService {
     public void setSearchProgram(Program searchProgram);
     
     public void setSearchDataFileNames(List<String> searchDataFileNames);
+    
 }

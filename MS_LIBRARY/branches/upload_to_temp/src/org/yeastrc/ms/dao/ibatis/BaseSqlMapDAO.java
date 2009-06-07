@@ -18,7 +18,7 @@ public class BaseSqlMapDAO {
     
     protected final SqlMapClient sqlMap;
     
-    protected static final Logger log = Logger.getLogger(BaseSqlMapDAO.class);
+    protected static final Logger log = Logger.getLogger(BaseSqlMapDAO.class.getName());
     
     public BaseSqlMapDAO(SqlMapClient sqlMap) {
         this.sqlMap = sqlMap;

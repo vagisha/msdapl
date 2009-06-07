@@ -74,12 +74,10 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
      */
     public abstract void delete(int resultId);
     
-//    /**
-//     * Deletes the search results (msRunSearchResult table) with the 
-//     * given runSearchId, scanId and charge, 
-//     * along with any associated protein matches (msProteinMatch)
-//     * and modifications.
-//     * @param resultId
-//     */
-//    public abstract void deleteResults(int runSearchId, int scanId, int charge);
+    /**
+     * Deletes the search results (msRunSearchResult table) with the 
+     * given runSearchId
+     * @param resultId
+     */
+    public abstract void deleteResultsForRunSearch(int runSearchId);
 }

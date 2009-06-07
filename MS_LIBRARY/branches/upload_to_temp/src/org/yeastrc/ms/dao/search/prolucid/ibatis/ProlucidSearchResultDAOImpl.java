@@ -394,8 +394,8 @@ ProlucidSearchResultDAO {
         resultDao.delete(resultId);
     }
 
-//    @Override
-//    public void deleteResults(int runSearchId, int scanId, int charge) {
-//        resultDao.deleteResults(runSearchId, scanId, charge);
-//    }
+    @Override
+    public void deleteResultsForRunSearch(int runSearchId) {
+        resultDao.deleteResultsForRunSearch(runSearchId);
+    }
 }

@@ -673,10 +673,10 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         resultDao.delete(resultId);
     }
 
-//    @Override
-//    public void deleteResults(int runSearchId, int scanId, int charge) {
-//        resultDao.deleteResults(runSearchId, scanId, charge);
-//    }
+    @Override
+    public void deleteResultsForRunSearch(int runSearchId) {
+        resultDao.deleteResultsForRunSearch(runSearchId);
+    }
     
     @Override
     public void disableKeys() throws SQLException {
@@ -764,4 +764,5 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             return result.getEvalue();
         }
     }
+
 }

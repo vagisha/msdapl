@@ -9,7 +9,7 @@ package org.yeastrc.ms.service.sqtfile;
 import java.io.File;
 import java.util.List;
 
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.UploadDAOFactory;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -46,6 +46,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
     public BaseSQTDataUploadService(SearchParamsDataProvider paramsProvider, 
             PeptideResultBuilder peptideResultBuilder,
             Program searchProgram, SearchFileFormat sqtType) {
+        super();
         this.paramsProvider = paramsProvider;
         this.peptideResultBuilder = peptideResultBuilder;
         this.searchProgram = searchProgram;
@@ -69,7 +70,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
             if(paramsProvider instanceof SequestParamsParser) {
-                SequestSearchDAO searchDAO = DAOFactory.instance().getSequestSearchDAO();
+                SequestSearchDAO searchDAO = UploadDAOFactory.getInstance().getSequestSearchDAO();
                 return searchDAO.saveSearch(SequestSQTDataUploadService.makeSearchObject((SequestParamsParser) parser, 
                                                                                         this.searchProgram,
                                                                                         remoteDirectory, 
@@ -77,7 +78,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
                                               experimentId, sequenceDatabaseId);
             }
             else if(paramsProvider instanceof ProlucidParamsParser) {
-                ProlucidSearchDAO searchDAO = DAOFactory.instance().getProlucidSearchDAO();
+                ProlucidSearchDAO searchDAO = UploadDAOFactory.getInstance().getProlucidSearchDAO();
                 return searchDAO.saveSearch(ProlucidSQTDataUploadService.makeSearchObject((ProlucidParamsParser) parser, 
                                                                                             remoteDirectory, 
                                                                                             searchDate), 

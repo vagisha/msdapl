@@ -114,12 +114,16 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
         int enzymeId = saveEnzyme(enzyme, properties);
         
         // now save an entry in the msRunEnzyme table liking this enzyme to the given runId
+        saveEnzymeForRun(enzymeId, runId);
+        
+        return enzymeId;
+    }
+    
+    public void saveEnzymeForRun(int enzymeId, int runId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("runID", runId);
         map.put("enzymeID", enzymeId);
         save("MsEnzyme.insertRunEnzyme", map);
-        
-        return enzymeId;
     }
 
     public void deleteEnzymesForRun(int runId) {
@@ -153,12 +157,16 @@ public class MsEnzymeDAOImpl extends BaseSqlMapDAO implements MsEnzymeDAO {
         int enzymeId = saveEnzyme(enzyme, properties);
         
         // now save an entry in the msRunEnzyme table liking this enzyme to the given runId
+        saveEnzymeForSearch(enzymeId, searchId);
+        
+        return enzymeId;
+    }
+    
+    public void saveEnzymeForSearch(int enzymeId, int searchId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("searchID", searchId);
         map.put("enzymeID", enzymeId);
         save("MsEnzyme.insertSearchEnzyme", map);
-        
-        return enzymeId;
     }
     
     @Override

@@ -44,4 +44,7 @@ public interface PercolatorResultDAO {
     public abstract int numRunAnalysisResults(int runSearchAnalysisId);
     
     public abstract int numAnalysisResults(int searchAnalysisId);
+
+
+    public abstract void deleteResultsForRunSearchAnalysis(int id);
 }

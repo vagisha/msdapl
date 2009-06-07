@@ -98,4 +98,8 @@
     	VALUES $values$
     </insert>
     
+    <delete id="deleteForRunSearchAnalysis" parameterClass="Integer">
+		DELETE FROM  PercolatorResult
+		WHERE runSearchAnalysisID = #runSearchAnalysisId#
+    </delete>
 </sqlMap>

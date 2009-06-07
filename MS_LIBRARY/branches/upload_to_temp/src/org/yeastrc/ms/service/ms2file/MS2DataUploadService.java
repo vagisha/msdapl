@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.UploadDAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
@@ -46,7 +46,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
 
     private static final Logger log = Logger.getLogger(MS2DataUploadService.class);
 
-    private static final DAOFactory daoFactory = DAOFactory.instance();
+    private static final UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
 
     public static final int BUF_SIZE = 1000;
     
@@ -209,12 +209,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
 
         fileName = removeExtension(fileName);
         MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
-        List <Integer> runIds = runDao.loadRunIdsForFileNameAndSha1Sum(fileName, sha1Sum);
-
-        // return the database of the first matching run found
-        if (runIds.size() > 0)
-            return runIds.get(0);
-        return 0;
+        return runDao.loadRunIdForFileNameAndSha1Sum(fileName, sha1Sum);
     }
     
     private String removeExtension(String filename) {
@@ -275,8 +270,9 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
                 throw ex;
             }
             // MS2 file scans may have a precursor scan number but the precursor scans are not in the database
-            // so we do not have a database id for the precursor scan. We still do the check, though
-            int precursorScanId = scanDao.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
+            // so we do not have a database id for the precursor scan. 
+            // int precursorScanId = scanDao.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
+            int precursorScanId = 0;
             int scanId = scanDao.save(scan, runId, precursorScanId); 
 
             // save charge independent analysis

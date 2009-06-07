@@ -63,8 +63,15 @@ public class MsRunDAOImplTest extends BaseDAOTestCase {
         run = createDefaultRun();
         int id2 = runDao.saveRun(run, "remoteDirectory");
         
-        List<Integer> runs = runDao.loadRunIdsForFileNameAndSha1Sum(run.getFileName(), run.getSha1Sum());
-        assertEquals(2, runs.size());
+//        List<Integer> runs = runDao.loadRunIdForFileNameAndSha1Sum(run.getFileName(), run.getSha1Sum());
+//        assertEquals(2, runs.size());
+        try {
+            runDao.loadRunIdForFileNameAndSha1Sum(run.getFileName(), run.getSha1Sum());
+            fail("Multiple entries with same filename and sha1sum -- should not happen in the real application");
+        }
+        catch(Exception e) {
+            assertEquals(e.getMessage(), "Failed to execute select statement: MsRun.selectRunIdsForFileNameAndSha1Sum");
+        }
         
         runDao.delete(id1);
         runDao.delete(id2);

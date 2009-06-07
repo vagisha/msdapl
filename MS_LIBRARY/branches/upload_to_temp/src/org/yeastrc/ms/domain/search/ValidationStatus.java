@@ -22,5 +22,16 @@ public enum ValidationStatus {VALID('V'), NOT_VALID('N'), MAYBE('M'), UNVALIDATE
         }
     }
     
+    public static ValidationStatus instance(String statusStr) {
+        if (statusStr == null)
+            return ValidationStatus.UNKNOWN;
+        if (statusStr.length() != 1)
+            throw new IllegalArgumentException("Cannot convert \""+statusStr+"\" to ValidationStatus");
+        ValidationStatus status = instance(statusStr.charAt(0));
+        if (status == ValidationStatus.UNKNOWN)
+            throw new IllegalArgumentException("Unrecognized validation status: "+statusStr);
+        return status; 
+    }
+    
     public char getStatusChar() { return statusChar; }
 }

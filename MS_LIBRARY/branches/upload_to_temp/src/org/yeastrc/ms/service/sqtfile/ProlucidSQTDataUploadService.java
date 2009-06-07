@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.UploadDAOFactory;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
@@ -39,6 +39,8 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
  */
 public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadService {
 
+    private final ProlucidSearchResultDAO sqtResultDao;
+    
     List<ProlucidResultDataWId> prolucidResultDataList; // cached prolucid search result data
     
     private MsSearchDatabaseIn db = null;
@@ -51,6 +53,9 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         this.prolucidResultDataList = new ArrayList<ProlucidResultDataWId>();
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
+        
+        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        sqtResultDao = daoFactory.getProlucidResultDAO();
     }
     
     void reset() {
@@ -91,7 +96,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            ProlucidSearchDAO searchDAO = DAOFactory.instance().getProlucidSearchDAO();
+            ProlucidSearchDAO searchDAO = UploadDAOFactory.getInstance().getProlucidSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }
         catch(RuntimeException e) {
@@ -264,7 +269,6 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
     }
     
     private void uploadProlucidResultBuffer() {
-        ProlucidSearchResultDAO sqtResultDao = daoFactory.getProlucidResultDAO();
         sqtResultDao.saveAllProlucidResultData(prolucidResultDataList);
         prolucidResultDataList.clear();
     }

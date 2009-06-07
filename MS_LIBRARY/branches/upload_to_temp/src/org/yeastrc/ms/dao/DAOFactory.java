@@ -177,7 +177,7 @@ public class DAOFactory {
         ms2ChgDAnalysisDAO = new MS2ChargeDependentAnalysisDAOImpl(sqlMap);
         ms2FileScanChargeDAO = new MS2ScanChargeDAOImpl(sqlMap, ms2ChgDAnalysisDAO);
         ms2ScanDAO = new MS2ScanDAOImpl(sqlMap, scanDAO, ms2ChgIAnalysisDAO, ms2FileScanChargeDAO);
-        ms2RunDAO = new MS2RunDAOImpl(sqlMap, runDAO);
+        ms2RunDAO = new MS2RunDAOImpl(sqlMap, runDAO, ms2FileHeadersDAO);
         
         // Search related
         seqDbDao = new MsSearchDatabaseDAOImpl(sqlMap);
@@ -215,7 +215,7 @@ public class DAOFactory {
     }
     
     public Connection getConnection() throws SQLException {
-        return new BaseSqlMapDAO(sqlMap).getConnection();
+        return sqlMap.getDataSource().getConnection();
     }
     //-------------------------------------------------------------------------------------------
     // EXPERIMENT related
