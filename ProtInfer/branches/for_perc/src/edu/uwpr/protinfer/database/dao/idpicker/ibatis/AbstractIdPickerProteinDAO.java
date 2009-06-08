@@ -390,8 +390,15 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         
         // If we are NOT filtering anything AND NOT sorting on peptide count just return all the protein Ids
         // for this protein inference run
-        if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
-            return getIdPickerProteinIds(pinferId, isParsimonious);
+        if(!uniqueToProtein) {
+            if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
+                return getIdPickerProteinIds(pinferId, isParsimonious);
+            }
+        }
+        if(uniqueToProtein) {
+            if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE && !sort) {
+                return getIdPickerProteinIds(pinferId, isParsimonious);
+            }
         }
         
         Map<String, Number> map = new HashMap<String, Number>(12);
