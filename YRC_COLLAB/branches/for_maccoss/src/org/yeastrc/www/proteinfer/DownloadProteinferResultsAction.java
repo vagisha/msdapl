@@ -271,7 +271,7 @@ public class DownloadProteinferResultsAction extends Action {
                     writer.write(fastaIds+"\t");
                     writer.write(spectrumCount+"\t");
                     writer.write(numPept+"\t");
-                    writer.write(numUniqPept);
+                    writer.write(numUniqPept+"");
                     if(printPeptides)
                         writer.write("\t"+peptides);
                     writer.write("\n");
