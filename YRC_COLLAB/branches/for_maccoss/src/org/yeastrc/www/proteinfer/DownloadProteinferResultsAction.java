@@ -214,7 +214,7 @@ public class DownloadProteinferResultsAction extends Action {
             writer.write(wProt.getProtein().getSpectrumCount()+"\t");
             writer.write(wProt.getProtein().getNsafFormatted()+"\t");
             writer.write(wProt.getProtein().getPeptideCount()+"\t");
-            writer.write(wProt.getProtein().getUniquePeptideCount());
+            writer.write(wProt.getProtein().getUniquePeptideCount()+"");
             
             if(printPeptides) {
                 writer.write("\t"+getPeptides(proteinId));
@@ -300,7 +300,7 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write(fastaIds+"\t");
         writer.write(spectrumCount+"\t");
         writer.write(numPept+"\t");
-        writer.write(numUniqPept);
+        writer.write(numUniqPept+"");
         if(printPeptides)
             writer.write("\t"+peptides);
         writer.write("\n");
