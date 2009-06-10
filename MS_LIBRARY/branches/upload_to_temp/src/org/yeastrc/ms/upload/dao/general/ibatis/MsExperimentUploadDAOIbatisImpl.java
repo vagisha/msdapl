@@ -42,28 +42,39 @@ public class MsExperimentUploadDAOIbatisImpl extends BaseSqlMapDAO implements Ms
 
     @Override
     public void saveExperimentRun(int experimentId, int runId) {
+        saveExperimentRun(experimentId, runId, true);
+    }
+    
+    @Override
+    public void saveExperimentRun(int experimentId, int runId, boolean check) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("experimentId", experimentId);
         map.put("runId", runId);
-        // if an entry for this experimentId and runId already exists don't 
-        // upload another one
-        if (getMatchingExptRunCount(experimentId, runId) == 0)
+        
+        boolean exists = false;
+        if(check) {
+            // if an entry for this experimentId and runId already exists don't 
+            // upload another one
+            exists = isExperimentRunLinked(experimentId, runId);
+        }
+        
+        if(!exists)
             save("MsExperiment.insertExperimentRun", map);
     }
     
-    public void updateLastUpdateDate(int experimentId) {
-       update("MsExperiment.updateLastUpdate", experimentId); 
-    }
-    
-    private int getMatchingExptRunCount(int experimentId, int runId) {
+    public boolean isExperimentRunLinked(int experimentId, int runId) {
         Map<String, Integer> map = new HashMap<String, Integer>(2);
         map.put("experimentId", experimentId);
         map.put("runId", runId);
         Integer cnt = (Integer) queryForObject("MsExperiment.getExperimentRunCount", map);
         if (cnt == null)
-            return 0;
-        return cnt;
+            return false;
+        return cnt > 0;
     }
+    
+    public void updateLastUpdateDate(int experimentId) {
+        update("MsExperiment.updateLastUpdate", experimentId); 
+     }
 
     @Override
     public void deleteExperiment(int experimentId) {

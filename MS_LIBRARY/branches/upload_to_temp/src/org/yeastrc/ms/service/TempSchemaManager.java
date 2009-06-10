@@ -47,13 +47,16 @@ public class TempSchemaManager {
     public void createTempSchema() throws SQLException, TempSchemaManagerException {
         
         log.info("Creating temporary database: "+ConnectionFactory.tempDbName());
-        List<String> tableNames = null;
-        tableNames = getMainTableNames();
         createTempDatabase();
-        createTables(tableNames);
+        createTables(getMainTableNames());
         matchTables();
+        createTriggers(getMainTriggerNames());
+        matchTriggers();
     }
 
+    //-----------------------------------------------------------------------------------------
+    // TABLES 
+    //-----------------------------------------------------------------------------------------
     List<String> getMainTableNames() throws SQLException {
         
         List<String> tableNames;
@@ -165,7 +168,126 @@ public class TempSchemaManager {
             catch (SQLException e) {}
         }
     }
+    
+    
+    //-----------------------------------------------------------------------------------------
+    // TRIGGERS
+    //-----------------------------------------------------------------------------------------
+    List<String> getMainTriggerNames() throws SQLException {
+        
+        List<String> tableNames;
+        Connection conn = null;
+        try {
+            conn = ConnectionFactory.getMainDbConnection();
+            tableNames = getTriggerNames(conn);
+        }
+        finally {
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
+        }
+        return tableNames;
+    }
 
+    List<String> getTempTriggerNames() throws SQLException {
+        
+        List<String> newTableNames;
+        Connection conn = null;
+        try {
+            conn = ConnectionFactory.getTempDbConnection();
+            newTableNames = getTriggerNames(conn);
+        }
+        finally {
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
+        }
+        return newTableNames;
+    }
+    
+    private List<String> getTriggerNames(Connection conn) throws SQLException {
+        
+        Statement stmt = null;
+        ResultSet rs = null;
+        List<String> tableNames = new ArrayList<String>();
+        try {
+            String sql = "SHOW TRIGGERS";
+            
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            while(rs.next()) {
+                tableNames.add(rs.getString(1));
+            }
+        }
+        finally {
+            if(rs != null) try { rs.close(); rs = null;}
+            catch (SQLException e) {}
+            
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+        }
+        return tableNames;
+    }
+
+    private void matchTriggers() throws SQLException, TempSchemaManagerException {
+        
+        List<String> triggerNames = getMainTriggerNames();
+        List<String> newTriggerNames = getTempTriggerNames();
+        
+        if(newTriggerNames.size() != triggerNames.size()) {
+            throw new TempSchemaManagerException("Number of TRIGGERS created in the temp database do not match");
+        }
+        Collections.sort(triggerNames);
+        Collections.sort(newTriggerNames);
+        for(int i = 0; i < triggerNames.size(); i++) {
+            if(!(triggerNames.get(i).equals(newTriggerNames.get(i)))) {
+                throw new TempSchemaManagerException("TRIGGER names do not match: mainTable: "
+                        +triggerNames.get(i)+"; tempTable: "+newTriggerNames.get(i));
+            }
+        }
+    }
+
+    private void createTriggers(List<String> triggerNames) throws SQLException, TempSchemaManagerException {
+        
+        Connection conn  = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = ConnectionFactory.getTempDbConnection();
+            stmt = conn.createStatement();
+            
+            for(String triggerName: triggerNames) {
+                String sql = "SHOW CREATE TRIGGER "+ConnectionFactory.masterDbName()+"."+triggerName;
+//                log.info(sql);
+                rs = stmt.executeQuery(sql);
+                String createSql = null;
+                if(rs.next()) {
+                    createSql = rs.getString("SQL Original Statement");
+                    log.info(createSql);
+                    stmt.execute(createSql);
+                }
+                else {
+                    throw new TempSchemaManagerException("Cannot get CREATE statement for trigger: "+triggerName);
+                }
+                rs.close();
+            }
+        }
+        finally {
+            if(rs != null) try { rs.close(); rs = null;}
+            catch (SQLException e) {}
+            
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
+        }
+    }
+    
+
+    //-----------------------------------------------------------------------------------------
+    // DATABASE
+    //-----------------------------------------------------------------------------------------
     private void createTempDatabase() throws SQLException {
         
         Connection conn = null;
@@ -186,6 +308,13 @@ public class TempSchemaManager {
     }
 
     
+    public void checkBeforeCopy() throws SQLException, TempSchemaManagerException, TableCopyException {
+        // make sure the tables still match
+        matchTables();
+        // in the main and temp databases
+        checkTables();
+    }
+    
     /**
      * Dump the contents of the temporary database into the main database;
      * @throws SQLException 
@@ -194,10 +323,6 @@ public class TempSchemaManager {
      */
     public void flushToMainDatabase() throws SQLException, TempSchemaManagerException, TableCopyException {
         
-        // make sure the tables still match
-        matchTables();
-        // make sure there are conflicting column values (mostly primary key columns) in the main and temp databases
-        checkTables();
         // copy the tables from the temp to main database
         copyTables();
     }
@@ -240,6 +365,8 @@ public class TempSchemaManager {
     }
     
     private void copyTables() throws TableCopyException {
+        
+        long s = System.currentTimeMillis();
         UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
         copyTable(daoFactory.getMsExperimentDAO());     // msExperiment, msExperimentRun
         
@@ -273,6 +400,9 @@ public class TempSchemaManager {
         copyTable(daoFactory.getMsRunSearchAnalysisDAO());  // msRunSearchAnalysis
         copyTable(daoFactory.getPercoltorParamsDAO());  // PercolatorParams
         copyTable(daoFactory.getPercolatorResultDAO()); // PercolatorResult
+        
+        long e = System.currentTimeMillis();
+        log.info("COPIED TABLES IN : "+((e - s)/(1000L * 60L))+" minutes");
     }
     
     public void rollBackMainTable() {

@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.general.MsExperiment;
-import org.yeastrc.ms.upload.dao.TableCopyUtil;
 import org.yeastrc.ms.upload.dao.TableCopier;
 import org.yeastrc.ms.upload.dao.TableCopyException;
+import org.yeastrc.ms.upload.dao.TableCopyUtil;
 import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
 
 /**
@@ -73,7 +73,28 @@ public class MsExperimentUploadDAOImpl implements MsExperimentUploadDAO, TableCo
     
     @Override
     public void saveExperimentRun(int experimentId, int runId) {
-        exptDao.saveExperimentRun(experimentId, runId);
+        saveExperimentRun(experimentId, runId, true);
+    }
+    
+    @Override
+    public void saveExperimentRun(int experimentId, int runId, boolean check) {
+        if(!check)
+            exptDao.saveExperimentRun(experimentId, runId, false);
+        else {
+            // this check might involve looking at the temp and main databases
+            if(!isExperimentRunLinked(experimentId, runId)) {
+                exptDao.saveExperimentRun(experimentId, runId, false);
+            }
+        }
+    }
+    
+    @Override
+    public boolean isExperimentRunLinked(int experimentId, int runId) {
+        boolean linked = exptDao.isExperimentRunLinked(experimentId, runId);
+        if(!linked && useTempTable) {
+            linked = mainExptDao.isExperimentRunLinked(experimentId, runId);
+        }
+        return linked;
     }
     
     public void updateLastUpdateDate(int experimentId) {

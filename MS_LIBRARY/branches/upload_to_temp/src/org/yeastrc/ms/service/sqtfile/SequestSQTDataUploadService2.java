@@ -223,6 +223,7 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
                     
                     if(results.size() == RESULT_BUF_SIZE) {
                         uploadSearchResults(results);
+                        numResults += results.size();
                         results.clear();
                     }
                 }
@@ -234,6 +235,7 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
         
         if(results.size() > 0) {
             uploadSearchResults(results);
+            numResults += results.size();
             results.clear();
         }
         

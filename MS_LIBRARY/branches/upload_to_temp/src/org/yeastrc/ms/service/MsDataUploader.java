@@ -570,7 +570,7 @@ public class MsDataUploader {
         StringBuilder msg = new StringBuilder();
         msg.append("BEGIN EXPERIMENT UPLOAD");
         msg.append("\n\tRemote server: "+remoteServer);
-        msg.append("\n\tRAW DATA ");
+        msg.append("\n\tSPECTRUM DATA ");
         msg.append("\n\t\t Directory: "+spectrumDataDirectory);
         msg.append("\n\t\t Remote Directory: "+remoteSpectrumDataDirectory);
         if(uploadSearch) {

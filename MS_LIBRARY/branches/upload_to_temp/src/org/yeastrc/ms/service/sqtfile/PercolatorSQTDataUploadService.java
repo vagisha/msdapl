@@ -194,7 +194,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             Integer runSearchId = runSearchIdMap.get(file); 
             if (runSearchId == null) {
                 UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_SQT);
-                ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
+                ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
                 deleteAnalysis(analysisId);
                 numAnalysisUploaded = 0;
                 throw ex;
@@ -206,7 +206,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
                 log.info("Number of results not found: "+numResultsNotFound);
             }
             catch (UploadException ex) {
-                ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
+                ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
                 deleteAnalysis(analysisId);
                 numAnalysisUploaded = 0;
                 throw ex;
@@ -216,7 +216,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         // if no sqt files were uploaded delete the top level search analysis
         if (numAnalysisUploaded == 0) {
             UploadException ex = new UploadException(ERROR_CODE.NO_PERC_ANALYSIS_UPLOADED);
-            ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
+            ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
             deleteAnalysis(analysisId);
             numAnalysisUploaded = 0;
             throw ex;
@@ -232,9 +232,9 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             addPercolatorParams(params, analysisId);
         }
         catch(UploadException e) {
-            e.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
+            e.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
             log.error(e.getMessage(), e);
-            deleteAnalysis(searchId);
+            deleteAnalysis(analysisId);
             numAnalysisUploaded = 0;
             throw e;
         }

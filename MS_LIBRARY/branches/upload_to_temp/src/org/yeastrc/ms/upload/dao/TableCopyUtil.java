@@ -58,10 +58,11 @@ public class TableCopyUtil {
             throw new TableCopyException("Failed to execute sql: "+sql, e);
         }
         finally {
-            try {if(conn != null) conn.close();}
-            catch(SQLException e){}
-            try {if(stmt != null) stmt.close();}
-            catch(SQLException e){}
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
             
             // enable keys on the main database table, if required
             if(disableKeys)
@@ -151,12 +152,14 @@ public class TableCopyUtil {
             throw new TableCopyException("Failed to execute sql: "+sql, e);
         }
         finally {
-            try {if(conn != null) conn.close();}
-            catch(SQLException e){}
-            try {if(stmt != null) stmt.close();}
-            catch(SQLException e){}
-            try {if(rs != null) rs.close();}
-            catch(SQLException e){}
+            if(rs != null) try { rs.close(); rs = null;}
+            catch (SQLException e) {}
+            
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
         }
     }
 
@@ -175,10 +178,11 @@ public class TableCopyUtil {
             throw new TableCopyException("Failed to execute sql: "+sql, e);
         }
         finally {
-            try {if(conn != null) conn.close();}
-            catch(SQLException e){}
-            try {if(stmt != null) stmt.close();}
-            catch(SQLException e){}
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
         }
     }
 
@@ -198,10 +202,11 @@ public class TableCopyUtil {
             throw new TableCopyException("Failed to execute sql: "+sql, e);
         }
         finally {
-            try {if(conn != null) conn.close();}
-            catch(SQLException e){}
-            try {if(stmt != null) stmt.close();}
-            catch(SQLException e){}
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
         }
     }
     
@@ -222,10 +227,11 @@ public class TableCopyUtil {
             throw new TableCopyException("Failed to execute sql: "+sql, e);
         }
         finally {
-            try {if(conn != null) conn.close();}
-            catch(SQLException e){}
-            try {if(stmt != null) stmt.close();}
-            catch(SQLException e){}
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
         }
     }
     
@@ -246,10 +252,11 @@ public class TableCopyUtil {
             throw new TableCopyException("Failed to execute sql: "+sql, e);
         }
         finally {
-            try {if(conn != null) conn.close();}
-            catch(SQLException e){}
-            try {if(stmt != null) stmt.close();}
-            catch(SQLException e){}
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
         }
         log.info("ENABLED KEYS ON "+tableName);
     }
@@ -296,10 +303,14 @@ public class TableCopyUtil {
             throw new TableCopyException("Failed to execute sql: "+sql, e);
         }
         finally {
-            try {if(conn != null) conn.close();}
-            catch(SQLException e){}
-            try {if(stmt != null) stmt.close();}
-            catch(SQLException e){}
+            if(rs != null) try { rs.close(); rs = null;}
+            catch (SQLException e) {}
+            
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
         }
         return 0;
     }
