@@ -121,4 +121,12 @@ public class MsRunSearchUploadDAOImpl implements MsRunSearchUploadDAO, TableCopi
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msRunSearch", "id"))
+            return false;
+        return true;
+    }
 }

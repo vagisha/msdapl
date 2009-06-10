@@ -108,5 +108,15 @@ public class MsExperimentUploadDAOImpl implements MsExperimentUploadDAO, TableCo
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msExperiment", "id"))
+            return false;
+        if(!copier.checkColumnValues("msExperimentRun", "experimentID"))
+            return false;
+        return true;
+    }
    
 }

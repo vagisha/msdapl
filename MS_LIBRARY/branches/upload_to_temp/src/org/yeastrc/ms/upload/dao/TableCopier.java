@@ -13,4 +13,6 @@ package org.yeastrc.ms.upload.dao;
 public interface TableCopier {
 
     public abstract void copyToMainTable() throws TableCopyException;
+    
+    public abstract boolean checkBeforeCopy() throws TableCopyException;
 }

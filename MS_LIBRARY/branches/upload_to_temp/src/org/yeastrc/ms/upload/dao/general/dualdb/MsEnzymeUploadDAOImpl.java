@@ -131,4 +131,14 @@ public class MsEnzymeUploadDAOImpl implements MsEnzymeUploadDAO, TableCopier {
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msSearchEnzyme", "searchID"))
+            return false;
+        if(!copier.checkColumnValues("msRunEnzyme", "runID"))
+            return false;
+        return true;
+    }
 }

@@ -66,4 +66,12 @@ public class SQTSearchScanUploadDAOImpl implements SQTSearchScanUploadDAO, Table
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("SQTSpectrumData", "runSearchID"))
+            return false;
+        return true;
+    }
 }

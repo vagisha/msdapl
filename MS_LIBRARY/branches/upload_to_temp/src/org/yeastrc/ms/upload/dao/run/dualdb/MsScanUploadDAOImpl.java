@@ -23,6 +23,7 @@ import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.PeakStorageType;
 import org.yeastrc.ms.upload.dao.BaseJDBCUploadDAO;
+import org.yeastrc.ms.upload.dao.TableCopier;
 import org.yeastrc.ms.upload.dao.TableCopyException;
 import org.yeastrc.ms.upload.dao.TableCopyUtil;
 import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
@@ -33,7 +34,7 @@ import org.yeastrc.ms.util.PeakStringBuilder;
  * 1. msScan
  * 2. msScanData
  */
-public class MsScanUploadDAOImpl extends BaseJDBCUploadDAO implements MsScanUploadDAO {
+public class MsScanUploadDAOImpl extends BaseJDBCUploadDAO implements MsScanUploadDAO, TableCopier {
 
     private static final Logger log = Logger.getLogger(MsScanUploadDAOImpl.class.getName());
     
@@ -248,6 +249,7 @@ public class MsScanUploadDAOImpl extends BaseJDBCUploadDAO implements MsScanUplo
     //------------------------------------------------------------------------------------------------
     // COPY DATA TO MAIN TABLES
     //------------------------------------------------------------------------------------------------
+    @Override
     public void copyToMainTable() throws TableCopyException {
         if(useTempTable) {
             TableCopyUtil copier = TableCopyUtil.getInstance();
@@ -258,5 +260,15 @@ public class MsScanUploadDAOImpl extends BaseJDBCUploadDAO implements MsScanUplo
         else {
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
+    }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msScan", "id"))
+            return false;
+        if(!copier.checkColumnValues("msScanData", "scanID"))
+            return false;
+        return true;
     }
 }

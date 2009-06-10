@@ -173,4 +173,14 @@ public class MsRunUploadDAOImpl extends BaseJDBCUploadDAO implements MsRunUpload
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msRun", "id"))
+            return false;
+        if(!copier.checkColumnValues("msExperimentRun", "experimentID"))
+            return false;
+        return true;
+    }
 }

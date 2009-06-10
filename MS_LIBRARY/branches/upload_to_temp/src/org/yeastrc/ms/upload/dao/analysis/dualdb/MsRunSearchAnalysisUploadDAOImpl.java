@@ -42,6 +42,7 @@ public class MsRunSearchAnalysisUploadDAOImpl implements MsRunSearchAnalysisUplo
     //------------------------------------------------------------------------------------------------
     // COPY DATA TO MAIN TABLES
     //------------------------------------------------------------------------------------------------
+    @Override
     public void copyToMainTable() throws TableCopyException {
         if(useTempTable) {
             TableCopyUtil copier = TableCopyUtil.getInstance();
@@ -53,4 +54,11 @@ public class MsRunSearchAnalysisUploadDAOImpl implements MsRunSearchAnalysisUplo
         }
     }
 
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msRunSearchAnalysis", "id"))
+            return false;
+        return true;
+    }
 }

@@ -253,4 +253,87 @@ public class TableCopyUtil {
         }
         log.info("ENABLED KEYS ON "+tableName);
     }
+    
+    public boolean checkColumnValues(String tableName, String columnName) throws TableCopyException {
+        log.info("Checking primary key: "+columnName+" on table: "+tableName);
+        
+        int numRowsInTemp = getRecordCount(tableName, true); // look in temp table
+        if(numRowsInTemp == 0) // if the temp table is empty we will not be copying anything. 
+            return true;
+        
+        numRowsInTemp = getRecordCount(tableName, false); // look in main table
+        if(numRowsInTemp == 0) // if the main table is empty there will not be any conflicts. 
+            return true;
+        
+        int maxValInMain = selectVal(tableName, columnName, true,true); // main table; max value
+        int minValInTemp = selectVal(tableName, columnName, false,false); // temp table; min value
+        
+        return maxValInMain < minValInTemp;
+    }
+    
+    
+    private int selectVal(String tableName, String columnName, boolean mainTable, boolean maxVal) throws TableCopyException {
+        
+        String sql = "SELECT ";
+        if(maxVal)
+            sql += "max(";
+        else
+            sql += "min(";
+        sql +=columnName+") FROM "+tableName;
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = mainTable ? ConnectionFactory.getMainDbConnection() : ConnectionFactory.getTempDbConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if(rs.next())
+                return rs.getInt(1);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute sql: "+sql, e);
+            throw new TableCopyException("Failed to execute sql: "+sql, e);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+        return 0;
+    }
+    
+
+    private int getRecordCount(String tableName, boolean tempTable) throws TableCopyException {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        String sql = "SELECT count(*) FROM "+tableName;
+        try {
+            conn = tempTable ? ConnectionFactory.getTempDbConnection() : ConnectionFactory.getMainDbConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if(rs.next()) {
+                return rs.getInt(1);
+            }
+            else {
+                throw new TableCopyException("No results for query: "+sql);
+            }
+        }
+        catch(SQLException e) {
+            throw new TableCopyException("Error executing query: "+sql, e);
+        }
+        finally {
+            if(rs != null) try { rs.close(); rs = null;}
+            catch (SQLException e) {}
+            
+            if(stmt != null) try { stmt.close(); stmt = null;}
+            catch (SQLException e) {}
+            
+            if(conn != null) try { conn.close(); conn = null;}
+            catch (SQLException e) {}
+        }
+    }
 }

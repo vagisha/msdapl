@@ -82,4 +82,12 @@ public class SequestSearchUploadDAOImpl implements SequestSearchUploadDAO, Table
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("SQTParams", "id"))
+            return false;
+        return true;
+    }
 }

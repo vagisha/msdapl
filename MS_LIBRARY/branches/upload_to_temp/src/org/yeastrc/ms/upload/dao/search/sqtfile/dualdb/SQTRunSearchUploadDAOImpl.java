@@ -63,4 +63,9 @@ public class SQTRunSearchUploadDAOImpl implements SQTRunSearchUploadDAO, TableCo
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        return true;
+    }
 }

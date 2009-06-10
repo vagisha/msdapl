@@ -82,4 +82,12 @@ public class ProlucidSearchUploadDAOImpl implements ProlucidSearchUploadDAO, Tab
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("ProLuCIDParams", "id"))
+            return false;
+        return true;
+    }
 }

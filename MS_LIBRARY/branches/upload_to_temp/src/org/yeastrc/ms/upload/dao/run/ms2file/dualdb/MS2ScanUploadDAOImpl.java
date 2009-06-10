@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanIn;
+import org.yeastrc.ms.upload.dao.TableCopier;
 import org.yeastrc.ms.upload.dao.TableCopyException;
 import org.yeastrc.ms.upload.dao.TableCopyUtil;
 import org.yeastrc.ms.upload.dao.run.ms2file.MS2ScanUploadDAO;
@@ -18,7 +19,7 @@ import org.yeastrc.ms.upload.dao.run.ms2file.MS2ScanUploadDAO;
 /**
  * 
  */
-public class MS2ScanUploadDAOImpl implements MS2ScanUploadDAO {
+public class MS2ScanUploadDAOImpl implements MS2ScanUploadDAO, TableCopier {
 
     private static final Logger log = Logger.getLogger(MS2ScanUploadDAOImpl.class.getName());
     
@@ -71,6 +72,18 @@ public class MS2ScanUploadDAOImpl implements MS2ScanUploadDAO {
         else {
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
+    }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("MS2FileScanCharge", "id"))
+            return false;
+        if(!copier.checkColumnValues("MS2FileChargeDependentAnalysis", "id"))
+            return false;
+        if(!copier.checkColumnValues("MS2FileChargeIndependentAnalysis", "id"))
+            return false;
+        return true;
     }
     
 }

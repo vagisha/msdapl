@@ -42,6 +42,7 @@ public class PercolatorParamsUploadDAOImpl implements PercolatorParamsUploadDAO,
     //------------------------------------------------------------------------------------------------
     // COPY DATA TO MAIN TABLES
     //------------------------------------------------------------------------------------------------
+    @Override
     public void copyToMainTable() throws TableCopyException {
         if(useTempTable) {
             TableCopyUtil copier = TableCopyUtil.getInstance();
@@ -51,5 +52,13 @@ public class PercolatorParamsUploadDAOImpl implements PercolatorParamsUploadDAO,
         else {
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
+    }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("PercolatorParams", "id"))
+            return false;
+        return true;
     }
 }

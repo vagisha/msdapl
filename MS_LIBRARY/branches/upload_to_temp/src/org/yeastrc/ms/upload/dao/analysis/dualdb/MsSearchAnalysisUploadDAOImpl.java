@@ -60,6 +60,7 @@ public class MsSearchAnalysisUploadDAOImpl implements MsSearchAnalysisUploadDAO,
     //------------------------------------------------------------------------------------------------
     // COPY DATA TO MAIN TABLES
     //------------------------------------------------------------------------------------------------
+    @Override
     public void copyToMainTable() throws TableCopyException {
         if(useTempTable) {
             TableCopyUtil copier = TableCopyUtil.getInstance();
@@ -69,6 +70,14 @@ public class MsSearchAnalysisUploadDAOImpl implements MsSearchAnalysisUploadDAO,
         else {
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
+    }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msSearchAnalysis", "id"))
+            return false;
+        return true;
     }
     
 }

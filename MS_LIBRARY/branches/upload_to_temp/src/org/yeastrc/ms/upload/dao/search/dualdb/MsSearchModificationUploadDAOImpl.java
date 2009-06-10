@@ -135,5 +135,23 @@ public class MsSearchModificationUploadDAOImpl implements MsSearchModificationUp
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
     }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msSearchStaticMod", "id"))
+            return false;
+        if(!copier.checkColumnValues("msSearchTerminalStaticMod", "id"))
+            return false;
+        if(!copier.checkColumnValues("msSearchDynamicMod", "id"))
+            return false;
+        if(!copier.checkColumnValues("msSearchTerminalDynamicMod", "id"))
+            return false;
+        if(!copier.checkColumnValues("msDynamicModResult", "resultID"))
+            return false;
+        if(!copier.checkColumnValues("msTerminalDynamicModResult", "resultID"))
+            return false;
+        return true;
+    }
 
 }

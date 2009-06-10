@@ -90,6 +90,9 @@ public class MsSearchDatabaseUploadDAOImpl implements MsSearchDatabaseUploadDAO,
         searchDatabaseDao.linkDatabaseAndSearch(databaseId, searchId);
     }
 
+    //------------------------------------------------------------------------------------------------
+    // COPY DATA TO MAIN TABLES
+    //------------------------------------------------------------------------------------------------
     @Override
     public void copyToMainTable() throws TableCopyException {
         if(useTempTable) {
@@ -100,5 +103,13 @@ public class MsSearchDatabaseUploadDAOImpl implements MsSearchDatabaseUploadDAO,
         else {
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
+    }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("msSearchDatabase", "searchID"))
+            return false;
+        return true;
     }
 }

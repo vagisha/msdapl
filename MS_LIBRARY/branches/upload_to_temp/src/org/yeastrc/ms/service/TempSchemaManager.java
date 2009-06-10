@@ -196,7 +196,50 @@ public class TempSchemaManager {
         
         // make sure the tables still match
         matchTables();
+        // make sure there are conflicting column values (mostly primary key columns) in the main and temp databases
+        checkTables();
+        // copy the tables from the temp to main database
+        copyTables();
+    }
+
+    private void checkTables() throws TableCopyException {
         
+        UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+        checkTable(daoFactory.getMsExperimentDAO());     // msExperiment, msExperimentRun
+        
+        checkTable(daoFactory.getEnzymeDAO());           // msSearchEnzyme, msRunEnzyme
+        
+        checkTable(daoFactory.getMsRunDAO());            // msRun, msRunLocation
+        checkTable(daoFactory.getMS2FileRunDAO());       // MS2FileHeader
+        checkTable(daoFactory.getMsScanDAO());           // msScan, msScanData
+        checkTable(daoFactory.getMS2FileScanDAO());      // MS2FileScanCharge, MS2FileChargeDependentAnalysis, MS2FileChargeIndependentAnalysis
+        
+        checkTable(daoFactory.getMsSearchDAO());         // msSearch
+        checkTable(daoFactory.getMsSequenceDatabaseDAO());// msSearchDatabase
+        checkTable(daoFactory.getMsRunSearchDAO());      // msRunSearch
+        checkTable(daoFactory.getMsSearchResultDAO());   // msRunSearchResult
+        checkTable(daoFactory.getMsSearchModDAO());      // msSearchStaticMod, msSearchTerminalStaticMod
+                                                        // msSearchDynamicMod, msSearchTerminalDynamicMod
+                                                        // msDynamicModResult, msTerminalDynamicModResult
+        checkTable(daoFactory.getMsProteinMatchDAO());   // msProteinMatch
+        
+        checkTable(daoFactory.getSqtHeaderDAO());        // SQTFileHeader
+        checkTable(daoFactory.getSqtRunSearchDAO());     // 
+        checkTable(daoFactory.getSqtSpectrumDAO());      // SQTSpectrumData
+        
+        checkTable(daoFactory.getSequestSearchDAO());    // SQTParams
+        checkTable(daoFactory.getSequestResultDAO());    // SQTSearchResult
+        
+        checkTable(daoFactory.getProlucidSearchDAO());   // ProLuCIDParams
+        checkTable(daoFactory.getProlucidResultDAO());   // ProLuCIDSearchResult
+        
+        checkTable(daoFactory.getMsSearchAnalysisDAO()); // msSearchAnalysis
+        checkTable(daoFactory.getMsRunSearchAnalysisDAO());  // msRunSearchAnalysis
+        checkTable(daoFactory.getPercoltorParamsDAO());  // PercolatorParams
+        checkTable(daoFactory.getPercolatorResultDAO()); // PercolatorResult
+    }
+    
+    private void copyTables() throws TableCopyException {
         UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
         copyTable(daoFactory.getMsExperimentDAO());     // msExperiment, msExperimentRun
         
@@ -230,8 +273,6 @@ public class TempSchemaManager {
         copyTable(daoFactory.getMsRunSearchAnalysisDAO());  // msRunSearchAnalysis
         copyTable(daoFactory.getPercoltorParamsDAO());  // PercolatorParams
         copyTable(daoFactory.getPercolatorResultDAO()); // PercolatorResult
-        
-        
     }
     
     public void rollBackMainTable() {
@@ -241,19 +282,19 @@ public class TempSchemaManager {
         
         // Delete the experiments
         MsExperimentUploadDAO exptDao = daoFactory.getMsExperimentDAO();
-        List<Integer> experimentIds = exptDao.getAllExperimentIds();
+        List<Integer> experimentIds = exptDao.getAllExperimentIds(); // experiment ids from the temp table
         for(int exptId: experimentIds)
             // This will delete the experiment from the main and temp tables
             exptDao.deleteExperiment(exptId);
         
         
         // Delete any searches that are left over after deleting the experiments
-        List<Integer> searchIds = getAllSearchIds();
+        List<Integer> searchIds = getAllSearchIds(); // search ids from the temp table
         for(int searchId: searchIds)
             deleteEntry("msSearch", searchId);
         
         // Delete any search analyses that are left over after deleting the experiments and searches
-        List<Integer> analysisIds = getAllAnalysisIds();
+        List<Integer> analysisIds = getAllAnalysisIds(); // analysis ids from the temp table
         for(int analysisId: analysisIds)
             deleteEntry("msSearchAnalysis", analysisId);
         
@@ -350,36 +391,16 @@ public class TempSchemaManager {
     }
     
     private void copyTable(Object tableDao) throws TableCopyException {
-        if(tableDao instanceof TableCopier)
+        if(tableDao instanceof TableCopier) {
             ((TableCopier)tableDao).copyToMainTable();
-    }
-
-    private int getTempRecordCount(String tableName) throws SQLException, TempSchemaManagerException {
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = ConnectionFactory.getTempDbConnection();
-            stmt = conn.createStatement();
-            String sql = "SELECT count(*) FROM "+tableName;
-            rs = stmt.executeQuery(sql);
-            if(rs.next()) {
-                return rs.getInt(1);
-            }
-            else {
-                throw new TempSchemaManagerException("No results for query: "+sql);
-            }
         }
-        finally {
-            if(rs != null) try { rs.close(); rs = null;}
-            catch (SQLException e) {}
-            
-            if(stmt != null) try { stmt.close(); stmt = null;}
-            catch (SQLException e) {}
-            
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
+    }
+    
+    private void checkTable(Object tableDao) throws TableCopyException {
+        if(tableDao instanceof TableCopier) {
+            if(!((TableCopier)tableDao).checkBeforeCopy()) {
+                throw new TableCopyException("Check before copying tables for"+tableDao.getClass().getName()+" failed");
+            }
         }
     }
     

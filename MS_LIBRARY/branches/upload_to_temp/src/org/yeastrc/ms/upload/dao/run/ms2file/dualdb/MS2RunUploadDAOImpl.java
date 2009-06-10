@@ -78,6 +78,7 @@ public class MS2RunUploadDAOImpl implements MS2RunUploadDAO, TableCopier {
     //------------------------------------------------------------------------------------------------
     // COPY DATA TO MAIN TABLES
     //------------------------------------------------------------------------------------------------
+    @Override
     public void copyToMainTable() throws TableCopyException {
         if(useTempTable) {
             // copy entries from the required tables
@@ -86,5 +87,13 @@ public class MS2RunUploadDAOImpl implements MS2RunUploadDAO, TableCopier {
         else {
             log.warn("Cannot copy to main tables; not using temp tables.");
         }
+    }
+    
+    @Override
+    public boolean checkBeforeCopy() throws TableCopyException {
+        TableCopyUtil copier = TableCopyUtil.getInstance();
+        if(!copier.checkColumnValues("MS2FileHeader", "id"))
+            return false;
+        return true;
     }
 }
