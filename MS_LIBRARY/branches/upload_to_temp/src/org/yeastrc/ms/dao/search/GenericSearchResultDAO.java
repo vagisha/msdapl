@@ -56,7 +56,7 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
     public abstract int save(int searchId, I searchResult, int runSearchId, int scanId);
 
     /**
-     * Saves the search result in the msPeptideSearchResult table. 
+     * Saves the search result in the msRunSearchResult table. 
      * Any data associated with the result (e.g. protein matches, dynamic modifications)
      * are NOT saved.
      * @param searchResult
@@ -64,7 +64,7 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
      * @param scanId
      * @return
      */
-    public abstract int saveResultOnly(I searchResult, int runSearchId, int scanId);
+    public abstract int saveResultOnly(MsSearchResultIn searchResult, int runSearchId, int scanId);
     
     /**
      * Deletes this search result (msRunSearchResult table) along with any 

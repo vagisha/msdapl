@@ -4,7 +4,7 @@
 <sqlMap namespace="ProlucidSearch"> 
 
 	<typeAlias alias="ProlucidSearchOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidSearchBean"/>
-	<typeAlias alias="ProlucidParamIn" type="org.yeastrc.ms.dao.search.prolucid.ibatis.ProlucidSearchDAOImpl$ProlucidParamSqlMapParam" />
+	<typeAlias alias="ProlucidParamIn" type="org.yeastrc.ms.upload.dao.search.prolucid.ibatis.ProlucidSearchDAOImpl$ProlucidParamSqlMapParam" />
 	<typeAlias alias="ProlucidParamOut" type="org.yeastrc.ms.domain.search.prolucid.impl.ProlucidParamBean" />
 	
 	<resultMap class="ProlucidSearchOut" id="prolucidSearchResult" extends="MsSearch.msSearchResult" >

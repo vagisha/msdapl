@@ -19,7 +19,6 @@ import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl;
 import org.yeastrc.ms.dao.general.ibatis.MsExperimentDAOImpl;
-import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl;

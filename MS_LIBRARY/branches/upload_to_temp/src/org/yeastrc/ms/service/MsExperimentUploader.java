@@ -9,10 +9,10 @@ package org.yeastrc.ms.service;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.UploadDAOFactory;
-import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
+import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
 
 /**
  * 
@@ -213,7 +213,7 @@ public class MsExperimentUploader {
     }
     
     private int saveExperiment() throws UploadException {
-        MsExperimentDAO experimentDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
+        MsExperimentUploadDAO experimentDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
         ExperimentBean experiment = new ExperimentBean();
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);
@@ -230,7 +230,7 @@ public class MsExperimentUploader {
     
     private void deleteExperiment(int experimentId) {
         log.error("\n\tDELETING EXPERIMENT: "+experimentId);
-        MsExperimentDAO exptDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
+        MsExperimentUploadDAO exptDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
         exptDao.deleteExperiment(experimentId);
     }
     

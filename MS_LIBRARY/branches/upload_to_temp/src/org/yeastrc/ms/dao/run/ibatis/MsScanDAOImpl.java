@@ -1,13 +1,11 @@
 /**
- * MsScanDAO.java
+ * MsScanDAOImpl.java
  * @author Vagisha Sharma
  * Jun 17, 2008
  * @version 1.0
  */
 package org.yeastrc.ms.dao.run.ibatis;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -22,7 +20,7 @@ import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.MsScanIn;
 import org.yeastrc.ms.domain.run.Peak;
 import org.yeastrc.ms.domain.run.PeakStorageType;
-import org.yeastrc.ms.util.PeakStringBuilder;
+import org.yeastrc.ms.upload.dao.run.ibatis.MsScanUploadDAOIbatisImpl.MsScanDataSqlMapParam;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -185,70 +183,7 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
         
     }
     
-    /**
-     * Convenience class for encapsulating data for a row in the msScanData table.
-     */
-    public static class MsScanDataSqlMapParam {
-        private int scanId;
-        private byte[] peakData;
-        private PeakStorageType peakStorageType;
-        
-        public MsScanDataSqlMapParam(int scanId, MsScanIn scan, PeakStorageType storageType) throws IOException {
-            this.scanId = scanId;
-            
-            if(storageType == PeakStorageType.DOUBLE_FLOAT)
-                this.peakData = getPeakBinaryData(scan);
-            else if(storageType == PeakStorageType.STRING)
-                this.peakData = getPeakDataString(scan);
-            
-            this.peakStorageType = storageType;
-        }
-        
-        public int getScanId() {
-            return scanId;
-        }
-        
-        public PeakStorageType getPeakStorageType() {
-            return peakStorageType;
-        }
-        
-        public byte[] getPeakData() {
-            return peakData;
-        }
-        
-        private byte[] getPeakDataString(MsScanIn scan) {
-            List<String[]> peaksStr = scan.getPeaksString();
-            PeakStringBuilder builder = new PeakStringBuilder();
-            for(String[] peak: peaksStr) {
-                builder.addPeak(peak[0], peak[1]);
-            }
-            return builder.getPeaksAsString().getBytes();
-        }
-        
-        private byte[] getPeakBinaryData(MsScanIn scan) throws IOException {
-            
-            ByteArrayOutputStream bos = null;
-            DataOutputStream dos = null;
-            
-            List<Peak> peaks = scan.getPeaks();
-            try {
-                bos = new ByteArrayOutputStream();
-                dos = new DataOutputStream(bos);
-                for(Peak peak: peaks) {
-                    dos.writeDouble(peak.getMz());
-                    dos.writeFloat(peak.getIntensity());
-                }
-                dos.flush();
-            }
-            finally {
-                if(dos != null) dos.close();
-                if(bos != null) bos.close();
-            }
-            byte [] data = bos.toByteArray();
-            return data;
-        }
-    }
-  
+
     //---------------------------------------------------------------------------------------
     /** 
      * Type handler for converting between 'F', 'T' from database to DataConversionType
@@ -323,6 +258,4 @@ public class MsScanDAOImpl extends BaseSqlMapDAO implements MsScanDAO {
             return type;
         }
     }
-
-    
 }

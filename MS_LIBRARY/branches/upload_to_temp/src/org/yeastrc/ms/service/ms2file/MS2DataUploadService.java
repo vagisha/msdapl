@@ -14,13 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.UploadDAOFactory;
-import org.yeastrc.ms.dao.general.MsExperimentDAO;
-import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ChargeDependentAnalysisDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ChargeIndependentAnalysisDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2RunDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ScanChargeDAO;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeDependentAnalysisWId;
 import org.yeastrc.ms.domain.run.ms2file.MS2ChargeIndependentAnalysisWId;
@@ -37,6 +30,13 @@ import org.yeastrc.ms.parser.ms2File.Ms2FileReader;
 import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
+import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
+import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
+import org.yeastrc.ms.upload.dao.run.ms2file.MS2ChargeDependentAnalysisUploadDAO;
+import org.yeastrc.ms.upload.dao.run.ms2file.MS2ChargeIndependentAnalysisUploadDAO;
+import org.yeastrc.ms.upload.dao.run.ms2file.MS2RunUploadDAO;
+import org.yeastrc.ms.upload.dao.run.ms2file.MS2ScanChargeUploadDAO;
 import org.yeastrc.ms.util.Sha1SumCalculator;
 
 /**
@@ -54,7 +54,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     private List<MS2ChargeDependentAnalysisWId> dAnalysisList;
     private List<MS2ChargeIndependentAnalysisWId> iAnalysisList;
     
-    private int lastUploadedRunId = 0;
+    int lastUploadedRunId = 0;
     
     private int numRunsUploaded = 0;
     
@@ -74,7 +74,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         fileFormats = new ArrayList<RunFileFormat>();
     }
 
-    private void resetCaches() {
+    protected void resetCaches() {
         dAnalysisList.clear();
         iAnalysisList.clear();
         
@@ -87,7 +87,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     }
     
     private static void deleteRun(Integer runId) {
-        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunUploadDAO runDao = daoFactory.getMS2FileRunDAO();
         runDao.delete(runId);
     }
     
@@ -178,7 +178,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     }
     
     private void saveRunLocation(String serverDirectory, int runId) {
-        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunUploadDAO runDao = daoFactory.getMS2FileRunDAO();
         // Save the original location (on remote server) of the MS2 file, if the location is not in the database already.
         int runLocs = runDao.loadMatchingRunLocations(runId, serverDirectory);
         if (runLocs == 0) {
@@ -187,7 +187,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     }
     
     private void linkExperimentAndRun(int experimentId, int runId) {
-        MsExperimentDAO exptDao = daoFactory.getMsExperimentDAO();
+        MsExperimentUploadDAO exptDao = daoFactory.getMsExperimentDAO();
         // an entry will be made in the msExperimentRun table only if 
         // it does not already exists. 
         exptDao.saveExperimentRun(experimentId, runId);
@@ -208,7 +208,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     int getMatchingRunId(String fileName, String sha1Sum) {
 
         fileName = removeExtension(fileName);
-        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunUploadDAO runDao = daoFactory.getMS2FileRunDAO();
         return runDao.loadRunIdForFileNameAndSha1Sum(fileName, sha1Sum);
     }
     
@@ -228,7 +228,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
      * @return
      * @throws UploadException 
      */
-    private int uploadMS2Run(MS2RunDataProvider provider, final String serverDirectory) throws UploadException  {
+    protected int uploadMS2Run(MS2RunDataProvider provider, final String serverDirectory) throws UploadException  {
 
         log.info("BEGIN MS2 FILE UPLOAD: "+provider.getFileName());
         long startTime = System.currentTimeMillis();
@@ -236,7 +236,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         // reset all caches.
         resetCaches();
         
-        MS2RunDAO runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunUploadDAO runDao = daoFactory.getMS2FileRunDAO();
 
 
         // Get the top-level run information and upload it
@@ -254,7 +254,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         log.info("Uploaded top-level run information with runId: "+runId);
 
         // upload each of the scans
-        MsScanDAO scanDao = daoFactory.getMsScanDAO();
+        MsScanUploadDAO scanDao = daoFactory.getMsScanDAO();
         int all = 0;
         int uploaded = 0;
         while(true) {
@@ -279,7 +279,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
             saveChargeIndependentAnalysis(scan, scanId);
 
             // save the scan charge states for this scan
-            MS2ScanChargeDAO chargeDao = daoFactory.getMS2FileScanChargeDAO();
+            MS2ScanChargeUploadDAO chargeDao = daoFactory.getMS2FileScanChargeDAO();
             for (MS2ScanCharge scanCharge: scan.getScanChargeList()) {
                 int scanChargeId = chargeDao.saveScanChargeOnly(scanCharge, scanId);
                 saveChargeDependentAnalysis(scanCharge, scanChargeId);
@@ -304,7 +304,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
         return runId;
     }
 
-    private void saveChargeDependentAnalysis(MS2ScanCharge scanCharge, final int scanChargeId) {
+    protected void saveChargeDependentAnalysis(MS2ScanCharge scanCharge, final int scanChargeId) {
         if (dAnalysisList.size() > BUF_SIZE) {
             saveChargeDependentAnalysis();
         }
@@ -315,12 +315,12 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     }
 
     private void saveChargeDependentAnalysis() {
-        MS2ChargeDependentAnalysisDAO dao = daoFactory.getMs2FileChargeDAnalysisDAO();
+        MS2ChargeDependentAnalysisUploadDAO dao = daoFactory.getMs2FileChargeDAnalysisDAO();
         dao.saveAll(dAnalysisList);
         dAnalysisList.clear();
     }
 
-    private void saveChargeIndependentAnalysis(MS2ScanIn scan, final int scanId) {
+    protected void saveChargeIndependentAnalysis(MS2ScanIn scan, final int scanId) {
         if (iAnalysisList.size() > BUF_SIZE) {
             saveChargeIndependentAnalysis();
         }
@@ -331,12 +331,12 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     }
 
     private void saveChargeIndependentAnalysis() {
-        MS2ChargeIndependentAnalysisDAO dao = daoFactory.getMs2FileChargeIAnalysisDAO();
+        MS2ChargeIndependentAnalysisUploadDAO dao = daoFactory.getMs2FileChargeIAnalysisDAO();
         dao.saveAll(iAnalysisList);
         iAnalysisList.clear();
     }
     
-    private void flush() {
+    protected void flush() {
         if (iAnalysisList.size() > 0)
             saveChargeIndependentAnalysis();
         if (dAnalysisList.size() > 0)

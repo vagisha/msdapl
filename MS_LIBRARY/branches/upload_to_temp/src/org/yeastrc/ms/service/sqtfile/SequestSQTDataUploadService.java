@@ -11,16 +11,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.yeastrc.ms.dao.UploadDAOFactory;
-import org.yeastrc.ms.dao.run.MsRunDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
@@ -38,6 +30,9 @@ import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
+import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchResultUploadDAO;
+import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchUploadDAO;
 
 /**
  * 
@@ -45,7 +40,7 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 public final class SequestSQTDataUploadService extends AbstractSQTDataUploadService {
 
     
-    private final SequestSearchResultDAO sqtResultDao;
+    private final SequestSearchResultUploadDAO sqtResultDao;
     
     // these are the things we will cache and do bulk-inserts
     List<SequestResultDataWId> sequestResultDataList; // sequest scores
@@ -110,7 +105,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         
         // create a new entry in the MsSearch table and upload the search options, databases, enzymes etc.
         try {
-            SequestSearchDAO searchDAO = UploadDAOFactory.getInstance().getSequestSearchDAO();
+            SequestSearchUploadDAO searchDAO = UploadDAOFactory.getInstance().getSequestSearchDAO();
             return searchDAO.saveSearch(makeSearchObject(parser, getSearchProgram(),
                     remoteDirectory, searchDate), experimentId, sequenceDatabaseId);
         }
@@ -343,45 +338,6 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
     }
     
-    public static void main(String[] args) {
-        int experimentID = 1;
-        
-        String dir = "/Users/vagisha/WORK/MacCoss_Genn_CE/ALL/sequest";
-        Set<String> fileNames = new HashSet<String>();
-        String[] files = new File(dir).list();
-        for(String file: files) {
-            if(!(file.endsWith(".sqt")))
-                continue;
-            int idx = file.lastIndexOf(".");
-            file = file.substring(0, idx);
-            fileNames.add(file);
-        }
-        Map<String, Integer> runIdMap = new HashMap<String, Integer>(fileNames.size());
-        MsRunDAO runDao = UploadDAOFactory.getInstance().getMsRunDAO();
-        for(String filename: fileNames) {
-            List<Integer> runIds = runDao.loadRunIdsForFileName(filename+".ms2");
-            if(runIds.size() > 1) {
-                System.out.println("More than one runIDs found for filename: "+filename);
-                System.exit(1);
-            }
-            runIdMap.put(filename, runIds.get(0));
-        }
-        
-        // $JAVA_HOME/bin/java -classpath .:bin/:lib/'*' org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService
-        SequestSQTDataUploadService uploader = new SequestSQTDataUploadService(SearchFileFormat.SQT_SEQ);
-        uploader.setExperimentId(experimentID);
-        uploader.setDirectory(dir);
-        uploader.setRemoteDirectory(dir);
-        uploader.setRemoteServer("local");
-        uploader.setSearchDate(new Date(new java.util.Date().getTime()));
-        try {
-            uploader.upload();
-        }
-        catch (UploadException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     SearchFileFormat getSearchFileFormat() {
         return this.format;

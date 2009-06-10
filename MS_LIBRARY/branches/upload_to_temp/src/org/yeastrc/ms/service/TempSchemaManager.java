@@ -16,10 +16,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.ConnectionFactory;
-import org.yeastrc.ms.dao.UploadDAOFactory;
-import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.upload.dao.TableCopier;
 import org.yeastrc.ms.upload.dao.TableCopyException;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
+import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
 
 
 /**
@@ -59,7 +59,7 @@ public class TempSchemaManager {
         List<String> tableNames;
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = ConnectionFactory.getMainDbConnection();
             tableNames = getTableNames(conn);
         }
         finally {
@@ -171,7 +171,7 @@ public class TempSchemaManager {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = ConnectionFactory.getMainDbConnection();
             stmt = conn.createStatement();
             stmt.execute("DROP DATABASE IF EXISTS "+ConnectionFactory.tempDbName());
             stmt.execute("CREATE DATABASE "+ConnectionFactory.tempDbName());
@@ -240,7 +240,7 @@ public class TempSchemaManager {
         UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
         
         // Delete the experiments
-        MsExperimentDAO exptDao = daoFactory.getMsExperimentDAO();
+        MsExperimentUploadDAO exptDao = daoFactory.getMsExperimentDAO();
         List<Integer> experimentIds = exptDao.getAllExperimentIds();
         for(int exptId: experimentIds)
             // This will delete the experiment from the main and temp tables
@@ -321,7 +321,7 @@ public class TempSchemaManager {
         if(conn != null) deleteEntry(conn, tableName, id);
         
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = ConnectionFactory.getMainDbConnection();
         }
         catch (SQLException e) {
             log.error("", e);

@@ -25,6 +25,7 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
@@ -334,16 +335,10 @@ ProlucidSearchResultDAO {
     }
 
     @Override
-    public int saveResultOnly(ProlucidSearchResultIn searchResult,
+    public int saveResultOnly(MsSearchResultIn searchResult,
             int runSearchId, int scanId) {
         // save the base result (saves data to msRunSearchResult table only).
-        int resultId = resultDao.saveResultOnly(searchResult, runSearchId, scanId);
-
-        // now save the ProLuCID specific information
-        ProlucidResultDataWrap resultDb = new ProlucidResultDataWrap(searchResult.getProlucidResultData(), resultId);
-        save("ProlucidResult.insert", resultDb);
-
-        return resultId;
+        return resultDao.saveResultOnly(searchResult, runSearchId, scanId);
     }
 
     /**

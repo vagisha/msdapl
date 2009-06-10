@@ -26,6 +26,7 @@ import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
 import org.yeastrc.ms.domain.search.impl.MsSearchDatabaseWrap;
 import org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap;
+import org.yeastrc.ms.upload.dao.search.ibatis.MsSearchWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;

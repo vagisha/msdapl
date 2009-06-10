@@ -10,9 +10,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.UploadDAOFactory;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 
 public class TempSchemaManagerTest extends TestCase {
 

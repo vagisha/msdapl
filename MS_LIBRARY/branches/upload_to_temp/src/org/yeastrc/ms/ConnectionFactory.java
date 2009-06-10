@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.UploadDAOFactory;
+import org.yeastrc.ms.service.MsDataUploadProperties;
 
 import com.ibatis.common.resources.Resources;
 
@@ -58,7 +58,7 @@ public class ConnectionFactory {
     }
     private ConnectionFactory() {}
     
-    public static Connection getConnection() throws SQLException {
+    public static Connection getMainDbConnection() throws SQLException {
 //        return UploadDAOFactory.getInstance().getConnection();
         return mainMsData.getConnection();
     }
@@ -66,6 +66,13 @@ public class ConnectionFactory {
     public static Connection getTempDbConnection() throws SQLException {
 //        return UploadDAOFactory.getInstance().getTempDbConnection();
         return tempMsData.getConnection();
+    }
+    
+    public static Connection getConnection() throws SQLException {
+        if(MsDataUploadProperties.uploadToTempTables())
+            return getTempDbConnection();
+        else
+            return getMainDbConnection();
     }
     
     private static DataSource setupDataSource(String dbUrl, String user, String password) {

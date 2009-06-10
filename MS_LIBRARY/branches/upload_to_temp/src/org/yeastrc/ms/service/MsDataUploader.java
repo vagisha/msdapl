@@ -7,14 +7,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.UploadDAOFactory;
-import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
-import org.yeastrc.ms.dao.general.MsExperimentDAO;
-import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
+import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
+import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
+import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 
 public class MsDataUploader {
 
@@ -349,7 +349,7 @@ public class MsDataUploader {
     public void uploadData(int experimentId) {
         
         resetUploader();
-        MsExperimentDAO exptDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
+        MsExperimentUploadDAO exptDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
         MsExperiment expt = exptDao.loadExperiment(experimentId);
         if (expt == null) {
             UploadException ex = new UploadException(ERROR_CODE.EXPT_NOT_FOUND);
@@ -514,7 +514,7 @@ public class MsDataUploader {
     }
 
     private int getSearchAnalysisId(int searchId) throws Exception {
-        MsSearchAnalysisDAO analysisDao = UploadDAOFactory.getInstance().getMsSearchAnalysisDAO();
+        MsSearchAnalysisUploadDAO analysisDao = UploadDAOFactory.getInstance().getMsSearchAnalysisDAO();
         List<Integer> analysisIds = analysisDao.getAnalysisIdsForSearch(searchId);
         if(analysisIds.size() > 1) {
             throw new Exception("Multiple analysis ids for found for searchID: "+searchId);
@@ -525,7 +525,7 @@ public class MsDataUploader {
 
     private int getExperimentSequestSearchId(int uploadedExptId2) throws Exception {
        
-        MsSearchDAO searchDao = UploadDAOFactory.getInstance().getMsSearchDAO();
+        MsSearchUploadDAO searchDao = UploadDAOFactory.getInstance().getMsSearchDAO();
         List<Integer> searchIds = searchDao.getSearchIdsForExperiment(uploadedExptId2);
         
         if(searchIds.size() == 0)
@@ -544,7 +544,7 @@ public class MsDataUploader {
     }
 
     private void updateLastUpdateDate(int experimentId) {
-        MsExperimentDAO experimentDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
+        MsExperimentUploadDAO experimentDao = UploadDAOFactory.getInstance().getMsExperimentDAO();
         experimentDao.updateLastUpdateDate(experimentId);
         
     }
