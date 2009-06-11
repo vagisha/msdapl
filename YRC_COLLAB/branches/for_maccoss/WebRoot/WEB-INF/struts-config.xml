@@ -691,6 +691,17 @@
 		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 	</action>
 	
+		<action 
+		path="/goEnrichment"
+		name="proteinInferFilterForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.proteinfer.GOEnrichmentAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/viewGoEnrichmentResult.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewGoEnrichmentResult.jsp" redirect="false" />
+	</action>
+	
 	<action 
 		path="/updateProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.UpdateProteinInferenceResultAjaxAction"

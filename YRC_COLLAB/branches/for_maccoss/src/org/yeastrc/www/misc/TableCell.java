@@ -10,6 +10,7 @@ public class TableCell {
 
     private String data;
     private String hyperlink;
+    private boolean absoluteHyperlink = false;
     private boolean newWindow = false;
     private String targetName = null;
     private String className = null;
@@ -59,8 +60,13 @@ public class TableCell {
     }
     
     public TableCell(String data, String hyperlink, boolean newWindow) {
+        this(data, hyperlink, false, newWindow);
+    }
+    
+    public TableCell(String data, String hyperlink, boolean absoluteLink, boolean newWindow) {
         this.data = data;
         this.hyperlink = hyperlink;
+        this.absoluteHyperlink = absoluteLink;
         this.newWindow = newWindow;
     }
     
@@ -72,11 +78,10 @@ public class TableCell {
         this.data = data;
     }
     
-    /**
-     * If the full url is http://localhost:8080/viewProject.do?ID=20
-     * this method will return viewProject.do?ID=20
-     * @return
-     */
+    public boolean isAbsoluteHyperlink() {
+        return this.absoluteHyperlink;
+    }
+    
     public String getHyperlink() {
         return hyperlink;
     }
@@ -88,12 +93,25 @@ public class TableCell {
      * @param hyperlink
      */
     public void setHyperlink(String hyperlink) {
-        this.setHyperlink(hyperlink, false);
+        this.setHyperlink(hyperlink, false, false);
+    }
+    
+    public void setAbsoluteHyperLink(String hyperlink) {
+        this.setHyperlink(hyperlink, true, false);
     }
     
     public void setHyperlink(String hyperlink, boolean newWindow) {
+        setHyperlink(hyperlink, false, newWindow);
+    }
+    
+    public void setAbsoluteHyperlink(String hyperlink, boolean newWindow) {
+        setHyperlink(hyperlink, true, newWindow);
+    }
+    
+    public void setHyperlink(String hyperlink, boolean absolute, boolean newWindow) {
         this.hyperlink = hyperlink;
         this.newWindow = newWindow;
+        this.absoluteHyperlink = absolute;
     }
     
     public boolean openLinkInNewWindow() {

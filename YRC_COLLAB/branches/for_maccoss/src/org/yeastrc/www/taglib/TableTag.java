@@ -160,7 +160,11 @@ public class TableTag extends TagSupport {
                     writer.print(">");
                     
                     if(cell.getHyperlink() != null) {
-                        String url = contextPath+cell.getHyperlink();
+                        String url = "";
+                        if(!cell.isAbsoluteHyperlink()) {
+                            url += contextPath;
+                        }
+                        url += cell.getHyperlink();
                         if(!cell.openLinkInNewWindow())
                             writer.print("<a href=\""+url+"\" >"); 
                         else {

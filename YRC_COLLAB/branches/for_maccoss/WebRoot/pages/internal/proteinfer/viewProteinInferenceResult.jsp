@@ -904,6 +904,45 @@ function downloadResults() {
 }
 
 // ---------------------------------------------------------------------------------------
+// GENE ONTOLOGY ENRICHMENT
+// ---------------------------------------------------------------------------------------
+function doGoEnrichmentAnalysis() {
+
+	// validate the current entries in the form
+	var validated = validateForm();
+	if(!validated)	return false;
+	
+	// copy the values from the filter form to the download form
+	$("#goEnrichmentForm  input[name='minPeptides']").val($("#filterForm  input[name='minPeptides']").val());
+	$("#goEnrichmentForm  input[name='maxPeptides']").val($("#filterForm  input[name='maxPeptides']").val());
+	
+	$("#goEnrichmentForm  input[name='minUniquePeptides']").val($("#filterForm input[name='minUniquePeptides']").val());
+	$("#goEnrichmentForm  input[name='maxUniquePeptides']").val($("#filterForm input[name='maxUniquePeptides']").val());
+	
+	$("#goEnrichmentForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
+	$("#goEnrichmentForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
+	
+	$("#goEnrichmentForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
+	$("#goEnrichmentForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
+	
+	$("#goEnrichmentForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
+
+	$("#goEnrichmentForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
+	$("#goEnrichmentForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
+	
+	var validationStatus = "";
+	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
+	if(validationStatus.length) {
+		validationStatus = validationStatus.substring(1); // remove first comma
+	}
+	$("#goEnrichmentForm  input[name='validationStatusString']").val(validationStatus);
+	
+	
+	$("#goEnrichmentForm").submit();
+	
+}
+
+// ---------------------------------------------------------------------------------------
 // SORT RESULTS
 // ---------------------------------------------------------------------------------------
 function sortResults(pinferId, sortBy, sortOrder) {
@@ -1132,6 +1171,7 @@ function toggleDivVisibility(mydiv) {
 	
 		<%@ include file="proteinInferFilterForm.jsp" %>
 		<%@include file="proteinInferDownloadForm.jsp" %>
+		<%@include file="goEnrichmentInputForm.jsp" %>
 		</td></tr></table>
 		</CENTER>
 		
