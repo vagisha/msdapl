@@ -17,9 +17,9 @@ public class GOEnrichmentInput {
     private List<Integer> proteinIds; // NRSEQ protein ids
     private double pValCutoff = 0.01;
     
-    private boolean useCellularComponent = true;
-    private boolean useMolecularFunction = true;
-    private boolean useBiologicalProcess = true;
+    private boolean useCellularComponent = false;
+    private boolean useMolecularFunction = false;
+    private boolean useBiologicalProcess = false;
     
     public GOEnrichmentInput(int speciesId) {
         this.speciesId = speciesId;

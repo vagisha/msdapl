@@ -22,6 +22,7 @@ import org.yeastrc.www.misc.Tabular;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
 
 /**
  * 
@@ -39,6 +40,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     // counts BEFORE filtering
     private int[][] proteinCounts;
     private int[][] proteinGroupCounts;
+    
+    private float minNormalizedSpectrumCount;
+    private float maxNormalizedSpectrumCount;
     
     private int rowCount = 50;
     private int currentPage = 1;
@@ -99,11 +103,44 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         return proteinGroups.size();
     }
     
+    public void setMinNormalizedSpectrumCount(int minNormalizedSpectrumCount) {
+        this.minNormalizedSpectrumCount = minNormalizedSpectrumCount;
+    }
+
+    public void setMaxNormalizedSpectrumCount(int maxNormalizedSpectrumCount) {
+        this.maxNormalizedSpectrumCount = maxNormalizedSpectrumCount;
+    }
+    
     public void initSummary() {
         initProteinCounts();
         initProteinGroupCounts();
+        calculateSpectrumCountNormalization();
+        getMinMaxSpectrumCounts();
     }
     
+    private void getMinMaxSpectrumCounts() {
+        float minCount = Float.MAX_VALUE;
+        float maxCount = 1.0f;
+        for(Dataset dataset: datasets) {
+            minCount = Math.min(minCount, dataset.getNormMinProteinSpectrumCount());
+            maxCount = Math.max(maxCount, dataset.getNormMaxProteinSpectrumCount());
+        }
+        this.minNormalizedSpectrumCount = minCount;
+        this.maxNormalizedSpectrumCount = maxCount;
+    }
+
+    private void calculateSpectrumCountNormalization() {
+        Dataset maxDataset = null;
+        for(Dataset dataset: datasets) {
+            if(maxDataset == null || maxDataset.getSpectrumCount() < dataset.getSpectrumCount())
+                maxDataset = dataset;
+        }
+        for(Dataset dataset: datasets) {
+            float normFactor = (float)maxDataset.getSpectrumCount() / (float)dataset.getSpectrumCount();
+            dataset.setSpectrumCountNormalizationFactor(normFactor);
+        }
+    }
+
     private void initProteinCounts() {
         
         proteinCounts = new int[datasets.size()][datasets.size()];
@@ -252,10 +289,34 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         TableRow row = new TableRow();
         
-        // Protein ID
-//        TableCell protId = new TableCell(String.valueOf(protein.getNrseqId()));
-//        protId.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
-//        row.addCell(protId);
+        // Present / not present in each dataset
+        int dsIndex = 0;
+        for(Dataset dataset: datasets) {
+            DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+            TableCell cell = new TableCell();
+            cell.setId(String.valueOf(dsIndex));
+            dsIndex++;
+            
+            if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
+                cell.setClassName("prot-not-found");
+            }
+            else {
+                String className = "prot-found";
+                if(dpi.isParsimonious())
+                    className += "  prot-parsim centered ";
+                if(dpi.isGrouped()) {
+                    className += " faded prot-group clickable ";
+                    cell.setName(String.valueOf(protein.getNrseqId()));
+                }
+                
+                cell.setClassName(className);
+                
+                if(dpi.isParsimonious()) {
+                    cell.setData("*");
+                }
+            }
+            row.addCell(cell);
+        }
         
         if(currentGroupId == -1 || currentGroupId != protein.getGroupId()) {
             currentGroupId = protein.getGroupId();
@@ -289,7 +350,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         // Protein description
         TableCell protDescr = new TableCell();
-        protDescr.setClassName("prot_descr");
+        protDescr.setClassName("prot_descr left_align");
         String descr = protein.getDescription();
         
         if(descr != null) {
@@ -315,36 +376,53 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         }
         row.addCell(protDescr);
         
-        // Present / not present in each dataset
-        int dsIndex = 0;
+        
+        // Spectrum counts in each dataset
         for(Dataset dataset: datasets) {
             DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
             TableCell cell = new TableCell();
-            cell.setId(String.valueOf(dsIndex));
-            dsIndex++;
             
             if(dpi == null || !dpi.isPresent()) { // dataset does not contain this protein
                 cell.setClassName("prot-not-found");
             }
             else {
                 String className = "prot-found";
-                if(dpi.isParsimonious())
-                    className += "  prot-parsim centered ";
-                if(dpi.isGrouped()) {
-                    className += " faded prot-group clickable ";
-                    cell.setName(String.valueOf(protein.getNrseqId()));
-                }
-                
                 cell.setClassName(className);
-                
-                if(dpi.isParsimonious()) {
-                    cell.setData("*");
-                }
+                int scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
+                cell.setData(dpi.getSpectrumCount()+"("+scaledCount+")");
+                cell.setTextColor("#FFFFFF");
+                cell.setBackgroundColor(getScaledColor(scaledCount));
             }
             row.addCell(cell);
         }
-        
         return row;
+    }
+    
+    private int getScaledSpectrumCount(float count) {
+        float scaled = ((count - minNormalizedSpectrumCount + 1)/maxNormalizedSpectrumCount)*100.0f;
+        return (int)Math.ceil(scaled);
+    }
+    
+    private String getScaledColor(float scaledSpectrumCount) {
+        int rounded = (int)Math.ceil(scaledSpectrumCount);
+        int green = 255;
+        green -= 255.0/100.0 * rounded;
+        int red = 0;
+        red  += 255.0/100.0 * rounded;
+        return "#"+hexValue(red, green, 0);
+    }
+    
+    private String hexValue(int r, int g, int b) {
+        String red = Integer.toHexString(r);
+        if(red.length() == 1)
+            red = "0"+red;
+        String green = Integer.toHexString(g);
+        if(green.length() == 1)
+            green = "0"+green;
+        String blue = Integer.toHexString(b);
+        if(blue.length() == 1)
+            blue = "0"+blue;
+        return red+green+blue;
     }
 
     private String getCommaSeparatedDatasetIds() {
@@ -368,11 +446,12 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         List<TableHeader> headers = new ArrayList<TableHeader>(columnCount());
         TableHeader header = null;
         
-//        header = new TableHeader("ID");
-//        header.setWidth(5);
-//        header.setSortable(false);
-//        headers.add(header);
-        
+        for(Dataset dataset: datasets) {
+            header = new TableHeader(String.valueOf(dataset.getDatasetId()));
+            header.setWidth(2);
+            header.setSortable(false);
+            headers.add(header);
+        }
         
         header = new TableHeader("GroupID");
         header.setWidth(10);
@@ -399,8 +478,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         header.setSortable(false);
         headers.add(header);
         
+        // spectrum counts
         for(Dataset dataset: datasets) {
-            header = new TableHeader(String.valueOf(dataset.getDatasetId()));
+            header = new TableHeader("SC("+dataset.getDatasetId()+")");
             header.setWidth(2);
             header.setSortable(false);
             headers.add(header);
@@ -439,6 +519,19 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
                 dpi.setGrouped(grouped);
             }
             // TODO for DTASelect
+        }
+        
+        // Get the spectrum count information for the protein in the different datasets
+        ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
+        nrseqIds.add(protein.getNrseqId());
+        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+            if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
+                List<Integer> piProteinIds = idpProtDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
+                if(piProteinIds.size() == 1) {
+                    IdPickerProteinBase prot = idpProtDao.loadProtein(piProteinIds.get(0));
+                    dpi.setSpectrumCount(prot.getSpectrumCount());
+                }
+            }
         }
     }
     

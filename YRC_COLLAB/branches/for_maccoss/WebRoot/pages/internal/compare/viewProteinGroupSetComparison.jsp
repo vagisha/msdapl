@@ -208,6 +208,7 @@ function  setupPeptidesTable(table){
 function pageResults(pageNum) {
   	$("input#pageNum").val(pageNum);
   	$("input#download").val("false");
+  	$("input#goEnrichment").val("false");
   	//alert("setting to "+pageNum+" value set to: "+$("input#pageNum").val());
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -218,6 +219,7 @@ function pageResults(pageNum) {
 function updateResults() {
   	$("input#pageNum").val(1);
   	$("input#download").val("false");
+  	$("input#goEnrichment").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
@@ -227,10 +229,44 @@ function updateResults() {
 // ---------------------------------------------------------------------------------------
 function downloadResults() {
   	$("input#download").val("true");
+  	$("input#goEnrichment").val("false");
   	$("form[name='proteinSetComparisonForm']").attr('target', '_blank');
   	$("form[name='proteinSetComparisonForm']").submit();
 }
 
+// ---------------------------------------------------------------------------------------
+// GENE ONTOLOGY ENRICHMENT
+// ---------------------------------------------------------------------------------------
+function doGoEnrichmentAnalysis() {
+	$("input#download").val("false");
+	$("input#goEnrichment").val("true");
+	if(!validateGoEnrichmentForm())
+    	return false;
+	$("form[name='proteinSetComparisonForm']").submit();
+}
+
+function validateGoEnrichmentForm() {
+	// fieldValue is a Form Plugin method that can be invoked to find the 
+    // current value of a field 
+    value = $('form input[@name=goEnrichmentPVal]').fieldValue();
+    valid = validateFloat(value, "P-Value", 0.0, 1.0);
+    if(!valid)	return false;
+    
+    return true;
+}
+
+function validateFloat(value, fieldName, min, max) {
+	var floatVal = parseFloat(value);
+	var valid = true;
+	if(isNaN(floatVal))						valid = false;
+	if(valid && floatVal < min)			valid = false;
+	if(max && (valid && floatVal > max))	valid = false;
+	if(!valid) {
+		if(max) alert("Value for "+fieldName+" should be between "+min+" and "+max);
+		else	alert("Value for "+fieldName+" should be >= "+min);
+	}
+	return valid;
+}
 // ---------------------------------------------------------------------------------------
 // TOGGLE AND, OR, NOT FILTERS
 // ---------------------------------------------------------------------------------------
@@ -311,6 +347,7 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 <thead>
 	<tr>
 		<th>Dataset</th>
+		<th>Spectrum Count (Max)</th>
 		<th># Protein Groups (# Proteins)</th>
 	</tr>
 </thead>
@@ -320,7 +357,10 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 		<th align="center">
 			<span><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></span>
 		</th>
-		<td style="color:#FFFFFF; background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> ); padding: 3 5 3 5;">
+		<td align="center">
+			<bean:write name="dataset" property="spectrumCount" />(<bean:write name="dataset" property="maxProteinSpectrumCount" />)
+		</td>
+		<td align="center" style="color:#FFFFFF; background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> ); padding: 3 5 3 5;">
 			<%=comparison.getProteinGroupCount(row)%> (<%=comparison.getProteinCount(row) %>)
 		</td>
 	</tr>

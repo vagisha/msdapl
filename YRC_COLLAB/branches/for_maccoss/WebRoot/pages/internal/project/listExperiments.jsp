@@ -172,6 +172,58 @@ function deleteProtInferRun(pinferId) {
         return 1;
     }
 }
+
+// ---------------------------------------------------------------------------------------
+// COMPARE SELECTED PROTEIN INFERENCE RUNS
+// --------------------------------------------------------------------------------------- 
+function compareSelectedProtInfer() {
+	var pinferIds = "";
+	var forDisplay = "\n";
+	var i = 0;
+	$("input.compare_cb:checked").each(function() {
+		if(i > 0) {
+			pinferIds += ",";
+		}
+		pinferIds += $(this).val();
+		forDisplay += $(this).val()+"\n";
+		i++;
+	});
+	if(i < 2) {
+		alert("Please select at least two protein inference results to compare");
+		return false;
+	}
+	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
+	forDisplay +="Group Indistinguishable Proteins: "+groupIndistinguishable;
+	
+	var doCompare = confirm("Compare protein inference results: "+forDisplay);
+	if(doCompare) {
+		var url = "<yrcwww:link path='compareProteinInferenceResults.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+		window.location.href = url;
+	}
+}
+
+function compareSelectedProtInferAndMore() {
+	var pinferIds = "";
+	var i = 0;
+	$("input.compare_cb:checked").each(function() {
+		if(i > 0) {
+			pinferIds += ",";
+		}
+		pinferIds += $(this).val();
+		i++;
+	});
+	
+	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
+	
+	var url = "<yrcwww:link path='newProteinSetComparison.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+	window.location.href = url;
+}
+
+function clearSelectedProtInfer() {
+	$("input.compare_cb:checked").each(function() {
+		$(this).attr('checked', false);
+	});
+}
 </script>
 
 
@@ -339,7 +391,8 @@ function deleteProtInferRun(pinferId) {
 						<th valign="top" align="center">#Groups<br>(#Proteins)</th>
 						<th valign="top" align="center">#Peptides</th>
 						<th valign="top">Comments</th>
-						<th valign="top">Status</th></tr>
+						<th valign="top">&nbsp;</th>
+						<th valign="top">Compare</th></tr>
 					</thead>
 					<tbody>
 					<logic:iterate name="experiment" property="protInferRuns" id="piJob" type="org.yeastrc.experiment.ExperimentProteinferRun">
@@ -375,10 +428,8 @@ function deleteProtInferRun(pinferId) {
 							<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piJob' property='job.pinferId'/>">
 							<b><font color="green">View</font></b></a>
 							&nbsp;
-							<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='job.pinferId'/>">Compare</a>
-							&nbsp;
 							<span class="clickable" style="text-decoration: underline; color:red;" 
-							      onclick="javascript:deleteProtInferRun(<bean:write name='piJob' property='job.pinferId'/>);">Del</span>
+							      onclick="javascript:deleteProtInferRun(<bean:write name='piJob' property='job.pinferId'/>);">Delete</span>
 							</nobr>
 						</logic:equal>
 						<!-- Job FAILED -->
@@ -395,6 +446,14 @@ function deleteProtInferRun(pinferId) {
 						</logic:equal>
 						
 	   		 			</td>
+	   		 			
+	   		 			<td valign="top">
+	   		 				<input type="checkbox" class="compare_cb" value="<bean:write name='piJob' property='job.pinferId'/>"></input>
+	   		 				<!-- 
+							<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='job.pinferId'/>">Compare</a>
+							-->
+						</td>
+	   		 			
 						</tr>
 						<tr>
 							<td colspan="5" valign="top">
@@ -408,6 +467,17 @@ function deleteProtInferRun(pinferId) {
 							</td>
 						</tr>
 					</logic:iterate>
+					<tr>
+						<td colspan="9" align="right">
+							<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
+							&nbsp;
+							<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
+							&nbsp;
+							<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"><b>[Compare]</b></span>
+							<br><br>
+							<span class="clickable" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer();">[Clear Selected]</span>
+						</td>
+					</tr>
 					</tbody>
 					</table>
 				</div>

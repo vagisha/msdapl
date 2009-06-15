@@ -196,7 +196,7 @@
 			</td>
 			
 			<!-- Protein description -->
-			<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
+			<td style="font-size: 8pt;" class="left_align"><bean:write name="protein" property="shortDescription"/></td>
 			<td><bean:write name="protein" property="protein.coverage"/></td>
 			<td><bean:write name="protein" property="protein.nsafFormatted"/></td>
 		
@@ -311,7 +311,7 @@
 			</td>
 			
 		<!-- Protein Description -->
-		<td style="font-size: 8pt;"><bean:write name="protein" property="shortDescription"/></td>
+		<td style="font-size: 8pt;" class="left_align"><bean:write name="protein" property="shortDescription"/></td>
 		
 		
 		<td><bean:write name="protein" property="protein.coverage"/></td>

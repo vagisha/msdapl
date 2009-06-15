@@ -4,11 +4,12 @@
  * Jun 11, 2009
  * @version 1.0
  */
-package org.yeastrc.www.go;
+package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.www.go.EnrichedGOTerm;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
@@ -90,14 +91,14 @@ public class GOEnrichmentTabular implements Tabular {
         return enrichedTerms;
     }
 
-    public int getEnrichedTermCount() {
-        return this.enrichedTerms.size();
-    }
-    
     public void setEnrichedTerms(List<EnrichedGOTerm> enrichedTerms) {
         this.enrichedTerms = enrichedTerms;
     }
 
+    public int getEnrichedTermCount() {
+        return this.enrichedTerms.size();
+    }
+    
     @Override
     public int columnCount() {
         return headers.size();
@@ -145,7 +146,5 @@ public class GOEnrichmentTabular implements Tabular {
     public void tabulate() {
         // nothing to do here
     }
-    
-    
     
 }

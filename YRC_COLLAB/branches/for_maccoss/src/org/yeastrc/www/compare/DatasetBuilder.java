@@ -7,6 +7,7 @@
 package org.yeastrc.www.compare;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
 
 
 /**
@@ -39,19 +40,10 @@ public class DatasetBuilder {
         Dataset dataset = new Dataset(datasetId, DatasetSource.PROT_INFER);
         
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
-//        IdPickerRunDAO idpRunDao = fact.getIdPickerRunDao();
-//        IdPickerRun idpRun = idpRunDao.loadProteinferRun(datasetId);
-//        
-        // Get the total number of hits in this dataset
-//        List<IdPickerInput> inputs = idpRun.getInputList();
-//        int totalHitCount = 0;
-//        for(IdPickerInput input: inputs) {
-//            totalHitCount += input.getNumFilteredTargetHits();
-//        }
-//        dataset.setSpectrumCount(totalHitCount);
-        
-        
-        // Get the maximum number of hits for a protein in this dataset
+        ProteinferSpectrumMatchDAO specDao = fact.getProteinferSpectrumMatchDao();
+        dataset.setSpectrumCount(specDao.getSpectrumCountForPinferRun(datasetId));
+        dataset.setMaxProteinSpectrumCount(specDao.getMaxSpectrumCountForPinferRunProtein(datasetId));
+        dataset.setMinProteinSpectrumCount(specDao.getMinSpectrumCountForPinferRunProtein(datasetId));
         
         return dataset;
     }

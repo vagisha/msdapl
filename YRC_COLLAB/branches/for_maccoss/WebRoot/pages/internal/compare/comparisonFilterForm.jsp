@@ -1,13 +1,18 @@
 
 <%@page import="org.yeastrc.www.compare.DatasetColor"%>
+<%@page import="org.yeastrc.bio.go.GOUtils"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <html:form action="doProteinSetComparison" method="POST">
+
 	<!-- Does the user want to download the results -->
 	<html:hidden name="proteinSetComparisonForm" property="download" value="false" styleId="download" />
+	
+	<!-- Does the user want to do GO Enrichment analysis-->
+	<html:hidden name="proteinSetComparisonForm" property="goEnrichment" value="false" styleId="goEnrichment" />
 	
 	<logic:iterate name="proteinSetComparisonForm" property="proteinferRunList" id="proteinferRun">
 		<logic:equal name="proteinferRun" property="selected" value="true">
@@ -113,8 +118,11 @@
 		<td valign="top" style="padding-right:10px;"><html:checkbox name="proteinSetComparisonForm" property="onlyParsimonious">Only Parsimonious</html:checkbox> </td>
 
 		<!-- ################## GROUP PROTEINS CHECKBOX	  ########################### -->
-		<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="groupProteins">Group Indistinguishable Proteins</html:checkbox> </td>
+		<logic:notPresent name="goEnrichmentView">
+			<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="groupProteins">Group Indistinguishable Proteins</html:checkbox> </td>
+		</logic:notPresent>
 	</tr>
+	<logic:notPresent name="goEnrichmentView">
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
 		<td valign="top">
@@ -130,7 +138,30 @@
 			<span style="color:red; font-size:8pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
 		</td>
 	</tr>
+	</logic:notPresent>
 </table>
+</div>
+
+<br>
+<div align="center"
+	style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
+	<b>GO Enrichment:</b>
+	<html:select name="proteinSetComparisonForm" property="goAspect">
+		<html:option
+			value="<%=String.valueOf(GOUtils.BIOLOGICAL_PROCESS) %>">Biological Process</html:option>
+		<html:option
+			value="<%=String.valueOf(GOUtils.CELLULAR_COMPONENT) %>">Cellular Component</html:option>
+		<html:option
+			value="<%=String.valueOf(GOUtils.MOLECULAR_FUNCTION) %>">Molecular Function</html:option>
+	</html:select>
+	&nbsp; &nbsp; Species:
+	<html:select name="proteinSetComparisonForm" property="speciesId">
+		<html:option value="4932">Saccharomyces cerevisiae </html:option>
+	</html:select>
+	&nbsp; &nbsp; P-Value:
+	<html:text name="proteinSetComparisonForm" property="goEnrichmentPVal"></html:text>
+	&nbsp; &nbsp;
+	<html:submit value="Calculate" onclick="javascript:doGoEnrichmentAnalysis();"></html:submit>
 </div>
 
 </center>

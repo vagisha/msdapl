@@ -30,6 +30,7 @@ import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
 import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
 import edu.uwpr.protinfer.infer.graph.GraphCollapser;
 import edu.uwpr.protinfer.infer.graph.PeptideVertex;
@@ -66,6 +67,13 @@ public class CompareProteinSetsAction extends Action {
             log.info("DOWNLOADING......");
             return mapping.findForward("Download");
         }
+        
+        // GO ENRICHMENT ANALYSIS?
+        if(myForm.isGoEnrichment()) {
+            log.info("DOING GENE ONTOLOGY ENRICHMENT ANALYSIS...");
+            return mapping.findForward("GOAnalysis");
+        }
+        
         
         // Get the selected protein inference run ids
         List<Integer> piRunIds = myForm.getSelectedProteinferRunIds();
@@ -255,7 +263,20 @@ public class CompareProteinSetsAction extends Action {
             // Set the page number
             grpComparison.setCurrentPage(myForm.getPageNum());
             
-            grpComparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+            // set the information for displaying normalized spectrum counts
+            ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
+            for(Dataset dataset: grpComparison.getDatasets()) {
+                if(dataset.getSource() == DatasetSource.PROT_INFER) {
+                    int spectrumCount = specDao.getSpectrumCountForPinferRun(dataset.getDatasetId());
+                    dataset.setSpectrumCount(spectrumCount);
+                }
+            }
+            
+            grpComparison.initSummary(); // initialize the summary -- 
+                                        // (totalProteinCount, # common proteins)
+                                        // spectrum count normalization factors
+                                        // calculate min/max normalized spectrum counts for scaling
+            
             
             // Create Venn Diagram only if 2 or 3 datasets are being compared
             if(grpComparison.getDatasetCount() == 2 || grpComparison.getDatasetCount() == 3) {

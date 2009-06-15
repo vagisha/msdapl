@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
@@ -34,7 +35,7 @@ import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
- * GOEnrichmentAction.java
+ * ProteinInferGOEnrichmentAction.java
  * @author Vagisha Sharma
  * Jun 10, 2009
  * @version 1.0
@@ -43,9 +44,9 @@ import edu.uwpr.protinfer.util.TimeUtils;
 /**
  * 
  */
-public class GOEnrichmentAction extends Action {
+public class ProteinInferGOEnrichmentAction extends Action {
 
-    private static final Logger log = Logger.getLogger(DownloadProteinferResultsAction.class.getName());
+    private static final Logger log = Logger.getLogger(ProteinInferGOEnrichmentAction.class.getName());
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -77,39 +78,47 @@ public class GOEnrichmentAction extends Action {
         
         long s = System.currentTimeMillis();
         
-        int speciesId = 4932; // only S. cenevisiae for now
+        int speciesId = filterForm.getSpeciesId();
         GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(pinferId, speciesId, filterForm);
         // Biological Process
-        GOEnrichmentTabular bpTabular = new GOEnrichmentTabular();
-        bpTabular.setEnrichedTerms(enrichment.getBiologicalProcessEnriched());
-        bpTabular.setTitle("Biological Process");
-        bpTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedBiologicalProcess());
-        bpTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
+        if(filterForm.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS) {
+            GOEnrichmentTabular bpTabular = new GOEnrichmentTabular();
+            bpTabular.setEnrichedTerms(enrichment.getBiologicalProcessEnriched());
+            bpTabular.setTitle("Biological Process");
+            bpTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedBiologicalProcess());
+            bpTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
+            request.setAttribute("bioProcessTerms", bpTabular);
+        }
         
         // Cellular Component
-        GOEnrichmentTabular ccTabular = new GOEnrichmentTabular();
-        ccTabular.setEnrichedTerms(enrichment.getCellularComponentEnriched());
-        ccTabular.setTitle("Cellular Component");
-        ccTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedCellularComponent());
-        ccTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
+        if(filterForm.getGoAspect() == GOUtils.CELLULAR_COMPONENT) {
+            GOEnrichmentTabular ccTabular = new GOEnrichmentTabular();
+            ccTabular.setEnrichedTerms(enrichment.getCellularComponentEnriched());
+            ccTabular.setTitle("Cellular Component");
+            ccTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedCellularComponent());
+            ccTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
+            request.setAttribute("cellComponentTerms", ccTabular);
+        }
         
         // Molecular Function
-        GOEnrichmentTabular mfTabular = new GOEnrichmentTabular();
-        mfTabular.setEnrichedTerms(enrichment.getMolecularFunctionEnriched());
-        mfTabular.setTitle("Molecular Function");
-        mfTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedMolecularFunction());
-        mfTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
-        
+        if(filterForm.getGoAspect() == GOUtils.MOLECULAR_FUNCTION) {
+            GOEnrichmentTabular mfTabular = new GOEnrichmentTabular();
+            mfTabular.setEnrichedTerms(enrichment.getMolecularFunctionEnriched());
+            mfTabular.setTitle("Molecular Function");
+            mfTabular.setNumProteinsInUniverse(enrichment.getTotalAnnotatedMolecularFunction());
+            mfTabular.setNumProteinsInSet(enrichment.getNumSpeciesProteins());
+            request.setAttribute("molFunctionTerms", mfTabular);
+        }
         
         request.setAttribute("enrichment", enrichment);
         request.setAttribute("pinferId", pinferId);
         request.setAttribute("species", Species.getInstance(speciesId));
-        request.setAttribute("bioProcessTerms", bpTabular);
-        request.setAttribute("cellComponentTerms", ccTabular);
-        request.setAttribute("molFunctionTerms", mfTabular);
+        request.setAttribute("proteinInferFilterForm", filterForm);
+        request.setAttribute("showGoForm", true);
+        
         
         long e = System.currentTimeMillis();
-        log.info("GOEnrichmentAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+        log.info("ProteinInferGOEnrichmentAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
         return mapping.findForward("Success");
     }
     
@@ -154,10 +163,16 @@ public class GOEnrichmentAction extends Action {
         
         GOEnrichmentInput input = new GOEnrichmentInput(speciesId);
         input.setProteinIds(nrseqIds);
+        if(filterForm.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS)
+            input.setUseBiologicalProcess(true);
+        if(filterForm.getGoAspect() == GOUtils.CELLULAR_COMPONENT)
+            input.setUseCellularComponent(true);
+        if(filterForm.getGoAspect() == GOUtils.MOLECULAR_FUNCTION)
+            input.setUseMolecularFunction(true);
+        input.setPValCutoff(Double.parseDouble(filterForm.getGoEnrichmentPVal()));
         
         GOEnrichmentOutput enrichment = GOEnrichmentCalculator.calculate(input);
         return enrichment;
-//        return null;
         
     }
 }

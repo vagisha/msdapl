@@ -17,6 +17,8 @@ public class TableCell {
     private String id = null;
     private String name = null;
     private int rowSpan = 0;
+    private String backgroundColor = null;
+    private String textColor = "0 0 0"; // black
     
     public int getRowSpan() {
         return rowSpan;
@@ -118,6 +120,22 @@ public class TableCell {
         return this.newWindow;
     }
 
+    public void setBackgroundColor(String color) {
+        this.backgroundColor = color;
+    }
+    
+    public String getBackgroundColor() {
+        return this.backgroundColor;
+    }
+    
+    public void setTextColor(String color) {
+        this.textColor = color;
+    }
+    
+    public String getTextColor() {
+        return this.textColor;
+    }
+    
     public String getClassName() {
         return className;
     }

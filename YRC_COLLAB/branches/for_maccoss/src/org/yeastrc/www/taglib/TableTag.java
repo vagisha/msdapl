@@ -157,6 +157,10 @@ public class TableTag extends TagSupport {
                     if(cell.getName() != null && cell.getName().length() > 0) {
                         writer.print(" name=\""+cell.getName()+"\"");
                     }
+                    if(cell.getBackgroundColor() != null) {
+                        writer.print(" style=\"background:"+cell.getBackgroundColor()
+                                +"; color:"+cell.getTextColor()+"\"");
+                    }
                     writer.print(">");
                     
                     if(cell.getHyperlink() != null) {

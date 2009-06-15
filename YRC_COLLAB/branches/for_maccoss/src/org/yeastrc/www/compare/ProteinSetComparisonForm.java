@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.go.GOUtils;
 
 /**
  * 
@@ -31,12 +32,17 @@ public class ProteinSetComparisonForm extends ActionForm {
     private int pageNum = 1;
     
     private boolean download = false;
+    private boolean goEnrichment = false;
     
     private String searchString;
     
     private boolean onlyParsimonious = false;
     
     private boolean groupProteins = false;
+    
+    private int goAspect = GOUtils.BIOLOGICAL_PROCESS;
+    private int speciesId;
+    private String goEnrichmentPVal = "0.01";
     
     public boolean isGroupProteins() {
         return groupProteins;
@@ -221,5 +227,40 @@ public class ProteinSetComparisonForm extends ActionForm {
 
     public void setDownload(boolean download) {
         this.download = download;
+    }
+
+    //-----------------------------------------------------------------------------
+    // GO Enrichment
+    //-----------------------------------------------------------------------------
+    public int getGoAspect() {
+        return goAspect;
+    }
+
+    public void setGoAspect(int goAspect) {
+        this.goAspect = goAspect;
+    }
+
+    public String getGoEnrichmentPVal() {
+        return goEnrichmentPVal;
+    }
+
+    public void setGoEnrichmentPVal(String goEnrichmentPVal) {
+        this.goEnrichmentPVal = goEnrichmentPVal;
+    }
+
+    public boolean isGoEnrichment() {
+        return goEnrichment;
+    }
+
+    public void setGoEnrichment(boolean goEnrichment) {
+        this.goEnrichment = goEnrichment;
+    }
+    
+    public int getSpeciesId() {
+        return speciesId;
+    }
+
+    public void setSpeciesId(int speciesId) {
+        this.speciesId = speciesId;
     }
 }

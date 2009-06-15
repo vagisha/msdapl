@@ -19,6 +19,7 @@ import org.yeastrc.www.misc.Tabular;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
 
 /**
  * 
@@ -34,6 +35,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     // counts BEFORE filtering
     private int[][] proteinCounts;
     private int totalProteinCount;
+    
+    private int minNormalizedSpectrumCount;
+    private int maxNormalizedSpectrumCount;
     
     private int rowCount = 50;
     private int currentPage = 1;
@@ -82,6 +86,14 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     
     public int getFilteredProteinCount() {
         return proteins.size();
+    }
+    
+    public void setMinNormalizedSpectrumCount(int minNormalizedSpectrumCount) {
+        this.minNormalizedSpectrumCount = minNormalizedSpectrumCount;
+    }
+
+    public void setMaxNormalizedSpectrumCount(int maxNormalizedSpectrumCount) {
+        this.maxNormalizedSpectrumCount = maxNormalizedSpectrumCount;
     }
     
     public void initSummary() {
@@ -194,7 +206,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         
         // Protein description
         TableCell protDescr = new TableCell();
-        protDescr.setClassName("prot_descr");
+        protDescr.setClassName("prot_descr left_align");
         String descr = protein.getDescription();
         
         if(descr != null) {
@@ -339,6 +351,20 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             }
             // TODO for DTASelect
         }
+        
+        // Get the spectrum count information for the protein in the different datasets
+        ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
+        nrseqIds.add(protein.getNrseqId());
+        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+            if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
+                List<Integer> piProteinIds = idpProtDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
+                if(piProteinIds.size() == 1) {
+                    IdPickerProteinBase prot = idpProtDao.loadProtein(piProteinIds.get(0));
+                    dpi.setSpectrumCount(prot.getSpectrumCount());
+                }
+            }
+        }
+        
 //            // get the (max)number of peptides identified for this protein
 //            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
     }
@@ -403,4 +429,5 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     public int getPageCount() {
         return this.pageCount;
     }
+   
 }

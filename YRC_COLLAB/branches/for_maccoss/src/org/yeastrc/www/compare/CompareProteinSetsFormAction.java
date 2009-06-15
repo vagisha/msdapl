@@ -58,28 +58,28 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
 
         
         // If a protein inference run id was sent with the request get it now
-        int pinferRunId = 0;
+        List<Integer> inputPiRunIds = new ArrayList<Integer>();
         try {
-            String idStr = request.getParameter("piRunId");
+            String idStr = request.getParameter("piRunIds");
             if(idStr != null) {
-                pinferRunId = Integer.parseInt(idStr);
+                String[] tokens = idStr.split(",");
+                for(String tok: tokens)
+                    inputPiRunIds.add(Integer.parseInt(tok.trim()));
             }
         }
-        catch(Exception e) {
-            pinferRunId = 0;
-        }
+        catch(Exception e) {}
         
         // If a DTASelect run id was sent with the request get it now
-        int dtaRunId = 0;
-        try {
-            String idStr = request.getParameter("dtaRunId");
-            if(idStr != null) {
-                dtaRunId = Integer.parseInt(idStr);
-            }
-        }
-        catch(Exception e) {
-            dtaRunId = 0;
-        }
+//        int dtaRunId = 0;
+//        try {
+//            String idStr = request.getParameter("dtaRunId");
+//            if(idStr != null) {
+//                dtaRunId = Integer.parseInt(idStr);
+//            }
+//        }
+//        catch(Exception e) {
+//            dtaRunId = 0;
+//        }
         
         
         // Get a list of the user's projects (all projects to which user has READ access)
@@ -118,7 +118,7 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
                         piRunIds.add(job.getPinferId());
                         
                         ProteinferRunFormBean bean = new ProteinferRunFormBean(job, project.getID());
-                        if(job.getPinferId() == pinferRunId)
+                        if(inputPiRunIds.contains(job.getPinferId()))
                             bean.setSelected(true);
                         piRuns.add(bean);
                     }
@@ -131,15 +131,17 @@ public class CompareProteinSetsFormAction extends org.apache.struts.action.Actio
             List<YatesRun> yatesRuns = searcher.search();
             for(YatesRun run: yatesRuns) {
                 DTASelectRunFormBean bean = new DTASelectRunFormBean(run);
-                if(run.getId() == dtaRunId)
-                    bean.setSelected(true);
+//                if(run.getId() == dtaRunId)
+//                    bean.setSelected(true);
                 dtaRuns.add(bean);
             }
         }
         
+        boolean groupProteins = Boolean.parseBoolean(request.getParameter("groupProteins"));
         ProteinSetComparisonForm myForm = new ProteinSetComparisonForm();
         myForm.setProteinferRunList(piRuns);
         myForm.setDtaRunList(dtaRuns);
+        myForm.setGroupProteins(groupProteins);
         request.setAttribute("proteinSetComparisonForm", myForm);
         
         

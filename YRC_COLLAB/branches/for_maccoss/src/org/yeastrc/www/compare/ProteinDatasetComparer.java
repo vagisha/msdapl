@@ -122,37 +122,6 @@ public class ProteinDatasetComparer {
         }
     }
 
-//    public static String getSystematicName(int nrseqProteinId)
-//        throws Exception {
-//        NRProteinFactory nrpf = NRProteinFactory.getInstance();
-//        NRProtein nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
-//        return getSystematicName(nrseqProt);
-//    }
-//    
-//    public static String getSystematicName(NRProtein nrseqProt)
-//            throws Exception {
-//        Set<String> systNames = nrseqProt.getSystematicNames();
-//        if(systNames == null || systNames.size() == 0)
-//            return "";
-//        
-//        StringBuilder buf = new StringBuilder();
-//        for(String sname: systNames) {
-//            buf.append(", ");
-//            buf.append(sname);
-//            if(buf.length() > 15)
-//                break;
-//        }
-//        if(buf.length() > 0)
-//            buf.deleteCharAt(0);
-//        
-//        if(buf.length() > 15) {
-//            buf.delete(15, buf.length());
-//            buf.append("...");
-//        }
-//        String systName = buf.toString();
-//        return systName;
-//    }
-
     public void applyFilters(ProteinComparisonDataset dataset, ProteinDatasetComparisonFilters filters) {
         
         List<ComparisonProtein> proteins = dataset.getProteins();

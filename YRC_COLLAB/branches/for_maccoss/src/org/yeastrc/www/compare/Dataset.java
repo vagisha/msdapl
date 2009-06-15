@@ -13,8 +13,10 @@ public class Dataset {
 
     private int datasetId;
     private DatasetSource source;
-//    private int spectrumCount;
-//    private int maxPeptideSpectrumCount;
+    private float spectrumCountNormalizationFactor = 1.0f;
+    private int totalSpectrumCount;
+    private int maxProteinSpectrumCount = 1;
+    private int minProteinSpectrumCount = 1;
     
     public Dataset() {}
     
@@ -34,6 +36,14 @@ public class Dataset {
         return source.name();
     }
     
+    public float getSpectrumCountNormalizationFactor() {
+        return spectrumCountNormalizationFactor;
+    }
+
+    public void setSpectrumCountNormalizationFactor(
+            float spectrumCountNormalizationFactor) {
+        this.spectrumCountNormalizationFactor = spectrumCountNormalizationFactor;
+    }
     
     public boolean equals(Object o) {
         if(this == o)
@@ -63,19 +73,35 @@ public class Dataset {
         this.source = DatasetSource.instance(sourceStr);
     }
 
-//    public int getSpectrumCount() {
-//        return spectrumCount;
-//    }
-//
-//    public void setSpectrumCount(int spectrumCount) {
-//        this.spectrumCount = spectrumCount;
-//    }
-//
-//    public int getMaxPeptideSpectrumCount() {
-//        return maxPeptideSpectrumCount;
-//    }
-//
-//    public void setMaxPeptideSpectrumCount(int maxPeptideSpectrumCount) {
-//        this.maxPeptideSpectrumCount = maxPeptideSpectrumCount;
-//    }
+    public int getSpectrumCount() {
+        return totalSpectrumCount;
+    }
+
+    public void setSpectrumCount(int spectrumCount) {
+        this.totalSpectrumCount = spectrumCount;
+    }
+
+    public int getMaxProteinSpectrumCount() {
+        return maxProteinSpectrumCount;
+    }
+    
+    public float getNormMaxProteinSpectrumCount() {
+        return maxProteinSpectrumCount * this.spectrumCountNormalizationFactor;
+    }
+
+    public void setMaxProteinSpectrumCount(int maxProteinSpectrumCount) {
+        this.maxProteinSpectrumCount = maxProteinSpectrumCount;
+    }
+
+    public int getMinProteinSpectrumCount() {
+        return minProteinSpectrumCount;
+    }
+
+    public float getNormMinProteinSpectrumCount() {
+        return minProteinSpectrumCount * this.spectrumCountNormalizationFactor;
+    }
+    
+    public void setMinProteinSpectrumCount(int minProteinSpectrumCount) {
+        this.minProteinSpectrumCount = minProteinSpectrumCount;
+    }
 }

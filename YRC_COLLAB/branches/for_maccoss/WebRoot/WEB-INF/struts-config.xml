@@ -691,15 +691,15 @@
 		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 	</action>
 	
-		<action 
-		path="/goEnrichment"
+	<action 
+		path="/protInferGoEnrichment"
 		name="proteinInferFilterForm"
 		scope="request"
 		validate="true"
-		type="org.yeastrc.www.proteinfer.GOEnrichmentAction"
+		type="org.yeastrc.www.proteinfer.ProteinInferGOEnrichmentAction"
 	>
-		<forward name="Success" path="/pages/internal/proteinfer/viewGoEnrichmentResult.jsp" redirect="false" />
-		<forward name="Failure" path="/pages/internal/proteinfer/viewGoEnrichmentResult.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/viewProtInferGoEnrichment.jsp" redirect="false" />
 	</action>
 	
 	<action 
@@ -851,6 +851,17 @@
 	</action>
 	
 	<action 
+		path="/compareProteinInferenceResults"
+		type="org.yeastrc.www.compare.CompareProtInferResultsAction"
+		name="proteinSetComparisonForm"
+		scope="request"
+		validate="false"
+	>
+		<forward name="Success" path="/doProteinSetComparison.do" redirect="false" />
+		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
+	</action>
+	
+	<action 
 		path="/doProteinSetComparison"
 		type="org.yeastrc.www.compare.CompareProteinSetsAction"
 		name="proteinSetComparisonForm"
@@ -862,6 +873,7 @@
 		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/newProteinSetComparison.do" redirect="false" />
 		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
+		<forward name="GOAnalysis" path="/compareGoEnrichment.do" redirect="false" />
 	</action>
 	
 	<action 
@@ -891,6 +903,17 @@
 	>
 		<forward name="Success" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/compareGoEnrichment"
+		name="proteinSetComparisonForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.compare.CompareGOEnrichmentAction"
+	>
+		<forward name="Success" path="/pages/internal/compare/viewCompareGoEnrichment.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/compare/viewCompareGoEnrichment.jsp" redirect="false" />
 	</action>
 	
 	<!-- ================================================================================== -->
