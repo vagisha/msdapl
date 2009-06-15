@@ -17,7 +17,13 @@ public interface GenericProteinferSpectrumMatchDAO <T extends ProteinferSpectrum
     public abstract T loadBestSpectrumMatchForIon(int pinferIonId);
 
     public abstract List<Integer> getSpectrumMatchIdsForPinferRun(int pinferId);
-
+    
+    public abstract int getSpectrumCountForPinferRun(int pinferId);
+    
+    public abstract int getMaxSpectrumCountForPinferRunProtein(int pinferId);
+    
+    public abstract int getMinSpectrumCountForPinferRunProtein(int prinferId);
+    
     public abstract List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId);
     
     public abstract int update(ProteinferSpectrumMatch psm);

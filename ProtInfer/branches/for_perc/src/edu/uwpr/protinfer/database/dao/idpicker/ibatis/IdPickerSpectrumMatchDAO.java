@@ -1,6 +1,8 @@
 package edu.uwpr.protinfer.database.dao.idpicker.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 
@@ -50,6 +52,18 @@ public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericPr
         return psmDao.getSpectrumMatchIdsForPinferRun(pinferId);
     }
 
+    public int getSpectrumCountForPinferRun(int pinferId) {
+        return psmDao.getSpectrumCountForPinferRun(pinferId);
+    }
+    
+    public int getMaxSpectrumCountForPinferRunProtein(int pinferId) {
+       return psmDao.getMaxSpectrumCountForPinferRunProtein(pinferId);
+    }
+    
+    public int getMinSpectrumCountForPinferRunProtein(int pinferId) {
+        return psmDao.getMinSpectrumCountForPinferRunProtein(pinferId);
+    }
+    
     @Override
     public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
         return psmDao.getSpectrumMatchIdsForPinferRunInput(pinferId, inputId);

@@ -50,6 +50,29 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements Generic
         return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferId", pinferId);
     }
     
+    public int getSpectrumCountForPinferRun(int pinferId) {
+        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectMatchCountForPinferId", pinferId);
+        if(count != null)   return count;
+        return 0;
+    }
+    
+    public int getMaxSpectrumCountForPinferRunProtein(int pinferId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("pinferId", pinferId);
+        map.put("max", 1);
+        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectMatchCountForPinferIdProtein", map);
+        if(count != null)   return count;
+        return 0;
+    }
+    
+    public int getMinSpectrumCountForPinferRunProtein(int pinferId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("pinferId", pinferId);
+        Integer count = (Integer)queryForObject(sqlMapNameSpace+".selectMatchCountForPinferIdProtein", map);
+        if(count != null)   return count;
+        return 0;
+    }
+    
     public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
         
         // first determine if the inputID is a runSearchID or a runSearchAnalysisID

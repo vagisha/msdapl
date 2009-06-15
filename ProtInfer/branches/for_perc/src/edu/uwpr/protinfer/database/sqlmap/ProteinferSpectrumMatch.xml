@@ -52,6 +52,41 @@
     	AND ion.id = psm.piIonID
     </select>
     
+    <select id="selectMatchCountForPinferId" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(psm.id)
+    	FROM msProteinInferSpectrumMatch AS psm,
+    	msProteinInferIon AS ion, 
+    	msProteinInferPeptide AS pept 
+    	WHERE pept.piRunID=#pinferId#
+    	AND pept.id = ion.piPeptideID
+    	AND ion.id = psm.piIonID
+    </select>
+    
+    <select id="selectMatchCountForPinferIdProtein" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(prot.id) AS cnt, prot.id 
+    	FROM msProteinInferProtein AS prot, 
+    	msProteinInferProteinPeptideMatch AS m, 
+    	msProteinInferPeptide AS pept, 
+    	msProteinInferIon AS ion, 
+    	msProteinInferSpectrumMatch AS psm 
+    	WHERE prot.piRunID=#pinferId# 
+    	AND prot.id = m.piProteinID 
+    	AND m.piPeptideID = pept.id 
+    	AND pept.id = ion.piPeptideID 
+    	AND ion.id = psm.piIonID 
+    	GROUP BY prot.id 
+    	ORDER BY cnt
+    	<isPropertyAvailable property="max">
+    		DESC
+    	</isPropertyAvailable>
+    	<isNotPropertyAvailable property="max">
+    		ASC
+    	</isNotPropertyAvailable>
+    	LIMIT 1
+    </select>
+    
+    
+    
     <select id="selectMatchIdsForPinferSearchInput" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT psm.id 
     	FROM msProteinInferSpectrumMatch AS psm,
