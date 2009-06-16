@@ -913,7 +913,16 @@
 		type="org.yeastrc.www.compare.CompareGOEnrichmentAction"
 	>
 		<forward name="Success" path="/pages/internal/compare/viewCompareGoEnrichment.jsp" redirect="false" />
+		<forward name="CreateGraph" path="/viewCompareGoEnrichmentGraph.do" redirect="false" />
 		<forward name="Failure" path="/pages/internal/compare/viewCompareGoEnrichment.jsp" redirect="false" />
+	</action>
+	
+	<action
+	  path="/viewCompareGoEnrichmentGraph"
+	  type="org.yeastrc.www.compare.CompareGOEnrichmentGraphAction"
+	  validate="false">
+	  <forward name="Success" path="/pages/utils/showImage.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 	
 	<!-- ================================================================================== -->

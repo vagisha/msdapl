@@ -14,6 +14,10 @@
 	<!-- Does the user want to do GO Enrichment analysis-->
 	<html:hidden name="proteinSetComparisonForm" property="goEnrichment" value="false" styleId="goEnrichment" />
 	
+	<!-- Does the user want to do GO Enrichment analysis-->
+	<html:hidden name="proteinSetComparisonForm" property="goEnrichmentGraph" value="false" styleId="goEnrichmentGraph" />
+	
+	
 	<logic:iterate name="proteinSetComparisonForm" property="proteinferRunList" id="proteinferRun">
 		<logic:equal name="proteinferRun" property="selected" value="true">
 			<html:hidden name="proteinferRun" property="runId" indexed="true" />
@@ -162,6 +166,9 @@
 	<html:text name="proteinSetComparisonForm" property="goEnrichmentPVal"></html:text>
 	&nbsp; &nbsp;
 	<html:submit value="Calculate" onclick="javascript:doGoEnrichmentAnalysis();"></html:submit>
+	<logic:present name="goEnrichmentView">
+		<html:submit value="Create Graph" onclick="javascript:doGoEnrichmentAnalysisGraph();"></html:submit>
+	</logic:present>
 </div>
 
 </center>

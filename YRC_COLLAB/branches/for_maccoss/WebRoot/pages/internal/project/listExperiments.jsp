@@ -447,12 +447,14 @@ function clearSelectedProtInfer() {
 						
 	   		 			</td>
 	   		 			
-	   		 			<td valign="top">
+	   		 			<logic:equal name="piJob" property="job.complete" value="true">
+	   		 			<td valign="top" align="center" >
 	   		 				<input type="checkbox" class="compare_cb" value="<bean:write name='piJob' property='job.pinferId'/>"></input>
 	   		 				<!-- 
 							<a href="<yrcwww:link path='newProteinSetComparison.do?'/>piRunId=<bean:write name='piJob' property='job.pinferId'/>">Compare</a>
 							-->
 						</td>
+						</logic:equal>
 	   		 			
 						</tr>
 						<tr>

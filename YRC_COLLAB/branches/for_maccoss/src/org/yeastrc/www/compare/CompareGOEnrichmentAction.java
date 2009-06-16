@@ -166,10 +166,17 @@ public class CompareGOEnrichmentAction extends Action {
         
         comparison.initSummary();
         request.setAttribute("comparison", comparison);
+        request.setAttribute("goEnrichmentView", true);
        
         GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(comparison, myForm);
         // Biological Process
         if(myForm.getGoAspect() == GOUtils.BIOLOGICAL_PROCESS) {
+            
+            if(myForm.isGoEnrichmentGraph()) {
+                request.setAttribute("enrichedTerms", enrichment.getBiologicalProcessEnriched());
+                return mapping.findForward("CreateGraph");
+            }
+            
             GOEnrichmentTabular bpTabular = new GOEnrichmentTabular();
             bpTabular.setEnrichedTerms(enrichment.getBiologicalProcessEnriched());
             bpTabular.setTitle("Biological Process");
@@ -180,6 +187,12 @@ public class CompareGOEnrichmentAction extends Action {
         
         // Cellular Component
         if(myForm.getGoAspect() == GOUtils.CELLULAR_COMPONENT) {
+            
+            if(myForm.isGoEnrichmentGraph()) {
+                request.setAttribute("enrichedTerms", enrichment.getCellularComponentEnriched());
+                return mapping.findForward("CreateGraph");
+            }
+            
             GOEnrichmentTabular ccTabular = new GOEnrichmentTabular();
             ccTabular.setEnrichedTerms(enrichment.getCellularComponentEnriched());
             ccTabular.setTitle("Cellular Component");
@@ -190,6 +203,12 @@ public class CompareGOEnrichmentAction extends Action {
         
         // Molecular Function
         if(myForm.getGoAspect() == GOUtils.MOLECULAR_FUNCTION) {
+            
+            if(myForm.isGoEnrichmentGraph()) {
+                request.setAttribute("enrichedTerms", enrichment.getMolecularFunctionEnriched());
+                return mapping.findForward("CreateGraph");
+            }
+            
             GOEnrichmentTabular mfTabular = new GOEnrichmentTabular();
             mfTabular.setEnrichedTerms(enrichment.getMolecularFunctionEnriched());
             mfTabular.setTitle("Molecular Function");
@@ -201,7 +220,6 @@ public class CompareGOEnrichmentAction extends Action {
         
         request.setAttribute("enrichment", enrichment);
         request.setAttribute("species", Species.getInstance(myForm.getSpeciesId()));
-        request.setAttribute("goEnrichmentView", true);
         
         
         e = System.currentTimeMillis();
@@ -227,6 +245,7 @@ public class CompareGOEnrichmentAction extends Action {
         if(myForm.getGoAspect() == GOUtils.MOLECULAR_FUNCTION)
             input.setUseMolecularFunction(true);
         
+        input.setPValCutoff(Double.parseDouble(myForm.getGoEnrichmentPVal()));
         input.setProteinIds(nrseqIds);
         
         GOEnrichmentOutput enrichment = GOEnrichmentCalculator.calculate(input);

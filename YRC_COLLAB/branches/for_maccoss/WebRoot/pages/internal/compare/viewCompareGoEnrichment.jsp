@@ -52,6 +52,7 @@ $(document).ready(function() {
 // ---------------------------------------------------------------------------------------
 function doGoEnrichmentAnalysis() {
 	$("input#goEnrichment").val("true");
+	$("input#goEnrichmentGraph").val("false");
 	if(!validateGoEnrichmentForm())
     	return false;
 	$("form[name='proteinSetComparisonForm']").submit();
@@ -78,6 +79,17 @@ function validateFloat(value, fieldName, min, max) {
 		else	alert("Value for "+fieldName+" should be >= "+min);
 	}
 	return valid;
+}
+// ---------------------------------------------------------------------------------------
+// GENE ONTOLOGY ENRICHMENT GRAPH
+// ---------------------------------------------------------------------------------------
+function doGoEnrichmentAnalysisGraph() {
+	alert("graph!");
+	$("input#goEnrichment").val("true");
+	$("input#goEnrichmentGraph").val("true");
+	if(!validateGoEnrichmentForm())
+    	return false;
+	$("form[name='proteinSetComparisonForm']").submit();
 }
 
 // ---------------------------------------------------------------------------------------

@@ -33,6 +33,7 @@ public class ProteinSetComparisonForm extends ActionForm {
     
     private boolean download = false;
     private boolean goEnrichment = false;
+    private boolean goEnrichmentGraph = false;
     
     private String searchString;
     
@@ -262,5 +263,13 @@ public class ProteinSetComparisonForm extends ActionForm {
 
     public void setSpeciesId(int speciesId) {
         this.speciesId = speciesId;
+    }
+
+    public boolean isGoEnrichmentGraph() {
+        return goEnrichmentGraph;
+    }
+
+    public void setGoEnrichmentGraph(boolean goEnrichmentGraph) {
+        this.goEnrichmentGraph = goEnrichmentGraph;
     }
 }
