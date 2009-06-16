@@ -28,6 +28,10 @@ public interface PercolatorResultDAO {
             PercolatorResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
     
+    public abstract List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId, 
+            PercolatorResultFilterCriteria filterCriteria, 
+            ResultSortCriteria sortCriteria);
+    
     public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
     
     
