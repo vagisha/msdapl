@@ -319,7 +319,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID min(pres.qvalue) AS mq FROM ( ");
+        sql.append("SELECT pres.resultID, min(pres.qvalue) AS mq FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PercolatorResult AS pres, msRunSearchResult AS res");
         
         
