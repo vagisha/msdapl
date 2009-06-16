@@ -190,8 +190,9 @@
 		<logic:iterate name="piRuns" id="piRun">
 			<tr>
 			<td>
+				<bean:write name='piRun' property='id'/> &nbsp;
 				<a href="<yrcwww:link path='viewProteinInferenceResult.do?'/>pinferId=<bean:write name='piRun' property='id'/>">
-				View Results</a>
+				[View]</a>
 			</td>
 			<td><bean:write name="piRun" property="date"/></td>
 			<td><bean:write name="piRun" property="comments"/></td>

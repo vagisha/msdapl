@@ -17,11 +17,13 @@ public class ProteinDatasetComparisonFilters {
     private List<Dataset> andFilters;
     private List<Dataset> orFilters;
     private List<Dataset> notFilters;
+    private List<Dataset> xorFilters;
     
     public ProteinDatasetComparisonFilters() {
         andFilters = new ArrayList<Dataset>();
         orFilters = new ArrayList<Dataset>();
         notFilters = new ArrayList<Dataset>();
+        xorFilters = new ArrayList<Dataset>();
     }
 
     public List<Dataset> getAndFilters() {
@@ -47,6 +49,13 @@ public class ProteinDatasetComparisonFilters {
     public void setNotFilters(List<Dataset> notFilters) {
         this.notFilters = notFilters;
     }
+
+    public List<Dataset> getXorFilters() {
+        return xorFilters;
+    }
     
+    public void setXorFilters(List<Dataset> xorFilters) {
+        this.xorFilters = xorFilters;
+    }
     
 }

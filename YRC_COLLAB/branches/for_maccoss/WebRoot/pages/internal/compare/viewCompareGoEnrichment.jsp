@@ -141,6 +141,18 @@ function toggleNotSelect(dsIndex) {
 		$("td#NOT_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
 	}
 }
+function toggleXorSelect(dsIndex) {
+	var id = "XOR_"+dsIndex+"_select";
+	var value = $("input#"+id).val();
+	if(value == "true") {
+		$("input#"+id).val("false");	
+		$("td#XOR_"+dsIndex+"_td").css("background-color", "#FFFFFF");
+	}
+	else {
+		$("input#"+id).val("true");	
+		$("td#XOR_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+	}
+}
 
 </script>
 

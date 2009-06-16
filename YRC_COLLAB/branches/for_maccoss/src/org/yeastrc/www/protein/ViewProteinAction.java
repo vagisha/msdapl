@@ -26,6 +26,7 @@ import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectsSearcher;
 import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
 import org.yeastrc.www.user.User;
@@ -125,10 +126,14 @@ public class ViewProteinAction extends Action {
 		}
 		
 		
-		// Get the protein inference runs where this protein was listed as parsimonious
+		// Get the protein inference runs where this protein was listed
 		// This is a bit convoluted
-		// First get all the users' projects
-		List<Project> projects = user.getProjects();
+		// First get all the users' projects (projects the user has read access to)
+		ProjectsSearcher projSearcher = new ProjectsSearcher();
+        projSearcher.setResearcher(user.getResearcher());
+        List<Project> projects = projSearcher.search();
+//		List<Project> projects = user.getProjects();
+        
 		List<Integer> pinferIds = new ArrayList<Integer>();
 		for(Project project: projects) {
 		    List<Integer> experimentIds = ProjectExperimentDAO.instance().getProjectExperimentIds(project.getID());
@@ -141,7 +146,7 @@ public class ViewProteinAction extends Action {
 	        }
 		}
 		// We now have the protein inference runs for this user.
-		// Find out which ones listed the given protein as parsimonious
+		// Find out which one of then has the protein of interest.
 		List<ProteinferRun> piRuns = new ArrayList<ProteinferRun>(pinferIds.size());
 		ProteinferRunDAO piRunDao = ProteinferDAOFactory.instance().getProteinferRunDao();
 		ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();

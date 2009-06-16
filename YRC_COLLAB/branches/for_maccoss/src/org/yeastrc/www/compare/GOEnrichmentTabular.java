@@ -8,6 +8,7 @@ package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.www.go.EnrichedGOTerm;
 import org.yeastrc.www.misc.TableCell;
@@ -26,13 +27,18 @@ public class GOEnrichmentTabular implements Tabular {
     private int numProteinsInUniverse;
     
     private List<EnrichedGOTerm> enrichedTerms;
+    private Map<EnrichedGOTerm, List<DatasetGoInformation>> datasetInformation;
+    private List<Dataset> datasets;
     
     private List<TableHeader> headers;
     
     public GOEnrichmentTabular() {
         
         headers = new ArrayList<TableHeader>();
-        TableHeader header = new TableHeader("GO Term");
+        
+        TableHeader header = null;
+        
+        header = new TableHeader("GO Term");
         header.setSortable(true);
         header.setSortClass(SORT_CLASS.SORT_ALPHA);
         headers.add(header);
@@ -61,6 +67,13 @@ public class GOEnrichmentTabular implements Tabular {
         header.setSortable(true);
         header.setSortClass(SORT_CLASS.SORT_INT);
         headers.add(header);
+        
+//        for(Dataset dataset: datasets) {
+//            header = new TableHeader(String.valueOf(dataset.getDatasetId()));
+//            header.setWidth(2);
+//            header.setSortable(false);
+//            headers.add(header);
+//        }
     }
 
     public String getTitle() {
@@ -128,6 +141,24 @@ public class GOEnrichmentTabular implements Tabular {
         
         cell = new TableCell(""+numProteinsInUniverse);
         row.addCell(cell);
+        
+        // Present / not present in each dataset
+//        int dsIndex = 0;
+//        List<DatasetGoInformation> dgiList = datasetInformation.get(term);
+//        for(DatasetGoInformation dgi: dgiList) {
+//            cell = new TableCell();
+//            cell.setId(String.valueOf(dsIndex));
+//            dsIndex++;
+//            
+//            if(dgi == null || !dgi.isPresent()) { // dataset does not contain this protein
+//                cell.setClassName("prot-not-found");
+//            }
+//            else {
+//                String className = "prot-found";
+//                cell.setClassName(className);
+//            }
+//            row.addCell(cell);
+//        }
         
         return row;
     }

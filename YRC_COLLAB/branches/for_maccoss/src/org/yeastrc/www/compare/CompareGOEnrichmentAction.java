@@ -8,6 +8,7 @@ package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -109,42 +110,51 @@ public class CompareGOEnrichmentAction extends Action {
         
         // ANY AND, OR, NOT filters
         if((myForm.getAndList().size() == 0) && 
-           (myForm.getOrList().size() == 0) && 
-           (myForm.getNotList().size() == 0)) {
+                (myForm.getOrList().size() == 0) && 
+                (myForm.getNotList().size() == 0) &&
+                myForm.getXorList().size() == 0) {
             List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
             for(Dataset dataset: datasets) {
                 SelectableDataset sds = new SelectableDataset(dataset);
                 sds.setSelected(false);
                 sdsList.add(sds);
             }
-            
+
             myForm.setAndList(sdsList);
             myForm.setOrList(sdsList);
             myForm.setNotList(sdsList);
+            myForm.setXorList(sdsList);
         }
         List<SelectableDataset> andDataset = myForm.getAndList();
         List<SelectableDataset> orDataset = myForm.getOrList();
         List<SelectableDataset> notDataset = myForm.getNotList();
-        
+        List<SelectableDataset> xorDataset = myForm.getXorList();
+
         List<Dataset> andFilters = new ArrayList<Dataset>();
         for(SelectableDataset sds: andDataset) {
             if(sds.isSelected())    andFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
-        
+
         List<Dataset> orFilters = new ArrayList<Dataset>();
         for(SelectableDataset sds: orDataset) {
             if(sds.isSelected())    orFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
-        
+
         List<Dataset> notFilters = new ArrayList<Dataset>();
         for(SelectableDataset sds: notDataset) {
             if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
-        
+
+        List<Dataset> xorFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: xorDataset) {
+            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+
         ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
         filters.setAndFilters(andFilters);
         filters.setOrFilters(orFilters);
         filters.setNotFilters(notFilters);
+        filters.setXorFilters(xorFilters);
         
         
         // Do the comparison

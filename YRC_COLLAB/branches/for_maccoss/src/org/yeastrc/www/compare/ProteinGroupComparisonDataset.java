@@ -478,6 +478,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         header.setSortable(false);
         headers.add(header);
         
+        
         // spectrum counts
         for(Dataset dataset: datasets) {
             header = new TableHeader("SC("+dataset.getDatasetId()+")");

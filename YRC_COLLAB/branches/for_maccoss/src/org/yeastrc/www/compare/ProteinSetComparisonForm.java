@@ -28,6 +28,7 @@ public class ProteinSetComparisonForm extends ActionForm {
     private List<SelectableDataset> andList = new ArrayList<SelectableDataset>();
     private List<SelectableDataset> orList  = new ArrayList<SelectableDataset>();
     private List<SelectableDataset> notList = new ArrayList<SelectableDataset>();
+    private List<SelectableDataset> xorList = new ArrayList<SelectableDataset>();
     
     private int pageNum = 1;
     
@@ -212,11 +213,29 @@ public class ProteinSetComparisonForm extends ActionForm {
     }
     
     public void setNotList(List<SelectableDataset> notList) {
-        this.notList = orList;
+        this.notList = notList;
     }
     
     public List<SelectableDataset> getNotList() {
         return notList;
+    }
+    
+    //-----------------------------------------------------------------------------
+    // XOR list
+    //-----------------------------------------------------------------------------
+    public SelectableDataset getXorDataset(int index) {
+        while(index >= xorList.size()) {
+            xorList.add(new SelectableDataset());
+        }
+        return xorList.get(index);
+    }
+    
+    public void setXorList(List<SelectableDataset> xorList) {
+        this.xorList = xorList;
+    }
+    
+    public List<SelectableDataset> getXorList() {
+        return xorList;
     }
 
     //-----------------------------------------------------------------------------

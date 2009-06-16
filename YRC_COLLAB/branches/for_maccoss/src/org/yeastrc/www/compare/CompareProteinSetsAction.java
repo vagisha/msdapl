@@ -129,10 +129,11 @@ public class CompareProteinSetsAction extends Action {
             request.setAttribute("dtasWarning", true);
         }
         
-        // ANY AND, OR, NOT filters
+        // ANY AND, OR, NOT, XOR filters
         if((myForm.getAndList().size() == 0) && 
            (myForm.getOrList().size() == 0) && 
-           (myForm.getNotList().size() == 0)) {
+           (myForm.getNotList().size() == 0) &&
+           myForm.getXorList().size() == 0) {
             List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
             for(Dataset dataset: datasets) {
                 SelectableDataset sds = new SelectableDataset(dataset);
@@ -143,10 +144,12 @@ public class CompareProteinSetsAction extends Action {
             myForm.setAndList(sdsList);
             myForm.setOrList(sdsList);
             myForm.setNotList(sdsList);
+            myForm.setXorList(sdsList);
         }
         List<SelectableDataset> andDataset = myForm.getAndList();
         List<SelectableDataset> orDataset = myForm.getOrList();
         List<SelectableDataset> notDataset = myForm.getNotList();
+        List<SelectableDataset> xorDataset = myForm.getXorList();
         
         List<Dataset> andFilters = new ArrayList<Dataset>();
         for(SelectableDataset sds: andDataset) {
@@ -163,10 +166,16 @@ public class CompareProteinSetsAction extends Action {
             if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
         
+        List<Dataset> xorFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: xorDataset) {
+            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+        
         ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
         filters.setAndFilters(andFilters);
         filters.setOrFilters(orFilters);
         filters.setNotFilters(notFilters);
+        filters.setXorFilters(xorFilters);
         
         // Do the comparison
         long s = System.currentTimeMillis();
@@ -180,7 +189,7 @@ public class CompareProteinSetsAction extends Action {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
         }
         
-        // Apply AND, OR, NOT filters
+        // Apply AND, OR, NOT, XOR filters
         s = System.currentTimeMillis();
         ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
         e = System.currentTimeMillis();

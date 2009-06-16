@@ -91,7 +91,7 @@
 			</table>
 		</td>
 		<td valign="top"><b>NOT</b></td>
-		<td>
+		<td style="padding-right:10px">
 			<table  cellpadding="0" cellspacing="0">
 			<tr>
 				<logic:iterate name="proteinSetComparisonForm" property="notList" id="notDataset" indexId="dsIndex">
@@ -108,6 +108,30 @@
 					<html:hidden name="notDataset" property="datasetId" indexed="true" />
 					<html:hidden name="notDataset" property="sourceString" indexed="true" />
 					<html:hidden name="notDataset" property="selected" indexed="true" styleId='<%="NOT_"+dsIndex+"_select"%>' />
+					</td>
+					
+				</logic:iterate>
+			</tr>
+			</table>
+		</td>
+		<td valign="top"><b>XOR</b></td>
+		<td>
+			<table  cellpadding="0" cellspacing="0">
+			<tr>
+				<logic:iterate name="proteinSetComparisonForm" property="xorList" id="xorDataset" indexId="dsIndex">
+					
+					<logic:equal name="xorDataset" property="selected" value="true">
+						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
+							id='<%="XOR_"+dsIndex+"_td"%>'
+						>
+					</logic:equal>
+					<logic:notEqual name="xorDataset" property="selected" value="true">
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="XOR_"+dsIndex+"_td"%>'>
+					</logic:notEqual>
+					<span style="cursor:pointer;" onclick="javascript:toggleXorSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<html:hidden name="xorDataset" property="datasetId" indexed="true" />
+					<html:hidden name="xorDataset" property="sourceString" indexed="true" />
+					<html:hidden name="xorDataset" property="selected" indexed="true" styleId='<%="XOR_"+dsIndex+"_select"%>' />
 					</td>
 					
 				</logic:iterate>
@@ -146,6 +170,7 @@
 </table>
 </div>
 
+<yrcwww:member group="administrator">
 <br>
 <div align="center"
 	style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
@@ -170,6 +195,6 @@
 		<html:submit value="Create Graph" onclick="javascript:doGoEnrichmentAnalysisGraph();"></html:submit>
 	</logic:present>
 </div>
-
+</yrcwww:member>
 </center>
 </html:form>

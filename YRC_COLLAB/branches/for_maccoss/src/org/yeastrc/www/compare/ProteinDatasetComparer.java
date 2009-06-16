@@ -134,6 +134,9 @@ public class ProteinDatasetComparer {
         // Apply the NOT filters
         applyNotFilter(proteins, filters.getNotFilters());
         
+        // Apply the XOR filters
+        applyXorFilter(proteins, filters.getXorFilters());
+        
     }
     
     private void applyAndFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
@@ -189,6 +192,30 @@ public class ProteinDatasetComparer {
                     break;
                 }
             }
+        }
+    }
+    
+    private void applyXorFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+        
+        if(datasets.size() ==0)
+            return;
+        
+        Iterator<ComparisonProtein> iter = proteins.iterator();
+        while(iter.hasNext()) {
+            ComparisonProtein protein = iter.next();
+            
+            int numOccur = 0;
+            boolean reject = false;
+            for(Dataset dataset: datasets) {
+                if(protein.isInDataset(dataset)) {
+                    numOccur++;
+                    if(numOccur > 1) {
+                        reject = true;
+                        break;
+                    }
+                }
+            }
+            if(reject)  iter.remove();
         }
     }
 
