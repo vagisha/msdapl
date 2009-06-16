@@ -136,8 +136,13 @@ public class ViewPercolatorResults extends Action {
         // Get ALL the filtered and sorted resultIds
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
         numResults = presDao.numAnalysisResults(searchAnalysisId);
-        List<Integer> resultIds = presDao.loadResultIdsForSearchAnalysis(searchAnalysisId,
-                myForm.getFilterCriteria(), myForm.getSortCriteria());
+        List<Integer> resultIds = null;
+        if(myForm.isPeptidesView()) {
+            resultIds = presDao.loadResultIdsForSearchAnalysisUniqPeptide(searchAnalysisId, myForm.getFilterCriteria(), myForm.getSortCriteria());
+        }
+        else {
+            resultIds = presDao.loadResultIdsForSearchAnalysis(searchAnalysisId, myForm.getFilterCriteria(), myForm.getSortCriteria());
+        }
         numResultsFiltered = resultIds.size();
 
 

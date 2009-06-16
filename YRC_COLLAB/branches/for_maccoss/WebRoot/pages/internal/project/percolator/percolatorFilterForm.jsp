@@ -64,16 +64,20 @@
 				
 				<tr>
 					<td valign="top">File(s)</td> 
-					<td colspan=8 align="left" valign="top" style="font-size:8pt;"> 
-						<html:text name="filterForm" property="fileNameFilter" size="100" /><br>
+					<td colspan=6 align="left" valign="top" style="font-size:8pt;"> 
+						<html:text name="filterForm" property="fileNameFilter" size="50" /><br>
 						Enter comma-separated file names
 					</td>
+					
+					<td valign="top">Unique peptides</td><td valign="top"> <html:checkbox name="filterForm" property="peptidesView" /> </td>
 				</tr>
 				
 				<tr>
-					<td colspan="9" align="center"><html:submit value="Update" 
+					<td colspan="9" align="center">
+					<html:submit value="Update" 
 									styleClass="plain_button" 
-									onclick="javascript:updateResults();return false;"/></td>
+									onclick="javascript:updateResults();return false;"/>
+					</td>
 				</tr>
 				<tr>
 					<td colspan="9" align="center">
