@@ -32,7 +32,8 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
     
     private boolean usePEP = true;
     
-    
+    private boolean peptidesView = false;
+
 
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
@@ -195,6 +196,8 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
         criteria.setMinDs(getMinDsDouble());
         criteria.setMaxDs(getMaxDsDouble());
         
+        criteria.setFileNames(filteredFileNames());
+        
         return criteria;
     }
 
@@ -204,6 +207,14 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
 
     public void setSearchAnalysisId(int searchAnalysisId) {
         this.searchAnalysisId = searchAnalysisId;
+    }
+    
+    public boolean isPeptidesView() {
+        return peptidesView;
+    }
+
+    public void setPeptidesView(boolean peptidesView) {
+        this.peptidesView = peptidesView;
     }
 
 }

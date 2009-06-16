@@ -39,6 +39,8 @@ public class FilterResultsForm extends ActionForm {
     private String peptide = null;
     private boolean exactMatch = true;
     
+    private String fileNameFilter = null;
+    
     private boolean showModified = true;
     private boolean showUnmodified = true;
     
@@ -295,5 +297,24 @@ public class FilterResultsForm extends ActionForm {
 
     public void setMaxObsMass(String maxObsMass) {
         this.maxObsMass = maxObsMass;
+    }
+
+    public String getFileNameFilter() {
+        return fileNameFilter;
+    }
+
+    public void setFileNameFilter(String fileNameFilter) {
+        if(fileNameFilter != null)
+            this.fileNameFilter = fileNameFilter.trim();
+    }
+    
+    public String[] filteredFileNames() {
+        if(fileNameFilter == null || fileNameFilter.length() == 0)
+            return new String[0];
+        String[] filenames = fileNameFilter.split(",");
+        for(int i = 0; i < filenames.length; i++) {
+            filenames[i] = filenames[i].trim();
+        }
+        return filenames;
     }
 }
