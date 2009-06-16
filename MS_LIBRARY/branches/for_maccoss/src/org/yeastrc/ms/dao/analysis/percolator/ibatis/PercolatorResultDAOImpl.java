@@ -342,8 +342,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
         
         sql.append("AND rsa.id = pres.runSearchAnalysisID ");
-        if(useResultsTable)
-            sql.append("AND res.id = pres.resultID ");
+        sql.append("AND res.id = pres.resultID ");
+        
         if(useScanTable) {
             sql.append("AND res.scanID = scan.id ");
         }
