@@ -160,16 +160,16 @@ public class MsDataUploader {
         if(uploadSearch) {
             
             // disable keys
-//            try {
-//                disableSearchTableKeys();
-//            }
-//            catch (SQLException e) {
-//                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
-//                uploadExceptionList.add(ex);
-//                log.error(ex.getMessage(), ex);
-//                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                return;
-//            }
+            try {
+                disableSearchTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
             
             try {
                 this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
@@ -188,16 +188,16 @@ public class MsDataUploader {
             }
             
             // enable keys
-//            try {
-//                enableSearchTableKeys();
-//            }
-//            catch (SQLException e) {
-//                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
-//                uploadExceptionList.add(ex);
-//                log.error(ex.getMessage(), ex);
-//                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                return;
-//            }
+            try {
+                enableSearchTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
         }
         
         // ----- UPLOAD ANALYSIS DATA
@@ -226,16 +226,16 @@ public class MsDataUploader {
         DAOFactory.instance().getMsSearchResultDAO().disableKeys();
         
         // disable keys on SQTSearchResult
-        log.info("Disabling keys on SQTSearchResult table");
-        DAOFactory.instance().getSequestResultDAO().disableKeys();
-        
-        // disable keys on SQTSpectrumData
-        log.info("Disabling keys on SQTSpectrumData table");
-        DAOFactory.instance().getSqtSpectrumDAO().disableKeys();
-        
-        // disable keys on msProteinMatch
-        log.info("Disabling keys on msProteinMatch table");
-        DAOFactory.instance().getMsProteinMatchDAO().disableKeys();
+//        log.info("Disabling keys on SQTSearchResult table");
+//        DAOFactory.instance().getSequestResultDAO().disableKeys();
+//        
+//        // disable keys on SQTSpectrumData
+//        log.info("Disabling keys on SQTSpectrumData table");
+//        DAOFactory.instance().getSqtSpectrumDAO().disableKeys();
+//        
+//        // disable keys on msProteinMatch
+//        log.info("Disabling keys on msProteinMatch table");
+//        DAOFactory.instance().getMsProteinMatchDAO().disableKeys();
         
         log.info("Disabled keys");
     }
@@ -246,17 +246,17 @@ public class MsDataUploader {
         log.info("Enabling keys on msRunSearchResult table");
         DAOFactory.instance().getMsSearchResultDAO().enableKeys();
         
-        // enable keys on SQTSearchResult
-        log.info("Enabling keys on SQTSearchResult table");
-        DAOFactory.instance().getSequestResultDAO().enableKeys();
-        
-        // enable keys on SQTSpectrumData
-        log.info("Enabling keys on SQTSpectrumData table");
-        DAOFactory.instance().getSqtSpectrumDAO().enableKeys();
-        
-        // enable keys on msProteinMatch
-        log.info("Enabling keys on msProteinMatch table");
-        DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
+//        // enable keys on SQTSearchResult
+//        log.info("Enabling keys on SQTSearchResult table");
+//        DAOFactory.instance().getSequestResultDAO().enableKeys();
+//        
+//        // enable keys on SQTSpectrumData
+//        log.info("Enabling keys on SQTSpectrumData table");
+//        DAOFactory.instance().getSqtSpectrumDAO().enableKeys();
+//        
+//        // enable keys on msProteinMatch
+//        log.info("Enabling keys on msProteinMatch table");
+//        DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
         
         log.info("Enabled keys");
     }
@@ -428,16 +428,16 @@ public class MsDataUploader {
             if(searchId == 0) {
                 
                 // disable keys
-//                try {
-//                    disableSearchTableKeys();
-//                }
-//                catch (SQLException e) {
-//                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
-//                    uploadExceptionList.add(ex);
-//                    log.error(ex.getMessage(), ex);
-//                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                    return;
-//                }
+                try {
+                    disableSearchTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
+                }
                     
                 try {
                     this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
@@ -457,16 +457,16 @@ public class MsDataUploader {
                 }
                 
                 // enable keys
-//                try {
-//                    enableSearchTableKeys();
-//                }
-//                catch (SQLException e) {
-//                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
-//                    uploadExceptionList.add(ex);
-//                    log.error(ex.getMessage(), ex);
-//                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
-//                    return;
-//                }
+                try {
+                    enableSearchTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
+                }
             }
             else {
                 this.uploadedSearchId = searchId;

@@ -26,4 +26,14 @@ public class PrimitiveTools {
 		return Float.intBitsToFloat(temp);
 	}
 
+	public static byte[] LEFloatTobyteArray(float f){
+		int temp = Float.floatToIntBits(f);
+		byte[] b = new byte[4];
+		b[0] = (byte)((temp )>>>0);
+		b[1] = (byte)((temp )>>>8);
+		b[2] = (byte)((temp )>>>16);
+		b[3] = (byte)((temp )>>>24);
+		return b;
+	}
+	
 }
