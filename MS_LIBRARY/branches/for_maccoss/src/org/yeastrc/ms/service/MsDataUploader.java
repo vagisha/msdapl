@@ -222,8 +222,8 @@ public class MsDataUploader {
     private void disableSearchTableKeys() throws SQLException {
         
         // disable keys on msRunSearchResult table
-        log.info("Disabling keys on msRunSearchResult table");
-        DAOFactory.instance().getMsSearchResultDAO().disableKeys();
+//        log.info("Disabling keys on msRunSearchResult table");
+//        DAOFactory.instance().getMsSearchResultDAO().disableKeys();
         
         // disable keys on SQTSearchResult
 //        log.info("Disabling keys on SQTSearchResult table");

@@ -56,7 +56,7 @@ public class Ms2FileReader extends AbstractReader implements MS2RunDataProvider 
 
     public MS2Header getRunHeader() throws DataProviderException {
 
-        MS2Header header = new MS2Header();
+        MS2Header header = new MS2Header(RunFileFormat.MS2);
         while (isHeaderLine(currentLine)) {
             String[] nameAndVal = parseHeader(currentLine);
             if (nameAndVal.length == 2) {
