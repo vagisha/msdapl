@@ -38,6 +38,10 @@ public class UploadException extends Exception {
         
         RUNTIME_MS2_ERROR       ("", ERROR),
         
+        READ_ERROR_MZXML          ("Error reading mzXML file", ERROR),
+        INVALID_MZXML_SCAN        ("Invalid mzXML scan", ERROR),
+        RUNTIME_MZXML_ERROR       ("", ERROR),
+        
         NO_SQT_TYPE             ("No sqt type found", ERROR),
         UNSUPPORTED_SQT         ("Unsupported sqt file found", ERROR),
         MULTIPLE_SQT_TYPES      ("More than one sqt file types found", ERROR),
