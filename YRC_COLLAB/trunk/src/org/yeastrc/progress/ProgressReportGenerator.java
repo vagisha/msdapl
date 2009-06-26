@@ -1947,8 +1947,8 @@ public class ProgressReportGenerator {
 	private final int[] microMembers = { 137, 194 };
 	private final int[] y2hMembers = { 272 };
 	private final int[] pspMembers = { 268 };
-	private final int[] infoMembers = { 254, 137 };
-	private final int[] yatesMembers = { 262 };
+	private final int[] infoMembers = { 254, 1880, 137 };
+	private final int[] yatesMembers = { 262, 1337, 1416, 1417 };
 	private final int[] nobleMembers = { 1122 };
 	private final int[] maccossMembers = { 1049 };
 	private final int[] coreMembers = { 137 };
