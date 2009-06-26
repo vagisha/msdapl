@@ -52,7 +52,7 @@ public class ProteinComplexImageMapGenerator extends Action {
 
 		final String OUTPUT_DIRECTORY = "D:\\tmp\\complexes\\big\\";
 		//final int[] publications = { 1, 10, 11, 12, 13, 14, 16 };
-		final int[] publications = { 1, 10, 11, 12, 13, 14, 16 };
+		final int[] publications = { 24 };
 		//final int[] publications = { 1 };
 		
 		

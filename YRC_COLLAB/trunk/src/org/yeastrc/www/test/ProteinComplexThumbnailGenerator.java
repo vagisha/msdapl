@@ -43,7 +43,7 @@ public class ProteinComplexThumbnailGenerator extends Action {
 		final String OUTPUT_DIRECTORY = "D:\\tmp\\complexes\\thumbnails\\";
 		
 		// 1  10  11  12  13  14  16 23
-		final int[] publications = { 1, 10, 11, 12, 13, 14, 16 };
+		final int[] publications = { 24 };
 		
 		Connection conn = DBConnectionManager.getConnection( "pdr" );
 		

@@ -7,10 +7,7 @@
 package org.yeastrc.www.test;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.image.BufferedImage;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -19,29 +16,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.io.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
 import org.yeastrc.bio.go.GONode;
 import org.yeastrc.bio.go.GOUtils;
-import org.yeastrc.bio.taxonomy.Species;
-import org.yeastrc.bio.taxonomy.TaxonomyUtils;
 import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.nr_seq.*;
-
 import y.base.Node;
 import y.io.JPGIOHandler;
 import y.layout.organic.SmartOrganicLayouter;
@@ -51,23 +37,8 @@ import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.LineType;
-import y.view.NodeLabel;
 import y.view.PolyLineEdgeRealizer;
 import y.view.ShapeNodeRealizer;
-import yext.svg.io.*;
-import org.yeastrc.bio.protein.*;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Description of class goes here.
@@ -76,7 +47,7 @@ import org.w3c.dom.Element;
  * @version Jan 29, 2007
  */
 
-public class MSCounterNetworkViewer extends Action {
+public class ShowAllComplexesTopology extends Action {
 
 	public ActionForward execute( ActionMapping mapping,
 								  ActionForm form,
@@ -84,45 +55,54 @@ public class MSCounterNetworkViewer extends Action {
 								  HttpServletResponse response )
 	throws Exception {
 
-		String dataset = request.getParameter( "dataset" );
-		String cutoff = request.getParameter( "cutoff" );
+		int publication = Integer.parseInt( request.getParameter( "dataset" ) );
+		Set vPairs = new HashSet();
 		
-		
-		Connection conn = DBConnectionManager.getConnection( "yrc" );
+		Connection conn = DBConnectionManager.getConnection( "pdr" );
 		Statement stmt = conn.createStatement();
-		String sql = "SELECT orfOne, orfTwo FROM PredictedComplexes." + dataset + "Compares WHERE pvalue <= " + cutoff + " AND orfOne <> orfTwo";
+		String sql = "SELECT id FROM tblComplex WHERE publicationID = " + publication;
 		ResultSet rs = stmt.executeQuery( sql );
 		
-		Set vPairs = new HashSet();
-		while (rs.next()) {
-			Set tmpSet = new HashSet();
-			String orfOne = rs.getString( 1 );
-			String orfTwo = rs.getString( 2 );
-
-			//NRProtein p1 = NRDatabaseUtils.getInstance().findProteinByName(orfOne, Species.getInstance( TaxonomyUtils.SACCHAROMYCES_CEREVISIAE ) );
-			NRProtein p1 = null;
-			try { p1 = (NRProtein)NRProteinFactory.getInstance().getProtein( Integer.parseInt( orfOne ) ); }
-			catch( Exception e ) { ; }
+		while( rs.next() ) {
 			
-			if (p1 == null)
-				continue;
+			sql = "SELECT proteinID FROM tblComplexMembers WHERE complexID = " + rs.getInt( 1 );
+			Set<Integer> pp = new HashSet<Integer>();
 			
-			//NRProtein p2 = NRDatabaseUtils.getInstance().findProteinByName(orfTwo, Species.getInstance( TaxonomyUtils.SACCHAROMYCES_CEREVISIAE ) );
-			NRProtein p2 = null;
-			try {
-				p2 = (NRProtein)NRProteinFactory.getInstance().getProtein( Integer.parseInt( orfTwo ) );
-			} catch (Exception e) { ; }
+			Statement pstmt = conn.createStatement();
+			ResultSet prs = pstmt.executeQuery( sql );
+			while ( prs.next() ) {
+				pp.add( prs.getInt( 1 ) );
+			}
 			
-			if (p2 == null)
-				continue;
+			prs.close(); prs = null;
+			pstmt.close(); pstmt = null;
 			
-			tmpSet.add( p1 );
-			tmpSet.add( p2 );
-			
-			if (vPairs.contains( tmpSet ))
-				continue;
-			
-			vPairs.add( tmpSet );
+			for( Integer pi : pp ) {
+				
+				// added because we need species test
+				NRProtein p1 = (NRProtein)NRProteinFactory.getInstance().getProtein( pi );
+				
+				for( Integer pk : pp ) {
+					
+					if ( pk.equals( pi ) ) continue;
+					
+					// added because we need species test
+					NRProtein p2 = (NRProtein)NRProteinFactory.getInstance().getProtein( pk );
+					
+					// do species test
+					if ( !p1.getSpecies().equals( p2.getSpecies() ) ) continue;
+					
+					Set<Integer> tmpSet = new HashSet<Integer>();
+					tmpSet.add( pi );
+					tmpSet.add( pk );
+					
+					
+					
+					
+					vPairs.add( tmpSet );
+					
+				}
+			}	
 		}
 		
 		rs.close(); rs = null;
@@ -138,35 +118,31 @@ public class MSCounterNetworkViewer extends Action {
 		
 		ShapeNodeRealizer realizer = new ShapeNodeRealizer();
 		realizer.setShapeType(ShapeNodeRealizer.ELLIPSE);
-		realizer.setFillColor( new Color ( 255, 200, 200 ) );
-		realizer.setFillColor2( new Color ( 255, 100, 100 ) );
-		realizer.setLineColor( new Color ( 50, 0, 0 ) );
-
-		NodeLabel nl = new NodeLabel();
-		nl.setFontSize(12);
-		nl.setFontStyle( Font.BOLD );
-		realizer.setLabel(nl);		
+		realizer.setFillColor( new Color ( 0, 0, 0 ) );
+		realizer.setFillColor2( new Color ( 0, 0, 0 ) );
+		realizer.setLineColor( new Color ( 0, 0, 0 ) );
 		
 		graph.setDefaultNodeRealizer(realizer);
 
 		EdgeRealizer er = new PolyLineEdgeRealizer();
 		er.setArrow(Arrow.NONE);
-		er.setLineType( LineType.LINE_4 );
-
-		graph.setDefaultNodeRealizer(realizer);
+		er.setLineColor( new Color ( 0, 0, 0 ) );
+		er.setLineType( LineType.LINE_1 );
+		
 		graph.setDefaultEdgeRealizer(er);
 		
 		
 		Iterator iter = vPairs.iterator();
 		while (iter.hasNext()) {
 			Set tmpPair = (Set)iter.next();
-			NRProtein p1 = null;
-			NRProtein p2 = null;
+			String p1 = null;
+			String p2 = null;
 
 			Iterator tmpIter = tmpPair.iterator();
+			
 			while (tmpIter.hasNext()) {
-				if (p1 == null) p1 = (NRProtein)tmpIter.next();
-				else p2 = (NRProtein)tmpIter.next();
+				if (p1 == null) p1 = String.valueOf( tmpIter.next() );
+				else p2 = String.valueOf( tmpIter.next() );
 			}
 			
 			if (p1 == null || p2 == null)
@@ -178,12 +154,7 @@ public class MSCounterNetworkViewer extends Action {
 			else {
 				node1 = graph.createNode();
 
-				//String label = p1.getListing();
-				String label = ProteinNamerFactory.getInstance().getProteinNamer( p1 ).getListing( p1 );
-				graph.setLabelText(node1, label);
-				
-				graph.setSize(node1, graph.getLabelLayout(node1)[0].getBox().width + 10, graph.getLabelLayout(node1)[0].getBox().height + 5);
-				//graph.setSize(node1, 5, 5);
+				graph.setSize(node1, 5, 5);
 				
 				addedNodes.put(p1, node1);
 			}
@@ -194,12 +165,7 @@ public class MSCounterNetworkViewer extends Action {
 			else {
 				node2 = graph.createNode();
 
-				//String label = p2.getListing();
-				String label = ProteinNamerFactory.getInstance().getProteinNamer( p2 ).getListing( p2 );
-				graph.setLabelText(node2, label);
-				
-				graph.setSize(node2, graph.getLabelLayout(node2)[0].getBox().width + 10, graph.getLabelLayout(node2)[0].getBox().height + 5);
-				//graph.setSize(node2, 5, 5);
+				graph.setSize(node2, 5, 5);
 				
 				addedNodes.put(p2, node2);
 			}			
@@ -237,35 +203,24 @@ public class MSCounterNetworkViewer extends Action {
 		layouter.doLayout(graph);
 		
 	    JPGIOHandler jpg = new JPGIOHandler();
-	    jpg.setQuality((float)(12.0));
+	    jpg.setQuality((float)(7.0));
 
-	    //SVGIOHandler svg = new SVGIOHandler();
-	    //SVGGraph2DRenderer renderer = new SVGGraph2DRenderer();
-	    //renderer.setSVGIOHandler( svg );
-	    
 	    Graph2DView view = jpg.createDefaultGraph2DView(graph);
 	    DefaultGraph2DRenderer renderer = (DefaultGraph2DRenderer)view.getGraph2DRenderer();
 
 	    renderer.setDrawEdgesFirst( true );
 	    view.setAntialiasedPainting( true );
 	    
-	    /*
-	    // XML STUFF //
-	    File file = new File( "/foo.svg" );
-	    FileOutputStream fos = new FileOutputStream( file );
-	    svg.write( view.getGraph2D(), fos );
-	    fos.close();
-		return null;
-		// END XML STUFF //
-		*/
-
 	    BufferedImage bi = (BufferedImage)(view.getImage());
-	    request.setAttribute("image", bi);
+		
+		
+	    request.setAttribute("image", bi);		
+		
 		return mapping.findForward( "Success" );
 	}
 	
 	
-	private Color getEdgeColor( NRProtein p1, NRProtein p2 ) throws Exception {
+	private Color getEdgeColor( String p1, String p2 ) throws Exception {
 
 		return new Color( 0, 0, 0 );
 		
