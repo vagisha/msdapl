@@ -17,7 +17,7 @@ public class PeptideProphetResultBean extends SearchResultBean implements Peptid
     private PeptideProphetResultDataBean data = new PeptideProphetResultDataBean();
     
     @Override
-    public String allNttProb() {
+    public String getAllNttProb() {
         return data.getAllNttProb();
     }
     

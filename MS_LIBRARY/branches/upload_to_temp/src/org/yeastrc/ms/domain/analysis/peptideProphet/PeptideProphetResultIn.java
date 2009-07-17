@@ -22,5 +22,5 @@ public interface PeptideProphetResultIn {
     public abstract double getMassDifference();
     
     // TODO Not sure how to handle this PeptideProphet result
-    public abstract String allNttProb();
+    public abstract String getAllNttProb();
 }

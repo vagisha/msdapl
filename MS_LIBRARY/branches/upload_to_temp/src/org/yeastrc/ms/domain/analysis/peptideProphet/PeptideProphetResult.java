@@ -28,6 +28,5 @@ public interface PeptideProphetResult extends MsSearchResult {
     public abstract double getMassDifference();
     public abstract double getMassDifferenceRounded();
     
-    // TODO Not sure how to handle this PeptideProphet result
-    public abstract String allNttProb();
+    public abstract String getAllNttProb();
 }
