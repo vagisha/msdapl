@@ -15,6 +15,8 @@ import org.yeastrc.ms.domain.search.SORT_BY;
 public class SequestResultFilterCriteria extends ResultFilterCriteria {
 
     
+    private Integer maxXcorrRank;
+    
     private Double minXCorr_1;
     private Double minXCorr_2;
     private Double minXCorr_3;
@@ -28,7 +30,8 @@ public class SequestResultFilterCriteria extends ResultFilterCriteria {
         if(super.hasFilters())
             return true;
         
-        return (hasXCorrFilter() ||
+        return (hasXcorrRankFilter() ||
+                hasXCorrFilter() ||
                 hasDeltaCnFilter() ||
                 hasSpFilter());
     }
@@ -77,6 +80,37 @@ public class SequestResultFilterCriteria extends ResultFilterCriteria {
     
     public String makeDeltaCnFilterSql() {
         return makeFilterSql(SORT_BY.DELTACN.getColumnName(), minDeltaCN, null);
+    }
+    
+    //-------------------------------------------------------------
+    // XCORR RANK  FILTER
+    //-------------------------------------------------------------
+    public Integer getMaxXcorrRank() {
+        return maxXcorrRank;
+    }
+    
+    public void setMaxXcorrRank(Integer xcorrRank) {
+        this.maxXcorrRank = xcorrRank;
+    }
+    
+    public boolean hasXcorrRankFilter() {
+        return this.maxXcorrRank != null;
+    }
+    
+    public String makeXCorrRankFilterSql() {
+        if(!hasXcorrRankFilter())
+            return "";
+        StringBuilder buf = new StringBuilder();
+        String xCorrRankCol = SORT_BY.XCORR_RANK.getColumnName();
+        
+        
+        int xcorrRank = this.maxXcorrRank == null ? 1 : this.maxXcorrRank;
+        
+        buf.append(" ( ");
+        buf.append(" (" +xCorrRankCol+" <= "+xcorrRank+") ");
+        buf.append(" ) ");
+        
+        return buf.toString();
     }
     
     //-------------------------------------------------------------

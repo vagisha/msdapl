@@ -203,10 +203,40 @@ public class MsDataUploader {
         // ----- UPLOAD ANALYSIS DATA
         if(uploadAnalysis) {
             
+            // disable keys
+            try {
+                disableAnalysisTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
+            
             try {
                 exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
             catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                
+                // enable keys
+                try {
+                    enableAnalysisTableKeys();
+                }
+                catch(SQLException e){log.error("Error enabling keys");}
+                return;
+            }
+            
+            // enable keys
+            try {
+                enableAnalysisTableKeys();
+            }
+            catch (SQLException e) {
+                UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage(), ex);
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
@@ -257,6 +287,25 @@ public class MsDataUploader {
 //        // enable keys on msProteinMatch
 //        log.info("Enabling keys on msProteinMatch table");
 //        DAOFactory.instance().getMsProteinMatchDAO().enableKeys();
+        
+        log.info("Enabled keys");
+    }
+    
+    
+    private void disableAnalysisTableKeys() throws SQLException {
+        
+        // disable keys on msRunSearchResult table
+//        log.info("Disabling keys on PercolatorResult table");
+//        DAOFactory.instance().getPercolatorResultDAO().disableKeys();
+        
+        log.info("Disabled keys");
+    }
+    
+    private void enableAnalysisTableKeys() throws SQLException {
+        
+        // enable keys on msRunSearchResult table
+        log.info("Enabling keys on PercolatorResult table");
+        DAOFactory.instance().getPercolatorResultDAO().enableKeys();
         
         log.info("Enabled keys");
     }
@@ -492,10 +541,43 @@ public class MsDataUploader {
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
             }
             if(searchAnalysisID == 0) {
+                
+                // disable keys
+                try {
+                    disableAnalysisTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_DISABLE_KEYS, e);
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    return;
+                }
+                
+                
                 try {
                     searchAnalysisID = exptUploader.uploadAnalysisData(this.uploadedSearchId);
                 }
                 catch (UploadException ex) {
+                    uploadExceptionList.add(ex);
+                    log.error(ex.getMessage(), ex);
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    
+                    // enable keys
+                    try {
+                        enableAnalysisTableKeys();
+                    }
+                    catch(SQLException e){log.error("Error enabling keys");}
+                    
+                    return;
+                }
+                
+                // enable keys
+                try {
+                    enableAnalysisTableKeys();
+                }
+                catch (SQLException e) {
+                    UploadException ex = new UploadException(ERROR_CODE.ERROR_SQL_ENABLE_KEYS, e);
                     uploadExceptionList.add(ex);
                     log.error(ex.getMessage(), ex);
                     log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");

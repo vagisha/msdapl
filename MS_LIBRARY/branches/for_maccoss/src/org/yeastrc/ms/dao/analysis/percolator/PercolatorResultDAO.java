@@ -1,5 +1,6 @@
 package org.yeastrc.ms.dao.analysis.percolator;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
@@ -48,4 +49,8 @@ public interface PercolatorResultDAO {
     public abstract int numRunAnalysisResults(int runSearchAnalysisId);
     
     public abstract int numAnalysisResults(int searchAnalysisId);
+    
+    public abstract void disableKeys() throws SQLException;
+    
+    public abstract void enableKeys() throws SQLException;
 }
