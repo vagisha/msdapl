@@ -29,26 +29,26 @@
 		
 		<tbody>
 		<tr>
-			<td width="20%" align="left" valign="top">Submitted By:</td>
-			<td width="80%" align="left" valign="top">
+			<td width="20%" align="left" valign="top" class="left_align">Submitted By:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
 				<a href="<yrcwww:link path='viewResearcher.do?'/>id=<bean:write name="job" property="submitter" />">
 					<bean:write name="job" property="researcher.firstName" /> <bean:write name="job" property="researcher.lastName" /></a>
 			</td>
 		</tr>	
 
 		<tr >
-			<td width="20%" align="left" valign="top">Submitted On:</td>
-			<td width="80%" align="left" valign="top"><bean:write name="job" property="submitDate" /></td>
+			<td width="20%" align="left" valign="top" class="left_align">Submitted On:</td>
+			<td width="80%" align="left" valign="top" class="left_align"><bean:write name="job" property="submitDate" /></td>
 		</tr>
 	
 		<tr >
-			<td width="20%" align="left" valign="top">Last Change:</td>
-			<td width="80%" align="left" valign="top"><bean:write name="job" property="lastUpdate" /></td>
+			<td width="20%" align="left" valign="top" class="left_align">Last Change:</td>
+			<td width="80%" align="left" valign="top" class="left_align"><bean:write name="job" property="lastUpdate" /></td>
 		</tr>
 
 		<tr >
-			<td width="20%" align="left" valign="top">Status:</td>
-			<td width="80%" align="left" valign="top">
+			<td width="20%" align="left" valign="top" class="left_align">Status:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
 				<logic:equal name="job" property="status" value="4">
 					<bean:write name="job" property="statusDescription" /> <a href="<yrcwww:link path='viewYatesRun.do?'/>id=<bean:write name="job" property="runID" />"><span style="color:red;">[View Run]</span></a>
 				</logic:equal>
@@ -73,7 +73,7 @@
 
 		<logic:notEmpty name="job" property="log">
 			<tr >
-				<td width="100%" colspan="2">
+				<td width="100%" colspan="2" class="left_align">
 					<div style="width:100%;height:auto;overflow:auto;">
 						Log Text:<br><br>
 						<pre style="font-size:8pt;"><bean:write name="job" property="log" /></pre>
@@ -94,37 +94,37 @@
 		
 		<tbody>
 		<tr >
-			<td width="20%" align="left" valign="top">Project:</td>
-			<td width="80%" align="left" valign="top">
+			<td width="20%" align="left" valign="top" class="left_align">Project:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
 				<a href="<yrcwww:link path='viewProject.do?'/>ID=<bean:write name="job" property="projectID" />">
 					<bean:write name="job" property="project.title" /></a>
 			</td>
 		</tr>
 
 		<tr >
-			<td width="20%" align="left" valign="top">Directory:</td>
-			<td width="80%" align="left" valign="top">
+			<td width="20%" align="left" valign="top" class="left_align">Directory:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
 				<bean:write name="job" property="serverDirectory" />
 			</td>
 		</tr>
 
 		<tr >
-			<td width="20%" align="left" valign="top">Run Date:</td>
-			<td width="80%" align="left" valign="top">
+			<td width="20%" align="left" valign="top" class="left_align">Run Date:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
 				<bean:write name="job" property="runDate" />
 			</td>
 		</tr>
 
 		<tr >
-			<td width="20%" align="left" valign="top">Bait Desc:</td>
-			<td width="80%" align="left" valign="top">
+			<td width="20%" align="left" valign="top" class="left_align">Bait Desc:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
 				<bean:write name="job" property="baitProteinDescription" />
 			</td>
 		</tr>
 
 		<tr >
-			<td width="20%" align="left" valign="top">Comments:</td>
-			<td width="80%" align="left" valign="top">
+			<td width="20%" align="left" valign="top" class="left_align">Comments:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
 				<bean:write name="job" property="comments" />
 			</td>
 		</tr>

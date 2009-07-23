@@ -47,7 +47,7 @@
 		<logic:equal name="protein" property="protein.isParsimonious" value="true">Yes</logic:equal>
 		<logic:equal name="protein" property="protein.isParsimonious" value="false">No</logic:equal>
 	</td>
-	<td style="border: 1px #CCCCCC dotted;" align="center">
+	<td style="border: 1px #CCCCCC dotted; text-align: left;" align="center">
 	<logic:empty name="groupProteins">--</logic:empty>
 	<logic:iterate name="groupProteins" id="prot">
 		<span onclick="showProteinDetails(<bean:write name="prot" property="protein.id" />)" 
@@ -114,7 +114,7 @@
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="true">*</logic:equal>
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false"></logic:equal>
      		</td>
-     		<td><bean:write name="ion" property="ionSequence" /></td>
+     		<td class="left_align"><bean:write name="ion" property="ionSequence" /></td>
      		<td><bean:write name="ion" property="charge" /></td>
      		<td>
      			<bean:write name="ion" property="spectrumCount" />

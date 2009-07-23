@@ -47,7 +47,7 @@
 	   </NOBR></TD>
 	   <TD valign="top" width="20%"><bean:write name="run" property="baitDesc"/></TD>
 
-	   <TD valign="top" width="20%">
+	   <TD valign="top" width="20%" class="left_align">
 	   <logic:empty name="run" property="comments">
 	    No Comments
 	   </logic:empty>

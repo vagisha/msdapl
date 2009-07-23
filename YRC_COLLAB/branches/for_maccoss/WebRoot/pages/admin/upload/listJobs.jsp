@@ -92,7 +92,7 @@
 					
 				<td align="left" valign="top" style="width:10%;font-size:8pt;"><bean:write name="job" property="submitDate" /></td>
 
-				<td align="left" valign="top" style="width:32%;font-size:8pt;">
+				<td align="left" valign="top" style="width:32%;font-size:8pt;" class="left_align">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<bean:write name="job" property="serverDirectory" />
 					</div>
@@ -104,7 +104,7 @@
 					</div>
 				</td>
 
-				<td align="left" valign="top" style="width:15%;font-size:8pt;">
+				<td align="left" valign="top" style="width:15%;font-size:8pt;" class="left_align">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<bean:write name="job" property="comments" />
 					</div>

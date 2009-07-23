@@ -492,8 +492,7 @@ function clearSelectedProtInfer() {
 			<span
 				id="listfileslink_<bean:write name='experiment' property='id'/>"  
 				class="clickable" style="font-weight:bold; color:#D74D2D;" 
-				onclick="javascript:toggleFilesForExperiment(<bean:write name='experiment' property='id'/>);">[List Files]
-			</span>
+				onclick="javascript:toggleFilesForExperiment(<bean:write name='experiment' property='id'/>);">[List Files]</span>
 			</div>
 			<div style="background-color: #FFFFFF; margin:5 5 5 5; padding:0;" id="listfileslink_<bean:write name='experiment' property='id'/>_target"></div>
 			

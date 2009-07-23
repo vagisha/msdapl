@@ -40,7 +40,7 @@
 	<tbody>
 	 	<logic:iterate name="inputSummary"  id="input">
  			<tr>
- 				<td>
+ 				<td class="left_align">
  					<!--  <span style="text-decoration: underline; cursor: pointer;"
  								onclick="showSpectrumMatches(<bean:write name="input" property="input.inputId" />, '<bean:write name="input" property="fileName" />')">
  					-->
@@ -53,7 +53,7 @@
  			</tr>
 	 	</logic:iterate>
 	 	<tr>
-	 		<td><b>TOTAL</b></td>
+	 		<td class="left_align"><b>TOTAL</b></td>
 	 		<!-- <td><b><bean:write name="totalDecoyHits" /></b></td> -->
 	 		<td><b><bean:write name="totalTargetHits" /></b></td>
 	 		<td><b><bean:write name="filteredTargetHits"  /></b></td>

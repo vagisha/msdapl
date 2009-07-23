@@ -138,7 +138,9 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         Collections.sort(ms2Files, comparator);
         for(MsFile file: ms2Files) {
             TableRow row = new TableRow();
-            row.addCell(new TableCell(file.getFileName(), null));
+            TableCell cell = new TableCell(file.getFileName(), null);
+            cell.setClassName("left_align");
+            row.addCell(cell);
             row.addCell(new TableCell(String.valueOf(file.getScanCount()), null));
             rows.add(row);
         }

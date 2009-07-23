@@ -195,7 +195,7 @@
 				[View]</a>
 			</td>
 			<td><bean:write name="piRun" property="date"/></td>
-			<td><bean:write name="piRun" property="comments"/></td>
+			<td class="left_align"><bean:write name="piRun" property="comments"/></td>
 			</tr>
 		</logic:iterate>
 		</tbody>

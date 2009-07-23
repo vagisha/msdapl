@@ -46,7 +46,7 @@
    </NOBR>
   </TD>
   <TD valign="top"><bean:write name="project" property="ID"/></TD>
-  <TD valign="top"><bean:write name="project" property="title"/></TD>
+  <TD valign="top" class="left_align"><bean:write name="project" property="title"/></TD>
   <TD valign="top"><bean:write name="project" property="submitDate"/></TD>
  </TR>
 </logic:iterate>
@@ -85,7 +85,7 @@
 		  </TD>
 		  <TD valign="top"><bean:write name="project" property="ID"/></TD>
 		  <TD valign="top"><bean:write name="project" property="PI.lastName"/></TD>
-		  <TD valign="top"><bean:write name="project" property="title"/></TD>
+		  <TD valign="top" class="left_align"><bean:write name="project" property="title"/></TD>
 		  <TD valign="top"><bean:write name="project" property="submitDate"/></TD>
 		 </TR>
 		</logic:iterate>

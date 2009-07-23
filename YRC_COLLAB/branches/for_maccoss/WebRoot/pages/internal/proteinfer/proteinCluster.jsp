@@ -24,7 +24,7 @@
  <tbody>
  <logic:iterate name="cluster" property="proteinGroups" id="protGrp">
   <tr id="protGrp_<bean:write name="protGrp" property="groupId" />">
-     <td valign="middle">
+     <td valign="middle" style="text-align: center;">
      <span onclick="highlightProteinAndPeptides('<bean:write name="protGrp" property="groupId" />', '<bean:write name="protGrp" property="nonUniqMatchingPeptideGroupIdsString" />', '<bean:write name="protGrp" property="uniqMatchingPeptideGroupIdsString" />')"
      style="cursor:pointer;text-decoration:underline"><bean:write name="protGrp" property="groupId" />
      </span>
@@ -41,8 +41,8 @@
             <logic:equal name="prot" property="protein.isParsimonious" value="true"></b></logic:equal>
         </logic:iterate>
      </td>
-     <td><bean:write name="protGrp" property="matchingPeptideCount" />(<bean:write name="protGrp" property="uniqMatchingPeptideCount" />)</td>
-     <td><bean:write name="protGrp" property="spectrumCount" /></td>
+     <td style="text-align: center;" ><bean:write name="protGrp" property="matchingPeptideCount" />(<bean:write name="protGrp" property="uniqMatchingPeptideCount" />)</td>
+     <td style="text-align: center;"><bean:write name="protGrp" property="spectrumCount" /></td>
  </tr>
  </logic:iterate>
  </tbody>
@@ -76,7 +76,7 @@
     <tr>
        	<th><b><font size="2pt"><bean:write name="peptGrp" property="groupId" /></font></b></th>
 		<logic:iterate name="cluster" property="proteinGroups" id="protGrp" type="org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup">
-	    	<td id="peptEvFor_<bean:write name="protGrp" property="groupId" />_<bean:write name="peptGrp" property="groupId" />">
+	    	<td id="peptEvFor_<bean:write name="protGrp" property="groupId" />_<bean:write name="peptGrp" property="groupId" />" style="text-align: center;">
 	         	<%if(cluster.proteinAndPeptideGroupsMatch(protGrp.getGroupId(), peptGrp.getGroupId())) { %>
 	          	 x
 	          	<%} else {%>&nbsp;<%} %>
@@ -106,9 +106,9 @@
         <logic:iterate name="cluster" property="peptideGroups" id="peptGrp">
         	<logic:iterate name="peptGrp" property="peptides" id="pept">
         	<tr class="peptGrp_<bean:write name="pept" property="groupId" />">
-        		<td><bean:write name="pept" property="groupId" /></td>
+        		<td style="text-align: center;"><bean:write name="pept" property="groupId" /></td>
         		<td><bean:write name="pept" property="sequence" /></td>
-        		<td><bean:write name="pept" property="spectrumCount" /></td>
+        		<td style="text-align: center;"><bean:write name="pept" property="spectrumCount" /></td>
         	</tr>
        		</logic:iterate>
         </logic:iterate>

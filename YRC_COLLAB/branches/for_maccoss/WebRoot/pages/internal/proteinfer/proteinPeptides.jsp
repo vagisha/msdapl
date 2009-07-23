@@ -63,7 +63,7 @@
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="true">*</logic:equal>
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false"></logic:equal>
      		</td>
-     		<td><bean:write name="ion" property="ionSequence" /></td>
+     		<td class="left_align"><bean:write name="ion" property="ionSequence" /></td>
      		<td><bean:write name="ion" property="charge" /></td>
      		<td><bean:write name="ion" property="spectrumCount" /></td>
      		
