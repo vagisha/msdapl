@@ -44,6 +44,7 @@ public class DatasetBuilder {
         dataset.setSpectrumCount(specDao.getSpectrumCountForPinferRun(datasetId));
         dataset.setMaxProteinSpectrumCount(specDao.getMaxSpectrumCountForPinferRunProtein(datasetId));
         dataset.setMinProteinSpectrumCount(specDao.getMinSpectrumCountForPinferRunProtein(datasetId));
+        dataset.setDatasetComments(fact.getProteinferRunDao().loadProteinferRun(datasetId).getComments());
         
         return dataset;
     }

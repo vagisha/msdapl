@@ -30,10 +30,18 @@ public class SequestFilterResultsForm extends FilterResultsForm {
     
     private String minSp;
     
+    private String xcorrRank;
+    
     
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors =  super.validate(mapping, request);
         
+        if(xcorrRank != null && xcorrRank.trim().length() > 0) {
+            try {Integer.parseInt(xcorrRank);}
+            catch(NumberFormatException e) {
+                errors.add(ActionMessages.GLOBAL_MESSAGE, 
+                        new ActionMessage("error.general.errorMessage", "Invalid value for xCorrRank"));}
+        }
         if(minXCorr_1 != null && minXCorr_1.trim().length() > 0) {
             try{Double.parseDouble(minXCorr_1);}
             catch(NumberFormatException e){
@@ -88,6 +96,19 @@ public class SequestFilterResultsForm extends FilterResultsForm {
         this.searchId = searchId;
     }
 
+    public String getXcorrRank() {
+        return xcorrRank;
+    }
+
+    public Integer getXcorrRank_Integer() {
+        if(xcorrRank != null && xcorrRank.trim().length() > 0)
+            return Integer.parseInt(xcorrRank);
+        return null;
+    }
+    
+    public void setXcorrRank(String xcorrRank) {
+        this.xcorrRank = xcorrRank;
+    }
     
     public String getMinXCorr_1() {
         return minXCorr_1;
@@ -202,6 +223,7 @@ public class SequestFilterResultsForm extends FilterResultsForm {
         criteria.setShowOnlyModified(isShowModified() && !isShowUnmodified());
         criteria.setShowOnlyUnmodified(isShowUnmodified() && !isShowModified());
         
+        criteria.setMaxXcorrRank(getXcorrRank_Integer());
         criteria.setMinXCorr_1(getMinXCorr_1Double());
         criteria.setMinXCorr_2(getMinXCorr_2Double());
         criteria.setMinXCorr_3(getMinXCorr_3Double());
@@ -209,6 +231,8 @@ public class SequestFilterResultsForm extends FilterResultsForm {
         
         criteria.setMinDeltaCn(getMinDeltaCNDouble());
         criteria.setMinSp(getMinSpDouble());
+        
+        criteria.setFileNames(filteredFileNames());
         
         return criteria;
     }

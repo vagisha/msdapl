@@ -36,19 +36,19 @@
 				</tr>
 				
 				<tr>
-					<td>Min. XCorr (+1)</td> <td> <html:text name="filterForm" property="minXCorr_1" size="5"/> </td>
-					<td>Min. XCorr (+2)</td> <td> <html:text name="filterForm" property="minXCorr_2" size="5"/> </td>
+					<td>Max. XCorr Rank</td> <td> <html:text name="filterForm" property="xcorrRank" size="5"/> </td>
+					<td></td> <td></td>
 					<td></td>
 					<td>Min. DeltaCN</td><td> <html:text name="filterForm" property="minDeltaCN" size="5" /> </td>
 					<td>Min. Sp</td><td> <html:text name="filterForm" property="minSp" size="5" /> </td>
 				</tr>
 				
 				<tr>
+					<td>Min. XCorr (+1)</td> <td> <html:text name="filterForm" property="minXCorr_1" size="5"/> </td>
+					<td>Min. XCorr (+2)</td> <td> <html:text name="filterForm" property="minXCorr_2" size="5"/> </td>
+					<td></td>
 					<td>Min. XCorr (+3)</td> <td> <html:text name="filterForm" property="minXCorr_3" size="5"/> </td>
 					<td>Min. XCorr (>3)</td> <td> <html:text name="filterForm" property="minXCorr_H" size="5"/> </td>
-					<td></td>
-					<td></td>
-					<td></td>
 				</tr>
 				
 				<tr>
@@ -59,6 +59,14 @@
 					</td>
 					<td valign="top">Modified peptides</td><td valign="top"> <html:checkbox name="filterForm" property="showModified" /> </td>
 					<td valign="top">Unmodified peptides</td><td valign="top"> <html:checkbox name="filterForm" property="showUnmodified" /> </td>
+				</tr>
+				
+				<tr>
+					<td valign="top">File(s)</td> 
+					<td colspan=6 align="left" valign="top" style="font-size:8pt;"> 
+						<html:text name="filterForm" property="fileNameFilter" size="50" /><br>
+						Enter comma-separated file names
+					</td>
 				</tr>
 				
 				<tr>

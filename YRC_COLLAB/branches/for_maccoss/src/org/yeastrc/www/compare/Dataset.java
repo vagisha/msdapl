@@ -12,6 +12,7 @@ package org.yeastrc.www.compare;
 public class Dataset {
 
     private int datasetId;
+    private String datasetComments;
     private DatasetSource source;
     private float spectrumCountNormalizationFactor = 1.0f;
     private int totalSpectrumCount;
@@ -103,5 +104,13 @@ public class Dataset {
     
     public void setMinProteinSpectrumCount(int minProteinSpectrumCount) {
         this.minProteinSpectrumCount = minProteinSpectrumCount;
+    }
+
+    public String getDatasetComments() {
+        return datasetComments;
+    }
+
+    public void setDatasetComments(String datasetComments) {
+        this.datasetComments = datasetComments;
     }
 }

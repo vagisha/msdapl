@@ -337,7 +337,7 @@ function toggleXorSelect(dsIndex) {
 
 <yrcwww:contentbox centered="true" width="90" widthRel="true" title="Protein Dataset Comparison">
 
-<table align="center">
+<table align="center" >
 
 <tr>
 <td colspan="2" style="background-color:#F2F2F2; font-weight:bold; text-align: center; padding:5 5 5 5;" >
@@ -416,11 +416,22 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 </td>
 
 </tr>
-
-
 </table>
 
-<br>
+<table  align="center" style="border: 1px dashed gray;" width="80%">
+<tbody>
+<logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
+	<bean:define id="mod" value="<%=String.valueOf(row%2)%>"></bean:define>
+	<logic:equal name="mod" value="0"><tr></logic:equal>
+	<td width="1%" style="background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );">
+		&nbsp;&nbsp;
+	</td>
+	<td width="4%" style="font-size:8pt;"><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></td>
+	<td width="45%" style="font-size:8pt;" ><bean:write name="dataset" property="datasetComments" /></td>
+	<logic:equal name="mod" value="1"></tr></logic:equal>
+</logic:iterate>
+</tbody>
+</table>
 
 <logic:present name="dtasWarning">
 <p style="color:red; font-weight: bold;" align="center">
@@ -430,6 +441,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 
 <!-- ################## FILTER FORM  ########################################### -->
 <%@include file="comparisonFilterForm.jsp" %>
+
 
 
 <!-- PAGE RESULTS -->
@@ -446,7 +458,16 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <div > 
 <yrcwww:table name="comparison" tableId='compare_results' tableClass="table_compare_grp" center="true" />
 </div>
-
+<!--  
+<yrcwww:member group="administrator">
+<logic:present name="comparison" property="davidUrl">
+<br>
+<div align="center">
+	<a href="<%=comparison.getDavidUrl() %>">To DAVID</a>
+</div>
+</logic:present>
+</yrcwww:member>
+-->
 </yrcwww:contentbox>
 
 </CENTER>

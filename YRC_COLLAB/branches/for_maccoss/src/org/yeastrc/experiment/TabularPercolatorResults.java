@@ -123,7 +123,9 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         TableRow row = new TableRow();
         
         // row.addCell(new TableCell(String.valueOf(result.getId())));
-        row.addCell(new TableCell(result.getFilename()));
+        TableCell cell = new TableCell(result.getFilename());
+        cell.setClassName("left_align");
+        row.addCell(cell);
         row.addCell(new TableCell(String.valueOf(result.getScanNumber())));
         row.addCell(new TableCell(String.valueOf(result.getCharge())));
         row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
@@ -156,9 +158,13 @@ public class TabularPercolatorResults implements Tabular, Pageable {
 //        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
         
         String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
-        row.addCell(new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true));
+        cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
+        cell.setClassName("left_align");
+        row.addCell(cell);
         
-        row.addCell(new TableCell(String.valueOf(result.getProteins())));
+        cell = new TableCell(String.valueOf(result.getProteins()));
+        cell.setClassName("left_align");
+        row.addCell(cell);
         
         return row;
     }
