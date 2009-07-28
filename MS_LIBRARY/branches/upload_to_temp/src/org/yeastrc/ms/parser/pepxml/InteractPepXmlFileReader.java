@@ -18,7 +18,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC.PeptideProphetROCPoint;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetResultBean;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
@@ -32,7 +34,9 @@ import org.yeastrc.ms.domain.search.pepxml.PepXmlSearchScanIn;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.InteractPepXmlDataProvider;
+import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
+import org.yeastrc.ms.util.AminoAcidUtils;
 
 
 /**
@@ -40,10 +44,15 @@ import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
  */
 public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepXmlSearchScanIn> {
 
+    private static final String MSMS_RUN_SUMMARY = "msms_run_summary";
     private String filePath;
     private XMLStreamReader reader = null;
     private String currentRunSearchName = null;
     private List<MsResidueModificationIn> searchDynamicResidueMods;
+    private boolean refreshParserRun = false;
+    
+    private String peptideProphetVersion;
+    private PeptideProphetROC peptideProphetRoc;
     
     public void open(String filePath) throws DataProviderException {
         
@@ -51,6 +60,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         try {
             InputStream input = new FileInputStream(filePath);
             reader = inputFactory.createXMLStreamReader(input);
+            readAnalysisSummary(reader);
         }
         catch (FileNotFoundException e) {
             throw new DataProviderException("File not found: "+filePath, e);
@@ -61,6 +71,54 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         this.filePath = filePath;
     }
     
+    private void readAnalysisSummary(XMLStreamReader reader2) throws XMLStreamException {
+        
+        boolean inPPAnalysis = false;
+        
+        while(reader.hasNext()) {
+            if(reader.next() == XMLStreamReader.START_ELEMENT) {
+                if(reader.getLocalName().equalsIgnoreCase(MSMS_RUN_SUMMARY)) {
+                    System.out.println(reader.getAttributeValue(null, "base_name"));
+                    break;
+                }
+                else if(reader.getLocalName().equalsIgnoreCase("analysis_summary")) {
+                    if(reader.getAttributeValue(null,"analysis").equalsIgnoreCase("database_refresh")) {
+                        refreshParserRun = true;
+                    }
+                }
+                else if (reader.getLocalName().equalsIgnoreCase("peptideprophet_summary")) {
+                    this.peptideProphetVersion = reader.getAttributeValue(null, "version");
+                    inPPAnalysis = true;
+                }
+                else if (reader.getLocalName().equalsIgnoreCase("roc_data_point") && inPPAnalysis) {
+                    // <roc_data_point min_prob="0.99" sensitivity="0.4384" error="0.0024" num_corr="1123" num_incorr="3"/>
+                    if(peptideProphetRoc == null) {
+                        this.peptideProphetRoc = new PeptideProphetROC();
+                    }
+                    PeptideProphetROCPoint rocPoint = new PeptideProphetROCPoint();
+                    rocPoint.setProbability(Double.parseDouble(reader.getAttributeValue(null, "min_prob")));
+                    rocPoint.setSensitivity(Double.parseDouble(reader.getAttributeValue(null, "sensitivity")));
+                    rocPoint.setError(Double.parseDouble(reader.getAttributeValue(null, "error")));
+                    rocPoint.setNumCorrect(Integer.parseInt(reader.getAttributeValue(null, "num_corr")));
+                    rocPoint.setNumIncorrect(Integer.parseInt(reader.getAttributeValue(null, "num_incorr")));
+                    this.peptideProphetRoc.addRocPoint(rocPoint);
+                }
+            }
+        }
+    }
+    
+    public boolean isRefreshParserRun() {
+        return refreshParserRun;
+    }
+    
+    public String getPeptideProphetVersion() {
+        return this.peptideProphetVersion;
+    }
+    
+    public PeptideProphetROC getPeptideProphetRoc() {
+        return peptideProphetRoc;
+    }
+
     @Override
     public void close() {
         if (reader != null) try {
@@ -80,8 +138,9 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
             return false;
         try {
             while(reader.hasNext()) {
-                if (reader.next() == XMLStreamReader.START_ELEMENT) {
-                    if (reader.getLocalName().equalsIgnoreCase("msms_run_summary")) {
+                int evtType = reader.getEventType();
+                if (evtType == XMLStreamReader.START_ELEMENT) {
+                    if (reader.getLocalName().equalsIgnoreCase(MSMS_RUN_SUMMARY)) {
                         for (int i = 0; i < reader.getAttributeCount(); i++) {
                             if (reader.getAttributeLocalName(i).equalsIgnoreCase("base_name"))
                                 currentRunSearchName = new File(reader.getAttributeValue(i)).getName();
@@ -92,6 +151,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                         return true;
                     }
                 }
+                reader.next();
             }
         }
         catch (XMLStreamException e) {
@@ -151,7 +211,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                 
                 int evtId = reader.next();
                 if (evtId == XMLStreamReader.END_ELEMENT) {
-                    if (reader.getLocalName().equals("msms_run_summary"))  {
+                    if (reader.getLocalName().equals(MSMS_RUN_SUMMARY))  {
                         return false;
                     }
                 }
@@ -180,7 +240,8 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
 //            else if (attrib.equalsIgnoreCase("end_scan"))
 //                scanResult.setEndScan(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("precursor_neutral_mass"))
-                scanResult.mass = new BigDecimal(val);
+                // NOTE: We store M+H in the database
+                scanResult.precursorMass = new BigDecimal(val).add(BigDecimal.valueOf(AminoAcidUtils.PROTON));
             else if (attrib.equalsIgnoreCase("assumed_charge"))
                 scanResult.charge = Integer.parseInt(val);
             else if (attrib.equalsIgnoreCase("retention_time_sec"))
@@ -224,6 +285,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         String prDescr = null;
         
         int numMatchingProteins = 0;
+        int numEnzymaticTermini = 0;
         
         SequestResult seqRes = new SequestResult(searchDynaResidueMods);
         seqRes.setScanNumber(scan.getScanNumber());
@@ -235,6 +297,8 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         
         // read the <search_hit> element
         for (int i = 0; i < reader.getAttributeCount(); i++) {
+            
+            seqRes.setObservedMass(scan.getObservedMass());
             
             String attrib = reader.getAttributeLocalName(i);
             String val = reader.getAttributeValue(i);
@@ -256,12 +320,20 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                 seqRes.setNumMatchingIons(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("tot_num_ions"))
                 seqRes.setNumPredictedIons(Integer.parseInt(val));
-            else if (attrib.equalsIgnoreCase("calc_neutral_pep_mass"))
-                seqRes.setObservedMass(new BigDecimal(val)); // TODO -- are we storing neutral peptide mass in the database?
+            else if (attrib.equalsIgnoreCase("calc_neutral_pep_mass")) {
+                // NOTE: We are storing M+H in the database
+                seqRes.setCalculatedMass(new BigDecimal(val).add(BigDecimal.valueOf(AminoAcidUtils.PROTON))); 
+            }
+            else if (attrib.equalsIgnoreCase("num_tol_term")) 
+                numEnzymaticTermini = Integer.parseInt(val);
         }
         
         seqRes.setOriginalPeptideSequence(preResidue+"."+peptideSeq+"."+postResidue);
-        seqRes.addMatchingLocus(prAcc, prDescr);
+        DbLocus locus = new DbLocus(prAcc, prDescr);
+        locus.setNtermResidue(preResidue);
+        locus.setCtermResidue(postResidue);
+        locus.setNumEnzymaticTermini(numEnzymaticTermini);
+        seqRes.addMatchingLocus(locus);
         
         boolean inPeptideProphetAnalysis = false;
         
@@ -273,10 +345,14 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                 inPeptideProphetAnalysis = false;
             
             if (evtType == XMLStreamReader.START_ELEMENT) {
-                // red the <alternative_protein> elements
+                // read the <alternative_protein> elements
                 if (reader.getLocalName().equalsIgnoreCase("alternative_protein")) {
                     prAcc = null;
                     prDescr = null;
+                    preResidue = 0;
+                    postResidue = 0;
+                    numEnzymaticTermini = 0;
+                    
                     for (int i = 0; i < reader.getAttributeCount(); i++) {
                         String attrib = reader.getAttributeLocalName(i);
                         String val = reader.getAttributeValue(i);
@@ -284,8 +360,18 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                             prAcc = val;
                         else if (attrib.equalsIgnoreCase("protein_descr"))
                             prDescr = val;
+                        else if (attrib.equalsIgnoreCase("peptide_prev_aa"))
+                            preResidue = Character.valueOf(val.charAt(0));
+                        else if (attrib.equalsIgnoreCase("peptide_next_aa"))
+                            postResidue = Character.valueOf(val.charAt(0));
+                        else if (attrib.equalsIgnoreCase("num_tol_term")) 
+                            numEnzymaticTermini = Integer.parseInt(val);
                     }
-                    seqRes.addMatchingLocus(prAcc, prDescr);
+                    locus = new DbLocus(prAcc, prDescr);
+                    locus.setNtermResidue(preResidue);
+                    locus.setCtermResidue(postResidue);
+                    locus.setNumEnzymaticTermini(numEnzymaticTermini);
+                    seqRes.addMatchingLocus(locus);
                 }
                 // read the <search_score> elements
                 else if (reader.getLocalName().equalsIgnoreCase("search_score")) {
@@ -358,7 +444,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
 
         private int scanNumber;
         private int charge;
-        private BigDecimal mass;
+        private BigDecimal precursorMass;
         private BigDecimal retentionTime;
         private List<SequestPeptideProphetResultIn> results = new ArrayList<SequestPeptideProphetResultIn>();
         
@@ -374,7 +460,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
 
         @Override
         public BigDecimal getObservedMass() {
-            return mass;
+            return precursorMass;
         }
 
         @Override
@@ -438,6 +524,21 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         }
 
         @Override
+        public double getProbabilityNtt_0() {
+            return ppRes.getProbabilityNtt_0();
+        }
+
+        @Override
+        public double getProbabilityNtt_1() {
+            return ppRes.getProbabilityNtt_1();
+        }
+
+        @Override
+        public double getProbabilityNtt_2() {
+            return ppRes.getProbabilityNtt_2();
+        }
+        
+        @Override
         public double getMassDifference() {
             return ppRes.getMassDifference();
         }
@@ -448,7 +549,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         }
 
         @Override
-        public int getNumTrypticTermini() {
+        public int getNumEnzymaticTermini() {
             return ppRes.getNumTrypticTermini();
         }
 

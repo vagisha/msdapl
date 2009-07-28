@@ -5,6 +5,7 @@ public enum Program {
     SEQUEST("SEQUEST"),
     //EE_NORM_SEQUEST("EE-normalized SEQUEST"),
     PERCOLATOR("Percolator"),
+    PEPTIDE_PROPHET("PeptideProphet"),
     PROLUCID("ProLuCID"),
     PEPPROBE("PEP_PROBE"),
     BIBLIOSPEC("BiblioSpec"),
@@ -33,6 +34,8 @@ public enum Program {
             return Program.PEPPROBE;
         else if (SearchFileFormat.SQT_BIBLIO == format)
             return Program.BIBLIOSPEC;
+        else if (SearchFileFormat.PEPXML == format)
+            return Program.PEPTIDE_PROPHET;
         else
             return Program.UNKNOWN;
     }
@@ -48,6 +51,8 @@ public enum Program {
             return Program.PEPPROBE;
         else if (Program.PERCOLATOR.name().equalsIgnoreCase(prog))
             return Program.PERCOLATOR;
+        else if (Program.PEPTIDE_PROPHET.name().equalsIgnoreCase(prog))
+            return Program.PEPTIDE_PROPHET;
         else if (Program.BIBLIOSPEC.name().equalsIgnoreCase(prog))
             return Program.BIBLIOSPEC;
         else return Program.UNKNOWN;
@@ -62,7 +67,7 @@ public enum Program {
     }
     
     public static boolean isAnalysisProgram(Program program) {
-        if(program == PERCOLATOR)
+        if(program == PERCOLATOR || program == PEPTIDE_PROPHET)
             return true;
         return false;
     }

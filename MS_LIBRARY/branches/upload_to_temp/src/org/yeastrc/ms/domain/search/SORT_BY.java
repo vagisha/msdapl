@@ -31,8 +31,11 @@ public enum SORT_BY {
     QVAL("q-value", "qvalue"),
     PEP("PEP", "pep"),
     DS("DS", "discriminantScore"),
-    P_RT("Predict. RT", "predictedRetentionTime");
+    P_RT("Predict. RT", "predictedRetentionTime"),
 
+    // PeptideProphet specific
+    PEPTP_PROB("Probability", "probability");
+    
     private String displayName;
     private String columnName;
 

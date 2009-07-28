@@ -20,6 +20,7 @@ public class UploadException extends Exception {
         
         
         PREUPLOAD_CHECK_FALIED  ("Pre-upload check failed", ERROR),
+        GENERAL                 ("", WARN),
         
         EXPT_NOT_FOUND          ("Experiment not found in the database", ERROR),
         DIRECTORY_NOT_FOUND     ("Directory not found.", ERROR),
@@ -46,9 +47,10 @@ public class UploadException extends Exception {
         UNSUPPORTED_SQT         ("Unsupported sqt file found", ERROR),
         MULTIPLE_SQT_TYPES      ("More than one sqt file types found", ERROR),
         NO_RUNID_FOR_SQT        ("No runID found for sqt file", WARN),
+        NO_RUNID_FOR_SEARCH_FILE("No runID found for input search file", WARN),
         INVALID_SQT_HEADER      ("Invalid SQT header", WARN),
         INVALID_SQT_SCAN        ("Invalid SQT scan", WARN),
-        NO_SCANID_FOR_SQT_SCAN  ("No database scanID found for SQT scan", WARN),
+        NO_SCANID_FOR_SCAN      ("No database scanID found for scan", WARN),
         DUPLICATE_SCAN_CHARGE   ("Duplicate result found for scan + charge combination", ERROR),
         READ_ERROR_SQT          ("Error reading SQT file", ERROR),
         
@@ -75,6 +77,13 @@ public class UploadException extends Exception {
         
         // General
         RUNTIME_SQT_ERROR       ("Runtime exception.", WARN),
+        RUNTIME_ERROR           ("Runtime exception", WARN),
+        
+        // PepXml
+        PEPXML_ERROR            ("Error reading pepxml", WARN),
+        
+        // PeptideProphet
+        NO_PEPTPROPH_ANALYSIS_UPLOADED("No PeptideProphet analyses were uploaded", ERROR),
         
         // Error disabling/enabling keys
         ERROR_SQL_DISABLE_KEYS  ("Error disabling keys", ERROR),

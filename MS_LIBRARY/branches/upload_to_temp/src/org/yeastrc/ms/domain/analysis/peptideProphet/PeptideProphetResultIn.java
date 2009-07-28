@@ -15,7 +15,7 @@ public interface PeptideProphetResultIn {
     
     public abstract double getfVal();
     
-    public abstract int getNumTrypticTermini();
+    public abstract int getNumEnzymaticTermini();
     
     public abstract int getNumMissedCleavages();
     
@@ -23,4 +23,8 @@ public interface PeptideProphetResultIn {
     
     // TODO Not sure how to handle this PeptideProphet result
     public abstract String getAllNttProb();
+    
+    public double getProbabilityNtt_0();
+    public double getProbabilityNtt_1();
+    public double getProbabilityNtt_2();
 }

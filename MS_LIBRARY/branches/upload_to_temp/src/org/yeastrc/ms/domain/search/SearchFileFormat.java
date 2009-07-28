@@ -18,6 +18,7 @@ public enum SearchFileFormat {
     SQT_PERC("SQT: "+Program.PERCOLATOR.displayName()), 
     SQT_BIBLIO("SQT: "+Program.BIBLIOSPEC.displayName()),
     PEPXML("pepxml"), 
+    PROTXML("protxml"),
     UNKNOWN("Unknown");
 
     private String typeName;
@@ -41,6 +42,8 @@ public enum SearchFileFormat {
             return SearchFileFormat.SQT_PPROBE;
         else if (SearchFileFormat.PEPXML.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.PEPXML;
+        else if (SearchFileFormat.PROTXML.name().equalsIgnoreCase(fmtString))
+            return SearchFileFormat.PROTXML;
         else return SearchFileFormat.UNKNOWN;
     }
     
@@ -49,8 +52,12 @@ public enum SearchFileFormat {
             extString = extString.substring(1);
         if (extString.equalsIgnoreCase(SearchFileFormat.SQT.name()))
             return SearchFileFormat.SQT;
-        else if (extString.equalsIgnoreCase(SearchFileFormat.PEPXML.name()))
+        else if (extString.equalsIgnoreCase(SearchFileFormat.PEPXML.name()) ||
+                extString.equalsIgnoreCase("pep.xml"))
             return SearchFileFormat.PEPXML;
+        else if (extString.equalsIgnoreCase(SearchFileFormat.PROTXML.name()) ||
+                extString.equalsIgnoreCase("prot.xml"))
+            return SearchFileFormat.PROTXML;
         else return SearchFileFormat.UNKNOWN;
     }
 }

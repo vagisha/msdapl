@@ -428,7 +428,7 @@ public class MsDataUploaderTest extends BaseDAOTestCase {
         List<UploadException> exceptions = uploader.getUploadExceptionList();
         assertEquals(1, exceptions.size());
 //        System.out.println(uploader.getUploadWarnings());
-        assertEquals(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN, exceptions.get(0).getErrorCode());
+        assertEquals(ERROR_CODE.NO_SCANID_FOR_SCAN, exceptions.get(0).getErrorCode());
         
         assertEquals(1, runDao.loadRunIdsForFileName("771_5489").size());
         assertNull(searchDao.loadSearch(1));

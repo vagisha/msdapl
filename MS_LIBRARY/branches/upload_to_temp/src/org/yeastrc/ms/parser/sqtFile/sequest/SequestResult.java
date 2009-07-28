@@ -24,7 +24,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     
     private int xcorrRank = -1;
     private int spRank = -1;
-    private BigDecimal mass; // Calculated M+H+ value for this sequence
+    private BigDecimal calclatedMass; // Calculated M+H+ value for this sequence
     private BigDecimal deltaCN; 
     private BigDecimal xcorr;
     private BigDecimal sp;
@@ -69,8 +69,8 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     /**
      * @param mass the mass to set
      */
-    public void setMass(BigDecimal mass) {
-        this.mass = mass;
+    public void setCalculatedMass(BigDecimal mass) {
+        this.calclatedMass = mass;
     }
 
     /**
@@ -116,7 +116,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
         buf.append("\t");
         buf.append(spRank);
         buf.append("\t");
-        buf.append(mass);
+        buf.append(calclatedMass);
         buf.append("\t");
         buf.append(deltaCN.stripTrailingZeros());
         buf.append("\t");
@@ -147,7 +147,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
         return new SequestResultData() {
 
             public BigDecimal getCalculatedMass() {
-                return mass;
+                return calclatedMass;
             }
             public BigDecimal getDeltaCN() {
                 return deltaCN;

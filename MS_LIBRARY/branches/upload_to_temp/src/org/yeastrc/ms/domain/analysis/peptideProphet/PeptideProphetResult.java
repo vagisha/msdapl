@@ -29,4 +29,8 @@ public interface PeptideProphetResult extends MsSearchResult {
     public abstract double getMassDifferenceRounded();
     
     public abstract String getAllNttProb();
+    
+    public double getProbabilityNtt_0();
+    public double getProbabilityNtt_1();
+    public double getProbabilityNtt_2();
 }

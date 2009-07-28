@@ -23,7 +23,6 @@ import org.yeastrc.ms.parser.mzxml.MzXmlFileReader;
 import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
 import org.yeastrc.ms.upload.dao.run.MsRunUploadDAO;

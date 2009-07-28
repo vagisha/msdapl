@@ -54,7 +54,7 @@ public class PeptideProphetResultDataBean implements PeptideProphetResultDataWId
         return ntt;
     }
     
-    public void setNumTrypticTermini(int ntt) {
+    public void setNumEnzymaticTermini(int ntt) {
         this.ntt = ntt;
     }
 
