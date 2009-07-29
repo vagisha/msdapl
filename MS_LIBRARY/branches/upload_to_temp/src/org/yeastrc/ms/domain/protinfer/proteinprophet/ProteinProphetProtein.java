@@ -7,12 +7,16 @@
 package org.yeastrc.ms.domain.protinfer.proteinprophet;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 
 /**
  * 
  */
-public class ProteinProphetProtein {
+public class ProteinProphetProtein extends GenericProteinferProtein {
 
     private String proteinName;
     private double probability;
@@ -24,7 +28,7 @@ public class ProteinProphetProtein {
     private String subsumingProteinEntry;
     
     private List<String> indistinguishableProteins;
-    private List<ProteinProphetProteinPeptide> peptides;
+    private List<ProteinProphetProteinPeptideIon> peptides;
     
     
     public ProteinProphetProtein() {
@@ -33,7 +37,7 @@ public class ProteinProphetProtein {
     
     public ProteinProphetProtein(int numIndistinguishableProteins) {
         this.indistinguishableProteins = new ArrayList<String>(numIndistinguishableProteins);
-        peptides = new ArrayList<ProteinProphetProteinPeptide>();
+        peptides = new ArrayList<ProteinProphetProteinPeptideIon>();
     }
 
     public String getProteinName() {
@@ -106,17 +110,29 @@ public class ProteinProphetProtein {
     public String getSubsumingProteinEntry() {
         return subsumingProteinEntry;
     }
+    
+    public Set<String> getSusumingProteins() {
+        if(subsumingProteinEntry == null || subsumingProteinEntry.length() == 0)
+            return new HashSet<String>(0);
+        String[] tokens = subsumingProteinEntry.split("\\s+");
+        Set<String> set = new HashSet<String>(tokens.length*2);
+        for(String tok: tokens)
+            set.add(tok);
+        return set;
+    }
 
     public void setSubsumingProteinEntry(String subsumingProteinEntry) {
-        this.subsumingProteinEntry = subsumingProteinEntry;
+        if(subsumingProteinEntry == null)
+            return;
+        this.subsumingProteinEntry = subsumingProteinEntry.trim();
         this.isSubsumed = !(subsumingProteinEntry == null || subsumingProteinEntry.trim().length() == 0);
     }
 
-    public List<ProteinProphetProteinPeptide> getPeptides() {
+    public List<ProteinProphetProteinPeptideIon> getPeptides() {
         return peptides;
     }
     
-    public void addPeptide(ProteinProphetProteinPeptide peptide) {
+    public void addPeptide(ProteinProphetProteinPeptideIon peptide) {
         peptides.add(peptide);
     }
     
@@ -143,7 +159,7 @@ public class ProteinProphetProtein {
         buf.append("\t");
         buf.append("pctSpecCnt: "+pctSpectrumCount);
         
-        for(ProteinProphetProteinPeptide peptide: this.peptides) {
+        for(ProteinProphetProteinPeptideIon peptide: this.peptides) {
             buf.append("\n");
             buf.append(peptide.toString());
         }

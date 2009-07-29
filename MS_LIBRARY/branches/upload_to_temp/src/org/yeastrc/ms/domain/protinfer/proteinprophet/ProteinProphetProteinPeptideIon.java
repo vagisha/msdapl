@@ -9,16 +9,16 @@ package org.yeastrc.ms.domain.protinfer.proteinprophet;
 /**
  * 
  */
-public class ProteinProphetProteinPeptide {
+public class ProteinProphetProteinPeptideIon {
 
-    private ProteinProphetPeptide peptide;
+    private ProteinProphetPeptideIon peptide;
     private double initialProbability;
     private double nspAdjProbability;
     private double weight;
     private int numEnzymaticTermini;
     private int numInstances;
     
-    public ProteinProphetProteinPeptide(ProteinProphetPeptide peptide) {
+    public ProteinProphetProteinPeptideIon(ProteinProphetPeptideIon peptide) {
         this.peptide = peptide;
     }
     
@@ -28,7 +28,7 @@ public class ProteinProphetProteinPeptide {
     public void setNumInstances(int numInstances) {
         this.numInstances = numInstances;
     }
-    public ProteinProphetPeptide getPeptide() {
+    public ProteinProphetPeptideIon getPeptide() {
         return peptide;
     }
     public double getInitialProbability() {

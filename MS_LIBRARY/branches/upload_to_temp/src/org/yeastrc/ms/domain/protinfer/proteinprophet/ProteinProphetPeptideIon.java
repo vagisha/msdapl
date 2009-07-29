@@ -9,9 +9,10 @@ package org.yeastrc.ms.domain.protinfer.proteinprophet;
 /**
  * 
  */
-public class ProteinProphetPeptide {
+public class ProteinProphetPeptideIon {
 
     private String sequence;
+    private String modifiedSequence;
     private int charge;
     private boolean isUniqueToProtein;
     private double numSiblingPeptides;
@@ -23,6 +24,15 @@ public class ProteinProphetPeptide {
     }
     public void setSequence(String sequence) {
         this.sequence = sequence;
+    }
+    public String getModifiedSequence() {
+        if(modifiedSequence == null)
+            return sequence;
+        else
+            return modifiedSequence;
+    }
+    public void setModifiedSequence(String modifiedSequence) {
+        this.modifiedSequence = modifiedSequence;
     }
     public boolean isUniqueToProtein() {
         return isUniqueToProtein;

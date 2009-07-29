@@ -16,6 +16,7 @@ public class ProteinProphetGroup {
 
     private double probability;
     private int groupNumber;
+    private int piRunId;
 
     private List<ProteinProphetProtein> proteinList;
     
@@ -46,5 +47,13 @@ public class ProteinProphetGroup {
 
     public void addProtein(ProteinProphetProtein protein) {
         this.proteinList.add(protein);
+    }
+
+    public int getPiRunId() {
+        return piRunId;
+    }
+
+    public void setPiRunId(int piRunId) {
+        this.piRunId = piRunId;
     }
 }
