@@ -11,8 +11,6 @@ import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.ibatis.MsRunSearchAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImpl;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
-import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImpl;
@@ -159,9 +157,6 @@ public class DAOFactory {
     private PercolatorParamsDAO percSQTHeaderDAO;
     private PercolatorResultDAO percResultDAO;
     
-    // DAOs related to PeptideProphet post search analysis
-    private PeptideProphetResultDAO pprophResultDAO;
-    
     private DAOFactory() {
         
         // Experiment related
@@ -212,7 +207,6 @@ public class DAOFactory {
         percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
         
         // PeptideProphet post search analysis related
-        pprophResultDAO = new PeptideProphetResultDAOImpl(sqlMap);
         
     }
     
@@ -360,12 +354,5 @@ public class DAOFactory {
     
     public PercolatorResultDAO getPercolatorResultDAO() {
         return percResultDAO;
-    }
-    
-    //-------------------------------------------------------------------------------------------
-    // PeptideProphet related
-    //-------------------------------------------------------------------------------------------
-    public PeptideProphetResultDAO getPeptideProphetResultDAO() {
-        return pprophResultDAO;
     }
 }

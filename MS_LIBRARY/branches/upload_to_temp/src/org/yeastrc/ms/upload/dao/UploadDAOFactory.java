@@ -13,6 +13,8 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.upload.dao.analysis.MsRunSearchAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
@@ -20,6 +22,10 @@ import org.yeastrc.ms.upload.dao.analysis.dualdb.MsRunSearchAnalysisUploadDAOImp
 import org.yeastrc.ms.upload.dao.analysis.dualdb.MsSearchAnalysisUploadDAOImpl;
 import org.yeastrc.ms.upload.dao.analysis.ibatis.MsRunSearchAnalysisUploadDAOIbatisImpl;
 import org.yeastrc.ms.upload.dao.analysis.ibatis.MsSearchAnalysisUploadDAOIbatisImpl;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetRocUploadDAO;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.ibatis.PeptideProphetResultUploadDAOImpl;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.ibatis.PeptideProphetRocUploadDAOImpl;
 import org.yeastrc.ms.upload.dao.analysis.percolator.PercolatorParamsUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.percolator.PercolatorResultUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.percolator.dualdb.PercolatorParamsUploadDAOImpl;
@@ -197,6 +203,9 @@ public class UploadDAOFactory {
     private PercolatorParamsUploadDAO percSQTHeaderDAO;
     private PercolatorResultUploadDAO percResultDAO;
     
+    // DAOs related to PeptideProphet post search analysis
+    private PeptideProphetRocUploadDAO ppRocDAO;
+    private PeptideProphetResultUploadDAO pprophResultDAO;
     
     private UploadDAOFactory() {
         
@@ -300,6 +309,10 @@ public class UploadDAOFactory {
         percSQTHeaderDAO = new PercolatorParamsUploadDAOImpl(percParamsDao, true);
         PercolatorResultUploadDAO percResDao = new PercolatorResultUploadDAOIbatisImpl(tempSqlMap);
         percResultDAO = new PercolatorResultUploadDAOImpl(percResDao, true);
+        
+        // DAOs related to PeptideProphet post search analysis
+        ppRocDAO = new PeptideProphetRocUploadDAOImpl(tempSqlMap);
+        pprophResultDAO = new PeptideProphetResultUploadDAOImpl(tempSqlMap);
         
     }
 
@@ -501,5 +514,16 @@ public class UploadDAOFactory {
     
     public PercolatorResultUploadDAO getPercolatorResultDAO() {
         return percResultDAO;
+    }
+    
+  //-------------------------------------------------------------------------------------------
+    // PeptideProphet related
+    //-------------------------------------------------------------------------------------------
+    public PeptideProphetResultUploadDAO getPeptideProphetResultDAO() {
+        return pprophResultDAO;
+    }
+    
+    public PeptideProphetRocUploadDAO getPeptideProphetRocDAO() {
+        return ppRocDAO;
     }
 }

@@ -6,9 +6,6 @@
  */
 package org.yeastrc.ms.domain.analysis.peptideProphet.impl;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.search.impl.SearchResultBean;
 
@@ -17,7 +14,6 @@ import org.yeastrc.ms.domain.search.impl.SearchResultBean;
  */
 public class PeptideProphetResultBean extends SearchResultBean implements PeptideProphetResult {
 
-    private static final Pattern allNttPattern = Pattern.compile("^\\((\\d\\.?\\d*)\\s*,\\s*(\\d\\.?\\d*)\\s*,\\s*(\\d\\.?\\d*)\\s*\\)$");
     private PeptideProphetResultDataBean data = new PeptideProphetResultDataBean();
     
     @Override
@@ -100,44 +96,16 @@ public class PeptideProphetResultBean extends SearchResultBean implements Peptid
 
     @Override
     public double getProbabilityNtt_0() {
-        if(this.getAllNttProb() == null)
-            return -1.0;
-        Matcher m = allNttPattern.matcher(getAllNttProb());
-        if(m.matches()) {
-            return Double.parseDouble(m.group(1));
-        }
-        return -1.0;
+        return data.getProbabilityNet_0();
     }
 
     @Override
     public double getProbabilityNtt_1() {
-        if(this.getAllNttProb() == null)
-            return -1.0;
-        Matcher m = allNttPattern.matcher(getAllNttProb());
-        if(m.matches()) {
-            return Double.parseDouble(m.group(2));
-        }
-        return -1.0;
+        return data.getProbabilityNet_1();
     }
 
     @Override
     public double getProbabilityNtt_2() {
-        if(this.getAllNttProb() == null)
-            return -1.0;
-        Matcher m = allNttPattern.matcher(getAllNttProb());
-        if(m.matches()) {
-            return Double.parseDouble(m.group(3));
-        }
-        return -1.0;
-    }
-    
-    public static void main(String[] args) {
-        String allnttProb = "(0.0000,0.0029,0.3436)";
-        Matcher m = allNttPattern.matcher(allnttProb);
-        if(m.matches()) {
-            System.out.println("NTT_0: "+m.group(1));
-            System.out.println("NTT_1: "+m.group(2));
-            System.out.println("NTT_2: "+m.group(3));
-        }
+        return data.getProbabilityNet_2();
     }
 }

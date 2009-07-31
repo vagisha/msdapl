@@ -12,6 +12,7 @@
 		<result property="xCorrRank" column="XCorrRank" nullValue="-1"/>
 		<result property="spRank" column="spRank" nullValue="-1"/>
 		<result property="deltaCN" column="deltaCN"/>
+		<result property="deltaCNstar" column="deltaCNstar"/>
 		<result property="xCorr" column="XCorr"/>
 		<result property="sp" column="sp"/>
 		<result property="evalue" column="evalue"/>
@@ -52,6 +53,7 @@
 		<parameter property="xCorr" jdbcType="DECIMAL"/>
 		<parameter property="xCorrRank" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="deltaCN" jdbcType="DECIMAL"/>
+		<parameter property="deltaCNstar" jdbcType="DECIMAL"/>
 		<parameter property="evalue" jdbcType="DOUBLE" />
 		<parameter property="calculatedMass" jdbcType="DECIMAL" />
 		<parameter property="matchingIons" jdbcType="INTEGER" nullValue="-1"/>
@@ -99,12 +101,13 @@
     	spRank,
     	XCorr,
     	XCorrRank, 
-    	deltaCN, 
+    	deltaCN,
+    	deltaCNstar, 
     	evalue,
     	calculatedMass,
     	matchingIons,
     	predictedIons) 
-    	VALUES (?,?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
@@ -115,6 +118,7 @@
     	XCorr,
     	XCorrRank, 
     	deltaCN, 
+    	deltaCNstar, 
     	evalue,
     	calculatedMass,
     	matchingIons,

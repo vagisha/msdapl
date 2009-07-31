@@ -303,6 +303,7 @@ CREATE TABLE SQTSearchResult (
    XCorrRank INT UNSIGNED NOT NULL,
    spRank INT UNSIGNED NOT NULL,
    deltaCN DECIMAL(10,5) NOT NULL,
+   deltaCNstar DECIMAL(10,5),
    XCorr DECIMAL(10,5) NOT NULL,
    sp DECIMAL(10,5),
    calculatedMass DECIMAL(18,9),
@@ -375,6 +376,36 @@ ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
 ALTER TABLE PercolatorResult ADD INDEX(qvalue);
 ALTER TABLE PercolatorResult ADD INDEX(pep);
 ALTER TABLE PercolatorResult ADD INDEX(discriminantScore);
+
+#####################################################################
+# PeptideProphet tables
+#####################################################################
+CREATE TABLE PeptideProphetROC (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		searchAnalysisID INT UNSIGNED NOT NULL,
+	   	sensitivity DOUBLE UNSIGNED NOT NULL,
+	   	error DOUBLE UNSIGNED NOT NULL,
+	   	probability DOUBLE UNSIGNED NOT NULL,
+	   	numCorrect INT UNSIGNED NOT NULL,
+	   	numIncorrect INT UNSIGNED NOT NULL
+);
+ALTER TABLE PeptideProphetROC ADD INDEX(searchAnalysisID);
+
+CREATE TABLE PeptideProphetResult (
+		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
+		runSearchAnalysisID INT UNSIGNED NOT NULL,
+		probability DOUBLE UNSIGNED NOT NULL,
+		fVal DOUBLE UNSIGNED NOT NULL,
+		numEnzymaticTermini INT UNSIGNED NOT NULL,
+		numMissedCleavages INT UNSIGNED NOT NULL,
+		massDifference DOUBLE  NOT NULL,
+		probabilityNet_0 DOUBLE UNSIGNED,
+		probabilityNet_1 DOUBLE UNSIGNED,
+		probabilityNet_2 DOUBLE UNSIGNED
+);
+ALTER TABLE PeptideProphetResult ADD INDEX(runSearchAnalysisID);
+ALTER TABLE PeptideProphetResult ADD INDEX(probability);
+
 
 
 #######################################################################################
@@ -588,6 +619,7 @@ CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
  FOR EACH ROW
  BEGIN
    	DELETE FROM PercolatorParams WHERE searchAnalysisID = OLD.id;
+   	DELETE FROM PeptideProphetROC WHERE searchAnalysisID = OLD.id;
 	DELETE FROM msRunSearchAnalysis WHERE searchAnalysisID = OLD.id;
  END;
 |
@@ -598,6 +630,7 @@ CREATE TRIGGER msRunSearchAnalysis_bdelete BEFORE DELETE ON msRunSearchAnalysis
  FOR EACH ROW
  BEGIN
  	DELETE FROM PercolatorResult WHERE runSearchAnalysisID = OLD.id;
+ 	DELETE FROM PeptideProphetResult WHERE runSearchAnalysisID = OLD.id;
  	DELETE FROM msProteinInferInput WHERE inputID = OLD.id AND inputType = 'A';
  END;
 |
@@ -617,6 +650,7 @@ CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
    DELETE FROM msDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM msTerminalDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM PercolatorResult WHERE resultID = OLD.id;
+   DELETE FROM PeptideProphetResult WHERE resultID = OLD.id;
    DELETE FROM msProteinInferSpectrumMatch WHERE runSearchResultID = OLD.id;
  END;
 |

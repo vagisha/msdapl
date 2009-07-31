@@ -17,6 +17,7 @@ public class SequestResultDataBean implements SequestResultData {
 
     private BigDecimal calculatedMass;
     private BigDecimal deltaCN;
+    private BigDecimal deltaCNstar;
     private int matchingIons = -1;
     private int predictedIons = -1;
     private BigDecimal sp;
@@ -36,6 +37,11 @@ public class SequestResultDataBean implements SequestResultData {
         return deltaCN;
     }
 
+    @Override
+    public BigDecimal getDeltaCNstar() {
+        return deltaCNstar;
+    }
+    
     @Override
     public int getMatchingIons() {
         return matchingIons;
@@ -78,6 +84,10 @@ public class SequestResultDataBean implements SequestResultData {
     public void setDeltaCN(BigDecimal deltaCN) {
         this.deltaCN = deltaCN;
     }
+    
+    public void setDeltaCNstar(BigDecimal deltaCNstar) {
+        this.deltaCNstar = deltaCNstar;
+    }
 
     public void setMatchingIons(int matchingIons) {
         this.matchingIons = matchingIons;
@@ -106,4 +116,5 @@ public class SequestResultDataBean implements SequestResultData {
     public void setXcorrRank(int xcorrRank) {
         this.xcorrRank = xcorrRank;
     }
+    
 }

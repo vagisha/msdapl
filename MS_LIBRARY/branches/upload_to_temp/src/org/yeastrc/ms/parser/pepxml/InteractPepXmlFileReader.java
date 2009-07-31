@@ -19,8 +19,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROCPoint;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
-import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC.PeptideProphetROCPoint;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetResultBean;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
@@ -381,6 +381,8 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                         seqRes.setXcorr(new BigDecimal(scoreVal));
                     else if (scoreType.equalsIgnoreCase("deltacn"))
                         seqRes.setDeltaCN(new BigDecimal(scoreVal));
+                    else if(scoreType.equalsIgnoreCase("deltacnstar"))
+                        seqRes.setDeltaCNstar(new BigDecimal(scoreVal));
                     else if (scoreType.equalsIgnoreCase("spscore"))
                         seqRes.setSp(new BigDecimal(scoreVal));
                     else if (scoreType.equalsIgnoreCase("sprank"))
@@ -437,6 +439,20 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         
         hit.seqRes = seqRes;
         hit.ppRes = ppRes;
+        
+        // make sure the probability for this hit is the best from all_ntt_prob
+        if(ppRes.getAllNttProb() != null) {
+           int maxNet = 0;  // max number of enzymatic termini for a matched protein
+           List<MsSearchResultProteinIn> proteins = hit.getProteinMatchList();
+           for(MsSearchResultProteinIn protein: proteins) {
+               maxNet = Math.max(maxNet, ((DbLocus)protein).getNumEnzymaticTermini());
+           }
+           if(maxNet == 1) 
+               ppRes.setProbability(ppRes.getProbability() >= ppRes.getProbabilityNtt_1() ? ppRes.getProbability() : ppRes.getProbabilityNtt_1());
+           else if (maxNet == 2)
+               ppRes.setProbability(ppRes.getProbability() >= ppRes.getProbabilityNtt_2() ? ppRes.getProbability() : ppRes.getProbabilityNtt_2());
+        }
+        
         return hit;
     }
     
@@ -524,17 +540,17 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         }
 
         @Override
-        public double getProbabilityNtt_0() {
+        public double getProbabilityNet_0() {
             return ppRes.getProbabilityNtt_0();
         }
 
         @Override
-        public double getProbabilityNtt_1() {
+        public double getProbabilityNet_1() {
             return ppRes.getProbabilityNtt_1();
         }
 
         @Override
-        public double getProbabilityNtt_2() {
+        public double getProbabilityNet_2() {
             return ppRes.getProbabilityNtt_2();
         }
         

@@ -26,6 +26,7 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
     private int spRank = -1;
     private BigDecimal calclatedMass; // Calculated M+H+ value for this sequence
     private BigDecimal deltaCN; 
+    private BigDecimal deltaCNstar;
     private BigDecimal xcorr;
     private BigDecimal sp;
     private Double evalue;
@@ -78,6 +79,13 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
      */
     public void setDeltaCN(BigDecimal deltaCN) {
         this.deltaCN = deltaCN;
+    }
+    
+    /**
+     * @param deltaCNstar the deltaCNstar to set
+     */
+    public void setDeltaCNstar(BigDecimal deltaCNstar) {
+        this.deltaCNstar = deltaCNstar;
     }
 
     /**
@@ -172,6 +180,9 @@ public class SequestResult extends SQTSearchResult implements SequestSearchResul
             }
             public int getxCorrRank() {
                 return xcorrRank;
+            }
+            public BigDecimal getDeltaCNstar() {
+                return deltaCNstar;
             }};
     }
 }

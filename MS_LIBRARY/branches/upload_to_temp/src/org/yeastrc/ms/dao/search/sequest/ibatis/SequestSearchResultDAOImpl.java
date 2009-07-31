@@ -580,6 +580,8 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         result.setxCorr(rs.getBigDecimal("XCorr"));
         result.setxCorrRank(rs.getInt("XCorrRank"));
         result.setDeltaCN(rs.getBigDecimal("deltaCN"));
+        if(rs.getObject("deltaCNstar") != null)
+            result.setDeltaCNstar(rs.getBigDecimal("deltaCNstar"));
         if(rs.getObject("evalue") != null)
             result.setEvalue(rs.getDouble("evalue"));
         result.setCalculatedMass(rs.getBigDecimal("calculatedMass"));
@@ -598,6 +600,12 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     public int numResultsForRunSearchScanChargeMass(int runSearchId,
             int scanId, int charge, BigDecimal mass) {
         return resultDao.numResultsForRunSearchScanChargeMass(runSearchId, scanId, charge, mass);
+    }
+    
+    @Override
+    public List<Integer> loadResultIdsForSearchChargePeptide(int searchId,
+            int charge, String peptide) {
+        return resultDao.loadResultIdsForSearchChargePeptide(searchId, charge, peptide);
     }
     
     @Override
@@ -643,6 +651,8 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             values.append(xcorrRank == -1 ? "NULL" : xcorrRank);
             values.append(",");
             values.append(data.getDeltaCN());
+            values.append(",");
+            values.append(data.getDeltaCNstar());
             values.append(",");
             values.append(data.getEvalue());
             values.append(",");
@@ -758,6 +768,9 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         public Double getEvalue() {
             return result.getEvalue();
         }
-    }
 
+        public BigDecimal getDeltaCNstar() {
+            return result.getDeltaCNstar();
+        }
+    }
 }

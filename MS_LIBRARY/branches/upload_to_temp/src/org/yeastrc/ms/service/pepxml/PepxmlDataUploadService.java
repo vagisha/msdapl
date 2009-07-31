@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
@@ -53,6 +51,8 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.analysis.MsRunSearchAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetRocUploadDAO;
 import org.yeastrc.ms.upload.dao.run.MsRunUploadDAO;
 import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsRunSearchUploadDAO;
@@ -96,8 +96,8 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     private final MsSearchAnalysisUploadDAO analysisDao;
     private final MsRunSearchAnalysisUploadDAO runSearchAnalysisDao;
     
-    private final PeptideProphetRocDAO rocDao;
-    private final PeptideProphetResultDAO ppResDao;
+    private final PeptideProphetRocUploadDAO rocDao;
+    private final PeptideProphetResultUploadDAO ppResDao;
     
     
     // these are the things we will cache and do bulk-inserts
@@ -144,6 +144,9 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         
         this.analysisDao = daoFactory.getMsSearchAnalysisDAO();
         this.runSearchAnalysisDao  = daoFactory.getMsRunSearchAnalysisDAO();
+        
+        this.rocDao = daoFactory.getPeptideProphetRocDAO();
+        this.ppResDao = daoFactory.getPeptideProphetResultDAO();
     }
     
     @Override
@@ -420,7 +423,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         }
         PeptideProphetROC roc = parser.getPeptideProphetRoc();
         roc.setSearchAnalysisId(analysisId);
-        rocDao.saveRocPoint(roc);
+        rocDao.saveRoc(roc);
         
         return analysisId;
         

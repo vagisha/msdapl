@@ -52,6 +52,7 @@ public class SequestSearchResultBean extends SearchResultBean implements Sequest
         bean.setxCorrRank(seqInfo.getxCorrRank());
         bean.setSpRank(seqInfo.getSpRank());
         bean.setDeltaCN(seqInfo.getDeltaCN());
+        bean.setDeltaCNstar(seqInfo.getDeltaCNstar());
         bean.setxCorr(seqInfo.getxCorr());
         bean.setEvalue(seqInfo.getEvalue());
         bean.setSp(seqInfo.getSp());
@@ -82,6 +83,13 @@ public class SequestSearchResultBean extends SearchResultBean implements Sequest
      */
     public void setDeltaCN(BigDecimal deltaCN) {
         sequestData.setDeltaCN(deltaCN);
+    }
+    
+    /**
+     * @param deltaCNstar the deltaCNstar to set
+     */
+    public void setDeltaCNstar(BigDecimal deltaCNstar) {
+        sequestData.setDeltaCNstar(deltaCNstar);
     }
     
     /**

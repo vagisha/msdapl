@@ -27,6 +27,11 @@ public interface SequestResultData {
      * @return the deltaCN
      */
     public abstract BigDecimal getDeltaCN();
+    
+    /**
+     * @return the deltaCNstar
+     */
+    public abstract BigDecimal getDeltaCNstar();
 
     /**
      * @return the xCorr

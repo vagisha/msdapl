@@ -37,21 +37,25 @@ public class PeptideProphetROC {
         this.rocPoints.add(point);
     }
     
+    public void setRocPoints(List<PeptideProphetROCPoint> rocPoints) {
+        this.rocPoints = rocPoints;
+    }
+
     public double getMinProbabilityForError(double error) {
         double closestError = Double.MIN_VALUE;
         double probability = -1.0;
         
         for(PeptideProphetROCPoint point: rocPoints) {
             if(probability == -1.0) {
-                closestError = point.error;
-                probability = point.probability;
+                closestError = point.getError();
+                probability = point.getProbability();
                 continue;
             }
-            double diff = Math.abs(error - point.error);
+            double diff = Math.abs(error - point.getError());
             double oldDiff = Math.abs(error - closestError);
             if(diff < oldDiff) {
-                closestError = point.error;
-                probability = point.probability;
+                closestError = point.getError();
+                probability = point.getProbability();
             }
         }
         return probability;
@@ -62,53 +66,13 @@ public class PeptideProphetROC {
         double closestError = rocPoints.get(0).getError();
         
         for(PeptideProphetROCPoint point: rocPoints) {
-            double diff = Math.abs(error - point.error);
+            double diff = Math.abs(error - point.getError());
             double oldDiff = Math.abs(error - closestError);
             if(diff < oldDiff) {
-                closestError = point.error;
+                closestError = point.getError();
             }
         }
         return closestError;
-    }
-    
-    public static class PeptideProphetROCPoint {
-        
-        private double sensitivity;
-        private double error;
-        private double probability;
-        private int numCorrect;
-        private int numIncorrect;
-        
-        public double getSensitivity() {
-            return sensitivity;
-        }
-        public void setSensitivity(double sensitivity) {
-            this.sensitivity = sensitivity;
-        }
-        public double getError() {
-            return error;
-        }
-        public void setError(double error) {
-            this.error = error;
-        }
-        public double getProbability() {
-            return probability;
-        }
-        public void setProbability(double probability) {
-            this.probability = probability;
-        }
-        public int getNumCorrect() {
-            return numCorrect;
-        }
-        public void setNumCorrect(int numCorrect) {
-            this.numCorrect = numCorrect;
-        }
-        public int getNumIncorrect() {
-            return numIncorrect;
-        }
-        public void setNumIncorrect(int numIncorrect) {
-            this.numIncorrect = numIncorrect;
-        }
     }
 }
 

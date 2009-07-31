@@ -122,6 +122,16 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         return queryForList("MsSearchResult.selectResultIdsForRunSearchScan", map);
     }
     
+    @Override
+    public List<Integer> loadResultIdsForSearchChargePeptide(int searchId,
+            int charge, String peptide) {
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        map.put("searchId", searchId);
+        map.put("charge", charge);
+        map.put("peptide", peptide);
+        return queryForList("MsSearchResult.selectResultIdsForSearchChargePeptide", map);
+    }
+    
     public int save(int searchId, MsSearchResultIn searchResult, int runSearchId, int scanId) {
         
         int resultId = saveResultOnly(searchResult, runSearchId, scanId);
@@ -248,5 +258,5 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
             return status;
         }
     }
-    
+
 }

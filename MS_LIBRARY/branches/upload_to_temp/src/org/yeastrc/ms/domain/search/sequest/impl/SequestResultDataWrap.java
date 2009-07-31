@@ -72,4 +72,9 @@ public class SequestResultDataWrap implements SequestResultData {
     public int getxCorrRank() {
         return data.getxCorrRank();
     }
+
+    @Override
+    public BigDecimal getDeltaCNstar() {
+        return data.getDeltaCNstar();
+    }
 }

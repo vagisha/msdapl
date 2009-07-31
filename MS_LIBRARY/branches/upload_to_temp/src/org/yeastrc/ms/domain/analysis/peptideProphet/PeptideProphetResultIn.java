@@ -24,7 +24,7 @@ public interface PeptideProphetResultIn {
     // TODO Not sure how to handle this PeptideProphet result
     public abstract String getAllNttProb();
     
-    public double getProbabilityNtt_0();
-    public double getProbabilityNtt_1();
-    public double getProbabilityNtt_2();
+    public double getProbabilityNet_0();
+    public double getProbabilityNet_1();
+    public double getProbabilityNet_2();
 }
