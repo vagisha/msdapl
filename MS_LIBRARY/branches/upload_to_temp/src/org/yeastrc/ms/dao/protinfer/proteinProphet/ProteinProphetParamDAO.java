@@ -9,7 +9,7 @@ package org.yeastrc.ms.dao.protinfer.proteinProphet;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetParam;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetParam;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 

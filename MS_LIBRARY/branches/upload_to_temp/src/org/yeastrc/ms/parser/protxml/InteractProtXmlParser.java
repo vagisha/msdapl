@@ -15,12 +15,12 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetGroup;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetParam;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProtein;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProteinPeptide;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProteinPeptideIon;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProteinPeptideIon.Modification;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetParam;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon.Modification;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class InteractProtXmlParser {

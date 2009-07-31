@@ -4,7 +4,7 @@
  * Jul 16, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.protinfer.proteinp;
+package org.yeastrc.ms.domain.protinfer.proteinProphet;
 
 
 /**

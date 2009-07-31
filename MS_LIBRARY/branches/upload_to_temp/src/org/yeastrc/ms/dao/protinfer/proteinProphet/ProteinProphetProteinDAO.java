@@ -15,7 +15,7 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinUserValidation;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProtein;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
