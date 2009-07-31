@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="IdPickerRun"> 
+
+	<typeAlias alias="IdPickerRun" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun"/>
+		
+	<resultMap class="IdPickerRun" id="idpickerRunResult" extends="ProteinferRun.pinferRunBaseResult">
+		<result property="inputSummaryList" 
+				select="IdPickerInput.selectIdPickerInputList"
+				column="id"/>
+		<result property="params" 
+				select="IdPickerParam.selectParamsForRun"
+				column="id"/>
+	</resultMap>
+	
+	
+	<select id="select" resultMap="idpickerRunResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferRun WHERE id=#id#
+    </select>
+    
+</sqlMap>

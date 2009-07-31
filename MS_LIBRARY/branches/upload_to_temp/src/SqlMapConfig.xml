@@ -89,4 +89,30 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorParamsSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/percolator/PercolatorResultSqlMap.xml"/>
 	
+	<!-- Related to PeptideProphet -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/peptideProphet/PeptideProphetRocSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/peptideProphet/PeptideProphetResultSqlMap.xml"/>
+	
+	
+	
+	<!-- Relate to protein inference -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferSpectrumMatch.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferIon.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferPeptide.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferProtein.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferInput.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/ProteinferRun.xml"/>
+	
+	<!-- Related to IDPicker -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerSpectrumMatch.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerIon.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerPeptide.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerProtein.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerParam.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerInputSummary.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerRun.xml"/>
+	
+	<!-- Related to ProteinProphet -->
+	
+	
 </sqlMapConfig>	

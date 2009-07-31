@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="IdPickerProtein"> 
+
+	<typeAlias alias="IdPickerProtein" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProtein" />
+	<typeAlias alias="IdPickerProteinBase" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase" />
+	
+	<resultMap class="IdPickerProteinBase" id="baseResult" extends="ProteinferProtein.pinferBaseProteinResult">
+		<result property="clusterId" column="clusterID" nullValue="0"/>
+		<result property="isParsimonious" column="isParsimonious" />
+		<result property="groupId" column="groupID" nullValue="0"/>
+		<result property="nsaf" column="nsaf" nullValue="-1.0"/>
+	</resultMap>
+	
+	<resultMap class="IdPickerProtein" id="idpickerProteinResult" extends="IdPickerProtein.baseResult">
+		<result property="peptides" 
+				select="IdPickerPeptide.selectPeptidesForProtein"
+				column="id"/>
+	</resultMap>
+	
+	<resultMap class="IdPickerProteinBase" id="idpickerBaseProteinResult" extends="IdPickerProtein.baseResult">
+		<result property="peptides" 
+				select="IdPickerPeptide.selectBasePeptidesForProtein"
+				column="id"/>
+	</resultMap>
+	
+	<parameterMap class="IdPickerProteinBase" id="idpickerProteinParam">
+		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="isParsimonious" jdbcType="TINYINT" />
+		<parameter property="clusterId" jdbcType="INTEGER" />
+		<parameter property="groupId" jdbcType="INTEGER" />
+		<parameter property="nsaf" jdbcType="DOUBLE" nullValue="-1.0"/>
+	</parameterMap>
+	
+	<select id="select" resultMap="idpickerProteinResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.id=#id#
+    </select>
+    
+    <select id="selectBaseProtein" resultMap="idpickerBaseProteinResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.id=#id#
+    </select>
+    
+    
+    
+    <select id="selectProteinsForProteinferRun" resultMap="idpickerProteinResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #id#
+    </select>
+    
+    <select id="selectBaseProteinsForProteinferRun" resultMap="idpickerBaseProteinResult" parameterClass="Integer">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #id#
+    </select>
+    
+    
+    
+    <select id="selectProteinsForCluster" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
+    	AND idpProt.clusterID = #clusterId#
+    </select>
+    
+    <select id="selectBaseProteinsForCluster" resultMap="idpickerBaseProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
+    	AND idpProt.clusterID = #clusterId#
+    </select>
+    
+    
+    
+    <select id="selectProteinsForGroup" resultMap="idpickerProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
+    	AND idpProt.groupID = #groupId#
+    </select>
+    
+    <select id="selectBaseProteinsForGroup" resultMap="idpickerBaseProteinResult" parameterClass="java.util.Map">
+    	SELECT * FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.id = idpProt.piProteinID
+    	AND prot.piRunID = #pinferId#
+    	AND idpProt.groupID = #groupId#
+    </select>
+    
+    <select id="selectGroupCount" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(DISTINCT(idprot.groupID)) 
+    	FROM IDPickerProtein AS idprot, msProteinInferProtein as prot
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idprot.piProteinID
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idprot.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="selectPeptGrpIdsForProtGrpId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT peptideGroupID FROM IDPickerGroupAssociation
+    	WHERE piRunID=#pinferId#
+    	AND proteinGroupID=#groupId#
+    </select>
+    
+    <select id="selectProtGrpIdsForClusterId" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT idpProt.groupID 
+    	FROM IDPickerProtein as idpProt, msProteinInferProtein as prot
+    	WHERE prot.piRunID = #pinferId# 
+    	AND idpProt.clusterID = #clusterId#
+    	AND prot.id = idpProt.piProteinID
+    </select>
+    
+    <select id="selectClusterIdsForPinfer" resultClass="Integer" parameterClass="Integer">
+    	SELECT DISTINCT idpProt.clusterID 
+    	FROM IDPickerProtein as idpProt, msProteinInferProtein as prot
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID
+    </select>
+    
+    
+    <select id="selectParsimProteinCountForProteinferRun" resultClass="Integer" parameterClass="Integer">
+    	SELECT count(*) FROM msProteinInferProtein as prot, IDPickerProtein as idpProt 
+    	WHERE prot.piRunID = #id# 
+    	AND prot.id = idpProt.piProteinID
+    	AND idpProt.isParsimonious = 1
+    </select>
+    
+	
+	<select id="selectProteinIdsForGroup" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.id FROM msProteinInferProtein as prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID = #pinferId#
+    	AND idpProt.groupID = #groupId#
+    	AND prot.id = idpProt.piProteinID
+    </select>
+    
+    <resultMap class="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinAndGroup" 
+    				id="protAndGroupResult">
+		<result property="proteinId" jdbcType="INTEGER"/>
+		<result property="groupId" jdbcType="INTEGER"/>
+	</resultMap>
+	
+    <select id="selectProteinAndGroupIds" resultMap="protAndGroupResult" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id, idpProt.groupID 
+    	FROM msProteinInferProtein as prot, IDPickerProtein as idpProt 
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="checkGroupAssociation" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT count(*) FROM IDPickerGroupAssociation
+    	WHERE piRunID=#pinferId#
+    	AND proteinGroupID=#protGrpId#
+    	AND peptideGroupID=#peptGrpId#
+    </select>
+    
+    
+    
+    <select id="idPickerNrseqProteinIds" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID 
+    	FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    </select>
+    
+    
+    <!-- =========================================================================== -->
+    <!-- QUERIES FOR FILTERING AND SORTING PROTEINS                                  -->
+    
+    <select id="idPickerProteinIds" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+		<isPropertyAvailable property="groupProteins">
+			ORDER BY idpProt.groupID ASC
+		</isPropertyAvailable>
+    	
+    </select>
+    
+    <select id="proteinIdsByClusterId" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	ORDER BY idpProt.clusterID, idpProt.groupID ASC
+    </select>
+    
+    <select id="proteinIdsByGroupId" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	ORDER BY idpProt.groupID ASC
+    </select>
+    
+    <select id="filterByCoverage" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein 
+    	WHERE piRunID=#pinferId#
+    	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY coverage ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterProteinGroupCoverage" 
+    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupCoverage" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id AS proteinId, iprot.groupID AS proteinGroupId, prot.coverage AS coverage 
+    	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot 
+    	WHERE prot.id = iprot.piProteinID 
+    	AND prot.piRunID = #pinferId# 
+    	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
+    	ORDER BY proteinGroupId, coverage DESC
+    </select>
+    
+    <select id="filterByNsaf" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	AND idpProt.nsaf >=#nsaf# 
+    	<isPropertyAvailable property="sort">
+    		ORDER BY idpProt.nsaf ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterProteinGroupNSAF" 
+    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupNsaf" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id AS proteinId, iprot.groupID AS proteinGroupId, iprot.nsaf AS nsaf
+    	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot 
+    	WHERE prot.id = iprot.piProteinID 
+    	AND prot.piRunID = #pinferId# 
+    	AND iprot.nsaf >=#nsaf# 
+    	ORDER BY proteinGroupId, nsaf DESC
+    </select>
+    
+    <select id="filterByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein 
+    	WHERE piRunID=#pinferId#
+    	<isPropertyAvailable property="validationStatus">
+    		AND userValidation IN $validationStatus$
+    	</isPropertyAvailable>
+    	<isPropertyAvailable property="sort">
+    		ORDER BY userValidation ASC
+    	</isPropertyAvailable>
+    </select>
+
+    <select id="filterBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.id, count(*) AS cnt 
+    	FROM msProteinInferProtein AS prot, 
+    		 IDPickerProtein as idpProt,
+    	     msProteinInferProteinPeptideMatch AS m, 
+    		 msProteinInferPeptide AS pept, 
+    		 msProteinInferIon AS ion,
+    		 msProteinInferSpectrumMatch AS psm
+    	WHERE prot.id = idpProt.piProteinID
+    	AND idpProt.piProteinID = m.piProteinID
+    	AND m.piPeptideID = pept.id 
+    	AND pept.id = ion.piPeptideID 
+    	AND ion.id = psm.piIonID
+    	AND prot.piRunID = #pinferId# 
+    	GROUP BY prot.id HAVING cnt BETWEEN #minSpectra# AND #maxSpectra#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY cnt
+			<isPropertyAvailable property="groupProteins">
+				, idpProt.groupID
+			</isPropertyAvailable>
+    		ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterByPeptideCount_S" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.id, count(pept.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept )
+    	ON  (m.piPeptideID = pept.id 
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID 
+    	AND prot.id = m.piProteinID 
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    	GROUP BY prot.id
+    	HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY cnt
+			<isPropertyAvailable property="groupProteins">
+				, idpProt.groupID
+			</isPropertyAvailable>
+    		ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.id, count(ion.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
+    	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID 
+    	AND prot.id = m.piProteinID 
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    	GROUP BY prot.id HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY cnt
+			<isPropertyAvailable property="groupProteins">
+				, idpProt.groupID
+			</isPropertyAvailable>
+    		ASC
+    	</isPropertyAvailable>
+    </select>
+   <!-- =========================================================================== -->
+    
+    
+    
+    <insert id="insertGroupAssociation" parameterClass="java.util.Map">
+    	INSERT INTO IDPickerGroupAssociation (
+    	piRunID,
+    	proteinGroupID,
+    	peptideGroupID)
+    	values(#pinferId#, #protGrpId#, #peptGrpId#)
+    </insert>
+    
+    <insert id="insert" parameterMap="idpickerProteinParam">
+    	INSERT INTO IDPickerProtein (
+    	piProteinID,
+    	isParsimonious,
+    	clusterID,
+    	groupID,
+    	nsaf) 
+    	VALUES (?,?,?,?,?)
+    </insert>
+    
+    <update id="updateIdPickerProtein" parameterClass="IdPickerProteinBase">
+    	UPDATE IDPickerProtein 
+    	SET clusterID=#clusterId#,
+    	groupID=#groupId#,
+    	isParsimonious=#isParsimonious#,
+    	nsaf=#nsaf#
+    	WHERE piProteinID=#id#
+    </update>
+    
+    
+    <delete id="delete" parameterClass="Integer">
+		DELETE FROM msProteinInferProtein WHERE id=#id#		    
+    </delete>
+    
+</sqlMap>
