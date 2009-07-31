@@ -6,6 +6,9 @@
  */
 package org.yeastrc.ms.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 
  */
@@ -15,7 +18,38 @@ public class AminoAcidUtils {
     public static final double OXYGEN = 15.9994;
     public static final double PROTON = 1.00727646688;
     
-    private AminoAcidUtils() {}
+    public static final Set<Character> validChars = new HashSet<Character>();
+    
+    private AminoAcidUtils() {
+        validChars.add('G');
+        validChars.add('A');
+        validChars.add('S');
+        validChars.add('P');
+        validChars.add('V');
+        validChars.add('T');
+        validChars.add('C');
+        validChars.add('L');
+        validChars.add('I');
+        validChars.add('X');
+        validChars.add('N');
+        validChars.add('O');
+        validChars.add('B');
+        validChars.add('D');
+        validChars.add('Q');
+        validChars.add('K');
+        validChars.add('Z');
+        validChars.add('E');
+        validChars.add('M');
+        validChars.add('H');
+        validChars.add('F');
+        validChars.add('R');
+        validChars.add('Y');
+        validChars.add('W');
+    }
+    
+    public static boolean isAminoAcid(char aa) {
+        return validChars.contains(Character.toUpperCase(aa));
+    }
     
     public static double avgMass(char aminoAcid) {
         switch(aminoAcid) {

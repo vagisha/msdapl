@@ -82,6 +82,9 @@ public class UploadException extends Exception {
         // PepXml
         PEPXML_ERROR            ("Error reading pepxml", WARN),
         
+        // ProtXml
+        PROTXML_ERROR           ("Error reading protxml", WARN),
+        
         // PeptideProphet
         NO_PEPTPROPH_ANALYSIS_UPLOADED("No PeptideProphet analyses were uploaded", ERROR),
         

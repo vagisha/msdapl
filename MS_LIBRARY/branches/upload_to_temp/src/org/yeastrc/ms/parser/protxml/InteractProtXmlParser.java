@@ -3,8 +3,13 @@ package org.yeastrc.ms.parser.protxml;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -12,9 +17,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetGroup;
 import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetParam;
-import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetPeptide;
 import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProtein;
 import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProteinPeptide;
+import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProteinPeptideIon;
+import org.yeastrc.ms.domain.protinfer.proteinprophet.ProteinProphetProteinPeptideIon.Modification;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class InteractProtXmlParser {
@@ -31,6 +37,7 @@ public class InteractProtXmlParser {
     private XMLStreamReader reader = null;
     private String programName;
     private String programVersion;
+    private java.util.Date date;
     private List<ProteinProphetParam> params;
     
     public void open(String filePath) throws DataProviderException {
@@ -61,6 +68,13 @@ public class InteractProtXmlParser {
             if (evtType == XMLStreamReader.START_ELEMENT && PROGRAM_DETAILS.equalsIgnoreCase(reader.getLocalName())) {
                 programName = reader.getAttributeValue(null, "analysis");
                 programVersion = reader.getAttributeValue(null, "version");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                try {
+                    date = simpleDateFormat.parse(reader.getAttributeValue(null, "time"));
+                }
+                catch (ParseException e) {
+                    throw new DataProviderException("Error parsing date", e);
+                }
                 readParams();
             }
         }
@@ -79,6 +93,10 @@ public class InteractProtXmlParser {
     
     public String getProgramVersion() {
         return programVersion;
+    }
+    
+    public java.util.Date getDate() {
+        return date;
     }
     
     public List<ProteinProphetParam> getParams() {
@@ -158,7 +176,7 @@ public class InteractProtXmlParser {
                 
                 if(evtType == XMLStreamReader.START_ELEMENT && PROTEIN.equalsIgnoreCase(reader.getLocalName())) {
                     
-                    ProteinProphetProtein protein = readProtein();
+                    ProteinProphetProtein protein = readProtein(group);
                     readPeptides(protein);
                     group.addProtein(protein);
                 }
@@ -176,6 +194,11 @@ public class InteractProtXmlParser {
         // read the <peptide> elements for the protein
         // at this point we should be at the beginning of a <peptide> element
         int evtType;
+        
+        ProteinProphetProteinPeptideIon lastIon = null;
+        
+        Map<String, ProteinProphetProteinPeptide> map = new HashMap<String, ProteinProphetProteinPeptide>();
+        
         while(reader.hasNext()) {
             
             evtType = reader.getEventType();
@@ -184,27 +207,49 @@ public class InteractProtXmlParser {
             }
             
             if(evtType == XMLStreamReader.START_ELEMENT && PEPTIDE.equalsIgnoreCase(reader.getLocalName())) {
-                ProteinProphetPeptide peptide = new ProteinProphetPeptide();
-                peptide.setSequence(reader.getAttributeValue(null, "peptide_sequence"));
-                peptide.setCharge(Integer.parseInt(reader.getAttributeValue(null, "charge")));
-                peptide.setUniqueToProtein(reader.getAttributeValue(null, "is_nondegenerate_evidence").equalsIgnoreCase("Y"));
-                peptide.setContributingEvidence(reader.getAttributeValue(null, "is_contributing_evidence").equalsIgnoreCase("Y"));
-                peptide.setNumSiblingPeptides(Double.parseDouble(reader.getAttributeValue(null, "n_sibling_peptides")));
                 
-                ProteinProphetProteinPeptide protPeptide = new ProteinProphetProteinPeptide(peptide);
-                protPeptide.setInitialProbability(Double.parseDouble(reader.getAttributeValue(null, "initial_probability")));
-                protPeptide.setNspAdjProbability(Double.parseDouble(reader.getAttributeValue(null, "nsp_adjusted_probability")));
-                protPeptide.setNumEnzymaticTermini(Integer.parseInt(reader.getAttributeValue(null, "n_enzymatic_termini")));
-                protPeptide.setNumInstances(Integer.parseInt(reader.getAttributeValue(null, "n_instances")));
-                protPeptide.setWeight(Double.parseDouble(reader.getAttributeValue(null, "weight")));
+                String sequence = reader.getAttributeValue(null, "peptide_sequence");
+                ProteinProphetProteinPeptide peptide = map.get(sequence);
+                if(peptide == null) {
+                    peptide = new ProteinProphetProteinPeptide();
+                    peptide.setSequence(sequence);
+                    peptide.setUniqueToProtein(reader.getAttributeValue(null, "is_nondegenerate_evidence").equalsIgnoreCase("Y"));
+                    peptide.setNumEnzymaticTermini(Integer.parseInt(reader.getAttributeValue(null, "n_enzymatic_termini")));
+                    
+                    protein.addPeptide(peptide);
+                    map.put(sequence, peptide);
+                }
                 
-                protein.addPeptide(protPeptide);
+                lastIon = new ProteinProphetProteinPeptideIon();
+                lastIon.setUnmodifiedSequence(peptide.getSequence());
+                lastIon.setCharge(Integer.parseInt(reader.getAttributeValue(null, "charge")));
+                lastIon.setContributingEvidence(reader.getAttributeValue(null, "is_contributing_evidence").equalsIgnoreCase("Y"));
+                lastIon.setSpectrumCount(Integer.parseInt(reader.getAttributeValue(null, "n_instances")));
+                lastIon.setInitialProbability(Double.parseDouble(reader.getAttributeValue(null, "initial_probability")));
+                lastIon.setNspAdjProbability(Double.parseDouble(reader.getAttributeValue(null, "nsp_adjusted_probability")));
+                lastIon.setNumSiblingPeptides(Double.parseDouble(reader.getAttributeValue(null, "n_sibling_peptides")));
+                lastIon.setWeight(Double.parseDouble(reader.getAttributeValue(null, "weight")));
+                lastIon.setModifiedSequence(sequence); // if this ion is modified the correct sequence will
+                                                       // be set later.
+                peptide.addIon(lastIon);
             }
+            
+            if(evtType == XMLStreamReader.START_ELEMENT && "modification_info".equalsIgnoreCase(reader.getLocalName())) {
+                String modPeptide = reader.getAttributeValue(null, "modified_peptide");
+                lastIon.setModifiedSequence(modPeptide);
+            }
+            
+            if(evtType == XMLStreamReader.START_ELEMENT && "mod_aminoacid_mass".equalsIgnoreCase(reader.getLocalName())) {
+                int pos = Integer.parseInt(reader.getAttributeValue(null, "position"));
+                BigDecimal mass = new BigDecimal(reader.getAttributeValue(null, "mass"));
+                lastIon.addModification(new Modification(pos, mass));
+            }
+            
             reader.next();
         }
     }
 
-    private ProteinProphetProtein readProtein() throws XMLStreamException {
+    private ProteinProphetProtein readProtein(ProteinProphetGroup group) throws XMLStreamException {
         
         int numIndistinguishable = Integer.parseInt(reader.getAttributeValue(null, "n_indistinguishable_proteins"));
         

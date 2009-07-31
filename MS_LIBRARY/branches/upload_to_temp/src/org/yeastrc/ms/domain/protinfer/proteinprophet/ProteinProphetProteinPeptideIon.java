@@ -6,31 +6,37 @@
  */
 package org.yeastrc.ms.domain.protinfer.proteinprophet;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
+import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
+
 /**
  * 
  */
-public class ProteinProphetProteinPeptideIon {
+public class ProteinProphetProteinPeptideIon extends GenericProteinferIon<ProteinferSpectrumMatch> {
 
-    private ProteinProphetPeptideIon peptide;
+    private int pinferProteinId;
+   
     private double initialProbability;
     private double nspAdjProbability;
     private double weight;
-    private int numEnzymaticTermini;
-    private int numInstances;
+    private double numSiblingPeptides;
+    private boolean isContributingEvidence;
+    private List<ProteinferSpectrumMatch> psmList;
     
-    public ProteinProphetProteinPeptideIon(ProteinProphetPeptideIon peptide) {
-        this.peptide = peptide;
+    private List<Modification> modifications;
+    private String unmodifiedSequence;
+    
+    
+
+    public ProteinProphetProteinPeptideIon() {
+        psmList = new ArrayList<ProteinferSpectrumMatch>();
+        modifications = new ArrayList<Modification>();
     }
     
-    public int getNumInstances() {
-        return numInstances;
-    }
-    public void setNumInstances(int numInstances) {
-        this.numInstances = numInstances;
-    }
-    public ProteinProphetPeptideIon getPeptide() {
-        return peptide;
-    }
     public double getInitialProbability() {
         return initialProbability;
     }
@@ -49,16 +55,55 @@ public class ProteinProphetProteinPeptideIon {
     public void setWeight(double weight) {
         this.weight = weight;
     }
-    public int getNumEnzymaticTermini() {
-        return numEnzymaticTermini;
+    
+    public boolean isContributingEvidence() {
+        return isContributingEvidence;
     }
-    public void setNumEnzymaticTermini(int numEnzymaticTermini) {
-        this.numEnzymaticTermini = numEnzymaticTermini;
+    public void setContributingEvidence(boolean isContributingEvidence) {
+        this.isContributingEvidence = isContributingEvidence;
+    }
+    public double getNumSiblingPeptides() {
+        return numSiblingPeptides;
+    }
+    public void setNumSiblingPeptides(double numSiblingPeptides) {
+        this.numSiblingPeptides = numSiblingPeptides;
+    }
+    
+    public List<ProteinferSpectrumMatch> getPsmList() {
+        return psmList;
+    }
+    
+    public void addPsm(ProteinferSpectrumMatch psm) {
+        this.psmList.add(psm);
+    }
+    
+    public List<Modification> getModifications() {
+        return modifications;
+    }
+    
+    public void addModification(Modification mod) {
+        this.modifications.add(mod);
+    }
+    
+    public int getPinferProteinId() {
+        return pinferProteinId;
+    }
+
+    public void setPinferProteinId(int pinferProteinId) {
+        this.pinferProteinId = pinferProteinId;
+    }
+    
+    public String getUnmodifiedSequence() {
+        return unmodifiedSequence;
+    }
+
+    public void setUnmodifiedSequence(String unmodifiedSequence) {
+        this.unmodifiedSequence = unmodifiedSequence;
     }
     
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(peptide.toString());
+        buf.append(super.toString());
         buf.append("\t");
         buf.append("initProb: "+initialProbability);
         buf.append("\t");
@@ -66,9 +111,31 @@ public class ProteinProphetProteinPeptideIon {
         buf.append("\t");
         buf.append("wt: "+weight);
         buf.append("\t");
-        buf.append("ntt: "+numEnzymaticTermini);
+        buf.append("numsiblingPept: "+numSiblingPeptides);
         buf.append("\t");
-        buf.append("numInst: "+numInstances);
+        buf.append("contrib_evidence: "+this.isContributingEvidence);
         return buf.toString();
+    }
+    
+    public static class Modification {
+        private int position;
+        private BigDecimal mass;
+        
+        public Modification(int pos, BigDecimal mass) {
+            this.position = pos;
+            this.mass = mass;
+        }
+        public int getPosition() {
+            return position;
+        }
+        public void setPosition(int position) {
+            this.position = position;
+        }
+        public BigDecimal getMass() {
+            return mass;
+        }
+        public void setMass(BigDecimal mass) {
+            this.mass = mass;
+        }
     }
 }

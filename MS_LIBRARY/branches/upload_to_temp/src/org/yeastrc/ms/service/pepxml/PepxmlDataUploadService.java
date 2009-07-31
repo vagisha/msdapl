@@ -616,7 +616,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicResidueModificationId(
                     mod.getModifiedResidue(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -640,7 +640,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicResidueModificationId( 
                     mod.getModifiedResidue(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -672,7 +672,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicTerminalModificationId( 
                     mod.getModifiedTerminal(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -696,7 +696,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicTerminalModificationId(
                     mod.getModifiedTerminal(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);

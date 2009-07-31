@@ -78,7 +78,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         while(reader.hasNext()) {
             if(reader.next() == XMLStreamReader.START_ELEMENT) {
                 if(reader.getLocalName().equalsIgnoreCase(MSMS_RUN_SUMMARY)) {
-                    System.out.println(reader.getAttributeValue(null, "base_name"));
+//                    System.out.println(reader.getAttributeValue(null, "base_name"));
                     break;
                 }
                 else if(reader.getLocalName().equalsIgnoreCase("analysis_summary")) {

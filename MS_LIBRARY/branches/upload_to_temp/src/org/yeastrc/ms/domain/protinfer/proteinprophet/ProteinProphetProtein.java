@@ -16,19 +16,21 @@ import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 /**
  * 
  */
-public class ProteinProphetProtein extends GenericProteinferProtein {
+public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProphetProteinPeptide> {
 
     private String proteinName;
     private double probability;
-    private double coverage;
     private int totalSpectrumCount;
     private double pctSpectrumCount;
     private double confidence;
     private boolean isSubsumed = false;
     private String subsumingProteinEntry;
     
+    private int indistinguishableGroupId;
+    private int proteinProphetGroupId;
+    
     private List<String> indistinguishableProteins;
-    private List<ProteinProphetProteinPeptideIon> peptides;
+    private List<ProteinProphetProteinPeptide> peptides;
     
     
     public ProteinProphetProtein() {
@@ -37,7 +39,7 @@ public class ProteinProphetProtein extends GenericProteinferProtein {
     
     public ProteinProphetProtein(int numIndistinguishableProteins) {
         this.indistinguishableProteins = new ArrayList<String>(numIndistinguishableProteins);
-        peptides = new ArrayList<ProteinProphetProteinPeptideIon>();
+        peptides = new ArrayList<ProteinProphetProteinPeptide>();
     }
 
     public String getProteinName() {
@@ -55,14 +57,6 @@ public class ProteinProphetProtein extends GenericProteinferProtein {
 
     public void setProbability(double probability) {
         this.probability = probability;
-    }
-
-    public double getCoverage() {
-        return coverage;
-    }
-
-    public void setCoverage(double coverage) {
-        this.coverage = coverage;
     }
 
     public int getTotalSpectrumCount() {
@@ -93,6 +87,28 @@ public class ProteinProphetProtein extends GenericProteinferProtein {
         return indistinguishableProteins;
     }
 
+    public ProteinProphetProtein getIndistinguishableProtein(String name) {
+        if(!indistinguishableProteins.contains(name))
+            return null;
+        ProteinProphetProtein protein = new ProteinProphetProtein();
+        protein.setProteinName(name);
+        protein.setConfidence(this.confidence);
+        protein.setCoverage(this.getCoverage());
+        protein.setIndistinguishableGroupId(this.indistinguishableGroupId);
+        protein.setPctSpectrumCount(this.pctSpectrumCount);
+        protein.setPeptideDefinition(this.getPeptideDefinition());
+        protein.setPeptides(this.getPeptides());
+        protein.setProbability(this.probability);
+        protein.setProteinferId(this.getProteinferId());
+        protein.setProteinProphetGroupId(this.getProteinProphetGroupId());
+        protein.setSubsumed(this.isSubsumed);
+        protein.setSubsumingProteinEntry(this.subsumingProteinEntry);
+        protein.setTotalSpectrumCount(this.totalSpectrumCount);
+        protein.setUserAnnotation(this.getUserAnnotation());
+        protein.setUserValidation(this.getUserValidation());
+        return protein;
+    }
+    
     public void addIndistinguishableProteins(String protein) {
         if(indistinguishableProteins.contains(protein))
             return;
@@ -128,12 +144,28 @@ public class ProteinProphetProtein extends GenericProteinferProtein {
         this.isSubsumed = !(subsumingProteinEntry == null || subsumingProteinEntry.trim().length() == 0);
     }
 
-    public List<ProteinProphetProteinPeptideIon> getPeptides() {
+    public List<ProteinProphetProteinPeptide> getPeptides() {
         return peptides;
     }
     
-    public void addPeptide(ProteinProphetProteinPeptideIon peptide) {
+    public void addPeptide(ProteinProphetProteinPeptide peptide) {
         peptides.add(peptide);
+    }
+    
+    public int getIndistinguishableGroupId() {
+        return indistinguishableGroupId;
+    }
+
+    public void setIndistinguishableGroupId(int indistinguishableGroupId) {
+        this.indistinguishableGroupId = indistinguishableGroupId;
+    }
+
+    public int getProteinProphetGroupId() {
+        return proteinProphetGroupId;
+    }
+
+    public void setProteinProphetGroupId(int proteinProphetGroupId) {
+        this.proteinProphetGroupId = proteinProphetGroupId;
     }
     
     public String toString() {
@@ -159,7 +191,7 @@ public class ProteinProphetProtein extends GenericProteinferProtein {
         buf.append("\t");
         buf.append("pctSpecCnt: "+pctSpectrumCount);
         
-        for(ProteinProphetProteinPeptideIon peptide: this.peptides) {
+        for(ProteinProphetProteinPeptide peptide: this.peptides) {
             buf.append("\n");
             buf.append(peptide.toString());
         }
