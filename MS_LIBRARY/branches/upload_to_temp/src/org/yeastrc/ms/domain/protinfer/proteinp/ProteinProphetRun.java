@@ -4,7 +4,7 @@
  * Jul 28, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.protinfer.proteinprophet;
+package org.yeastrc.ms.domain.protinfer.proteinp;
 
 import org.yeastrc.ms.domain.protinfer.GenericProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;

@@ -4,7 +4,7 @@
  * Jul 16, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.protinfer.proteinprophet;
+package org.yeastrc.ms.domain.protinfer.proteinp;
 
 import java.util.ArrayList;
 import java.util.List;
