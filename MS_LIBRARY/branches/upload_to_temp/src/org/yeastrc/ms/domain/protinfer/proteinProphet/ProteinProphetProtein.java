@@ -19,15 +19,15 @@ import org.yeastrc.ms.domain.protinfer.GenericProteinferProtein;
 public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProphetProteinPeptide> {
 
     private String proteinName;
-    private double probability;
-    private int totalSpectrumCount;
-    private double pctSpectrumCount;
-    private double confidence;
+    private double probability = -1.0;
+    private int totalSpectrumCount = -1;
+    private double pctSpectrumCount = -1.0;
+    private double confidence = -1.0;
     private boolean isSubsumed = false;
     private String subsumingProteinEntry;
     
-    private int indistinguishableGroupId;
-    private int proteinProphetGroupId;
+    private int indistinguishableGroupId = 0;
+    private int proteinProphetGroupId = 0;
     
     private List<String> indistinguishableProteins;
     private List<ProteinProphetProteinPeptide> peptides;

@@ -43,7 +43,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     public int saveProteinProphetProtein(ProteinProphetProtein protein) {
         int proteinId = save(protein);
         protein.setId(proteinId);
-        save(sqlMapNameSpace+".insert", protein); // save entry in the ProteinProphet table
+        save(sqlMapNameSpace+".insert", protein); // save entry in the ProteinProphetProtein table
         return proteinId;
     }
 
@@ -114,20 +114,17 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
 
     @Override
     public ProteinProphetProtein loadProtein(int pinferProteinId) {
-        // TODO Auto-generated method stub
-        return null;
+        return (ProteinProphetProtein) super.queryForObject(sqlMapNameSpace+".select", pinferProteinId);
     }
 
     @Override
     public ProteinferProtein loadProtein(int proteinferId, int nrseqProteinId) {
-        // TODO Auto-generated method stub
-        return null;
+        return protDao.loadProtein(proteinferId, nrseqProteinId);
     }
 
     @Override
     public List<ProteinProphetProtein> loadProteins(int proteinferId) {
-        // TODO Auto-generated method stub
-        return null;
+        return super.queryForList(sqlMapNameSpace+".selectProteinsForProteinferRun", proteinferId);
     }
 
 }

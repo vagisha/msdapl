@@ -394,7 +394,7 @@ ALTER TABLE PeptideProphetROC ADD INDEX(searchAnalysisID);
 CREATE TABLE PeptideProphetResult (
 		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
 		runSearchAnalysisID INT UNSIGNED NOT NULL,
-		probability DOUBLE UNSIGNED NOT NULL,
+		minProbability DOUBLE UNSIGNED NOT NULL,
 		fVal DOUBLE UNSIGNED NOT NULL,
 		numEnzymaticTermini INT UNSIGNED NOT NULL,
 		numMissedCleavages INT UNSIGNED NOT NULL,
@@ -533,6 +533,50 @@ CREATE TABLE IDPickerSpectrumMatch (
 	piSpectrumMatchID INT UNSIGNED NOT NULL PRIMARY KEY,
 	fdr DOUBLE UNSIGNED
 );
+
+#####################################################################
+# ProteinProphet Tables
+#####################################################################
+CREATE TABLE ProteinProphetParam (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    piRunID INT UNSIGNED NOT NULL,
+    name VARCHAR(255) NOT NULL,
+   	value VARCHAR(255)
+);
+ALTER TABLE  ProteinProphetParam ADD INDEX (piRunID);
+
+CREATE TABLE ProteinProphetROC (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		piRunID INT UNSIGNED NOT NULL,
+	   	sensitivity DOUBLE UNSIGNED NOT NULL,
+	   	falsePositiveErrorRate DOUBLE UNSIGNED NOT NULL,
+	   	minProbability DOUBLE UNSIGNED NOT NULL,
+	   	numCorrect INT UNSIGNED NOT NULL,
+	   	numIncorrect INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProteinProphetROC ADD INDEX(piRunID);
+
+
+CREATE TABLE ProteinProphetProtein (
+	piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
+	proteinProphetGroupID INT UNSIGNED NOT NULL,
+    groupID INT UNSIGNED NOT NULL,
+    probability DOUBLE UNSIGNED NOT NULL,
+    confidence DOUBLE UNSIGNED NOT NULL,
+    subsumed TINYINT NOT NULL DEFAULT 0,
+    totalSpectrumCount INT UNSIGNED NOT NULL,
+    pctSpectrumCount INT UnSIGNED NOT NULL
+);
+ALTER TABLE ProteinProphetProtein ADD INDEX(groupID);
+ALTER TABLE ProteinProphetProtein ADD INDEX(prophetGroupID);
+
+CREATE TABLE ProteinProphetProteinGroup (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    piRunID INT UNSIGNED NOT NULL,
+    probability DOUBLE UNSIGNED NOT NULL,
+    groupNumber INT UNSIGNED NOT NULL
+);
+ALTER TABLE ProteinProphetProteinGroup ADD INDEX(piRunID);
 
 
 

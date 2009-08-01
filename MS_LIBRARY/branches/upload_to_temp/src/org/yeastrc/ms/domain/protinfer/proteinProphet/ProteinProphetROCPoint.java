@@ -1,16 +1,16 @@
 /**
- * PeptideProphetROCPoint.java
+ * ProteinProphetROCPoint.java
  * @author Vagisha Sharma
  * Jul 31, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.analysis.peptideProphet;
+package org.yeastrc.ms.domain.protinfer.proteinProphet;
 
-public class PeptideProphetROCPoint {
+public class ProteinProphetROCPoint {
     
     private int searchAnalysisId;
     private double sensitivity;
-    private double error;
+    private double falsePositiveErrorRate;
     private double minProbability;
     private int numCorrect;
     private int numIncorrect;
@@ -28,10 +28,10 @@ public class PeptideProphetROCPoint {
         this.sensitivity = sensitivity;
     }
     public double getError() {
-        return error;
+        return falsePositiveErrorRate;
     }
     public void setError(double error) {
-        this.error = error;
+        this.falsePositiveErrorRate = error;
     }
     public double getMinProbability() {
         return minProbability;

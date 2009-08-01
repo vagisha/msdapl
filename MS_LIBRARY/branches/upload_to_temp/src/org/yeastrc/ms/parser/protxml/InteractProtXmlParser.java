@@ -20,6 +20,8 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetParam;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROCPoint;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon.Modification;
 import org.yeastrc.ms.parser.DataProviderException;
 
@@ -38,7 +40,9 @@ public class InteractProtXmlParser {
     private String programName;
     private String programVersion;
     private java.util.Date date;
+    
     private List<ProteinProphetParam> params;
+    private ProteinProphetROC proteinProphetRoc;
     
     public void open(String filePath) throws DataProviderException {
         
@@ -75,7 +79,7 @@ public class InteractProtXmlParser {
                 catch (ParseException e) {
                     throw new DataProviderException("Error parsing date", e);
                 }
-                readParams();
+                readProteinProphetDetails();
             }
         }
     }
@@ -103,9 +107,16 @@ public class InteractProtXmlParser {
         return params;
     }
     
-    private void readParams() throws DataProviderException {
+    public ProteinProphetROC getProteinProphetRoc() {
+        return proteinProphetRoc;
+    }
+    
+    private void readProteinProphetDetails() throws DataProviderException {
         
         this.params = new ArrayList<ProteinProphetParam>();
+        
+        List<ProteinProphetROCPoint> rocPoints = new ArrayList<ProteinProphetROCPoint>();
+        this.proteinProphetRoc = new ProteinProphetROC();
         
         try {
             while(reader.hasNext()) {
@@ -121,6 +132,17 @@ public class InteractProtXmlParser {
                         String value = reader.getAttributeValue(i);
                         params.add(new ProteinProphetParam(name, value));
                     }
+                }
+                
+                else if(evtType == XMLStreamReader.START_ELEMENT 
+                        && "protein_summary_data_filter".equalsIgnoreCase(reader.getLocalName())) {
+                    ProteinProphetROCPoint rocPoint = new ProteinProphetROCPoint();
+                    rocPoint.setMinProbability(Double.parseDouble(reader.getAttributeValue(null, "min_probability")));
+                    rocPoint.setSensitivity(Double.parseDouble(reader.getAttributeValue(null, "sensitivity")));
+                    rocPoint.setError(Double.parseDouble(reader.getAttributeValue(null, "false_positive_error_rate")));
+                    rocPoint.setNumCorrect(Integer.parseInt(reader.getAttributeValue(null, "predicted_num_correct")));
+                    rocPoint.setNumIncorrect(Integer.parseInt(reader.getAttributeValue(null, "predicted_num_incorrect")));
+                    rocPoints.add(rocPoint);
                 }
             }
         }

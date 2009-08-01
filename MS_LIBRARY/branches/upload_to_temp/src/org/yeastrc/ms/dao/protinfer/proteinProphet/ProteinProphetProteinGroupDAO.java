@@ -22,6 +22,6 @@ public class ProteinProphetProteinGroupDAO extends BaseSqlMapDAO {
     }
     
     public int saveGroup(int pinferId, double probability, int groupNumber) {
-        return 0;
+        
     }
 }

@@ -113,6 +113,10 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/idpicker/IdPickerRun.xml"/>
 	
 	<!-- Related to ProteinProphet -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRocSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetParam.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProtein.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRun.xml"/>
 	
 	
 </sqlMapConfig>	

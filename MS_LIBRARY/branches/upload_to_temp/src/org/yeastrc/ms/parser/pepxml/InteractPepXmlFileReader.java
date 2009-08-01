@@ -74,6 +74,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
     private void readAnalysisSummary(XMLStreamReader reader2) throws XMLStreamException {
         
         boolean inPPAnalysis = false;
+        this.peptideProphetRoc = new PeptideProphetROC();
         
         while(reader.hasNext()) {
             if(reader.next() == XMLStreamReader.START_ELEMENT) {
@@ -92,11 +93,8 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                 }
                 else if (reader.getLocalName().equalsIgnoreCase("roc_data_point") && inPPAnalysis) {
                     // <roc_data_point min_prob="0.99" sensitivity="0.4384" error="0.0024" num_corr="1123" num_incorr="3"/>
-                    if(peptideProphetRoc == null) {
-                        this.peptideProphetRoc = new PeptideProphetROC();
-                    }
                     PeptideProphetROCPoint rocPoint = new PeptideProphetROCPoint();
-                    rocPoint.setProbability(Double.parseDouble(reader.getAttributeValue(null, "min_prob")));
+                    rocPoint.setMinProbability(Double.parseDouble(reader.getAttributeValue(null, "min_prob")));
                     rocPoint.setSensitivity(Double.parseDouble(reader.getAttributeValue(null, "sensitivity")));
                     rocPoint.setError(Double.parseDouble(reader.getAttributeValue(null, "error")));
                     rocPoint.setNumCorrect(Integer.parseInt(reader.getAttributeValue(null, "num_corr")));

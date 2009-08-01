@@ -1,10 +1,10 @@
 /**
- * PeptideProphet_ROC.java
+ * ProteinProphetRoc.java
  * @author Vagisha Sharma
- * Jul 23, 2009
+ * Jul 31, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.analysis.peptideProphet;
+package org.yeastrc.ms.domain.protinfer.proteinProphet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,32 +12,32 @@ import java.util.List;
 /**
  * 
  */
-public class PeptideProphetROC {
+public class ProteinProphetROC {
 
-    private int searchAnalysisId;
-    private List<PeptideProphetROCPoint> rocPoints;
+    private int proteinferId;
+    private List<ProteinProphetROCPoint> rocPoints;
     
-    public PeptideProphetROC() {
-        rocPoints = new ArrayList<PeptideProphetROCPoint>();
+    public ProteinProphetROC() {
+        rocPoints = new ArrayList<ProteinProphetROCPoint>();
     }
     
-    public int getSearchAnalysisId() {
-        return searchAnalysisId;
+    public int getProteinferId() {
+        return proteinferId;
     }
 
-    public void setSearchAnalysisId(int searchAnalysisId) {
-        this.searchAnalysisId = searchAnalysisId;
+    public void setProteinferId(int proteinferId) {
+        this.proteinferId = proteinferId;
     }
 
-    public List<PeptideProphetROCPoint> getRocPoints() {
+    public List<ProteinProphetROCPoint> getRocPoints() {
         return rocPoints;
     }
     
-    public void addRocPoint(PeptideProphetROCPoint point) {
+    public void addRocPoint(ProteinProphetROCPoint point) {
         this.rocPoints.add(point);
     }
     
-    public void setRocPoints(List<PeptideProphetROCPoint> rocPoints) {
+    public void setRocPoints(List<ProteinProphetROCPoint> rocPoints) {
         this.rocPoints = rocPoints;
     }
 
@@ -45,7 +45,7 @@ public class PeptideProphetROC {
         double closestError = Double.MIN_VALUE;
         double probability = -1.0;
         
-        for(PeptideProphetROCPoint point: rocPoints) {
+        for(ProteinProphetROCPoint point: rocPoints) {
             if(probability == -1.0) {
                 closestError = point.getError();
                 probability = point.getMinProbability();
@@ -65,7 +65,7 @@ public class PeptideProphetROC {
         
         double closestError = rocPoints.get(0).getError();
         
-        for(PeptideProphetROCPoint point: rocPoints) {
+        for(ProteinProphetROCPoint point: rocPoints) {
             double diff = Math.abs(error - point.getError());
             double oldDiff = Math.abs(error - closestError);
             if(diff < oldDiff) {
@@ -75,5 +75,3 @@ public class PeptideProphetROC {
         return closestError;
     }
 }
-
-

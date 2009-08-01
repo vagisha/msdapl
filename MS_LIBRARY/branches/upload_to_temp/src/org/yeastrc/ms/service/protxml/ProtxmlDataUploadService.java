@@ -28,6 +28,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetParamDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRocDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProteinDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
@@ -205,7 +206,7 @@ public class ProtxmlDataUploadService {
         
         int nrseqId = getNrseqProteinId(protein.getProteinName(), nrseqDatabaseId);
         protein.setNrseqProteinId(nrseqId);
-        int piProteinId = ppProtDao.save(protein);
+        int piProteinId = ppProtDao.saveProteinProphetProtein(protein);
         // save peptides
         savePeptides(protein);
         
@@ -456,6 +457,17 @@ public class ProtxmlDataUploadService {
             throw e;
         }
         
+        
+        // save the ROC points
+        ProteinProphetRocDAO rocDao = piDaoFactory.getProteinProphetRocDao();
+        try {
+            rocDao.saveRoc(parser.getProteinProphetRoc());
+        }
+        catch(RuntimeException e) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+            ex.appendErrorMessage("Error saving ProteinProphet ROC points.");
+            throw ex;
+        }
         return pinferId;
     }
     
