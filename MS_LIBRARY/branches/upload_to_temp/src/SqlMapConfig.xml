@@ -118,6 +118,8 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRun.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProteinGroup.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProtein.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProteinIon.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetSubsumedProtein.xml"/>
 	
 	
 	

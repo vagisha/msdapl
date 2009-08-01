@@ -10,6 +10,7 @@
 		<result property="id" column="id" />
 		<result property="proteinferPeptideId" column="piPeptideID" />
 		<result property="charge" column="charge" />
+		<result property="modificationSequence" column="modificationSequence" />
 		<result property="modificationStateId" column="modificationStateID" />
 		<result property="spectrumCount" select="ProteinferSpectrumMatch.selectSpectrumCountForIon" column="id" />
 	</resultMap>
@@ -23,6 +24,7 @@
 	<parameterMap class="BaseProteinferIon" id="pinferIonParam">
 		<parameter property="proteinferPeptideId" jdbcType="INTEGER" />
 		<parameter property="charge" jdbcType="INTEGER" />
+		<parameter property="modifiedSequence" jdbcType="VARCHAR" />
 		<parameter property="modificationStateId" jdbcType="INTEGER" />
 	</parameterMap>
 	
@@ -38,6 +40,7 @@
     	INSERT INTO msProteinInferIon (
     	piPeptideID,
     	charge,
+    	modifiedSequence,
     	modificationStateID) 
     	VALUES (?,?,?)
     	<selectKey resultClass="int">

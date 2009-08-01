@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
@@ -57,6 +56,8 @@ import org.yeastrc.ms.service.ModifiedSequenceBuilder;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
 import org.yeastrc.ms.util.AminoAcidUtils;
 
 /**
@@ -66,7 +67,7 @@ public class ProtxmlDataUploadService {
 
     private final DAOFactory daoFactory;
     private final MsSearchResultDAO resDao;
-    private final PeptideProphetResultDAO ppResDao;
+    private final PeptideProphetResultUploadDAO ppResDao;
     
     private final int nrseqDatabaseId;
     
@@ -100,7 +101,7 @@ public class ProtxmlDataUploadService {
         daoFactory = DAOFactory.instance();
         
         resDao = daoFactory.getMsSearchResultDAO();
-        ppResDao = daoFactory.getPeptideProphetResultDAO();
+        ppResDao = UploadDAOFactory.getInstance().getPeptideProphetResultDAO();
         
         runDao = piDaoFactory.getProteinferRunDao();
         peptDao = piDaoFactory.getProteinferPeptideDao();
@@ -207,6 +208,12 @@ public class ProtxmlDataUploadService {
     public int saveProtein(ProteinProphetProtein protein, Map<Integer, Set<String>> subsumedMap) throws UploadException {
         
         int nrseqId = getNrseqProteinId(protein.getProteinName(), nrseqDatabaseId);
+        if(nrseqId == 0) {
+            UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
+            ex.appendErrorMessage("No NRSEQ id foud for protein: "+protein.getProteinName());
+            throw ex;
+        }
+        
         protein.setNrseqProteinId(nrseqId);
         int piProteinId = ppProtDao.saveProteinProphetProtein(protein);
         // save peptides
@@ -243,7 +250,7 @@ public class ProtxmlDataUploadService {
                 
                 // create an entry in the ProteinProphetProteinIon table
                 ion.setId(pinferIonId);
-                ion.setPinferProteinId(protein.getId());
+                ion.setPiProteinId(protein.getId());
                 ppProteinIonDao.save(ion);
             }
         }
@@ -282,6 +289,8 @@ public class ProtxmlDataUploadService {
             ion.setModificationStateId(modStateId);
             pinferIonId = ionDao.save(ion);
             ion.setId(pinferIonId);
+            
+            ionMap.put(ion.getModifiedSequence(), pinferIonId);
             
             // save spectra for the ion
             saveIonSpectra(ion, searchId, modList);
@@ -410,7 +419,10 @@ public class ProtxmlDataUploadService {
 
     private int getNrseqProteinId(String accession, int nrseqDatabaseId) {
         NrDbProtein protein = NrSeqLookupUtil.getDbProtein(nrseqDatabaseId, accession);
-        return protein.getProteinId();
+        if(protein != null)
+            return protein.getProteinId();
+        else
+            return 0;
     }
 
     private int addProteinInferenceRun(InteractProtXmlParser parser, int searchId) throws UploadException {

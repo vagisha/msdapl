@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinProphetProteinIon"> 
+
+	<typeAlias alias="ProteinProphetProteinIon" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinIon"/>
+	
+	<resultMap class="ProteinProphetProteinIon" id="proteinIonResult">
+		<result property="piProteinId" column="piProteinID" nullValue="0" />
+		<result property="id" column="piIonID" nullValue="0" />
+		<result property="initialProbability" column="initialProbability" nullValue="-1.0"/>
+		<result property="nspAdjProbability" column="nspAdjProbability" nullValue="-1.0"/>
+		<result property="numSiblingPeptides" column="numSiblingPeptides" nullValue="-1.0"/>
+		<result property="isContributingEvidence" column="isContributingEvidence" />
+	</resultMap>
+	
+	<parameterMap class="ProteinProphetProteinIon" id="proteinIonParam">
+		<parameter property="piProteinId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="id" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="initialProbability" jdbcType="DOUBLE" nullValue="-1.0" />
+		<parameter property="nspAdjProbability" jdbcType="DOUBLE" nullValue="-1.0" />
+		<parameter property="numSiblingPeptides" jdbcType="DOUBLE" nullValue="-1.0" />
+	  	<parameter property="isContributingEvidence" jdbcType="TINYINT"  />
+	</parameterMap>
+	
+
+    <insert id="insert" parameterMap="proteinIonParam">
+    	INSERT INTO ProteinProphetProteinIon (
+    	piProteinID,
+    	piIonID,
+    	initialProbability,
+    	nspAdjProbability,
+    	numSiblingPeptides,
+    	isContributingEvidence)
+    	VALUES (?,?,?,?,?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+</sqlMap>

@@ -18,12 +18,12 @@ import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
  */
 public class ProteinProphetProteinPeptideIon extends GenericProteinferIon<ProteinferSpectrumMatch> {
 
-    private int pinferProteinId;
+    private int piProteinId = 0;
    
-    private double initialProbability;
-    private double nspAdjProbability;
-    private double weight;
-    private double numSiblingPeptides;
+    private double initialProbability = -1.0;
+    private double nspAdjProbability = -1.0;
+    private double weight = -1.0;
+    private double numSiblingPeptides = -1.0;
     private boolean isContributingEvidence;
     private List<ProteinferSpectrumMatch> psmList;
     
@@ -85,14 +85,14 @@ public class ProteinProphetProteinPeptideIon extends GenericProteinferIon<Protei
         this.modifications.add(mod);
     }
     
-    public int getPinferProteinId() {
-        return pinferProteinId;
+    public int getPiProteinId() {
+        return piProteinId;
     }
 
-    public void setPinferProteinId(int pinferProteinId) {
-        this.pinferProteinId = pinferProteinId;
+    public void setPiProteinId(int piProteinId) {
+        this.piProteinId = piProteinId;
     }
-    
+
     public String getUnmodifiedSequence() {
         return unmodifiedSequence;
     }

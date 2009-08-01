@@ -456,6 +456,7 @@ CREATE TABLE msProteinInferIon(
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	piPeptideID INT UNSIGNED NOT NULL,
 	charge INT UNSIGNED NOT NULL,
+	modifiedSequence VARCHAR(255) NOT NULL,
 	modificationStateID INT UNSIGNED NOT NULL
 );
 ALTER TABLE  msProteinInferIon ADD INDEX (piPeptideID);
@@ -579,14 +580,22 @@ CREATE TABLE ProteinProphetProtein (
 ALTER TABLE ProteinProphetProtein ADD INDEX(groupID);
 ALTER TABLE ProteinProphetProtein ADD INDEX(prophetGroupID);
 
-CREATE TABLE ProteinProphetProteinGroup (
-	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    piRunID INT UNSIGNED NOT NULL,
-    probability DOUBLE UNSIGNED NOT NULL,
-    groupNumber INT UNSIGNED NOT NULL
+CREATE TABLE ProteinProphetProteinIon (
+	piProteinID INT UNSIGNED NOT NULL ,
+	piIonID INT UNSIGNED NOT NULL ,
+    initialProbability DOUBLE UNSIGNED NOT NULL,
+    nspAdjProbability DOUBLE UNSIGNED NOT NULL,
+    numSiblingPeptides DOUBLE UNSIGNED NOT NULL,
+    isContributingEvidence TINYINT NOT NULL DEFAULT 1
 );
-ALTER TABLE ProteinProphetProteinGroup ADD INDEX(piRunID);
+ALTER TABLE ProteinProphetProteinIon ADD PRIMARY KEY (piProteinID, piIonID);
 
+CREATE TABLE ProteinProphetSubsumedProtein (
+	piRunID INT UNSIGNED NOT NULL ,
+	subsumedProteinID INT UNSIGNED NOT NULL ,
+	subsumingProteinID INT UNSIGNED NOT NULL 
+);
+ALTER TABLE ProteinProphetSubsumedProtein ADD INDEX (piRunID, subsumedProteinID);
 
 
 #######################################################################################

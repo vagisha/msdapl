@@ -16,11 +16,13 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  */
 public class ProteinProphetProteinIonDAO extends BaseSqlMapDAO {
 
+    private static final String sqlMapNameSpace = "ProteinProphetProteinIon";
+    
     public ProteinProphetProteinIonDAO(SqlMapClient sqlMap) {
         super(sqlMap);
     }
     
     public void save(ProteinProphetProteinPeptideIon proteinIon) {
-        // TODO
+        super.save(sqlMapNameSpace+".insert", proteinIon);
     }
 }
