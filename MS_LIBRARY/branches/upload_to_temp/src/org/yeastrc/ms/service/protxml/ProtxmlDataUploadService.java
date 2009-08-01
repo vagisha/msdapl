@@ -167,7 +167,9 @@ public class ProtxmlDataUploadService {
     private void saveProteinProphetGroup(ProteinProphetGroup proteinGroup,
             int pinferId) throws UploadException {
         
-        int ppGrpId = grpDao.saveGroup(pinferId, proteinGroup.getProbability(), proteinGroup.getGroupNumber());
+        proteinGroup.setProteinferId(pinferId);
+        
+        int ppGrpId = grpDao.saveGroup(proteinGroup);
         
         Map<Integer, Set<String>> subsumedMap = new HashMap<Integer, Set<String>>();
         Map<String, Integer> proteinIdMap = new HashMap<String, Integer>();

@@ -7,6 +7,7 @@
 package org.yeastrc.ms.dao.protinfer.proteinProphet;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -21,7 +22,7 @@ public class ProteinProphetProteinGroupDAO extends BaseSqlMapDAO {
         super(sqlMap);
     }
     
-    public int saveGroup(int pinferId, double probability, int groupNumber) {
-        
+    public int saveGroup(ProteinProphetGroup group) {
+        return super.saveAndReturnId(sqlMapNameSpace+".insert", group);
     }
 }

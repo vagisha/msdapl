@@ -6,16 +6,16 @@
 	<typeAlias alias="ProteinProphetRun" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun"/>
 		
 	<resultMap class="ProteinProphetRun" id="proteinProphetRunResult" extends="ProteinferRun.pinferRunBaseResult">
-		<result property="inputSummaryList" 
-				select="IdPickerInput.selectIdPickerInputList"
-				column="id"/>
 		<result property="params" 
-				select="IdPickerParam.selectParamsForRun"
+				select="ProteinProphetParam.selectParamsForRun"
+				column="id"/>
+		<result property="rocPoints" 
+				select="ProteinProphetRoc.select"
 				column="id"/>
 	</resultMap>
 	
 	
-	<select id="select" resultMap="idpickerRunResult" parameterClass="Integer">
+	<select id="select" resultMap="proteinProphetRunResult" parameterClass="Integer">
     	SELECT * FROM msProteinInferRun WHERE id=#id#
     </select>
     

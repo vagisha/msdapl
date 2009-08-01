@@ -557,6 +557,15 @@ CREATE TABLE ProteinProphetROC (
 ALTER TABLE ProteinProphetROC ADD INDEX(piRunID);
 
 
+CREATE TABLE ProteinProphetProteinGroup (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	piRunID INT UNSIGNED NOT NULL,
+    groupNumber INT UNSIGNED NOT NULL,
+    probability DOUBLE UNSIGNED NOT NULL
+);
+ALTER TABLE ProteinProphetProteinGroup ADD INDEX(piRunID, probability);
+
+
 CREATE TABLE ProteinProphetProtein (
 	piProteinID INT UNSIGNED NOT NULL PRIMARY KEY,
 	proteinProphetGroupID INT UNSIGNED NOT NULL,

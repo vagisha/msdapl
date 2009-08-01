@@ -14,9 +14,10 @@ import java.util.List;
  */
 public class ProteinProphetGroup {
 
-    private double probability;
-    private int groupNumber;
-    private int piRunId;
+    private double probability = -1.0;
+    private int groupNumber = -1;
+    private int proteinferId = 0;
+    private int id;
 
     private List<ProteinProphetProtein> proteinList;
     
@@ -49,11 +50,19 @@ public class ProteinProphetGroup {
         this.proteinList.add(protein);
     }
 
-    public int getPiRunId() {
-        return piRunId;
+    public int getProteinferId() {
+        return proteinferId;
     }
 
-    public void setPiRunId(int piRunId) {
-        this.piRunId = piRunId;
+    public void setProteinferId(int proteinferId) {
+        this.proteinferId = proteinferId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -115,8 +115,10 @@
 	<!-- Related to ProteinProphet -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRocSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetParam.xml"/>
-	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProtein.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetRun.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProteinGroup.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/protinfer/proteinProphet/ProteinProphetProtein.xml"/>
+	
 	
 	
 </sqlMapConfig>	

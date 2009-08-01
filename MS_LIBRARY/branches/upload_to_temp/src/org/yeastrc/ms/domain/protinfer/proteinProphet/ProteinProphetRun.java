@@ -40,4 +40,10 @@ public class ProteinProphetRun extends GenericProteinferRun<ProteinferInput> {
         this.roc = roc;
     }
     
+    public void setRocPoints(List<ProteinProphetROCPoint> points) {
+        this.roc = new ProteinProphetROC();
+        roc.setProteinferId(this.getId());
+        roc.setRocPoints(points);
+    }
+    
 }

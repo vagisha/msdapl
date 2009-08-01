@@ -24,6 +24,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRocDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProteinDAO;
 
 import com.ibatis.common.resources.Resources;
@@ -80,6 +81,7 @@ public class ProteinferDAOFactory {
     // ProteinProphet related
     private ProteinProphetParamDAO ppParamDao;
     private ProteinProphetRocDAO ppRocDao;
+    private ProteinProphetRunDAO ppRunDao;
     private ProteinProphetProteinGroupDAO ppProteinGrpDao;
     private ProteinProphetProteinDAO ppProteinDao;
     private ProteinProphetProteinIonDAO ppProteinIonDao;
@@ -111,6 +113,7 @@ public class ProteinferDAOFactory {
        // ProteinProphet related
        ppParamDao = new ProteinProphetParamDAO(sqlMap);
        ppRocDao = new ProteinProphetRocDAO(sqlMap);
+       ppRunDao = new ProteinProphetRunDAO(sqlMap, pinferRunDao);
        ppProteinGrpDao = new ProteinProphetProteinGroupDAO(sqlMap);
        ppProteinDao = new ProteinProphetProteinDAO(sqlMap, proteinDao);
        ppProteinIonDao = new ProteinProphetProteinIonDAO(sqlMap);
@@ -215,6 +218,10 @@ public class ProteinferDAOFactory {
     
     public ProteinProphetRocDAO getProteinProphetRocDao() {
         return ppRocDao;
+    }
+    
+    public ProteinProphetRunDAO getProteinProphetRunDao() {
+        return ppRunDao;
     }
     
     public ProteinProphetProteinGroupDAO getProteinProphetProteinGroupDao() {
