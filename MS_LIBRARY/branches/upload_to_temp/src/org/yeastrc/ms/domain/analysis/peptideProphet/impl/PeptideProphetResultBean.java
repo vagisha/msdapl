@@ -16,9 +16,8 @@ public class PeptideProphetResultBean extends SearchResultBean implements Peptid
 
     private PeptideProphetResultDataBean data = new PeptideProphetResultDataBean();
     
-    @Override
-    public String getAllNttProb() {
-        return data.getAllNttProb();
+    public boolean hasAllNttProb() {
+        return data.hasAllNttProb();
     }
     
     public void setAllNttProb(String allNttProb) {
@@ -49,11 +48,11 @@ public class PeptideProphetResultBean extends SearchResultBean implements Peptid
     }
 
     @Override
-    public int getNumTrypticTermini() {
-        return data.getNumTrypticTermini();
+    public int getNumEnzymaticTermini() {
+        return data.getNumEnzymaticTermini();
     }
     
-    public void setNumTrypticTermini(int ntt) {
+    public void setNumEnzymaticTermini(int ntt) {
         this.data.setNumEnzymaticTermini(ntt);
     }
 
@@ -95,17 +94,29 @@ public class PeptideProphetResultBean extends SearchResultBean implements Peptid
     }
 
     @Override
-    public double getProbabilityNtt_0() {
+    public double getProbabilityNet_0() {
         return data.getProbabilityNet_0();
     }
 
     @Override
-    public double getProbabilityNtt_1() {
+    public double getProbabilityNet_1() {
         return data.getProbabilityNet_1();
     }
 
     @Override
-    public double getProbabilityNtt_2() {
+    public double getProbabilityNet_2() {
         return data.getProbabilityNet_2();
+    }
+    
+    public void setProbabilityNet_0(double probabilityNet_0) {
+        data.setProbabilityNet_0(probabilityNet_0);
+    }
+
+    public void setProbabilityNet_1(double probabilityNet_1) {
+        data.setProbabilityNet_1(probabilityNet_1);
+    }
+
+    public void setProbabilityNet_2(double probabilityNet_2) {
+        data.setProbabilityNet_2(probabilityNet_2);
     }
 }

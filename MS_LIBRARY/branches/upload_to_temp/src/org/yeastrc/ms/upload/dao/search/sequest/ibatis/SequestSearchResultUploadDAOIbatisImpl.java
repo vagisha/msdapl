@@ -85,6 +85,8 @@ public class SequestSearchResultUploadDAOIbatisImpl extends BaseSqlMapDAO implem
             values.append(",");
             values.append(data.getDeltaCN());
             values.append(",");
+            values.append(data.getDeltaCNstar());
+            values.append(",");
             values.append(data.getEvalue());
             values.append(",");
             values.append(data.getCalculatedMass());
@@ -189,6 +191,10 @@ public class SequestSearchResultUploadDAOIbatisImpl extends BaseSqlMapDAO implem
 
         public Double getEvalue() {
             return result.getEvalue();
+        }
+
+        public BigDecimal getDeltaCNstar() {
+            return result.getDeltaCNstar();
         }
     }
 }

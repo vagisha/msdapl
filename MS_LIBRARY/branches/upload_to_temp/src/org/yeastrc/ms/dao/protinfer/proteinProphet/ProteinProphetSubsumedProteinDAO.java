@@ -24,10 +24,9 @@ public class ProteinProphetSubsumedProteinDAO extends BaseSqlMapDAO {
         super(sqlMap);
     }
     
-    public void saveSubsumedProtein(int pinferId, int subsumedProteinId, int subsumingProteinId) {
+    public void saveSubsumedProtein(int subsumedProteinId, int subsumingProteinId) {
         
         Map<String, Integer> map = new HashMap<String, Integer>(6);
-        map.put("pinferId", pinferId);
         map.put("subsumedProteinId", subsumedProteinId);
         map.put("subsumingProteinId", subsumingProteinId);
         super.save(namespace+".insert", map);

@@ -146,6 +146,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                         if(this.searchDynamicResidueMods == null) {
                             readModifications();
                         }
+                        reader.next();
                         return true;
                     }
                 }
@@ -417,7 +418,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                     if (scoreType.equalsIgnoreCase("fval"))
                         ppRes.setfVal(Double.parseDouble(scoreVal));
                     else if (scoreType.equalsIgnoreCase("ntt"))
-                        ppRes.setNumTrypticTermini(Integer.parseInt(scoreVal));
+                        ppRes.setNumEnzymaticTermini(Integer.parseInt(scoreVal));
                     else if (scoreType.equalsIgnoreCase("nmc"))
                         ppRes.setNumMissedCleavages(Integer.parseInt(scoreVal));
                     else if (scoreType.equalsIgnoreCase("massd"))
@@ -439,16 +440,18 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         hit.ppRes = ppRes;
         
         // make sure the probability for this hit is the best from all_ntt_prob
-        if(ppRes.getAllNttProb() != null) {
+        if(ppRes.hasAllNttProb()) {
            int maxNet = 0;  // max number of enzymatic termini for a matched protein
            List<MsSearchResultProteinIn> proteins = hit.getProteinMatchList();
            for(MsSearchResultProteinIn protein: proteins) {
                maxNet = Math.max(maxNet, ((DbLocus)protein).getNumEnzymaticTermini());
            }
            if(maxNet == 1) 
-               ppRes.setProbability(ppRes.getProbability() >= ppRes.getProbabilityNtt_1() ? ppRes.getProbability() : ppRes.getProbabilityNtt_1());
+               ppRes.setProbability(ppRes.getProbability() >= ppRes.getProbabilityNet_1() ? ppRes.getProbability() : ppRes.getProbabilityNet_1());
            else if (maxNet == 2)
-               ppRes.setProbability(ppRes.getProbability() >= ppRes.getProbabilityNtt_2() ? ppRes.getProbability() : ppRes.getProbabilityNtt_2());
+               ppRes.setProbability(ppRes.getProbability() >= ppRes.getProbabilityNet_2() ? ppRes.getProbability() : ppRes.getProbabilityNet_2());
+           
+           ppRes.setNumEnzymaticTermini(maxNet);
         }
         
         return hit;
@@ -533,23 +536,18 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         }
 
         @Override
-        public String getAllNttProb() {
-            return ppRes.getAllNttProb();
-        }
-
-        @Override
         public double getProbabilityNet_0() {
-            return ppRes.getProbabilityNtt_0();
+            return ppRes.getProbabilityNet_0();
         }
 
         @Override
         public double getProbabilityNet_1() {
-            return ppRes.getProbabilityNtt_1();
+            return ppRes.getProbabilityNet_1();
         }
 
         @Override
         public double getProbabilityNet_2() {
-            return ppRes.getProbabilityNtt_2();
+            return ppRes.getProbabilityNet_2();
         }
         
         @Override
@@ -564,7 +562,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
 
         @Override
         public int getNumEnzymaticTermini() {
-            return ppRes.getNumTrypticTermini();
+            return ppRes.getNumEnzymaticTermini();
         }
 
         @Override

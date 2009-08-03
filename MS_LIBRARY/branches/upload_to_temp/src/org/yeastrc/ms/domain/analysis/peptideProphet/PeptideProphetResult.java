@@ -21,16 +21,16 @@ public interface PeptideProphetResult extends MsSearchResult {
     public abstract double getfVal();
     public abstract double getfValRounded();
     
-    public abstract int getNumTrypticTermini();
+    public abstract int getNumEnzymaticTermini();
     
     public abstract int getNumMissedCleavages();
     
     public abstract double getMassDifference();
     public abstract double getMassDifferenceRounded();
     
-    public abstract String getAllNttProb();
+//    public abstract String getAllNttProb();
     
-    public double getProbabilityNtt_0();
-    public double getProbabilityNtt_1();
-    public double getProbabilityNtt_2();
+    public double getProbabilityNet_0();
+    public double getProbabilityNet_1();
+    public double getProbabilityNet_2();
 }

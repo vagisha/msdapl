@@ -47,14 +47,14 @@ public class ProteinProphetROC {
         
         for(ProteinProphetROCPoint point: rocPoints) {
             if(probability == -1.0) {
-                closestError = point.getError();
+                closestError = point.getFalsePositiveErrorRate();
                 probability = point.getMinProbability();
                 continue;
             }
-            double diff = Math.abs(error - point.getError());
+            double diff = Math.abs(error - point.getFalsePositiveErrorRate());
             double oldDiff = Math.abs(error - closestError);
             if(diff < oldDiff) {
-                closestError = point.getError();
+                closestError = point.getFalsePositiveErrorRate();
                 probability = point.getMinProbability();
             }
         }
@@ -63,13 +63,13 @@ public class ProteinProphetROC {
     
     public double getClosestError(double error) {
         
-        double closestError = rocPoints.get(0).getError();
+        double closestError = rocPoints.get(0).getFalsePositiveErrorRate();
         
         for(ProteinProphetROCPoint point: rocPoints) {
-            double diff = Math.abs(error - point.getError());
+            double diff = Math.abs(error - point.getFalsePositiveErrorRate());
             double oldDiff = Math.abs(error - closestError);
             if(diff < oldDiff) {
-                closestError = point.getError();
+                closestError = point.getFalsePositiveErrorRate();
             }
         }
         return closestError;

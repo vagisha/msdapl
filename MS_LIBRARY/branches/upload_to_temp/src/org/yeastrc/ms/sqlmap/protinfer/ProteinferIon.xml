@@ -10,7 +10,7 @@
 		<result property="id" column="id" />
 		<result property="proteinferPeptideId" column="piPeptideID" />
 		<result property="charge" column="charge" />
-		<result property="modificationSequence" column="modificationSequence" />
+		<result property="modifiedSequence" column="modifiedSequence" />
 		<result property="modificationStateId" column="modificationStateID" />
 		<result property="spectrumCount" select="ProteinferSpectrumMatch.selectSpectrumCountForIon" column="id" />
 	</resultMap>

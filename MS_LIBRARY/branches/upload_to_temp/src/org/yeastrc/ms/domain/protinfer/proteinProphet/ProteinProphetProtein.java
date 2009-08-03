@@ -94,7 +94,7 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
         protein.setProteinName(name);
         protein.setConfidence(this.confidence);
         protein.setCoverage(this.getCoverage());
-        protein.setIndistinguishableGroupId(this.indistinguishableGroupId);
+        protein.setGroupId(this.indistinguishableGroupId);
         protein.setPctSpectrumCount(this.pctSpectrumCount);
         protein.setPeptideDefinition(this.getPeptideDefinition());
         protein.setPeptides(this.getPeptides());
@@ -115,7 +115,7 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
         this.indistinguishableProteins.add(protein);
     }
     
-    public boolean isSubsumed() {
+    public boolean getSubsumed() {
         return isSubsumed;
     }
 
@@ -152,11 +152,11 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
         peptides.add(peptide);
     }
     
-    public int getIndistinguishableGroupId() {
+    public int getGroupId() {
         return indistinguishableGroupId;
     }
 
-    public void setIndistinguishableGroupId(int indistinguishableGroupId) {
+    public void setGroupId(int indistinguishableGroupId) {
         this.indistinguishableGroupId = indistinguishableGroupId;
     }
 

@@ -20,7 +20,7 @@ public enum RunFileFormat {
             return RunFileFormat.MS2;
         if (fmtString.equalsIgnoreCase(RunFileFormat.CMS2.name()))
             return RunFileFormat.CMS2;
-        else if (fmtString.equals(RunFileFormat.MZXML.name()))
+        else if (fmtString.equalsIgnoreCase(RunFileFormat.MZXML.name()))
             return RunFileFormat.MZXML;
         else if (fmtString.equalsIgnoreCase(RunFileFormat.MZDATA.name()))
             return RunFileFormat.MZDATA;

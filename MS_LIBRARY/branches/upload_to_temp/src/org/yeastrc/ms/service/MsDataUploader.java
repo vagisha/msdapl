@@ -321,7 +321,8 @@ public class MsDataUploader {
             sdus.setRemoteServer(remoteServer);
             sdus.setRemoteDirectory(remoteDirectory);
             sdus.setSearchDate(searchDate);
-            sdus.checkResultChargeMass(doScanChargeMassCheck);
+            if(doScanChargeMassCheck)
+                sdus.checkResultChargeMass(doScanChargeMassCheck);
         }
         catch (UploadServiceFactoryException e1) {
             UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);

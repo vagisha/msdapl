@@ -27,6 +27,9 @@ public class PeptideProphetROC {
 
     public void setSearchAnalysisId(int searchAnalysisId) {
         this.searchAnalysisId = searchAnalysisId;
+        for(PeptideProphetROCPoint point: rocPoints) {
+            point.setSearchAnalysisId(searchAnalysisId);
+        }
     }
 
     public List<PeptideProphetROCPoint> getRocPoints() {
@@ -35,10 +38,13 @@ public class PeptideProphetROC {
     
     public void addRocPoint(PeptideProphetROCPoint point) {
         this.rocPoints.add(point);
+        point.setSearchAnalysisId(this.searchAnalysisId);
     }
     
     public void setRocPoints(List<PeptideProphetROCPoint> rocPoints) {
         this.rocPoints = rocPoints;
+        for(PeptideProphetROCPoint point: rocPoints)
+            point.setSearchAnalysisId(searchAnalysisId);
     }
 
     public double getMinProbabilityForError(double error) {

@@ -56,10 +56,10 @@ public class ProteinProphetProteinPeptideIon extends GenericProteinferIon<Protei
         this.weight = weight;
     }
     
-    public boolean isContributingEvidence() {
+    public boolean getIsContributingEvidence() {
         return isContributingEvidence;
     }
-    public void setContributingEvidence(boolean isContributingEvidence) {
+    public void setIsContributingEvidence(boolean isContributingEvidence) {
         this.isContributingEvidence = isContributingEvidence;
     }
     public double getNumSiblingPeptides() {

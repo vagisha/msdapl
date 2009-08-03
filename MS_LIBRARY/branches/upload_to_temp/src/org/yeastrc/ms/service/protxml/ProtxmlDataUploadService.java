@@ -69,7 +69,7 @@ public class ProtxmlDataUploadService {
     private final MsSearchResultDAO resDao;
     private final PeptideProphetResultUploadDAO ppResDao;
     
-    private final int nrseqDatabaseId;
+    private int nrseqDatabaseId;
     
     private final ProteinferDAOFactory piDaoFactory;
     private ProteinferRunDAO runDao;
@@ -90,7 +90,7 @@ public class ProtxmlDataUploadService {
     private DynamicModLookupUtil modLookup;
     private int searchId;
     
-    public ProtxmlDataUploadService(int nrseqDatabaseId) {
+    public ProtxmlDataUploadService() {
         
         peptideMap = new HashMap<String, Integer>();
         ionMap = new HashMap<String, Integer>();
@@ -113,10 +113,12 @@ public class ProtxmlDataUploadService {
         ppProteinIonDao = piDaoFactory.getProteinProphetProteinIonDao();
         ppSusumedDao = piDaoFactory.getProteinProphetSubsumedProteinDao();
         
-        this.nrseqDatabaseId = nrseqDatabaseId;
     }
     
-    public int upload(String filepath, int searchId) throws UploadException {
+    
+    public int upload(String filepath, int searchId, int nrseqDatabaseId) throws UploadException {
+        
+        this.nrseqDatabaseId = nrseqDatabaseId;
         
         InteractProtXmlParser parser = new InteractProtXmlParser();
         try {
@@ -191,16 +193,16 @@ public class ProtxmlDataUploadService {
             }
         }
         
-        saveSubsumedProteins(pinferId, subsumedMap, proteinIdMap);
+        saveSubsumedProteins(subsumedMap, proteinIdMap);
     }
     
-    private void saveSubsumedProteins(int pinferId, Map<Integer, Set<String>> subsumedMap, Map<String, Integer> proteinIdMap) {
+    private void saveSubsumedProteins(Map<Integer, Set<String>> subsumedMap, Map<String, Integer> proteinIdMap) {
         
         for(int subsumedId: subsumedMap.keySet()) {
             Set<String> subsuming = subsumedMap.get(subsumedId);
             for(String name: subsuming) {
                 int subsumingId = proteinIdMap.get(name);
-                ppSusumedDao.saveSubsumedProtein(pinferId, subsumedId, subsumingId);
+                ppSusumedDao.saveSubsumedProtein(subsumedId, subsumingId);
             }
         }
     }
@@ -222,7 +224,7 @@ public class ProtxmlDataUploadService {
         // Is this a subsumed protein
         // NOTE: assuming all subsuming proteins for a protein will be in the same
         // protein group as the protein
-        if(protein.isSubsumed()) {
+        if(protein.getSubsumed()) {
             subsumedMap.put(piProteinId, protein.getSusumingProteins());
         }
         return piProteinId;

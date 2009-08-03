@@ -20,6 +20,7 @@ import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MzXmlDataProvider;
 import org.yeastrc.ms.parser.mzxml.MzXmlFileReader;
+import org.yeastrc.ms.parser.mzxml.MzXmlScan;
 import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -39,7 +40,8 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     
     private static final Logger log = Logger.getLogger(MzXmlDataUploadService.class.getName());
 
-    private static final UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
+    private final UploadDAOFactory daoFactory;
+    private MsScanUploadDAO scanDao;
 
     public static final int SCAN_BUF_SIZE = 100;
     
@@ -54,7 +56,10 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     int lastUploadedRunId = 0;
     private int numRunsUploaded = 0;
     
-    public MzXmlDataUploadService() {}
+    public MzXmlDataUploadService() {
+        daoFactory = UploadDAOFactory.getInstance();
+        scanDao = daoFactory.getMsScanDAO();
+    }
 
     @Override
     public void setExperimentId(int experimentId) {
@@ -127,6 +132,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
             }});
         
         Set<RunFileFormat> formats = new HashSet<RunFileFormat>();
+        filenames = new ArrayList<String>();
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory())
                 continue;
@@ -193,7 +199,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     }
     
     private static void deleteRun(Integer runId) {
-        MS2RunUploadDAO runDao = daoFactory.getMS2FileRunDAO();
+        MS2RunUploadDAO runDao = UploadDAOFactory.getInstance().getMS2FileRunDAO();
         runDao.delete(runId);
     }
     
@@ -335,9 +341,14 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
             MsScanIn scan;
             try {
                 scan = provider.getNextScan();
+                
                 if(scan == null)
                     break;
-                scans.add(scan);
+                if(scan.getMsLevel() == 1)  {
+                    scanDao.save(scan, runId);
+                }
+                else
+                    scans.add(scan);
             }
             catch (DataProviderException e) {
                 UploadException ex = new UploadException(ERROR_CODE.INVALID_MZXML_SCAN);
@@ -374,8 +385,6 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
     
 
     private int uploadScans(List<MsScanIn> scans, int runId) {
-        
-        MsScanUploadDAO scanDao = daoFactory.getMsScanDAO();
         List<Integer> autoIncrIds = scanDao.save(scans, runId);
         return scans.size();
     }

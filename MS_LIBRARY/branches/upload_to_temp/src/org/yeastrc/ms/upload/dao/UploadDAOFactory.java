@@ -13,8 +13,6 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
 import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.upload.dao.analysis.MsRunSearchAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
@@ -363,6 +361,10 @@ public class UploadDAOFactory {
         // Percolator post search analysis related 
         percSQTHeaderDAO = new PercolatorParamsUploadDAOIbatisImpl(sqlMap);
         percResultDAO = new PercolatorResultUploadDAOIbatisImpl(sqlMap);
+        
+        // DAOs related to PeptideProphet post search analysis
+        ppRocDAO = new PeptideProphetRocUploadDAOImpl(sqlMap);
+        pprophResultDAO = new PeptideProphetResultUploadDAOImpl(sqlMap);
     }
     
     public static UploadDAOFactory getInstance() {

@@ -19,55 +19,61 @@ public class PeptideProphetResultDataBean implements PeptideProphetResultDataWId
     private int resultId;
     private int runSearchAnalysisId;
     private double probability = -1.0;
+    private double probabilityNet_0 = -1.0;
+    private double probabilityNet_1 = -1.0;
+    private double probabilityNet_2 = -1.0;
+    
     private double fVal = -1.0; // TODO is this always positive?
     private double massDiff = 0.0;
     private int ntt = -1;
     private int nmc = -1;
-    private String allNttProb;
+    private boolean hasAllNttProb = false;
     
     private static final Pattern allNttPattern = Pattern.compile("^\\((\\d\\.?\\d*)\\s*,\\s*(\\d\\.?\\d*)\\s*,\\s*(\\d\\.?\\d*)\\s*\\)$");
     
-    @Override
-    public String getAllNttProb() {
-        return allNttProb;
+    public boolean hasAllNttProb() {
+        return hasAllNttProb;
     }
     
     public void setAllNttProb(String allNttProb) {
-        this.allNttProb = allNttProb;
+        if(allNttProb != null) {
+            Matcher m = allNttPattern.matcher(allNttProb);
+            if(m.matches()) {
+                probabilityNet_0 = Double.parseDouble(m.group(1));
+                probabilityNet_1 = Double.parseDouble(m.group(2));
+                probabilityNet_2 = Double.parseDouble(m.group(3));
+            }
+            hasAllNttProb = true;
+        }
     }
 
     @Override
     public double getProbabilityNet_0() {
-        if(this.getAllNttProb() == null)
-            return -1.0;
-        Matcher m = allNttPattern.matcher(getAllNttProb());
-        if(m.matches()) {
-            return Double.parseDouble(m.group(1));
-        }
-        return -1.0;
+       return probabilityNet_0;
     }
 
     @Override
     public double getProbabilityNet_1() {
-        if(this.getAllNttProb() == null)
-            return -1.0;
-        Matcher m = allNttPattern.matcher(getAllNttProb());
-        if(m.matches()) {
-            return Double.parseDouble(m.group(2));
-        }
-        return -1.0;
+        return probabilityNet_1;
     }
 
     @Override
     public double getProbabilityNet_2() {
-        if(this.getAllNttProb() == null)
-            return -1.0;
-        Matcher m = allNttPattern.matcher(getAllNttProb());
-        if(m.matches()) {
-            return Double.parseDouble(m.group(3));
-        }
-        return -1.0;
+        return probabilityNet_2;
     }
+    
+    public void setProbabilityNet_0(double probabilityNet_0) {
+        this.probabilityNet_0 = probabilityNet_0;
+    }
+
+    public void setProbabilityNet_1(double probabilityNet_1) {
+        this.probabilityNet_1 = probabilityNet_1;
+    }
+
+    public void setProbabilityNet_2(double probabilityNet_2) {
+        this.probabilityNet_2 = probabilityNet_2;
+    }
+    
     @Override
     public double getMassDifference() {
         return massDiff;
@@ -87,7 +93,7 @@ public class PeptideProphetResultDataBean implements PeptideProphetResultDataWId
     }
 
     @Override
-    public int getNumTrypticTermini() {
+    public int getNumEnzymaticTermini() {
         return ntt;
     }
     

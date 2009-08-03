@@ -5,10 +5,9 @@
 
     <insert id="insert" parameterClass="java.util.Map">
     	INSERT INTO ProteinProphetSubsumedProtein (
-    	piRunID,
     	subsumedProteinID,
     	subsumingProteinID)
-    	VALUES (?,?,?)
+    	VALUES (?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

@@ -341,7 +341,7 @@ ALTER TABLE ProLuCIDSearchResult ADD INDEX(secondaryScore);
 CREATE TABLE msSearchAnalysis (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	   	programName VARCHAR(255) NOT NULL,
-	   	programVersion VARCHAR(20),
+	   	programVersion VARCHAR(255),
 	   	uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -385,7 +385,7 @@ CREATE TABLE PeptideProphetROC (
 		searchAnalysisID INT UNSIGNED NOT NULL,
 	   	sensitivity DOUBLE UNSIGNED NOT NULL,
 	   	error DOUBLE UNSIGNED NOT NULL,
-	   	probability DOUBLE UNSIGNED NOT NULL,
+	   	minProbability DOUBLE UNSIGNED NOT NULL,
 	   	numCorrect INT UNSIGNED NOT NULL,
 	   	numIncorrect INT UNSIGNED NOT NULL
 );
@@ -394,7 +394,7 @@ ALTER TABLE PeptideProphetROC ADD INDEX(searchAnalysisID);
 CREATE TABLE PeptideProphetResult (
 		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
 		runSearchAnalysisID INT UNSIGNED NOT NULL,
-		minProbability DOUBLE UNSIGNED NOT NULL,
+		probability DOUBLE UNSIGNED NOT NULL,
 		fVal DOUBLE UNSIGNED NOT NULL,
 		numEnzymaticTermini INT UNSIGNED NOT NULL,
 		numMissedCleavages INT UNSIGNED NOT NULL,
@@ -415,7 +415,7 @@ ALTER TABLE PeptideProphetResult ADD INDEX(probability);
 CREATE TABLE msProteinInferRun (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	program VARCHAR(255) NOT NULL,
-	programVersion VARCHAR(10) NOT NULL,
+	programVersion VARCHAR(255) NOT NULL,
 	inputGenerator VARCHAR(255) NOT NULL,
 	dateRun DATETIME,
 	comments TEXT(10)
@@ -578,7 +578,7 @@ CREATE TABLE ProteinProphetProtein (
     pctSpectrumCount INT UnSIGNED NOT NULL
 );
 ALTER TABLE ProteinProphetProtein ADD INDEX(groupID);
-ALTER TABLE ProteinProphetProtein ADD INDEX(prophetGroupID);
+ALTER TABLE ProteinProphetProtein ADD INDEX(proteinProphetGroupID);
 
 CREATE TABLE ProteinProphetProteinIon (
 	piProteinID INT UNSIGNED NOT NULL ,
@@ -591,11 +591,11 @@ CREATE TABLE ProteinProphetProteinIon (
 ALTER TABLE ProteinProphetProteinIon ADD PRIMARY KEY (piProteinID, piIonID);
 
 CREATE TABLE ProteinProphetSubsumedProtein (
-	piRunID INT UNSIGNED NOT NULL ,
 	subsumedProteinID INT UNSIGNED NOT NULL ,
 	subsumingProteinID INT UNSIGNED NOT NULL 
 );
-ALTER TABLE ProteinProphetSubsumedProtein ADD INDEX (piRunID, subsumedProteinID);
+ALTER TABLE ProteinProphetSubsumedProtein ADD INDEX (subsumedProteinID);
+ALTER TABLE ProteinProphetSubsumedProtein ADD INDEX (subsumingProteinID);
 
 
 #######################################################################################
@@ -620,6 +620,7 @@ CREATE TRIGGER msProteinInferIon_bdelete BEFORE DELETE ON msProteinInferIon
  FOR EACH ROW
  BEGIN
    DELETE FROM msProteinInferSpectrumMatch WHERE piIonID = OLD.id;
+   DELETE FROM ProteinProphetProteinIon WHERE piIonID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -641,7 +642,10 @@ CREATE TRIGGER msProteinInferProtein_bdelete BEFORE DELETE ON msProteinInferProt
  FOR EACH ROW
  BEGIN
  	DELETE FROM IDPickerProtein WHERE piProteinID = OLD.id;
+ 	DELETE FROM ProteinProphetProtein WHERE piProteinID = OLD.id;
    	DELETE FROM msProteinInferProteinPeptideMatch WHERE piProteinID = OLD.id;
+   	DELETE FROM ProteinProphetSubsumedProtein WHERE subsumedProteinID = OLD.id;
+   	DELETE FROM ProteinProphetSubsumedProtein WHERE subsumingProteinID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -665,6 +669,9 @@ CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
    	DELETE FROM msProteinInferInput WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferProtein WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferPeptide WHERE piRunID = OLD.id;
+  	DELETE FROM ProteinPropehtParam WHERE piRunID = OLD.id;
+  	DELETE FROM ProteinProphetROC WHERE piRunID = OLD.id;
+  	DELETE FROM ProteinProphetProteinGroup WHERE piRunID = OLD.id;
  END;
 |
 DELIMITER ;

@@ -35,9 +35,7 @@ public class MzXmlHeader implements MsRunIn {
     
     
     public void setFileName(String fileName) {
-        int idx = fileName.lastIndexOf("."+RunFileFormat.MZXML.name().toLowerCase());
-        if(idx == -1)
-            idx = fileName.lastIndexOf("."+RunFileFormat.MZXML.name());
+        int idx = fileName.toLowerCase().lastIndexOf("."+RunFileFormat.MZXML.name().toLowerCase());
         if(idx == -1)
             this.fileName = fileName;
         else

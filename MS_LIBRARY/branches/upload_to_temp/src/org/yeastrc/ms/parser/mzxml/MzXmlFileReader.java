@@ -27,6 +27,9 @@ public class MzXmlFileReader implements MzXmlDataProvider {
     private MSXMLParser parser;
     private int numScans = 0;
     private int numScansRead = 0;
+    private int lastMs1ScanNumber = -1;
+    private boolean isCentroided = false;
+    private DataConversionType dataConvType = DataConversionType.UNKNOWN;
     
     private static final Pattern rtPattern = Pattern.compile("^PT(\\d+\\.?\\d*)S$"); 
     
@@ -64,12 +67,29 @@ public class MzXmlFileReader implements MzXmlDataProvider {
         mScan.setStartScanNum(header.getNum());
         mScan.setEndScanNum(header.getNum());
         
-        if(header.getPrecursorScanNum() > 0) {
-            mScan.setPrecursorScanNum(header.getPrecursorScanNum());
+        if(header.getMsLevel() == 1) {
+            this.lastMs1ScanNumber = mScan.getStartScanNum();
+        }
+        else if(header.getMsLevel() > 1) {
+            
+            if(header.getPrecursorScanNum() > 0) {
+                if(header.getPrecursorScanNum() != this.lastMs1ScanNumber) {
+                    throw new DataProviderException("last MS1 scan: "+this.lastMs1ScanNumber+
+                            " is not the same as precursor scan number: "+header.getPrecursorScanNum()+
+                            " for scan: "+header.getNum());
+                }
+                mScan.setPrecursorScanNum(header.getPrecursorScanNum());
+            }
+            else {
+                mScan.setPrecursorScanNum(this.lastMs1ScanNumber);
+            }
             mScan.setPrecursorMz(new BigDecimal(header.getPrecursorMz()));
         }
         mScan.setRetentionTime(getRetentionTime(header));
-        mScan.setDataConversionType(getDataConversionType(header.getCentroided()));
+        if(header.getCentroided() != -1)
+            mScan.setDataConversionType(getDataConversionType(header.getCentroided()));
+        else
+            mScan.setDataConversionType(this.dataConvType);
         
         mScan.setPeakCount(header.getPeaksCount());
         double[][] mzInt = scan.getMassIntensityList();
@@ -122,7 +142,7 @@ public class MzXmlFileReader implements MzXmlDataProvider {
         
         DataProcessingInfo dpInfo = info.getDataProcessing();
         
-        DataConversionType dataConvType = getDataConversionType(dpInfo.getCentroided());
+        dataConvType  = getDataConversionType(dpInfo.getCentroided());
         run.setDataConversionType(dataConvType);
         
         List<SoftwareInfo> swList = dpInfo.getSoftwareUsed();
@@ -140,6 +160,10 @@ public class MzXmlFileReader implements MzXmlDataProvider {
         run.setInstrumentModel(msiInfo.getModel());
         run.setInstrumentVendor(msiInfo.getManufacturer());
       
+        run.setFileName(this.filename);
+        run.setSha1Sum(sha1Sum);
+        
+        
         return run;
     }
 

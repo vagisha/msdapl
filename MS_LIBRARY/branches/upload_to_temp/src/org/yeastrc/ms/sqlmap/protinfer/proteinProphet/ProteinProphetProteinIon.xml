@@ -3,7 +3,7 @@
       "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
 <sqlMap namespace="ProteinProphetProteinIon"> 
 
-	<typeAlias alias="ProteinProphetProteinIon" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinIon"/>
+	<typeAlias alias="ProteinProphetProteinIon" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon"/>
 	
 	<resultMap class="ProteinProphetProteinIon" id="proteinIonResult">
 		<result property="piProteinId" column="piProteinID" nullValue="0" />

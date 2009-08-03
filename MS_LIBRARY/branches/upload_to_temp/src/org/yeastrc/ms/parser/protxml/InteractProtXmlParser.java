@@ -139,7 +139,7 @@ public class InteractProtXmlParser {
                     ProteinProphetROCPoint rocPoint = new ProteinProphetROCPoint();
                     rocPoint.setMinProbability(Double.parseDouble(reader.getAttributeValue(null, "min_probability")));
                     rocPoint.setSensitivity(Double.parseDouble(reader.getAttributeValue(null, "sensitivity")));
-                    rocPoint.setError(Double.parseDouble(reader.getAttributeValue(null, "false_positive_error_rate")));
+                    rocPoint.setFalsePositiveErrorRate(Double.parseDouble(reader.getAttributeValue(null, "false_positive_error_rate")));
                     rocPoint.setNumCorrect(Integer.parseInt(reader.getAttributeValue(null, "predicted_num_correct")));
                     rocPoint.setNumIncorrect(Integer.parseInt(reader.getAttributeValue(null, "predicted_num_incorrect")));
                     rocPoints.add(rocPoint);
@@ -245,7 +245,7 @@ public class InteractProtXmlParser {
                 lastIon = new ProteinProphetProteinPeptideIon();
                 lastIon.setUnmodifiedSequence(peptide.getSequence());
                 lastIon.setCharge(Integer.parseInt(reader.getAttributeValue(null, "charge")));
-                lastIon.setContributingEvidence(reader.getAttributeValue(null, "is_contributing_evidence").equalsIgnoreCase("Y"));
+                lastIon.setIsContributingEvidence(reader.getAttributeValue(null, "is_contributing_evidence").equalsIgnoreCase("Y"));
                 lastIon.setSpectrumCount(Integer.parseInt(reader.getAttributeValue(null, "n_instances")));
                 lastIon.setInitialProbability(Double.parseDouble(reader.getAttributeValue(null, "initial_probability")));
                 lastIon.setNspAdjProbability(Double.parseDouble(reader.getAttributeValue(null, "nsp_adjusted_probability")));

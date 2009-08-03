@@ -19,6 +19,8 @@ import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
+import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
+import org.yeastrc.ms.service.pepxml.PepxmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.BaseSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
@@ -78,6 +80,11 @@ public class UploadServiceFactory {
             service.setDirectory(dataDirectory);
             return service;
         }
+        else if(format == RunFileFormat.MZXML) {
+            SpectrumDataUploadService service = new MzXmlDataUploadService();
+            service.setDirectory(dataDirectory);
+            return service;
+        }
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
         }
@@ -105,10 +112,17 @@ public class UploadServiceFactory {
             if(files[i].isDirectory())
                 continue;
             String fileName = files[i].getName();
-            int idx = fileName.lastIndexOf(".");
-            if(idx == -1)   continue;
             
-            String ext = fileName.substring(idx);
+            String ext = null;
+            if(fileName.toLowerCase().endsWith("pep.xml"))
+                ext = "pep.xml";
+            else {
+                int idx = fileName.lastIndexOf(".");
+                if(idx == -1)   continue;
+
+                ext = fileName.substring(idx);
+            }
+           
             SearchFileFormat format = SearchFileFormat.forFileExtension(ext);
             if(format == SearchFileFormat.UNKNOWN) 
                 continue;
@@ -152,6 +166,11 @@ public class UploadServiceFactory {
                 throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
             }
         }
+        else if(format == SearchFileFormat.PEPXML) {
+            SearchDataUploadService service = new PepxmlDataUploadService();
+            service.setDirectory(dataDirectory);
+            return service;
+        }
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
         }
@@ -173,17 +192,24 @@ public class UploadServiceFactory {
         }
         
         File[] files = dir.listFiles();
-        String name = null;
         Set<SearchFileFormat> formats = new HashSet<SearchFileFormat>();
         Set<String> filenames = new HashSet<String>();
+        
         for (int i = 0; i < files.length; i++) {
             if(files[i].isDirectory())
                 continue;
             String fileName = files[i].getName();
-            int idx = fileName.lastIndexOf(".");
-            if(idx == -1)   continue;
             
-            String ext = fileName.substring(idx);
+            String ext = null;
+            if(fileName.toLowerCase().endsWith("prot.xml"))
+                ext = "prot.xml";
+            else {
+                int idx = fileName.lastIndexOf(".");
+                if(idx == -1)   continue;
+
+                ext = fileName.substring(idx);
+            }
+            
             SearchFileFormat format = SearchFileFormat.forFileExtension(ext);
             if(format == SearchFileFormat.UNKNOWN) 
                 continue;
@@ -213,6 +239,11 @@ public class UploadServiceFactory {
             else {
                 throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
             }
+        }
+        else if(format == SearchFileFormat.PEPXML) {
+            AnalysisDataUploadService service = new PepxmlDataUploadService();
+            service.setDirectory(dataDirectory);
+            return service;
         }
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());

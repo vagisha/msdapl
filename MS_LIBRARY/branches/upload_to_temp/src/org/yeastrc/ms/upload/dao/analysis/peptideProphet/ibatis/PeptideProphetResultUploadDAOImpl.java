@@ -51,7 +51,7 @@ public class PeptideProphetResultUploadDAOImpl extends BaseSqlMapDAO implements
             double fVal = data.getfVal();
             values.append(fVal == -1.0 ? "NULL" : fVal);
             values.append(",");
-            int ntt = data.getNumTrypticTermini();
+            int ntt = data.getNumEnzymaticTermini();
             values.append(ntt == -1 ? "NULL" : ntt);
             values.append(",");
             int nmc = data.getNumMissedCleavages();
@@ -59,11 +59,11 @@ public class PeptideProphetResultUploadDAOImpl extends BaseSqlMapDAO implements
             values.append(",");
             values.append(data.getMassDifference());
             values.append(",");
-            values.append(data.getAllNttProb() == null ? "NULL" : data.getProbabilityNet_0());
+            values.append(data.getProbabilityNet_0() == -1.0 ? "NULL" : data.getProbabilityNet_0());
             values.append(",");
-            values.append(data.getAllNttProb() == null ? "NULL" : data.getProbabilityNet_1());
+            values.append(data.getProbabilityNet_1() == -1.0 ? "NULL" : data.getProbabilityNet_1());
             values.append(",");
-            values.append(data.getAllNttProb() == null ? "NULL" : data.getProbabilityNet_2());
+            values.append(data.getProbabilityNet_2() == -1.0 ? "NULL" : data.getProbabilityNet_2());
             values.append(")");
         }
         values.deleteCharAt(0);

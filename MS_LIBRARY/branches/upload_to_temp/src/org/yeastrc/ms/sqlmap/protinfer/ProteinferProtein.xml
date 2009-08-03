@@ -5,9 +5,9 @@
 
 	<typeAlias alias="ProteinferProtein" type="org.yeastrc.ms.domain.protinfer.ProteinferProtein" />
 	<typeAlias alias="BaseProteinferProtein" type="org.yeastrc.ms.domain.protinfer.GenericProteinferProtein" />
-	
+
 	<typeAlias alias="UserValidationTypeHandler" 
-				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO$UserValidationTypeHandler"/>
+				type="org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO$UserValidationTypeHandler"/>
 	
 	<resultMap class="BaseProteinferProtein" id="pinferBaseProteinResult" >
 		<result property="id" column="id" nullValue="0" />

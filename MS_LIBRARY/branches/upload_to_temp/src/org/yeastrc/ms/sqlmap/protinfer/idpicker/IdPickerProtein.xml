@@ -138,7 +138,7 @@
     	AND prot.id = idpProt.piProteinID
     </select>
     
-    <resultMap class="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinAndGroup" 
+    <resultMap class="org.yeastrc.ms.dao.protinfer.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinAndGroup" 
     				id="protAndGroupResult">
 		<result property="proteinId" jdbcType="INTEGER"/>
 		<result property="groupId" jdbcType="INTEGER"/>
@@ -215,7 +215,7 @@
     </select>
     
     <select id="filterProteinGroupCoverage" 
-    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupCoverage" 
+    		resultClass="org.yeastrc.ms.dao.protinfer.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupCoverage" 
     		parameterClass="java.util.Map">
     	SELECT prot.id AS proteinId, iprot.groupID AS proteinGroupId, prot.coverage AS coverage 
     	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot 
@@ -236,7 +236,7 @@
     </select>
     
     <select id="filterProteinGroupNSAF" 
-    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupNsaf" 
+    		resultClass="org.yeastrc.ms.dao.protinfer.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupNsaf" 
     		parameterClass="java.util.Map">
     	SELECT prot.id AS proteinId, iprot.groupID AS proteinGroupId, iprot.nsaf AS nsaf
     	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot 

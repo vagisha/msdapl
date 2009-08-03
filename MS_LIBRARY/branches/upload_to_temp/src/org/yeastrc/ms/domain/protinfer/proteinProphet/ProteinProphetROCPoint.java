@@ -8,29 +8,23 @@ package org.yeastrc.ms.domain.protinfer.proteinProphet;
 
 public class ProteinProphetROCPoint {
     
-    private int searchAnalysisId;
+    private int proteinferId;
     private double sensitivity;
     private double falsePositiveErrorRate;
     private double minProbability;
     private int numCorrect;
     private int numIncorrect;
     
-    public int getSearchAnalysisId() {
-        return searchAnalysisId;
-    }
-    public void setSearchAnalysisId(int searchAnalysisId) {
-        this.searchAnalysisId = searchAnalysisId;
-    }
     public double getSensitivity() {
         return sensitivity;
     }
     public void setSensitivity(double sensitivity) {
         this.sensitivity = sensitivity;
     }
-    public double getError() {
+    public double getFalsePositiveErrorRate() {
         return falsePositiveErrorRate;
     }
-    public void setError(double error) {
+    public void setFalsePositiveErrorRate(double error) {
         this.falsePositiveErrorRate = error;
     }
     public double getMinProbability() {
@@ -50,5 +44,11 @@ public class ProteinProphetROCPoint {
     }
     public void setNumIncorrect(int numIncorrect) {
         this.numIncorrect = numIncorrect;
+    }
+    public int getProteinferId() {
+        return proteinferId;
+    }
+    public void setProteinferId(int proteinferId) {
+        this.proteinferId = proteinferId;
     }
 }

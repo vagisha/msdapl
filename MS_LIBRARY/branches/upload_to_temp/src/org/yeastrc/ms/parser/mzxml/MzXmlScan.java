@@ -24,6 +24,7 @@ public class MzXmlScan implements MsScanIn {
     private int startScan = -1;
     private int endScan = -1;
     private int precursorScanNum = -1;
+    private int precursorScanId;
 
     private BigDecimal precursorMz;
     private BigDecimal retentionTime;

@@ -10,7 +10,7 @@
 		<result property="groupId" column="groupID" nullValue="0"/>
 		<result property="probability" column="probability" nullValue = "-1.0"/>
 		<result property="confidence" column="confidence" nullValue = "-1.0"/>
-		<result property="isSubsumed" column="subsumed" />
+		<result property="subsumed" column="subsumed" />
 		<result property="totalSpectrumCount" column="totalSpectrumCount" nullValue = "-1"/>
 		<result property="pctSpectrumCount" column="pctSpectrumCount" nullValue = "-1.0"/>
 	</resultMap>
@@ -19,7 +19,7 @@
 	<parameterMap class="ProteinProphetProtein" id="proteinParam">
 		<parameter property="id" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="proteinProphetGroupId" jdbcType="INTEGER" nullValue="0"/>
-		<parameter property="groupID" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="groupId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="probability" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="confidence" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="subsumed" jdbcType="TINYINT" />

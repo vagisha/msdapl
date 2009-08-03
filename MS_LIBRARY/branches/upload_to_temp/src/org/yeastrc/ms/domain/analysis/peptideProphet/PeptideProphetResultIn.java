@@ -22,7 +22,7 @@ public interface PeptideProphetResultIn {
     public abstract double getMassDifference();
     
     // TODO Not sure how to handle this PeptideProphet result
-    public abstract String getAllNttProb();
+//    public abstract String getAllNttProb();
     
     public double getProbabilityNet_0();
     public double getProbabilityNet_1();

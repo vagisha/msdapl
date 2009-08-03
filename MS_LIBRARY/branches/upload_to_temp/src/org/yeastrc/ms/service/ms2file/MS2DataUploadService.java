@@ -223,8 +223,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
     /**
      * provider should be closed after this method returns
      * @param provider
-     * @param experimentId
-     * @param sha1Sum
+     * @param serverDirectory
      * @return
      * @throws UploadException 
      */

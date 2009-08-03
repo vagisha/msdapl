@@ -19,14 +19,14 @@ public interface PeptideProphetResultDataWId {
     
     public abstract double getfVal();
     
-    public abstract int getNumTrypticTermini();
+    public abstract int getNumEnzymaticTermini();
     
     public abstract int getNumMissedCleavages();
     
     public abstract double getMassDifference();
     
     // TODO Not sure how to handle this PeptideProphet result
-    public abstract String getAllNttProb();
+//    public abstract String getAllNttProb();
     
     public double getProbabilityNet_0();
     public double getProbabilityNet_1();

@@ -148,7 +148,11 @@ public class MsScanUploadDAOIbatisImpl extends BaseSqlMapDAO implements MsScanUp
                 
                 stmt.setBigDecimal(5, scan.getPrecursorMz());
                 
-                stmt.setNull(6, Types.INTEGER); // precursorScanId
+                int precursorScanId = this.loadScanIdForScanNumRun(scan.getPrecursorScanNum(), runId);
+                if(precursorScanId > 0)
+                    stmt.setInt(6, precursorScanId);
+                else 
+                    stmt.setNull(6, Types.INTEGER); // precursorScanId
                 
                 if(scan.getPrecursorScanNum() == -1)    stmt.setNull(7, Types.INTEGER);
                 else                                    stmt.setInt(7, scan.getPrecursorScanNum());

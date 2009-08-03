@@ -7,9 +7,9 @@
 	<typeAlias alias="GenericProteinferRun" type="org.yeastrc.ms.domain.protinfer.GenericProteinferRun"/>
 	
 	<typeAlias alias="ProteinferStatusTypeHandler" 
-				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO$ProteinferStatusTypeHandler"/>
+				type="org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO$ProteinferStatusTypeHandler"/>
 	<typeAlias alias="ProteinferProgramTypeHandler" 
-				type="edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO$ProteinferProgramTypeHandler"/>
+				type="org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO$ProteinferProgramTypeHandler"/>
 	
 	<typeAlias alias="ProgramType" type="org.yeastrc.ms.domain.search.SearchProgram"/>
 	<typeAlias alias="ProgramTypeHandler" type="org.yeastrc.ms.dao.search.ibatis.MsSearchDAOImpl$SearchProgramTypeHandler"/>

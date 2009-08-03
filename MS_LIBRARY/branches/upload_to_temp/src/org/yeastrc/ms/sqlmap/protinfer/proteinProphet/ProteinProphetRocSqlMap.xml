@@ -9,7 +9,7 @@
 	
 	
 	<resultMap class="ProteinProphetRocOut" id="rocResult">
-		<result property="proteinferId" column="piRunID"/>
+		<result property="proteinferId" column="piRunID" nullValue="0"/>
 		<result property="sensitivity" column="sensitivity"/>
 		<result property="falsePositiveErrorRate" column="error"/>
 		<result property="minProbability" column="minProbability"/>
