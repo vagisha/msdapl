@@ -31,6 +31,8 @@ public class MsDataUploadProperties {
     
     private static String mysqlTempDirectory;
     
+    private static String backupDirectory;
+    
     private static PeakStorageType peakStorageType;
     
     static {
@@ -62,6 +64,8 @@ public class MsDataUploadProperties {
         
         mysqlTempDirectory = props.getProperty("upload.temp.dir");
         
+        backupDirectory = props.getProperty("backup.dir");
+        
         log.info("Uploader will sync databases at time: "+uploadSyncHour+":"+uploadSyncMinutes);
         
     }
@@ -91,5 +95,9 @@ public class MsDataUploadProperties {
     
     public static String getMysqlTempDirectory() {
         return mysqlTempDirectory;
+    }
+    
+    public static String getBackupDirectory() {
+        return backupDirectory;
     }
 }

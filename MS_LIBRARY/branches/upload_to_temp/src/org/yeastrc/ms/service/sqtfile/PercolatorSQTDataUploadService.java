@@ -30,6 +30,7 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearchIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
@@ -553,7 +554,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         MsScanUploadDAO scanDao = UploadDAOFactory.getInstance().getMsScanDAO();
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
         if (scanId == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN);
+            UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SCAN);
             ex.setErrorMessage("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
             throw ex;
         }
@@ -690,5 +691,61 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     @Override
     public void setSearchDataFileNames(List<String> searchDataFileNames) {
         this.searchDataFileNames = searchDataFileNames;
+    }
+    
+    public int getMaxPsmRank() {
+
+        // now upload the individual sqt files
+        for (String file: filenames) {
+            String filePath = dataDirectory+File.separator+file;
+            // if the file does not exist skip over to the next
+            if (!(new File(filePath).exists()))
+                continue;
+            
+            PercolatorSQTFileReader provider = new PercolatorSQTFileReader();
+            try {
+                provider.open(filePath, searchProgram);
+                provider.setDynamicResidueMods(this.dynaResidueMods);
+                provider.setDynamicTerminalMods(this.dynaTermMods);
+            }
+            catch (DataProviderException e) {
+                log.error("Error opening PercolatorSQTFileReader", e);
+                return Integer.MAX_VALUE;
+            }
+            finally {provider.close();}
+             
+            try {
+                SQTRunSearchIn search = provider.getSearchHeader();
+
+                if (search instanceof SQTHeader) {
+                    SQTHeader header = (SQTHeader)search;
+                    for(SQTHeaderItem h: header.getHeaders()) {
+                        if(h.getName().equalsIgnoreCase("percolator")) {
+                            String cmdline = h.getValue();
+                            String[] tokens = cmdline.split(",");
+                            for(int i = 0; i < tokens.length; i++) {
+                                String val = tokens[i];
+                                if(val.startsWith("-m")) {
+                                    int rank = Integer.parseInt(tokens[++i]);
+                                    return rank;
+                                }
+                                                    
+                            }
+                        }
+                    }
+                    // If we are here it means we did not find the -m flag in the percolator command-line
+                    // This means percolator will only use the top hit for each scan+charge combination
+                    return 1;
+                }
+            }
+            catch (DataProviderException e) {
+                log.error("Error reading percolator SQT file", e);
+                return Integer.MAX_VALUE;
+            }
+            finally {provider.close();}
+        }
+        log.warn("Could not read percolator command-line to determine value of -m argument. "+
+                "ALL sequest results will be uploaded.");
+        return Integer.MAX_VALUE;
     }
 }

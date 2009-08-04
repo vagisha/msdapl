@@ -123,7 +123,7 @@ public class DbToSqtFileConverter {
             peptResult.setCharge(result.getCharge());
             peptResult.setObservedMass(result.getObservedMass());
             peptResult.setDeltaCN(data.getDeltaCN());
-            peptResult.setMass(data.getCalculatedMass());
+            peptResult.setCalculatedMass(data.getCalculatedMass());
             peptResult.setNumMatchingIons(data.getMatchingIons());
             peptResult.setNumPredictedIons(data.getPredictedIons());
             peptResult.setOriginalPeptideSequence(reconstructSequestPeptideSequence(runSearch.getSearchId(), result));

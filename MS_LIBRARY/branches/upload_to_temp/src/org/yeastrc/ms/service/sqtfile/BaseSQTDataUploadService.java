@@ -122,7 +122,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
     }
 
     @Override
-    void uploadSqtFile(String filePath, int runId) throws UploadException {
+    int uploadSqtFile(String filePath, int runId) throws UploadException {
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
         long startTime = System.currentTimeMillis();
@@ -147,8 +147,9 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
             throw ex;
         }
         
+        int runSearchId;
         try {
-            uploadBaseSqtFile(provider, searchId, runId, sequenceDatabaseId);
+            runSearchId = uploadBaseSqtFile(provider, searchId, runId, sequenceDatabaseId);
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
@@ -166,15 +167,17 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
         long endTime = System.currentTimeMillis();
         
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
+        
+        return runSearchId;
     }
     
     // parse and upload a sqt file
-    private void uploadBaseSqtFile(BaseSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
+    private int uploadBaseSqtFile(BaseSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
-        int lastUploadedRunSearchId;
+        int runSearchId;
         try {
-            lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
-            log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
+            runSearchId = uploadSearchHeader(provider, runId, searchId);
+            log.info("Uploaded top-level info for sqt file. runSearchId: "+runSearchId);
         }
         catch(DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER, e);
@@ -198,10 +201,10 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
             int scanId = getScanId(runId, scan.getScanNumber());
             
             // save spectrum data
-            if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
+            if(uploadSearchScan(scan, runSearchId, scanId)) {
                 // save all the search results for this scan
                 for (MsSearchResultIn result: scan.getScanResults()) {
-                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                    uploadSearchResult(result, runSearchId, scanId);
                     numResults++;
                 }
             }
@@ -211,8 +214,9 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
         }
         flush(); // save any cached data
         log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
-                " results. (runSearchId: "+lastUploadedRunSearchId+")");
-                
+                " results. (runSearchId: "+runSearchId+")");
+        
+        return runSearchId;
     }
     
     void uploadSearchResult(MsSearchResultIn result, int runSearchId, int scanId) throws UploadException {
@@ -227,6 +231,12 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
     @Override
     String searchParamsFile() {
         return this.paramsProvider.paramsFileName();
+    }
+
+    @Override
+    protected void copyFiles(int experimentId) throws UploadException {
+        // TODO Auto-generated method stub
+        
     }
     
 }

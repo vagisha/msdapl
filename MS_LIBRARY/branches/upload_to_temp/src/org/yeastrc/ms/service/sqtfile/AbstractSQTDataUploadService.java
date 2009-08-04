@@ -80,12 +80,16 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
     private int numSearchesUploaded = 0;
     
+    boolean useXcorrRankCutoff = false;
+    int xcorrRankCutoff = Integer.MAX_VALUE;
+    
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
     private String programVersion = "uninit";
 
     private int experimentId;
     private java.util.Date searchDate;
     private String dataDirectory;
+    private String decoyDirectory;
     private String remoteServer;
     private String remoteDirectory;
     private StringBuilder preUploadCheckMsg;
@@ -125,6 +129,23 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         this.resultDao = daoFactory.getMsSearchResultDAO();
         this.spectrumDataDao = daoFactory.getSqtSpectrumDAO();
         
+    }
+    
+    public void setXcorrRankCutoff(int cutoff) {
+        if(cutoff < Integer.MAX_VALUE && cutoff > 1) {
+            xcorrRankCutoff = cutoff;
+            useXcorrRankCutoff = true;
+        }
+    }
+    
+    protected String getDecoyDirectory() {
+        return this.decoyDirectory;
+    }
+    protected String getDataDirectory() {
+        return this.dataDirectory;
+    }
+    protected List<String> getFileNames() {
+        return this.filenames;
     }
     
     void reset() {
@@ -167,7 +188,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
         int scanId = scanDao.loadScanIdForScanNumRun(scanNumber, runId);
         if (scanId == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SQT_SCAN);
+            UploadException ex = new UploadException(ERROR_CODE.NO_SCANID_FOR_SCAN);
             ex.setErrorMessage("No scanId found for scan number: "+scanNumber+" and runId: "+runId);
             throw ex;
         }
@@ -208,7 +229,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     
     abstract SearchFileFormat getSearchFileFormat();
     
-    abstract void uploadSqtFile(String filePath, int runId) throws UploadException;
+    abstract int uploadSqtFile(String filePath, int runId) throws UploadException;
     
     //--------------------------------------------------------------------------------------------------
     @Override
@@ -259,8 +280,10 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             Integer runId = runIdMap.get(file); 
             
             resetCaches();
+            int runSearchId;
             try {
-                uploadSqtFile(filePath, runId);
+                runSearchId = uploadSqtFile(filePath, runId);
+                
                 numSearchesUploaded++;
             }
             catch (UploadException ex) {
@@ -285,8 +308,14 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             updateProgramVersion(searchId, programVersion);
         }
         
+        // copy files to a directory
+        copyFiles(experimentId);
+        
         return searchId;
     }
+
+    protected abstract void copyFiles(int experimentId) throws UploadException;
+    
 
     private Map<String, Integer> createRunIdMap() throws UploadException {
         
@@ -531,7 +560,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicResidueModificationId( 
                     mod.getModifiedResidue(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -555,7 +584,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicResidueModificationId( 
                     mod.getModifiedResidue(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -585,7 +614,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicTerminalModificationId( 
                     mod.getModifiedTerminal(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -609,7 +638,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         for (MsTerminalModificationIn mod: result.getResultPeptide().getResultDynamicTerminalModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicTerminalModificationId(searchId, 
+            int modId = dynaModLookup.getDynamicTerminalModificationId( 
                     mod.getModifiedTerminal(), mod.getModificationMass()); 
             if (modId == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
@@ -679,7 +708,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     
     @Override
     public void setDecoyDirectory(String directory) {
-        throw new UnsupportedOperationException();
+        this.decoyDirectory = directory;
     }
     
     @Override
@@ -743,12 +772,12 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         }
         
         // 4. If we know the raw data file names that will be uploaded match them with up with the SQT files
-        //    and make sure there is a raw data file for each SQT file
+        //    and make sure there is a spectrum data file for each SQT file
         if(spectrumFileNames != null) {
             for(String file:filenames) {
                 String filenoext = removeFileExtension(file);
                 if(!spectrumFileNames.contains(filenoext)) {
-                    appendToMsg("No corresponding raw data file found for: "+filenoext);
+                    appendToMsg("No corresponding spectrum data file found for: "+filenoext);
                     return false;
                 }
             }
@@ -757,7 +786,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         // 5. Make sure the search parameters file is present
         File paramsFile = new File(dataDirectory+File.separator+searchParamsFile());
         if(!paramsFile.exists()) {
-            appendToMsg("Cannot fild search parameters file: "+paramsFile.getAbsolutePath());
+            appendToMsg("Cannot find search parameters file: "+paramsFile.getAbsolutePath());
             return false;
         }
         

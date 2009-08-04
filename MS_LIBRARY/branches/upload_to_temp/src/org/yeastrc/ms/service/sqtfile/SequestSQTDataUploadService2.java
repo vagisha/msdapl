@@ -139,7 +139,7 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
     
     
     @Override
-    void uploadSqtFile(String filePath, int runId) throws UploadException {
+    int uploadSqtFile(String filePath, int runId) throws UploadException {
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
 //        lastUploadedRunSearchId = 0;
@@ -158,8 +158,9 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
             throw ex;
         }
         
+        int runSearchId;
         try {
-            uploadSequestSqtFile(provider, searchId, runId, sequenceDatabaseId);
+            runSearchId = uploadSequestSqtFile(provider, searchId, runId, sequenceDatabaseId);
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
@@ -178,15 +179,16 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
         
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
             
+        return runSearchId;
     }
     
     // parse and upload a sqt file
-    private void uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
+    private int uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
-        int lastUploadedRunSearchId;
+        int runSearchId;
         try {
-            lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
-            log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
+            runSearchId = uploadSearchHeader(provider, runId, searchId);
+            log.info("Uploaded top-level info for sqt file. runSearchId: "+runSearchId);
         }
         catch(DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER, e);
@@ -213,10 +215,14 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
             int scanId = getScanId(runId, scan.getScanNumber());
             
             // save spectrum data
-            if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
+            if(uploadSearchScan(scan, runSearchId, scanId)) {
                 // save all the search results for this scan
                 for (SequestSearchResultIn result: scan.getScanResults()) {
-                    SequestSearchResultBean res = SequestSearchResultBean.create(result, lastUploadedRunSearchId, scanId);
+                    // upload results only upto the given xCorrRank cutoff.
+                    if(useXcorrRankCutoff && result.getSequestResultData().getxCorrRank() > xcorrRankCutoff)
+                        continue;
+                    
+                    SequestSearchResultBean res = SequestSearchResultBean.create(result, runSearchId, scanId);
                     results.add(res);
 //                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
 //                    numResults++;
@@ -241,8 +247,9 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
         
         flush(); // save any cached data
         log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
-                " results. (runSearchId: "+lastUploadedRunSearchId+")");
-                
+                " results. (runSearchId: "+runSearchId+")");
+        
+        return runSearchId;
     }
 
     static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final Program searchProgram,
@@ -365,6 +372,11 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
         public int getxCorrRank() {
             return data.getxCorrRank();
         }
+        @Override
+        public BigDecimal getDeltaCNstar() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
     
     @Override
@@ -376,5 +388,10 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
     String searchParamsFile() {
         SequestParamsParser parser = new SequestParamsParser();
         return parser.paramsFileName();
+    }
+
+    @Override
+    protected void copyFiles(int experimentId) throws UploadException {
+        // TODO Auto-generated method stub
     }
 }

@@ -129,7 +129,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
 
 
     @Override
-    void uploadSqtFile(String filePath, int runId) throws UploadException {
+    int uploadSqtFile(String filePath, int runId) throws UploadException {
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
         
@@ -149,8 +149,9 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
             throw ex;
         }
         
+        int runSearchId;
         try {
-            uploadProlucidSqtFile(provider, searchId, runId, sequenceDatabaseId);
+            runSearchId = uploadProlucidSqtFile(provider, searchId, runId, sequenceDatabaseId);
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
@@ -169,16 +170,17 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds");
         
+        return runSearchId;
     }
     
     
     // parse and upload a sqt file
-    private void uploadProlucidSqtFile(ProlucidSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
+    private int uploadProlucidSqtFile(ProlucidSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
-        int lastUploadedRunSearchId;
+        int runSearchId;
         try {
-            lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
-            log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
+            runSearchId = uploadSearchHeader(provider, runId, searchId);
+            log.info("Uploaded top-level info for sqt file. runSearchId: "+runSearchId);
         }
         catch(DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER, e);
@@ -202,10 +204,10 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
             
             int scanId = getScanId(runId, scan.getScanNumber());
             // save spectrum data
-            if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
+            if(uploadSearchScan(scan, runSearchId, scanId)) {
                 // save all the search results for this scan
                 for (ProlucidSearchResultIn result: scan.getScanResults()) {
-                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                    uploadSearchResult(result, runSearchId, scanId);
                     numResults++;
                     numProteins += result.getProteinMatchList().size();
                 }
@@ -214,8 +216,9 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         
         flush(); // save any cached data
         log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
-                " results, "+numProteins+" protein matches. (runSearchId: "+lastUploadedRunSearchId+")");
+                " results, "+numProteins+" protein matches. (runSearchId: "+runSearchId+")");
                 
+        return runSearchId;
     }
 
     
@@ -289,5 +292,11 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
     String searchParamsFile() {
         ProlucidParamsParser parser = new ProlucidParamsParser();
         return parser.paramsFileName();
+    }
+
+    @Override
+    protected void copyFiles(int experimentId) throws UploadException {
+        // TODO Auto-generated method stub
+        
     }
 }

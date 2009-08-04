@@ -7,6 +7,7 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +29,13 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
+import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchResultUploadDAO;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchUploadDAO;
+import org.yeastrc.ms.util.FileUtils;
 
 /**
  * 
@@ -65,7 +68,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         
         this.sqtResultDao = daoFactory.getSequestResultDAO();
     }
-
+    
     void reset() {
         super.reset();
         usesEvalue = false;
@@ -139,7 +142,7 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     
     
     @Override
-    void uploadSqtFile(String filePath, int runId) throws UploadException {
+    int uploadSqtFile(String filePath, int runId) throws UploadException {
         
         log.info("BEGIN SQT FILE UPLOAD: "+(new File(filePath).getName())+"; RUN_ID: "+runId+"; SEARCH_ID: "+searchId);
 //        lastUploadedRunSearchId = 0;
@@ -158,8 +161,9 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             throw ex;
         }
         
+        int runSearchId;
         try {
-            uploadSequestSqtFile(provider, searchId, runId, sequenceDatabaseId);
+            runSearchId = uploadSequestSqtFile(provider, searchId, runId, sequenceDatabaseId);
         }
         catch (UploadException ex) {
             ex.setFile(filePath);
@@ -177,16 +181,17 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         long endTime = System.currentTimeMillis();
         
         log.info("END SQT FILE UPLOAD: "+provider.getFileName()+"; RUN_ID: "+runId+ " in "+(endTime - startTime)/(1000L)+"seconds\n");
-            
+        
+        return runSearchId;
     }
     
     // parse and upload a sqt file
-    private void uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
+    private int uploadSequestSqtFile(SequestSQTFileReader provider, int searchId, int runId, int searchDbId) throws UploadException {
         
-        int lastUploadedRunSearchId;
+        int runSearchId;
         try {
-            lastUploadedRunSearchId = uploadSearchHeader(provider, runId, searchId);
-            log.info("Uploaded top-level info for sqt file. runSearchId: "+lastUploadedRunSearchId);
+            runSearchId = uploadSearchHeader(provider, runId, searchId);
+            log.info("Uploaded top-level info for sqt file. runSearchId: "+runSearchId);
         }
         catch(DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.INVALID_SQT_HEADER, e);
@@ -210,10 +215,13 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
             int scanId = getScanId(runId, scan.getScanNumber());
             
             // save spectrum data
-            if(uploadSearchScan(scan, lastUploadedRunSearchId, scanId)) {
+            if(uploadSearchScan(scan, runSearchId, scanId)) {
                 // save all the search results for this scan
                 for (SequestSearchResultIn result: scan.getScanResults()) {
-                    uploadSearchResult(result, lastUploadedRunSearchId, scanId);
+                    // upload results only upto the given xCorrRank cutoff.
+                    if(useXcorrRankCutoff && result.getSequestResultData().getxCorrRank() > xcorrRankCutoff)
+                        continue;
+                    uploadSearchResult(result, runSearchId, scanId);
                     numResults++;
                 }
             }
@@ -223,8 +231,9 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         }
         flush(); // save any cached data
         log.info("Uploaded SQT file: "+provider.getFileName()+", with "+numResults+
-                " results. (runSearchId: "+lastUploadedRunSearchId+")");
-                
+                " results. (runSearchId: "+runSearchId+")");
+        
+        return runSearchId;
     }
 
     static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final Program searchProgram,
@@ -336,6 +345,11 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
         public int getxCorrRank() {
             return data.getxCorrRank();
         }
+        @Override
+        public BigDecimal getDeltaCNstar() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
     
     @Override
@@ -347,6 +361,63 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     String searchParamsFile() {
         SequestParamsParser parser = new SequestParamsParser();
         return parser.paramsFileName();
+    }
+
+    @Override
+    protected void copyFiles(int experimentId) throws UploadException {
+        
+        String backupDir = MsDataUploadProperties.getBackupDirectory();
+        if(!new File(backupDir).exists()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Backup directory: "+backupDir+" does not exist");
+            throw ex;
+        }
+        // create a directory for the experiment
+        String exptDir = backupDir+File.separator+experimentId;
+        if(new File(exptDir).exists()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Experiment backup directory: "+exptDir+" already exists");
+            throw ex;
+        }
+        if(!new File(exptDir).mkdir()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Could not create directory: "+exptDir);
+            throw ex;
+        }
+        // copy sqt files from the data directory
+        for(String file: getFileNames()) {
+             File src = new File(getDataDirectory()+File.separator+file);
+             File dest = new File(exptDir+File.separator+file);
+             try {
+                FileUtils.copyFile(src, dest);
+            }
+            catch (IOException e) {
+                UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+                ex.appendErrorMessage("Could not copy file: "+getDataDirectory()+File.separator+file);
+                throw ex;
+            }
+        }
+        
+        // create a decoy directory
+        String decoyDir = exptDir+File.separator+"decoy";
+        if(!new File(decoyDir).mkdir()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Could not create decoy directory: "+decoyDir);
+            throw ex;
+        }
+        // copy sqt files from the decoy directory
+        for(String file: getFileNames()) {
+            File src = new File(getDecoyDirectory()+File.separator+file);
+            File dest = new File(decoyDir+File.separator+file);
+            try {
+               FileUtils.copyFile(src, dest);
+           }
+           catch (IOException e) {
+               UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+               ex.appendErrorMessage("Could not copy file: "+getDataDirectory()+File.separator+file);
+               throw ex;
+           }
+       }
     }
     
 }
