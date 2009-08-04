@@ -32,10 +32,12 @@ public class MS2Header implements MS2RunIn {
     private String acquisionMethod;
     private DataConversionType dataConversionType = DataConversionType.UNKNOWN;
     private StringBuilder comment;
+    private RunFileFormat format;
     
-    public MS2Header() {
+    public MS2Header(RunFileFormat format) {
         headerList = new ArrayList<MS2NameValuePair>();
         comment = new StringBuilder();
+        this.format = format;
     }
     
     public void addHeaderItem(String name, String value) {
@@ -167,7 +169,7 @@ public class MS2Header implements MS2RunIn {
     }
 
     public RunFileFormat getRunFileFormat() {
-        return RunFileFormat.MS2;
+        return this.format;
     }
 
     public String toString() {

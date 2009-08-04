@@ -172,6 +172,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT pres.resultID FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PercolatorResult AS pres");
+        
+        
         if(useResultsTable)
             sql.append(", msRunSearchResult AS res");
         if(useScanTable)
@@ -183,6 +185,15 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
         
         sql.append("WHERE rsa.searchAnalysisID = "+searchAnalysisId+" ");
+        
+        if(filterCriteria.hasFileNamesFilter()) {
+            List<Integer> rsaIds = getRunSearchAnalysisIds(filterCriteria.getFileNames(), searchAnalysisId);
+            String rsaIdStr = "";
+            for(Integer id: rsaIds) rsaIdStr += ","+id;
+            if(rsaIdStr.length() > 0)   rsaIdStr = rsaIdStr.substring(1);
+            sql.append("AND rsa.id IN ("+rsaIdStr+") ");
+        }
+        
         sql.append("AND rsa.id = pres.runSearchAnalysisID ");
         if(useResultsTable)
             sql.append("AND res.id = pres.resultID ");
@@ -277,6 +288,177 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
     }
     
+    @Override
+    public List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId,
+            PercolatorResultFilterCriteria filterCriteria,
+            ResultSortCriteria sortCriteria) {
+        
+        if(filterCriteria == null)
+            filterCriteria = new PercolatorResultFilterCriteria();
+        
+        if(sortCriteria == null)
+            sortCriteria = new ResultSortCriteria(null, null);
+        
+        int offset =  sortCriteria.getOffset() == null ? 0 : sortCriteria.getOffset();
+        
+        // If we don't have filters and nothing to sort by use the simple method
+        if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
+            return loadResultIdsForAnalysis(searchAnalysisId); 
+        }
+
+        boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
+        boolean useModsTable = filterCriteria.hasMofificationFilter();
+        boolean useResultsTable = filterCriteria.superHasFilters() 
+                                || SORT_BY.isSearchRelated(sortCriteria.getSortBy())
+                                || useScanTable
+                                || useModsTable;
+        
+        boolean userPercTable = filterCriteria.hasFilters() || SORT_BY.isPercolatorRelated(sortCriteria.getSortBy());
+        
+        // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
+        if(!useScanTable && !useResultsTable && !useModsTable && !userPercTable) {
+            if(sortCriteria.getLimitCount() != null)
+                return loadResultIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
+            else 
+                return loadResultIdsForAnalysis(searchAnalysisId); 
+        }
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT pres.resultID, min(pres.qvalue) AS mq FROM ( ");
+        sql.append("msRunSearchAnalysis AS rsa, PercolatorResult AS pres, msRunSearchResult AS res");
+        
+        
+        if(useScanTable)
+            sql.append(", msScan AS scan");
+        sql.append(" ) ");
+        
+        if(useModsTable) {
+            sql.append("LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) ");
+        }
+        
+        sql.append("WHERE rsa.searchAnalysisID = "+searchAnalysisId+" ");
+        
+        if(filterCriteria.hasFileNamesFilter()) {
+            List<Integer> rsaIds = getRunSearchAnalysisIds(filterCriteria.getFileNames(), searchAnalysisId);
+            String rsaIdStr = "";
+            for(Integer id: rsaIds) rsaIdStr += ","+id;
+            if(rsaIdStr.length() > 0)   rsaIdStr = rsaIdStr.substring(1);
+            sql.append("AND rsa.id IN ("+rsaIdStr+") ");
+        }
+        
+        sql.append("AND rsa.id = pres.runSearchAnalysisID ");
+        sql.append("AND res.id = pres.resultID ");
+        
+        if(useScanTable) {
+            sql.append("AND res.scanID = scan.id ");
+        }
+        
+        // filter of scan number
+        if(filterCriteria.hasScanFilter()) {
+            sql.append("AND "+filterCriteria.makeScanFilterSql());
+        }
+        // filter on retention time
+        if(filterCriteria.hasRTFilter()) {
+            sql.append("AND "+filterCriteria.makeRTFilterSql());
+        }
+        // filter on charge
+        if(filterCriteria.hasChargeFilter()) {
+            sql.append("AND "+filterCriteria.makeChargeFilterSql());
+        }
+        // observed mass filter
+        if(filterCriteria.hasMassFilter()) {
+            sql.append("AND "+filterCriteria.makeMassFilterSql());
+        }
+        // peptide filter
+        if(filterCriteria.hasPeptideFilter()) {
+            sql.append("AND "+filterCriteria.makePeptideSql());
+        }
+        // modifications filter
+        if(filterCriteria.hasMofificationFilter()) {
+            sql.append("AND "+filterCriteria.makeModificationFilter());
+        }
+        // QValue filter
+        if(filterCriteria.hasQValueFilter()) {
+            sql.append("AND "+filterCriteria.makeQValueFilterSql());
+        }
+        // PEP filter
+        if(filterCriteria.hasPepFilter()) {
+            sql.append("AND "+filterCriteria.makePepFilterSql());
+        }
+        // Discriminant Score (SVM score filter)
+        if(filterCriteria.hasDsFilter()) {
+            sql.append("AND "+filterCriteria.makeDsFilterSql());
+        }
+        
+        sql.append("GROUP BY res.peptide ");
+        
+        if(sortCriteria != null) {
+            if(sortCriteria.getSortBy() != null && !sortCriteria.getSortBy().getColumnName().equals("qvalue")) {
+                sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
+            }
+            else {
+                sql.append("ORDER BY mq ");
+            }
+        }
+        
+        if(sortCriteria.getLimitCount() != null) {
+            sql.append("LIMIT "+sortCriteria.getLimitCount()+", "+offset);
+        }
+        
+        System.out.println(sql.toString());
+        
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = super.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql.toString());
+            
+            List<Integer> resultIds = new ArrayList<Integer>();
+            
+            while ( rs.next() ) {
+                resultIds.add(rs.getInt("resultID"));
+            }
+            return resultIds;
+        }
+        catch (Exception e) {
+            log.error("Failed to execute query: "+sql.toString(), e);
+            throw new RuntimeException("Failed to execute query: "+sql, e);
+        }
+        finally {
+            if (rs != null) {
+                try { rs.close(); rs = null; } catch (Exception e) { ; }
+            }
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }     
+        }
+    }
+    
+    private List<Integer> getRunSearchAnalysisIds(String[] fileNames, int searchAnalysisId) {
+        
+        List<Integer> runSearchAnalysisIds = runSearchAnalysisDao.getRunSearchAnalysisIdsForAnalysis(searchAnalysisId);
+
+        Map<String, Integer> filenameMap = new HashMap<String, Integer>(runSearchAnalysisIds.size()*2);
+        for(int runSearchAnalysisId: runSearchAnalysisIds) {
+            String filename = runSearchAnalysisDao.loadFilenameForRunSearchAnalysis(runSearchAnalysisId);
+            filenameMap.put(filename, runSearchAnalysisId);
+        }
+        List<Integer> ids = new ArrayList<Integer>();
+        for(String name: fileNames) {
+            if(filenameMap.containsKey(name)) 
+                ids.add(filenameMap.get(name));
+        }
+        return ids;
+    }
+    
+
     @Override
     public List<Integer> loadResultIdsForRunSearchAnalysis(
             int runSearchAnalysisId,
@@ -598,6 +780,43 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         }
     }
 
+    
+    @Override
+    public void disableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE PercolatorResult DISABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+
+    @Override
+    public void enableKeys() throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = super.getConnection();
+            String sql = "ALTER TABLE PercolatorResult ENABLE KEYS";
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            try {if(conn != null) conn.close();}
+            catch(SQLException e){}
+            try {if(stmt != null) stmt.close();}
+            catch(SQLException e){}
+        }
+    }
+    
     private PercolatorResultBean makePercolatorResult(ResultSet rs)
             throws SQLException {
         PercolatorResultBean result = new PercolatorResultBean();

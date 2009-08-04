@@ -87,7 +87,7 @@ public class DbToMs2FileConverter {
     }
 
     private void printMs2Header(MS2Run run) throws IOException {
-        MS2Header ms2Header = new MS2Header();
+        MS2Header ms2Header = new MS2Header(run.getRunFileFormat());
         List<MS2NameValuePair> headerList = run.getHeaderList();
         
         for (MS2NameValuePair header: headerList) {

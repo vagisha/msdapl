@@ -72,7 +72,10 @@ public class UploadServiceFactory {
         }
         
         if(formats.size() > 1) {
-            throw new UploadServiceFactoryException("Multiple spectrum data file formats found in directory: "+dataDirectory);
+            // If multiple formats are found it may be that we have a combination of .ms2 and .cms2 files in the 
+            // same directory.  In that case, we don't throw an exception.
+            if(!isMs2Format(formats))
+                throw new UploadServiceFactoryException("Multiple spectrum data file formats found in directory: "+dataDirectory);
         }
         
         RunFileFormat format = formats.iterator().next();
@@ -89,6 +92,14 @@ public class UploadServiceFactory {
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
         }
+    }
+    
+    private boolean isMs2Format(Set<RunFileFormat> formats) {
+        for(RunFileFormat fmt: formats) {
+            if(fmt != RunFileFormat.MS2 && fmt != RunFileFormat.CMS2)
+                return false;
+        }
+        return true;
     }
     
     public SearchDataUploadService getSearchDataUploadService(String dataDirectory) throws UploadServiceFactoryException {

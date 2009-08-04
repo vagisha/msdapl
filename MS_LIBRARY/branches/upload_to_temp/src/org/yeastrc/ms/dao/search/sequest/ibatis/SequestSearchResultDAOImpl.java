@@ -189,6 +189,10 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         if(filterCriteria.hasMofificationFilter()) {
             sql.append("AND "+filterCriteria.makeModificationFilter());
         }
+        // XCorr rank filter
+        if(filterCriteria.hasXcorrRankFilter()) {
+            sql.append("AND "+filterCriteria.makeXCorrRankFilterSql());
+        }
         // XCorr filter
         if(filterCriteria.hasXCorrFilter()) {
             sql.append("AND "+filterCriteria.makeXCorrFilterSql());
@@ -251,6 +255,23 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             }     
         }
     }
+    
+    private List<Integer> getRunSearchIds(String[] fileNames, int searchId) {
+    
+        List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
+
+        Map<String, Integer> filenameMap = new HashMap<String, Integer>(runSearchIds.size()*2);
+        for(int runSearchId: runSearchIds) {
+            String filename = runSearchDao.loadFilenameForRunSearch(runSearchId);
+            filenameMap.put(filename, runSearchId);
+        }
+        List<Integer> ids = new ArrayList<Integer>();
+        for(String name: fileNames) {
+            if(filenameMap.containsKey(name)) 
+                ids.add(filenameMap.get(name));
+        }
+        return ids;
+    }
 
     @Override
     public List<Integer> loadResultIdsForSearch(int searchId,
@@ -301,6 +322,13 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         }
         
         sql.append("WHERE rs.searchID = "+searchId+" ");
+        if(filterCriteria.hasFileNamesFilter()) {
+            List<Integer> rsIds = getRunSearchIds(filterCriteria.getFileNames(), searchId);
+            String rsIdStr = "";
+            for(Integer id: rsIds) rsIdStr += ","+id;
+            if(rsIdStr.length() > 0)   rsIdStr = rsIdStr.substring(1);
+            sql.append("AND rs.id IN ("+rsIdStr+") ");
+        }
         sql.append("AND rs.id = res.runSearchID ");
         if(useSeqTable)
             sql.append("AND res.id = sres.resultID ");
@@ -331,6 +359,10 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         // modifications filter
         if(filterCriteria.hasMofificationFilter()) {
             sql.append("AND "+filterCriteria.makeModificationFilter());
+        }
+        // XCorr rank filter
+        if(filterCriteria.hasXcorrRankFilter()) {
+            sql.append("AND "+filterCriteria.makeXCorrRankFilterSql());
         }
         // XCorr filter
         if(filterCriteria.hasXCorrFilter()) {

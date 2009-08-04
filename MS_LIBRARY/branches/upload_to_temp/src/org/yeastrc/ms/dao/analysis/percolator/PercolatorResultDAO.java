@@ -1,5 +1,6 @@
 package org.yeastrc.ms.dao.analysis.percolator;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
@@ -28,6 +29,10 @@ public interface PercolatorResultDAO {
             PercolatorResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
     
+    public abstract List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId, 
+            PercolatorResultFilterCriteria filterCriteria, 
+            ResultSortCriteria sortCriteria);
+    
     public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
     
     
@@ -47,4 +52,8 @@ public interface PercolatorResultDAO {
 
 
     public abstract void deleteResultsForRunSearchAnalysis(int id);
+    
+    public abstract void disableKeys() throws SQLException;
+    
+    public abstract void enableKeys() throws SQLException;
 }

@@ -28,6 +28,8 @@ public class ResultFilterCriteria {
     private String peptide;
     private boolean exactMatch = true;
     
+    private String[] filterFileNames;
+    
     private boolean showOnlyModified;
     private boolean showOnlyUnmodified;
     
@@ -38,7 +40,8 @@ public class ResultFilterCriteria {
                 hasMassFilter() ||
                 hasRTFilter() ||
                 hasPeptideFilter() ||
-                hasMofificationFilter());
+                hasMofificationFilter() ||
+                hasFileNamesFilter());
     }
     
     protected boolean hasScanFilters() {
@@ -169,6 +172,7 @@ public class ResultFilterCriteria {
     public void setExactPeptideMatch(boolean exact) {
         this.exactMatch = exact;
     }
+    
     public String makePeptideSql() {
         if(hasPeptideFilter()) {
             if(exactMatch)
@@ -179,6 +183,20 @@ public class ResultFilterCriteria {
         return "";
     }
     
+    //-------------------------------------------------------------
+    // FILE NAME FILTER
+    //-------------------------------------------------------------
+    public String[] getFileNames() {
+        return filterFileNames;
+    }
+    public void setFileNames(String[] fileNames) {
+        this.filterFileNames = fileNames;
+    }
+    public boolean hasFileNamesFilter() {
+        return filterFileNames != null && filterFileNames.length > 0;
+    }
+    
+//    public abstract String makeFileNameFilterSql();
     
     
     //-------------------------------------------------------------
