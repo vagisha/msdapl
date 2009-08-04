@@ -21,6 +21,7 @@ import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepxmlDataUploadService;
+import org.yeastrc.ms.service.protxml.ProtxmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.BaseSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
@@ -282,5 +283,65 @@ public class UploadServiceFactory {
         }
         
         return sqtType;
+    }
+    
+    public ProtinferUploadService getProtinferUploadService(String dataDirectory) throws UploadServiceFactoryException {
+        
+        if(dataDirectory == null) {
+            throw new UploadServiceFactoryException("dataDirectory is null");
+        }
+        
+        File dir = new File(dataDirectory);
+        if(!dir.exists()) {
+            throw new UploadServiceFactoryException("dataDirectory does not exist: "+dataDirectory);
+        }
+        
+        if(!dir.isDirectory()) {
+            throw new UploadServiceFactoryException(dataDirectory+" is not a directory");
+        }
+        
+        File[] files = dir.listFiles();
+        Set<SearchFileFormat> formats = new HashSet<SearchFileFormat>();
+        Set<String> filenames = new HashSet<String>();
+        for (int i = 0; i < files.length; i++) {
+            if(files[i].isDirectory())
+                continue;
+            String fileName = files[i].getName();
+            
+            String ext = null;
+            if(fileName.toLowerCase().endsWith("prot.xml"))
+                ext = "prot.xml";
+            else {
+                int idx = fileName.lastIndexOf(".");
+                if(idx == -1)   continue;
+
+                ext = fileName.substring(idx);
+            }
+           
+            SearchFileFormat format = SearchFileFormat.forFileExtension(ext);
+            if(format == SearchFileFormat.UNKNOWN) 
+                continue;
+            
+            filenames.add(fileName);
+            formats.add(format);
+        }
+        
+        if(formats.size() == 0) {
+            throw new UploadServiceFactoryException("No valid protein inference file format found in directory: "+dataDirectory);
+        }
+        
+        if(formats.size() > 1) {
+            throw new UploadServiceFactoryException("Multiple protein inference file formats found in directory: "+dataDirectory);
+        }
+        
+        SearchFileFormat format = formats.iterator().next();
+        if(format == SearchFileFormat.PROTXML) {
+            ProtinferUploadService service = new ProtxmlDataUploadService();
+            service.setDirectory(dataDirectory);
+            return service;
+        }
+        else {
+            throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+        }
     }
 }

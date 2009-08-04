@@ -41,7 +41,8 @@ public class ProteinferDAOFactory {
     
     static {
         Reader reader = null;
-        String ibatisConfigFile = "ProteinferSqlMapConfig.xml";
+//        String ibatisConfigFile = "ProteinferSqlMapConfig.xml";
+        String ibatisConfigFile = "SqlMapConfig.xml";
         
         try {
             reader = Resources.getResourceAsReader(ibatisConfigFile);

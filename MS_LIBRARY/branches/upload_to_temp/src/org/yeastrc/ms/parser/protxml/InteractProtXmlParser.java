@@ -15,6 +15,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.yeastrc.ms.domain.protinfer.proteinProphet.Modification;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetParam;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
@@ -22,7 +23,6 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPepti
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROCPoint;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon.Modification;
 import org.yeastrc.ms.parser.DataProviderException;
 
 public class InteractProtXmlParser {

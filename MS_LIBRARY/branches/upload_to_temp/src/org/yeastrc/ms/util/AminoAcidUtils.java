@@ -20,7 +20,7 @@ public class AminoAcidUtils {
     
     public static final Set<Character> validChars = new HashSet<Character>();
     
-    private AminoAcidUtils() {
+    static {
         validChars.add('G');
         validChars.add('A');
         validChars.add('S');
@@ -46,6 +46,8 @@ public class AminoAcidUtils {
         validChars.add('Y');
         validChars.add('W');
     }
+    
+    private AminoAcidUtils() {}
     
     public static boolean isAminoAcid(char aa) {
         return validChars.contains(Character.toUpperCase(aa));

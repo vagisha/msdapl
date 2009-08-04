@@ -7,7 +7,7 @@
     	INSERT INTO ProteinProphetSubsumedProtein (
     	subsumedProteinID,
     	subsumingProteinID)
-    	VALUES (?,?)
+    	VALUES (#subsumedProteinId#,#subsumingProteinId#)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>

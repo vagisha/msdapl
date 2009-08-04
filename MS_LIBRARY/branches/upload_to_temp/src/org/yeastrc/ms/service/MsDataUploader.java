@@ -20,6 +20,7 @@ public class MsDataUploader {
 
     private static final Logger log = Logger.getLogger(MsDataUploader.class);
     
+    private int uploadedAnalysisId;
     private int uploadedSearchId;
     private int uploadedExptId;
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
@@ -32,10 +33,12 @@ public class MsDataUploader {
     private String remoteSearchDataDirectory;
     private java.util.Date searchDate;
     private String analysisDirectory;
+    private String protinferDirectory;
     private boolean doScanChargeMassCheck = false; // For MacCoss lab data
     
     private boolean uploadSearch = false;
     private boolean uploadAnalysis = false;
+    private boolean uploadProtinfer = false;
     
     
     private void resetUploader() {
@@ -78,6 +81,12 @@ public class MsDataUploader {
         this.analysisDirectory = analysisDirectory;
         if(analysisDirectory != null)
             this.uploadAnalysis = true;
+    }
+    
+    public void setProtinferDirectory(String protinferDirectory) {
+        this.protinferDirectory = protinferDirectory;
+        if(protinferDirectory != null)
+            this.uploadProtinfer = true;
     }
     
     public void checkResultChargeMass(boolean doScanChargeMassCheck) {
@@ -204,7 +213,20 @@ public class MsDataUploader {
         if(uploadAnalysis) {
             
             try {
-                exptUploader.uploadAnalysisData(this.uploadedSearchId);
+                this.uploadedAnalysisId = exptUploader.uploadAnalysisData(this.uploadedSearchId);
+            }
+            catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
+        }
+        
+        // ----- UPLOAD PROTEIN INFERENCE DATA
+        if(uploadProtinfer) {
+            try {
+                exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisId);
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
@@ -295,10 +317,29 @@ public class MsDataUploader {
             AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory);
             exptUploader.setAnalysisDataUploader(adus);
         }
+        // Get the protein inference uploader
+        if(uploadProtinfer) {
+            log.info("Initializing ProtinferUploadService");
+            ProtinferUploadService pidus = getProtinferUploader(protinferDirectory);
+            exptUploader.setProtinferUploader(pidus);
+        }
         
         return exptUploader;
     }
 
+    private ProtinferUploadService getProtinferUploader(String dataDirectory) throws UploadException {
+        ProtinferUploadService pidus = null;
+        try {
+            pidus = UploadServiceFactory.instance().getProtinferUploadService(dataDirectory);
+        }
+        catch (UploadServiceFactoryException e1) {
+            UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+            ex.appendErrorMessage("Error getting ProtinferUploadService: "+e1.getMessage());
+            throw ex;
+        }
+        return pidus;
+    }
+    
     private AnalysisDataUploadService getAnalysisDataUploader(String dataDirectory) throws UploadException {
         AnalysisDataUploadService adus = null;
         try {
@@ -509,6 +550,19 @@ public class MsDataUploader {
             }
         }
         
+        // ----- UPLOAD PROTEIN INFERENCE DATA
+        if(uploadProtinfer) {
+            try {
+                exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisId);
+            }
+            catch (UploadException ex) {
+                uploadExceptionList.add(ex);
+                log.error(ex.getMessage(), ex);
+                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
+            }
+        }
+        
         long end = System.currentTimeMillis();
         logEndExperimentUpload(exptUploader, start, end);
        
@@ -582,9 +636,12 @@ public class MsDataUploader {
         if(uploadAnalysis) {
             msg.append("\n\tANALYSIS DATA");
             msg.append("\n\t\t Directory: "+analysisDirectory);
-            msg.append("\n\tTime: "+(new Date().toString()));
         }
-        
+        if(uploadProtinfer) {
+            msg.append("\n\tPROTEIN INFERENCE");
+            msg.append("\n\t\t Directory: "+protinferDirectory);
+        }
+        msg.append("\n\tTime: "+(new Date().toString()));
         log.info(msg.toString());
     }
 
@@ -649,12 +706,15 @@ public class MsDataUploader {
         uploader.setRemoteServer("local");
         uploader.setSpectrumDataDirectory(directory);
         uploader.setSearchDirectory(directory);
+        uploader.setProtinferDirectory(directory);
+        
         uploader.setRemoteSpectrumDataDirectory(directory);
         uploader.setRemoteSearchDataDirectory(directory);
         uploader.setSearchDate(new Date());
         uploader.checkResultChargeMass(maccossData);
         
-        uploader.uploadData();
+        uploader.uploadData(32);
+//        uploader.uploadData();
 //        }
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");

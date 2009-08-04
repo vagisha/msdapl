@@ -11,6 +11,8 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.sqtfile.AbstractSQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
 
@@ -29,10 +31,12 @@ public class MsExperimentUploader {
     private SpectrumDataUploadService rdus;
     private SearchDataUploadService sdus;
     private AnalysisDataUploadService adus;
+    private ProtinferUploadService pidus;
     
     private boolean do_rdupload = true;
     private boolean do_sdupload = false;
     private boolean do_adupload = false;
+    private boolean do_piupload = false;
     
     
     private StringBuilder preUploadCheckMsg;
@@ -68,6 +72,11 @@ public class MsExperimentUploader {
     public void setAnalysisDataUploader(AnalysisDataUploadService adus) {
         this.adus = adus;
         this.do_adupload = true;
+    }
+    
+    public void setProtinferUploader(ProtinferUploadService pidus) {
+        this.pidus = pidus;
+        this.do_piupload = true;
     }
 
     public void setDirectory(String directory) {
@@ -129,7 +138,46 @@ public class MsExperimentUploader {
             if(!passed) log.info("...FAILED");
             else        log.info("...PASSED");
         }
+        
+        
+        // Protein inference uploader check
+        if(do_piupload) {
+            log.info("Doing pre-upload check for protein inference data uploader....");
+            if(!do_sdupload && !do_adupload) {
+                appendToMsg("No search or analysis results uploader found. "+
+                        "Cannot upload protein inference results without uploading search and analysis results first.");
+                passed = false;
+            }
+            if(pidus == null) {
+                appendToMsg("ProteinInferenceUploader was null");
+                passed = false;
+            }
+            else {
+                if(!pidus.preUploadCheckPassed()) {
+                    appendToMsg(pidus.getPreUploadCheckMsg());
+                    passed = false;
+                }
+            }
+            if(!passed) log.info("...FAILED");
+            else        log.info("...PASSED");
+        }
+        
+        doSequestResultRankCheck(); // Are we uploading all or top "N" sequest results
+        
         return passed;
+    }
+    
+    private void doSequestResultRankCheck() {
+        if(do_sdupload && do_adupload) {
+            if(adus instanceof PercolatorSQTDataUploadService &&
+               sdus instanceof AbstractSQTDataUploadService) {
+                
+                PercolatorSQTDataUploadService ps = (PercolatorSQTDataUploadService) adus;
+                int maxPsmRank = ps.getMaxPsmRank();
+                log.info("SEQUEST results upto xCorrRank: "+maxPsmRank+" will be uploaded");
+                ((AbstractSQTDataUploadService)sdus).setXcorrRankCutoff(maxPsmRank);
+            }
+        }
     }
     
     public String getPreUploadCheckMsg() {
@@ -147,6 +195,8 @@ public class MsExperimentUploader {
             summary.append(sdus.getUploadSummary()+"\n");
         if(do_adupload)
             summary.append(adus.getUploadSummary()+"\n");
+        if(do_piupload)
+            summary.append(pidus.getUploadSummary()+"\n");
         summary.append("\n");
         return summary.toString();
     }
@@ -210,6 +260,22 @@ public class MsExperimentUploader {
             return 0;
         }
         return analysisId;
+    }
+    
+    public int uploadProtinferData(int searchId, int analysisId) throws UploadException {
+        
+        int protinferId;
+        
+        if(do_piupload) {
+            pidus.setSearchId(searchId);
+            pidus.setAnalysisId(analysisId);
+            protinferId = pidus.upload();
+        }
+        else {
+            log.error("No ProtinferUploadService found");
+            return 0;
+        }
+        return protinferId;
     }
     
     private int saveExperiment() throws UploadException {

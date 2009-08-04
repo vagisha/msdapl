@@ -22,16 +22,14 @@ import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROCPoint;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetResultBean;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.Modification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
-import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.domain.search.impl.RunSearchBean;
 import org.yeastrc.ms.domain.search.pepxml.PepXmlSearchScanIn;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.InteractPepXmlDataProvider;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
@@ -123,11 +121,6 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
             reader.close();
         }
         catch (XMLStreamException e) {}
-    }
-    
-    public void setDynamicResidueMods(List<MsResidueModificationIn> dynaResidueMods) {
-        if (dynaResidueMods != null)
-            this.searchDynamicResidueMods = dynaResidueMods;
     }
     
     @Override
@@ -276,7 +269,7 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
     private SequestPeptideProphetResultIn readSearchHit(SearchScan scan, List<MsResidueModificationIn> searchDynaResidueMods) 
             throws XMLStreamException, DataProviderException {
         
-        ScanResult hit = new ScanResult();
+        SequestPeptideProphetResultBean hit = new SequestPeptideProphetResultBean(); 
         String peptideSeq = null;
         char preResidue = 0;
         char postResidue = 0;
@@ -327,7 +320,11 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                 numEnzymaticTermini = Integer.parseInt(val);
         }
         
-        seqRes.setOriginalPeptideSequence(preResidue+"."+peptideSeq+"."+postResidue);
+        hit.setStrippedSequence(peptideSeq);
+        hit.setPreResidue(preResidue);
+        hit.setPostResidue(postResidue);
+        
+        
         DbLocus locus = new DbLocus(prAcc, prDescr);
         locus.setNtermResidue(preResidue);
         locus.setCtermResidue(postResidue);
@@ -335,6 +332,8 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         seqRes.addMatchingLocus(locus);
         
         boolean inPeptideProphetAnalysis = false;
+        
+        String modifiedSequence = null;
         
         while(reader.hasNext()) {
             int evtType = reader.next();
@@ -344,8 +343,22 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                 inPeptideProphetAnalysis = false;
             
             if (evtType == XMLStreamReader.START_ELEMENT) {
+                
+                // read the modification information
+                if(reader.getLocalName().equalsIgnoreCase("modification_info")) {
+                    modifiedSequence = reader.getAttributeValue(null, "modified_peptide");
+                }
+                if(reader.getLocalName().equalsIgnoreCase("mod_aminoacid_mass")) {
+                    int pos = Integer.parseInt(reader.getAttributeValue(null, "position"));
+                    BigDecimal mass = new BigDecimal(reader.getAttributeValue(null, "mass"));
+                    // Add only if this is a dynamic residue modification   
+                    if(isDynamicModification(peptideSeq.charAt(pos - 1), mass)) {
+                        hit.addModification(new Modification(pos, mass));
+                    }
+                }
+                
                 // read the <alternative_protein> elements
-                if (reader.getLocalName().equalsIgnoreCase("alternative_protein")) {
+                else if (reader.getLocalName().equalsIgnoreCase("alternative_protein")) {
                     prAcc = null;
                     prDescr = null;
                     preResidue = 0;
@@ -436,8 +449,8 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         
         
         
-        hit.seqRes = seqRes;
-        hit.ppRes = ppRes;
+        hit.setSequestResult(seqRes);
+        hit.setPeptideProphetResult(ppRes);
         
         // make sure the probability for this hit is the best from all_ntt_prob
         if(ppRes.hasAllNttProb()) {
@@ -457,6 +470,24 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         return hit;
     }
     
+    private boolean isDynamicModification(char modChar, BigDecimal mass) throws DataProviderException {
+        boolean foundchar = false;
+        for(MsResidueModificationIn mod: this.searchDynamicResidueMods) {
+            if(mod.getModifiedResidue() == modChar) {
+                foundchar = true;
+                double massDiff = mass.doubleValue() - AminoAcidUtils.monoMass(modChar);
+                if(Math.abs(massDiff - mod.getModificationMass().doubleValue()) < 0.05) {
+                    return true;
+                }
+            }
+        }
+        if(foundchar) {
+            throw new DataProviderException("Found a match for modified residue: "+modChar+
+                    " but no match for mass: "+mass.doubleValue());
+        }
+        return false;
+    }
+
     private class SearchScan implements PepXmlSearchScanIn {
 
         private int scanNumber;
@@ -495,84 +526,4 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
         }
     }
     
-    private class ScanResult implements SequestPeptideProphetResultIn {
-
-        private PeptideProphetResultBean ppRes;
-        private SequestResult seqRes;
-        
-        @Override
-        public SequestResultData getSequestResultData() {
-            return seqRes.getSequestResultData();
-        }
-
-        @Override
-        public List<MsSearchResultProteinIn> getProteinMatchList() {
-            return seqRes.getProteinMatchList();
-        }
-
-        @Override
-        public int getScanNumber() {
-            return seqRes.getScanNumber();
-        }
-
-        @Override
-        public int getCharge() {
-            return seqRes.getCharge();
-        }
-
-        @Override
-        public BigDecimal getObservedMass() {
-            return seqRes.getObservedMass();
-        }
-
-        @Override
-        public MsSearchResultPeptide getResultPeptide() {
-            return seqRes.getResultPeptide();
-        }
-
-        @Override
-        public ValidationStatus getValidationStatus() {
-            return seqRes.getValidationStatus();
-        }
-
-        @Override
-        public double getProbabilityNet_0() {
-            return ppRes.getProbabilityNet_0();
-        }
-
-        @Override
-        public double getProbabilityNet_1() {
-            return ppRes.getProbabilityNet_1();
-        }
-
-        @Override
-        public double getProbabilityNet_2() {
-            return ppRes.getProbabilityNet_2();
-        }
-        
-        @Override
-        public double getMassDifference() {
-            return ppRes.getMassDifference();
-        }
-
-        @Override
-        public int getNumMissedCleavages() {
-            return ppRes.getNumMissedCleavages();
-        }
-
-        @Override
-        public int getNumEnzymaticTermini() {
-            return ppRes.getNumEnzymaticTermini();
-        }
-
-        @Override
-        public double getProbability() {
-            return ppRes.getProbability();
-        }
-
-        @Override
-        public double getfVal() {
-            return ppRes.getfVal();
-        }
-    }
 }

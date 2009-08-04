@@ -575,7 +575,7 @@ CREATE TABLE ProteinProphetProtein (
     confidence DOUBLE UNSIGNED NOT NULL,
     subsumed TINYINT NOT NULL DEFAULT 0,
     totalSpectrumCount INT UNSIGNED NOT NULL,
-    pctSpectrumCount INT UnSIGNED NOT NULL
+    pctSpectrumCount INT UnSIGNED
 );
 ALTER TABLE ProteinProphetProtein ADD INDEX(groupID);
 ALTER TABLE ProteinProphetProtein ADD INDEX(proteinProphetGroupID);
@@ -669,7 +669,7 @@ CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
    	DELETE FROM msProteinInferInput WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferProtein WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferPeptide WHERE piRunID = OLD.id;
-  	DELETE FROM ProteinPropehtParam WHERE piRunID = OLD.id;
+  	DELETE FROM ProteinProphetParam WHERE piRunID = OLD.id;
   	DELETE FROM ProteinProphetROC WHERE piRunID = OLD.id;
   	DELETE FROM ProteinProphetProteinGroup WHERE piRunID = OLD.id;
  END;

@@ -6,7 +6,6 @@
  */
 package org.yeastrc.ms.domain.protinfer.proteinProphet;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,27 +114,5 @@ public class ProteinProphetProteinPeptideIon extends GenericProteinferIon<Protei
         buf.append("\t");
         buf.append("contrib_evidence: "+this.isContributingEvidence);
         return buf.toString();
-    }
-    
-    public static class Modification {
-        private int position;
-        private BigDecimal mass;
-        
-        public Modification(int pos, BigDecimal mass) {
-            this.position = pos;
-            this.mass = mass;
-        }
-        public int getPosition() {
-            return position;
-        }
-        public void setPosition(int position) {
-            this.position = position;
-        }
-        public BigDecimal getMass() {
-            return mass;
-        }
-        public void setMass(BigDecimal mass) {
-            this.mass = mass;
-        }
     }
 }

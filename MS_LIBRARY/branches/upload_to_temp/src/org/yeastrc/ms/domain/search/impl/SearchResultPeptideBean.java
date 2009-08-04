@@ -114,7 +114,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
                 char modSymbol = mod.getModificationSymbol();
                 if(modSymbol == '\u0000') {
                     seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
-                            AminoAcidUtils.avgMass(origseq.charAt(mod.getModifiedPosition())))+"]");
+                            AminoAcidUtils.monoMass(origseq.charAt(mod.getModifiedPosition())))+"]");
                 }
                 else {
                     seq.append(modSymbol);

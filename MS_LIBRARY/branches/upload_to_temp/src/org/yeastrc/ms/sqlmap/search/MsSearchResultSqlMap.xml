@@ -85,8 +85,8 @@
     	AND peptide = #peptide#
     </select>
     
-    <select id="selectResultIdsForSearchChargePeptide" resultMap="msSearchResult" parameterClass="java.util.Map">
-    	SELECT res.* 
+    <select id="selectResultIdsForSearchChargePeptide" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT res.id 
     	FROM msRunSearchResult AS res, msRunSearch AS rs
     	WHERE rs.searchID = #searchId#
     	AND rs.id = res.runSearchID

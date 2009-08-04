@@ -64,6 +64,17 @@ public class DynamicModLookupUtil {
         }
     }
 
+    /**
+     * @param aa
+     * @return true if the given amino acid has a dynamic modification.
+     */
+    public boolean hasDynamicModification(char aa) {
+        for(MsResidueModification mod: this.dynaResMods) {
+            if(mod.getModifiedResidue() == aa)
+                return true;
+        }
+        return false;
+    }
     
     /**
      * @param searchId

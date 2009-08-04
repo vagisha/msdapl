@@ -6,6 +6,8 @@
  */
 package org.yeastrc.ms.service.protxml;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,22 +40,26 @@ import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.Modification;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetParam;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon.Modification;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.protxml.InteractProtXmlParser;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
 import org.yeastrc.ms.service.ModifiedSequenceBuilder;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.service.ProtinferUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
@@ -63,13 +69,12 @@ import org.yeastrc.ms.util.AminoAcidUtils;
 /**
  * 
  */
-public class ProtxmlDataUploadService {
+public class ProtxmlDataUploadService implements ProtinferUploadService {
 
     private final DAOFactory daoFactory;
     private final MsSearchResultDAO resDao;
     private final PeptideProphetResultUploadDAO ppResDao;
     
-    private int nrseqDatabaseId;
     
     private final ProteinferDAOFactory piDaoFactory;
     private ProteinferRunDAO runDao;
@@ -89,11 +94,23 @@ public class ProtxmlDataUploadService {
     
     private DynamicModLookupUtil modLookup;
     private int searchId;
+    private int analysisId;
+    private String protxmlDirectory;
+    private int nrseqDatabaseId;
+    
+    private int uploadedPinferId;
+    private int indistinguishableProteinGroupId = 1;
+    
+    private int numProteinGroups;
+    
+    private StringBuilder preUploadCheckMsg;
+    private boolean preUploadCheckDone = false;
     
     public ProtxmlDataUploadService() {
         
         peptideMap = new HashMap<String, Integer>();
         ionMap = new HashMap<String, Integer>();
+        modifiedStateMap = new HashMap<String, Integer>();
         peptModStateCountMap = new HashMap<Integer, Integer>();
         
         
@@ -116,13 +133,39 @@ public class ProtxmlDataUploadService {
     }
     
     
-    public int upload(String filepath, int searchId, int nrseqDatabaseId) throws UploadException {
+    public int upload() throws UploadException {
         
-        this.nrseqDatabaseId = nrseqDatabaseId;
+        uploadedPinferId = 0;
+        indistinguishableProteinGroupId = 1;
+        
+        if(!preUploadCheckDone) {
+            if(!preUploadCheckPassed()) {
+                UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+                ex.appendErrorMessage(this.getPreUploadCheckMsg());
+                ex.appendErrorMessage("\n\t!!!PROTEIN INFERENCE WILL NOT BE UPLOADED\n");
+                throw ex;
+            }
+        }
+        
+        // Make sure we have a nrseq database ID
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        MsSearch search = searchDao.loadSearch(searchId);
+        List<MsSearchDatabase> dbList = search.getSearchDatabases();
+        if(dbList.size() != 1) {
+            UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
+            ex.appendErrorMessage("No NRSEQ fasta database ID found for searchID: "+searchId);
+            ex.appendErrorMessage("\n\t!!!PROTEIN INFERENCE WILL NOT BE UPLOADED\n");
+            throw ex;
+        }
+        else {
+            this.nrseqDatabaseId = dbList.get(0).getSequenceDatabaseId();
+        }
+        
+        numProteinGroups = 0;
         
         InteractProtXmlParser parser = new InteractProtXmlParser();
         try {
-            parser.open(filepath);
+            parser.open(this.protxmlDirectory+File.separator+"interact.prot.xml");
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PROTXML_ERROR, e);
@@ -130,40 +173,45 @@ public class ProtxmlDataUploadService {
             throw ex;
         }
         
-        this.searchId = searchId;
         modLookup = new DynamicModLookupUtil(searchId);
         
         // create a new entry for this protein inference run
-        int pinferId = 0;
-        try {pinferId = addProteinInferenceRun(parser, searchId);}
+        try {addProteinInferenceRun(parser, searchId);}
         catch(UploadException ex) {
-            ex.appendErrorMessage("DELETING PROTEIN INFERENCE...");
-            runDao.delete(pinferId);
+            ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
+            runDao.delete(uploadedPinferId);
             throw ex;
         }
         
         // save the protein and protein groups
         try {
             while(parser.hasNextProteinGroup()) {
-                saveProteinProphetGroup(parser.getNextGroup(), pinferId);
+                saveProteinProphetGroup(parser.getNextGroup(), uploadedPinferId);
+                numProteinGroups++;
             }
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PROTXML_ERROR, e);
             ex.appendErrorMessage(e.getErrorMessage());
-            ex.appendErrorMessage("DELETING PROTEIN INFERENCE...");
-            runDao.delete(pinferId);
+            ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
+            runDao.delete(uploadedPinferId);
             throw ex;
         }
         catch(UploadException e) {
-            e.appendErrorMessage("DELETING PROTEIN INFERENCE...");
-            runDao.delete(pinferId);
+            e.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
+            runDao.delete(uploadedPinferId);
             throw e;
+        }
+        catch(RuntimeException e) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+            ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
+            runDao.delete(uploadedPinferId);
+            throw ex;
         }
         
         parser.close();
         
-        return pinferId;
+        return uploadedPinferId;
     }
 
 
@@ -181,16 +229,21 @@ public class ProtxmlDataUploadService {
             
             protein.setProteinferId(pinferId);
             protein.setProteinProphetGroupId(ppGrpId);
+            protein.setGroupId(this.indistinguishableProteinGroupId);
             int piProteinId = saveProtein(protein, subsumedMap);
             proteinIdMap.put(protein.getProteinName(), piProteinId);
             
             // Are there indistinguishable proteins?
             for(String name: protein.getIndistinguishableProteins()) {
+                if(name.equals(protein.getProteinName()))
+                    continue;
                 ProteinProphetProtein iProt = protein.getIndistinguishableProtein(name);
                 piProteinId = saveProtein(iProt, subsumedMap);
                 proteinIdMap.put(name, piProteinId);
                 // TODO what about protein coverage
             }
+            
+            indistinguishableProteinGroupId++;
         }
         
         saveSubsumedProteins(subsumedMap, proteinIdMap);
@@ -237,6 +290,7 @@ public class ProtxmlDataUploadService {
             Integer pinferPeptideId = peptideMap.get(peptide.getSequence());
             if(pinferPeptideId == null) {
                 // save the peptide
+                peptide.setProteinferId(protein.getProteinferId());
                 pinferPeptideId = peptDao.save(peptide);
                 peptideMap.put(peptide.getSequence(), pinferPeptideId);
             }
@@ -324,13 +378,8 @@ public class ProtxmlDataUploadService {
         for(Modification mod: ion.getModifications()) {
             
             // if this is not a dynamic modification ignore it
-            // Dynamic modifications will be of the form: CPETLFQPSFIGMESAGIHETTYNSIM[147]K
-            // where 147 is the mass of the amino acid (M) plus the mass of the modification
-            // The mass [147] will not be appended to the sequence for a static modification.
-            // If the character just after the modified amino acid is a valid amino acid character
-            // this the modification is NOT a dynamic modification.
             // NOTE: ProtXml modifications are 1-based.  
-            if(AminoAcidUtils.isAminoAcid(ion.getModifiedSequence().charAt(mod.getPosition())))
+            if(!modLookup.hasDynamicModification(strippedSeq.charAt(mod.getPosition() - 1)))
                 continue;
             
             MsResidueModification dbMod = modLookup.getDynamicResidueModification(
@@ -341,7 +390,9 @@ public class ProtxmlDataUploadService {
             if(dbMod == null) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
                 ex.appendErrorMessage("searchId: "+searchId+
+                        "; peptide: "+strippedSeq+
                         "; char: "+strippedSeq.charAt(mod.getPosition() - 1)+
+                        "; pos: "+mod.getPosition()+
                         "; mass: "+mod.getMass());
                 throw ex;
             }
@@ -413,7 +464,7 @@ public class ProtxmlDataUploadService {
         // ProtXml file.
         if(numFound != ion.getSpectrumCount()) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.appendErrorMessage("Spectrum count for ion ("+ion.getModifiedSequence()+
+            ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
                         ") does not match the number of results returned: "+numFound);
             throw ex;
         }
@@ -427,7 +478,7 @@ public class ProtxmlDataUploadService {
             return 0;
     }
 
-    private int addProteinInferenceRun(InteractProtXmlParser parser, int searchId) throws UploadException {
+    private void addProteinInferenceRun(InteractProtXmlParser parser, int searchId) throws UploadException {
         
         MsSearchDAO searchDao = daoFactory.getMsSearchDAO();
         MsSearch search = searchDao.loadSearch(searchId);
@@ -437,7 +488,7 @@ public class ProtxmlDataUploadService {
         run.setProgram(ProteinInferenceProgram.PROTEIN_PROPHET);
         run.setProgramVersion(parser.getProgramVersion());
         run.setDate(new java.sql.Date(parser.getDate().getTime()));
-        int pinferId = runDao.save(run);
+        uploadedPinferId = runDao.save(run);
         
         MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
         List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
@@ -448,7 +499,7 @@ public class ProtxmlDataUploadService {
                 ProteinferInput input = new ProteinferInput();
                 input.setInputId(runSearchId);
                 input.setInputType(InputType.SEARCH);
-                input.setProteinferId(pinferId);
+                input.setProteinferId(uploadedPinferId);
                 inputDao.saveProteinferInput(input);
             }
         }
@@ -464,6 +515,7 @@ public class ProtxmlDataUploadService {
         ProteinProphetParamDAO paramDao = ProteinferDAOFactory.instance().getProteinProphetParamDao();
         try {
             for(ProteinProphetParam param: params) {
+                param.setProteinferId(uploadedPinferId);
                 paramDao.saveProteinProphetParam(param);
             }
         }
@@ -477,14 +529,97 @@ public class ProtxmlDataUploadService {
         // save the ROC points
         ProteinProphetRocDAO rocDao = piDaoFactory.getProteinProphetRocDao();
         try {
-            rocDao.saveRoc(parser.getProteinProphetRoc());
+            ProteinProphetROC roc = parser.getProteinProphetRoc();
+            roc.setProteinferId(uploadedPinferId);
+            rocDao.saveRoc(roc);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
             ex.appendErrorMessage("Error saving ProteinProphet ROC points.");
             throw ex;
         }
-        return pinferId;
+    }
+
+
+    @Override
+    public void setAnalysisId(int analysisId) {
+        this.analysisId = analysisId;
+    }
+
+    @Override
+    public void setSearchId(int searchId) {
+        this.searchId = searchId;
+    }
+
+    @Override
+    public String getPreUploadCheckMsg() {
+        return preUploadCheckMsg.toString();
+    }
+
+    @Override
+    public String getUploadSummary() {
+        return "\tProtein inference file format: "+SearchFileFormat.PROTXML+
+        "\n\t#Protein groups in interact.prot.xml: "+numProteinGroups;
+    }
+
+    @Override
+    public boolean preUploadCheckPassed() {
+        
+        preUploadCheckMsg = new StringBuilder();
+        
+        // 1. valid data directory
+        File dir = new File(protxmlDirectory);
+        if(!dir.exists()) {
+            appendToMsg("Data directory does not exist: "+protxmlDirectory);
+            return false;
+        }
+        if(!dir.isDirectory()) {
+            appendToMsg(protxmlDirectory+" is not a directory");
+            return false;
+        }
+        
+        // 2. Look for interact.prot.xml file
+        File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String name_uc = name.toLowerCase();
+                return name_uc.endsWith(".prot.xml");
+            }});
+        
+        boolean found = false;
+        for (int i = 0; i < files.length; i++) {
+            if(files[i].getName().equalsIgnoreCase("interact.prot.xml")) {
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            appendToMsg("Could not find interact.prot.xml in directory: "+protxmlDirectory);
+            return false;
+        }
+        
+        
+        preUploadCheckDone = true;
+        
+        return true;
+    }
+    private void appendToMsg(String msg) {
+        this.preUploadCheckMsg.append(msg+"\n");
+    }
+
+    @Override
+    public void setDirectory(String directory) {
+        this.protxmlDirectory = directory;
+    }
+
+    @Override
+    public void setRemoteDirectory(String remoteDirectory) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setRemoteServer(String remoteServer) {
+        throw new UnsupportedOperationException();
     }
     
 }

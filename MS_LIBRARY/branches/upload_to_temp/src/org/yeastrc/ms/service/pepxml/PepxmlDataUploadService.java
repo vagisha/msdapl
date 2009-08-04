@@ -21,6 +21,7 @@ import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResultDataWId
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetResultDataBean;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
+import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
@@ -659,9 +660,10 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         for (MsResultResidueMod mod: result.getResultPeptide().getResultDynamicResidueModifications()) {
             if (mod == null)
                 continue;
-            int modId = dynaModLookup.getDynamicResidueModificationId(
-                    mod.getModifiedResidue(), mod.getModificationMass()); 
-            if (modId == 0) {
+            MsResidueModification modMatch = dynaModLookup.getDynamicResidueModification(
+                                        mod.getModifiedResidue(),
+                                        mod.getModificationMass(), false);
+            if (modMatch == null) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
                 ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
                         searchId+
@@ -669,7 +671,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
                         "; modMass: "+mod.getModificationMass().doubleValue());
                 throw ex;
             }
-            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modId, mod.getModifiedPosition());
+            ResultResidueModIds resultMod = new ResultResidueModIds(resultId, modMatch.getId(), mod.getModifiedPosition());
             resultResidueModList.add(resultMod);
         }
     }

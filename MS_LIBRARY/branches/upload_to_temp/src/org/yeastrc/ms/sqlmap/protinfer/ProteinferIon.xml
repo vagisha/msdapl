@@ -42,7 +42,7 @@
     	charge,
     	modifiedSequence,
     	modificationStateID) 
-    	VALUES (?,?,?)
+    	VALUES (?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
