@@ -9,15 +9,15 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchResultProteinDAO;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.Program;
 
-import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.ProgramParam.SCORE;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideHit;
 import edu.uwpr.protinfer.infer.Protein;

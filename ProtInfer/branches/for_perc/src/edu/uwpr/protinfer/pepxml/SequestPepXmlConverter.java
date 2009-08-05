@@ -285,13 +285,13 @@ public class SequestPepXmlConverter extends PepXmlConverter<SequestSearchResult>
     }
     
     public static void main(String[] args) {
-        int runSearchId = 7; // PARC_1_ip_01_itms.sqt
-        int searchId = 2;
-        String outDir = "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375/pepxml";
-        String outFile = "/Users/silmaril/WORK/UW/PROT_INFER/TEST_DATA/runID2931_exptID375/pepxml/msData_test_search2.pep.xml";
+        int runSearchId = 2; // 011805-ammsul2-15-totalN2-02
+        int searchId = 1;
+        String outDir = "/Users/silmaril/WORK/UW/MacCoss_Genn_CE/";
+        String outFile = outDir+File.separator+"011805-ammsul2-15-totalN2-02.pepxml";
         SequestPepXmlConverter converter = new SequestPepXmlConverter();
-        //converter.convertRunSearch(runSearchId, outDir);
-         converter.convertSearch(searchId, outFile);
+        converter.convertRunSearch(runSearchId, outDir);
+         //converter.convertSearch(searchId, outFile);
     }
 
 }

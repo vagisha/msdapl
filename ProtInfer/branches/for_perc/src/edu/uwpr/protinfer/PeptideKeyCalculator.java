@@ -6,9 +6,9 @@
  */
 package edu.uwpr.protinfer;
 
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinferIon;
 import org.yeastrc.ms.domain.search.MsSearchResult;
-
-import edu.uwpr.protinfer.database.dto.ProteinferIon;
 
 /**
  * 
