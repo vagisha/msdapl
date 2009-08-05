@@ -26,6 +26,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.ExperimentProteinProphetRun;
 import org.yeastrc.experiment.ExperimentProteinferRun;
 import org.yeastrc.experiment.ExperimentSearch;
 import org.yeastrc.experiment.ProjectExperiment;
@@ -35,9 +36,18 @@ import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
@@ -51,9 +61,6 @@ import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
 import org.yeastrc.yates.YatesRunMsSearchLinker;
 import org.yeastrc.yates.YatesRunSearcher;
-
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
 
 /**
  * Implements the logic to register a user
@@ -205,7 +212,8 @@ public class ViewProjectAction extends Action {
             try {
                 job = MSJobFactory.getInstance().getJobForExperiment(experimentId);
                 status = job.getStatus();
-                if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK)
+                if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK
+                   || status == JobUtils.STATUS_PENDING_UPLOAD)
                     continue;
             }
             catch(Exception e) {continue;} // because job with experimentID does not exist. Should not really happen.
@@ -235,6 +243,30 @@ public class ViewProjectAction extends Action {
                 analyses.add(getSearchAnalysis(analysisId));
             }
             pExpt.setAnalyses(analyses);
+            
+            
+            // load protein prophet results, if any
+            List<Integer> piRunIds = ProteinInferJobSearcher.instance().getProteinferIdsForMsExperiment(experimentId);
+            // loop over and see if any are ProteinProphet runs
+            ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+            ProteinProphetRunDAO pRunDao = ProteinferDAOFactory.instance().getProteinProphetRunDao();
+            ProteinProphetProteinDAO prophetProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
+            ProteinferPeptideDAO peptDao = ProteinferDAOFactory.instance().getProteinferPeptideDao();
+            
+            List<ExperimentProteinProphetRun> prophetRunList = new ArrayList<ExperimentProteinProphetRun>();
+            for(int piRunId: piRunIds) {
+                ProteinferRun run = runDao.loadProteinferRun(piRunId);
+                if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
+                    ProteinProphetRun ppRun = pRunDao.loadProteinferRun(piRunId);
+                    ExperimentProteinProphetRun eppRun = new ExperimentProteinProphetRun(ppRun);
+                    eppRun.setNumParsimoniousProteins(prophetProtDao.getProteinferProteinIds(piRunId, true).size());
+                    eppRun.setNumParsimoniousProteinGroups(prophetProtDao.getIndistinguishableGroupCount(piRunId, true));
+                    eppRun.setUniqPeptideSequenceCount(peptDao.getUniquePeptideSequenceCountForRun(piRunId));
+                    
+                    prophetRunList.add(eppRun);
+                }
+            }
+            pExpt.setProteinProphetRun(prophetRunList);
             
             
             // load the protein inference jobs, if any

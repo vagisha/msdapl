@@ -1,4 +1,5 @@
 
+<%@page import="org.yeastrc.ms.domain.search.Program"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -341,6 +342,9 @@ function clearSelectedProtInfer() {
 						<b><bean:write name="analysis" property="analysisProgram"/>
 						&nbsp;
 						<bean:write name="analysis" property="analysisProgramVersion"/></b></td>
+						
+						<!-- !!!!!! PERCOLATOR !!!!!! -->
+						<logic:equal name="analysis" property="analysisProgram" value="<%=Program.PERCOLATOR.toString() %>">
 						<td width="33%">
 							<b>
 								<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
@@ -353,6 +357,23 @@ function clearSelectedProtInfer() {
 							<b><a href="<yrcwww:link path='newPercolatorProteinInference.do?'/>searchAnalysisId=<bean:write name='analysis' property='id' />&projectId=<bean:write name='project' property='ID'/>"> 
 							[Infer Proteins]</a></b>
 						</td>
+						</logic:equal>
+						
+						<!-- !!!!!! PEPTIDE PROPHET !!!!!! -->
+						<logic:equal name="analysis" property="analysisProgram" value="<%=Program.PEPTIDE_PROPHET.toString() %>">
+						<td width="33%">
+							<b>
+								<html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
+								<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
+											paramId="ID" 
+											paramName="search" paramProperty="id">[PepXML]</html:link> -->
+							</b>
+						</td>
+						<td width="33%">
+							&nbsp;
+						</td>
+						</logic:equal>
+						
 					</tr>
 					</table>
 				</div>
@@ -378,6 +399,71 @@ function clearSelectedProtInfer() {
 					</table>
 				</div>
 			</logic:present>
+			
+			<logic:present name="experiment" property="proteinProphetRuns">
+				<div style="background-color: #FFFFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
+					<div><b>ProteinProphet Results</b></div> 
+					<table width="100%">
+					<thead>
+					<tr align="left">
+						<th valign="top">ID</th>
+						<th valign="top">Version</th>
+						<th valign="top" align="center">#Groups<br>(#Proteins)</th>
+						<th valign="top" align="center">#Peptides</th>
+						<th valign="top">Comments</th>
+						<th valign="top"></th>
+						<th valign="top">Compare</th></tr>
+					</thead>
+					<tbody>
+					<logic:iterate name="experiment" property="proteinProphetRuns" id="prpRun" type="org.yeastrc.experiment.ExperimentProteinProphetRun">
+						<tr>
+						<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.id"/></b></td>
+						<td valign="top"><bean:write name="prpRun" property="proteinProphetRun.programVersion"/></td>
+						<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><nobr><bean:write name="prpRun" property="numParsimoniousProteinGroups"/>(<bean:write name="prpRun" property="numParsimoniousProteins"/>)</nobr></td>
+						<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqPeptideSequenceCount"/></td>
+						<td valign="top">
+							<span id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_text"><bean:write name="prpRun" property="proteinProphetRun.comments"/></span>
+							<logic:equal name="writeAccess" value="true">
+							<span class="editableComment clickable" id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>" style="font-size:8pt; color:red;">[Edit]</span>
+							</logic:equal>
+						</td>
+						<td valign="top">
+						<a href="<yrcwww:link path='viewProteinProphetResult.do?'/>pinferId=<bean:write name='prpRun' property='proteinProphetRun.id'/>">
+							<b><font color="green">View</font></b></a>
+						</td>
+						<td valign="top" align="center" >
+	   		 				<input type="checkbox" class="compare_cb" value="<bean:write name='prpRun' property='proteinProphetRun.id'/>"></input>
+						</td>
+						</tr>
+						<tr>
+							<td colspan="5" valign="top">
+							<div id="piRun_<bean:write name='prpRun' property='proteinProphetRun.id'/>_edit" align="center"
+						     style="display:none;">
+						     <textarea rows="5" cols="60" class="edit_text"></textarea>
+						     <br>
+						     <button class="savePiRunComments" id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Save</button>
+						     <button class="cancelPiRunComments" id="<bean:write name='prpRun' property='proteinProphetRun.id'/>">Cancel</button>
+							</div>
+							</td>
+						</tr>
+					</logic:iterate>
+					
+					<tr>
+						<td colspan="9" align="right">
+							<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
+							&nbsp;
+							<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
+							&nbsp;
+							<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"><b>[Compare]</b></span>
+							<br><br>
+							<span class="clickable" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer();">[Clear Selected]</span>
+						</td>
+					</tr>
+					</tbody>
+					</table>
+				</div>
+			</logic:present>
+			
 			<logic:notEmpty name="experiment" property="protInferRuns">
 				<div style="background-color: #F0F8FF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
 					<div><b>Protein Inference Results</b></div> 

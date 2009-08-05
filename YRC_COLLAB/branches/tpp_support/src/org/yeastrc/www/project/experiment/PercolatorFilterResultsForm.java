@@ -17,9 +17,8 @@ import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultFilterCriteria;
 /**
  * 
  */
-public class PercolatorFilterResultsForm extends FilterResultsForm {
+public class PercolatorFilterResultsForm extends AnalysisFilterResultsForm {
 
-    private int searchAnalysisId;
     
     private String minQValue = null;
     private String maxQValue = null;
@@ -32,8 +31,6 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
     
     private boolean usePEP = true;
     
-    private boolean peptidesView = false;
-
 
     public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         ActionErrors errors = super.validate(mapping, request);
@@ -199,22 +196,6 @@ public class PercolatorFilterResultsForm extends FilterResultsForm {
         criteria.setFileNames(filteredFileNames());
         
         return criteria;
-    }
-
-    public int getSearchAnalysisId() {
-        return searchAnalysisId;
-    }
-
-    public void setSearchAnalysisId(int searchAnalysisId) {
-        this.searchAnalysisId = searchAnalysisId;
-    }
-    
-    public boolean isPeptidesView() {
-        return peptidesView;
-    }
-
-    public void setPeptidesView(boolean peptidesView) {
-        this.peptidesView = peptidesView;
     }
 
 }

@@ -32,6 +32,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     private List<ExperimentSearch> searches;
     private List<SearchAnalysis> analyses;
     private YatesRun dtaSelect;
+    private List<ExperimentProteinProphetRun> prophetRuns;
     private List<ExperimentProteinferRun> protInferRuns;
     
     private List<TableRow> rows;
@@ -107,6 +108,14 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         this.analyses = analyses;
     }
 
+    public List<ExperimentProteinProphetRun> getProteinProphetRuns() {
+        return prophetRuns;
+    }
+    
+    public void setProteinProphetRun(List<ExperimentProteinProphetRun> runs) {
+        this.prophetRuns = runs;
+    }
+    
     public YatesRun getDtaSelect() {
         return dtaSelect;
     }

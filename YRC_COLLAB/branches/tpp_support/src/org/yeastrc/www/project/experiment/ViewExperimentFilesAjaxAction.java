@@ -31,6 +31,7 @@ import org.yeastrc.experiment.SearchFile;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
@@ -188,6 +189,12 @@ private static DAOFactory daoFactory = DAOFactory.instance();
             PercolatorResultDAO prDao = daoFactory.getPercolatorResultDAO();
             for(AnalysisFile file: files) {
                 file.setNumResults(prDao.numRunAnalysisResults(file.getId()));
+            }
+        }
+        else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+            PeptideProphetResultDAO ppResDao = daoFactory.getPeptideProphetResultDAO();
+            for(AnalysisFile file: files) {
+                file.setNumResults(ppResDao.numRunAnalysisResults(file.getId()));
             }
         }
         

@@ -56,6 +56,7 @@
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
 	<form-bean name="filterPercolatorResultsForm" type="org.yeastrc.www.project.experiment.PercolatorFilterResultsForm" />
+	<form-bean name="filterPeptideProphetResultsForm" type="org.yeastrc.www.project.experiment.PeptideProphetFilterResultsForm" />
 	<form-bean name="filterSequestResultsForm" type="org.yeastrc.www.project.experiment.SequestFilterResultsForm" />
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
@@ -357,13 +358,24 @@
 	
 	<action
 	  path="/viewPercolatorResults"
-	  type="org.yeastrc.www.project.experiment.ViewPercolatorResults"
+	  type="org.yeastrc.www.project.experiment.ViewAnalysisResults"
 	  name="filterPercolatorResultsForm"
 	  validate="true"
 	  scope="request"
 	  input="/pages/internal/project/percolator/viewPercolatorResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/percolator/viewPercolatorResults.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/viewPeptideProphetResults"
+	  type="org.yeastrc.www.project.experiment.ViewAnalysisResults"
+	  name="filterPeptideProphetResultsForm"
+	  validate="true"
+	  scope="request"
+	  input="/pages/internal/project/peptideProphet/viewPeptideProphetResults.jsp">
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/peptideProphet/viewPeptideProphetResults.jsp" redirect="false"/>
 	</action>
 	
 	<action

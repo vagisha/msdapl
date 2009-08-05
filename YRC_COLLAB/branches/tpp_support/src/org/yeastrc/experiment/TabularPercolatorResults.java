@@ -1,5 +1,5 @@
 /**
- * TabularResults.java
+ * TabularPercolatorResults.java
  * @author Vagisha Sharma
  * Apr 5, 2009
  * @version 1.0
@@ -22,7 +22,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
 
     
     private SORT_BY[] columns = new SORT_BY[] {
-        SORT_BY.FILE_PERC,
+        SORT_BY.FILE_ANALYSIS,
         SORT_BY.SCAN, 
         SORT_BY.CHARGE, 
         SORT_BY.MASS, 
@@ -57,7 +57,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         // Report Percolator Discriminant Score instead of PEP
         if(!hasPEP) {
             columns = new SORT_BY[] {
-                    SORT_BY.FILE_PERC,
+                    SORT_BY.FILE_ANALYSIS,
                     SORT_BY.SCAN, 
                     SORT_BY.CHARGE, 
                     SORT_BY.MASS, 
