@@ -1,6 +1,6 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptide;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptide;
 
 public class WIdPickerPeptide {
 

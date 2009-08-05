@@ -19,12 +19,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.EnrichedGOTerm;
 import org.yeastrc.www.go.EnrichedGOTermsGraphCreator;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
  * 

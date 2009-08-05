@@ -16,14 +16,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.ms.domain.protinfer.ProgramParam;
+import org.yeastrc.ms.domain.protinfer.ProgramParam.ParamMaker;
 import org.yeastrc.project.Projects;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.ProgramParam;
-import edu.uwpr.protinfer.ProgramParam.ParamMaker;
 
 /**
  * 

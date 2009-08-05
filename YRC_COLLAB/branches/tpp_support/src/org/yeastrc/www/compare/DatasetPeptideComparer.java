@@ -11,10 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferPeptideDAO;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
 
 /**
  * 

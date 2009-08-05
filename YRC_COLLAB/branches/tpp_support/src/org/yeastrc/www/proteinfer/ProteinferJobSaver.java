@@ -8,22 +8,21 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerParamDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProteinferInput;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.www.proteinfer.ProgramParameters.Param;
 import org.yeastrc.www.proteinfer.ProteinInferInputSummary.ProteinInferIputFile;
-
-import edu.uwpr.protinfer.ProteinInferenceProgram;
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferInputDAO;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerParamDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferInput;
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
-import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 public class ProteinferJobSaver {
 

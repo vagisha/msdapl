@@ -16,14 +16,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptideBase;
 import org.yeastrc.www.proteinfer.alignment.AlignedProtein.AlignedPosition;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
-
-import edu.uwpr.protinfer.PeptideDefinition;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideBase;
 
 public class SequenceAligner {
 

@@ -14,12 +14,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
-import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 
 public class ProteinInferJobSearcher {
 
@@ -59,7 +58,7 @@ public class ProteinInferJobSearcher {
         return jobs;
     }
     
-    private List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
+    public List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
         
         Set<Integer> pinferRunIds = new HashSet<Integer>();
         

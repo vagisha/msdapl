@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.www.compare.ComparisonProtein;
 
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
 import edu.uwpr.protinfer.infer.graph.InvalidVertexException;

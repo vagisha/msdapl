@@ -18,6 +18,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
@@ -25,9 +27,6 @@ import org.yeastrc.project.Projects;
 import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.ProteinInferenceProgram;
-import edu.uwpr.protinfer.database.dto.ProteinferInput.InputType;
 
 /**
  * 

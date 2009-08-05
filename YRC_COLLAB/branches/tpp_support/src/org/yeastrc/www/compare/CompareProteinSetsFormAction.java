@@ -22,17 +22,16 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.jobqueue.JobUtils;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectsSearcher;
-import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
+import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
 import org.yeastrc.yates.YatesRunSearcher;
-
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 
 /**
  * 

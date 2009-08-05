@@ -11,17 +11,16 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.PeptideDefinition;
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
-import edu.uwpr.protinfer.util.TimeUtils;
 
 public class ProteinDetailsAjaxAction extends Action {
 

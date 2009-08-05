@@ -18,11 +18,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.data.InvalidIDException;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.yates.YatesRun;
-
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
 
 /**
  * 

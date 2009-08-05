@@ -15,15 +15,14 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
+import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
-import edu.uwpr.protinfer.database.dto.ProteinferProtein;
 
 public class ProteinSequenceAjaxAction extends Action {
 

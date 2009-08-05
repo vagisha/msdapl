@@ -6,8 +6,8 @@
  */
 package org.yeastrc.www.compare;
 
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferSpectrumMatchDAO;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
 
 
 /**

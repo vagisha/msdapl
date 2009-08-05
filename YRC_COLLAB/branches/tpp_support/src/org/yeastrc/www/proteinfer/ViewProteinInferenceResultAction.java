@@ -15,8 +15,15 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.misc.ResultsPager;
@@ -27,15 +34,8 @@ import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
-import edu.uwpr.protinfer.PeptideDefinition;
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.idpicker.IDPickerParams;
 import edu.uwpr.protinfer.idpicker.IdPickerParamsMaker;
-import edu.uwpr.protinfer.util.TimeUtils;
 
 public class ViewProteinInferenceResultAction extends Action {
 

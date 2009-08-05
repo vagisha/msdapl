@@ -2,8 +2,6 @@ package org.yeastrc.www.proteinfer.idpicker;
 
 import java.util.List;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerPeptideGroup;
-
 public class WIdPickerCluster {
 
     private int pinferId;

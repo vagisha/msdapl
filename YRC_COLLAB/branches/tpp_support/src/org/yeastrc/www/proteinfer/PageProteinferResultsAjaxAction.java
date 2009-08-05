@@ -16,16 +16,15 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER;
+import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.PeptideDefinition;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
-import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER;
-import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
  * 

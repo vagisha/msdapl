@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 
 public class WIdPickerProteinGroup {
 

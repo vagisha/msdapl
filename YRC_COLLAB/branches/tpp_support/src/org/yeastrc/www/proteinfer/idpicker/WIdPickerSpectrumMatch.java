@@ -1,8 +1,7 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
+import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
-
-import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 
 public class WIdPickerSpectrumMatch {
     

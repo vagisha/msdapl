@@ -21,23 +21,21 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.experiment.ProjectExperiment;
 import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.nr_seq.NRProtein;
 import org.yeastrc.nr_seq.NRProteinFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectsSearcher;
-import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
+import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
 import org.yeastrc.yates.YatesRunSearcher;
-
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
-import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
-import edu.uwpr.protinfer.database.dto.ProteinferRun;
 
 /**
  * Description of class goes here.

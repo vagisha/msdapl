@@ -19,6 +19,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.www.proteinfer.alignment.AlignedProtein;
 import org.yeastrc.www.proteinfer.alignment.AlignedProteins;
 import org.yeastrc.www.proteinfer.alignment.SequenceAligner;
@@ -26,8 +27,6 @@ import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.PeptideDefinition;
 
 /**
  * 

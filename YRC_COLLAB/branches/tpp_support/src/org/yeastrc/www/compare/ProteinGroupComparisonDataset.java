@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
@@ -19,10 +22,6 @@ import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
-
-import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
-import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
 
 /**
  * 
@@ -595,5 +594,15 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     @Override
     public int getPageCount() {
         return this.pageCount;
+    }
+    
+    @Override
+    public void setDisplayPageNumbers(List<Integer> pageList) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setLastPage(int pageCount) {
+        throw new UnsupportedOperationException();
     }
 }
