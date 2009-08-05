@@ -37,6 +37,10 @@ public interface PeptideProphetResultDAO {
             PeptideProphetResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
     
+    public abstract List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId, 
+            PeptideProphetResultFilterCriteria filterCriteria, 
+            ResultSortCriteria sortCriteria);
+    
     public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
     
     public abstract List<Integer> loadResultIdsForAnalysis(int analysisId);

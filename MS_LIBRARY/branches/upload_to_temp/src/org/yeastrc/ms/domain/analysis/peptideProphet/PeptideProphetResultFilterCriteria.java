@@ -51,7 +51,7 @@ public class PeptideProphetResultFilterCriteria extends ResultFilterCriteria {
       return (minProbability != null || maxProbability != null);
     }
     
-    public String makeQValueFilterSql() {
+    public String makeProbabilityFilterSql() {
         return makeFilterSql(SORT_BY.PEPTP_PROB.getColumnName(), minProbability, maxProbability);
     }
     

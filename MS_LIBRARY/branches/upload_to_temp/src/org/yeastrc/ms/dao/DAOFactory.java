@@ -11,6 +11,10 @@ import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.ibatis.MsRunSearchAnalysisDAOImpl;
 import org.yeastrc.ms.dao.analysis.ibatis.MsSearchAnalysisDAOImpl;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetRocDAO;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetResultDAOImpl;
+import org.yeastrc.ms.dao.analysis.peptideProphet.ibatis.PeptideProphetRocDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorParamsDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImpl;
@@ -157,6 +161,10 @@ public class DAOFactory {
     private PercolatorParamsDAO percSQTHeaderDAO;
     private PercolatorResultDAO percResultDAO;
     
+    // DAOs related to PeptideProphet search analysis
+    private PeptideProphetRocDAO ppRocDAO;
+    private PeptideProphetResultDAO pprophResultDAO;
+    
     private DAOFactory() {
         
         // Experiment related
@@ -207,6 +215,8 @@ public class DAOFactory {
         percResultDAO = new PercolatorResultDAOImpl(sqlMap, rsAnalysisDAO, runSearchDAO, modDAO);
         
         // PeptideProphet post search analysis related
+        ppRocDAO = new PeptideProphetRocDAOImpl(sqlMap);
+        pprophResultDAO = new PeptideProphetResultDAOImpl(sqlMap, rsAnalysisDAO);
         
     }
     
@@ -354,5 +364,15 @@ public class DAOFactory {
     
     public PercolatorResultDAO getPercolatorResultDAO() {
         return percResultDAO;
+    }
+    //-------------------------------------------------------------------------------------------
+    // PeptideProphet related
+    //-------------------------------------------------------------------------------------------
+    public PeptideProphetResultDAO getPeptideProphetResultDAO() {
+        return pprophResultDAO;
+    }
+    
+    public PeptideProphetRocDAO getPeptideProphetRocDAO() {
+        return ppRocDAO;
     }
 }

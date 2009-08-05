@@ -17,6 +17,7 @@ public enum SORT_BY {
     PEPTIDE("Peptide", "peptide"),
     PROTEIN("Protein", "accession"),
     FILE_SEARCH("File", "runSearchID"),
+    FILE_ANALYSIS("File", "runSearchAnalysisID"),
     
     // Sequest specific
     XCORR("XCorr", "XCorr"),
@@ -27,7 +28,6 @@ public enum SORT_BY {
     CALC_MASS_SEQ("Calc. Mass", "calculatedMass"),
     
     // Percolator specific
-    FILE_PERC("File", "runSearchAnalysisID"),
     QVAL("q-value", "qvalue"),
     PEP("PEP", "pep"),
     DS("DS", "discriminantScore"),
@@ -83,4 +83,7 @@ public enum SORT_BY {
         return sortBy == XCORR || sortBy == DELTACN || sortBy == SP || sortBy == EVAL || sortBy == CALC_MASS_SEQ;
     }
     
+    public static boolean isPeptideProphetRelated(SORT_BY sortBy) {
+        return sortBy == PEPTP_PROB;
+    }
 }

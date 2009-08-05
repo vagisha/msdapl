@@ -79,6 +79,8 @@ public class ProteinInferenceProgram {
             return PROTINFER_PERC;
         else if ("PROTINFER_PERC_OLD".equalsIgnoreCase(name))
             return PROTINFER_PERC_OLD;
+        else if("ProteinProphet".equalsIgnoreCase(name))
+            return PROTEIN_PROPHET;
         else 
             return null;
     }
