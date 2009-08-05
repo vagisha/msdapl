@@ -7,7 +7,9 @@
 package org.yeastrc.ms.dao.protinfer.proteinProphet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferProteinDAO;
@@ -112,6 +114,24 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         return protDao.getProteinferProteinIds(proteinferId);
     }
 
+    public List<Integer> getProteinferProteinIds(int pinferId, boolean isParsimonious) {
+        
+        Map<String, Number> map = new HashMap<String, Number>(4);
+        map.put("pinferId", pinferId);
+        if(isParsimonious)          map.put("isSubsumed", 0);
+        return queryForList(sqlMapNameSpace+".proteinProphetProteinIds", map);
+    }
+    
+    public  int getIndistinguishableGroupCount(int pinferId, boolean parsimonious) {
+        
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        if(parsimonious) {
+            map.put("isSubsumed", 0);
+        }
+        return (Integer)queryForObject(sqlMapNameSpace+".selectGroupCount", map);
+    }
+    
     @Override
     public ProteinProphetProtein loadProtein(int pinferProteinId) {
         return (ProteinProphetProtein) super.queryForObject(sqlMapNameSpace+".select", pinferProteinId);

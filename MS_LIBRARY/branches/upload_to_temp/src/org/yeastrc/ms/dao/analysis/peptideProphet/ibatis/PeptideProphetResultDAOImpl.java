@@ -284,7 +284,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID, min(pres.qvalue) AS mq FROM ( ");
+        sql.append("SELECT pres.resultID, max(pres.probability) AS mp FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PeptideProphetResult AS pres, msRunSearchResult AS res");
         
         
@@ -345,11 +345,11 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         sql.append("GROUP BY res.peptide ");
         
         if(sortCriteria != null) {
-            if(sortCriteria.getSortBy() != null && !sortCriteria.getSortBy().getColumnName().equals("qvalue")) {
+            if(sortCriteria.getSortBy() != null && !sortCriteria.getSortBy().getColumnName().equals("probability")) {
                 sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
             }
             else {
-                sql.append("ORDER BY mq ");
+                sql.append("ORDER BY mp ");
             }
         }
         
