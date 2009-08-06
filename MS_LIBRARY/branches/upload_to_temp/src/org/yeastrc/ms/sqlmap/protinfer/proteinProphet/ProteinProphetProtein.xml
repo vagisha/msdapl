@@ -65,6 +65,23 @@
     	AND ppProt.subsumed = 0
     </select>
     
+    <resultMap class="org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO$ProteinAndGroup" 
+    				id="protAndGroupResult">
+		<result property="proteinId" jdbcType="INTEGER"/>
+		<result property="groupId" jdbcType="INTEGER"/>
+	</resultMap>
+	
+    <select id="selectProteinAndGroupIds" resultMap="protAndGroupResult" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id, pprot.groupID 
+    	FROM msProteinInferProtein as prot, ProteinProphetProtein as pprot 
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = pprot.piProteinID
+    	<isPropertyAvailable property="isSubsumed">
+    		AND pprot.isSubsumed = #isSubsumed#
+    	</isPropertyAvailable>
+    </select>
+    
 	
 	<select id="selectProteinIdsForGroup" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id FROM msProteinInferProtein as prot, ProteinProphetProtein as ppProt
@@ -118,6 +135,16 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterProteinGroupCoverage" 
+    		resultClass="org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO$ProteinGroupCoverage" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id AS proteinId, pprot.groupID AS proteinGroupId, prot.coverage AS coverage 
+    	FROM msProteinInferProtein AS prot, ProteinProphetProtein AS pprot 
+    	WHERE prot.id = pprot.piProteinID 
+    	AND prot.piRunID = #pinferId# 
+    	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
+    	ORDER BY proteinGroupId, coverage DESC
+    </select>
     
     <select id="filterByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 
