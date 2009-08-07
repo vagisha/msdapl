@@ -1747,7 +1747,7 @@ public class ProgressReportGenerator {
 	 * @throws Exception
 	 */
 	private void buildProjects() throws Exception {
-		this.projects = ReportProjectsSearcher.search(2008);
+		this.projects = ReportProjectsSearcher.search(2009);
 	}
 
 	/**
