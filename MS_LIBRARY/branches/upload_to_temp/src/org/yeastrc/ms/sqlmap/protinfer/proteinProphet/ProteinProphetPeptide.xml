@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinProphetPeptide"> 
+
+	<typeAlias alias="ProteinProphetPeptide" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide"/>
+	
+	<resultMap class="ProteinProphetPeptide" id="proteinProphetPeptideResult" extends="ProteinferPeptide.pinferPeptideBaseResult">
+		<result property="ionList" 
+				column="{piPeptideId=id, piProteinId=piProteinID}"
+				select="ProteinProphetProteinIon.selectIonsForProteinPeptide"
+				 />
+	</resultMap>
+	
+	
+	<select id="selectPeptidesForProtein" resultMap="proteinProphetPeptideResult" parameterClass="Integer">
+    	SELECT p.*, protMatch.piProteinID
+    	FROM  msProteinInferPeptide as p, msProteinInferProteinPeptideMatch as protMatch 
+    	WHERE p.id = protMatch.piPeptideID
+    	AND protMatch.piProteinID = #id#
+    </select>
+    
+</sqlMap>

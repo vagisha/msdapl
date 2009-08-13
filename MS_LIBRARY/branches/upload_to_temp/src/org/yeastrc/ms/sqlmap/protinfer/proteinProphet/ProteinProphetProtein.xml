@@ -13,6 +13,9 @@
 		<result property="subsumed" column="subsumed" />
 		<result property="totalSpectrumCount" column="totalSpectrumCount" nullValue = "-1"/>
 		<result property="pctSpectrumCount" column="pctSpectrumCount" nullValue = "-1.0"/>
+		<result property="peptides" 
+				select="ProteinProphetPeptide.selectPeptidesForProtein"
+				column="id"/>
 	</resultMap>
 	
 	

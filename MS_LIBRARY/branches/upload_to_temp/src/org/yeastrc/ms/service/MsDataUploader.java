@@ -181,6 +181,7 @@ public class MsDataUploader {
                 return;
             }
             
+            log.info("BEGINNING upload of search results");
             try {
                 this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
             }
@@ -225,6 +226,7 @@ public class MsDataUploader {
                 return;
             }
             
+            log.info("BEGINNING upload of sanalysis results");
             try {
                 this.uploadedAnalysisId = exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
@@ -256,6 +258,7 @@ public class MsDataUploader {
         
         // ----- UPLOAD PROTEIN INFERENCE DATA
         if(uploadProtinfer) {
+            log.info("BEGINNING upload of protein inference results");
             try {
                 exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisId);
             }
@@ -797,7 +800,7 @@ public class MsDataUploader {
         uploader.setSearchDate(new Date());
         uploader.checkResultChargeMass(maccossData);
         
-        uploader.uploadData(32);
+        uploader.uploadData(1);
 //        uploader.uploadData();
 //        }
         long end = System.currentTimeMillis();

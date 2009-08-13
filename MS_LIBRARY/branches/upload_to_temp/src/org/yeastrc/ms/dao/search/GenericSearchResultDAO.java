@@ -41,6 +41,8 @@ public interface GenericSearchResultDAO <I extends MsSearchResultIn, O extends M
     
     public abstract List<Integer> loadResultIdsForSearchChargePeptide(int searchId, int charge, String peptide);
     
+    public abstract List<Integer> loadResultIdsForSearchPeptide(int searchId, String peptide);
+    
     
     /**
      * Saves the search result in the msRunSearchResult table. 

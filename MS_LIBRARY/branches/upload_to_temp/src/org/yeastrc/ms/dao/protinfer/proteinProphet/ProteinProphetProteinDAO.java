@@ -144,7 +144,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     public ProteinProphetProtein loadProtein(int pinferProteinId) {
         return (ProteinProphetProtein) super.queryForObject(sqlMapNameSpace+".select", pinferProteinId);
     }
-
+    
     @Override
     public ProteinferProtein loadProtein(int proteinferId, int nrseqProteinId) {
         return protDao.loadProtein(proteinferId, nrseqProteinId);

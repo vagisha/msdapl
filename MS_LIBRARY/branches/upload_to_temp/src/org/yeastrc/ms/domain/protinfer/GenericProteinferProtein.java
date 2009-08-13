@@ -98,6 +98,10 @@ public class GenericProteinferProtein <T extends GenericProteinferPeptide<?,?>>{
         this.peptideList = peptideList;
     }
     
+    public void addPeptide(T peptide) {
+        peptideList.add(peptide);
+    }
+    
     public int getPeptideCount() {
         // peptide is uniquely defined by its sequence
         if(!peptideDefinition.isUseCharge() && !peptideDefinition.isUseMods()) 

@@ -5,9 +5,13 @@
 
 	<typeAlias alias="ProteinProphetProteinIon" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon"/>
 	
-	<resultMap class="ProteinProphetProteinIon" id="proteinIonResult">
+	
+	<resultMap class="ProteinProphetProteinIon" id="prophetIonResult" extends="ProteinferIon.pinferIonResult">
+		
+	</resultMap>
+	
+	<resultMap class="ProteinProphetProteinIon" id="prophetProteinIonResult" extends="ProteinProphetProteinIon.prophetIonResult">
 		<result property="piProteinId" column="piProteinID" nullValue="0" />
-		<result property="id" column="piIonID" nullValue="0" />
 		<result property="initialProbability" column="initialProbability" nullValue="-1.0"/>
 		<result property="nspAdjProbability" column="nspAdjProbability" nullValue="-1.0"/>
 		<result property="numSiblingPeptides" column="numSiblingPeptides" nullValue="-1.0"/>
@@ -24,7 +28,36 @@
 	</parameterMap>
 	
 
-    <insert id="insert" parameterMap="proteinIonParam">
+	<select id="selectIon" resultMap="prophetIonResult" parameterClass="Integer">
+		SELECT * FROM msProteinInferIon WHERE id=#id#
+	</select>
+	
+	<select id="selectProteinIon" resultMap="prophetIonResult" parameterClass="java.util.Map">
+		SELECT * FROM msProteinInferIon AS ion, ProteinProphetProteinIon AS pion
+		WHERE ion.id=#piIonId#
+		AND ion.id = pion.piIonID
+		AND pion.piProteinID=#piProteinId#
+	</select>
+	
+	<select id="selectIonsForProtein" resultMap="prophetProteinIonResult" parameterClass="java.util.Map">
+		SELECT * FROM msProteinInferIon AS ion, ProteinProphetProteinIon AS pion
+		AND ion.id = pion.piIonID
+		AND pion.piProteinID=#piProteinId#
+	</select>
+	
+	<!-- This one is used internally by ProteinProphetPeptide (lazy loading of ionList property -->
+	<select id="selectIonsForProteinPeptide" resultMap="prophetProteinIonResult" >
+		SELECT * FROM msProteinInferIon AS ion, ProteinProphetProteinIon AS pion
+		WHERE ion.piPeptideID=#piPeptideId# 
+		AND ion.id = pion.piIonID
+		AND pion.piProteinID=#piProteinId#
+	</select>
+	
+	<select id="selectIonsForPeptide" resultMap="prophetIonResult" parameterClass="Integer">
+    	SELECT * from msProteinInferIon WHERE piPeptideID=#id#
+    </select>
+    
+	<insert id="insert" parameterMap="proteinIonParam">
     	INSERT INTO ProteinProphetProteinIon (
     	piProteinID,
     	piIonID,

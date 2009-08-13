@@ -646,6 +646,7 @@ CREATE TRIGGER msProteinInferProtein_bdelete BEFORE DELETE ON msProteinInferProt
    	DELETE FROM msProteinInferProteinPeptideMatch WHERE piProteinID = OLD.id;
    	DELETE FROM ProteinProphetSubsumedProtein WHERE subsumedProteinID = OLD.id;
    	DELETE FROM ProteinProphetSubsumedProtein WHERE subsumingProteinID = OLD.id;
+   	DELETE FROM ProteinProphetProteinIon WHERE piProteinID = OLD.id;
  END;
 |
 DELIMITER ;

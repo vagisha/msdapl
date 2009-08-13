@@ -94,6 +94,14 @@
     	AND res.peptide = #peptide#
     </select>
     
+    <select id="selectResultIdsForSearchPeptide" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT res.id 
+    	FROM msRunSearchResult AS res, msRunSearch AS rs
+    	WHERE rs.searchID = #searchId#
+    	AND rs.id = res.runSearchID
+    	AND res.peptide = #peptide#
+    </select>
+    
     <select id="countRunSearchResults" resultClass="Integer" parameterClass="Integer">
     	SELECT count(*) FROM msRunSearchResult WHERE runSearchID=#runSearchId# 
     </select>

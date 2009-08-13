@@ -64,7 +64,6 @@ import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
-import org.yeastrc.ms.util.AminoAcidUtils;
 
 /**
  * 
@@ -294,19 +293,22 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 pinferPeptideId = peptDao.save(peptide);
                 peptideMap.put(peptide.getSequence(), pinferPeptideId);
             }
+            peptide.setId(pinferPeptideId);
             
             // link this peptide and protein
-            protDao.saveProteinferProteinPeptideMatch(protein.getId(), pinferPeptideId);
+            protDao.saveProteinferProteinPeptideMatch(protein.getId(), peptide.getId());
             
             
             // look at each ion for the peptide
             for(ProteinProphetProteinPeptideIon ion: peptide.getIonList()) {
                 
+                ion.setPiProteinId(protein.getId());
+                ion.setProteinferPeptideId(pinferPeptideId);
+                
                 Integer pinferIonId = savePeptideIon(peptide, ion);
                 
                 // create an entry in the ProteinProphetProteinIon table
                 ion.setId(pinferIonId);
-                ion.setPiProteinId(protein.getId());
                 ppProteinIonDao.save(ion);
             }
         }
@@ -315,19 +317,19 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private Integer savePeptideIon(ProteinProphetProteinPeptide peptide,
             ProteinProphetProteinPeptideIon ion) throws UploadException {
         
+        // Update the modified sequence for the ion based on the modifications we have
+        // in the database for this search
+        List<MsResultResidueMod> modList = null;
+        if(ion.getModifications().size() > 0) {
+            String strippedSeq = peptide.getSequence();
+            
+            modList = getMatchingModifications(ion, strippedSeq);
+            updateModifiedSequence(ion, strippedSeq, modList);
+        }
+        
         Integer pinferIonId = ionMap.get(ion.getCharge()+"_"+ion.getModifiedSequence());
         
         if(pinferIonId == null) {
-            
-            // Update the modified sequence for each ion based on the modifications we have
-            // in the database for this search
-            List<MsResultResidueMod> modList = null;
-            if(ion.getModifications().size() > 0) {
-                String strippedSeq = peptide.getSequence();
-                
-                modList = getMatchingModifications(ion, strippedSeq);
-                updateModifiedSequence(ion, strippedSeq, modList);
-            }
             
             Integer modStateId = modifiedStateMap.get(ion.getModifiedSequence());
             if(modStateId == null) {
@@ -342,11 +344,12 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 modifiedStateMap.put(ion.getModifiedSequence(), modStateId);
                 
             }
+            
             ion.setModificationStateId(modStateId);
             pinferIonId = ionDao.save(ion);
             ion.setId(pinferIonId);
             
-            ionMap.put(ion.getModifiedSequence(), pinferIonId);
+            ionMap.put(ion.getCharge()+"_"+ion.getModifiedSequence(), pinferIonId);
             
             // save spectra for the ion
             saveIonSpectra(ion, searchId, modList);
@@ -412,8 +415,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         throws UploadException {
         
         
-        // get all spectra for the given searchID that have the given sequence and modifications
-        List<Integer> resultIds = resDao.loadResultIdsForSearchChargePeptide(searchId, ion.getCharge(), ion.getUnmodifiedSequence());
+        // get all spectra for the given searchID that have the given unmodified sequence
+        List<Integer> resultIds = resDao.loadResultIdsForSearchPeptide(searchId, ion.getUnmodifiedSequence());
         List<PeptideProphetResult> matchingResults = new ArrayList<PeptideProphetResult>();
         for(int resultId: resultIds) {
             
@@ -426,18 +429,27 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             matchingResults.add(result);
         }
         
+//        if(ion.getUnmodifiedSequence().equals("HQGVMVGMGQK")) {
+//            System.out.println("Found");
+//        }
+        
         // sort the results by probability
         Collections.sort(matchingResults, new Comparator<PeptideProphetResult>() {
             @Override
             public int compare(PeptideProphetResult o1, PeptideProphetResult o2) {
-                return Double.valueOf(o1.getProbability()).compareTo(o2.getProbability());
+                return Double.valueOf(o2.getProbability()).compareTo(o1.getProbability());
             }});
         
         // store the ones that have the charge and modification state as this ion
-        int rank = 1;
+        int rank = 0;
         int numFound = 0;
         for(PeptideProphetResult result: matchingResults) {
         
+            rank++;
+            // make sure they are the same charge
+            if(result.getCharge() != ion.getCharge())
+                continue;
+            
             List<MsResultResidueMod> resMods = result.getResultPeptide().getResultDynamicResidueModifications();
             String modifiedSeq;
             try {
@@ -456,7 +468,6 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 psm.setProteinferIonId(ion.getId());
                 psm.setRank(rank); 
                 psmDao.saveSpectrumMatch(psm);
-                rank++;
             }
         }
         

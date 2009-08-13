@@ -30,7 +30,6 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
     private int proteinProphetGroupId = 0;
     
     private List<String> indistinguishableProteins;
-    private List<ProteinProphetProteinPeptide> peptides;
     
     
     public ProteinProphetProtein() {
@@ -39,7 +38,6 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
     
     public ProteinProphetProtein(int numIndistinguishableProteins) {
         this.indistinguishableProteins = new ArrayList<String>(numIndistinguishableProteins);
-        peptides = new ArrayList<ProteinProphetProteinPeptide>();
     }
 
     public String getProteinName() {
@@ -144,14 +142,6 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
         this.isSubsumed = !(subsumingProteinEntry == null || subsumingProteinEntry.trim().length() == 0);
     }
 
-    public List<ProteinProphetProteinPeptide> getPeptides() {
-        return peptides;
-    }
-    
-    public void addPeptide(ProteinProphetProteinPeptide peptide) {
-        peptides.add(peptide);
-    }
-    
     public int getGroupId() {
         return indistinguishableGroupId;
     }
@@ -191,7 +181,7 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
         buf.append("\t");
         buf.append("pctSpecCnt: "+pctSpectrumCount);
         
-        for(ProteinProphetProteinPeptide peptide: this.peptides) {
+        for(ProteinProphetProteinPeptide peptide: this.getPeptides()) {
             buf.append("\n");
             buf.append(peptide.toString());
         }
