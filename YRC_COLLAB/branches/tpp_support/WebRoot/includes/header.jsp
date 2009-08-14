@@ -180,6 +180,9 @@ function fold(foldable) {
  <logic:equal name="dir" scope="request" value="percolator">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
+ <logic:equal name="dir" scope="request" value="peptideProphet">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
  <logic:equal name="dir" scope="request" value="sequest">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
@@ -187,6 +190,9 @@ function fold(foldable) {
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
  <logic:equal name="dir" scope="request" value="proteinfer">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
+ <logic:equal name="dir" scope="request" value="proteinProphet">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
  <logic:equal name="dir" scope="request" value="compare">
