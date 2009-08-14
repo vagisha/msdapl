@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.dao.run.ms2file.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
@@ -67,6 +69,11 @@ public class MS2ScanDAOImpl extends BaseSqlMapDAO implements MS2ScanDAO {
     @Override
     public int numScans(int runId) {
         return msScanDao.numScans(runId);
+    }
+    
+    @Override
+    public int numScans(int runId, int level) {
+        return msScanDao.numScans(runId, level);
     }
     
     public int loadScanIdForScanNumRun(int scanNum, int runId) {

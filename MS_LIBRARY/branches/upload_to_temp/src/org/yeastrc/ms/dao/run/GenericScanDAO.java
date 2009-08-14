@@ -68,6 +68,13 @@ public interface GenericScanDAO <I extends MsScanIn, O extends MsScan> {
      */
     public abstract int numScans(int runId);
     
+    /**
+     * Returns the number of scans of the given level for the given runId;
+     * @param runId
+     * @return
+     */
+    public abstract int numScans(int runId, int level);
+    
     
     public abstract void delete(int scanId);
     
