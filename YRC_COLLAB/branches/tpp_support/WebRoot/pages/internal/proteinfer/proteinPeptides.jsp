@@ -1,6 +1,6 @@
 
-<%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
 <%@page import="org.yeastrc.ms.domain.search.Program"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -50,6 +50,13 @@
      		<th class="sort-float" align="left">DS</th>
      	</logic:present>
      </logic:equal>
+     <logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
+     	<th class="sort-float" align="left">Probability</th>
+     	<th class="sort-float" align="left">FVal</th>
+     	<th class="sort-float" align="left">NET</th>
+     	<th class="sort-float" align="left">NMC</th>
+     	<th class="sort-float" align="left">Mass Diff.</th>
+     </logic:equal>
      
      <th align="left">Spectrum</th>
      </tr></thead>
@@ -98,6 +105,15 @@
 	     		<logic:present name="oldPercolator">
 	     			<td><bean:write name="psm_perc" property="discriminantScoreRounded" /></td>
 	     		</logic:present>
+     		</logic:equal>
+     		
+     		<logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
+     		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_peptProphet" type="org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult"/>
+     		 	<td><bean:write name="psm_peptProphet" property="probabilityRounded" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="numEnzymaticTermini" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="numMissedCleavages" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="massDifferenceRounded" /></td>
      		</logic:equal>
      		 
      		<td><span style="text-decoration: underline; cursor: pointer;" 

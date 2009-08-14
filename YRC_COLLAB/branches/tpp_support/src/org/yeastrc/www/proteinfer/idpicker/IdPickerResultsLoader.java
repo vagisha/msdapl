@@ -535,7 +535,8 @@ public class IdPickerResultsLoader {
 
     
     //---------------------------------------------------------------------------------------------------
-    // Peptide ions for a protein group (sorted by sequence, modification state and charge
+    // Peptide ions for a indistinguishable protein group 
+    // (sorted by sequence, modification state and charge)
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerIon> getPeptideIonsForProteinGroup(int pinferId, int pinferProteinGroupId) {
         
@@ -629,7 +630,7 @@ public class IdPickerResultsLoader {
     
     
     //---------------------------------------------------------------------------------------------------
-    // Peptide ions for a protein group (sorted by sequence, modification state and charge
+    // Peptide ions for a protein (sorted by sequence, modification state and charge
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerIonForProtein> getPeptideIonsForProtein(int pinferId, int proteinId) {
         

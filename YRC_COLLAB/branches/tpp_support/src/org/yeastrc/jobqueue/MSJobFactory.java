@@ -108,12 +108,12 @@ public class MSJobFactory {
 	}
 	
 	/**
-     * Get the MSJob from the database for the given experimentId
+     * Get the MSJob from the database for the given projectId and experimentId
      * @param experimentId
      * @return
      * @throws Exception
      */
-    public MSJob getJobForExperiment( int experimentId ) throws Exception {
+    public MSJob getJobForProjectExperiment( int projectId, int experimentId ) throws Exception {
         
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -123,9 +123,10 @@ public class MSJobFactory {
         try {
             
             conn = DBConnectionManager.getConnection(DBConnectionManager.JOB_QUEUE);
-            String sql = "SELECT * from tblJobs AS j, tblMSJobs AS mj WHERE mj.experimentID=? AND j.id = mj.jobID";
+            String sql = "SELECT * from tblJobs AS j, tblMSJobs AS mj WHERE mj.projectID=? AND mj.experimentID=? AND j.id = mj.jobID";
             stmt = conn.prepareStatement( sql );
-            stmt.setInt( 1, experimentId );
+            stmt.setInt(1, projectId);
+            stmt.setInt( 2, experimentId );
             rs = stmt.executeQuery();
             
             if ( !rs.next() )

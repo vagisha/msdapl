@@ -210,7 +210,7 @@ public class ViewProjectAction extends Action {
             MSJob job = null;
             int status = 0;
             try {
-                job = MSJobFactory.getInstance().getJobForExperiment(experimentId);
+                job = MSJobFactory.getInstance().getJobForProjectExperiment(projectId, experimentId);
                 status = job.getStatus();
                 if(status == JobUtils.STATUS_QUEUED || status == JobUtils.STATUS_OUT_FOR_WORK
                    || status == JobUtils.STATUS_PENDING_UPLOAD)

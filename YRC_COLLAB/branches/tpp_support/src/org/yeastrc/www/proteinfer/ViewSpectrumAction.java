@@ -162,7 +162,7 @@ public class ViewSpectrumAction extends Action {
         }
         
         // TODO fix this 
-//        else if (search.getSearchProgram() == Program.PERCOLATOR) {
+//        else if (search.getSearchProgram() == Program.PROUCID) {
 //            ProlucidSearchResultDAO plDao = DAOFactory.instance().getProlucidResultDAO();
 //            List<ProlucidSearchResult> results = new ArrayList<ProlucidSearchResult>(resultIds.size());
 //            for(int resultId: resultIds) {
@@ -246,8 +246,12 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN()), null));
             if(!useEvalue)
                 row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getSp())), null));
-            else
-                row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getEvalue())), null));
+            else {
+                if(result.getSequestResultData().getEvalue() != null)
+                    row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getEvalue())), null));
+                else
+                    row.addCell(new TableCell("NULL", null));
+            }
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
             TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);

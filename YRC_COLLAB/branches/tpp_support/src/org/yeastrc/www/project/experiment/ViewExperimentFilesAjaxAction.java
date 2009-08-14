@@ -40,6 +40,7 @@ import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.run.MsRun;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
@@ -110,16 +111,30 @@ private static DAOFactory daoFactory = DAOFactory.instance();
 
         // load the ms2 file names and the number of spectra in each file
         List<Integer> runIds = daoFactory.getMsExperimentDAO().getRunIdsForExperiment(experimentId);
-        List<MsFile> files = new ArrayList<MsFile>(runIds.size());
+        List<MsFile> ms2Files = new ArrayList<MsFile>(runIds.size());
+        List<MsFile> ms1Files = null;
+        
         MsRunDAO runDao = daoFactory.getMsRunDAO();
         MsScanDAO scanDao = daoFactory.getMsScanDAO();
         for(Integer runId: runIds) {
             MsRun run = runDao.loadRun(runId);
-            int numScans = scanDao.numScans(runId);
+            int numScans = scanDao.numScans(runId, 2);
             MsFile file = new MsFile(run, numScans);
-            files.add(file);
+            ms2Files.add(file);
+            
+            if(run.getRunFileFormat() == RunFileFormat.MZXML) {
+                numScans = scanDao.numScans(runId, 1);
+                file = new MsFile(run, numScans);
+                if(ms1Files == null)
+                    ms1Files = new ArrayList<MsFile>(runIds.size());
+                ms1Files.add(file);
+            }
         }
-        pExpt.setMs2Files(files);
+        pExpt.setMs2Files(ms2Files);
+        pExpt.setMs1Files(ms1Files);
+        
+        // if we are looking at mzXML files load the ms1 information
+        
 
         // load the searches
         List<Integer> searchIds = daoFactory.getMsSearchDAO().getSearchIdsForExperiment(experimentId);

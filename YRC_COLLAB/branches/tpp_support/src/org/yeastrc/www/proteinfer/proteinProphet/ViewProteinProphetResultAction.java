@@ -1,0 +1,201 @@
+/**
+ * ViewProteinProphetResults.java
+ * @author Vagisha Sharma
+ * Aug 5, 2009
+ * @version 1.0
+ */
+package org.yeastrc.www.proteinfer.proteinProphet;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.util.TimeUtils;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectDAO;
+import org.yeastrc.www.misc.ResultsPager;
+import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
+import org.yeastrc.www.user.User;
+import org.yeastrc.www.user.UserUtils;
+
+/**
+ * 
+ */
+public class ViewProteinProphetResultAction extends Action {
+
+private static final Logger log = Logger.getLogger(ViewProteinProphetResultAction.class);
+    
+    public ActionForward execute( ActionMapping mapping,
+            ActionForm form,
+            HttpServletRequest request,
+            HttpServletResponse response )
+    throws Exception {
+        
+        
+        // User making this request
+        User user = UserUtils.getUser(request);
+        if (user == null) {
+            ActionErrors errors = new ActionErrors();
+            errors.add("username", new ActionMessage("error.login.notloggedin"));
+            saveErrors( request, errors );
+            return mapping.findForward("authenticate");
+        }
+
+        // form for filtering and display options
+        ProteinInferFilterForm filterForm = (ProteinInferFilterForm)form;
+        request.setAttribute("proteinInferFilterForm", filterForm);
+        
+        // look for the protein inference run id in the form first
+        int pinferId = filterForm.getPinferId();
+        
+        // if this is a newly created form the id will be 0.  In this case
+        // look for the pinferId in the request parameters
+        if(pinferId == 0) {
+            try {pinferId = Integer.parseInt(request.getParameter("pinferId"));}
+            catch(NumberFormatException e){};
+        }
+        
+        // if we still do not have a valid protein inference run id
+        // return an error.
+        if(pinferId <= 0) {
+            log.error("Invalid protein inference run id: "+pinferId);
+            ActionErrors errors = new ActionErrors();
+            errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.pinferId"));
+            saveErrors( request, errors );
+            return mapping.findForward("Failure");
+        }
+        
+        // Get a list of projects for this protein inference run.  If the user making the request to view this
+        // protein inference run is not affiliated with the projects, they should not be able to edit any of 
+        // the editable fields
+        List<Integer> searchIds = ProteinferDAOFactory.instance().getProteinferRunDao().loadSearchIdsForProteinferRun(pinferId);
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        ProjectExperimentDAO projExptDao = ProjectExperimentDAO.instance();
+        List<Integer> projectIds = new ArrayList<Integer>();
+        for(int searchId: searchIds) {
+            MsSearch search = searchDao.loadSearch(searchId);
+            int experimentId = search.getExperimentId();
+            int projectId = projExptDao.getProjectIdForExperiment(experimentId);
+            if(projectId > 0)
+                projectIds.add(projectId);
+        }
+        boolean writeAccess = false;
+        ProjectDAO projDao = ProjectDAO.instance();
+        for(int projectId: projectIds) {
+            Project project = projDao.load(projectId);
+            if(project.checkAccess(user.getResearcher())) {
+                writeAccess = true;
+                break;
+            }
+        }
+        request.setAttribute("writeAccess", writeAccess);
+        
+        
+        long s = System.currentTimeMillis();
+        
+        request.setAttribute("pinferId", pinferId);
+        filterForm.setPinferId(pinferId);
+        
+        // Get the peptide definition
+        PeptideDefinition peptideDef = new PeptideDefinition();
+        peptideDef.setUseCharge(true);
+        peptideDef.setUseMods(true);
+        
+        
+        // Get the filtering criteria
+        ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+        filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
+        filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
+        filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
+        filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
+        filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
+        filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
+        filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
+        filterCriteria.setPeptideDefinition(peptideDef);
+        filterCriteria.setSortBy(SORT_BY.defaultSortBy());
+        filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
+        filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        
+        // Get the protein Ids that fulfill the criteria.
+        List<Integer> proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria);
+        
+        // put the list of filtered and sorted protein IDs in the session, along with the filter criteria
+        request.getSession().setAttribute("proteinIds", proteinIds);
+        request.getSession().setAttribute("pinferId", pinferId);
+        request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);
+        
+        // page number is now 1
+        int pageNum = 1;
+        
+        
+        // limit to the proteins that will be displayed on this page
+        List<Integer> proteinIdsPage = ResultsPager.instance().page(proteinIds, pageNum,
+                filterCriteria.getSortOrder() == SORT_ORDER.DESC);
+        
+        // get the protein groups 
+        List<WProteinProphetProteinGroup> proteinGroups = null;
+        if(filterCriteria.isGroupProteins())
+            proteinGroups = ProteinProphetResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
+        else
+            proteinGroups = ProteinProphetResultsLoader.getProteinGroups(pinferId, proteinIdsPage, false, peptideDef);
+        
+        request.setAttribute("proteinGroups", proteinGroups);
+        
+        // get the list of page numbers to display
+        int pageCount = ResultsPager.instance().getPageCount(proteinIds.size());
+        List<Integer> pages = ResultsPager.instance().getPageList(proteinIds.size(), pageNum);
+        
+        
+        request.setAttribute("currentPage", pageNum);
+        request.setAttribute("onFirst", pageNum == 1);
+        request.setAttribute("onLast", (pages.size() == 0 || (pageNum == pages.get(pages.size() - 1))));
+        request.setAttribute("pages", pages);
+        request.setAttribute("pageCount", pageCount);
+        
+        
+        // Run summary
+        ProteinProphetRun proteinProphetRun = ProteinferDAOFactory.instance().getProteinProphetRunDao().loadProteinferRun(pinferId);
+        request.setAttribute("proteinProphetRun", proteinProphetRun);
+        
+        // Input summary
+        request.setAttribute("filteredUniquePeptideCount", ProteinProphetResultsLoader.getUniquePeptideCount(pinferId));
+        
+        // Results summary
+        WProteinProphetResultSummary summary = ProteinProphetResultsLoader.getProteinProphetResultSummary(pinferId, proteinIds);
+        request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
+        request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
+        request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
+        request.setAttribute("parsimProteinGrpCount", summary.getFilteredParsimoniousProteinGroupCount());
+        
+        
+        request.setAttribute("sortBy", filterCriteria.getSortBy());
+        request.setAttribute("sortOrder", filterCriteria.getSortOrder());
+        
+        long e = System.currentTimeMillis();
+        log.info("Total time (ViewProteinProphetResultAction): "+TimeUtils.timeElapsedSeconds(s, e));
+        
+        // Go!
+        return mapping.findForward("Success");
+    }
+}

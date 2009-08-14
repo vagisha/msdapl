@@ -104,6 +104,7 @@
 	<forward name="editResearcher" path="/editResearcher.do" />
 	<forward name="newPercolatorProteinInference" path="/newPercolatorProteinInference.do" />
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
+	<forward name="viewProteinProphetResult" path="/viewProteinProphetResult.do" />
 	<forward name="newProteinSetComparison" path="/newProteinSetComparison.do" />
 	<forward name="doProteinSetComparison" path="/doProteinSetComparison.do" />
 	<forward name="sequestPepxmlDownload" path="/newSequestPepXmlDownload.do" />
@@ -684,6 +685,17 @@
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/proteinfer/viewProteinInferenceResult.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/viewProteinProphetResult"
+		type="org.yeastrc.www.proteinfer.proteinProphet.ViewProteinProphetResultAction"
+		name="proteinInferFilterForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetResult.jsp" redirect="false" />
 	</action>
 	
 	<action

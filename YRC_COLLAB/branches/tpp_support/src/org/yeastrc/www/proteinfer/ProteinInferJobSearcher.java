@@ -17,6 +17,7 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 
@@ -126,34 +127,39 @@ public class ProteinInferJobSearcher {
     }
     
     
+    /**
+     * Returns a ProteinferJob object if the protein inference run with the given id
+     * @param pinferRunId
+     * @return
+     */
     public ProteinferJob getJob(int pinferRunId) {
         
         ProteinferRun run = runDao.loadProteinferRun(pinferRunId);
-        if(run != null) {
-            
-//            // make sure the input generator for this protein inference program was
-//            // a search program or an analysis program
-//            if(!Program.isSearchProgram(run.getInputGenerator()) && !Program.isAnalysisProgram(run.getInputGenerator()))
-//                continue;
-            ProteinferJob job = null;
-            try {
-                job = getPiJob(run.getId());
-            }
-            catch (SQLException e) {
-               log.error("Exception getting ProteinferJob", e);
-               return null;
-            }
-            if(job == null) {
-                log.error("No job found with protein inference run id: "+pinferRunId);
-                return null;
-            }
-            job.setProgram(run.getProgramString());
-            job.setVersion(run.getProgramVersion());
-            job.setComments(run.getComments());
-            job.setDateRun(run.getDate());
-            return job;
+        
+        if(run == null || !ProteinInferenceProgram.isIdPicker(run.getProgram()))
+            return null;
+        
+//      // make sure the input generator for this protein inference program was
+//      // a search program or an analysis program
+//      if(!Program.isSearchProgram(run.getInputGenerator()) && !Program.isAnalysisProgram(run.getInputGenerator()))
+//      continue;
+        ProteinferJob job = null;
+        try {
+            job = getPiJob(run.getId());
         }
-        return null;
+        catch (SQLException e) {
+            log.error("Exception getting ProteinferJob", e);
+            return null;
+        }
+        if(job == null) {
+            log.error("No job found with protein inference run id: "+pinferRunId);
+            return null;
+        }
+        job.setProgram(run.getProgramString());
+        job.setVersion(run.getProgramVersion());
+        job.setComments(run.getComments());
+        job.setDateRun(run.getDate());
+        return job;
     }
     
     

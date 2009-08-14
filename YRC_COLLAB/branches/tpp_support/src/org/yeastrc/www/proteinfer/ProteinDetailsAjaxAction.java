@@ -14,11 +14,15 @@ import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIonForProtein;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerProtein;
+import org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetResultsLoader;
+import org.yeastrc.www.proteinfer.proteinProphet.WProteinProphetIon;
+import org.yeastrc.www.proteinfer.proteinProphet.WProteinProphetProtein;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -76,40 +80,71 @@ public class ProteinDetailsAjaxAction extends Action {
 
         long s = System.currentTimeMillis();
         
-        // get the protein 
-        WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
-        request.setAttribute("protein", iProt);
         
-        // get other proteins in this group
-        List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, 
-                                                    iProt.getProtein().getGroupId(), 
-                                                    peptideDef);
-        if(groupProteins.size() == 1)
-            groupProteins.clear();
-        else {
-            Iterator<WIdPickerProtein> protIter = groupProteins.iterator();
-            while(protIter.hasNext()) {
-                WIdPickerProtein prot = protIter.next();
-                if(prot.getProtein().getId() == iProt.getProtein().getId()) {
-                    protIter.remove();
-                    break;
-                }
-            }
-        }
-        request.setAttribute("groupProteins", groupProteins);
-        
-        // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
-        List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
-        request.setAttribute("ionList", ionsWAllSpectra);
-        
+        ProteinferRun run = ProteinferDAOFactory.instance().getProteinferRunDao().loadProteinferRun(pinferId);
+        request.setAttribute("protInferProgram", run.getProgram().name());
+        request.setAttribute("inputGenerator", run.getInputGenerator().name());
+        request.setAttribute("isIdPicker", ProteinInferenceProgram.isIdPicker(run.getProgram()));
         
         request.setAttribute("pinferProtId", pinferProtId);
         request.setAttribute("pinferId", pinferId);
+         
+        if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
+            // get the protein 
+            WIdPickerProtein iProt = IdPickerResultsLoader.getIdPickerProtein(pinferId, pinferProtId, peptideDef);
+            request.setAttribute("protein", iProt);
+
+            // get other proteins in this group
+            List<WIdPickerProtein> groupProteins = IdPickerResultsLoader.getGroupProteins(pinferId, 
+                    iProt.getProtein().getGroupId(), 
+                    peptideDef);
+            if(groupProteins.size() == 1)
+                groupProteins.clear();
+            else {
+                Iterator<WIdPickerProtein> protIter = groupProteins.iterator();
+                while(protIter.hasNext()) {
+                    WIdPickerProtein prot = protIter.next();
+                    if(prot.getProtein().getId() == iProt.getProtein().getId()) {
+                        protIter.remove();
+                        break;
+                    }
+                }
+            }
+            request.setAttribute("groupProteins", groupProteins);
+
+            // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
+            List<WIdPickerIonForProtein> ionsWAllSpectra = IdPickerResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
+            request.setAttribute("ionList", ionsWAllSpectra);
+        }
+        else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
+            
+            // get the protein 
+            WProteinProphetProtein pProt = ProteinProphetResultsLoader.getWProteinProphetProtein(pinferId, pinferProtId, peptideDef);
+            request.setAttribute("protein", pProt);
+
+            // get other proteins in this group
+            List<WProteinProphetProtein> groupProteins = ProteinProphetResultsLoader.getGroupProteins(pinferId, 
+                    pProt.getProtein().getGroupId(), 
+                    peptideDef);
+            if(groupProteins.size() == 1)
+                groupProteins.clear();
+            else {
+                Iterator<WProteinProphetProtein> protIter = groupProteins.iterator();
+                while(protIter.hasNext()) {
+                    WProteinProphetProtein prot = protIter.next();
+                    if(prot.getProtein().getId() == pProt.getProtein().getId()) {
+                        protIter.remove();
+                        break;
+                    }
+                }
+            }
+            request.setAttribute("groupProteins", groupProteins);
+
+            // We will return the best filtered search hit for each peptide ion (along with terminal residues in the protein).
+            List<WProteinProphetIon> ionsWAllSpectra = ProteinProphetResultsLoader.getPeptideIonsForProtein(pinferId, pinferProtId);
+            request.setAttribute("ionList", ionsWAllSpectra);
+        }
         
-        
-        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
-        request.setAttribute("protInferProgram", run.getProgram().name());
-        request.setAttribute("inputGenerator", run.getInputGenerator().name());
         
         long e = System.currentTimeMillis();
         log.info("Total time (ProteinDetailsAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));

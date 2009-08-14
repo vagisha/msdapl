@@ -28,6 +28,7 @@ import org.yeastrc.yates.YatesRun;
 public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperiment>, Tabular {
 
     private final MsExperiment experiment;
+    private List<MsFile> ms1Files;
     private List<MsFile> ms2Files;
     private List<ExperimentSearch> searches;
     private List<SearchAnalysis> analyses;
@@ -92,6 +93,14 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         this.ms2Files = ms2Files;
     }
     
+    public List<MsFile> getMs1Files() {
+        return ms1Files;
+    }
+
+    public void setMs1Files(List<MsFile> ms1Files) {
+        this.ms1Files = ms1Files;
+    }
+    
     public List<ExperimentSearch> getSearches() {
         return searches;
     }
@@ -142,16 +151,32 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         rows = new ArrayList<TableRow>(ms2Files.size());
         int colCount = columnCount();
         
-        FileComparator comparator = new FileComparator();
-        
-        Collections.sort(ms2Files, comparator);
         for(MsFile file: ms2Files) {
             TableRow row = new TableRow();
             TableCell cell = new TableCell(file.getFileName(), null);
             cell.setClassName("left_align");
             row.addCell(cell);
-            row.addCell(new TableCell(String.valueOf(file.getScanCount()), null));
             rows.add(row);
+        }
+        
+        FileComparator comparator = new FileComparator();
+        
+        if(ms1Files != null) {
+            Collections.sort(ms1Files,comparator);
+            int r = 0;
+            for(MsFile file: ms1Files) {
+                TableRow row = rows.get(r);
+                row.addCell(new TableCell(String.valueOf(file.getScanCount()), null));
+                r++;
+            }
+        }
+        
+        Collections.sort(ms2Files, comparator);
+        int r = 0;
+        for(MsFile file: ms2Files) {
+            TableRow row = rows.get(r);
+            row.addCell(new TableCell(String.valueOf(file.getScanCount()), null));
+            r++;
         }
         
         // iterate over the searches
@@ -164,7 +189,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
                 //action = "viewSequestResults.do";
             
             int j = 0;
-            for(int r = 0; r < rows.size(); r++) {
+            for(r = 0; r < rows.size(); r++) {
                 TableRow row = rows.get(r);
                 SearchFile file = files.get(j);
                 if(file.getFileName().equals(row.getCells().get(0).getData())) {
@@ -189,7 +214,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
              //   action = "viewPercolatorResults.do";
             
             int j = 0;
-            for(int r = 0; r < rows.size(); r++) {
+            for(r = 0; r < rows.size(); r++) {
                 TableRow row = rows.get(r);
                 AnalysisFile file = files.get(j);
                 if(file.getFileName().equals(row.getCells().get(0).getData())) {
@@ -220,7 +245,12 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     public int columnCount() {
         // first column is filename
         // second column is # ms2 spectra
-        return 1 + 1 + searches.size()+analyses.size();
+        int count = searches.size()+analyses.size();
+        count++;  // filename
+        count++;  // ms2 file
+        if(ms1Files != null)
+            count++;
+        return count;
     }
 
     @Override
@@ -240,6 +270,12 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         TableHeader header = new TableHeader("File");
         header.setSortClass(SORT_CLASS.SORT_ALPHA);
         headers.add(header);
+        
+        if(ms1Files != null) {
+            header = new TableHeader("# MS1 Scans");
+            header.setSortClass(SORT_CLASS.SORT_INT);
+            headers.add(header);
+        }
         
         header = new TableHeader("# MS2 Scans");
         header.setSortClass(SORT_CLASS.SORT_INT);

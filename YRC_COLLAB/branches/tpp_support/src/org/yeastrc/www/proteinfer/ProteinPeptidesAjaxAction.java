@@ -11,9 +11,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerIon;
+import org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetResultsLoader;
+import org.yeastrc.www.proteinfer.proteinProphet.WProteinProphetIon;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -69,17 +71,24 @@ public class ProteinPeptidesAjaxAction extends Action {
             request.setAttribute("proteinId", proteinId); // this is needed so that the peptides table has the right html id.
         }
         
-        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
+        ProteinferRun run = ProteinferDAOFactory.instance().getProteinferRunDao().loadProteinferRun(pinferId);
         request.setAttribute("protInferProgram", run.getProgram().name());
         request.setAttribute("inputGenerator", run.getInputGenerator().name());
         if(run.getProgram() == ProteinInferenceProgram.PROTINFER_PERC_OLD) {
             request.setAttribute("oldPercolator", true);
         }
         
+        if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
+            List<WIdPickerIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
+            request.setAttribute("proteinPeptideIons", ionList);
+            return mapping.findForward("Success");
+        }
+        else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
+            List<WProteinProphetIon> ionList = ProteinProphetResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
+            request.setAttribute("proteinPeptideIons", ionList);
+            return mapping.findForward("Success");
+        }
         
-        List<WIdPickerIon> ionList = IdPickerResultsLoader.getPeptideIonsForProteinGroup(pinferId, proteinGroupId);
-        request.setAttribute("proteinPeptideIons", ionList);
-        
-        return mapping.findForward("Success");
+        return null;
     }
 }

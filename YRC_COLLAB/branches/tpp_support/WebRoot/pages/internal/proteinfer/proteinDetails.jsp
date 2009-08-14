@@ -1,6 +1,6 @@
 
-<%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
 <%@page import="org.yeastrc.ms.domain.search.Program"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -32,17 +32,23 @@
 	<td># Peptides</td>
 	<td># Uniq.Peptides</td>
 	<td># Spectra </td>
-	<td>NSAF** </td>
+	<logic:equal name="isIdPicker" value="true">
+		<td>NSAF** </td>
+	</logic:equal>
 	<td>Parsimonious</td>
 	<td>Other Proteins in Group</td>
-	<td>Protein Cluster</td>
+	<logic:equal name="isIdPicker" value="true">
+		<td>Protein Cluster</td>
+	</logic:equal>
 </tr>
 <tr>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.coverage" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.peptideCount" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.uniquePeptideCount" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.spectrumCount" /></td>
-	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.nsafFormatted" /></td>
+	<logic:equal name="isIdPicker" value="true">
+		<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.nsafFormatted" /></td>
+	</logic:equal>
 	<td style="border: 1px #CCCCCC dotted;" align="center">
 		<logic:equal name="protein" property="protein.isParsimonious" value="true">Yes</logic:equal>
 		<logic:equal name="protein" property="protein.isParsimonious" value="false">No</logic:equal>
@@ -56,12 +62,15 @@
 		</span><br>
 	</logic:iterate>
 	</td>
-	<td style="border: 1px #CCCCCC dotted;" align="center">
-		<span style="cursor:pointer;text-decoration:underline" 
-		  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
-		<bean:write name="protein" property="protein.clusterId"/>
-		</span>
-	</td>
+	<logic:equal name="isIdPicker" value="true">
+		<td style="border: 1px #CCCCCC dotted;" align="center">
+			<span style="cursor:pointer;text-decoration:underline" 
+			  onclick="showProteinCluster(<bean:write name="protein" property="protein.clusterId"/>)">
+			<bean:write name="protein" property="protein.clusterId"/>
+			</span>
+		</td>
+	</logic:equal>
+	
 </tr>
 </table>
 </div>
@@ -102,6 +111,13 @@
      <logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      	<th class="main" style="font-size:10pt;">qValue</th>
      	<th class="main" style="font-size:10pt;">PEP</th>
+     </logic:equal>
+     <logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
+     	<th class="sort-float" align="left">Probability</th>
+     	<th class="sort-float" align="left">FVal</th>
+     	<th class="sort-float" align="left">NET</th>
+     	<th class="sort-float" align="left">NMC</th>
+     	<th class="sort-float" align="left">Mass Diff.</th>
      </logic:equal>
      <th class="main" style="font-size:10pt;">Spectrum</th>
     </tr>
@@ -152,6 +168,15 @@
      			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
      		</logic:equal>
      		 
+     		 <logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
+     		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_peptProphet" type="org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult"/>
+     		 	<td><bean:write name="psm_peptProphet" property="probabilityRounded" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="numEnzymaticTermini" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="numMissedCleavages" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="massDifferenceRounded" /></td>
+     		</logic:equal>
+     		
      		<td><span style="text-decoration: underline; cursor: pointer;" 
 				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />)" >
 				View
