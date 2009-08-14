@@ -142,6 +142,10 @@ public class ProteinProphetProtein extends GenericProteinferProtein<ProteinProph
         this.isSubsumed = !(subsumingProteinEntry == null || subsumingProteinEntry.trim().length() == 0);
     }
 
+    public boolean getIsParsimonious() {
+        return !getSubsumed();
+    }
+    
     public int getGroupId() {
         return indistinguishableGroupId;
     }

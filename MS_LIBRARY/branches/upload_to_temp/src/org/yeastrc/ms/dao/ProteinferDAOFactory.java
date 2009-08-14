@@ -20,6 +20,7 @@ import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerSpectrumMatchDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetParamDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
@@ -85,6 +86,7 @@ public class ProteinferDAOFactory {
     private ProteinProphetRunDAO ppRunDao;
     private ProteinProphetProteinGroupDAO ppProteinGrpDao;
     private ProteinProphetProteinDAO ppProteinDao;
+    private ProteinProphetPeptideDAO ppPeptideDao;
     private ProteinProphetProteinIonDAO ppProteinIonDao;
     private ProteinProphetSubsumedProteinDAO ppSubsumedDao;
     
@@ -117,6 +119,7 @@ public class ProteinferDAOFactory {
        ppRunDao = new ProteinProphetRunDAO(sqlMap, pinferRunDao);
        ppProteinGrpDao = new ProteinProphetProteinGroupDAO(sqlMap);
        ppProteinDao = new ProteinProphetProteinDAO(sqlMap, proteinDao);
+       ppPeptideDao = new ProteinProphetPeptideDAO(sqlMap, peptideDao);
        ppProteinIonDao = new ProteinProphetProteinIonDAO(sqlMap);
        ppSubsumedDao = new ProteinProphetSubsumedProteinDAO(sqlMap);
     }
@@ -231,6 +234,10 @@ public class ProteinferDAOFactory {
     
     public ProteinProphetProteinDAO getProteinProphetProteinDao() {
         return ppProteinDao;
+    }
+    
+    public ProteinProphetPeptideDAO getProteinProphetPeptideDao() {
+        return ppPeptideDao;
     }
     
     public ProteinProphetProteinIonDAO getProteinProphetProteinIonDao() {

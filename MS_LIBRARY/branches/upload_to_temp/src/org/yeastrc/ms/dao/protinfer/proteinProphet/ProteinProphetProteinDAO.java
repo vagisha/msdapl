@@ -453,6 +453,13 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         }
         return ordered;
     }
+    
+    public List<Integer> getProteinProphetGroupProteinIds(int pinferId, int groupId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(2);
+        map.put("pinferId", pinferId);
+        map.put("groupId", groupId);
+        return queryForList(sqlMapNameSpace+".selectProteinIdsForGroup", map);
+    }
 
     public List<ProteinProphetProtein> loadProteinProphetGroupProteins(
             int pinferId, int groupId) {

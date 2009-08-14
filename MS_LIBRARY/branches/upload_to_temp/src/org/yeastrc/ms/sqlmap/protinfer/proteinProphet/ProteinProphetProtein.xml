@@ -93,7 +93,6 @@
     	AND prot.id = ppProt.piProteinID
     </select>
     
-    
     <select id="idPickerNrseqProteinIds" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.nrseqProteinID 
     	FROM msProteinInferProtein AS prot, ProteinProphetProtein as ppProt
