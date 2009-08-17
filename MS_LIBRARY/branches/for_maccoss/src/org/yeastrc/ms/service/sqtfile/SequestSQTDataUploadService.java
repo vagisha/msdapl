@@ -235,6 +235,8 @@ public final class SequestSQTDataUploadService extends AbstractSQTDataUploadServ
     @Override
     protected void copyFiles(int experimentId) throws UploadException {
         
+        log.info("Copying target and decoy SQT files");
+        
         String backupDir = MsDataUploadProperties.getBackupDirectory();
         if(!new File(backupDir).exists()) {
             UploadException ex = new UploadException(ERROR_CODE.SQT_BACKUP_ERROR);

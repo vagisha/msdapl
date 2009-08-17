@@ -107,7 +107,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     }
     
     public void setXcorrRankCutoff(int cutoff) {
-        if(cutoff < Integer.MAX_VALUE && cutoff > 1) {
+        if(cutoff < Integer.MAX_VALUE && cutoff > 0) {
             xcorrRankCutoff = cutoff;
             useXcorrRankCutoff = true;
         }
