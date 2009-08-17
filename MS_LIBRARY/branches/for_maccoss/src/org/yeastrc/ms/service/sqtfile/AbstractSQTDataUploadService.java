@@ -67,12 +67,16 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
 
     private int numSearchesUploaded = 0;
     
+    boolean useXcorrRankCutoff = false;
+    int xcorrRankCutoff = Integer.MAX_VALUE;
+    
     // This is information we will get from the SQT files and then update the entries in the msSearch and msSequenceDatabaseDetail table.
     private String programVersion = "uninit";
 
     private int experimentId;
     private java.util.Date searchDate;
     private String dataDirectory;
+    private String decoyDirectory;
     private String remoteServer;
     private String remoteDirectory;
     private StringBuilder preUploadCheckMsg;
@@ -100,6 +104,23 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     
     public void doScanChargeMassCheck(boolean doCheck) {
         this.doScanChargeMassCheck = doCheck;
+    }
+    
+    public void setXcorrRankCutoff(int cutoff) {
+        if(cutoff < Integer.MAX_VALUE && cutoff > 1) {
+            xcorrRankCutoff = cutoff;
+            useXcorrRankCutoff = true;
+        }
+    }
+    
+    protected String getDecoyDirectory() {
+        return this.decoyDirectory;
+    }
+    protected String getDataDirectory() {
+        return this.dataDirectory;
+    }
+    protected List<String> getFileNames() {
+        return this.filenames;
     }
     
     void reset() {
@@ -262,9 +283,13 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             updateProgramVersion(searchId, programVersion);
         }
         
+        copyFiles(experimentId);
+        
         return searchId;
     }
 
+    protected abstract void copyFiles(int experimentId) throws UploadException;
+    
     private Map<String, Integer> createRunIdMap() throws UploadException {
         
         Map<String, Integer> runIdMap = new HashMap<String, Integer>(filenames.size()*2);
@@ -570,7 +595,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     
     @Override
     public void setDecoyDirectory(String directory) {
-        throw new UnsupportedOperationException();
+        this.decoyDirectory = directory;
     }
     
     @Override

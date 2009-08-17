@@ -144,6 +144,7 @@ public class UploadServiceFactory {
             if (sqtFormat == SearchFileFormat.SQT_SEQ) {
                 SearchDataUploadService service = new SequestSQTDataUploadService(sqtFormat);
                 service.setDirectory(dataDirectory);
+                service.setDecoyDirectory(dataDirectory+File.separator+"decoy");
                 return service;
             }
             else if (sqtFormat == SearchFileFormat.SQT_PLUCID) {

@@ -286,4 +286,9 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         ProlucidParamsParser parser = new ProlucidParamsParser();
         return parser.paramsFileName();
     }
+    
+    @Override
+    protected void copyFiles(int experimentId) throws UploadException {
+        // Does nothing
+    }
 }

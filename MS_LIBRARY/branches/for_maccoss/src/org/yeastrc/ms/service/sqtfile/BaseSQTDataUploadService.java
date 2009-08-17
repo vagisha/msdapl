@@ -228,4 +228,9 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
         return this.paramsProvider.paramsFileName();
     }
     
+    @Override
+    protected void copyFiles(int experimentId) throws UploadException {
+        // Does nothing
+    }
+    
 }

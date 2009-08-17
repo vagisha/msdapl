@@ -177,14 +177,18 @@ public class MsDataUploader {
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage(), ex);
-                log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                 
-                // enable keys
-                try {
-                    enableSearchTableKeys();
+                // If there was an error making a backup of the SQT files we still go forward.
+                if(ex.getErrorCode() != ERROR_CODE.SQT_BACKUP_ERROR) {
+                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                    
+                    // enable keys
+                    try {
+                        enableSearchTableKeys();
+                    }
+                    catch(SQLException e){log.error("Error enabling keys");}
+                    return;
                 }
-                catch(SQLException e){log.error("Error enabling keys");}
-                return;
             }
             
             // enable keys
@@ -494,15 +498,19 @@ public class MsDataUploader {
                 catch (UploadException ex) {
                     uploadExceptionList.add(ex);
                     log.error(ex.getMessage(), ex);
-                    log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                     
-                    // enable keys
-                    try {
-                        enableSearchTableKeys();
+                    // If there was an error making a backup of the SQT files we still go forward.
+                    if(ex.getErrorCode() != ERROR_CODE.SQT_BACKUP_ERROR) {
+                        log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+
+                        // enable keys
+                        try {
+                            enableSearchTableKeys();
+                        }
+                        catch(SQLException e){log.error("Error enabling keys");}
+
+                        return;
                     }
-                    catch(SQLException e){log.error("Error enabling keys");}
-                    
-                    return;
                 }
                 
                 // enable keys

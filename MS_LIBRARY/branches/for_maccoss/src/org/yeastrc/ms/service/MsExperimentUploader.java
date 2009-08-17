@@ -13,6 +13,8 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.sqtfile.AbstractSQTDataUploadService;
+import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 
 /**
  * 
@@ -129,7 +131,23 @@ public class MsExperimentUploader {
             if(!passed) log.info("...FAILED");
             else        log.info("...PASSED");
         }
+        
+        doSequestResultRankCheck(); // Are we uploading all or top "N" sequest results
+        
         return passed;
+    }
+    
+    private void doSequestResultRankCheck() {
+        if(do_sdupload && do_adupload) {
+            if(adus instanceof PercolatorSQTDataUploadService &&
+               sdus instanceof AbstractSQTDataUploadService) {
+                
+                PercolatorSQTDataUploadService ps = (PercolatorSQTDataUploadService) adus;
+                int maxPsmRank = ps.getMaxPsmRank();
+                log.info("SEQUEST results upto xCorrRank: "+maxPsmRank+" will be uploaded");
+                ((AbstractSQTDataUploadService)sdus).setXcorrRankCutoff(maxPsmRank);
+            }
+        }
     }
     
     public String getPreUploadCheckMsg() {
