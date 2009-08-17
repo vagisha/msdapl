@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.Program;
+
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
 public class IdPickerInputGetter {
 

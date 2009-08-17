@@ -8,7 +8,7 @@ package edu.uwpr.protinfer.idpicker;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 /**
  * 

@@ -8,9 +8,10 @@ package edu.uwpr.protinfer.idpicker;
 
 import java.util.List;
 
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.Program;
+
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 
 /**
  * 

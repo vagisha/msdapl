@@ -12,17 +12,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
-import org.yeastrc.ms.domain.protinfer.ProteinferIon;
-import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
-import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.PeptideKeyCalculator;
+import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferProteinDAO;
+import edu.uwpr.protinfer.database.dto.ProteinferIon;
+import edu.uwpr.protinfer.database.dto.ProteinferPeptide;
+import edu.uwpr.protinfer.database.dto.ProteinferProtein;
+import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
+import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
 import edu.uwpr.protinfer.infer.PeptideEvidence;
