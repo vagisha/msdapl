@@ -54,6 +54,9 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     
     private String rowCssClass = "tr_even";
     
+//    private String davidUrl = null;
+//    private String names = "";
+    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
     private int  getOffset() {
@@ -512,6 +515,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         protein.setFastaName(nameDescr[0]);
         protein.setCommonName(nameDescr[2]);
         protein.setDescription(nameDescr[1]);
+//        if(protein.getCommonName() != null)
+//            this.names += ","+protein.getCommonName();
 
         // Get the group information for the different datasets
         for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
@@ -569,6 +574,17 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
             return fastaDatabaseIds;
         }
     }
+    
+//    public String getDavidUrl() {
+//        if(names.trim().length() == 0)
+//            return null;
+//        names = names.trim();
+//        if(names.length() > 0)  names = names.substring(1);
+//        davidUrl = "http://david.abcc.ncifcrf.gov/api.jsp?type=OFFICIAL_GENE_SYMBOL&ids=";
+//        davidUrl += names;
+//        davidUrl += "&tool=summary";
+//        return davidUrl;
+//    }
 
     public void setCurrentPage(int page) {
         this.currentPage = page;
