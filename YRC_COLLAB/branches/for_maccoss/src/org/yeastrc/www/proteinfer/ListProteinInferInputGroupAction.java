@@ -156,6 +156,13 @@ public class ListProteinInferInputGroupAction extends Action {
         MsSearchAnalysisDAO saDao = DAOFactory.instance().getMsSearchAnalysisDAO();
         MsRunSearchAnalysisDAO rsaDao = DAOFactory.instance().getMsRunSearchAnalysisDAO();
 
+        // If we are loading Percolator results make sure the versions are compatible
+        String percolatorVersion = null;
+        if(prog == Program.PERCOLATOR) {
+            MsSearchAnalysis percAnalysis = saDao.load(excludeInputGrpList.get(0)); // the size of this list should always be > 0
+            percolatorVersion = percAnalysis.getAnalysisProgramVersion();
+        }
+        
         for(Project proj: userProjects) {
             System.out.println("Getting analysis ids for project: "+proj.getID());
             List<Integer> analysisIds = searcher.getSearchAnalysisIdsForProject(proj);
@@ -168,6 +175,13 @@ public class ListProteinInferInputGroupAction extends Action {
                 // as the other analyses the user has
                 MsSearchAnalysis analysis = saDao.load(analysisId);
                 if(analysis.getAnalysisProgram() == prog) {
+                    
+                    // check for Percolator version
+                    if(prog == Program.PERCOLATOR) {
+                        if(!compatiblePercolatorVersions(percolatorVersion, analysis.getAnalysisProgramVersion()))
+                            continue;
+                                
+                    }
                     List<Integer> rsAnalysisIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(analysisId);
                     List<ProteinInferIputFile> runSearchAnalysisFiles = new ArrayList<ProteinInferIputFile>(rsAnalysisIds.size());
                     for(int rsaId: rsAnalysisIds) {
@@ -185,5 +199,19 @@ public class ListProteinInferInputGroupAction extends Action {
             }
         }
         return projAnalyses;
+    }
+
+    private boolean compatiblePercolatorVersions(String percolatorVersion, String analysisProgramVersion) {
+        
+        if(percolatorVersion == null || analysisProgramVersion == null)
+            return false;
+        float reqVer = Float.parseFloat(percolatorVersion);
+        float myVer = Float.parseFloat(analysisProgramVersion);
+        
+        if(reqVer < 1.06 && myVer >= 1.06)
+            return false;
+        if(reqVer >= 1.06 && myVer < 1.06)
+            return false;
+        return true;
     }
 }
