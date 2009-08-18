@@ -52,6 +52,12 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
     private String peptideProphetVersion;
     private PeptideProphetROC peptideProphetRoc;
     
+    private boolean parseEvalue = false;
+    
+    public void setParseEvalue(boolean parseEvalue) {
+        this.parseEvalue = parseEvalue;
+    }
+    
     public void open(String filePath) throws DataProviderException {
         
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -395,8 +401,12 @@ public class InteractPepXmlFileReader implements InteractPepXmlDataProvider<PepX
                         seqRes.setDeltaCN(new BigDecimal(scoreVal));
                     else if(scoreType.equalsIgnoreCase("deltacnstar"))
                         seqRes.setDeltaCNstar(new BigDecimal(scoreVal));
-                    else if (scoreType.equalsIgnoreCase("spscore"))
-                        seqRes.setSp(new BigDecimal(scoreVal));
+                    else if (scoreType.equalsIgnoreCase("spscore")) {
+                        if(!parseEvalue)
+                            seqRes.setSp(new BigDecimal(scoreVal));
+                        else
+                            seqRes.setEvalue(Double.valueOf(scoreVal));
+                    }
                     else if (scoreType.equalsIgnoreCase("sprank"))
                         seqRes.setSpRank(Integer.parseInt(scoreVal));
                 }

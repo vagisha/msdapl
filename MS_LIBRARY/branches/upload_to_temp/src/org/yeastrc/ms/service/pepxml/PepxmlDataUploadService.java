@@ -122,6 +122,8 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     private int numSearchesUploaded = 0;
     private int numAnalysisUploaded = 0;
     
+    private boolean uploadDone = false;
+    
     private static final Logger log = Logger.getLogger(PepxmlDataUploadService.class.getName());
     
     public PepxmlDataUploadService() {
@@ -290,6 +292,13 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     @Override
     public int upload() throws UploadException {
         
+        // PepXml files have both search results and analysis results.  They get uploaded at the same time
+        // When the MsExperimentUploader calls the upload() method of this class to upload the analysis data
+        // data has already been uploaded.  So we just return the analysisId. 
+        if(uploadDone) {
+            return this.analysisId;
+        }
+        
         reset();// reset all caches etc.
         
         if(!preUploadCheckDone) {
@@ -328,6 +337,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         
         // now upload the search (Sequest) and analysis (PeptideProphet) data in the interact.pep.xml file
         InteractPepXmlFileReader parser = new InteractPepXmlFileReader();
+        parser.setParseEvalue(this.usesEvalue);
         try {
             parser.open(dataDirectory+File.separator+"interact.pep.xml");
         }
@@ -418,6 +428,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
             throw ex;
         }
         
+        uploadDone = true;
         return searchId;
     }
     
@@ -972,7 +983,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
 
     @Override
     public void setSearchId(int searchId) {
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
     }
 
     @Override

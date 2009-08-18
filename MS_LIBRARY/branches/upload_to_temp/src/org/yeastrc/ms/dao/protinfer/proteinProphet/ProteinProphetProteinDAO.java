@@ -89,6 +89,14 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         return protDao.getNrseqIdsForRun(proteinferId);
     }
 
+    public List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious) {
+        Map<String, Number> map = new HashMap<String, Number>(4);
+        map.put("pinferId", pinferId);
+        if(parsimonious && !nonParsimonious)            map.put("isSubsumed", 0);
+        else if(!parsimonious && nonParsimonious)       map.put("isSubsumed", 1);
+        return queryForList(sqlMapNameSpace+".proteinProphetNrseqProteinIds", map);
+    }
+    
     @Override
     public int getPeptideCountForProtein(int nrseqId, List<Integer> pinferIds) {
         // TODO may need to override -- 
@@ -117,6 +125,18 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         return protDao.getProteinIdsForNrseqIds(proteinferId, nrseqIds);
     }
 
+    public boolean isNrseqProteinGrouped(int pinferId, int nrseqId) {
+        ProteinferProtein protein = this.loadProtein(pinferId, nrseqId);
+        return isProteinGrouped(protein.getId());
+    }
+    
+    public boolean isProteinGrouped(int pinferProteinId) {
+        ProteinProphetProtein ppProt = this.loadProtein(pinferProteinId);
+        int groupId = ppProt.getGroupId();
+        return (this.getProteinProphetGroupProteinIds(ppProt.getProteinferId(), groupId).size() > 1);
+    }
+        
+        
     @Override
     public List<Integer> getProteinferProteinIds(int proteinferId) {
         return protDao.getProteinferProteinIds(proteinferId);

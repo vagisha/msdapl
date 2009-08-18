@@ -296,7 +296,6 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
 
     @Override
     protected void copyFiles(int experimentId) throws UploadException {
-        // TODO Auto-generated method stub
-        
+        // Does nothing
     }
 }

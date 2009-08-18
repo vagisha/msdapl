@@ -695,7 +695,6 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     
     public int getMaxPsmRank() {
 
-        // now upload the individual sqt files
         for (String file: filenames) {
             String filePath = dataDirectory+File.separator+file;
             // if the file does not exist skip over to the next

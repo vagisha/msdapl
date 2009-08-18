@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
@@ -34,6 +35,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProtein
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
@@ -175,7 +177,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         modLookup = new DynamicModLookupUtil(searchId);
         
         // create a new entry for this protein inference run
-        try {addProteinInferenceRun(parser, searchId);}
+        try {addProteinInferenceRun(parser, analysisId);}
         catch(UploadException ex) {
             ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
             runDao.delete(uploadedPinferId);
@@ -489,13 +491,18 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             return 0;
     }
 
-    private void addProteinInferenceRun(InteractProtXmlParser parser, int searchId) throws UploadException {
+    private void addProteinInferenceRun(InteractProtXmlParser parser, int analysisId) throws UploadException {
         
-        MsSearchDAO searchDao = daoFactory.getMsSearchDAO();
-        MsSearch search = searchDao.loadSearch(searchId);
+        MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
+        MsSearchAnalysis analysis = analysisDao.load(analysisId);
+        if(analysis == null) {
+            UploadException e = new UploadException(ERROR_CODE.GENERAL);
+            e.appendErrorMessage("No analysis found for ID: "+analysisId);
+            throw e;
+        }
         
         ProteinProphetRun run = new ProteinProphetRun();
-        run.setInputGenerator(search.getSearchProgram());
+        run.setInputGenerator(analysis.getAnalysisProgram());
         run.setProgram(ProteinInferenceProgram.PROTEIN_PROPHET);
         run.setProgramVersion(parser.getProgramVersion());
         run.setDate(new java.sql.Date(parser.getDate().getTime()));

@@ -12,6 +12,7 @@ import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.pepxml.PepxmlDataUploadService;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
@@ -356,10 +357,11 @@ public class MsDataUploader {
             throw ex;
         }
         
+        SearchDataUploadService sdus  = null;
         // Get the search data uploader
         if(uploadSearch) {
             log.info("Initializing SearchDataUploadService");
-            SearchDataUploadService sdus = getSearchDataUploader(searchDirectory, 
+             sdus = getSearchDataUploader(searchDirectory, 
                     remoteServer, remoteSearchDataDirectory, searchDate);
             exptUploader.setSearchDataUploader(sdus);
             //sdus.setRawDataFileNames(rdus.getFileNames(), rdus.getFileFormat());
@@ -367,8 +369,13 @@ public class MsDataUploader {
         // Get the analysis data uploader
         if(uploadAnalysis) {
             log.info("Initializing AnalysisDataUploadService");
-            AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory);
-            exptUploader.setAnalysisDataUploader(adus);
+            // PepXml files contain both search results and analysis results
+            if(sdus != null && sdus instanceof PepxmlDataUploadService) 
+                exptUploader.setAnalysisDataUploader((AnalysisDataUploadService) sdus);
+            else {
+                AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory);
+                exptUploader.setAnalysisDataUploader(adus);
+            }
         }
         // Get the protein inference uploader
         if(uploadProtinfer) {
@@ -793,6 +800,7 @@ public class MsDataUploader {
         uploader.setRemoteServer("local");
         uploader.setSpectrumDataDirectory(directory);
         uploader.setSearchDirectory(directory);
+        uploader.setAnalysisDirectory(directory);
         uploader.setProtinferDirectory(directory);
         
         uploader.setRemoteSpectrumDataDirectory(directory);
@@ -800,8 +808,8 @@ public class MsDataUploader {
         uploader.setSearchDate(new Date());
         uploader.checkResultChargeMass(maccossData);
         
-        uploader.uploadData(1);
-//        uploader.uploadData();
+//        uploader.uploadData(1);
+        uploader.uploadData();
 //        }
         long end = System.currentTimeMillis();
         log.info("TOTAL TIME: "+((end - start)/(1000L))+"seconds.");

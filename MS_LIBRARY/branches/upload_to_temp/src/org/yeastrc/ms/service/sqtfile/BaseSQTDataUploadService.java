@@ -235,8 +235,7 @@ public class BaseSQTDataUploadService extends AbstractSQTDataUploadService {
 
     @Override
     protected void copyFiles(int experimentId) throws UploadException {
-        // TODO Auto-generated method stub
-        
+        // Does nothing
     }
     
 }
