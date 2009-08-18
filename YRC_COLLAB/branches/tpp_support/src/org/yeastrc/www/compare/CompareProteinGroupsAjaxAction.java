@@ -19,8 +19,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
@@ -49,7 +53,7 @@ public class CompareProteinGroupsAjaxAction extends Action{
         
         // get the protein inference ids to compare
         String piDatasetIdStr = request.getParameter("piDatasetIds");
-        List<Dataset> piDatasets = getDatasets(piDatasetIdStr, DatasetSource.PROT_INFER);
+        List<Dataset> piDatasets = getDatasets(piDatasetIdStr);
         
         // get the DTASelect ids to compare
 //        String dtaDatasetIdStr = request.getParameter("dtaDatasetIds");
@@ -82,6 +86,8 @@ public class CompareProteinGroupsAjaxAction extends Action{
        
         // Get the protein groups for this protein in the given datasets.
         IdPickerProteinBaseDAO protDao = ProteinferDAOFactory.instance().getIdPickerProteinBaseDao();
+        ProteinProphetProteinDAO ppProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
+        
         ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
         nrseqIds.add(nrseqProteinId);
         
@@ -97,20 +103,37 @@ public class CompareProteinGroupsAjaxAction extends Action{
             
             int pinferProteinId = pinferProteinIds.get(0); // use the first one.  The others should be part of this group
             
-            // get the protein
-            IdPickerProteinBase idpProtein = protDao.loadProtein(pinferProteinId);
-            
-            // get all the proteins in the group
-            List<IdPickerProteinBase> groupProteins = protDao.loadIdPickerGroupProteins(dataset.getDatasetId(), 
-                    idpProtein.getGroupId());
-            
             Set<Integer> groupNrseqIds = new HashSet<Integer>();
-            for(IdPickerProteinBase gprot: groupProteins) {
-                groupNrseqIds.add(gprot.getNrseqProteinId());
+            
+            if(dataset.getSource() == DatasetSource.PROTINFER) {
+                // get the protein
+                IdPickerProteinBase idpProtein = protDao.loadProtein(pinferProteinId);
+
+                // get all the proteins in the group
+                List<IdPickerProteinBase> groupProteins = protDao.loadIdPickerGroupProteins(dataset.getDatasetId(), 
+                        idpProtein.getGroupId());
+
+                for(IdPickerProteinBase gprot: groupProteins) {
+                    groupNrseqIds.add(gprot.getNrseqProteinId());
+                }
+            }
+            else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
+                
+                // get the protein
+                ProteinProphetProtein ppProtein = ppProtDao.loadProtein(pinferProteinId);
+
+                // get all the proteins in the group
+                List<ProteinProphetProtein> groupProteins = ppProtDao.loadProteinProphetGroupProteins(dataset.getDatasetId(), 
+                        ppProtein.getGroupId());
+
+                
+                for(ProteinProphetProtein gprot: groupProteins) {
+                    groupNrseqIds.add(gprot.getNrseqProteinId());
+                }
             }
             
             // get the names of all the proteins in the group
-            if(dataset.getSource() == DatasetSource.PROT_INFER) {
+            if(dataset.getSource() == DatasetSource.PROTINFER || dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
                 List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(dataset.getDatasetId());
                 
                 StringBuilder buf = new StringBuilder();
@@ -140,6 +163,18 @@ public class CompareProteinGroupsAjaxAction extends Action{
         }
         return ids;
     }
+    
+    private List<Dataset> getDatasets(String idString) {
+        List<Integer> ids = parseCommaSeparated(idString);
+        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+        List<Dataset> datasets = new ArrayList<Dataset>(ids.size());
+        for(int id: ids) {
+            ProteinferRun run = runDao.loadProteinferRun(id);
+            datasets.add(new Dataset(id, DatasetSource.getSourceForProtinferProgram(run.getProgram())));
+        }
+        return datasets;
+    }
+    
     private List<Dataset> getDatasets(String idString, DatasetSource source) {
         List<Integer> ids = parseCommaSeparated(idString);
         List<Dataset> datasets = new ArrayList<Dataset>(ids.size());

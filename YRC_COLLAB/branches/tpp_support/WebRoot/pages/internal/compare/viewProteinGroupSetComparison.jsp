@@ -459,16 +459,7 @@ WARNING:  Comparison with DTASelect results is not yet fully supported.
 <div > 
 <yrcwww:table name="comparison" tableId='compare_results' tableClass="table_compare_grp" center="true" />
 </div>
-<!--  
-<yrcwww:member group="administrator">
-<logic:present name="comparison" property="davidUrl">
-<br>
-<div align="center">
-	<a href="<%=comparison.getDavidUrl() %>">To DAVID</a>
-</div>
-</logic:present>
-</yrcwww:member>
--->
+
 </yrcwww:contentbox>
 
 </CENTER>

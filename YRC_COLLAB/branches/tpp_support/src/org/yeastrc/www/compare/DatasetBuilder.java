@@ -25,8 +25,10 @@ public class DatasetBuilder {
     }
     
     public Dataset buildDataset(int datasetId, DatasetSource source) {
-        if(source == DatasetSource.PROT_INFER)
+        if(source == DatasetSource.PROTINFER)
             return buildProtInferDataset(datasetId);
+        else if (source == DatasetSource.PROTEIN_PROPHET)
+            return buildProteinProphetDataset(datasetId);
         else if(source == DatasetSource.DTA_SELECT)
             return buildDtaSelectDatasource(datasetId);
         return null;
@@ -37,17 +39,23 @@ public class DatasetBuilder {
     }
 
     private Dataset buildProtInferDataset(int datasetId) {
-        Dataset dataset = new Dataset(datasetId, DatasetSource.PROT_INFER);
-        
+        Dataset dataset = new Dataset(datasetId, DatasetSource.PROTINFER);
+        initDataset(datasetId, dataset);
+        return dataset;
+    }
+    
+    private Dataset buildProteinProphetDataset(int datasetId) {
+        Dataset dataset = new Dataset(datasetId, DatasetSource.PROTEIN_PROPHET);
+        initDataset(datasetId, dataset);
+        return dataset;
+    }
+
+    private void initDataset(int datasetId, Dataset dataset) {
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
         ProteinferSpectrumMatchDAO specDao = fact.getProteinferSpectrumMatchDao();
         dataset.setSpectrumCount(specDao.getSpectrumCountForPinferRun(datasetId));
         dataset.setMaxProteinSpectrumCount(specDao.getMaxSpectrumCountForPinferRunProtein(datasetId));
         dataset.setMinProteinSpectrumCount(specDao.getMinSpectrumCountForPinferRunProtein(datasetId));
         dataset.setDatasetComments(fact.getProteinferRunDao().loadProteinferRun(datasetId).getComments());
-        
-        return dataset;
     }
-    
-    
 }

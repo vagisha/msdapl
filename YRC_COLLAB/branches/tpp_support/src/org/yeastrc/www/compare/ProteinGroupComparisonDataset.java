@@ -13,7 +13,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.misc.Pageable;
@@ -427,7 +430,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     private String getCommaSeparatedDatasetIds() {
         StringBuilder buf = new StringBuilder();
         for(Dataset dataset: datasets) {
-            if(dataset.getSource() == DatasetSource.PROT_INFER)
+            if(dataset.getSource() != DatasetSource.DTA_SELECT)
                 buf.append(","+dataset.getDatasetId());
         }
         if(buf.length() > 0)
@@ -505,7 +508,10 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     public void initializeProteinInfo(ComparisonProtein protein) {
         
+        ProteinferProteinDAO protDao = ProteinferDAOFactory.instance().getProteinferProteinDao();
         IdPickerProteinBaseDAO idpProtDao = ProteinferDAOFactory.instance().getIdPickerProteinBaseDao();
+        ProteinProphetProteinDAO ppProtDao = ProteinferDAOFactory.instance().getProteinProphetProteinDao();
+        
         // Get the common name and description
         String[] nameDescr = getProteinNames(protein.getNrseqId());
         protein.setFastaName(nameDescr[0]);
@@ -514,8 +520,12 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
         // Get the group information for the different datasets
         for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
-            if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
+            if(dpi.getDatasetSource() == DatasetSource.PROTINFER) {
                 boolean grouped = idpProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
+                dpi.setGrouped(grouped);
+            }
+            else if(dpi.getDatasetSource() == DatasetSource.PROTEIN_PROPHET) {
+                boolean grouped = ppProtDao.isNrseqProteinGrouped(dpi.getDatasetId(), protein.getNrseqId());
                 dpi.setGrouped(grouped);
             }
             // TODO for DTASelect
@@ -525,11 +535,15 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
         nrseqIds.add(protein.getNrseqId());
         for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
-            if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
-                List<Integer> piProteinIds = idpProtDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
+            if(dpi.getDatasetSource() != DatasetSource.DTA_SELECT) {
+                List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
                 if(piProteinIds.size() == 1) {
-                    IdPickerProteinBase prot = idpProtDao.loadProtein(piProteinIds.get(0));
+                    ProteinferProtein prot = protDao.loadProtein(piProteinIds.get(0));
                     dpi.setSpectrumCount(prot.getSpectrumCount());
+                }
+                else {
+                    log.error("Number of proteinIds for nrseqId: "+protein.getNrseqId()+
+                            " is "+piProteinIds.size()+"; Expected only one.");
                 }
             }
         }
@@ -562,7 +576,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
             fastaDatabaseIds = new ArrayList<Integer>();
             List<Integer> pinferIds = new ArrayList<Integer>();
             for(Dataset dataset: this.datasets)
-                if(dataset.getSource() == DatasetSource.PROT_INFER)
+                if(dataset.getSource() != DatasetSource.DTA_SELECT)
                     pinferIds.add(dataset.getDatasetId());
             fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferIds);
             return fastaDatabaseIds;

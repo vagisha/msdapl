@@ -25,6 +25,7 @@ import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
@@ -97,14 +98,16 @@ public class CompareProteinSetsAction extends Action {
         
         // Protein inference datasets
         for(int piRunId: piRunIds) {
-            if(runDao.loadProteinferRun(piRunId) == null) {
+            ProteinferRun run = runDao.loadProteinferRun(piRunId);
+            if(run == null) {
                 ActionErrors errors = new ActionErrors();
                 errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
                         "No protein inference run found with ID: "+piRunId+"."));
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, DatasetSource.PROT_INFER);
+            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId,
+                                DatasetSource.getSourceForProtinferProgram(run.getProgram()));
             datasets.add(dataset);
         }
         
@@ -198,7 +201,7 @@ public class CompareProteinSetsAction extends Action {
         
         request.setAttribute("proteinSetComparisonForm", myForm);
         
-        // create a list of they dataset ids being compared
+        // create a list of the dataset ids being compared
         request.setAttribute("piDatasetIds", makeCommaSeparated(piRunIds));
         request.setAttribute("dtaDatasetIds", makeCommaSeparated(dtaRunIds));
         
@@ -275,7 +278,7 @@ public class CompareProteinSetsAction extends Action {
             // set the information for displaying normalized spectrum counts
             ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
             for(Dataset dataset: grpComparison.getDatasets()) {
-                if(dataset.getSource() == DatasetSource.PROT_INFER) {
+                if(dataset.getSource() != DatasetSource.DTA_SELECT) {
                     int spectrumCount = specDao.getSpectrumCountForPinferRun(dataset.getDatasetId());
                     dataset.setSpectrumCount(spectrumCount);
                 }

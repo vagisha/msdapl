@@ -65,7 +65,7 @@ public class DatasetPeptideComparer {
             
             
         }
-        else if(dataset.getSource() == DatasetSource.PROT_INFER) {
+        else if(dataset.getSource() == DatasetSource.PROTINFER || dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
             
             ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
             nrseqIds.add(nrseqProteinId);
@@ -85,7 +85,7 @@ public class DatasetPeptideComparer {
             
             // TODO
         }
-        else if(dataset.getSource() == DatasetSource.PROT_INFER) {
+        else if(dataset.getSource() == DatasetSource.PROTINFER || dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
             
             ArrayList<Integer> nrseqIds = new ArrayList<Integer>(1);
             nrseqIds.add(nrseqProteinId);
@@ -109,7 +109,7 @@ public class DatasetPeptideComparer {
         
         for(Dataset dataset: datasets) {
             
-            if(dataset.getSource() == DatasetSource.PROT_INFER) {
+            if(dataset.getSource() != DatasetSource.DTA_SELECT) {
                 List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(dataset.getDatasetId(), nrseqIds);
                 
                 for(int piProteinId: piProteinIds) {

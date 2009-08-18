@@ -6,16 +6,28 @@
  */
 package org.yeastrc.www.compare;
 
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+
 /**
  * 
  */
 public enum DatasetSource {
 
-    PROT_INFER, DTA_SELECT;
+    PROTINFER, DTA_SELECT, PROTEIN_PROPHET;
     
     public static DatasetSource instance(String name) {
-        if(PROT_INFER.name().equals(name))      return PROT_INFER;
-        else if(DTA_SELECT.name().equals(name)) return DTA_SELECT;
+        if(PROTINFER.name().equals(name))               return PROTINFER;
+        else if(DTA_SELECT.name().equals(name))         return DTA_SELECT;
+        else if(PROTEIN_PROPHET.name().equals(name))    return PROTEIN_PROPHET;
         return null;
+    }
+    
+    public static DatasetSource getSourceForProtinferProgram(ProteinInferenceProgram program) {
+        if(program == ProteinInferenceProgram.PROTEIN_PROPHET)
+            return PROTEIN_PROPHET;
+        else if(ProteinInferenceProgram.isIdPicker(program))
+            return PROTINFER;
+        else
+            return null;
     }
 }

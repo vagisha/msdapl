@@ -23,6 +23,7 @@ import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
@@ -79,14 +80,16 @@ public class CompareGOEnrichmentAction extends Action {
         
         // Protein inference datasets
         for(int piRunId: piRunIds) {
-            if(runDao.loadProteinferRun(piRunId) == null) {
+            ProteinferRun run = runDao.loadProteinferRun(piRunId);
+            if(run == null) {
                 ActionErrors errors = new ActionErrors();
                 errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
                         "No protein inference run found with ID: "+piRunId+"."));
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, DatasetSource.PROT_INFER);
+            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, 
+                                DatasetSource.getSourceForProtinferProgram(run.getProgram()));
             datasets.add(dataset);
         }
         

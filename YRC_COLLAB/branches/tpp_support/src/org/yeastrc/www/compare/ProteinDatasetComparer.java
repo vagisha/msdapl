@@ -21,6 +21,7 @@ import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.yates.YatesRun;
 
 /**
@@ -34,6 +35,7 @@ public class ProteinDatasetComparer {
     
     private ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
     private IdPickerProteinBaseDAO protDao = fact.getIdPickerProteinBaseDao();
+    private ProteinProphetProteinDAO ppProtDao = fact.getProteinProphetProteinDao();
     
     private ProteinDatasetComparer() {}
     
@@ -53,7 +55,7 @@ public class ProteinDatasetComparer {
             
             List<Integer> nrseqProteinIds = new ArrayList<Integer>(0);
             
-            if(dataset.getSource() == DatasetSource.PROT_INFER)
+            if(dataset.getSource() != DatasetSource.DTA_SELECT)
                 nrseqProteinIds = getProteinIdsForDataset(dataset, true, false); // get only parsimonious
             
             else if (dataset.getSource() == DatasetSource.DTA_SELECT) 
@@ -77,7 +79,7 @@ public class ProteinDatasetComparer {
             
             for(Dataset dataset: datasets) {
                 
-                if(dataset.getSource() != DatasetSource.PROT_INFER)
+                if(dataset.getSource() == DatasetSource.DTA_SELECT)
                     continue;
                 
                 List<Integer> nrseqProteinIds = getProteinIdsForDataset(dataset, false, true); // get only non-parsimonious
@@ -113,8 +115,11 @@ public class ProteinDatasetComparer {
 
     private List<Integer> getProteinIdsForDataset(Dataset dataset, boolean parsimonious, boolean nonParsimonious) {
         
-        if(dataset.getSource() == DatasetSource.PROT_INFER) {
+        if(dataset.getSource() == DatasetSource.PROTINFER) {
             return protDao.getNrseqProteinIds(dataset.getDatasetId(), parsimonious, nonParsimonious);
+        }
+        else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
+            return ppProtDao.getNrseqProteinIds(dataset.getDatasetId(), parsimonious, nonParsimonious);
         }
         else {
             return new ArrayList<Integer>(0);

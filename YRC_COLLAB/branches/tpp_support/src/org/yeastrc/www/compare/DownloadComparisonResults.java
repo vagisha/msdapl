@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
@@ -77,14 +78,16 @@ public class DownloadComparisonResults extends Action {
         
         // Protein inference datasets
         for(int piRunId: piRunIds) {
-            if(runDao.loadProteinferRun(piRunId) == null) {
+            ProteinferRun run = runDao.loadProteinferRun(piRunId);
+            if(run == null) {
                 ActionErrors errors = new ActionErrors();
                 errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
                         "No protein inference run found with ID: "+piRunId+"."));
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, DatasetSource.PROT_INFER);
+            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, 
+                                DatasetSource.getSourceForProtinferProgram(run.getProgram()));
             datasets.add(dataset);
         }
         

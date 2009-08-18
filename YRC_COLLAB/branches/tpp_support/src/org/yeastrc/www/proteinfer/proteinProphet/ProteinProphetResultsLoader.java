@@ -325,7 +325,7 @@ public class ProteinProphetResultsLoader {
         
         
         if(pinferProgram == ProteinInferenceProgram.PROTEIN_PROPHET) {
-            List<ProteinProphetProteinPeptide> peptides = ppPeptDao.loadPeptidesForProteinferProtein(pinferId);
+            List<ProteinProphetProteinPeptide> peptides = ppPeptDao.loadPeptidesForProteinferProtein(proteinId);
             for(ProteinProphetProteinPeptide peptide: peptides) {
                 List<ProteinProphetProteinPeptideIon> ions = peptide.getIonList();
                 sortIonList(ions);

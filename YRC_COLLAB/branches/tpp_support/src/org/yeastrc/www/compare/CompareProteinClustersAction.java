@@ -19,8 +19,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerCluster;
@@ -50,7 +52,7 @@ public class CompareProteinClustersAction extends Action {
         
         // get the protein inference ids to compare
         String piDatasetIdStr = request.getParameter("piDatasetIds");
-        List<Dataset> piDatasets = getDatasets(piDatasetIdStr, DatasetSource.PROT_INFER);
+        List<Dataset> piDatasets = getDatasets(piDatasetIdStr);
         
         // get the DTASelect ids to compare
         String dtaDatasetIdStr = request.getParameter("dtaDatasetIds");
@@ -113,6 +115,18 @@ public class CompareProteinClustersAction extends Action {
         }
         return ids;
     }
+    
+    private List<Dataset> getDatasets(String idString) {
+        List<Integer> ids = parseCommaSeparated(idString);
+        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+        List<Dataset> datasets = new ArrayList<Dataset>(ids.size());
+        for(int id: ids) {
+            ProteinferRun run = runDao.loadProteinferRun(id);
+            datasets.add(new Dataset(id, DatasetSource.getSourceForProtinferProgram(run.getProgram())));
+        }
+        return datasets;
+    }
+    
     private List<Dataset> getDatasets(String idString, DatasetSource source) {
         List<Integer> ids = parseCommaSeparated(idString);
         List<Dataset> datasets = new ArrayList<Dataset>(ids.size());
