@@ -267,7 +267,7 @@ public class DownloadComparisonResults extends Action {
                 
                 DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
                 if(dpi == null || !dpi.isPresent()) {
-                    writer.write("0");
+                    writer.write("0\t");
                 }
                 else {
                     writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
