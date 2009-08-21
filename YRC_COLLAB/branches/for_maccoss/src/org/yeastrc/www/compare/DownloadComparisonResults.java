@@ -199,7 +199,9 @@ public class DownloadComparisonResults extends Action {
         writer.write("Datasets: \n");
         int idx = 0;
         for(Dataset dataset: comparison.getDatasets()) {
-            writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+": "+comparison.getProteinCount(idx++)+"\n");
+            writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+
+                    ": Proteins  "+comparison.getProteinCount(idx++)+
+                    "; SpectrumCount(max.) "+dataset.getSpectrumCount()+"("+dataset.getMaxProteinSpectrumCount()+")\n");
         }
         writer.write("\n\n");
         
@@ -224,9 +226,15 @@ public class DownloadComparisonResults extends Action {
         writer.write("CommonName\t");
         writer.write("NumPept\t");
         for(Dataset dataset: comparison.getDatasets()) {
-            writer.write(dataset.getSourceString()+"_"+dataset.getDatasetId()+"\t");
+            writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
+        }
+        // spectrum count column headers.
+        for(Dataset dataset: comparison.getDatasets()) {
+            writer.write("SC("+dataset.getDatasetId()+")\t");
         }
         writer.write("Description\n");
+        
+        comparison.setPrintFullProteinName(true); 
         
         for(ComparisonProtein protein: comparison.getProteins()) {
             
@@ -253,6 +261,17 @@ public class DownloadComparisonResults extends Action {
                         writer.write("g");
                 }
                 writer.write("\t");
+            }
+            // spectrum count information
+            for(Dataset dataset: comparison.getDatasets()) {
+                
+                DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                if(dpi == null || !dpi.isPresent()) {
+                    writer.write("0");
+                }
+                else {
+                    writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                }
             }
             
             writer.write(protein.getDescription()+"\n");
