@@ -238,7 +238,7 @@ function fold(foldable) {
    <%if(home_menus) { %>
         <li><html:link action="newProject.do"><span>New Project</span></html:link></li>
         <yrcwww:member group="any">
-   			<li><html:link action="uploadMacCossFormAction.do"><span>Upload Data</span></html:link></li>
+   			<li><html:link action="uploadMSDataFormAction.do"><span>Upload Data</span></html:link></li>
    			<li><html:link action="listUploadJobs.do"><span>List Uploads</span></html:link></li>
    		</yrcwww:member>
    <%} %>

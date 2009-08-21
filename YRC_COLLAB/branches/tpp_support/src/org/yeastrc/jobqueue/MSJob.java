@@ -5,6 +5,7 @@ package org.yeastrc.jobqueue;
 
 import java.util.Date;
 import org.yeastrc.project.*;
+import org.yeastrc.www.upload.Pipeline;
 /**
  * @author Mike
  *
@@ -25,9 +26,10 @@ public class MSJob extends Job {
 	private int runID;
 	private int group;
 	private Project project;
+	private Pipeline pipeline;
 	
 	/**
-	 * Get the Project object for which this MS run aws submitted
+	 * Get the Project object for which this MS run was submitted
 	 * @return the project, null if it can't be obtained for any reason
 	 */
 	public Project getProject() {
@@ -151,4 +153,20 @@ public class MSJob extends Job {
 		this.targetSpecies = targetSpecies;
 	}
 
+
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
+    
+    public String getPipelineLongName() {
+        return pipeline.getLongName();
+    }
+
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
+    }
+    
+    public void setPipeline(String pipeline) {
+        this.pipeline = Pipeline.forName(pipeline);
+    }
 }

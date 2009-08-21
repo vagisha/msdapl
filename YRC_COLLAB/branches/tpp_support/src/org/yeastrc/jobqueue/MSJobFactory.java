@@ -83,6 +83,7 @@ public class MSJobFactory {
 			job.setComments( rs.getString( "comments" ) );
 			job.setRunID( rs.getInt( "runID" ) );
 			job.setGroup( rs.getInt( "groupID" ) );
+			job.setPipeline(rs.getString("pipeline"));
 			
 			rs.close(); rs = null;
 			stmt.close(); stmt = null;
@@ -151,6 +152,7 @@ public class MSJobFactory {
             job.setComments( rs.getString( "comments" ) );
             job.setRunID( rs.getInt( "runID" ) );
             job.setGroup( rs.getInt( "groupID" ) );
+            job.setPipeline(rs.getString("pipeline"));
             
             
         } finally {

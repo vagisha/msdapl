@@ -181,7 +181,7 @@ public class ViewProjectAction extends Action {
 		}
 
 		if(showUpload)
-		    request.setAttribute( "showMacCossUpload", true );
+		    request.setAttribute( "showMSDataUpload", true );
 
 
 		// Forward them on to the happy success view page!

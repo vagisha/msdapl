@@ -51,7 +51,7 @@
 	<form-bean name="editResearcherForm" type="org.yeastrc.www.project.EditResearcherForm"/>
 	<form-bean name="manageGroupMembersForm" type="org.yeastrc.www.admin.ManageGroupMembersForm"/>
 	<form-bean name="searchProjectsForm" type="org.yeastrc.www.project.SearchProjectsForm"/>
-	<form-bean name="uploadDataForm" type="org.yeastrc.www.yates.UploadDataForm"/>
+	<form-bean name="uploadMSDataForm" type="org.yeastrc.www.upload.UploadMSDataForm"/>
 	<form-bean name="GOAnnotationForm" type="org.yeastrc.www.microscopy.GOAnnotationForm"/>
 	<form-bean name="MSCommentsForm" type="org.yeastrc.www.yates.MSCommentsForm"/>
 	<form-bean name="editGrantForm" type="org.yeastrc.www.project.EditGrantForm"></form-bean>
@@ -96,7 +96,7 @@
 	<forward name="viewYatesRun" path="/viewYatesRun.do" />
 	<forward name="viewYatesResult" path="/viewYatesResult.do" />
 	<forward name="viewProtein" path="/viewProtein.do" />
-	<forward name="uploadMacCossFormAction" path="/uploadMacCossFormAction.do" />
+	<forward name="uploadMSDataFormAction" path="/uploadMSDataFormAction.do" />
 	<forward name="viewSpectra" path="/viewSpectra.do" />
 	<forward name="viewResearcher" path="/viewResearcher.do" />
 	<forward name="listUploadJobs" path="/listUploadJobs.do" />
@@ -477,20 +477,20 @@
 	<!-- Actions related to data upload -->
 	<!-- ================================================================================== -->
 	<action
-	  path="/uploadMacCossFormAction"
-	  type="org.yeastrc.www.yates.UploadMacCossFormAction"
+	  path="/uploadMSDataFormAction"
+	  type="org.yeastrc.www.upload.UploadMSDataFormAction"
 	  validate="false">
-	  <forward name="Success" path="/pages/admin/upload/uploadMacCossForm.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/admin/upload/uploadMSDataForm.jsp" redirect="false"/>
 	</action>
 
 	<action
-	  path="/uploadData"
-	  input="/pages/admin/upload/uploadMacCossForm.jsp"
-	  name="uploadDataForm"
+	  path="/uploadMSData"
+	  input="/pages/admin/upload/uploadMSDataForm.jsp"
+	  name="uploadMSDataForm"
 	  scope="request"
-	  type="org.yeastrc.www.yates.UploadDataAction"
+	  type="org.yeastrc.www.upload.UploadMSDataAction"
 	  validate="true">
-	  <forward name="Failure" path="/pages/admin/upload/uploadMacCossForm.jsp" redirect="false"/>
+	  <forward name="Failure" path="/pages/admin/upload/uploadMSDataForm.jsp" redirect="false"/>
 	  <forward name="Success" path="/listUploadJobs.do" redirect="true"/>
 	</action>
 
@@ -499,7 +499,7 @@
 	  type="org.yeastrc.www.misc.UploadRedirectAction"
 	  validate="false">
 	  <forward name="Yates" path="uploadYatesFormAction.do" redirect="true"/>
-	  <forward name="MacCoss" path="uploadMacCossFormAction.do" redirect="true"/>
+	  <forward name="MacCoss" path="uploadMSDataAction.do" redirect="true"/>
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	</action>
 

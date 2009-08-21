@@ -109,7 +109,7 @@
  
 <script>
 
-	function goMacCoss() { document.location.href = "<yrcwww:link path='uploadMacCossFormAction.do?'/>projectID=<bean:write name="project" property="ID" scope="request" />"; }
+	function goMSUpload() { document.location.href = "<yrcwww:link path='uploadMSDataFormAction.do?'/>projectID=<bean:write name="project" property="ID" scope="request" />"; }
 	function goEdit() { document.location.href = "<yrcwww:link path='editProject.do?ID='/><bean:write name="project" property="ID" scope="request" />"; }
 </script>
 
@@ -117,8 +117,8 @@
   <div>
   	<input type="button" class="plain_button" value="Edit Project" onClick="goEdit()">
 
-	<logic:equal name="showMacCossUpload" value="true" scope="request">
-	  	<input type="button" class="plain_button" value="Upload Data" onClick="goMacCoss()">
+	<logic:equal name="showMSDataUpload" value="true" scope="request">
+	  	<input type="button" class="plain_button" value="Upload Data" onClick="goMSUpload()">
 	</logic:equal>
 
 	<yrcwww:member group="administrators">

@@ -107,6 +107,13 @@
 				<bean:write name="job" property="serverDirectory" />
 			</td>
 		</tr>
+		
+		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Pipeline:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<bean:write name="job" property="pipelineLongName" />
+			</td>
+		</tr>
 
 		<tr >
 			<td width="20%" align="left" valign="top" class="left_align">Run Date:</td>

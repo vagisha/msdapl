@@ -232,7 +232,7 @@ function clearSelectedProtInfer() {
 
 	<logic:empty name="experiments">
 		<div align="center" style="margin:20">
-		There are no experiments for this project. To upload an experiment for this project click <a href="" onClick="javascript:goMacCoss(); return false;">here</a>
+		There are no experiments for this project. To upload an experiment for this project click <a href="" onClick="javascript:goMSUpload(); return false;">here</a>
 		</div>
 	</logic:empty>
 

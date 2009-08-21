@@ -1,4 +1,5 @@
-<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+
+<%@page import="org.yeastrc.www.upload.Pipeline"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -46,11 +47,21 @@ function onCancel(projectId) {
 
 <yrcwww:contentbox title="Upload Data" centered="true" width="700" scheme="upload">
 
-<html:form action="uploadData" method="POST">
- <html:hidden property="group" value="MacCoss"/>
+<html:form action="uploadMSData" method="POST">
 
  <CENTER>
   <table border="0">
+  
+  <tr>
+  <td colspan="2">Select the pipeline that generated the data</td>
+  </tr>
+  <tr>
+  	<td colspan="2">
+		<html:radio property="pipelineName" value="<%=Pipeline.MACOSS.name() %>"><b><%=Pipeline.MACOSS.getLongName() %></b></html:radio>  
+		<html:radio property="pipelineName" value="<%=Pipeline.TPP.name() %>"><b><%=Pipeline.TPP.getLongName() %></b></html:radio>			
+  	</td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
    <tr>
     <td colspan="2">Select the project to which this data belongs:</td>
    </tr>
@@ -66,7 +77,7 @@ function onCancel(projectId) {
 						<html:options collection="researcherProjects" property="id" labelProperty="title"/>
    					</html:select>
 					<!--<html:text property="projectID" size="10" maxlength="10" /><br>-->
-					<!--  <a href="javascript:projectSearcherPopUp(document.uploadDataForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a> -->
+					<!--  <a href="javascript:projectSearcherPopUp(document.uploadMSDataForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a> -->
 				</td>
 			</tr>
 
@@ -181,7 +192,7 @@ function onCancel(projectId) {
  <p>
 <nobr>
 <html:submit styleClass="plain_button" value="Upload Data"/>
-<input type="button" class="plain_button" onclick="javascript:onCancel(<bean:write name='uploadDataForm' property='projectID' />);" value="Cancel" />
+<input type="button" class="plain_button" onclick="javascript:onCancel(<bean:write name='uploadMSDataForm' property='projectID' />);" value="Cancel" />
  </nobr>
  </p>
  </CENTER>

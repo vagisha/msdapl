@@ -50,19 +50,19 @@ public class UploadRedirectAction extends Action {
 		if (groupMan.isMember(user.getResearcher().getID(), Projects.YATES))
 			return mapping.findForward("Yates");
 
-		if (groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS))
-			return mapping.findForward("MacCoss");
-		
 		else if (groupMan.isMember(user.getResearcher().getID(), Projects.TWOHYBRID))
 			return mapping.findForward("Y2H");
 
 		else if (groupMan.isMember(user.getResearcher().getID(), Projects.MICROSCOPY))
 			return mapping.findForward("Microscopy");
 		
-		else if (groupMan.isMember(user.getResearcher().getID(), "administrators"))
-			return mapping.findForward("Yates");
+		if (groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS))
+            return mapping.findForward("MSUpload");
 		
+		else if (groupMan.isMember(user.getResearcher().getID(), "administrators"))
+			return mapping.findForward("MSUpload");
 
+		
 		ActionErrors errors = new ActionErrors();
 		errors.add("access", new ActionMessage("error.access.invalidgroup"));
 		saveErrors( request, errors );
