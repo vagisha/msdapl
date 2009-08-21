@@ -105,10 +105,11 @@ public class DownloadComparisonResults extends Action {
             datasets.add(dataset);
         }
         
-        // ANY AND, OR, NOT filters
+        // ANY AND, OR, NOT, XOR filters
         if((myForm.getAndList().size() == 0) && 
            (myForm.getOrList().size() == 0) && 
-           (myForm.getNotList().size() == 0)) {
+           (myForm.getNotList().size() == 0) &&
+           myForm.getXorList().size() == 0) {
             List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
             for(Dataset dataset: datasets) {
                 SelectableDataset sds = new SelectableDataset(dataset);
@@ -119,10 +120,12 @@ public class DownloadComparisonResults extends Action {
             myForm.setAndList(sdsList);
             myForm.setOrList(sdsList);
             myForm.setNotList(sdsList);
+            myForm.setXorList(sdsList);
         }
         List<SelectableDataset> andDataset = myForm.getAndList();
         List<SelectableDataset> orDataset = myForm.getOrList();
         List<SelectableDataset> notDataset = myForm.getNotList();
+        List<SelectableDataset> xorDataset = myForm.getXorList();
         
         List<Dataset> andFilters = new ArrayList<Dataset>();
         for(SelectableDataset sds: andDataset) {
@@ -139,10 +142,16 @@ public class DownloadComparisonResults extends Action {
             if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
         
+        List<Dataset> xorFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: xorDataset) {
+            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+        
         ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
         filters.setAndFilters(andFilters);
         filters.setOrFilters(orFilters);
         filters.setNotFilters(notFilters);
+        filters.setXorFilters(xorFilters);
         
         
         response.setContentType("text/plain");
@@ -165,7 +174,7 @@ public class DownloadComparisonResults extends Action {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
         }
         
-        // Apply AND, OR, NOT filters
+        // Apply AND, OR, NOT, XOR filters
         s = System.currentTimeMillis();
         ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
         e = System.currentTimeMillis();
@@ -191,7 +200,7 @@ public class DownloadComparisonResults extends Action {
     
     private void writeResults(PrintWriter writer, ProteinComparisonDataset comparison, ProteinSetComparisonForm form) {
         
-        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
+//        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
         writer.write("Filtered protein count: "+comparison.getFilteredProteinCount()+"\n");
         writer.write("\n\n");
         
