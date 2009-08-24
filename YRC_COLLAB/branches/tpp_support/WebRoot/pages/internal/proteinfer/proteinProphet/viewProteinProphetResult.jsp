@@ -35,7 +35,7 @@
  <logic:forward name="authenticate" />
 </yrcwww:notauthenticated>
 
-<logic:notPresent name="proteinInferFilterForm">
+<logic:notPresent name="proteinProphetFilterForm">
 	<logic:forward  name="viewProteinProphetResult" />
 </logic:notPresent>
 
@@ -122,6 +122,7 @@ $(document).ready(function() {
  	
 	var selected = 0;
 	if(location.hash == "#protdetails")  selected = 1;
+	if(location.hash == "#roc") selected = 2;
 	
 	
 	// set up the tabs and select the first tab
@@ -862,6 +863,7 @@ function toggleDivVisibility(mydiv) {
       <ul>
           <li><a href="#protlist" rel="history" id="protlistlink"><span>Protein List</span></a></li>
           <li><a href="#protdetails" rel="history" id="protdetailslink"><span>Protein Details</span></a></li>
+          <li><a href="#roc" rel="history" id="roclink"><span>Sensitivity / Error</span></a></li>
       </ul>
    </div>
       
@@ -928,13 +930,14 @@ function toggleDivVisibility(mydiv) {
 		</table>
 		</div>
 	
-		<%@ include file="../proteinInferFilterForm.jsp" %>
+		<%@ include file="proteinProphetFilterForm.jsp" %>
 		</td></tr></table>
 		</CENTER>
 		
 		<div id="protlist_table">
     	<%@ include file="proteinlist.jsp" %>
     	</div>
+    	
     </div>
     
     
@@ -946,7 +949,12 @@ function toggleDivVisibility(mydiv) {
       		<div id="protein_div" style="display: none;" class="protdetail_prot"></div>
       </div>
       
- 	
+ 	<!-- SENSITIVITY / ERROR INFORMATION -->
+ 	<div id="roc">
+    	<%@ include file="rocSummary.jsp" %>
+    </div>
+    	
+    	
 </yrcwww:contentbox>
 </CENTER>
 

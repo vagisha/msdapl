@@ -27,6 +27,7 @@ import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.util.TimeUtils;
@@ -62,7 +63,7 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
 
         // form for filtering and display options
         ProteinInferFilterForm filterForm = (ProteinInferFilterForm)form;
-        request.setAttribute("proteinInferFilterForm", filterForm);
+        request.setAttribute("proteinProphetFilterForm", filterForm);
         
         // look for the protein inference run id in the form first
         int pinferId = filterForm.getPinferId();
@@ -191,6 +192,11 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
+        
+        // ROC
+        ProteinProphetROC rocSummary = proteinProphetRun.getRoc();
+        request.setAttribute("rocSummary", rocSummary);
+        
         
         long e = System.currentTimeMillis();
         log.info("Total time (ViewProteinProphetResultAction): "+TimeUtils.timeElapsedSeconds(s, e));
