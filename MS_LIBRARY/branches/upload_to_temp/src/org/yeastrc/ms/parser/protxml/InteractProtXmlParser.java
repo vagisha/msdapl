@@ -149,6 +149,7 @@ public class InteractProtXmlParser {
         catch (XMLStreamException e) {
             throw new DataProviderException("Error reading ProteinProphet params.", e);
         }
+        proteinProphetRoc.setRocPoints(rocPoints);
     }
     
     public boolean hasNextProteinGroup() throws DataProviderException {

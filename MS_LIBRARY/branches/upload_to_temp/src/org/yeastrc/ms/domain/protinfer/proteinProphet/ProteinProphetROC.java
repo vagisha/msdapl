@@ -27,6 +27,8 @@ public class ProteinProphetROC {
 
     public void setProteinferId(int proteinferId) {
         this.proteinferId = proteinferId;
+        for(ProteinProphetROCPoint point: rocPoints)
+            point.setProteinferId(proteinferId);
     }
 
     public List<ProteinProphetROCPoint> getRocPoints() {
