@@ -1,5 +1,6 @@
 
-<%@page import="edu.uwpr.protinfer.database.dto.ProteinUserValidation"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProteinUserValidation"%>
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>

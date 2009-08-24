@@ -141,12 +141,12 @@
      		</td>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
-     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch"/>
      			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
      		</logic:equal>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_PLCID.name()%>">
-     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch"/>
      			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
      		</logic:equal>
      		
