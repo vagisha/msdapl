@@ -45,7 +45,21 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     private int pageCount = 1;
     private List<Integer> displayPageNumbers;
     
+    private boolean fullProteinName = false;
+    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
+    
+
+
+    public ProteinComparisonDataset() {
+        this.datasets = new ArrayList<Dataset>();
+        this.proteins = new ArrayList<ComparisonProtein>();
+        this.displayPageNumbers = new ArrayList<Integer>();
+    }
+    
+    public void setPrintFullProteinName(boolean printFull) {
+        this.fullProteinName = printFull;
+    }
     
     private int  getOffset() {
         return (this.currentPage - 1)*rowCount;
@@ -53,12 +67,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
 
     public void setRowCount(int count) {
         this.rowCount = count;
-    }
-
-    public ProteinComparisonDataset() {
-        this.datasets = new ArrayList<Dataset>();
-        this.proteins = new ArrayList<ComparisonProtein>();
-        this.displayPageNumbers = new ArrayList<Integer>();
     }
 
     public List<Dataset> getDatasets() {
@@ -304,7 +312,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return row;
     }
     
-    private int getScaledSpectrumCount(float count) {
+    protected int getScaledSpectrumCount(float count) {
         float scaled = ((count - minNormalizedSpectrumCount + 1)/maxNormalizedSpectrumCount)*100.0f;
         return (int)Math.ceil(scaled);
     }
@@ -461,12 +469,20 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         
         List<Integer> dbIds = getFastaDatabaseIds();
         ProteinListing fastaListing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqProteinId, dbIds);
-        String accession = fastaListing.getName();
+        String accession = null;
+        if(this.fullProteinName)
+            accession = fastaListing.getFullName();
+        else
+            fastaListing.getName();
         
         try {
             
             ProteinListing commonListing = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId);
-            String commonName = commonListing.getName();
+            String commonName = null;
+            if(this.fullProteinName)
+                commonName = commonListing.getName(20, ",");
+            else
+                commonName = commonListing.getName();
             String description = commonListing.getDescription(90, ", ");
             
             return new String[] {accession, description, commonName};

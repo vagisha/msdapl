@@ -132,16 +132,21 @@ $(document).ready(function() {
    					$(row).addClass('pept_open');
    					
    					if($(row).is('.has_peptides')) {
-   						var nextTopRow = $(row).nextAll('.top_row').get(0);
-   						$(nextTopRow).prev().show();
+   						var peptideRow = $(row).nextAll('.pept_row').get(0);
+   						$(peptideRow).show();
    					}
    					else {
    						// append a row for the peptide list to go into
-   						var newRow = "<tr><td colspan='"+colCount+"'>";
+   						var newRow = "<tr class='pept_row'><td colspan='"+colCount+"'>";
    						newRow += "<div align='center' width='90%' id='peptides_"+nrseqId+"'></div></td></tr>"
    						
  						var nextTopRow = $(row).nextAll('.top_row').get(0);
- 						$(nextTopRow).before(newRow);
+ 						if(nextTopRow === undefined) {
+ 							$('tr:last', $table).after(newRow);
+ 						}
+ 						else {
+ 							$(nextTopRow).before(newRow);
+ 						}
    						
    						
    						// send a request for the peptides
@@ -162,8 +167,8 @@ $(document).ready(function() {
    				else {
    					$(row).removeClass('pept_open');
    					$(row).addClass('pept_closed');
-   					var nextTopRow = $(row).nextAll('.top_row').get(0);
-   					$(nextTopRow).prev().hide();
+   					var peptideRow = $(row).nextAll('.pept_row').get(0);
+					$(peptideRow).hide();
    				}
    			});
    			

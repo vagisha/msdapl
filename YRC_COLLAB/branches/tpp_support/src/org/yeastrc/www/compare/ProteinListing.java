@@ -75,6 +75,19 @@ public class ProteinListing {
         return buf.toString();
     }
     
+    public String getFullName() {
+        
+        StringBuilder buf = new StringBuilder();
+        for(ProteinNameDescription cnd: nameDescr) {
+            buf.append(",");
+            buf.append(cnd.getName());
+        }
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        
+        return buf.toString();
+    }
+    
    
     public String getDescription() {
         return getDescription(50, ", ");

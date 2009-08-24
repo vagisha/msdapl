@@ -107,10 +107,11 @@ public class DownloadComparisonResults extends Action {
             datasets.add(dataset);
         }
         
-        // ANY AND, OR, NOT filters
+        // ANY AND, OR, NOT, XOR filters
         if((myForm.getAndList().size() == 0) && 
            (myForm.getOrList().size() == 0) && 
-           (myForm.getNotList().size() == 0)) {
+           (myForm.getNotList().size() == 0) &&
+           myForm.getXorList().size() == 0) {
             List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
             for(Dataset dataset: datasets) {
                 SelectableDataset sds = new SelectableDataset(dataset);
@@ -121,10 +122,12 @@ public class DownloadComparisonResults extends Action {
             myForm.setAndList(sdsList);
             myForm.setOrList(sdsList);
             myForm.setNotList(sdsList);
+            myForm.setXorList(sdsList);
         }
         List<SelectableDataset> andDataset = myForm.getAndList();
         List<SelectableDataset> orDataset = myForm.getOrList();
         List<SelectableDataset> notDataset = myForm.getNotList();
+        List<SelectableDataset> xorDataset = myForm.getXorList();
         
         List<Dataset> andFilters = new ArrayList<Dataset>();
         for(SelectableDataset sds: andDataset) {
@@ -141,10 +144,16 @@ public class DownloadComparisonResults extends Action {
             if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
         
+        List<Dataset> xorFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: xorDataset) {
+            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+        
         ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
         filters.setAndFilters(andFilters);
         filters.setOrFilters(orFilters);
         filters.setNotFilters(notFilters);
+        filters.setXorFilters(xorFilters);
         
         
         response.setContentType("text/plain");
@@ -167,7 +176,7 @@ public class DownloadComparisonResults extends Action {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
         }
         
-        // Apply AND, OR, NOT filters
+        // Apply AND, OR, NOT, XOR filters
         s = System.currentTimeMillis();
         ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
         e = System.currentTimeMillis();
@@ -193,7 +202,7 @@ public class DownloadComparisonResults extends Action {
     
     private void writeResults(PrintWriter writer, ProteinComparisonDataset comparison, ProteinSetComparisonForm form) {
         
-        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
+//        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
         writer.write("Filtered protein count: "+comparison.getFilteredProteinCount()+"\n");
         writer.write("\n\n");
         
@@ -201,7 +210,9 @@ public class DownloadComparisonResults extends Action {
         writer.write("Datasets: \n");
         int idx = 0;
         for(Dataset dataset: comparison.getDatasets()) {
-            writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+": "+comparison.getProteinCount(idx++)+"\n");
+            writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+
+                    ": Proteins  "+comparison.getProteinCount(idx++)+
+                    "; SpectrumCount(max.) "+dataset.getSpectrumCount()+"("+dataset.getMaxProteinSpectrumCount()+")\n");
         }
         writer.write("\n\n");
         
@@ -226,9 +237,15 @@ public class DownloadComparisonResults extends Action {
         writer.write("CommonName\t");
         writer.write("NumPept\t");
         for(Dataset dataset: comparison.getDatasets()) {
-            writer.write(dataset.getSourceString()+"_"+dataset.getDatasetId()+"\t");
+            writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
+        }
+        // spectrum count column headers.
+        for(Dataset dataset: comparison.getDatasets()) {
+            writer.write("SC("+dataset.getDatasetId()+")\t");
         }
         writer.write("Description\n");
+        
+        comparison.setPrintFullProteinName(true); 
         
         for(ComparisonProtein protein: comparison.getProteins()) {
             
@@ -255,6 +272,17 @@ public class DownloadComparisonResults extends Action {
                         writer.write("g");
                 }
                 writer.write("\t");
+            }
+            // spectrum count information
+            for(Dataset dataset: comparison.getDatasets()) {
+                
+                DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                if(dpi == null || !dpi.isPresent()) {
+                    writer.write("0\t");
+                }
+                else {
+                    writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                }
             }
             
             writer.write(protein.getDescription()+"\n");
