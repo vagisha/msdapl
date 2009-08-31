@@ -11,7 +11,7 @@
 	<resultMap class="PeptideProphetResultOut" id="prophetResultResult" extends="MsSearchResult.msSearchResult">
 		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
 		<result property="probability" column="probability" nullValue="-1.0"/>
-		<result property="fVal" column="fVal" nullValue="-1.0"/>
+		<result property="fVal" column="fVal" />
 		<result property="numEnzymaticTermini" column="numEnzymaticTermini" nullValue="-1"/>
 		<result property="numMissedCleavages" column="numMissedCleavages" nullValue="-1"/>
 		<result property="massDifference" column="massDifference" />
@@ -24,7 +24,7 @@
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="runSearchAnalysisId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="probability" jdbcType="DOUBLE" nullValue="-1.0"/>
-		<parameter property="fVal" jdbcType="DOUBLE" nullValue="-1.0"/>
+		<parameter property="fVal" jdbcType="DOUBLE" />
 		<parameter property="numEnzymaticTermini" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="numMissedCleavages" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="massDifference" jdbcType="DOUBLE" />

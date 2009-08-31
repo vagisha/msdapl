@@ -23,7 +23,7 @@ public class PeptideProphetResultDataBean implements PeptideProphetResultDataWId
     private double probabilityNet_1 = -1.0;
     private double probabilityNet_2 = -1.0;
     
-    private double fVal = -1.0; // TODO is this always positive?
+    private double fVal;
     private double massDiff = 0.0;
     private int ntt = -1;
     private int nmc = -1;

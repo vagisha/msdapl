@@ -395,7 +395,7 @@ CREATE TABLE PeptideProphetResult (
 		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
 		runSearchAnalysisID INT UNSIGNED NOT NULL,
 		probability DOUBLE UNSIGNED NOT NULL,
-		fVal DOUBLE UNSIGNED NOT NULL,
+		fVal DOUBLE NOT NULL,
 		numEnzymaticTermini INT UNSIGNED NOT NULL,
 		numMissedCleavages INT UNSIGNED NOT NULL,
 		massDifference DOUBLE  NOT NULL,
