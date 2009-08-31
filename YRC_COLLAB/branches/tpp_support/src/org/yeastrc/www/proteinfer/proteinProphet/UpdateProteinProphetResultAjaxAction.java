@@ -4,7 +4,7 @@
  * Jan 9, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.proteinProphet;
 
 import java.util.List;
 
@@ -17,23 +17,20 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerResultSummary;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 /**
  * 
  */
-public class UpdateProteinInferenceResultAjaxAction extends Action {
+public class UpdateProteinProphetResultAjaxAction extends Action {
 
-    private static final Logger log = Logger.getLogger(UpdateProteinInferenceResultAjaxAction.class);
+    private static final Logger log = Logger.getLogger(UpdateProteinProphetResultAjaxAction.class);
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -51,8 +48,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         }
 
         // form for filtering and display options
-        ProteinInferFilterForm filterForm = (ProteinInferFilterForm)form;
-        request.setAttribute("proteinInferFilterForm", filterForm);
+        ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
+        request.setAttribute("proteinProphetFilterForm", filterForm);
         
         // look for the protein inference run id in the form first
         int pinferId = filterForm.getPinferId();
@@ -80,11 +77,11 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         
         
         // Check if there a filtering criteria in the session
-        ProteinFilterCriteria filterCritSession = (ProteinFilterCriteria) request.getSession().getAttribute("pinferFilterCriteria");
+        ProteinProphetFilterCriteria filterCritSession = (ProteinProphetFilterCriteria) request.getSession().getAttribute("proteinProphetFilterCriteria");
         
         // Get the filtering criteria from the request
         PeptideDefinition peptideDef = filterCritSession.getPeptideDefinition();
-        ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+        ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
@@ -93,14 +90,16 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
         filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
+        filterCriteria.setMinProbability(filterForm.getMinProbabilityDouble());
+        filterCriteria.setMaxProbability(filterForm.getMaxProbabilityDouble());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(filterCritSession == null ? 
-                ProteinFilterCriteria.defaultSortBy() : 
+                ProteinProphetFilterCriteria.defaultSortBy() : 
                 filterCritSession.getSortBy());
         filterCriteria.setSortOrder(filterCritSession == null ? 
-                ProteinFilterCriteria.defaultSortOrder() : 
+                ProteinProphetFilterCriteria.defaultSortOrder() : 
                 filterCritSession.getSortOrder());
-        filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
@@ -119,8 +118,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             if(filterCriteria.isGroupProteins()) {
                 SORT_BY sortby = filterCriteria.getSortBy();
                 if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.VALIDATION_STATUS)
-                    filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
-                filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
+                    filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
+                filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
             }
             resort = true; // if the grouping has changed we will resort proteins (UNLESS the filtering criteria has also changed).
         }
@@ -136,12 +135,12 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             
             resort = false; // no need to re-sort.  The method below will take that into account.
             // Get a list of filtered and sorted proteins
-            storedProteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
+            storedProteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria);
         }
         
         if(resort) {
             // resorted the filtered protein IDs
-            storedProteinIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
+            storedProteinIds = ProteinProphetResultsLoader.getSortedProteinIds(pinferId, 
                     peptideDef, 
                     storedProteinIds, 
                     filterCriteria.getSortBy(), 
@@ -165,7 +164,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups 
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
+        List<WProteinProphetProteinGroup> proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, proteinIds, 
                                                         filterCriteria.isGroupProteins(), peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
@@ -181,9 +180,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         request.setAttribute("pageCount", pageCount);
         
         
-        // Get some summary
-        WIdPickerResultSummary summary = IdPickerResultsLoader.getIdPickerResultSummary(pinferId, storedProteinIds);
-//        request.setAttribute("unfilteredProteinCount", summary.getUnfilteredProteinCount());
+        // Results summary
+        WProteinProphetResultSummary summary = ProteinProphetResultsLoader.getProteinProphetResultSummary(pinferId, storedProteinIds);
         request.setAttribute("filteredProteinCount", summary.getFilteredProteinCount());
         request.setAttribute("parsimProteinCount", summary.getFilteredParsimoniousProteinCount());
         request.setAttribute("filteredProteinGrpCount", summary.getFilteredProteinGroupCount());
@@ -193,13 +191,13 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         
         
         long e = System.currentTimeMillis();
-        log.info("Total time (UpdateProteinInferenceResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
+        log.info("Total time (UpdateProteinProphetResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         // Go!
         return mapping.findForward("Success");
     }
 
-    private boolean matchFilterCriteria(ProteinFilterCriteria filterCritSession,  ProteinFilterCriteria filterCriteria) {
+    private boolean matchFilterCriteria(ProteinProphetFilterCriteria filterCritSession,  ProteinProphetFilterCriteria filterCriteria) {
         return filterCritSession.equals(filterCriteria);
     }
 }

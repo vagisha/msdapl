@@ -860,7 +860,6 @@ function refreshProteinList(responseText) {
 	}
 	else {
 		alert("Got stale Protein Inference ID. Please refresh the page.");
-		document.loca
 	}
 	//setupProteinListTable();
 }

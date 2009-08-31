@@ -24,9 +24,8 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.search.MsSearch;
@@ -34,7 +33,6 @@ import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -62,7 +60,7 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         }
 
         // form for filtering and display options
-        ProteinInferFilterForm filterForm = (ProteinInferFilterForm)form;
+        ProteinProphetFilterForm filterForm = (ProteinProphetFilterForm)form;
         request.setAttribute("proteinProphetFilterForm", filterForm);
         
         // look for the protein inference run id in the form first
@@ -123,7 +121,7 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         
         
         // Get the filtering criteria
-        ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
+        ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
@@ -132,10 +130,12 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
         filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
+        filterCriteria.setMinProbability(filterForm.getMinProbabilityDouble());
+        filterCriteria.setMaxProbability(filterForm.getMaxProbabilityDouble());
         filterCriteria.setPeptideDefinition(peptideDef);
-        filterCriteria.setSortBy(SORT_BY.defaultSortBy());
-        filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
-        filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
+        filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
+        filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         
         // Get the protein Ids that fulfill the criteria.
@@ -144,7 +144,7 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         // put the list of filtered and sorted protein IDs in the session, along with the filter criteria
         request.getSession().setAttribute("proteinIds", proteinIds);
         request.getSession().setAttribute("pinferId", pinferId);
-        request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);
+        request.getSession().setAttribute("proteinProphetFilterCriteria", filterCriteria);
         
         // page number is now 1
         int pageNum = 1;
@@ -157,9 +157,9 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         // get the protein groups 
         List<WProteinProphetProteinGroup> proteinGroups = null;
         if(filterCriteria.isGroupProteins())
-            proteinGroups = ProteinProphetResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
+            proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, proteinIdsPage, peptideDef);
         else
-            proteinGroups = ProteinProphetResultsLoader.getProteinGroups(pinferId, proteinIdsPage, false, peptideDef);
+            proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, proteinIdsPage, false, peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
         

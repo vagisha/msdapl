@@ -36,7 +36,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferIon;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerIon;
@@ -53,6 +53,9 @@ import org.yeastrc.www.compare.CommonNameLookupUtil;
 import org.yeastrc.www.compare.FastaProteinLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.compare.ProteinListing;
+import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
+import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
+import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
 
 public class IdPickerResultsLoader {
 
@@ -86,96 +89,109 @@ public class IdPickerResultsLoader {
         long s = System.currentTimeMillis();
         List<Integer> proteinIds = idpProtBaseDao.getFilteredSortedProteinIds(pinferId, filterCriteria);
         log.info("Returned "+proteinIds.size()+" protein IDs for protein inference ID: "+pinferId);
+        
+        // filter by accession, if required
+        if(filterCriteria.getAccessionLike() != null) {
+            log.info("Filtering by accession: "+filterCriteria.getAccessionLike());
+            proteinIds = ProteinAccessionFilter.filterByProteinAccession(pinferId, proteinIds, filterCriteria.getAccessionLike());
+        }
+        
+        // filter by description, if required
+        if(filterCriteria.getDescriptionLike() != null) {
+            log.info("Filtering by description: "+filterCriteria.getDescriptionLike());
+            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionLike());
+        }
+        
         long e = System.currentTimeMillis();
         log.info("Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         return proteinIds;
     }
     
-    public static List<Integer> filterByProteinAccession(int pinferId,
-            List<Integer> allProteinIds,
-            Map<Integer, String> proteinAccessionMap, String accessionLike) {
-        
-        Set<String> reqAcc = new HashSet<String>();
-        String[] tokens = accessionLike.split(",");
-        for(String tok: tokens)
-            reqAcc.add(tok.trim().toLowerCase());
-        
-        List<Integer> filtered = new ArrayList<Integer>();
-        
-        
-        // If we have a accession map look in there
-        if(proteinAccessionMap != null) {
-        
-            for(int id: allProteinIds) {
-                String acc = proteinAccessionMap.get(id);
-                if(acc != null) acc = acc.toLowerCase();
-                // first check if the exact accession is given to us
-                if(reqAcc.contains(acc)) {
-                    filtered.add(id);
-                    continue;
-                }
-                // we may have a partial accession
-                for(String ra: reqAcc) {
-                    if(acc.contains(ra)) {
-                        filtered.add(id);
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // Look in the database for matching ids.
-        else {
-            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIds(new ArrayList<String>(reqAcc), pinferId);
-            
-            // get the corresponding protein inference protein ids
-            if(found.size() > 0) {
-                List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(found));
-                Collections.sort(piProteinIds);
-                for(int id: allProteinIds) {
-                    if(Collections.binarySearch(piProteinIds, id) >= 0)
-                        filtered.add(id);
-                }
-            }
-        }
-        
-        return filtered;
-    }
+//    public static List<Integer> filterByProteinAccession(int pinferId,
+//            List<Integer> allProteinIds,
+//            Map<Integer, String> proteinAccessionMap, String accessionLike) {
+//        
+//        Set<String> reqAcc = new HashSet<String>();
+//        String[] tokens = accessionLike.split(",");
+//        for(String tok: tokens)
+//            reqAcc.add(tok.trim().toLowerCase());
+//        
+//        List<Integer> filtered = new ArrayList<Integer>();
+//        
+//        
+//        // If we have a accession map look in there
+//        if(proteinAccessionMap != null) {
+//        
+//            for(int id: allProteinIds) {
+//                String acc = proteinAccessionMap.get(id);
+//                if(acc != null) acc = acc.toLowerCase();
+//                // first check if the exact accession is given to us
+//                if(reqAcc.contains(acc)) {
+//                    filtered.add(id);
+//                    continue;
+//                }
+//                // we may have a partial accession
+//                for(String ra: reqAcc) {
+//                    if(acc.contains(ra)) {
+//                        filtered.add(id);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//        
+//        // Look in the database for matching ids.
+//        else {
+//            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIds(new ArrayList<String>(reqAcc), pinferId);
+//            
+//            // get the corresponding protein inference protein ids
+//            if(found.size() > 0) {
+//                List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(found));
+//                Collections.sort(piProteinIds);
+//                for(int id: allProteinIds) {
+//                    if(Collections.binarySearch(piProteinIds, id) >= 0)
+//                        filtered.add(id);
+//                }
+//            }
+//        }
+//        
+//        return filtered;
+//    }
     
-    public static List<Integer> filterByProteinDescription(int pinferId,
-            List<Integer> storedProteinIds, String descriptionLike) {
-        
-        List<Integer> searchDbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-        List<NrDbProtein> nrProteins = NrSeqLookupUtil.getDbProteinsForDescription(searchDbIds, descriptionLike);
-        
-        NrDbProtComparator comparator = new NrDbProtComparator();
-        Collections.sort(nrProteins, comparator);
-           
-        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
-        Set<Integer> accepted = new HashSet<Integer>();
-        for(ProteinferProtein protein: proteins) {
-            NrDbProtein nrp = new NrDbProtein();
-            nrp.setProteinId(protein.getNrseqProteinId());
-            int idx = Collections.binarySearch(nrProteins, nrp, comparator);
-            if(idx >= 0) {
-                accepted.add(protein.getId());
-            }
-        }
-        
-        List<Integer> acceptedProteinIds = new ArrayList<Integer>(accepted.size());
-        for(int id: storedProteinIds) {
-            if(accepted.contains(id))
-                acceptedProteinIds.add(id);
-        }
-        return acceptedProteinIds;
-    }
-    
-    private static class NrDbProtComparator implements Comparator<NrDbProtein> {
-        public int compare(NrDbProtein o1, NrDbProtein o2) {
-            return Integer.valueOf(o1.getProteinId()).compareTo(o2.getProteinId());
-        }
-    }
-    
+//    public static List<Integer> filterByProteinDescription(int pinferId,
+//            List<Integer> storedProteinIds, String descriptionLike) {
+//        
+//        List<Integer> searchDbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+//        List<NrDbProtein> nrProteins = NrSeqLookupUtil.getDbProteinsForDescription(searchDbIds, descriptionLike);
+//        
+//        NrDbProtComparator comparator = new NrDbProtComparator();
+//        Collections.sort(nrProteins, comparator);
+//           
+//        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
+//        Set<Integer> accepted = new HashSet<Integer>();
+//        for(ProteinferProtein protein: proteins) {
+//            NrDbProtein nrp = new NrDbProtein();
+//            nrp.setProteinId(protein.getNrseqProteinId());
+//            int idx = Collections.binarySearch(nrProteins, nrp, comparator);
+//            if(idx >= 0) {
+//                accepted.add(protein.getId());
+//            }
+//        }
+//        
+//        List<Integer> acceptedProteinIds = new ArrayList<Integer>(accepted.size());
+//        for(int id: storedProteinIds) {
+//            if(accepted.contains(id))
+//                acceptedProteinIds.add(id);
+//        }
+//        return acceptedProteinIds;
+//    }
+//    
+//    private static class NrDbProtComparator implements Comparator<NrDbProtein> {
+//        public int compare(NrDbProtein o1, NrDbProtein o2) {
+//            return Integer.valueOf(o1.getProteinId()).compareTo(o2.getProteinId());
+//        }
+//    }
+//    
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given sorting criteria
     //---------------------------------------------------------------------------------------------------
@@ -184,6 +200,12 @@ public class IdPickerResultsLoader {
         
         long s = System.currentTimeMillis();
         List<Integer> allIds = null;
+        if(sortBy == SORT_BY.ACCESSION) {
+            List<Integer> sortedIds = ProteinAccessionSorter.sortIdsByAccession(proteinIds, pinferId);
+            long e = System.currentTimeMillis();
+            log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            return sortedIds;
+        }
         if(sortBy == SORT_BY.CLUSTER_ID) {
             allIds = idpProtBaseDao.sortProteinIdsByCluster(pinferId);
         }
@@ -208,9 +230,6 @@ public class IdPickerResultsLoader {
         else if (sortBy == SORT_BY.NUM_SPECTRA) {
             allIds = idpProtBaseDao.sortProteinIdsBySpectrumCount(pinferId, groupProteins);
         }
-//        else if (sortBy == SORT_BY.ACCESSION) {
-//            allIds = sortIdsByAccession(proteinIds);
-//        }
         if(allIds == null) {
             log.warn("Could not get sorted order for all protein IDs for protein inference run: "+pinferId);
         }
@@ -233,56 +252,34 @@ public class IdPickerResultsLoader {
         return allIds;
     }
     
-    public static Map<Integer, String> getProteinAccessionMap(int pinferId) {
-        log.info("Building Protein Accession map");
-        long s = System.currentTimeMillis();
-        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
-        Map<Integer, String> map = new HashMap<Integer, String>((int) (proteins.size() * 1.5));
-        long e = System.currentTimeMillis();
-        log.info("Time to get all proteins: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        
-        s = System.currentTimeMillis();
-        
-        FastaProteinLookupUtil fplUtil = FastaProteinLookupUtil.getInstance();
-        List<Integer> dbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-        
-        for(ProteinferProtein protein: proteins) {
-            String accession = fplUtil.getProteinListing(protein.getNrseqProteinId(), dbIds).getAllNames();
-            map.put(protein.getId(), accession);
-        }
-        e = System.currentTimeMillis();
-        log.info("Time to assign protein accessions: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        return map;
-    }
-    
-    public static List<Integer> sortIdsByAccession(List<Integer> proteinIds, Map<Integer, String> proteinAccessionMap) {
-        
-        List<ProteinIdAccession> accMap = new ArrayList<ProteinIdAccession>(proteinIds.size());
-        
-        for(int id: proteinIds) {
-            accMap.add(new ProteinIdAccession(id, proteinAccessionMap.get(id)));
-        }
-        Collections.sort(accMap, new Comparator<ProteinIdAccession>() {
-            public int compare(ProteinIdAccession o1, ProteinIdAccession o2) {
-                return o1.accession.toLowerCase().compareTo(o2.accession.toLowerCase());
-            }});
-        List<Integer> sortedIds = new ArrayList<Integer>(proteinIds.size());
-        for(ProteinIdAccession pa: accMap) {
-            sortedIds.add(pa.proteinId);
-        }
-        return sortedIds;
-    }
-    
-    
-    
-    private static class ProteinIdAccession {
-        int proteinId;
-        String accession;
-        public ProteinIdAccession(int proteinId, String accession) {
-            this.proteinId = proteinId;
-            this.accession = accession;
-        }
-    }
+//    public static List<Integer> sortIdsByAccession(List<Integer> proteinIds, Map<Integer, String> proteinAccessionMap) {
+//        
+//        List<ProteinIdAccession> accMap = new ArrayList<ProteinIdAccession>(proteinIds.size());
+//        
+//        for(int id: proteinIds) {
+//            accMap.add(new ProteinIdAccession(id, proteinAccessionMap.get(id)));
+//        }
+//        Collections.sort(accMap, new Comparator<ProteinIdAccession>() {
+//            public int compare(ProteinIdAccession o1, ProteinIdAccession o2) {
+//                return o1.accession.toLowerCase().compareTo(o2.accession.toLowerCase());
+//            }});
+//        List<Integer> sortedIds = new ArrayList<Integer>(proteinIds.size());
+//        for(ProteinIdAccession pa: accMap) {
+//            sortedIds.add(pa.proteinId);
+//        }
+//        return sortedIds;
+//    }
+//    
+//    
+//    
+//    private static class ProteinIdAccession {
+//        int proteinId;
+//        String accession;
+//        public ProteinIdAccession(int proteinId, String accession) {
+//            this.proteinId = proteinId;
+//            this.accession = accession;
+//        }
+//    }
 
     //---------------------------------------------------------------------------------------------------
     // Get a list of proteins

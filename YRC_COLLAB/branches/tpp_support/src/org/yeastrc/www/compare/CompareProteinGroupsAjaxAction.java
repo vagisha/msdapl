@@ -123,7 +123,7 @@ public class CompareProteinGroupsAjaxAction extends Action{
                 ProteinProphetProtein ppProtein = ppProtDao.loadProtein(pinferProteinId);
 
                 // get all the proteins in the group
-                List<ProteinProphetProtein> groupProteins = ppProtDao.loadProteinProphetGroupProteins(dataset.getDatasetId(), 
+                List<ProteinProphetProtein> groupProteins = ppProtDao.loadProteinProphetIndistinguishableGroupProteins(dataset.getDatasetId(), 
                         ppProtein.getGroupId());
 
                 

@@ -19,9 +19,9 @@
 	});
 </script>
 
-  <html:form action="/updateProteinInferenceResult" method="post" styleId="filterForm" >
+  <html:form action="/updateProteinProphetResult" method="post" styleId="filterForm" >
   
-  <html:hidden name="proteinInferFilterForm" property="pinferId" />
+  <html:hidden name="proteinProphetFilterForm" property="pinferId" />
   <TABLE CELLPADDING="5px" CELLSPACING="5px" align="center" style="border: 1px solid gray;">
   
   <!-- Filtering options -->
@@ -31,69 +31,77 @@
   <tr>
   <td>Peptides: </td>
   <td>
-  	Min <html:text name="proteinInferFilterForm" property="minPeptides" size="3"></html:text>
-  	Max <html:text name="proteinInferFilterForm" property="maxPeptides" size="3"></html:text>
+  	Min <html:text name="proteinProphetFilterForm" property="minPeptides" size="3"></html:text>
+  	Max <html:text name="proteinProphetFilterForm" property="maxPeptides" size="3"></html:text>
   </td>
   </tr>
   <tr>
   <td>Unique Peptides: </td>
   <td>
-  	Min <html:text name="proteinInferFilterForm" property="minUniquePeptides" size="3"></html:text>
-  	Max <html:text name="proteinInferFilterForm" property="maxUniquePeptides" size="3"></html:text>
+  	Min <html:text name="proteinProphetFilterForm" property="minUniquePeptides" size="3"></html:text>
+  	Max <html:text name="proteinProphetFilterForm" property="maxUniquePeptides" size="3"></html:text>
   </td>
   </tr>
+  <tr>
+  	<td>Probability:</td>
+  	<td>
+  		Min <html:text name="proteinProphetFilterForm" property="minProbability" size="3"></html:text>
+  		Max <html:text name="proteinProphetFilterForm" property="maxProbability" size="3"></html:text>
+  	</td>
+  	</tr>
   </table></td>
   
-  <td><table>
+  <td valign="top"><table>
   <tr>
   <td>Coverage(%):</td>
   <td>
-  	Min <html:text name="proteinInferFilterForm" property="minCoverage" size="3"></html:text>
-  	Max <html:text name="proteinInferFilterForm" property="maxCoverage" size="3"></html:text>
+  	Min <html:text name="proteinProphetFilterForm" property="minCoverage" size="3"></html:text>
+  	Max <html:text name="proteinProphetFilterForm" property="maxCoverage" size="3"></html:text>
   </td>
   </tr>
   <tr>
   <td>Spectrum Matches: </td>
   <td>
-  	Min <html:text name="proteinInferFilterForm" property="minSpectrumMatches" size="3"></html:text>
-  	Max <html:text name="proteinInferFilterForm" property="maxSpectrumMatches" size="3"></html:text>
+  	Min <html:text name="proteinProphetFilterForm" property="minSpectrumMatches" size="3"></html:text>
+  	Max <html:text name="proteinProphetFilterForm" property="maxSpectrumMatches" size="3"></html:text>
   </td>
   </tr>
   </table></td>
   
-  <td><table>
+  <td valign="top"><table>
   <tr>
-  	<td colspan="2">Group Indistinguishable Proteins: </td>
+  	<td colspan="2">Show Protein Groups: </td>
   	<td>
-  		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="true">Yes</html:radio>
+  		<html:radio name="proteinProphetFilterForm" property="joinProphetGroupProteins" value="true">Yes</html:radio>
   	</td>
   	<td>
-  		<html:radio name="proteinInferFilterForm" property="joinGroupProteins" value="false">No</html:radio>
+  		<html:radio name="proteinProphetFilterForm" property="joinProphetGroupProteins" value="false">No</html:radio>
   	</td>
   </tr>
   <tr>
   	<td colspan="2">Show Proteins: </td>
   	<td>
-  		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="true">All</html:radio>
+  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="true">All</html:radio>
   	</td>
   	<td>
-  		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="false">Parsimonious</html:radio>
+  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="false">Parsimonious</html:radio>
   	</td>
   </tr>
   </table></td>
   </tr>
   
   <tr>
+  
   	<td colspan="2">
   		Validation Status: 
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus" value="All"/> All
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus" 
+  		<html:multibox name="proteinProphetFilterForm" property="validationStatus" value="All"/> All
+  		<html:multibox name="proteinProphetFilterForm" property="validationStatus" 
   					   value="<%=String.valueOf(ProteinUserValidation.UNVALIDATED.getStatusChar()) %>"/> Unvalidated 
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
+  		<html:multibox name="proteinProphetFilterForm" property="validationStatus"  
   		               value="<%=String.valueOf(ProteinUserValidation.ACCEPTED.getStatusChar()) %>"/> Accepted
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
+  		<html:multibox name="proteinProphetFilterForm" property="validationStatus"  
   		               value="<%=String.valueOf(ProteinUserValidation.REJECTED.getStatusChar()) %>"/> Rejected
-  		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
+  		<html:multibox name="proteinProphetFilterForm" property="validationStatus"  
   		               value="<%=String.valueOf(ProteinUserValidation.NOT_SURE.getStatusChar()) %>"/> Not Sure
   	</td>
   </tr>
@@ -103,12 +111,12 @@
   	<table align="left">
   		<tr>
   			<td valign="top">Fasta ID(s): </td>
-  			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
+  			<td valign="top"><html:text name="proteinProphetFilterForm" property="accessionLike" size="40"></html:text><br>
   				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
   			</td>
   			<td valign="top">Description: </td>
   			<td valign="top">
-  				<html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text>
+  				<html:text name="proteinProphetFilterForm" property="descriptionLike" size="40"></html:text>
   			</td>
   		</tr>
   		<tr>

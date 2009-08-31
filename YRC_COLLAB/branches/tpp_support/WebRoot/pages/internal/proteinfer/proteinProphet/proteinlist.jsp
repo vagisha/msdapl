@@ -28,7 +28,7 @@
 </div>
 
 
-<bean:define name="proteinInferFilterForm" property="joinGroupProteins" id="groupProteins"></bean:define>
+<bean:define name="proteinProphetFilterForm" property="joinProphetGroupProteins" id="groupProteins"></bean:define>
 			
 <div id="proteinListTable">
 	<%@ include file="proteinListTable.jsp" %>

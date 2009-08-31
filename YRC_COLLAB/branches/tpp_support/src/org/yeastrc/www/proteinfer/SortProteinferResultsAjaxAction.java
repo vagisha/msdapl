@@ -7,7 +7,6 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,8 +18,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
@@ -115,22 +114,12 @@ public class SortProteinferResultsAjaxAction extends Action{
 
                 List<Integer> newOrderIds = null;
 
-                // Sorting by accession is a special case.
-                // If we are sorting by accession, first check if the protein accession map in the session is current
-                if(sortBy_r == SORT_BY.ACCESSION) {
-                    Map<Integer, String> proteinAccessionMap = getProteinAccessionMap(request, pinferId, true);
-                    // sort the results based accession
-                    newOrderIds = IdPickerResultsLoader.sortIdsByAccession(storedProteinIds, proteinAccessionMap);
-                }
-                //Sorting by any other column
-                else {
-                    // resort  the results based on the given criteria
-                    newOrderIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
-                            peptideDef, 
-                            storedProteinIds, 
-                            sortBy_r, 
-                            group);
-                }
+                // resort  the results based on the given criteria
+                newOrderIds = IdPickerResultsLoader.getSortedProteinIds(pinferId, 
+                        peptideDef, 
+                        storedProteinIds, 
+                        sortBy_r, 
+                        group);
 
                 filterCriteria.setSortBy(sortBy_r);
                 request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);
@@ -174,37 +163,4 @@ public class SortProteinferResultsAjaxAction extends Action{
 
     }
 
-    private Map<Integer, String> getProteinAccessionMap(
-            HttpServletRequest request, int pinferId, boolean createNew) {
-
-        Map<Integer, String> proteinAccessionMap = (Map<Integer, String>) request.getSession().getAttribute("proteinAccessionMap");
-        boolean foundMap = true;
-
-        if(proteinAccessionMap == null) {
-            log.info("proteinAccessionMap was null.");
-            foundMap = false;
-        }
-        else {
-            Integer pinferIdForProtAccession = (Integer)request.getSession().getAttribute("pinferIdForProtAccession");
-            if(pinferIdForProtAccession != null && pinferIdForProtAccession != pinferId) {
-                log.info("proteinIdForProtAccession ("+pinferIdForProtAccession+
-                        ") does not match pinfer id in request ("+pinferId+") ... ");
-                foundMap = false;
-            }
-        }
-        if(foundMap) {
-            return proteinAccessionMap;
-        }
-        else {
-            if(createNew) {
-                log.info("Creating new map....");
-                proteinAccessionMap = IdPickerResultsLoader.getProteinAccessionMap(pinferId);
-                request.getSession().setAttribute("proteinAccessionMap", proteinAccessionMap);
-                request.getSession().setAttribute("pinferIdForProtAccession", pinferId);
-                return proteinAccessionMap;
-            }
-            else
-                return null;
-        }
-    }
 }

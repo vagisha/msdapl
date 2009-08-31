@@ -5,7 +5,7 @@
  * Jan 8, 2009
  * @version 1.0
  */
-package org.yeastrc.www.proteinfer;
+package org.yeastrc.www.proteinfer.proteinProphet;
 
 import java.util.List;
 
@@ -18,21 +18,19 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
-import org.yeastrc.www.proteinfer.idpicker.WIdPickerProteinGroup;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
 /**
  * 
  */
-public class PageProteinferResultsAjaxAction extends Action {
+public class PageProteinProphetResultsAjaxAction extends Action {
 
-    private static final Logger log = Logger.getLogger(ViewProteinInferenceResultAction.class);
+    private static final Logger log = Logger.getLogger(PageProteinProphetResultsAjaxAction.class);
     
     public ActionForward execute( ActionMapping mapping,
             ActionForm form,
@@ -73,8 +71,8 @@ public class PageProteinferResultsAjaxAction extends Action {
         
         
         // Peptide definition from the session
-        ProteinFilterCriteria filterCriteria = (ProteinFilterCriteria) request.getSession().getAttribute("pinferFilterCriteria");
-        if(filterCriteria == null)  filterCriteria = new ProteinFilterCriteria();
+        ProteinProphetFilterCriteria filterCriteria = (ProteinProphetFilterCriteria) request.getSession().getAttribute("proteinProphetFilterCriteria");
+        if(filterCriteria == null)  filterCriteria = new ProteinProphetFilterCriteria();
         PeptideDefinition peptideDef = filterCriteria.getPeptideDefinition();
 
         // How are we displaying the results (grouped by protein group or individually)
@@ -99,7 +97,7 @@ public class PageProteinferResultsAjaxAction extends Action {
         
         long s = System.currentTimeMillis();
         
-        log.info("Paging results for protein inference: "+pinferId+"; page num: "+pageNum+"; sort order: "+filterCriteria.getSortOrder() );
+        log.info("Paging ProteinProphet results for protein inference: "+pinferId+"; page num: "+pageNum+"; sort order: "+filterCriteria.getSortOrder() );
         
         
         // determine the list of proteins we will be displaying
@@ -108,7 +106,7 @@ public class PageProteinferResultsAjaxAction extends Action {
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
+        List<WProteinProphetProteinGroup> proteinGroups = ProteinProphetResultsLoader.getProteinProphetGroups(pinferId, proteinIds, 
                 group, peptideDef);
         request.setAttribute("proteinGroups", proteinGroups);
         
@@ -126,7 +124,7 @@ public class PageProteinferResultsAjaxAction extends Action {
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
         long e = System.currentTimeMillis();
-        log.info("Total time (PageProteinInferenceResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
+        log.info("Total time (PageProteinProphetResultAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         return mapping.findForward("Success");
         

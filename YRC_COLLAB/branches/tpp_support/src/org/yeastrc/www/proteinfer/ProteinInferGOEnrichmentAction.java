@@ -19,8 +19,7 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
@@ -142,8 +141,8 @@ public class ProteinInferGOEnrichmentAction extends Action {
         if(filterForm.isCollapseGroups()) 
             filterCriteria.setSortBy(SORT_BY.GROUP_ID);
         else
-            filterCriteria.setSortBy(SORT_BY.defaultSortBy());
-        filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
+            filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
+        filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
         filterCriteria.setGroupProteins(true);
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());

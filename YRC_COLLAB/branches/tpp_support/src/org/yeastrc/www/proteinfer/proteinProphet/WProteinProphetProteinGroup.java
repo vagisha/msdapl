@@ -7,90 +7,53 @@
 package org.yeastrc.www.proteinfer.proteinProphet;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 
 /**
  * 
  */
 public class WProteinProphetProteinGroup {
 
-    private int groupId;
-    private List<WProteinProphetProtein> proteins;
-    private int matchingPeptideCount;
-    private int uniqMatchingPeptideCount;
-    private int spectrumCount;
-    private Set<Integer> nonUniqPeptGrpIds;
-    private Set<Integer> uniqPeptGrpIds;
+    private List<WProteinProphetIndistProteinGroup> indistinguishableProteins;
+    private ProteinProphetGroup proteinProphetGroup;
     
-    
-    public WProteinProphetProteinGroup(List<WProteinProphetProtein> groupProteins) {
+    public WProteinProphetProteinGroup(ProteinProphetGroup proteinProphetGroup,
+            List<WProteinProphetIndistProteinGroup> groupProteins) {
+        
+        this.proteinProphetGroup = proteinProphetGroup;
+        
        if(groupProteins != null)
-           proteins = groupProteins;
+           indistinguishableProteins = groupProteins;
        if(groupProteins == null)
-           groupProteins = new ArrayList<WProteinProphetProtein>(0);
-       if(groupProteins.size() > 0) {
-           ProteinProphetProtein prot = groupProteins.get(0).getProtein();
-           this.groupId = prot.getGroupId();
-           this.spectrumCount = prot.getSpectrumCount();
-           this.matchingPeptideCount = prot.getPeptideCount();
-           this.uniqMatchingPeptideCount = prot.getUniquePeptideCount();
-       }
-       nonUniqPeptGrpIds = new HashSet<Integer>();
-       uniqPeptGrpIds = new HashSet<Integer>();
-    }
-    
-    public String getNonUniqMatchingPeptideGroupIdsString() {
-        StringBuilder buf = new StringBuilder();
-        for(Integer grpId: nonUniqPeptGrpIds) {
-//            if(!uniqPeptideGroupIds.contains(grpId))
-            buf.append(","+grpId);
-        }
-        if(buf.length() > 0)    buf.deleteCharAt(0);
-        return buf.toString();
+           groupProteins = new ArrayList<WProteinProphetIndistProteinGroup>(0);
     }
 
-    public String getUniqMatchingPeptideGroupIdsString() {
-        StringBuilder buf = new StringBuilder();
-        for(Integer grpId: uniqPeptGrpIds) {
-            buf.append(","+grpId);
-        }
-        if(buf.length() > 0)    buf.deleteCharAt(0);
-        return buf.toString();
+    public double getGroupProbability() {
+        return this.proteinProphetGroup.getProbability();
     }
     
-    public void addNonUniqPeptideGrpId(int id) {
-        nonUniqPeptGrpIds.add(id);
+    public int getProteinProphetGroupId() {
+        return this.proteinProphetGroup.getId();
     }
     
-    public void addUniqPeptideGrpId(int id) {
-        uniqPeptGrpIds.add(id);
+    public int getProteinProphetGroupNumber() {
+        return this.proteinProphetGroup.getGroupNumber();
     }
     
-    public int getGroupId() {
-        return groupId;
+    public int getIndistinguishableProteinGroupCount() {
+        return indistinguishableProteins.size();
     }
     
     public int getProteinCount() {
-        return proteins.size();
+        int count = 0;
+        for(WProteinProphetIndistProteinGroup iGroup: indistinguishableProteins)
+            count += iGroup.getProteinCount();
+        return count;
     }
     
-    public int getMatchingPeptideCount() {
-        return matchingPeptideCount;
-    }
-    
-    public int getUniqMatchingPeptideCount() {
-        return uniqMatchingPeptideCount;
-    }
-    
-    public int getSpectrumCount() {
-        return spectrumCount;
-    }
-    
-    public List<WProteinProphetProtein> getProteins() {
-        return proteins;
+    public List<WProteinProphetIndistProteinGroup> getIndistinguishableProteinGroups() {
+        return indistinguishableProteins;
     }
 }

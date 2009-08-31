@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,16 +27,19 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProtein;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptide;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
@@ -48,6 +52,9 @@ import org.yeastrc.www.compare.CommonNameLookupUtil;
 import org.yeastrc.www.compare.FastaProteinLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.compare.ProteinListing;
+import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
+import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
+import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
 
 /**
  * 
@@ -66,6 +73,7 @@ public class ProteinProphetResultsLoader {
     private static final ProteinferSpectrumMatchDAO psmDao = pinferDaoFactory.getProteinferSpectrumMatchDao();
     private static final ProteinferPeptideDAO peptDao = pinferDaoFactory.getProteinferPeptideDao();
     private static final ProteinProphetProteinDAO ppProtDao = pinferDaoFactory.getProteinProphetProteinDao();
+    private static final ProteinProphetProteinGroupDAO ppProtGrpDao = pinferDaoFactory.getProteinProphetProteinGroupDao();
     private static final ProteinProphetPeptideDAO ppPeptDao = pinferDaoFactory.getProteinProphetPeptideDao();
     private static final ProteinferProteinDAO protDao = pinferDaoFactory.getProteinferProteinDao();
     private static final ProteinferInputDAO inputDao = pinferDaoFactory.getProteinferInputDao();
@@ -78,24 +86,37 @@ public class ProteinProphetResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given filtering criteria
     //---------------------------------------------------------------------------------------------------
-    public static List<Integer> getProteinIds(int pinferId, ProteinFilterCriteria filterCriteria) {
+    public static List<Integer> getProteinIds(int pinferId, ProteinProphetFilterCriteria filterCriteria) {
         long s = System.currentTimeMillis();
         List<Integer> proteinIds = ppProtDao.getFilteredSortedProteinIds(pinferId, filterCriteria);
         log.info("Returned "+proteinIds.size()+" protein IDs for protein inference ID: "+pinferId);
+        
+        // filter by accession, if required
+        if(filterCriteria.getAccessionLike() != null) {
+            log.info("Filtering by accession: "+filterCriteria.getAccessionLike());
+            proteinIds = ProteinAccessionFilter.filterByProteinAccession(pinferId, proteinIds, filterCriteria.getAccessionLike());
+        }
+        
+        // filter by description, if required
+        if(filterCriteria.getDescriptionLike() != null) {
+            log.info("Filtering by description: "+filterCriteria.getDescriptionLike());
+            proteinIds = ProteinDescriptionFilter.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionLike());
+        }
+        
         long e = System.currentTimeMillis();
         log.info("Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         return proteinIds;
     }
     
     //---------------------------------------------------------------------------------------------------
-    // Get all the proteins in a group
+    // Get all the proteins in a indistinguishable protein group
     //---------------------------------------------------------------------------------------------------
     public static List<WProteinProphetProtein> getGroupProteins(int pinferId, int groupId, 
             PeptideDefinition peptideDef) {
         
         long s = System.currentTimeMillis();
         
-        List<ProteinProphetProtein> groupProteins = ppProtDao.loadProteinProphetGroupProteins(pinferId, groupId);
+        List<ProteinProphetProtein> groupProteins = ppProtDao.loadProteinProphetIndistinguishableGroupProteins(pinferId, groupId);
         
         List<WProteinProphetProtein> proteins = new ArrayList<WProteinProphetProtein>(groupProteins.size());
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
@@ -114,12 +135,12 @@ public class ProteinProphetResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein groups
     //---------------------------------------------------------------------------------------------------
-    public static List<WProteinProphetProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, 
+    public static List<WProteinProphetProteinGroup> getProteinProphetGroups(int pinferId, List<Integer> proteinIds, 
             PeptideDefinition peptideDef) {
-        return getProteinGroups(pinferId, proteinIds, true, peptideDef);
+        return getProteinProphetGroups(pinferId, proteinIds, true, peptideDef);
     }
     
-    public static List<WProteinProphetProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, boolean append, 
+    public static List<WProteinProphetProteinGroup> getProteinProphetGroups(int pinferId, List<Integer> proteinIds, boolean append, 
             PeptideDefinition peptideDef) {
         
         long s = System.currentTimeMillis();
@@ -132,7 +153,7 @@ public class ProteinProphetResultsLoader {
         List<Integer> fastaDatabaseIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
         
         if(append) {
-            // protein Ids should be sorted by groupID. If the proteins at the top of the list
+            // protein Ids should be sorted by protein prophet groupID. If the proteins at the top of the list
             // does not have all members of the group in the list, add them
             int groupId_top = proteins.get(0).getProtein().getGroupId();
             List<ProteinProphetProtein> groupProteins = ppProtDao.loadProteinProphetGroupProteins(pinferId, groupId_top);
@@ -143,7 +164,7 @@ public class ProteinProphetResultsLoader {
                 }
             }
 
-            // protein Ids should be sorted by groupID. If the proteins at the bottom of the list
+            // protein Ids should be sorted by protein prophet groupID. If the proteins at the bottom of the list
             // does not have all members of the group in the list, add them
             int groupId_last = proteins.get(proteins.size() - 1).getProtein().getGroupId();
             if(groupId_last != groupId_top) {
@@ -161,30 +182,70 @@ public class ProteinProphetResultsLoader {
             return new ArrayList<WProteinProphetProteinGroup>(0);
         
         int currGrpId = -1;
-        List<WProteinProphetProtein> grpProteins = null;
-        List<WProteinProphetProteinGroup> groups = new ArrayList<WProteinProphetProteinGroup>();
+        List<WProteinProphetProtein> prophetGrpProteins = null;
+        List<WProteinProphetProteinGroup> prophetGrps = new ArrayList<WProteinProphetProteinGroup>();
+        
         for(WProteinProphetProtein prot: proteins) {
-            if(prot.getProtein().getGroupId() != currGrpId) {
-                if(grpProteins != null && grpProteins.size() > 0) {
-                    WProteinProphetProteinGroup grp = new WProteinProphetProteinGroup(grpProteins);
-                    groups.add(grp);
+            if(prot.getProtein().getProteinProphetGroupId() != currGrpId) {
+                if(prophetGrpProteins != null && prophetGrpProteins.size() > 0) {
+                    ProteinProphetGroup prophetGroup = ppProtGrpDao.load(currGrpId);
+                    
+                    List<WProteinProphetIndistProteinGroup> indistGrps = makeIndistinguishableGroups(prophetGrpProteins);
+                    WProteinProphetProteinGroup grp = new WProteinProphetProteinGroup(prophetGroup, indistGrps);
+                    prophetGrps.add(grp);
                 }
-                currGrpId = prot.getProtein().getGroupId();
-                grpProteins = new ArrayList<WProteinProphetProtein>();
+                currGrpId = prot.getProtein().getProteinProphetGroupId();
+                prophetGrpProteins = new ArrayList<WProteinProphetProtein>();
             }
-            grpProteins.add(prot);
+            prophetGrpProteins.add(prot);
         }
-        if(grpProteins != null && grpProteins.size() > 0) {
-            WProteinProphetProteinGroup grp = new WProteinProphetProteinGroup(grpProteins);
-            groups.add(grp);
+        if(prophetGrpProteins != null && prophetGrpProteins.size() > 0) {
+            ProteinProphetGroup prophetGroup = ppProtGrpDao.load(currGrpId);
+            
+            List<WProteinProphetIndistProteinGroup> indistGrps = makeIndistinguishableGroups(prophetGrpProteins);
+            WProteinProphetProteinGroup grp = new WProteinProphetProteinGroup(prophetGroup, indistGrps);
+            prophetGrps.add(grp);
         }
         
         long e = System.currentTimeMillis();
         log.info("Time to get WProteinProphetProteinsGroups: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        return groups;
+        return prophetGrps;
     }
     
+    private static List<WProteinProphetIndistProteinGroup> makeIndistinguishableGroups(
+            List<WProteinProphetProtein> prophetGrpProteins) {
+        
+        // sort by indistinguishable protein group ID
+        Collections.sort(prophetGrpProteins, new Comparator<WProteinProphetProtein>() {
+            @Override
+            public int compare(WProteinProphetProtein o1, WProteinProphetProtein o2) {
+                return Integer.valueOf(o1.getProtein().getGroupId()).compareTo(o2.getProtein().getGroupId());
+            }});
+        
+        List<WProteinProphetIndistProteinGroup> indistGrps = new ArrayList<WProteinProphetIndistProteinGroup>();
+        int currGrpId = -1;
+        List<WProteinProphetProtein> iGrpProteins = null;
+        for(WProteinProphetProtein prot: prophetGrpProteins) {
+            if(prot.getProtein().getGroupId() != currGrpId) {
+                if(iGrpProteins != null && iGrpProteins.size() > 0) {
+                    
+                    WProteinProphetIndistProteinGroup grp = new WProteinProphetIndistProteinGroup(iGrpProteins);
+                    indistGrps.add(grp);
+                }
+                currGrpId = prot.getProtein().getGroupId();
+                iGrpProteins = new ArrayList<WProteinProphetProtein>();
+            }
+            iGrpProteins.add(prot);
+        }
+        if(iGrpProteins != null && iGrpProteins.size() > 0) {
+            
+            WProteinProphetIndistProteinGroup grp = new WProteinProphetIndistProteinGroup(iGrpProteins);
+            indistGrps.add(grp);
+        }
+        return indistGrps;
+    }
+
     //---------------------------------------------------------------------------------------------------
     // Get a list of proteins
     //---------------------------------------------------------------------------------------------------
@@ -465,4 +526,60 @@ public class ProteinProphetResultsLoader {
         return new WProteinProphetIon(ion, origResult);
     }
 
+  //---------------------------------------------------------------------------------------------------
+    // Get a list of protein IDs with the given sorting criteria
+    //---------------------------------------------------------------------------------------------------
+    public static List<Integer> getSortedProteinIds(int pinferId, PeptideDefinition peptideDef, 
+            List<Integer> proteinIds, SORT_BY sortBy, boolean groupProteins) {
+        
+        long s = System.currentTimeMillis();
+        List<Integer> allIds = null;
+        if(sortBy == SORT_BY.ACCESSION) {
+            List<Integer> sortedIds = ProteinAccessionSorter.sortIdsByAccession(proteinIds, pinferId);
+            long e = System.currentTimeMillis();
+            log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            return sortedIds;
+        }
+        else if (sortBy == SORT_BY.PROTEIN_PROPHET_GROUP) {
+            allIds = ppProtDao.sortProteinIdsByProteinProphetGroup(pinferId);
+        }
+        else if (sortBy == SORT_BY.COVERAGE) {
+            allIds = ppProtDao.sortProteinIdsByCoverage(pinferId, groupProteins);
+        }
+        else if(sortBy == SORT_BY.VALIDATION_STATUS) {
+            allIds = ppProtDao.sortProteinIdsByValidationStatus(pinferId);
+        }
+        else if (sortBy == SORT_BY.NUM_PEPT) {
+            allIds = ppProtDao.sortProteinIdsByPeptideCount(pinferId, peptideDef, groupProteins);
+        }
+        else if (sortBy == SORT_BY.NUM_UNIQ_PEPT) {
+            allIds = ppProtDao.sortProteinIdsByUniquePeptideCount(pinferId, peptideDef, groupProteins);
+        }
+        else if (sortBy == SORT_BY.NUM_SPECTRA) {
+            allIds = ppProtDao.sortProteinIdsBySpectrumCount(pinferId, groupProteins);
+        }
+        else if (sortBy == SORT_BY.PROBABILITY) {
+            allIds = ppProtDao.sortProteinIdsByProbability(pinferId, groupProteins);
+        }
+        if(allIds == null) {
+            log.warn("Could not get sorted order for all protein IDs for protein inference run: "+pinferId);
+        }
+        
+        // we want the sorted order from allIds but only want to keep the ids in the current 
+        // filtered list.
+        // remove the ones from allIds that are not in the current filtered list. 
+        Set<Integer> currentOrder = new HashSet<Integer>((int) (proteinIds.size() * 1.5));
+        currentOrder.addAll(proteinIds);
+        Iterator<Integer> iter = allIds.iterator();
+        while(iter.hasNext()) {
+            Integer protId = iter.next();
+            if(!currentOrder.contains(protId))
+                iter.remove();
+        }
+        
+        long e = System.currentTimeMillis();
+        log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+        
+        return allIds;
+    }
 }

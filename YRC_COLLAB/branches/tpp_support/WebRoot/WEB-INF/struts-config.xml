@@ -61,6 +61,7 @@
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
+	<form-bean name="proteinProphetFilterForm" type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetFilterForm"></form-bean>
 	<form-bean name="proteinSetComparisonForm" type="org.yeastrc.www.compare.ProteinSetComparisonForm"></form-bean>
 	<form-bean name="peptideComparisonForm" type="org.yeastrc.www.compare.ComparePeptidesForm"></form-bean>
 	<form-bean name="sequestPepxmlDownloadForm" type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadForm"></form-bean>
@@ -690,7 +691,7 @@
 	<action 
 		path="/viewProteinProphetResult"
 		type="org.yeastrc.www.proteinfer.proteinProphet.ViewProteinProphetResultAction"
-		name="proteinInferFilterForm"
+		name="proteinProphetFilterForm"
 		scope="request"
 		validate="true"
 	>
@@ -738,6 +739,17 @@
 	</action>
 	
 	<action 
+		path="/updateProteinProphetResult"
+		type="org.yeastrc.www.proteinfer.proteinProphet.UpdateProteinProphetResultAjaxAction"
+		name="proteinProphetFilterForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="ViewNewResults" path="/viewProteinProphetResult.do" redirect="false" />
+		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/proteinlist.jsp" redirect="false" />
+	</action>
+	
+	<action 
 		path="/pageProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.PageProteinferResultsAjaxAction"
 	>
@@ -746,11 +758,27 @@
 	</action>
 	
 	<action 
+		path="/pageProteinProphetResult"
+		type="org.yeastrc.www.proteinfer.proteinProphet.PageProteinProphetResultsAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/proteinListTable.jsp" redirect="false" />
+		<forward name="ViewNewResults" path="/viewProteinProphetResult.do" redirect="false" />
+	</action>
+	
+	<action 
 		path="/sortProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.SortProteinferResultsAjaxAction"
 	>
 		<forward name="Success" path="/pages/internal/proteinfer/proteinListTable.jsp" redirect="false" />
 		<forward name="ViewNewResults" path="/viewProteinInferenceResult.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/sortProteinProphetResult"
+		type="org.yeastrc.www.proteinfer.proteinProphet.SortProteinProphetResultsAjaxAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/proteinListTable.jsp" redirect="false" />
+		<forward name="ViewNewResults" path="/viewProteinProphetResult.do" redirect="false" />
 	</action>
 	
 	

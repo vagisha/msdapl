@@ -642,25 +642,65 @@ function validateForm() {
 	// fieldValue is a Form Plugin method that can be invoked to find the 
     // current value of a field 
     
+    // peptides
     var value = $("form#filterForm input[name='minPeptides']").fieldValue();
     var valid = validateInt(value, "Min. Peptides", 1);
     if(!valid)	return false;
     var minPept = parseInt(value);
-    $('form#filterForm input[name=minPeptides]').val(minPept);
     
-    value = $('form#filterForm input[@name=minUniquePeptides]').fieldValue();
+    var value = $("form#filterForm input[name='maxPeptides']").fieldValue();
+    if(!isNaN(parseInt(value))) {
+    	var valid = validateInt(value, "Max. Peptides", minPept);
+    	if(!valid)	return false;
+    }
+    
+    
+    
+    // unique peptides
+    value = $("form#filterForm input[@name='minUniquePeptides']").fieldValue();
     valid = validateInt(value, "Min. Unique Peptides", 0, minPept);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minUniquePeptides]').val(parseInt(value));
+    var minUniqPept = parseInt(value);
     
-    value = $('form#filterForm input[@name=minCoverage]').fieldValue();
+    value = $("form#filterForm input[@name='maxUniquePeptides']").fieldValue();
+    if(!isNaN(parseInt(value))) {
+    	valid = validateInt(value, "Max. Unique Peptides", minUniqPept);
+    	if(!valid)	return false;
+    }
+    
+    
+    // coverage
+    value = $("form#filterForm input[@name='minCoverage']").fieldValue();
     valid = validateFloat(value, "Min. Coverage", 0.0, 100.0);
     if(!valid)	return false;
+    var minCoverage = parseFloat(value);
     
-    value = $('form#filterForm input[@name=minSpectrumMatches]').fieldValue();
+    value = $("form#filterForm input[@name='maxCoverage']").fieldValue();
+    valid = validateFloat(value, "Max. Coverage", minCoverage, 100.0);
+    if(!valid)	return false;
+    
+    
+    // spectrum matches
+    value = $("form#filterForm input[@name='minSpectrumMatches']").fieldValue();
     valid = validateInt(value, "Min. Spectrum Matches", 1);
     if(!valid)	return false;
-    $('form#filterForm input[@name=minSpectrumMatches]').val(parseInt(value));
+    var minSpecMatch = parseInt(value);
+    
+    value = $("form#filterForm input[@name='maxSpectrumMatches']").fieldValue();
+    if(!isNaN(parseFloat(value))) {
+    	valid = validateInt(value, "Max. Spectrum Matches", minSpecMatch);
+    	if(!valid)	return false;
+    }
+
+	// probability
+    value = $("form#filterForm input[@name='minProbability']").fieldValue();
+    valid = validateFloat(value, "Min. Probability", 0.0, 1.0);
+    if(!valid)	return false;
+    var minProb = parseFloat(value);
+    
+    value = $("form#filterForm input[@name='maxProbability']").fieldValue();
+    valid = validateFloat(value, "Max. Probability", minProb, 1.0);
+    if(!valid)	return false;
     
     return true;
 }
@@ -700,7 +740,6 @@ function refreshProteinList(responseText) {
 	}
 	else {
 		alert("Got stale Protein Inference ID. Please refresh the page.");
-		document.loca
 	}
 	//setupProteinListTable();
 }

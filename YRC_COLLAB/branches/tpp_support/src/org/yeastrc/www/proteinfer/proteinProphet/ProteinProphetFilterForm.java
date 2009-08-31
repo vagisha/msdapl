@@ -3,11 +3,10 @@ package org.yeastrc.www.proteinfer.proteinProphet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.yeastrc.bio.go.GOUtils;
-import org.yeastrc.www.proteinfer.ProteinInferFilterForm;
 
-public class ProteinProphetFilterForm extends ProteinInferFilterForm {
+public class ProteinProphetFilterForm extends ActionForm {
 
     private int pinferId;
     
@@ -20,34 +19,29 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
     private String minSpectrumMatches = "1";
     private String maxSpectrumMatches;
     
-    private boolean joinGroupProteins = true;
+    private boolean joinProphetGroupProteins = true;
     private boolean showAllProteins = true;
-    private boolean collapseGroups = false; // Used for downloads only
-    private boolean printPeptides = false; // Used for downloads only
     
     private String accessionLike = null;
     private String descriptionLike = null;
     private String[] validationStatus = new String[]{"All"};
     
-    private int goAspect = GOUtils.BIOLOGICAL_PROCESS;  // Used for GO enrichment only
-    private int speciesId;
-    private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
     
-    
-    private boolean showProteinProphetGroups = true;
-    private double minProbablity;
+    private String minProbability = "0.0";
+    private String maxProbability = "1.0";
     
     public ProteinProphetFilterForm () {}
     
     public void reset() {
-        super.reset();
         minCoverage = "0.0";
         minPeptides = "1";
         minUniquePeptides = "0";
         minSpectrumMatches = "1";
-        joinGroupProteins = true;
+        joinProphetGroupProteins = true;
         showAllProteins = true;
         accessionLike = null;
+        minProbability = "0.0";
+        maxProbability = "1.0";
     }
     
     /**
@@ -70,6 +64,34 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
         this.pinferId = pinferId;
     }
 
+    // MIN PROBABILITY
+    public String getMinProbability() {
+        return minProbability;
+    }
+    public double getMinProbabilityDouble() {
+        if(minProbability == null || minProbability.trim().length() == 0)
+            return 0.0;
+        else
+            return Double.parseDouble(minProbability);
+    }
+    public void setMinProbability(String minProbability) {
+        this.minProbability = minProbability;
+    }
+    
+    // MAX PROBABILITY
+    public String getMaxProbability() {
+        return maxProbability;
+    }
+    public double getMaxProbabilityDouble() {
+        if(maxProbability == null || maxProbability.trim().length() == 0)
+            return 100.0;
+        else
+            return Double.parseDouble(maxProbability);
+    }
+    public void setMaxProbability(String maxProbability) {
+        this.maxProbability = maxProbability;
+    }
+    
     // MIN COVERAGE
     public String getMinCoverage() {
         return minCoverage;
@@ -180,12 +202,12 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
     }
 
 
-    public boolean isJoinGroupProteins() {
-        return joinGroupProteins;
+    public boolean isJoinProphetGroupProteins() {
+        return joinProphetGroupProteins;
     }
 
-    public void setJoinGroupProteins(boolean joinGroupProteins) {
-        this.joinGroupProteins = joinGroupProteins;
+    public void setJoinProphetGroupProteins(boolean joinGroupProteins) {
+        this.joinProphetGroupProteins = joinGroupProteins;
     }
 
     public boolean isShowAllProteins() {
@@ -251,48 +273,5 @@ public class ProteinProphetFilterForm extends ProteinInferFilterForm {
         if(buf.length() > 0)
             buf.deleteCharAt(0);
         return buf.toString();
-    }
-
-    public boolean isCollapseGroups() {
-        return collapseGroups;
-    }
-
-    public void setCollapseGroups(boolean collapseGroups) {
-        this.collapseGroups = collapseGroups;
-    }
-
-    public boolean isPrintPeptides() {
-        return printPeptides;
-    }
-
-    public void setPrintPeptides(boolean printPeptides) {
-        this.printPeptides = printPeptides;
-    }
-   
-    //-----------------------------------------------------------------------------
-    // GO Enrichment
-    //-----------------------------------------------------------------------------
-    public int getGoAspect() {
-        return goAspect;
-    }
-
-    public void setGoAspect(int goAspect) {
-        this.goAspect = goAspect;
-    }
-
-    public String getGoEnrichmentPVal() {
-        return goEnrichmentPVal;
-    }
-
-    public void setGoEnrichmentPVal(String goEnrichmentPVal) {
-        this.goEnrichmentPVal = goEnrichmentPVal;
-    }
-
-    public int getSpeciesId() {
-        return speciesId;
-    }
-
-    public void setSpeciesId(int speciesId) {
-        this.speciesId = speciesId;
     }
 }
