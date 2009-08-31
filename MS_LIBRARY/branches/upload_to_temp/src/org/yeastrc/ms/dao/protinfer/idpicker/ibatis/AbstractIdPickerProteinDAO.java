@@ -22,7 +22,7 @@ import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinUserValidation;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY;
+import org.yeastrc.ms.domain.protinfer.SORT_BY;
 import org.yeastrc.ms.domain.protinfer.idpicker.GenericIdPickerProtein;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -702,7 +702,7 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
             return getCommonIds(ids_spec_count, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_uniq_pept);
+            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status);
             return getCommonIds(ids_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT) {

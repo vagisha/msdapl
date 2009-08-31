@@ -14,49 +14,6 @@ import java.util.List;
  */
 public class ProteinFilterCriteria {
 
-    public static enum SORT_BY {
-        NUM_PEPT, 
-        NUM_UNIQ_PEPT, 
-        ACCESSION, 
-        COVERAGE, 
-        NUM_SPECTRA, 
-        GROUP_ID,
-        CLUSTER_ID,
-        VALIDATION_STATUS,
-        NSAF,
-        NONE;
-        
-        public static SORT_BY getSortByForString(String sortBy) {
-            if(sortBy == null)
-                return NONE;
-            else if (sortBy.equalsIgnoreCase(NUM_PEPT.name())) return NUM_PEPT;
-            else if (sortBy.equalsIgnoreCase(NUM_UNIQ_PEPT.name())) return NUM_UNIQ_PEPT;
-            else if (sortBy.equalsIgnoreCase(ACCESSION.name())) return ACCESSION;
-            else if (sortBy.equalsIgnoreCase(COVERAGE.name())) return COVERAGE;
-            else if (sortBy.equalsIgnoreCase(NUM_SPECTRA.name())) return NUM_SPECTRA;
-            else if (sortBy.equalsIgnoreCase(GROUP_ID.name())) return GROUP_ID;
-            else if (sortBy.equalsIgnoreCase(CLUSTER_ID.name())) return CLUSTER_ID;
-            else if (sortBy.equalsIgnoreCase(VALIDATION_STATUS.name())) return VALIDATION_STATUS;
-            else if (sortBy.equalsIgnoreCase(NSAF.name())) return NSAF;
-            else    return NONE;
-            
-        }
-        
-        public static SORT_BY defaultSortBy() {
-            return COVERAGE;
-        }
-    }
-        
-      public static enum SORT_ORDER {ASC, DESC;
-          public static SORT_ORDER getSortByForString(String sortOrder) {
-              if(sortOrder == null || sortOrder.equalsIgnoreCase("ASC")) return ASC;
-              else return DESC;
-          }
-          public static SORT_ORDER defaultSortOrder() {
-              return DESC;
-          }
-      }
-    
     private int numPeptides;
     private int numMaxPeptides;
     private int numUniquePeptides;
@@ -92,7 +49,15 @@ public class ProteinFilterCriteria {
     public SORT_BY getSortBy() {
         return sortBy;
     }
-
+    
+    public static SORT_BY defaultSortBy() {
+        return SORT_BY.COVERAGE;
+    }
+    
+    public static SORT_ORDER defaultSortOrder() {
+        return SORT_ORDER.DESC;
+    }
+    
     public void setSortBy(SORT_BY sortBy) {
         this.sortBy = sortBy;
     }

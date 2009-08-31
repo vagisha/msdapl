@@ -25,4 +25,8 @@ public class ProteinProphetProteinGroupDAO extends BaseSqlMapDAO {
     public int saveGroup(ProteinProphetGroup group) {
         return super.saveAndReturnId(sqlMapNameSpace+".insert", group);
     }
+    
+    public ProteinProphetGroup load(int proteinProphetGroupId) {
+        return (ProteinProphetGroup) super.queryForObject(sqlMapNameSpace+".select", proteinProphetGroupId);
+    }
 }
