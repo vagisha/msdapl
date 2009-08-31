@@ -541,7 +541,8 @@ public class MsDataUploader {
                     log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
                     return;
                 }
-                    
+                  
+                log.info("BEGINNING upload of search results"); 
                 try {
                     this.uploadedSearchId = exptUploader.uploadSearchData(this.uploadedExptId);
                 }
@@ -608,7 +609,7 @@ public class MsDataUploader {
                     return;
                 }
                 
-                
+                log.info("BEGINNING upload of sanalysis results");
                 try {
                     this.uploadedAnalysisId = exptUploader.uploadAnalysisData(this.uploadedSearchId);
                 }
@@ -646,6 +647,7 @@ public class MsDataUploader {
         
         // ----- UPLOAD PROTEIN INFERENCE DATA
         if(uploadProtinfer) {
+            log.info("BEGINNING upload of protein inference results");
             try {
                 exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisId);
             }
