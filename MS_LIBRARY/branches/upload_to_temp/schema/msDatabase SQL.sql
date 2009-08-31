@@ -583,6 +583,7 @@ ALTER TABLE ProteinProphetProtein ADD INDEX(proteinProphetGroupID);
 CREATE TABLE ProteinProphetProteinIon (
 	piProteinID INT UNSIGNED NOT NULL ,
 	piIonID INT UNSIGNED NOT NULL ,
+	weight DOUBLE UNSIGNED NOT NULL,
     initialProbability DOUBLE UNSIGNED NOT NULL,
     nspAdjProbability DOUBLE UNSIGNED NOT NULL,
     numSiblingPeptides DOUBLE UNSIGNED NOT NULL,

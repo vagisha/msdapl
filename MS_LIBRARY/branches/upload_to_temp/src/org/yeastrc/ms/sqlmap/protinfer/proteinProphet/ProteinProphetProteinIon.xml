@@ -12,6 +12,7 @@
 	
 	<resultMap class="ProteinProphetProteinIon" id="prophetProteinIonResult" extends="ProteinProphetProteinIon.prophetIonResult">
 		<result property="piProteinId" column="piProteinID" nullValue="0" />
+		<result property="weight" column="weight" nullValue="-1.0"/>
 		<result property="initialProbability" column="initialProbability" nullValue="-1.0"/>
 		<result property="nspAdjProbability" column="nspAdjProbability" nullValue="-1.0"/>
 		<result property="numSiblingPeptides" column="numSiblingPeptides" nullValue="-1.0"/>
@@ -21,6 +22,7 @@
 	<parameterMap class="ProteinProphetProteinIon" id="proteinIonParam">
 		<parameter property="piProteinId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="id" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="weight" jdbcType="DOUBLE" nullValue="-1.0" />
 		<parameter property="initialProbability" jdbcType="DOUBLE" nullValue="-1.0" />
 		<parameter property="nspAdjProbability" jdbcType="DOUBLE" nullValue="-1.0" />
 		<parameter property="numSiblingPeptides" jdbcType="DOUBLE" nullValue="-1.0" />
@@ -61,11 +63,12 @@
     	INSERT INTO ProteinProphetProteinIon (
     	piProteinID,
     	piIonID,
+    	weight,
     	initialProbability,
     	nspAdjProbability,
     	numSiblingPeptides,
     	isContributingEvidence)
-    	VALUES (?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?)
     	<selectKey resultClass="int">
       		select last_insert_id() as id
     	</selectKey>
