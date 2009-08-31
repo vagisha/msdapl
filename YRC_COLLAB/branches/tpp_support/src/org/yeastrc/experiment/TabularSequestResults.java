@@ -21,7 +21,7 @@ import org.yeastrc.www.misc.Tabular;
 public class TabularSequestResults implements Tabular, Pageable {
 
     
-    private static SORT_BY[] columns = new SORT_BY[] {
+    private SORT_BY[] columns = new SORT_BY[] {
         SORT_BY.FILE_SEARCH,
         SORT_BY.SCAN, 
         SORT_BY.CHARGE, 
@@ -38,6 +38,8 @@ public class TabularSequestResults implements Tabular, Pageable {
     private SORT_BY sortColumn;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
+    private boolean useEvalue;
+    
     private List<SequestResultPlus> results;
     
     private int currentPage;
@@ -45,10 +47,28 @@ public class TabularSequestResults implements Tabular, Pageable {
     private List<Integer> displayPageNumbers;
     
     
-    public TabularSequestResults(List<SequestResultPlus> results) {
+    public TabularSequestResults(List<SequestResultPlus> results, boolean useEvalue) {
         this.results = results;
         displayPageNumbers = new ArrayList<Integer>();
         displayPageNumbers.add(currentPage);
+        
+        this.useEvalue = useEvalue;
+        
+        if(useEvalue) {
+            columns = new SORT_BY[] {
+                    SORT_BY.FILE_SEARCH,
+                    SORT_BY.SCAN, 
+                    SORT_BY.CHARGE, 
+                    SORT_BY.MASS, 
+                    SORT_BY.RT, 
+                    SORT_BY.XCORR_RANK,
+                    SORT_BY.XCORR, 
+                    SORT_BY.DELTACN, 
+                    SORT_BY.EVAL, 
+                    SORT_BY.PEPTIDE,
+                    SORT_BY.PROTEIN
+                };
+        }
     }
     
     
@@ -116,7 +136,10 @@ public class TabularSequestResults implements Tabular, Pageable {
         row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getxCorrRank())));
         row.addCell(new TableCell(String.valueOf(round(result.getSequestResultData().getxCorr()))));
         row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getDeltaCN())));
-        row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getSp())));
+        if(useEvalue)
+            row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getEvalue())));
+        else
+            row.addCell(new TableCell(String.valueOf(result.getSequestResultData().getSp())));
         
         String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
         cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);

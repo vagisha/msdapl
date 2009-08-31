@@ -113,8 +113,9 @@ public class ViewSequestResults extends Action {
         int numResultsFiltered = 0;
 
 
-        MsSearch search = DAOFactory.instance().getMsSearchDAO().loadSearch(searchId);
-        program = search.getSearchProgram()+" "+search.getSearchProgramVersion();
+        MsSearch search = DAOFactory.instance().getSequestSearchDAO().loadSearch(searchId);
+        program = search.getSearchProgram().toString();
+        if(search.getSearchProgramVersion() != null) program = program+" "+search.getSearchProgramVersion();
         experimentId = search.getExperimentId();
         if(experimentId != 0) {
             // Get the project for this experiment
@@ -164,7 +165,8 @@ public class ViewSequestResults extends Action {
 
 
         // Set up for tabular display
-        TabularSequestResults tabResults = new TabularSequestResults(results);
+        boolean useEvalue = DAOFactory.instance().getSequestSearchDAO().hasEvalue(searchId);
+        TabularSequestResults tabResults = new TabularSequestResults(results, useEvalue);
         tabResults.setCurrentPage(pageNum);
         int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
         tabResults.setLastPage(pageCount);
