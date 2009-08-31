@@ -30,4 +30,10 @@ public interface SequestSearchDAO extends GenericSearchDAO <SequestSearchIn, Seq
      * @return
      */
     public abstract MassType getFragmentMassType(int searchId);
+    
+    /**
+     * Returns true if the value of print_expect_score is 1
+     * @return
+     */
+    public abstract boolean hasEvalue(int searchId);
 }

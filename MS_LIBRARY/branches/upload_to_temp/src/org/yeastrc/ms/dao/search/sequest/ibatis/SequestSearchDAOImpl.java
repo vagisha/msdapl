@@ -85,6 +85,16 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
     }
     
     @Override
+    public boolean hasEvalue(int searchId) {
+        String val = getSearchParamValue(searchId, "print_expect_score");
+        if(val == null) return false;
+        try {
+            return Integer.parseInt(val) == 1;
+        }
+        catch(NumberFormatException e) {return false;}
+    }
+    
+    @Override
     public int updateSearchProgramVersion(int searchId,
             String versionStr) {
         return searchDao.updateSearchProgramVersion(searchId, versionStr);
@@ -123,5 +133,6 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
             return param.getParamValue();
         }
     }
+    
    
 }
