@@ -82,6 +82,7 @@ public class MSJobFactory {
 			job.setTargetSpecies( rs.getInt( "targetSpecies" ) );
 			job.setComments( rs.getString( "comments" ) );
 			job.setRunID( rs.getInt( "runID" ) );
+			job.setExperimentID( rs.getInt( "experimentID" ) );
 			job.setGroup( rs.getInt( "groupID" ) );
 			job.setPipeline(rs.getString("pipeline"));
 			

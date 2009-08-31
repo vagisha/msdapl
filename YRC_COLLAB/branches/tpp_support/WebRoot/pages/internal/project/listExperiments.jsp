@@ -241,7 +241,7 @@ function clearSelectedProtInfer() {
 		
 		<logic:iterate name="experiments" id="experiment" scope="request">
 		
-		
+			<A HREF='#Expt<bean:write name="experiment" property="id"/>'></A> 
 			<div style="border:1px dotted gray;margin:5 5 5 5; padding:0 0 5 0;">
 			<div style="background-color:#ED9A2E;width:100%; margin:0; padding:3 0 3 0; color:white;" >
 				<span style="margin-left:10;" class="foldable fold-open" id="expt_fold_<bean:write name="experiment" property="id"/>" >

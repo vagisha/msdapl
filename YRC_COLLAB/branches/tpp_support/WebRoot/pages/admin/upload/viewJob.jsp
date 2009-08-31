@@ -50,7 +50,7 @@
 			<td width="20%" align="left" valign="top" class="left_align">Status:</td>
 			<td width="80%" align="left" valign="top" class="left_align">
 				<logic:equal name="job" property="status" value="4">
-					<bean:write name="job" property="statusDescription" /> <a href="<yrcwww:link path='viewYatesRun.do?'/>id=<bean:write name="job" property="runID" />"><span style="color:red;">[View Run]</span></a>
+					<bean:write name="job" property="statusDescription" /> <a href="<yrcwww:link path='viewProject.do?ID='/><bean:write name="job" property="projectID" />#Expt<bean:write name="job" property="experimentID" />"><span style="color:red;">[View Experiment]</span></a>
 				</logic:equal>
 				<logic:notEqual name="job" property="status" value="4"><!-- not completed -->
 					<bean:write name="job" property="statusDescription" />

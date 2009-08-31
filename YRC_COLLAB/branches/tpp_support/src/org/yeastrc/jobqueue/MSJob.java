@@ -24,6 +24,7 @@ public class MSJob extends Job {
 	private int targetSpecies;
 	private String comments;
 	private int runID;
+	private int experimentID;
 	private int group;
 	private Project project;
 	private Pipeline pipeline;
@@ -128,6 +129,20 @@ public class MSJob extends Job {
 	public void setRunID(int runID) {
 		this.runID = runID;
 	}
+	
+	/**
+     * @return the experimentID
+     */
+    public int getExperimentID() {
+        return experimentID;
+    }
+    /**
+     * @param experimentID the experimentID to set
+     */
+    public void setExperimentID(int experimentID) {
+        this.experimentID = experimentID;
+    }
+    
 	/**
 	 * @return the serverDirectory
 	 */
