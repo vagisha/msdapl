@@ -20,7 +20,7 @@ public class FileUtils {
 
     private FileUtils() {}
 
-    public static void copyFile (File src, File dest) throws IOException {
+    public static void copyFile (File src, File dest) throws IOException  {
 
         InputStream in = null;
         OutputStream out = null;
@@ -36,8 +36,18 @@ public class FileUtils {
             }
         }
         finally {
-            in.close();
-            out.close();
+            if(in != null) try {
+                in.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(out != null) try {
+                out.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
     
