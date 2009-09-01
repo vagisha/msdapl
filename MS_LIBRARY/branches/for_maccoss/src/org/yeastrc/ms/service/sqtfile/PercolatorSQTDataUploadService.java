@@ -219,7 +219,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         catch(UploadException e) {
             e.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...\n");
             log.error(e.getMessage(), e);
-            deleteAnalysis(searchId);
+            deleteAnalysis(analysisId);
             numAnalysisUploaded = 0;
             throw e;
         }
