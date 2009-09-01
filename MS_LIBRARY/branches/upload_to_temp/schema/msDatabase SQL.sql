@@ -67,6 +67,7 @@ CREATE TABLE msScan (
 );
 ALTER TABLE msScan ADD INDEX(runID);
 ALTER TABLE msScan ADD INDEX(startScanNumber);
+ALTER TABLE msScan ADD INDEX(runID, startScanNumber);
 
 CREATE TABLE msScanData (
    scanID INT UNSIGNED NOT NULL PRIMARY KEY,
@@ -196,8 +197,9 @@ CREATE TABLE msRunSearchResult (
 
 ALTER TABLE msRunSearchResult ADD INDEX(runSearchID);
 ALTER TABLE msRunSearchResult ADD INDEX(scanID);
-ALTER TABLE msRunSearchResult ADD INDEX(charge);
+# ALTER TABLE msRunSearchResult ADD INDEX(charge);
 ALTER TABLE msRunSearchResult ADD INDEX(peptide(10));
+alter table msRunSearchResult add index (runSearchID, scanID);
 # DO I WANT ALL THESE INDICES?
 
 CREATE TABLE msProteinMatch (
@@ -222,7 +224,7 @@ CREATE TABLE SQTSpectrumData (
 );
 ALTER TABLE SQTSpectrumData ADD PRIMARY KEY(scanID, runSearchID, charge);
 ALTER TABLE SQTSpectrumData ADD INDEX (runSearchID);
-ALTER TABLE SQTSpectrumData ADD INDEX (charge);
+# ALTER TABLE SQTSpectrumData ADD INDEX (charge);
 
 CREATE TABLE SQTFileHeader (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
