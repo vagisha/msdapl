@@ -704,14 +704,12 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             PercolatorSQTFileReader provider = new PercolatorSQTFileReader();
             try {
                 provider.open(filePath, searchProgram);
-                provider.setDynamicResidueMods(this.dynaResidueMods);
-                provider.setDynamicTerminalMods(this.dynaTermMods);
             }
             catch (DataProviderException e) {
+                provider.close();
                 log.error("Error opening PercolatorSQTFileReader", e);
                 return Integer.MAX_VALUE;
             }
-            finally {provider.close();}
              
             try {
                 SQTRunSearchIn search = provider.getSearchHeader();

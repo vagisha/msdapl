@@ -29,7 +29,7 @@ public class FileUtils {
             out = new FileOutputStream(dest);
 
             // Transfer bytes from in to out
-            byte[] buf = new byte[2048];
+            byte[] buf = new byte[4096];
             int len;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
@@ -38,6 +38,17 @@ public class FileUtils {
         finally {
             in.close();
             out.close();
+        }
+    }
+    
+    public static void deleteFile(File file) {
+        if(file.isDirectory()) {
+            File[] files = file.listFiles();
+            for(File f: files)
+                deleteFile(f);
+        }
+        else {
+            file.delete();
         }
     }
 }

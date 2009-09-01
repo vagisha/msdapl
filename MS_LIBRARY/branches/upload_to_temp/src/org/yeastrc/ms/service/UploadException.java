@@ -22,6 +22,8 @@ public class UploadException extends Exception {
         PREUPLOAD_CHECK_FALIED  ("Pre-upload check failed", ERROR),
         GENERAL                 ("", WARN),
         
+        SQT_BACKUP_ERROR            ("SQT backup error", WARN),
+        
         EXPT_NOT_FOUND          ("Experiment not found in the database", ERROR),
         DIRECTORY_NOT_FOUND     ("Directory not found.", ERROR),
         EMPTY_DIRECTORY         ("No files found to upload.", ERROR),

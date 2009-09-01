@@ -7,6 +7,7 @@
 package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,11 +30,13 @@ import org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestSQTFileReader;
+import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchResultUploadDAO;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchUploadDAO;
+import org.yeastrc.ms.util.FileUtils;
 
 /**
  * 
@@ -392,6 +395,58 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
 
     @Override
     protected void copyFiles(int experimentId) throws UploadException {
-        // TODO Auto-generated method stub
+        
+        String backupDir = MsDataUploadProperties.getBackupDirectory();
+        if(!new File(backupDir).exists()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Backup directory: "+backupDir+" does not exist");
+            throw ex;
+        }
+        // create a directory for the experiment
+        String exptDir = backupDir+File.separator+experimentId;
+        if(new File(exptDir).exists()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Experiment backup directory: "+exptDir+" already exists");
+            throw ex;
+        }
+        if(!new File(exptDir).mkdir()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Could not create directory: "+exptDir);
+            throw ex;
+        }
+        // copy sqt files from the data directory
+        for(String file: getFileNames()) {
+             File src = new File(getDataDirectory()+File.separator+file);
+             File dest = new File(exptDir+File.separator+file);
+             try {
+                FileUtils.copyFile(src, dest);
+            }
+            catch (IOException e) {
+                UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+                ex.appendErrorMessage("Could not copy file: "+getDataDirectory()+File.separator+file);
+                throw ex;
+            }
+        }
+        
+        // create a decoy directory
+        String decoyDir = exptDir+File.separator+"decoy";
+        if(!new File(decoyDir).mkdir()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Could not create decoy directory: "+decoyDir);
+            throw ex;
+        }
+        // copy sqt files from the decoy directory
+        for(String file: getFileNames()) {
+            File src = new File(getDecoyDirectory()+File.separator+file);
+            File dest = new File(decoyDir+File.separator+file);
+            try {
+               FileUtils.copyFile(src, dest);
+           }
+           catch (IOException e) {
+               UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+               ex.appendErrorMessage("Could not copy file: "+getDataDirectory()+File.separator+file);
+               throw ex;
+           }
+       }
     }
 }
