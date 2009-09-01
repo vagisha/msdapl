@@ -11,11 +11,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.Program;
 
 import edu.uwpr.protinfer.ProgramParam.SCORE;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerInput;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerRun;
 import edu.uwpr.protinfer.filter.Filter;
 import edu.uwpr.protinfer.filter.FilterException;
 import edu.uwpr.protinfer.filter.fdr.FdrCalculatorException;

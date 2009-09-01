@@ -9,9 +9,10 @@ package edu.uwpr.protinfer.idpicker;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.uwpr.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
+import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam;
+
 import edu.uwpr.protinfer.ProgramParam.SCORE;
-import edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam;
 
 /**
  * 
