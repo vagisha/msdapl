@@ -9,6 +9,8 @@ import org.yeastrc.ms.domain.search.MsModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.service.ModifiedSequenceBuilder;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.ms.util.AminoAcidUtils;
 
 public class SearchResultPeptideBean  implements MsSearchResultPeptide {
@@ -133,8 +135,9 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     /**
      * Returns the modified peptide sequence: e.g. PEP[80]TIDE
      * @return
+     * @throws ModifiedSequenceBuilderException 
      */
-    public String getModifiedPeptide() {
+    public String getModifiedPeptide() throws ModifiedSequenceBuilderException {
         
         if (modifiedSequence != null)
             return modifiedSequence;
@@ -144,22 +147,25 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
             modifiedSequence = String.valueOf(sequence);
         }
         else {
-            String origseq = String.valueOf(sequence);
-            int lastIdx = 0;
-            StringBuilder seq = new StringBuilder();
-            sortDynaResidueModifications();
-            for (MsResultResidueMod mod: dynaResidueMods) {
-                seq.append(origseq.subSequence(lastIdx, mod.getModifiedPosition()+1)); // get sequence up to an including the modified position.
-                seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
-                        AminoAcidUtils.avgMass(origseq.charAt(mod.getModifiedPosition())))+"]");
-                
-                lastIdx = mod.getModifiedPosition()+1;
-            }
-            if (lastIdx < origseq.length())
-                seq.append(origseq.subSequence(lastIdx, origseq.length()));
             
-            modifiedSequence = seq.toString();
-//            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
+            String origseq = String.valueOf(sequence);
+            modifiedSequence = ModifiedSequenceBuilder.build(origseq, dynaResidueMods);
+            
+//            int lastIdx = 0;
+//            StringBuilder seq = new StringBuilder();
+//            sortDynaResidueModifications();
+//            for (MsResultResidueMod mod: dynaResidueMods) {
+//                seq.append(origseq.subSequence(lastIdx, mod.getModifiedPosition()+1)); // get sequence up to an including the modified position.
+//                seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
+//                        AminoAcidUtils.avgMass(origseq.charAt(mod.getModifiedPosition())))+"]");
+//                
+//                lastIdx = mod.getModifiedPosition()+1;
+//            }
+//            if (lastIdx < origseq.length())
+//                seq.append(origseq.subSequence(lastIdx, origseq.length()));
+//            
+//            modifiedSequence = seq.toString();
+////            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
         }
         
         return modifiedSequence;
@@ -173,7 +179,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
     }
 
     @Override
-    public String getFullModifiedPeptide() {
+    public String getFullModifiedPeptide() throws ModifiedSequenceBuilderException {
         String pept = getModifiedPeptide();
         return preResidue+"."+pept+"."+postResidue;
     }

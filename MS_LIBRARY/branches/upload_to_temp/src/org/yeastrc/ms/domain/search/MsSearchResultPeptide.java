@@ -8,6 +8,8 @@ package org.yeastrc.ms.domain.search;
 
 import java.util.List;
 
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+
 
 /**
  * 
@@ -32,14 +34,16 @@ public interface MsSearchResultPeptide {
     /**
      * Returns the modified peptide sequence: e.g. PEP[80]TIDE
      * @return
+     * @throws ModifiedSequenceBuilderException 
      */
-    public abstract String getModifiedPeptide();
+    public abstract String getModifiedPeptide() throws ModifiedSequenceBuilderException;
     
     /**
      * Returns the modified peptide along with the pre and post residues
      * @return
+     * @throws ModifiedSequenceBuilderException 
      */
-    public abstract String getFullModifiedPeptide();
+    public abstract String getFullModifiedPeptide() throws ModifiedSequenceBuilderException;
     
     /**
      * Returns the modified peptide in a program specific format

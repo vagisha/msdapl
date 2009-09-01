@@ -151,13 +151,13 @@ public class ProteinInferenceProgram {
             
             ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
                     "qval_percolator", "Max. q-value", 
-                    "0.05", null,
+                    "0.01", null,
                     "Qvalue threshold for filtering search hits");
             qvalParam.setValidator(validator);
             
             ProgramParam pepParam = new ProgramParam(TYPE.DOUBLE, 
                     "pep_percolator", "Max. PEP", 
-                    "0.05", null,
+                    "1.0", null,
                     "Posterior Error Probability threshold for filtering search hits");
                 pepParam.setValidator(validator);
             
@@ -185,7 +185,7 @@ public class ProteinInferenceProgram {
             
             ProgramParam qvalParam = new ProgramParam(TYPE.DOUBLE, 
                     "qval_percolator", "Max. q-value", 
-                    "0.05", null,
+                    "0.01", null,
                     "Qvalue threshold for filtering search hits");
             qvalParam.setValidator(qValValidator);
             
