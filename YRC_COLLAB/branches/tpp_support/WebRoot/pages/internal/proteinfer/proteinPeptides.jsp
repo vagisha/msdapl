@@ -50,12 +50,18 @@
      		<th class="sort-float" align="left">DS</th>
      	</logic:present>
      </logic:equal>
+     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTEIN_PROPHET.name()%>">
+     	<th class="sort-float" align="left">nsp</th>
+     	<th class="sort-float" align="left">Wt.</th>
+     	<th class="sort-float" align="left">Init.Prob.</th>
+     	<th class="sort-float" align="left">nsp adj. Prob.</th>
+     </logic:equal>
      <logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
-     	<th class="sort-float" align="left">Probability</th>
-     	<th class="sort-float" align="left">FVal</th>
+     	<!-- <th class="sort-float" align="left">Probability</th> -->
      	<th class="sort-float" align="left">NET</th>
      	<th class="sort-float" align="left">NMC</th>
      	<th class="sort-float" align="left">Mass Diff.</th>
+     	<th class="sort-float" align="left">FVal</th>
      </logic:equal>
      
      <th align="left">Spectrum</th>
@@ -75,12 +81,12 @@
      		<td><bean:write name="ion" property="spectrumCount" /></td>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
-     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch"/>
      			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
      		</logic:equal>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_PLCID.name()%>">
-     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+     			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch"/>
      			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
      		</logic:equal>
      		
@@ -107,13 +113,21 @@
 	     		</logic:present>
      		</logic:equal>
      		
+     		
+     		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTEIN_PROPHET.name()%>">
+     			<bean:define name="ion" property="ion" id="prophetIon" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon"/>
+     		 	<td><bean:write name="prophetIon" property="numSiblingPeptides" /></td>
+     		 	<td><bean:write name="prophetIon" property="weight" /></td>
+	     		<td><bean:write name="prophetIon" property="initialProbability" /></td>
+	     		<td><bean:write name="prophetIon" property="nspAdjProbability" /></td>
+     		</logic:equal>
      		<logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_peptProphet" type="org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult"/>
-     		 	<td><bean:write name="psm_peptProphet" property="probabilityRounded" /></td>
-	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
+     		 	<!--  <td><bean:write name="psm_peptProphet" property="probabilityRounded" /></td> -->
 	     		<td><bean:write name="psm_peptProphet" property="numEnzymaticTermini" /></td>
 	     		<td><bean:write name="psm_peptProphet" property="numMissedCleavages" /></td>
 	     		<td><bean:write name="psm_peptProphet" property="massDifferenceRounded" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
      		</logic:equal>
      		 
      		<td><span style="text-decoration: underline; cursor: pointer;" 

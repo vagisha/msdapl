@@ -9,8 +9,7 @@ package org.yeastrc.www.proteinfer.proteinProphet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
-import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
+import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 
 /**
@@ -18,14 +17,14 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
  */
 public class WProteinProphetIon {
 
-    private GenericProteinferIon<? extends ProteinferSpectrumMatch> ion;
+    private ProteinProphetProteinPeptideIon ion;
     private MsSearchResult bestSpectrumMatch;
     private boolean uniqueToProteinGrp = false;
     
     private List<Character> ntermResidues = new ArrayList<Character>();
     private List<Character> cTermResidues = new ArrayList<Character>();
     
-    public WProteinProphetIon(GenericProteinferIon<? extends ProteinferSpectrumMatch> ion, MsSearchResult psm) {
+    public WProteinProphetIon(ProteinProphetProteinPeptideIon ion, MsSearchResult psm) {
         this.ion = ion;
         this.bestSpectrumMatch = psm;
     }
@@ -39,7 +38,7 @@ public class WProteinProphetIon {
         return bestSpectrumMatch.getScanId();
     }
 
-    public GenericProteinferIon<? extends ProteinferSpectrumMatch> getIon() {
+    public ProteinProphetProteinPeptideIon getIon() {
         return ion;
     }
     

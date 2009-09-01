@@ -373,8 +373,9 @@ public class ProteinProphetResultsLoader {
         
         List<WProteinProphetIon> ionList = new ArrayList<WProteinProphetIon>();
         
-        // get the id of one of the proteins in the group. All proteins in a group match the same peptides
-        int proteinId = ppProtDao.getProteinProphetGroupProteinIds(pinferId, pinferProteinGroupId).get(0);
+        // get the id of one of the proteins in the indistinguishable group. 
+        // All proteins in a group match the same peptides
+        int proteinId = ppProtDao.getProteinProphetIndistinguishableGroupProteinIds(pinferId, pinferProteinGroupId).get(0);
         
         ProteinferRun run = ppRunDao.loadProteinferRun(pinferId);
         
@@ -409,8 +410,7 @@ public class ProteinProphetResultsLoader {
         return ionList;
     }
     
-    private static <I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>>
-        WProteinProphetIon makeWProteinProphetIon(I ion, Program inputGenerator) {
+    private static WProteinProphetIon makeWProteinProphetIon(ProteinProphetProteinPeptideIon ion, Program inputGenerator) {
         
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
         MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
@@ -466,7 +466,7 @@ public class ProteinProphetResultsLoader {
                 List<ProteinProphetProteinPeptideIon> ions = peptide.getIonList();
                 sortIonList(ions);
                 for(ProteinProphetProteinPeptideIon ion: ions) {
-                    WProteinProphetIon wIon = makeWProteinProphetIonForProtein(ion, inputGenerator);
+                    WProteinProphetIon wIon = makeWProteinProphetIon(ion, inputGenerator);
                     for(int i = 0; i < termResidues[0].size(); i++) {
                         wIon.addTerminalResidues(termResidues[0].get(i), termResidues[1].get(i));
                     }
@@ -519,12 +519,6 @@ public class ProteinProphetResultsLoader {
         return nrprot.getPeptide().getSequenceString();
     }
     
-    private static <I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>>
-        WProteinProphetIon makeWProteinProphetIonForProtein(I ion, Program inputGenerator) {
-        ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
-        MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
-        return new WProteinProphetIon(ion, origResult);
-    }
 
   //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given sorting criteria
