@@ -303,6 +303,8 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
     }
     
     public boolean getHasProtInferResults() {
-        return dtaSelect != null || protInferRuns != null;
+        return dtaSelect != null || 
+        (protInferRuns != null && protInferRuns.size() > 0) ||
+        (prophetRuns != null && prophetRuns.size() > 0);
     }
 }
