@@ -287,13 +287,13 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
         };
     }
     
-    void uploadSearchResult(SequestSearchResultIn result, int runSearchId, int scanId) throws UploadException {
-        
-        int resultId = super.uploadBaseSearchResult(result, runSearchId, scanId);
-        
-        // upload the SQT sequest specific information for this result.
-        uploadSequestResultData(result.getSequestResultData(), resultId);
-    }
+//    void uploadSearchResult(SequestSearchResultIn result, int runSearchId, int scanId) throws UploadException {
+//        
+//        int resultId = super.uploadBaseSearchResult(result, runSearchId, scanId);
+//        
+//        // upload the SQT sequest specific information for this result.
+//        uploadSequestResultData(result.getSequestResultData(), resultId);
+//    }
     
     void uploadSearchResults(List<SequestSearchResultBean> results) throws UploadException {
         
@@ -396,57 +396,86 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
     @Override
     protected void copyFiles(int experimentId) throws UploadException {
         
+        log.info("Copying target and decoy SQT files");
+        
         String backupDir = MsDataUploadProperties.getBackupDirectory();
         if(!new File(backupDir).exists()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            UploadException ex = new UploadException(ERROR_CODE.SQT_BACKUP_ERROR);
             ex.appendErrorMessage("Backup directory: "+backupDir+" does not exist");
             throw ex;
         }
         // create a directory for the experiment
         String exptDir = backupDir+File.separator+experimentId;
-        if(new File(exptDir).exists()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.appendErrorMessage("Experiment backup directory: "+exptDir+" already exists");
+        createDirectory(exptDir);
+        
+        // backup SQT files searched with target database
+        backupTargetSqt(exptDir);
+        
+        // backup SQT files searched with decoy database
+        backupDecoySqt(exptDir);
+        
+    }
+    
+    private void createDirectory(String directory) throws UploadException {
+        if(new File(directory).exists()) {
+            UploadException ex = new UploadException(ERROR_CODE.SQT_BACKUP_ERROR);
+            ex.appendErrorMessage("Experiment backup directory: "+directory+" already exists");
             throw ex;
         }
-        if(!new File(exptDir).mkdir()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.appendErrorMessage("Could not create directory: "+exptDir);
+        if(!new File(directory).mkdir()) {
+            UploadException ex = new UploadException(ERROR_CODE.SQT_BACKUP_ERROR);
+            ex.appendErrorMessage("Could not create directory: "+directory);
             throw ex;
-        }
-        // copy sqt files from the data directory
+        } 
+    }
+    
+    private void backupTargetSqt(String exptDir) throws UploadException {
+        
+        String destDir = exptDir+File.separator+"sequest";
+        createDirectory(destDir);
+        String srcDir = getDataDirectory();
+        backupSqt(srcDir, destDir, exptDir);
+    }
+    
+    private void backupDecoySqt(String exptDir) throws UploadException {
+        String destDir = exptDir+File.separator+"sequest"+File.separator+"decoy";
+        createDirectory(destDir);
+        String srcDir = getDataDirectory()+File.separator+"decoy";
+        backupSqt(srcDir, destDir, exptDir);
+    }
+    
+    private void backupSqt(String srcDir, String destDir, String exptDir) throws UploadException {
+        // copy sqt files from the source to target directory
+        
         for(String file: getFileNames()) {
-             File src = new File(getDataDirectory()+File.separator+file);
-             File dest = new File(exptDir+File.separator+file);
+             File src = new File(srcDir+File.separator+file);
+             File dest = new File(destDir+File.separator+file);
              try {
                 FileUtils.copyFile(src, dest);
             }
             catch (IOException e) {
-                UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
-                ex.appendErrorMessage("Could not copy file: "+getDataDirectory()+File.separator+file);
+                log.error("Error copying file: "+src.getAbsolutePath());
+                deleteBackupDirectory(exptDir);
+                UploadException ex = new UploadException(ERROR_CODE.SQT_BACKUP_ERROR, e);
+                ex.appendErrorMessage("Error copying file: "+getDataDirectory()+File.separator+file);
                 throw ex;
             }
         }
-        
-        // create a decoy directory
-        String decoyDir = exptDir+File.separator+"decoy";
-        if(!new File(decoyDir).mkdir()) {
+    }
+    
+    private void deleteBackupDirectory(String experimentDir) throws UploadException {
+        File file = new File(experimentDir);
+        if(!file.exists()) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.appendErrorMessage("Could not create decoy directory: "+decoyDir);
+            ex.appendErrorMessage("Cannot delete backup experiment directory: "+experimentDir+". It does not exist");
             throw ex;
         }
-        // copy sqt files from the decoy directory
-        for(String file: getFileNames()) {
-            File src = new File(getDecoyDirectory()+File.separator+file);
-            File dest = new File(decoyDir+File.separator+file);
-            try {
-               FileUtils.copyFile(src, dest);
-           }
-           catch (IOException e) {
-               UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
-               ex.appendErrorMessage("Could not copy file: "+getDataDirectory()+File.separator+file);
-               throw ex;
-           }
-       }
+        log.info("Deleting backup experiment directory: "+experimentDir);
+        FileUtils.deleteFile(new File(experimentDir));
+        if(file.exists()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.appendErrorMessage("Backup experiment directory was not deleted: "+experimentDir);
+            throw ex;
+        }
     }
 }
