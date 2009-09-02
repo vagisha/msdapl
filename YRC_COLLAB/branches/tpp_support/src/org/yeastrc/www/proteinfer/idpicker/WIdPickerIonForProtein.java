@@ -6,6 +6,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 public class WIdPickerIonForProtein extends WIdPickerIon {
 
@@ -25,7 +26,13 @@ public class WIdPickerIonForProtein extends WIdPickerIon {
         
         if(getBestSpectrumMatch() == null)
             return null;
-        String seq = removeTerminalResidues(getBestSpectrumMatch().getResultPeptide().getModifiedPeptide());
+        String seq;
+        try {
+            seq = removeTerminalResidues(getBestSpectrumMatch().getResultPeptide().getModifiedPeptide());
+        }
+        catch (ModifiedSequenceBuilderException e) {
+            return null;
+        }
         seq = "."+seq+".";
         for(int i = 0; i < ntermResidues.size(); i++) {
             seq = "("+ntermResidues.get(i)+")"+seq+"("+cTermResidues.get(i)+")";

@@ -3,6 +3,7 @@ package org.yeastrc.www.proteinfer.idpicker;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 public class WIdPickerIon {
 
@@ -36,7 +37,12 @@ public class WIdPickerIon {
     }
     
     public String getIonSequence() {
-        return removeTerminalResidues(bestSpectrumMatch.getResultPeptide().getModifiedPeptide());
+        try {
+            return removeTerminalResidues(bestSpectrumMatch.getResultPeptide().getModifiedPeptide());
+        }
+        catch (ModifiedSequenceBuilderException e) {
+            return null;
+        }
     }
     
     public int getCharge() {

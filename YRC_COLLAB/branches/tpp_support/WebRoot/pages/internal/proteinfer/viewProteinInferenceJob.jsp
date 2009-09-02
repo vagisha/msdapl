@@ -56,12 +56,12 @@
 <td><bean:write name="pinferJob" property="comments"/></td>
 </yrcwww:colorrow>
 
-<bean:define name="program" id="program" type="edu.uwpr.protinfer.ProteinInferenceProgram"/>
+<bean:define name="program" id="program" type="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"/>
 <logic:present name="params">
 <yrcwww:colorrow scheme="project">
 <td colspan="2" align="center"><b>Parameters</b></td>
 </yrcwww:colorrow>
-<logic:iterate name="params" id="param" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam">
+<logic:iterate name="params" id="param" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerParam">
 <yrcwww:colorrow  scheme="project" repeat="true">
 	<td><%=program.getDisplayNameForParam(param.getName()) %></td>
 	<td><bean:write name="param" property="value"/></td>

@@ -2,6 +2,7 @@ package org.yeastrc.www.proteinfer.idpicker;
 
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 public class WIdPickerSpectrumMatch {
     
@@ -39,7 +40,12 @@ public class WIdPickerSpectrumMatch {
     }
 
     public String getModifiedSequence() {
-        return removeTerminalResidues(spectrumMatch.getResultPeptide().getModifiedPeptide());
+        try {
+            return removeTerminalResidues(spectrumMatch.getResultPeptide().getModifiedPeptide());
+        }
+        catch (ModifiedSequenceBuilderException e) {
+            return null;
+        }
     }
     
     private static String removeTerminalResidues(String peptide) {

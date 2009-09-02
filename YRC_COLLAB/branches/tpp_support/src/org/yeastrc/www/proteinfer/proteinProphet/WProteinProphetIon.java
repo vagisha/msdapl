@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetProteinPeptideIon;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 /**
  * 
@@ -58,7 +59,13 @@ public class WProteinProphetIon {
         
         if(getBestSpectrumMatch() == null)
             return null;
-        String seq = removeTerminalResidues(getBestSpectrumMatch().getResultPeptide().getModifiedPeptide());
+        String seq;
+        try {
+            seq = removeTerminalResidues(getBestSpectrumMatch().getResultPeptide().getModifiedPeptide());
+        }
+        catch (ModifiedSequenceBuilderException e) {
+            return null;
+        }
         if(ntermResidues.size() == 0 & cTermResidues.size() == 0)
             return seq;
         
