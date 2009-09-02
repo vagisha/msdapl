@@ -1,6 +1,6 @@
 
-<%@page import="org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_BY"%>
-<%@page import="org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria.SORT_ORDER"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.SORT_BY"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.SORT_ORDER"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
