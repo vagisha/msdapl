@@ -133,7 +133,7 @@ public final class ProgramParam {
         }
         
         public static ProgramParam makeMinPeptParam() {
-            ProgramParam param = new ProgramParam(TYPE.INTEGER, "minPept", "Min. Peptides", "2", null, 
+            ProgramParam param = new ProgramParam(TYPE.INTEGER, "minPept", "Min. Peptides", "1", null, 
                     "Minimum number of peptides required for a protein(group) to be included in the analysis.");
             IntegerValidator validator = new IntegerValidator();
             validator.minVal = 0;
