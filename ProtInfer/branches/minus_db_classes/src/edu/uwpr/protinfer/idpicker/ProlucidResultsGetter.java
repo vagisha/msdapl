@@ -16,6 +16,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidResultData;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 import edu.uwpr.protinfer.ProgramParam.SCORE;
 import edu.uwpr.protinfer.infer.PeptideHit;
@@ -37,7 +38,8 @@ public class ProlucidResultsGetter extends SearchResultsGetter<ProlucidSearchRes
     }
 
 
-    PeptideSpectrumMatchIDP createPeptideSpectrumMatch(ProlucidSearchResult result, PeptideHit peptHit, SCORE scoreForFdr) {
+    PeptideSpectrumMatchIDP createPeptideSpectrumMatch(ProlucidSearchResult result, PeptideHit peptHit, SCORE scoreForFdr) 
+        throws ModifiedSequenceBuilderException {
 
         ProlucidResultData scores = result.getProlucidResultData();
 

@@ -9,6 +9,7 @@ package edu.uwpr.protinfer;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinferIon;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 /**
  * 
@@ -17,7 +18,7 @@ public class PeptideKeyCalculator {
 
     private PeptideKeyCalculator() {}
     
-    public static String getKey(MsSearchResult result, PeptideDefinition peptideDef) {
+    public static String getKey(MsSearchResult result, PeptideDefinition peptideDef) throws ModifiedSequenceBuilderException {
         String key = null;
         if(peptideDef.isUseMods()) {
             key = result.getResultPeptide().getModifiedPeptide();

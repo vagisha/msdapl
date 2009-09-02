@@ -15,6 +15,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.ProgramParam.SCORE;
@@ -43,14 +44,15 @@ public abstract class SearchResultsGetter <T extends MsSearchResult> implements 
     }
 
     @Override
-    public List<PeptideSpectrumMatchIDP> getResults(IdPickerRun run, IDPickerParams params) {
+    public List<PeptideSpectrumMatchIDP> getResults(IdPickerRun run, IDPickerParams params) 
+        throws ModifiedSequenceBuilderException {
         return getResults(run.getInputList(), run.getInputGenerator(), params);
     }
 
     @Override
     public List<PeptideSpectrumMatchIDP> getResults(
             List<IdPickerInput> inputList, Program inputGenerator,
-            IDPickerParams params) {
+            IDPickerParams params) throws ModifiedSequenceBuilderException {
 
         long start = System.currentTimeMillis();
 
@@ -106,7 +108,8 @@ public abstract class SearchResultsGetter <T extends MsSearchResult> implements 
         }
     }
 
-    private List<PeptideSpectrumMatchIDP> convertResults(List<T> resultList, IDPickerParams params) {
+    private List<PeptideSpectrumMatchIDP> convertResults(List<T> resultList, IDPickerParams params) 
+        throws ModifiedSequenceBuilderException {
 
         // make a list of peptide spectrum matches
         long s = System.currentTimeMillis();
@@ -215,5 +218,6 @@ public abstract class SearchResultsGetter <T extends MsSearchResult> implements 
     // --------------------------------------------------------------------------------------------------------------
     abstract List<T> getAllSearchResults(List<IdPickerInput> inputList, Program inputGenerator,  IDPickerParams params);
     
-    abstract PeptideSpectrumMatchIDP createPeptideSpectrumMatch(T result, PeptideHit peptHit, SCORE score);
+    abstract PeptideSpectrumMatchIDP createPeptideSpectrumMatch(T result, PeptideHit peptHit, SCORE score) 
+        throws ModifiedSequenceBuilderException;
 }

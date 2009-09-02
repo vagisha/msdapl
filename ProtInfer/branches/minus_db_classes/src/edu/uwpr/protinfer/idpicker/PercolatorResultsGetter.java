@@ -16,6 +16,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 import edu.uwpr.protinfer.PeptideKeyCalculator;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -52,9 +53,11 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
      * and for min peptide length and 
      * ranked by relevant score(s) for each peptide (as defined in the PeptideDefinition). 
      * Ambiguous spectra are filtered.
+     * @throws ModifiedSequenceBuilderException 
      */
     @Override
-    public  List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(IdPickerRun run, IDPickerParams params) {
+    public  List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(IdPickerRun run, IDPickerParams params) 
+        throws ModifiedSequenceBuilderException {
         
         return getResultsNoFdr(run.getInputList(), run.getInputGenerator(), params);
     }
@@ -62,7 +65,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     
     @Override
     public List<PeptideSpectrumMatchNoFDR> getResultsNoFdr(List<IdPickerInput> inputList, Program inputGenerator,
-            IDPickerParams params) {
+            IDPickerParams params) throws ModifiedSequenceBuilderException {
         
         long start = System.currentTimeMillis();
 
@@ -122,7 +125,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
     // Convert the list of PercolatorResult to a list of PeptideSpectrumMatchNoFDR 
     // Results are ranked for each peptide. 
     private List<PeptideSpectrumMatchNoFDR> rankAndConvertResults(IDPickerParams params, PercolatorParams percParams,
-            List<PercolatorResult> allResults) {
+            List<PercolatorResult> allResults) throws ModifiedSequenceBuilderException {
         
         long s = System.currentTimeMillis();
         // Rank the Percolator results

@@ -32,6 +32,7 @@ import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 
 import edu.uwpr.protinfer.infer.InferredProtein;
 import edu.uwpr.protinfer.infer.Peptide;
@@ -339,6 +340,7 @@ public class IdPickerResultSaver {
             String modseq = key.substring(0, key.lastIndexOf("_"));
 //            ion.setSequence(modseq);
             ion.setModificationStateId(modIds.get(modseq));
+            ion.setModifiedSequence(modseq);
             int ionId = ionDao.save(ion);
             
             // save all the spectra for this ion
@@ -365,7 +367,13 @@ public class IdPickerResultSaver {
         Map<String, Integer> ionIdMap = new HashMap<String, Integer>();
         for(ProteinferIon ion: ionList) {
             ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
-            String modPeptide = getModifiedPeptide(psm.getMsRunSearchResultId());
+            String modPeptide = null;
+            try {
+                modPeptide = getModifiedPeptide(psm.getMsRunSearchResultId());
+            }
+            catch (ModifiedSequenceBuilderException e) {
+                throw new RuntimeException("Error getting modified sequence", e);
+            }
             // modification state id
             Integer modStateId = modStateIdMap.get(modPeptide);
             if(modStateId == null) 
@@ -432,6 +440,7 @@ public class IdPickerResultSaver {
                 ion.setProteinferPeptideId(oldPeptide.getId());
                 ion.setCharge(psmList.get(0).getCharge());
                 ion.setModificationStateId(modStateIdMap.get(modseq));
+                ion.setModifiedSequence(modseq);
                 ionId = ionDao.save(ion);
             }
             // save all the spectra for this ion
@@ -532,7 +541,7 @@ public class IdPickerResultSaver {
     // ----------------------------------------------------------------------------------------------
     // Get modified peptide for a result
     // ----------------------------------------------------------------------------------------------
-    public String getModifiedPeptide (int resultId) {
+    public String getModifiedPeptide (int resultId) throws ModifiedSequenceBuilderException {
         MsSearchResult res = resDao.load(resultId);
         return res.getResultPeptide().getModifiedPeptide();
     }
