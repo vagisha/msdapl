@@ -1,5 +1,5 @@
 
-<%@page import="edu.uwpr.protinfer.database.dto.ProteinferInput.InputType"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>

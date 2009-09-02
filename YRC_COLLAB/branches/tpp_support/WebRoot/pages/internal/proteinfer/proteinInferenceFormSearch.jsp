@@ -1,10 +1,10 @@
 
 <%@page import="org.yeastrc.www.proteinfer.ProteinInferenceForm"%>
-<%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
-<%@page import="edu.uwpr.protinfer.ProgramParam"%>
-<%@page import="edu.uwpr.protinfer.ProgramParam.TYPE"%>
-<%@page import="edu.uwpr.protinfer.ProgramParam.DoubleValidator"%>
-<%@page import="edu.uwpr.protinfer.ProgramParam.IntegerValidator"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.TYPE"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.DoubleValidator"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProgramParam.IntegerValidator"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>

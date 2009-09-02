@@ -1,5 +1,5 @@
-<%@page import="edu.uwpr.protinfer.ProteinInferenceProgram"%>
 <%@page import="org.yeastrc.ms.domain.search.Program"%>
+<%@page import="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -41,12 +41,12 @@
      		<td><bean:write name="psm" property="spectrumMatch.charge" /></td>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
-     			<bean:define name="psm" property="proteinferSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+     			<bean:define name="psm" property="proteinferSpectrumMatch" id="psm_idp" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch"/>
      			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
      		</logic:equal>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_PLCID.name()%>">
-     			<bean:define name="psm" property="proteinferSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
+     			<bean:define name="psm" property="proteinferSpectrumMatch" id="psm_idp" type="org.yeastrc.ms.domain.protinfer.idpicker.IdPickerSpectrumMatch"/>
      			<td><bean:write name="psm_idp" property="fdrRounded" /></td>
      		</logic:equal>
      		
