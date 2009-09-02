@@ -151,6 +151,9 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         rows = new ArrayList<TableRow>(ms2Files.size());
         int colCount = columnCount();
         
+        FileComparator comparator = new FileComparator();
+        Collections.sort(ms2Files, comparator);
+        
         for(MsFile file: ms2Files) {
             TableRow row = new TableRow();
             TableCell cell = new TableCell(file.getFileName(), null);
@@ -159,7 +162,6 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             rows.add(row);
         }
         
-        FileComparator comparator = new FileComparator();
         
         if(ms1Files != null) {
             Collections.sort(ms1Files,comparator);
@@ -171,7 +173,6 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             }
         }
         
-        Collections.sort(ms2Files, comparator);
         int r = 0;
         for(MsFile file: ms2Files) {
             TableRow row = rows.get(r);

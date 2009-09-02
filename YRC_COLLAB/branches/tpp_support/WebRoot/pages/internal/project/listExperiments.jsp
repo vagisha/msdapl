@@ -400,7 +400,7 @@ function clearSelectedProtInfer() {
 				</div>
 			</logic:present>
 			
-			<logic:present name="experiment" property="proteinProphetRuns">
+			<logic:notEmpty name="experiment" property="proteinProphetRuns">
 				<div style="background-color: #FFFFF0; margin:5 5 5 5; padding:5; border: 1px dashed gray;" > 
 					<div><b>ProteinProphet Results</b></div> 
 					<table width="100%">
@@ -462,7 +462,7 @@ function clearSelectedProtInfer() {
 					</tbody>
 					</table>
 				</div>
-			</logic:present>
+			</logic:notEmpty>
 			
 			<logic:notEmpty name="experiment" property="protInferRuns">
 				<div style="background-color: #F0F8FF; margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
