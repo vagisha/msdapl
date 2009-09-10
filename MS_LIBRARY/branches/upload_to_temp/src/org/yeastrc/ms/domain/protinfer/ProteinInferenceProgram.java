@@ -21,6 +21,7 @@ public class ProteinInferenceProgram {
     public static final ProteinInferenceProgram PROTINFER_PERC = new PIPercolatorProgram();
     public static final ProteinInferenceProgram PROTINFER_PERC_OLD = new PIPercolatorProgramOld();
     public static final ProteinInferenceProgram PROTEIN_PROPHET = new ProteinProphetProgram();
+    public static final ProteinInferenceProgram DTA_SELECT = new DtaSelectProgram();
     
     
     private ProteinInferenceProgram(String name, String displayName, String version) {
@@ -216,6 +217,14 @@ public class ProteinInferenceProgram {
         private ProteinProphetProgram() {
             super("ProteinProphet", "ProteinProphet", "unknown");
             this.setDescription("ProteinProphet");
+        }
+    }
+    
+    static class DtaSelectProgram extends ProteinInferenceProgram {
+        
+        private DtaSelectProgram() {
+            super("DTASelect", "DTASelect", "unknown");
+            this.setDescription("DTASelect");
         }
     }
         

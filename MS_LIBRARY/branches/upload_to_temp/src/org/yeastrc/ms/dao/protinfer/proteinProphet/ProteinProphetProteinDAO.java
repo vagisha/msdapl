@@ -89,6 +89,13 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         return protDao.getNrseqIdsForRun(proteinferId);
     }
 
+    public  List<Integer> getNrseqProteinIds(int pinferId, boolean isParsimonious) {
+        if(isParsimonious)
+            return getNrseqProteinIds(pinferId, isParsimonious, false); // return only parsimonious
+        else
+            return getNrseqIdsForRun(pinferId); // return parsimonious and non-parsimonious
+    }
+    
     public List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious) {
         Map<String, Number> map = new HashMap<String, Number>(4);
         map.put("pinferId", pinferId);
@@ -197,7 +204,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
                                             filterCriteria.getPeptideDefinition(),
                                             sort, 
                                             filterCriteria.isGroupProteins(), 
-                                            filterCriteria.showParsimonious()
+                                            filterCriteria.parsimoniousOnly()
                                             );
         
         // Get a list of protein ids filtered by UNIQUE peptide count
@@ -215,7 +222,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
                                                filterCriteria.getPeptideDefinition(),
                                                sort,
                                                filterCriteria.isGroupProteins(),
-                                               filterCriteria.showParsimonious());
+                                               filterCriteria.parsimoniousOnly());
         }
         
         
@@ -272,9 +279,55 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         }
     }
     
-//    public List<Integer> sortProteinIdsByGroup(int pinferId) {
-//        return queryForList(sqlMapNameSpace+".proteinIdsByGroupId", pinferId);
-//    }
+    public List<Integer> getFilteredNrseqIds(int pinferId, ProteinProphetFilterCriteria filterCriteria) {
+        
+        // Get a list of protein ids filtered by sequence coverage
+        List<Integer> ids_cov = nrseqIdsByCoverage(pinferId, 
+                filterCriteria.getCoverage(), filterCriteria.getMaxCoverage());
+        
+        // Get a list of protein ids filtered by spectrum count
+        List<Integer> ids_spec_count = nrseqIdsBySpectrumCount(pinferId, 
+                filterCriteria.getNumSpectra(), filterCriteria.getNumMaxSpectra());
+        
+        // Get a list of protein ids filtered by peptide count
+        List<Integer> ids_pept = nrseqIdsByAllPeptideCount(pinferId, 
+                                            filterCriteria.getNumPeptides(), filterCriteria.getNumMaxPeptides(),
+                                            filterCriteria.getPeptideDefinition(),
+                                            filterCriteria.parsimoniousOnly()
+                                            );
+        
+        // Get a list of protein ids filtered by UNIQUE peptide count
+        List<Integer> ids_uniq_pept = null;
+        if(filterCriteria.getNumUniquePeptides() == 0  &&
+           filterCriteria.getNumMaxUniquePeptides() == Integer.MAX_VALUE) {
+            ids_uniq_pept = ids_pept;
+        }
+        else {
+            ids_uniq_pept = nrseqIdsByAllPeptideCount(pinferId, 
+                                               filterCriteria.getNumUniquePeptides(),
+                                               filterCriteria.getNumMaxUniquePeptides(),
+                                               filterCriteria.getPeptideDefinition(),
+                                               filterCriteria.parsimoniousOnly());
+        }
+        
+        
+        // If the user is filtering on validation status 
+        List<Integer> ids_validation_status = null;
+        if(filterCriteria.getValidationStatus().size() > 0) {
+            ids_validation_status = nrseqIdsByValidationStatus(pinferId, filterCriteria.getValidationStatus());
+        }
+        
+        // If the user is filtering on probability
+        List<Integer> ids_probability = null;
+        ids_probability = nrseqIdsByProbability(pinferId, 
+                filterCriteria.getMinProbability(), filterCriteria.getMaxProbability());
+        
+        
+        // get the set of common ids; 
+        Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, ids_probability);
+        return new ArrayList<Integer>(combineLists);
+    }
+    
     
     /**
      * List is sorted by the proteinProphetGrouID and groupID (indistinguishable group ID). 
@@ -296,7 +349,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
             double minProbability, double maxProbability,
             boolean sort, boolean groupProteins) {
         
-        // If we are NOT filtering anything AND NOT sorting on spectrum count just return all the protein Ids
+        // If we are NOT filtering anything AND NOT sorting on probability just return all the protein Ids
         // for this protein inference run
         if(minProbability == 0.0 && maxProbability == 1.0 && !sort) {
             return getProteinferProteinIds(pinferId, false);
@@ -315,6 +368,24 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         // proteins in an indistinguishable protein group will have the same probability
         else
             return queryForList(sqlMapNameSpace+".filterByProteinProbability", map);
+       
+    }
+    
+    private List<Integer> nrseqIdsByProbability(int pinferId, 
+            double minProbability, double maxProbability) {
+        
+        // If we are NOT filtering anything AND NOT sorting on spectrum count just return all the protein Ids
+        // for this protein inference run
+        if(minProbability == 0.0 && maxProbability == 1.0) {
+            return getNrseqIdsForRun(pinferId);
+        }
+        
+        Map<String, Number> map = new HashMap<String, Number>(10);
+        map.put("pinferId", pinferId);
+        map.put("minProbability", minProbability);
+        map.put("maxProbability", maxProbability);
+        
+        return queryForList(sqlMapNameSpace+".filterNrseqIdsByProteinProbability", map);
        
     }
     
@@ -444,6 +515,21 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         }
     }
     
+    private List<Integer> nrseqIdsByCoverage(int pinferId, 
+            double minCoverage, double maxCoverage) {
+        
+        if(minCoverage == 0 && maxCoverage == 100.0) {
+            return getNrseqIdsForRun(pinferId);
+        }
+        Map<String, Number> map = new HashMap<String, Number>(10);
+        map.put("pinferId", pinferId);
+        map.put("minCoverage", minCoverage);
+        map.put("maxCoverage", maxCoverage);
+        
+        return queryForList(sqlMapNameSpace+".filterNrseqIdsByCoverage", map);
+    }
+    
+    
     // -----------------------------------------------------------------------------------------------
     // SPECTRUM COUNT
     // -----------------------------------------------------------------------------------------------
@@ -451,6 +537,21 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         return proteinIdsBySpectrumCount(pinferId, 1, Integer.MAX_VALUE, true, groupProteins);
     }
     
+    private List<Integer> nrseqIdsBySpectrumCount(int pinferId, int minSpecCount, int maxSpecCount) {
+        
+        // If we are NOT filtering anything just return all the protein Ids
+        // for this protein inference run
+        if(minSpecCount <= 1 && maxSpecCount == Integer.MAX_VALUE) {
+            return getNrseqIdsForRun(pinferId); // get both parsimonious and non-parsimonious
+        }
+        
+        Map<String, Number> map = new HashMap<String, Number>(10);
+        map.put("pinferId", pinferId);
+        map.put("minSpectra", minSpecCount);
+        map.put("maxSpectra", maxSpecCount);
+        return queryForList(sqlMapNameSpace+".filterNrseqIdsBySpecCount", map);
+    }
+
     private List<Integer> proteinIdsBySpectrumCount(int pinferId, int minSpecCount, int maxSpecCount,
             boolean sort, boolean groupProteins) {
         
@@ -498,6 +599,22 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
                 peptDef, sort, groupProteins, isParsimonious, false);
     }
     
+    private List<Integer> nrseqIdsByUniquePeptideCount(int pinferId, 
+            int minUniqPeptideCount, int maxUniqPeptideCount, 
+            PeptideDefinition peptDef,boolean isParsimonious) {
+        return nrseqIdsByPeptideCount(pinferId, 
+                minUniqPeptideCount, maxUniqPeptideCount, 
+                peptDef, isParsimonious, true);
+    }
+    
+    private List<Integer> nrseqIdsByAllPeptideCount(int pinferId, 
+            int minUniqPeptideCount, int maxUniqPeptideCount,
+            PeptideDefinition peptDef, boolean isParsimonious) {
+        return nrseqIdsByPeptideCount(pinferId, 
+                minUniqPeptideCount, maxUniqPeptideCount,
+                peptDef, isParsimonious, false);
+    }
+    
     private List<Integer> proteinIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
             PeptideDefinition peptDef,
             boolean sort, boolean groupProteins, boolean isParsimonious, boolean uniqueToProtein) {
@@ -534,6 +651,40 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         return peptideIds;
     }
     
+    private List<Integer> nrseqIdsByPeptideCount(int pinferId, int minPeptideCount, int maxPeptideCount,
+            PeptideDefinition peptDef, boolean isParsimonious, boolean uniqueToProtein) {
+        
+        // If we are NOT filtering anything just return all the protein Ids
+        // for this protein inference run
+        if(!uniqueToProtein) {
+            if(minPeptideCount <= 1 && maxPeptideCount == Integer.MAX_VALUE) {
+                return getNrseqProteinIds(pinferId, isParsimonious);
+            }
+        }
+        else {
+            if(minPeptideCount <= 0 && maxPeptideCount == Integer.MAX_VALUE) {
+                return getNrseqProteinIds(pinferId, isParsimonious);
+            }
+        }
+        
+        Map<String, Number> map = new HashMap<String, Number>(12);
+        map.put("pinferId", pinferId);
+        map.put("minPeptides", minPeptideCount);
+        map.put("maxPeptides", maxPeptideCount);
+        if(uniqueToProtein) map.put("uniqueToProtein", 1);
+        if(isParsimonious)          map.put("isSubsumed", 0);
+        
+        
+        List<Integer> proteinIds = null;
+        // peptide uniquely defined by sequence, mods and charge (this is the only option
+        // used by ProteinProphet)
+        if(peptDef.isUseCharge() && peptDef.isUseMods()) {
+            proteinIds = queryForList(sqlMapNameSpace+".filterNrseqIdsByPeptideCount_SMC", map);
+        }
+        
+        return proteinIds;
+    }
+    
     
     // -----------------------------------------------------------------------------------------------
     // VALIDATION STATUS
@@ -556,6 +707,21 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         }
         if(sort)    map.put("sort", 1);
         return queryForList(sqlMapNameSpace+".filterByValidationStatus", map);
+    }
+    
+    private List<Integer> nrseqIdsByValidationStatus(int pinferId,
+            List<ProteinUserValidation> validationStatus) {
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        map.put("pinferId", pinferId);
+        if(validationStatus != null && validationStatus.size() > 0) {
+            String vs = "";
+            for(ProteinUserValidation v: validationStatus)
+                vs += ",\'"+v.getStatusChar()+"\'";
+            if(vs.length() > 0) vs = vs.substring(1); // remove first comma
+            vs = "("+vs+")";
+            map.put("validationStatus", vs);
+        }
+        return queryForList(sqlMapNameSpace+".filterNrseqIdsByValidationStatus", map);
     }
     
     

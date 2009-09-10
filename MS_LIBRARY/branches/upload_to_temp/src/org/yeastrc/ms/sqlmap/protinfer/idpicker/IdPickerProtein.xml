@@ -214,6 +214,15 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterNrseqIdsByCoverage" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT DISTINCT(nrseqProteinID) FROM msProteinInferProtein 
+    	WHERE piRunID=#pinferId#
+    	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY coverage ASC
+    	</isPropertyAvailable>
+    </select>
+    
     <select id="filterProteinGroupCoverage" 
     		resultClass="org.yeastrc.ms.dao.protinfer.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupCoverage" 
     		parameterClass="java.util.Map">
@@ -256,6 +265,14 @@
     		ORDER BY userValidation ASC
     	</isPropertyAvailable>
     </select>
+    
+    <select id="filterNrseqIdsByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT nrseqProteinID FROM msProteinInferProtein 
+    	WHERE piRunID=#pinferId#
+    	<isPropertyAvailable property="validationStatus">
+    		AND userValidation IN $validationStatus$
+    	</isPropertyAvailable>
+    </select>
 
     <select id="filterBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id, count(*) AS cnt 
@@ -279,6 +296,23 @@
 			</isPropertyAvailable>
     		ASC
     	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterNrseqIdsBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID, prot.id, count(*) AS cnt 
+    	FROM msProteinInferProtein AS prot, 
+    		 IDPickerProtein as idpProt,
+    	     msProteinInferProteinPeptideMatch AS m, 
+    		 msProteinInferPeptide AS pept, 
+    		 msProteinInferIon AS ion,
+    		 msProteinInferSpectrumMatch AS psm
+    	WHERE prot.id = idpProt.piProteinID
+    	AND idpProt.piProteinID = m.piProteinID
+    	AND m.piPeptideID = pept.id 
+    	AND pept.id = ion.piPeptideID 
+    	AND ion.id = psm.piIonID
+    	AND prot.piRunID = #pinferId# 
+    	GROUP BY prot.id HAVING cnt BETWEEN #minSpectra# AND #maxSpectra#
     </select>
     
     <select id="filterByPeptideCount_S" resultClass="Integer" parameterClass="java.util.Map">
@@ -307,8 +341,59 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterNrseqIdsByPeptideCount_S" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID, prot.id, count(pept.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept )
+    	ON  (m.piPeptideID = pept.id 
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID 
+    	AND prot.id = m.piProteinID 
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    	GROUP BY prot.id
+    	HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY cnt
+			<isPropertyAvailable property="groupProteins">
+				, idpProt.groupID
+			</isPropertyAvailable>
+    		ASC
+    	</isPropertyAvailable>
+    </select>
+    
     <select id="filterByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id, count(ion.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
+    	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = idpProt.piProteinID 
+    	AND prot.id = m.piProteinID 
+    	<isPropertyAvailable property="isParsimonious">
+    		AND idpProt.isParsimonious = #isParsimonious#
+    	</isPropertyAvailable>
+    	GROUP BY prot.id HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY cnt
+			<isPropertyAvailable property="groupProteins">
+				, idpProt.groupID
+			</isPropertyAvailable>
+    		ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterNrseqIdsByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID, prot.id, count(ion.id) AS cnt 
     	FROM (msProteinInferProtein AS prot, IDPickerProtein as idpProt, msProteinInferProteinPeptideMatch as m)
     	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
     	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID

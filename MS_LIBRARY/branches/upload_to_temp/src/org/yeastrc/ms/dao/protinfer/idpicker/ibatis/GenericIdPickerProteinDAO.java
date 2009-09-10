@@ -34,6 +34,8 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     public abstract int getIdPickerGroupCount(int pinferId, boolean parsimonious);
     
     public abstract List<Integer> getFilteredSortedProteinIds(int pinferId, ProteinFilterCriteria filterCriteria);
+    
+    public abstract List<Integer> getFilteredNrseqIds(int pinferId, ProteinFilterCriteria filterCriteria);
 
     public abstract List<Integer> sortProteinIdsByCoverage(int pinferId, boolean groupProteins);
     
@@ -53,7 +55,7 @@ public interface GenericIdPickerProteinDAO <P extends GenericIdPickerProtein<?>>
     
     public abstract List<Integer> getIdPickerProteinIds(int pinferId, boolean isParsimonious);
     
-    public  abstract List<Integer> getNrseqProteinIds(int pinferId);
+    public  abstract List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious);
     
     public abstract List<Integer> getNrseqProteinIds(int pinferId, boolean parsimonious, boolean nonParsimonious);
     

@@ -162,6 +162,13 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterNrseqIdsByProteinProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID, prot.id FROM msProteinInferProtein AS prot, ProteinProphetProtein as ppProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = ppProt.piProteinID
+    	AND ppProt.probability BETWEEN #minProbability# AND #maxProbability#
+    </select>
+    
     <select id="filterByProteinGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id FROM msProteinInferProtein AS prot, 
     	               ProteinProphetProtein AS ppProt,
@@ -176,6 +183,15 @@
     </select>
     
     <select id="filterByCoverage" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein 
+    	WHERE piRunID=#pinferId#
+    	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY coverage ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterNrseqIdsByCoverage" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 
     	WHERE piRunID=#pinferId#
     	AND coverage BETWEEN #minCoverage# AND #maxCoverage#
@@ -199,6 +215,17 @@
     </select>
     
     <select id="filterByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein 
+    	WHERE piRunID=#pinferId#
+    	<isPropertyAvailable property="validationStatus">
+    		AND userValidation IN $validationStatus$
+    	</isPropertyAvailable>
+    	<isPropertyAvailable property="sort">
+    		ORDER BY userValidation ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterNrseqIdsByValidationStatus" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 
     	WHERE piRunID=#pinferId#
     	<isPropertyAvailable property="validationStatus">
@@ -233,6 +260,23 @@
     	</isPropertyAvailable>
     </select>
     
+    <select id="filterNrseqIdsBySpecCount" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID, prot.id, count(*) AS cnt 
+    	FROM msProteinInferProtein AS prot, 
+    		 ProteinProphetProtein as ppProt,
+    	     msProteinInferProteinPeptideMatch AS m, 
+    		 msProteinInferPeptide AS pept, 
+    		 msProteinInferIon AS ion,
+    		 msProteinInferSpectrumMatch AS psm
+    	WHERE prot.id = ppProt.piProteinID
+    	AND ppProt.piProteinID = m.piProteinID
+    	AND m.piPeptideID = pept.id 
+    	AND pept.id = ion.piPeptideID 
+    	AND ion.id = psm.piIonID
+    	AND prot.piRunID = #pinferId# 
+    	GROUP BY prot.id HAVING cnt BETWEEN #minSpectra# AND #maxSpectra#
+    </select>
+    
     
     <select id="filterByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT prot.id, count(ion.id) AS cnt 
@@ -257,6 +301,25 @@
 			</isPropertyAvailable>
     		ASC
     	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterNrseqIdsByPeptideCount_SMC" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID, prot.id, count(ion.id) AS cnt 
+    	FROM (msProteinInferProtein AS prot, ProteinProphetProtein as ppProt, msProteinInferProteinPeptideMatch as m)
+    	LEFT JOIN ( msProteinInferPeptide AS pept, msProteinInferIon AS ion )
+    	ON  (m.piPeptideID = pept.id AND pept.id = ion.piPeptideID
+    		<isPropertyAvailable property="uniqueToProtein">
+    			AND pept.uniqueToProtein = #uniqueToProtein#
+    		</isPropertyAvailable>
+    	)
+    	WHERE prot.piRunID = #pinferId# 
+    	AND prot.id = ppProt.piProteinID 
+    	AND prot.id = m.piProteinID 
+    	<isPropertyAvailable property="isSubsumed">
+    		AND ppProt.subsumed = #isSubsumed#
+    	</isPropertyAvailable>
+    	GROUP BY prot.id HAVING cnt BETWEEN #minPeptides# AND #maxPeptides#
+    	
     </select>
    <!-- =========================================================================== -->
     

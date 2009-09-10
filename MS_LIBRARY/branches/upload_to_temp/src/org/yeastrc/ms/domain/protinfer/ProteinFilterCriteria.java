@@ -20,7 +20,8 @@ public class ProteinFilterCriteria {
     private int numMaxUniquePeptides;
     private PeptideDefinition peptideDefinition = new PeptideDefinition();
     
-    private boolean showParsimonious = false;
+    private boolean parsimonious = true;
+    private boolean nonParsimonious = true;
     
     private boolean groupProteins = true;
     
@@ -102,14 +103,48 @@ public class ProteinFilterCriteria {
         this.coverage = coverage;
     }
 
-    public boolean showParsimonious() {
-        return showParsimonious;
-    }
+//    public boolean showParsimonious() {
+//        return showParsimonious;
+//    }
+//
+//    public void setShowParsimonious(boolean isParsimonious) {
+//        this.showParsimonious = isParsimonious;
+//    }
 
-    public void setShowParsimonious(boolean isParsimonious) {
-        this.showParsimonious = isParsimonious;
+    public boolean getParsimonious() {
+        return parsimonious;
     }
-
+    
+    public void setParsimonious(boolean parsimonious) {
+        this.parsimonious = parsimonious;
+    }
+    
+    public boolean getNonParsimonious() {
+        return nonParsimonious;
+    }
+    
+    public void setNonParsimonious(boolean nonParsimonious) {
+        this.nonParsimonious = nonParsimonious;
+    }
+    
+    public void setParsimoniousOnly() {
+        setParsimonious(true);
+        setNonParsimonious(false);
+    }
+    
+    public void setNonParsimoniousOnly() {
+        setParsimonious(false);
+        setNonParsimonious(true);
+    }
+    
+    public boolean parsimoniousOnly() {
+        return getParsimonious() && !getNonParsimonious();
+    }
+    
+    public boolean nonParsimoniousOnly() {
+        return !getParsimonious() && getNonParsimonious();
+    }
+    
     public boolean isGroupProteins() {
         return groupProteins;
     }
@@ -198,7 +233,8 @@ public class ProteinFilterCriteria {
         if(this.coverage != that.coverage)                      return false;
         if(this.maxCoverage != that.maxCoverage)                return false;
 //        if(this.groupProteins != that.groupProteins)            return false;
-        if(this.showParsimonious != that.showParsimonious)      return false;
+        if(this.parsimonious != that.parsimonious)              return false;
+        if(this.nonParsimonious != that.nonParsimonious)        return false;
         
         if(this.validationStatus.size() != that.validationStatus.size()) return false;
         else {
@@ -225,4 +261,5 @@ public class ProteinFilterCriteria {
         }
         return true;
     }
+    
 }
