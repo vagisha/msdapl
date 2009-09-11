@@ -18,12 +18,7 @@
 	<html:hidden name="proteinSetComparisonForm" property="goEnrichmentGraph" value="false" styleId="goEnrichmentGraph" />
 	
 	
-	<logic:iterate name="proteinSetComparisonForm" property="proteinferRunList" id="proteinferRun">
-		<logic:equal name="proteinferRun" property="selected" value="true">
-			<html:hidden name="proteinferRun" property="runId" indexed="true" />
-			<html:hidden name="proteinferRun" property="selected" indexed="true" />
-		</logic:equal>
-	</logic:iterate>
+	
 	
 	<logic:iterate name="proteinSetComparisonForm" property="proteinProphetRunList" id="proteinProphetRun">
 		<logic:equal name="proteinProphetRun" property="selected" value="true">
@@ -51,19 +46,22 @@
 			<tr>
 				<logic:iterate name="proteinSetComparisonForm" property="andList" id="andDataset" indexId="dsIndex">
 					
+					<bean:define name="andDataset" property="datasetIndex" id="datasetIndex"/>
 					<logic:equal name="andDataset" property="selected" value="true">
-						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
-							id='<%="AND_"+dsIndex+"_td"%>'
+						<td style="background-color:rgb(<bean:write name='andDataset' property='red'/>,<bean:write name='andDataset' property='green'/>,<bean:write name='andDataset' property='blue'/>); border:1px solid #AAAAAA;"
+							id="AND_<bean:write name='datasetIndex'/>_td"
 						>
 					</logic:equal>
 					<logic:notEqual name="andDataset" property="selected" value="true">
-						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="AND_"+dsIndex+"_td"%>' >
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="AND_<bean:write name='datasetIndex'/>_td" >
 					</logic:notEqual>
-					<span style="cursor:pointer;" onclick="javascript:toggleAndSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<span style="cursor:pointer;" onclick="javascript:toggleAndSelect(<bean:write name='datasetIndex'/>, <bean:write name='andDataset' property='red'/>,<bean:write name='andDataset' property='green'/>,<bean:write name='andDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="andDataset" property="datasetId" indexed="true" />
+					<html:hidden name="andDataset" property="datasetIndex" indexed="true" />
 					<html:hidden name="andDataset" property="sourceString" indexed="true" />
-					<html:hidden name="andDataset" property="selected" indexed="true" styleId='<%="AND_"+dsIndex+"_select"%>' />
-					</td>
+					<html:hidden name="andDataset" property="selected" indexed="true" 
+				             styleId='<%= "AND_"+datasetIndex+"_select"%>' />
+				</td>
 				</logic:iterate>
 			</tr>
 			</table>
@@ -74,19 +72,23 @@
 			<tr>
 				<logic:iterate name="proteinSetComparisonForm" property="orList" id="orDataset" indexId="dsIndex">
 					
+					<bean:define name="orDataset" property="datasetIndex" id="datasetIndex"/>
 					<logic:equal name="orDataset" property="selected" value="true">
-						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
-							id='<%="OR_"+dsIndex+"_td"%>'
+						<td style="background-color:rgb(<bean:write name='orDataset' property='red'/>,<bean:write name='orDataset' property='green'/>,<bean:write name='orDataset' property='blue'/>); border:1px solid #AAAAAA;"
+							id="OR_<bean:write name='datasetIndex'/>_td"
 						>
 					</logic:equal>
 					<logic:notEqual name="orDataset" property="selected" value="true">
-						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="OR_"+dsIndex+"_td"%>'>
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="OR_<bean:write name='datasetIndex'/>_td">
 					</logic:notEqual>
-					<span style="cursor:pointer;" onclick="javascript:toggleOrSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<span style="cursor:pointer;" onclick="javascript:toggleOrSelect(<bean:write name='datasetIndex'/>,<bean:write name='orDataset' property='red'/>,<bean:write name='orDataset' property='green'/>,<bean:write name='orDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="orDataset" property="datasetId" indexed="true" />
+					<html:hidden name="orDataset" property="datasetIndex" indexed="true" />
 					<html:hidden name="orDataset" property="sourceString" indexed="true" />
-					<html:hidden name="orDataset" property="selected" indexed="true" styleId='<%="OR_"+dsIndex+"_select"%>' />
-					</td>
+					<html:hidden name="orDataset" property="selected" indexed="true" 
+								styleId='<%= "OR_"+datasetIndex+"_select"%>' />
+				</td>
+
 				</logic:iterate>
 			</tr>
 			</table>
@@ -97,19 +99,22 @@
 			<tr>
 				<logic:iterate name="proteinSetComparisonForm" property="notList" id="notDataset" indexId="dsIndex">
 					
+					<bean:define name="notDataset" property="datasetIndex" id="datasetIndex"/>
 					<logic:equal name="notDataset" property="selected" value="true">
-						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
-							id='<%="NOT_"+dsIndex+"_td"%>'
+						<td style="background-color:rgb(<bean:write name='notDataset' property='red'/>,<bean:write name='notDataset' property='green'/>,<bean:write name='notDataset' property='blue'/>); border:1px solid #AAAAAA;"
+							id="NOT_<bean:write name='datasetIndex'/>_td"
 						>
 					</logic:equal>
 					<logic:notEqual name="notDataset" property="selected" value="true">
-						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="NOT_"+dsIndex+"_td"%>'>
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="NOT_<bean:write name='datasetIndex'/>_td">
 					</logic:notEqual>
-					<span style="cursor:pointer;" onclick="javascript:toggleNotSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<span style="cursor:pointer;" onclick="javascript:toggleNotSelect(<bean:write name='datasetIndex'/>,<bean:write name='notDataset' property='red'/>,<bean:write name='notDataset' property='green'/>,<bean:write name='notDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="notDataset" property="datasetId" indexed="true" />
+					<html:hidden name="notDataset" property="datasetIndex" indexed="true" />
 					<html:hidden name="notDataset" property="sourceString" indexed="true" />
-					<html:hidden name="notDataset" property="selected" indexed="true" styleId='<%="NOT_"+dsIndex+"_select"%>' />
-					</td>
+					<html:hidden name="notDataset" property="selected" indexed="true" 
+								styleId='<%= "NOT_"+datasetIndex+"_select"%>' />
+				</td>
 					
 				</logic:iterate>
 			</tr>
@@ -121,18 +126,21 @@
 			<tr>
 				<logic:iterate name="proteinSetComparisonForm" property="xorList" id="xorDataset" indexId="dsIndex">
 					
+					<bean:define name="xorDataset" property="datasetIndex" id="datasetIndex"/>
 					<logic:equal name="xorDataset" property="selected" value="true">
-						<td style="background-color:rgb(<%=DatasetColor.get(dsIndex).R %>,<%=DatasetColor.get(dsIndex).G %>,<%=DatasetColor.get(dsIndex).B %>); border:1px solid #AAAAAA;"
-							id='<%="XOR_"+dsIndex+"_td"%>'
+						<td style="background-color:rgb(<bean:write name='xorDataset' property='red'/>,<bean:write name='xorDataset' property='green'/>,<bean:write name='xorDataset' property='blue'/>); border:1px solid #AAAAAA;"
+							id="XOR_<bean:write name='datasetIndex'/>_td"
 						>
 					</logic:equal>
 					<logic:notEqual name="xorDataset" property="selected" value="true">
-						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id='<%="XOR_"+dsIndex+"_td"%>'>
+						<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="XOR_<bean:write name='datasetIndex'/>_td">
 					</logic:notEqual>
-					<span style="cursor:pointer;" onclick="javascript:toggleXorSelect(<%=dsIndex %>);">&nbsp;&nbsp;</span>
+					<span style="cursor:pointer;" onclick="javascript:toggleXorSelect(<bean:write name='datasetIndex'/>,<bean:write name='xorDataset' property='red'/>,<bean:write name='xorDataset' property='green'/>,<bean:write name='xorDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 					<html:hidden name="xorDataset" property="datasetId" indexed="true" />
+					<html:hidden name="xorDataset" property="datasetIndex" indexed="true" />
 					<html:hidden name="xorDataset" property="sourceString" indexed="true" />
-					<html:hidden name="xorDataset" property="selected" indexed="true" styleId='<%="XOR_"+dsIndex+"_select"%>' />
+					<html:hidden name="xorDataset" property="selected" indexed="true" 
+								styleId='<%= "XOR_"+datasetIndex+"_select"%>' />
 					</td>
 					
 				</logic:iterate>

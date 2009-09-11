@@ -274,29 +274,21 @@ function validateFloat(value, fieldName, min, max) {
 // ---------------------------------------------------------------------------------------
 // TOGGLE AND, OR, NOT FILTERS
 // ---------------------------------------------------------------------------------------
-var colors = [];
-<%
-	int datasetCount = comparison.getDatasetCount();
-	for(int i = 0; i < datasetCount; i++) {
-%>
-	colors[<%=i%>] = '<%="rgb("+DatasetColor.get(i).R+","+DatasetColor.get(i).G+","+DatasetColor.get(i).B+")"%>';
-<%
-}
-%>
-function toggleAndSelect(dsIndex) {
+function toggleAndSelect(dsIndex, red, green, blue) {
+	
 	var id = "AND_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
-	
 	if(value == "true") {
 		$("input#"+id).val("false");	
 		$("td#AND_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#AND_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#AND_"+dsIndex+"_td").css("background-color", color);
 	}
 }
-function toggleOrSelect(dsIndex) {
+function toggleOrSelect(dsIndex, red, green, blue) {
 	var id = "OR_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
 	if(value == "true") {
@@ -304,11 +296,12 @@ function toggleOrSelect(dsIndex) {
 		$("td#OR_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#OR_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#OR_"+dsIndex+"_td").css("background-color", color);
 	}
 }
-function toggleNotSelect(dsIndex) {
+function toggleNotSelect(dsIndex, red, green, blue) {
 	var id = "NOT_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
 	if(value == "true") {
@@ -316,11 +309,12 @@ function toggleNotSelect(dsIndex) {
 		$("td#NOT_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#NOT_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#NOT_"+dsIndex+"_td").css("background-color", color);
 	}
 }
-function toggleXorSelect(dsIndex) {
+function toggleXorSelect(dsIndex, red, green, blue) {
 	var id = "XOR_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
 	if(value == "true") {
@@ -328,8 +322,9 @@ function toggleXorSelect(dsIndex) {
 		$("td#XOR_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#XOR_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#XOR_"+dsIndex+"_td").css("background-color", color);
 	}
 }
 </script>
@@ -349,7 +344,8 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 </td>
 
 <logic:present name="chart">
-<td rowspan="<%=String.valueOf(2 + datasetCount) %>">
+
+<td rowspan="<%=String.valueOf(2 + comparison.getDatasetCount()) %>">
 	<img src="<bean:write name='chart' />" align="top" alt="Comparison"></img>
 </td>
 </logic:present>

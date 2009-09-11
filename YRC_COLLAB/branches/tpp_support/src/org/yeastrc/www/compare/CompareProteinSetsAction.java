@@ -113,9 +113,11 @@ public class CompareProteinSetsAction extends Action {
            (myForm.getNotList().size() == 0) &&
            myForm.getXorList().size() == 0) {
             List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
+            int datasetIndex = 0;
             for(Dataset dataset: datasets) {
                 SelectableDataset sds = new SelectableDataset(dataset);
                 sds.setSelected(false);
+                sds.setDatasetIndex(datasetIndex++);
                 sdsList.add(sds);
             }
             

@@ -18,7 +18,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 public class DatasetFiltersForm extends ActionForm {
 
     
-    private List<ProteinferRunFormBean> proteinferRunList = new ArrayList<ProteinferRunFormBean>();
+//    private List<ProteinferRunFormBean> proteinferRunList = new ArrayList<ProteinferRunFormBean>();
     private List<ProteinProphetRunFormBean> proteinProphetRunList = new ArrayList<ProteinProphetRunFormBean>();
 //    private List<DTASelectRunFormBean> dtaRuns = new ArrayList<DTASelectRunFormBean>();
     
@@ -370,28 +370,28 @@ public class DatasetFiltersForm extends ActionForm {
     //-----------------------------------------------------------------------------
     // Protein inference datasets
     //-----------------------------------------------------------------------------
-    public ProteinferRunFormBean getProteinferRun(int index) {
-        while(index >= proteinferRunList.size())
-            proteinferRunList.add(new ProteinferRunFormBean());
-        return proteinferRunList.get(index);
-    }
-    
-    public void setProteinferRunList(List <ProteinferRunFormBean> piRuns) {
-        this.proteinferRunList = piRuns;
-    }
-    
-    public List <ProteinferRunFormBean> getProteinferRunList() {
-        return proteinferRunList;
-    }
-    
-    public List<Integer> getSelectedProteinferRunIds() {
-        List<Integer> ids = new ArrayList<Integer>();
-        for(ProteinferRunFormBean run: proteinferRunList) {
-            if(run != null && run.isSelected())
-                ids.add(run.getRunId());
-        }
-        return ids;
-    }
+//    public ProteinferRunFormBean getProteinferRun(int index) {
+//        while(index >= proteinferRunList.size())
+//            proteinferRunList.add(new ProteinferRunFormBean());
+//        return proteinferRunList.get(index);
+//    }
+//    
+//    public void setProteinferRunList(List <ProteinferRunFormBean> piRuns) {
+//        this.proteinferRunList = piRuns;
+//    }
+//    
+//    public List <ProteinferRunFormBean> getProteinferRunList() {
+//        return proteinferRunList;
+//    }
+//    
+//    public List<Integer> getSelectedProteinferRunIds() {
+//        List<Integer> ids = new ArrayList<Integer>();
+//        for(ProteinferRunFormBean run: proteinferRunList) {
+//            if(run != null && run.isSelected())
+//                ids.add(run.getRunId());
+//        }
+//        return ids;
+//    }
     
     //-----------------------------------------------------------------------------
     // Protein Prophet datasets
@@ -423,26 +423,14 @@ public class DatasetFiltersForm extends ActionForm {
     // Total
     //-----------------------------------------------------------------------------
     public int getSelectedRunCount() {
-        int i = 0;
-        for (ProteinferRunFormBean piRun: proteinferRunList) {
-            if (piRun != null && piRun.isSelected()) i++;
-        }
-        for(ProteinProphetRunFormBean ppRun: proteinProphetRunList) {
-            if(ppRun != null && ppRun.isSelected()) i++;
-        }
-        return i;
+        return andList.size();
     }
     
     public List<Integer> getAllSelectedRunIds() {
         
         List<Integer> all = new ArrayList<Integer>();
-        for (ProteinferRunFormBean piRun: proteinferRunList) {
-            if(piRun != null && piRun.isSelected())
-                all.add(piRun.getRunId());
-        }
-        for(ProteinProphetRunFormBean ppRun: proteinProphetRunList) {
-            if(ppRun != null && ppRun.isSelected())
-                all.add(ppRun.getRunId());
+        for (SelectableDataset dataset: andList) {
+            all.add(dataset.getDatasetId());
         }
         return all;
     }

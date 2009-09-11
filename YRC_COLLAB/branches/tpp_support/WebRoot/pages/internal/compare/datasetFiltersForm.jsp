@@ -21,9 +21,6 @@
 <%@ include file="/includes/errors.jsp" %>
 
 
-<bean:define name="datasetFiltersForm"
-             property="selectedRunCount" 
-             id="selectedRunCount" type="java.lang.Integer"></bean:define>
 <script>
 // ---------------------------------------------------------------------------------------
 // SETUP THE ROC tables for PeptideProphet
@@ -62,6 +59,9 @@ function toggleRoc(proteinProphetId){
 
 function selectError(proteinProphetId, row, error, probability) {
 	$("#error_prob_"+proteinProphetId).text(error+" ("+probability+")");
+	$("input#error_"+proteinProphetId).val(error);
+	$("input#prob_"+proteinProphetId).val(probability);
+	
 	$(".roc_row").each(function() {
 		$(this).css({backgroundColor: '', color: ''}).removeClass("row_selected");
 	});
@@ -71,30 +71,21 @@ function selectError(proteinProphetId, row, error, probability) {
 // ---------------------------------------------------------------------------------------
 // TOGGLE AND, OR, NOT FILTERS
 // ---------------------------------------------------------------------------------------
-var colors = [];
-<%
-	int datasetCount = selectedRunCount;
-	for(int i = 0; i < datasetCount; i++) {
-%>
-	colors[<%=i%>] = '<%="rgb("+DatasetColor.get(i).R+","+DatasetColor.get(i).G+","+DatasetColor.get(i).B+")"%>';
-<%
-}
-%>
-function toggleAndSelect(dsIndex) {
+function toggleAndSelect(dsIndex, red, green, blue) {
 	
 	var id = "AND_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
-	
 	if(value == "true") {
 		$("input#"+id).val("false");	
 		$("td#AND_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#AND_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#AND_"+dsIndex+"_td").css("background-color", color);
 	}
 }
-function toggleOrSelect(dsIndex) {
+function toggleOrSelect(dsIndex, red, green, blue) {
 	var id = "OR_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
 	if(value == "true") {
@@ -102,11 +93,12 @@ function toggleOrSelect(dsIndex) {
 		$("td#OR_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#OR_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#OR_"+dsIndex+"_td").css("background-color", color);
 	}
 }
-function toggleNotSelect(dsIndex) {
+function toggleNotSelect(dsIndex, red, green, blue) {
 	var id = "NOT_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
 	if(value == "true") {
@@ -114,11 +106,12 @@ function toggleNotSelect(dsIndex) {
 		$("td#NOT_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#NOT_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#NOT_"+dsIndex+"_td").css("background-color", color);
 	}
 }
-function toggleXorSelect(dsIndex) {
+function toggleXorSelect(dsIndex, red, green, blue) {
 	var id = "XOR_"+dsIndex+"_select";
 	var value = $("input#"+id).val();
 	if(value == "true") {
@@ -126,8 +119,9 @@ function toggleXorSelect(dsIndex) {
 		$("td#XOR_"+dsIndex+"_td").css("background-color", "#FFFFFF");
 	}
 	else {
+		var color = "rgb("+red+","+green+","+blue+")";
 		$("input#"+id).val("true");	
-		$("td#XOR_"+dsIndex+"_td").css("background-color", colors[dsIndex]);
+		$("td#XOR_"+dsIndex+"_td").css("background-color", color);
 	}
 }
 
@@ -161,22 +155,6 @@ function toggleXorSelect(dsIndex) {
 
 <html:form action="doProteinSetComparison" method="POST">
 
-<!-- ======================================================================================== -->
-<!-- DATASETS being compared -->
-<!-- ======================================================================================== -->
-<logic:iterate name="datasetFiltersForm" property="proteinferRunList" id="proteinferRun">
-	<logic:equal name="proteinferRun" property="selected" value="true">
-		<html:hidden name="proteinferRun" property="runId" indexed="true" />
-		<html:hidden name="proteinferRun" property="selected" indexed="true" />
-	</logic:equal>
-</logic:iterate>
-
-<logic:iterate name="datasetFiltersForm" property="proteinProphetRunList" id="proteinProphetRun">
-	<logic:equal name="proteinProphetRun" property="selected" value="true">
-		<html:hidden name="proteinProphetRun" property="runId" indexed="true" />
-		<html:hidden name="proteinProphetRun" property="selected" indexed="true" />
-	</logic:equal>
-</logic:iterate>
 	
 <!-- ======================================================================================== -->
 <!-- AND, OR, NOT, XOR filters -->
@@ -194,18 +172,21 @@ function toggleXorSelect(dsIndex) {
 		<tr>
 			<logic:iterate name="datasetFiltersForm" property="andList" id="andDataset">
 				
+				<bean:define name="andDataset" property="datasetIndex" id="datasetIndex"/>
 				<logic:equal name="andDataset" property="selected" value="true">
 					<td style="background-color:rgb(<bean:write name='andDataset' property='red'/>,<bean:write name='andDataset' property='green'/>,<bean:write name='andDataset' property='blue'/>); border:1px solid #AAAAAA;"
-						id="AND_<bean:write name='andDataset' property='datasetIndex'/>_td"
+						id="AND_<bean:write name='datasetIndex'/>_td"
 					>
 				</logic:equal>
 				<logic:notEqual name="andDataset" property="selected" value="true">
-					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="AND_<bean:write name='andDataset' property='datasetIndex'/>_td" >
+					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="AND_<bean:write name='datasetIndex'/>_td" >
 				</logic:notEqual>
-				<span style="cursor:pointer;" onclick="javascript:toggleAndSelect(<bean:write name='andDataset' property='datasetIndex'/>);">&nbsp;&nbsp;</span>
+				<span style="cursor:pointer;" onclick="javascript:toggleAndSelect(<bean:write name='datasetIndex'/>, <bean:write name='andDataset' property='red'/>,<bean:write name='andDataset' property='green'/>,<bean:write name='andDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 				<html:hidden name="andDataset" property="datasetId" indexed="true" />
+				<html:hidden name="andDataset" property="datasetIndex" indexed="true" />
 				<html:hidden name="andDataset" property="sourceString" indexed="true" />
-				<html:hidden name="andDataset" property="selected" indexed="true" styleId="AND_<bean:write name='andDataset' property='datasetIndex'/>_select" />
+				<html:hidden name="andDataset" property="selected" indexed="true" 
+				             styleId='<%= "AND_"+datasetIndex+"_select"%>' />
 				</td>
 			</logic:iterate>
 		</tr>
@@ -217,18 +198,21 @@ function toggleXorSelect(dsIndex) {
 		<tr>
 			<logic:iterate name="datasetFiltersForm" property="orList" id="orDataset">
 				
+				<bean:define name="orDataset" property="datasetIndex" id="datasetIndex"/>
 				<logic:equal name="orDataset" property="selected" value="true">
 					<td style="background-color:rgb(<bean:write name='orDataset' property='red'/>,<bean:write name='orDataset' property='green'/>,<bean:write name='orDataset' property='blue'/>); border:1px solid #AAAAAA;"
-						id="OR_<bean:write name='orDataset' property='datasetIndex'/>_td"
+						id="OR_<bean:write name='datasetIndex'/>_td"
 					>
 				</logic:equal>
 				<logic:notEqual name="orDataset" property="selected" value="true">
-					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="OR_<bean:write name='orDataset' property='datasetIndex'/>_td">
+					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="OR_<bean:write name='datasetIndex'/>_td">
 				</logic:notEqual>
-				<span style="cursor:pointer;" onclick="javascript:toggleOrSelect(<bean:write name='orDataset' property='datasetIndex'/>);">&nbsp;&nbsp;</span>
+				<span style="cursor:pointer;" onclick="javascript:toggleOrSelect(<bean:write name='datasetIndex'/>,<bean:write name='orDataset' property='red'/>,<bean:write name='orDataset' property='green'/>,<bean:write name='orDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 				<html:hidden name="orDataset" property="datasetId" indexed="true" />
+				<html:hidden name="orDataset" property="datasetIndex" indexed="true" />
 				<html:hidden name="orDataset" property="sourceString" indexed="true" />
-				<html:hidden name="orDataset" property="selected" indexed="true" styleId="OR_<bean:write name='orDataset' property='datasetIndex'/>_select" />
+				<html:hidden name="orDataset" property="selected" indexed="true" 
+							styleId='<%= "OR_"+datasetIndex+"_select"%>' />
 				</td>
 			</logic:iterate>
 		</tr>
@@ -240,18 +224,21 @@ function toggleXorSelect(dsIndex) {
 		<tr>
 			<logic:iterate name="datasetFiltersForm" property="notList" id="notDataset" indexId="dsIndex">
 				
+				<bean:define name="notDataset" property="datasetIndex" id="datasetIndex"/>
 				<logic:equal name="notDataset" property="selected" value="true">
 					<td style="background-color:rgb(<bean:write name='notDataset' property='red'/>,<bean:write name='notDataset' property='green'/>,<bean:write name='notDataset' property='blue'/>); border:1px solid #AAAAAA;"
-						id="NOT_<bean:write name='notDataset' property='datasetIndex'/>_td"
+						id="NOT_<bean:write name='datasetIndex'/>_td"
 					>
 				</logic:equal>
 				<logic:notEqual name="notDataset" property="selected" value="true">
-					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="NOT_<bean:write name='notDataset' property='datasetIndex'/>_td">
+					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="NOT_<bean:write name='datasetIndex'/>_td">
 				</logic:notEqual>
-				<span style="cursor:pointer;" onclick="javascript:toggleNotSelect(<bean:write name='notDataset' property='datasetIndex'/>);">&nbsp;&nbsp;</span>
+				<span style="cursor:pointer;" onclick="javascript:toggleNotSelect(<bean:write name='datasetIndex'/>,<bean:write name='notDataset' property='red'/>,<bean:write name='notDataset' property='green'/>,<bean:write name='notDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 				<html:hidden name="notDataset" property="datasetId" indexed="true" />
+				<html:hidden name="notDataset" property="datasetIndex" indexed="true" />
 				<html:hidden name="notDataset" property="sourceString" indexed="true" />
-				<html:hidden name="notDataset" property="selected" indexed="true" styleId="NOT_<bean:write name='notDataset' property='datasetIndex'/>_select" />
+				<html:hidden name="notDataset" property="selected" indexed="true" 
+							styleId='<%= "NOT_"+datasetIndex+"_select"%>' />
 				</td>
 				
 			</logic:iterate>
@@ -264,18 +251,21 @@ function toggleXorSelect(dsIndex) {
 		<tr>
 			<logic:iterate name="datasetFiltersForm" property="xorList" id="xorDataset" indexId="dsIndex">
 				
+				<bean:define name="xorDataset" property="datasetIndex" id="datasetIndex"/>
 				<logic:equal name="xorDataset" property="selected" value="true">
 					<td style="background-color:rgb(<bean:write name='xorDataset' property='red'/>,<bean:write name='xorDataset' property='green'/>,<bean:write name='xorDataset' property='blue'/>); border:1px solid #AAAAAA;"
-						id="XOR_<bean:write name='xorDataset' property='datasetIndex'/>_td"
+						id="XOR_<bean:write name='datasetIndex'/>_td"
 					>
 				</logic:equal>
 				<logic:notEqual name="xorDataset" property="selected" value="true">
-					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="XOR_<bean:write name='xorDataset' property='datasetIndex'/>_td">
+					<td style="background-color:#FFFFFF; border:1px solid #AAAAAA;" id="XOR_<bean:write name='datasetIndex'/>_td">
 				</logic:notEqual>
-				<span style="cursor:pointer;" onclick="javascript:toggleXorSelect(<bean:write name='xorDataset' property='datasetIndex'/>);">&nbsp;&nbsp;</span>
+				<span style="cursor:pointer;" onclick="javascript:toggleXorSelect(<bean:write name='datasetIndex'/>,<bean:write name='xorDataset' property='red'/>,<bean:write name='xorDataset' property='green'/>,<bean:write name='xorDataset' property='blue'/>);">&nbsp;&nbsp;</span>
 				<html:hidden name="xorDataset" property="datasetId" indexed="true" />
+				<html:hidden name="xorDataset" property="datasetIndex" indexed="true" />
 				<html:hidden name="xorDataset" property="sourceString" indexed="true" />
-				<html:hidden name="xorDataset" property="selected" indexed="true" styleId="XOR_<bean:write name='xorDataset' property='datasetIndex'/>_select" />
+				<html:hidden name="xorDataset" property="selected" indexed="true" 
+							styleId='<%= "XOR_"+datasetIndex+"_select"%>' />
 				</td>
 				
 			</logic:iterate>
@@ -383,6 +373,7 @@ function toggleXorSelect(dsIndex) {
 <!-- ======================================================================================== -->
 <logic:notEmpty name="datasetFiltersForm" property="proteinProphetRunList">
 	<br>
+	
 	<yrcwww:contentbox centered="true" title="ProteinProphet Datasets" width="89" widthRel="true">
 	
 	<table align="center" width="99%" class="table_basic">
@@ -397,6 +388,12 @@ function toggleXorSelect(dsIndex) {
 	</thead>
 	<tbody>
 		<logic:iterate name="datasetFiltersForm" property="proteinProphetRunList" id="ppRun">
+		
+		<logic:equal name="ppRun" property="selected" value="true">
+			<html:hidden name="ppRun" property="runId" indexed="true" />
+			<html:hidden name="ppRun" property="selected" indexed="true" />
+		</logic:equal>
+		
 		<tr>
 		<td><b><bean:write name="ppRun" property="runId"/><b></td>
 		<td>
@@ -407,7 +404,14 @@ function toggleXorSelect(dsIndex) {
 			</b>
 		</td>
 		<td><bean:write name="ppRun" property="comments"/>
-		<td><span id="error_prob_<bean:write name="ppRun" property="runId"/>"><bean:write name="ppRun" property="errorRate"/> (<bean:write name="ppRun" property="probability"/>)</span></td>
+		<td>
+			<bean:define name="ppRun" property="runId" id="runId"/>
+			<span id="error_prob_<bean:write name="ppRun" property="runId"/>">
+			<bean:write name="ppRun" property="errorRate"/> (<bean:write name="ppRun" property="probability"/>)
+			</span>
+			<html:hidden name="ppRun" property="errorRate" styleId='<%="error_"+runId %>' />
+			<html:hidden name="ppRun" property="probability" styleId='<%="prob_"+runId %>' />
+		</td>
 		<td><span class="clickable underline" 
 				  id="view_roc_<bean:write name="ppRun" property="runId"/>"
 				  onclick="javascript:toggleRoc(<bean:write name="ppRun" property="runId"/>);">View</span></td>

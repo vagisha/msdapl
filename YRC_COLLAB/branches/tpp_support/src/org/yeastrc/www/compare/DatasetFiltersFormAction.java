@@ -85,18 +85,18 @@ public class DatasetFiltersFormAction extends Action {
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
         ProteinProphetRocDAO ppRocDao = ProteinferDAOFactory.instance().getProteinProphetRocDao();
         
-        List<ProteinferRunFormBean> pinferDatasets = new ArrayList<ProteinferRunFormBean>();
+//        List<ProteinferRunFormBean> pinferDatasets = new ArrayList<ProteinferRunFormBean>();
         List<ProteinProphetRunFormBean> proteinProphetDatasets = new ArrayList<ProteinProphetRunFormBean>();
         
         for(Integer inputId: inputPiRunIds) {
             ProteinferRun run = runDao.loadProteinferRun(inputId);
             List<Integer> projectIds = getProjectIdsForRun(run.getId());
-            if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
-                ProteinferRunFormBean bean = new ProteinferRunFormBean(run, projectIds);
-                bean.setSelected(true);
-                pinferDatasets.add(bean);
-            }
-            else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
+//            if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
+//                ProteinferRunFormBean bean = new ProteinferRunFormBean(run, projectIds);
+//                bean.setSelected(true);
+//                pinferDatasets.add(bean);
+//            }
+            if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
                 ProteinProphetRunFormBean bean = new ProteinProphetRunFormBean(run, projectIds);
                 bean.setSelected(true);
                 ProteinProphetROC roc = ppRocDao.loadRoc(run.getId());
@@ -107,7 +107,7 @@ public class DatasetFiltersFormAction extends Action {
                 proteinProphetDatasets.add(bean);
             }
         }
-        myForm.setProteinferRunList(pinferDatasets);
+//        myForm.setProteinferRunList(pinferDatasets);
         myForm.setProteinProphetRunList(proteinProphetDatasets);
         
         
