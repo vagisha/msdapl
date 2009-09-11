@@ -63,6 +63,8 @@
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
 	<form-bean name="proteinProphetFilterForm" type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetFilterForm"></form-bean>
 	<form-bean name="proteinSetComparisonForm" type="org.yeastrc.www.compare.ProteinSetComparisonForm"></form-bean>
+	<form-bean name="datasetSelectionForm" type="org.yeastrc.www.compare.DatasetSelectionForm"></form-bean>
+	<form-bean name="datasetFiltersForm" type="org.yeastrc.www.compare.DatasetFiltersForm"></form-bean>
 	<form-bean name="peptideComparisonForm" type="org.yeastrc.www.compare.ComparePeptidesForm"></form-bean>
 	<form-bean name="sequestPepxmlDownloadForm" type="org.yeastrc.www.project.experiment.SequestPepxmlDownloadForm"></form-bean>
 	
@@ -106,7 +108,7 @@
 	<forward name="newPercolatorProteinInference" path="/newPercolatorProteinInference.do" />
 	<forward name="viewProteinInferenceResult" path="/viewProteinInferenceResult.do" />
 	<forward name="viewProteinProphetResult" path="/viewProteinProphetResult.do" />
-	<forward name="newProteinSetComparison" path="/newProteinSetComparison.do" />
+	<forward name="selectComparisonDatasets" path="/selectComparisonDatasets.do" />
 	<forward name="doProteinSetComparison" path="/doProteinSetComparison.do" />
 	<forward name="sequestPepxmlDownload" path="/newSequestPepXmlDownload.do" />
     </global-forwards>
@@ -894,12 +896,25 @@
 	<!-- ================================================================================== -->
 	
 	<action 
-		path="/newProteinSetComparison"
-		type="org.yeastrc.www.compare.CompareProteinSetsFormAction"
+		path="/selectComparisonDatasets"
+		type="org.yeastrc.www.compare.DatasetSelectionFormAction"
+		name="datasetSelectionForm"
+		scope="request"
 		validate="false"
 	>
-		<forward name="Success" path="/pages/internal/compare/proteinSetComparisonForm.jsp" redirect="false" />
+		<forward name="Success" path="/pages/internal/compare/datasetSelectionForm.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
+	</action>
+	
+	<action 
+		path="/setComparisonFilters"
+		type="org.yeastrc.www.compare.DatasetFiltersFormAction"
+		name="datasetSelectionForm"
+		scope="request"
+		validate="false"
+	>
+		<forward name="Success" path="/pages/internal/compare/datasetFiltersForm.jsp" redirect="false" />
+		<forward name="Failure" path="/selectComparisonDatasets.do" redirect="false" />
 	</action>
 	
 	<action 
@@ -917,13 +932,13 @@
 		path="/doProteinSetComparison"
 		type="org.yeastrc.www.compare.CompareProteinSetsAction"
 		name="proteinSetComparisonForm"
-		input="/pages/internal/compare/proteinSetComparisonForm.jsp"
+		input="/pages/internal/compare/datasetFiltersForm.jsp"
 		scope="request"
 		validate="true"
 	>
 		<forward name="ProteinList" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
 		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
-		<forward name="Failure" path="/newProteinSetComparison.do" redirect="false" />
+		<forward name="Failure" path="/selectComparisonDatasets.do" redirect="false" />
 		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
 		<forward name="GOAnalysis" path="/compareGoEnrichment.do" redirect="false" />
 	</action>

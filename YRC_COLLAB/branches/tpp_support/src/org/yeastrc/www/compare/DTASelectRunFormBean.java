@@ -6,7 +6,7 @@
  */
 package org.yeastrc.www.compare;
 
-import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.yates.YatesRun;
 
 /**
@@ -21,6 +21,6 @@ public class DTASelectRunFormBean extends ProteinferRunFormBean {
               dtasRun.getId(), 
               dtasRun.getRunDate(), 
               dtasRun.getComments(), 
-              Program.SEQUEST.displayName());
+              ProteinInferenceProgram.DTA_SELECT);
     }
 }

@@ -31,7 +31,6 @@ import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
 import edu.uwpr.protinfer.infer.graph.GraphCollapser;
@@ -60,7 +59,7 @@ public class CompareProteinSetsAction extends Action {
         }
 
         
-        // get the protein inference ids to compare
+        // Form we will use
         ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
         
         // IS THE USER DOWNLOADING?
@@ -77,14 +76,10 @@ public class CompareProteinSetsAction extends Action {
         
         
         // Get the selected protein inference run ids
-        List<Integer> piRunIds = myForm.getSelectedProteinferRunIds();
-        
-        List<Integer> dtaRunIds = myForm.getSelectedDtaRunIds();
+        List<Integer> allRunIds = myForm.getAllSelectedRunIds();
 
-        int total = piRunIds.size() + dtaRunIds.size();
-        
         // Need atleast two datasets to compare.
-        if(total < 2) {
+        if(allRunIds.size() < 2) {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more datasets to compare."));
             saveErrors( request, errors );
@@ -94,10 +89,10 @@ public class CompareProteinSetsAction extends Action {
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
         ProteinferRunDAO runDao = fact.getProteinferRunDao();
         
-        List<Dataset> datasets = new ArrayList<Dataset>(total);
+        List<Dataset> datasets = new ArrayList<Dataset>(allRunIds.size());
         
-        // Protein inference datasets
-        for(int piRunId: piRunIds) {
+        
+        for(int piRunId: allRunIds) {
             ProteinferRun run = runDao.loadProteinferRun(piRunId);
             if(run == null) {
                 ActionErrors errors = new ActionErrors();
@@ -110,27 +105,7 @@ public class CompareProteinSetsAction extends Action {
                                 DatasetSource.getSourceForProtinferProgram(run.getProgram()));
             datasets.add(dataset);
         }
-        
-        // DTASelect datasets
-        for(int dtaRunId: dtaRunIds) {
-            YatesRun run = new YatesRun();
-            try {
-                run.load(dtaRunId);
-            }
-            catch(Exception e) {
-                ActionErrors errors = new ActionErrors();
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Error loading DTASelect dataset with ID: "+dtaRunId+"."));
-                saveErrors( request, errors );
-                return mapping.findForward("Failure");
-            }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(dtaRunId, DatasetSource.DTA_SELECT);
-            datasets.add(dataset);
-        }
 
-        // TODO this is temporary till results from DTASelect are fully supported.
-        if(dtaRunIds.size() > 0) {
-            request.setAttribute("dtasWarning", true);
-        }
         
         // ANY AND, OR, NOT, XOR filters
         if((myForm.getAndList().size() == 0) && 
@@ -182,12 +157,12 @@ public class CompareProteinSetsAction extends Action {
         
         // Do the comparison
         long s = System.currentTimeMillis();
-        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, myForm.isOnlyParsimonious());
+        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, !myForm.getUseAllProteins());
         long e = System.currentTimeMillis();
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getSearchString();
+        String searchString = myForm.getAccessionLike();
         if(searchString != null && searchString.trim().length() > 0) {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
         }
@@ -202,11 +177,10 @@ public class CompareProteinSetsAction extends Action {
         request.setAttribute("proteinSetComparisonForm", myForm);
         
         // create a list of the dataset ids being compared
-        request.setAttribute("piDatasetIds", makeCommaSeparated(piRunIds));
-        request.setAttribute("dtaDatasetIds", makeCommaSeparated(dtaRunIds));
+        request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));
         
         
-        if(!myForm.isGroupProteins()) {
+        if(!myForm.getGroupIndistinguishableProteins()) {
             // Sort by peptide count
             s = System.currentTimeMillis();
             ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
@@ -233,7 +207,7 @@ public class CompareProteinSetsAction extends Action {
             s = System.currentTimeMillis();
             GraphBuilder graphBuilder = new GraphBuilder();
             BipartiteGraph<ComparisonProteinGroup, PeptideVertex> graph = 
-                graphBuilder.buildGraph(comparison.getProteins(), piRunIds);
+                graphBuilder.buildGraph(comparison.getProteins(), allRunIds);
             log.info("BEFORE collapsing graph: "+graph.getLeftVertices().size());
             GraphCollapser<ComparisonProteinGroup, PeptideVertex> collapser = new GraphCollapser<ComparisonProteinGroup, PeptideVertex>();
             collapser.collapseGraph(graph);
@@ -301,12 +275,16 @@ public class CompareProteinSetsAction extends Action {
         }
     }
 
-    private String makeCommaSeparated(List<Integer> ids) {
+    private String makeCommaSeparated(List<Integer> ... idLists) {
         StringBuilder buf = new StringBuilder();
-        for(int id: ids)
-            buf.append(","+id);
-        if(buf.length() > 0)
-            buf.deleteCharAt(0);
+        for(List<Integer> ids: idLists) {
+            if(ids == null)
+                continue;
+            for(int id: ids)
+                buf.append(","+id);
+            if(buf.length() > 0)
+                buf.deleteCharAt(0);
+        }
         return buf.toString();
     }
     

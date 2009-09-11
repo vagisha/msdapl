@@ -101,7 +101,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                 ProteinFilterCriteria.defaultSortOrder() : 
                 filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
-        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        if(!filterForm.isShowAllProteins())
+            filterCriteria.setParsimoniousOnly();
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());

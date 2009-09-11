@@ -136,7 +136,8 @@ public class ViewProteinInferenceResultAction extends Action {
         filterCriteria.setSortBy(ProteinFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinFilterCriteria.defaultSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
-        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        if(!filterForm.isShowAllProteins())
+            filterCriteria.setParsimoniousOnly();
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);

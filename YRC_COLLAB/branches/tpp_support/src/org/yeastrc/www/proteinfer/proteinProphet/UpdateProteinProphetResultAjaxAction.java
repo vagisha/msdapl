@@ -100,7 +100,8 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
                 ProteinProphetFilterCriteria.defaultSortOrder() : 
                 filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
-        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        if(!filterForm.isShowAllProteins())
+            filterCriteria.setParsimoniousOnly();
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());

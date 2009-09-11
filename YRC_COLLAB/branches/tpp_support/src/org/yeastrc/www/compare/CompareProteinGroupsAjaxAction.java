@@ -52,12 +52,8 @@ public class CompareProteinGroupsAjaxAction extends Action{
 
         
         // get the protein inference ids to compare
-        String piDatasetIdStr = request.getParameter("piDatasetIds");
-        List<Dataset> piDatasets = getDatasets(piDatasetIdStr);
-        
-        // get the DTASelect ids to compare
-//        String dtaDatasetIdStr = request.getParameter("dtaDatasetIds");
-//        List<Dataset> dtaDatasets = getDatasets(dtaDatasetIdStr, DatasetSource.DTA_SELECT);
+        String datasetIdString = request.getParameter("datasetIds");
+        List<Dataset> piDatasets = getDatasets(datasetIdString);
         
         
         // Get the selected nrseqProteinId
@@ -76,8 +72,6 @@ public class CompareProteinGroupsAjaxAction extends Action{
         // Combine the datasets
         List<Dataset> datasets = new ArrayList<Dataset>(piDatasets.size());
         datasets.addAll(piDatasets);
-        // TODO Don't know how to do this for DTAselect.
-        //datasets.addAll(dtaDatasets); 
         if(datasets.size() == 0) {
             response.setContentType("text/html");
             response.getWriter().write("<b>No datasets found to compare</b>");
@@ -175,13 +169,6 @@ public class CompareProteinGroupsAjaxAction extends Action{
         return datasets;
     }
     
-    private List<Dataset> getDatasets(String idString, DatasetSource source) {
-        List<Integer> ids = parseCommaSeparated(idString);
-        List<Dataset> datasets = new ArrayList<Dataset>(ids.size());
-        for(int id: ids)
-            datasets.add(new Dataset(id, source));
-        return datasets;
-    }
     
     public static class ComparisonProteinGroup implements Tabular {
         

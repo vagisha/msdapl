@@ -196,11 +196,11 @@ function compareSelectedProtInfer() {
 	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
 	forDisplay +="Group Indistinguishable Proteins: "+groupIndistinguishable;
 	
-	var doCompare = confirm("Compare protein inference results: "+forDisplay);
-	if(doCompare) {
-		var url = "<yrcwww:link path='compareProteinInferenceResults.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+	// var doCompare = confirm("Compare protein inference results: "+forDisplay);
+	// if(doCompare) {
+		var url = "<yrcwww:link path='setComparisonFilters.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
 		window.location.href = url;
-	}
+	// }
 }
 
 function compareSelectedProtInferAndMore() {
@@ -215,8 +215,7 @@ function compareSelectedProtInferAndMore() {
 	});
 	
 	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
-	
-	var url = "<yrcwww:link path='newProteinSetComparison.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+	var url = "<yrcwww:link path='selectComparisonDatasets.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
 	window.location.href = url;
 }
 
@@ -448,17 +447,6 @@ function clearSelectedProtInfer() {
 						</tr>
 					</logic:iterate>
 					
-					<tr>
-						<td colspan="9" align="right">
-							<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
-							&nbsp;
-							<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInferAndMore();"><b>[Compare More]</b></span>
-							&nbsp;
-							<span class="clickable" style="text-decoration:underline;" onclick="javascript:compareSelectedProtInfer();"><b>[Compare]</b></span>
-							<br><br>
-							<span class="clickable" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer();">[Clear Selected]</span>
-						</td>
-					</tr>
 					</tbody>
 					</table>
 				</div>
@@ -555,7 +543,14 @@ function clearSelectedProtInfer() {
 							</td>
 						</tr>
 					</logic:iterate>
-					<tr>
+					
+					</tbody>
+					</table>
+				</div>
+			</logic:notEmpty>
+			<div style="margin:5 5 5 5; padding:5; border: 1px dashed gray;" >
+			<table width="100%">
+				<tr>
 						<td colspan="9" align="right">
 							<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins
 							&nbsp;
@@ -566,10 +561,8 @@ function clearSelectedProtInfer() {
 							<span class="clickable" style="text-decoration:underline;" onclick="javascript:clearSelectedProtInfer();">[Clear Selected]</span>
 						</td>
 					</tr>
-					</tbody>
-					</table>
-				</div>
-			</logic:notEmpty>
+			</table>
+			</div>
 			</logic:equal>
 			
 			

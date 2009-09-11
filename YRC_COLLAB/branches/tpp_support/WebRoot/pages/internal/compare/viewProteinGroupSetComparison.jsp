@@ -1,7 +1,8 @@
 
 <%@page import="org.yeastrc.www.compare.ProteinGroupComparisonDataset"%>
 <%@page import="org.yeastrc.www.compare.DatasetColor"%>
-<%@page import="org.yeastrc.www.compare.Dataset"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+<%@page import="org.yeastrc.www.compare.Dataset"%>
+<%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -96,8 +97,7 @@ $(document).ready(function() {
    						// send a request for the peptides
    						$.blockUI();
   						$("#proteins_"+nrseqId).load("<yrcwww:link path='doProteinGroupComparison.do'/>", 	//url
-  											{'piDatasetIds': 	'<bean:write name="piDatasetIds"/>', 	// data
-  									 		 'dtaDatasetIds':   '<bean:write name="dtaDatasetIds"/>',
+  											{'datasetIds': 	'<bean:write name="datasetIds"/>', 	// data
   									 		 'nrseqProteinId': 		nrseqId
   									 },
   									 function(responseText, status, xhr) {			// callback
@@ -152,8 +152,7 @@ $(document).ready(function() {
    						// send a request for the peptides
    						$.blockUI();
   						$("#peptides_"+nrseqId).load("<yrcwww:link path='doPeptidesComparison.do'/>", 	//url
-  											{'piDatasetIds': 	'<bean:write name="piDatasetIds"/>', 	// data
-  									 		 'dtaDatasetIds':   '<bean:write name="dtaDatasetIds"/>',
+  											{'datasetIds': 	'<bean:write name="datasetIds"/>', 	// data
   									 		 'nrseqProteinId': 		nrseqId
   									 },
   									 function(responseText, status, xhr) {			// callback

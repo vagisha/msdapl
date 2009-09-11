@@ -9,8 +9,8 @@
 	<thead>
 	<tr>
 	<th class="sort-float" align="left"><b><font size="2pt">Min. Probability</font></b></th>
-	<th class="sort-float" align="left"><b><font size="2pt">Sensitivity</font></b></th>
 	<th class="sort-float" align="left"><b><font size="2pt">Error</font></b></th>
+	<th class="sort-float" align="left"><b><font size="2pt">Sensitivity</font></b></th>
 	<th class="sort-int" align="left"><b><font size="2pt"># Correct</font></b></th>
 	<th class="sort-int" align="left"><b><font size="2pt"># Incorrect</font></b></th>
 	</tr>
@@ -20,8 +20,8 @@
 	 	<logic:iterate name="rocSummary"  property="rocPoints" id="rocPoint">
 	 		<tr>
 	 		<td><bean:write name="rocPoint" property="minProbability" /></td>
-	 		<td><bean:write name="rocPoint" property="sensitivity" /></td>
 	 		<td><bean:write name="rocPoint" property="falsePositiveErrorRate" /></td>
+	 		<td><bean:write name="rocPoint" property="sensitivity" /></td>
 	 		<td><bean:write name="rocPoint" property="numCorrect" /></td>
 	 		<td><bean:write name="rocPoint" property="numIncorrect" /></td>
 	 		</tr>

@@ -44,12 +44,8 @@ public class ComparePeptidesAjaxAction extends Action {
 
         
         // get the protein inference ids to compare
-        String piDatasetIdStr = request.getParameter("piDatasetIds");
-        List<Dataset> piDatasets = getDatasets(piDatasetIdStr);
-        
-        // get the DTASelect ids to compare
-        String dtaDatasetIdStr = request.getParameter("dtaDatasetIds");
-        List<Dataset> dtaDatasets = getDatasets(dtaDatasetIdStr, DatasetSource.DTA_SELECT);
+        String datasetIdString = request.getParameter("datasetIds");
+        List<Dataset> piDatasets = getDatasets(datasetIdString);
         
         
         // Get the selected nrseqProteinId
@@ -66,9 +62,8 @@ public class ComparePeptidesAjaxAction extends Action {
         
         
         // Combine the datasets
-        List<Dataset> datasets = new ArrayList<Dataset>(piDatasets.size() + dtaDatasets.size());
+        List<Dataset> datasets = new ArrayList<Dataset>(piDatasets.size());// + dtaDatasets.size());
         datasets.addAll(piDatasets);
-        datasets.addAll(dtaDatasets);
         if(datasets.size() == 0) {
             response.setContentType("text/html");
             response.getWriter().write("<b>No datasets found to compare</b>");
@@ -105,11 +100,4 @@ public class ComparePeptidesAjaxAction extends Action {
         return datasets;
     }
     
-    private List<Dataset> getDatasets(String idString, DatasetSource source) {
-        List<Integer> ids = parseCommaSeparated(idString);
-        List<Dataset> datasets = new ArrayList<Dataset>(ids.size());
-        for(int id: ids)
-            datasets.add(new Dataset(id, source));
-        return datasets;
-    }
 }

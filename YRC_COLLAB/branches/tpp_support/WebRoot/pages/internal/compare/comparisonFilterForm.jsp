@@ -25,13 +25,14 @@
 		</logic:equal>
 	</logic:iterate>
 	
-	<logic:iterate name="proteinSetComparisonForm" property="dtaRunList" id="dtaRun">
-		<logic:equal name="dtaRun" property="selected" value="true">
-			<html:hidden name="dtaRun" property="runId" indexed="true" />
-			<html:hidden name="dtaRun" property="selected" indexed="true" />
+	<logic:iterate name="proteinSetComparisonForm" property="proteinProphetRunList" id="proteinProphetRun">
+		<logic:equal name="proteinProphetRun" property="selected" value="true">
+			<html:hidden name="proteinProphetRun" property="runId" indexed="true" />
+			<html:hidden name="proteinProphetRun" property="selected" indexed="true" />
 		</logic:equal>
 	</logic:iterate>
 	
+
 	<html:hidden name="proteinSetComparisonForm" property="pageNum" styleId="pageNum" />
 	
 <center>
@@ -147,7 +148,7 @@
 
 		<!-- ################## GROUP PROTEINS CHECKBOX	  ########################### -->
 		<logic:notPresent name="goEnrichmentView">
-			<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="groupProteins">Group Indistinguishable Proteins</html:checkbox> </td>
+			<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox> </td>
 		</logic:notPresent>
 	</tr>
 	<logic:notPresent name="goEnrichmentView">
@@ -157,7 +158,7 @@
 			Search:
 		</td>
 		<td style="padding-left:5px;"> 
-			<html:text name="proteinSetComparisonForm" property="searchString" size="40"></html:text><br>
+			<html:text name="proteinSetComparisonForm" property="accessionLike" size="40"></html:text><br>
  			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
  		</td>
  		

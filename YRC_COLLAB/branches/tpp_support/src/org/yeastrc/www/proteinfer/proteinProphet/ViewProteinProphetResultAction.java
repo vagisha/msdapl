@@ -136,7 +136,8 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinProphetGroupProteins());
-        filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        if(!filterForm.isShowAllProteins())
+            filterCriteria.setParsimoniousOnly();
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = ProteinProphetResultsLoader.getProteinIds(pinferId, filterCriteria);
