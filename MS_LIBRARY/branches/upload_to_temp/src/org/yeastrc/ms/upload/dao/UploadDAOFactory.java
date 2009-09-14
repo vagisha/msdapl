@@ -20,8 +20,10 @@ import org.yeastrc.ms.upload.dao.analysis.dualdb.MsRunSearchAnalysisUploadDAOImp
 import org.yeastrc.ms.upload.dao.analysis.dualdb.MsSearchAnalysisUploadDAOImpl;
 import org.yeastrc.ms.upload.dao.analysis.ibatis.MsRunSearchAnalysisUploadDAOIbatisImpl;
 import org.yeastrc.ms.upload.dao.analysis.ibatis.MsSearchAnalysisUploadDAOIbatisImpl;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetRocUploadDAO;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.ibatis.PeptideProphetAnalysisUploadDAOImpl;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.ibatis.PeptideProphetResultUploadDAOImpl;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.ibatis.PeptideProphetRocUploadDAOImpl;
 import org.yeastrc.ms.upload.dao.analysis.percolator.PercolatorParamsUploadDAO;
@@ -202,6 +204,7 @@ public class UploadDAOFactory {
     private PercolatorResultUploadDAO percResultDAO;
     
     // DAOs related to PeptideProphet post search analysis
+    private PeptideProphetAnalysisUploadDAO pprophAnalysisDAO;
     private PeptideProphetRocUploadDAO ppRocDAO;
     private PeptideProphetResultUploadDAO pprophResultDAO;
     
@@ -309,6 +312,7 @@ public class UploadDAOFactory {
         percResultDAO = new PercolatorResultUploadDAOImpl(percResDao, true);
         
         // DAOs related to PeptideProphet post search analysis
+        pprophAnalysisDAO = new PeptideProphetAnalysisUploadDAOImpl(tempSqlMap, analysisDAO);
         ppRocDAO = new PeptideProphetRocUploadDAOImpl(tempSqlMap);
         pprophResultDAO = new PeptideProphetResultUploadDAOImpl(tempSqlMap);
         
@@ -363,6 +367,7 @@ public class UploadDAOFactory {
         percResultDAO = new PercolatorResultUploadDAOIbatisImpl(sqlMap);
         
         // DAOs related to PeptideProphet post search analysis
+        pprophAnalysisDAO = new PeptideProphetAnalysisUploadDAOImpl(sqlMap, analysisDAO);
         ppRocDAO = new PeptideProphetRocUploadDAOImpl(sqlMap);
         pprophResultDAO = new PeptideProphetResultUploadDAOImpl(sqlMap);
     }
@@ -521,6 +526,9 @@ public class UploadDAOFactory {
     //-------------------------------------------------------------------------------------------
     // PeptideProphet related
     //-------------------------------------------------------------------------------------------
+    public PeptideProphetAnalysisUploadDAO getPeptideProphetAnalysisDAO() {
+        return pprophAnalysisDAO;
+    }
     public PeptideProphetResultUploadDAO getPeptideProphetResultDAO() {
         return pprophResultDAO;
     }

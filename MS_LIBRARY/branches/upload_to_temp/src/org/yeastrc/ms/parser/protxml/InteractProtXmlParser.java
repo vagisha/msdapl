@@ -42,6 +42,7 @@ public class InteractProtXmlParser {
     private java.util.Date date;
     
     private List<ProteinProphetParam> params;
+    private List<String> inputFiles;
     private ProteinProphetROC proteinProphetRoc;
     
     public void open(String filePath) throws DataProviderException {
@@ -50,7 +51,7 @@ public class InteractProtXmlParser {
         try {
             InputStream input = new FileInputStream(filePath);
             reader = inputFactory.createXMLStreamReader(input);
-            readProgramDetails();
+            readProteinSummaryHeader();
         }
         catch (FileNotFoundException e) {
             throw new DataProviderException("File not found: "+filePath, e);
@@ -61,27 +62,52 @@ public class InteractProtXmlParser {
         this.filePath = filePath;
     }
     
-    private void readProgramDetails() throws XMLStreamException, DataProviderException {
+    private void readProteinSummaryHeader() throws XMLStreamException, DataProviderException {
         
+        boolean inHeader = false;
         while(reader.hasNext()) {
             int evtType = reader.next();
-            if (evtType == XMLStreamReader.END_ELEMENT && PROGRAM_DETAILS.equalsIgnoreCase(reader.getLocalName())) {
-                return;
+            if(evtType == XMLStreamReader.END_ELEMENT && "protein_summary_header".equalsIgnoreCase(reader.getLocalName())) {
+                return; // we have reached the end of the protein_summary_header
             }
-            
-            if (evtType == XMLStreamReader.START_ELEMENT && PROGRAM_DETAILS.equalsIgnoreCase(reader.getLocalName())) {
-                programName = reader.getAttributeValue(null, "analysis");
-                programVersion = reader.getAttributeValue(null, "version");
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                try {
-                    date = simpleDateFormat.parse(reader.getAttributeValue(null, "time"));
+            else if(evtType == XMLStreamReader.START_ELEMENT && "protein_summary_header".equalsIgnoreCase(reader.getLocalName())) {
+                String files = reader.getAttributeValue(null, "source_files");
+                if(files != null) {
+                    files.trim();
+                    String[] tokens = files.split(",");
+                    for(String file: tokens) {
+                        if(inputFiles == null)  inputFiles = new ArrayList<String>();
+                        this.inputFiles.add(file);
+                    }
                 }
-                catch (ParseException e) {
-                    throw new DataProviderException("Error parsing date", e);
+                else {
+                    throw new DataProviderException("No source_files attribute found");
                 }
-                readProteinProphetDetails();
+                if(inputFiles == null) {
+                    throw new DataProviderException("No source files found");
+                }
+                inHeader = true;
+            }
+            else if(inHeader == true && evtType == XMLStreamReader.START_ELEMENT  &&
+                    PROGRAM_DETAILS.equalsIgnoreCase(reader.getLocalName())) {
+                readProgramDetails();
             }
         }
+        
+    }
+    
+    private void readProgramDetails() throws XMLStreamException, DataProviderException {
+        
+        programName = reader.getAttributeValue(null, "analysis");
+        programVersion = reader.getAttributeValue(null, "version");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try {
+            date = simpleDateFormat.parse(reader.getAttributeValue(null, "time"));
+        }
+        catch (ParseException e) {
+            throw new DataProviderException("Error parsing date", e);
+        }
+        readProteinProphetDetails();
     }
 
     public void close() {
@@ -109,6 +135,10 @@ public class InteractProtXmlParser {
     
     public ProteinProphetROC getProteinProphetRoc() {
         return proteinProphetRoc;
+    }
+    
+    public List<String> getInputFiles() {
+        return this.inputFiles;
     }
     
     private void readProteinProphetDetails() throws DataProviderException {

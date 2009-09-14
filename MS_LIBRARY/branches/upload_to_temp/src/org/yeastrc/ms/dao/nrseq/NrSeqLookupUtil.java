@@ -16,6 +16,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
+import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -281,6 +282,20 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         String statementName = "NrSeq.selectProteinSequenceForNrDbProt";
         try {
             return (String) sqlMap.queryForObject(statementName, nrDbProtId);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
+    public static List<Integer> getDbProteinIdsMatchingPeptide(String peptide, List<Integer> nrDbIds) {
+        String statementName = "NrSeq.selectDbProtIdsMatchingPeptide";
+        try {
+           Map<String, Object> map = new HashMap<String, Object>(4);
+           map.put("peptide", peptide);
+           map.put("nrDbIds", StringUtils.makeCommaSeparated(nrDbIds));
+           return sqlMap.queryForList(statementName, map);
         }
         catch (SQLException e) {
             log.error("Failed to execute select statement: ", e);

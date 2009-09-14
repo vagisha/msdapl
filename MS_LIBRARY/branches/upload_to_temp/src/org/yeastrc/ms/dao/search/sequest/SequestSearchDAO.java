@@ -36,4 +36,11 @@ public interface SequestSearchDAO extends GenericSearchDAO <SequestSearchIn, Seq
      * @return
      */
     public abstract boolean hasEvalue(int searchId);
+    
+    /**
+     * Returns the enzymatic termini contraint used for this search
+     * @param searchId
+     * @return
+     */
+    public abstract int getNumEnzymaticTermini(int searchId);
 }

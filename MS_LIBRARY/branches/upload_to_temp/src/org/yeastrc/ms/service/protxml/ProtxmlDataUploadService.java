@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
@@ -36,6 +37,7 @@ import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
@@ -65,6 +67,7 @@ import org.yeastrc.ms.service.ProtinferUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
+import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
 
 /**
@@ -95,7 +98,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     
     private DynamicModLookupUtil modLookup;
     private int searchId;
-    private int analysisId;
+//    private int analysisId;
     private String protxmlDirectory;
     private int nrseqDatabaseId;
     
@@ -177,7 +180,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         modLookup = new DynamicModLookupUtil(searchId);
         
         // create a new entry for this protein inference run
-        try {addProteinInferenceRun(parser, analysisId);}
+        try {addProteinInferenceRun(parser);}
         catch(UploadException ex) {
             ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
             runDao.delete(uploadedPinferId);
@@ -491,42 +494,55 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             return 0;
     }
 
-    private void addProteinInferenceRun(InteractProtXmlParser parser, int analysisId) throws UploadException {
+    private void addProteinInferenceRun(InteractProtXmlParser parser) throws UploadException {
         
-        MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
-        MsSearchAnalysis analysis = analysisDao.load(analysisId);
-        if(analysis == null) {
+        List<String> inputFiles = parser.getInputFiles();
+        
+        if(inputFiles.size() == 0) {
             UploadException e = new UploadException(ERROR_CODE.GENERAL);
-            e.appendErrorMessage("No analysis found for ID: "+analysisId);
-            throw e;
+            e.appendErrorMessage("No input(pepXML) files found for ProteinProphet run");
+            throw e; 
         }
         
-        ProteinProphetRun run = new ProteinProphetRun();
-        run.setInputGenerator(analysis.getAnalysisProgram());
-        run.setProgram(ProteinInferenceProgram.PROTEIN_PROPHET);
-        run.setProgramVersion(parser.getProgramVersion());
-        run.setDate(new java.sql.Date(parser.getDate().getTime()));
-        uploadedPinferId = runDao.save(run);
-        
-        MsRunSearchDAO rsDao = daoFactory.getMsRunSearchDAO();
-        List<Integer> runSearchIds = rsDao.loadRunSearchIdsForSearch(searchId);
-        
-        ProteinferInputDAO inputDao = ProteinferDAOFactory.instance().getProteinferInputDao();
-        try {
-            for(int runSearchId: runSearchIds) {
-                ProteinferInput input = new ProteinferInput();
-                input.setInputId(runSearchId);
-                input.setInputType(InputType.SEARCH);
-                input.setProteinferId(uploadedPinferId);
-                inputDao.saveProteinferInput(input);
+        boolean first = true;
+        for(String inputPepXml: inputFiles) {
+            PeptideProphetAnalysisUploadDAO pprophAnalysisDao = UploadDAOFactory.getInstance().getPeptideProphetAnalysisDAO();
+            PeptideProphetAnalysis analysis = pprophAnalysisDao.loadAnalysisForFileName(inputPepXml, this.searchId);
+            if(analysis == null) {
+                UploadException e = new UploadException(ERROR_CODE.GENERAL);
+                e.appendErrorMessage("No matching PeptideProphet analysis found for input file: "+inputPepXml);
+                throw e;
+            }
+            
+            if(first) {
+                ProteinProphetRun run = new ProteinProphetRun();
+                run.setInputGenerator(analysis.getAnalysisProgram());
+                run.setProgram(ProteinInferenceProgram.PROTEIN_PROPHET);
+                run.setProgramVersion(parser.getProgramVersion());
+                run.setDate(new java.sql.Date(parser.getDate().getTime()));
+                uploadedPinferId = runDao.save(run);
+                first = false;
+            }
+            
+            MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
+            List<Integer> rsaIds = rsaDao.getRunSearchAnalysisIdsForAnalysis(analysis.getId());
+            
+            ProteinferInputDAO inputDao = ProteinferDAOFactory.instance().getProteinferInputDao();
+            try {
+                for(int rsaId: rsaIds) {
+                    ProteinferInput input = new ProteinferInput();
+                    input.setInputId(rsaId);
+                    input.setInputType(InputType.ANALYSIS);
+                    input.setProteinferId(uploadedPinferId);
+                    inputDao.saveProteinferInput(input);
+                }
+            }
+            catch(RuntimeException ex) {
+                UploadException e = new UploadException(ERROR_CODE.GENERAL, ex);
+                e.appendErrorMessage("Error saving ProteinProphet input.");
+                throw e;
             }
         }
-        catch(RuntimeException ex) {
-            UploadException e = new UploadException(ERROR_CODE.GENERAL, ex);
-            e.appendErrorMessage("Error saving ProteinProphet input.");
-            throw e;
-        }
-        
         
         // save the parameters
         List<ProteinProphetParam> params = parser.getParams();
@@ -561,7 +577,9 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
 
     @Override
     public void setAnalysisId(int analysisId) {
-        this.analysisId = analysisId;
+        throw new UnsupportedOperationException("ProxmlDataUploadService determines the analysis ID based "+ 
+                "on source_files attribute in pep.mxl files");
+//        this.analysisId = analysisId;
     }
 
     @Override

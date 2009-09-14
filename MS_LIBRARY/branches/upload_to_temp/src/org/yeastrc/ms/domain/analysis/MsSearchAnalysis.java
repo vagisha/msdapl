@@ -20,6 +20,8 @@ public interface MsSearchAnalysis {
      */
     public abstract int getId();
     
+    public abstract void setId(int analysisId);
+    
     /**
      * database id of the search on which Percolator was run.
      * @return
