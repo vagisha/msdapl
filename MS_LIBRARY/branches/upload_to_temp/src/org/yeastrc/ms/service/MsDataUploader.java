@@ -8,13 +8,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.service.pepxml.PepxmlDataUploadService;
+import org.yeastrc.ms.service.pepxml.PepxmlAnalysisDataUploadService;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 
@@ -22,7 +23,7 @@ public class MsDataUploader {
 
     private static final Logger log = Logger.getLogger(MsDataUploader.class);
     
-    private int uploadedAnalysisId;
+    private List<Integer> uploadedAnalysisIds;
     private int uploadedSearchId;
     private int uploadedExptId;
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
@@ -229,7 +230,7 @@ public class MsDataUploader {
             
             log.info("BEGINNING upload of sanalysis results");
             try {
-                this.uploadedAnalysisId = exptUploader.uploadAnalysisData(this.uploadedSearchId);
+                this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
@@ -261,7 +262,7 @@ public class MsDataUploader {
         if(uploadProtinfer) {
             log.info("BEGINNING upload of protein inference results");
             try {
-                exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisId);
+                exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisIds);
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
@@ -369,13 +370,8 @@ public class MsDataUploader {
         // Get the analysis data uploader
         if(uploadAnalysis) {
             log.info("Initializing AnalysisDataUploadService");
-            // PepXml files contain both search results and analysis results
-            if(sdus != null && sdus instanceof PepxmlDataUploadService) 
-                exptUploader.setAnalysisDataUploader((AnalysisDataUploadService) sdus);
-            else {
-                AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory);
-                exptUploader.setAnalysisDataUploader(adus);
-            }
+            AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory);
+            exptUploader.setAnalysisDataUploader(adus);
         }
         // Get the protein inference uploader
         if(uploadProtinfer) {
@@ -611,7 +607,7 @@ public class MsDataUploader {
                 
                 log.info("BEGINNING upload of sanalysis results");
                 try {
-                    this.uploadedAnalysisId = exptUploader.uploadAnalysisData(this.uploadedSearchId);
+                    this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
                 }
                 catch (UploadException ex) {
                     uploadExceptionList.add(ex);
@@ -640,7 +636,7 @@ public class MsDataUploader {
                 }
             }
             else {
-                this.uploadedAnalysisId = searchAnalysisID;
+                this.uploadedAnalysisIds.add(searchAnalysisID);
                 log.info("Search Analysis was uploaded previously. SearchAnalysisID: "+searchAnalysisID);
             }
         }
@@ -649,7 +645,7 @@ public class MsDataUploader {
         if(uploadProtinfer) {
             log.info("BEGINNING upload of protein inference results");
             try {
-                exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisId);
+                exptUploader.uploadProtinferData(this.uploadedSearchId, this.uploadedAnalysisIds);
             }
             catch (UploadException ex) {
                 uploadExceptionList.add(ex);
@@ -665,12 +661,20 @@ public class MsDataUploader {
     }
 
     private int getSearchAnalysisId(int searchId) throws Exception {
-        MsSearchAnalysisUploadDAO analysisDao = UploadDAOFactory.getInstance().getMsSearchAnalysisDAO();
-        List<Integer> analysisIds = analysisDao.getAnalysisIdsForSearch(searchId);
+        MsSearchAnalysisDAO adao = DAOFactory.instance().getMsSearchAnalysisDAO();
+        List<Integer> analysisIds = adao.getAnalysisIdsForSearch(searchId);
+        if(analysisIds.size() > 0) {
+            // If we are uploading PEPTIDE_PROPHET results we may have multiple
+            // pepxml files in the same folder. So we will look at each one and 
+            // check if it has been uploaded or not.
+            MsSearchAnalysis analysis = adao.load(analysisIds.get(0));
+            if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+                return 0;
+            }
+        }
         if(analysisIds.size() > 1) {
             throw new Exception("Multiple analysis ids for found for searchID: "+searchId);
         }
-        if(analysisIds.size() == 0) return 0;
         return analysisIds.get(0);
     }
 
@@ -789,24 +793,26 @@ public class MsDataUploader {
 
         
 //        for(int i = 0; i < 10; i++) {
-        String directory = args[0];
+//        String directory = args[0];
+        String directory = "/Users/silmaril/WORK/UW/SQT_BKUP_TEST";
         
         if(directory == null || directory.length() == 0 || !(new File(directory).exists()))
             System.out.println("Invalid directory: "+directory);
         
-        boolean maccossData = Boolean.parseBoolean(args[1]);
+//        boolean maccossData = Boolean.parseBoolean(args[1]);
+        boolean maccossData = true;
         
         System.out.println("Directory: "+directory+"; Maccoss Data: "+maccossData);
         
         MsDataUploader uploader = new MsDataUploader();
         uploader.setRemoteServer("local");
         uploader.setSpectrumDataDirectory(directory);
-        uploader.setSearchDirectory(directory);
-        uploader.setAnalysisDirectory(directory);
-        uploader.setProtinferDirectory(directory);
+        uploader.setSearchDirectory(directory+File.separator+"pipeline"+File.separator+"sequest");
+        uploader.setAnalysisDirectory(directory+File.separator+"pipeline"+File.separator+"percolator");
+//        uploader.setProtinferDirectory(directory);
         
         uploader.setRemoteSpectrumDataDirectory(directory);
-        uploader.setRemoteSearchDataDirectory(directory);
+        uploader.setRemoteSearchDataDirectory(directory+File.separator+"pipeline"+File.separator+"sequest");
         uploader.setSearchDate(new Date());
         uploader.checkResultChargeMass(maccossData);
         

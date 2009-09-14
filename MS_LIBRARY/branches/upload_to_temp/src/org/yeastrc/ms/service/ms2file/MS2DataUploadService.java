@@ -98,7 +98,7 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
      * @throws UploadException
      */
     @Override
-    public int upload() throws UploadException {
+    public void upload() throws UploadException {
         
         if(!preUploadCheckDone) {
             if(!preUploadCheckPassed()) {
@@ -122,8 +122,8 @@ public class MS2DataUploadService implements SpectrumDataUploadService {
                 throw e;
             }
         }
-        return experimentId;
     }
+    
     
     private int uploadMS2Run(int experimentId, String filePath, String serverDirectory) throws UploadException {
         

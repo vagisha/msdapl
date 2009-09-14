@@ -7,6 +7,7 @@
 package org.yeastrc.ms.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
@@ -237,7 +238,8 @@ public class MsExperimentUploader {
         if(do_sdupload) {
             sdus.setExperimentId(experimentId);
             sdus.setSpectrumFileNames(rdus.getFileNames());
-            searchId = sdus.upload();
+            sdus.upload();
+            searchId = sdus.getUploadedSearchId();
         }
         else {
             log.error("No SearchDataUploadService found");
@@ -247,35 +249,33 @@ public class MsExperimentUploader {
         
     }
     
-    public int uploadAnalysisData(int searchId) throws UploadException {
+    public List<Integer> uploadAnalysisData(int searchId) throws UploadException {
         
-        int analysisId;
+        List<Integer> uploadedAnalysisIds = null;
         // if we have post-search analysis data upload that next
         if(do_adupload) {
             adus.setSearchId(searchId);
-            analysisId = adus.upload();
+            adus.setSearchDataFileNames(sdus.getFileNames());
+            adus.upload();
         }
         else {
             log.error("No AnalysisDataUploadService found");
-            return 0;
+            return null;
         }
-        return analysisId;
+        return uploadedAnalysisIds;
     }
     
-    public int uploadProtinferData(int searchId, int analysisId) throws UploadException {
-        
-        int protinferId;
+    public void uploadProtinferData(int searchId, List<Integer> analysisIds) throws UploadException {
         
         if(do_piupload) {
             pidus.setSearchId(searchId);
-            pidus.setAnalysisId(analysisId);
-            protinferId = pidus.upload();
+            if(analysisIds != null && analysisIds.size() == 1)
+                pidus.setAnalysisId(analysisIds.get(0));
+            pidus.upload();
         }
         else {
             log.error("No ProtinferUploadService found");
-            return 0;
         }
-        return protinferId;
     }
     
     private int saveExperiment() throws UploadException {

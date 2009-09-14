@@ -16,23 +16,18 @@ public class EnzymeRule {
     private Sense sense;
     private char[] cutResidues;
     private char[] noCutResidues;
-    private int numEnzymaticTermini;
     
-    public EnzymeRule(MsEnzyme enzyme, int numEnzymaticTermini) {
+    public EnzymeRule(MsEnzyme enzyme) {
+        
         this.sense = enzyme.getSense();
         cutResidues = enzyme.getCut().toCharArray();
         if(enzyme.getNocut() == null)
             noCutResidues = new char[0];
         else
             noCutResidues = enzyme.getNocut().toCharArray();
-        
-        this.numEnzymaticTermini = numEnzymaticTermini;
     }
     
-    public boolean applyRule(String peptide, char nterm, char cterm) {
-        
-        if(numEnzymaticTermini == 0)
-            return true;
+    public int getNumEnzymaticTermini(String peptide, char nterm, char cterm) {
         
         char cut_pre = 0;
         char cut_post = 0;
@@ -52,22 +47,22 @@ public class EnzymeRule {
             nocut_post = peptide.charAt(peptide.length() -1);
         }
         
-        if(numEnzymaticTermini == 2) {
-            return (nterm == '-' ||  // beginning of protein sequence
-                   (inCharArray(cutResidues, cut_pre) && !inCharArray(noCutResidues, nocut_pre)))
-                    &&
-                   (cterm == '-' || // end of protein sequence
-                   (inCharArray(cutResidues, cut_post) && !inCharArray(noCutResidues, nocut_post)));
-        }
+        int numEnzymaticTermini = 0;
         
+        if((nterm == '-' ||  // beginning of protein sequence
+                   (inCharArray(cutResidues, cut_pre) && !inCharArray(noCutResidues, nocut_pre))))
+            numEnzymaticTermini++;
         
-        if(numEnzymaticTermini == 1) {
-            return (inCharArray(cutResidues, cut_pre) && !inCharArray(noCutResidues, nocut_pre))
-                    ||
-                    (inCharArray(cutResidues, cut_post) && !inCharArray(noCutResidues, nocut_post));
-        }
+        if(cterm == '-' || // end of protein sequence
+                   (inCharArray(cutResidues, cut_post) && !inCharArray(noCutResidues, nocut_post)))
+            numEnzymaticTermini++;
         
-        return false;
+        return numEnzymaticTermini;
+    }
+    
+    public boolean applyRule(String peptide, char nterm, char cterm, int minEnzymaticTermini) {
+        
+        return getNumEnzymaticTermini(peptide, nterm, cterm) >= minEnzymaticTermini;
     }
     
     private boolean inCharArray(char[] array, char myChar) {

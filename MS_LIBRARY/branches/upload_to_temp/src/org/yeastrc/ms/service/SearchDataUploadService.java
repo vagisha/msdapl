@@ -19,9 +19,17 @@ public interface SearchDataUploadService extends UploadService {
     
     public void setSpectrumFileNames(List<String> fileNames);
     
+    /**
+     * Returns the filenames WITHOUT extensions
+     * @return
+     */
+    public List<String> getFileNames();
+    
     public void setDecoyDirectory(String directory);
     
     public void setRemoteDecoyDirectory(String directory);
+    
+    public int getUploadedSearchId();
     
     /**
      * If true, the charge and mass reported for a search result will be matched against 

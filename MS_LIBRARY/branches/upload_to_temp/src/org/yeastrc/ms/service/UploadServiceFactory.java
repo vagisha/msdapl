@@ -20,7 +20,8 @@ import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
-import org.yeastrc.ms.service.pepxml.PepxmlDataUploadService;
+import org.yeastrc.ms.service.pepxml.PepxmlAnalysisDataUploadService;
+import org.yeastrc.ms.service.pepxml.PepxmlSearchDataUploadService;
 import org.yeastrc.ms.service.protxml.ProtxmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.BaseSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
@@ -179,7 +180,7 @@ public class UploadServiceFactory {
             }
         }
         else if(format == SearchFileFormat.PEPXML) {
-            SearchDataUploadService service = new PepxmlDataUploadService();
+            SearchDataUploadService service = new PepxmlSearchDataUploadService();
             service.setDirectory(dataDirectory);
             return service;
         }
@@ -253,7 +254,7 @@ public class UploadServiceFactory {
             }
         }
         else if(format == SearchFileFormat.PEPXML) {
-            AnalysisDataUploadService service = new PepxmlDataUploadService();
+            AnalysisDataUploadService service = new PepxmlAnalysisDataUploadService();
             service.setDirectory(dataDirectory);
             return service;
         }

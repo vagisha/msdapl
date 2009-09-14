@@ -15,11 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
@@ -33,10 +33,8 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRocDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProteinDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
@@ -102,13 +100,17 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private String protxmlDirectory;
     private int nrseqDatabaseId;
     
-    private int uploadedPinferId;
+//    private int uploadedPinferId;
     private int indistinguishableProteinGroupId = 1;
     
-    private int numProteinGroups;
+//    private int numProteinGroups;
     
+    private StringBuilder uploadMsg;
     private StringBuilder preUploadCheckMsg;
     private boolean preUploadCheckDone = false;
+    
+    private static final Pattern fileNamePattern = Pattern.compile("interact*.prot.xml");
+    private List<String> protXmlFiles = new ArrayList<String>();
     
     public ProtxmlDataUploadService() {
         
@@ -137,10 +139,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     }
     
     
-    public int upload() throws UploadException {
-        
-        uploadedPinferId = 0;
-        indistinguishableProteinGroupId = 1;
+    public void upload() throws UploadException {
         
         if(!preUploadCheckDone) {
             if(!preUploadCheckPassed()) {
@@ -165,11 +164,21 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             this.nrseqDatabaseId = dbList.get(0).getSequenceDatabaseId();
         }
         
-        numProteinGroups = 0;
+        for(String protxmlFile: this.protXmlFiles) {
+            uploadProtxmlFile(protxmlFile);
+        }
+    }
+
+
+    private void uploadProtxmlFile(String protxmlFile) throws UploadException {
+        
+        indistinguishableProteinGroupId = 1;
+        int numProteinGroups = 0;
+        int uploadedPinferId = 0;
         
         InteractProtXmlParser parser = new InteractProtXmlParser();
         try {
-            parser.open(this.protxmlDirectory+File.separator+"interact.prot.xml");
+            parser.open(this.protxmlDirectory+File.separator+protxmlFile);
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PROTXML_ERROR, e);
@@ -180,8 +189,9 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         modLookup = new DynamicModLookupUtil(searchId);
         
         // create a new entry for this protein inference run
-        try {addProteinInferenceRun(parser);}
+        try {uploadedPinferId = addProteinInferenceRun(parser);}
         catch(UploadException ex) {
+            parser.close();
             ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
             runDao.delete(uploadedPinferId);
             throw ex;
@@ -212,10 +222,11 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             runDao.delete(uploadedPinferId);
             throw ex;
         }
-        
-        parser.close();
-        
-        return uploadedPinferId;
+        finally {
+            parser.close();
+        }
+        uploadMsg.append("\n\tProtein inferenceID: "+uploadedPinferId);
+        uploadMsg.append("; #Protein groups in file: "+protxmlFile+": "+numProteinGroups);
     }
 
 
@@ -247,7 +258,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 // TODO what about protein coverage
             }
             
-            indistinguishableProteinGroupId++;
+            this.indistinguishableProteinGroupId++;
         }
         
         saveSubsumedProteins(subsumedMap, proteinIdMap);
@@ -494,7 +505,9 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             return 0;
     }
 
-    private void addProteinInferenceRun(InteractProtXmlParser parser) throws UploadException {
+    private int addProteinInferenceRun(InteractProtXmlParser parser) throws UploadException {
+        
+        int uploadedPinferId = 0;
         
         List<String> inputFiles = parser.getInputFiles();
         
@@ -572,6 +585,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             ex.appendErrorMessage("Error saving ProteinProphet ROC points.");
             throw ex;
         }
+        return uploadedPinferId;
     }
 
 
@@ -595,7 +609,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     @Override
     public String getUploadSummary() {
         return "\tProtein inference file format: "+SearchFileFormat.PROTXML+
-        "\n\t#Protein groups in interact.prot.xml: "+numProteinGroups;
+        "\n\t"+uploadMsg.toString();
     }
 
     @Override
@@ -624,13 +638,14 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         boolean found = false;
         for (int i = 0; i < files.length; i++) {
-            if(files[i].getName().equalsIgnoreCase("interact.prot.xml")) {
+            if (fileNamePattern.matcher(files[i].getName().toLowerCase()).matches()) {
+//            if(files[i].getName().equalsIgnoreCase("interact.prot.xml")) {
                 found = true;
                 break;
             }
         }
         if(!found) {
-            appendToMsg("Could not find interact.prot.xml in directory: "+protxmlDirectory);
+            appendToMsg("Could not find interact*.prot.xml file(s) in directory: "+protxmlDirectory);
             return false;
         }
         

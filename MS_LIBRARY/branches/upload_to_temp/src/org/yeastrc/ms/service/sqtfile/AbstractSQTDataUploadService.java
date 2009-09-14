@@ -144,7 +144,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     protected String getDataDirectory() {
         return this.dataDirectory;
     }
-    protected List<String> getFileNames() {
+    public List<String> getFileNames() {
         return this.filenames;
     }
     
@@ -233,7 +233,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     
     //--------------------------------------------------------------------------------------------------
     @Override
-    public int upload() throws UploadException {
+    public void upload() throws UploadException {
 
         reset();// reset all caches etc.
         
@@ -311,6 +311,9 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         // copy files to a directory
         copyFiles(experimentId);
         
+    }
+    
+    public int getUploadedSearchId() {
         return searchId;
     }
 

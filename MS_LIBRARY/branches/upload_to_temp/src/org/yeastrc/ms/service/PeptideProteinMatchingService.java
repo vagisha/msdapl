@@ -44,7 +44,7 @@ public class PeptideProteinMatchingService {
         
         List<EnzymeRule> enzymeRules = new ArrayList<EnzymeRule>(enzymes.size());
         for(MsEnzyme enzyme: enzymes)
-            enzymeRules.add(new EnzymeRule(enzyme, numEnzymaticTermini));
+            enzymeRules.add(new EnzymeRule(enzyme));
         
         // find the matching database protein ids for the given peptide and fasta databases
         List<Integer> dbProtIds = getMatchingDbProteinIds(peptide, databases);
@@ -62,7 +62,7 @@ public class PeptideProteinMatchingService {
     }
 
     private static PeptideProteinMatch getPeptideProteinMatch(NrDbProtein dbProt, String peptide,
-            List<EnzymeRule> enzymeRules, int numEnymaticTermini) {
+            List<EnzymeRule> enzymeRules, int minEnzymaticTermini) {
         
         String sequence = NrSeqLookupUtil.getProteinSequence(dbProt.getProteinId());
         
@@ -84,7 +84,9 @@ public class PeptideProteinMatchingService {
             }
             // look at each enzyme rule and return the first match
             for(EnzymeRule rule: enzymeRules) {
-                if(rule.applyRule(peptide, nterm, cterm)) {
+                int net = rule.getNumEnzymaticTermini(peptide, nterm, cterm);
+                if(net >= minEnzymaticTermini) {
+                    match.setNumEnzymaticTermini(net);
                     return match;
                 }
             }

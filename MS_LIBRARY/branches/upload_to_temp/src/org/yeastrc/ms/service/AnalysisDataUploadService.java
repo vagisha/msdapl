@@ -24,4 +24,6 @@ public interface AnalysisDataUploadService extends UploadService {
     
     public void setSearchDataFileNames(List<String> searchDataFileNames);
     
+    public List<Integer> getUploadedAnalysisIds();
+    
 }

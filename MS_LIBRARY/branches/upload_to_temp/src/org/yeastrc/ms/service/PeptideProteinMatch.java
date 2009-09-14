@@ -16,6 +16,7 @@ public class PeptideProteinMatch {
     private String peptide;
     private char preResidue;
     private char postResidue;
+    private int numEnzymaticTermini;
     private NrDbProtein protein;
     
     public String getPeptide() {
@@ -41,6 +42,12 @@ public class PeptideProteinMatch {
     }
     public void setProtein(NrDbProtein protein) {
         this.protein = protein;
+    }
+    public int getNumEnzymaticTermini() {
+        return numEnzymaticTermini;
+    }
+    public void setNumEnzymaticTermini(int numEnzymaticTermini) {
+        this.numEnzymaticTermini = numEnzymaticTermini;
     }
    
 }

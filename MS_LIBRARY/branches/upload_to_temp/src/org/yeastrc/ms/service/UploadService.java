@@ -23,6 +23,6 @@ public interface UploadService {
     
     public String getUploadSummary();
     
-    public int upload() throws UploadException;
+    public void upload() throws UploadException;
     
 }

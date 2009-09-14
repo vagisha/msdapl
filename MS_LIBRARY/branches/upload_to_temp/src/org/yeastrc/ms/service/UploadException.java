@@ -71,7 +71,7 @@ public class UploadException extends Exception {
         SCAN_CHARGE_NOT_FOUND   ("MS2 scan charge information not found", ERROR),
         
         // For Percolator uploads
-        NO_RUNSEARCHID_FOR_SQT  ("No runSearchID found for Percolator sqt file", WARN),
+        NO_RUNSEARCHID_FOR_ANALYSIS_FILE  ("No runSearchID found for analysis file", WARN),
         NO_PERC_ANALYSIS_UPLOADED("No Percolator analysis files were uploaded", ERROR),
         NO_MATCHING_SEARCH_RESULT("No matching search result was found for the Percolator result", WARN),
         MULTI_MATCHING_SEARCH_RESULT("Multiple matching search results were found for the Percolator result", WARN),

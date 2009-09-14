@@ -1,3 +1,9 @@
+/**
+ * PepxmlSearchDataUploadService.java
+ * @author Vagisha Sharma
+ * Sep 13, 2009
+ * @version 1.0
+ */
 package org.yeastrc.ms.service.pepxml;
 
 import java.io.File;
@@ -14,12 +20,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl.SequestResultDataSqlMapParam;
-import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
-import org.yeastrc.ms.domain.analysis.impl.SearchAnalysisBean;
-import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
-import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResultDataWId;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
-import org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetResultDataBean;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -45,18 +46,13 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.pepxml.InteractPepXmlFileReader;
+import org.yeastrc.ms.parser.pepxml.PepXmlFileReader;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
-import org.yeastrc.ms.service.AnalysisDataUploadService;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
-import org.yeastrc.ms.upload.dao.analysis.MsRunSearchAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
-import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetRocUploadDAO;
 import org.yeastrc.ms.upload.dao.run.MsRunUploadDAO;
 import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsRunSearchUploadDAO;
@@ -68,15 +64,15 @@ import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchResultUploadDAO;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchUploadDAO;
 
-// This will upload the Sequest results and the corresponding PeptideProphet results. 
-public class PepxmlDataUploadService implements SearchDataUploadService,
-        AnalysisDataUploadService {
+/**
+ * 
+ */
+public class PepxmlSearchDataUploadService implements SearchDataUploadService {
 
-    private static final int BUF_SIZE = 500;
+private static final int BUF_SIZE = 500;
     
     private int experimentId;
     private int searchId;
-    private int analysisId;
     
     private String dataDirectory;
     private Date searchDate;
@@ -87,7 +83,6 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     private List<String> searchDataFileNames;
     private List<String> spectrumFileNames;
 
-    private String numSearchFiles;
     private boolean preUploadCheckDone;
     
     private final MsRunUploadDAO runDao;
@@ -98,11 +93,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     private final MsSearchModificationUploadDAO modDao;
     private final MsSearchResultUploadDAO resultDao;
     private final MsSearchUploadDAO searchDao;
-    private final MsSearchAnalysisUploadDAO analysisDao;
-    private final MsRunSearchAnalysisUploadDAO runSearchAnalysisDao;
     private final SequestSearchResultUploadDAO sqtResultDao;
-    private final PeptideProphetRocUploadDAO rocDao;
-    private final PeptideProphetResultUploadDAO ppResDao;
     
     
     // these are the things we will cache and do bulk-inserts
@@ -110,7 +101,6 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     private List<MsResultResidueModIds> resultResidueModList;
     private List<MsResultTerminalModIds> resultTerminalModList;
     private List<SequestResultDataWId> sequestResultDataList; // sequest scores
-    private List<PeptideProphetResultDataWId> prophetResultDataList; // PeptideProphet scores
     
     private MsSearchDatabaseIn db = null;
     private boolean usesEvalue = false;
@@ -120,13 +110,11 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     private int sequenceDatabaseId; // nrseq database id
     private DynamicModLookupUtil dynaModLookup;
     private int numSearchesUploaded = 0;
-    private int numAnalysisUploaded = 0;
     
-    private boolean uploadDone = false;
     
-    private static final Logger log = Logger.getLogger(PepxmlDataUploadService.class.getName());
+    private static final Logger log = Logger.getLogger(PepxmlAnalysisDataUploadService.class.getName());
     
-    public PepxmlDataUploadService() {
+    public PepxmlSearchDataUploadService() {
         
         this.searchDataFileNames = new ArrayList<String>();
         
@@ -134,7 +122,6 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         this.resultResidueModList = new ArrayList<MsResultResidueModIds>(BUF_SIZE);
         this.resultTerminalModList = new ArrayList<MsResultTerminalModIds>(BUF_SIZE);
         this.sequestResultDataList = new ArrayList<SequestResultDataWId>(BUF_SIZE);
-        this.prophetResultDataList = new ArrayList<PeptideProphetResultDataWId>(BUF_SIZE);
         
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
@@ -151,11 +138,6 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         this.modDao = daoFactory.getMsSearchModDAO();
         this.resultDao = daoFactory.getMsSearchResultDAO();
         
-        this.analysisDao = daoFactory.getMsSearchAnalysisDAO();
-        this.runSearchAnalysisDao  = daoFactory.getMsRunSearchAnalysisDAO();
-        
-        this.rocDao = daoFactory.getPeptideProphetRocDAO();
-        this.ppResDao = daoFactory.getPeptideProphetResultDAO();
     }
     
     @Override
@@ -196,7 +178,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     @Override
     public String getUploadSummary() {
         return "\tSearch file format: "+SearchFileFormat.PEPXML+
-        "\n\t#Searches/Analyses in interact.pep.xml: "+numSearchFiles;
+        "\n\t#Search files in Directory: "+searchDataFileNames.size()+"; #Uploaded: "+numSearchesUploaded;
     }
 
     @Override
@@ -216,49 +198,23 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
             return false;
         }
         
-        // 2. Look for interact.pep.xml file
+        // 2. Look for *.pep.xml file
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String name_uc = name.toLowerCase();
                 return name_uc.endsWith(".pep.xml");
             }});
-        
-        boolean found = false;
         for (int i = 0; i < files.length; i++) {
-            if(files[i].getName().equalsIgnoreCase("interact.pep.xml")) {
-                found = true;
-                break;
-            }
+            String name = files[i].getName();
+            name = name.substring(0, name.lastIndexOf("pep.xml"));
+            if(!name.startsWith("interact")) // don't add interact*.pep.xml files here
+                searchDataFileNames.add(name);
         }
-        if(!found) {
-            appendToMsg("Could not find interact.pep.xml in directory: "+dataDirectory);
-            return false;
-        }
+        
         
         // 3. If we know the raw data file names that will be uploaded match them with up with the 
-        //    file names in the interact.pep.xml file and make sure there is a spectrum data file 
-        //    for each one.
-        InteractPepXmlFileReader parser = new InteractPepXmlFileReader();
-        try {
-            parser.open(dataDirectory+File.separator+"interact.pep.xml");
-        }
-        catch (DataProviderException e) {
-            appendToMsg("Error opening interact.pep.xml file: "+e.getMessage());
-            return false;
-        }
-        this.searchDataFileNames = new ArrayList<String>();
-        try {
-            while(parser.hasNextRunSearch()) {
-                searchDataFileNames.add(parser.getFileName());
-            }
-        }
-        catch (DataProviderException e) {
-            appendToMsg("Error reading interact.pep.xml file: "+e.getMessage());
-            return false;
-        }
-        parser.close();
-        
+        //    *.pep.xml file and make sure there is a spectrum data file for each one.
         if(spectrumFileNames != null) {
             for(String file:searchDataFileNames) {
                 if(!spectrumFileNames.contains(file)) {
@@ -290,14 +246,8 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     }
 
     @Override
-    public int upload() throws UploadException {
+    public void upload() throws UploadException {
         
-        // PepXml files have both search results and analysis results.  They get uploaded at the same time
-        // When the MsExperimentUploader calls the upload() method of this class to upload the analysis data
-        // data has already been uploaded.  So we just return the analysisId. 
-        if(uploadDone) {
-            return this.analysisId;
-        }
         
         reset();// reset all caches etc.
         
@@ -335,78 +285,41 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         dynaModLookup = new DynamicModLookupUtil(searchId);
         
         
-        // now upload the search (Sequest) and analysis (PeptideProphet) data in the interact.pep.xml file
-        InteractPepXmlFileReader parser = new InteractPepXmlFileReader();
-        parser.setParseEvalue(this.usesEvalue);
-        try {
-            parser.open(dataDirectory+File.separator+"interact.pep.xml");
-        }
-        catch (DataProviderException e) {
-            UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
-            ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
-            deleteSearch(searchId);
-            numSearchesUploaded = 0;
-            numAnalysisUploaded = 0;
-            throw ex;
-        }
-        
-        // TODO  If refresh parser has not been run determine peptide protein matches from the 
-        // protein sequence database.
-        if(!parser.isRefreshParserRun()) {
-            UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR);
-            ex.setErrorMessage("Refresh parser has not been run");
-            throw ex;
-        }
-        
-        // create a new entry for PeptideProphet analysis.
-        try {
-            analysisId = createPeptideProphetAnalysis(parser);
-        }
-        catch(UploadException ex) {
-            ex.appendErrorMessage("\n\tDELETING SEARCH AND ANALYSIS...\n");
-            deleteSearch(searchId);
+        // now upload the search (Sequest) data in the *.pep.xml files
+        for (String file: searchDataFileNames) {
+            String filePath = dataDirectory+File.separator+file+".pep.xml";
+            Integer runId = runIdMap.get(file); 
             
-            numSearchesUploaded = 0;
-            numAnalysisUploaded = 0;
+            resetCaches();
+            // int runSearchId;
             
-            throw ex;
-        }
-        
-        try {
-            while(parser.hasNextRunSearch()) {
-                String filename = parser.getFileName();
-                
-                Integer runId = runIdMap.get(filename);
-                try {
-                    uploadRunSearchAndAnalysis(filename, searchId, analysisId, runId, parser);
-                }
-                catch (UploadException ex) {
-                    ex.appendErrorMessage("\n\tDELETING SEARCH AND ANALYSIS...\n");
-                    deleteSearch(searchId);
-                    deleteAnalysis(analysisId);
-                    
-                    numSearchesUploaded = 0;
-                    numAnalysisUploaded = 0;
-                    
-                    throw ex;
-                }
-                numSearchesUploaded++;
-                numAnalysisUploaded++;
-                 
-                resetCaches();
+            PepXmlFileReader parser = new PepXmlFileReader();
+            parser.setParseEvalue(this.usesEvalue);
+            try {
+                parser.open(dataDirectory+File.separator+"interact.pep.xml");
             }
-        }
-        catch (DataProviderException e) {
-            UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
-            ex.appendErrorMessage("\n\tDELETING SEARCH AND ANALYSIS...\n");
-            deleteSearch(searchId);
-            deleteAnalysis(analysisId);
-            numSearchesUploaded = 0;
-            numAnalysisUploaded = 0;
-            throw ex;
-        }
-        finally {
-            parser.close();
+            catch (DataProviderException e) {
+                UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
+                ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
+                deleteSearch(searchId);
+                numSearchesUploaded = 0;
+                throw ex;
+            }
+            
+            try {
+                uploadRunSearch(filePath, searchId, runId, parser);
+                numSearchesUploaded++;
+            }
+            catch (UploadException ex) {
+                ex.appendErrorMessage("\n\tDELETING SEARCH ..."+searchId+"\n");
+                deleteSearch(searchId);
+                numSearchesUploaded = 0;
+                
+                throw ex;
+            }
+            finally {
+                parser.close();
+            }
         }
         
         
@@ -419,44 +332,8 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
             throw ex;
         }
         
-        // if no PeptideProphet analyses were uploaded delete the top level search analysis
-        if (numAnalysisUploaded == 0) {
-            UploadException ex = new UploadException(ERROR_CODE.NO_PEPTPROPH_ANALYSIS_UPLOADED);
-            ex.appendErrorMessage("\n\tDELETING PEPTIDE PROPHET ANALYSIS...ID: "+analysisId+"\n");
-            deleteAnalysis(analysisId);
-            numAnalysisUploaded = 0;
-            throw ex;
-        }
-        
-        uploadDone = true;
-        return searchId;
     }
     
-    // ---------------------------------------------------------------------------------------------
-    // SAVE THE PEPTIDE PROPHET ANALYSIS INFORMATION
-    // ---------------------------------------------------------------------------------------------
-    private int createPeptideProphetAnalysis(InteractPepXmlFileReader parser) throws UploadException {
-            
-        SearchAnalysisBean analysis = new SearchAnalysisBean();
-//      analysis.setSearchId(searchId);
-        analysis.setAnalysisProgram(Program.PEPTIDE_PROPHET);
-        analysis.setAnalysisProgramVersion(parser.getPeptideProphetVersion());
-        int analysisId;
-        try {
-            analysisId = analysisDao.save(analysis);
-        }
-        catch(RuntimeException e) {
-            UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR, e);
-            ex.setErrorMessage(e.getMessage());
-            throw ex;
-        }
-        PeptideProphetROC roc = parser.getPeptideProphetRoc();
-        roc.setSearchAnalysisId(analysisId);
-        rocDao.saveRoc(roc);
-        
-        return analysisId;
-        
-    }
 
     private int getScanId(int runId, int scanNumber)
             throws UploadException {
@@ -471,11 +348,10 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     }
     
     
-    private void uploadRunSearchAndAnalysis(String filename, int searchId, int analysisId, int runId,
-            InteractPepXmlFileReader parser) throws UploadException {
+    private void uploadRunSearch(String filename, int searchId, int runId,
+            PepXmlFileReader parser) throws UploadException {
         
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
-        int runSearchAnalysisId = uploadRunSearchAnalysis(analysisId, runSearchId);
         
         // upload the search results for each scan + charge combination
         int numResults = 0;
@@ -488,7 +364,6 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
                 for(SequestPeptideProphetResultIn result: scan.getScanResults()) {
                     int resultId = uploadBaseSearchResult(result, runSearchId, scanId);
                     uploadSequestResultData(result.getSequestResultData(), resultId); // Sequest scores
-                    uploadAnalysisResult(result, resultId, runSearchAnalysisId);      // PeptideProphet scores
                     numResults++;
                 }
             }
@@ -499,7 +374,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         }
         
         flush(); // save any cached data
-        log.info("Uploaded search and analysis results for file: "+filename+", with "+numResults+
+        log.info("Uploaded search results for file: "+filename+", with "+numResults+
                 " results. (runSearchId: "+runSearchId+")");
         
     }
@@ -517,44 +392,8 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         if (sequestResultDataList.size() > 0) {
             uploadSequestResultBuffer();
         }
-        if(prophetResultDataList.size() > 0) {
-            uploadPeptideProphetResultBuffer();
-        }
-    }
-    // -------------------------------------------------------------------------------------------
-    // UPLOAD PEPTIDE PROPHET ANALYSIS RESULT
-    // -------------------------------------------------------------------------------------------
-    private boolean uploadAnalysisResult(SequestPeptideProphetResultIn result, int resultId, int rsAnalysisId) 
-        throws UploadException {
-        
-        
-        // upload the PeptideProphet specific result information if the cache has enough entries
-        if (prophetResultDataList.size() >= BUF_SIZE) {
-            uploadPeptideProphetResultBuffer();
-        }
-        
-        // add the PeptideProphet specific information for this result to the cache
-        PeptideProphetResultDataBean res = new PeptideProphetResultDataBean();
-        res.setRunSearchAnalysisId(rsAnalysisId);
-        res.setResultId(resultId);
-        res.setProbability(result.getProbability());
-        res.setfVal(result.getfVal());
-        res.setNumEnzymaticTermini(result.getNumEnzymaticTermini());
-        res.setNumMissedCleavages(result.getNumMissedCleavages());
-        res.setMassDifference(result.getMassDifference());
-        res.setProbabilityNet_0(result.getProbabilityNet_0());
-        res.setProbabilityNet_1(result.getProbabilityNet_1());
-        res.setProbabilityNet_2(result.getProbabilityNet_2());
-       
-        prophetResultDataList.add(res);
-        return true;
     }
 
-    private void uploadPeptideProphetResultBuffer() {
-        ppResDao.saveAllPeptideProphetResultData(prophetResultDataList);
-        prophetResultDataList.clear();
-    }
-    
     // -------------------------------------------------------------------------------------------
     // UPLOAD SEQUEST SCORES
     // -------------------------------------------------------------------------------------------
@@ -777,7 +616,7 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
     // UPLOAD DATA INTO THE msRunSearch TABLE
     // -------------------------------------------------------------------------------
     private int uploadRunSearchHeader(int searchId, int runId,
-            InteractPepXmlFileReader parser) throws UploadException {
+            PepXmlFileReader parser) throws UploadException {
         
         MsRunSearchIn search;
         try {
@@ -802,21 +641,6 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         }
     }
     
-    // -------------------------------------------------------------------------------
-    // UPLOAD DATA INTO THE msRunSearchAnalysis TABLE
-    // -------------------------------------------------------------------------------
-    private int uploadRunSearchAnalysis(int analysisId, int runSearchId) 
-        throws UploadException {
-        
-        // TODO save any PeptideProphet params?
-        // save the run search analysis and return the database id
-        RunSearchAnalysisBean rsa = new RunSearchAnalysisBean();
-        rsa.setAnalysisFileFormat(SearchFileFormat.PEPXML);
-        rsa.setAnalysisId(analysisId);
-        rsa.setRunSearchId(runSearchId);
-        return runSearchAnalysisDao.save(rsa);
-    }
-
     private Map<String, Integer> createRunIdMap() throws UploadException {
         
         Map<String, Integer> runIdMap = new HashMap<String, Integer>(searchDataFileNames.size()*2);
@@ -945,12 +769,10 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         dynaModLookup = null;
 
         numSearchesUploaded = 0;
-        numAnalysisUploaded = 0;
 
         resetCaches();
 
         searchId = 0;
-        analysisId = 0;
         sequenceDatabaseId = 0;
         
         preUploadCheckMsg = new StringBuilder();
@@ -968,29 +790,8 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         resultResidueModList.clear();
         resultTerminalModList.clear();
         sequestResultDataList.clear();
-        prophetResultDataList.clear();
     }
     
-    @Override
-    public SearchFileFormat getAnalysisFileFormat() {
-        return SearchFileFormat.PEPXML;
-    }
-
-    @Override
-    public void setSearchDataFileNames(List<String> searchDataFileNames) {
-        this.searchDataFileNames = searchDataFileNames;
-    }
-
-    @Override
-    public void setSearchId(int searchId) {
-//        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setSearchProgram(Program searchProgram) {
-        throw new UnsupportedOperationException();
-    }
-
     
     @Override
     public void checkResultChargeMass(boolean check) {
@@ -1013,11 +814,14 @@ public class PepxmlDataUploadService implements SearchDataUploadService,
         log.info("Deleting search ID: "+searchId);
         searchDao.deleteSearch(searchId);
     }
-    
-    public void deleteAnalysis(int analysisId) {
-        if (analysisId == 0)
-            return;
-        log.info("Deleting analysis ID: "+analysisId);
-        analysisDao.delete(analysisId);
+
+    @Override
+    public int getUploadedSearchId() {
+        return this.searchId;
+    }
+
+    @Override
+    public List<String> getFileNames() {
+        return this.searchDataFileNames;
     }
 }

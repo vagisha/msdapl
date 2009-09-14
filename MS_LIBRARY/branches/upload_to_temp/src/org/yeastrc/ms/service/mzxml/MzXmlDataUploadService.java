@@ -20,7 +20,6 @@ import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.MzXmlDataProvider;
 import org.yeastrc.ms.parser.mzxml.MzXmlFileReader;
-import org.yeastrc.ms.parser.mzxml.MzXmlScan;
 import org.yeastrc.ms.service.SpectrumDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -166,7 +165,7 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
      * @throws UploadException
      */
     @Override
-    public int upload() throws UploadException {
+    public void upload() throws UploadException {
         
         if(!preUploadCheckDone) {
             if(!preUploadCheckPassed()) {
@@ -190,7 +189,6 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
                 throw e;
             }
         }
-        return experimentId;
     }
     
     private void deleteLastUploadedRun() {

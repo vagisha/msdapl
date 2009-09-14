@@ -152,7 +152,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
     }
 
     @Override
-    public int upload() throws UploadException {
+    public void upload() throws UploadException {
 
         reset();// reset all caches etc.
         
@@ -194,7 +194,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
                 continue;
             Integer runSearchId = runSearchIdMap.get(file); 
             if (runSearchId == null) {
-                UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_SQT);
+                UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
                 ex.appendErrorMessage("\n\tDELETING PERCOLATOR ANALYSIS...ID: "+analysisId+"\n");
                 deleteAnalysis(analysisId);
                 numAnalysisUploaded = 0;
@@ -239,7 +239,12 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             numAnalysisUploaded = 0;
             throw e;
         }
-        return analysisId;
+    }
+    
+    public List<Integer> getUploadedAnalysisIds() {
+        List<Integer> analysisIds = new ArrayList<Integer>();
+        analysisIds.add(analysisId);
+        return analysisIds;
     }
     
     
@@ -251,7 +256,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             String filenoext = removeFileExtension(file);
             int runSearchId = runSearchDao.loadIdForSearchAndFileName(searchId, filenoext);
             if(runSearchId == 0) {
-                UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_SQT);
+                UploadException ex = new UploadException(ERROR_CODE.NO_RUNSEARCHID_FOR_ANALYSIS_FILE);
                 ex.appendErrorMessage("File: "+filenoext);
                 ex.appendErrorMessage("; SearchID: "+searchId);
                 throw ex;
