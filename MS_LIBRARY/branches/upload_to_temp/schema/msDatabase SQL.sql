@@ -386,7 +386,7 @@ CREATE TABLE PeptideProphetAnalysis (
 	searchAnalysisID INT UNSIGNED NOT NULL PRIMARY KEY,
 	filename VARCHAR(255) NOT NULL
 );
-ALTER TABLE PeptideProphetAnalysis ADD INDEX(analysisID, filename);
+ALTER TABLE PeptideProphetAnalysis ADD INDEX(searchAnalysisID, filename);
 
 
 CREATE TABLE PeptideProphetROC (

@@ -110,7 +110,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private StringBuilder preUploadCheckMsg;
     private boolean preUploadCheckDone = false;
     
-    private static final Pattern fileNamePattern = Pattern.compile("interact*.prot.xml");
+    private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.prot.xml");
     private List<String> protXmlFiles = new ArrayList<String>();
     
     private static final Logger log = Logger.getLogger(ProtxmlDataUploadService.class.getName());
@@ -686,7 +686,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     
     public static void main(String[] args) throws UploadException {
         ProtxmlDataUploadService p = new ProtxmlDataUploadService();
-        p.setDirectory("/Users/silmaril/Desktop/18mix_new");
+//        p.setDirectory("/Users/silmaril/Desktop/18mix_new");
+        p.setDirectory("/Users/silmaril/WORK/UW/FLINT/Jimmy_Test");
 //        p.setAnalysisId(30);
         p.setSearchId(35);
         p.upload();

@@ -80,7 +80,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     
     private StringBuilder uploadMsg;
     
-    private static final Pattern fileNamePattern = Pattern.compile("interact*.pep.xml");
+    private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.pep.xml");
     
     private static final Logger log = Logger.getLogger(PepxmlAnalysisDataUploadService.class.getName());
     
