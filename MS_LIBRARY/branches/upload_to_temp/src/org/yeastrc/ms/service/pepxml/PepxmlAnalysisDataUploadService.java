@@ -250,6 +250,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         // now upload the analysis (PeptideProphet) data in the interact*.pep.xml file(s)
         for(String file: interactPepxmlFiles) {
             
+            resetCaches(); // clear all old cached results.
             numAnalysisUploaded = 0;
             
             // determine if a file with this name has already been uploaded for this experiment
