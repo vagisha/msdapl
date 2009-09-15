@@ -19,6 +19,7 @@ public class SearchAnalysis implements MsSearchAnalysis {
 
     
     private final MsSearchAnalysis analysis;
+    private String analysisName;
     private List<AnalysisFile> files;
     
     public SearchAnalysis(MsSearchAnalysis analysis) {
@@ -51,6 +52,19 @@ public class SearchAnalysis implements MsSearchAnalysis {
     @Override
     public Date getUploadDate() {
         return analysis.getUploadDate();
+    }
+
+    public String getAnalysisName() {
+        return analysisName;
+    }
+
+    public void setAnalysisName(String analysisName) {
+        this.analysisName = analysisName;
+    }
+
+    @Override
+    public void setId(int analysisId) {
+        throw new UnsupportedOperationException();
     }
 
 }

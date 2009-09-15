@@ -44,11 +44,14 @@ import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Researcher;
@@ -300,6 +303,12 @@ public class ViewProjectAction extends Action {
         
         MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
         SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
+        if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+            System.out.println(analysis.getId());
+           PeptideProphetAnalysis prophetAnalysis = daoFactory.getPeptideProphetAnalysisDAO().load(analysis.getId());
+           if(prophetAnalysis != null)
+               sAnalysis.setAnalysisName(prophetAnalysis.getFileName());
+        }
         return sAnalysis;
     }
     

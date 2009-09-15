@@ -38,12 +38,14 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.domain.analysis.MsRunSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
+import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
@@ -186,6 +188,11 @@ private static DAOFactory daoFactory = DAOFactory.instance();
         
         MsSearchAnalysis analysis = daoFactory.getMsSearchAnalysisDAO().load(searchAnalysisId);
         SearchAnalysis sAnalysis = new SearchAnalysis(analysis);
+        if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
+            PeptideProphetAnalysis prophetAnalysis = daoFactory.getPeptideProphetAnalysisDAO().load(analysis.getId());
+            if(prophetAnalysis != null)
+                sAnalysis.setAnalysisName(prophetAnalysis.getFileName());
+         }
         
         MsRunSearchAnalysisDAO rsaDao = daoFactory.getMsRunSearchAnalysisDAO();
         

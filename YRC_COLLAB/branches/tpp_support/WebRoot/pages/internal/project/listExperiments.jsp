@@ -360,6 +360,7 @@ function clearSelectedProtInfer() {
 						
 						<!-- !!!!!! PEPTIDE PROPHET !!!!!! -->
 						<logic:equal name="analysis" property="analysisProgram" value="<%=Program.PEPTIDE_PROPHET.toString() %>">
+						
 						<td width="33%">
 							<b>
 								<html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
@@ -368,9 +369,11 @@ function clearSelectedProtInfer() {
 											paramName="search" paramProperty="id">[PepXML]</html:link> -->
 							</b>
 						</td>
+						
 						<td width="33%">
-							&nbsp;
+							<b><bean:write name="analysis" property="analysisName" /></b>
 						</td>
+						
 						</logic:equal>
 						
 					</tr>

@@ -27,7 +27,6 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.yates.YatesRun;
 
 /**
  * 
@@ -57,27 +56,25 @@ public class DownloadComparisonResults extends Action {
         
         
         // Get the selected protein inference run ids
-        List<Integer> piRunIds = myForm.getSelectedProteinferRunIds();
+        List<Integer> allRunIds = myForm.getAllSelectedRunIds();
         
-        List<Integer> dtaRunIds = myForm.getSelectedDtaRunIds();
-
-        int total = piRunIds.size() + dtaRunIds.size();
         
         // Need atleast two datasets to compare.
-        if(total < 2) {
+        if(allRunIds.size() < 2) {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more datasets to compare."));
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
         
+        
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
         ProteinferRunDAO runDao = fact.getProteinferRunDao();
         
-        List<Dataset> datasets = new ArrayList<Dataset>(total);
+        List<Dataset> datasets = new ArrayList<Dataset>(allRunIds.size());
         
         // Protein inference datasets
-        for(int piRunId: piRunIds) {
+        for(int piRunId: allRunIds) {
             ProteinferRun run = runDao.loadProteinferRun(piRunId);
             if(run == null) {
                 ActionErrors errors = new ActionErrors();
@@ -88,22 +85,6 @@ public class DownloadComparisonResults extends Action {
             }
             Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, 
                                 DatasetSource.getSourceForProtinferProgram(run.getProgram()));
-            datasets.add(dataset);
-        }
-        
-        // DTASelect datasets
-        for(int dtaRunId: dtaRunIds) {
-            YatesRun run = new YatesRun();
-            try {
-                run.load(dtaRunId);
-            }
-            catch(Exception e) {
-                ActionErrors errors = new ActionErrors();
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Error loading DTASelect dataset with ID: "+dtaRunId+"."));
-                saveErrors( request, errors );
-                return mapping.findForward("Failure");
-            }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(dtaRunId, DatasetSource.DTA_SELECT);
             datasets.add(dataset);
         }
         
@@ -171,7 +152,7 @@ public class DownloadComparisonResults extends Action {
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getSearchString();
+        String searchString = myForm.getAccessionLike();
         if(searchString != null && searchString.trim().length() > 0) {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
         }
