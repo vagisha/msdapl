@@ -382,6 +382,13 @@ ALTER TABLE PercolatorResult ADD INDEX(discriminantScore);
 #####################################################################
 # PeptideProphet tables
 #####################################################################
+CREATE TABLE PeptideProphetAnalysis (
+	searchAnalysisID INT UNSIGNED NOT NULL PRIMARY KEY,
+	filename VARCHAR(255) NOT NULL
+);
+ALTER TABLE PeptideProphetAnalysis ADD INDEX(analysisID, filename);
+
+
 CREATE TABLE PeptideProphetROC (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 		searchAnalysisID INT UNSIGNED NOT NULL,
@@ -692,6 +699,7 @@ CREATE TRIGGER msSearchAnalysis_bdelete BEFORE DELETE ON msSearchAnalysis
  FOR EACH ROW
  BEGIN
    	DELETE FROM PercolatorParams WHERE searchAnalysisID = OLD.id;
+   	DELETE FROM PeptideProphetAnalysis WHERE searchAnalysisID = OLD.id;
    	DELETE FROM PeptideProphetROC WHERE searchAnalysisID = OLD.id;
 	DELETE FROM msRunSearchAnalysis WHERE searchAnalysisID = OLD.id;
  END;

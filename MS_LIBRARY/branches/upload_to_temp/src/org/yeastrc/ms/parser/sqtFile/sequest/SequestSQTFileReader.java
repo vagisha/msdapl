@@ -86,7 +86,7 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
                 DbLocus locus = null;
                 locus = parseLocus(currentLine);
                 if (locus != null)
-                    result.addMatchingLocus(locus);
+                    result.addMatchingProteinMatch(locus);
             }
             else
                 break;

@@ -129,8 +129,8 @@ public class UploadDAOFactory {
             throw new RuntimeException("Error reading Ibatis config xml: "+ibatisConfigFile, e);
         }
         catch (Exception e) {
-            log.error("Error initializing "+DAOFactory.class.getName()+" class: ", e);
-            throw new RuntimeException("Error initializing "+DAOFactory.class.getName()+" class: ", e);
+            log.error("Error initializing "+UploadDAOFactory.class.getName()+" class: ", e);
+            throw new RuntimeException("Error initializing "+UploadDAOFactory.class.getName()+" class: ", e);
         }
         System.out.println("Loaded Ibatis SQL map config -- "+ibatisConfigFile);
         
@@ -147,8 +147,8 @@ public class UploadDAOFactory {
                 throw new RuntimeException("Error reading Ibatis config xml: "+ibatisConfigFile, e);
             }
             catch (Exception e) {
-                log.error("Error initializing "+DAOFactory.class.getName()+" class: ", e);
-                throw new RuntimeException("Error initializing "+DAOFactory.class.getName()+" class: ", e);
+                log.error("Error initializing "+UploadDAOFactory.class.getName()+" class: ", e);
+                throw new RuntimeException("Error initializing "+UploadDAOFactory.class.getName()+" class: ", e);
             }
             System.out.println("Loaded Ibatis SQL map config -- "+ibatisConfigFile);
         }

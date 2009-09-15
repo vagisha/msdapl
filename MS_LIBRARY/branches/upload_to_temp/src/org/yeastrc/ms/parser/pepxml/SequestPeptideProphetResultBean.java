@@ -157,4 +157,9 @@ public class SequestPeptideProphetResultBean implements
         return ppRes.getfVal();
     }
 
+    @Override
+    public void addMatchingProteinMatch(MsSearchResultProteinIn match) {
+        seqRes.addMatchingProteinMatch(match);
+    }
+
 }

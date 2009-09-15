@@ -110,6 +110,7 @@ public class MsExperimentUploader {
                 passed = false;
             }
             else {
+                sdus.setSpectrumFileNames(rdus.getFileNames());
                 if(!sdus.preUploadCheckPassed()) {
                     appendToMsg(sdus.getPreUploadCheckMsg());
                     passed = false;
@@ -131,6 +132,7 @@ public class MsExperimentUploader {
                 passed = false;
             }
             else {
+                adus.setSearchDataFileNames(sdus.getFileNames());
                 if(!adus.preUploadCheckPassed()) {
                     appendToMsg(adus.getPreUploadCheckMsg());
                     passed = false;

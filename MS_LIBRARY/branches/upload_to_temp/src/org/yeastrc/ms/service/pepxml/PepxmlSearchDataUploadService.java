@@ -48,7 +48,10 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.pepxml.PepXmlFileReader;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
+import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
+import org.yeastrc.ms.service.PeptideProteinMatch;
+import org.yeastrc.ms.service.PeptideProteinMatchingService;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -207,7 +210,7 @@ private static final int BUF_SIZE = 500;
             }});
         for (int i = 0; i < files.length; i++) {
             String name = files[i].getName();
-            name = name.substring(0, name.lastIndexOf("pep.xml"));
+            name = name.substring(0, name.lastIndexOf(".pep.xml"));
             if(!name.startsWith("interact")) // don't add interact*.pep.xml files here
                 searchDataFileNames.add(name);
         }
@@ -296,7 +299,7 @@ private static final int BUF_SIZE = 500;
             PepXmlFileReader parser = new PepXmlFileReader();
             parser.setParseEvalue(this.usesEvalue);
             try {
-                parser.open(dataDirectory+File.separator+"interact.pep.xml");
+                parser.open(filePath);
             }
             catch (DataProviderException e) {
                 UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
@@ -362,6 +365,30 @@ private static final int BUF_SIZE = 500;
                 int scanId = getScanId(runId, scan.getScanNumber());
                 
                 for(SequestPeptideProphetResultIn result: scan.getScanResults()) {
+                    // If the refresh parser has not been run, find alternative matches for the peptide
+                    if(!parser.isRefreshParserRun()) {
+                        List<PeptideProteinMatch> matches = PeptideProteinMatchingService.getMatchingProteins(searchId, 
+                                        result.getResultPeptide().getPeptideSequence());
+                        List<MsSearchResultProteinIn> protList = result.getProteinMatchList();
+                        
+                        for(PeptideProteinMatch match: matches) {
+                            boolean haveAlready = false;
+                            for(MsSearchResultProteinIn prot: protList) {
+                                if(match.getProtein().getAccessionString().equals(prot.getAccession())) { // this one we have already
+                                    haveAlready = true;
+                                    break;
+                                }
+                            }
+                            if(haveAlready)
+                                continue;
+                            DbLocus locus = new DbLocus(match.getProtein().getAccessionString(), match.getProtein().getDescription());
+                            locus.setNtermResidue(match.getPreResidue());
+                            locus.setCtermResidue(match.getPostResidue());
+                            locus.setNumEnzymaticTermini(match.getNumEnzymaticTermini());
+                            result.addMatchingProteinMatch(locus);
+
+                        }
+                    }
                     int resultId = uploadBaseSearchResult(result, runSearchId, scanId);
                     uploadSequestResultData(result.getSequestResultData(), resultId); // Sequest scores
                     numResults++;
@@ -823,5 +850,20 @@ private static final int BUF_SIZE = 500;
     @Override
     public List<String> getFileNames() {
         return this.searchDataFileNames;
+    }
+    
+    public static void main(String[] args) throws UploadException {
+        PepxmlSearchDataUploadService p = new PepxmlSearchDataUploadService();
+        List<String> spectrumFileNames = new ArrayList<String>();
+        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_01");
+        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_02");
+        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_03");
+        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_04");
+        p.setSpectrumFileNames(spectrumFileNames);
+        
+        p.setDirectory("/Users/silmaril/Desktop/18mix_new");
+        p.setSearchDate(new Date());
+        p.setExperimentId(26);
+        p.upload();
     }
 }

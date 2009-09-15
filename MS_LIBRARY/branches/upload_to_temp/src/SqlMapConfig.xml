@@ -92,7 +92,7 @@
 	<!-- Related to PeptideProphet -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/peptideProphet/PeptideProphetRocSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/peptideProphet/PeptideProphetResultSqlMap.xml"/>
-	
+	<sqlMap resource="org/yeastrc/ms/sqlmap/analysis/peptideProphet/PeptideProphetAnalysisSqlMap.xml"/>
 	
 	
 	<!-- Relate to protein inference -->

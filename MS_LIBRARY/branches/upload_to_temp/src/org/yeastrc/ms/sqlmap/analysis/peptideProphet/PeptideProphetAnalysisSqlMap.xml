@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="PeptideProphetAnalysis"> 
+
+	
+	<typeAlias alias="PeptideProphetAnalysis" type="org.yeastrc.ms.domain.analysis.peptideProphet.impl.PeptideProphetAnalysisBean" />
+	
+	
+	<resultMap class="PeptideProphetAnalysis" id="prophetAnalysisResult" extends="MsSearchAnalysis.msAnalysisResult">
+		<result property="fileName" column="filename" />
+	</resultMap>
+	
+	<parameterMap class="PeptideProphetAnalysis" id="prophetAnalysisParam">
+		<parameter property="id" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="fileName" jdbcType="STRING" nullValue="0" />
+	</parameterMap>
+	
+	
+    <select id="select" resultMap="prophetAnalysisResult" parameterClass="Integer">
+		SELECT * FROM msSearchAnalysis, PeptideProphetAnalysis 
+		WHERE PeptideProphetAnalysis.searchAnalysisID = msSearchAnalysis.id
+		AND msSearchAnalysis.id = #id#
+	</select>
+    
+    <select id="selectAnalysisForFileName" resultMap="prophetAnalysisResult" parameterClass="java.util.Map">
+		SELECT * FROM msSearchAnalysis, PeptideProphetAnalysis 
+		WHERE PeptideProphetAnalysis.searchAnalysisID = msSearchAnalysis.id
+		AND msSearchAnalysis.id IN $analysisIds$
+		AND PeptideProphetAnalysis.filename = #filename#
+	</select>
+    
+    <insert id="insert" parameterMap="prophetAnalysisParam">
+    	INSERT INTO PeptideProphetAnalysis 
+    	(searchAnalysisID, 
+    	filename) 
+    	VALUES (?,?)
+    </insert>
+    
+</sqlMap>

@@ -124,7 +124,7 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
                 locus = parseLocus(currentLine);
                 
                 if (locus != null) {
-                    result.addMatchingLocus(locus);
+                    result.addMatchingProteinMatch(locus);
                 
                     // NOTE: IGNORE ALL 'M' LINES FOLLOWED BY THE FOLLOWING 'L' LINE
                     // L       Placeholder satisfying DTASelect

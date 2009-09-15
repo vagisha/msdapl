@@ -109,6 +109,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.ppAnalysisDao = daoFactory.getPeptideProphetAnalysisDAO();
         
         uploadMsg = new StringBuilder();
+        this.analysisIds = new ArrayList<Integer>();
     }
     
 
@@ -349,7 +350,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         analysis.setFileName(pepxmlFile);
         int analysisId;
         try {
-            analysisId = analysisDao.save(analysis);
+            analysisId = ppAnalysisDao.save(analysis);
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.RUNTIME_ERROR, e);
@@ -360,11 +361,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         roc.setSearchAnalysisId(analysisId);
         rocDao.saveRoc(roc);
         
-        analysis.setId(analysisId);
-        ppAnalysisDao.save(analysis);
-        
         return analysisId;
-        
     }
 
     private int getScanId(int runId, int scanNumber)
@@ -549,7 +546,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
 
         resetCaches();
 
-        searchId = 0;
+//        searchId = 0;
         analysisIds.clear();
         
         preUploadCheckMsg = new StringBuilder();
@@ -582,7 +579,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
 
     @Override
     public void setSearchProgram(Program searchProgram) {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        // TODO 
     }
     
     public void deleteAnalysis(int analysisId) {

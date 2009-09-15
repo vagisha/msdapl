@@ -14,7 +14,6 @@ import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
-import org.yeastrc.ms.service.pepxml.PepxmlAnalysisDataUploadService;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.general.MsExperimentUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;

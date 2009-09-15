@@ -15,6 +15,9 @@ public interface MsSearchResultIn extends MsRunSearchResultBase {
      * @return the proteinMatchList
      */
     public abstract List<MsSearchResultProteinIn> getProteinMatchList();
+    
+    
+    public void addMatchingProteinMatch(MsSearchResultProteinIn match) ;
 
 }
 

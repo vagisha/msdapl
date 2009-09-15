@@ -71,7 +71,7 @@ public class BaseSQTFileReader extends SQTFileReader<SQTSearchScanIn<MsSearchRes
                 DbLocus locus = null;
                 locus = parseLocus(currentLine);
                 if (locus != null) {
-                    result.addMatchingLocus(locus);
+                    result.addMatchingProteinMatch(locus);
 
                     if(doPercolatorMLineCheck) {
                         // NOTE: IGNORE ALL 'M' LINES FOLLOWED BY THE FOLLOWING 'L' LINE

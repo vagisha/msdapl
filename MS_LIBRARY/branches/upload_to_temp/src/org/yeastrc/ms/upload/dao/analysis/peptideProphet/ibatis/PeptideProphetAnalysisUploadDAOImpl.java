@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
-import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.upload.dao.analysis.MsSearchAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetAnalysisUploadDAO;
@@ -44,10 +43,13 @@ public class PeptideProphetAnalysisUploadDAOImpl extends BaseSqlMapDAO implement
     public PeptideProphetAnalysis loadAnalysisForFileName(String fileName, int searchId) {
         // get all the runSearchIds for the search
         List<Integer> analysisIds = analysisDao.getAnalysisIdsForSearch(searchId);
+        if(analysisIds == null || analysisIds.size() == 0)
+            return null;
         String idString = StringUtils.makeCommaSeparated(analysisIds);
+        System.out.println(idString);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("filename", fileName);
-        map.put("analysisIds", idString);
+        map.put("analysisIds", "("+idString+")");
         
         return (PeptideProphetAnalysis) queryForObject(namespace+".selectAnalysisForFileName", map);
     }

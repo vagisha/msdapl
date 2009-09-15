@@ -214,8 +214,8 @@ public class UploadServiceFactory {
             String fileName = files[i].getName();
             
             String ext = null;
-            if(fileName.toLowerCase().endsWith("prot.xml"))
-                ext = "prot.xml";
+            if(fileName.toLowerCase().endsWith("pep.xml"))
+                ext = "pep.xml";
             else {
                 int idx = fileName.lastIndexOf(".");
                 if(idx == -1)   continue;

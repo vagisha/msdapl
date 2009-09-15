@@ -73,8 +73,8 @@ public class UploadException extends Exception {
         // For Percolator uploads
         NO_RUNSEARCHID_FOR_ANALYSIS_FILE  ("No runSearchID found for analysis file", WARN),
         NO_PERC_ANALYSIS_UPLOADED("No Percolator analysis files were uploaded", ERROR),
-        NO_MATCHING_SEARCH_RESULT("No matching search result was found for the Percolator result", WARN),
-        MULTI_MATCHING_SEARCH_RESULT("Multiple matching search results were found for the Percolator result", WARN),
+        NO_MATCHING_SEARCH_RESULT("No matching search result was found for the analysis result", WARN),
+        MULTI_MATCHING_SEARCH_RESULT("Multiple matching search results were found for the analysis result", WARN),
         NO_MATCHING_SEARCH_SCAN("No matching search scan was found for the Percolator search scan", WARN),
         
         // General

@@ -53,10 +53,10 @@ public abstract class SQTSearchResult implements MsSearchResultIn {
 
     public void addMatchingLocus(String accession, String description) {
         DbLocus locus = new DbLocus(accession, description);
-        addMatchingLocus(locus);
+        addMatchingProteinMatch(locus);
     }
 
-    public void addMatchingLocus(DbLocus locus) {
+    public void addMatchingProteinMatch(MsSearchResultProteinIn locus) {
         matchingLoci.add(locus);
     }
 

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
@@ -112,6 +113,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private static final Pattern fileNamePattern = Pattern.compile("interact*.prot.xml");
     private List<String> protXmlFiles = new ArrayList<String>();
     
+    private static final Logger log = Logger.getLogger(ProtxmlDataUploadService.class.getName());
+    
     public ProtxmlDataUploadService() {
         
         peptideMap = new HashMap<String, Integer>();
@@ -150,6 +153,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             }
         }
         
+        uploadMsg = new StringBuilder();
+        
         // Make sure we have a nrseq database ID
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         MsSearch search = searchDao.loadSearch(searchId);
@@ -171,6 +176,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
 
 
     private void uploadProtxmlFile(String protxmlFile) throws UploadException {
+        
+        log.info("Uploading protein inference results in file: "+protxmlFile);
         
         indistinguishableProteinGroupId = 1;
         int numProteinGroups = 0;
@@ -225,6 +232,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         finally {
             parser.close();
         }
+        log.info("Uploaded file: "+protxmlFile+"; ID: "+uploadedPinferId+"; #protein groups: "+numProteinGroups);
+        
         uploadMsg.append("\n\tProtein inferenceID: "+uploadedPinferId);
         uploadMsg.append("; #Protein groups in file: "+protxmlFile+": "+numProteinGroups);
     }
@@ -280,7 +289,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         int nrseqId = getNrseqProteinId(protein.getProteinName(), nrseqDatabaseId);
         if(nrseqId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
-            ex.appendErrorMessage("No NRSEQ id foud for protein: "+protein.getProteinName());
+            ex.appendErrorMessage("No NRSEQ id foud for protein: "+protein.getProteinName()+"; databaseId: "+nrseqDatabaseId);
             throw ex;
         }
         
@@ -437,6 +446,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         for(int resultId: resultIds) {
             
             PeptideProphetResult result = ppResDao.load(resultId);
+            if(result == null)
+                continue;
             
             // ignore all spectra with PeptideProphet probability < 0.05
             if(result.getProbability() < 0.05)
@@ -520,10 +531,11 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         boolean first = true;
         for(String inputPepXml: inputFiles) {
             PeptideProphetAnalysisUploadDAO pprophAnalysisDao = UploadDAOFactory.getInstance().getPeptideProphetAnalysisDAO();
-            PeptideProphetAnalysis analysis = pprophAnalysisDao.loadAnalysisForFileName(inputPepXml, this.searchId);
+            String fileName = new File(inputPepXml).getName();
+            PeptideProphetAnalysis analysis = pprophAnalysisDao.loadAnalysisForFileName(fileName, this.searchId);
             if(analysis == null) {
                 UploadException e = new UploadException(ERROR_CODE.GENERAL);
-                e.appendErrorMessage("No matching PeptideProphet analysis found for input file: "+inputPepXml);
+                e.appendErrorMessage("No matching PeptideProphet analysis found for input file: "+fileName+" and searchID: "+searchId);
                 throw e;
             }
             
@@ -628,20 +640,19 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             return false;
         }
         
-        // 2. Look for interact.prot.xml file
+        // 2. Look for interact*.prot.xml file
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                String name_uc = name.toLowerCase();
-                return name_uc.endsWith(".prot.xml");
+                String name_lc = name.toLowerCase();
+                return name_lc.endsWith(".prot.xml");
             }});
         
         boolean found = false;
         for (int i = 0; i < files.length; i++) {
             if (fileNamePattern.matcher(files[i].getName().toLowerCase()).matches()) {
-//            if(files[i].getName().equalsIgnoreCase("interact.prot.xml")) {
+                protXmlFiles.add(files[i].getName());
                 found = true;
-                break;
             }
         }
         if(!found) {
@@ -673,4 +684,12 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         throw new UnsupportedOperationException();
     }
     
+    public static void main(String[] args) throws UploadException {
+        ProtxmlDataUploadService p = new ProtxmlDataUploadService();
+        p.setDirectory("/Users/silmaril/Desktop/18mix_new");
+//        p.setAnalysisId(30);
+        p.setSearchId(35);
+        p.upload();
+        System.out.println(p.getUploadSummary());
+    }
 }
