@@ -95,8 +95,12 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write("Show all Proteins: "+filterForm.isShowAllProteins()+"\n");
         writer.write("Exclude indistinguishable protein groups: "+filterForm.isExcludeIndistinProteinGroups()+"\n");
         writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
-        writer.write("Fasta ID filter: "+filterForm.getAccessionLike()+"\n");
-        writer.write("Description filter: "+filterForm.getDescriptionLike()+"\n");
+        String filterStr = filterForm.getAccessionLike() == null ? "NONE" : filterForm.getAccessionLike();
+        writer.write("Fasta ID filter: "+filterStr+"\n");
+        filterStr = filterForm.getDescriptionLike() == null ? "NONE" : filterForm.getDescriptionLike();
+        writer.write("Description (includes): "+filterStr+"\n");
+        filterStr = filterForm.getDescriptionNotLike() == null ? "NONE" : filterForm.getDescriptionNotLike();
+        writer.write("Description (excludes): "+filterStr+"\n");
     }
 
     private void writeResults(PrintWriter writer, int pinferId, ProteinInferFilterForm filterForm) {
@@ -128,9 +132,24 @@ public class DownloadProteinferResultsAction extends Action {
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
+        
+        // filter by accession, if required
+        if(filterCriteria.getAccessionLike() != null) {
+            proteinIds = IdPickerResultsLoader.filterByProteinAccession(pinferId,
+                    proteinIds, null, 
+                    filterCriteria.getAccessionLike());
+        }
+        // filter by description, if required
+        if(filterCriteria.getDescriptionLike() != null) {
+            proteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionLike(), true);
+        }
+        if(filterCriteria.getDescriptionNotLike() != null) {
+            proteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionNotLike(), false);
+        }
         
         // print the parameters used for the protein inference run
         writer.write("Program Version: "+idpRun.getProgramVersion()+"\n");

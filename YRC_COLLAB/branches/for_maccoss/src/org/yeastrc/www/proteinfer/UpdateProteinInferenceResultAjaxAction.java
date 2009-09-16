@@ -104,6 +104,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
         
         
         // Get the protein IDs from the session
@@ -148,7 +149,10 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             }
             // filter by description, if required
             if(filterCriteria.getDescriptionLike() != null) {
-                storedProteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, storedProteinIds, filterCriteria.getDescriptionLike());
+                storedProteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, storedProteinIds, filterCriteria.getDescriptionLike(), true);
+            }
+            if(filterCriteria.getDescriptionNotLike() != null) {
+                storedProteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, storedProteinIds, filterCriteria.getDescriptionNotLike(), false);
             }
         }
         

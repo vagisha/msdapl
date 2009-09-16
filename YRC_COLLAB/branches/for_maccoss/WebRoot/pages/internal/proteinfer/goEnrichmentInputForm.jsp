@@ -59,14 +59,42 @@
   		<html:radio name="proteinInferFilterForm" property="showAllProteins" value="false">Parsimonious</html:radio>
   	</td>
   </tr>
+  <tr>
+ 	<td colspan="3">
+  	  Exclude Indistinguishable Groups: <html:checkbox name="proteinInferFilterForm" property="excludeIndistinProteinGroups" value="true"/>
+  	</td>
   </table></td>
   </tr>
+  
+  <tr>
+  	<td colspan="3">
+  	<table align="left">
+  		<tr>
+  			<td valign="top">Fasta ID(s): </td>
+  			<td valign="top" colspan="3"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
+  			</td>
+  			
+  		</tr>
+  		<tr>
+  			<td valign="top">Description Include: </td>
+  			<td valign="top"><html:text name="proteinInferFilterForm" property="descriptionLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  			</td>
+  			<td valign="top">Exclude: </td>
+  			<td valign="top">
+  				<html:text name="proteinInferFilterForm" property="descriptionNotLike" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Enter a comma-separated list of terms</span>
+  			</td>
+  		</tr>
+  	</table>
+  	</td>
+  </tr>
+  
  </TABLE>
  
  <html:hidden name="proteinInferFilterForm"
 			property="validationStatusString" />
- <html:hidden name="proteinInferFilterForm" property="accessionLike" />
- <html:hidden name="proteinInferFilterForm" property="descriptionLike" />
 <br>	
  <div align="center"
 			style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF;">
@@ -112,10 +140,12 @@
 		<html:hidden name="proteinInferFilterForm"
 			property="maxSpectrumMatches" />
 		<html:hidden name="proteinInferFilterForm" property="showAllProteins" />
+		<html:hidden name="proteinInferFilterForm" property="excludeIndistinProteinGroups" />
 		<html:hidden name="proteinInferFilterForm"
 			property="validationStatusString" />
 		<html:hidden name="proteinInferFilterForm" property="accessionLike" />
 		<html:hidden name="proteinInferFilterForm" property="descriptionLike" />
+		<html:hidden name="proteinInferFilterForm" property="descriptionNotLike" />
 
 		<div align="center"
 			style="padding: 5; border: 1px dashed gray; background-color: #F0F8FF;">

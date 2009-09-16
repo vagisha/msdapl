@@ -146,9 +146,11 @@ public class ProteinInferGOEnrichmentAction extends Action {
         filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
         filterCriteria.setGroupProteins(true);
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);

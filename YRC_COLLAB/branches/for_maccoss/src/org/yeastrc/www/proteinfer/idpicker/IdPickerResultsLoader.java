@@ -14,7 +14,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
-import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
@@ -96,10 +95,13 @@ public class IdPickerResultsLoader {
             List<Integer> allProteinIds,
             Map<Integer, String> proteinAccessionMap, String accessionLike) {
         
+        // First get the NRSEQ protein IDs that match the accession(s) 
         Set<String> reqAcc = new HashSet<String>();
         String[] tokens = accessionLike.split(",");
         for(String tok: tokens)
-            reqAcc.add(tok.trim().toLowerCase());
+            // In MySQL string comparisons are NOT case sensitive unless one of the operands is a binary string
+            // We are converting to lower case in case we will look up in a proteinAccessionMap.
+            reqAcc.add(tok.trim().toLowerCase()); 
         
         List<Integer> filtered = new ArrayList<Integer>();
         
@@ -127,7 +129,7 @@ public class IdPickerResultsLoader {
         
         // Look in the database for matching ids.
         else {
-            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIds(new ArrayList<String>(reqAcc), pinferId);
+            List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIdsForNames(new ArrayList<String>(reqAcc), pinferId);
             
             // get the corresponding protein inference protein ids
             if(found.size() > 0) {
@@ -144,38 +146,64 @@ public class IdPickerResultsLoader {
     }
     
     public static List<Integer> filterByProteinDescription(int pinferId,
-            List<Integer> storedProteinIds, String descriptionLike) {
+            List<Integer> storedProteinIds, String descriptionLike, boolean include) {
         
-        List<Integer> searchDbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-        List<NrDbProtein> nrProteins = NrSeqLookupUtil.getDbProteinsForDescription(searchDbIds, descriptionLike);
+        List<Integer> filtered = new ArrayList<Integer>();
         
-        NrDbProtComparator comparator = new NrDbProtComparator();
-        Collections.sort(nrProteins, comparator);
-           
-        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
-        Set<Integer> accepted = new HashSet<Integer>();
-        for(ProteinferProtein protein: proteins) {
-            NrDbProtein nrp = new NrDbProtein();
-            nrp.setProteinId(protein.getNrseqProteinId());
-            int idx = Collections.binarySearch(nrProteins, nrp, comparator);
-            if(idx >= 0) {
-                accepted.add(protein.getId());
+        Set<String> reqDescriptions = new HashSet<String>();
+        String[] tokens = descriptionLike.split(",");
+        for(String tok: tokens)
+            // In MySQL string comparisons are NOT case sensitive unless one of the operands is a binary string
+            reqDescriptions.add(tok.trim()); 
+        
+        // First get the NRSEQ protein IDs that match the description terms
+        List<Integer> found = FastaProteinLookupUtil.getInstance().getProteinIdsForDescriptions(new ArrayList<String>(reqDescriptions), pinferId);
+        
+        if(found.size() > 0) {
+            // Get the protein inference IDs corresponding to the matching NRSEQ IDs.
+            List<Integer> piProteinIds = protDao.getProteinIdsForNrseqIds(pinferId, new ArrayList<Integer>(found));
+            Collections.sort(piProteinIds);
+            for(int id: storedProteinIds) {
+                int contains = Collections.binarySearch(piProteinIds, id);
+                if(include && contains >= 0)
+                    filtered.add(id);
+                else if(!include && contains < 0)
+                    filtered.add(id);
             }
         }
         
-        List<Integer> acceptedProteinIds = new ArrayList<Integer>(accepted.size());
-        for(int id: storedProteinIds) {
-            if(accepted.contains(id))
-                acceptedProteinIds.add(id);
-        }
-        return acceptedProteinIds;
+        return filtered;
+        
+//        List<Integer> searchDbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
+//        List<NrDbProtein> nrProteins = NrSeqLookupUtil.getDbProteinsForDescription(searchDbIds, descriptionLike);
+//        
+//        NrDbProtComparator comparator = new NrDbProtComparator();
+//        Collections.sort(nrProteins, comparator);
+//           
+//        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
+//        Set<Integer> accepted = new HashSet<Integer>();
+//        for(ProteinferProtein protein: proteins) {
+//            NrDbProtein nrp = new NrDbProtein();
+//            nrp.setProteinId(protein.getNrseqProteinId());
+//            int idx = Collections.binarySearch(nrProteins, nrp, comparator);
+//            if(idx >= 0) {
+//                accepted.add(protein.getId());
+//            }
+//        }
+//        
+//        List<Integer> acceptedProteinIds = new ArrayList<Integer>(accepted.size());
+//        for(int id: storedProteinIds) {
+//            if(accepted.contains(id))
+//                acceptedProteinIds.add(id);
+//        }
+//        return acceptedProteinIds;
     }
     
-    private static class NrDbProtComparator implements Comparator<NrDbProtein> {
-        public int compare(NrDbProtein o1, NrDbProtein o2) {
-            return Integer.valueOf(o1.getProteinId()).compareTo(o2.getProteinId());
-        }
-    }
+//    private static class NrDbProtComparator implements Comparator<NrDbProtein> {
+//        public int compare(NrDbProtein o1, NrDbProtein o2) {
+//            return Integer.valueOf(o1.getProteinId()).compareTo(o2.getProteinId());
+//        }
+//    }
     
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given sorting criteria

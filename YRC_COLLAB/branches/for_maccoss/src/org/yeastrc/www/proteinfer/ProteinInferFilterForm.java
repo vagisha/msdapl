@@ -27,6 +27,7 @@ public class ProteinInferFilterForm extends ActionForm {
     
     private String accessionLike = null;
     private String descriptionLike = null;
+    private String descriptionNotLike = null;
     private String[] validationStatus = new String[]{"All"};
     
     private boolean excludeIndistinGroups = false;
@@ -45,6 +46,8 @@ public class ProteinInferFilterForm extends ActionForm {
         joinGroupProteins = true;
         showAllProteins = true;
         accessionLike = null;
+        descriptionLike = null;
+        descriptionNotLike = null;
         excludeIndistinGroups = false;
     }
     
@@ -202,6 +205,7 @@ public class ProteinInferFilterForm extends ActionForm {
         this.showAllProteins = showAllProteins;
     }
     
+    // ACCESSION
     public String getAccessionLike() {
         if(accessionLike == null || accessionLike.trim().length() == 0)
             return null;
@@ -214,18 +218,30 @@ public class ProteinInferFilterForm extends ActionForm {
         this.accessionLike = accessionLike;
     }
     
+    // DESCRIPTION
     public String getDescriptionLike() {
         if(descriptionLike == null || descriptionLike.trim().length() == 0)
             return null;
         else
             return descriptionLike.trim();
-            
     }
     
     public void setDescriptionLike(String descriptionLike) {
         this.descriptionLike = descriptionLike;
     }
+    
+    public String getDescriptionNotLike() {
+        if(descriptionNotLike == null || descriptionNotLike.trim().length() == 0)
+            return null;
+        else
+            return descriptionNotLike.trim();
+    }
+    
+    public void setDescriptionNotLike(String descriptionNotLike) {
+        this.descriptionNotLike = descriptionNotLike;
+    }
 
+    // VALIDATION STATUS
     public String[] getValidationStatus() {
         return validationStatus;
     }

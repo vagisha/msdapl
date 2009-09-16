@@ -887,9 +887,12 @@ function downloadResults() {
 	$("#downloadForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
 	
 	$("#downloadForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
+	
+	$("#downloadForm  input[name='excludeIndistinProteinGroups']").val($("#filterForm  input[name='excludeIndistinProteinGroups']:checked").val());
 
 	$("#downloadForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
 	$("#downloadForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
+	$("#downloadForm  input[name='descriptionNotLike']").val($("#filterForm input[name='descriptionNotLike']").val());
 	
 	var validationStatus = "";
 	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
@@ -930,9 +933,12 @@ function doGoEnrichmentAnalysis() {
 	$("#goEnrichmentForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
 	
 	$("#goEnrichmentForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
+	
+	$("#goEnrichmentForm  input[name='excludeIndistinProteinGroups']").val($("#filterForm  input[name='excludeIndistinProteinGroups']:checked").val());
 
 	$("#goEnrichmentForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
 	$("#goEnrichmentForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
+	$("#goEnrichmentForm  input[name='descriptionNotLike']").val($("#filterForm input[name='descriptionNotLike']").val());
 	
 	var validationStatus = "";
 	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
@@ -1175,7 +1181,9 @@ function toggleDivVisibility(mydiv) {
 	
 		<%@ include file="proteinInferFilterForm.jsp" %>
 		<%@include file="proteinInferDownloadForm.jsp" %>
-		<yrcwww:member group="administrator"><%@include file="goEnrichmentInputForm.jsp" %></yrcwww:member>
+		<!-- <yrcwww:member group="administrator"> -->
+		<%@include file="goEnrichmentInputForm.jsp" %>
+		<!-- </yrcwww:member> -->
 		</td></tr></table>
 		</CENTER>
 		
