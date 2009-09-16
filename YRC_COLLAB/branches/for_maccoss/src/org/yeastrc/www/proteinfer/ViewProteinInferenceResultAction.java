@@ -1,7 +1,9 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +16,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
+import org.yeastrc.www.compare.Dataset;
+import org.yeastrc.www.compare.DatasetSource;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;
@@ -29,6 +35,7 @@ import org.yeastrc.www.user.UserUtils;
 
 import edu.uwpr.protinfer.PeptideDefinition;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
+import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_BY;
 import edu.uwpr.protinfer.database.dto.ProteinFilterCriteria.SORT_ORDER;
@@ -209,11 +216,42 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
+        request.setAttribute("showGOForm", isSpeciesYeast(pinferId));
+        
         long e = System.currentTimeMillis();
         log.info("Total time (ViewProteinInferenceResultAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         // Go!
         return mapping.findForward("Success");
+    }
+    
+    private boolean isSpeciesYeast(int pinferId) throws Exception {
+        
+        
+        Set<Integer> notYeastExpts = new HashSet<Integer>();
+        
+        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        
+        List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(pinferId);
+        if(searchIds != null) {
+            for(int searchId: searchIds) {
+
+                MsSearch search = searchDao.loadSearch(searchId);
+
+                if(notYeastExpts.contains(search.getExperimentId())) // if we have already seen this and it is not yeast go on looking
+                    continue;
+
+                MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+
+                if(job.getTargetSpecies() == 4932) {
+                    return true;
+                }
+                else 
+                    notYeastExpts.add(search.getExperimentId());
+            }
+        }
+        return false;
     }
 
 }

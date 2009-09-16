@@ -1181,9 +1181,13 @@ function toggleDivVisibility(mydiv) {
 	
 		<%@ include file="proteinInferFilterForm.jsp" %>
 		<%@include file="proteinInferDownloadForm.jsp" %>
+		
 		<!-- <yrcwww:member group="administrator"> -->
+		<logic:equal name="showGOForm" value="true">
 		<%@include file="goEnrichmentInputForm.jsp" %>
+		</logic:equal>
 		<!-- </yrcwww:member> -->
+		
 		</td></tr></table>
 		</CENTER>
 		

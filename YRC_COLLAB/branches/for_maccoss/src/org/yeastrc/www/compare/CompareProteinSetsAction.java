@@ -9,8 +9,10 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +24,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.user.User;
@@ -294,6 +301,7 @@ public class CompareProteinSetsAction extends Action {
             }
             
             request.setAttribute("comparison", grpComparison);
+            request.setAttribute("showGOForm", isSpeciesYeast(datasets));
             return mapping.findForward("ProteinGroupList");
         }
     }
@@ -305,6 +313,39 @@ public class CompareProteinSetsAction extends Action {
         if(buf.length() > 0)
             buf.deleteCharAt(0);
         return buf.toString();
+    }
+    
+    private boolean isSpeciesYeast(List<Dataset> datasets) throws Exception {
+        
+        
+        Set<Integer> notYeastExpts = new HashSet<Integer>();
+        
+        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        
+        for(Dataset dataset: datasets) {
+            if(dataset.getSource() == DatasetSource.PROT_INFER) {
+                List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(dataset.getDatasetId());
+                if(searchIds != null) {
+                   for(int searchId: searchIds) {
+                       
+                       MsSearch search = searchDao.loadSearch(searchId);
+                       
+                       if(notYeastExpts.contains(search.getExperimentId())) // if we have already seen this and it is not yeast go on looking
+                           continue;
+                       
+                       MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+                       
+                       if(job.getTargetSpecies() == 4932) {
+                           return true;
+                       }
+                       else 
+                           notYeastExpts.add(search.getExperimentId());
+                   }
+                }
+            }
+        }
+        return false;
     }
     
 }

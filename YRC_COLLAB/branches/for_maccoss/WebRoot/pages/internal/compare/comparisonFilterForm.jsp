@@ -150,7 +150,7 @@
 			<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="groupProteins">Group Indistinguishable Proteins</html:checkbox> </td>
 		</logic:notPresent>
 	</tr>
-	<logic:notPresent name="goEnrichmentView">
+	
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
 		<td valign="top">
@@ -160,17 +160,20 @@
 			<html:text name="proteinSetComparisonForm" property="searchString" size="40"></html:text><br>
  			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
  		</td>
- 		
+ 		<logic:notPresent name="goEnrichmentView">
  		<td valign="top" align="center" colspan="2">
  			<html:submit value="Update" onclick="javascript:updateResults();"></html:submit> &nbsp;
 			<span style="color:red; font-size:8pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
 		</td>
+		</logic:notPresent>
 	</tr>
-	</logic:notPresent>
+	
 </table>
 </div>
 
-<yrcwww:member group="administrator">
+<!-- <yrcwww:member group="administrator"> -->
+<logic:equal name="showGOForm" value="true">
+
 <br>
 <div align="center"
 	style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
@@ -195,6 +198,8 @@
 		<html:submit value="Create Graph" onclick="javascript:doGoEnrichmentAnalysisGraph();"></html:submit>
 	</logic:present>
 </div>
-</yrcwww:member>
+</logic:equal>
+
+<!-- </yrcwww:member> -->
 </center>
 </html:form>
