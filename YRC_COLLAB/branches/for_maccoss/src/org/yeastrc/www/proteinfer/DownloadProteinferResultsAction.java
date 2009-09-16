@@ -93,6 +93,7 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write("Min. Coverage(%): "+filterForm.getMinCoverage()+"\n");
         writer.write("Max. Coverage(%): "+filterForm.getMaxCoverage()+"\n");
         writer.write("Show all Proteins: "+filterForm.isShowAllProteins()+"\n");
+        writer.write("Exclude indistinguishable protein groups: "+filterForm.isExcludeIndistinProteinGroups()+"\n");
         writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
         writer.write("Fasta ID filter: "+filterForm.getAccessionLike()+"\n");
         writer.write("Description filter: "+filterForm.getDescriptionLike()+"\n");
