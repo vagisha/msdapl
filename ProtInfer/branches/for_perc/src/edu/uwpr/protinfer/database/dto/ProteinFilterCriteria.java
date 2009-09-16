@@ -280,6 +280,14 @@ public class ProteinFilterCriteria {
             if(!this.descriptionLike.equalsIgnoreCase(that.descriptionLike))
                 return false;
         }
+        
+        if(descriptionNotLike == null) {
+            if(that.descriptionNotLike != null)  return false;
+        }
+        else {
+            if(!this.descriptionNotLike.equalsIgnoreCase(that.descriptionNotLike))
+                return false;
+        }
         return true;
     }
 }
