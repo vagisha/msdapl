@@ -80,6 +80,7 @@ public class ProteinFilterCriteria {
     
     private String accessionLike;
     private String descriptionLike;
+    private String descriptionNotLike;
     
     private SORT_BY sortBy = SORT_BY.NONE;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
@@ -179,6 +180,14 @@ public class ProteinFilterCriteria {
     
     public void setDescriptionLike(String descriptionLike) {
         this.descriptionLike = descriptionLike;
+    }
+    
+    public String getDescriptionNotLike() {
+        return descriptionNotLike;
+    }
+    
+    public void setDescriptionNotLike(String descriptionNotLike) {
+        this.descriptionNotLike = descriptionNotLike;
     }
     
     public List<ProteinUserValidation> getValidationStatus() {
