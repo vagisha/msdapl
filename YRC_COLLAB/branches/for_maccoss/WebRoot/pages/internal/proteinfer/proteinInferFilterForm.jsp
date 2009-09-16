@@ -96,6 +96,9 @@
   		<html:multibox name="proteinInferFilterForm" property="validationStatus"  
   		               value="<%=String.valueOf(ProteinUserValidation.NOT_SURE.getStatusChar()) %>"/> Not Sure
   	</td>
+  	<td>
+  		Exclude Indistinguishable Groups: <html:checkbox name="proteinInferFilterForm" property="excludeIndistinProteinGroups" value="true"/>
+  	</td>
   </tr>
   
   <tr>

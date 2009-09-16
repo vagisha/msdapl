@@ -29,6 +29,8 @@ public class ProteinInferFilterForm extends ActionForm {
     private String descriptionLike = null;
     private String[] validationStatus = new String[]{"All"};
     
+    private boolean excludeIndistinGroups = false;
+    
     private int goAspect = GOUtils.BIOLOGICAL_PROCESS;  // Used for GO enrichment only
     private int speciesId;
     private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
@@ -43,6 +45,7 @@ public class ProteinInferFilterForm extends ActionForm {
         joinGroupProteins = true;
         showAllProteins = true;
         accessionLike = null;
+        excludeIndistinGroups = false;
     }
     
     /**
@@ -174,7 +177,7 @@ public class ProteinInferFilterForm extends ActionForm {
         this.maxSpectrumMatches = maxSpectrumMatches;
     }
 
-
+    // PROTEIN GROUPS
     public boolean isJoinGroupProteins() {
         return joinGroupProteins;
     }
@@ -183,6 +186,14 @@ public class ProteinInferFilterForm extends ActionForm {
         this.joinGroupProteins = joinGroupProteins;
     }
 
+    public boolean isExcludeIndistinProteinGroups() {
+        return this.excludeIndistinGroups;
+    }
+    
+    public void setExcludeIndistinProteinGroups(boolean exclude) {
+        this.excludeIndistinGroups = exclude;
+    }
+    
     public boolean isShowAllProteins() {
         return showAllProteins;
     }

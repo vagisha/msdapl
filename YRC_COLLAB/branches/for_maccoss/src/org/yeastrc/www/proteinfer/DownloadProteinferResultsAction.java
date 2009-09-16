@@ -122,6 +122,7 @@ public class DownloadProteinferResultsAction extends Action {
             filterCriteria.setSortBy(SORT_BY.defaultSortBy());
         filterCriteria.setSortOrder(SORT_ORDER.defaultSortOrder());
         filterCriteria.setGroupProteins(true);
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());

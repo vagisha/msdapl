@@ -99,6 +99,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setSortBy(filterCritSession == null ? SORT_BY.defaultSortBy() : filterCritSession.getSortBy());
         filterCriteria.setSortOrder(filterCritSession == null ? SORT_ORDER.defaultSortOrder() : filterCritSession.getSortOrder());
         filterCriteria.setGroupProteins(filterForm.isJoinGroupProteins());
+        filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
