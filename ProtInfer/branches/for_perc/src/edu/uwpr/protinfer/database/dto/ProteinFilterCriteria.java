@@ -69,6 +69,8 @@ public class ProteinFilterCriteria {
     
     private boolean groupProteins = true;
     
+    private boolean excludeIndistinGroups = false;
+    
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
     private int numSpectra;
@@ -155,6 +157,14 @@ public class ProteinFilterCriteria {
         this.groupProteins = groupProteins;
     }
 
+    public boolean isExcludeIndistinGroups() {
+        return this.excludeIndistinGroups;
+    }
+    
+    public void setExcludeIndistinGroups(boolean exclude) {
+        this.excludeIndistinGroups = exclude;
+    }
+    
     public String getAccessionLike() {
         return accessionLike;
     }
@@ -234,6 +244,7 @@ public class ProteinFilterCriteria {
         if(this.numMaxSpectra != that.numMaxSpectra)            return false;
         if(this.coverage != that.coverage)                      return false;
         if(this.maxCoverage != that.maxCoverage)                return false;
+        if(this.excludeIndistinGroups != that.excludeIndistinGroups)    return false;
 //        if(this.groupProteins != that.groupProteins)            return false;
         if(this.showParsimonious != that.showParsimonious)      return false;
         

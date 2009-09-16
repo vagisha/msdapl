@@ -640,6 +640,11 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         return queryForList(sqlMapNameSpace+".proteinIdsByGroupId", pinferId);
     }
     
+    
+    public List<Integer> proteinsNotInGroup(int pinferId) {
+        return queryForList(sqlMapNameSpace+".proteinsNotInGroup", pinferId);
+    }
+    
     @Override
     public List<Integer> getFilteredSortedProteinIds(int pinferId, ProteinFilterCriteria filterCriteria) {
         
@@ -692,40 +697,47 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                                                  sort);
         }
         
+        // If the user wants to exclude indistinguishable protein groups get the protein IDs that are not
+        // in a indistinguishable protein group.
+        List<Integer> notInGroup = null;
+        if(filterCriteria.isExcludeIndistinGroups()) {
+            notInGroup = proteinsNotInGroup(pinferId);
+        }
+        
         // get the set of common ids; keep the order of ids returned from the query
         // that returned sorted results
         if(filterCriteria.getSortBy() == SORT_BY.COVERAGE) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup);
             return getCommonIds(ids_cov, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA) {
-            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status);
+            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup);
             return getCommonIds(ids_spec_count, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_uniq_pept);
+            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_uniq_pept, notInGroup);
             return getCommonIds(ids_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, notInGroup);
             return getCommonIds(ids_uniq_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.GROUP_ID) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup);
             List<Integer> idsbyGroup = sortProteinIdsByGroup(pinferId);
             return getCommonIds(idsbyGroup, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.CLUSTER_ID) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup);
             List<Integer> idsbyCluster = sortProteinIdsByCluster(pinferId);
             return getCommonIds(idsbyCluster, others);
         }
         else if(filterCriteria.getSortBy() == SORT_BY.VALIDATION_STATUS) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, notInGroup);
             return getCommonIds(ids_validation_status, others);
         }
         else {
-            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status);
+            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup);
             return new ArrayList<Integer>(combineLists);
         }
     }

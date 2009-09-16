@@ -205,6 +205,13 @@
     	ORDER BY idpProt.groupID ASC
     </select>
     
+    <select id="proteinsNotInGroup" resultClass="Integer" parameterClass="Integer">
+    	SELECT id, count(*) AS cnt FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = idpProt.piProteinID
+    	GROUP BY idpProt.groupID HAVING cnt = 1
+    </select>
+    
     <select id="filterByCoverage" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein 
     	WHERE piRunID=#pinferId#
