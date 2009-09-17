@@ -461,7 +461,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         if(this.fullProteinName)
             accession = fastaListing.getFullName();
         else
-            fastaListing.getName();
+            accession = fastaListing.getName();
         
         try {
             

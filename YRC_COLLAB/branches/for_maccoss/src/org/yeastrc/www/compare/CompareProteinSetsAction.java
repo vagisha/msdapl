@@ -230,6 +230,7 @@ public class CompareProteinSetsAction extends Action {
             }
             
             request.setAttribute("comparison", comparison);
+            request.setAttribute("showGOForm", isSpeciesYeast(datasets));
             return mapping.findForward("ProteinList");
         }
         

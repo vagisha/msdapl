@@ -395,6 +395,21 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 
 <br>
 
+<table  align="center" style="border: 1px dashed gray;" width="80%">
+<tbody>
+<logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
+	<bean:define id="mod" value="<%=String.valueOf(row%2)%>"></bean:define>
+	<logic:equal name="mod" value="0"><tr></logic:equal>
+	<td width="2%"style="background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );">
+		&nbsp;&nbsp;
+	</td>
+	<td style="font-size:8pt;text-align:left;"><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></td>
+	<td width="42%" style="font-size:8pt;" ><bean:write name="dataset" property="datasetComments" /></td>
+	<logic:equal name="mod" value="1"></tr></logic:equal>
+</logic:iterate>
+</tbody>
+</table>
+
 <logic:present name="dtasWarning">
 <p style="color:red; font-weight: bold;" align="center">
 WARNING:  Comparison with DTASelect results is not yet fully supported. 

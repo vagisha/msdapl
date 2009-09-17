@@ -171,7 +171,6 @@
 </table>
 </div>
 
-<!-- <yrcwww:member group="administrator"> -->
 <logic:equal name="showGOForm" value="true">
 
 <br>
@@ -200,6 +199,5 @@
 </div>
 </logic:equal>
 
-<!-- </yrcwww:member> -->
 </center>
 </html:form>
