@@ -1,14 +1,17 @@
 package org.yeastrc.ms.parser.mzxml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.systemsbiology.jrap.stax.DataProcessingInfo;
 import org.systemsbiology.jrap.stax.MSInstrumentInfo;
-import org.systemsbiology.jrap.stax.MSXMLParser;
+import org.systemsbiology.jrap.stax.MSXMLSequentialParser;
 import org.systemsbiology.jrap.stax.MZXMLFileInfo;
 import org.systemsbiology.jrap.stax.Scan;
 import org.systemsbiology.jrap.stax.ScanHeader;
@@ -24,7 +27,7 @@ public class MzXmlFileReader implements MzXmlDataProvider {
 
     private String sha1Sum;
     private String filename;
-    private MSXMLParser parser;
+    private MSXMLSequentialParser parser;
     private int numScans = 0;
     private int numScansRead = 0;
     private int lastMs1ScanNumber = -1;
@@ -39,13 +42,23 @@ public class MzXmlFileReader implements MzXmlDataProvider {
             throws DataProviderException {
         this.sha1Sum = sha1Sum;
         this.filename = new File(filePath).getName();
-        parser = new MSXMLParser(filePath);
+        parser = new MSXMLSequentialParser();
+        try {
+            parser.open(filePath);
+        }
+        catch (FileNotFoundException e) {
+            throw new DataProviderException("Could not find file: "+filePath, e);
+        }
+        catch (XMLStreamException e) {
+            throw new DataProviderException("Error reading file: "+filePath, e);
+        }
         numScans = parser.getScanCount();
     }
     
     @Override
     public void close() {
-        // TODO
+        if(parser != null)
+            parser.close();
     }
 
     @Override
@@ -57,7 +70,15 @@ public class MzXmlFileReader implements MzXmlDataProvider {
     public MsScanIn getNextScan() throws DataProviderException {
         if(numScansRead >= numScans)
             return null;
-        Scan scan = parser.rap(++numScansRead);
+        Scan scan = null;
+        if(parser.hasNextScan()) {
+            try {
+                scan = parser.getNextScan();
+            }
+            catch (XMLStreamException e) {
+                throw new DataProviderException("Error reading scan.", e);
+            }
+        }
         if(scan == null)
             return null;
         
@@ -137,7 +158,7 @@ public class MzXmlFileReader implements MzXmlDataProvider {
 
     @Override
     public MsRunIn getRunHeader() throws DataProviderException {
-        MZXMLFileInfo info = parser.rapFileHeader();
+        MZXMLFileInfo info = parser.getFileHeader();
         MzXmlHeader run = new MzXmlHeader();
         
         DataProcessingInfo dpInfo = info.getDataProcessing();

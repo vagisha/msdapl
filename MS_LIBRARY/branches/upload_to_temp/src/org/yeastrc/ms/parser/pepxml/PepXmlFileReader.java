@@ -9,6 +9,7 @@ package org.yeastrc.ms.parser.pepxml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class PepXmlFileReader implements PepxmlDataProvider<PepXmlSearchScanIn> 
 
     private static final String MSMS_RUN_SUMMARY = "msms_run_summary";
     private String filePath;
+    private InputStream inputStr = null;
     private XMLStreamReader reader = null;
     private List<MsResidueModificationIn> searchDynamicResidueMods;
     private boolean refreshParserRun = false;
@@ -58,8 +60,8 @@ public class PepXmlFileReader implements PepxmlDataProvider<PepXmlSearchScanIn> 
         
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         try {
-            InputStream input = new FileInputStream(filePath);
-            reader = inputFactory.createXMLStreamReader(input);
+            inputStr = new FileInputStream(filePath);
+            reader = inputFactory.createXMLStreamReader(inputStr);
             readAnalysisSummary(reader);
         }
         catch (FileNotFoundException e) {
@@ -98,10 +100,15 @@ public class PepXmlFileReader implements PepxmlDataProvider<PepXmlSearchScanIn> 
     
     @Override
     public void close() {
-        if (reader != null) try {
-            reader.close();
+        if (reader != null) {
+            try {reader.close();}
+            catch (XMLStreamException e) {}
         }
-        catch (XMLStreamException e) {}
+        
+        if(inputStr != null) {
+            try {inputStr.close();}
+            catch(IOException e){}
+        }
     }
     
     
