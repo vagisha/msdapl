@@ -97,17 +97,6 @@ public class MSXMLSequentialParser {
     }
 
 
-    private void closeFile(FileInputStream fileIN) {
-        if(fileIN != null) {
-            try {
-                fileIN.close();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     /**
      * Returns true if there are more scans to be parsed in the file
      * @return
