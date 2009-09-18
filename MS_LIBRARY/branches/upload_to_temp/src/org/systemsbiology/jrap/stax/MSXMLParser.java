@@ -107,6 +107,7 @@ public final class MSXMLParser
 		headerParser.setFileInputStream(fileIN);
 		headerParser.parseScanAndHeader();
 
+		closeFile(fileIN);
 		return (headerParser.getHeader());
 	    }
 	else
@@ -115,9 +116,21 @@ public final class MSXMLParser
 		headerParser.setIsScan(false);
 		headerParser.setFileInputStream(fileIN);
 		headerParser.parseMLScanAndHeader();
+		closeFile(fileIN);
 		return (headerParser.getHeader());
 	    }
 
+    }
+    
+    private void closeFile(FileInputStream fileIN) {
+        if(fileIN != null) {
+            try {
+                fileIN.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -154,6 +167,7 @@ public final class MSXMLParser
 		scanParser.setFileInputStream(fileIN);
 		scanParser.parseScanAndHeader();
 
+		closeFile(fileIN);
 		return ( scanParser.getScan());
 	    }
 	else
@@ -162,6 +176,8 @@ public final class MSXMLParser
 		scanParser.setIsScan(true);
 		scanParser.setFileInputStream(fileIN);
 		scanParser.parseMLScanAndHeader();
+		
+		closeFile(fileIN);
 		return (scanParser.getScan());
 	    }
     }

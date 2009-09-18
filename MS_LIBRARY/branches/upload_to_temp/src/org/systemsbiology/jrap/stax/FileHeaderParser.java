@@ -27,10 +27,13 @@
 
 package org.systemsbiology.jrap.stax;
 
-import java.io.*;
-import javax.xml.stream.*;
-import javax.xml.stream.events.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public class FileHeaderParser{
 
@@ -66,6 +69,14 @@ public class FileHeaderParser{
 	else
 	    parseMLFileHeader();
     }
+    
+    public void parseFileHeader(XMLStreamReader xmlSR) throws XMLStreamException
+    {
+    if(isXML)
+        parseXMLFileHeader(xmlSR);
+    else
+        parseMLFileHeader(xmlSR);
+    }
 
     private void parseXMLFileHeader()
     {
@@ -74,7 +85,19 @@ public class FileHeaderParser{
 	    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 	    XMLStreamReader xmlSR = inputFactory.createXMLStreamReader(new FileInputStream(inputMZXMLfile));
 
-	    String elementName = null;
+	    parseXMLFileHeader(xmlSR);
+	    xmlSR.close();
+	}
+	catch(Exception e)
+	    {
+		if(!(e.getMessage()).equals("HeaderEndFoundException"))
+		    e.printStackTrace(System.err);
+	    }
+    }
+
+    private void parseXMLFileHeader(XMLStreamReader xmlSR)
+            throws XMLStreamException {
+        String elementName = null;
 	    int event = -1;
 
 	    boolean isInstrument = false;
@@ -83,7 +106,7 @@ public class FileHeaderParser{
 	    while(xmlSR.hasNext())
 		{
 		    event = xmlSR.next();
-		    if(event == xmlSR.START_ELEMENT)
+		    if(event == XMLStreamConstants.START_ELEMENT)
 			{
 			    elementName = xmlSR.getLocalName();
 			    //System.out.println("elementName "+elementName);
@@ -164,7 +187,7 @@ public class FileHeaderParser{
 				}
 			    
 			}
-		    if(event == xmlSR.END_ELEMENT)
+		    if(event == XMLStreamConstants.END_ELEMENT)
 			{
 			    elementName = xmlSR.getLocalName();
 			    if(elementName.equals("msInstrument"))
@@ -175,17 +198,11 @@ public class FileHeaderParser{
 				    isDataProcess = false;
 				    info.parentFiles = parentFiles;
 				    info.dataProcessing.softwareUsed = dataProcessingSoftware;
-				    throw new XMLStreamException("HeaderEndFoundException");
+//				    throw new XMLStreamException("HeaderEndFoundException");
+				    return;
 				}
 			}
 		}
-	    xmlSR.close();
-	}
-	catch(Exception e)
-	    {
-		if(!(e.getMessage()).equals("HeaderEndFoundException"))
-		    e.printStackTrace(System.err);
-	    }
     }
 
     private SoftwareInfo parseSoftware(XMLStreamReader xmlSR)
@@ -215,7 +232,19 @@ public class FileHeaderParser{
 	    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 	    XMLStreamReader xmlSR = inputFactory.createXMLStreamReader(new FileInputStream(inputMZXMLfile));
 
-	    String elementName = null;
+	    parseMLFileHeader(xmlSR);
+	    xmlSR.close();
+	}
+	catch(Exception e)
+	    {
+		if(!(e.getMessage()).equals("HeaderEndFoundException"))
+		    e.printStackTrace(System.err);
+	    }
+    }
+
+    private void parseMLFileHeader(XMLStreamReader xmlSR)
+            throws XMLStreamException {
+        String elementName = null;
 	    int event = -1;
 
 	    boolean isInstrument = false;
@@ -410,12 +439,5 @@ public class FileHeaderParser{
 				}
 			}
 		}
-	    xmlSR.close();
-	}
-	catch(Exception e)
-	    {
-		if(!(e.getMessage()).equals("HeaderEndFoundException"))
-		    e.printStackTrace(System.err);
-	    }
     }
 }

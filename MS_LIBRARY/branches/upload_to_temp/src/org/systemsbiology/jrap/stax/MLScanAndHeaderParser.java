@@ -27,12 +27,15 @@
  
 //support mzML parsing
 package org.systemsbiology.jrap.stax;
-import java.io.*;
-import javax.xml.stream.*;
-import javax.xml.stream.events.*;
-import java.util.*;
-import java.nio.*;
-import java.util.zip.*;
+import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public class MLScanAndHeaderParser{
 
@@ -75,11 +78,40 @@ public class MLScanAndHeaderParser{
 
     public void parseMLScanAndHeader()
     {
+        XMLStreamReader xmlSR = null;
 	try{
 	    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-	    XMLStreamReader xmlSR = inputFactory.createXMLStreamReader(fileIN,"ISO-8859-1");
+	    xmlSR = inputFactory.createXMLStreamReader(fileIN,"ISO-8859-1");
 
-	    boolean inSpectrum = false;
+	    parseMLScanAndHeader(xmlSR);
+	   
+	}
+	catch(Exception e)
+	    {
+		String exception1=e.getMessage();
+		if(!exception1.equals("ScanHeaderEndFoundException"))
+		    {
+			if(!exception1.equals("ScanEndFoundException"))
+			    e.printStackTrace();
+		    }
+	    }
+	    finally {
+	        if(xmlSR != null) {
+	            try {
+                    xmlSR.close();
+                }
+                catch (XMLStreamException e) {
+                    e.printStackTrace();
+                }
+	        }
+	    }
+    }
+
+
+
+    public void parseMLScanAndHeader(XMLStreamReader xmlSR)
+            throws XMLStreamException {
+        boolean inSpectrum = false;
 	    boolean inPeaks = false;
 	    boolean isPeaks = false;
 	    String elementName = null;
@@ -254,17 +286,6 @@ public class MLScanAndHeaderParser{
 
 		    
 		}
-	   
-	}
-	catch(Exception e)
-	    {
-		String exception1=e.getMessage();
-		if(!exception1.equals("ScanHeaderEndFoundException"))
-		    {
-			if(!exception1.equals("ScanEndFoundException"))
-			    e.printStackTrace();
-		    }
-	    }
     }
 
     public String getStringValue(XMLStreamReader xmlSR, String name)
