@@ -49,7 +49,23 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         return 0;
     }
     
-    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, InputType inputType) {
+    @Override
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds) {
+        if(inputIds.size() == 0) 
+            return new ArrayList<Integer>(0);
+        
+        StringBuilder buf = new StringBuilder();
+        buf.append("(");
+        for(Integer id: inputIds) {
+            buf.append(id+",");
+        }
+        buf.deleteCharAt(buf.length() - 1);
+        buf.append(")");
+        
+        return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIds", buf.toString());
+    }
+    
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, Program inputGenerator) {
         if(inputIds.size() == 0) 
             return new ArrayList<Integer>(0);
         
@@ -62,10 +78,10 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         buf.append(")");
         
         Map<String, String> map = new HashMap<String, String>(4);
-        map.put("inputType", String.valueOf(inputType.getShortName()));
+        map.put("inputGenarator", inputGenerator.name());
         map.put("inputIds", buf.toString());
         
-        return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIds", map);
+        return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIdsProgram", map);
     }
     
     @Override

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.GenericProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
-import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
+import org.yeastrc.ms.domain.search.Program;
 
 public interface GenericProteinferRunDAO <S extends ProteinferInput, T extends GenericProteinferRun<S>>{
 
@@ -16,7 +16,9 @@ public interface GenericProteinferRunDAO <S extends ProteinferInput, T extends G
     
     public abstract int getMaxProteinHitCount(int proteinferId);
     
-    public abstract List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, InputType inputType);
+    public abstract List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds);
+    
+    public abstract List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, Program inputGenerator);
 
     public abstract List<Integer> loadSearchIdsForProteinferRun(int pinferId);
     

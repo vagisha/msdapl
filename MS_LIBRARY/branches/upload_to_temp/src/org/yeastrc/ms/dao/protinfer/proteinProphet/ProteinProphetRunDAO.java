@@ -7,8 +7,8 @@ import org.yeastrc.ms.dao.protinfer.GenericProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
-import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
+import org.yeastrc.ms.domain.search.Program;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -34,8 +34,13 @@ public class ProteinProphetRunDAO extends BaseSqlMapDAO implements GenericProtei
     }
 
     @Override
-    public List<Integer> loadProteinferIdsForInputIds(List<Integer> runSearchIds, InputType inputType) {
-        return runDao.loadProteinferIdsForInputIds(runSearchIds, inputType);
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds) {
+        return runDao.loadProteinferIdsForInputIds(inputIds);
+    }
+    
+    @Override
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, Program inputGenerator) {
+        return runDao.loadProteinferIdsForInputIds(inputIds, inputGenerator);
     }
 
     @Override
@@ -46,6 +51,12 @@ public class ProteinProphetRunDAO extends BaseSqlMapDAO implements GenericProtei
     @Override
     public int save(GenericProteinferRun<?> run) {
         return runDao.save(run);
+    }
+    
+    public int saveProteinProphetRun(ProteinProphetRun run) {
+        int runID = runDao.save(run);
+        super.save(sqlMapNameSpace+".insert", run);
+        return runID;
     }
 
     @Override

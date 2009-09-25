@@ -27,13 +27,13 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferIonDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetParamDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinIonDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRocDAO;
+import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetSubsumedProteinDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
@@ -80,11 +80,11 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     
     
     private final ProteinferDAOFactory piDaoFactory;
-    private ProteinferRunDAO runDao;
     private ProteinferPeptideDAO peptDao;
     private ProteinferProteinDAO protDao;
     private ProteinferIonDAO ionDao;
     private ProteinferSpectrumMatchDAO psmDao;
+    private ProteinProphetRunDAO ppRunDao;
     private ProteinProphetProteinGroupDAO grpDao;
     private ProteinProphetProteinDAO ppProtDao;
     private ProteinProphetProteinIonDAO ppProteinIonDao; 
@@ -136,12 +136,12 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         resDao = daoFactory.getMsSearchResultDAO();
         ppResDao = UploadDAOFactory.getInstance().getPeptideProphetResultDAO();
         
-        runDao = piDaoFactory.getProteinferRunDao();
         peptDao = piDaoFactory.getProteinferPeptideDao();
         protDao = piDaoFactory.getProteinferProteinDao();
         ionDao = piDaoFactory.getProteinferIonDao();
         psmDao = piDaoFactory.getProteinferSpectrumMatchDao();
         grpDao = piDaoFactory.getProteinProphetProteinGroupDao();
+        ppRunDao = piDaoFactory.getProteinProphetRunDao();
         ppProtDao = piDaoFactory.getProteinProphetProteinDao();
         ppProteinIonDao = piDaoFactory.getProteinProphetProteinIonDao();
         ppSusumedDao = piDaoFactory.getProteinProphetSubsumedProteinDao();
@@ -218,7 +218,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         catch(UploadException ex) {
             parser.close();
             ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
-            runDao.delete(uploadedPinferId);
+            ppRunDao.delete(uploadedPinferId);
             throw ex;
         }
         
@@ -233,18 +233,18 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             UploadException ex = new UploadException(ERROR_CODE.PROTXML_ERROR, e);
             ex.appendErrorMessage(e.getErrorMessage());
             ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
-            runDao.delete(uploadedPinferId);
+            ppRunDao.delete(uploadedPinferId);
             throw ex;
         }
         catch(UploadException e) {
             e.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
-            runDao.delete(uploadedPinferId);
+            ppRunDao.delete(uploadedPinferId);
             throw e;
         }
         catch(RuntimeException e) {
             UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
             ex.appendErrorMessage("DELETING PROTEIN INFERENCE..."+uploadedPinferId);
-            runDao.delete(uploadedPinferId);
+            ppRunDao.delete(uploadedPinferId);
             throw ex;
         }
         finally {
@@ -302,7 +302,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         }
     }
 
-    public int saveProtein(ProteinProphetProtein protein, Map<Integer, Set<String>> subsumedMap) 
+    private int saveProtein(ProteinProphetProtein protein, Map<Integer, Set<String>> subsumedMap) 
         throws UploadException {
         
         int nrseqId = getNrseqProteinId(protein.getProteinName(), nrseqDatabaseId);
@@ -684,7 +684,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 run.setProgram(ProteinInferenceProgram.PROTEIN_PROPHET);
                 run.setProgramVersion(parser.getProgramVersion());
                 run.setDate(new java.sql.Date(parser.getDate().getTime()));
-                uploadedPinferId = runDao.save(run);
+                run.setFilename(parser.getFileName());
+                uploadedPinferId = ppRunDao.saveProteinProphetRun(run);
                 first = false;
             }
             

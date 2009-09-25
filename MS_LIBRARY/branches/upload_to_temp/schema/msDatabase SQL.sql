@@ -550,6 +550,11 @@ CREATE TABLE IDPickerSpectrumMatch (
 #####################################################################
 # ProteinProphet Tables
 #####################################################################
+CREATE TABLE ProteinProphetRun (
+    piRunID INT UNSIGNED NOT NULL PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE ProteinProphetParam (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     piRunID INT UNSIGNED NOT NULL,
@@ -683,6 +688,7 @@ CREATE TRIGGER msProteinInferRun_bdelete BEFORE DELETE ON msProteinInferRun
    	DELETE FROM msProteinInferInput WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferProtein WHERE piRunID = OLD.id;
   	DELETE FROM msProteinInferPeptide WHERE piRunID = OLD.id;
+  	DELETE FROM ProteinProphetRun WHERE piRunID = OLD.id;
   	DELETE FROM ProteinProphetParam WHERE piRunID = OLD.id;
   	DELETE FROM ProteinProphetROC WHERE piRunID = OLD.id;
   	DELETE FROM ProteinProphetProteinGroup WHERE piRunID = OLD.id;

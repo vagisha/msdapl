@@ -17,6 +17,7 @@ import org.yeastrc.ms.domain.protinfer.ProteinferInput;
  */
 public class ProteinProphetRun extends GenericProteinferRun<ProteinferInput> {
 
+    private String filename;
     private List<ProteinProphetParam> params;
     private ProteinProphetROC roc;
     
@@ -44,6 +45,14 @@ public class ProteinProphetRun extends GenericProteinferRun<ProteinferInput> {
         this.roc = new ProteinProphetROC();
         roc.setProteinferId(this.getId());
         roc.setRocPoints(points);
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
     
 }

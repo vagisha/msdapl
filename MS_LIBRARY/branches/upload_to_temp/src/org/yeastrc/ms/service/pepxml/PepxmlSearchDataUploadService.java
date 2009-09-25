@@ -48,7 +48,10 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.pepxml.PepXmlFileReader;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
+import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
+import org.yeastrc.ms.service.PeptideProteinMatch;
+import org.yeastrc.ms.service.PeptideProteinMatchingService;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
@@ -111,6 +114,9 @@ private static final int BUF_SIZE = 500;
     private DynamicModLookupUtil dynaModLookup;
     private int numSearchesUploaded = 0;
     
+    // list of protein peptide matches (if the refresh parser has not been run)
+    private Map<String, List<PeptideProteinMatch>> proteinMatches;
+    
     
     private static final Logger log = Logger.getLogger(PepxmlAnalysisDataUploadService.class.getName());
     
@@ -125,6 +131,8 @@ private static final int BUF_SIZE = 500;
         
         this.dynaResidueMods = new ArrayList<MsResidueModificationIn>();
         this.dynaTermMods = new ArrayList<MsTerminalModificationIn>();
+        
+        proteinMatches = new HashMap<String, List<PeptideProteinMatch>>();
         
         UploadDAOFactory daoFactory = UploadDAOFactory.getInstance();
         
@@ -363,29 +371,35 @@ private static final int BUF_SIZE = 500;
                 
                 for(SequestPeptideProphetResultIn result: scan.getScanResults()) {
                     // If the refresh parser has not been run, find alternative matches for the peptide
-//                    if(!parser.isRefreshParserRun()) {
-//                        List<PeptideProteinMatch> matches = PeptideProteinMatchingService.getMatchingProteins(searchId, 
-//                                        result.getResultPeptide().getPeptideSequence());
-//                        List<MsSearchResultProteinIn> protList = result.getProteinMatchList();
-//                        
-//                        for(PeptideProteinMatch match: matches) {
-//                            boolean haveAlready = false;
-//                            for(MsSearchResultProteinIn prot: protList) {
-//                                if(match.getProtein().getAccessionString().equals(prot.getAccession())) { // this one we have already
-//                                    haveAlready = true;
-//                                    break;
-//                                }
-//                            }
-//                            if(haveAlready)
-//                                continue;
-//                            DbLocus locus = new DbLocus(match.getProtein().getAccessionString(), match.getProtein().getDescription());
-//                            locus.setNtermResidue(match.getPreResidue());
-//                            locus.setCtermResidue(match.getPostResidue());
-//                            locus.setNumEnzymaticTermini(match.getNumEnzymaticTermini());
-//                            result.addMatchingProteinMatch(locus);
-//
-//                        }
-//                    }
+                    if(!parser.isRefreshParserRun()) {
+                        
+                        List<PeptideProteinMatch> matches = proteinMatches.get(result.getResultPeptide().getPeptideSequence());
+                        if(matches == null) {
+                            matches = PeptideProteinMatchingService.getMatchingProteins(searchId, 
+                                        result.getResultPeptide().getPeptideSequence());
+                            proteinMatches.put(result.getResultPeptide().getPeptideSequence(), matches);
+                        }
+                        
+                        List<MsSearchResultProteinIn> protList = result.getProteinMatchList();
+                        
+                        for(PeptideProteinMatch match: matches) {
+                            boolean haveAlready = false;
+                            for(MsSearchResultProteinIn prot: protList) {
+                                if(match.getProtein().getAccessionString().equals(prot.getAccession())) { // this one we have already
+                                    haveAlready = true;
+                                    break;
+                                }
+                            }
+                            if(haveAlready)
+                                continue;
+                            DbLocus locus = new DbLocus(match.getProtein().getAccessionString(), match.getProtein().getDescription());
+                            locus.setNtermResidue(match.getPreResidue());
+                            locus.setCtermResidue(match.getPostResidue());
+                            locus.setNumEnzymaticTermini(match.getNumEnzymaticTermini());
+                            result.addMatchingProteinMatch(locus);
+
+                        }
+                    }
                     int resultId = uploadBaseSearchResult(result, runSearchId, scanId);
                     uploadSequestResultData(result.getSequestResultData(), resultId); // Sequest scores
                     numResults++;

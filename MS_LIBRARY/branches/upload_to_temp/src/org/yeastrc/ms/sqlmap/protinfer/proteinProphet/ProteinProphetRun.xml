@@ -6,6 +6,7 @@
 	<typeAlias alias="ProteinProphetRun" type="org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun"/>
 		
 	<resultMap class="ProteinProphetRun" id="proteinProphetRunResult" extends="ProteinferRun.pinferRunBaseResult">
+		<result property="filename" column="filename" />
 		<result property="params" 
 				select="ProteinProphetParam.selectParamsForRun"
 				column="id"/>
@@ -14,9 +15,23 @@
 				column="id"/>
 	</resultMap>
 	
+	<parameterMap class="ProteinProphetRun" id="proteinProphetRunParam">
+		<parameter property="id" jdbcType="INTEGER" />
+		<parameter property="filename" jdbcType="VARCHAR"/>
+	</parameterMap>
 	
 	<select id="select" resultMap="proteinProphetRunResult" parameterClass="Integer">
-    	SELECT * FROM msProteinInferRun WHERE id=#id#
+    	SELECT * 
+    	FROM msProteinInferRun AS RUN, ProteinProphetRun as prun
+    	WHERE run.id=#id#
+    	AND prun.piRunID = run.id
     </select>
+    
+    <insert id="insert" parameterMap="proteinProphetRunParam">
+    	INSERT INTO ProteinProphetRun (
+    	piRunID,
+    	filename)
+    	VALUES(?,?)
+    </insert>
     
 </sqlMap>

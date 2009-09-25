@@ -1,5 +1,6 @@
 package org.yeastrc.ms.parser.protxml;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -146,6 +147,10 @@ public class InteractProtXmlParser {
             reader.close();
         }
         catch (XMLStreamException e) {}
+    }
+    
+    public String getFileName() {
+        return new File(filePath).getName();
     }
     
     public String getProgramName() {

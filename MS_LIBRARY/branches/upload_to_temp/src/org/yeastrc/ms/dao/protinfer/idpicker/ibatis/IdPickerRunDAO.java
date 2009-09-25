@@ -6,9 +6,9 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.protinfer.GenericProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferRun;
-import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.domain.search.Program;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -34,8 +34,13 @@ public class IdPickerRunDAO extends BaseSqlMapDAO implements GenericProteinferRu
     }
 
     @Override
-    public List<Integer> loadProteinferIdsForInputIds(List<Integer> runSearchIds, InputType inputType) {
-        return runDao.loadProteinferIdsForInputIds(runSearchIds, inputType);
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds) {
+        return runDao.loadProteinferIdsForInputIds(inputIds);
+    }
+    
+    @Override
+    public List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, Program inputGenerator) {
+        return runDao.loadProteinferIdsForInputIds(inputIds, inputGenerator);
     }
 
     @Override
