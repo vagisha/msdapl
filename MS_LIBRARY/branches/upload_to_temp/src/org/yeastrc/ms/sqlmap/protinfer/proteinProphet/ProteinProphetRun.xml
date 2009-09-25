@@ -22,8 +22,8 @@
 	
 	<select id="select" resultMap="proteinProphetRunResult" parameterClass="Integer">
     	SELECT * 
-    	FROM msProteinInferRun AS RUN, ProteinProphetRun as prun
-    	WHERE prun.id=#id#
+    	FROM msProteinInferRun AS run, ProteinProphetRun as prun
+    	WHERE run.id=#id#
     	AND prun.piRunID = run.id
     </select>
     
