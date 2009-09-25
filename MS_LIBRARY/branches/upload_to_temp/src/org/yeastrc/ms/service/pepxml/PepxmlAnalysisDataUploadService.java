@@ -4,11 +4,15 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.impl.RunSearchAnalysisBean;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetROC;
@@ -20,6 +24,8 @@ import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultProtein;
+import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
@@ -61,7 +67,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     
     private final MsScanUploadDAO scanDao;
     private final MsRunSearchUploadDAO runSearchDao;
-    private final MsSearchResultUploadDAO resultDao;
+    private final MsSearchResultUploadDAO uploadResultDao;
+    private final MsSearchResultDAO resDao;
     private final MsSearchUploadDAO searchDao;
     private final MsSearchAnalysisUploadDAO analysisDao;
     private final MsRunSearchAnalysisUploadDAO runSearchAnalysisDao;
@@ -79,6 +86,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     private int numAnalysisUploaded = 0;
     
     private StringBuilder uploadMsg;
+    
+    private Set<String> checkedPeptideProteinMatches; // TODO this should be removed soon
     
     private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.pep.xml");
     
@@ -99,7 +108,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.scanDao = daoFactory.getMsScanDAO();
         this.searchDao = daoFactory.getMsSearchDAO();
         this.runSearchDao = daoFactory.getMsRunSearchDAO();
-        this.resultDao = daoFactory.getMsSearchResultDAO();
+        this.uploadResultDao = daoFactory.getMsSearchResultDAO();
         
         this.analysisDao = daoFactory.getMsSearchAnalysisDAO();
         this.runSearchAnalysisDao  = daoFactory.getMsRunSearchAnalysisDAO();
@@ -108,8 +117,12 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.ppResDao = daoFactory.getPeptideProphetResultDAO();
         this.ppAnalysisDao = daoFactory.getPeptideProphetAnalysisDAO();
         
+        resDao = DAOFactory.instance().getMsSearchResultDAO();
+        
         uploadMsg = new StringBuilder();
         this.analysisIds = new ArrayList<Integer>();
+        
+        checkedPeptideProteinMatches = new HashSet<String>();
     }
     
 
@@ -272,8 +285,11 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 throw ex;
             }
 
-            // TODO  If refresh parser has not been run determine peptide protein matches from the 
-            // protein sequence database.
+            // TODO  this check should be removed once I am confident that the protein matches that
+            // I get from PeptideProteinMatchingService are the same as the ones the TPP's
+            // refresh parser generates.  Till then I will be matching the protein matches
+            // in the interact*.pep.xml files against those I store in the database in the 
+            // PepxmlSearchDataUploadService. 
             if(!parser.isRefreshParserRun()) {
                 UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR);
                 ex.setErrorMessage("Refresh parser has not been run");
@@ -394,6 +410,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 
                 for(SequestPeptideProphetResultIn result: scan.getScanResults()) {
                     int resultId = getUploadedResultId(result, runSearchId, scanId);
+                    // TODO this check should be removed soon.
+                    checkPeptideProteinMatches(resultId, result);
                     uploadAnalysisResult(result, resultId, runSearchAnalysisId);      // PeptideProphet scores
                     numResults++;
                 }
@@ -410,6 +428,45 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
     }
     
+    private void checkPeptideProteinMatches(int matchingSearchResultId, SequestPeptideProphetResultIn result) throws UploadException {
+        
+        // Peptide to protein matches should be the same for all PSMs with the same peptide sequence
+        // If we have already checked the results for a PSM with this peptide sequence no need 
+        // to check again
+        if(checkedPeptideProteinMatches.contains(result.getResultPeptide().getPeptideSequence())) {
+            return;
+        }
+        
+        // load the stored result
+        MsSearchResult storedResult = resDao.load(matchingSearchResultId);
+        List<MsSearchResultProtein> storedMatches = storedResult.getProteinMatchList();
+        
+        List<MsSearchResultProteinIn> myMatches = result.getProteinMatchList();
+        if(storedMatches.size() != myMatches.size()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+                    " does not match the number of matches found in interact files: "+myMatches.size()+
+                    " for searchResultID: "+matchingSearchResultId);
+            throw ex;
+        }
+        
+        Set<String> storedAccessions = new HashSet<String>(storedMatches.size());
+        for(MsSearchResultProtein prot: storedMatches) {
+            storedAccessions.add(prot.getAccession());
+        }
+        
+        for(MsSearchResultProteinIn prot: myMatches) {
+            if(!storedAccessions.contains(prot.getAccession())) {
+                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                ex.setErrorMessage("Protein in interact file not found in database: "+prot.getAccession()+
+                        "; searchResultID: "+matchingSearchResultId+
+                        "; peptide: "+result.getResultPeptide().getPeptideSequence());
+                throw ex;
+            }
+        }
+    }
+
+
     private int getRunIdForRunSearch(int runSearchId) {
         MsRunSearch rs = runSearchDao.loadRunSearch(runSearchId);
         if(rs != null)
@@ -422,7 +479,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         MsSearchResult searchResult = null;
         try {
-            List<MsSearchResult> matchingResults = resultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
+            List<MsSearchResult> matchingResults = uploadResultDao.loadResultForSearchScanChargePeptide(runSearchId, scanId, 
                         result.getCharge(), 
                         result.getResultPeptide().getPeptideSequence());
             
