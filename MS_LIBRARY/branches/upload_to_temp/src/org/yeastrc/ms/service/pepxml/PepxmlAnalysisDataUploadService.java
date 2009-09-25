@@ -46,6 +46,7 @@ import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsRunSearchUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsSearchResultUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
+import org.yeastrc.ms.util.TimeUtils;
 
 // This will upload the corresponding PeptideProphet results. 
 public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadService {
@@ -275,7 +276,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
             }
             
             // file has not been uploaded upload it now
-            log.info("Uploading interact pepxml file: "+file);
+            long s = System.currentTimeMillis();
+            log.info("Uploading analysis results in interact pepxml file: "+file);
             InteractPepXmlFileReader parser = new InteractPepXmlFileReader();
             try {
                 parser.open(dataDirectory+File.separator+file);
@@ -334,7 +336,9 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 parser.close();
             }
 
-
+            long e = System.currentTimeMillis();
+            log.info("Finished uploading analysis results in interact pepxml file: "+file+"; Time: "+TimeUtils.timeElapsedSeconds(s, e));
+            
             // if no PeptideProphet analyses were uploaded delete the top level search analysis
             if (numAnalysisUploaded == 0) {
                 UploadException ex = new UploadException(ERROR_CODE.NO_PEPTPROPH_ANALYSIS_UPLOADED);

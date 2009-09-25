@@ -66,6 +66,7 @@ import org.yeastrc.ms.upload.dao.search.MsSearchResultUploadDAO;
 import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchResultUploadDAO;
 import org.yeastrc.ms.upload.dao.search.sequest.SequestSearchUploadDAO;
+import org.yeastrc.ms.util.TimeUtils;
 
 /**
  * 
@@ -301,6 +302,8 @@ private static final int BUF_SIZE = 500;
             resetCaches();
             // int runSearchId;
             
+            long s = System.currentTimeMillis();
+            log.info("Uploading search results in file: "+file);
             PepXmlFileReader parser = new PepXmlFileReader();
             parser.setParseEvalue(this.usesEvalue);
             try {
@@ -328,6 +331,8 @@ private static final int BUF_SIZE = 500;
             finally {
                 parser.close();
             }
+            long e = System.currentTimeMillis();
+            log.info("Finished uploading search results in file: "+file+"; Time: "+TimeUtils.timeElapsedSeconds(s, e));
         }
         
         
