@@ -22,8 +22,8 @@ public class IdPickerInputGetter {
     
     public int getUnfilteredInputCount(int inputId, Program program) {
         if(program == Program.PERCOLATOR) {
-            List<Integer> resultIds = DAOFactory.instance().getPercolatorResultDAO().loadResultIdsForRunSearchAnalysis(inputId);
-            return resultIds.size();
+            List<Integer> percResultIds = DAOFactory.instance().getPercolatorResultDAO().loadIdsForRunSearchAnalysis(inputId);
+            return percResultIds.size();
         }
         else if( Program.isSearchProgram(program)) {
             List<Integer> resultIds = DAOFactory.instance().getMsSearchResultDAO().loadResultIdsForRunSearch(inputId);

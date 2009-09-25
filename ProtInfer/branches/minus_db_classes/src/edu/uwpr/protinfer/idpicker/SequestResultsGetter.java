@@ -44,7 +44,8 @@ public class SequestResultsGetter extends SearchResultsGetter<SequestSearchResul
         SequestResultData scores = result.getSequestResultData();
         
         SpectrumMatchIDPImpl specMatch = new SpectrumMatchIDPImpl();
-        specMatch.setHitId(result.getId());
+        specMatch.setResultId(result.getId());
+        specMatch.setSearchResultId(result.getId());
         specMatch.setScanId(result.getScanId());
         specMatch.setCharge(result.getCharge());
         specMatch.setSourceId(result.getRunSearchId());

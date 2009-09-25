@@ -186,7 +186,7 @@ public abstract class SearchResultsGetter <T extends MsSearchResult> implements 
         for (PeptideSpectrumMatchIDP psm: psmList) {
 
             // read the matching proteins from the database now
-            List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(psm.getHitId());
+            List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(psm.getSearchResultId());
 
             for (MsSearchResultProtein protein: msProteinList) {
 

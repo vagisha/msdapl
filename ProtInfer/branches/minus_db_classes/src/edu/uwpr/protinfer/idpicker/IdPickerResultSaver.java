@@ -190,7 +190,7 @@ public class IdPickerResultSaver {
             
             // get all the percolator results for this peptide
             for(ProteinferSpectrumMatch psm: psmList) {
-                PercolatorResult res = presDao.load(psm.getMsRunSearchResultId());
+                PercolatorResult res = presDao.loadForPercolatorResultId(psm.getResultId());
                 percResults.add(res);
             }
             
@@ -203,7 +203,7 @@ public class IdPickerResultSaver {
             
             // set the new rank and update the results
             for(ProteinferSpectrumMatch psm: psmList) {
-                psm.setRank(resultRankMap.get(psm.getMsRunSearchResultId()));
+                psm.setRank(resultRankMap.get(psm.getResultId()));
                 if(psmDao.update(psm) != 1)
                     throw new IllegalArgumentException("Could not update psm: "+psm.getId());
             }
@@ -366,14 +366,15 @@ public class IdPickerResultSaver {
         Map<String, Integer> modStateIdMap = new HashMap<String, Integer>();
         Map<String, Integer> ionIdMap = new HashMap<String, Integer>();
         for(ProteinferIon ion: ionList) {
-            ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
-            String modPeptide = null;
-            try {
-                modPeptide = getModifiedPeptide(psm.getMsRunSearchResultId());
-            }
-            catch (ModifiedSequenceBuilderException e) {
-                throw new RuntimeException("Error getting modified sequence", e);
-            }
+            String modPeptide = ion.getModifiedSequence();
+//            ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
+//            String modPeptide = null;
+//            try {
+//                modPeptide = getModifiedPeptide(psm.getSearchResultId());
+//            }
+//            catch (ModifiedSequenceBuilderException e) {
+//                throw new RuntimeException("Error getting modified sequence", e);
+//            }
             // modification state id
             Integer modStateId = modStateIdMap.get(modPeptide);
             if(modStateId == null) 
@@ -489,7 +490,7 @@ public class IdPickerResultSaver {
     private <T extends SpectrumMatch> void saveSpectrumMatch(int ionId, T psm) {
         ProteinferSpectrumMatch idpPsm = new ProteinferSpectrumMatch();
         idpPsm.setProteinferIonId(ionId);
-        idpPsm.setMsRunSearchResultId(psm.getHitId());
+        idpPsm.setResultId(psm.getResultId());
         idpPsm.setRank(psm.getRank());
         psmDao.saveSpectrumMatch(idpPsm);
     }
@@ -501,7 +502,7 @@ public class IdPickerResultSaver {
         
         IdPickerSpectrumMatch idpPsm = new IdPickerSpectrumMatch();
         idpPsm.setProteinferIonId(ionId);
-        idpPsm.setMsRunSearchResultId(psm.getHitId());
+        idpPsm.setResultId(psm.getResultId());
         idpPsm.setFdr(((SpectrumMatchIDP)psm).getFdr());
         idpPsm.setRank(psm.getRank());
         idpPsmDao.saveSpectrumMatch(idpPsm);
@@ -539,7 +540,7 @@ public class IdPickerResultSaver {
     }
     
     // ----------------------------------------------------------------------------------------------
-    // Get modified peptide for a result
+    // Get modified peptide for a result (this should be the id from the msRunSearchResult table)
     // ----------------------------------------------------------------------------------------------
     public String getModifiedPeptide (int resultId) throws ModifiedSequenceBuilderException {
         MsSearchResult res = resDao.load(resultId);

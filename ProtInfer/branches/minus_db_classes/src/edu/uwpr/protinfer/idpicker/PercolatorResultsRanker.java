@@ -65,7 +65,7 @@ public class PercolatorResultsRanker {
       }
       
       
-      // Map of resultID and rank
+      // Map of percolatorResultId and rank
       Map<Integer, Integer> resultRankMap = new HashMap<Integer, Integer>((int)(resultList.size()*1.5));
       
       List<PercolatorResult> resForPeptide = new ArrayList<PercolatorResult>();

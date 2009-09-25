@@ -14,7 +14,8 @@ import edu.uwpr.protinfer.infer.SpectrumMatch;
 public class SpectrumMatchNoFDRImpl implements SpectrumMatch {
 
     private int charge;
-    private int hitId;
+    private int resultId;
+    private int searchResultId;
     private int sourceId;
     private int scanId;
     private String peptideModifiedSequence;
@@ -28,12 +29,20 @@ public class SpectrumMatchNoFDRImpl implements SpectrumMatch {
         return charge;
     }
 
-    public void setHitId(int hitId) {
-        this.hitId = hitId;
+    public void setResultId(int resultId) {
+        this.resultId = resultId;
     }
     
-    public int getHitId() {
-        return this.hitId;
+    public int getResultId() {
+        return this.resultId;
+    }
+    
+    public void setSearchResultId(int searchResultId) {
+        this.searchResultId = searchResultId;
+    }
+    
+    public int getSearchResultId() {
+        return this.searchResultId;
     }
 
     

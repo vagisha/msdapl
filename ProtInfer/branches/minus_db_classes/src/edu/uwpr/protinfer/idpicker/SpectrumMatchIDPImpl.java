@@ -4,7 +4,8 @@ package edu.uwpr.protinfer.idpicker;
 public class SpectrumMatchIDPImpl implements SpectrumMatchIDP {
 
     private int charge;
-    private int hitId;
+    private int resultId;
+    private int searchResultId;
     private int runSearchId;
     private int scanId;
     private double fdr = 1.0;
@@ -20,12 +21,20 @@ public class SpectrumMatchIDPImpl implements SpectrumMatchIDP {
         return charge;
     }
 
-    public void setHitId(int hitId) {
-        this.hitId = hitId;
+    public void setResultId(int resultId) {
+        this.resultId = resultId;
     }
     
-    public int getHitId() {
-        return this.hitId;
+    public int getResultId() {
+        return this.resultId;
+    }
+    
+    public void setSearchResultId(int searchResultId) {
+        this.searchResultId = searchResultId;
+    }
+    
+    public int getSearchResultId() {
+        return this.searchResultId;
     }
 
     

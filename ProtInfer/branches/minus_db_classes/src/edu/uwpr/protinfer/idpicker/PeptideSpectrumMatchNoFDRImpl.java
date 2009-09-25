@@ -29,8 +29,13 @@ public class PeptideSpectrumMatchNoFDRImpl implements PeptideSpectrumMatchNoFDR 
     }
     
     @Override
-    public int getHitId() {
-        return specMatch.getHitId();
+    public int getResultId() {
+        return specMatch.getResultId();
+    }
+    
+    @Override
+    public int getSearchResultId() {
+        return specMatch.getSearchResultId();
     }
 
     @Override

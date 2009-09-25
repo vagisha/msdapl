@@ -229,9 +229,9 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
         Collections.sort(scanIds);
         
         // get a list of all the resultIds for this run search.
-        List<Integer> resultIds = resultDao.loadResultIdsForRunSearchAnalysis(rsa.getId());
+        List<Integer> percResultIds = resultDao.loadIdsForRunSearchAnalysis(rsa.getId());
         // sort the resultIds
-        Collections.sort(resultIds);
+        Collections.sort(percResultIds);
         
         // get all the results one scanId at a time; group them by charge and write out to xml
         for(int scanId: scanIds) {
@@ -239,23 +239,23 @@ public class PercolatorPepXmlConverter extends PepXmlConverter<PercolatorResult>
             // remove the result ids returned by the function above from our sorted list of 
             // all result ids for this runSearch.  
             for(PercolatorResult res: results) {
-                int idx = Collections.binarySearch(resultIds, res.getId());
-                if(idx >= 0)    resultIds.remove(idx);
+                int idx = Collections.binarySearch(percResultIds, res.getId());
+                if(idx >= 0)    percResultIds.remove(idx);
             }
             writeResultsForScan(results, staticMods, basefile, writer);
         }
         
         // at the end the resultIds list should be empty.  If not print an error
-        if(resultIds.size() > 0) {
+        if(percResultIds.size() > 0) {
             log.error("Did not print all resultIds");
         }
     }
     
     private List<PercolatorResult> getResultsFor(int runSearchAnalysisId, int scanId) {
-        List<Integer> resultIds = resultDao.loadResultIdsForRunSearchAnalysisScan(runSearchAnalysisId, scanId);
+        List<Integer> resultIds = resultDao.loadIdsForRunSearchAnalysisScan(runSearchAnalysisId, scanId);
         List<PercolatorResult> results = new ArrayList<PercolatorResult>(resultIds.size());
-        for(int resultId: resultIds) {
-            results.add(resultDao.load(resultId));
+        for(int percResultId: resultIds) {
+            results.add(resultDao.loadForPercolatorResultId(percResultId));
         }
         return results;
     }

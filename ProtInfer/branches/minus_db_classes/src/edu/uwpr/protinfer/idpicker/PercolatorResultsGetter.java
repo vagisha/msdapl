@@ -102,7 +102,7 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
         for(PeptideSpectrumMatchNoFDR psm: psmList) {
             
             // read the matching proteins from the database now
-            List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(psm.getHitId());
+            List<MsSearchResultProtein> msProteinList = protDao.loadResultProteins(psm.getSearchResultId());
 
             for (MsSearchResultProtein protein: msProteinList) {
                 // we could have multiple accessions, keep the first one only
@@ -156,7 +156,8 @@ private static final Logger log = Logger.getLogger(IdPickerInputGetter.class);
             }
             
             SpectrumMatchNoFDRImpl specMatch = new SpectrumMatchNoFDRImpl();
-            specMatch.setHitId(result.getId());
+            specMatch.setResultId(result.getId());
+            specMatch.setSearchResultId(result.getSearchResultId());
             specMatch.setScanId(result.getScanId());
             specMatch.setCharge(result.getCharge());
             specMatch.setSourceId(result.getRunSearchAnalysisId());
