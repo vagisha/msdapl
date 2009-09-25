@@ -410,6 +410,7 @@ function clearSelectedProtInfer() {
 					<tr align="left">
 						<th valign="top">ID</th>
 						<th valign="top">Version</th>
+						<th valign="top">File</th>
 						<th valign="top" align="center">#Groups<br>(#Proteins)</th>
 						<th valign="top" align="center">#Peptides</th>
 						<th valign="top">Comments</th>
@@ -421,6 +422,7 @@ function clearSelectedProtInfer() {
 						<tr>
 						<td valign="top"><b><bean:write name="prpRun" property="proteinProphetRun.id"/></b></td>
 						<td valign="top"><bean:write name="prpRun" property="proteinProphetRun.programVersion"/></td>
+						<td valign="top"><b><NOBR><bean:write name="prpRun" property="proteinProphetRun.filename"/></NOBR></b></td>
 						<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><nobr><bean:write name="prpRun" property="numParsimoniousProteinGroups"/>(<bean:write name="prpRun" property="numParsimoniousProteins"/>)</nobr></td>
 						<td valign="top" align="center" style="font-weight:bold; color:#191970; padding:0 3 0 3"><bean:write name="prpRun" property="uniqPeptideSequenceCount"/></td>
 						<td valign="top">

@@ -19,7 +19,6 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
-import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 
 public class ProteinInferJobSearcher {
 
@@ -66,7 +65,7 @@ public class ProteinInferJobSearcher {
         // Get the searchIds for this experiment
         List<Integer> searchIds = DAOFactory.instance().getMsSearchDAO().getSearchIdsForExperiment(experimentId);
         for(int searchId: searchIds) {
-            Set<Integer> piRunIds = getPinferRunIdsForSearch(searchId);
+            List<Integer> piRunIds = getPinferRunIdsForSearch(searchId);
             pinferRunIds.addAll(piRunIds);
         }
         
@@ -78,7 +77,7 @@ public class ProteinInferJobSearcher {
 
     public List<ProteinferJob> getProteinferJobsForMsSearch(int msSearchId) {
         
-        Set<Integer> pinferRunIds = getPinferRunIdsForSearch(msSearchId);
+        List<Integer> pinferRunIds = getPinferRunIdsForSearch(msSearchId);
         
         if(pinferRunIds == null || pinferRunIds.size() == 0)
             return new ArrayList<ProteinferJob>(0);
@@ -102,27 +101,28 @@ public class ProteinInferJobSearcher {
     }
 
 
-    private Set<Integer> getPinferRunIdsForSearch(int msSearchId) {
+    private List<Integer> getPinferRunIdsForSearch(int msSearchId) {
         
-        Set<Integer> pinferRunIds = new HashSet<Integer>();
-        // first check if search results were used to do protein inference
+        // first get all the runSearchIds for this search
         List<Integer> msRunSearchIds = getRunSearchIdsForMsSearch(msSearchId);
-        List<Integer> sPinferRunIds = runDao.loadProteinferIdsForInputIds(msRunSearchIds, InputType.SEARCH);
-        if(pinferRunIds != null)    
-            pinferRunIds.addAll(sPinferRunIds);
         
         // now check if there is any analysis associated with this search
         List<Integer> analysisIds = getAnalysisIdsForMsSearch(msSearchId);
         
-        // for each analysisId get the ids of all the protein inference runs
+        // get all the runSearchAnalysisIds for each analysis done on the search
+        List<Integer> runSearchAnalysisIds = new ArrayList<Integer>();
         for(int analysisId: analysisIds) {
-            // get a list run search analyses
-            List<Integer> rsAnalysisIds = getRunSearchAnalysisIdsForAnalysis(analysisId);
-            // get a list of protein inference ids associated with these run search analyses
-            List<Integer> aPinferIds = runDao.loadProteinferIdsForInputIds(rsAnalysisIds, InputType.ANALYSIS);
-            if(aPinferIds != null)
-                pinferRunIds.addAll(aPinferIds);
+            runSearchAnalysisIds.addAll(getRunSearchAnalysisIdsForAnalysis(analysisId));
         }
+        
+        // collect all the possible inputIds 
+        Set<Integer> allInputIds = new HashSet<Integer>(msRunSearchIds);
+        allInputIds.addAll(runSearchAnalysisIds);
+        
+        List<Integer> pinferRunIds = runDao.loadProteinferIdsForInputIds(new ArrayList<Integer>(allInputIds));
+        if(pinferRunIds != null)    
+            pinferRunIds.addAll(pinferRunIds);
+       
         return pinferRunIds;
     }
     

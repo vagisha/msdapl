@@ -45,7 +45,6 @@ import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;

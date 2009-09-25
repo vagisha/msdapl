@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
@@ -288,7 +289,11 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             headers.add(header);
         }
         for(SearchAnalysis analysis: analyses) {
-            header = new TableHeader(analysis.getAnalysisProgram().displayName());
+            String text = analysis.getAnalysisProgram().displayName();
+            if(analysis.getAnalysisName() != null && analysis.getAnalysisName().length() > 0) {
+                text += "<br><NOBR>"+analysis.getAnalysisName()+"</NOBR></br>";
+            }
+            header = new TableHeader(text);
             header.setSortClass(SORT_CLASS.SORT_INT);
             headers.add(header);
         }

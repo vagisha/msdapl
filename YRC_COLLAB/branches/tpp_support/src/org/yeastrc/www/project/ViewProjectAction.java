@@ -51,7 +51,6 @@ import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.project.Researcher;
