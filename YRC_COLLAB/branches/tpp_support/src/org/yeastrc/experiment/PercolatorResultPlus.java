@@ -100,6 +100,11 @@ public class PercolatorResultPlus implements PercolatorResult {
     }
 
     @Override
+    public int getSearchResultId() {
+        return result.getSearchResultId();
+    }
+    
+    @Override
     public List<MsSearchResultProtein> getProteinMatchList() {
         return result.getProteinMatchList();
     }

@@ -95,7 +95,7 @@ public class ProteinferJobSaver {
             ProteinferInput input = new ProteinferInput();
             input.setProteinferId(pinferId);
             input.setInputId(runSearch.getInputId());
-            input.setInputType(inputType);
+//            input.setInputType(inputType);
             pinferInputDao.saveProteinferInput(input);
         }
         

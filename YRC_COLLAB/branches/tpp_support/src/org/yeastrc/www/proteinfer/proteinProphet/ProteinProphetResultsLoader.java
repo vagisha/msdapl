@@ -19,7 +19,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferInputDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
@@ -30,7 +29,6 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinGroupDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
@@ -52,6 +50,7 @@ import org.yeastrc.www.compare.CommonNameLookupUtil;
 import org.yeastrc.www.compare.FastaProteinLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.compare.ProteinListing;
+import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
@@ -67,8 +66,7 @@ public class ProteinProphetResultsLoader {
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
     private static final MsRunSearchAnalysisDAO rsaDao = msDataDaoFactory.getMsRunSearchAnalysisDAO();
     
-    private static final SequestSearchResultDAO seqResDao = msDataDaoFactory.getSequestResultDAO();
-    private static final PeptideProphetResultDAO peptPResDao = msDataDaoFactory.getPeptideProphetResultDAO();
+    private static final MsResultLoader resLoader = MsResultLoader.getInstance();
     
     private static final ProteinferSpectrumMatchDAO psmDao = pinferDaoFactory.getProteinferSpectrumMatchDao();
     private static final ProteinferPeptideDAO peptDao = pinferDaoFactory.getProteinferPeptideDao();
@@ -413,7 +411,7 @@ public class ProteinProphetResultsLoader {
     private static WProteinProphetIon makeWProteinProphetIon(ProteinProphetProteinPeptideIon ion, Program inputGenerator) {
         
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
-        MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
+        MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
         return new WProteinProphetIon(ion, origResult);
     }
 
@@ -428,15 +426,6 @@ public class ProteinProphetResultsLoader {
             }});
     }
     
-    private static MsSearchResult getOriginalResult(int msRunSearchResultId, Program inputGenerator) {
-        if(inputGenerator == Program.PEPTIDE_PROPHET) {//|| inputGenerator == Program.EE_NORM_SEQUEST) {
-            return peptPResDao.load(msRunSearchResultId);
-        }
-        else {
-            log.warn("Unrecognized input generator for protein inference: "+inputGenerator);
-            return null;
-        }
-    }
     
     //---------------------------------------------------------------------------------------------------
     // Peptide ions for a protein (sorted by sequence, modification state and charge

@@ -63,6 +63,11 @@ public class PeptideProphetResultPlus implements PeptideProphetResult {
     public int getId() {
         return result.getId();
     }
+    
+    @Override
+    public int getSearchResultId() {
+        return result.getSearchResultId();
+    }
 
     @Override
     public List<MsSearchResultProtein> getProteinMatchList() {
@@ -175,4 +180,5 @@ public class PeptideProphetResultPlus implements PeptideProphetResult {
     public double getfValRounded() {
         return result.getfValRounded();
     }
+   
 }

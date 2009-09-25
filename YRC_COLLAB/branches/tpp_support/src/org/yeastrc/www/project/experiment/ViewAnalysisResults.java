@@ -246,12 +246,12 @@ public class ViewAnalysisResults extends Action {
         
         PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
         List<PercolatorResultPlus> results = new ArrayList<PercolatorResultPlus>(numResultsPerPage);
-        for(Integer resultId: forPage) {
-            PercolatorResult result = presDao.load(resultId);
+        for(Integer percResultId: forPage) {
+            PercolatorResult result = presDao.loadForPercolatorResultId(percResultId);
             MsScan scan = scanDao.loadScanLite(result.getScanId());
             PercolatorResultPlus resPlus = new PercolatorResultPlus(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setSequestData(seqResDao.load(resultId).getSequestResultData());
+            resPlus.setSequestData(seqResDao.load(result.getSearchResultId()).getSequestResultData());
             results.add(resPlus);
         }
 
@@ -285,12 +285,12 @@ public class ViewAnalysisResults extends Action {
         
         PeptideProphetResultDAO presDao = DAOFactory.instance().getPeptideProphetResultDAO();
         List<PeptideProphetResultPlus> results = new ArrayList<PeptideProphetResultPlus>(numResultsPerPage);
-        for(Integer resultId: forPage) {
-            PeptideProphetResult result = presDao.load(resultId);
+        for(Integer prophetResultId: forPage) {
+            PeptideProphetResult result = presDao.loadForProphetResultId(prophetResultId);
             MsScan scan = scanDao.loadScanLite(result.getScanId());
             PeptideProphetResultPlus resPlus = new PeptideProphetResultPlus(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setSequestData(seqResDao.load(resultId).getSequestResultData());
+            resPlus.setSequestData(seqResDao.load(result.getSearchResultId()).getSequestResultData());
             results.add(resPlus);
         }
 
@@ -328,11 +328,11 @@ public class ViewAnalysisResults extends Action {
         if(program == Program.PEPTIDE_PROPHET) {
             PeptideProphetResultDAO ppRes = DAOFactory.instance().getPeptideProphetResultDAO();
             if(myForm.isPeptidesView()) {
-                return ppRes.loadResultIdsForSearchAnalysisUniqPeptide(searchAnalysisId, 
+                return ppRes.loadIdsForSearchAnalysisUniqPeptide(searchAnalysisId, 
                         ((PeptideProphetFilterResultsForm)myForm).getFilterCriteria(), myForm.getSortCriteria());
             }
             else {
-                return ppRes.loadResultIdsForSearchAnalysis(searchAnalysisId, 
+                return ppRes.loadIdsForSearchAnalysis(searchAnalysisId, 
                         ((PeptideProphetFilterResultsForm)myForm).getFilterCriteria(), myForm.getSortCriteria());
             }
             
@@ -340,11 +340,11 @@ public class ViewAnalysisResults extends Action {
         else if(program == Program.PERCOLATOR) {
             PercolatorResultDAO presDao = DAOFactory.instance().getPercolatorResultDAO();
             if(myForm.isPeptidesView()) {
-                return presDao.loadResultIdsForSearchAnalysisUniqPeptide(searchAnalysisId, 
+                return presDao.loadIdsForSearchAnalysisUniqPeptide(searchAnalysisId, 
                         ((PercolatorFilterResultsForm)myForm).getFilterCriteria(), myForm.getSortCriteria());
             }
             else {
-                return presDao.loadResultIdsForSearchAnalysis(searchAnalysisId, 
+                return presDao.loadIdsForSearchAnalysis(searchAnalysisId, 
                         ((PercolatorFilterResultsForm)myForm).getFilterCriteria(), myForm.getSortCriteria());
             }
         }

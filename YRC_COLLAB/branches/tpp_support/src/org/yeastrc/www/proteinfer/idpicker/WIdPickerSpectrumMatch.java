@@ -27,8 +27,8 @@ public class WIdPickerSpectrumMatch {
         return spectrumMatch.getScanId();
     }
     
-    public int getRunSearchResultId() {
-        return idpPsm.getMsRunSearchResultId();
+    public int getResultId() {
+        return idpPsm.getResultId();
     }
     
     public ProteinferSpectrumMatch getProteinferSpectrumMatch() {

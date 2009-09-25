@@ -14,8 +14,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.analysis.MsRunSearchAnalysisDAO;
-import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerInputDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerPeptideBaseDAO;
@@ -25,17 +25,15 @@ import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerRunDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerSpectrumMatchDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
-import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
-import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.protinfer.GenericProteinferIon;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferIon;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.protinfer.SORT_BY;
-import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerInput;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerIon;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerPeptide;
@@ -51,6 +49,7 @@ import org.yeastrc.www.compare.CommonNameLookupUtil;
 import org.yeastrc.www.compare.FastaProteinLookupUtil;
 import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 import org.yeastrc.www.compare.ProteinListing;
+import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
@@ -63,9 +62,7 @@ public class IdPickerResultsLoader {
     private static final MsRunSearchDAO rsDao = msDataDaoFactory.getMsRunSearchDAO();
     private static final MsRunSearchAnalysisDAO rsaDao = msDataDaoFactory.getMsRunSearchAnalysisDAO();
     
-    private static final SequestSearchResultDAO seqResDao = msDataDaoFactory.getSequestResultDAO();
-    private static final ProlucidSearchResultDAO plcResDao = msDataDaoFactory.getProlucidResultDAO();
-    private static final PercolatorResultDAO percResDao = msDataDaoFactory.getPercolatorResultDAO();
+    private static final MsResultLoader resLoader = MsResultLoader.getInstance();
     
     private static final ProteinferSpectrumMatchDAO psmDao = pinferDaoFactory.getProteinferSpectrumMatchDao();
     private static final IdPickerSpectrumMatchDAO idpPsmDao = pinferDaoFactory.getIdPickerSpectrumMatchDao();
@@ -75,6 +72,7 @@ public class IdPickerResultsLoader {
     private static final ProteinferProteinDAO protDao = pinferDaoFactory.getProteinferProteinDao();
     private static final IdPickerInputDAO inputDao = pinferDaoFactory.getIdPickerInputDao();
     private static final IdPickerRunDAO idpRunDao = pinferDaoFactory.getIdPickerRunDao();
+    private static final ProteinferRunDAO runDao = pinferDaoFactory.getProteinferRunDao();
     
     private static final Logger log = Logger.getLogger(IdPickerResultsLoader.class);
     
@@ -453,17 +451,18 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     public static List<WIdPickerInputSummary> getIDPickerInputSummary(int pinferId) {
         
+        ProteinferRun run = runDao.loadProteinferRun(pinferId);
         List<IdPickerInput> inputSummary = inputDao.loadProteinferInputList(pinferId);
         List<WIdPickerInputSummary> wInputList = new ArrayList<WIdPickerInputSummary>(inputSummary.size());
         
         for(IdPickerInput input: inputSummary) {
             String filename = "";
-            if(input.getInputType() == InputType.SEARCH)
+            if(Program.isSearchProgram(run.getInputGenerator()))
                 filename = rsDao.loadFilenameForRunSearch(input.getInputId());
-            else if(input.getInputType() == InputType.ANALYSIS)
+            else if(Program.isAnalysisProgram(run.getInputGenerator()))
                 filename = rsaDao.loadFilenameForRunSearchAnalysis(input.getInputId());
             else
-                log.error("Unknown input type: "+input.getInputType().name());
+                log.error("Unknown program type: "+run.getInputGenerator().name());
             
             WIdPickerInputSummary winput = new WIdPickerInputSummary(input);
             winput.setFileName(filename);
@@ -592,7 +591,8 @@ public class IdPickerResultsLoader {
     private static <I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>>
             WIdPickerIon makeWIdPickerIon(I ion, Program inputGenerator) {
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
-        MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
+        MsSearchResult origResult = resLoader.getResult(psm.getId(), inputGenerator);
+//        MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
         return new WIdPickerIon(ion, origResult);
     }
 
@@ -605,22 +605,6 @@ public class IdPickerResultsLoader {
                 if(o2.getCharge() > o2.getCharge())                             return 1;
                 return 0;
             }});
-    }
-    
-    private static MsSearchResult getOriginalResult(int msRunSearchResultId, Program inputGenerator) {
-        if(inputGenerator == Program.SEQUEST) {//|| inputGenerator == Program.EE_NORM_SEQUEST) {
-            return seqResDao.load(msRunSearchResultId);
-        }
-        else if (inputGenerator == Program.PROLUCID) {
-            return plcResDao.load(msRunSearchResultId);
-        }
-        else if (inputGenerator == Program.PERCOLATOR) {
-            return percResDao.load(msRunSearchResultId);
-        }
-        else {
-            log.warn("Unrecognized input generator for protein inference: "+inputGenerator);
-            return null;
-        }
     }
     
     
@@ -727,7 +711,7 @@ public class IdPickerResultsLoader {
     private static <I extends GenericProteinferIon<? extends ProteinferSpectrumMatch>>
             WIdPickerIonForProtein makeWIdPickerIonForProtein(I ion, Program inputGenerator) {
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
-        MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
+        MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
         return new WIdPickerIonForProtein(ion, origResult);
     }
 
@@ -748,7 +732,7 @@ public class IdPickerResultsLoader {
         
         List<WIdPickerSpectrumMatch> wPsmList = new ArrayList<WIdPickerSpectrumMatch>(psmList.size());
         for(ProteinferSpectrumMatch psm: psmList) {
-            MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
+            MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
             WIdPickerSpectrumMatch wPsm = new WIdPickerSpectrumMatch(psm, origResult);
             int scanNum = scanDao.load(origResult.getScanId()).getStartScanNum();
             wPsm.setScanNumber(scanNum);
