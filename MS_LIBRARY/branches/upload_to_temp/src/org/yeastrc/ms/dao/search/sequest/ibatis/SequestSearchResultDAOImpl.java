@@ -646,6 +646,17 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
     }
     
     @Override
+    public List<Integer> loadResultIdsForSearchPeptides(int searchId, List<String> peptides) {
+        return resultDao.loadResultIdsForSearchPeptides(searchId, peptides);
+    }
+    
+    @Override
+    public List<Integer> loadResultIdsForSearchPeptideRegex(int searchId,
+            String peptideRegex) {
+        return resultDao.loadResultIdsForSearchPeptideRegex(searchId, peptideRegex);
+    }
+    
+    @Override
     public List<Integer> loadResultIdsForSearchScan(int runSearchId, int scanId) {
         return resultDao.loadResultIdsForSearchScan(runSearchId, scanId);
     }

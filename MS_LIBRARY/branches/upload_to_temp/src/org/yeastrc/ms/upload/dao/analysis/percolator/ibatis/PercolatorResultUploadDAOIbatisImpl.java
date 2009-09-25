@@ -23,7 +23,7 @@ public class PercolatorResultUploadDAOIbatisImpl extends BaseSqlMapDAO implement
         StringBuilder values = new StringBuilder();
         for ( PercolatorResultDataWId data: dataList) {
             values.append(",(");
-            values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
+            values.append(data.getSearchResultId() == 0 ? "NULL" : data.getSearchResultId());
             values.append(",");
             values.append(data.getRunSearchAnalysisId() == 0 ? "NULL" : data.getRunSearchAnalysisId());
             values.append(",");

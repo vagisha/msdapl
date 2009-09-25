@@ -18,14 +18,19 @@ import org.yeastrc.ms.domain.search.ResultSortCriteria;
  */
 public interface PeptideProphetResultDAO {
 
-    public abstract PeptideProphetResult load(int resultId);
+    public abstract PeptideProphetResult loadForProphetResultId(int peptideProphetResultId);
+    
+    public abstract PeptideProphetResult loadForRunSearchAnalysis(int searchResultId, int runSearchAnalysisId);
+    
+    public abstract PeptideProphetResult loadForSearchAnalysis(int searchResultId, int searchAnalysisId);
+    
     
     // ids for a runSearchAnalysis
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId);
+    public abstract List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId);
     
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset);
+    public abstract List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset);
     
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, 
+    public abstract List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId, 
                             PeptideProphetResultFilterCriteria filterCriteria, 
                             ResultSortCriteria sortCriteria);
     public abstract int numRunAnalysisResults(int runSearchAnalysisId);
@@ -33,19 +38,19 @@ public interface PeptideProphetResultDAO {
     
     
     // ids for a searchAnalysis
-    public abstract List<Integer> loadResultIdsForSearchAnalysis(int searchAnalysisId, 
+    public abstract List<Integer> loadIdsForSearchAnalysis(int searchAnalysisId, 
             PeptideProphetResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
     
-    public abstract List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId, 
+    public abstract List<Integer> loadIdsForSearchAnalysisUniqPeptide(int searchAnalysisId, 
             PeptideProphetResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
     
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
+    public abstract List<Integer> loadIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
     
-    public abstract List<Integer> loadResultIdsForAnalysis(int analysisId);
+    public abstract List<Integer> loadIdsForAnalysis(int analysisId);
     
-    public abstract List<Integer> loadResultIdsForAnalysis(int analysisId, int limit, int offset);
+    public abstract List<Integer> loadIdsForAnalysis(int analysisId, int limit, int offset);
     
     public abstract int numAnalysisResults(int searchAnalysisId);
     

@@ -4,15 +4,17 @@ public class ProteinferSpectrumMatch {
 
     private int id;
     private int pinferIonId;
-    private int msRunSearchResultId;
+    private int resultId;
+//    private int searchResultId;
     private int rank; // rank of this spectrum match for the peptide (not the ion).
     
 
     public ProteinferSpectrumMatch() {}
     
-    public ProteinferSpectrumMatch(int pinferIonId, int msRunSearchResultId) {
+    public ProteinferSpectrumMatch(int pinferIonId, int resultId) {
         this.pinferIonId = pinferIonId;
-        this.msRunSearchResultId = msRunSearchResultId;
+        this.resultId = resultId;
+//        this.searchResultId = searchResultId;
     }
     
     public int getProteinferIonId() {
@@ -23,13 +25,21 @@ public class ProteinferSpectrumMatch {
         this.pinferIonId = pinferIonId;
     }
     
-    public int getMsRunSearchResultId() {
-        return msRunSearchResultId;
+    public int getResultId() {
+        return resultId;
     }
     
-    public void setMsRunSearchResultId(int msRunSearchResultId) {
-        this.msRunSearchResultId = msRunSearchResultId;
+    public void setResultId(int resultId) {
+        this.resultId = resultId;
     }
+    
+//    public int getSearchResultId() {
+//        return searchResultId;
+//    }
+//    
+//    public void setSearchResultId(int searchResultId) {
+//        this.searchResultId = searchResultId;
+//    }
     
     public int getId() {
         return id;

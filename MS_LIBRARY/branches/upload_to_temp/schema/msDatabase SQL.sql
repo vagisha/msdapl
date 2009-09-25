@@ -367,7 +367,8 @@ ALTER TABLE PercolatorParams ADD INDEX(searchAnalysisID);
 
 
 CREATE TABLE PercolatorResult (
-		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		resultID INT UNSIGNED NOT NULL,
 		runSearchAnalysisID INT UNSIGNED NOT NULL,
 		qvalue DOUBLE UNSIGNED NOT NULL,
 		pep DOUBLE UNSIGNED,
@@ -375,6 +376,7 @@ CREATE TABLE PercolatorResult (
 		predictedRetentionTime DECIMAL(10,5)
 );
 ALTER TABLE PercolatorResult ADD INDEX(runSearchAnalysisID);
+ALTER TABLE PercolatorResult ADD INDEX(resultID);
 ALTER TABLE PercolatorResult ADD INDEX(qvalue);
 ALTER TABLE PercolatorResult ADD INDEX(pep);
 ALTER TABLE PercolatorResult ADD INDEX(discriminantScore);
@@ -401,7 +403,8 @@ CREATE TABLE PeptideProphetROC (
 ALTER TABLE PeptideProphetROC ADD INDEX(searchAnalysisID);
 
 CREATE TABLE PeptideProphetResult (
-		resultID INT UNSIGNED NOT NULL PRIMARY KEY,
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		resultID INT UNSIGNED NOT NULL,
 		runSearchAnalysisID INT UNSIGNED NOT NULL,
 		probability DOUBLE UNSIGNED NOT NULL,
 		fVal DOUBLE NOT NULL,
@@ -413,6 +416,7 @@ CREATE TABLE PeptideProphetResult (
 		probabilityNet_2 DOUBLE UNSIGNED
 );
 ALTER TABLE PeptideProphetResult ADD INDEX(runSearchAnalysisID);
+ALTER TABLE PeptideProphetResult ADD INDEX(resultID);
 ALTER TABLE PeptideProphetResult ADD INDEX(probability);
 
 
@@ -433,8 +437,7 @@ CREATE TABLE msProteinInferRun (
 CREATE TABLE msProteinInferInput (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     piRunID INT UNSIGNED NOT NULL,
-    inputID INT UNSIGNED NOT NULL,
-    inputType ENUM('S','A')
+    inputID INT UNSIGNED NOT NULL
 );
 ALTER TABLE msProteinInferInput ADD INDEX (piRunID);
 ALTER TABLE msProteinInferInput ADD INDEX (inputID);
@@ -484,10 +487,10 @@ ALTER TABLE msProteinInferProteinPeptideMatch ADD INDEX (piPeptideID);
 CREATE TABLE msProteinInferSpectrumMatch (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	piIonID INT UNSIGNED NOT NULL,
-    runSearchResultID INT UNSIGNED NOT NULL,
+    resultID INT UNSIGNED NOT NULL,
     rankForPeptide INT UNSIGNED
 );
-ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (runSearchResultID);
+ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (resultID);
 ALTER TABLE  msProteinInferSpectrumMatch ADD INDEX (piIonID);
 
 
@@ -584,7 +587,7 @@ CREATE TABLE ProteinProphetProtein (
     confidence DOUBLE UNSIGNED NOT NULL,
     subsumed TINYINT NOT NULL DEFAULT 0,
     totalSpectrumCount INT UNSIGNED NOT NULL,
-    pctSpectrumCount INT UNSIGNED
+    pctSpectrumCount DOUBLE UNSIGNED
 );
 ALTER TABLE ProteinProphetProtein ADD INDEX(groupID);
 ALTER TABLE ProteinProphetProtein ADD INDEX(proteinProphetGroupID);

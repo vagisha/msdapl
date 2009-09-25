@@ -7,13 +7,13 @@
 	
 	<resultMap class="ProteinferSpectrumMatch" id="pinferSMatchResult">
 		<result property="id" column="id" nullValue="0"/>
-		<result property="msRunSearchResultId" column="runSearchResultID" nullValue="0"/>
+		<result property="resultId" column="resultID" nullValue="0"/>
 		<result property="proteinferIonId" column="piIonID" nullValue="0"/>
 		<result property="rank" column="rankForPeptide"/>
 	</resultMap>
 	
 	<parameterMap class="ProteinferSpectrumMatch" id="pinferSMatchParam">
-		<parameter property="msRunSearchResultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="proteinferIonId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="rank" jdbcType="INTEGER"/>
 	</parameterMap>
@@ -117,7 +117,7 @@
     
      <update id="update" parameterClass="ProteinferSpectrumMatch">
     	UPDATE msProteinInferSpectrumMatch 
-    	SET runSearchResultID=#msRunSearchResultId#,
+    	SET resultID=#resultId#,
     	piIonID=#proteinferIonId#,
     	rankForPeptide=#rank#
     	WHERE id=#id#
@@ -126,7 +126,7 @@
     
     <insert id="insert" parameterMap="pinferSMatchParam">
     	INSERT INTO msProteinInferSpectrumMatch (
-    	runSearchResultID,
+    	resultID,
     	piIonID,
     	rankForPeptide) 
     	VALUES (?,?,?)

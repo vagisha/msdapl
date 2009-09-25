@@ -8,7 +8,11 @@
 	<typeAlias alias="PeptideProphetResultIn" type="org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResultDataWId" />
 	
 	
-	<resultMap class="PeptideProphetResultOut" id="prophetResultResult" extends="MsSearchResult.msSearchResult">
+	<!-- All properties of the "super" resultMap will be included as part of this resultMap, 			-->
+	<!-- and values from the "super" resultMap  are set before any values specified by this resultMap 	-->
+	<resultMap class="PeptideProphetResultOut" id="prophetResultResult" extends="MsSearchResult.msSearchBaseResult">
+		<result property="id" column="presID" />
+		<result property="searchResultId" column="sresID" />
 		<result property="runSearchAnalysisId" column="runSearchAnalysisID" nullValue="0"/>
 		<result property="probability" column="probability" nullValue="-1.0"/>
 		<result property="fVal" column="fVal" />
@@ -18,10 +22,13 @@
 		<result property="probabilityNet_0" column="probabilityNet_0" nullValue="-1.0" />
 		<result property="probabilityNet_1" column="probabilityNet_1" nullValue="-1.0" />
 		<result property="probabilityNet_2" column="probabilityNet_2" nullValue="-1.0" />
+		<result property="proteinMatchList" 
+				select="MsResultProtein.selectResultProteins" 
+				column="sresID"/>
 	</resultMap>
 	
 	<parameterMap class="PeptideProphetResultIn" id="prophetResultParam">
-		<parameter property="resultId" jdbcType="INTEGER" nullValue="0" />
+		<parameter property="searchResultId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="runSearchAnalysisId" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="probability" jdbcType="DOUBLE" nullValue="-1.0"/>
 		<parameter property="fVal" jdbcType="DOUBLE" />
@@ -34,24 +41,42 @@
 	</parameterMap>
 	
 	
-    <select id="select" resultMap="prophetResultResult" parameterClass="Integer">
-		SELECT * FROM msRunSearchResult, PeptideProphetResult 
-		WHERE PeptideProphetResult.resultID = msRunSearchResult.id
-		AND msRunSearchResult.id = #id#
+	<select id="select" resultMap="prophetResultResult" parameterClass="Integer">
+		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
+		FROM msRunSearchResult AS res, PeptideProphetResult AS pres
+		WHERE pres.id = #id#
+		AND pres.resultID = res.id
+	</select>
+	
+	<select id="selectForRunSearchAnalysis" resultMap="prophetResultResult" parameterClass="java.util.Map">
+		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
+		FROM msRunSearchResult AS res, PeptideProphetResult AS pres 
+		WHERE res.id = #searchResultId#
+		AND pres.resultID = res.id
+		AND pres.runSearchAnalysisID = #runSearchAnalysisId#
+	</select>
+    
+    <select id="selectForSearchAnalysis" resultMap="prophetResultResult" parameterClass="java.util.Map">
+		SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* 
+		FROM msRunSearchResult AS res, PeptideProphetResult AS pres, msRunSearchAnalysis AS rsa
+		WHERE res.id = #searchResultId#
+		AND pres.resultID = res.id
+		AND pres.runSearchAnalysisID = rsa.id
+		AND rsa.searchAnalysisID = #searchAnalysisId# 
 	</select>
     
     <select id="selectResultIdsForRunSearchAnalysis" resultClass="Integer" parameterClass="Integer">
-    	SELECT resultID FROM PeptideProphetResult WHERE runSearchAnalysisID=#runSearchAnalysisId#
+    	SELECT id FROM PeptideProphetResult WHERE runSearchAnalysisID=#runSearchAnalysisId#
     </select>
     
     <select id="selectResultIdsLimitedForRunSearchAnalysis" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT resultID FROM PeptideProphetResult 
+    	SELECT id FROM PeptideProphetResult 
     	WHERE runSearchAnalysisID=#runSearchAnalysisId# 
-    	ORDER BY resultID LIMIT #offset#, #limit#
+    	ORDER BY id LIMIT #offset#, #limit#
     </select>
     
     <select id="selectResultIdsForRunSearchAnalysisScan" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT pres.resultID
+    	SELECT pres.id
     	FROM msRunSearchResult AS res, PeptideProphetResult AS pres 
     	WHERE pres.runSearchAnalysisID=#runSearchAnalysisId#
     	AND   pres.resultID = res.id
@@ -59,18 +84,18 @@
     </select>
     
     <select id="selectResultIdsForAnalysis" resultClass="Integer" parameterClass="Integer">
-    	SELECT pres.resultID 
+    	SELECT pres.id 
     	FROM PeptideProphetResult AS pres, msRunSearchAnalysis as rsa 
     	WHERE pres.runSearchAnalysisID = rsa.id AND
     	rsa.searchAnalysisID = #analysisId# 
     </select>
     
     <select id="selectResultIdsLimitedForAnalysis" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT pres.resultID 
+    	SELECT pres.id 
     	FROM PeptideProphetResult AS pres, msRunSearchAnalysis as rsa 
     	WHERE pres.runSearchAnalysisID = rsa.id AND
     	rsa.searchAnalysisID = #searchAnalyisId# 
-    	ORDER BY resultID LIMIT #offset#, #limit#
+    	ORDER BY id LIMIT #offset#, #limit#
     </select>
     
    	<select id="countRunSearchAnalysisResults" resultClass="Integer" parameterClass="Integer">

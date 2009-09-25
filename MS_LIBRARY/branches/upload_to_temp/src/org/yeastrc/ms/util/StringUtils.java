@@ -22,4 +22,14 @@ public class StringUtils {
         
         return buf.toString();
     }
+    
+    public static <T extends Object>  String makeQuotedCommaSeparated(List<T> entries) {
+        StringBuilder buf = new StringBuilder();
+        for(T entry: entries)
+            buf.append(",'"+entry.toString()+"'");
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        
+        return buf.toString();
+    }
 }

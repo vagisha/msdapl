@@ -24,6 +24,9 @@ public class ModifiedSequenceBuilder {
     
     public static String build(String sequence, List<MsResultResidueMod> modifications) throws ModifiedSequenceBuilderException {
         
+        if(modifications == null || modifications.size() == 0)
+            return sequence;
+        
         Map<Integer, List<MsResultResidueMod>> modMap = new HashMap<Integer, List<MsResultResidueMod>>();
         for(MsResultResidueMod mod: modifications) {
             List<MsResultResidueMod> mods = modMap.get(mod.getModifiedPosition());

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -43,6 +45,9 @@ public class InteractProtXmlParser {
     
     private List<ProteinProphetParam> params;
     private List<String> inputFiles;
+    private double initialMinPeptideProb = 0.01;
+    private List<String> equivalentResidues;
+    private static final Pattern equiResPattern = Pattern.compile("([A-Z])\\s\\->\\s([A-Z])\\s?");
     private ProteinProphetROC proteinProphetRoc;
     
     public void open(String filePath) throws DataProviderException {
@@ -71,6 +76,8 @@ public class InteractProtXmlParser {
                 return; // we have reached the end of the protein_summary_header
             }
             else if(evtType == XMLStreamReader.START_ELEMENT && "protein_summary_header".equalsIgnoreCase(reader.getLocalName())) {
+                
+                // pep xml files used as input
                 String files = reader.getAttributeValue(null, "source_files");
                 if(files != null) {
                     files.trim();
@@ -87,6 +94,30 @@ public class InteractProtXmlParser {
                     throw new DataProviderException("No source files found");
                 }
                 inHeader = true;
+                
+                // minimum PeptideProphet probability cutoff for PSMs used 
+                String initProb = reader.getAttributeValue(null, "initial_min_peptide_prob");
+                if(initProb != null) {
+                    try {this.initialMinPeptideProb = Double.valueOf(initProb);}
+                    catch(NumberFormatException e) 
+                    {throw new DataProviderException("Invalid value of attribute initial_min_peptide_prob: "+initProb);}
+                }
+                
+                // equivalent residues -- residue_substitution_list="I -> L" 
+                String equiResidues = reader.getAttributeValue(null, "residue_substitution_list");
+                if(equiResidues != null) {
+                    this.equivalentResidues = new ArrayList<String>();
+                    Matcher m = equiResPattern.matcher(equiResidues);
+                    StringBuilder buf;
+                    while(m.find()) {
+                        buf = new StringBuilder();
+                        for(int i = 1; i <= m.groupCount(); i++) {
+                            buf.append(m.group(i));
+                        }
+                        equivalentResidues.add(buf.toString());
+                    }
+                }
+                
             }
             else if(inHeader == true && evtType == XMLStreamReader.START_ELEMENT  &&
                     PROGRAM_DETAILS.equalsIgnoreCase(reader.getLocalName())) {
@@ -137,8 +168,16 @@ public class InteractProtXmlParser {
         return proteinProphetRoc;
     }
     
+    public double getMinInitialProbability() {
+        return this.initialMinPeptideProb;
+    }
+    
     public List<String> getInputFiles() {
         return this.inputFiles;
+    }
+    
+    public List<String> getEquivalentResidues() {
+        return this.equivalentResidues;
     }
     
     private void readProteinProphetDetails() throws DataProviderException {

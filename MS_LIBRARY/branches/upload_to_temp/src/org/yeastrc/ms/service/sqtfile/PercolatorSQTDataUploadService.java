@@ -517,22 +517,22 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         return uploadPercolatorResultData(result, rsAnalysisId, searchResult.getId());
     }
 
-    private boolean uploadPercolatorResultData(PercolatorResultIn resultData, int rsAnalysisId, int resultId) {
+    private boolean uploadPercolatorResultData(PercolatorResultIn resultData, int rsAnalysisId, int searchResultId) {
         // upload the Percolator specific result information if the cache has enough entries
         if (percolatorResultDataList.size() >= BUF_SIZE) {
             uploadPercolatorResultBuffer();
         }
         
         // TODO THIS IS TEMP TILL I SORT OUT THE DUPLICATE RESULTS IN PERCOLATOR SQT FILES
-        if(uploadedResultIds.contains(resultId))
+        if(uploadedResultIds.contains(searchResultId))
             return false;
-        uploadedResultIds.add(resultId);
+        uploadedResultIds.add(searchResultId);
         
         
         // add the Percolator specific information for this result to the cache
         PercolatorResultDataBean res = new PercolatorResultDataBean();
         res.setRunSearchAnalysisId(rsAnalysisId);
-        res.setResultId(resultId);
+        res.setSearchResultId(searchResultId);
         res.setPredictedRetentionTime(resultData.getPredictedRetentionTime());
         res.setDiscriminantScore(resultData.getDiscriminantScore());
         res.setPosteriorErrorProbability(resultData.getPosteriorErrorProbability());

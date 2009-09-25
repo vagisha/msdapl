@@ -46,7 +46,6 @@ public class PeptideProphetAnalysisUploadDAOImpl extends BaseSqlMapDAO implement
         if(analysisIds == null || analysisIds.size() == 0)
             return null;
         String idString = StringUtils.makeCommaSeparated(analysisIds);
-        System.out.println(idString);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("filename", fileName);
         map.put("analysisIds", "("+idString+")");

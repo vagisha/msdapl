@@ -15,6 +15,7 @@ import org.yeastrc.ms.domain.search.impl.SearchResultBean;
 public class PeptideProphetResultBean extends SearchResultBean implements PeptideProphetResult {
 
     private PeptideProphetResultDataBean data = new PeptideProphetResultDataBean();
+    private int searchResultId;
     
     public boolean hasAllNttProb() {
         return data.hasAllNttProb();
@@ -118,5 +119,14 @@ public class PeptideProphetResultBean extends SearchResultBean implements Peptid
 
     public void setProbabilityNet_2(double probabilityNet_2) {
         data.setProbabilityNet_2(probabilityNet_2);
+    }
+    
+    @Override
+    public int getSearchResultId() {
+        return this.searchResultId;
+    }
+    
+    public void setSearchResultId(int resultId) {
+        this.searchResultId = resultId;
     }
 }

@@ -78,6 +78,17 @@ ProlucidSearchResultDAO {
     }
     
     @Override
+    public List<Integer> loadResultIdsForSearchPeptides(int searchId, List<String> peptides) {
+        return resultDao.loadResultIdsForSearchPeptides(searchId, peptides);
+    }
+    
+    @Override
+    public List<Integer> loadResultIdsForSearchPeptideRegex(int searchId,
+            String peptideRegex) {
+        return resultDao.loadResultIdsForSearchPeptideRegex(searchId, peptideRegex);
+    }
+    
+    @Override
     public int numResultsForRunSearchScanChargeMass(int runSearchId,
             int scanId, int charge, BigDecimal mass) {
         return resultDao.numResultsForRunSearchScanChargeMass(runSearchId, scanId, charge, mass);

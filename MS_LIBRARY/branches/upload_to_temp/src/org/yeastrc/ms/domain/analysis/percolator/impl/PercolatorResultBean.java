@@ -17,6 +17,7 @@ import org.yeastrc.ms.domain.search.impl.SearchResultBean;
 public class PercolatorResultBean extends SearchResultBean implements PercolatorResult{
 
     private PercolatorResultDataBean data = new PercolatorResultDataBean();
+    private int searchResultId;
     
     @Override
     public Double getDiscriminantScore() {
@@ -78,5 +79,14 @@ public class PercolatorResultBean extends SearchResultBean implements Percolator
     
     public void setPredictedRetentionTime(BigDecimal predictedRT) {
         data.setPredictedRetentionTime(predictedRT);
+    }
+
+    @Override
+    public int getSearchResultId() {
+        return this.searchResultId;
+    }
+    
+    public void setSearchResultId(int resultId) {
+        this.searchResultId = resultId;
     }
 }

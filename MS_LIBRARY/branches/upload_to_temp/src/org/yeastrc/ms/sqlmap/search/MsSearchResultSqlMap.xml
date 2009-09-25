@@ -23,7 +23,7 @@
 				column="id" />
 	</resultMap>
 	
-	<resultMap class="MsSearchResultOut" id="msSearchResult">
+	<resultMap class="MsSearchResultOut" id="msSearchBaseResult">
 		<result property="id" column="id" />
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="scanId" column="scanID" nullValue="0"/>
@@ -31,6 +31,9 @@
 		<result property="observedMass" column="observedMass"/>
 		<result property="validationStatus" column="validationStatus" typeHandler="VStatusHandler"/>
 		<result property="resultPeptide" resultMap="MsSearchResult.msSearchResultPeptideResult" />
+	</resultMap>
+	
+	<resultMap class="MsSearchResultOut" id="msSearchResult" extends="MsSearchResult.msSearchBaseResult">
 		<result property="proteinMatchList" 
 				select="MsResultProtein.selectResultProteins" 
 				column="id"/>
@@ -100,6 +103,22 @@
     	WHERE rs.searchID = #searchId#
     	AND rs.id = res.runSearchID
     	AND res.peptide = #peptide#
+    </select>
+    
+    <select id="selectResultIdsForSearchPeptideRegex" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT res.id 
+    	FROM msRunSearchResult AS res, msRunSearch AS rs
+    	WHERE rs.searchID = #searchId#
+    	AND rs.id = res.runSearchID
+    	AND res.peptide REGEXP #peptideRegex#
+    </select>
+    
+    <select id="selectResultIdsForSearchPeptides" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT res.id 
+    	FROM msRunSearchResult AS res, msRunSearch AS rs
+    	WHERE rs.searchID = #searchId#
+    	AND rs.id = res.runSearchID
+    	AND res.peptide IN $peptides$
     </select>
     
     <select id="countRunSearchResults" resultClass="Integer" parameterClass="Integer">

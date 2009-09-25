@@ -39,13 +39,33 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         this.runSearchAnalysisDao = rsaDao;
     }
 
+    public PeptideProphetResult loadForProphetResultId(int peptideProphetResultId) {
+        return (PeptideProphetResult) queryForObject(namespace+".select", peptideProphetResultId);
+    }
+    
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId) {
+    public PeptideProphetResult loadForRunSearchAnalysis(int searchResultId, int runSearchAnalysisId) {
+       Map<String, Integer> map = new HashMap<String, Integer>(4);
+       map.put("searchResultId", searchResultId);
+       map.put("runSearchResultId", runSearchAnalysisId);
+       return (PeptideProphetResult) queryForObject(namespace+".selectForRunSearchAnalysis", map);
+    }
+
+    @Override
+    public PeptideProphetResult loadForSearchAnalysis(int searchResultId, int searchAnalysisId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("searchResultId", searchResultId);
+        map.put("searchAnalysisId", searchAnalysisId);
+        return (PeptideProphetResult) queryForObject(namespace+".selectForSearchAnalysis", map);
+    }
+    
+    @Override
+    public List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId) {
         return queryForList(namespace+".selectResultIdsForRunSearchAnalysis", runSearchAnalysisId);
     }
     
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset) {
+    public List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset) {
         Map<String, Integer> map = new HashMap<String, Integer>(5);
         map.put("runSearchAnalysisId", runSearchAnalysisId);
         map.put("limit", limit);
@@ -54,7 +74,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
     }
 
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId) {
+    public List<Integer> loadIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId) {
         Map<String, Integer> map = new HashMap<String, Integer>(4);
         map.put("runSearchAnalysisId", runSearchAnalysisId);
         map.put("scanId", scanId);
@@ -62,12 +82,12 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
     }
     
     @Override
-    public List<Integer> loadResultIdsForAnalysis(int analysisId) {
+    public List<Integer> loadIdsForAnalysis(int analysisId) {
         return queryForList(namespace+".selectResultIdsForAnalysis", analysisId);
     }
     
     @Override
-    public List<Integer> loadResultIdsForAnalysis(int searchAnalyisId, int limit, int offset) {
+    public List<Integer> loadIdsForAnalysis(int searchAnalyisId, int limit, int offset) {
         Map<String, Integer> map = new HashMap<String, Integer>(5);
         map.put("searchAnalyisId", searchAnalyisId);
         map.put("limit", limit);
@@ -96,13 +116,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
     }
 
     @Override
-    public PeptideProphetResult load(int resultId) {
-       return (PeptideProphetResult) queryForObject(namespace+".select", resultId);
-    }
-
-    
-    @Override
-    public List<Integer> loadResultIdsForSearchAnalysis(int searchAnalysisId,
+    public List<Integer> loadIdsForSearchAnalysis(int searchAnalysisId,
             PeptideProphetResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
@@ -116,7 +130,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         
         // If we don't have filters and nothing to sort by use the simple method
         if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
-            return loadResultIdsForAnalysis(searchAnalysisId); 
+            return loadIdsForAnalysis(searchAnalysisId); 
         }
 
         boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
@@ -131,13 +145,13 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
         if(!useScanTable && !useResultsTable && !useModsTable && !userProphetTable) {
             if(sortCriteria.getLimitCount() != null)
-                return loadResultIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
+                return loadIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
             else 
-                return loadResultIdsForAnalysis(searchAnalysisId); 
+                return loadIdsForAnalysis(searchAnalysisId); 
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID FROM ( ");
+        sql.append("SELECT pres.id FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PeptideProphetResult AS pres");
         
         
@@ -204,7 +218,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
                 sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
             }
             else {
-                sql.append("ORDER BY pres.resultID ");
+                sql.append("ORDER BY pres.id ");
             }
         }
         
@@ -227,7 +241,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
             List<Integer> resultIds = new ArrayList<Integer>();
             
             while ( rs.next() ) {
-                resultIds.add(rs.getInt("resultID"));
+                resultIds.add(rs.getInt("id"));
             }
             return resultIds;
         }
@@ -249,7 +263,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
     }
     
     @Override
-    public List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId,
+    public List<Integer> loadIdsForSearchAnalysisUniqPeptide(int searchAnalysisId,
             PeptideProphetResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
@@ -263,7 +277,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         
         // If we don't have filters and nothing to sort by use the simple method
         if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
-            return loadResultIdsForAnalysis(searchAnalysisId); 
+            return loadIdsForAnalysis(searchAnalysisId); 
         }
 
         boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
@@ -278,13 +292,13 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
         if(!useScanTable && !useResultsTable && !useModsTable && !userProphetTable) {
             if(sortCriteria.getLimitCount() != null)
-                return loadResultIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
+                return loadIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
             else 
-                return loadResultIdsForAnalysis(searchAnalysisId); 
+                return loadIdsForAnalysis(searchAnalysisId); 
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID, max(pres.probability) AS mp FROM ( ");
+        sql.append("SELECT pres.id, max(pres.probability) AS mp FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PeptideProphetResult AS pres, msRunSearchResult AS res");
         
         
@@ -372,7 +386,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
             List<Integer> resultIds = new ArrayList<Integer>();
             
             while ( rs.next() ) {
-                resultIds.add(rs.getInt("resultID"));
+                resultIds.add(rs.getInt("id"));
             }
             return resultIds;
         }
@@ -394,7 +408,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
     }
 
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysis(
+    public List<Integer> loadIdsForRunSearchAnalysis(
             int runSearchAnalysisId,
             PeptideProphetResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
@@ -409,7 +423,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         
         // If we don't have filters and nothing to sort by use the simple method
         if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
-            return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId); 
+            return loadIdsForRunSearchAnalysis(runSearchAnalysisId); 
         }
         
         
@@ -425,13 +439,13 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
         if(!useScanTable && !useResultsTable && !useModsTable && !userProphetTable) {
             if(sortCriteria.getLimitCount() != null)
-                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId, sortCriteria.getLimitCount(), offset);
+                return loadIdsForRunSearchAnalysis(runSearchAnalysisId, sortCriteria.getLimitCount(), offset);
             else 
-                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId); 
+                return loadIdsForRunSearchAnalysis(runSearchAnalysisId); 
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID FROM ( ");
+        sql.append("SELECT pres.id FROM ( ");
         sql.append("PeptideProphetResult as pres");
         if(useResultsTable)
             sql.append(", msRunSearchResult AS res");
@@ -486,7 +500,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
                 sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
             }
             else {
-                sql.append("ORDER BY pres.resultID ");
+                sql.append("ORDER BY pres.id ");
             }
         }
         
@@ -509,7 +523,7 @@ public class PeptideProphetResultDAOImpl extends BaseSqlMapDAO implements Peptid
             List<Integer> resultIds = new ArrayList<Integer>();
             
             while ( rs.next() ) {
-                resultIds.add(rs.getInt("resultID"));
+                resultIds.add(rs.getInt("id"));
             }
             return resultIds;
         }

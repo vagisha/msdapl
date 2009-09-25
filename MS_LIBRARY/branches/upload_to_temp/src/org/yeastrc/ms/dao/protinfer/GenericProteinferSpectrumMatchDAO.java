@@ -24,7 +24,7 @@ public interface GenericProteinferSpectrumMatchDAO <T extends ProteinferSpectrum
     
     public abstract int getMinSpectrumCountForPinferRunProtein(int prinferId);
     
-    public abstract List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId);
+//    public abstract List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId);
     
     public abstract int update(ProteinferSpectrumMatch psm);
 }

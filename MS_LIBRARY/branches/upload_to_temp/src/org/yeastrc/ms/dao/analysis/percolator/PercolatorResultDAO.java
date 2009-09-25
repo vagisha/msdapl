@@ -11,34 +11,38 @@ import org.yeastrc.ms.domain.search.ResultSortCriteria;
 public interface PercolatorResultDAO {
 
     
-    public abstract PercolatorResult load(int resultId);
+    public abstract PercolatorResult loadForPercolatorResultId(int percolatorResultId);
+    
+    public abstract PercolatorResult loadForRunSearchAnalysis(int searchResultId, int runSearchAnalysisId);
+    
+    public abstract PercolatorResult loadForSearchAnalysis(int searchResultId, int searchAnalysisId);
     
     
     public abstract List<PercolatorResult> loadTopPercolatorResultsN(int runSearchAnalysisId, 
                                 Double qvalue, Double pep, Double discriminantScore, boolean getDynaResMods);
     
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId);
+    public abstract List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId);
     
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset);
+    public abstract List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset);
     
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, 
+    public abstract List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId, 
                             PercolatorResultFilterCriteria filterCriteria, 
                             ResultSortCriteria sortCriteria);
     
-    public abstract List<Integer> loadResultIdsForSearchAnalysis(int searchAnalysisId, 
+    public abstract List<Integer> loadIdsForSearchAnalysis(int searchAnalysisId, 
             PercolatorResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
     
-    public abstract List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId, 
+    public abstract List<Integer> loadIdsForSearchAnalysisUniqPeptide(int searchAnalysisId, 
             PercolatorResultFilterCriteria filterCriteria, 
             ResultSortCriteria sortCriteria);
     
-    public abstract List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
+    public abstract List<Integer> loadIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId);
     
     
-    public abstract List<Integer> loadResultIdsForAnalysis(int analysisId);
+    public abstract List<Integer> loadIdsForAnalysis(int analysisId);
     
-    public abstract List<Integer> loadResultIdsForAnalysis(int analysisId, int limit, int offset);
+    public abstract List<Integer> loadIdsForAnalysis(int analysisId, int limit, int offset);
     
     
     public abstract void save(PercolatorResultDataWId data);

@@ -13,6 +13,8 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
  */
 public interface PeptideProphetResult extends MsSearchResult {
 
+    public abstract int getSearchResultId();
+    
     public abstract int getRunSearchAnalysisId();
     
     public abstract double getProbability();

@@ -48,17 +48,33 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public PercolatorResult load(int msResultId) {
-        return (PercolatorResult) queryForObject(namespace+".select", msResultId);
+    public PercolatorResult loadForPercolatorResultId(int percolatorResultId) {
+        return (PercolatorResult) queryForObject(namespace+".select", percolatorResultId);
     }
 
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId) {
+    public PercolatorResult loadForRunSearchAnalysis(int searchResultId, int runSearchAnalysisId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("searchResultId", searchResultId);
+        map.put("runSearchAnalysisId", runSearchAnalysisId);
+        return (PercolatorResult) queryForObject(namespace+".selectForRunSearchAnalysis", map);
+    }
+
+    @Override
+    public PercolatorResult loadForSearchAnalysis(int searchResultId, int searchAnalysisId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("searchResultId", searchResultId);
+        map.put("searchAnalysisId", searchAnalysisId);
+        return (PercolatorResult) queryForObject(namespace+".selectForSearchAnalysis", map);
+    }
+    
+    @Override
+    public List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId) {
         return queryForList(namespace+".selectResultIdsForRunSearchAnalysis", runSearchAnalysisId);
     }
     
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset) {
+    public List<Integer> loadIdsForRunSearchAnalysis(int runSearchAnalysisId, int limit, int offset) {
         Map<String, Integer> map = new HashMap<String, Integer>(5);
         map.put("runSearchAnalysisId", runSearchAnalysisId);
         map.put("limit", limit);
@@ -67,7 +83,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId) {
+    public List<Integer> loadIdsForRunSearchAnalysisScan(int runSearchAnalysisId, int scanId) {
         Map<String, Integer> map = new HashMap<String, Integer>(4);
         map.put("runSearchAnalysisId", runSearchAnalysisId);
         map.put("scanId", scanId);
@@ -75,12 +91,12 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
     
     @Override
-    public List<Integer> loadResultIdsForAnalysis(int analysisId) {
+    public List<Integer> loadIdsForAnalysis(int analysisId) {
         return queryForList(namespace+".selectResultIdsForAnalysis", analysisId);
     }
     
     @Override
-    public List<Integer> loadResultIdsForAnalysis(int searchAnalyisId, int limit, int offset) {
+    public List<Integer> loadIdsForAnalysis(int searchAnalyisId, int limit, int offset) {
         Map<String, Integer> map = new HashMap<String, Integer>(5);
         map.put("searchAnalyisId", searchAnalyisId);
         map.put("limit", limit);
@@ -115,7 +131,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         StringBuilder values = new StringBuilder();
         for ( PercolatorResultDataWId data: dataList) {
             values.append(",(");
-            values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
+            values.append(data.getSearchResultId() == 0 ? "NULL" : data.getSearchResultId());
             values.append(",");
             values.append(data.getRunSearchAnalysisId() == 0 ? "NULL" : data.getRunSearchAnalysisId());
             values.append(",");
@@ -135,7 +151,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
 
     @Override
-    public List<Integer> loadResultIdsForSearchAnalysis(int searchAnalysisId,
+    public List<Integer> loadIdsForSearchAnalysis(int searchAnalysisId,
             PercolatorResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
@@ -149,7 +165,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         
         // If we don't have filters and nothing to sort by use the simple method
         if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
-            return loadResultIdsForAnalysis(searchAnalysisId); 
+            return loadIdsForAnalysis(searchAnalysisId); 
         }
 
         boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
@@ -164,13 +180,13 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
         if(!useScanTable && !useResultsTable && !useModsTable && !userPercTable) {
             if(sortCriteria.getLimitCount() != null)
-                return loadResultIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
+                return loadIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
             else 
-                return loadResultIdsForAnalysis(searchAnalysisId); 
+                return loadIdsForAnalysis(searchAnalysisId); 
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID FROM ( ");
+        sql.append("SELECT pres.id FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PercolatorResult AS pres");
         
         
@@ -244,7 +260,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
                 sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
             }
             else {
-                sql.append("ORDER BY pres.resultID ");
+                sql.append("ORDER BY pres.id ");
             }
         }
         
@@ -267,7 +283,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             List<Integer> resultIds = new ArrayList<Integer>();
             
             while ( rs.next() ) {
-                resultIds.add(rs.getInt("resultID"));
+                resultIds.add(rs.getInt("id"));
             }
             return resultIds;
         }
@@ -289,7 +305,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     }
     
     @Override
-    public List<Integer> loadResultIdsForSearchAnalysisUniqPeptide(int searchAnalysisId,
+    public List<Integer> loadIdsForSearchAnalysisUniqPeptide(int searchAnalysisId,
             PercolatorResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
@@ -303,7 +319,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         
         // If we don't have filters and nothing to sort by use the simple method
         if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
-            return loadResultIdsForAnalysis(searchAnalysisId); 
+            return loadIdsForAnalysis(searchAnalysisId); 
         }
 
         boolean useScanTable = filterCriteria.hasScanFilter() || SORT_BY.isScanRelated(sortCriteria.getSortBy());
@@ -318,13 +334,13 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
         if(!useScanTable && !useResultsTable && !useModsTable && !userPercTable) {
             if(sortCriteria.getLimitCount() != null)
-                return loadResultIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
+                return loadIdsForAnalysis(searchAnalysisId, sortCriteria.getLimitCount(), offset);
             else 
-                return loadResultIdsForAnalysis(searchAnalysisId); 
+                return loadIdsForAnalysis(searchAnalysisId); 
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID, min(pres.qvalue) AS mq FROM ( ");
+        sql.append("SELECT pres.id, min(pres.qvalue) AS mq FROM ( ");
         sql.append("msRunSearchAnalysis AS rsa, PercolatorResult AS pres, msRunSearchResult AS res");
         
         
@@ -420,7 +436,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             List<Integer> resultIds = new ArrayList<Integer>();
             
             while ( rs.next() ) {
-                resultIds.add(rs.getInt("resultID"));
+                resultIds.add(rs.getInt("id"));
             }
             return resultIds;
         }
@@ -460,7 +476,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     
 
     @Override
-    public List<Integer> loadResultIdsForRunSearchAnalysis(
+    public List<Integer> loadIdsForRunSearchAnalysis(
             int runSearchAnalysisId,
             PercolatorResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
@@ -475,7 +491,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         
         // If we don't have filters and nothing to sort by use the simple method
         if(!filterCriteria.hasFilters() && sortCriteria.getSortBy() == null) {
-            return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId); 
+            return loadIdsForRunSearchAnalysis(runSearchAnalysisId); 
         }
         
         
@@ -491,13 +507,13 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
         if(!useScanTable && !useResultsTable && !useModsTable && !userPercTable) {
             if(sortCriteria.getLimitCount() != null)
-                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId, sortCriteria.getLimitCount(), offset);
+                return loadIdsForRunSearchAnalysis(runSearchAnalysisId, sortCriteria.getLimitCount(), offset);
             else 
-                return loadResultIdsForRunSearchAnalysis(runSearchAnalysisId); 
+                return loadIdsForRunSearchAnalysis(runSearchAnalysisId); 
         }
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pres.resultID FROM ( ");
+        sql.append("SELECT pres.id FROM ( ");
         sql.append("PercolatorResult as pres");
         if(useResultsTable)
             sql.append(", msRunSearchResult AS res");
@@ -559,7 +575,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
                 sql.append("ORDER BY "+sortCriteria.getSortBy().getColumnName());
             }
             else {
-                sql.append("ORDER BY pres.resultID ");
+                sql.append("ORDER BY pres.id ");
             }
         }
         
@@ -582,7 +598,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             List<Integer> resultIds = new ArrayList<Integer>();
             
             while ( rs.next() ) {
-                resultIds.add(rs.getInt("resultID"));
+                resultIds.add(rs.getInt("id"));
             }
             return resultIds;
         }
@@ -639,7 +655,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         PreparedStatement stmt = null;
         ResultSet rs = null;
         
-        String sql = "SELECT * FROM (msRunSearchResult AS res, PercolatorResult AS pres) "+
+        String sql = "SELECT res.id AS sresID, pres.id AS presID, res.*, pres.*, dmod.* "+
+                     "FROM (msRunSearchResult AS res, PercolatorResult AS pres) "+
                      "LEFT JOIN (msDynamicModResult AS dmod) ON (dmod.resultID = res.id) "+
                      "WHERE res.id = pres.resultID "+
                      "AND pres.runSearchAnalysisID = ? ";
@@ -650,7 +667,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         if(discriminantScore != null)
             sql +=   " AND discriminantScore >= "+discriminantScore;
 
-        sql +=       " ORDER BY res.id";
+        sql +=       " ORDER BY pres.id";
 
         try {
             conn = super.getConnection();
@@ -666,9 +683,9 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             
             while ( rs.next() ) {
             
-                int resultId = rs.getInt("id");
+                int percResultId = rs.getInt("presID");
                 
-                if(lastResult == null || resultId != lastResult.getId()) {
+                if(lastResult == null || percResultId != lastResult.getId()) {
                     
                     if(lastResult != null) {
                         lastResult.getResultPeptide().setDynamicResidueModifications(resultDynaMods);
@@ -732,7 +749,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
         ResultSet rs = null;
         
         StringBuilder buf = new StringBuilder();
-        buf.append("SELECT * from msRunSearchResult as res, PercolatorResult as pres ");
+        buf.append("SELECT res.id AS sresID, pres.id AS presID, res.*, pres.* ");
+        buf.append("FROM msRunSearchResult AS res, PercolatorResult AS pres ");
         buf.append("WHERE res.id = pres.resultID ");
         buf.append("AND pres.runSearchAnalysisID = ?");
         if(qvalue != null)
@@ -741,7 +759,7 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
             buf.append(" AND pep <= "+pep);
         if(discriminantScore != null)
             buf.append(" AND discriminantScore >= "+discriminantScore);
-        buf.append(" ORDER BY res.id");
+        buf.append(" ORDER BY pres.id");
         String sql = buf.toString();
         
         try {
@@ -820,7 +838,8 @@ public class PercolatorResultDAOImpl extends BaseSqlMapDAO implements Percolator
     private PercolatorResultBean makePercolatorResult(ResultSet rs)
             throws SQLException {
         PercolatorResultBean result = new PercolatorResultBean();
-        result.setId(rs.getInt("id"));
+        result.setId(rs.getInt("presID"));
+        result.setSearchResultId(rs.getInt("sresID"));
         result.setRunSearchId(rs.getInt("runSearchID"));
         result.setRunSearchAnalysisId(rs.getInt("runSearchAnalysisID"));
         result.setScanId(rs.getInt("scanID"));

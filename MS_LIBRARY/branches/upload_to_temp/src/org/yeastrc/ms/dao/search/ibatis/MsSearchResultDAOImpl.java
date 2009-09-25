@@ -22,6 +22,7 @@ import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.MsResidueModificationWrap;
 import org.yeastrc.ms.domain.search.impl.MsTerminalModificationWrap;
 import org.yeastrc.ms.upload.dao.search.ibatis.MsSearchResultWrap;
+import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.extensions.ParameterSetter;
@@ -138,6 +139,24 @@ public class MsSearchResultDAOImpl extends BaseSqlMapDAO
         map.put("searchId", searchId);
         map.put("peptide", peptide);
         return queryForList("MsSearchResult.selectResultIdsForSearchPeptide", map);
+    }
+    
+    
+    @Override
+    public List<Integer> loadResultIdsForSearchPeptides(int searchId, List<String> peptides) {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("searchId", searchId);
+        map.put("peptides", "("+StringUtils.makeQuotedCommaSeparated(peptides)+")");
+        return queryForList("MsSearchResult.selectResultIdsForSearchPeptides", map);
+    }
+    
+    @Override
+    public List<Integer> loadResultIdsForSearchPeptideRegex(int searchId,
+            String peptideRegex) {
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("searchId", searchId);
+        map.put("peptideRegex", peptideRegex);
+        return queryForList("MsSearchResult.selectResultIdsForSearchPeptideRegex", map);
     }
     
     public int save(int searchId, MsSearchResultIn searchResult, int runSearchId, int scanId) {

@@ -13,7 +13,7 @@ public interface PeptideProphetResultDataWId {
 
     public abstract int getRunSearchAnalysisId();
     
-    public abstract int getResultId();
+    public abstract int getSearchResultId();
     
     public abstract double getProbability();
     

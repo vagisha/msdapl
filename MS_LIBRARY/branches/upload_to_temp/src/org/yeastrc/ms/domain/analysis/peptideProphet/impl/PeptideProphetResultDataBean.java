@@ -16,7 +16,7 @@ import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResultDataWId
  */
 public class PeptideProphetResultDataBean implements PeptideProphetResultDataWId {
 
-    private int resultId;
+    private int searchResultId;
     private int runSearchAnalysisId;
     private double probability = -1.0;
     private double probabilityNet_0 = -1.0;
@@ -111,12 +111,12 @@ public class PeptideProphetResultDataBean implements PeptideProphetResultDataWId
     }
 
     @Override
-    public int getResultId() {
-        return resultId;
+    public int getSearchResultId() {
+        return searchResultId;
     }
 
-    public void setResultId(int resultId) {
-        this.resultId = resultId;
+    public void setSearchResultId(int searchResultId) {
+        this.searchResultId = searchResultId;
     }
     
     @Override

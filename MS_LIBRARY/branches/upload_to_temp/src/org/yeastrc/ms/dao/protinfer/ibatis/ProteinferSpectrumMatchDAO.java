@@ -72,23 +72,23 @@ public class ProteinferSpectrumMatchDAO extends BaseSqlMapDAO implements Generic
         return 0;
     }
     
-    public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
-        
-        // first determine if the inputID is a runSearchID or a runSearchAnalysisID
-        GenericProteinferRun<?> pinferRun = runDao.loadProteinferRun(pinferId);
-        Program inputGenerator = pinferRun.getInputGenerator();
-        Map<String, Integer> map = new HashMap<String, Integer>(2);
-        map.put("pinferId", pinferId);
-        map.put("inputId", inputId);
-        if(Program.isSearchProgram(inputGenerator)) {
-            return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferSearchInput", map);
-        }
-        else if(Program.isAnalysisProgram(inputGenerator)) {
-            return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferAnalysisInput", map);
-        }
-        else
-            return null;
-    }
+//    public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
+//        
+//        // first determine if the inputID is a runSearchID or a runSearchAnalysisID
+//        GenericProteinferRun<?> pinferRun = runDao.loadProteinferRun(pinferId);
+//        Program inputGenerator = pinferRun.getInputGenerator();
+//        Map<String, Integer> map = new HashMap<String, Integer>(2);
+//        map.put("pinferId", pinferId);
+//        map.put("inputId", inputId);
+//        if(Program.isSearchProgram(inputGenerator)) {
+//            return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferSearchInput", map);
+//        }
+//        else if(Program.isAnalysisProgram(inputGenerator)) {
+//            return super.queryForList(sqlMapNameSpace+".selectMatchIdsForPinferAnalysisInput", map);
+//        }
+//        else
+//            return null;
+//    }
 
     public int update(ProteinferSpectrumMatch psm) {
        return update(sqlMapNameSpace+".update", psm);

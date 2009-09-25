@@ -6,7 +6,7 @@ public interface PercolatorResultDataWId {
 
     public abstract int getRunSearchAnalysisId();
     
-    public abstract int getResultId();
+    public abstract int getSearchResultId();
     
     /**
      * @return the qvalue

@@ -61,10 +61,10 @@ public class IdPickerSpectrumMatchDAO extends BaseSqlMapDAO implements GenericPr
         return psmDao.getMinSpectrumCountForPinferRunProtein(pinferId);
     }
     
-    @Override
-    public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
-        return psmDao.getSpectrumMatchIdsForPinferRunInput(pinferId, inputId);
-    }
+//    @Override
+//    public List<Integer> getSpectrumMatchIdsForPinferRunInput(int pinferId, int inputId) {
+//        return psmDao.getSpectrumMatchIdsForPinferRunInput(pinferId, inputId);
+//    }
 
     @Override
     public int update(ProteinferSpectrumMatch psm) {

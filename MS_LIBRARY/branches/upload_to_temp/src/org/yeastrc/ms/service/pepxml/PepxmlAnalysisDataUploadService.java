@@ -477,7 +477,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     // -------------------------------------------------------------------------------------------
     // UPLOAD PEPTIDE PROPHET ANALYSIS RESULT
     // -------------------------------------------------------------------------------------------
-    private boolean uploadAnalysisResult(SequestPeptideProphetResultIn result, int resultId, int rsAnalysisId) 
+    private boolean uploadAnalysisResult(SequestPeptideProphetResultIn result, int searchResultId, int rsAnalysisId) 
         throws UploadException {
         
         
@@ -489,7 +489,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         // add the PeptideProphet specific information for this result to the cache
         PeptideProphetResultDataBean res = new PeptideProphetResultDataBean();
         res.setRunSearchAnalysisId(rsAnalysisId);
-        res.setResultId(resultId);
+        res.setSearchResultId(searchResultId);
         res.setProbability(result.getProbability());
         res.setfVal(result.getfVal());
         res.setNumEnzymaticTermini(result.getNumEnzymaticTermini());

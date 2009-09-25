@@ -6,7 +6,9 @@
  */
 package org.yeastrc.ms.upload.dao.analysis.peptideProphet.ibatis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
@@ -27,9 +29,24 @@ public class PeptideProphetResultUploadDAOImpl extends BaseSqlMapDAO implements
         super(sqlMap);
     }
     
+    public PeptideProphetResult loadForProphetResultId(int peptideProphetResultId) {
+        return (PeptideProphetResult) queryForObject(namespace+".select", peptideProphetResultId);
+    }
+    
     @Override
-    public PeptideProphetResult load(int resultId) {
-        return (PeptideProphetResult) queryForObject(namespace+".select", resultId);
+    public PeptideProphetResult loadForRunSearchAnalysis(int searchResultId, int runSearchAnalysisId) {
+       Map<String, Integer> map = new HashMap<String, Integer>(4);
+       map.put("searchResultId", searchResultId);
+       map.put("runSearchAnalysisId", runSearchAnalysisId);
+       return (PeptideProphetResult) queryForObject(namespace+".selectForRunSearchAnalysis", map);
+    }
+
+    @Override
+    public PeptideProphetResult loadForSearchAnalysis(int searchResultId, int searchAnalysisId) {
+        Map<String, Integer> map = new HashMap<String, Integer>(4);
+        map.put("searchResultId", searchResultId);
+        map.put("searchAnalysisId", searchAnalysisId);
+        return (PeptideProphetResult) queryForObject(namespace+".selectForSearchAnalysis", map);
     }
 
     @Override
@@ -41,7 +58,7 @@ public class PeptideProphetResultUploadDAOImpl extends BaseSqlMapDAO implements
         StringBuilder values = new StringBuilder();
         for ( PeptideProphetResultDataWId data: dataList) {
             values.append(",(");
-            values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
+            values.append(data.getSearchResultId() == 0 ? "NULL" : data.getSearchResultId());
             values.append(",");
             values.append(data.getRunSearchAnalysisId() == 0 ? "NULL" : data.getRunSearchAnalysisId());
             values.append(",");
