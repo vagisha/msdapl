@@ -66,6 +66,14 @@ public class PeptideProteinMatchingService {
         
         String sequence = NrSeqLookupUtil.getProteinSequence(dbProt.getProteinId());
         
+        return getPeptideProteinMatch(dbProt, peptide, enzymeRules,
+                minEnzymaticTermini, sequence);
+    }
+
+    protected static PeptideProteinMatch getPeptideProteinMatch(
+            NrDbProtein dbProt, String peptide, List<EnzymeRule> enzymeRules,
+            int minEnzymaticTermini, String sequence) {
+        
         int idx = sequence.indexOf(peptide);
         
         while(idx != -1) {

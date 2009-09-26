@@ -34,6 +34,7 @@ import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.pepxml.InteractPepXmlFileReader;
 import org.yeastrc.ms.service.AnalysisDataUploadService;
 import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
+import org.yeastrc.ms.service.MsDataUploadProperties;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
@@ -89,6 +90,8 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
     private StringBuilder uploadMsg;
     
     private Set<String> checkedPeptideProteinMatches; // TODO this should be removed soon
+    private boolean checkPeptideProteinMatches = false;
+    
     
     private static final Pattern fileNamePattern = Pattern.compile("interact\\S*.pep.xml");
     
@@ -124,6 +127,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.analysisIds = new ArrayList<Integer>();
         
         checkedPeptideProteinMatches = new HashSet<String>();
+        this.checkPeptideProteinMatches = MsDataUploadProperties.getCheckPeptideProteinMatches();
     }
     
 
@@ -142,7 +146,6 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         this.remoteServer = remoteServer;
     }
     
-
     @Override
     public String getPreUploadCheckMsg() {
         return preUploadCheckMsg.toString();
@@ -415,7 +418,9 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
                 for(SequestPeptideProphetResultIn result: scan.getScanResults()) {
                     int resultId = getUploadedResultId(result, runSearchId, scanId);
                     // TODO this check should be removed soon.
-                    checkPeptideProteinMatches(resultId, result);
+                    if(checkPeptideProteinMatches) {
+                        checkPeptideProteinMatches(resultId, result);
+                    }
                     uploadAnalysisResult(result, resultId, runSearchAnalysisId);      // PeptideProphet scores
                     numResults++;
                 }

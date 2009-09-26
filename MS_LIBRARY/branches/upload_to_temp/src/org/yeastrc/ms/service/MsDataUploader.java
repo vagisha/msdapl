@@ -227,7 +227,7 @@ public class MsDataUploader {
                 return;
             }
             
-            log.info("BEGINNING upload of sanalysis results");
+            log.info("BEGINNING upload of analysis results");
             try {
                 this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
             }
@@ -604,7 +604,7 @@ public class MsDataUploader {
                     return;
                 }
                 
-                log.info("BEGINNING upload of sanalysis results");
+                log.info("BEGINNING upload of analysis results");
                 try {
                     this.uploadedAnalysisIds = exptUploader.uploadAnalysisData(this.uploadedSearchId);
                 }

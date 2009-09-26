@@ -35,6 +35,8 @@ public class MsDataUploadProperties {
     
     private static PeakStorageType peakStorageType;
     
+    private static boolean checkPeptideProteinMatches = false;
+    
     static {
         Properties props = new Properties();
         try {
@@ -65,6 +67,9 @@ public class MsDataUploadProperties {
         mysqlTempDirectory = props.getProperty("upload.temp.dir");
         
         backupDirectory = props.getProperty("backup.dir");
+        
+        value = props.getProperty("interact.pepxml.checkpeptideproteinmatches");
+        checkPeptideProteinMatches = Boolean.parseBoolean(value);
         
         log.info("Uploader will sync databases at time: "+uploadSyncHour+":"+uploadSyncMinutes);
         
@@ -99,5 +104,9 @@ public class MsDataUploadProperties {
     
     public static String getBackupDirectory() {
         return backupDirectory;
+    }
+    
+    public static boolean getCheckPeptideProteinMatches() {
+        return checkPeptideProteinMatches;
     }
 }

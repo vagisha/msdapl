@@ -721,7 +721,6 @@ CREATE TRIGGER msRunSearchAnalysis_bdelete BEFORE DELETE ON msRunSearchAnalysis
  BEGIN
  	DELETE FROM PercolatorResult WHERE runSearchAnalysisID = OLD.id;
  	DELETE FROM PeptideProphetResult WHERE runSearchAnalysisID = OLD.id;
- 	DELETE FROM msProteinInferInput WHERE inputID = OLD.id AND inputType = 'A';
  END;
 |
 DELIMITER ;
@@ -741,7 +740,6 @@ CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
    DELETE FROM msTerminalDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM PercolatorResult WHERE resultID = OLD.id;
    DELETE FROM PeptideProphetResult WHERE resultID = OLD.id;
-   DELETE FROM msProteinInferSpectrumMatch WHERE runSearchResultID = OLD.id;
  END;
 |
 DELIMITER ;
@@ -781,7 +779,6 @@ CREATE TRIGGER msRunSearch_bdelete BEFORE DELETE ON msRunSearch
    DELETE FROM SQTSpectrumData WHERE runSearchID = OLD.id;
    DELETE FROM SQTFileHeader WHERE runSearchID = OLD.id;
    DELETE FROM msRunSearchAnalysis WHERE runSearchID = OLD.id;
-   DELETE FROM msProteinInferInput WHERE inputID = OLD.id AND inputType = 'S';
  END;
 |
 DELIMITER ;
