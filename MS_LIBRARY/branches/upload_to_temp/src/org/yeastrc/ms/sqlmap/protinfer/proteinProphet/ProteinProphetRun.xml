@@ -16,7 +16,7 @@
 	</resultMap>
 	
 	<parameterMap class="ProteinProphetRun" id="proteinProphetRunParam">
-		<parameter property="id" jdbcType="INTEGER" />
+		<parameter property="id" jdbcType="INTEGER" nullValue="0" />
 		<parameter property="filename" jdbcType="VARCHAR"/>
 	</parameterMap>
 	

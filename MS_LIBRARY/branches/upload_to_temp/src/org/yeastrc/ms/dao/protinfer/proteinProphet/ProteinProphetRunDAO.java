@@ -54,9 +54,10 @@ public class ProteinProphetRunDAO extends BaseSqlMapDAO implements GenericProtei
     }
     
     public int saveProteinProphetRun(ProteinProphetRun run) {
-        int runID = runDao.save(run);
+        int runId = runDao.save(run);
+        run.setId(runId);
         super.save(sqlMapNameSpace+".insert", run);
-        return runID;
+        return runId;
     }
 
     @Override
