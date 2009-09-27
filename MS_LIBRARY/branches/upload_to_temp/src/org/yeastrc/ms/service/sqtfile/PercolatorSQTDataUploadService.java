@@ -653,9 +653,9 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
         //    and make sure there is a raw data file for each SQT file
         if(searchDataFileNames != null) {
             for(String file:filenames) {
-                String filenoext = removeFileExtension(file);
-                if(!searchDataFileNames.contains(filenoext)) {
-                    appendToMsg("No corresponding search data file found for: "+filenoext);
+//                String filenoext = removeFileExtension(file);
+                if(!searchDataFileNames.contains(file)) {
+                    appendToMsg("No corresponding search data file found for: "+file);
                     return false;
                 }
             }
