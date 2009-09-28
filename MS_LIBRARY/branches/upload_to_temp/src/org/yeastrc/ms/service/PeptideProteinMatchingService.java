@@ -42,9 +42,25 @@ public class PeptideProteinMatchingService {
         // TODO what about other search engines
         
         
+        return getMatchingProteins(peptide, enzymes, databases,
+                numEnzymaticTermini);
+    }
+
+    private static List<PeptideProteinMatch> getMatchingProteins(
+            String peptide, List<MsEnzyme> enzymes,
+            List<MsSearchDatabase> databases, int numEnzymaticTermini) {
+        
         List<EnzymeRule> enzymeRules = new ArrayList<EnzymeRule>(enzymes.size());
         for(MsEnzyme enzyme: enzymes)
             enzymeRules.add(new EnzymeRule(enzyme));
+        
+        return getMatchingProteins(peptide, databases, numEnzymaticTermini,
+                enzymeRules);
+    }
+
+    public static List<PeptideProteinMatch> getMatchingProteins(String peptide,
+            List<MsSearchDatabase> databases, int numEnzymaticTermini,
+            List<EnzymeRule> enzymeRules) {
         
         // find the matching database protein ids for the given peptide and fasta databases
         List<Integer> dbProtIds = getMatchingDbProteinIds(peptide, databases);

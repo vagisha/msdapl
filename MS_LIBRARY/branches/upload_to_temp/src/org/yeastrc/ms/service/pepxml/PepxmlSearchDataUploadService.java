@@ -18,9 +18,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl.SequestResultDataSqlMapParam;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
+import org.yeastrc.ms.domain.general.EnzymeRule;
+import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
@@ -28,6 +32,8 @@ import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsResultResidueModIds;
 import org.yeastrc.ms.domain.search.MsResultTerminalModIds;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
+import org.yeastrc.ms.domain.search.MsSearch;
+import org.yeastrc.ms.domain.search.MsSearchDatabase;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
@@ -366,6 +372,24 @@ private static final int BUF_SIZE = 500;
         
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
         
+        
+        // get the search
+        MsSearch search = searchDao.loadSearch(searchId);
+        List<MsEnzyme> enzymes = search.getEnzymeList();
+        List<MsSearchDatabase> databases = search.getSearchDatabases();
+        
+        int numEnzymaticTermini = 0;
+        if(search.getSearchProgram() == Program.SEQUEST) {
+            SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
+            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
+        }
+        // TODO what about other search engines
+        
+        List<EnzymeRule> enzymeRules = new ArrayList<EnzymeRule>(enzymes.size());
+        for(MsEnzyme enzyme: enzymes)
+            enzymeRules.add(new EnzymeRule(enzyme));
+        
+        
         // upload the search results for each scan + charge combination
         int numResults = 0;
         try {
@@ -380,8 +404,9 @@ private static final int BUF_SIZE = 500;
                         
                         List<PeptideProteinMatch> matches = proteinMatches.get(result.getResultPeptide().getPeptideSequence());
                         if(matches == null) {
-                            matches = PeptideProteinMatchingService.getMatchingProteins(searchId, 
-                                        result.getResultPeptide().getPeptideSequence());
+                            matches = PeptideProteinMatchingService.getMatchingProteins(
+                                        result.getResultPeptide().getPeptideSequence(),
+                                        databases, numEnzymaticTermini, enzymeRules);
                             proteinMatches.put(result.getResultPeptide().getPeptideSequence(), matches);
                         }
                         

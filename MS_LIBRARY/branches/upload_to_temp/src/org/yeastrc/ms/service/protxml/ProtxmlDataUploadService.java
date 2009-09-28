@@ -521,10 +521,12 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         // make sure the number of results returned above match the spectrum count for this ion in the 
         // ProtXml file.
         if(numFound != ion.getSpectrumCount()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
-                        ") does not match the number of results returned: "+numFound);
-            throw ex;
+//            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+//            ex.appendErrorMessage("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
+//                        ") does not match the number of results returned: "+numFound);
+//            throw ex;
+            log.warn("Spectrum count ("+ion.getSpectrumCount()+") for ion ("+ion.getModifiedSequence()+
+                  ")  charge ("+ion.getCharge()+") does not match the number of results returned: "+numFound);
         }
     }
 
