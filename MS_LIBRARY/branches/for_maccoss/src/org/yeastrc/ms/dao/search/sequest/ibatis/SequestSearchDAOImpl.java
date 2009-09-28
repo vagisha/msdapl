@@ -85,6 +85,16 @@ public class SequestSearchDAOImpl extends BaseSqlMapDAO implements SequestSearch
     }
     
     @Override
+    public int getNumEnzymaticTermini(int searchId) {
+        String val = getSearchParamValue(searchId, "num_enzyme_termini");
+        // valid values are 1 (semi-digested) or 2 (fully digested, default)
+        if(val == null)
+            return 2;
+        
+        return Integer.valueOf(val);
+    }
+    
+    @Override
     public int updateSearchProgramVersion(int searchId,
             String versionStr) {
         return searchDao.updateSearchProgramVersion(searchId, versionStr);

@@ -137,4 +137,13 @@
     	WHERE accessionString LIKE #accession#
     </select>
     
+    <select id="selectDbProtIdsMatchingPeptide" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT pd.id
+    	FROM tblProteinDatabase AS pd, tblProtein AS p, tblProteinSequence AS s 
+    	WHERE s.sequence LIKE '%$peptide$%'
+    	AND pd.databaseID in ($nrDbIds$) 
+    	AND pd.proteinID = p.id 
+    	AND p.sequenceID = s.id
+    </select>
+    
 </sqlMap>
