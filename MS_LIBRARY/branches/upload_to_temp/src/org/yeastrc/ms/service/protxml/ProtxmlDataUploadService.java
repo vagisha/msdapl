@@ -119,6 +119,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
     private List<Pattern> equivalentAAPatterns = null;
     private Map<Pattern, char[]> equivalentAminoAcids = null;
     
+    private Map<String, Integer> proteinIdMap;
+    
     private static final Logger log = Logger.getLogger(ProtxmlDataUploadService.class.getName());
     
     public ProtxmlDataUploadService() {
@@ -157,6 +159,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         modifiedStateMap.clear();
         peptModStateCountMap.clear();
         runSearchAnalysisIds.clear();
+        
+        proteinIdMap = new HashMap<String, Integer>();
     }
     
     public void upload() throws UploadException {
@@ -265,7 +269,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         int ppGrpId = grpDao.saveGroup(proteinGroup);
         
         Map<Integer, Set<String>> subsumedMap = new HashMap<Integer, Set<String>>();
-        Map<String, Integer> proteinIdMap = new HashMap<String, Integer>();
+//        Map<String, Integer> proteinIdMap = new HashMap<String, Integer>();
         
         for(ProteinProphetProtein protein: proteinGroup.getProteinList()) {
             
@@ -296,7 +300,11 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         for(int subsumedId: subsumedMap.keySet()) {
             Set<String> subsuming = subsumedMap.get(subsumedId);
             for(String name: subsuming) {
-                int subsumingId = proteinIdMap.get(name);
+                Integer subsumingId = proteinIdMap.get(name);
+                if(subsumingId == null) {
+                    log.warn("Subsuming protein not seen yet: "+name);
+                    continue;
+                }
                 ppSusumedDao.saveSubsumedProtein(subsumedId, subsumingId);
             }
         }
