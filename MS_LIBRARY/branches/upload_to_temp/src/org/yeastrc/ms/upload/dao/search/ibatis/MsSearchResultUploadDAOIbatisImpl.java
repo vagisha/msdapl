@@ -108,7 +108,7 @@ public class MsSearchResultUploadDAOIbatisImpl extends BaseSqlMapDAO
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = ConnectionFactory.getMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
             
@@ -143,7 +143,7 @@ public class MsSearchResultUploadDAOIbatisImpl extends BaseSqlMapDAO
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = ConnectionFactory.getMsDataConnection();
             stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             conn.setAutoCommit(false);
             

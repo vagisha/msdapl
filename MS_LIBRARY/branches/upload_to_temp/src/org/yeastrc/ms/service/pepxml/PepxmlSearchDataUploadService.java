@@ -8,6 +8,7 @@ package org.yeastrc.ms.service.pepxml;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -23,7 +24,6 @@ import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl.SequestResultDataSqlMapParam;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
-import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModification;
@@ -57,10 +57,10 @@ import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
 import org.yeastrc.ms.service.PeptideProteinMatch;
-import org.yeastrc.ms.service.PeptideProteinMatchingService;
 import org.yeastrc.ms.service.SearchDataUploadService;
 import org.yeastrc.ms.service.UploadException;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
+import org.yeastrc.ms.service.database.fasta.PeptideProteinMatchingService;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.run.MsRunUploadDAO;
 import org.yeastrc.ms.upload.dao.run.MsScanUploadDAO;
@@ -123,6 +123,7 @@ private static final int BUF_SIZE = 500;
     
     // list of protein peptide matches (if the refresh parser has not been run)
     private Map<String, List<PeptideProteinMatch>> proteinMatches;
+    private PeptideProteinMatchingService matchService;
     
     
     private static final Logger log = Logger.getLogger(PepxmlAnalysisDataUploadService.class.getName());
@@ -372,23 +373,10 @@ private static final int BUF_SIZE = 500;
         
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
         
-        
-        // get the search
-        MsSearch search = searchDao.loadSearch(searchId);
-        List<MsEnzyme> enzymes = search.getEnzymeList();
-        List<MsSearchDatabase> databases = search.getSearchDatabases();
-        
-        int numEnzymaticTermini = 0;
-        if(search.getSearchProgram() == Program.SEQUEST) {
-            SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
-            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
+        // If the refresh parser has not been run we will initialize the PeptideProteinMatchingService
+        if(!parser.isRefreshParserRun()) {
+            initializePeptideProteinMatchingService(searchId);
         }
-        // TODO what about other search engines
-        
-        List<EnzymeRule> enzymeRules = new ArrayList<EnzymeRule>(enzymes.size());
-        for(MsEnzyme enzyme: enzymes)
-            enzymeRules.add(new EnzymeRule(enzyme));
-        
         
         // upload the search results for each scan + charge combination
         int numResults = 0;
@@ -404,11 +392,15 @@ private static final int BUF_SIZE = 500;
                         
                         List<PeptideProteinMatch> matches = proteinMatches.get(result.getResultPeptide().getPeptideSequence());
                         if(matches == null) {
-                            matches = PeptideProteinMatchingService.getMatchingProteins(
-                                        result.getResultPeptide().getPeptideSequence(),
-                                        databases, numEnzymaticTermini, enzymeRules);
+                            matches = matchService.getMatchingProteins(result.getResultPeptide().getPeptideSequence());
                             proteinMatches.put(result.getResultPeptide().getPeptideSequence(), matches);
                         }
+//                        else {
+//                            log.info("Already found matches");
+//                        }
+//                        if(proteinMatches.size()%10 == 0) {
+//                            log.info("Found matches for "+proteinMatches.size()+" peptides");
+//                        }
                         
                         List<MsSearchResultProteinIn> protList = result.getProteinMatchList();
                         
@@ -447,6 +439,45 @@ private static final int BUF_SIZE = 500;
         
     }
     
+    private void initializePeptideProteinMatchingService(int searchId) throws UploadException {
+        
+        if(this.matchService != null)
+            return;
+        
+        // get the search
+        MsSearch search = searchDao.loadSearch(searchId);
+        List<MsEnzyme> enzymes = search.getEnzymeList();
+        List<MsSearchDatabase> databases = search.getSearchDatabases();
+        
+        int numEnzymaticTermini = 0;
+        if(search.getSearchProgram() == Program.SEQUEST) {
+            SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
+            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
+        }
+        // TODO what about other search engines
+        
+        if(databases.size() != 1) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Multiple search databases found for search: "+
+                    searchId+
+                    "; PeptideProteinMatchingService does not handle multiple databases");
+            throw ex; 
+        }
+        try {
+            this.matchService = new PeptideProteinMatchingService(databases.get(0).getSequenceDatabaseId());
+        }
+        catch (SQLException e) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL, e);
+            ex.setErrorMessage("Error initializing PeptideProteinMatchingService for databaseID: "+
+                    databases.get(0).getSequenceDatabaseId());
+            ex.appendErrorMessage(e.getMessage());
+            throw ex; 
+        }
+        
+        matchService.setNumEnzymaticTermini(numEnzymaticTermini);
+        matchService.setEnzymes(enzymes);
+    }
+
     private void flush() {
         if (proteinMatchList.size() > 0) {
             uploadProteinMatchBuffer();
@@ -896,15 +927,12 @@ private static final int BUF_SIZE = 500;
     public static void main(String[] args) throws UploadException {
         PepxmlSearchDataUploadService p = new PepxmlSearchDataUploadService();
         List<String> spectrumFileNames = new ArrayList<String>();
-        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_01");
-        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_02");
-        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_03");
-        spectrumFileNames.add("JE102306_102306_18Mix4_Tube1_04");
+        spectrumFileNames.add("M_123008_Yeast_short_ETD_EPI_03");
         p.setSpectrumFileNames(spectrumFileNames);
         
-        p.setDirectory("/Users/silmaril/Desktop/18mix_new");
+        p.setDirectory("/Users/silmaril/WORK/UW/FLINT/Jimmy_Test/PROT_MATCH_TEST");
         p.setSearchDate(new Date());
-        p.setExperimentId(26);
+        p.setExperimentId(37);
         p.upload();
     }
 }

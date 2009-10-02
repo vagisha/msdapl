@@ -78,7 +78,7 @@ public class MsRunSearchUploadDAOImpl implements MsRunSearchUploadDAO, TableCopi
             Statement stmt = null;
             ResultSet rs = null;
             try {
-                conn = ConnectionFactory.getTempDbConnection();
+                conn = ConnectionFactory.getTempMsDataConnection();
                 stmt = conn.createStatement();
                 rs = stmt.executeQuery(sql);
                 

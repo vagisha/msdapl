@@ -85,7 +85,7 @@ public class MsRunUploadDAOImpl extends BaseJDBCUploadDAO implements MsRunUpload
             Statement stmt = null;
             ResultSet rs = null;
             try {
-                conn = ConnectionFactory.getTempDbConnection();
+                conn = ConnectionFactory.getTempMsDataConnection();
                 stmt = conn.createStatement();
                 rs = stmt.executeQuery(sql);
                 if(rs.next())
@@ -123,7 +123,7 @@ public class MsRunUploadDAOImpl extends BaseJDBCUploadDAO implements MsRunUpload
             Statement stmt = null;
             ResultSet rs = null;
             try {
-                conn = ConnectionFactory.getTempDbConnection();
+                conn = ConnectionFactory.getTempMsDataConnection();
                 stmt = conn.createStatement();
                 rs = stmt.executeQuery(sql);
                 if(rs.next())

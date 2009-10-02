@@ -15,7 +15,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.domain.nrseq.NrDatabase;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
+import org.yeastrc.ms.domain.nrseq.NrDbProteinFull;
 import org.yeastrc.ms.util.StringUtils;
 
 import com.ibatis.common.resources.Resources;
@@ -191,6 +193,19 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         return id;
     }
     
+    
+    public static NrDatabase getDatabase(int databaseId) {
+        String statementName = "NrSeq.selectDatabase";
+        
+        try {
+            return (NrDatabase) sqlMap.queryForObject(statementName, databaseId);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     /**
      * 
      * @param searchDatabaseId
@@ -228,6 +243,21 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
             throw new RuntimeException("Failed to execute select statement: "+statementName, e);
         }
     }
+    
+    public static NrDbProteinFull getDbProteinFull(int dbProtId) {
+        String statementName = "NrSeq.selectDbProteinFull";
+        try {
+            NrDbProteinFull dbProt = (NrDbProteinFull) sqlMap.queryForObject(statementName, dbProtId);
+            if (dbProt == null)
+                throw new NrSeqLookupException(dbProtId);
+            return dbProt;
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     
 //    public static NrDbProtein getDbProtein(int databaseId, int proteinId) {
 //        Map<String, Integer> map = new HashMap<String, Integer>(2);
@@ -289,12 +319,48 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+    public static List<Integer> getDbProteinIdsForDatabase(int databaseId) {
+        String statementName = "NrSeq.selectDbProtIdsForDatabase";
+        try {
+           return sqlMap.queryForList(statementName, databaseId);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
+    public static List<Integer> getProteinIdsForDatabase(int databaseId) {
+        String statementName = "NrSeq.selectProtIdsForDatabase";
+        try {
+           return sqlMap.queryForList(statementName, databaseId);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     public static List<Integer> getDbProteinIdsMatchingPeptide(String peptide, List<Integer> nrDbIds) {
-        String statementName = "NrSeq.selectDbProtIdsMatchingPeptide";
+        String statementName = "NrSeq.selectDbProtIdsMatchingPeptide_1";
         try {
            Map<String, Object> map = new HashMap<String, Object>(4);
            map.put("peptide", peptide);
            map.put("nrDbIds", StringUtils.makeCommaSeparated(nrDbIds));
+           return sqlMap.queryForList(statementName, map);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
+    public static List<Integer> getDbProteinIdsMatchingPeptide(String peptide, Integer nrDbId) {
+        String statementName = "NrSeq.selectDbProtIdsMatchingPeptide_2";
+        try {
+           Map<String, Object> map = new HashMap<String, Object>(4);
+           map.put("peptide", peptide);
+           map.put("nrDbId", nrDbId);
            return sqlMap.queryForList(statementName, map);
         }
         catch (SQLException e) {

@@ -80,7 +80,7 @@ public class MS2ScanChargeUploadDAOImpl extends BaseJDBCUploadDAO implements MS2
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionFactory.getConnection();
+            conn = ConnectionFactory.getMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
             

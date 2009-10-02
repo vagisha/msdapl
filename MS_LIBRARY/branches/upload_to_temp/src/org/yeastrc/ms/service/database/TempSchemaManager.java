@@ -4,14 +4,13 @@
  * May 5, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.service.database;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -47,271 +46,27 @@ public class TempSchemaManager {
     public void createTempSchema() throws SQLException, TempSchemaManagerException {
         
         log.info("Creating temporary database: "+ConnectionFactory.tempDbName());
-        createTempDatabase();
-        createTables(getMainTableNames());
-        matchTables();
-        createTriggers(getMainTriggerNames());
-        matchTriggers();
-    }
-
-    //-----------------------------------------------------------------------------------------
-    // TABLES 
-    //-----------------------------------------------------------------------------------------
-    List<String> getMainTableNames() throws SQLException {
-        
-        List<String> tableNames;
-        Connection conn = null;
+        DatabaseCopier instance = DatabaseCopier.getInstance();
         try {
-            conn = ConnectionFactory.getMainDbConnection();
-            tableNames = getTableNames(conn);
+            instance.copyDatabase(ConnectionFactory.masterDbName(), ConnectionFactory.tempDbName());
         }
-        finally {
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
-        }
-        return tableNames;
-    }
-
-    List<String> getTempTableNames() throws SQLException {
-        
-        List<String> newTableNames;
-        Connection conn = null;
-        try {
-            conn = ConnectionFactory.getTempDbConnection();
-            newTableNames = getTableNames(conn);
-        }
-        finally {
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
-        }
-        return newTableNames;
-    }
-    
-    private List<String> getTableNames(Connection conn) throws SQLException {
-        
-        Statement stmt = null;
-        ResultSet rs = null;
-        List<String> tableNames = new ArrayList<String>();
-        try {
-            String sql = "SHOW TABLES";
-            
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            
-            while(rs.next()) {
-                tableNames.add(rs.getString(1));
-            }
-        }
-        finally {
-            if(rs != null) try { rs.close(); rs = null;}
-            catch (SQLException e) {}
-            
-            if(stmt != null) try { stmt.close(); stmt = null;}
-            catch (SQLException e) {}
-        }
-        return tableNames;
-    }
-
-    private void matchTables() throws SQLException, TempSchemaManagerException {
-        
-        List<String> tableNames = getMainTableNames();
-        List<String> newTableNames = getTempTableNames();
-        
-        if(newTableNames.size() != tableNames.size()) {
-            throw new TempSchemaManagerException("Number of tables created in the temp database do not match");
-        }
-        Collections.sort(tableNames);
-        Collections.sort(newTableNames);
-        for(int i = 0; i < tableNames.size(); i++) {
-            if(!(tableNames.get(i).equals(newTableNames.get(i)))) {
-                throw new TempSchemaManagerException("Table names do not match: mainTable: "
-                        +tableNames.get(i)+"; tempTable: "+newTableNames.get(i));
-            }
-        }
-    }
-
-    private void createTables(List<String> tableNames) throws SQLException, TempSchemaManagerException {
-        
-        Connection conn  = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = ConnectionFactory.getTempDbConnection();
-            stmt = conn.createStatement();
-            
-            for(String tableName: tableNames) {
-//                String sql = "CREATE TABLE "+tableName+" LIKE "+ConnectionFactory.masterDbName()+"."+tableName;
-                String sql = "SHOW CREATE TABLE "+ConnectionFactory.masterDbName()+"."+tableName;
-//                log.info(sql);
-                rs = stmt.executeQuery(sql);
-                String createSql = null;
-                if(rs.next()) {
-                    createSql = rs.getString(2);
-                    log.info(createSql);
-                    stmt.execute(createSql);
-                }
-                else {
-                    throw new TempSchemaManagerException("Cannot get CREATE statement for table: "+tableName);
-                }
-                rs.close();
-            }
-        }
-        finally {
-            if(rs != null) try { rs.close(); rs = null;}
-            catch (SQLException e) {}
-            
-            if(stmt != null) try { stmt.close(); stmt = null;}
-            catch (SQLException e) {}
-            
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
-        }
-    }
-    
-    
-    //-----------------------------------------------------------------------------------------
-    // TRIGGERS
-    //-----------------------------------------------------------------------------------------
-    List<String> getMainTriggerNames() throws SQLException {
-        
-        List<String> tableNames;
-        Connection conn = null;
-        try {
-            conn = ConnectionFactory.getMainDbConnection();
-            tableNames = getTriggerNames(conn);
-        }
-        finally {
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
-        }
-        return tableNames;
-    }
-
-    List<String> getTempTriggerNames() throws SQLException {
-        
-        List<String> newTableNames;
-        Connection conn = null;
-        try {
-            conn = ConnectionFactory.getTempDbConnection();
-            newTableNames = getTriggerNames(conn);
-        }
-        finally {
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
-        }
-        return newTableNames;
-    }
-    
-    private List<String> getTriggerNames(Connection conn) throws SQLException {
-        
-        Statement stmt = null;
-        ResultSet rs = null;
-        List<String> tableNames = new ArrayList<String>();
-        try {
-            String sql = "SHOW TRIGGERS";
-            
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            
-            while(rs.next()) {
-                tableNames.add(rs.getString(1));
-            }
-        }
-        finally {
-            if(rs != null) try { rs.close(); rs = null;}
-            catch (SQLException e) {}
-            
-            if(stmt != null) try { stmt.close(); stmt = null;}
-            catch (SQLException e) {}
-        }
-        return tableNames;
-    }
-
-    private void matchTriggers() throws SQLException, TempSchemaManagerException {
-        
-        List<String> triggerNames = getMainTriggerNames();
-        List<String> newTriggerNames = getTempTriggerNames();
-        
-        if(newTriggerNames.size() != triggerNames.size()) {
-            throw new TempSchemaManagerException("Number of TRIGGERS created in the temp database do not match");
-        }
-        Collections.sort(triggerNames);
-        Collections.sort(newTriggerNames);
-        for(int i = 0; i < triggerNames.size(); i++) {
-            if(!(triggerNames.get(i).equals(newTriggerNames.get(i)))) {
-                throw new TempSchemaManagerException("TRIGGER names do not match: mainTable: "
-                        +triggerNames.get(i)+"; tempTable: "+newTriggerNames.get(i));
-            }
-        }
-    }
-
-    private void createTriggers(List<String> triggerNames) throws SQLException, TempSchemaManagerException {
-        
-        Connection conn  = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = ConnectionFactory.getTempDbConnection();
-            stmt = conn.createStatement();
-            
-            for(String triggerName: triggerNames) {
-                String sql = "SHOW CREATE TRIGGER "+ConnectionFactory.masterDbName()+"."+triggerName;
-//                log.info(sql);
-                rs = stmt.executeQuery(sql);
-                String createSql = null;
-                if(rs.next()) {
-                    createSql = rs.getString("SQL Original Statement");
-                    log.info(createSql);
-                    stmt.execute(createSql);
-                }
-                else {
-                    throw new TempSchemaManagerException("Cannot get CREATE statement for trigger: "+triggerName);
-                }
-                rs.close();
-            }
-        }
-        finally {
-            if(rs != null) try { rs.close(); rs = null;}
-            catch (SQLException e) {}
-            
-            if(stmt != null) try { stmt.close(); stmt = null;}
-            catch (SQLException e) {}
-            
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
-        }
-    }
-    
-
-    //-----------------------------------------------------------------------------------------
-    // DATABASE
-    //-----------------------------------------------------------------------------------------
-    private void createTempDatabase() throws SQLException {
-        
-        Connection conn = null;
-        Statement stmt = null;
-        try {
-            conn = ConnectionFactory.getMainDbConnection();
-            stmt = conn.createStatement();
-            stmt.execute("DROP DATABASE IF EXISTS "+ConnectionFactory.tempDbName());
-            stmt.execute("CREATE DATABASE "+ConnectionFactory.tempDbName());
-        }
-        finally {
-            if(stmt != null) try { stmt.close(); stmt = null;}
-            catch (SQLException e) {}
-            
-            if(conn != null) try { conn.close(); conn = null;}
-            catch (SQLException e) {}
+        catch (DatabaseCopyException e) {
+            throw new TempSchemaManagerException("Could not create temp schema: "+e.getMessage(), e);
         }
     }
 
     
     public void checkBeforeCopy() throws SQLException, TempSchemaManagerException, TableCopyException {
         // make sure the tables still match
-        matchTables();
         // in the main and temp databases
+        DatabaseCopier instance = DatabaseCopier.getInstance();
+        try {
+            instance.matchTables(ConnectionFactory.masterDbName(), ConnectionFactory.tempDbName());
+        }
+        catch (DatabaseCopyException e) {
+            throw new TempSchemaManagerException("tables don't match in the original and copied database: "+
+                    e.getMessage(), e);
+        }
         checkTables();
     }
     
@@ -457,7 +212,7 @@ public class TempSchemaManager {
         ResultSet rs = null;
         List<Integer> ids = new ArrayList<Integer>();
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             
@@ -484,7 +239,7 @@ public class TempSchemaManager {
         
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
         }
         catch (SQLException e) {
             log.error("", e);
@@ -492,7 +247,7 @@ public class TempSchemaManager {
         if(conn != null) deleteEntry(conn, tableName, id);
         
         try {
-            conn = ConnectionFactory.getMainDbConnection();
+            conn = ConnectionFactory.getMainMsDataConnection();
         }
         catch (SQLException e) {
             log.error("", e);

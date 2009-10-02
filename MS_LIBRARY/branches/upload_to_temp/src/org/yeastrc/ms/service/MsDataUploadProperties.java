@@ -37,6 +37,8 @@ public class MsDataUploadProperties {
     
     private static boolean checkPeptideProteinMatches = false;
     
+    private static boolean useNrseqSuffixTables = true;
+    
     static {
         Properties props = new Properties();
         try {
@@ -70,6 +72,9 @@ public class MsDataUploadProperties {
         
         value = props.getProperty("interact.pepxml.checkpeptideproteinmatches");
         checkPeptideProteinMatches = Boolean.parseBoolean(value);
+        
+        value = props.getProperty("use.nrseq.suffix.tables");
+        useNrseqSuffixTables = Boolean.parseBoolean(value);
         
         log.info("Uploader will sync databases at time: "+uploadSyncHour+":"+uploadSyncMinutes);
         
@@ -108,5 +113,9 @@ public class MsDataUploadProperties {
     
     public static boolean getCheckPeptideProteinMatches() {
         return checkPeptideProteinMatches;
+    }
+    
+    public static boolean useNrseqSuffixTables() {
+        return useNrseqSuffixTables;
     }
 }

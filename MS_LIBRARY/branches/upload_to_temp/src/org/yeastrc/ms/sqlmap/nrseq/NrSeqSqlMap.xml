@@ -4,12 +4,30 @@
 <sqlMap namespace="NrSeq"> 
 
 	<typeAlias alias="NrDbProtein" type="org.yeastrc.ms.domain.nrseq.NrDbProtein"/>
+	<typeAlias alias="NrDbProteinFull" type="org.yeastrc.ms.domain.nrseq.NrDbProteinFull"/>
+	<typeAlias alias="NrDatabase" type="org.yeastrc.ms.domain.nrseq.NrDatabase"/>
 
 	<resultMap class="NrDbProtein" id="nrDbProtResult">
 		<result property="id" column="id" />
 		<result property="proteinId" column="proteinID" />
 		<result property="databaseId" column="databaseID" />
 		<result property="accessionString" column="accessionString" />
+		<result property="description" column="description" />
+	</resultMap>
+	
+	<resultMap class="NrDbProteinFull" id="nrDbProtFullResult">
+		<result property="id" column="id" />
+		<result property="proteinId" column="proteinID" />
+		<result property="databaseId" column="databaseID" />
+		<result property="accessionString" column="accessionString" />
+		<result property="description" column="description" />
+		<result property="speciesId" column="speciesID" />
+		<result property="sequenceId" column="sequenceID" />
+	</resultMap>
+	
+	<resultMap class="NrDatabase" id="nrDbResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
 		<result property="description" column="description" />
 	</resultMap>
 	
@@ -22,6 +40,10 @@
     
     <select id="selectDatabaseId" resultClass="Integer" parameterClass="String"> 
         SELECT id FROM tblDatabase WHERE name = #name#
+    </select>
+    
+    <select id="selectDatabase" resultMap="nrDbResult" parameterClass="Integer"> 
+        SELECT * FROM tblDatabase WHERE id = #id#
     </select>
     
     <select id="selectDbProteinIdForDbNameExactMatch" resultClass="Integer" parameterClass="java.util.Map"> 
@@ -87,6 +109,13 @@
         AND pr.id = pd.proteinID
     </select>
     
+    <select id="selectDbProteinFull" resultMap="nrDbProtFullResult" parameterClass="Integer"> 
+        SELECT pd.*, p.sequenceID, p.speciesID
+        FROM tblProteinDatabase AS pd, tblProtein AS p
+        WHERE pd.id = #id#
+        AND pd.proteinID = p.id
+    </select>
+    
     <select id="selectDbProtein" resultMap="nrDbProtResult" parameterClass="Integer"> 
         SELECT *
         FROM tblProteinDatabase 
@@ -137,11 +166,28 @@
     	WHERE accessionString LIKE #accession#
     </select>
     
-    <select id="selectDbProtIdsMatchingPeptide" resultClass="Integer" parameterClass="java.util.Map">
+     <select id="selectDbProtIdsForDatabase" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM tblProteinDatabase WHERE databaseID=#databaseId#
+    </select>
+    
+     <select id="selectProtIdsForDatabase" resultClass="Integer" parameterClass="Integer">
+    	SELECT DISTINCT(proteinID) FROM tblProteinDatabase WHERE databaseID=#databaseId#
+    </select>
+    
+    <select id="selectDbProtIdsMatchingPeptide_1" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT pd.id
     	FROM tblProteinDatabase AS pd, tblProtein AS p, tblProteinSequence AS s 
     	WHERE s.sequence LIKE '%$peptide$%'
     	AND pd.databaseID in ($nrDbIds$) 
+    	AND pd.proteinID = p.id 
+    	AND p.sequenceID = s.id
+    </select>
+    
+    <select id="selectDbProtIdsMatchingPeptide_2" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT pd.id
+    	FROM tblProteinDatabase AS pd, tblProtein AS p, tblProteinSequence AS s 
+    	WHERE s.sequence LIKE '%$peptide$%'
+    	AND pd.databaseID = #nrDbId# 
     	AND pd.proteinID = p.id 
     	AND p.sequenceID = s.id
     </select>

@@ -32,6 +32,13 @@ public class ConnectionFactory {
     private static DataSource mainMsData = null;
     private static DataSource tempMsData = null;
     
+    private static String nrseqDbName;
+    
+    private static DataSource nrseq = null;
+    
+    private static String user;
+    private static String password;
+    
     private static final Logger log = Logger.getLogger(ConnectionFactory.class.getName());
     
     static {
@@ -46,8 +53,8 @@ public class ConnectionFactory {
         
         String mainDbUrl = props.getProperty("db.url");
         mainDbName = props.getProperty("db.name");
-        String user = props.getProperty("db.user");
-        String password = props.getProperty("db.password");
+        user = props.getProperty("db.user");
+        password = props.getProperty("db.password");
         
         String tempDbUrl = props.getProperty("db.temp.url");
         tempDbName = props.getProperty("db.temp.name");
@@ -55,24 +62,33 @@ public class ConnectionFactory {
         mainMsData = setupDataSource(mainDbUrl, user, password);
         tempMsData = setupDataSource(tempDbUrl, user, password);
         
+        nrseqDbName = props.getProperty("db.nrseq.name");
+        String nrseqUrl = props.getProperty("db.nrseq.url");
+        nrseq = setupDataSource(nrseqUrl, user, password);
+        
     }
     private ConnectionFactory() {}
     
-    public static Connection getMainDbConnection() throws SQLException {
+    public static Connection getMainMsDataConnection() throws SQLException {
 //        return UploadDAOFactory.getInstance().getConnection();
         return mainMsData.getConnection();
     }
     
-    public static Connection getTempDbConnection() throws SQLException {
+    public static Connection getTempMsDataConnection() throws SQLException {
 //        return UploadDAOFactory.getInstance().getTempDbConnection();
         return tempMsData.getConnection();
     }
     
-    public static Connection getConnection() throws SQLException {
+    public static Connection getNrseqConnection() throws SQLException {
+//      return UploadDAOFactory.getInstance().getConnection();
+      return nrseq.getConnection();
+  }
+  
+    public static Connection getMsDataConnection() throws SQLException {
         if(MsDataUploadProperties.uploadToTempTables())
-            return getTempDbConnection();
+            return getTempMsDataConnection();
         else
-            return getMainDbConnection();
+            return getMainMsDataConnection();
     }
     
     private static DataSource setupDataSource(String dbUrl, String user, String password) {
@@ -98,5 +114,19 @@ public class ConnectionFactory {
         return tempDbName;
     }
     
+    public static String nrseqDbName() {
+        return nrseqDbName;
+    }
     
+    public static DataSource getDataSource(String dbName) {
+        String dbUrl = "jdbc:mysql://localhost/"+dbName;
+        DataSource ds = setupDataSource(dbUrl, user, password);
+        return ds;
+    }
+    
+    public static Connection getConnection(String dbName) throws SQLException {
+        String dbUrl = "jdbc:mysql://localhost/"+dbName;
+        DataSource ds = setupDataSource(dbUrl, user, password);
+        return ds.getConnection();
+    }
 }

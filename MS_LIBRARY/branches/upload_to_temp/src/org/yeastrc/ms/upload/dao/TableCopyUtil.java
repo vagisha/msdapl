@@ -49,7 +49,7 @@ public class TableCopyUtil {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
         }
@@ -140,7 +140,7 @@ public class TableCopyUtil {
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if(rs.next())
@@ -169,7 +169,7 @@ public class TableCopyUtil {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = ConnectionFactory.getMainDbConnection();
+            conn = ConnectionFactory.getMainMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
         }
@@ -193,7 +193,7 @@ public class TableCopyUtil {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeQuery(sql);
         }
@@ -218,7 +218,7 @@ public class TableCopyUtil {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
         }
@@ -243,7 +243,7 @@ public class TableCopyUtil {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
         }
@@ -292,7 +292,7 @@ public class TableCopyUtil {
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = mainTable ? ConnectionFactory.getMainDbConnection() : ConnectionFactory.getTempDbConnection();
+            conn = mainTable ? ConnectionFactory.getMainMsDataConnection() : ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if(rs.next())
@@ -323,7 +323,7 @@ public class TableCopyUtil {
         
         String sql = "SELECT count(*) FROM "+tableName;
         try {
-            conn = tempTable ? ConnectionFactory.getTempDbConnection() : ConnectionFactory.getMainDbConnection();
+            conn = tempTable ? ConnectionFactory.getTempMsDataConnection() : ConnectionFactory.getMainMsDataConnection();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if(rs.next()) {

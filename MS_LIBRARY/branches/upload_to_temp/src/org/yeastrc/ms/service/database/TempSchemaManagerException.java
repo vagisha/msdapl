@@ -4,7 +4,7 @@
  * May 8, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.service.database;
 
 
 /**

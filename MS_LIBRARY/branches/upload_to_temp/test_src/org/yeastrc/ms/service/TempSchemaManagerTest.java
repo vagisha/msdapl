@@ -12,6 +12,8 @@ import junit.framework.TestCase;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.ms.domain.general.impl.ExperimentBean;
+import org.yeastrc.ms.service.database.TempSchemaManager;
+import org.yeastrc.ms.service.database.TempSchemaManagerException;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 
 public class TempSchemaManagerTest extends TestCase {

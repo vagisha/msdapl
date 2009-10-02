@@ -77,7 +77,7 @@ public class MsScanUploadDAOImpl extends BaseJDBCUploadDAO implements MsScanUplo
         Connection conn = null;
         PreparedStatement stmt = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.prepareStatement(sql);
             prepareScanDataInsertStatement(stmt, scan, scanId);
             stmt.executeUpdate();
@@ -200,7 +200,7 @@ public class MsScanUploadDAOImpl extends BaseJDBCUploadDAO implements MsScanUplo
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionFactory.getTempDbConnection();
+            conn = ConnectionFactory.getTempMsDataConnection();
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
             
