@@ -1,29 +1,16 @@
 package org.yeastrc.ms.parser.sqtFile.percolator;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultIn;
-import org.yeastrc.ms.domain.search.MsResidueModificationIn;
-import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
-import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
-import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.ms.parser.sqtFile.SQTParseException;
-import org.yeastrc.ms.parser.sqtFile.SQTSearchResult;
-import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidResultPeptideBuilder;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
+import org.yeastrc.ms.domain.search.impl.SearchResult;
 
-public class PercolatorAnalysisResult extends SQTSearchResult implements PercolatorResultIn {
+public class PercolatorAnalysisResult extends SearchResult implements PercolatorResultIn {
 
-    private MsSearchResultPeptide resultPeptide = null;
-    
     private int numMatchingIons = -1;
     private int numPredictedIons = -1;
     
-    private List<MsResidueModificationIn> searchDynaResidueMods;
-    private List<MsTerminalModificationIn> searchDynaTermMods;
     
     private int xcorrRank = -1;
     private int spRank = -1;
@@ -33,23 +20,9 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
     private Double discriminantScore = null;
     private double qvalue = -1.0;
     
-    private Program searchProgram;
     
-    
-    public PercolatorAnalysisResult(List<MsResidueModificationIn> searchDynaResidueMods, List<MsTerminalModificationIn> searchDynaTermMods,
-            Program searchProgram) {
+    public PercolatorAnalysisResult() {
         super();
-        if (searchDynaResidueMods != null)
-            this.searchDynaResidueMods = searchDynaResidueMods;
-        else
-            this.searchDynaResidueMods = new ArrayList<MsResidueModificationIn>(0);
-        
-        if (searchDynaTermMods != null)
-            this.searchDynaTermMods = searchDynaTermMods;
-        else
-            this.searchDynaTermMods = new ArrayList<MsTerminalModificationIn>(0);
-        
-        this.searchProgram = searchProgram;
     }
 
     /**
@@ -128,22 +101,6 @@ public class PercolatorAnalysisResult extends SQTSearchResult implements Percola
     @Override
     public BigDecimal getPredictedRetentionTime() {
         return null;
-    }
-    
-    public MsSearchResultPeptide buildPeptideResult() throws SQTParseException {
-        if (resultPeptide != null)
-            return resultPeptide;
-        
-        if(searchProgram == null)
-            throw new SQTParseException("Cannot parse peptide string without know the name of the search program that created it", SQTParseException.FATAL);
-        
-        if(searchProgram == Program.SEQUEST )//|| searchProgram == Program.EE_NORM_SEQUEST)
-            resultPeptide = SequestResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods, null);
-        
-        else if (searchProgram == Program.PROLUCID)
-            resultPeptide = ProlucidResultPeptideBuilder.instance().build(getOriginalPeptideSequence(), searchDynaResidueMods, searchDynaTermMods);
-
-        return resultPeptide;
     }
     
     public String toString() {

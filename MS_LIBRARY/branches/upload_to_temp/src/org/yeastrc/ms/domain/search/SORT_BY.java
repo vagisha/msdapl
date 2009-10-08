@@ -27,6 +27,13 @@ public enum SORT_BY {
     EVAL("e-value", "evalue"),
     CALC_MASS_SEQ("Calc. Mass", "calculatedMass"),
     
+    // Mascot specific
+    ION_SCORE("IonScore", "ionScore"),
+    IDENTITY_SCORE("IdScore", "identityScore"),
+    HOMOLOGY_SCORE("HomolScore", "homologyScore"),
+    EXPECT("Expect", "expect"),
+    STAR("Star", "star"),
+    
     // Percolator specific
     QVAL("q-value", "qvalue"),
     PEP("PEP", "pep"),
@@ -81,6 +88,10 @@ public enum SORT_BY {
     
     public static boolean isSequestRelated(SORT_BY sortBy) {
         return sortBy == XCORR || sortBy == DELTACN || sortBy == SP || sortBy == EVAL || sortBy == CALC_MASS_SEQ;
+    }
+    
+    public static boolean isMascotRelated(SORT_BY sortBy) {
+        return sortBy == CALC_MASS_SEQ || sortBy == ION_SCORE || sortBy == IDENTITY_SCORE || sortBy == HOMOLOGY_SCORE || sortBy == EXPECT || sortBy == STAR;
     }
     
     public static boolean isPeptideProphetRelated(SORT_BY sortBy) {

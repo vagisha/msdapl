@@ -5,7 +5,7 @@
 
 	<typeAlias alias="SequestSearchOut" type="org.yeastrc.ms.domain.search.sequest.impl.SequestSearchBean"/>
 	<typeAlias alias="SequestParamIn" type="org.yeastrc.ms.domain.search.sequest.impl.SequestParamWarp" />
-	<typeAlias alias="SequestParamOut" type="org.yeastrc.ms.domain.search.sequest.impl.SequestParamBean" />
+	<typeAlias alias="SequestParamOut" type="org.yeastrc.ms.domain.search.impl.ParamBean" />
 	
 	<resultMap class="SequestSearchOut" id="sequestSearchResult" extends="MsSearch.msSearchResult" >
 		<result property="sequestParams" 

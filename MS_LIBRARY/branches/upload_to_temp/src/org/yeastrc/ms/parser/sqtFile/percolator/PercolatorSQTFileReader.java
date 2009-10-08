@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResultIn;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorSearchScan;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.parser.DataProviderException;
@@ -23,6 +24,8 @@ import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SearchScan;
+import org.yeastrc.ms.parser.sqtFile.prolucid.ProlucidResultPeptideBuilder;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 
 /**
  * 
@@ -161,7 +164,7 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-        PercolatorAnalysisResult result = new PercolatorAnalysisResult(getDynamicResidueMods(), getDynamicTerminalMods(), searchProgram);
+        PercolatorAnalysisResult result = new PercolatorAnalysisResult();
         try {
             result.setxCorrRank(Integer.parseInt(tokens[1]));
             result.setSpRank(Integer.parseInt(tokens[2]));
@@ -205,7 +208,21 @@ public class PercolatorSQTFileReader extends SQTFileReader<PercolatorSearchScan>
 
         // parse the peptide sequence
         try {
-            result.buildPeptideResult();
+
+            MsSearchResultPeptide resultPeptide = null;
+            
+            if(searchProgram == Program.SEQUEST )//|| searchProgram == Program.EE_NORM_SEQUEST)
+                resultPeptide = SequestResultPeptideBuilder.instance().build(
+                        result.getOriginalPeptideSequence(), getDynamicResidueMods(), null);
+            
+            else if (searchProgram == Program.PROLUCID)
+                resultPeptide = ProlucidResultPeptideBuilder.instance().build(
+                        result.getOriginalPeptideSequence(), getDynamicResidueMods(), getDynamicTerminalMods());
+
+            else
+                throw new SQTParseException("Cannot parse peptide string without know the name of the search program that created it.", SQTParseException.FATAL);
+            
+            result.setResultPeptide(resultPeptide);
         }
         catch(SQTParseException e) {
             throw new DataProviderException(currentLineNum, "Invalid peptide sequence in 'M'. "+e.getMessage(), line);

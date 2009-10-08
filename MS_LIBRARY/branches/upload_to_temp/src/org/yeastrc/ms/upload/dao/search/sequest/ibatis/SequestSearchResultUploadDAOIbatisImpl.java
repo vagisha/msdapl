@@ -15,7 +15,6 @@ import java.util.List;
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.upload.dao.search.MsSearchResultUploadDAO;
@@ -140,61 +139,6 @@ public class SequestSearchResultUploadDAOIbatisImpl extends BaseSqlMapDAO implem
             catch(SQLException e){}
             try {if(stmt != null) stmt.close();}
             catch(SQLException e){}
-        }
-    }
-    
-    public static final class SequestResultDataSqlMapParam implements SequestResultDataWId {
-        
-        private int resultId;
-        private SequestResultData result;
-        
-        public SequestResultDataSqlMapParam(int resultId, SequestResultData result) {
-            this.resultId = resultId;
-            this.result = result;
-        }
-
-        public int getResultId() {
-            return resultId;
-        }
-
-        public BigDecimal getDeltaCN() {
-            return result.getDeltaCN();
-        }
-
-        public BigDecimal getSp() {
-            return result.getSp();
-        }
-
-        public int getSpRank() {
-            return result.getSpRank();
-        }
-
-        public BigDecimal getxCorr() {
-            return result.getxCorr();
-        }
-
-        public int getxCorrRank() {
-            return result.getxCorrRank();
-        }
-
-        public BigDecimal getCalculatedMass() {
-            return result.getCalculatedMass();
-        }
-
-        public int getMatchingIons() {
-            return result.getMatchingIons();
-        }
-
-        public int getPredictedIons() {
-            return result.getPredictedIons();
-        }
-
-        public Double getEvalue() {
-            return result.getEvalue();
-        }
-
-        public BigDecimal getDeltaCNstar() {
-            return result.getDeltaCNstar();
         }
     }
 }

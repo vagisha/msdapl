@@ -6,18 +6,18 @@
  */
 package org.yeastrc.ms.domain.search.sequest.impl;
 
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.Param;
 
 /**
  * 
  */
-public class SequestParamWrap implements SequestParam {
+public class SequestParamWrap implements Param {
 
     
     private int searchId;
-    private SequestParam param;
+    private Param param;
     
-    public SequestParamWrap(SequestParam param, int searchId) {
+    public SequestParamWrap(Param param, int searchId) {
         this.param = param;
         this.searchId = searchId;
     }

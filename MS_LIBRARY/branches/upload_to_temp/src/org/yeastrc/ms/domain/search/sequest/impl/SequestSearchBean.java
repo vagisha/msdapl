@@ -9,8 +9,8 @@ package org.yeastrc.ms.domain.search.sequest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.impl.SearchBean;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 
 
@@ -19,18 +19,18 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearch;
  */
 public class SequestSearchBean extends SearchBean implements SequestSearch {
 
-    private List<SequestParam> paramList;
+    private List<Param> paramList;
     
     public SequestSearchBean() {
-        paramList = new ArrayList<SequestParam>();
+        paramList = new ArrayList<Param>();
     }
     
     @Override
-    public List<SequestParam> getSequestParams() {
+    public List<Param> getSequestParams() {
         return paramList;
     }
     
-    public void setSequestParams(List<SequestParam> paramList) {
+    public void setSequestParams(List<Param> paramList) {
         this.paramList = paramList;
     }
 }

@@ -3,6 +3,7 @@ package org.yeastrc.ms.domain.search;
 public enum Program {
 
     SEQUEST("SEQUEST"),
+    MASCOT("MASCOT"),
     //EE_NORM_SEQUEST("EE-normalized SEQUEST"),
     PERCOLATOR("Percolator"),
     PEPTIDE_PROPHET("PeptideProphet"),
@@ -36,6 +37,10 @@ public enum Program {
             return Program.BIBLIOSPEC;
         else if (SearchFileFormat.PEPXML == format)
             return Program.PEPTIDE_PROPHET;
+        else if (SearchFileFormat.PEPXML_SEQ == format)
+            return Program.SEQUEST;
+        else if (SearchFileFormat.PEPXML_MASCOT == format)
+            return Program.MASCOT;
         else
             return Program.UNKNOWN;
     }
@@ -45,6 +50,8 @@ public enum Program {
             return Program.SEQUEST;
 //        else if (Program.EE_NORM_SEQUEST.name().equalsIgnoreCase(prog))
 //            return Program.EE_NORM_SEQUEST;
+        else if (Program.MASCOT.name().equalsIgnoreCase(prog))
+            return Program.MASCOT;
         else if (Program.PROLUCID.name().equalsIgnoreCase(prog))
             return Program.PROLUCID;
         else if (Program.PEPPROBE.name().equalsIgnoreCase(prog))
@@ -60,6 +67,7 @@ public enum Program {
     
     public static boolean isSearchProgram(Program program) {
         if(program == SEQUEST || // program == EE_NORM_SEQUEST ||
+           program == MASCOT ||
            program == PROLUCID || program == PEPPROBE||
            program == BIBLIOSPEC)
             return true;

@@ -153,6 +153,15 @@ CREATE TABLE SQTParams (
 );
 ALTER TABLE SQTParams ADD INDEX(searchID,param);
 
+CREATE TABLE MascotParams (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   searchID INT UNSIGNED NOT NULL,
+   param VARCHAR(255) NOT NULL,
+   value TEXT
+);
+ALTER TABLE MascotParams ADD INDEX(searchID,param);
+
+
 CREATE TABLE ProLuCIDParams (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    searchID INT UNSIGNED NOT NULL,
@@ -318,6 +327,24 @@ ALTER TABLE SQTSearchResult ADD INDEX(spRank);
 ALTER TABLE SQTSearchResult ADD INDEX(deltaCN);
 ALTER TABLE SQTSearchResult ADD INDEX(XCorr);
 ALTER TABLE SQTSearchResult ADD INDEX(sp);
+
+CREATE TABLE MascotSearchResult (
+   resultID INT UNSIGNED NOT NULL PRIMARY KEY,
+   rank INT UNSIGNED NOT NULL,
+   ionScore DECIMAL(10,5) NOT NULL,
+   identityScore DECIMAL(10,5) NOT NULL,
+   homologyScore DECIMAL(10,5) NOT NULL,
+   expect DECIMAL(10,5) NOT NULL,
+   star INT UNSIGNED NOT NULL,
+   calculatedMass DECIMAL(18,9),
+   matchingIons INT UNSIGNED,
+   predictedIons INT UNSIGNED,
+   evalue DOUBLE UNSIGNED
+);
+ALTER TABLE MascotSearchResult ADD INDEX(ionScore);
+ALTER TABLE MascotSearchResult ADD INDEX(identityScore);
+ALTER TABLE MascotSearchResult ADD INDEX(homologyScore);
+ALTER TABLE MascotSearchResult ADD INDEX(expect);
 
 CREATE TABLE ProLuCIDSearchResult (
    resultID INT UNSIGNED NOT NULL PRIMARY KEY,
@@ -735,6 +762,7 @@ CREATE TRIGGER msRunSearchResult_bdelete BEFORE DELETE ON msRunSearchResult
  BEGIN
    DELETE FROM msProteinMatch WHERE resultID = OLD.id;
    DELETE FROM SQTSearchResult WHERE resultID = OLD.id;
+   DELETE FROM MascotSearchResult WHERE resultID = OLD.id;
    DELETE FROM ProLuCIDSearchResult WHERE resultID = OLD.id;
    DELETE FROM msDynamicModResult WHERE resultID = OLD.id;
    DELETE FROM msTerminalDynamicModResult WHERE resultID = OLD.id;
@@ -835,6 +863,7 @@ CREATE TRIGGER msSearch_bdelete BEFORE DELETE ON msSearch
  BEGIN
    DELETE FROM msSearchDatabase WHERE searchID = OLD.id;
    DELETE FROM SQTParams WHERE searchID = OLD.id;
+   DELETE FROM MascotParams WHERE searchID = OLD.id;
    DELETE FROM ProLuCIDParams WHERE searchID = OLD.id;
    DELETE FROM msSearchEnzyme WHERE searchID = OLD.id;
    DELETE FROM msRunSearch WHERE searchID = OLD.id;

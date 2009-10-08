@@ -26,7 +26,7 @@ import org.yeastrc.ms.parser.sqtFile.SQTParseException;
  */
 public final class SequestResultPeptideBuilder implements PeptideResultBuilder {
 
-    public static final SequestResultPeptideBuilder instance = new SequestResultPeptideBuilder();
+    private static final SequestResultPeptideBuilder instance = new SequestResultPeptideBuilder();
 
     private SequestResultPeptideBuilder() {}
 

@@ -1,7 +1,7 @@
 /**
- * PepxmlSearchDataUploadService.java
+ * PepXmlSequestDataUploadService.java
  * @author Vagisha Sharma
- * Sep 13, 2009
+ * Oct 6, 2009
  * @version 1.0
  */
 package org.yeastrc.ms.service.pepxml;
@@ -11,6 +11,8 @@ import java.io.FilenameFilter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
-import org.yeastrc.ms.dao.search.sequest.ibatis.SequestSearchResultDAOImpl.SequestResultDataSqlMapParam;
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
@@ -39,20 +40,24 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModIds;
 import org.yeastrc.ms.domain.search.impl.ResultTerminalModIds;
 import org.yeastrc.ms.domain.search.impl.RunSearchBean;
 import org.yeastrc.ms.domain.search.impl.SearchResultProteinBean;
-import org.yeastrc.ms.domain.search.pepxml.PepXmlSearchScanIn;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.pepxml.sequest.PepXmlSequestSearchScanIn;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
+import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
+import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestResultDataWrap;
 import org.yeastrc.ms.parser.DataProviderException;
-import org.yeastrc.ms.parser.pepxml.PepXmlFileReader;
+import org.yeastrc.ms.parser.pepxml.PepXmlSequestFileReader;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
@@ -77,9 +82,9 @@ import org.yeastrc.ms.util.TimeUtils;
 /**
  * 
  */
-public class PepxmlSearchDataUploadService implements SearchDataUploadService {
+public class PepXmlSequestDataUploadService implements SearchDataUploadService {
 
-private static final int BUF_SIZE = 500;
+    private static final int BUF_SIZE = 500;
     
     private int experimentId;
     private int searchId;
@@ -112,7 +117,7 @@ private static final int BUF_SIZE = 500;
     private List<MsResultTerminalModIds> resultTerminalModList;
     private List<SequestResultDataWId> sequestResultDataList; // sequest scores
     
-    private MsSearchDatabaseIn db = null;
+//    private MsSearchDatabaseIn db = null;
     private boolean usesEvalue = false;
     private List<MsResidueModificationIn> dynaResidueMods;
     private List<MsTerminalModificationIn> dynaTermMods;
@@ -126,9 +131,9 @@ private static final int BUF_SIZE = 500;
     private PeptideProteinMatchingService matchService;
     
     
-    private static final Logger log = Logger.getLogger(PepxmlAnalysisDataUploadService.class.getName());
+    private static final Logger log = Logger.getLogger(PepXmlSequestDataUploadService.class.getName());
     
-    public PepxmlSearchDataUploadService() {
+    public PepXmlSequestDataUploadService() {
         
         this.searchDataFileNames = new ArrayList<String>();
         
@@ -311,7 +316,7 @@ private static final int BUF_SIZE = 500;
             
             long s = System.currentTimeMillis();
             log.info("Uploading search results in file: "+file);
-            PepXmlFileReader parser = new PepXmlFileReader();
+            PepXmlSequestFileReader parser = new PepXmlSequestFileReader();
             parser.setParseEvalue(this.usesEvalue);
             try {
                 parser.open(filePath);
@@ -324,22 +329,40 @@ private static final int BUF_SIZE = 500;
                 throw ex;
             }
             
+            // there should only be one run_search in this file
             try {
-                uploadRunSearch(filePath, searchId, runId, parser);
-                numSearchesUploaded++;
+                while(parser.hasNextRunSearch()) {
+                    
+                    // match the search parameters found in the file against those we uploaded
+                    // using the sequest.params file
+                    matchSearchParams(searchId, parser);
+                
+                    try {
+                        uploadRunSearch(filePath, searchId, runId, parser);
+                        numSearchesUploaded++;
+                    }
+                    catch (UploadException ex) {
+                        ex.appendErrorMessage("\n\tDELETING SEARCH ..."+searchId+"\n");
+                        deleteSearch(searchId);
+                        numSearchesUploaded = 0;
+                    
+                        throw ex;
+                    }
+                }
             }
-            catch (UploadException ex) {
-                ex.appendErrorMessage("\n\tDELETING SEARCH ..."+searchId+"\n");
+            catch (DataProviderException e) {
+                UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
+                ex.appendErrorMessage("\n\tDELETING SEARCH...\n");
                 deleteSearch(searchId);
                 numSearchesUploaded = 0;
-                
                 throw ex;
             }
-            finally {
-                parser.close();
-            }
+            
+            parser.close();
+            
             long e = System.currentTimeMillis();
             log.info("Finished uploading search results in file: "+file+"; Time: "+TimeUtils.timeElapsedSeconds(s, e));
+            
         }
         
         
@@ -355,6 +378,227 @@ private static final int BUF_SIZE = 500;
     }
     
 
+    private void matchSearchParams(int searchId, PepXmlSequestFileReader parser) throws UploadException {
+        
+        // load the search and its parameters, enzyme information, database information
+        // and modification information
+        SequestSearchDAO searchDao = DAOFactory.instance().getSequestSearchDAO();
+        SequestSearch search = searchDao.loadSearch(searchId);
+        
+        SequestSearchIn parsedSearch = parser.getSearch();
+        
+        // match enzyme information
+        List<MsEnzyme> uploadedEnzymes = search.getEnzymeList();
+        List<MsEnzymeIn> enzymes = parsedSearch.getEnzymeList();
+        matchEnzymes(uploadedEnzymes, enzymes, parser.getRunSearchName());
+        
+        // match database information
+        List<MsSearchDatabase> uploadedDbs = search.getSearchDatabases();
+        List<MsSearchDatabaseIn> databases = parsedSearch.getSearchDatabases();
+        matchDatabases(uploadedDbs, databases, parser.getRunSearchName());
+        
+        // match dynamic residue modification information
+        List<MsResidueModification> uploadedDynaResMods = search.getDynamicResidueMods();
+        List<MsResidueModificationIn> dynaResMods = parsedSearch.getDynamicResidueMods();
+        matchResidueModifictions(uploadedDynaResMods, dynaResMods, parser.getRunSearchName());
+        
+        // match static residue modification information
+        List<MsResidueModification> uploadedStaticResMods = search.getStaticResidueMods();
+        List<MsResidueModificationIn> staticResMods = parsedSearch.getStaticResidueMods();
+        matchResidueModifictions(uploadedStaticResMods, staticResMods, parser.getRunSearchName());
+        
+        // match dynamic terminal modification information
+        List<MsTerminalModification> uploadedDynaTermMods = search.getDynamicTerminalMods();
+        List<MsTerminalModificationIn> dynaTermMods = parsedSearch.getDynamicTerminalMods();
+        matchTerminalModifictions(uploadedDynaTermMods, dynaTermMods, parser.getRunSearchName());
+        
+        // match dynamic terminal modification information
+        List<MsTerminalModification> uploadedStaticTermMods = search.getStaticTerminalMods();
+        List<MsTerminalModificationIn> dynaStaticMods = parsedSearch.getStaticTerminalMods();
+        matchTerminalModifictions(uploadedStaticTermMods, dynaStaticMods, parser.getRunSearchName());
+        
+        // TODO do we need to match some other key parameters e.g. min_enzymatic_termini etc. 
+    }
+
+    private void matchTerminalModifictions(
+            List<MsTerminalModification> uploadedTermMods,
+            List<MsTerminalModificationIn> termMods, String fileName) throws UploadException {
+
+        if(uploadedTermMods.size() != uploadedTermMods.size()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Number of terminal modification in sequest.params: "+uploadedTermMods.size()+
+                    " does not match # found in file "+fileName+": "+uploadedTermMods.size());
+            throw ex;
+        }
+        
+        if(uploadedTermMods.size() == 0)
+            return;
+        
+        Collections.sort(uploadedTermMods, new Comparator<MsTerminalModification>() {
+            public int compare(MsTerminalModification o1, MsTerminalModification o2) {
+                int val = o1.getModifiedTerminal().compareTo(o2.getModifiedTerminal());
+                if(val != 0) return val;
+                return o1.getModificationMass().compareTo(o2.getModificationMass());
+            }});
+        Collections.sort(uploadedTermMods, new Comparator<MsTerminalModificationIn>() {
+            public int compare(MsTerminalModificationIn o1, MsTerminalModificationIn o2) {
+                int val = o1.getModifiedTerminal().compareTo(o2.getModifiedTerminal());
+                if(val != 0) return val;
+                return o1.getModificationMass().compareTo(o2.getModificationMass());
+            }});
+        
+        for(int i = 0; i < uploadedTermMods.size(); i++) {
+            if(!matchTerminalModification(uploadedTermMods.get(i), uploadedTermMods.get(i))) {
+                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                ex.setErrorMessage("Mismatching terminal modifications in sequest.params and file: "+fileName);
+                throw ex;
+            }
+        }
+    }
+    
+    private boolean matchTerminalModification(MsTerminalModification mod1, MsTerminalModificationIn mod2) {
+        
+        if(mod1.getModifiedTerminal() != mod2.getModifiedTerminal())
+            return false;
+        if(!mod1.getModificationMass().equals(mod2.getModificationMass()))
+            return false;
+        return true;
+    }
+
+
+    private void matchResidueModifictions(
+            List<MsResidueModification> uploadedResMods,
+            List<MsResidueModificationIn> resMods, String fileName) throws UploadException {
+        
+        if(uploadedResMods.size() != resMods.size()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Number of residue modification in sequest.params: "+uploadedResMods.size()+
+                    " does not match # found in file "+fileName+": "+resMods.size());
+            throw ex;
+        }
+        
+        if(uploadedResMods.size() == 0)
+            return;
+        
+        Collections.sort(uploadedResMods, new Comparator<MsResidueModification>() {
+            public int compare(MsResidueModification o1, MsResidueModification o2) {
+                int val = Character.valueOf(o1.getModifiedResidue()).compareTo(o2.getModifiedResidue());
+                if(val != 0) return val;
+                return o1.getModificationMass().compareTo(o2.getModificationMass());
+            }});
+        Collections.sort(resMods, new Comparator<MsResidueModificationIn>() {
+            public int compare(MsResidueModificationIn o1, MsResidueModificationIn o2) {
+                int val = Character.valueOf(o1.getModifiedResidue()).compareTo(o2.getModifiedResidue());
+                if(val != 0) return val;
+                return o1.getModificationMass().compareTo(o2.getModificationMass());
+            }});
+        
+        for(int i = 0; i < uploadedResMods.size(); i++) {
+            if(!matchResidueModification(uploadedResMods.get(i), resMods.get(i))) {
+                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                ex.setErrorMessage("Mismatching dynamic modifications in sequest.params and file: "+fileName);
+                throw ex;
+            }
+        }
+    }
+    
+    private boolean matchResidueModification(MsResidueModification mod1, MsResidueModificationIn mod2) {
+        
+        if(mod1.getModifiedResidue() != mod2.getModifiedResidue()) {
+            log.warn("Mismatch: uploaded modified residue: "+mod1.getModifiedResidue()+"; in file: "+mod2.getModifiedResidue());
+            return false;
+        }
+        if(mod1.getModificationSymbol() != mod2.getModificationSymbol()) {
+            log.warn("Mismatch: uploaded modification symbol "+mod1.getModificationSymbol()+"; in file: "+mod2.getModificationSymbol());
+            return false;
+        }
+        if(Math.abs(mod1.getModificationMass().doubleValue() - mod2.getModificationMass().doubleValue()) > 0.05) {
+            log.warn("Mismatch: uploaded modification mass: "+mod1.getModificationMass()+"; in file: "+mod2.getModificationMass());
+            return false;
+        }
+        return true;
+    }
+
+    private void matchDatabases(List<MsSearchDatabase> uploadedDbs,
+            List<MsSearchDatabaseIn> databases, String fileName) throws UploadException {
+        
+        if(uploadedDbs.size() != databases.size()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Number of search databases in sequest.params: "+uploadedDbs.size()+
+                    " does not match # databases in file "+fileName+": "+databases.size());
+            throw ex;
+        }
+        
+        Collections.sort(uploadedDbs, new Comparator<MsSearchDatabase>() {
+            public int compare(MsSearchDatabase o1, MsSearchDatabase o2) {
+                return o1.getDatabaseFileName().compareTo(o2.getDatabaseFileName());
+            }});
+        Collections.sort(databases, new Comparator<MsSearchDatabaseIn>() {
+            public int compare(MsSearchDatabaseIn o1, MsSearchDatabaseIn o2) {
+                return o1.getDatabaseFileName().compareTo(o2.getDatabaseFileName());
+            }});
+        for(int i = 0; i < uploadedDbs.size(); i++) {
+            if(!uploadedDbs.get(i).getDatabaseFileName().equals(databases.get(i).getDatabaseFileName())) {
+                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                ex.setErrorMessage("Mismatching databases in sequest.params and file: "+fileName);
+                ex.appendErrorMessage("In sequest.params: "+uploadedDbs.get(i).getDatabaseFileName());
+                ex.appendErrorMessage("In file: "+databases.get(i).getDatabaseFileName());
+                throw ex;
+            }
+        }
+    }
+
+    private void matchEnzymes(List<MsEnzyme> uploadedEnzymes,
+            List<MsEnzymeIn> enzymes, String fileName) throws UploadException {
+        
+        if(uploadedEnzymes.size() != enzymes.size()) {
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage("Number of enzymes in sequest.params: "+uploadedEnzymes.size()+
+                    " does not match # enzymes in file "+fileName+": "+enzymes.size());
+            throw ex;
+        }
+        
+        if(uploadedEnzymes.size() == 0)
+            return;
+        
+        Collections.sort(uploadedEnzymes, new Comparator<MsEnzyme>() {
+            public int compare(MsEnzyme o1, MsEnzyme o2) {
+                return o1.getName().compareTo(o2.getName());
+            }});
+        Collections.sort(enzymes, new Comparator<MsEnzymeIn>() {
+            public int compare(MsEnzymeIn o1, MsEnzymeIn o2) {
+                return o1.getName().compareTo(o2.getName());
+            }});
+        for(int i = 0; i < uploadedEnzymes.size(); i++) {
+//            if(!matchEnzyme(uploadedEnzymes.get(i), enzymes.get(i))) {
+//                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+//                ex.setErrorMessage("Mismatching enzymes in sequest.params and file: "+fileName);
+//                throw ex;
+//            }
+        }
+    }
+    
+    private boolean matchEnzyme(MsEnzyme enzyme1, MsEnzymeIn enzyme2) {
+        if(!enzyme1.getName().equals(enzyme2.getName())) {
+            log.info("Enzyme names do not match");
+            return false;
+        }
+        if(!enzyme1.getCut().equals(enzyme2.getCut())) {
+            log.info("Enzyme cut does not match");
+            return false;
+        }
+        if(!enzyme1.getNocut().equals(enzyme2.getNocut())) {
+            log.info("Enzyme nocut does not match");
+            return false;
+        }
+        if(enzyme1.getSense() != enzyme2.getSense()) {
+            log.info("Enzyme sense does not match");
+            return false;
+        }
+        return true;
+        
+    }
+
     private int getScanId(int runId, int scanNumber)
             throws UploadException {
 
@@ -369,7 +613,7 @@ private static final int BUF_SIZE = 500;
     
     
     private void uploadRunSearch(String filename, int searchId, int runId,
-            PepXmlFileReader parser) throws UploadException {
+            PepXmlSequestFileReader parser) throws UploadException {
         
         int runSearchId = uploadRunSearchHeader(searchId, runId, parser);
         
@@ -382,7 +626,7 @@ private static final int BUF_SIZE = 500;
         int numResults = 0;
         try {
             while(parser.hasNextSearchScan()) {
-                PepXmlSearchScanIn scan = parser.getNextSearchScan();
+                PepXmlSequestSearchScanIn scan = parser.getNextSearchScan();
                 
                 int scanId = getScanId(runId, scan.getScanNumber());
                 
@@ -390,19 +634,15 @@ private static final int BUF_SIZE = 500;
                     // If the refresh parser has not been run, find alternative matches for the peptide
                     if(!parser.isRefreshParserRun()) {
                         
-                        List<PeptideProteinMatch> matches = proteinMatches.get(result.getResultPeptide().getPeptideSequence());
+                        SequestSearchResultIn sres = result.getSearchResult();
+                        String peptideSeq = sres.getResultPeptide().getPeptideSequence();
+                        List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
                         if(matches == null) {
-                            matches = matchService.getMatchingProteins(result.getResultPeptide().getPeptideSequence());
-                            proteinMatches.put(result.getResultPeptide().getPeptideSequence(), matches);
+                            matches = matchService.getMatchingProteins(peptideSeq);
+                            proteinMatches.put(peptideSeq, matches);
                         }
-//                        else {
-//                            log.info("Already found matches");
-//                        }
-//                        if(proteinMatches.size()%10 == 0) {
-//                            log.info("Found matches for "+proteinMatches.size()+" peptides");
-//                        }
                         
-                        List<MsSearchResultProteinIn> protList = result.getProteinMatchList();
+                        List<MsSearchResultProteinIn> protList = sres.getProteinMatchList();
                         
                         for(PeptideProteinMatch match: matches) {
                             boolean haveAlready = false;
@@ -418,12 +658,12 @@ private static final int BUF_SIZE = 500;
                             locus.setNtermResidue(match.getPreResidue());
                             locus.setCtermResidue(match.getPostResidue());
                             locus.setNumEnzymaticTermini(match.getNumEnzymaticTermini());
-                            result.addMatchingProteinMatch(locus);
+                            sres.addMatchingProteinMatch(locus);
 
                         }
                     }
-                    int resultId = uploadBaseSearchResult(result, runSearchId, scanId);
-                    uploadSequestResultData(result.getSequestResultData(), resultId); // Sequest scores
+                    int resultId = uploadBaseSearchResult(result.getSearchResult(), runSearchId, scanId);
+                    uploadSequestResultData(result.getSearchResult().getSequestResultData(), resultId); // Sequest scores
                     numResults++;
                 }
             }
@@ -502,7 +742,7 @@ private static final int BUF_SIZE = 500;
             uploadSequestResultBuffer();
         }
         // add the Sequest specific information for this result to the cache
-        SequestResultDataSqlMapParam resultDataDb = new SequestResultDataSqlMapParam(resultId, resultData);
+        SequestResultDataWrap resultDataDb = new SequestResultDataWrap(resultData, resultId);
         sequestResultDataList.add(resultDataDb);
     }
     
@@ -715,19 +955,19 @@ private static final int BUF_SIZE = 500;
     // UPLOAD DATA INTO THE msRunSearch TABLE
     // -------------------------------------------------------------------------------
     private int uploadRunSearchHeader(int searchId, int runId,
-            PepXmlFileReader parser) throws UploadException {
+            PepXmlSequestFileReader parser) throws UploadException {
         
-        MsRunSearchIn search;
+        MsRunSearchIn runSearch;
         try {
-            search = parser.getSearchHeader();
+            runSearch = parser.getRunSearchHeader();
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
             ex.setErrorMessage(e.getMessage());
             throw ex;
         }
-        if(search instanceof RunSearchBean) {
-            RunSearchBean rsb = (RunSearchBean) search;
+        if(runSearch instanceof RunSearchBean) {
+            RunSearchBean rsb = (RunSearchBean) runSearch;
             rsb.setRunId(runId);
             rsb.setSearchId(searchId);
             rsb.setSearchDate(new java.sql.Date(searchDate.getTime()));
@@ -767,7 +1007,6 @@ private static final int BUF_SIZE = 500;
         SequestParamsParser parser = parseSequestParams(paramFileDirectory, remoteServer);
         
         usesEvalue = parser.reportEvalue();
-        db = parser.getSearchDatabase();
         dynaResidueMods = parser.getDynamicResidueMods();
         dynaTermMods = parser.getDynamicTerminalMods();
         
@@ -832,9 +1071,10 @@ private static final int BUF_SIZE = 500;
     
     private static SequestSearchIn makeSearchObject(final SequestParamsParser parser, final Program searchProgram,
                 final String remoteDirectory, final java.util.Date searchDate) {
+        
         return new SequestSearchIn() {
             @Override
-            public List<SequestParam> getSequestParams() {return parser.getParamList();}
+            public List<Param> getSequestParams() {return parser.getParamList();}
             @Override
             public List<MsResidueModificationIn> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
             @Override
@@ -879,7 +1119,6 @@ private static final int BUF_SIZE = 500;
         usesEvalue = false;
         dynaResidueMods.clear();
         dynaTermMods.clear();
-        db = null;
     }
 
     // called before uploading each msms_run_search in the interact.pep.xml file and in the reset() method.
@@ -925,12 +1164,19 @@ private static final int BUF_SIZE = 500;
     }
     
     public static void main(String[] args) throws UploadException {
-        PepxmlSearchDataUploadService p = new PepxmlSearchDataUploadService();
+        PepXmlSequestDataUploadService p = new PepXmlSequestDataUploadService();
         List<String> spectrumFileNames = new ArrayList<String>();
+        
+        spectrumFileNames.add("M_102908_Y_Lys_ETD_EPI_contol");
+        spectrumFileNames.add("M_102908_Y_Lys_ETD_EPI_poly2");
+        spectrumFileNames.add("M_121808_Yeast_LysC_ETD_EPIQ_01");
+        spectrumFileNames.add("M_123008_Yeast_short_ETD_EPI_01");
+        spectrumFileNames.add("M_123008_Yeast_short_ETD_EPI_02");
         spectrumFileNames.add("M_123008_Yeast_short_ETD_EPI_03");
+        
         p.setSpectrumFileNames(spectrumFileNames);
         
-        p.setDirectory("/Users/silmaril/WORK/UW/FLINT/Jimmy_Test/PROT_MATCH_TEST");
+        p.setDirectory("/Users/silmaril/WORK/UW/FLINT/Jimmy_Test");
         p.setSearchDate(new Date());
         p.setExperimentId(37);
         p.upload();

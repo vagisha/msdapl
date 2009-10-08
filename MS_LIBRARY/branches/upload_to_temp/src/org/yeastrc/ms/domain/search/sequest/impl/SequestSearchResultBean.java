@@ -68,7 +68,7 @@ public class SequestSearchResultBean extends SearchResultBean implements Sequest
      * @param xcorrRank the xCorrRank to set
      */
     public void setxCorrRank(int xcorrRank) {
-        sequestData.setXcorrRank(xcorrRank);
+        sequestData.setxCorrRank(xcorrRank);
     }
     
     /**
@@ -96,7 +96,7 @@ public class SequestSearchResultBean extends SearchResultBean implements Sequest
      * @param xcorr the xCorr to set
      */
     public void setxCorr(BigDecimal xcorr) {
-        sequestData.setXcorr(xcorr);
+        sequestData.setxCorr(xcorr);
     }
     
     /**

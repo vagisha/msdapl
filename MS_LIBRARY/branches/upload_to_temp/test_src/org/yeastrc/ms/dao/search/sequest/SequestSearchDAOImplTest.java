@@ -103,7 +103,7 @@ public class SequestSearchDAOImplTest extends SQTBaseDAOTestCase {
             this.params = params;
         }
         @Override
-        public List<SequestParam> getSequestParams() {
+        public List<SequestParam> getMascotParams() {
             return params;
         }
         

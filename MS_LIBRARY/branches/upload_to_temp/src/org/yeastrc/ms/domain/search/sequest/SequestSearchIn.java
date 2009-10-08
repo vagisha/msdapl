@@ -9,11 +9,12 @@ package org.yeastrc.ms.domain.search.sequest;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsSearchIn;
+import org.yeastrc.ms.domain.search.Param;
 
 /**
  * 
  */
 public interface SequestSearchIn extends MsSearchIn {
     
-    public abstract List<SequestParam> getSequestParams();
+    public abstract List<Param> getSequestParams();
 }

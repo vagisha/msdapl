@@ -12,11 +12,13 @@ import org.yeastrc.ms.domain.search.pepxml.PepXmlSearchScanIn;
 /**
  * 
  */
-public interface PepxmlDataProvider <T extends PepXmlSearchScanIn> {
+public interface PepxmlDataProvider <T extends PepXmlSearchScanIn<?, ?>> {
 
-    public abstract String getFileName();
+    public abstract boolean hasNextRunSearch() throws DataProviderException;
     
-    public abstract MsRunSearchIn getSearchHeader() throws DataProviderException;
+    public abstract String getRunSearchName();
+    
+    public abstract MsRunSearchIn getRunSearchHeader() throws DataProviderException;
     
     public abstract boolean hasNextSearchScan() throws DataProviderException;
     

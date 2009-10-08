@@ -22,14 +22,21 @@ public interface MsSearchResultPeptide {
      */
     public abstract List<MsResultResidueMod> getResultDynamicResidueModifications();
     
+    public abstract void setDynamicResidueModifications(List<MsResultResidueMod> dynaMods);
+    
     /**
      * Returns a list of dynamic terminal modifications.
      * @return
      */
     public abstract List<MsResultTerminalMod> getResultDynamicTerminalModifications();
 
+    public abstract void setDynamicTerminalModifications(List<MsResultTerminalMod> termDynaMods);
+    
     
     public abstract String getPeptideSequence();
+    
+    public abstract void setPeptideSequence(String sequence);
+    
     
     /**
      * Returns the modified peptide sequence: e.g. PEP[80]TIDE
@@ -59,7 +66,13 @@ public interface MsSearchResultPeptide {
     
     public abstract char getPreResidue();
     
+    public abstract void setPreResidue(char preResidue);
+    
+    
     public abstract char getPostResidue();
+    
+    public abstract void setPostResidue(char postResidue);
+    
     
     public abstract int getSequenceLength();
 }

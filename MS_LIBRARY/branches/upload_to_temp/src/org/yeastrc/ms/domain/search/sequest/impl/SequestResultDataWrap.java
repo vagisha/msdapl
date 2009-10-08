@@ -9,12 +9,13 @@ package org.yeastrc.ms.domain.search.sequest.impl;
 import java.math.BigDecimal;
 
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
+import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 
 
 /**
  * 
  */
-public class SequestResultDataWrap implements SequestResultData {
+public class SequestResultDataWrap implements SequestResultDataWId {
 
     private int resultId;
     private SequestResultData data;
@@ -76,5 +77,55 @@ public class SequestResultDataWrap implements SequestResultData {
     @Override
     public BigDecimal getDeltaCNstar() {
         return data.getDeltaCNstar();
+    }
+
+    @Override
+    public void setCalculatedMass(BigDecimal mass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setDeltaCN(BigDecimal deltaCn) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setDeltaCNstar(BigDecimal dcnStar) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setEvalue(Double evalue) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setMatchingIons(int matchingIons) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPredictedIons(int predictedIons) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSp(BigDecimal sp) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSpRank(int rank) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setxCorr(BigDecimal xcorr) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setxCorrRank(int rank) {
+        throw new UnsupportedOperationException();
     }
 }

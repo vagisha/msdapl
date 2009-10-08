@@ -53,6 +53,10 @@ import org.yeastrc.ms.dao.search.ibatis.MsSearchDatabaseDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchModificationDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.ibatis.MsSearchResultProteinDAOImpl;
+import org.yeastrc.ms.dao.search.mascot.MascotSearchDAO;
+import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
+import org.yeastrc.ms.dao.search.mascot.ibatis.MascotSearchDAOImpl;
+import org.yeastrc.ms.dao.search.mascot.ibatis.MascotSearchResultDAOImpl;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ibatis.ProlucidSearchDAOImpl;
@@ -151,6 +155,10 @@ public class DAOFactory {
     private SequestSearchResultDAO sequestResultDAO;
     private SequestSearchDAO sequestSearchDAO;
     
+    // DAOs for Mascot related objects
+    private MascotSearchResultDAO mascotResultDAO;
+    private MascotSearchDAO mascotSearchDAO;
+    
     // DAOs for Prolucid related objects
     private ProlucidSearchResultDAO prolucidResultDAO;
     private ProlucidSearchDAO prolucidSearchDAO;
@@ -204,6 +212,10 @@ public class DAOFactory {
         // sequest search related
         sequestResultDAO = new SequestSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
         sequestSearchDAO = new SequestSearchDAOImpl(sqlMap, searchDAO);
+        
+        // mascot search related
+        mascotResultDAO = new MascotSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
+        mascotSearchDAO = new MascotSearchDAOImpl(sqlMap, searchDAO);
         
         // prolucid search related
         prolucidResultDAO = new ProlucidSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
@@ -335,6 +347,17 @@ public class DAOFactory {
     
     public SequestSearchDAO getSequestSearchDAO() {
         return sequestSearchDAO;
+    }
+    
+    //-------------------------------------------------------------------------------------------
+    // Mascot SEARCH related
+    //-------------------------------------------------------------------------------------------
+    public MascotSearchResultDAO getMascotResultDAO() {
+        return mascotResultDAO;
+    }
+    
+    public MascotSearchDAO getMascotSearchDAO() {
+        return mascotSearchDAO;
     }
     
     //-------------------------------------------------------------------------------------------

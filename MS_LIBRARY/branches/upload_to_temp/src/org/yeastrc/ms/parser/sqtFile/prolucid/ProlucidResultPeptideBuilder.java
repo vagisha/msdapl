@@ -30,7 +30,7 @@ import org.yeastrc.ms.parser.sqtFile.SQTParseException;
  */
 public final class ProlucidResultPeptideBuilder implements PeptideResultBuilder {
 
-    public static final ProlucidResultPeptideBuilder instance = new ProlucidResultPeptideBuilder();
+    private static final ProlucidResultPeptideBuilder instance = new ProlucidResultPeptideBuilder();
     
     static final Pattern singleMod = Pattern.compile("\\(([+|-]?\\d+\\.?\\d*)\\)");
     static final Pattern multipleMods = Pattern.compile("("+singleMod.toString()+")+");

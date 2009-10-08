@@ -11,6 +11,6 @@ import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 /**
  * 
  */
-public interface SequestPeptideProphetResultIn extends SequestSearchResultIn, PeptideProphetResultIn {
+public interface SequestPeptideProphetResultIn extends GenericPeptideProphetResultIn<SequestSearchResultIn> {
 
 }

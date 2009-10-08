@@ -15,7 +15,7 @@ import org.yeastrc.ms.domain.search.sequest.SequestResultData;
  */
 public class SequestResultDataBean implements SequestResultData {
 
-    private BigDecimal calculatedMass;
+    private BigDecimal calculatedMass;  // Calculated M+H+ value for this sequence
     private BigDecimal deltaCN;
     private BigDecimal deltaCNstar;
     private int matchingIons = -1;
@@ -109,12 +109,11 @@ public class SequestResultDataBean implements SequestResultData {
         this.evalue = evalue;
     }
 
-    public void setXcorr(BigDecimal xcorr) {
+    public void setxCorr(BigDecimal xcorr) {
         this.xcorr = xcorr;
     }
 
-    public void setXcorrRank(int xcorrRank) {
+    public void setxCorrRank(int xcorrRank) {
         this.xcorrRank = xcorrRank;
     }
-    
 }

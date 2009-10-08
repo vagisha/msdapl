@@ -5,13 +5,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
+import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestResult;
+import org.yeastrc.ms.parser.sqtFile.SQTParseException;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 
 
 public class DbTest {
@@ -21,6 +25,8 @@ public class DbTest {
 
     private static Random rndgen = new Random( 19580427 );
 
+    private SequestResultPeptideBuilder builder = SequestResultPeptideBuilder.instance();
+    
     public static void main(String[] args) throws SQLException {
         DbTest test = new DbTest();
         
@@ -128,10 +134,20 @@ public class DbTest {
 
     private SequestResult makeSearchResult(int charge,
             double observedMass) {
-        SequestResult result = new SequestResult(new ArrayList<MsResidueModificationIn>(0));
+        SequestResult result = new SequestResult();
         result.setCharge(charge);
         result.setObservedMass(new BigDecimal(observedMass));
-        result.setOriginalPeptideSequence(generateResidue()+"."+generatePeptide()+"."+generateResidue());
+        
+        String origSequence = generateResidue()+"."+generatePeptide()+"."+generateResidue();
+        result.setOriginalPeptideSequence(origSequence);
+        try {
+            builder.build(origSequence, 
+                    new ArrayList<MsResidueModificationIn>(0), 
+                    new ArrayList<MsTerminalModificationIn>(0));
+        }
+        catch (SQTParseException e) {
+            e.printStackTrace();
+        }
         return result;
     }
 

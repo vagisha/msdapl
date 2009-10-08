@@ -31,11 +31,11 @@ import org.yeastrc.ms.domain.search.ResultSortCriteria;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
-import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sequest.SequestResultFilterCriteria;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestResultDataWrap;
 import org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -667,7 +667,7 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
         int resultId = resultDao.save(searchId, searchResult, runSearchId, scanId);
         
         // now save the Sequest specific information
-        SequestResultDataSqlMapParam resultDb = new SequestResultDataSqlMapParam(resultId, searchResult.getSequestResultData());
+        SequestResultDataWrap resultDb = new SequestResultDataWrap(searchResult.getSequestResultData(), resultId);
         save("SequestResult.insert", resultDb);
         return resultId;
     }
@@ -764,61 +764,6 @@ public class SequestSearchResultDAOImpl extends BaseSqlMapDAO implements Sequest
             catch(SQLException e){}
             try {if(stmt != null) stmt.close();}
             catch(SQLException e){}
-        }
-    }
-    
-    public static final class SequestResultDataSqlMapParam implements SequestResultDataWId {
-        
-        private int resultId;
-        private SequestResultData result;
-        
-        public SequestResultDataSqlMapParam(int resultId, SequestResultData result) {
-            this.resultId = resultId;
-            this.result = result;
-        }
-
-        public int getResultId() {
-            return resultId;
-        }
-
-        public BigDecimal getDeltaCN() {
-            return result.getDeltaCN();
-        }
-
-        public BigDecimal getSp() {
-            return result.getSp();
-        }
-
-        public int getSpRank() {
-            return result.getSpRank();
-        }
-
-        public BigDecimal getxCorr() {
-            return result.getxCorr();
-        }
-
-        public int getxCorrRank() {
-            return result.getxCorrRank();
-        }
-
-        public BigDecimal getCalculatedMass() {
-            return result.getCalculatedMass();
-        }
-
-        public int getMatchingIons() {
-            return result.getMatchingIons();
-        }
-
-        public int getPredictedIons() {
-            return result.getPredictedIons();
-        }
-
-        public Double getEvalue() {
-            return result.getEvalue();
-        }
-
-        public BigDecimal getDeltaCNstar() {
-            return result.getDeltaCNstar();
         }
     }
 }

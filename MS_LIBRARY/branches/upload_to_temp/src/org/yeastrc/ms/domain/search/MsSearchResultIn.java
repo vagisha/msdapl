@@ -11,6 +11,8 @@ public interface MsSearchResultIn extends MsRunSearchResultBase {
      */
     public abstract int getScanNumber();
     
+    public abstract void setScanNumber(int scanNumber);
+    
     /**
      * @return the proteinMatchList
      */
@@ -28,15 +30,21 @@ interface MsRunSearchResultBase {
      */
     public abstract MsSearchResultPeptide getResultPeptide();
     
+    public abstract void setResultPeptide(MsSearchResultPeptide resultPeptide);
+    
     /**
      * @return the charge
      */
     public abstract int getCharge();
     
+    public abstract void setCharge(int charge);
+    
     /**
      * @return the observedMass
      */
     public abstract BigDecimal getObservedMass();
+    
+    public abstract void setObservedMass(BigDecimal mass);
 
     /**
      * @return the validationStatus

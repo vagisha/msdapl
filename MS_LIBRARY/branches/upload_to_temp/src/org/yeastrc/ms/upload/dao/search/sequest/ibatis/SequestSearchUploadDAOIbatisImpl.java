@@ -9,8 +9,8 @@ package org.yeastrc.ms.upload.dao.search.sequest.ibatis;
 import java.util.List;
 
 import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestSearch;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.upload.dao.search.MsSearchUploadDAO;
@@ -40,7 +40,7 @@ public class SequestSearchUploadDAOIbatisImpl extends BaseSqlMapDAO implements S
         
         // save sequest search parameters
         try {
-            for (SequestParam param: search.getSequestParams()) {
+            for (Param param: search.getSequestParams()) {
                 save("SequestSearch.insertParams", new SequestParamSqlMapParam(searchId, param));
             }
         }
@@ -72,12 +72,12 @@ public class SequestSearchUploadDAOIbatisImpl extends BaseSqlMapDAO implements S
     }
 
     
-    public static final class SequestParamSqlMapParam implements SequestParam {
+    public static final class SequestParamSqlMapParam implements Param {
 
         private int searchId;
-        private SequestParam param;
+        private Param param;
         
-        public SequestParamSqlMapParam(int searchId, SequestParam param) {
+        public SequestParamSqlMapParam(int searchId, Param param) {
             this.searchId = searchId;
             this.param = param;
         }

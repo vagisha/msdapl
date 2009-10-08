@@ -77,6 +77,12 @@ import org.yeastrc.ms.upload.dao.search.ibatis.MsSearchModificationUploadDAOIbat
 import org.yeastrc.ms.upload.dao.search.ibatis.MsSearchResultProteinUploadDAOIbatisImpl;
 import org.yeastrc.ms.upload.dao.search.ibatis.MsSearchResultUploadDAOIbatisImpl;
 import org.yeastrc.ms.upload.dao.search.ibatis.MsSearchUploadDAOIbatisImpl;
+import org.yeastrc.ms.upload.dao.search.mascot.MascotSearchResultUploadDAO;
+import org.yeastrc.ms.upload.dao.search.mascot.MascotSearchUploadDAO;
+import org.yeastrc.ms.upload.dao.search.mascot.dualdb.MascotSearchResultUploadDAOImpl;
+import org.yeastrc.ms.upload.dao.search.mascot.dualdb.MascotSearchUploadDAOImpl;
+import org.yeastrc.ms.upload.dao.search.mascot.ibatis.MascotSearchResultUploadDAOIbatisImpl;
+import org.yeastrc.ms.upload.dao.search.mascot.ibatis.MascotSearchUploadDAOIbatisImpl;
 import org.yeastrc.ms.upload.dao.search.prolucid.ProlucidSearchResultUploadDAO;
 import org.yeastrc.ms.upload.dao.search.prolucid.ProlucidSearchUploadDAO;
 import org.yeastrc.ms.upload.dao.search.prolucid.dualdb.ProlucidSearchResultUploadDAOImpl;
@@ -191,6 +197,10 @@ public class UploadDAOFactory {
     private SequestSearchResultUploadDAO sequestResultDAO;
     private SequestSearchUploadDAO sequestSearchDAO;
     
+    // DAOs for Sequest related objects
+    private MascotSearchResultUploadDAO mascotResultDAO;
+    private MascotSearchUploadDAO mascotSearchDAO;
+    
     // DAOs for Prolucid related objects
     private ProlucidSearchResultUploadDAO prolucidResultDAO;
     private ProlucidSearchUploadDAO prolucidSearchDAO;
@@ -293,6 +303,12 @@ public class UploadDAOFactory {
         SequestSearchUploadDAO seqSDao = new SequestSearchUploadDAOIbatisImpl(tempSqlMap, searchDAO);
         sequestSearchDAO = new SequestSearchUploadDAOImpl(seqSDao, true);
         
+        // mascot search related
+        MascotSearchResultUploadDAO mascotRDao = new MascotSearchResultUploadDAOIbatisImpl(tempSqlMap, searchResultDAO);
+        mascotResultDAO = new MascotSearchResultUploadDAOImpl(mascotRDao, true);
+        MascotSearchUploadDAO mascotSDao = new MascotSearchUploadDAOIbatisImpl(tempSqlMap, searchDAO);
+        mascotSearchDAO = new MascotSearchUploadDAOImpl(mascotSDao, true);
+        
         // prolucid search related
         ProlucidSearchResultUploadDAO proRDao = new ProlucidSearchResultUploadDAOIbatisImpl(tempSqlMap, searchResultDAO);
         prolucidResultDAO = new ProlucidSearchResultUploadDAOImpl(proRDao, true);
@@ -353,6 +369,10 @@ public class UploadDAOFactory {
         // sequest search related
         sequestResultDAO = new SequestSearchResultUploadDAOIbatisImpl(sqlMap, searchResultDAO);
         sequestSearchDAO = new SequestSearchUploadDAOIbatisImpl(sqlMap, searchDAO);
+        
+        // mascot search related
+        mascotResultDAO = new MascotSearchResultUploadDAOIbatisImpl(sqlMap, searchResultDAO);
+        mascotSearchDAO = new MascotSearchUploadDAOIbatisImpl(sqlMap, searchDAO);
         
         // prolucid search related
         prolucidResultDAO = new ProlucidSearchResultUploadDAOIbatisImpl(sqlMap, searchResultDAO);
@@ -488,6 +508,17 @@ public class UploadDAOFactory {
     
     public SequestSearchUploadDAO getSequestSearchDAO() {
         return sequestSearchDAO;
+    }
+    
+    //-------------------------------------------------------------------------------------------
+    // Mascot SEARCH related
+    //-------------------------------------------------------------------------------------------
+    public MascotSearchResultUploadDAO getMascotResultDAO() {
+        return mascotResultDAO;
+    }
+    
+    public MascotSearchUploadDAO getMascotSearchDAO() {
+        return mascotSearchDAO;
     }
     
     //-------------------------------------------------------------------------------------------

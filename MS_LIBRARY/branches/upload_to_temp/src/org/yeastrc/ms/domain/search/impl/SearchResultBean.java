@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.ValidationStatus;
 
@@ -30,7 +31,7 @@ public class SearchResultBean implements MsSearchResult {
 
     private List<MsSearchResultProtein> proteinMatchList;
 
-    private SearchResultPeptideBean resultPeptide;
+    private MsSearchResultPeptide resultPeptide;
 
 
     public SearchResultBean() {
@@ -119,11 +120,11 @@ public class SearchResultBean implements MsSearchResult {
     // ----------------------------------------------------------------------------------------
     // Peptide sequence information for this result
     // ----------------------------------------------------------------------------------------
-    public SearchResultPeptideBean getResultPeptide() {
+    public MsSearchResultPeptide getResultPeptide() {
         return resultPeptide;
     }
     
-    public void setResultPeptide(SearchResultPeptideBean peptide) {
+    public void setResultPeptide(MsSearchResultPeptide peptide) {
         this.resultPeptide = peptide;
     }
     

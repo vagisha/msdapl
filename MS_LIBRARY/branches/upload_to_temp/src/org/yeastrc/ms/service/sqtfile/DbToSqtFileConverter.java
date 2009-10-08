@@ -35,13 +35,13 @@ import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestResult;
 import org.yeastrc.ms.domain.search.sqtfile.SQTHeaderItem;
 import org.yeastrc.ms.domain.search.sqtfile.SQTRunSearch;
 import org.yeastrc.ms.domain.search.sqtfile.SQTSearchScan;
 import org.yeastrc.ms.parser.sqtFile.SQTHeader;
 import org.yeastrc.ms.parser.sqtFile.SQTParseException;
 import org.yeastrc.ms.parser.sqtFile.SearchScan;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestResult;
 
 /**
  * 
@@ -118,20 +118,21 @@ public class DbToSqtFileConverter {
             for (MsResidueModification modDb: dynaResidueModsDb) {
                 dynaResidueMods.add(modDb);
             }
-            SequestResult peptResult = new SequestResult(dynaResidueMods);
+            SequestResult peptResult = new SequestResult();
+            peptResult.setResultPeptide(result.getResultPeptide());
             SequestResultData data = result.getSequestResultData();
             peptResult.setCharge(result.getCharge());
             peptResult.setObservedMass(result.getObservedMass());
             peptResult.setDeltaCN(data.getDeltaCN());
             peptResult.setCalculatedMass(data.getCalculatedMass());
-            peptResult.setNumMatchingIons(data.getMatchingIons());
-            peptResult.setNumPredictedIons(data.getPredictedIons());
+            peptResult.setMatchingIons(data.getMatchingIons());
+            peptResult.setPredictedIons(data.getPredictedIons());
             peptResult.setOriginalPeptideSequence(reconstructSequestPeptideSequence(runSearch.getSearchId(), result));
             peptResult.setScanNumber(currScan.getScanNumber());
             peptResult.setSp(data.getSp());
             peptResult.setSpRank(data.getSpRank());
             peptResult.setValidationStatus(result.getValidationStatus().getStatusChar());
-            peptResult.setXcorr(data.getxCorr());
+            peptResult.setxCorr(data.getxCorr());
             peptResult.setxCorrRank(data.getxCorrRank());
             peptResult.setEvalue(data.getEvalue());
             

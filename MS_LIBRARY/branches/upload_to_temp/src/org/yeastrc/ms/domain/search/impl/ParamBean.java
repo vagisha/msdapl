@@ -1,24 +1,24 @@
 /**
- * SequestParamImpl.java
+ * ParamBean.java
  * @author Vagisha Sharma
- * Aug 18, 2008
+ * Oct 5, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.sequest.impl;
+package org.yeastrc.ms.domain.search.impl;
 
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
+import org.yeastrc.ms.domain.search.Param;
 
 /**
  * 
  */
-public class SequestParamBean implements SequestParam {
+public class ParamBean implements Param {
 
     private String name;
     private String value;
     
-    public SequestParamBean() {}
+    public ParamBean() {}
     
-    public SequestParamBean(String name, String value) {
+    public ParamBean(String name, String value) {
         this.name = name;
         this.value = value;
     }

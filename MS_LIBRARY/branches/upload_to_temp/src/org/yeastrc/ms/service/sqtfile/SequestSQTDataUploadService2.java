@@ -8,7 +8,6 @@ package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,14 +17,15 @@ import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
 import org.yeastrc.ms.domain.search.sequest.SequestResultData;
 import org.yeastrc.ms.domain.search.sequest.SequestResultDataWId;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestResultDataWrap;
 import org.yeastrc.ms.domain.search.sequest.impl.SequestSearchResultBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
@@ -259,7 +259,7 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
                 final String remoteDirectory, final java.util.Date searchDate) {
         return new SequestSearchIn() {
             @Override
-            public List<SequestParam> getSequestParams() {return parser.getParamList();}
+            public List<Param> getSequestParams() {return parser.getParamList();}
             @Override
             public List<MsResidueModificationIn> getDynamicResidueMods() {return parser.getDynamicResidueMods();}
             @Override
@@ -312,7 +312,7 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
             uploadSequestResultBuffer();
         }
         // add the Sequest specific information for this result to the cache
-        ResultData resultDataDb = new ResultData(resultId, resultData);
+        SequestResultDataWrap resultDataDb = new SequestResultDataWrap(resultData, resultId);
         sequestResultDataList.add(resultDataDb);
     }
     
@@ -325,60 +325,6 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
         super.flush();
         if (sequestResultDataList.size() > 0) {
             uploadSequestResultBuffer();
-        }
-    }
-    
-    private static final class ResultData implements SequestResultDataWId {
-        private final SequestResultData data;
-        private final int resultId;
-        public ResultData(int resultId, SequestResultData data) {
-            this.data = data;
-            this.resultId = resultId;
-        }
-        @Override
-        public int getResultId() {
-            return resultId;
-        }
-        @Override
-        public BigDecimal getCalculatedMass() {
-            return data.getCalculatedMass();
-        }
-        @Override
-        public BigDecimal getDeltaCN() {
-            return data.getDeltaCN();
-        }
-        @Override
-        public Double getEvalue() {
-            return data.getEvalue();
-        }
-        @Override
-        public int getMatchingIons() {
-            return data.getMatchingIons();
-        }
-        @Override
-        public int getPredictedIons() {
-            return data.getPredictedIons();
-        }
-        @Override
-        public BigDecimal getSp() {
-            return data.getSp();
-        }
-        @Override
-        public int getSpRank() {
-            return data.getSpRank();
-        }
-        @Override
-        public BigDecimal getxCorr() {
-            return data.getxCorr();
-        }
-        @Override
-        public int getxCorrRank() {
-            return data.getxCorrRank();
-        }
-        @Override
-        public BigDecimal getDeltaCNstar() {
-            // TODO Auto-generated method stub
-            return null;
         }
     }
     

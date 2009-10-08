@@ -11,19 +11,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.yeastrc.ms.domain.run.RunFileFormat;
-import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
-import org.yeastrc.ms.parser.SearchParamsDataProvider;
-import org.yeastrc.ms.parser.sequestParams.SequestParamsParser;
-import org.yeastrc.ms.parser.sqtFile.PeptideResultBuilder;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
+import org.yeastrc.ms.service.pepxml.PepXmlMascotDataUploadService;
+import org.yeastrc.ms.service.pepxml.PepXmlSequestDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepxmlAnalysisDataUploadService;
-import org.yeastrc.ms.service.pepxml.PepxmlSearchDataUploadService;
 import org.yeastrc.ms.service.protxml.ProtxmlDataUploadService;
-import org.yeastrc.ms.service.sqtfile.BaseSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.ProlucidSQTDataUploadService;
 import org.yeastrc.ms.service.sqtfile.SequestSQTDataUploadService2;
@@ -41,6 +36,10 @@ public class UploadServiceFactory {
         return instance;
     }
     
+    
+    // ------------------------------------------------------------------------------------------------------
+    // Spectrum Data Upload service
+    // ------------------------------------------------------------------------------------------------------
     public SpectrumDataUploadService getSpectrumDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
@@ -103,6 +102,9 @@ public class UploadServiceFactory {
         return true;
     }
     
+    // ------------------------------------------------------------------------------------------------------
+    // SEARCH Data Upload service
+    // ------------------------------------------------------------------------------------------------------
     public SearchDataUploadService getSearchDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
@@ -167,11 +169,22 @@ public class UploadServiceFactory {
                 service.setDirectory(dataDirectory);
                 return service;
             }
-            else if (sqtFormat == SearchFileFormat.SQT_PERC) {
-                SearchParamsDataProvider paramsProvider = new SequestParamsParser();
-                PeptideResultBuilder peptbuilder = SequestResultPeptideBuilder.instance();
-                BaseSQTDataUploadService service = new BaseSQTDataUploadService(paramsProvider, peptbuilder, 
-                        Program.SEQUEST, SearchFileFormat.SQT_PERC);
+            else {
+                throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
+            }
+        }
+        else if(format == SearchFileFormat.PEPXML) {
+            // we know that we have pepxml files in this directory
+            // now we need to figure out which program (Sequest, Mascot etc.) results these files contain.
+            SearchFileFormat pepxmlFormat = getPepxmlType(dataDirectory, filenames);
+            
+            if(pepxmlFormat == SearchFileFormat.PEPXML_SEQ) {
+                SearchDataUploadService service = new PepXmlSequestDataUploadService();
+                service.setDirectory(dataDirectory);
+                return service;
+            }
+            else if(pepxmlFormat == SearchFileFormat.PEPXML_MASCOT) {
+                SearchDataUploadService service = new PepXmlMascotDataUploadService();
                 service.setDirectory(dataDirectory);
                 return service;
             }
@@ -179,16 +192,14 @@ public class UploadServiceFactory {
                 throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
             }
         }
-        else if(format == SearchFileFormat.PEPXML) {
-            SearchDataUploadService service = new PepxmlSearchDataUploadService();
-            service.setDirectory(dataDirectory);
-            return service;
-        }
         else {
             throw new UploadServiceFactoryException("We do not currently have support for the format: "+format.toString());
         }
     }
     
+    // ------------------------------------------------------------------------------------------------------
+    // ANALYSIS Data Upload service
+    // ------------------------------------------------------------------------------------------------------
     public AnalysisDataUploadService getAnalysisDataUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {
@@ -297,6 +308,46 @@ public class UploadServiceFactory {
         return sqtType;
     }
     
+    private SearchFileFormat getPepxmlType(String fileDirectory, Set<String> filenames) throws UploadServiceFactoryException {
+    
+        SearchFileFormat pepxmlType = null;
+        
+        // make sure all files are of the same type
+        for (String file: filenames) {
+            String pepxmlFile = fileDirectory+File.separator+file;
+            // first make sure the file exists
+            if (!(new File(pepxmlFile).exists()))
+                continue;
+            if(!file.toLowerCase().endsWith("pep.xml"))
+                continue;
+            if(file.startsWith("interact")) 
+                continue;
+            
+            SearchFileFormat myType = SQTFileReader.getSearchFileType(pepxmlFile);
+            
+            // For now we support only SEQUEST and MASCOT pepxml files. 
+            if (SearchFileFormat.PEPXML_SEQ!= myType && 
+                SearchFileFormat.PEPXML_MASCOT != myType) {
+                throw new UploadServiceFactoryException("We do not currently have support for the PEPXML format: "+myType);
+            }
+
+            if (pepxmlType == null) pepxmlType = myType;
+            if (myType != pepxmlType) {
+                String errMsg = "Multiple file formats found in directory: "+fileDirectory+"\n"+
+                "\tFound: "+pepxmlType.getFormatType()+" and "+myType.getFormatType();
+                throw new UploadServiceFactoryException(errMsg);
+            }
+        }
+        if (pepxmlType == null) {
+            throw new UploadServiceFactoryException("No valid PEPXML file format found");
+        }
+        
+        return pepxmlType;
+    }
+    
+    // ------------------------------------------------------------------------------------------------------
+    // PROTEIN INFERENCE Data Upload service
+    // ------------------------------------------------------------------------------------------------------
     public ProtinferUploadService getProtinferUploadService(String dataDirectory) throws UploadServiceFactoryException {
         
         if(dataDirectory == null) {

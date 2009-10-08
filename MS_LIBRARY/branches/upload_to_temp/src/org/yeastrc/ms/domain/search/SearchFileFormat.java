@@ -17,7 +17,10 @@ public enum SearchFileFormat {
     SQT_PPROBE("SQT: "+Program.PEPPROBE), 
     SQT_PERC("SQT: "+Program.PERCOLATOR.displayName()), 
     SQT_BIBLIO("SQT: "+Program.BIBLIOSPEC.displayName()),
-    PEPXML("pepxml"), 
+    PEPXML("pepxml: GENERIC"), 
+    PEPXML_SEQ("pepxml: "+Program.SEQUEST.displayName()),
+    PEPXML_MASCOT("pepxml: "+Program.MASCOT.displayName()),
+    PEPXML_PEPT_PROPHET("pepxml: "+Program.PEPTIDE_PROPHET.displayName()),
     PROTXML("protxml"),
     UNKNOWN("Unknown");
 

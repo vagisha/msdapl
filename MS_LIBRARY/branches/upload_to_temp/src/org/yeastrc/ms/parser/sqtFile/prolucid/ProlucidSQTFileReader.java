@@ -10,8 +10,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResultIn;
 import org.yeastrc.ms.domain.search.prolucid.ProlucidSearchScan;
+import org.yeastrc.ms.domain.search.prolucid.impl.ProlucidResult;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
@@ -98,7 +100,7 @@ public class ProlucidSQTFileReader extends SQTFileReader<ProlucidSearchScan> {
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-        ProlucidResult result = new ProlucidResult(getDynamicResidueMods(), getDynamicTerminalMods());
+        ProlucidResult result = new ProlucidResult();
         try {
             result.setPrimaryScoreRank(Integer.parseInt(tokens[1]));
             result.setSecondaryScoreRank(Integer.parseInt(tokens[2]));
@@ -128,7 +130,9 @@ public class ProlucidSQTFileReader extends SQTFileReader<ProlucidSearchScan> {
 
         // parse the peptide sequence
         try {
-            result.buildPeptideResult();
+            MsSearchResultPeptide resultPeptide = ProlucidResultPeptideBuilder.instance().build(
+                    result.getOriginalPeptideSequence(), getDynamicResidueMods(), getDynamicTerminalMods());
+            result.setResultPeptide(resultPeptide);
         }
         catch(SQTParseException e) {
             throw new DataProviderException(currentLineNum, "Invalid peptide sequence in 'M'. "+e.getMessage(), line);

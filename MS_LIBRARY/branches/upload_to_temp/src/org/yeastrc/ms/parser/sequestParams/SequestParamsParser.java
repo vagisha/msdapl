@@ -23,13 +23,13 @@ import org.yeastrc.ms.domain.general.impl.Enzyme;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
+import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
+import org.yeastrc.ms.domain.search.impl.ParamBean;
 import org.yeastrc.ms.domain.search.impl.ResidueModification;
 import org.yeastrc.ms.domain.search.impl.SearchDatabase;
 import org.yeastrc.ms.domain.search.impl.TerminalModification;
-import org.yeastrc.ms.domain.search.sequest.SequestParam;
-import org.yeastrc.ms.domain.search.sequest.impl.SequestParamBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.SearchParamsDataProvider;
 
@@ -41,7 +41,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
 
     private String remoteServer;
 
-    private List<SequestParam> paramList;
+    private List<Param> paramList;
 
     private boolean reportEvalue = false;
     private MsSearchDatabaseIn database;
@@ -104,7 +104,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return reportEvalue;
     }
 
-    public List<SequestParam> getParamList() {
+    public List<Param> getParamList() {
         return this.paramList;
     }
     
@@ -115,7 +115,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     }
     
     public SequestParamsParser() {
-        paramList = new ArrayList<SequestParam>();
+        paramList = new ArrayList<Param>();
         staticResidueModifications = new ArrayList<MsResidueModificationIn>();
         staticTerminalModifications = new ArrayList<MsTerminalModificationIn>();
         dynamicResidueModifications = new ArrayList<MsResidueModificationIn>();
@@ -145,7 +145,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
                     continue;
                 
                 // match a param = value pair, if we can
-                SequestParam param = matchParamValuePair(currentLine);
+                Param param = matchParamValuePair(currentLine);
                 if (param != null) {
                     addParam(param);
                 }
@@ -206,7 +206,7 @@ public class SequestParamsParser implements SearchParamsDataProvider {
         return enz;
     }
 
-    private void addParam(SequestParam param) throws DataProviderException {
+    private void addParam(Param param) throws DataProviderException {
         paramList.add(param);
         // e-value
         if (param.getParamName().equalsIgnoreCase("print_expect_score")) {
@@ -320,12 +320,12 @@ public class SequestParamsParser implements SearchParamsDataProvider {
     // parameter_name = parameter_value ; parameter_description
     // e.g. create_output_files = 1                ; 0=no, 1=yes
     // e.g. database_name = /net/maccoss/vol2/software/pipeline/dbase/mouse-contam.fasta
-    SequestParam matchParamValuePair(String line) {
+    Param matchParamValuePair(String line) {
         Matcher m = paramLinePattern.matcher(line);
         if (m.matches()) {
             final String paramName = m.group(1).trim();
             final String paramVal = m.group(2).trim();
-            SequestParamBean param = new SequestParamBean(paramName, paramVal);
+            ParamBean param = new ParamBean(paramName, paramVal);
             return param;
         }
         else {

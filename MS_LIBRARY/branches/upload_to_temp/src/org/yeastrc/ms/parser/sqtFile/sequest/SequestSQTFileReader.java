@@ -11,8 +11,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResultIn;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchScan;
+import org.yeastrc.ms.domain.search.sequest.impl.SequestResult;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
@@ -114,19 +116,19 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Expected 11 fields", line);
         }
 
-        SequestResult result = new SequestResult(getDynamicResidueMods());
+        SequestResult result = new SequestResult();
         try {
             result.setxCorrRank(Integer.parseInt(tokens[1]));
             result.setSpRank(Integer.parseInt(tokens[2]));
             result.setCalculatedMass(new BigDecimal(tokens[3]));
             result.setDeltaCN(new BigDecimal(tokens[4]));
-            result.setXcorr(new BigDecimal(tokens[5]));
+            result.setxCorr(new BigDecimal(tokens[5]));
             if (useEvalue)
                 result.setEvalue(Double.parseDouble(tokens[6]));
             else
                 result.setSp(new BigDecimal(tokens[6]));
-            result.setNumMatchingIons(Integer.parseInt(tokens[7]));
-            result.setNumPredictedIons(Integer.parseInt(tokens[8]));
+            result.setMatchingIons(Integer.parseInt(tokens[7]));
+            result.setPredictedIons(Integer.parseInt(tokens[8]));
         }
         catch(NumberFormatException e) {
             throw new DataProviderException(currentLineNum, "Invalid 'M' line. Error parsing number(s). "+e.getMessage(), line);
@@ -140,7 +142,9 @@ public class SequestSQTFileReader extends SQTFileReader<SequestSearchScan> {
 
         // parse the peptide sequence
         try {
-            result.buildPeptideResult();
+            MsSearchResultPeptide resultPeptide = SequestResultPeptideBuilder.instance().build(
+                    result.getOriginalPeptideSequence(), getDynamicResidueMods(), null);
+            result.setResultPeptide(resultPeptide);
         }
         catch(SQTParseException e) {
             throw new DataProviderException(currentLineNum, "Invalid peptide sequence in 'M'. "+e.getMessage(), line);
