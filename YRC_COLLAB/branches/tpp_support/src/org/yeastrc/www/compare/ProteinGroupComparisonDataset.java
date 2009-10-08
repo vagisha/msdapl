@@ -17,7 +17,6 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerProteinBase;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
@@ -50,6 +49,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     private int currentPage = 1;
     private int pageCount = 1;
     private List<Integer> displayPageNumbers;
+    int startIndex = -1;
+    int endIndex = -1;
     
     private int currentGroupId = -1;  // used in the getRow method
     private Map<Integer, Integer> groupMemberCount;
@@ -58,8 +59,38 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
-    private int  getOffset() {
-        return (this.currentPage - 1)*rowCount;
+    private int  getStartIndex() {
+        
+        if(startIndex != -1)
+            return startIndex;
+        
+        startIndex = (this.currentPage - 1)*rowCount;
+        // if this is not the first page and the protein at offset is in a indistinguishable group
+        // it should have been displayed in the previous page already. Skip over it....
+        if(startIndex > 0) {
+            int myGrp = proteins.get(startIndex - 1).getGroupId();
+            while(myGrp == proteins.get(startIndex).getGroupId() && startIndex < this.proteins.size()) {
+                startIndex++;
+            }
+        }
+        return startIndex;
+    }
+    
+    private int getEndIndex() {
+        
+        if(endIndex != -1)
+            return endIndex;
+        
+        endIndex = Math.min((this.getStartIndex() + rowCount), this.getTotalProteinCount());
+        // If the protein at the last index is in a indistinguishable protein group we want to display
+        // all the members of the group
+        if(endIndex < getTotalProteinCount()) {
+            int myGrp = proteins.get(endIndex-1).getGroupId();
+            while(proteins.get(endIndex).getGroupId() == myGrp && endIndex < this.getTotalProteinCount()) {
+                endIndex++;
+            }
+        }
+        return endIndex;
     }
 
     public void setRowCount(int count) {
@@ -287,7 +318,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     @Override
     public TableRow getRow(int index) {
         
-        ComparisonProtein protein = proteins.get(index + this.getOffset());
+        ComparisonProtein protein = proteins.get(index + this.getStartIndex());
         
         TableRow row = new TableRow();
         
@@ -427,20 +458,12 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         return red+green+blue;
     }
 
-    private String getCommaSeparatedDatasetIds() {
-        StringBuilder buf = new StringBuilder();
-        for(Dataset dataset: datasets) {
-            if(dataset.getSource() != DatasetSource.DTA_SELECT)
-                buf.append(","+dataset.getDatasetId());
-        }
-        if(buf.length() > 0)
-            buf.deleteCharAt(0);
-        return buf.toString();
-    }
-    
     @Override
     public int rowCount() {
-        return Math.min(rowCount, this.getTotalProteinCount() - this.getOffset());
+//        int cnt = Math.min(rowCount, this.getTotalProteinCount() - this.getOffset());
+        int start = getStartIndex();
+        int end = getEndIndex();
+        return end - start;
     }
 
     @Override
@@ -493,9 +516,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 
     @Override
     public void tabulate() {
-        
-        int max = Math.min((this.getOffset() + rowCount), this.getTotalProteinCount());
-        initializeInfo(this.getOffset(), max);
+        initializeInfo(this.getStartIndex(), this.getEndIndex());
     }
     
     public void initializeInfo(int startIndex, int endIndex) {
