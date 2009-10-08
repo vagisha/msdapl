@@ -50,8 +50,6 @@ import org.yeastrc.ms.parser.PepxmlDataProvider;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.util.AminoAcidUtils;
 
-import com.sun.tools.internal.ws.processor.modeler.annotation.AnnotationProcessorContext.SEIContext;
-
 /**
  * 
  */

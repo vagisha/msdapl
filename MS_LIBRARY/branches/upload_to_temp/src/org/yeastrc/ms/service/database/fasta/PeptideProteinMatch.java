@@ -4,7 +4,7 @@
  * Sep 11, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.service;
+package org.yeastrc.ms.service.database.fasta;
 
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 

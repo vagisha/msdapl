@@ -7,7 +7,6 @@ import java.util.List;
 import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
-import org.yeastrc.ms.service.PeptideProteinMatch;
 
 import junit.framework.TestCase;
 
