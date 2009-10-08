@@ -838,10 +838,11 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             reader = inputFactory.createXMLStreamReader(inputStr);
             
             while(reader.hasNext()) {
-                if(reader.next() == XMLStreamReader.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")){
+                int evtType = reader.next();
+                if(evtType == XMLStreamReader.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")){
                         break;
                 }
-                if(reader.next() == XMLStreamReader.START_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")) {
+                if(evtType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")) {
                     String value = reader.getAttributeValue(null,"search_engine");
                     if(value != null) {
                         if("SEQUEST".equalsIgnoreCase(value))       program = Program.SEQUEST;
@@ -883,5 +884,10 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             return SearchFileFormat.PEPXML_MASCOT;
         else
             return SearchFileFormat.UNKNOWN;
+    }
+    
+    public static void main(String[] args) throws DataProviderException {
+        String filePath = "/Users/silmaril/WORK/UW/FLINT/mascot_test/090715_EPO-iT_80mM_HCD.pep.xml";
+        System.out.println(PepXmlGenericFileReader.getSearchFileType(filePath));
     }
 }

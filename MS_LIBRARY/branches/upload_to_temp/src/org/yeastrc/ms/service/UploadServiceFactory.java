@@ -32,6 +32,8 @@ public class UploadServiceFactory {
 
     private static final UploadServiceFactory instance = new UploadServiceFactory();
     
+//    private static final Logger log = Logger.getLogger(UploadServiceFactory.class.getName());
+    
     private UploadServiceFactory() {}
     
     public static UploadServiceFactory instance() {
@@ -332,6 +334,8 @@ public class UploadServiceFactory {
             catch (DataProviderException e) {
                 throw new UploadServiceFactoryException("Exception getting file type: "+e.getErrorMessage());
             }
+            
+//            log.info("File type of "+pepxmlFile+" is: "+myType);
             
             // For now we support only SEQUEST and MASCOT pepxml files. 
             if (SearchFileFormat.PEPXML_SEQ != myType && 
