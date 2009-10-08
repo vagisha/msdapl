@@ -12,6 +12,8 @@ import java.util.Set;
 
 import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
+import org.yeastrc.ms.parser.DataProviderException;
+import org.yeastrc.ms.parser.pepxml.PepXmlGenericFileReader;
 import org.yeastrc.ms.parser.sqtFile.SQTFileReader;
 import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
@@ -318,15 +320,21 @@ public class UploadServiceFactory {
             // first make sure the file exists
             if (!(new File(pepxmlFile).exists()))
                 continue;
-            if(!file.toLowerCase().endsWith("pep.xml"))
+            if(!file.toLowerCase().endsWith(".pep.xml"))
                 continue;
             if(file.startsWith("interact")) 
                 continue;
             
-            SearchFileFormat myType = SQTFileReader.getSearchFileType(pepxmlFile);
+            SearchFileFormat myType = null;
+            try {
+                myType = PepXmlGenericFileReader.getSearchFileType(pepxmlFile);
+            }
+            catch (DataProviderException e) {
+                throw new UploadServiceFactoryException("Exception getting file type: "+e.getErrorMessage());
+            }
             
             // For now we support only SEQUEST and MASCOT pepxml files. 
-            if (SearchFileFormat.PEPXML_SEQ!= myType && 
+            if (SearchFileFormat.PEPXML_SEQ != myType && 
                 SearchFileFormat.PEPXML_MASCOT != myType) {
                 throw new UploadServiceFactoryException("We do not currently have support for the PEPXML format: "+myType);
             }

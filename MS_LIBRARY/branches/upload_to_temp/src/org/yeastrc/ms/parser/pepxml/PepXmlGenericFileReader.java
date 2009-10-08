@@ -50,6 +50,8 @@ import org.yeastrc.ms.parser.PepxmlDataProvider;
 import org.yeastrc.ms.parser.sqtFile.DbLocus;
 import org.yeastrc.ms.util.AminoAcidUtils;
 
+import com.sun.tools.internal.ws.processor.modeler.annotation.AnnotationProcessorContext.SEIContext;
+
 /**
  * 
  */
@@ -867,5 +869,19 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             }
         }
         return program;
+    }
+    
+    // ---------------------------------------------------------------------------------
+    // static method to get the search file format used.  Looks in the first search_summary 
+    // element
+    // ---------------------------------------------------------------------------------
+    public static SearchFileFormat getSearchFileType(String filePath) throws DataProviderException {
+        Program program = getSearchProgram(filePath);
+        if(program == Program.SEQUEST)
+            return SearchFileFormat.PEPXML_SEQ;
+        else if(program == Program.MASCOT)
+            return SearchFileFormat.PEPXML_MASCOT;
+        else
+            return SearchFileFormat.UNKNOWN;
     }
 }
