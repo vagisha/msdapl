@@ -219,6 +219,7 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
                 TableRow row = rows.get(r);
                 if(j >= files.size()) {
                     row.addCell(new TableCell("-"));
+                    continue;
                 }
                 AnalysisFile file = files.get(j);
                 // match the file names
