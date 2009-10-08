@@ -647,7 +647,7 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
 
     @Override
     public void setSearchProgram(Program searchProgram) {
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
         // TODO 
     }
     
