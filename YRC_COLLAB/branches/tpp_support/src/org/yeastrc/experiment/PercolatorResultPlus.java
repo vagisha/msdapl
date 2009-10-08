@@ -161,4 +161,18 @@ public class PercolatorResultPlus implements PercolatorResult {
         this.sequestData = sequestData;
     }
 
+    @Override
+    public void setCharge(int charge) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setObservedMass(BigDecimal mass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setResultPeptide(MsSearchResultPeptide resultPeptide) {
+        throw new UnsupportedOperationException();
+    }
 }

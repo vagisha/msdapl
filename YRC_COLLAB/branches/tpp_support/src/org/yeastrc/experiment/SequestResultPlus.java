@@ -99,4 +99,19 @@ public class SequestResultPlus implements SequestSearchResult {
     public BigDecimal getRetentionTime() {
         return retentionTime;
     }
+
+    @Override
+    public void setCharge(int charge) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setObservedMass(BigDecimal mass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setResultPeptide(MsSearchResultPeptide resultPeptide) {
+        throw new UnsupportedOperationException();
+    }
 }

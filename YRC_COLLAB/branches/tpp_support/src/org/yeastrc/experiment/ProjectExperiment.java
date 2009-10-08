@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
@@ -218,7 +217,11 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
             int j = 0;
             for(r = 0; r < rows.size(); r++) {
                 TableRow row = rows.get(r);
+                if(j >= files.size()) {
+                    row.addCell(new TableCell("-"));
+                }
                 AnalysisFile file = files.get(j);
+                // match the file names
                 if(file.getFileName().equals(row.getCells().get(0).getData())) {
                     String url = null;
                     if(action != null)
@@ -227,6 +230,9 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
                             url);
                     row.addCell(cell);
                     j++;
+                }
+                else {
+                    row.addCell(new TableCell("-"));
                 }
             }
         }
