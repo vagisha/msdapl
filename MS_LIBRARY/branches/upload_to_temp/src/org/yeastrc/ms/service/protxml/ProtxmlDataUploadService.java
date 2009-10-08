@@ -42,6 +42,7 @@ import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
+import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
 import org.yeastrc.ms.domain.protinfer.ProteinferSpectrumMatch;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.Modification;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
@@ -314,6 +315,15 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         throws UploadException {
         
         int nrseqId = getNrseqProteinId(protein.getProteinName(), nrseqDatabaseId);
+        
+        // if a protein with this nrseqId has already been saved do not save it again
+        // ProteinProphet can list identical proteins (same sequence) as indistinguishable
+        // proteins.  We will not save them twice. 
+        ProteinferProtein oldProtein = ppProtDao.loadProtein(protein.getProteinferId(), nrseqId);
+        if(oldProtein != null) {
+            return oldProtein.getId();
+        }
+        
         if(nrseqId == 0) {
             UploadException ex = new UploadException(ERROR_CODE.PROTEIN_NOT_FOUND);
             ex.appendErrorMessage("No NRSEQ id foud for protein: "+protein.getProteinName()+"; databaseId: "+nrseqDatabaseId);
