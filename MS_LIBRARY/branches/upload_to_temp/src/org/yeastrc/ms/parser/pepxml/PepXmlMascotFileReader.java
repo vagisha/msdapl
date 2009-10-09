@@ -81,7 +81,7 @@ public class PepXmlMascotFileReader extends PepXmlGenericFileReader<PepXmlMascot
 
             @Override
             public Program getSearchProgram() {
-                return Program.SEQUEST;
+                return Program.MASCOT;
             }
             @Override
             public String getSearchProgramVersion() {
