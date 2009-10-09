@@ -46,8 +46,11 @@
     	identityScore,
     	homologyScore,
     	expect, 
-    	star)
-    	VALUES (?,?,?,?,?,?)
+    	star,
+    	calculatedMass,
+    	matchingIons,
+    	predictedIons)
+    	VALUES (?,?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
@@ -57,7 +60,10 @@
     	identityScore,
     	homologyScore,
     	expect, 
-    	star)
+    	star,
+    	calculatedMass,
+    	matchingIons,
+    	predictedIons)
     	VALUES $values$
     </insert>
     
