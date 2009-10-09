@@ -400,9 +400,9 @@
 	  name="filterMascotResultsForm"
 	  validate="true"
 	  scope="request"
-	  input="/pages/internal/project/sequest/viewMascotResults.jsp">
+	  input="/pages/internal/project/mascot/viewMascotResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
-	  <forward name="Success" path="/pages/internal/project/sequest/viewMascotResults.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/mascot/viewMascotResults.jsp" redirect="false"/>
 	</action>
 	
 	<!-- ================================================================================== -->
