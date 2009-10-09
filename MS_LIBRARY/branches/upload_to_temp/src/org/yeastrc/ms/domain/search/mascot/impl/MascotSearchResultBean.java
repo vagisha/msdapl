@@ -68,6 +68,10 @@ public class MascotSearchResultBean extends SearchResultBean implements MascotSe
         mascotData.setIdentityScore(identityScore);
     }
     
+    public void setRank(int rank) {
+        mascotData.setRank(rank);
+    }
+    
     public void setIonScore(BigDecimal ionScore) {
         mascotData.setIonScore(ionScore);
     }
