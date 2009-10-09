@@ -69,6 +69,7 @@ import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetAnalysisUploadDAO;
 import org.yeastrc.ms.upload.dao.analysis.peptideProphet.PeptideProphetResultUploadDAO;
+import org.yeastrc.ms.util.TimeUtils;
 
 /**
  * 
@@ -201,6 +202,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         log.info("Uploading protein inference results in file: "+protxmlFile);
         
+        long s = System.currentTimeMillis();
+        
         reset();
         
         int numProteinGroups = 0;
@@ -255,7 +258,11 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         finally {
             parser.close();
         }
-        log.info("Uploaded file: "+protxmlFile+"; ID: "+uploadedPinferId+"; #protein groups: "+numProteinGroups);
+        
+        long e = System.currentTimeMillis();
+        
+        log.info("Uploaded file: "+protxmlFile+"; ID: "+uploadedPinferId+"; #protein groups: "+numProteinGroups+
+                "; Time: "+TimeUtils.timeElapsedSeconds(s, e));
         
         uploadMsg.append("\n\tProtein inferenceID: "+uploadedPinferId);
         uploadMsg.append("; #Protein groups in file: "+protxmlFile+": "+numProteinGroups);

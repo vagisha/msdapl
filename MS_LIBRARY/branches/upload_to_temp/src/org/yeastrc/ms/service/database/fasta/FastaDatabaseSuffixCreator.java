@@ -42,6 +42,8 @@ public class FastaDatabaseSuffixCreator {
     
     public void createSuffixTable(int databaseId) throws SQLException {
         
+        log.info("\n\nCreating suffix table for databaseID: "+databaseId);
+        
         // set up our datasource
         nrseqDbName = ConnectionFactory.nrseqDbName();
         nrseqDs = ConnectionFactory.getDataSource(nrseqDbName);
@@ -75,7 +77,7 @@ public class FastaDatabaseSuffixCreator {
         
         // get all the ids from tblProteinDatabase for the given databaseID
         List<Integer> dbProteinIds = NrSeqLookupUtil.getDbProteinIdsForDatabase(databaseId);
-        System.out.println("# proteins: "+dbProteinIds.size()+" for database: "+databaseId);
+        log.info("# proteins: "+dbProteinIds.size()+" for database: "+databaseId);
         
         // some proteins in a fasta file have the same sequence.  We will not create suffixes twice
         Set<Integer> seenSequenceIds = new HashSet<Integer>(dbProteinIds.size());
@@ -102,7 +104,8 @@ public class FastaDatabaseSuffixCreator {
             flushCache();
         
         long e = System.currentTimeMillis();
-        log.info("Total time to create table: "+TimeUtils.timeElapsedSeconds(s, e));
+        log.info("Total time to create suffix table for databaseID: "+databaseId+" was "
+                +TimeUtils.timeElapsedSeconds(s, e)+"\n\n");
     }
 
     
