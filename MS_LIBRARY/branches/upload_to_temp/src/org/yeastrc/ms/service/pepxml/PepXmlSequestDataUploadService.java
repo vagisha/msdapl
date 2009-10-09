@@ -641,7 +641,9 @@ public class PepXmlSequestDataUploadService implements SearchDataUploadService {
                             matches = matchService.getMatchingProteins(peptideSeq);
                             proteinMatches.put(peptideSeq, matches);
                         }
-                        
+//                        if(proteinMatches.size() % 10 == 0) {
+//                            System.out.println("matches for # sequences: "+proteinMatches.size());
+//                        }
                         List<MsSearchResultProteinIn> protList = sres.getProteinMatchList();
                         
                         for(PeptideProteinMatch match: matches) {

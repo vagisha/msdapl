@@ -77,7 +77,7 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/sequest/SequestSearchSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/sequest/SequestSearchResultSqlMap.xml"/>
 	
-		<!-- Related to Mascot -->
+	<!-- Related to Mascot -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/mascot/MascotSearchSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/mascot/MascotSearchResultSqlMap.xml"/>
 	

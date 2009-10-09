@@ -6,19 +6,22 @@
  */
 package org.yeastrc.ms.service.database.fasta;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.yeastrc.ms.ConnectionFactory;
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.general.EnzymeRule;
 import org.yeastrc.ms.domain.general.MsEnzyme;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
+import org.yeastrc.ms.domain.nrseq.NrDbProteinFull;
 import org.yeastrc.ms.service.MsDataUploadProperties;
+import org.yeastrc.ms.util.TimeUtils;
 
 /**
  * 
@@ -31,6 +34,10 @@ public class PeptideProteinMatchingService {
     private int numEnzymaticTermini = 0;
     private List<EnzymeRule> enzymeRules;
     
+    private Map<String, List<Integer>> suffixMap;
+    
+    private static final Logger log = Logger.getLogger(PeptideProteinMatchingService.class.getName());
+    
     public PeptideProteinMatchingService(int databaseId) throws SQLException {
         
         this.databaseId = databaseId;
@@ -42,8 +49,64 @@ public class PeptideProteinMatchingService {
     }
     
     private void createSuffixTable(int databaseId) throws SQLException {
-        FastaDatabaseSuffixCreator creator = new FastaDatabaseSuffixCreator();
-        creator.createSuffixTable(databaseId);
+//        FastaDatabaseSuffixCreator creator = new FastaDatabaseSuffixCreator();
+//        creator.createSuffixTable(databaseId);
+        buildSuffixes(databaseId);
+    }
+    
+    public void buildSuffixes(int databaseId) {
+        
+        suffixMap = new HashMap<String, List<Integer>>(3200000);
+        
+        // get all the ids from tblProteinDatabase for the given databaseID
+        List<Integer> dbProteinIds = NrSeqLookupUtil.getDbProteinIdsForDatabase(databaseId);
+        log.info("# proteins: "+dbProteinIds.size()+" in databaseID: "+databaseId);
+        
+        // some proteins in a fasta file have the same sequence.  We will not create suffixes twice
+        Set<Integer> seenSequenceIds = new HashSet<Integer>(dbProteinIds.size());
+        
+        long s = System.currentTimeMillis();
+        
+        int cnt = 0;
+        for(int dbProteinId: dbProteinIds) {
+            NrDbProteinFull protein = NrSeqLookupUtil.getDbProteinFull(dbProteinId);
+            
+            if(seenSequenceIds.contains(protein.getSequenceId()))
+                continue;
+            else
+                seenSequenceIds.add(protein.getSequenceId());
+            
+            String sequence = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(dbProteinId);
+            
+//            System.out.println("Looking at sequence: "+ ++cnt);
+            createSuffixes(sequence, protein.getSequenceId(), dbProteinId);
+            
+        }
+        
+        long e = System.currentTimeMillis();
+        
+        log.info("Created suffix map with "+suffixMap.size()+" entries");
+        log.info("Total time to create 5-mer suffix map for databaseID: "+databaseId+" was "
+                +TimeUtils.timeElapsedSeconds(s, e)+"\n\n");
+    }
+    
+    private void createSuffixes(String sequence, int sequenceId, int dbProteinId) {
+        
+        int SUFFIX_LENGTH = 5;
+        for(int i = 0; i < sequence.length(); i++) {
+            int end = Math.min(i+SUFFIX_LENGTH, sequence.length());
+            String subseq = sequence.substring(i, end);
+            
+            List<Integer> matchingProteins = suffixMap.get(subseq);
+            if(matchingProteins == null) {
+                matchingProteins = new ArrayList<Integer>();
+                suffixMap.put(subseq, matchingProteins);
+            }
+            matchingProteins.add(dbProteinId);
+            
+            if(i+SUFFIX_LENGTH >= sequence.length())
+                break;
+        }
     }
     
     public void setNumEnzymaticTermini(int net) {
@@ -138,31 +201,73 @@ public class PeptideProteinMatchingService {
     
     private List<Integer> getMatchingDbProteinIdsForSuffix(String suffix) {
         
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        List<Integer> dbProteinIds = new ArrayList<Integer>();
-        try {
-            conn = ConnectionFactory.getNrseqConnection();
-            String sql = "SELECT dbProteinID FROM "+
-            FastaDatabaseSuffixCreator.getSuffixTableName(databaseId)+
-            " WHERE suffix LIKE '"+suffix+"%'";
+        // suffixes we store are 5 aa long. 
+        Map<Integer, Integer> matches = new HashMap<Integer, Integer>();
+        int SUFFIX_LENGTH = 5;
+        int numSuffixesInSeq = 0;
+        for(int i = 0; i < suffix.length(); i++) {
+            int end = Math.min(i+SUFFIX_LENGTH, suffix.length());
+            String subseq = suffix.substring(i, end);
             
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            while(rs.next()) {
-                dbProteinIds.add((rs.getInt("dbProteinID")));
+            numSuffixesInSeq++;
+//            System.out.println("Looking for match for: "+subseq);
+//            System.out.println("suffix map size: "+suffixMap.size());
+            List<Integer> matchingProteins = suffixMap.get(subseq);
+            if(i == 0) {
+                for(int proteinId: matchingProteins)
+                    matches.put(proteinId, 1);
             }
-        }
-        catch (SQLException e) {
-            throw new RuntimeException("Exception getting matching proteinIds for suffix: "+suffix+" and database: "+this.databaseId, e);
-        }
-        finally {
+            else {
+                
+                for(int proteinId: matchingProteins) {
+                    Integer num = matches.get(proteinId);
+                    if(num != null) {
+                        matches.put(proteinId, ++num);
+                    }
+                }
+            }
             
-            if(conn != null)    try {conn.close();} catch(SQLException e){}
-            if(stmt != null)    try {stmt.close();} catch(SQLException e){}
-            if(rs != null)    try {rs.close();} catch(SQLException e){}
+            if(i+SUFFIX_LENGTH >= suffix.length())
+                break;
         }
-        return dbProteinIds;
+        
+        List<Integer> allMatches = new ArrayList<Integer>();
+        for(int proteinId: matches.keySet()) {
+            int cnt = matches.get(proteinId);
+            if(cnt == numSuffixesInSeq)
+                allMatches.add(proteinId);
+        }
+        if(allMatches.size() > 10)
+            System.out.println("!!!# matches found: "+allMatches.size());
+        return allMatches;
+        
+        
+        
+//        Connection conn = null;
+//        Statement stmt = null;
+//        ResultSet rs = null;
+//        List<Integer> dbProteinIds = new ArrayList<Integer>();
+//        try {
+//            conn = ConnectionFactory.getNrseqConnection();
+//            String sql = "SELECT dbProteinID FROM "+
+//            FastaDatabaseSuffixCreator.getSuffixTableName(databaseId)+
+//            " WHERE suffix LIKE '"+suffix+"%'";
+//            
+//            stmt = conn.createStatement();
+//            rs = stmt.executeQuery(sql);
+//            while(rs.next()) {
+//                dbProteinIds.add((rs.getInt("dbProteinID")));
+//            }
+//        }
+//        catch (SQLException e) {
+//            throw new RuntimeException("Exception getting matching proteinIds for suffix: "+suffix+" and database: "+this.databaseId, e);
+//        }
+//        finally {
+//            
+//            if(conn != null)    try {conn.close();} catch(SQLException e){}
+//            if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+//            if(rs != null)    try {rs.close();} catch(SQLException e){}
+//        }
+//        return dbProteinIds;
     }
 }

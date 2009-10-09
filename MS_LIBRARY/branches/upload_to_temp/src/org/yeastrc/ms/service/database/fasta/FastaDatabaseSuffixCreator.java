@@ -30,6 +30,7 @@ import org.yeastrc.ms.util.TimeUtils;
  */
 public class FastaDatabaseSuffixCreator {
 
+    private static final int SUFFIX_LENGTH = 255;
     private String nrseqDbName;
     private DataSource nrseqDs;
     
@@ -112,13 +113,15 @@ public class FastaDatabaseSuffixCreator {
     private void createSuffixes(String sequence, int sequenceId, int dbProteinId) throws SQLException {
         
         for(int i = 0; i < sequence.length(); i++) {
-            int end = Math.min(i+255, sequence.length());
+            int end = Math.min(i+SUFFIX_LENGTH, sequence.length());
             String subseq = sequence.substring(i, end);
             Suffix suffix = new Suffix();
             suffix.dbProteinId = dbProteinId;
             suffix.sequenceId = sequenceId;
             suffix.suffix = subseq;
             this.suffixCache.add(suffix);
+            if(i+SUFFIX_LENGTH >= sequence.length())
+                break;
         }
     }
     
