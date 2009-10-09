@@ -16,6 +16,7 @@ public class MascotResultFilterCriteria extends ResultFilterCriteria {
 
     
     private Integer star;
+    private Integer maxRank;
     
     private Double minIonScore;
     private Double minIdentityScore;
@@ -28,6 +29,7 @@ public class MascotResultFilterCriteria extends ResultFilterCriteria {
             return true;
         
         return (hasStarFilter() ||
+                hasRankFilter() ||
                 hasIonScoreFilter() ||
                 hasIdentityScoreFilter() ||
                 hasHomologyScoreFilter() ||
@@ -66,6 +68,37 @@ public class MascotResultFilterCriteria extends ResultFilterCriteria {
         return buf.toString();
     }
     
+    //-------------------------------------------------------------
+    // RANK FILTER
+    //-------------------------------------------------------------
+    public Integer getRank() {
+        return maxRank;
+    }
+
+    public void setRank(Integer rank) {
+        this.maxRank = rank;
+    }
+    
+    public boolean hasRankFilter() {
+        return maxRank != null;
+    }
+    
+    public String makeRankFilterSql() {
+        
+        if(!hasRankFilter())
+            return "";
+        StringBuilder buf = new StringBuilder();
+        String rankColumn = SORT_BY.MASCOT_RANK.getColumnName();
+        
+        int rank = this.maxRank == null ? 1 : this.maxRank;
+        
+        buf.append(" ( ");
+        buf.append(" (" +rankColumn+" <= "+rank+") ");
+        buf.append(" ) ");
+        
+        return buf.toString();
+        
+    }    
     
     //-------------------------------------------------------------
     // ION_SCORE  FILTER

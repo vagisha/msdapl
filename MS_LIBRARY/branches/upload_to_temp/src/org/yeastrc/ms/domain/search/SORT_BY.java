@@ -33,6 +33,7 @@ public enum SORT_BY {
     HOMOLOGY_SCORE("HomolScore", "homologyScore"),
     EXPECT("Expect", "expect"),
     STAR("Star", "star"),
+    MASCOT_RANK("Rank", "rank"),
     
     // Percolator specific
     QVAL("q-value", "qvalue"),

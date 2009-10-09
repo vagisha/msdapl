@@ -192,6 +192,10 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         if(filterCriteria.hasStarFilter()) {
             sql.append("AND "+filterCriteria.makeStarFilterSql());
         }
+        // rank filter
+        if(filterCriteria.hasRankFilter()) {
+            sql.append("AND "+filterCriteria.makeRankFilterSql());
+        }
         
         
         
@@ -367,6 +371,10 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         // star filter
         if(filterCriteria.hasStarFilter()) {
             sql.append("AND "+filterCriteria.makeStarFilterSql());
+        }
+        // rank filter
+        if(filterCriteria.hasRankFilter()) {
+            sql.append("AND "+filterCriteria.makeRankFilterSql());
         }
         
         
