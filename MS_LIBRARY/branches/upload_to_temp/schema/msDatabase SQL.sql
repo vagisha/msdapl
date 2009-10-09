@@ -176,7 +176,7 @@ CREATE TABLE msRunSearch (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    runID INT UNSIGNED NOT NULL,
    searchID INT UNSIGNED NOT NULL,
-   originalFileType VARCHAR(10) NOT NULL,
+   originalFileType VARCHAR(50) NOT NULL,
    searchDate DATE,
    searchDuration INT UNSIGNED,
    uploadDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -338,8 +338,7 @@ CREATE TABLE MascotSearchResult (
    star INT UNSIGNED NOT NULL,
    calculatedMass DECIMAL(18,9),
    matchingIons INT UNSIGNED,
-   predictedIons INT UNSIGNED,
-   evalue DOUBLE UNSIGNED
+   predictedIons INT UNSIGNED
 );
 ALTER TABLE MascotSearchResult ADD INDEX(ionScore);
 ALTER TABLE MascotSearchResult ADD INDEX(identityScore);

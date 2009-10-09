@@ -8,6 +8,8 @@ package org.yeastrc.ms.service;
 
 import java.util.List;
 
+import org.yeastrc.ms.domain.search.Program;
+
 /**
  * 
  */
@@ -30,6 +32,8 @@ public interface SearchDataUploadService extends UploadService {
     public void setRemoteDecoyDirectory(String directory);
     
     public int getUploadedSearchId();
+    
+    public Program getSearchProgram();
     
     /**
      * If true, the charge and mass reported for a search result will be matched against 

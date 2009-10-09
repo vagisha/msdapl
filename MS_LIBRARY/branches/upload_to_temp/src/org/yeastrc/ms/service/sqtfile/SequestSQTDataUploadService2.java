@@ -86,7 +86,7 @@ public class SequestSQTDataUploadService2 extends AbstractSQTDataUploadService {
         return db;
     }
 
-    Program getSearchProgram() {
+    public Program getSearchProgram() {
 //        return Program.SEQUEST;
         return program;
     }

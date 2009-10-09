@@ -11,7 +11,6 @@ import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
-import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.service.UploadException.ERROR_CODE;
 import org.yeastrc.ms.upload.dao.UploadDAOFactory;
@@ -369,7 +368,7 @@ public class MsDataUploader {
         // Get the analysis data uploader
         if(uploadAnalysis) {
             log.info("Initializing AnalysisDataUploadService");
-            AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory);
+            AnalysisDataUploadService adus = getAnalysisDataUploader(analysisDirectory, sdus.getSearchProgram());
             exptUploader.setAnalysisDataUploader(adus);
         }
         // Get the protein inference uploader
@@ -395,11 +394,12 @@ public class MsDataUploader {
         return pidus;
     }
     
-    private AnalysisDataUploadService getAnalysisDataUploader(String dataDirectory) throws UploadException {
+    private AnalysisDataUploadService getAnalysisDataUploader(String dataDirectory,
+            Program searchProgram) throws UploadException {
         AnalysisDataUploadService adus = null;
         try {
             adus = UploadServiceFactory.instance().getAnalysisDataUploadService(dataDirectory);
-            adus.setSearchProgram(Program.SEQUEST);
+            adus.setSearchProgram(searchProgram);
         }
         catch (UploadServiceFactoryException e1) {
             UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
@@ -510,10 +510,9 @@ public class MsDataUploader {
             // If the search is already uploaded, don't re-upload it.
             int searchId = 0;
             try {
-                // TODO We are looking for a Sequest search ID
-                // An experiment can have multiple searches, even multiple Sequest searches. 
+                // An experiment can have multiple searches
                 // Need to think about how to handle this.
-                searchId = getExperimentSequestSearchId(this.uploadedExptId);
+                searchId = getExperimentSearchId(this.uploadedExptId);
             }
             catch (Exception e) {
                 UploadException ex = new UploadException(ERROR_CODE.PREUPLOAD_CHECK_FALIED);
@@ -589,6 +588,7 @@ public class MsDataUploader {
                 uploadExceptionList.add(ex);
                 log.error(ex.getMessage());
                 log.error("ABORTING EXPERIMENT UPLOAD!!!\n\tTime: "+(new Date()).toString()+"\n\n");
+                return;
             }
             if(searchAnalysisID == 0) {
                 
@@ -662,22 +662,31 @@ public class MsDataUploader {
     private int getSearchAnalysisId(int searchId) throws Exception {
         MsSearchAnalysisDAO adao = DAOFactory.instance().getMsSearchAnalysisDAO();
         List<Integer> analysisIds = adao.getAnalysisIdsForSearch(searchId);
+        
+        if(analysisIds == null || analysisIds.size() == 0)
+            return 0;
+        
         if(analysisIds.size() > 0) {
             // If we are uploading PEPTIDE_PROPHET results we may have multiple
-            // pepxml files in the same folder. So we will look at each one and 
-            // check if it has been uploaded or not.
+            // pepxml files in the same folder. So we will have to look at each one and 
+            // check if it has been uploaded or not. In this method we just check if 
+            // any of the returned analyses is a PeptideProphet analysis.  If it is, 
+            // we return 0 so that each input PeptideProphet pep.xml file is checked.
             MsSearchAnalysis analysis = adao.load(analysisIds.get(0));
             if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
                 return 0;
             }
         }
+        // If none of the returned analyses was PeptideProphet we throw an exception
+        // TODO:  Multiple analyses per search is allowed only for PeptideProphet for now.
         if(analysisIds.size() > 1) {
             throw new Exception("Multiple analysis ids for found for searchID: "+searchId);
         }
+        
         return analysisIds.get(0);
     }
 
-    private int getExperimentSequestSearchId(int uploadedExptId2) throws Exception {
+    private int getExperimentSearchId(int uploadedExptId2) throws Exception {
        
         MsSearchUploadDAO searchDao = UploadDAOFactory.getInstance().getMsSearchDAO();
         List<Integer> searchIds = searchDao.getSearchIdsForExperiment(uploadedExptId2);
@@ -685,16 +694,11 @@ public class MsDataUploader {
         if(searchIds.size() == 0)
             return 0;
         
-        int sequestSearchId = 0;
-        for(Integer id: searchIds) {
-            MsSearch search = searchDao.loadSearch(id);
-            if(search.getSearchProgram() == Program.SEQUEST) {
-                if(sequestSearchId != 0)
-                    throw new Exception("Multiple sequest search ids found for experimentID: "+uploadedExptId2);
-                sequestSearchId = id;
-            }
+        if(searchIds.size() > 1) {
+            throw new Exception("Multiple search ids found for experimentID: "+uploadedExptId2);
         }
-        return sequestSearchId;
+        
+        return searchIds.get(0);
     }
 
     private void updateLastUpdateDate(int experimentId) {
@@ -744,48 +748,6 @@ public class MsDataUploader {
         log.info(msg.toString());
     }
 
-   
-   
-    
-//    // upload percolator sqt files
-//    private int uploadPercolatorSearch(Set<String> filenames, Map<String, Integer> runIdMap, final Date searchDate) {
-//        
-//        // first upload the sqt files to populate the core search tables
-//        SearchParamsDataProvider paramsProvider = new SequestParamsParser();
-//        PeptideResultBuilder peptbuilder = SequestResultPeptideBuilder.instance();
-//        
-//        BaseSQTDataUploadService service = new BaseSQTDataUploadService(paramsProvider, peptbuilder, Program.PERCOLATOR);
-//        if(isMacCossData) 
-//            service.doScanChargeMassCheck(true);
-//        
-//        int searchId = service.uploadSearch(uploadedExptId, uploadDirectory, filenames, runIdMap, 
-//                        remoteServer, remoteDirectory, new java.sql.Date(searchDate.getTime()));
-//        
-//        this.uploadExceptionList.addAll(service.getUploadExceptionList());
-//        this.numSearchesToUpload = service.getNumSearchesToUpload();
-//        this.numSearchesUploaded = service.getNumSearchesUploaded();
-//        
-//        // if the search information could not be uploaded don't go any further
-//        if(uploadExceptionList.size() > 0) {
-//            return searchId;
-//        }
-//        
-//        // now upload the Percolator search results
-//        PercolatorSQTDataUploadService percService = new PercolatorSQTDataUploadService();
-//        MsRunSearchDAO runSearchDao = DAOFactory.instance().getMsRunSearchDAO();
-//        List<Integer> runSearchIds = runSearchDao.loadRunSearchIdsForSearch(searchId);
-//        Map<String, Integer> runSearchIdMap = new HashMap<String, Integer>(runSearchIds.size());
-//        for(Integer id: runSearchIds) {
-//            String filename = runSearchDao.loadFilenameForRunSearch(id);
-//            runSearchIdMap.put(filename, id);
-//        }
-//        percService.uploadPostSearchAnalysis(searchId, Program.SEQUEST, uploadDirectory, filenames, 
-//                runSearchIdMap, remoteDirectory);
-//        
-//        this.uploadExceptionList.addAll(percService.getUploadExceptionList());
-//        
-//        return searchId;
-//    }
     
     public static void main(String[] args) throws UploadException {
         long start = System.currentTimeMillis();

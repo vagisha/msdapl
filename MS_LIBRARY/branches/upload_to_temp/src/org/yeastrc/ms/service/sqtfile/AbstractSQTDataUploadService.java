@@ -225,7 +225,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
     // NOTE: this method should be called AFTER uploadSearchParameters.
     abstract MsSearchDatabaseIn getSearchDatabase();
     
-    abstract Program getSearchProgram();
+    public abstract Program getSearchProgram();
     
     abstract SearchFileFormat getSearchFileFormat();
     

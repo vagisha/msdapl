@@ -75,7 +75,7 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
         return db;
     }
 
-    Program getSearchProgram() {
+    public Program getSearchProgram() {
         return Program.PROLUCID;
     }
     

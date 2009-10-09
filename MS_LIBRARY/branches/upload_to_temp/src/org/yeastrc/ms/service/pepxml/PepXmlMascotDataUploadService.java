@@ -10,8 +10,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +25,6 @@ import org.yeastrc.ms.dao.search.mascot.MascotSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.domain.analysis.peptideProphet.MascotPeptideProphetResultIn;
 import org.yeastrc.ms.domain.general.MsEnzyme;
-import org.yeastrc.ms.domain.general.MsEnzymeIn;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
@@ -42,7 +39,6 @@ import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.MsSearchResultProtein;
 import org.yeastrc.ms.domain.search.MsSearchResultProteinIn;
-import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
@@ -157,6 +153,11 @@ public class PepXmlMascotDataUploadService implements SearchDataUploadService {
         this.modDao = daoFactory.getMsSearchModDAO();
         this.resultDao = daoFactory.getMsSearchResultDAO();
         
+    }
+    
+    @Override
+    public Program getSearchProgram() {
+        return Program.SEQUEST;
     }
     
     @Override
@@ -366,7 +367,6 @@ public class PepXmlMascotDataUploadService implements SearchDataUploadService {
         }
         
     }
-    
 
     private void matchSearchParams(int searchId, MsSearchIn parsedSearch, String fileName) throws UploadException {
         
@@ -375,201 +375,17 @@ public class PepXmlMascotDataUploadService implements SearchDataUploadService {
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         MsSearch search = searchDao.loadSearch(searchId);
         
+        SearchParamMatcher matcher = new SearchParamMatcher();
+        boolean matches = matcher.matchSearchParams(search, parsedSearch, fileName);
         
-        // match enzyme information
-        List<MsEnzyme> uploadedEnzymes = search.getEnzymeList();
-        List<MsEnzymeIn> enzymes = parsedSearch.getEnzymeList();
-        matchEnzymes(uploadedEnzymes, enzymes, fileName);
-        
-        // match database information
-        List<MsSearchDatabase> uploadedDbs = search.getSearchDatabases();
-        List<MsSearchDatabaseIn> databases = parsedSearch.getSearchDatabases();
-        matchDatabases(uploadedDbs, databases, fileName);
-        
-        // match dynamic residue modification information
-        List<MsResidueModification> uploadedDynaResMods = search.getDynamicResidueMods();
-        List<MsResidueModificationIn> dynaResMods = parsedSearch.getDynamicResidueMods();
-        matchResidueModifictions(uploadedDynaResMods, dynaResMods, fileName);
-        
-        // match static residue modification information
-        List<MsResidueModification> uploadedStaticResMods = search.getStaticResidueMods();
-        List<MsResidueModificationIn> staticResMods = parsedSearch.getStaticResidueMods();
-        matchResidueModifictions(uploadedStaticResMods, staticResMods, fileName);
-        
-        // match dynamic terminal modification information
-        List<MsTerminalModification> uploadedDynaTermMods = search.getDynamicTerminalMods();
-        List<MsTerminalModificationIn> dynaTermMods = parsedSearch.getDynamicTerminalMods();
-        matchTerminalModifictions(uploadedDynaTermMods, dynaTermMods, fileName);
-        
-        // match dynamic terminal modification information
-        List<MsTerminalModification> uploadedStaticTermMods = search.getStaticTerminalMods();
-        List<MsTerminalModificationIn> dynaStaticMods = parsedSearch.getStaticTerminalMods();
-        matchTerminalModifictions(uploadedStaticTermMods, dynaStaticMods, fileName);
+        if(!matches) {
+            log.error(matcher.getErrorMessage());
+            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+            ex.setErrorMessage(matcher.getErrorMessage());
+            throw ex;
+        }
         
         // TODO do we need to match some other key parameters e.g. min_enzymatic_termini etc. 
-    }
-
-    private void matchTerminalModifictions(
-            List<MsTerminalModification> uploadedDynaTermMods,
-            List<MsTerminalModificationIn> dynaTermMods, String fileName) throws UploadException {
-
-        if(uploadedDynaTermMods.size() != uploadedDynaTermMods.size()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.setErrorMessage("Number of uploaded terminal modification : "+uploadedDynaTermMods.size()+
-                    " does not match # found in file "+fileName+": "+uploadedDynaTermMods.size());
-            throw ex;
-        }
-        
-        if(uploadedDynaTermMods.size() == 0)
-            return;
-        
-        Collections.sort(uploadedDynaTermMods, new Comparator<MsTerminalModification>() {
-            public int compare(MsTerminalModification o1, MsTerminalModification o2) {
-                int val = o1.getModifiedTerminal().compareTo(o2.getModifiedTerminal());
-                if(val != 0) return val;
-                return o1.getModificationMass().compareTo(o2.getModificationMass());
-            }});
-        Collections.sort(uploadedDynaTermMods, new Comparator<MsTerminalModificationIn>() {
-            public int compare(MsTerminalModificationIn o1, MsTerminalModificationIn o2) {
-                int val = o1.getModifiedTerminal().compareTo(o2.getModifiedTerminal());
-                if(val != 0) return val;
-                return o1.getModificationMass().compareTo(o2.getModificationMass());
-            }});
-        
-        for(int i = 0; i < uploadedDynaTermMods.size(); i++) {
-            if(!matchTerminalModification(uploadedDynaTermMods.get(i), uploadedDynaTermMods.get(i))) {
-                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                ex.setErrorMessage("Mismatch in uploaded terminal modification and modification in file: "+fileName);
-                throw ex;
-            }
-        }
-    }
-    
-    private boolean matchTerminalModification(MsTerminalModification mod1, MsTerminalModificationIn mod2) {
-        
-        if(mod1.getModifiedTerminal() != mod2.getModifiedTerminal())
-            return false;
-        if(!mod1.getModificationMass().equals(mod2.getModificationMass()))
-            return false;
-        return true;
-    }
-
-
-    private void matchResidueModifictions(
-            List<MsResidueModification> uploadedDynaResMods,
-            List<MsResidueModificationIn> dynaResMods, String fileName) throws UploadException {
-        
-        if(uploadedDynaResMods.size() != dynaResMods.size()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.setErrorMessage("Number of uploaded residue modification : "+uploadedDynaResMods.size()+
-                    " does not match # found in file "+fileName+": "+dynaResMods.size());
-            throw ex;
-        }
-        
-        if(uploadedDynaResMods.size() == 0)
-            return;
-        
-        Collections.sort(uploadedDynaResMods, new Comparator<MsResidueModification>() {
-            public int compare(MsResidueModification o1, MsResidueModification o2) {
-                int val = Character.valueOf(o1.getModifiedResidue()).compareTo(o2.getModifiedResidue());
-                if(val != 0) return val;
-                return o1.getModificationMass().compareTo(o2.getModificationMass());
-            }});
-        Collections.sort(dynaResMods, new Comparator<MsResidueModificationIn>() {
-            public int compare(MsResidueModificationIn o1, MsResidueModificationIn o2) {
-                int val = Character.valueOf(o1.getModifiedResidue()).compareTo(o2.getModifiedResidue());
-                if(val != 0) return val;
-                return o1.getModificationMass().compareTo(o2.getModificationMass());
-            }});
-        
-        for(int i = 0; i < uploadedDynaResMods.size(); i++) {
-            if(!matchResidueModification(uploadedDynaResMods.get(i), dynaResMods.get(i))) {
-                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                ex.setErrorMessage("Mismatch in uploaded residue modification and modification in file: "+fileName);
-                throw ex;
-            }
-        }
-    }
-    
-    private boolean matchResidueModification(MsResidueModification mod1, MsResidueModificationIn mod2) {
-        
-        if(mod1.getModifiedResidue() != mod2.getModifiedResidue())
-            return false;
-        if(mod1.getModificationSymbol() != mod2.getModificationSymbol())
-            return false;
-        if(!mod1.getModificationMass().equals(mod2.getModificationMass()))
-            return false;
-        return true;
-    }
-
-    private void matchDatabases(List<MsSearchDatabase> uploadedDbs,
-            List<MsSearchDatabaseIn> databases, String fileName) throws UploadException {
-        
-        if(uploadedDbs.size() != databases.size()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.setErrorMessage("Number of uploaded search databases : "+uploadedDbs.size()+
-                    " does not match # databases in file "+fileName+": "+databases.size());
-            throw ex;
-        }
-        
-        Collections.sort(uploadedDbs, new Comparator<MsSearchDatabase>() {
-            public int compare(MsSearchDatabase o1, MsSearchDatabase o2) {
-                return o1.getDatabaseFileName().compareTo(o2.getDatabaseFileName());
-            }});
-        Collections.sort(databases, new Comparator<MsSearchDatabaseIn>() {
-            public int compare(MsSearchDatabaseIn o1, MsSearchDatabaseIn o2) {
-                return o1.getDatabaseFileName().compareTo(o2.getDatabaseFileName());
-            }});
-        for(int i = 0; i < uploadedDbs.size(); i++) {
-            if(!uploadedDbs.get(i).getDatabaseFileName().equals(databases.get(i).getDatabaseFileName())) {
-                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                ex.setErrorMessage("Mismatch in uploaded database database in file: "+fileName);
-                throw ex;
-            }
-        }
-    }
-
-    private void matchEnzymes(List<MsEnzyme> uploadedEnzymes,
-            List<MsEnzymeIn> enzymes, String fileName) throws UploadException {
-        
-        if(uploadedEnzymes.size() != enzymes.size()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.setErrorMessage("Number of uploaded enzymes : "+uploadedEnzymes.size()+
-                    " does not match # enzymes in file "+fileName+": "+enzymes.size());
-            throw ex;
-        }
-        
-        if(uploadedEnzymes.size() == 0)
-            return;
-        
-        Collections.sort(uploadedEnzymes, new Comparator<MsEnzyme>() {
-            public int compare(MsEnzyme o1, MsEnzyme o2) {
-                return o1.getName().compareTo(o2.getName());
-            }});
-        Collections.sort(enzymes, new Comparator<MsEnzymeIn>() {
-            public int compare(MsEnzymeIn o1, MsEnzymeIn o2) {
-                return o1.getName().compareTo(o2.getName());
-            }});
-        for(int i = 0; i < uploadedEnzymes.size(); i++) {
-            if(!matchEnzyme(uploadedEnzymes.get(i), enzymes.get(i))) {
-                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                ex.setErrorMessage("Mismatch in uploaded enzyme and enzyme in file: "+fileName);
-                throw ex;
-            }
-        }
-    }
-    
-    private boolean matchEnzyme(MsEnzyme enzyme1, MsEnzymeIn enzyme2) {
-        if(!enzyme1.getName().equals(enzyme2.getName()))
-            return false;
-        if(!enzyme1.getCut().equals(enzyme2.getCut()))
-            return false;
-        if(!enzyme1.getNocut().equals(enzyme2.getNocut()))
-            return false;
-        if(enzyme1.getSense() != enzyme2.getSense())
-            return false;
-        return true;
-        
     }
 
     private int getScanId(int runId, int scanNumber)
