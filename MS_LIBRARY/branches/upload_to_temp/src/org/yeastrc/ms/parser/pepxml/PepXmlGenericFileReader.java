@@ -274,7 +274,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             if(reader.next() == XMLStreamReader.START_ELEMENT) {
                 if(reader.getLocalName().equalsIgnoreCase("sample_enzyme")) {
                     this.enzyme = new Enzyme();
-                    enzyme.setName(reader.getAttributeValue(null,"trypsin"));
+                    enzyme.setName(reader.getAttributeValue(null,"name"));
                 }
                 else if(reader.getLocalName().equalsIgnoreCase("specificity")) {
                     enzyme.setCut(reader.getAttributeValue(null, "cut"));
