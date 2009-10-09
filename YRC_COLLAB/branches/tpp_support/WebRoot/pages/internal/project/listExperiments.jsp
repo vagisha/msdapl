@@ -299,16 +299,34 @@ function clearSelectedProtInfer() {
 							<b><bean:write name="search" property="searchProgram"/>
 							&nbsp;
 							<bean:write name="search" property="searchProgramVersion"/></b></td>
+							
+							
+							<!-- !!!!!! SEQUEST !!!!!! -->
+							<logic:equal name="search" property="searchProgram" value="<%=Program.SEQUEST.toString() %>">
 							<td width="33%">
-							<b>
+								<b>
 								<html:link action="viewSequestResults.do" 
 											paramId="ID" 
 											paramName="search" paramProperty="id">[View Results]</html:link>
-								<!--<html:link action="newSequestPepXmlDownload.do" 
+								<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
 											paramId="ID" 
-											paramName="search" paramProperty="id">[PepXML]</html:link>-->
+											paramName="search" paramProperty="id">[PepXML]</html:link> -->
+								</b>
+							</td>
+							</logic:equal>
+							
+							<!-- !!!!!! MASCOT !!!!!! -->
+							<logic:equal name="search" property="searchProgram" value="<%=Program.MASCOT.toString() %>">
+							<td width="33%">
+							<b>
+								<html:link action="viewMascotResults.do" 
+											paramId="ID" 
+											paramName="search" paramProperty="id">[View Results]</html:link>
 							</b>
 							</td>
+							</logic:equal>
+							
+							
 							<td width="33%"><b>Search Date: </b>&nbsp;
 							<bean:write name="search" property="searchDate"/></td>
 							

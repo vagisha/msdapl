@@ -1,7 +1,7 @@
 /**
- * TabularPeptideProphetResult.java
+ * TabularMascotResults.java
  * @author Vagisha Sharma
- * Apr 5, 2009
+ * Oct 9, 2009
  * @version 1.0
  */
 package org.yeastrc.experiment;
@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
 import org.yeastrc.www.misc.Pageable;
@@ -19,64 +18,43 @@ import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
 import org.yeastrc.www.misc.Tabular;
 
-public class TabularPeptideProphetResults implements Tabular, Pageable {
+/**
+ * 
+ */
+public class TabularMascotResults implements Tabular, Pageable {
 
-        private SORT_BY[] columns;
+    private SORT_BY[] columns = new SORT_BY[] {
+            SORT_BY.FILE_SEARCH,
+            SORT_BY.SCAN, 
+            SORT_BY.CHARGE, 
+            SORT_BY.MASS, 
+            SORT_BY.RT, 
+            SORT_BY.MASCOT_RANK,
+            SORT_BY.ION_SCORE, 
+            SORT_BY.IDENTITY_SCORE, 
+            SORT_BY.HOMOLOGY_SCORE, 
+            SORT_BY.EXPECT, 
+            SORT_BY.PEPTIDE,
+            SORT_BY.PROTEIN
+        };
         
         private SORT_BY sortColumn;
         private SORT_ORDER sortOrder = SORT_ORDER.ASC;
         
         
-        private List<? extends PeptideProphetResultPlus> results;
-        private Program searchProgram;
+        private List<MascotResultPlus> results;
         
         private int currentPage;
         private int lastPage = currentPage;
         private List<Integer> displayPageNumbers;
         
         
-        public TabularPeptideProphetResults(List<? extends PeptideProphetResultPlus> results, 
-                Program searchProgram) {
-            
+        public TabularMascotResults(List<MascotResultPlus> results, boolean useEvalue) {
             this.results = results;
             displayPageNumbers = new ArrayList<Integer>();
             displayPageNumbers.add(currentPage);
-            this.searchProgram = searchProgram;
-            
-            if(searchProgram == Program.SEQUEST) {
-                columns = new SORT_BY[] {
-                        SORT_BY.FILE_ANALYSIS,
-                        SORT_BY.SCAN, 
-                        SORT_BY.CHARGE, 
-                        SORT_BY.MASS, 
-                        SORT_BY.RT, 
-                        SORT_BY.PEPTP_PROB, 
-                        SORT_BY.XCORR_RANK,
-                        SORT_BY.XCORR,
-//                        SORT_BY.DELTACN,
-                        SORT_BY.PEPTIDE,
-                        SORT_BY.PROTEIN
-                    };
-            }
-            else if(searchProgram == Program.MASCOT) {
-                columns = new SORT_BY[] {
-                        SORT_BY.FILE_ANALYSIS,
-                        SORT_BY.SCAN, 
-                        SORT_BY.CHARGE, 
-                        SORT_BY.MASS, 
-                        SORT_BY.RT, 
-                        SORT_BY.PEPTP_PROB, 
-                        SORT_BY.MASCOT_RANK,
-                        SORT_BY.ION_SCORE,
-                        SORT_BY.IDENTITY_SCORE,
-                        SORT_BY.HOMOLOGY_SCORE,
-                        SORT_BY.EXPECT,
-//                        SORT_BY.DELTACN,
-                        SORT_BY.PEPTIDE,
-                        SORT_BY.PROTEIN
-                    };
-            }
         }
+        
         
         @Override
         public int columnCount() {
@@ -98,33 +76,28 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
         public void setSortOrder(SORT_ORDER sortOrder) {
             this.sortOrder = sortOrder;
         }
-
+        
         @Override
         public List<TableHeader> tableHeaders() {
             List<TableHeader> headers = new ArrayList<TableHeader>(columns.length);
             for(SORT_BY col: columns) {
                 TableHeader header = new TableHeader(col.getDisplayName(), col.name());
-                
-                if(col == SORT_BY.XCORR_RANK || col == SORT_BY.XCORR || col == SORT_BY.DELTACN)
-                    header.setSortable(false);
-                if(col == SORT_BY.PROTEIN)
-                    header.setSortable(false);
-                
                 if(col == sortColumn) {
                     header.setSorted(true);
                     header.setSortOrder(sortOrder);
                 }
+                if(col == SORT_BY.PROTEIN)
+                    header.setSortable(false);
                 headers.add(header);
             }
             return headers;
         }
-        
+
         @Override
         public TableRow getRow(int index) {
-            
             if(index >= results.size())
                 return null;
-            PeptideProphetResultPlus result = results.get(index);
+            MascotResultPlus result = results.get(index);
             TableRow row = new TableRow();
             
             // row.addCell(new TableCell(String.valueOf(result.getId())));
@@ -144,23 +117,11 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                 row.addCell(new TableCell(String.valueOf(round(temp))));
             
             
-            row.addCell(new TableCell(String.valueOf(result.getProbabilityRounded())));
-            
-            // Sequest data
-            if(searchProgram == Program.SEQUEST) {
-                row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorrRank())));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusSequest)result).getSequestData().getxCorr()))));
-//            row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
-            }
-            
-            // Mascot data
-            else if(searchProgram == Program.MASCOT) {
-                row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusMascot)result).getMascotData().getRank())));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getIonScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getIdentityScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getHomologyScore()))));
-                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getExpect()))));
-            }
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getRank())));
+            row.addCell(new TableCell(String.valueOf(round(result.getMascotResultData().getIonScore()))));
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getIdentityScore())));
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore())));
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect())));
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
             cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
@@ -170,7 +131,6 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             cell = new TableCell(String.valueOf(result.getProteins()));
             cell.setClassName("left_align");
             row.addCell(cell);
-            
             return row;
         }
         
@@ -191,8 +151,7 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             // nothing to do here?
         }
 
-        
-        
+
         @Override
         public int getCurrentPage() {
             return currentPage;
@@ -224,5 +183,4 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
         public int getPageCount() {
             return lastPage;
         }
-
 }

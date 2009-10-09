@@ -21,7 +21,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.experiment.PeptideProphetResultPlus;
+import org.yeastrc.experiment.PeptideProphetResultPlusMascot;
+import org.yeastrc.experiment.PeptideProphetResultPlusSequest;
 import org.yeastrc.experiment.PercolatorResultPlus;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.TabularPeptideProphetResults;
@@ -32,6 +33,7 @@ import org.yeastrc.ms.dao.analysis.peptideProphet.PeptideProphetResultDAO;
 import org.yeastrc.ms.dao.analysis.percolator.PercolatorResultDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
@@ -134,8 +136,10 @@ public class ViewAnalysisResults extends Action {
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
 
 
+        Program searchProgram = null;
         for(int searchId: searchIds) {
             MsSearch search = searchDao.loadSearch(searchId);
+            searchProgram = search.getSearchProgram();
             experimentIds.add(search.getExperimentId());
         }
         if(experimentIds.size() > 0) {
@@ -191,7 +195,7 @@ public class ViewAnalysisResults extends Action {
 
         // Get details for the result we will display
         // Set up for tabular display
-        Tabular tabResults = getTabularResults(analysis, forPage, numResultsPerPage, myForm);
+        Tabular tabResults = getTabularResults(analysis, searchProgram, forPage, numResultsPerPage, myForm);
         
         ((Pageable)tabResults).setCurrentPage(pageNum);
         int pageCount = pager.getPageCount(resultIds.size(), numResultsPerPage);
@@ -220,14 +224,19 @@ public class ViewAnalysisResults extends Action {
     // ----------------------------------------------------------------------------------------
     // TABULAR RESULTS
     // ----------------------------------------------------------------------------------------
-    private Tabular getTabularResults(MsSearchAnalysis analysis, 
+    private Tabular getTabularResults(MsSearchAnalysis analysis, Program searchProgram,
             List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
         
         if(analysis.getAnalysisProgram() == Program.PERCOLATOR) {
             return getPercolatorResults(analysis, forPage, numResultsPerPage, myForm);
         }
-        else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET) {
-            return getPeptideProphetResults(analysis, forPage, numResultsPerPage, myForm);
+        else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET &&
+                searchProgram == Program.SEQUEST) {
+            return getPeptideProphetSequestResults(analysis, forPage, numResultsPerPage, myForm);
+        }
+        else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET &&
+                searchProgram == Program.MASCOT) {
+            return getPeptideProphetMascotResults(analysis, forPage, numResultsPerPage, myForm);
         }
         
         log.error("Unrecognized analysis program: "+analysis.getAnalysisProgram().displayName());
@@ -273,8 +282,8 @@ public class ViewAnalysisResults extends Action {
         return tabResults;
     }
     
-    // -------PEPTIDE PROPHET RESULTS
-    private Tabular getPeptideProphetResults(MsSearchAnalysis analysis,
+    // -------PEPTIDE PROPHET SEQUEST RESULTS
+    private Tabular getPeptideProphetSequestResults(MsSearchAnalysis analysis,
             List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
         
         // Get details for the result we will display
@@ -284,17 +293,45 @@ public class ViewAnalysisResults extends Action {
         SequestSearchResultDAO seqResDao = DAOFactory.instance().getSequestResultDAO();
         
         PeptideProphetResultDAO presDao = DAOFactory.instance().getPeptideProphetResultDAO();
-        List<PeptideProphetResultPlus> results = new ArrayList<PeptideProphetResultPlus>(numResultsPerPage);
+        List<PeptideProphetResultPlusSequest> results = new ArrayList<PeptideProphetResultPlusSequest>(numResultsPerPage);
         for(Integer prophetResultId: forPage) {
             PeptideProphetResult result = presDao.loadForProphetResultId(prophetResultId);
             MsScan scan = scanDao.loadScanLite(result.getScanId());
-            PeptideProphetResultPlus resPlus = new PeptideProphetResultPlus(result, scan);
+            PeptideProphetResultPlusSequest resPlus = new PeptideProphetResultPlusSequest(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
             resPlus.setSequestData(seqResDao.load(result.getSearchResultId()).getSequestResultData());
             results.add(resPlus);
         }
 
-        TabularPeptideProphetResults tabResults = new TabularPeptideProphetResults(results);
+        TabularPeptideProphetResults tabResults = new TabularPeptideProphetResults(results, Program.SEQUEST);
+        tabResults.setSortedColumn(myForm.getSortBy());
+        tabResults.setSortOrder(myForm.getSortOrder());
+        
+        return tabResults;
+    }
+    
+    // -------PEPTIDE PROPHET MASCOT RESULTS
+    private Tabular getPeptideProphetMascotResults(MsSearchAnalysis analysis,
+            List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
+        
+        // Get details for the result we will display
+        Map<Integer, String> filenameMap = getFileNames(analysis.getId());
+        
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        MascotSearchResultDAO mascotResDao = DAOFactory.instance().getMascotResultDAO();
+        
+        PeptideProphetResultDAO presDao = DAOFactory.instance().getPeptideProphetResultDAO();
+        List<PeptideProphetResultPlusMascot> results = new ArrayList<PeptideProphetResultPlusMascot>(numResultsPerPage);
+        for(Integer prophetResultId: forPage) {
+            PeptideProphetResult result = presDao.loadForProphetResultId(prophetResultId);
+            MsScan scan = scanDao.loadScanLite(result.getScanId());
+            PeptideProphetResultPlusMascot resPlus = new PeptideProphetResultPlusMascot(result, scan);
+            resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
+            resPlus.setMascotData(mascotResDao.load(result.getSearchResultId()).getMascotResultData());
+            results.add(resPlus);
+        }
+
+        TabularPeptideProphetResults tabResults = new TabularPeptideProphetResults(results, Program.MASCOT);
         tabResults.setSortedColumn(myForm.getSortBy());
         tabResults.setSortOrder(myForm.getSortOrder());
         
