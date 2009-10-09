@@ -241,17 +241,17 @@ public class SearchParamMatcher {
     }
     
     private boolean matchEnzyme(MsEnzyme enzyme1, MsEnzymeIn enzyme2) {
-        if(!enzyme1.getName().equals(enzyme2.getName())) {
+        if(!enzyme1.getName().equalsIgnoreCase(enzyme2.getName())) {
             errorMessage.append("Mismatching enzymes: Enzyme names do not match\n");
             errorMessage.append("uploaded name: "+enzyme1.getName()+"; name in file: "+enzyme2.getName()+"\n");
             return false;
         }
-        if(!enzyme1.getCut().equals(enzyme2.getCut())) {
+        if(!enzyme1.getCut().equalsIgnoreCase(enzyme2.getCut())) {
             errorMessage.append("Mismatching enzymes: Enzyme cut does not match\n");
             errorMessage.append("uploaded  cut: "+enzyme1.getCut()+"; cut in file: "+enzyme2.getCut()+"\n");
             return false;
         }
-        if(!enzyme1.getNocut().equals(enzyme2.getNocut())) {
+        if(!enzyme1.getNocut().equalsIgnoreCase(enzyme2.getNocut())) {
             errorMessage.append("Mismatching enzymes: Enzyme nocut does not match\n");
             errorMessage.append("uploaded nocut: "+enzyme1.getCut()+"; nocut in file: "+enzyme2.getCut()+"\n");
             return false;
