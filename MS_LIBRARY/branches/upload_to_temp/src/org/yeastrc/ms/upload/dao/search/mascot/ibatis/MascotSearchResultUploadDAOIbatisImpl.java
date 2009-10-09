@@ -68,6 +68,9 @@ public class MascotSearchResultUploadDAOIbatisImpl extends BaseSqlMapDAO impleme
             values.append(",(");
             values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
+            int rank = data.getRank();
+            values.append(rank == -1 ? "NULL" : rank);
+            values.append(",");
             values.append(data.getIonScore());
             values.append(",");
             values.append(data.getIdentityScore());

@@ -9,7 +9,8 @@
 	
 	
 	<resultMap class="MascotResultOut" id="mascotResultResult" extends="MsSearchResult.msSearchResult">
-		<result property="ionScore" column="ionScore"/>
+		<result property="ionScore" column="ionScore" nullValue="-1"/>
+		<result property="rank" column="rank"/>
 		<result property="identityScore" column="identityScore"/>
 		<result property="homologyScore" column="homologyScore"/>
 		<result property="expect" column="expect"/>
@@ -21,6 +22,7 @@
 	
 	<parameterMap class="MascotResultDataIn" id="mascotResultDataParam">
 		<parameter property="resultId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="rank" jdbcType="INTEGER" nullValue="-1"/>
 		<parameter property="ionScore" jdbcType="DECIMAL"/>
 		<parameter property="identityScore" jdbcType="DECIMAL"/>
 		<parameter property="homologyScore" jdbcType="DECIMAL"/>
@@ -41,7 +43,8 @@
     
     <insert id="insert" parameterMap="mascotResultDataParam">
     	INSERT INTO MascotSearchResult 
-    	(resultID, 
+    	(resultID,
+    	rank, 
     	ionScore,
     	identityScore,
     	homologyScore,
@@ -50,12 +53,13 @@
     	calculatedMass,
     	matchingIons,
     	predictedIons)
-    	VALUES (?,?,?,?,?,?,?,?,?)
+    	VALUES (?,?,?,?,?,?,?,?,?,?)
     </insert>
     
     <insert id="insertAll" parameterClass="String">
     	INSERT INTO MascotSearchResult 
     	(resultID, 
+    	rank,
     	ionScore,
     	identityScore,
     	homologyScore,
