@@ -452,11 +452,14 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         List<MsSearchResultProteinIn> myMatches = result.getSearchResult().getProteinMatchList();
         if(storedMatches.size() != myMatches.size()) {
-            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-            ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
-                    " does not match the number of matches found in interact files: "+myMatches.size()+
-                    " for searchResultID: "+matchingSearchResultId);
-            throw ex;
+//            UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+//            ex.setErrorMessage("Number of protein matches stored: "+storedMatches.size()+
+//                    " does not match the number of matches found in interact files: "+myMatches.size()+
+//                    " for searchResultID: "+matchingSearchResultId);
+//            throw ex;
+            log.error("Number of protein matches stored: "+storedMatches.size()+
+                  " does not match the number of matches found in interact files: "+myMatches.size()+
+                  " for searchResultID: "+matchingSearchResultId);
         }
         
         Set<String> storedAccessions = new HashSet<String>(storedMatches.size());
@@ -466,11 +469,14 @@ public class PepxmlAnalysisDataUploadService implements AnalysisDataUploadServic
         
         for(MsSearchResultProteinIn prot: myMatches) {
             if(!storedAccessions.contains(prot.getAccession())) {
-                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                ex.setErrorMessage("Protein in interact file not found in database: "+prot.getAccession()+
-                        "; searchResultID: "+matchingSearchResultId+
-                        "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
-                throw ex;
+//                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+//                ex.setErrorMessage("Protein in interact file not found in database: "+prot.getAccession()+
+//                        "; searchResultID: "+matchingSearchResultId+
+//                        "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
+//                throw ex;
+                log.error("Protein in interact file not found in database: "+prot.getAccession()+
+                      "; searchResultID: "+matchingSearchResultId+
+                      "; peptide: "+result.getSearchResult().getResultPeptide().getPeptideSequence());
             }
         }
     }
