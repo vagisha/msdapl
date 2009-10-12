@@ -455,11 +455,16 @@ public class PepXmlSequestDataUploadService implements SearchDataUploadService {
                         List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
                         if(matches == null) {
                             matches = matchService.getMatchingProteins(peptideSeq);
+                            if(matches.size() == 0) {
+                                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                                ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
+                                throw ex;
+                            }
                             proteinMatches.put(peptideSeq, matches);
                         }
-//                        if(proteinMatches.size() % 10 == 0) {
-//                            System.out.println("matches for # sequences: "+proteinMatches.size());
-//                        }
+                        if(proteinMatches.size() % 10 == 0) {
+                            System.out.println("matches for # sequences: "+proteinMatches.size());
+                        }
                         List<MsSearchResultProteinIn> protList = sres.getProteinMatchList();
                         
                         for(PeptideProteinMatch match: matches) {

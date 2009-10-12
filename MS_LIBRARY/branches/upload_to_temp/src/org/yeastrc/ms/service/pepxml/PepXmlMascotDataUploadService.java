@@ -428,6 +428,11 @@ public class PepXmlMascotDataUploadService implements SearchDataUploadService {
                         List<PeptideProteinMatch> matches = proteinMatches.get(peptideSeq);
                         if(matches == null) {
                             matches = matchService.getMatchingProteins(peptideSeq);
+                            if(matches.size() == 0) {
+                                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                                ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
+                                throw ex;
+                            }
                             proteinMatches.put(peptideSeq, matches);
                         }
                         

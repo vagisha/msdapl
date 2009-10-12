@@ -18,7 +18,8 @@ public class AminoAcidUtils {
     public static final double OXYGEN = 15.9994;
     public static final double PROTON = 1.00727646688;
     
-    public static final Set<Character> validChars = new HashSet<Character>();
+    private static final char[] aminoAcidsChars = new char[20];
+    private static final Set<Character> validChars = new HashSet<Character>();
     
     static {
         validChars.add('G');
@@ -45,9 +46,37 @@ public class AminoAcidUtils {
         validChars.add('R');
         validChars.add('Y');
         validChars.add('W');
+        
+        int i = 0;
+        aminoAcidsChars[i++] = 'A'; // Ananine
+        aminoAcidsChars[i++] = 'R'; // Arginine        
+        aminoAcidsChars[i++] = 'N'; // Asparagine
+        aminoAcidsChars[i++] = 'D'; // Aspartic Acid
+        aminoAcidsChars[i++] = 'C'; // Cysteine
+        aminoAcidsChars[i++] = 'E'; // Glutamic Acid
+        aminoAcidsChars[i++] = 'Q'; // Glutamine
+        aminoAcidsChars[i++] = 'G'; // Glycine
+        aminoAcidsChars[i++] = 'H'; // Histidine
+        aminoAcidsChars[i++] = 'I'; // Isoleucine
+        aminoAcidsChars[i++] = 'L'; // Leucine
+        aminoAcidsChars[i++] = 'K'; // Lycine
+        aminoAcidsChars[i++] = 'M'; // Methionine
+        aminoAcidsChars[i++] = 'F'; // Phenyl-ananine
+        aminoAcidsChars[i++] = 'P'; // Proline    
+        aminoAcidsChars[i++] = 'S'; // Serine
+        aminoAcidsChars[i++] = 'T'; // Threonine
+        aminoAcidsChars[i++] = 'W'; // Tryptophan
+        aminoAcidsChars[i++] = 'Y'; // Tyrosine
+        aminoAcidsChars[i++] = 'V'; // Valine
+        
+        
     }
     
     private AminoAcidUtils() {}
+    
+    public static char[] getAminoAcidChars() {
+        return aminoAcidsChars;
+    }
     
     public static boolean isAminoAcid(char aa) {
         return validChars.contains(Character.toUpperCase(aa));

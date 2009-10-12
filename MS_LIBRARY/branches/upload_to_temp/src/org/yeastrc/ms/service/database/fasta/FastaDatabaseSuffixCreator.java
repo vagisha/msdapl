@@ -12,8 +12,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -23,6 +25,7 @@ import org.yeastrc.ms.ConnectionFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.nrseq.NrDbProteinFull;
 import org.yeastrc.ms.service.database.DatabaseCopyException;
+import org.yeastrc.ms.util.AminoAcidUtils;
 import org.yeastrc.ms.util.TimeUtils;
 
 /**
@@ -30,14 +33,18 @@ import org.yeastrc.ms.util.TimeUtils;
  */
 public class FastaDatabaseSuffixCreator {
 
-    private static final int SUFFIX_LENGTH = 255;
+    public static final int SUFFIX_LENGTH = 5;
     private String nrseqDbName;
     private DataSource nrseqDs;
     
-    private String tableName;
+    private String dbTableName;
+    private static String suffixTableName = "suffix_"+SUFFIX_LENGTH;
+    
+    private Map<String, Integer> suffixIdMap;
     
     private List<Suffix> suffixCache;
-    private static final int BUF_SIZE = 500;
+    
+    private static final int BUF_SIZE = 1000;
     
     private static final Logger log = Logger.getLogger(FastaDatabaseSuffixCreator.class.getName());
     
@@ -51,27 +58,78 @@ public class FastaDatabaseSuffixCreator {
         
         suffixCache = new ArrayList<Suffix>();
         
-        tableName = getSuffixTableName(databaseId);
+        // check if the main suffix table exists. If not, create it.
+        if(checkTableExists(suffixTableName)) {
+            log.info("Main suffix table exists");
+        }
+        else {
+            log.info("Creating main suffix table: "+suffixTableName);
+            createMainSuffixTable();
+            this.addMainSuffixTableIndex();
+            buildSuffixTable();
+        }
         
+        // create the suffix table for the given database
+        dbTableName = getDbSuffixTableName(databaseId);
         // first check if a table for this database already exists
-        if(checkTableExists(tableName)) {
-            log.info("Table "+tableName+" already exists");
+        if(checkTableExists(dbTableName)) {
+            log.info("Table "+dbTableName+" already exists");
             return;
         }
         
-        // create the table
-        createTable(tableName);
-        
-        // add an index on the table
-        addTableIndex(tableName);
-        
-        // save the suffixes in the table
-        saveSuffixes(tableName, databaseId);
+        createDbSuffixTable();
+        // do the actual work
+        buildSuffixIdMap(); // build a map for fast lookup of suffixIds.
+        saveSuffixes(dbTableName, databaseId); // save the suffixes in the table
         
     }
+
+    private void buildSuffixIdMap() throws SQLException {
+       
+      log.info("Building suffixID map");
+      
+      Connection conn = null;
+      Statement stmt = null;
+      ResultSet rs = null;
+      try {
+          conn = this.nrseqDs.getConnection();
+          stmt = conn.createStatement();
+          String sql = "SELECT * FROM "+suffixTableName;
+          
+          rs = stmt.executeQuery(sql);
+          
+          this.suffixIdMap = new HashMap<String, Integer>(320000);
+          int i = 0;
+          while(rs.next()) {
+              suffixIdMap.put(rs.getString("suffix"), rs.getInt("id"));
+              if(i%1000 == 0) {
+                  System.out.println(i);
+              }
+              i++;
+          }
+      }
+      finally {
+          
+          if(conn != null)    try {conn.close();} catch(SQLException e){}
+          if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+          if(rs != null)      try {rs.close();} catch(SQLException e){}
+      }
+    }
+
+    private void createDbSuffixTable() throws SQLException {
+        // create the table
+        createDbSuffixTable(dbTableName);
+        
+        // add an index on the table
+        addTableIndex(dbTableName);
+    }
     
-    public static String getSuffixTableName(int databaseId) {
+    public static String getDbSuffixTableName(int databaseId) {
         return "suffix_db_"+databaseId;
+    }
+    
+    public static String getMainSuffixTableName() {
+        return suffixTableName;
     }
    
     public void saveSuffixes(String tableName, int databaseId) throws SQLException {
@@ -85,6 +143,7 @@ public class FastaDatabaseSuffixCreator {
         
         long s = System.currentTimeMillis();
         
+        int idx = 0;
         for(int dbProteinId: dbProteinIds) {
             NrDbProteinFull protein = NrSeqLookupUtil.getDbProteinFull(dbProteinId);
             
@@ -98,11 +157,13 @@ public class FastaDatabaseSuffixCreator {
             createSuffixes(sequence, protein.getSequenceId(), dbProteinId);
             
             if(this.suffixCache.size() >= BUF_SIZE)
-                flushCache();
+                flushDbSuffixCache(suffixCache);
+            
+            System.out.println("Done "+idx++);
         }
         
-        if(this.suffixCache.size() >= BUF_SIZE)
-            flushCache();
+        if(this.suffixCache.size() > 0)
+            flushDbSuffixCache(suffixCache);
         
         long e = System.currentTimeMillis();
         log.info("Total time to create suffix table for databaseID: "+databaseId+" was "
@@ -112,31 +173,59 @@ public class FastaDatabaseSuffixCreator {
     
     private void createSuffixes(String sequence, int sequenceId, int dbProteinId) throws SQLException {
         
+        Set<String> uniqSuffixes = new HashSet<String>();
+        
+        // get the unique suffixes in this sequence
         for(int i = 0; i < sequence.length(); i++) {
             int end = Math.min(i+SUFFIX_LENGTH, sequence.length());
             String subseq = sequence.substring(i, end);
-            Suffix suffix = new Suffix();
-            suffix.dbProteinId = dbProteinId;
-            suffix.sequenceId = sequenceId;
-            suffix.suffix = subseq;
-            this.suffixCache.add(suffix);
+            uniqSuffixes.add(subseq);
             if(i+SUFFIX_LENGTH >= sequence.length())
                 break;
         }
+        
+        // add the suffixes to the cache after looking up the suffixId from the suffixIdMap.
+        for(String s: uniqSuffixes) {
+            int suffixId = getSuffixId(s);
+            // suffixes that contain charcters that are not amino acid codes will not 
+            // have an id in the suffixIdMap. We will ignore these suffixes. 
+            if(suffixId == 0) {
+                log.warn("No id found for: "+s+"; sequenceID: "+sequenceId);
+                continue;
+            }
+            Suffix suffix = new Suffix();
+            suffix.dbProteinId = dbProteinId;
+            suffix.sequenceId = sequenceId;
+            suffix.suffixId = suffixId;
+            suffix.suffix = s;
+            this.suffixCache.add(suffix);
+        }
     }
     
-    private void flushCache() throws SQLException {
+    
+    private int getSuffixId(String suffix) throws SQLException {
         
-//        log.info("Flushing...");
+        Integer id = suffixIdMap.get(suffix);
+        if(id == null) {
+            return 0;
+        }
+        else {
+            return id;
+        }
+    }
+    
+    private void flushDbSuffixCache(List<Suffix> cache) throws SQLException {
+        
+        log.info("Flushing...");
         
         Connection conn = null;
         Statement stmt = null;
-        StringBuilder sql = new StringBuilder("INSERT INTO "+tableName+" VALUES ");
-        for(Suffix suffix: this.suffixCache) {
+        StringBuilder sql = new StringBuilder("INSERT INTO "+dbTableName+" VALUES ");
+        for(Suffix suffix: cache) {
             sql.append("(");
             sql.append(suffix.sequenceId+", ");
             sql.append(suffix.dbProteinId+", ");
-            sql.append("'"+suffix.suffix+"'");
+            sql.append(suffix.suffixId);
             sql.append("),");
         }
         sql.deleteCharAt(sql.length() - 1);
@@ -151,7 +240,7 @@ public class FastaDatabaseSuffixCreator {
             if(conn != null)    try {conn.close();} catch(SQLException e){}
             if(stmt != null)    try {stmt.close();} catch(SQLException e){}
         }
-        this.suffixCache.clear();
+        cache.clear();
     }
 
     
@@ -179,13 +268,118 @@ public class FastaDatabaseSuffixCreator {
         }
     }
     
-    private void createTable(String tableName) throws SQLException {
+    private void createMainSuffixTable() throws SQLException {
         
         Connection conn = null;
         Statement stmt = null;
         try {
             conn = this.nrseqDs.getConnection();
-            String sql = "CREATE TABLE "+tableName+" (sequenceID INT UNSIGNED NOT NULL, dbProteinID INT UNSIGNED NOT NULL, suffix VARCHAR(255) NOT NULL)";
+            String sql = "CREATE TABLE "+suffixTableName+" (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, suffix VARCHAR("+SUFFIX_LENGTH+") NOT NULL)";
+            
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            
+            if(conn != null)    try {conn.close();} catch(SQLException e){}
+            if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+        }
+    }
+    
+    private void buildSuffixTable() throws SQLException {
+        
+        char[] aaChars = AminoAcidUtils.getAminoAcidChars();
+        
+        int[] posIndex = new int[SUFFIX_LENGTH];
+        for(int i = 0; i < posIndex.length; i++) {
+            posIndex[i] = 0;
+        }
+        int[] posIncr = new int[SUFFIX_LENGTH];
+        int numPossibilities = 1;
+        for(int i = 0; i < posIncr.length; i++) {
+            posIncr[i] = numPossibilities;
+            numPossibilities *= aaChars.length;
+        }
+        
+        List<String> suffixes = new ArrayList<String>();
+        
+        for(int i = 1; i <= numPossibilities; i++) {
+            StringBuilder buf = new StringBuilder();
+            
+            for(int j = 0; j < SUFFIX_LENGTH; j++) {
+                buf.append(aaChars[posIndex[j]]);
+            }
+            
+            for(int x = 0; x < SUFFIX_LENGTH; x++) {
+                int y = i % posIncr[x];
+                if(y == 0) {
+                    posIndex[x] = (posIndex[x]+ 1)%aaChars.length;
+                };
+            }
+            suffixes.add(buf.toString());
+            if(suffixes.size() >= BUF_SIZE) {
+               flushSuffixCache(suffixes);
+            }
+        }
+
+        if(suffixes.size() >= 1) {
+            flushSuffixCache(suffixes);
+        }
+    }
+    
+    private void flushSuffixCache(List<String> cache) throws SQLException {
+        
+//      log.info("Flushing...");
+      
+      Connection conn = null;
+      Statement stmt = null;
+      StringBuilder sql = new StringBuilder("INSERT INTO "+suffixTableName+" (suffix) VALUES ");
+      for(String suffix: cache) {
+          sql.append("('");
+          sql.append(suffix);
+          sql.append("'),");
+      }
+      sql.deleteCharAt(sql.length() - 1);
+      
+      try {
+          conn = this.nrseqDs.getConnection();
+          stmt = conn.createStatement();
+          stmt.executeUpdate(sql.toString());
+      }
+      finally {
+          
+          if(conn != null)    try {conn.close();} catch(SQLException e){}
+          if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+      }
+      cache.clear();
+  }
+    
+    private void addMainSuffixTableIndex() throws SQLException {
+        
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = this.nrseqDs.getConnection();
+            String sql = "ALTER TABLE "+suffixTableName+" ADD INDEX (suffix)";
+            
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+        finally {
+            
+            if(conn != null)    try {conn.close();} catch(SQLException e){}
+            if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+        }
+    }
+
+
+    private void createDbSuffixTable(String tableName) throws SQLException {
+        
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = this.nrseqDs.getConnection();
+            String sql = "CREATE TABLE "+tableName+" (sequenceID INT UNSIGNED NOT NULL, dbProteinID INT UNSIGNED NOT NULL, suffixID INT UNSIGNED NOT NULL)";
             
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
@@ -203,7 +397,7 @@ public class FastaDatabaseSuffixCreator {
         Statement stmt = null;
         try {
             conn = this.nrseqDs.getConnection();
-            String sql = "ALTER TABLE "+tableName+" ADD INDEX (suffix(10))";
+            String sql = "ALTER TABLE "+tableName+" ADD INDEX (suffixID)";
             
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
@@ -220,6 +414,7 @@ public class FastaDatabaseSuffixCreator {
      
         FastaDatabaseSuffixCreator creator = new FastaDatabaseSuffixCreator();
         creator.createSuffixTable(123);
+
     }
  
  
@@ -227,7 +422,16 @@ public class FastaDatabaseSuffixCreator {
         
         int dbProteinId;
         int sequenceId;
+        int suffixId;
         String suffix;
+        
+        public int getSuffixId() {
+            return suffixId;
+        }
+        public void setSuffixId(int suffixId) {
+            this.suffixId = suffixId;
+        }
+        //        private String suffix;
         public int getDbProteinId() {
             return dbProteinId;
         }
