@@ -99,13 +99,8 @@ public class FastaDatabaseSuffixCreator {
           rs = stmt.executeQuery(sql);
           
           this.suffixIdMap = new HashMap<String, Integer>(320000);
-          int i = 0;
           while(rs.next()) {
               suffixIdMap.put(rs.getString("suffix"), rs.getInt("id"));
-              if(i%1000 == 0) {
-                  System.out.println(i);
-              }
-              i++;
           }
       }
       finally {
@@ -114,6 +109,7 @@ public class FastaDatabaseSuffixCreator {
           if(stmt != null)    try {stmt.close();} catch(SQLException e){}
           if(rs != null)      try {rs.close();} catch(SQLException e){}
       }
+      log.info("Finished bulding suffixID map");
     }
 
     private void createDbSuffixTable() throws SQLException {
@@ -159,7 +155,10 @@ public class FastaDatabaseSuffixCreator {
             if(this.suffixCache.size() >= BUF_SIZE)
                 flushDbSuffixCache(suffixCache);
             
-            System.out.println("Done "+idx++);
+            if(idx%1000 == 0) {
+                log.info("Saved suffixes for # proteins "+idx);
+            }
+            idx++;
         }
         
         if(this.suffixCache.size() > 0)
