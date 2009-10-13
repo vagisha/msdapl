@@ -486,11 +486,11 @@ public class PepXmlMascotDataUploadService implements SearchDataUploadService {
         int numEnzymaticTermini = 0;
         if(search.getSearchProgram() == Program.SEQUEST) {
             SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
-            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
+//            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
         }
         else if (search.getSearchProgram() == Program.MASCOT) {
             MascotSearchDAO mascotDao = DAOFactory.instance().getMascotSearchDAO();
-            numEnzymaticTermini = mascotDao.getNumEnzymaticTermini(searchId);
+//            numEnzymaticTermini = mascotDao.getNumEnzymaticTermini(searchId);
         }
         // TODO what about other search engines
         

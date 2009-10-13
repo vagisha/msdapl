@@ -129,7 +129,7 @@ public class FastaDatabaseSuffixCreator {
         log.info("# proteins: "+dbProteinIds.size()+" for database: "+databaseId);
         
         // some proteins in a fasta file have the same sequence.  We will not create suffixes twice
-        Set<Integer> seenSequenceIds = new HashSet<Integer>(dbProteinIds.size());
+//        Set<Integer> seenSequenceIds = new HashSet<Integer>(dbProteinIds.size());
         
         long s = System.currentTimeMillis();
         
@@ -137,10 +137,10 @@ public class FastaDatabaseSuffixCreator {
         for(int dbProteinId: dbProteinIds) {
             NrDbProteinFull protein = NrSeqLookupUtil.getDbProteinFull(dbProteinId);
             
-            if(seenSequenceIds.contains(protein.getSequenceId()))
-                continue;
-            else
-                seenSequenceIds.add(protein.getSequenceId());
+//            if(seenSequenceIds.contains(protein.getSequenceId()))
+//                continue;
+//            else
+//                seenSequenceIds.add(protein.getSequenceId());
             
             String sequence = NrSeqLookupUtil.getProteinSequenceForNrSeqDbProtId(dbProteinId);
             
