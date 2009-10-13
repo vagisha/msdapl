@@ -33,7 +33,7 @@ import org.yeastrc.ms.util.TimeUtils;
  */
 public class FastaDatabaseSuffixCreator {
 
-    public static final int SUFFIX_LENGTH = 5;
+    public static final int SUFFIX_LENGTH = 4;
     private String nrseqDbName;
     private DataSource nrseqDs;
     
@@ -209,7 +209,7 @@ public class FastaDatabaseSuffixCreator {
     
     private void flushDbSuffixCache(List<Suffix> cache) throws SQLException {
         
-        log.info("Flushing...");
+//        log.  info("Flushing...");
         
         Connection conn = null;
         Statement stmt = null;
@@ -386,6 +386,7 @@ public class FastaDatabaseSuffixCreator {
     
     private void addTableIndex(String tableName) throws SQLException {
         
+        long s = System.currentTimeMillis();
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -400,6 +401,8 @@ public class FastaDatabaseSuffixCreator {
             if(conn != null)    try {conn.close();} catch(SQLException e){}
             if(stmt != null)    try {stmt.close();} catch(SQLException e){}
         }
+        long e = System.currentTimeMillis();
+        log.info("Time to add index on suffixID: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
     }
     
     

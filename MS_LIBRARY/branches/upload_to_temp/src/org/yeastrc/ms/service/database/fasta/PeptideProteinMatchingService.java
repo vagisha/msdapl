@@ -12,8 +12,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.yeastrc.ms.ConnectionFactory;
@@ -190,6 +192,9 @@ public class PeptideProteinMatchingService {
             while(rs.next()) {
                 dbProteinIds.add((rs.getInt("dbProteinID")));
             }
+//            if(dbProteinIds.size() == 0) {
+//               System.out.println(sql);
+//            }
         }
         catch (SQLException e) {
             throw new RuntimeException("Exception getting matching proteinIds for suffix: "+peptide+" and database: "+this.databaseId, e);
@@ -205,7 +210,7 @@ public class PeptideProteinMatchingService {
     
     private List<String> getSuffixList(String peptide) {
         
-        List<String> suffixList = new ArrayList<String>();
+        Set<String> suffixList = new HashSet<String>();
         for(int i = 0; i < peptide.length(); i++) {
             int end = Math.min(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH, peptide.length());
             suffixList.add(peptide.substring(i, end));
@@ -213,7 +218,7 @@ public class PeptideProteinMatchingService {
             if(i+FastaDatabaseSuffixCreator.SUFFIX_LENGTH >= peptide.length())
                 break;
         }
-        return suffixList;
+        return new ArrayList<String>(suffixList);
     }
     
     private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) {
