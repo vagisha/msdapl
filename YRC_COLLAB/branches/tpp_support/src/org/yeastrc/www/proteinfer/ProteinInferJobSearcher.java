@@ -15,10 +15,14 @@ import org.apache.log4j.Logger;
 import org.yeastrc.db.DBConnectionManager;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.analysis.MsSearchAnalysisDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
+import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
+import org.yeastrc.ms.domain.search.MsSearch;
 
 public class ProteinInferJobSearcher {
 
@@ -26,6 +30,8 @@ public class ProteinInferJobSearcher {
     
     private static final ProteinferDAOFactory factory = ProteinferDAOFactory.instance();
     private static final ProteinferRunDAO runDao = factory.getProteinferRunDao();
+    private static final MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+    private static final MsSearchAnalysisDAO analysisDao = DAOFactory.instance().getMsSearchAnalysisDAO();
     
     private static ProteinInferJobSearcher instance;
     
@@ -103,27 +109,32 @@ public class ProteinInferJobSearcher {
 
     private List<Integer> getPinferRunIdsForSearch(int msSearchId) {
         
+        // load the search
+        MsSearch search = searchDao.loadSearch(msSearchId);
+        
+        Set<Integer> pinferIdsSet = new HashSet<Integer>();
+        
         // first get all the runSearchIds for this search
         List<Integer> msRunSearchIds = getRunSearchIdsForMsSearch(msSearchId);
+        // load protein inference results for the runSearchIDs where the input generator was 
+        // the search program
+        List<Integer> searchInputIds = runDao.loadProteinferIdsForInputIds(msRunSearchIds, search.getSearchProgram());
+        pinferIdsSet.addAll(searchInputIds);
+        
         
         // now check if there is any analysis associated with this search
         List<Integer> analysisIds = getAnalysisIdsForMsSearch(msSearchId);
         
         // get all the runSearchAnalysisIds for each analysis done on the search
-        List<Integer> runSearchAnalysisIds = new ArrayList<Integer>();
         for(int analysisId: analysisIds) {
-            runSearchAnalysisIds.addAll(getRunSearchAnalysisIdsForAnalysis(analysisId));
+            // load the analysis
+            MsSearchAnalysis analysis = analysisDao.load(analysisId);
+            List<Integer> analysisInputIds = runDao.loadProteinferIdsForInputIds(
+                    getRunSearchAnalysisIdsForAnalysis(analysisId), analysis.getAnalysisProgram());
+            pinferIdsSet.addAll(analysisInputIds);
         }
         
-        // collect all the possible inputIds 
-        Set<Integer> allInputIds = new HashSet<Integer>(msRunSearchIds);
-        allInputIds.addAll(runSearchAnalysisIds);
-        
-        List<Integer> pinferRunIds = runDao.loadProteinferIdsForInputIds(new ArrayList<Integer>(allInputIds));
-        if(pinferRunIds != null)    
-            pinferRunIds.addAll(pinferRunIds);
-       
-        return pinferRunIds;
+        return new ArrayList<Integer>(pinferIdsSet);
     }
     
     
@@ -216,8 +227,7 @@ public class ProteinInferJobSearcher {
     }
     
     private List<Integer> getAnalysisIdsForMsSearch(int msSearchId) {
-        org.yeastrc.ms.dao.DAOFactory factory = org.yeastrc.ms.dao.DAOFactory.instance();
-        return factory.getMsSearchAnalysisDAO().getAnalysisIdsForSearch(msSearchId);
+        return analysisDao.getAnalysisIdsForSearch(msSearchId);
     }
     
     private List<Integer> getRunSearchAnalysisIdsForAnalysis(int analysisId) {
