@@ -13,7 +13,6 @@ import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferInput;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.ProteinferStatus;
-import org.yeastrc.ms.domain.protinfer.ProteinferInput.InputType;
 import org.yeastrc.ms.domain.search.Program;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -78,7 +77,7 @@ public class ProteinferRunDAO extends BaseSqlMapDAO implements GenericProteinfer
         buf.append(")");
         
         Map<String, String> map = new HashMap<String, String>(4);
-        map.put("inputGenarator", inputGenerator.name());
+        map.put("inputGenerator", inputGenerator.name());
         map.put("inputIds", buf.toString());
         
         return super.queryForList(sqlMapNameSpace+".selectPinferIdsForInputIdsProgram", map);
