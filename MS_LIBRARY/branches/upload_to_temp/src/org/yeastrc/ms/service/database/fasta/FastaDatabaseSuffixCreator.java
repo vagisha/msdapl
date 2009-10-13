@@ -77,11 +77,13 @@ public class FastaDatabaseSuffixCreator {
             return;
         }
         
-        createDbSuffixTable();
+        // create the table
+        createDbSuffixTable(dbTableName);
         // do the actual work
         buildSuffixIdMap(); // build a map for fast lookup of suffixIds.
         saveSuffixes(dbTableName, databaseId); // save the suffixes in the table
-        
+        // add an index on the table
+        addTableIndex(dbTableName);
     }
 
     private void buildSuffixIdMap() throws SQLException {
@@ -112,14 +114,6 @@ public class FastaDatabaseSuffixCreator {
       log.info("Finished bulding suffixID map");
     }
 
-    private void createDbSuffixTable() throws SQLException {
-        // create the table
-        createDbSuffixTable(dbTableName);
-        
-        // add an index on the table
-        addTableIndex(dbTableName);
-    }
-    
     public static String getDbSuffixTableName(int databaseId) {
         return "suffix_db_"+databaseId;
     }

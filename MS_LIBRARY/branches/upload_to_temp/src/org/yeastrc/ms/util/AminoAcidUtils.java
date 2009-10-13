@@ -18,7 +18,7 @@ public class AminoAcidUtils {
     public static final double OXYGEN = 15.9994;
     public static final double PROTON = 1.00727646688;
     
-    private static final char[] aminoAcidsChars = new char[20];
+    private static final char[] aminoAcidsChars = new char[24];
     private static final Set<Character> validChars = new HashSet<Character>();
     
     static {
@@ -49,26 +49,29 @@ public class AminoAcidUtils {
         
         int i = 0;
         aminoAcidsChars[i++] = 'A'; // Ananine
-        aminoAcidsChars[i++] = 'R'; // Arginine        
-        aminoAcidsChars[i++] = 'N'; // Asparagine
-        aminoAcidsChars[i++] = 'D'; // Aspartic Acid
+        aminoAcidsChars[i++] = 'B'; // Aspartic Acid or Asparagine
         aminoAcidsChars[i++] = 'C'; // Cysteine
+        aminoAcidsChars[i++] = 'D'; // Aspartic Acid
         aminoAcidsChars[i++] = 'E'; // Glutamic Acid
-        aminoAcidsChars[i++] = 'Q'; // Glutamine
+        aminoAcidsChars[i++] = 'F'; // Phenyl-ananine
         aminoAcidsChars[i++] = 'G'; // Glycine
         aminoAcidsChars[i++] = 'H'; // Histidine
         aminoAcidsChars[i++] = 'I'; // Isoleucine
-        aminoAcidsChars[i++] = 'L'; // Leucine
         aminoAcidsChars[i++] = 'K'; // Lycine
+        aminoAcidsChars[i++] = 'L'; // Leucine
         aminoAcidsChars[i++] = 'M'; // Methionine
-        aminoAcidsChars[i++] = 'F'; // Phenyl-ananine
-        aminoAcidsChars[i++] = 'P'; // Proline    
+        aminoAcidsChars[i++] = 'N'; // Asparagine
+        aminoAcidsChars[i++] = 'O'; // Ornithine
+        aminoAcidsChars[i++] = 'P'; // Proline  
+        aminoAcidsChars[i++] = 'Q'; // Glutamine
+        aminoAcidsChars[i++] = 'R'; // Arginine        
         aminoAcidsChars[i++] = 'S'; // Serine
         aminoAcidsChars[i++] = 'T'; // Threonine
+        aminoAcidsChars[i++] = 'V'; // Valine
         aminoAcidsChars[i++] = 'W'; // Tryptophan
         aminoAcidsChars[i++] = 'Y'; // Tyrosine
-        aminoAcidsChars[i++] = 'V'; // Valine
-        
+        aminoAcidsChars[i++] = 'Z'; // Glutamatic Acid or Glutamine
+        aminoAcidsChars[i++] = 'X'; // Leucine or Isoleucine
         
     }
     
