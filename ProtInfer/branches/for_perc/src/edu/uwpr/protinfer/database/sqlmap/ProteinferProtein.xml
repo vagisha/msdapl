@@ -75,6 +75,19 @@
     	AND m.piPeptideID = pept.id
     </select>
     
+    <select id="proteinsForPeptideInRun" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT m.piProteinID
+    	FROM msProteinInferPeptide AS p, msProteinInferProteinPeptideMatch AS m
+    	<isPropertyAvailable property="exact">
+    		WHERE p.sequence = #peptide#
+    	</isPropertyAvailable>
+    	<isNotPropertyAvailable property="exact">
+    		WHERE p.sequence LIKE #peptide#
+    	</isNotPropertyAvailable>
+    	AND p.piRunID=#pinferId#
+    	AND p.id = m.piPeptideID
+    </select>
+    
     <select id="peptideCountForProteinInRuns" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT COUNT(DISTINCT(sequence))
     	FROM msProteinInferPeptide AS pept, 

@@ -149,62 +149,17 @@ public class ProteinferProteinDAO extends BaseSqlMapDAO implements GenericProtei
         return queryForList(sqlMapNameSpace+".peptidesForProteinInRuns", map);
     }
     
-//    public List<ProteinferProtein> loadProteinsN(int pinferId) {
-//        Connection conn = null;
-//        PreparedStatement stmt = null;
-//        ResultSet rs = null;
-//        
-//        try {
-//            conn = super.getConnection();
-//            String sql = "SELECT * from msProteinInferProtein WHERE piRunID=?";
-//            stmt = conn.prepareStatement( sql );
-//            stmt.setInt( 1, pinferId );
-//            rs = stmt.executeQuery();
-//            
-//            List<ProteinferProtein> proteinList = new ArrayList<ProteinferProtein>();
-//            
-//            while ( rs.next() ) {
-//            
-//                ProteinferProtein protein = new ProteinferProtein();
-//                protein.setId(rs.getInt("id"));
-//                protein.setProteinferId(rs.getInt("piRunID"));
-//                protein.setNrseqProteinId(rs.getInt("nrseqProteinID"));
-//                protein.setCoverage(rs.getDouble("coverage"));
-//                protein.setUserAnnotation(rs.getString("userAnnotation"));
-//                String validationStr = rs.getString("userValidation");
-//                ProteinUserValidation validation = ProteinUserValidation.UNVALIDATED;
-//                if(validationStr != null && validationStr.length() > 0) {
-//                    validation = ProteinUserValidation.getStatusForChar(validationStr.charAt(0));
-//                }
-//                protein.setUserValidation(validation);
-//                proteinList.add(protein);
-//            }
-//            
-//            rs.close(); rs = null;
-//            stmt.close(); stmt = null;
-//            conn.close(); conn = null;
-//            
-//            return proteinList;
-//          
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            
-//            if (rs != null) {
-//                try { rs.close(); rs = null; } catch (Exception e) { ; }
-//            }
-//
-//            if (stmt != null) {
-//                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
-//            }
-//            
-//            if (conn != null) {
-//                try { conn.close(); conn = null; } catch (Exception e) { ; }
-//            }           
-//        }
-//        return null;
-//    }
+    public List<Integer> getProteinsForPeptide(int pinferId, String peptide, boolean exactMatch) {
+        
+        String peptideStr = exactMatch ? peptide : "%"+peptide+"%";
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        if(exactMatch)
+            map.put("exact", exactMatch);
+        map.put("pinferId", pinferId);
+        map.put("peptide", peptideStr);
+        
+        return queryForList(sqlMapNameSpace+".proteinsForPeptideInRun", map);
+    }
     
     public int getProteinCount(int proteinferId) {
        return (Integer) queryForObject(sqlMapNameSpace+".selectProteinCountForProteinferRun", proteinferId); 

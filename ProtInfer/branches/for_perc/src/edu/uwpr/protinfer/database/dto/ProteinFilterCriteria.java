@@ -82,6 +82,9 @@ public class ProteinFilterCriteria {
     private String descriptionLike;
     private String descriptionNotLike;
     
+    private String peptide;
+    private boolean exactMatch = true;
+    
     private SORT_BY sortBy = SORT_BY.NONE;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
     
@@ -239,6 +242,23 @@ public class ProteinFilterCriteria {
         this.maxCoverage = maxCoverage;
     }
     
+    //-------------------------------------------------------------
+    // PEPTIDE FILTER
+    //-------------------------------------------------------------
+    public String getPeptide() {
+        return peptide;
+    }
+    public void setPeptide(String peptide) {
+        this.peptide = peptide;
+    }
+    public void setExactPeptideMatch(boolean exact) {
+        this.exactMatch = exact;
+    }
+    public boolean getExactPeptideMatch() {
+        return this.exactMatch;
+    }
+    
+    
     public boolean equals(ProteinFilterCriteria o) {
         if(this == o)
             return true;
@@ -286,6 +306,16 @@ public class ProteinFilterCriteria {
         }
         else {
             if(!this.descriptionNotLike.equalsIgnoreCase(that.descriptionNotLike))
+                return false;
+        }
+        
+        if(peptide == null) {
+            if(that.peptide != null)  return false;
+        }
+        else {
+            if(!this.peptide.equalsIgnoreCase(that.peptide))
+                return false;
+            if(this.exactMatch != that.exactMatch)
                 return false;
         }
         return true;
