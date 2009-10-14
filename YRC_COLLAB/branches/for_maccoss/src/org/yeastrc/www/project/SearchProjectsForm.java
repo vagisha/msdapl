@@ -32,8 +32,6 @@ public class SearchProjectsForm extends ActionForm {
 	/** The groups for this search */
 	private String[] groups = new String[0];
 	
-	/** The types for this search */
-	private String[] types = new String[0];
 	
 	/** The search string entered */
 	private String searchString = "";
@@ -53,13 +51,6 @@ public class SearchProjectsForm extends ActionForm {
 	}
 
 	/**
-	 * @return
-	 */
-	public String[] getTypes() {
-		return types;
-	}
-
-	/**
 	 * @param strings
 	 */
 	public void setGroups(String[] strings) {
@@ -71,13 +62,6 @@ public class SearchProjectsForm extends ActionForm {
 	 */
 	public void setSearchString(String string) {
 		searchString = string;
-	}
-
-	/**
-	 * @param strings
-	 */
-	public void setTypes(String[] strings) {
-		types = strings;
 	}
 
 }
