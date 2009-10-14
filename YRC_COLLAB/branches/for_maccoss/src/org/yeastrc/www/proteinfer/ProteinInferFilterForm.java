@@ -32,6 +32,9 @@ public class ProteinInferFilterForm extends ActionForm {
     
     private boolean excludeIndistinGroups = false;
     
+    private String peptide = null;
+    private boolean exactMatch = true;
+    
     private int goAspect = GOUtils.BIOLOGICAL_PROCESS;  // Used for GO enrichment only
     private int speciesId;
     private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
@@ -39,6 +42,9 @@ public class ProteinInferFilterForm extends ActionForm {
     public ProteinInferFilterForm () {}
     
     public void reset() {
+        // These need to be set to false because if a checkbox is not checked the browser does not
+        // send its value in the request.
+        // http://struts.apache.org/1.1/faqs/newbie.html#checkboxes
         minCoverage = "0.0";
         minPeptides = "1";
         minUniquePeptides = "0";
@@ -49,6 +55,7 @@ public class ProteinInferFilterForm extends ActionForm {
         descriptionLike = null;
         descriptionNotLike = null;
         excludeIndistinGroups = false;
+        exactMatch = false;
     }
     
     /**
@@ -241,6 +248,24 @@ public class ProteinInferFilterForm extends ActionForm {
         this.descriptionNotLike = descriptionNotLike;
     }
 
+    // PEPTIDE 
+    public String getPeptide() {
+        return peptide;
+    }
+    public void setPeptide(String peptide) {
+        if(peptide != null && peptide.trim().length() == 0)
+            this.peptide = null;
+        else
+            this.peptide = peptide;
+    }
+    
+    public boolean getExactPeptideMatch() {
+        return exactMatch;
+    }
+    public void setExactPeptideMatch(boolean exact) {
+        this.exactMatch = exact;
+    }
+    
     // VALIDATION STATUS
     public String[] getValidationStatus() {
         return validationStatus;

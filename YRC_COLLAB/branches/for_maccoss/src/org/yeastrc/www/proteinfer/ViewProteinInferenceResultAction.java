@@ -23,8 +23,6 @@ import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
-import org.yeastrc.www.compare.Dataset;
-import org.yeastrc.www.compare.DatasetSource;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerInputSummary;

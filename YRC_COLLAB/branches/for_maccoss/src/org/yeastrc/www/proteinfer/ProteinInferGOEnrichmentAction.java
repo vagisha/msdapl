@@ -151,6 +151,8 @@ public class ProteinInferGOEnrichmentAction extends Action {
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
         filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());
+        filterCriteria.setPeptide(filterForm.getPeptide());
+        filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
         
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);

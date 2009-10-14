@@ -90,6 +90,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
             int myGrp = proteins.get(endIndex-1).getGroupId();
             while(proteins.get(endIndex).getGroupId() == myGrp && endIndex < this.getTotalProteinCount()) {
                 endIndex++;
+                if(endIndex >= this.getTotalProteinCount())
+                    break;
             }
         }
         return endIndex;

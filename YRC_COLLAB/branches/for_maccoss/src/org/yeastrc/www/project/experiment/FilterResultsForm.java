@@ -240,7 +240,7 @@ public class FilterResultsForm extends ActionForm {
         return peptide;
     }
     public void setPeptide(String peptide) {
-        if(peptide != null && peptide.length() == 0)
+        if(peptide != null && peptide.trim().length() == 0)
             this.peptide = null;
         else
             this.peptide = peptide;

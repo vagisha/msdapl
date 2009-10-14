@@ -109,6 +109,11 @@
   			<td valign="top"><html:text name="proteinInferFilterForm" property="accessionLike" size="40"></html:text><br>
   				<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
   			</td>
+  			<td valign="top">Peptide: </td>
+  			<td valign="top">
+  				<html:text name="proteinInferFilterForm" property="peptide" size="40"></html:text>
+  				<span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinInferFilterForm" property="exactPeptideMatch"></html:checkbox></span>
+  			</td>
   			
   		</tr>
   		<tr>
