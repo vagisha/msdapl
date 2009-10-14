@@ -429,9 +429,24 @@ public class PepXmlMascotDataUploadService implements SearchDataUploadService {
                         if(matches == null) {
                             matches = matchService.getMatchingProteins(peptideSeq);
                             if(matches.size() == 0) {
-                                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
-                                ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
-                                throw ex;
+                                
+                                // This can happen if no matching protein was found with the search 
+                                // constraints used. Mascot still reports the hit. 
+                                // So we relax the constraints and search again
+                                int oldNet = matchService.getNumEnzymaticTermini();
+                                if(oldNet > 0) {
+                                    log.info("No protein match found for peptide: "+peptideSeq+"; relaxing NET and searching again...");
+                                    matchService.setNumEnzymaticTermini(0);
+                                    matches = matchService.getMatchingProteins(peptideSeq);
+                                    matchService.setNumEnzymaticTermini(oldNet);
+                                }
+                                
+                                // If we still did not find any matches
+                                if(matches.size() == 0) {
+                                    UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                                    ex.setErrorMessage("No protein matches found for peptide: "+peptideSeq);
+                                    throw ex;
+                                }
                             }
                             proteinMatches.put(peptideSeq, matches);
                         }
@@ -486,11 +501,11 @@ public class PepXmlMascotDataUploadService implements SearchDataUploadService {
         int numEnzymaticTermini = 0;
         if(search.getSearchProgram() == Program.SEQUEST) {
             SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
-//            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
+            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
         }
         else if (search.getSearchProgram() == Program.MASCOT) {
             MascotSearchDAO mascotDao = DAOFactory.instance().getMascotSearchDAO();
-//            numEnzymaticTermini = mascotDao.getNumEnzymaticTermini(searchId);
+            numEnzymaticTermini = mascotDao.getNumEnzymaticTermini(searchId);
         }
         // TODO what about other search engines
         

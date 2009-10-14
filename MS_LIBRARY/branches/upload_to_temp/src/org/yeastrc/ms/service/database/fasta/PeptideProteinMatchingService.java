@@ -80,6 +80,10 @@ public class PeptideProteinMatchingService {
         this.numEnzymaticTermini = net;
     }
     
+    public int getNumEnzymaticTermini() {
+        return this.numEnzymaticTermini;
+    }
+   
     public void setEnzymeRules(List<EnzymeRule> enzymeRules) {
         this.enzymeRules = enzymeRules;
     }

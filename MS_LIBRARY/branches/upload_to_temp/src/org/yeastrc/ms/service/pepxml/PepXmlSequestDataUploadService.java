@@ -515,7 +515,7 @@ public class PepXmlSequestDataUploadService implements SearchDataUploadService {
         int numEnzymaticTermini = 0;
         if(search.getSearchProgram() == Program.SEQUEST) {
             SequestSearchDAO seqDao = DAOFactory.instance().getSequestSearchDAO();
-//            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
+            numEnzymaticTermini = seqDao.getNumEnzymaticTermini(searchId);
         }
         // TODO what about other search engines
         
