@@ -1,11 +1,12 @@
 package org.yeastrc.www.proteinfer;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,28 +17,36 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.experiment.MascotResultPlus;
 import org.yeastrc.experiment.SequestResultPlus;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
-import org.yeastrc.ms.dao.run.ms2file.MS2ScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
 import org.yeastrc.ms.dao.search.GenericSearchDAO.MassType;
+import org.yeastrc.ms.dao.search.mascot.MascotSearchDAO;
+import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
+import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
+import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
+import org.yeastrc.ms.domain.search.mascot.MascotSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
+import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
+import org.yeastrc.ms.util.AminoAcidUtils;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
@@ -90,7 +99,7 @@ public class ViewSpectrumAction extends Action {
         }
         
         try {
-            List<String> params = useMsData(scanID, runSearchResultID, mapping, request);
+            List<String> params = makeAppletParams(scanID, runSearchResultID, mapping, request);
             if (params == null) {
                 // any errors have already been set. 
                 return mapping.findForward("Failure");
@@ -131,7 +140,8 @@ public class ViewSpectrumAction extends Action {
         int searchId = runSearch.getSearchId();
         
         // get the resultIds
-        List<Integer> resultIds = resultDao.loadResultIdsForSearchScan(runSearchId, scanId);
+//        List<Integer> resultIds = resultDao.loadResultIdsForSearchScan(runSearchId, scanId);
+        Set<Integer> resultIds = new HashSet<Integer>(resultDao.loadResultIdsForSearchScan(runSearchId, scanId));
         
         // get the search
         MsSearch search = searchDao.loadSearch(searchId);
@@ -155,6 +165,22 @@ public class ViewSpectrumAction extends Action {
                 MsScan scan = scanDao.load(sres.getScanId());
                 boolean highlight = runSearchResultId == sres.getId() ? true : false;
                 tabRes.addResult(new SequestResultPlus(sres, scan), highlight);
+            }
+            if(resultIds.size() > 0) {
+                request.setAttribute("results", tabRes);
+            }
+        }
+        
+        else if(search.getSearchProgram() == Program.MASCOT) {
+            
+            TabularMascotResults tabRes = new TabularMascotResults();
+            MascotSearchResultDAO masResDao = DAOFactory.instance().getMascotResultDAO();
+            
+            for(int resultId: resultIds) {
+                MascotSearchResult sres = masResDao.load(resultId);
+                MsScan scan = scanDao.load(sres.getScanId());
+                boolean highlight = runSearchResultId == sres.getId() ? true : false;
+                tabRes.addResult(new MascotResultPlus(sres, scan), highlight);
             }
             if(resultIds.size() > 0) {
                 request.setAttribute("results", tabRes);
@@ -281,6 +307,95 @@ public class ViewSpectrumAction extends Action {
             // nothing to do here
         }
     }
+    
+    
+    private static class TabularMascotResults implements Tabular {
+
+        
+        private static SORT_BY[] columns = new SORT_BY[] {
+            SORT_BY.MASS, 
+            SORT_BY.CALC_MASS_SEQ,
+            SORT_BY.CHARGE, 
+            SORT_BY.RT, 
+            SORT_BY.MASCOT_RANK,
+            SORT_BY.ION_SCORE, 
+            SORT_BY.IDENTITY_SCORE,
+            SORT_BY.HOMOLOGY_SCORE,
+            SORT_BY.EXPECT,
+            SORT_BY.PEPTIDE
+        };
+        
+        private int highlightedRow = -1;
+        
+        private final List<MascotResultPlus> results;
+        
+        public TabularMascotResults() {
+            this.results = new ArrayList<MascotResultPlus>();
+        }
+        
+        public void addResult(MascotResultPlus result, boolean highlight) {
+            if(highlight)
+                highlightedRow = results.size();
+            results.add(result);
+        }
+        @Override
+        public int columnCount() {
+            return columns.length;
+        }
+        @Override
+        public TableRow getRow(int index) {
+            if(index >= results.size())
+                return null;
+            MascotResultPlus result = results.get(index);
+            TableRow row = new TableRow();
+            
+            row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
+            row.addCell(new TableCell(String.valueOf(round(result.getMascotResultData().getCalculatedMass())), null));
+            row.addCell(new TableCell(String.valueOf(result.getCharge())));
+            
+            // Retention time
+            BigDecimal temp = result.getRetentionTime();
+            if(temp == null) {
+                row.addCell(new TableCell("", null));
+            }
+            else
+                row.addCell(new TableCell(String.valueOf(round(temp)), null));
+            
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getRank()), null));
+            row.addCell(new TableCell(String.valueOf(round(result.getMascotResultData().getIonScore())), null));
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getIdentityScore()), null));
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore()), null));
+            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect()), null));
+            
+            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+            TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
+            cell.setTargetName("SPECTRUM_WINDOW");
+            cell.setClassName("left_align");
+            row.addCell(cell);
+            
+            if(highlightedRow == index)
+                row.setRowHighighted(true);
+            return row;
+        }
+        @Override
+        public int rowCount() {
+            return results.size();
+        }
+        @Override
+        public List<TableHeader> tableHeaders() {
+            List<TableHeader> headers = new ArrayList<TableHeader>(columns.length);
+            for(SORT_BY col: columns) {
+                TableHeader header = new TableHeader(col.getDisplayName(), col.name());
+                headers.add(header);
+            }
+            return headers;
+        }
+        @Override
+        public void tabulate() {
+            // nothing to do here
+        }
+    }
+
     private static double round(BigDecimal number) {
         return round(number.doubleValue());
     }
@@ -288,8 +403,8 @@ public class ViewSpectrumAction extends Action {
         return Math.round(num*100.0)/100.0;
     }
     
-    private List<String> useMsData(int scanId, int runSearchResultId, ActionMapping mapping, HttpServletRequest request) 
-        throws IOException {
+    private List<String> makeAppletParams(int scanId, int runSearchResultId, ActionMapping mapping, HttpServletRequest request) 
+        throws Exception {
         
         MsSearchResultDAO resultDao = DAOFactory.instance().getMsSearchResultDAO();
         MsSearchResult result = resultDao.load(runSearchResultId);
@@ -301,34 +416,58 @@ public class ViewSpectrumAction extends Action {
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         MsSearch search = searchDao.loadSearch(searchId);
         
+        List<MsResidueModification> dynaResMods = search.getDynamicResidueMods();
+        if(dynaResMods.size() > 3) {
+            throw new Exception("SpectrumApplet cannot handle > 3 variable modifications");
+        }
+        // TODO SpectrumApplet only works with Sequest style modifications. Need to rewrite it.
+        if(search.getSearchProgram() != Program.SEQUEST) {
+            char[] symbols = new char[] {'*', '#', '@'};
+            int i = 0;
+            for(MsResidueModification mod: dynaResMods) {
+                mod.setModificationSymbol(symbols[i++]);
+            }
+        }
+        
         String Sq = result.getResultPeptide().getModifiedPeptidePS();
         Sq = result.getResultPeptide().getPreResidue()+"."+Sq+"."+result.getResultPeptide().getPostResidue();
         request.setAttribute("peptideSeq", Sq);
+        if(search.getSearchProgram() != Program.SEQUEST) {
+            MsSearchResultPeptide seqStylePeptide = SequestResultPeptideBuilder.instance().build(
+                    result.getResultPeptide().getPeptideSequence(), 
+                    dynaResMods, null);
+            Sq = seqStylePeptide.getFullModifiedPeptidePS();
+        }
         
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
         String filename = runDao.loadFilenameForRun(runSearch.getRunId());
 
         MsScanDAO msScanDao = DAOFactory.instance().getMsScanDAO();
-        int scanNumber = msScanDao.load(result.getScanId()).getStartScanNum();
+        MsScan scan = msScanDao.load(scanId);
+        int scanNumber = scan.getStartScanNum();
         
-        // get the scan
-        MS2ScanDAO scanDao = DAOFactory.instance().getMS2FileScanDAO();
-        MS2Scan scan = scanDao.load(scanId);
         
-        // get the precursor mass for the given charge state
-        List<MS2ScanCharge> scChargeList = scan.getScanChargeList();
-        BigDecimal massFrmScanCharge = null;
         int charge = result.getCharge();
-        for (MS2ScanCharge sc: scChargeList) {
-            if (sc.getCharge() == charge) {
-                massFrmScanCharge = sc.getMass();
-                break;
+        BigDecimal massFrmScanCharge = null;
+        // get the precursor mass for the given charge state for the MS2 tables if this was a MS2 run
+        MsRun run = DAOFactory.instance().getMsRunDAO().loadRun(scan.getRunId());
+        if(run.getRunFileFormat() == RunFileFormat.MS2 || run.getRunFileFormat() == RunFileFormat.CMS2) {
+        
+            // get the scan
+          MS2Scan ms2scan = DAOFactory.instance().getMS2FileScanDAO().load(scanId);
+            List<MS2ScanCharge> scChargeList = ms2scan.getScanChargeList();
+            
+            for (MS2ScanCharge sc: scChargeList) {
+                if (sc.getCharge() == charge) {
+                    massFrmScanCharge = sc.getMass();
+                    break;
+                }
             }
         }
         // If we did not find the mass, calculate it from what we have
         double mass = 0.0;
         if (massFrmScanCharge == null) {
-            mass = (scan.getPrecursorMz().doubleValue() - 1.00794) * charge + 1.00794;
+            mass = (scan.getPrecursorMz().doubleValue() - AminoAcidUtils.HYDROGEN) * charge + AminoAcidUtils.HYDROGEN;
         }
         else
             mass = massFrmScanCharge.doubleValue();
@@ -349,7 +488,6 @@ public class ViewSpectrumAction extends Action {
         params.add("<PARAM NAME=\"PreZ\" VALUE=\"" + charge + "\">");
         
         // dynamic modifications mod1, mod2, etc; mod1residues, mod2residues etc
-        List<MsResidueModification> dynaResMods = search.getDynamicResidueMods();
         Map<String, String> modMassResidueMap = new HashMap<String, String>();
         for (MsResidueModification mod: dynaResMods) {
             String chars = modMassResidueMap.get(mod.getModificationMass().toString());
@@ -383,6 +521,11 @@ public class ViewSpectrumAction extends Action {
             SequestSearchDAO seqSearchDao = DAOFactory.instance().getSequestSearchDAO();
             fragMassType = seqSearchDao.getFragmentMassType(searchId);
             parentMassType = seqSearchDao.getParentMassType(searchId);
+        }
+        else if(search.getSearchProgram() == Program.MASCOT) {
+            MascotSearchDAO masSearchDao = DAOFactory.instance().getMascotSearchDAO();
+            fragMassType = masSearchDao.getFragmentMassType(searchId);
+            parentMassType = masSearchDao.getParentMassType(searchId);
         }
         else if (search.getSearchProgram() == Program.PROLUCID) {
             ProlucidSearchDAO psearchDao = DAOFactory.instance().getProlucidSearchDAO();
