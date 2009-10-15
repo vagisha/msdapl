@@ -37,12 +37,14 @@ import org.yeastrc.ms.domain.run.RunFileFormat;
 import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResidueModification;
+import org.yeastrc.ms.domain.search.MsResultResidueMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
+import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.mascot.MascotSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
@@ -421,22 +423,33 @@ public class ViewSpectrumAction extends Action {
             throw new Exception("SpectrumApplet cannot handle > 3 variable modifications");
         }
         // TODO SpectrumApplet only works with Sequest style modifications. Need to rewrite it.
+        Map<String, Character> modSymbolMap = new HashMap<String, Character>(6);
         if(search.getSearchProgram() != Program.SEQUEST) {
             char[] symbols = new char[] {'*', '#', '@'};
             int i = 0;
             for(MsResidueModification mod: dynaResMods) {
-                mod.setModificationSymbol(symbols[i++]);
+                char symbol = symbols[i++];
+                mod.setModificationSymbol(symbol);
+                modSymbolMap.put(mod.getModificationMass().doubleValue()+"_"+mod.getModifiedResidue(), symbol);
             }
         }
         
-        String Sq = result.getResultPeptide().getModifiedPeptidePS();
-        Sq = result.getResultPeptide().getPreResidue()+"."+Sq+"."+result.getResultPeptide().getPostResidue();
+        MsSearchResultPeptide resPeptide = result.getResultPeptide();
+        String Sq = resPeptide.getModifiedPeptidePS();
+        Sq = resPeptide.getPreResidue()+"."+Sq+"."+resPeptide.getPostResidue();
         request.setAttribute("peptideSeq", Sq);
         if(search.getSearchProgram() != Program.SEQUEST) {
-            MsSearchResultPeptide seqStylePeptide = SequestResultPeptideBuilder.instance().build(
-                    result.getResultPeptide().getPeptideSequence(), 
-                    dynaResMods, null);
-            Sq = seqStylePeptide.getFullModifiedPeptidePS();
+            SearchResultPeptideBean peptBean = new SearchResultPeptideBean();
+            peptBean.setPreResidue(resPeptide.getPreResidue());
+            peptBean.setPostResidue(resPeptide.getPostResidue());
+            peptBean.setPeptideSequence(resPeptide.getPeptideSequence());
+            List<MsResultResidueMod> mods = resPeptide.getResultDynamicResidueModifications();
+            for(MsResultResidueMod mod: mods) {
+                mod.setModificationSymbol(
+                           modSymbolMap.get(mod.getModificationMass().doubleValue()+"_"+mod.getModifiedResidue()));
+            }
+            peptBean.setDynamicResidueModifications(mods);
+            Sq = peptBean.getFullModifiedPeptidePS();
         }
         
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();

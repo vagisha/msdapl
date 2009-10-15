@@ -157,7 +157,7 @@ public class TabularPercolatorResults implements Tabular, Pageable {
         row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getxCorr()))));
 //        row.addCell(new TableCell(String.valueOf(round(result.getSequestData().getDeltaCN()))));
         
-        String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+        String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getSearchResultId();
         cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
         cell.setClassName("left_align");
         row.addCell(cell);

@@ -162,7 +162,7 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                 row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getExpect()))));
             }
             
-            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getSearchResultId();
             cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
             cell.setClassName("left_align");
             row.addCell(cell);
