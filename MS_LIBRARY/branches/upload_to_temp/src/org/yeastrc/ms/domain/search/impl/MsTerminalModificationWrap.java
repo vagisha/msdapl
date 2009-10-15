@@ -45,4 +45,19 @@ public class MsTerminalModificationWrap implements MsTerminalModification {
     public Terminal getModifiedTerminal() {
         return mod.getModifiedTerminal();
     }
+
+    @Override
+    public void setModifiedTerminal(Terminal modTerminal) {
+        this.mod.setModifiedTerminal(modTerminal);
+    }
+
+    @Override
+    public void setModificationMass(BigDecimal modMass) {
+        this.mod.setModificationMass(modMass);
+    }
+
+    @Override
+    public void setModificationSymbol(char modSymbol) {
+        this.mod.setModificationSymbol(modSymbol);
+    }
 }

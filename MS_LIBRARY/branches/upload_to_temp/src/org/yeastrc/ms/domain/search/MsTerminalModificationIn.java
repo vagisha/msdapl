@@ -14,5 +14,7 @@ import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
  */
 public interface MsTerminalModificationIn extends MsModification {
 
-    public Terminal getModifiedTerminal();
+    public abstract Terminal getModifiedTerminal();
+    
+    public abstract void setModifiedTerminal(Terminal modTerminal);
 }

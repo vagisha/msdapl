@@ -52,5 +52,20 @@ public class MsResidueModificationWrap implements MsResidueModification {
     public char getModificationSymbol() {
         return mod.getModificationSymbol();
     }
+
+    @Override
+    public void setModifiedResidue(char modResidue) {
+        this.mod.setModifiedResidue(modResidue);
+    }
+
+    @Override
+    public void setModificationMass(BigDecimal modMass) {
+        this.mod.setModificationMass(modMass);
+    }
+
+    @Override
+    public void setModificationSymbol(char modSymbol) {
+        this.mod.setModificationSymbol(modSymbol);
+    }
    
 }
