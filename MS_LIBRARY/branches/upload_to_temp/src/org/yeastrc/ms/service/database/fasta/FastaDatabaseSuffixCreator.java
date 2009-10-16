@@ -86,6 +86,13 @@ public class FastaDatabaseSuffixCreator {
         addTableIndex(dbTableName);
     }
 
+    Map<String, Integer> getSuffixIdMap() throws SQLException {
+        if(this.suffixIdMap == null) {
+            buildSuffixIdMap();
+        }
+        return this.suffixIdMap;
+    }
+    
     private void buildSuffixIdMap() throws SQLException {
        
       log.info("Building suffixID map");
@@ -122,7 +129,7 @@ public class FastaDatabaseSuffixCreator {
         return suffixTableName;
     }
    
-    public void saveSuffixes(String tableName, int databaseId) throws SQLException {
+    private void saveSuffixes(String tableName, int databaseId) throws SQLException {
         
         // get all the ids from tblProteinDatabase for the given databaseID
         List<Integer> dbProteinIds = NrSeqLookupUtil.getDbProteinIdsForDatabase(databaseId);
@@ -368,6 +375,8 @@ public class FastaDatabaseSuffixCreator {
 
     private void createDbSuffixTable(String tableName) throws SQLException {
         
+        // TODO for partitioning if required
+        // alter table suffix_db_124 partition by key(suffixID) partitions 10;
         Connection conn = null;
         Statement stmt = null;
         try {
