@@ -48,7 +48,6 @@ public class MSXMLSequentialParser {
         if(fileName.indexOf("mzXML") != -1)
             isXML = true;
         else {
-            // don't know how to parse
             isML = true;
         }
 
@@ -64,7 +63,14 @@ public class MSXMLSequentialParser {
         xmlSR = inputFactory.createXMLStreamReader(inputStr);
 
         // read the file header 
-        readFileHeader(xmlSR);
+        try {
+            readFileHeader(xmlSR);
+        }
+        catch(XMLStreamException e) {
+            if(!(e.getMessage()).equals("HeaderEndFoundException")) {
+                throw e;
+            }
+        }
     }
 
     public void close() {
@@ -105,17 +111,6 @@ public class MSXMLSequentialParser {
         return currentScan != maxScan;
     }
     
-    // Note: scanNumbers are 1-based, so scanNumber must be atleast 1
-    // and be not greater than getScanCount() + 1
-//    private int getNextScanNmber() {
-//        Long offset = null;
-//        while(offset == null) {
-//            currentScan++;
-//            offset = this.offsets.get(currentScan);
-//        }
-//        return currentScan;
-//    }
-    
     /**
      * Returns a Scan object with its peaks and header information
      * @return
@@ -126,7 +121,15 @@ public class MSXMLSequentialParser {
         {
             ScanAndHeaderParser scanParser = new ScanAndHeaderParser();
             scanParser.setIsScan(true);
-            scanParser.parseScanAndHeader(xmlSR);
+            try {
+                scanParser.parseScanAndHeader(xmlSR);
+            }
+            catch(XMLStreamException e) {
+                if(!e.getMessage().equals("ScanHeaderEndFoundException") && 
+                   !e.getMessage().equals("ScanEndFoundException")) {
+                    throw e;
+                }
+            }
             this.currentScan = scanParser.getScan().getHeader().getNum();
             return scanParser.getScan();
         }
@@ -134,7 +137,15 @@ public class MSXMLSequentialParser {
         {
             MLScanAndHeaderParser scanParser = new MLScanAndHeaderParser();
             scanParser.setIsScan(true);
-            scanParser.parseMLScanAndHeader(xmlSR);
+            try {
+                scanParser.parseMLScanAndHeader(xmlSR);
+            }
+            catch(XMLStreamException e) {
+                if(!e.getMessage().equals("ScanHeaderEndFoundException") && 
+                   !e.getMessage().equals("ScanEndFoundException")) {
+                    throw e;
+                }
+            }
             this.currentScan = scanParser.getScan().getHeader().getNum();
             return (scanParser.getScan());
         }

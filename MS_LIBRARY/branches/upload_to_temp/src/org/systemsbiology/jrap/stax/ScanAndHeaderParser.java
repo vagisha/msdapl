@@ -201,8 +201,8 @@ public class ScanAndHeaderParser{
 				    getPeaks(peaksBuffer.toString());
 				    inPeaks = false;
 				    peaksBuffer = null;
-//				    throw new XMLStreamException("ScanEndFoundException");
-				    return;
+				    throw new XMLStreamException("ScanEndFoundException");
+				    
 				    
 				}
 			}

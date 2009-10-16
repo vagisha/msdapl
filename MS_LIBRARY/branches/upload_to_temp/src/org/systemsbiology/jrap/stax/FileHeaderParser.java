@@ -198,8 +198,7 @@ public class FileHeaderParser{
 				    isDataProcess = false;
 				    info.parentFiles = parentFiles;
 				    info.dataProcessing.softwareUsed = dataProcessingSoftware;
-//				    throw new XMLStreamException("HeaderEndFoundException");
-				    return;
+				    throw new XMLStreamException("HeaderEndFoundException");
 				}
 			}
 		}
