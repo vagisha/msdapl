@@ -63,14 +63,7 @@ public class MSXMLSequentialParser {
         xmlSR = inputFactory.createXMLStreamReader(inputStr);
 
         // read the file header 
-        try {
-            readFileHeader(xmlSR);
-        }
-        catch(XMLStreamException e) {
-            if(!(e.getMessage()).equals("HeaderEndFoundException")) {
-                throw e;
-            }
-        }
+        readFileHeader(xmlSR);
     }
 
     public void close() {
