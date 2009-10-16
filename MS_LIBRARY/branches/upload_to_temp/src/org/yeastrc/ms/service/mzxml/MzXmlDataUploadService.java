@@ -386,4 +386,14 @@ public class MzXmlDataUploadService implements SpectrumDataUploadService {
         List<Integer> autoIncrIds = scanDao.save(scans, runId);
         return scans.size();
     }
+    
+    public static void main(String[] args) throws UploadException {
+        String directoryPath = "/Users/silmaril/WORK/UW/FLINT/mascot_test/"; // 090715_EPO-iT_1M_HCD
+        MzXmlDataUploadService service = new MzXmlDataUploadService();
+        service.setDirectory(directoryPath);
+        service.setExperimentId(43);
+        service.setRemoteDirectory("remote.directory");
+//        service.setRemoteServer("remote.server");
+        service.upload();
+    }
 }

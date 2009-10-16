@@ -90,7 +90,13 @@ public class MSXMLSequentialParser {
      */
     private void readFileHeader(XMLStreamReader reader) throws XMLStreamException {
         FileHeaderParser fileHeaderParser = new FileHeaderParser(fileName);
-        fileHeaderParser.parseFileHeader(reader);
+        try {
+            fileHeaderParser.parseFileHeader(reader);
+        }
+        catch(XMLStreamException e) {
+            if(!(e.getMessage()).equals("HeaderEndFoundException"))
+                throw e;
+        }
         this.fileHeader = fileHeaderParser.getInfo();
     }
     
