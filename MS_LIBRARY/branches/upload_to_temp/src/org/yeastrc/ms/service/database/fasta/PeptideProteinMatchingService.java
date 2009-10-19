@@ -68,7 +68,7 @@ public class PeptideProteinMatchingService {
     private void createSuffixTable(int databaseId) throws SQLException {
         FastaDatabaseSuffixCreator creator = new FastaDatabaseSuffixCreator();
         creator.createSuffixTable(databaseId);
-        if(useSingleQuery)
+        if(!useSingleQuery)
             this.suffixIdMap = creator.getSuffixIdMap();
     }
     
