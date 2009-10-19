@@ -248,6 +248,11 @@ public class PeptideProteinMatchingService {
             stmt = conn.prepareStatement(sql);
             
             for(String suffix: suffixList) {
+                Integer suffixId = suffixIdMap.get(suffix);
+                if(suffixId == null) {
+                    log.error("No suffixID found for suffix: "+suffix);
+                    continue;
+                }
                 stmt.setInt(1, suffixIdMap.get(suffix));
                 rs = stmt.executeQuery();
                 while(rs.next()) {
