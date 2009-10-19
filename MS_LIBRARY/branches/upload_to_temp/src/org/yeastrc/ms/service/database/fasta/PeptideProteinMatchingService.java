@@ -52,7 +52,7 @@ public class PeptideProteinMatchingService {
         
         createSuffixTables = MsDataUploadProperties.useNrseqSuffixTables();
         createSuffixInMemory = MsDataUploadProperties.useNrseqSuffixInMemory();
-        useSingleQuery = true;
+        useSingleQuery = MsDataUploadProperties.useSingleQuery();
         
         if(createSuffixTables) {
             createSuffixTable(databaseId);

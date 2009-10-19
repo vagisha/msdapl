@@ -39,6 +39,7 @@ public class MsDataUploadProperties {
     
     private static boolean useNrseqSuffixTables = true;
     private static boolean useNrseqSuffixInMemory = false;
+    private static boolean useSingleQuery = false; // TEMPORARY
     
     static {
         Properties props = new Properties();
@@ -79,6 +80,9 @@ public class MsDataUploadProperties {
         
         value = props.getProperty("use.nrseq.suffix.in.memory");
         useNrseqSuffixInMemory = Boolean.parseBoolean(value);
+        
+        value = props.getProperty("use.single.query");
+        useSingleQuery = Boolean.parseBoolean(value);
         
         log.info("Uploader will sync databases at time: "+uploadSyncHour+":"+uploadSyncMinutes);
         
@@ -125,5 +129,9 @@ public class MsDataUploadProperties {
     
     public static boolean useNrseqSuffixInMemory() {
         return useNrseqSuffixInMemory;
+    }
+    
+    public static boolean useSingleQuery() {
+        return useSingleQuery;
     }
 }
