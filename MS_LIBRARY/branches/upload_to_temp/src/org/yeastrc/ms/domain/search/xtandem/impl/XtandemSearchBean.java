@@ -1,36 +1,36 @@
 /**
- * MascotSearchBean.java
+ * XtandemSearchBean.java
  * @author Vagisha Sharma
- * Oct 12, 2009
+ * Oct 20, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.mascot.impl;
+package org.yeastrc.ms.domain.search.xtandem.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.impl.SearchBean;
-import org.yeastrc.ms.domain.search.mascot.MascotSearch;
+import org.yeastrc.ms.domain.search.xtandem.XtandemSearch;
 
 
 /**
  * 
  */
-public class MascotSearchBean extends SearchBean implements MascotSearch {
+public class XtandemSearchBean extends SearchBean implements XtandemSearch {
 
     private List<Param> paramList;
     
-    public MascotSearchBean() {
+    public XtandemSearchBean() {
         paramList = new ArrayList<Param>();
     }
     
     @Override
-    public List<Param> getMascotParams() {
+    public List<Param> getXtandemParams() {
         return paramList;
     }
     
-    public void setMascotParams(List<Param> paramList) {
+    public void setXtandemParams(List<Param> paramList) {
         this.paramList = paramList;
     }
 }

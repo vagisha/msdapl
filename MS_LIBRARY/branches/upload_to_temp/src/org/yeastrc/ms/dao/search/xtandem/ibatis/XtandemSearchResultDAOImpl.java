@@ -1,10 +1,10 @@
 /**
- * MascotSearchResultDAOImpl.java
+ * XtandemSearchResultDAOImpl.java
  * @author Vagisha Sharma
- * Oct 5, 2009
+ * Oct 20, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.dao.search.mascot.ibatis;
+package org.yeastrc.ms.dao.search.xtandem.ibatis;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -20,29 +20,29 @@ import org.yeastrc.ms.dao.ibatis.BaseSqlMapDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.MsSearchModificationDAO;
 import org.yeastrc.ms.dao.search.MsSearchResultDAO;
-import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
+import org.yeastrc.ms.dao.search.xtandem.XtandemSearchResultDAO;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultIn;
 import org.yeastrc.ms.domain.search.ResultSortCriteria;
 import org.yeastrc.ms.domain.search.SORT_BY;
-import org.yeastrc.ms.domain.search.mascot.MascotResultDataWId;
-import org.yeastrc.ms.domain.search.mascot.MascotResultFilterCriteria;
-import org.yeastrc.ms.domain.search.mascot.MascotSearchResult;
-import org.yeastrc.ms.domain.search.mascot.MascotSearchResultIn;
-import org.yeastrc.ms.domain.search.mascot.impl.MascotResultDataWrap;
+import org.yeastrc.ms.domain.search.xtandem.XtandemResultDataWId;
+import org.yeastrc.ms.domain.search.xtandem.XtandemResultFilterCriteria;
+import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResult;
+import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResultIn;
+import org.yeastrc.ms.domain.search.xtandem.impl.XtandemResultDataWrap;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 
  */
-public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSearchResultDAO {
+public class XtandemSearchResultDAOImpl extends BaseSqlMapDAO implements XtandemSearchResultDAO {
 
     private MsSearchResultDAO resultDao;
     private MsRunSearchDAO runSearchDao;
     private MsSearchModificationDAO modDao;
     
-    public MascotSearchResultDAOImpl(SqlMapClient sqlMap,
+    public XtandemSearchResultDAOImpl(SqlMapClient sqlMap,
             MsSearchResultDAO resultDao, MsRunSearchDAO runSearchDao, MsSearchModificationDAO modDao) {
         super(sqlMap);
         this.resultDao = resultDao;
@@ -50,8 +50,8 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         this.modDao = modDao;
     }
     
-    public MascotSearchResult load(int resultId) {
-        return (MascotSearchResult) queryForObject("MascotResult.select", resultId);
+    public XtandemSearchResult load(int resultId) {
+        return (XtandemSearchResult) queryForObject("XtandemResult.select", resultId);
     }
     
     @Override
@@ -95,11 +95,11 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
     
     @Override
     public List<Integer> loadResultIdsForRunSearch(int runSearchId,
-            MascotResultFilterCriteria filterCriteria,
+            XtandemResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
         if(filterCriteria == null)
-            filterCriteria = new MascotResultFilterCriteria();
+            filterCriteria = new XtandemResultFilterCriteria();
         
         if(sortCriteria == null)
             sortCriteria = new ResultSortCriteria(null, null);
@@ -118,10 +118,10 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
                                 || useScanTable
                                 || useModsTable;
         
-        boolean useMascotTable = filterCriteria.hasFilters() || SORT_BY.isMascotRelated(sortCriteria.getSortBy());
+        boolean useXtandemTable = filterCriteria.hasFilters() || SORT_BY.isXtandemRelated(sortCriteria.getSortBy());
         
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
-        if(!useScanTable && !useResultsTable && !useModsTable && !useMascotTable) {
+        if(!useScanTable && !useResultsTable && !useModsTable && !useXtandemTable) {
             if(sortCriteria.getLimitCount() != null)
                 return loadResultIdsForRunSearch(runSearchId, sortCriteria.getLimitCount(), offset);
             else 
@@ -131,8 +131,8 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT res.id FROM ( ");
         sql.append("msRunSearchResult AS res ");
-        if(useMascotTable)
-            sql.append(", MascotSearchResult AS sres");
+        if(useXtandemTable)
+            sql.append(", XtandemSearchResult AS xres");
         if(useScanTable)
             sql.append(", msScan AS scan");
         sql.append(" ) ");
@@ -142,8 +142,8 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         }
         
         sql.append("WHERE res.runSearchID = "+runSearchId+" ");
-        if(useMascotTable)
-            sql.append("AND res.id = sres.resultID ");
+        if(useXtandemTable)
+            sql.append("AND res.id = xres.resultID ");
         if(useScanTable) {
             sql.append("AND res.scanID = scan.id ");
         }
@@ -172,25 +172,25 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         if(filterCriteria.hasMofificationFilter()) {
             sql.append("AND "+filterCriteria.makeModificationFilter());
         }
-        // Ion Score filter
-        if(filterCriteria.hasIonScoreFilter()) {
-            sql.append("AND "+filterCriteria.makeIonScoreFilterSql());
+        // Hyper Score filter
+        if(filterCriteria.hasHyperScoreFilter()) {
+            sql.append("AND "+filterCriteria.makeHyperScoreFilterSql());
         }
-        // Identity Score filter
-        if(filterCriteria.hasIdentityScoreFilter()) {
-            sql.append("AND "+filterCriteria.makeIdentityScoreFilterSql());
+        // Next Score filter
+        if(filterCriteria.hasNextScoreFilter()) {
+            sql.append("AND "+filterCriteria.makeNextScoreFilterSql());
         }
-        // Homology Score filter
-        if(filterCriteria.hasHomologyScoreFilter()) {
-            sql.append("AND "+filterCriteria.makeHomologyScoreFilterSql());
+        // B Score filter
+        if(filterCriteria.hasBscoreFilter()) {
+            sql.append("AND "+filterCriteria.makeBscoreFilterSql());
+        }
+        // Y Score filter
+        if(filterCriteria.hasYscoreFilter()) {
+            sql.append("AND "+filterCriteria.makeYscoreFilterSql());
         }
         // Expect filter
         if(filterCriteria.hasExpectFilter()) {
             sql.append("AND "+filterCriteria.makeExpectFilterSql());
-        }
-        // star filter
-        if(filterCriteria.hasStarFilter()) {
-            sql.append("AND "+filterCriteria.makeStarFilterSql());
         }
         // rank filter
         if(filterCriteria.hasRankFilter()) {
@@ -267,11 +267,11 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
 
     @Override
     public List<Integer> loadResultIdsForSearch(int searchId,
-            MascotResultFilterCriteria filterCriteria,
+            XtandemResultFilterCriteria filterCriteria,
             ResultSortCriteria sortCriteria) {
         
         if(filterCriteria == null)
-            filterCriteria = new MascotResultFilterCriteria();
+            filterCriteria = new XtandemResultFilterCriteria();
         
         if(sortCriteria == null)
             sortCriteria = new ResultSortCriteria(null, null);
@@ -290,10 +290,10 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
                                 || useScanTable
                                 || useModsTable;
         
-        boolean useMascotTable = filterCriteria.hasFilters() || SORT_BY.isMascotRelated(sortCriteria.getSortBy());
+        boolean useXtandemTable = filterCriteria.hasFilters() || SORT_BY.isXtandemRelated(sortCriteria.getSortBy());
         
         // If we don't have any filters on the msRunSearchResult, msScan and modifications tables use a simpler query
-        if(!useScanTable && !useResultsTable && !useModsTable && !useMascotTable) {
+        if(!useScanTable && !useResultsTable && !useModsTable && !useXtandemTable) {
             if(sortCriteria.getLimitCount() != null)
                 return loadResultIdsForSearch(searchId, sortCriteria.getLimitCount(), offset);
             else 
@@ -303,8 +303,8 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT res.id FROM ( ");
         sql.append("msRunSearchResult AS res, msRunSearch AS rs");
-        if(useMascotTable)
-            sql.append(", MascotSearchResult AS sres");
+        if(useXtandemTable)
+            sql.append(", XtandemSearchResult AS xres");
         if(useScanTable)
             sql.append(", msScan AS scan");
         sql.append(" ) ");
@@ -322,8 +322,8 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
             sql.append("AND rs.id IN ("+rsIdStr+") ");
         }
         sql.append("AND rs.id = res.runSearchID ");
-        if(useMascotTable)
-            sql.append("AND res.id = sres.resultID ");
+        if(useXtandemTable)
+            sql.append("AND res.id = xres.resultID ");
         if(useScanTable) {
             sql.append("AND res.scanID = scan.id ");
         }
@@ -352,25 +352,25 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         if(filterCriteria.hasMofificationFilter()) {
             sql.append("AND "+filterCriteria.makeModificationFilter());
         }
-        // Ion Score filter
-        if(filterCriteria.hasIonScoreFilter()) {
-            sql.append("AND "+filterCriteria.makeIonScoreFilterSql());
+        // Hyper Score filter
+        if(filterCriteria.hasHyperScoreFilter()) {
+            sql.append("AND "+filterCriteria.makeHyperScoreFilterSql());
         }
-        // Identity Score filter
-        if(filterCriteria.hasIdentityScoreFilter()) {
-            sql.append("AND "+filterCriteria.makeIdentityScoreFilterSql());
+        // Next Score filter
+        if(filterCriteria.hasNextScoreFilter()) {
+            sql.append("AND "+filterCriteria.makeNextScoreFilterSql());
         }
-        // Homology Score filter
-        if(filterCriteria.hasHomologyScoreFilter()) {
-            sql.append("AND "+filterCriteria.makeHomologyScoreFilterSql());
+        // B Score filter
+        if(filterCriteria.hasBscoreFilter()) {
+            sql.append("AND "+filterCriteria.makeBscoreFilterSql());
+        }
+        // Y Score filter
+        if(filterCriteria.hasYscoreFilter()) {
+            sql.append("AND "+filterCriteria.makeYscoreFilterSql());
         }
         // Expect filter
         if(filterCriteria.hasExpectFilter()) {
             sql.append("AND "+filterCriteria.makeExpectFilterSql());
-        }
-        // star filter
-        if(filterCriteria.hasStarFilter()) {
-            sql.append("AND "+filterCriteria.makeStarFilterSql());
         }
         // rank filter
         if(filterCriteria.hasRankFilter()) {
@@ -465,14 +465,14 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         return resultDao.loadResultIdsForSearchScan(runSearchId, scanId);
     }
     
-    public int save(int searchId, MascotSearchResultIn searchResult, int runSearchId, int scanId) {
+    public int save(int searchId, XtandemSearchResultIn searchResult, int runSearchId, int scanId) {
         
         // first save the base result
         int resultId = resultDao.save(searchId, searchResult, runSearchId, scanId);
         
         // now save the Mascot specific information
-        MascotResultDataWrap resultDb = new MascotResultDataWrap(searchResult.getMascotResultData(), resultId);
-        save("MascotResult.insert", resultDb);
+        XtandemResultDataWrap resultDb = new XtandemResultDataWrap(searchResult.getXtandemResultData(), resultId);
+        save("XtandemResult.insert", resultDb);
         return resultId;
     }
     
@@ -484,26 +484,25 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
     }
     
     @Override
-    public void saveAllMascotResultData(List<MascotResultDataWId> resultDataList) {
+    public void saveAllXtandemResultData(List<XtandemResultDataWId> resultDataList) {
         if (resultDataList.size() == 0)
             return;
         StringBuilder values = new StringBuilder();
-        for ( MascotResultDataWId data: resultDataList) {
+        for ( XtandemResultDataWId data: resultDataList) {
             values.append(",(");
             values.append(data.getResultId() == 0 ? "NULL" : data.getResultId());
             values.append(",");
             values.append(data.getRank() == 0 ? "NULL" : data.getRank());
             values.append(",");
-            values.append(data.getIonScore());
+            values.append(data.getHyperScore());
             values.append(",");
-            values.append(data.getIdentityScore());
+            values.append(data.getNextScore());
             values.append(",");
-            values.append(data.getHomologyScore());
+            values.append(data.getBscore());
+            values.append(",");
+            values.append(data.getYscore());
             values.append(",");
             values.append(data.getExpect());
-            values.append(",");
-            int star = data.getStar();
-            values.append(star == -1 ? "NULL" : star);
             values.append(",");
             values.append(data.getCalculatedMass());
             values.append(",");
@@ -516,11 +515,11 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         }
         values.deleteCharAt(0);
         
-        save("MascotResult.insertAll", values.toString());
+        save("XtandemResult.insertAll", values.toString());
     }
     
     /**
-     * Deletes the search result and any Mascot specific information associated with the result
+     * Deletes the search result and any Xtandem specific information associated with the result
      * @param resultId
      */
     public void delete(int resultId) {
@@ -538,7 +537,7 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         Statement stmt = null;
         try {
             conn = super.getConnection();
-            String sql = "ALTER TABLE MascotSearchResult DISABLE KEYS";
+            String sql = "ALTER TABLE XtandemSearchResult DISABLE KEYS";
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
         }
@@ -556,7 +555,7 @@ public class MascotSearchResultDAOImpl extends BaseSqlMapDAO implements MascotSe
         Statement stmt = null;
         try {
             conn = super.getConnection();
-            String sql = "ALTER TABLE MascotSearchResult ENABLE KEYS";
+            String sql = "ALTER TABLE XtandemSearchResult ENABLE KEYS";
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
         }

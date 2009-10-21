@@ -1,19 +1,19 @@
 /**
- * MascotSearchDAO.java
+ * XtandemSearchDAO.java
  * @author Vagisha Sharma
- * Oct 12, 2009
+ * Oct 20, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.dao.search.mascot;
+package org.yeastrc.ms.dao.search.xtandem;
 
 import org.yeastrc.ms.dao.search.GenericSearchDAO;
-import org.yeastrc.ms.domain.search.mascot.MascotSearch;
-import org.yeastrc.ms.domain.search.mascot.MascotSearchIn;
+import org.yeastrc.ms.domain.search.xtandem.XtandemSearch;
+import org.yeastrc.ms.domain.search.xtandem.XtandemSearchIn;
 
 /**
  * 
  */
-public interface MascotSearchDAO extends GenericSearchDAO <MascotSearchIn, MascotSearch>{
+public interface XtandemSearchDAO extends GenericSearchDAO <XtandemSearchIn, XtandemSearch>{
 
     public abstract String getSearchParamValue(int searchId, String paramName);
     

@@ -1,37 +1,37 @@
 /**
- * MascotResultData.java
+ * XtandemResultData.java
  * @author Vagisha Sharma
- * Oct 12, 2009
+ * Oct 20, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.mascot;
+package org.yeastrc.ms.domain.search.xtandem;
 
 import java.math.BigDecimal;
 
 /**
  * 
  */
-public interface MascotResultData {
+public interface XtandemResultData {
 
     public abstract int getRank();
     
     public abstract void setRank(int rank);
     
-    public abstract BigDecimal getIonScore();
+    public abstract BigDecimal getHyperScore();
     
-    public abstract void setIonScore(BigDecimal ionScore);
+    public abstract void setHyperScore(BigDecimal hyperScore);
 
-    public abstract BigDecimal getIdentityScore();
+    public abstract BigDecimal getNextScore();
     
-    public abstract void setIdentityScore(BigDecimal identityScore);
+    public abstract void setNextScore(BigDecimal nextScore);
 
-    public abstract int getStar();
+    public abstract BigDecimal getBscore();
     
-    public abstract void setStar(int star);
+    public abstract void setBscore(BigDecimal bscore);
     
-    public abstract BigDecimal getHomologyScore();
+    public abstract BigDecimal getYscore();
     
-    public abstract void setHomologyScore(BigDecimal homologyScore);
+    public abstract void setYscore(BigDecimal yscore);
 
     public abstract BigDecimal getExpect();
     

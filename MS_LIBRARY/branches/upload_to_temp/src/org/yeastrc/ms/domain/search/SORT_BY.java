@@ -31,9 +31,17 @@ public enum SORT_BY {
     ION_SCORE("IonScore", "ionScore"),
     IDENTITY_SCORE("IdScore", "identityScore"),
     HOMOLOGY_SCORE("HomolScore", "homologyScore"),
-    EXPECT("Expect", "expect"),
+    MASCOT_EXPECT("Expect", "expect"),
     STAR("Star", "star"),
     MASCOT_RANK("Rank", "rank"),
+    
+    // Xtandem specific
+    HYPER_SCORE("HyperScore", "hyperscore"),
+    NEXT_SCORE("NextScore", "nextscore"),
+    B_SCORE("B-Score", "bscore"),
+    Y_SCORE("Y-Score", "yscore"),
+    XTANDEM_EXPECT("Expect", "expect"),
+    XTANDEM_RANK("Rank", "rank"),
     
     // Percolator specific
     QVAL("q-value", "qvalue"),
@@ -92,7 +100,11 @@ public enum SORT_BY {
     }
     
     public static boolean isMascotRelated(SORT_BY sortBy) {
-        return sortBy == CALC_MASS_SEQ || sortBy == ION_SCORE || sortBy == IDENTITY_SCORE || sortBy == HOMOLOGY_SCORE || sortBy == EXPECT || sortBy == STAR;
+        return sortBy == CALC_MASS_SEQ || sortBy == ION_SCORE || sortBy == IDENTITY_SCORE || sortBy == HOMOLOGY_SCORE || sortBy == MASCOT_EXPECT || sortBy == STAR;
+    }
+    
+    public static boolean isXtandemRelated(SORT_BY sortBy) {
+        return sortBy == HYPER_SCORE || sortBy == NEXT_SCORE || sortBy == B_SCORE || sortBy == Y_SCORE || sortBy == MASCOT_EXPECT;
     }
     
     public static boolean isPeptideProphetRelated(SORT_BY sortBy) {

@@ -1,26 +1,26 @@
 /**
- * MascotResultDataBean.java
+ * XtandemResultDataBean.java
  * @author Vagisha Sharma
- * Oct 12, 2009
+ * Oct 20, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.mascot.impl;
+package org.yeastrc.ms.domain.search.xtandem.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.mascot.MascotResultData;
+import org.yeastrc.ms.domain.search.xtandem.XtandemResultData;
 
 /**
  * 
  */
-public class MascotResultDataBean implements MascotResultData {
+public class XtandemResultDataBean implements XtandemResultData {
 
     private int rank = -1;
-    private BigDecimal ionScore;
-    private BigDecimal identityScore;
-    private BigDecimal homologyScore;
+    private BigDecimal hyperScore;
+    private BigDecimal nextScore;
+    private BigDecimal bscore;
+    private BigDecimal yscore;
     private BigDecimal expect;
-    private int star = -1;
     private int matchingIons = -1;
     private int predictedIons = -1;
     private BigDecimal calculatedMass;
@@ -36,25 +36,25 @@ public class MascotResultDataBean implements MascotResultData {
     }
     
     @Override
-    public BigDecimal getIonScore() {
-        return ionScore;
+    public BigDecimal getHyperScore() {
+        return hyperScore;
     }
 
     @Override
-    public BigDecimal getIdentityScore() {
-        return identityScore;
+    public BigDecimal getNextScore() {
+        return nextScore;
     }
 
     @Override
-    public BigDecimal getHomologyScore() {
-        return homologyScore;
+    public BigDecimal getBscore() {
+        return bscore;
     }
     
     @Override
-    public int getStar() {
-        return star;
+    public BigDecimal getYscore() {
+        return yscore;
     }
-
+    
     @Override
     public BigDecimal getExpect() {
         return expect;
@@ -75,24 +75,24 @@ public class MascotResultDataBean implements MascotResultData {
         return predictedIons;
     }
     
-    public void setIonScore(BigDecimal ionScore) {
-        this.ionScore = ionScore;
+    public void setHyperScore(BigDecimal hyperScore) {
+        this.hyperScore = hyperScore;
     }
 
-    public void setIdentityScore(BigDecimal identityScore) {
-        this.identityScore = identityScore;
+    public void setNextScore(BigDecimal nextScore) {
+        this.nextScore = nextScore;
     }
 
-    public void setHomologyScore(BigDecimal homologyScore) {
-        this.homologyScore = homologyScore;
+    public void setBscore(BigDecimal bscore) {
+        this.bscore = bscore;
+    }
+    
+    public void setYscore(BigDecimal yscore) {
+        this.yscore = yscore;
     }
 
     public void setExpect(BigDecimal expect) {
         this.expect = expect;
-    }
-
-    public void setStar(int star) {
-        this.star = star;
     }
 
     public void setCalculatedMass(BigDecimal calculatedMass) {

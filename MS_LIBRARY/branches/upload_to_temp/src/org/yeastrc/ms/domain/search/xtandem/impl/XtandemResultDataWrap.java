@@ -1,26 +1,26 @@
 /**
- * MascotResultDataWrap.java
+ * XtandemResultDataWrap.java
  * @author Vagisha Sharma
- * Oct 12, 2009
+ * Oct 20, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.mascot.impl;
+package org.yeastrc.ms.domain.search.xtandem.impl;
 
 import java.math.BigDecimal;
 
-import org.yeastrc.ms.domain.search.mascot.MascotResultData;
-import org.yeastrc.ms.domain.search.mascot.MascotResultDataWId;
+import org.yeastrc.ms.domain.search.xtandem.XtandemResultData;
+import org.yeastrc.ms.domain.search.xtandem.XtandemResultDataWId;
 
 
 /**
  * 
  */
-public class MascotResultDataWrap implements MascotResultDataWId {
+public class XtandemResultDataWrap implements XtandemResultDataWId {
 
     private int resultId;
-    private MascotResultData data;
+    private XtandemResultData data;
     
-    public MascotResultDataWrap(MascotResultData data, int resultId) {
+    public XtandemResultDataWrap(XtandemResultData data, int resultId) {
         this.data = data;
         this.resultId = resultId;
     }
@@ -35,23 +35,23 @@ public class MascotResultDataWrap implements MascotResultDataWId {
     }
 
     @Override
-    public BigDecimal getIonScore() {
-        return data.getIonScore();
+    public BigDecimal getHyperScore() {
+        return data.getHyperScore();
     }
 
     @Override
-    public BigDecimal getIdentityScore() {
-        return data.getIdentityScore();
+    public BigDecimal getNextScore() {
+        return data.getNextScore();
     }
 
     @Override
-    public BigDecimal getHomologyScore() {
-        return data.getHomologyScore();
+    public BigDecimal getBscore() {
+        return data.getBscore();
     }
-
+    
     @Override
-    public int getStar() {
-        return data.getStar();
+    public BigDecimal getYscore() {
+        return data.getYscore();
     }
 
     @Override
@@ -85,17 +85,22 @@ public class MascotResultDataWrap implements MascotResultDataWId {
     }
 
     @Override
-    public void setHomologyScore(BigDecimal homologyScore) {
+    public void setHyperScore(BigDecimal hyperScore) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setIdentityScore(BigDecimal identityScore) {
+    public void setNextScore(BigDecimal nextScore) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setIonScore(BigDecimal ionScore) {
+    public void setBscore(BigDecimal bscore) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public void setYscore(BigDecimal yscore) {
         throw new UnsupportedOperationException();
     }
 
@@ -111,11 +116,6 @@ public class MascotResultDataWrap implements MascotResultDataWId {
 
     @Override
     public void setRank(int rank) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setStar(int star) {
         throw new UnsupportedOperationException();
     }
 }

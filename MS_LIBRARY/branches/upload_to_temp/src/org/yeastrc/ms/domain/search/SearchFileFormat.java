@@ -20,6 +20,7 @@ public enum SearchFileFormat {
     PEPXML("pepxml: GENERIC"), 
     PEPXML_SEQ("pepxml: "+Program.SEQUEST.displayName()),
     PEPXML_MASCOT("pepxml: "+Program.MASCOT.displayName()),
+    PEPXML_XTANDEM("pepxml: "+Program.XTANDEM.displayName()),
     PEPXML_PEPT_PROPHET("pepxml: "+Program.PEPTIDE_PROPHET.displayName()),
     PROTXML("protxml"),
     UNKNOWN("Unknown");

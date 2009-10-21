@@ -9,8 +9,8 @@
 	
 	
 	<resultMap class="MascotResultOut" id="mascotResultResult" extends="MsSearchResult.msSearchResult">
+		<result property="rank" column="rank" nullValue="-1"/>
 		<result property="ionScore" column="ionScore" nullValue="-1"/>
-		<result property="rank" column="rank"/>
 		<result property="identityScore" column="identityScore"/>
 		<result property="homologyScore" column="homologyScore"/>
 		<result property="expect" column="expect"/>

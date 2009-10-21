@@ -4,6 +4,7 @@ public enum Program {
 
     SEQUEST("SEQUEST"),
     MASCOT("MASCOT"),
+    XTANDEM("XTANDEM"),
     //EE_NORM_SEQUEST("EE-normalized SEQUEST"),
     PERCOLATOR("Percolator"),
     PEPTIDE_PROPHET("PeptideProphet"),
@@ -41,6 +42,8 @@ public enum Program {
             return Program.SEQUEST;
         else if (SearchFileFormat.PEPXML_MASCOT == format)
             return Program.MASCOT;
+        else if (SearchFileFormat.PEPXML_XTANDEM == format)
+            return Program.XTANDEM;
         else
             return Program.UNKNOWN;
     }
@@ -52,6 +55,8 @@ public enum Program {
 //            return Program.EE_NORM_SEQUEST;
         else if (Program.MASCOT.name().equalsIgnoreCase(prog))
             return Program.MASCOT;
+        else if (Program.XTANDEM.name().equalsIgnoreCase(prog))
+            return Program.XTANDEM;
         else if (Program.PROLUCID.name().equalsIgnoreCase(prog))
             return Program.PROLUCID;
         else if (Program.PEPPROBE.name().equalsIgnoreCase(prog))
@@ -68,6 +73,7 @@ public enum Program {
     public static boolean isSearchProgram(Program program) {
         if(program == SEQUEST || // program == EE_NORM_SEQUEST ||
            program == MASCOT ||
+           program == XTANDEM ||
            program == PROLUCID || program == PEPPROBE||
            program == BIBLIOSPEC)
             return true;

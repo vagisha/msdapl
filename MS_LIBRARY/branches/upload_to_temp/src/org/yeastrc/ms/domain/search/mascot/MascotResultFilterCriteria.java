@@ -1,7 +1,7 @@
 /**
- * SequestResultFilterCriteria.java
+ * MascotResultFilterCriteria.java
  * @author Vagisha Sharma
- * Apr 7, 2009
+ * Oct 12, 2009
  * @version 1.0
  */
 package org.yeastrc.ms.domain.search.mascot;
@@ -173,6 +173,6 @@ public class MascotResultFilterCriteria extends ResultFilterCriteria {
     }
     
     public String makeExpectFilterSql() {
-        return makeFilterSql(SORT_BY.EXPECT.getColumnName(), minExpect, null);
+        return makeFilterSql(SORT_BY.MASCOT_EXPECT.getColumnName(), minExpect, null);
     }
 }

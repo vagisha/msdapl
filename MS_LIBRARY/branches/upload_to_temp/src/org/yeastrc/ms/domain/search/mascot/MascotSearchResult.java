@@ -1,7 +1,7 @@
 /**
- * SequestRunSearchResultDb.java
+ * MascotSearchResult.java
  * @author Vagisha Sharma
- * Aug 17, 2008
+ * Oct 12, 2009
  * @version 1.0
  */
 package org.yeastrc.ms.domain.search.mascot;

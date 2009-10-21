@@ -1,23 +1,23 @@
 /**
- * MascotParamWrap.java
+ * XtandemParamWrap.java
  * @author Vagisha Sharma
- * Oct 12, 2009
+ * Oct 20, 2009
  * @version 1.0
  */
-package org.yeastrc.ms.domain.search.mascot.impl;
+package org.yeastrc.ms.domain.search.xtandem.impl;
 
 import org.yeastrc.ms.domain.search.Param;
 
 /**
  * 
  */
-public class MascotParamWrap implements Param {
+public class XtandemParamWrap implements Param {
 
     
     private int searchId;
     private Param param;
     
-    public MascotParamWrap(Param param, int searchId) {
+    public XtandemParamWrap(Param param, int searchId) {
         this.param = param;
         this.searchId = searchId;
     }
