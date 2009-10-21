@@ -397,9 +397,13 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
                 }
             }
             if(!found) {
-                log.info("No matching scan+charge result found for: scanId: "+
-                        scanId+"; charge: "+charge+"; mass: "+scan.getObservedMass());
-                return false;
+                UploadException ex = new UploadException(ERROR_CODE.GENERAL);
+                ex.setErrorMessage("No matching scan+charge result found for: scanId: "+
+                      scanId+"; scanNumber: "+scan.getScanNumber()+"; charge: "+charge+"; mass: "+scan.getObservedMass());
+                throw ex;
+//                log.info("No matching scan+charge result found for: scanId: "+
+//                        scanId+"; charge: "+charge+"; mass: "+scan.getObservedMass());
+//                return false;
             }
             
             // sometimes results can be exact duplicates.  In this case we will keep the old result and ignore this one

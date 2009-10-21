@@ -59,7 +59,14 @@ public class Cms2FileReader implements MS2RunDataProvider {
     @Override
     public MS2RunIn getRunHeader() throws DataProviderException {
        
-       MS2Header header = new MS2Header(RunFileFormat.CMS2);
+       
+        if(reader.getversion() > 2) {
+            DataProviderException e = new DataProviderException("Unsupported version of CMS2 file found. Version: "+reader.getversion());
+            log.warn(e.getMessage());
+            throw e;
+        }
+        
+        MS2Header header = new MS2Header(RunFileFormat.CMS2);
        
        String h = reader.getheader();
        String[] lines = h.split("\\n");

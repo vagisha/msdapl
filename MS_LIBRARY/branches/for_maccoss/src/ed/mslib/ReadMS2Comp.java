@@ -3,14 +3,17 @@ package ed.mslib;
 import java.io.*;
 import ed.javatools.BufferedRaf;
 import ed.javatools.PrimitiveTools;
-import java.util.zip.*;
+//import java.util.zip.*;	//jzip old
+import com.jcraft.jzlib.*;
 
 public class ReadMS2Comp implements ReadMS2Interface{
 	
 	public ReadMS2Comp(File file) throws FileNotFoundException, IOException{
+		this.file = file;
 		raf = new BufferedRaf(file,"r");
-		mzinflater = new Inflater();
-		intinflater = new Inflater();		
+//		mzinflater = new Inflater();	//jzip old
+//		intinflater = new Inflater();	//jzip old
+		zs = new ZStream();
 		readheader();
 	}
 	
@@ -58,7 +61,9 @@ public class ReadMS2Comp implements ReadMS2Interface{
 		double convB = -1; //conversion factor B
 		double tic = -1; //total ion current
 		float iit = -1; //ion injection time
-		if (version == 2){
+		int numez = 0;	//number of EZ lines
+		
+		if (version >= 2){		
 			bpi = raf.readLEFloat();
 			bpm = raf.readLEDouble();
 			convA = raf.readLEDouble();
@@ -66,15 +71,35 @@ public class ReadMS2Comp implements ReadMS2Interface{
 			tic = raf.readLEDouble();
 			iit = raf.readLEFloat();
 		}
-		int numz = raf.readLEInt();
-		int numdatapts = raf.readLEInt();
 
+		int numz = raf.readLEInt();			//number of Z lines
+		
+		if (version >= 3){
+			numez = raf.readLEInt();
+		}
+		
+		int numdatapts = raf.readLEInt();	//number of mz-intensity data points
+
+		//Read Z lines
 		int[] chargearray = new int[numz];
 		double[] mpharray = new double[numz];
 		for (int i=0; i<numz; i++){
 			chargearray[i] = raf.readLEInt();
 			mpharray[i] = raf.readLEDouble();
-		}		
+		}
+		
+		//Read EZ lines
+		int[] ezz = new int[numez];
+		double[] ezmph = new double[numez];
+		float[] ezrtime = new float[numez];
+		float[] ezarea = new float[numez];
+		for (int i=0; i<numez; i++){
+			ezz[i] = raf.readLEInt();
+			ezmph[i] = raf.readLEDouble();
+			ezrtime[i] = raf.readLEFloat();
+			ezarea[i] = raf.readLEFloat();
+		}
+		
 		int mzlength = raf.readLEInt();
 		int intlength = raf.readLEInt();
 		
@@ -82,49 +107,106 @@ public class ReadMS2Comp implements ReadMS2Interface{
 		
 		if (scan==scan1 || scan == -1){ //if scan found or just want next scan, then read and uncomp data
 		
-			byte[] mzcomp = new byte[mzlength];
+			byte[] mzcomp = new byte[mzlength];		//read compressed mz data
 			for (int i=0; i<mzlength; i++){
 				mzcomp[i]=(byte)raf.read();
 			}
 			
-			byte[] intcomp = new byte[intlength];
+			byte[] intcomp = new byte[intlength];	//read compressed intensity data
 			for (int i=0; i<intlength; i++){
 				intcomp[i]=(byte)raf.read();
 			}
-
+			
+			//init 
 			result = new MS2Scan();			
 			result.setscan(scan1);
 			result.setendscan(scan2);
 			result.setprecursor((float)fragmass);
 			result.addIfield("RTime\t"+rtime);
-			
-			if (version == 2){
+			if (version >= 2){
 				result.addIfield("BPI\t"+bpi);
 				result.addIfield("BPM\t"+bpm);
 				result.addIfield("ConvA\t"+convA);
 				result.addIfield("ConvB\t"+convB);
 				result.addIfield("TIC\t"+tic);
 				result.addIfield("IIT\t"+iit);
+				for (int i=0; i<numez; i++){
+					result.addezline(ezz[i],ezmph[i], ezrtime[i], ezarea[i]);
+				}
 			}
 			
 			for (int i=0; i<numz;i++){
 				result.addchargemass(chargearray[i],mpharray[i]);
 			}
 			
-			mzinflater.reset();
-			intinflater.reset();
-			mzinflater.setInput(mzcomp);
-			intinflater.setInput(intcomp);
+//			mzinflater.reset();				//jzip old
+//			intinflater.reset();			//jzip old
+//			mzinflater.setInput(mzcomp);	//jzip old
+//			intinflater.setInput(intcomp);	//jzip old
+			
 			byte[] mzb = new byte[8];
 			byte[] intb = new byte[4];
 			
 			try {
-			
 				//read all data at once
 				byte[] mzbbig = new byte[8*numdatapts];
 				byte[] intbbig = new byte[4*numdatapts];
-				mzinflater.inflate(mzbbig);
-				intinflater.inflate(intbbig);
+//				mzinflater.inflate(mzbbig); 	//jzip old
+//				intinflater.inflate(intbbig);	//jzip old
+				
+				//jzlib				
+				int err;
+				zs.next_in = mzcomp;
+				zs.next_in_index=0;
+				zs.next_out = mzbbig;
+				zs.next_out_index = 0;				
+				err = zs.inflateInit();
+				
+				zs.avail_in = mzcomp.length;
+				zs.avail_out = mzbbig.length;
+				err = zs.inflate(JZlib.Z_NO_FLUSH);
+				
+				zs.next_in = intcomp;
+				zs.next_in_index = 0;
+				zs.next_out = intbbig;
+				zs.next_out_index = 0;
+				err = zs.inflateInit();
+				
+				zs.avail_in = intcomp.length;
+				zs.avail_out = intbbig.length;
+				err = zs.inflate(JZlib.Z_NO_FLUSH);
+				//jzlib end
+				
+				//*****test debug
+		/*		Inflater testinf = new Inflater();
+				testinf.setInput(intcomp);
+				byte[] tempb = new byte[4];
+				
+				System.out.println("*"+intcomp.length + " " + (numdatapts*4) + " " + testinf.getAdler());
+				
+				byte[] bx = PrimitiveTools.LEFloatTobyteArray(215.4f);
+				System.out.println(bx[3]+" " + bx[2] + " " + bx[1] + " " +bx[0] + "*");
+				
+				for (int i=0; i< numdatapts; i++){
+					System.out.print(testinf.inflate(tempb) + " ");
+					testinf.inflate(tempb);
+					System.out.println(PrimitiveTools.LEbyteArrayToFloat(tempb) + " " + testinf.getBytesWritten() + " " + testinf.getBytesRead());
+					
+					if(testinf.getBytesWritten() == 976){
+						byte[] b2 = new byte[3];
+						testinf.inflate(b2);
+						System.out.println(b2[2] + " " +b2[1] + " " +b2[0]);
+						byte[] b4 = new byte[4];
+						b4[2] = b2[2];
+						b4[1] = b2[1];
+						b4[0] = b2[0];
+						for (int ii=0; ii<256; ii++ ){
+							b4[3] = (byte)ii;
+							System.out.println(PrimitiveTools.LEbyteArrayToFloat(b4) + " " + (byte)ii);
+						}
+					}
+				}
+		*/		//*****endtest debug
 				
 				//then read data into smaller byte arrays and translate values
 				for (int i=0; i<numdatapts; i++){
@@ -140,7 +222,10 @@ public class ReadMS2Comp implements ReadMS2Interface{
 					result.addscan(mz,inten);
 				}
 			
-			} catch (DataFormatException e) {
+//			} catch (DataFormatException e) {
+			} catch (Exception e){
+				System.out.println("Error uncompressing data");
+				e.printStackTrace();
 				return null;
 			}
 			return result;
@@ -161,13 +246,18 @@ public class ReadMS2Comp implements ReadMS2Interface{
 		filetype = raf.readLEInt();
 		version = raf.readLEInt();
 
-		byte[] b = new byte[2048];
-		for (int i=0; i<b.length; i++){
-			b[i] = (byte)raf.read();
+		byte[] b = new byte[headerlength];
+		int counter = 0;
+		for (int i=0; i<headerlength; i++){
+			byte x = (byte)raf.read();
+			if (x!=0){
+				b[counter] = x;
+				counter++;
+			}
 		}
 		
 		endofheader = raf.getFilePointer();
-		header = new String(b);
+		header = new String(b, 0, counter);
 	}
 	
 	public String getheader(){return header;}
@@ -184,16 +274,21 @@ public class ReadMS2Comp implements ReadMS2Interface{
 				e.printStackTrace();
 			}
 		}
+		
 	}
+	
+	public int getversion(){return version;}
 	
 	private String header;
 	private File file;
 	BufferedRaf raf;
-	private long version;
+	private int version;
 	private long filetype;
-	private Inflater mzinflater;
-	private Inflater intinflater;
+	private ZStream zs;
+//	private Inflater mzinflater;	//jzip old
+//	private Inflater intinflater;	//jzip old
 	private int lastscan=0;
 	private long endofheader=0;
+	private int headerlength = 2048;
 	
 }

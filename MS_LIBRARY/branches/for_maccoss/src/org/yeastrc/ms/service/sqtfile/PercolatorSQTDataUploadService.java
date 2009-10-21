@@ -375,13 +375,14 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             
             int numMatches = resultDao.numResultsForRunSearchScanChargeMass(runSearchId, scanId, scan.getCharge(), scan.getObservedMass());
             if(numMatches == 0) {
-                log.error("No matching results found with runSearchId: "+runSearchId+
-                        "; scanId: "+scanId+"; charge: "+scan.getCharge()+
-                        "; mass: "+scan.getObservedMass());
-//              String msg = "No matching SQTSearchScan found with runSearchId: "+runSearchId+"; scanId: "+scanId+"; charge: "+scan.getCharge();
-//              UploadException ex = new UploadException(ERROR_CODE.NOT_MATCHING_SEARCH_SCAN);
-//              ex.setErrorMessage(msg);
-//              throw ex;
+                String msg = "No matching results found with runSearchId: "+runSearchId+
+                "; scanId: "+scanId+"; charge: "+scan.getCharge()+
+                "; mass: "+scan.getObservedMass();
+                
+//                log.error(msg);
+                UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_SCAN);
+                ex.setErrorMessage(msg);
+                throw ex;
             }
             else {
                 // save all the search results for this scan

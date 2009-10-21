@@ -205,6 +205,9 @@ public final class ProlucidSQTDataUploadService extends AbstractSQTDataUploadSer
                     numProteins += result.getProteinMatchList().size();
                 }
             }
+            else {
+                log.info("Ignoring search scan: "+scan.getScanNumber()+"; scanId: "+scanId+"; charge: "+scan.getCharge()+"; mass: "+scan.getObservedMass());
+            }
         }
         
         flush(); // save any cached data
