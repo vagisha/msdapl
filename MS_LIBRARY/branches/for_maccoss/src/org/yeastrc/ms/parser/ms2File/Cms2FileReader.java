@@ -60,7 +60,7 @@ public class Cms2FileReader implements MS2RunDataProvider {
     public MS2RunIn getRunHeader() throws DataProviderException {
        
        
-        if(reader.getversion() > 2) {
+        if(reader.getversion() > 3) {
             DataProviderException e = new DataProviderException("Unsupported version of CMS2 file found. Version: "+reader.getversion());
             log.warn(e.getMessage());
             throw e;
