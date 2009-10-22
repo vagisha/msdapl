@@ -71,6 +71,10 @@ import org.yeastrc.ms.dao.search.sqtfile.SQTSearchScanDAO;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTHeaderDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTRunSearchDAOImpl;
 import org.yeastrc.ms.dao.search.sqtfile.ibatis.SQTSearchScanDAOImpl;
+import org.yeastrc.ms.dao.search.xtandem.XtandemSearchDAO;
+import org.yeastrc.ms.dao.search.xtandem.XtandemSearchResultDAO;
+import org.yeastrc.ms.dao.search.xtandem.ibatis.XtandemSearchDAOImpl;
+import org.yeastrc.ms.dao.search.xtandem.ibatis.XtandemSearchResultDAOImpl;
 import org.yeastrc.ms.domain.run.PeakStorageType;
 
 import com.ibatis.common.resources.Resources;
@@ -159,6 +163,10 @@ public class DAOFactory {
     private MascotSearchResultDAO mascotResultDAO;
     private MascotSearchDAO mascotSearchDAO;
     
+    // DAOs for Xtandem related objects
+    private XtandemSearchResultDAO xtandemResultDAO;
+    private XtandemSearchDAO xtandemSearchDAO;
+    
     // DAOs for Prolucid related objects
     private ProlucidSearchResultDAO prolucidResultDAO;
     private ProlucidSearchDAO prolucidSearchDAO;
@@ -216,6 +224,10 @@ public class DAOFactory {
         // mascot search related
         mascotResultDAO = new MascotSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
         mascotSearchDAO = new MascotSearchDAOImpl(sqlMap, searchDAO);
+        
+        // xtandem search related
+        xtandemResultDAO = new XtandemSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
+        xtandemSearchDAO = new XtandemSearchDAOImpl(sqlMap, searchDAO);
         
         // prolucid search related
         prolucidResultDAO = new ProlucidSearchResultDAOImpl(sqlMap, searchResultDAO, runSearchDAO, modDAO);
@@ -358,6 +370,17 @@ public class DAOFactory {
     
     public MascotSearchDAO getMascotSearchDAO() {
         return mascotSearchDAO;
+    }
+    
+    //-------------------------------------------------------------------------------------------
+    // Xtandem SEARCH related
+    //-------------------------------------------------------------------------------------------
+    public XtandemSearchResultDAO getXtandemResultDAO() {
+        return xtandemResultDAO;
+    }
+    
+    public XtandemSearchDAO getXtandemSearchDAO() {
+        return xtandemSearchDAO;
     }
     
     //-------------------------------------------------------------------------------------------

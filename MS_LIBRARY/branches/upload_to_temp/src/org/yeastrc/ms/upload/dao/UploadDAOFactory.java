@@ -104,6 +104,12 @@ import org.yeastrc.ms.upload.dao.search.sqtfile.dualdb.SQTSearchScanUploadDAOImp
 import org.yeastrc.ms.upload.dao.search.sqtfile.ibatis.SQTHeaderUploadDAOIbatisImpl;
 import org.yeastrc.ms.upload.dao.search.sqtfile.ibatis.SQTRunSearchUploadDAOIbatisImpl;
 import org.yeastrc.ms.upload.dao.search.sqtfile.ibatis.SQTSearchScanUploadDAOIbatisImpl;
+import org.yeastrc.ms.upload.dao.search.xtandem.XtandemSearchResultUploadDAO;
+import org.yeastrc.ms.upload.dao.search.xtandem.XtandemSearchUploadDAO;
+import org.yeastrc.ms.upload.dao.search.xtandem.dualdb.XtandemSearchResultUploadDAOImpl;
+import org.yeastrc.ms.upload.dao.search.xtandem.dualdb.XtandemSearchUploadDAOImpl;
+import org.yeastrc.ms.upload.dao.search.xtandem.ibatis.XtandemSearchResultUploadDAOIbatisImpl;
+import org.yeastrc.ms.upload.dao.search.xtandem.ibatis.XtandemSearchUploadDAOIbatisImpl;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -197,9 +203,13 @@ public class UploadDAOFactory {
     private SequestSearchResultUploadDAO sequestResultDAO;
     private SequestSearchUploadDAO sequestSearchDAO;
     
-    // DAOs for Sequest related objects
+    // DAOs for Mascot related objects
     private MascotSearchResultUploadDAO mascotResultDAO;
     private MascotSearchUploadDAO mascotSearchDAO;
+    
+    // DAOs for Xtandem related objects
+    private XtandemSearchResultUploadDAO xtandemResultDAO;
+    private XtandemSearchUploadDAO xtandemSearchDAO;
     
     // DAOs for Prolucid related objects
     private ProlucidSearchResultUploadDAO prolucidResultDAO;
@@ -309,6 +319,12 @@ public class UploadDAOFactory {
         MascotSearchUploadDAO mascotSDao = new MascotSearchUploadDAOIbatisImpl(tempSqlMap, searchDAO);
         mascotSearchDAO = new MascotSearchUploadDAOImpl(mascotSDao, true);
         
+        // xtandem search related
+        XtandemSearchResultUploadDAO xtandemRDao = new XtandemSearchResultUploadDAOIbatisImpl(tempSqlMap, searchResultDAO);
+        xtandemResultDAO = new XtandemSearchResultUploadDAOImpl(xtandemRDao, true);
+        XtandemSearchUploadDAO xtandemSDao = new XtandemSearchUploadDAOIbatisImpl(tempSqlMap, searchDAO);
+        xtandemSearchDAO = new XtandemSearchUploadDAOImpl(xtandemSDao, true);
+        
         // prolucid search related
         ProlucidSearchResultUploadDAO proRDao = new ProlucidSearchResultUploadDAOIbatisImpl(tempSqlMap, searchResultDAO);
         prolucidResultDAO = new ProlucidSearchResultUploadDAOImpl(proRDao, true);
@@ -374,6 +390,10 @@ public class UploadDAOFactory {
         mascotResultDAO = new MascotSearchResultUploadDAOIbatisImpl(sqlMap, searchResultDAO);
         mascotSearchDAO = new MascotSearchUploadDAOIbatisImpl(sqlMap, searchDAO);
         
+        // xtandem search related
+        xtandemResultDAO = new XtandemSearchResultUploadDAOIbatisImpl(sqlMap, searchResultDAO);
+        xtandemSearchDAO = new XtandemSearchUploadDAOIbatisImpl(sqlMap, searchDAO);
+        
         // prolucid search related
         prolucidResultDAO = new ProlucidSearchResultUploadDAOIbatisImpl(sqlMap, searchResultDAO);
         prolucidSearchDAO = new ProlucidSearchUploadDAOIbatisImpl(sqlMap, searchDAO);
@@ -404,7 +424,7 @@ public class UploadDAOFactory {
         return tempSqlMap.getDataSource().getConnection();
     }
     
-  //-------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------
     // EXPERIMENT related
     //-------------------------------------------------------------------------------------------
     public MsExperimentUploadDAO getMsExperimentDAO() {
@@ -519,6 +539,17 @@ public class UploadDAOFactory {
     
     public MascotSearchUploadDAO getMascotSearchDAO() {
         return mascotSearchDAO;
+    }
+    
+    //-------------------------------------------------------------------------------------------
+    // Xtandem SEARCH related
+    //-------------------------------------------------------------------------------------------
+    public XtandemSearchResultUploadDAO getXtandemResultDAO() {
+        return xtandemResultDAO;
+    }
+    
+    public XtandemSearchUploadDAO getXtandemSearchDAO() {
+        return xtandemSearchDAO;
     }
     
     //-------------------------------------------------------------------------------------------

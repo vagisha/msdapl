@@ -46,6 +46,12 @@ public enum SearchFileFormat {
             return SearchFileFormat.SQT_PPROBE;
         else if (SearchFileFormat.PEPXML.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.PEPXML;
+        else if (SearchFileFormat.PEPXML_SEQ.name().equalsIgnoreCase(fmtString))
+            return SearchFileFormat.PEPXML_SEQ;
+        else if (SearchFileFormat.PEPXML_MASCOT.name().equalsIgnoreCase(fmtString))
+            return SearchFileFormat.PEPXML_MASCOT;
+        else if (SearchFileFormat.PEPXML_XTANDEM.name().equalsIgnoreCase(fmtString))
+            return SearchFileFormat.PEPXML_XTANDEM;
         else if (SearchFileFormat.PROTXML.name().equalsIgnoreCase(fmtString))
             return SearchFileFormat.PROTXML;
         else return SearchFileFormat.UNKNOWN;

@@ -843,8 +843,9 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
                 if(evtType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")) {
                     String value = reader.getAttributeValue(null,"search_engine");
                     if(value != null) {
-                        if("SEQUEST".equalsIgnoreCase(value))       program = Program.SEQUEST;
-                        else if("MASCOT".equalsIgnoreCase(value))   program = Program.MASCOT;
+                        if("SEQUEST".equalsIgnoreCase(value))           program = Program.SEQUEST;
+                        else if("MASCOT".equalsIgnoreCase(value))       program = Program.MASCOT;
+                        else if ("X! Tandem".equalsIgnoreCase(value))   program = Program.XTANDEM;
                     }
                 }
             }
@@ -880,6 +881,8 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             return SearchFileFormat.PEPXML_SEQ;
         else if(program == Program.MASCOT)
             return SearchFileFormat.PEPXML_MASCOT;
+        else if(program == Program.XTANDEM)
+            return SearchFileFormat.PEPXML_XTANDEM;
         else
             return SearchFileFormat.UNKNOWN;
     }

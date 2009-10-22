@@ -19,6 +19,7 @@ import org.yeastrc.ms.service.ms2file.MS2DataUploadService2;
 import org.yeastrc.ms.service.mzxml.MzXmlDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlMascotDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepXmlSequestDataUploadService;
+import org.yeastrc.ms.service.pepxml.PepXmlXtandemDataUploadService;
 import org.yeastrc.ms.service.pepxml.PepxmlAnalysisDataUploadService;
 import org.yeastrc.ms.service.protxml.ProtxmlDataUploadService;
 import org.yeastrc.ms.service.sqtfile.PercolatorSQTDataUploadService;
@@ -179,7 +180,7 @@ public class UploadServiceFactory {
         }
         else if(format == SearchFileFormat.PEPXML) {
             // we know that we have pepxml files in this directory
-            // now we need to figure out which program (Sequest, Mascot etc.) results these files contain.
+            // now we need to figure out which program (Sequest, Mascot, Xtandem) results these files contain.
             SearchFileFormat pepxmlFormat = getPepxmlType(dataDirectory, filenames);
             
             if(pepxmlFormat == SearchFileFormat.PEPXML_SEQ) {
@@ -189,6 +190,11 @@ public class UploadServiceFactory {
             }
             else if(pepxmlFormat == SearchFileFormat.PEPXML_MASCOT) {
                 SearchDataUploadService service = new PepXmlMascotDataUploadService();
+                service.setDirectory(dataDirectory);
+                return service;
+            }
+            else if(pepxmlFormat == SearchFileFormat.PEPXML_XTANDEM) {
+                SearchDataUploadService service = new PepXmlXtandemDataUploadService();
                 service.setDirectory(dataDirectory);
                 return service;
             }
@@ -337,9 +343,10 @@ public class UploadServiceFactory {
             
 //            log.info("File type of "+pepxmlFile+" is: "+myType);
             
-            // For now we support only SEQUEST and MASCOT pepxml files. 
+            // For now we support only SEQUEST, MASCOT and XTANDEM pepxml files. 
             if (SearchFileFormat.PEPXML_SEQ != myType && 
-                SearchFileFormat.PEPXML_MASCOT != myType) {
+                SearchFileFormat.PEPXML_MASCOT != myType &&
+                SearchFileFormat.PEPXML_XTANDEM != myType) {
                 throw new UploadServiceFactoryException("We do not currently have support for the PEPXML format: "+myType);
             }
 
