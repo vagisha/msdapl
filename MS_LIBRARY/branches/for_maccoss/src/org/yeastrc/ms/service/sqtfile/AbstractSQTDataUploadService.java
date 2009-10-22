@@ -390,8 +390,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             // we will not upload this scan
             boolean found = false;
             for(MS2ScanCharge sc: scanChgStates) {
-                if(sc.getCharge() == charge && // sc.getMass().doubleValue() == scan.getObservedMass().doubleValue()) {
-                        Math.abs(sc.getMass().doubleValue() - scan.getObservedMass().doubleValue()) <= 0.05){
+                if(sc.getCharge() == charge && sc.getMass().doubleValue() == scan.getObservedMass().doubleValue()) {
+                        // Math.abs(sc.getMass().doubleValue() - scan.getObservedMass().doubleValue()) <= 0.05){
                     found = true;
                     break;
                 }
