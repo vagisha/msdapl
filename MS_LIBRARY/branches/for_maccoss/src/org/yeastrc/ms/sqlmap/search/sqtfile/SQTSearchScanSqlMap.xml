@@ -11,6 +11,7 @@
 		<result property="runSearchId" column="runSearchID" nullValue="0"/>
 		<result property="scanId" column="scanID" nullValue="0"/>
 		<result property="charge" column="charge" nullValue="0"/>
+		<result property="observedMass" column="observedMass"/>
 		<result property="processTime" column="processTime" nullValue="0"/>
 		<result property="serverName" column="serverName"/>
 		<result property="totalIntensity" column="totalIntensity"/>
@@ -23,6 +24,7 @@
 		<parameter property="runSearchId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="scanId" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="charge" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="observedMass" jdbcType="DECIMAL"/>
 		<parameter property="processTime" jdbcType="INTEGER" nullValue="0"/>
 		<parameter property="serverName" jdbcType="VARCHAR" />
 		<parameter property="totalIntensity" jdbcType="DECIMAL"/>
@@ -33,9 +35,10 @@
     
     <select id="select" resultMap="sqtSpectrumResult" parameterClass="java.util.Map">
 		SELECT * FROM SQTSpectrumData
-		WHERE runSearchID = #runSearchId#
-		AND scanID = #scanId#
+		WHERE scanID = #scanId#
+		AND runSearchID = #runSearchId#
 		AND charge = #charge#
+		AND observedMass = #observedMass#
 	</select>
 	
     <insert id="insert" parameterMap="sqtSpectrumParam">
@@ -43,6 +46,7 @@
     	(runSearchID, 
     	scanID, 
     	charge, 
+    	observedMass,
     	processTime, 
     	serverName,
     	totalIntensity,
@@ -56,6 +60,7 @@
     	(runSearchID, 
     	scanID, 
     	charge, 
+    	observedMass,
     	processTime, 
     	serverName,
     	totalIntensity,
@@ -66,13 +71,6 @@
     
     <delete id="deleteForRunSearch" parameterClass="Integer">
 		DELETE FROM SQTSpectrumData WHERE runSearchID=#id#
-    </delete>
-    
-    <delete id="delete" parameterClass="java.util.Map">
-		DELETE FROM SQTSpectrumData 
-		WHERE runSearchID = #runSearchId#
-		AND scanID = #scanId#
-		AND charge = #charge#
     </delete>
     
 </sqlMap>

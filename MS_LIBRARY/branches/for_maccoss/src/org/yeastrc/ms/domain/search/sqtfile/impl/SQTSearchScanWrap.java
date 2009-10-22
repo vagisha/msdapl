@@ -46,10 +46,10 @@ public class SQTSearchScanWrap implements SQTSearchScan {
         return scan.getLowestSp();
     }
 
-//    @Override
-//    public BigDecimal getObservedMass() {
-//        return scan.getObservedMass();
-//    }
+    @Override
+    public BigDecimal getObservedMass() {
+        return scan.getObservedMass();
+    }
 
     @Override
     public int getProcessTime() {

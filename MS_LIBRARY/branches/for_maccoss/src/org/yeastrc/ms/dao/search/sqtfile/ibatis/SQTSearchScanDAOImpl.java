@@ -6,6 +6,7 @@
  */
 package org.yeastrc.ms.dao.search.sqtfile.ibatis;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -29,11 +30,12 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
         super(sqlMap);
     }
     
-    public SQTSearchScanBean load(int runSearchId, int scanId, int charge) {
-        Map<String, Integer> map = new HashMap<String, Integer>(3);
+    public SQTSearchScanBean load(int runSearchId, int scanId, int charge, BigDecimal observedMass) {
+        Map<String, Object> map = new HashMap<String, Object>(8);
         map.put("runSearchId", runSearchId);
         map.put("scanId", scanId);
         map.put("charge", charge);
+        map.put("observedMass", observedMass);
         return (SQTSearchScanBean) queryForObject("SqtSpectrum.select", map);
     }
     
@@ -46,15 +48,6 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
     }
 
     @Override
-    public void delete(int runSearchId, int scanId, int charge) {
-        Map<String, Integer> map = new HashMap<String, Integer>(3);
-        map.put("runSearchId", runSearchId);
-        map.put("scanId", scanId);
-        map.put("charge", charge);
-        delete("SqtSpectrum.delete", map);
-    }
-
-    @Override
     public void saveAll(List<SQTSearchScan> scanDataList) {
         if (scanDataList.size() == 0)
             return;
@@ -62,6 +55,7 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
 //        (runSearchID, 
 //        scanID, 
 //        charge, 
+//        observedMass,
 //        processTime, 
 //        serverName,
 //        totalIntensity,
@@ -82,8 +76,8 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
             values.append("\""+scan.getServerName()+"\"");
             values.append(",");
             values.append(scan.getTotalIntensity());
-//            values.append(",");
-//            values.append(scan.getObservedMass());
+            values.append(",");
+            values.append(scan.getObservedMass());
             values.append(",");
             values.append(scan.getLowestSp());
             values.append(",");

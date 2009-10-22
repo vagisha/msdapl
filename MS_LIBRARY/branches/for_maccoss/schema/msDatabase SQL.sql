@@ -211,18 +211,19 @@ ALTER TABLE msProteinMatch ADD INDEX(accession);
 
 
 CREATE TABLE SQTSpectrumData (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    scanID INT UNSIGNED NOT NULL,
    runSearchID INT UNSIGNED NOT NULL,
-   charge TINYINT UNSIGNED,
+   charge TINYINT UNSIGNED NOT NULL,
+   observedMass DECIMAL(18,9) NOT NULL,
    processTime INT UNSIGNED,
    serverName VARCHAR(50),
    totalIntensity DECIMAL(18,9),
    lowestSp DECIMAL(10,5),
    sequenceMatches INT UNSIGNED
 );
-ALTER TABLE SQTSpectrumData ADD PRIMARY KEY(scanID, runSearchID, charge);
+ALTER TABLE SQTSpectrumData ADD INDEX(scanID, runSearchID, charge, observedMass);
 ALTER TABLE SQTSpectrumData ADD INDEX (runSearchID);
-ALTER TABLE SQTSpectrumData ADD INDEX (charge);
 
 CREATE TABLE SQTFileHeader (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,

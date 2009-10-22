@@ -111,7 +111,7 @@ public class DbToSqtFileConverter {
                 }
                 currScanId = result.getScanId();
                 currCharge = result.getCharge();
-                SQTSearchScan scanDb = scanDao.load(runSearch.getId(), currScanId, currCharge);
+                SQTSearchScan scanDb = scanDao.load(runSearch.getId(), currScanId, currCharge, result.getObservedMass());
                 currScan = makeScanResult(scanDb);
             }
             List<MsResidueModificationIn> dynaResidueMods = new ArrayList<MsResidueModificationIn>();

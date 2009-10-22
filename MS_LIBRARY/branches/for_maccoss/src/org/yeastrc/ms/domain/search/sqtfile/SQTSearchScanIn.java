@@ -9,8 +9,6 @@ public interface SQTSearchScanIn <T extends MsSearchResultIn> extends SQTSearchS
 
     public abstract int getScanNumber();
     
-    public abstract BigDecimal getObservedMass();
-
     public abstract List<T> getScanResults();
 }
 
@@ -19,6 +17,11 @@ interface SQTSearchScanBase {
      * @return the charge
      */
     public abstract int getCharge();
+    
+    /**
+     * @return the observed M+H
+     */
+    public abstract BigDecimal getObservedMass();
 
     /**
      * @return the processTime

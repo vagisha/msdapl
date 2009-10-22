@@ -2,6 +2,7 @@ package org.yeastrc.ms.service.sqtfile;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -356,13 +357,13 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         return runSearchDao.saveRunSearch(new SQTRunSearchWrap(search, searchId, runId));
     }
 
-    private SQTSearchScan getOldScanIfExists(int runSearchId, int scanId, int charge) {
+    private SQTSearchScan getOldScanIfExists(int runSearchId, int scanId, int charge, BigDecimal observedMass) {
         // look in the cache first
-        SQTSearchScan scan = searchScanMap.get(scanId+"_"+charge);
+        SQTSearchScan scan = searchScanMap.get(scanId+"_"+charge+"_"+observedMass);
         if(scan != null)   return scan;
         // now look in the database
         SQTSearchScanDAO spectrumDataDao = DAOFactory.instance().getSqtSpectrumDAO();
-        return spectrumDataDao.load(runSearchId, scanId, charge);
+        return spectrumDataDao.load(runSearchId, scanId, charge, observedMass);
     }
     
     /**
@@ -390,8 +391,8 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             // we will not upload this scan
             boolean found = false;
             for(MS2ScanCharge sc: scanChgStates) {
-                if(sc.getCharge() == charge && sc.getMass().doubleValue() == scan.getObservedMass().doubleValue()) {
-                        // Math.abs(sc.getMass().doubleValue() - scan.getObservedMass().doubleValue()) <= 0.05){
+                if(sc.getCharge() == charge && //sc.getMass().doubleValue() == scan.getObservedMass().doubleValue()) {
+                         Math.abs(sc.getMass().doubleValue() - scan.getObservedMass().doubleValue()) <= 0.0001){
                     found = true;
                     break;
                 }
@@ -408,7 +409,7 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
             
             // sometimes results can be exact duplicates.  In this case we will keep the old result and ignore this one
             if(found) {
-                SQTSearchScan oldScan = getOldScanIfExists(runSearchId, scanId, charge);
+                SQTSearchScan oldScan = getOldScanIfExists(runSearchId, scanId, charge, scan.getObservedMass());
                 if(oldScan != null) {
                     log.info("Duplicate scan+charge result found for: scanId: "+
                             scanId+"; charge: "+charge+"; mass: "+scan.getObservedMass());
@@ -445,11 +446,11 @@ public abstract class AbstractSQTDataUploadService implements SearchDataUploadSe
         if(searchScanMap.size() >= BUF_SIZE) {
             uploadSearchScanBuffer();
         }
-        String key = searchScan.getScanId()+"_"+searchScan.getCharge();
+        String key = searchScan.getScanId()+"_"+searchScan.getCharge()+"_"+searchScan.getObservedMass();
         if(searchScanMap.get(key) != null) {
             UploadException ex = new UploadException(ERROR_CODE.DUPLICATE_SCAN_CHARGE);
             ex.appendErrorMessage("Result already exists for scanID: "+searchScan.getScanId()+
-                    " and charge: "+searchScan.getCharge());
+                    " and charge: "+searchScan.getCharge()+" and observedMass: "+searchScan.getObservedMass());
             throw ex;
         }
         searchScanMap.put(key, searchScan);
