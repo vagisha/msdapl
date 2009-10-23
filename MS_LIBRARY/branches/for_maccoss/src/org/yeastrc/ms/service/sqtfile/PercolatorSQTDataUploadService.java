@@ -468,7 +468,8 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
                 // check for 1. first
                 int numMatching = 0;
                 for(MsSearchResult res: matchingResults) {
-                    if(result.getObservedMass().equals(res.getObservedMass())) {
+//                    log.info("My mass: "+result.getObservedMass()+". Looking at: "+res.getObservedMass());
+                    if(result.getObservedMass().doubleValue() == res.getObservedMass().doubleValue()) {
                         searchResult = res;
                         numMatching++;
                     }
@@ -490,7 +491,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
                 if(numMatching > 1) {
                     UploadException ex = new UploadException(ERROR_CODE.MULTI_MATCHING_SEARCH_RESULT);
                     ex.setErrorMessage("Multiple matching search results were found for runSearchId: "+runSearchId+
-                            " scanId: "+scanId+"; charge: "+result.getCharge()+
+                            " scanId: "+scanId+"; charge: "+result.getCharge()+"; mass: "+result.getObservedMass()+
                             "; peptide: "+result.getResultPeptide().getPeptideSequence()+
                             "; modified peptide: "+result.getResultPeptide().getModifiedPeptidePS());
                     throw ex;
@@ -506,7 +507,7 @@ public class PercolatorSQTDataUploadService implements AnalysisDataUploadService
             numResultsNotFound++;
             UploadException ex = new UploadException(ERROR_CODE.NO_MATCHING_SEARCH_RESULT);
             ex.setErrorMessage("No matching search result was found for runSearchId: "+runSearchId+
-                    " scanId: "+scanId+"; charge: "+result.getCharge()+
+                    " scanId: "+scanId+"; charge: "+result.getCharge()+"; mass: "+result.getObservedMass()+
                     "; peptide: "+result.getResultPeptide().getPeptideSequence()+
                     "; modified peptide: "+result.getResultPeptide().getModifiedPeptidePS());
             throw ex;
