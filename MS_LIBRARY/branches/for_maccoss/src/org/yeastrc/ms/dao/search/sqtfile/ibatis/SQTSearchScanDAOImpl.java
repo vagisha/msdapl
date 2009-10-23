@@ -71,13 +71,13 @@ public class SQTSearchScanDAOImpl extends BaseSqlMapDAO implements SQTSearchScan
             values.append(",");
             values.append(scan.getCharge() == 0 ? "NULL" : scan.getCharge());
             values.append(",");
+            values.append(scan.getObservedMass());
+            values.append(",");
             values.append(scan.getProcessTime());
             values.append(",");
             values.append("\""+scan.getServerName()+"\"");
             values.append(",");
             values.append(scan.getTotalIntensity());
-            values.append(",");
-            values.append(scan.getObservedMass());
             values.append(",");
             values.append(scan.getLowestSp());
             values.append(",");

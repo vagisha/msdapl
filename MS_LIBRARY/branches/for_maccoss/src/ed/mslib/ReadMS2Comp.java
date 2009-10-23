@@ -240,24 +240,38 @@ public class ReadMS2Comp implements ReadMS2Interface{
 	 * read uncompressed file header
 	 * @throws IOException
 	 */
-	private void readheader() throws IOException{
-		
-		raf.seek(0);
-		filetype = raf.readLEInt();
-		version = raf.readLEInt();
+	 private void readheader() throws IOException{
+		 raf.seek(0);
+		 filetype = raf.readLEInt();
+		 version = raf.readLEInt();
 
-		byte[] b = new byte[headerlength];
-		int counter = 0;
-		for (int i=0; i<headerlength; i++){
-			byte x = (byte)raf.read();
-			if (x!=0){
-				b[counter] = x;
-				counter++;
-			}
-		}
-		
-		endofheader = raf.getFilePointer();
-		header = new String(b, 0, counter);
+		 byte[] b = new byte[headerlength];
+		 int counter = 0;
+		 boolean lineEnd = false;
+
+		 for (int i=0; i<headerlength; i++){
+			 byte x = (byte)raf.read();
+
+			 if (x == 0) { // end of valid data in a line
+				 lineEnd = true;
+				 continue;
+			 }
+
+			 if (lineEnd && i % 128 != 0) { // we have already read all the valid data in this line; skip over junk bytes
+				 continue;
+			 }
+			 if (i % 128 == 0) { // beginning of a new line
+				 lineEnd = false;
+			 }
+		            
+			 if (x!=0){
+				 b[counter] = x;
+				 counter++;	
+			 }
+		 }
+
+		 endofheader = raf.getFilePointer();
+		 header = new String(b, 0, counter);
 	}
 	
 	public String getheader(){return header;}
