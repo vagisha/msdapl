@@ -618,6 +618,8 @@ public abstract class PepXmlDataUploadService <T extends PepXmlSearchScanIn<G, R
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
                 ex.setErrorMessage("No matching dynamic residue modification found for: searchId: "+
                         searchId+
+                        "; peptide: "+result.getResultPeptide().getPeptideSequence()+
+                        "; position: "+mod.getModifiedPosition()+
                         "; modResidue: "+mod.getModifiedResidue()+
                         "; modMass: "+mod.getModificationMass().doubleValue());
                 throw ex;

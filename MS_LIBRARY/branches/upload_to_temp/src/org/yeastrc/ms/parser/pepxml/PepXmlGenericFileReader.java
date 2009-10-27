@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -79,6 +81,9 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
     Enzyme enzyme;
     SearchDatabase searchDatabase;
     private String currentRunSearchName = null;
+    
+    private Map<Character, BigDecimal> staticModMap;
+    private Map<Character, BigDecimal> dynamicModMap;
     
     
     private PeptideProphetResultPeptideBuilder peptideResultBuilder;
@@ -261,6 +266,9 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         searchStaticResidueMods = new ArrayList<MsResidueModificationIn>();
         searchStaticTerminalMods = new ArrayList<MsTerminalModificationIn>();
         searchDynamicTerminalMods = new ArrayList<MsTerminalModificationIn>();
+        
+        staticModMap = new HashMap<Character, BigDecimal>();
+        dynamicModMap = new HashMap<Character, BigDecimal>();
     }
     
     
@@ -320,8 +328,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         // search_engine="MASCOT" precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic"
         String value = reader.getAttributeValue(null,"search_engine");
         if(value != null) {
-            if("SEQUEST".equalsIgnoreCase(value))       this.searchProgram = Program.SEQUEST;
-            else if("MASCOT".equalsIgnoreCase(value))   this.searchProgram = Program.MASCOT;
+            this.searchProgram = parseProgram(value);
         }
         value = reader.getAttributeValue(null,"precursor_mass_type");
         if(value != null) {
@@ -396,7 +403,8 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         }
     }
     
-    private void readResidueModification(XMLStreamReader reader) throws XMLStreamException {
+    // method has "protected" access because PepXmlXtandemFileReader overrides it.
+    protected void readResidueModification(XMLStreamReader reader) throws XMLStreamException {
         
         // <aminoacid_modification aminoacid="M" massdiff="15.9949" mass="147.0354" variable="Y" symbol="*"/>
         // <aminoacid_modification aminoacid="C" massdiff="57.0215" mass="160.0306" variable="N"/>
@@ -413,6 +421,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
                 mod.setModificationSymbol(symbol.charAt(0));
             mod.setModifiedResidue(aa.charAt(0));
             this.searchDynamicResidueMods.add(mod);
+            this.dynamicModMap.put(aa.charAt(0), new BigDecimal(massdiff));
         }
         
         // static modifications
@@ -423,6 +432,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             mod.setModificationMass(new BigDecimal(massdiff));
             mod.setModifiedResidue(aa.charAt(0));
             this.searchStaticResidueMods.add(mod);
+            this.staticModMap.put(aa.charAt(0), new BigDecimal(massdiff));
         }
     }
     
@@ -474,6 +484,8 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             runSearch.setSearchFileFormat(SearchFileFormat.PEPXML_SEQ);
         else if(this.searchProgram == Program.MASCOT)
             runSearch.setSearchFileFormat(SearchFileFormat.PEPXML_MASCOT);
+        else if(this.searchProgram == Program.XTANDEM)
+            runSearch.setSearchFileFormat(SearchFileFormat.PEPXML_XTANDEM);
         else
             throw new DataProviderException("Unknown search program for pepxml file: "+this.pepXmlFilePath);
         return runSearch;
@@ -745,10 +757,33 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
     // ---------------------------------------------------------------------------------
     private List<Modification> readModifications(String peptideSeq, XMLStreamReader reader) throws XMLStreamException, DataProviderException {
        
+        List<Modification> dynamicMods = new ArrayList<Modification>();
+        
         // read any relevant attributes
         // String modifiedPeptide = reader.getAttributeValue(null, "modified_peptide");
+        String modNtermMass = reader.getAttributeValue(null, "mod_nterm_mass");
+        String modCtermMass = reader.getAttributeValue(null, "mod_ctermMass");
+        if(modNtermMass != null) {
+            // add this only if this is a dynamic terminal modification
+            BigDecimal mass = new BigDecimal(modNtermMass);
+            for(MsTerminalModificationIn mMod: this.searchDynamicTerminalMods) {
+                if(mass.doubleValue() == mMod.getModificationMass().doubleValue()) {
+                    dynamicMods.add(new Modification(mass, Terminal.NTERM));
+                }
+            }
+        }
+        if(modCtermMass != null) {
+         // add this only if this is a dynamic terminal modification
+            BigDecimal mass = new BigDecimal(modNtermMass);
+            for(MsTerminalModificationIn mMod: this.searchDynamicTerminalMods) {
+                if(mass.doubleValue() == mMod.getModificationMass().doubleValue()) {
+                    dynamicMods.add(new Modification(mass, Terminal.CTERM));
+                }
+            }
+        }
         
-        List<Modification> dynamicMods = new ArrayList<Modification>();
+        
+        
         // read useful nested elements
         while(reader.hasNext()) {
             int evtType = reader.next();
@@ -761,31 +796,57 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
                 
                 // Add only if this is a dynamic residue modification  
                 // this will also match it against the dynamic modifications used for the search
-                if(isDynamicModification(peptideSeq.charAt(pos - 1), mass)) {
-                    dynamicMods.add(new Modification(pos, mass));
+                Modification mMod = makeModification(peptideSeq.charAt(pos - 1), pos-1, mass);
+                if(mMod != null) {
+                    dynamicMods.add(mMod);
                 }
             }
         }
         return dynamicMods;
     }
 
-    private boolean isDynamicModification(char modChar, BigDecimal mass) throws DataProviderException {
-        boolean foundchar = false;
-        for(MsResidueModificationIn mod: this.searchDynamicResidueMods) {
-            if(mod.getModifiedResidue() == modChar) {
-                foundchar = true;
-                double massDiff = mass.doubleValue() - AminoAcidUtils.monoMass(modChar);
-                if(Math.abs(massDiff - mod.getModificationMass().doubleValue()) < 0.05) {
-                    return true;
-                }
+    // method has "protected" access because PepXmlXtandemFileReader overrides it.
+    protected Modification makeModification(char modChar, int position, BigDecimal mass) throws DataProviderException {
+        
+        // the purpose is to figure out if this represents a dynamic modificaion (residue)
+        // we also want to get the massDiff for this modification since the modification_info
+        // element has mass_of_aminoacid + modification_mass. 
+        
+        double massDiff = getModMassDiff(modChar, mass, false);
+        // If this mass difference and modChar match a static modification return null
+        BigDecimal modMass = staticModMap.get(modChar);
+        if(modMass != null && Math.abs(massDiff - modMass.doubleValue()) < 0.05) {
+            return null;
+        }
+        
+        massDiff = getModMassDiff(modChar, mass, true);
+        modMass = dynamicModMap.get(modChar);
+        if(modMass != null) {
+            if(Math.abs(massDiff - modMass.doubleValue()) < 0.05) {
+                return new Modification(position, modMass);
+            }
+            else {
+                throw new DataProviderException("Found a match for modified residue: "+modChar+
+                        " but no match for mass: "+mass.doubleValue());
             }
         }
-        // TODO what about dynamic terminal modifications??
-        if(foundchar) {
-            throw new DataProviderException("Found a match for modified residue: "+modChar+
-                    " but no match for mass: "+mass.doubleValue());
+        throw new DataProviderException("No modification match found for : "+modChar+
+                " and mass: "+mass.doubleValue());
+    }
+    
+    protected final double getModMassDiff(char modChar, BigDecimal mass, boolean subtractStatic) {
+        // modification mass in pepXml files are: mass_of_aminoacid + modification_mass
+        // we need just the modification_mass
+        double massDiff = mass.doubleValue() - AminoAcidUtils.monoMass(modChar);
+        // if this is amino acid has a static modification, subtract that 
+        // A residue could have both static and dynamic modifications(??)
+        if(subtractStatic) {
+            BigDecimal staticModMass = staticModMap.get(modChar);
+            if(staticModMass != null) {
+                massDiff -= staticModMass.doubleValue();
+            }
         }
-        return false;
+        return massDiff;
     }
     
     // ---------------------------------------------------------------------------------
@@ -843,9 +904,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
                 if(evtType == XMLStreamReader.START_ELEMENT && reader.getLocalName().equalsIgnoreCase("search_summary")) {
                     String value = reader.getAttributeValue(null,"search_engine");
                     if(value != null) {
-                        if("SEQUEST".equalsIgnoreCase(value))           program = Program.SEQUEST;
-                        else if("MASCOT".equalsIgnoreCase(value))       program = Program.MASCOT;
-                        else if ("X! Tandem".equalsIgnoreCase(value))   program = Program.XTANDEM;
+                        program = parseProgram(value);
                     }
                 }
             }
@@ -869,6 +928,13 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
             }
         }
         return program;
+    }
+
+    private static Program parseProgram(String value) {
+        if("SEQUEST".equalsIgnoreCase(value))           return Program.SEQUEST;
+        else if("MASCOT".equalsIgnoreCase(value))       return Program.MASCOT;
+        else if ("X! Tandem".equalsIgnoreCase(value))   return Program.XTANDEM;
+        return null;
     }
     
     // ---------------------------------------------------------------------------------

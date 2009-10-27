@@ -6,16 +6,16 @@
  */
 package org.yeastrc.ms.domain.analysis.peptideProphet;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.yeastrc.ms.domain.protinfer.proteinProphet.Modification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
+import org.yeastrc.ms.domain.search.impl.ResultTerminalModBean;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
-import org.yeastrc.ms.util.AminoAcidUtils;
 
 /**
  * 
@@ -41,15 +41,25 @@ public class PeptideProphetResultPeptideBuilder {
         peptide.setPreResidue(preResidue);
         peptide.setPostResidue(postResidue);
         List<MsResultResidueMod> mods = new ArrayList<MsResultResidueMod>(modificationList.size());
+        List<MsResultTerminalMod> termMods = new ArrayList<MsResultTerminalMod>();
         for(Modification mod: modificationList) {
-            ResultResidueModBean mb = new ResultResidueModBean();
-            char modRes = strippedSequence.charAt(mod.getPosition() - 1);
-            mb.setModificationMass(BigDecimal.valueOf(mod.getMass().doubleValue() - AminoAcidUtils.monoMass(modRes)));
-            mb.setModifiedPosition(mod.getPosition() - 1);
-            mb.setModifiedResidue(modRes);
-            mods.add(mb);
+            if(!mod.isTerminalModification()) {
+                ResultResidueModBean mb = new ResultResidueModBean();
+                char modRes = strippedSequence.charAt(mod.getPosition());
+                mb.setModificationMass(mod.getMass());
+                mb.setModifiedPosition(mod.getPosition());
+                mb.setModifiedResidue(modRes);
+                mods.add(mb);
+            }
+            else {
+                ResultTerminalModBean mb = new ResultTerminalModBean();
+                mb.setModificationMass(mod.getMass());
+                mb.setModifiedTerminal(mod.getTerminus());
+                termMods.add(mb);
+            }
         }
         peptide.setDynamicResidueModifications(mods);
+        peptide.setDynamicTerminalModifications(termMods);
         return peptide;
     }
 }

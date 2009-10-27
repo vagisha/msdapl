@@ -114,15 +114,18 @@ public class PepXmlXtandemDataUploadService extends PepXmlDataUploadService<PepX
         // read parameters from one of the pep.xml files
         String filePath = dataDirectory+File.separator+searchDataFileNames.get(0)+".pep.xml";
         PepXmlXtandemFileReader parser = new PepXmlXtandemFileReader();
+        XtandemSearchIn search = null;
         try {
             parser.open(filePath);
+            if(parser.hasNextRunSearch()) {
+                search = parser.getSearch();
+            }
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
             ex.appendErrorMessage("\n\tCould not read search parameters from file: "+filePath+"\n");
             throw ex;
         }
-        XtandemSearchIn search = parser.getSearch();
         parser.close();
         
         return search;
@@ -133,12 +136,19 @@ public class PepXmlXtandemDataUploadService extends PepXmlDataUploadService<PepX
         PepXmlXtandemDataUploadService p = new PepXmlXtandemDataUploadService();
         
         List<String> spectrumFileNames = new ArrayList<String>();
-        spectrumFileNames.add("090715_EPO-iT_80mM_HCD.pep.xml");
+        spectrumFileNames.add("000");
+        spectrumFileNames.add("020");
+        spectrumFileNames.add("040");
+        spectrumFileNames.add("060");
+        spectrumFileNames.add("080");
+        spectrumFileNames.add("100");
+        spectrumFileNames.add("500");
+        spectrumFileNames.add("900");
         p.setSpectrumFileNames(spectrumFileNames);
         
-        p.setDirectory("/Users/silmaril/WORK/UW/FLINT/mascot_test");
+        p.setDirectory("/Users/silmaril/WORK/UW/FLINT/xtandem_test");
         p.setSearchDate(new Date());
-        p.setExperimentId(37);
+        p.setExperimentId(47);
         p.upload();
     }
 

@@ -123,15 +123,18 @@ public class PepXmlMascotDataUploadService extends PepXmlDataUploadService<PepXm
         // read parameters from one of the pep.xml files
         String filePath = dataDirectory+File.separator+searchDataFileNames.get(0)+".pep.xml";
         PepXmlMascotFileReader parser = new PepXmlMascotFileReader();
+        MascotSearchIn search = null;
         try {
             parser.open(filePath);
+            if(parser.hasNextRunSearch()) {
+                search = parser.getSearch();
+            }
         }
         catch (DataProviderException e) {
             UploadException ex = new UploadException(ERROR_CODE.PEPXML_ERROR, e);
             ex.appendErrorMessage("\n\tCould not read search parameters from file: "+filePath+"\n");
             throw ex;
         }
-        MascotSearchIn search = parser.getSearch();
         parser.close();
         
         return search;
