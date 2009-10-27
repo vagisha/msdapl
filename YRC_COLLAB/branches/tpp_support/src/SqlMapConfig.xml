@@ -62,6 +62,10 @@
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/mascot/MascotSearchSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/mascot/MascotSearchResultSqlMap.xml"/>
 	
+	<!-- Related to Xtandem -->
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/xtandem/XtandemSearchSqlMap.xml"/>
+	<sqlMap resource="org/yeastrc/ms/sqlmap/search/xtandem/XtandemSearchResultSqlMap.xml"/>
+	
 	<!-- Related to ProLuCID files -->
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/prolucid/ProlucidSearchSqlMap.xml"/>
 	<sqlMap resource="org/yeastrc/ms/sqlmap/search/prolucid/ProlucidSearchResultSqlMap.xml"/>

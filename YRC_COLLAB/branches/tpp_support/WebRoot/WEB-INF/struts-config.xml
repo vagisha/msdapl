@@ -59,6 +59,7 @@
 	<form-bean name="filterPeptideProphetResultsForm" type="org.yeastrc.www.project.experiment.PeptideProphetFilterResultsForm" />
 	<form-bean name="filterSequestResultsForm" type="org.yeastrc.www.project.experiment.SequestFilterResultsForm" />
 	<form-bean name="filterMascotResultsForm" type="org.yeastrc.www.project.experiment.MascotFilterResultsForm" />
+	<form-bean name="filterXtandemResultsForm" type="org.yeastrc.www.project.experiment.XtandemFilterResultsForm" />
 	<form-bean name="proteinInferenceFormSearch" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferenceFormAnalysis" type="org.yeastrc.www.proteinfer.ProteinInferenceForm"></form-bean>
 	<form-bean name="proteinInferFilterForm" type="org.yeastrc.www.proteinfer.ProteinInferFilterForm"></form-bean>
@@ -403,6 +404,17 @@
 	  input="/pages/internal/project/mascot/viewMascotResults.jsp">
 	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
 	  <forward name="Success" path="/pages/internal/project/mascot/viewMascotResults.jsp" redirect="false"/>
+	</action>
+	
+	<action
+	  path="/viewXtandemResults"
+	  type="org.yeastrc.www.project.experiment.ViewXtandemResults"
+	  name="filterXtandemResultsForm"
+	  validate="true"
+	  scope="request"
+	  input="/pages/internal/project/xtandem/viewXtandemResults.jsp">
+	  <forward name="Failure" path="/pages/internal/front.jsp" redirect="false"/>
+	  <forward name="Success" path="/pages/internal/project/xtandem/viewXtandemResults.jsp" redirect="false"/>
 	</action>
 	
 	<!-- ================================================================================== -->

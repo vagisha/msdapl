@@ -70,7 +70,7 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                         SORT_BY.ION_SCORE,
                         SORT_BY.IDENTITY_SCORE,
                         SORT_BY.HOMOLOGY_SCORE,
-                        SORT_BY.EXPECT,
+                        SORT_BY.MASCOT_EXPECT,
 //                        SORT_BY.DELTACN,
                         SORT_BY.PEPTIDE,
                         SORT_BY.PROTEIN

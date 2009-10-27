@@ -326,6 +326,17 @@ function clearSelectedProtInfer() {
 							</td>
 							</logic:equal>
 							
+							<!-- !!!!!! XTANDEM !!!!!! -->
+							<logic:equal name="search" property="searchProgram" value="<%=Program.XTANDEM.toString() %>">
+							<td width="33%">
+							<b>
+								<html:link action="viewXtandemResults.do" 
+											paramId="ID" 
+											paramName="search" paramProperty="id">[View Results]</html:link>
+							</b>
+							</td>
+							</logic:equal>
+							
 							
 							<td width="33%"><b>Search Date: </b>&nbsp;
 							<bean:write name="search" property="searchDate"/></td>

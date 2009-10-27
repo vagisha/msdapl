@@ -5,7 +5,7 @@
 
 <div style="padding:7 7 0 7; margin-bottom:30;">
 
-		<html:form action="viewMascotResults" method="POST">
+		<html:form action="viewXtandemResults" method="POST">
 		
 		<logic:present name="filterForm" property="searchId">
 			<html:hidden name="filterForm" property="searchId"/>
@@ -39,14 +39,14 @@
 					<td>Max. Rank</td> <td> <html:text name="filterForm" property="maxRank" size="5"/> </td>
 					<td></td> <td></td>
 					<td></td>
-					<td>Min. Ion Score</td><td> <html:text name="filterForm" property="minIonScore" size="5" /> </td>
-					<td>Min. Identity Score</td><td> <html:text name="filterForm" property="minIdentityScore" size="5" /> </td>
+					<td>Min. HyperScore</td><td> <html:text name="filterForm" property="minHyperScore" size="5" /> </td>
+					<td>Min. NextScore</td><td> <html:text name="filterForm" property="minNextScore" size="5" /> </td>
 				</tr>
 				
 				<tr>
-					<td>Min. Homology Score</td> <td> <html:text name="filterForm" property="minHomologyScore" size="5"/> </td>
+					<td>Min. B-Score</td> <td> <html:text name="filterForm" property="minBscore" size="5"/> </td>
+					<td>Min. Y-Score</td> <td> <html:text name="filterForm" property="minYscore" size="5"/> </td>
 					<td>Min. Expect. Score</td> <td> <html:text name="filterForm" property="minExpect" size="5"/> </td>
-					<td></td>
 					<td></td>
 					<td></td>
 				</tr>

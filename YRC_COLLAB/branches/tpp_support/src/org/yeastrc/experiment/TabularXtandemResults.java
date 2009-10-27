@@ -1,7 +1,7 @@
 /**
- * TabularMascotResults.java
+ * TabularXtandemResults.java
  * @author Vagisha Sharma
- * Oct 9, 2009
+ * Oct 27, 2009
  * @version 1.0
  */
 package org.yeastrc.experiment;
@@ -21,7 +21,7 @@ import org.yeastrc.www.misc.Tabular;
 /**
  * 
  */
-public class TabularMascotResults implements Tabular, Pageable {
+public class TabularXtandemResults implements Tabular, Pageable {
 
     private SORT_BY[] columns = new SORT_BY[] {
             SORT_BY.FILE_SEARCH,
@@ -29,11 +29,12 @@ public class TabularMascotResults implements Tabular, Pageable {
             SORT_BY.CHARGE, 
             SORT_BY.MASS, 
             SORT_BY.RT, 
-            SORT_BY.MASCOT_RANK,
-            SORT_BY.ION_SCORE, 
-            SORT_BY.IDENTITY_SCORE, 
-            SORT_BY.HOMOLOGY_SCORE, 
-            SORT_BY.MASCOT_EXPECT, 
+            SORT_BY.XCORR_RANK,
+            SORT_BY.HYPER_SCORE, 
+            SORT_BY.NEXT_SCORE, 
+            SORT_BY.B_SCORE, 
+            SORT_BY.Y_SCORE,
+            SORT_BY.XTANDEM_EXPECT,
             SORT_BY.PEPTIDE,
             SORT_BY.PROTEIN
         };
@@ -42,14 +43,14 @@ public class TabularMascotResults implements Tabular, Pageable {
         private SORT_ORDER sortOrder = SORT_ORDER.ASC;
         
         
-        private List<MascotResultPlus> results;
+        private List<XtandemResultPlus> results;
         
         private int currentPage;
         private int lastPage = currentPage;
         private List<Integer> displayPageNumbers;
         
         
-        public TabularMascotResults(List<MascotResultPlus> results, boolean useEvalue) {
+        public TabularXtandemResults(List<XtandemResultPlus> results, boolean useEvalue) {
             this.results = results;
             displayPageNumbers = new ArrayList<Integer>();
             displayPageNumbers.add(currentPage);
@@ -97,7 +98,7 @@ public class TabularMascotResults implements Tabular, Pageable {
         public TableRow getRow(int index) {
             if(index >= results.size())
                 return null;
-            MascotResultPlus result = results.get(index);
+            XtandemResultPlus result = results.get(index);
             TableRow row = new TableRow();
             
             // row.addCell(new TableCell(String.valueOf(result.getId())));
@@ -117,11 +118,12 @@ public class TabularMascotResults implements Tabular, Pageable {
                 row.addCell(new TableCell(String.valueOf(round(temp))));
             
             
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getRank())));
-            row.addCell(new TableCell(String.valueOf(round(result.getMascotResultData().getIonScore()))));
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getIdentityScore())));
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore())));
-            row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect())));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getRank())));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getHyperScore())));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getNextScore())));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getBscore())));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getYscore())));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getExpect())));
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
             cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);

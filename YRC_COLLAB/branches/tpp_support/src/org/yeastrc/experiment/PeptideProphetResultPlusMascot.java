@@ -25,7 +25,7 @@ public class PeptideProphetResultPlusMascot extends PeptideProphetResultPlus {
         return mascotData;
     }
 
-    public void setMascotData(MascotResultData sequestData) {
-        this.mascotData = sequestData;
+    public void setMascotData(MascotResultData mascotData) {
+        this.mascotData = mascotData;
     }
 }

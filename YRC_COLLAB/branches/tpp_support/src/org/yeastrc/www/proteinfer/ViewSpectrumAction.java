@@ -19,6 +19,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.MascotResultPlus;
 import org.yeastrc.experiment.SequestResultPlus;
+import org.yeastrc.experiment.XtandemResultPlus;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
@@ -31,6 +32,8 @@ import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.search.xtandem.XtandemSearchDAO;
+import org.yeastrc.ms.dao.search.xtandem.XtandemSearchResultDAO;
 import org.yeastrc.ms.domain.run.MsRun;
 import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.run.RunFileFormat;
@@ -47,7 +50,7 @@ import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
 import org.yeastrc.ms.domain.search.mascot.MascotSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
-import org.yeastrc.ms.parser.sqtFile.sequest.SequestResultPeptideBuilder;
+import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResult;
 import org.yeastrc.ms.util.AminoAcidUtils;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
@@ -189,6 +192,22 @@ public class ViewSpectrumAction extends Action {
             }
         }
         
+        else if(search.getSearchProgram() == Program.XTANDEM) {
+            
+            TabularXtandemResults tabRes = new TabularXtandemResults();
+            XtandemSearchResultDAO xtResDao = DAOFactory.instance().getXtandemResultDAO();
+            
+            for(int resultId: resultIds) {
+                XtandemSearchResult sres = xtResDao.load(resultId);
+                MsScan scan = scanDao.load(sres.getScanId());
+                boolean highlight = runSearchResultId == sres.getId() ? true : false;
+                tabRes.addResult(new XtandemResultPlus(sres, scan), highlight);
+            }
+            if(resultIds.size() > 0) {
+                request.setAttribute("results", tabRes);
+            }
+        }
+        
         // TODO fix this 
 //        else if (search.getSearchProgram() == Program.PROUCID) {
 //            ProlucidSearchResultDAO plDao = DAOFactory.instance().getProlucidResultDAO();
@@ -323,7 +342,7 @@ public class ViewSpectrumAction extends Action {
             SORT_BY.ION_SCORE, 
             SORT_BY.IDENTITY_SCORE,
             SORT_BY.HOMOLOGY_SCORE,
-            SORT_BY.EXPECT,
+            SORT_BY.MASCOT_EXPECT,
             SORT_BY.PEPTIDE
         };
         
@@ -368,6 +387,95 @@ public class ViewSpectrumAction extends Action {
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getIdentityScore()), null));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getHomologyScore()), null));
             row.addCell(new TableCell(String.valueOf(result.getMascotResultData().getExpect()), null));
+            
+            String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
+            TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
+            cell.setTargetName("SPECTRUM_WINDOW");
+            cell.setClassName("left_align");
+            row.addCell(cell);
+            
+            if(highlightedRow == index)
+                row.setRowHighighted(true);
+            return row;
+        }
+        @Override
+        public int rowCount() {
+            return results.size();
+        }
+        @Override
+        public List<TableHeader> tableHeaders() {
+            List<TableHeader> headers = new ArrayList<TableHeader>(columns.length);
+            for(SORT_BY col: columns) {
+                TableHeader header = new TableHeader(col.getDisplayName(), col.name());
+                headers.add(header);
+            }
+            return headers;
+        }
+        @Override
+        public void tabulate() {
+            // nothing to do here
+        }
+    }
+    
+    private static class TabularXtandemResults implements Tabular {
+
+        
+        private static SORT_BY[] columns = new SORT_BY[] {
+            SORT_BY.MASS, 
+            SORT_BY.CALC_MASS_SEQ,
+            SORT_BY.CHARGE, 
+            SORT_BY.RT, 
+            SORT_BY.XTANDEM_RANK,
+            SORT_BY.HYPER_SCORE, 
+            SORT_BY.NEXT_SCORE,
+            SORT_BY.B_SCORE,
+            SORT_BY.Y_SCORE,
+            SORT_BY.XTANDEM_EXPECT,
+            SORT_BY.PEPTIDE
+        };
+        
+        private int highlightedRow = -1;
+        
+        private final List<XtandemResultPlus> results;
+        
+        public TabularXtandemResults() {
+            this.results = new ArrayList<XtandemResultPlus>();
+        }
+        
+        public void addResult(XtandemResultPlus result, boolean highlight) {
+            if(highlight)
+                highlightedRow = results.size();
+            results.add(result);
+        }
+        @Override
+        public int columnCount() {
+            return columns.length;
+        }
+        @Override
+        public TableRow getRow(int index) {
+            if(index >= results.size())
+                return null;
+            XtandemResultPlus result = results.get(index);
+            TableRow row = new TableRow();
+            
+            row.addCell(new TableCell(String.valueOf(round(result.getObservedMass()))));
+            row.addCell(new TableCell(String.valueOf(round(result.getXtandemResultData().getCalculatedMass())), null));
+            row.addCell(new TableCell(String.valueOf(result.getCharge())));
+            
+            // Retention time
+            BigDecimal temp = result.getRetentionTime();
+            if(temp == null) {
+                row.addCell(new TableCell("", null));
+            }
+            else
+                row.addCell(new TableCell(String.valueOf(round(temp)), null));
+            
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getRank()), null));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getHyperScore()), null));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getNextScore()), null));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getBscore()), null));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getYscore()), null));
+            row.addCell(new TableCell(String.valueOf(result.getXtandemResultData().getExpect()), null));
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getId();
             TableCell cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
@@ -537,6 +645,11 @@ public class ViewSpectrumAction extends Action {
         }
         else if(search.getSearchProgram() == Program.MASCOT) {
             MascotSearchDAO masSearchDao = DAOFactory.instance().getMascotSearchDAO();
+            fragMassType = masSearchDao.getFragmentMassType(searchId);
+            parentMassType = masSearchDao.getParentMassType(searchId);
+        }
+        else if(search.getSearchProgram() == Program.XTANDEM) {
+            XtandemSearchDAO masSearchDao = DAOFactory.instance().getXtandemSearchDAO();
             fragMassType = masSearchDao.getFragmentMassType(searchId);
             parentMassType = masSearchDao.getParentMassType(searchId);
         }
