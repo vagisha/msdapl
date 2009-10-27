@@ -1,12 +1,3 @@
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Lesser General Public License as        *
- *   published by the Free Software Foundation; either version 2 of the    *
- *   License, or (at your option) any later version.                       *
- *                                                                         *
- ***************************************************************************/
-
 /*******************************************************************************
  * --------------------------------------------------------------------------- *
  * File: * @(#) MSXMLParser.java * Author: * Ning Zhang
@@ -80,48 +71,53 @@ public final class MSXMLParser
 
     /**
      *@return a scan header object without peaks information.
+     * dhmay changing 20091021 to set the scanOffset on the returned scanHeader.  This was earlier behavior that
+     * was removed by Ning.  Replacing, because it increases efficiency quite a bit for calling code.
      */
     public ScanHeader rapHeader(int scanNumber)
     {
-	FileInputStream fileIN = null;
-	try
-	    {
-		fileIN = new FileInputStream(fileName);
-		long scanOffset = getScanOffset(scanNumber);
-		if (scanOffset == -1)
-		{
-			return null;
-		}
+        FileInputStream fileIN = null;
+        long scanOffset = -1;
+        try
+        {
+            fileIN = new FileInputStream(fileName);
+            scanOffset = getScanOffset(scanNumber);
+            if (scanOffset == -1)
+            {
+                return null;
+            }
 
-		fileIN.skip(scanOffset);
-	    } catch (Exception e)
-	    {
-		System.out.println("File exception:" + e);
-		e.printStackTrace();
-	    }
+            fileIN.skip(scanOffset);
+        }
+        catch (Exception e)
+        {
+            System.out.println("File exception:" + e);
+            e.printStackTrace();
+        }
+        ScanHeader scanHeader = null;
+        if(isXML)
+        {
+            ScanAndHeaderParser headerParser = new ScanAndHeaderParser();
+            headerParser.setIsScan(false);
+            headerParser.setFileInputStream(fileIN);
+            headerParser.parseScanAndHeader();
 
-	if(isXML)
-	    {
-		ScanAndHeaderParser headerParser = new ScanAndHeaderParser();
-		headerParser.setIsScan(false);
-		headerParser.setFileInputStream(fileIN);
-		headerParser.parseScanAndHeader();
-
-		closeFile(fileIN);
-		return (headerParser.getHeader());
-	    }
-	else
-	    {
-		MLScanAndHeaderParser headerParser = new MLScanAndHeaderParser();
-		headerParser.setIsScan(false);
-		headerParser.setFileInputStream(fileIN);
-		headerParser.parseMLScanAndHeader();
-		closeFile(fileIN);
-		return (headerParser.getHeader());
-	    }
-
+            closeFile(fileIN);
+            scanHeader = headerParser.getHeader();
+        }
+        else
+        {
+            MLScanAndHeaderParser headerParser = new MLScanAndHeaderParser();
+            headerParser.setIsScan(false);
+            headerParser.setFileInputStream(fileIN);
+            headerParser.parseMLScanAndHeader();
+            closeFile(fileIN);
+            scanHeader = headerParser.getHeader();
+        }
+        scanHeader.setScanOffset(scanOffset);
+        return scanHeader;
     }
-    
+
     private void closeFile(FileInputStream fileIN) {
         if(fileIN != null) {
             try {

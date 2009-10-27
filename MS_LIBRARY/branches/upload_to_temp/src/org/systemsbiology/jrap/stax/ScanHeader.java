@@ -1,12 +1,3 @@
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Lesser General Public License as        *
- *   published by the Free Software Foundation; either version 2 of the    *
- *   License, or (at your option) any later version.                       *
- *                                                                         *
- ***************************************************************************/
-
 /*******************************************************************************
  * --------------------------------------------------------------------------- *
  * File: * @(#) ScanHeader.java * Author: * Mathijs Vogelzang
@@ -45,6 +36,10 @@ import java.io.Serializable;
  * was made because parsing the peaklist costs a lot of time, and
  * in this way, programs can parse headers separately, and not parse
  * the peaklist when it's not needed.
+ *
+ * dhmay: rt and retentionTime are completely separate fields, which is horribly confusing.  Probably getRetentionTime()
+ * should form a String around rt, and getDoubleRetentionTime() should just be a cover for getRT(), if both need to
+ * exist. Noting this on 2009/03/10 but not touching it, in case there are unknown dependencies on this separation.
  * 
  * @author M. Vogelzang 
  */
@@ -146,7 +141,13 @@ public class ScanHeader implements Serializable
     protected String intenCompressionType = null;
     protected int intenCompressedLen = -1;
 
-	/**
+    /**
+     * Store the byte offset, within the mz(X)ML file, at which the binary data for this scan are found.
+     * dhmay re-adding 20091021.  This was removed by in mid-2008, super important.  Note: this must be set explicitly
+     * by calling code -- the offset won't be found in the scan XML itself */
+    protected long scanOffset = -1;
+
+    /**
 	 * @return Returns the basePeakIntensity.
 	 */
 	public float getBasePeakIntensity()
@@ -189,7 +190,7 @@ public class ScanHeader implements Serializable
     }
 
     /**
-     *@param set the byteOrder
+     *@param byteOrder set the byteOrder
      */
     public void setByteOrder(String byteOrder)
     {
@@ -257,7 +258,7 @@ public class ScanHeader implements Serializable
     }
 
     /**
-     *@param set compressionType
+     *@param compressionType set compressionType
      */
     public void setCompressionType(String compressionType)
     {
@@ -273,7 +274,7 @@ public class ScanHeader implements Serializable
     }
 
     /**
-     *@param set compressedLen
+     *@param compressedLen set compressedLen
      */
     public void setCompressedLen(int compressedLen)
     {
@@ -289,7 +290,7 @@ public class ScanHeader implements Serializable
     }
 
     /**
-     *@param set the contentType
+     *@param contentType set the contentType
      */
     public void setContentType(String contentType)
     {
@@ -571,7 +572,7 @@ public class ScanHeader implements Serializable
 
 
     /**
-     * @param rt
+     * 
      *             The retentionTime for mzML.
      */
     public double getRT()
@@ -637,7 +638,7 @@ public class ScanHeader implements Serializable
 
 	public double getDoubleRetentionTime()
 	{
-		// TODO: more robust ISO time conversion?
+        // TODO: more robust ISO time conversion?
 		if (retentionTime.charAt(0) != 'P'
 			|| retentionTime.charAt(1) != 'T'
 			|| retentionTime.charAt(retentionTime.length() - 1) != 'S')
@@ -806,6 +807,15 @@ public class ScanHeader implements Serializable
 		tmpStrBuffer.append("filterLine = "+filterLine+"\n");
 
 		return (tmpStrBuffer.toString());
-	}	
+	}
 
+    public long getScanOffset()
+    {
+        return scanOffset;
+    }
+
+    public void setScanOffset(long scanOffset)
+    {
+        this.scanOffset = scanOffset;
+    }
 }

@@ -1,12 +1,3 @@
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Lesser General Public License as        *
- *   published by the Free Software Foundation; either version 2 of the    *
- *   License, or (at your option) any later version.                       *
- *                                                                         *
- ***************************************************************************/
-
 /***************************************************************************** 
  * --------------------------------------------------------------------------- 
  * File: * @(#) IndexParser.java * Author: * Ning Zhang
@@ -28,13 +19,17 @@
 package org.systemsbiology.jrap.stax;
 
 import javax.xml.stream.*;
-import javax.xml.stream.events.*;
 import java.io.*;
 import java.util.*;
 
-public class IndexParser{
-
-    String inputMZXMLfile;
+/**
+ * dhmay 20091021:
+ * -Incorporating Vagisha's changes to close files, merging in my changes for mzML 1.1 support
+ * -adding a debug flag for messages that probably don't need to be displayed every time
+ */
+public class IndexParser
+{
+    String inputMZXMLfilename;
     Map<Integer, Long> offsetMap = new HashMap<Integer, Long>(10000);
 
     //for mzML
@@ -47,12 +42,16 @@ public class IndexParser{
     boolean isXML = false;
     boolean isML = false;
 
-    public IndexParser(String inputMZXMLfile)
-    {
-        this.inputMZXMLfile = inputMZXMLfile;
+    //a flag for verbose logging
+    protected boolean debug = false;
 
-        //determine whether the file is mzXML or mzML?
-        if(inputMZXMLfile.indexOf("mzXML") != -1)
+
+    public IndexParser(String inputMZXMLfilename)
+    {
+        this.inputMZXMLfilename = inputMZXMLfilename;
+
+        //determine whether the file is mzXML or mzML? This is a bit hokey
+        if(inputMZXMLfilename.contains("mzXML"))
             isXML = true;
         else
             isML = true;
@@ -60,21 +59,24 @@ public class IndexParser{
 
     public Map<Integer, Long> getOffsetMap()
     {
-        System.out.println("offset size "+offsetMap.size());
+        if (debug)
+            System.out.println("offset size "+offsetMap.size());
         return offsetMap;
 
     }
 
     public long getChrogramIndex()
     {
-        System.out.println("chrogramIndex "+chrogramIndex);
+        if (debug)
+            System.out.println("chrogramIndex "+chrogramIndex);
         return chrogramIndex;
 
     }
 
     public int getMaxScan()
     {
-        System.out.println("maxScan "+maxScan);
+        if (debug)
+            System.out.println("maxScan "+maxScan);
         return maxScan;
     }
 
@@ -93,10 +95,10 @@ public class IndexParser{
 
         try
         {
-            tmpXML = new File(inputMZXMLfile);
-            //System.out.println(inputMZXMLfile +" length is "+ tmpXML.length());
+            tmpXML = new File(inputMZXMLfilename);
+            //System.out.println(inputMZXMLfilename +" length is "+ tmpXML.length());
 
-            fileIN = new FileInputStream(inputMZXMLfile);
+            fileIN = new FileInputStream(inputMZXMLfilename);
             fileIN.skip(tmpXML.length() - 500);
             byte[] bytes = new byte[500];
             int bytesRead = fileIN.read(bytes);
@@ -117,16 +119,26 @@ public class IndexParser{
             indexPosition = Long.parseLong(footer);
 
             fileIN.close();
-            System.out.println("indexPosition is "+indexPosition);
-        } catch (Exception e)
+            if (debug)
+                System.out.println("indexPosition is "+indexPosition);
+        }
+        catch (Exception e)
         {
             System.out.println("exception:" + e);
             e.printStackTrace();
         }
-        finally {
-            if(fileIN != null) {
-                try {fileIN.close();}
-                catch (IOException e) {e.printStackTrace();}
+        finally
+        {
+            if(fileIN != null)
+            {
+                try
+                {
+                    fileIN.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
         return indexPosition;
@@ -141,7 +153,7 @@ public class IndexParser{
             //System.out.println("indexPos "+indexPos);
 
 
-            fileIN = new FileInputStream(inputMZXMLfile);
+            fileIN = new FileInputStream(inputMZXMLfilename);
             fileIN.skip(indexPos);
 
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -187,7 +199,12 @@ public class IndexParser{
                         if(isXML)
                             currentScan = Integer.parseInt(xmlSR.getAttributeValue(null, "id"));
                         else if(inSpec)
-                            currentScan = Integer.parseInt(xmlSR.getAttributeValue(null, "nativeID"));
+                        //dhmay changing from the "nativeID" attribute due to mzML 1.1 change.  1.1 format seems to be
+                        //"scan=<scannum>" as the "idRef" attribute value, but there may be extra name-value pairs in there
+                        {
+                            currentScan = parseScanNumberFromOffsetIdrefField(xmlSR.getAttributeValue(null, "idRef"));
+                        }
+
                     }
                 }
                 if(event == xmlSR.CHARACTERS)
@@ -253,5 +270,31 @@ public class IndexParser{
                 }
             }
         }
+    }
+
+    /**
+     * dhmay adding.  mzML 1.1 changes the way scan IDs are stored in the index.  They are now stored in
+     * the "idRef" attribute of "offset", which is being used to contain multiple name-value pairs; the
+     * name of the name-value pair containing the scan number is "scan", so I'm knocking off everything but that pair.
+     * @param idString
+     * @return
+     */
+    protected int parseScanNumberFromOffsetIdrefField(String idString)
+    {
+        if (idString.contains("scan="))
+            idString = idString.substring(idString.indexOf("scan=") + "scan=".length());
+        if (idString.contains(" "))
+            idString = idString.substring(0, idString.indexOf(" "));
+        return Integer.parseInt(idString);
+    }
+
+    public boolean isDebug()
+    {
+        return debug;
+    }
+
+    public void setDebug(boolean debug)
+    {
+        this.debug = debug;
     }
 }
