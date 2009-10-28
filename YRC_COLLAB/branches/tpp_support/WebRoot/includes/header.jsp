@@ -186,6 +186,12 @@ function fold(foldable) {
  <logic:equal name="dir" scope="request" value="sequest">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
+ <logic:equal name="dir" scope="request" value="mascot">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
+ <logic:equal name="dir" scope="request" value="xtandem">
+ 	<%home_class = "current"; home_menus = true;%>
+ </logic:equal>
  <logic:equal name="dir" scope="request" value="yates">
  	<%home_class = "current"; home_menus = true;%>
  </logic:equal>
