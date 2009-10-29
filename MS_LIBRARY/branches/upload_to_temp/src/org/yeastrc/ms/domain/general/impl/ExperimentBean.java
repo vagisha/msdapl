@@ -22,6 +22,7 @@ public class ExperimentBean implements MsExperiment {
     private Date uploadDate;
     private Timestamp lastUpdateDate;
     private String comments;
+    private int instrumentId;
     
     
     public void setId(int id) {
@@ -50,6 +51,15 @@ public class ExperimentBean implements MsExperiment {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+    
+    
+    public int getInstrumentId() {
+        return this.instrumentId;
+    }
+    
+    public void setInstrumentId(int instrumentId) {
+        this.instrumentId = instrumentId;
     }
     
     @Override

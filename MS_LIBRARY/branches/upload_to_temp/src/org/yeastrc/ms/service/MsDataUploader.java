@@ -27,6 +27,7 @@ public class MsDataUploader {
     private List<UploadException> uploadExceptionList = new ArrayList<UploadException>();
     
     private String comments;
+    private int instrumentId;
     private String remoteServer;
     private String spectrumDataDirectory;
     private String remoteSpectrumDataDirectory;
@@ -50,6 +51,10 @@ public class MsDataUploader {
     
     public void setComments(String comments) {
         this.comments = comments;
+    }
+    
+    public void setInstrumentId(int instrumentId) {
+        this.instrumentId = instrumentId;
     }
 
     public void setRemoteServer(String remoteServer) {
@@ -343,6 +348,7 @@ public class MsDataUploader {
         exptUploader.setRemoteDirectory(remoteSpectrumDataDirectory);
         exptUploader.setRemoteServer(remoteServer);
         exptUploader.setComments(comments);
+        exptUploader.setInstrumentId(instrumentId);
         
         // Get the spectrum data uploader
         log.info("Initializing SpectrumDataUploadService");

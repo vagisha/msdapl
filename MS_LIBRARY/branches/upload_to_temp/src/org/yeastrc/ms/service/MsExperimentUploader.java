@@ -28,6 +28,7 @@ public class MsExperimentUploader {
     private String remoteDirectory;
     private String uploadDirectory;
     private String comments;
+    private int instrumentId;
     
     private SpectrumDataUploadService rdus;
     private SearchDataUploadService sdus;
@@ -63,6 +64,14 @@ public class MsExperimentUploader {
 
     public void setSpectrumDataUploader(SpectrumDataUploadService rdus) {
         this.rdus = rdus;
+    }
+    
+    public void setInstrumentId(int instrumentId) {
+        this.instrumentId = instrumentId;
+    }
+    
+    public int getInstrumentId() {
+        return this.instrumentId;
     }
 
     public void setSearchDataUploader(SearchDataUploadService sdus) {
@@ -286,6 +295,7 @@ public class MsExperimentUploader {
         experiment.setServerAddress(remoteServer);
         experiment.setServerDirectory(remoteDirectory);
         experiment.setComments(comments);
+        experiment.setInstrumentId(instrumentId);
         experiment.setUploadDate(new java.sql.Date(new Date().getTime()));
         try { return experimentDao.saveExperiment(experiment);}
         catch(RuntimeException e) {

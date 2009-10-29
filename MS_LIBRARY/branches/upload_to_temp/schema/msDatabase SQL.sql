@@ -11,9 +11,15 @@ CREATE TABLE msExperiment (
 	serverDirectory VARCHAR(500),
 	uploadDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	lastUpdate TIMESTAMP NOT NULL,
-	comments TEXT
+	comments TEXT,
+	instrumentID INT UNSIGNED
 );
 
+CREATE TABLE msInstrument (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	description VARCHAR(255)
+);
 
 # SPECTRA SIDE
 
@@ -505,6 +511,7 @@ CREATE TABLE msProteinInferProtein (
 );
 ALTER TABLE  msProteinInferProtein ADD INDEX (piRunID);
 ALTER TABLE  msProteinInferProtein ADD INDEX (nrseqProteinID);
+alter table msProteinInferProtein add index (nrseqProteinID, piRunID);
 
 
 CREATE TABLE msProteinInferPeptide (

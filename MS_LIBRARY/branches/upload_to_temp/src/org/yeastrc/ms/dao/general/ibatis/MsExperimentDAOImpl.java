@@ -67,10 +67,26 @@ public class MsExperimentDAOImpl extends BaseSqlMapDAO implements MsExperimentDA
     
     @Override
     public void updateComments(int experimentId, String comments) {
-        Map<Object, Object> map = new HashMap<Object, Object>(4);
-        map.put("experimentId", experimentId);
-        map.put("comments", comments);
-        update("MsExperiment.updateComments", map);
+        MsExperiment experiment = loadExperiment(experimentId);
+        if(experiment == null) {
+            log.error("Failed to update comments. No experiment found with ID: "+experiment.getId());
+            throw new RuntimeException("Failed to update comments. No experiment found with ID: "+experiment.getId());
+        }
+        else {
+            experiment.setComments(comments);
+            update("MsExperiment.update", experiment);
+        }
+    }
+    
+    public void update(MsExperiment experiment) {
+        MsExperiment oldExpt = loadExperiment(experiment.getId());
+        if(oldExpt != null) {
+            update("MsExperiment.update", experiment);
+        }
+        else {
+            log.error("Failed to execute MsExperiment.update. No experiment found with ID: "+experiment.getId());
+            throw new RuntimeException("Failed to execute MsExperiment.update. No experiment found with ID: "+experiment.getId());
+        }
     }
     
     private int getMatchingExptRunCount(int experimentId, int runId) {

@@ -33,5 +33,7 @@ public interface MsExperimentDAO {
     
     public abstract void updateComments(int experimentId, String comments);
     
+    public abstract void update(MsExperiment experiment);
+    
     public abstract void deleteExperiment(int experimentId);
 }
