@@ -23,8 +23,10 @@ import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorParamsDAOImpl;
 import org.yeastrc.ms.dao.analysis.percolator.ibatis.PercolatorResultDAOImpl;
 import org.yeastrc.ms.dao.general.MsEnzymeDAO;
 import org.yeastrc.ms.dao.general.MsExperimentDAO;
+import org.yeastrc.ms.dao.general.MsInstrumentDAO;
 import org.yeastrc.ms.dao.general.ibatis.MsEnzymeDAOImpl;
 import org.yeastrc.ms.dao.general.ibatis.MsExperimentDAOImpl;
+import org.yeastrc.ms.dao.general.ibatis.MsInstrumentDAOImpl;
 import org.yeastrc.ms.dao.run.MsRunDAO;
 import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.run.ibatis.MsRunDAOImpl;
@@ -130,6 +132,9 @@ public class DAOFactory {
     // DAOs for enzyme related objects
     private MsEnzymeDAO enzymeDAO;
     
+    // DAOs for Instrument related objects
+    private MsInstrumentDAO instrumentDAO;
+    
     // DAOs for run related objects
     private MsRunDAO runDAO;
     private MsScanDAO scanDAO;
@@ -191,6 +196,9 @@ public class DAOFactory {
         
         // Enzyme related
         enzymeDAO = new MsEnzymeDAOImpl(sqlMap);
+        
+        // Instrument related
+        instrumentDAO = new MsInstrumentDAOImpl(sqlMap);
         
         // Run related
         scanDAO = new MsScanDAOImpl(sqlMap, peakStorageType);
@@ -268,6 +276,13 @@ public class DAOFactory {
     //-------------------------------------------------------------------------------------------
     public MsEnzymeDAO getEnzymeDAO() {
         return enzymeDAO;
+    }
+    
+    //-------------------------------------------------------------------------------------------
+    // INSTRUMENT related
+    //-------------------------------------------------------------------------------------------
+    public MsInstrumentDAO getInstrumentDAO() {
+        return instrumentDAO;
     }
     
     //-------------------------------------------------------------------------------------------
