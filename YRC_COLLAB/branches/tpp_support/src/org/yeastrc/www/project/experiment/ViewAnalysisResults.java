@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.PeptideProphetResultPlusMascot;
 import org.yeastrc.experiment.PeptideProphetResultPlusSequest;
+import org.yeastrc.experiment.PeptideProphetResultPlusXtandem;
 import org.yeastrc.experiment.PercolatorResultPlus;
 import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.experiment.TabularPeptideProphetResults;
@@ -35,6 +36,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.dao.search.mascot.MascotSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.dao.search.xtandem.XtandemSearchResultDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult;
 import org.yeastrc.ms.domain.analysis.percolator.PercolatorResult;
@@ -238,6 +240,10 @@ public class ViewAnalysisResults extends Action {
                 searchProgram == Program.MASCOT) {
             return getPeptideProphetMascotResults(analysis, forPage, numResultsPerPage, myForm);
         }
+        else if(analysis.getAnalysisProgram() == Program.PEPTIDE_PROPHET &&
+                searchProgram == Program.XTANDEM) {
+            return getPeptideProphetXtandemResults(analysis, forPage, numResultsPerPage, myForm);
+        }
         
         log.error("Unrecognized analysis program: "+analysis.getAnalysisProgram().displayName());
         return null;
@@ -332,6 +338,34 @@ public class ViewAnalysisResults extends Action {
         }
 
         TabularPeptideProphetResults tabResults = new TabularPeptideProphetResults(results, Program.MASCOT);
+        tabResults.setSortedColumn(myForm.getSortBy());
+        tabResults.setSortOrder(myForm.getSortOrder());
+        
+        return tabResults;
+    }
+    
+    // -------PEPTIDE PROPHET XTANDEM RESULTS
+    private Tabular getPeptideProphetXtandemResults(MsSearchAnalysis analysis,
+            List<Integer> forPage, int numResultsPerPage, AnalysisFilterResultsForm myForm) {
+        
+        // Get details for the result we will display
+        Map<Integer, String> filenameMap = getFileNames(analysis.getId());
+        
+        MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
+        XtandemSearchResultDAO mascotResDao = DAOFactory.instance().getXtandemResultDAO();
+        
+        PeptideProphetResultDAO presDao = DAOFactory.instance().getPeptideProphetResultDAO();
+        List<PeptideProphetResultPlusXtandem> results = new ArrayList<PeptideProphetResultPlusXtandem>(numResultsPerPage);
+        for(Integer prophetResultId: forPage) {
+            PeptideProphetResult result = presDao.loadForProphetResultId(prophetResultId);
+            MsScan scan = scanDao.loadScanLite(result.getScanId());
+            PeptideProphetResultPlusXtandem resPlus = new PeptideProphetResultPlusXtandem(result, scan);
+            resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
+            resPlus.setXtandemData(mascotResDao.load(result.getSearchResultId()).getXtandemResultData());
+            results.add(resPlus);
+        }
+
+        TabularPeptideProphetResults tabResults = new TabularPeptideProphetResults(results, Program.XTANDEM);
         tabResults.setSortedColumn(myForm.getSortBy());
         tabResults.setSortOrder(myForm.getSortOrder());
         

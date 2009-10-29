@@ -76,6 +76,25 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                         SORT_BY.PROTEIN
                     };
             }
+            
+            else if(searchProgram == Program.XTANDEM) {
+                columns = new SORT_BY[] {
+                        SORT_BY.FILE_ANALYSIS,
+                        SORT_BY.SCAN, 
+                        SORT_BY.CHARGE, 
+                        SORT_BY.MASS, 
+                        SORT_BY.RT, 
+                        SORT_BY.PEPTP_PROB, 
+                        SORT_BY.XTANDEM_RANK,
+                        SORT_BY.HYPER_SCORE,
+                        SORT_BY.NEXT_SCORE,
+                        SORT_BY.B_SCORE,
+                        SORT_BY.Y_SCORE,
+                        SORT_BY.XTANDEM_EXPECT,
+                        SORT_BY.PEPTIDE,
+                        SORT_BY.PROTEIN
+                    };
+            }
         }
         
         @Override
@@ -160,6 +179,16 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
                 row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getIdentityScore()))));
                 row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getHomologyScore()))));
                 row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusMascot)result).getMascotData().getExpect()))));
+            }
+            
+            // Xtandem data
+            else if(searchProgram == Program.XTANDEM) {
+                row.addCell(new TableCell(String.valueOf(((PeptideProphetResultPlusXtandem)result).getXtandemData().getRank())));
+                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getHyperScore()))));
+                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getNextScore()))));
+                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getBscore()))));
+                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getYscore()))));
+                row.addCell(new TableCell(String.valueOf(round(((PeptideProphetResultPlusXtandem)result).getXtandemData().getExpect()))));
             }
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getSearchResultId();

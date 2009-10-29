@@ -252,6 +252,9 @@ function fold(foldable) {
       <yrcwww:member group="administrators">
         <li><html:link action="manageGroups.do"><span>Manage Groups</span></html:link></li>
       </yrcwww:member>
+      <yrcwww:member group="administrators">
+        <li><html:link action="manageInstruments.do"><span>Instruments</span></html:link></li>
+      </yrcwww:member>
    <%} %>
   </ul>
 </div>
