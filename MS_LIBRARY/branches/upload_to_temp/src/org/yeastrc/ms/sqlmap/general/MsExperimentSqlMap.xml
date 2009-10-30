@@ -58,8 +58,8 @@
     
     <update id="update" parameterClass="MsExperiment">
     	UPDATE msExperiment SET 
-    	comments=#comments# 
-    	instrumentID=#instrumentId#
+    	comments=#comments#, 
+    	instrumentID=#instrumentId#,
     	lastUpdate=CURRENT_TIMESTAMP 
     	WHERE id=#id#
     </update>
