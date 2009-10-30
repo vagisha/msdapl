@@ -4,7 +4,11 @@
 package org.yeastrc.jobqueue;
 
 import java.util.Date;
-import org.yeastrc.project.*;
+
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.domain.general.MsInstrument;
+import org.yeastrc.project.Project;
+import org.yeastrc.project.ProjectFactory;
 import org.yeastrc.www.upload.Pipeline;
 /**
  * @author Mike
@@ -28,6 +32,8 @@ public class MSJob extends Job {
 	private int group;
 	private Project project;
 	private Pipeline pipeline;
+	private int instrumentId;
+	private MsInstrument instrument = null;
 	
 	/**
 	 * Get the Project object for which this MS run was submitted
@@ -183,5 +189,22 @@ public class MSJob extends Job {
     
     public void setPipeline(String pipeline) {
         this.pipeline = Pipeline.forName(pipeline);
+    }
+
+    public int getInstrumentId() {
+        return instrumentId;
+    }
+
+    public void setInstrumentId(int instrumentId) {
+        this.instrumentId = instrumentId;
+    }
+    
+    public MsInstrument getInstrument() {
+        if (this.instrument == null) {
+            try {
+                this.instrument = DAOFactory.instance().getInstrumentDAO().load(this.instrumentId);
+            } catch (Exception e) { ; }
+        }
+        return this.instrument;
     }
 }

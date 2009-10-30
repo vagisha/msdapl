@@ -63,6 +63,7 @@
 			<th width="8%">Sub. Date</th>
 			<th width="8%">Directory</th>
 			<th width="8%">PI</th>
+			<th width="8%">Instrument</th>
 			<th width="8%">Comments</th>
 		</tr>
 		</thead>
@@ -104,6 +105,17 @@
 					</div>
 				</td>
 
+				<td align="left" valign="top" style="width:7%;font-size:8pt;" class="left_align">
+					<div style="width:100%;height:auto;overflow:auto;">
+					<logic:present name="job" property="instrument">
+						<bean:write name="job" property="instrument.name" />
+					</logic:present>
+					<logic:notPresent name="job" property="instrument">
+						UNKNOWN
+					</logic:notPresent>
+					</div>
+				</td>
+				
 				<td align="left" valign="top" style="width:15%;font-size:8pt;" class="left_align">
 					<div style="width:100%;height:auto;overflow:auto;">
 						<bean:write name="job" property="comments" />

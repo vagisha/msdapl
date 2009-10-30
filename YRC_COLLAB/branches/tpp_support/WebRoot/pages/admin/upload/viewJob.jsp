@@ -109,6 +109,18 @@
 		</tr>
 		
 		<tr >
+			<td width="20%" align="left" valign="top" class="left_align">Instrument:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<logic:present name="job" property="instrument">
+					<bean:write name="job" property="instrument.name" />
+				</logic:present>
+				<logic:notPresent name="job" property="instrument">
+					UNKNOWN
+				</logic:notPresent>
+			</td>
+		</tr>
+		
+		<tr >
 			<td width="20%" align="left" valign="top" class="left_align">Pipeline:</td>
 			<td width="80%" align="left" valign="top" class="left_align">
 				<bean:write name="job" property="pipelineLongName" />

@@ -19,6 +19,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.ms.dao.DAOFactory;
+import org.yeastrc.ms.domain.general.MsInstrument;
 import org.yeastrc.project.ProjectLite;
 import org.yeastrc.project.ProjectLiteDAO;
 import org.yeastrc.project.Projects;
@@ -79,6 +81,10 @@ public class UploadMSDataFormAction extends Action {
             }});
 		
 		request.getSession().setAttribute("researcherProjects", projects);
+		
+		// get a list of instruments available
+		List<MsInstrument> instruments = DAOFactory.instance().getInstrumentDAO().loadAllInstruments();
+		request.getSession().setAttribute("instrumentList", instruments);
 		
 		// Kick it to the view page
 		return mapping.findForward("Success");

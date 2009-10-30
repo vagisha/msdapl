@@ -181,6 +181,17 @@ function onCancel(projectId) {
    </tr>
    
    <tr>
+   		<td valign="top"><b>MS Instrument:</b></td>
+   		<td>
+   		<html:select property="instrumentId">
+			<html:option value="0">None</html:option>
+			<html:options collection="instrumentList" property="id" labelProperty="name"/>
+   		</html:select>
+   		</td>
+   </tr>
+   
+   
+   <tr>
     <td valign="top"><b>Comments:</b></td>
     <td><html:textarea property="comments" cols="40" rows="5"/></td>
    </tr>

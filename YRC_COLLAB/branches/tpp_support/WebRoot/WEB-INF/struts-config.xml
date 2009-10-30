@@ -365,6 +365,12 @@
 	</action>
 	
 	<action
+	  path="/saveExperimentInstrument"
+	  type="org.yeastrc.www.project.experiment.SaveExperimentInstrumentAjaxAction"
+	  >
+	</action>
+	
+	<action
 	  path="/viewPercolatorResults"
 	  type="org.yeastrc.www.project.experiment.ViewAnalysisResults"
 	  name="filterPercolatorResultsForm"

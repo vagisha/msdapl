@@ -57,6 +57,7 @@ public class MSUploadJobSaver {
 			rs.updateString( "comments", this.comments );
 			rs.updateInt( "groupID", this.groupID );
 			rs.updateString("pipeline", this.pipeline.name());
+			rs.updateInt("instrumentID", this.instrumentId);
 			
 			rs.insertRow();
 			
@@ -91,8 +92,10 @@ public class MSUploadJobSaver {
 	private String comments;
 	private int groupID;
 	private Pipeline pipeline;
+	private int instrumentId;
 	
-//	/**
+	
+    //	/**
 //	 * @return the baitDescription
 //	 */
 //	public String getBaitDescription() {
@@ -204,4 +207,11 @@ public class MSUploadJobSaver {
 	public void setPipeline(Pipeline pipeline) {
 	    this.pipeline = pipeline;
 	}
+	
+	public int getInstrumentId() {
+        return instrumentId;
+    }
+    public void setInstrumentId(int instrumentId) {
+        this.instrumentId = instrumentId;
+    }
 }

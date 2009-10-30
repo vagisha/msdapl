@@ -85,6 +85,7 @@ public class MSJobFactory {
 			job.setExperimentID( rs.getInt( "experimentID" ) );
 			job.setGroup( rs.getInt( "groupID" ) );
 			job.setPipeline(rs.getString("pipeline"));
+			job.setInstrumentId(rs.getInt("instrumentID"));
 			
 			rs.close(); rs = null;
 			stmt.close(); stmt = null;
@@ -154,6 +155,7 @@ public class MSJobFactory {
             job.setRunID( rs.getInt( "runID" ) );
             job.setGroup( rs.getInt( "groupID" ) );
             job.setPipeline(rs.getString("pipeline"));
+            job.setInstrumentId(rs.getInt("instrumentID"));
             
             
         } finally {

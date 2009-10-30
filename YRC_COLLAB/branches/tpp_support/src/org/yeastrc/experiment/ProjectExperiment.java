@@ -13,7 +13,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.general.MsExperiment;
+import org.yeastrc.ms.domain.general.MsInstrument;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;
@@ -83,6 +85,25 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
 
     public String getComments() {
         return experiment.getComments();
+    }
+    
+    @Override
+    public int getInstrumentId() {
+        return this.experiment.getInstrumentId();
+    }
+    
+    public MsInstrument getInstrument() {
+        try {
+            return DAOFactory.instance().getInstrumentDAO().load(experiment.getInstrumentId());
+        } catch (Exception e) { return null; }
+    }
+    
+    public String getInstrumentName() {
+        MsInstrument instrument = getInstrument();
+        if(instrument != null)
+            return instrument.getName();
+        else
+            return "UNKNOWN";
     }
 
     public List<MsFile> getMs2Files() {
@@ -319,5 +340,35 @@ public class ProjectExperiment implements MsExperiment, Comparable<ProjectExperi
         return dtaSelect != null || 
         (protInferRuns != null && protInferRuns.size() > 0) ||
         (prophetRuns != null && prophetRuns.size() > 0);
+    }
+
+    @Override
+    public void setComments(String comments) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setId(int id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setInstrumentId(int instrumentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setServerAddress(String serverAddress) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setServerDirectory(String serverDirectory) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setUploadDate(Date uploadDate) {
+        throw new UnsupportedOperationException();
     }
 }

@@ -85,6 +85,7 @@ public class UploadMSDataAction extends Action {
 		jobSaver.setTargetSpecies( species );
 		jobSaver.setComments( comments );
 		jobSaver.setPipeline(uform.getPipeline());
+		jobSaver.setInstrumentId(uform.getInstrumentId());
 		
 		// TODO assuming that the data server will be accessible on web-server
 		if(!yates)

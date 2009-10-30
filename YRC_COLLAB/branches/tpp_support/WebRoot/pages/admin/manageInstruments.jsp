@@ -46,10 +46,10 @@
    			<logic:iterate id="instrument" name="instrumentList">
    				<tr>
    				<td><bean:write name="instrument" property="id"/></td>
-   				<td><bean:write name="instrument" property="name"/></td>
+   				<td class="left_align"><bean:write name="instrument" property="name"/></td>
    				<td class="left_align"><bean:write name="instrument" property="description"/></td>
    				<td><font color="red">
-   					<html:link action="/editInstrument.do" paramId="instrumentId" paramName="instrument" paramProperty="id">Edit</html:link></font></td>
+   					<html:link action="/editInstrument.do" paramId="instrumentId" paramName="instrument" paramProperty="id"><font color="green">Edit</font></html:link></font></td>
    				<td>
    					<span class="clickable underline" onClick="confirmDelete('<bean:write name="instrument" property="id"/>', '<bean:write name="instrument" property="name"/>')">
    					<font color="red">Delete</font>

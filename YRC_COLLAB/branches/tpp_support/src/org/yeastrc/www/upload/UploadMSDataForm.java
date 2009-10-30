@@ -35,6 +35,8 @@ public class UploadMSDataForm extends ActionForm {
     
     private int projectID;
     
+    private int instrumentId;
+    
     private Pipeline pipeline;
     
 	
@@ -84,6 +86,10 @@ public class UploadMSDataForm extends ActionForm {
 				errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
 		} catch (Exception e) {
 			errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
+		}
+		
+		if(this.instrumentId == 0) {
+		    errors.add("upload", new ActionMessage("error.upload.noinstrument"));
 		}
 		
 		return errors;
@@ -147,6 +153,16 @@ public class UploadMSDataForm extends ActionForm {
 
     public String getYear() {
         return year;
+    }
+
+
+    public int getInstrumentId() {
+        return instrumentId;
+    }
+
+
+    public void setInstrumentId(int instrumentId) {
+        this.instrumentId = instrumentId;
     }
 
 

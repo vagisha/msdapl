@@ -1,11 +1,14 @@
 
 <%@page import="org.yeastrc.ms.domain.search.Program"%>
+<%@page import="org.yeastrc.ms.domain.general.MsInstrument"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <script src="<yrcwww:link path='/js/jquery.blockUI.js'/>"></script>
+
+<bean:define name="instrumentList" id="instrumentList" type="java.util.List"></bean:define>
 <script>
 
 // ---------------------------------------------------------------------------------------
@@ -16,6 +19,11 @@ $(document).ready(function() {
 });
 
 function makeEditable() {
+	makeCommentEditable();
+	makeInstrumentEditable();
+}
+
+function makeCommentEditable() {
 	$(".editableComment").click(function() {
 		var id = $(this).attr('id');
 		var currentComments = $.trim($("#"+id+"_text").text());
@@ -98,6 +106,83 @@ function saveComments(url, idName, id, comments) {
 	});
 }
 
+function makeInstrumentEditable() {
+
+	$(".editableInstrument").click(function() {
+		var id = $(this).attr('id');
+		
+		var instrumentId = $(this).attr('title').split("_")[0];
+		var experimentId = $(this).attr('title').split("_")[1];
+
+		var target = ("#"+id+"_select"); // target element after which we will add the list box and 'Save' , 'Cancel' links
+		
+		var editInstrumentElementId = "\'"+id+"_edit\'";
+		
+		var onclickSaveStr = "onClick=\""+"saveSelectedInstrument(\'"+id+"_select\', "+experimentId+", "+editInstrumentElementId+");\"";
+		var onclickCancelStr = "onClick=\""+"cancelEditSelectedInstrument(\'"+id+"_select\', "+editInstrumentElementId+");\"";
+		
+		var toAppend = '<span id='+editInstrumentElementId+'>';
+		
+		toAppend += '<select id="instrumentSelect"> ';
+		toAppend += '<option value="0">-Select-</option>';
+		<% for (Object instrument: instrumentList) {%>
+			toAppend += '<option value=\"'+<%= ((MsInstrument)instrument).getId()%>;
+			toAppend += '\">'+"<%= ((MsInstrument)instrument).getName()%>"+'</option>';
+		<%}%>
+		toAppend += '</select> ';
+		toAppend += '&nbsp;&nbsp;<span class="clickable underline" '+onclickSaveStr+'><font color="red"><b>Save</b></font></span>';
+		toAppend += '&nbsp;&nbsp;<span class="clickable underline" '+onclickCancelStr+'><font color="red"><b>Cancel</b></font></span>';
+		toAppend +='</span>';
+		$(target).after(toAppend);
+		$(target).hide();
+	});
+}
+
+function saveSelectedInstrument(elementId, experimentId, editInstrumentElementId) {
+	var selectedInstrumentId = $("#instrumentSelect option[selected]").val();
+	
+	if(selectedInstrumentId == 0) {
+		alert("Please select a instrument"); return;
+	}
+	
+	var selectedInstrumentName = $("#instrumentSelect option[selected]").text();
+	
+	var oldInstrumentName = $("#"+elementId).text();
+	
+	$.ajax({
+		url:      "<yrcwww:link path='saveExperimentInstrument.do'/>",
+		dataType: "text",
+		data:     {'id': 			experimentId, 
+		           'instrumentId':  selectedInstrumentId},
+		beforeSend: function(xhr) {
+						$("#"+elementId).text("Saving....");
+						$("#"+elementId).show();
+						$("#"+editInstrumentElementId).remove();
+					},
+		success:  function(data) {
+			        if(data == 'OK') {
+			        	$("#"+elementId).text(selectedInstrumentName);
+			        }
+			        else {
+			        	$(textFieldId).text(oldInstrumentName);
+			        	alert("Error saving instrument: "+data);
+			        }
+			        success = true;
+		          },
+		complete:  function(xhr, textStatus) {
+			if(!success) {
+				$(textFieldId).text(oldInstrumentName);
+			    alert("Error saving instrument: "+data);
+			}
+		}
+		
+	});
+}
+
+function cancelEditSelectedInstrument(elementId, editInstrumentElementId) {
+	$("#"+elementId).show();
+	$("#"+editInstrumentElementId).remove();
+}
 // ---------------------------------------------------------------------------------------
 // AJAX DEFAULTS
 // ---------------------------------------------------------------------------------------
@@ -258,6 +343,23 @@ function clearSelectedProtInfer() {
 				<tr>
 					<td><b>Location: </b></td>
 					<td style="padding-left:10"><bean:write name="experiment" property="serverDirectory"/></td>
+				</tr>
+				<tr>
+					<td><b>Instrument: </b>
+						<logic:equal name="writeAccess" value="true">
+							<span class="editableInstrument clickable" 
+							      id="instrumentfor_<bean:write name='experiment' property='id'/>" 
+							      title="<bean:write name='experiment' property='instrumentId'/>_<bean:write name='experiment' property='id'/>"
+							      style="font-size:8pt; color:red;">[Change]</span>
+						</logic:equal>
+					</td>
+					<td style="padding-left:10">
+						<span
+							id="instrumentfor_<bean:write name='experiment' property='id'/>_select"
+						>
+							<bean:write name="experiment" property="instrumentName"/>
+						</span>
+					</td>
 				</tr>
 				<tr>
 					<td valign="top"><b>Comments </b>

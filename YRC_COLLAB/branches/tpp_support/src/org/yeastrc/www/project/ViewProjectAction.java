@@ -46,6 +46,7 @@ import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetRunDAO;
 import org.yeastrc.ms.domain.analysis.MsSearchAnalysis;
 import org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetAnalysis;
 import org.yeastrc.ms.domain.general.MsExperiment;
+import org.yeastrc.ms.domain.general.MsInstrument;
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
@@ -186,6 +187,10 @@ public class ViewProjectAction extends Action {
 		    request.setAttribute( "showMSDataUpload", true );
 
 
+		// Set a list of available instruments in the request. 
+		List<MsInstrument> instrumentList = DAOFactory.instance().getInstrumentDAO().loadAllInstruments();
+		request.setAttribute("instrumentList", instrumentList);
+		
 		// Forward them on to the happy success view page!
 		return mapping.findForward("Success");
 
