@@ -457,7 +457,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             
             // if this is not a dynamic modification ignore it
             // NOTE: ProtXml modifications are 1-based.  
-            if(!modLookup.hasDynamicModification(strippedSeq.charAt(mod.getPosition() - 1)))
+            if(modLookup.isStaticModification(strippedSeq.charAt(mod.getPosition() - 1), mod.getMass(), true))
                 continue;
             
             MsResidueModification dbMod = modLookup.getDynamicResidueModification(

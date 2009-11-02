@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsTerminalModification;
@@ -22,8 +23,10 @@ public class DynamicModLookupUtil {
     private List<MsResidueModification> dynaResMods;
     private List<MsTerminalModification> dynaTermMods;
     
-    private static Map<String, Integer> residueModMap;
-    private static Map<String, Integer> terminalModMap;
+    private Map<String, Integer> residueModMap;
+    private Map<String, Integer> terminalModMap;
+    
+    private List<MsResidueModification> staticResMods;
     
     private int searchId;
 
@@ -42,6 +45,7 @@ public class DynamicModLookupUtil {
     private void buildModLookups(int searchId) {
         buildResidueModLookup(searchId);
         buildTerminalModLookup(searchId);
+        loadStaticMods(searchId);
     }
     
     private void buildResidueModLookup(int searchId) {
@@ -63,14 +67,23 @@ public class DynamicModLookupUtil {
             terminalModMap.put(key, mod.getId());
         }
     }
+    
+    private void loadStaticMods(int searchId) {
+        staticResMods.clear();
+        staticResMods = DAOFactory.instance().getMsSearchDAO().loadSearch(searchId).getStaticResidueMods();
+    }
 
     /**
      * @param aa
-     * @return true if the given amino acid has a dynamic modification.
+     * @return true if the given amino acid and modification mass is a static modification
      */
-    public boolean hasDynamicModification(char aa) {
-        for(MsResidueModification mod: this.dynaResMods) {
-            if(mod.getModifiedResidue() == aa)
+    public boolean isStaticModification(char aa, BigDecimal modMass, boolean isMassPlusCharMass) {
+        double mass = modMass.doubleValue();
+        if(isMassPlusCharMass) {
+            mass -= AminoAcidUtils.monoMass(aa);
+        }
+        for(MsResidueModification mod: this.staticResMods) {
+            if(mod.getModifiedResidue() == aa && (Math.abs(mass - mod.getModificationMass().doubleValue()) < 0.05))
                 return true;
         }
         return false;
