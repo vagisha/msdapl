@@ -141,4 +141,15 @@ public class DynamicModLookupUtil {
         if (modId != null)  return modId;
         return 0;
     }
+    
+    public MsTerminalModification getTerminalModification(Terminal modTerminal, BigDecimal modMass) {
+        int modId = getDynamicTerminalModificationId(modTerminal, modMass);
+        if(modId > 0) {
+            for(MsTerminalModification mod: dynaTermMods) {
+                if(mod.getId() == modId)
+                    return mod;
+            }
+        }
+        return null;
+    }
 }

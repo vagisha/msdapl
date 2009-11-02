@@ -403,8 +403,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         }
     }
     
-    // method has "protected" access because PepXmlXtandemFileReader overrides it.
-    protected void readResidueModification(XMLStreamReader reader) throws XMLStreamException {
+    private void readResidueModification(XMLStreamReader reader) throws XMLStreamException {
         
         // <aminoacid_modification aminoacid="M" massdiff="15.9949" mass="147.0354" variable="Y" symbol="*"/>
         // <aminoacid_modification aminoacid="C" massdiff="57.0215" mass="160.0306" variable="N"/>
@@ -805,8 +804,7 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         return dynamicMods;
     }
 
-    // method has "protected" access because PepXmlXtandemFileReader overrides it.
-    protected Modification makeModification(char modChar, int position, BigDecimal mass) throws DataProviderException {
+    private Modification makeModification(char modChar, int position, BigDecimal mass) throws DataProviderException {
         
         // the purpose is to figure out if this represents a dynamic modificaion (residue)
         // we also want to get the massDiff for this modification since the modification_info

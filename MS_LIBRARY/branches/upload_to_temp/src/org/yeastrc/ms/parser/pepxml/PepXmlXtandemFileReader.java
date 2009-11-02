@@ -11,22 +11,16 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.yeastrc.ms.domain.analysis.peptideProphet.SequestPeptideProphetResultIn;
 import org.yeastrc.ms.domain.analysis.peptideProphet.XtandemPeptideProphetResultIn;
 import org.yeastrc.ms.domain.analysis.peptideProphet.impl.XtandemPeptideProphetResult;
 import org.yeastrc.ms.domain.general.MsEnzymeIn;
-import org.yeastrc.ms.domain.protinfer.proteinProphet.Modification;
 import org.yeastrc.ms.domain.search.MsResidueModificationIn;
 import org.yeastrc.ms.domain.search.MsRunSearchIn;
 import org.yeastrc.ms.domain.search.MsSearchDatabaseIn;
 import org.yeastrc.ms.domain.search.MsTerminalModificationIn;
 import org.yeastrc.ms.domain.search.Param;
 import org.yeastrc.ms.domain.search.Program;
-import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
-import org.yeastrc.ms.domain.search.impl.TerminalModification;
 import org.yeastrc.ms.domain.search.pepxml.sequest.PepXmlSequestSearchScanIn;
 import org.yeastrc.ms.domain.search.pepxml.xtandem.PepXmlXtandemSearchScanIn;
 import org.yeastrc.ms.domain.search.pepxml.xtandem.impl.PepXmlXtandemSearchScan;
@@ -153,65 +147,6 @@ public class PepXmlXtandemFileReader extends PepXmlGenericFileReader<PepXmlXtand
         else if (name.equalsIgnoreCase("expect"))
             searchResult.getXtandemResultData().setExpect(new BigDecimal(value));
         
-    }
-    
-    protected void readResidueModification(XMLStreamReader reader) throws XMLStreamException {
-        
-        // This is a hack to read Xtandem terminal modifications
-        // <aminoacid_modification aminoacid="C" massdiff="-17.0265" mass="143.0037" variable="Y" symbol="^" /><!--X! Tandem n-terminal AA variable modification-->
-        
-        String variable = reader.getAttributeValue(null, "variable");
-        // dynamic modifications
-        boolean isXtandemNtermMod = false;
-        if("Y".equalsIgnoreCase(variable)) {
-            String symbol = reader.getAttributeValue(null, "symbol");
-            String massdiff = reader.getAttributeValue(null, "massdiff");
-            if(symbol != null && symbol.equals("^")) { // this is a terminal modification!!
-                TerminalModification mod = new TerminalModification();
-                mod.setModificationMass(new BigDecimal(massdiff));
-                mod.setModificationSymbol(symbol.charAt(0));
-                mod.setModifiedTerminal(Terminal.NTERM);
-                this.searchDynamicTerminalMods.add(mod);
-                isXtandemNtermMod = true;
-            }
-        }
-        // If this is not a Xtandem Nterm modification read the usual way.
-        if(!isXtandemNtermMod){
-            super.readResidueModification(reader);
-        }
-    }
-    
-    protected Modification makeModification(char modChar, int position, BigDecimal mass) throws DataProviderException {
-        
-        // Xtandem pepxml files have terminal modifications listed as amino acid modifications!
-        // Example: 
-        /*
-         * <modification_info>
-               <mod_aminoacid_mass position="1" mass="143.0037" />
-            </modification_info>
-
-         */
-        // The superclass will throw a DataProviderException if it is not able to find a 
-        // a matching dynamic residue modification
-        // We will catch the exception here and try to determine if it is dynamic terminal modification
-        try {
-            return super.makeModification(modChar, position, mass);
-        }
-        catch(DataProviderException e) {
-            if(!(position == 0)) {
-                throw e;
-            }
-            double massDiff = getModMassDiff(modChar, mass, true); // subtract the aa mass and any static mod mass
-            // If this matches one of the dynamic terminal modifications return a new Modification object
-            for(MsTerminalModificationIn tMod: searchDynamicTerminalMods) {
-                if(Math.abs(massDiff - tMod.getModificationMass().doubleValue()) < 0.05) {
-                    return new Modification(tMod.getModificationMass(), Terminal.NTERM);
-                }
-            }
-            
-            // If no match was found throw the exception back.
-            throw e;
-        }
     }
     
     public static void main(String[] args) throws DataProviderException {

@@ -149,23 +149,7 @@ public class SearchResultPeptideBean  implements MsSearchResultPeptide {
         else {
             
             String origseq = String.valueOf(sequence);
-            modifiedSequence = ModifiedSequenceBuilder.build(origseq, dynaResidueMods);
-            
-//            int lastIdx = 0;
-//            StringBuilder seq = new StringBuilder();
-//            sortDynaResidueModifications();
-//            for (MsResultResidueMod mod: dynaResidueMods) {
-//                seq.append(origseq.subSequence(lastIdx, mod.getModifiedPosition()+1)); // get sequence up to an including the modified position.
-//                seq.append("["+Math.round(mod.getModificationMass().doubleValue() +
-//                        AminoAcidUtils.avgMass(origseq.charAt(mod.getModifiedPosition())))+"]");
-//                
-//                lastIdx = mod.getModifiedPosition()+1;
-//            }
-//            if (lastIdx < origseq.length())
-//                seq.append(origseq.subSequence(lastIdx, origseq.length()));
-//            
-//            modifiedSequence = seq.toString();
-////            modifiedSequence = preResidue+"."+modifiedSequence+"."+postResidue;
+            modifiedSequence = ModifiedSequenceBuilder.build(origseq, dynaResidueMods, dynaTerminalMods);
         }
         
         return modifiedSequence;

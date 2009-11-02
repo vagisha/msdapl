@@ -54,10 +54,13 @@ import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetROC;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetRun;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchDatabase;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.SearchFileFormat;
 import org.yeastrc.ms.domain.search.impl.ResultResidueModBean;
+import org.yeastrc.ms.domain.search.impl.ResultTerminalModBean;
 import org.yeastrc.ms.parser.DataProviderException;
 import org.yeastrc.ms.parser.protxml.InteractProtXmlParser;
 import org.yeastrc.ms.service.DynamicModLookupUtil;
@@ -388,12 +391,14 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         
         // Update the modified sequence for the ion based on the modifications we have
         // in the database for this search
-        List<MsResultResidueMod> modList = null;
+        List<MsResultResidueMod> dynaResModList = null;
+        List<MsResultTerminalMod> dynaTermModList = null;
         if(ion.getModifications().size() > 0) {
             String strippedSeq = peptide.getSequence();
             
-            modList = getMatchingModifications(ion, strippedSeq);
-            updateModifiedSequence(ion, strippedSeq, modList);
+            dynaResModList = getMatchingResidueModifications(ion, strippedSeq);
+            dynaTermModList = getMatchingTerminalModifications(ion, strippedSeq);
+            updateModifiedSequence(ion, strippedSeq, dynaResModList, dynaTermModList);
         }
         
         Integer pinferIonId = ionMap.get(ion.getCharge()+"_"+ion.getModifiedSequence());
@@ -421,17 +426,18 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             ionMap.put(ion.getCharge()+"_"+ion.getModifiedSequence(), pinferIonId);
             
             // save spectra for the ion
-            saveIonSpectra(ion, modList);
+            saveIonSpectra(ion, dynaResModList);
         }
         return pinferIonId;
     }
 
     private void updateModifiedSequence(ProteinProphetProteinPeptideIon ion,
-            String strippedSeq, List<MsResultResidueMod> modList)
+            String strippedSeq, List<MsResultResidueMod> modList,
+            List<MsResultTerminalMod> termModList)
             throws UploadException {
         
         try {
-            String modifiedSequence = ModifiedSequenceBuilder.build(strippedSeq, modList);
+            String modifiedSequence = ModifiedSequenceBuilder.build(strippedSeq, modList, termModList);
             ion.setModifiedSequence(modifiedSequence);
         }
         catch (ModifiedSequenceBuilderException e) {
@@ -441,7 +447,7 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
         }
     }
 
-    private List<MsResultResidueMod> getMatchingModifications(
+    private List<MsResultResidueMod> getMatchingResidueModifications(
             ProteinProphetProteinPeptideIon ion, String strippedSeq)
             throws UploadException {
         
@@ -474,6 +480,38 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
             resModBean.setModificationSymbol(dbMod.getModificationSymbol());
             resModBean.setModifiedPosition(mod.getPosition() - 1); // ProtXml modifications are 1-based
             resModBean.setModifiedResidue(dbMod.getModifiedResidue());
+            
+            modList.add(resModBean);
+        }
+        return modList;
+    }
+    
+    private List<MsResultTerminalMod> getMatchingTerminalModifications(
+            ProteinProphetProteinPeptideIon ion, String strippedSeq)
+            throws UploadException {
+        
+        List<MsResultTerminalMod> modList = new ArrayList<MsResultTerminalMod>(ion.getModifications().size());
+        
+        for(Modification mod: ion.getModifications()) {
+            
+            // don't look any further if this is not a modification at the terminal residues
+            if(!mod.isTerminalModification())
+                continue;
+            
+            MsTerminalModification dbMod = modLookup.getTerminalModification(mod.getTerminus(), mod.getMass());
+            if(dbMod == null) {
+                UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
+                ex.appendErrorMessage("searchId: "+searchId+
+                        "; peptide: "+strippedSeq+
+                        "; terminus: "+mod.getTerminus()+
+                        "; mass: "+mod.getMass());
+                throw ex;
+            }
+            
+            ResultTerminalModBean resModBean = new ResultTerminalModBean();
+            resModBean.setModificationMass(dbMod.getModificationMass());
+            resModBean.setModificationSymbol(dbMod.getModificationSymbol());
+            resModBean.setModifiedTerminal(dbMod.getModifiedTerminal());
             
             modList.add(resModBean);
         }
@@ -521,10 +559,11 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 continue;
             
             List<MsResultResidueMod> resMods = result.getResultPeptide().getResultDynamicResidueModifications();
+            List<MsResultTerminalMod> termMods = result.getResultPeptide().getResultDynamicTerminalModifications();
             String modifiedSeq;
             
             try {
-                modifiedSeq = ModifiedSequenceBuilder.build(ion.getUnmodifiedSequence(), resMods);
+                modifiedSeq = ModifiedSequenceBuilder.build(ion.getUnmodifiedSequence(), resMods, termMods);
             }
             catch (ModifiedSequenceBuilderException e) {
                 UploadException ex = new UploadException(ERROR_CODE.MOD_LOOKUP_FAILED);
