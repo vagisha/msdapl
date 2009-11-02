@@ -90,7 +90,7 @@ public class DynamicModLookupUtil {
             mass -= AminoAcidUtils.monoMass(aa);
         }
         for(MsResidueModification mod: this.staticResMods) {
-            if(mod.getModifiedResidue() == aa && (Math.abs(mass - mod.getModificationMass().doubleValue()) < 0.05))
+            if(mod.getModifiedResidue() == aa && (Math.abs(mass - mod.getModificationMass().doubleValue()) < 0.5))
                 return mod;
         }
         return null;
