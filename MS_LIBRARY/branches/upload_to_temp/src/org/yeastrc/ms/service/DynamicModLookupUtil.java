@@ -115,7 +115,7 @@ public class DynamicModLookupUtil {
         }
         for(MsResidueModification mod: this.dynaResMods) {
             double mm = mod.getModificationMass().doubleValue();
-            if(Math.abs(mm - mass) < 0.5)
+            if(Math.abs(mm - mass) < 0.5 && modChar == mod.getModifiedResidue())
                 return mod;
         }
         return null;

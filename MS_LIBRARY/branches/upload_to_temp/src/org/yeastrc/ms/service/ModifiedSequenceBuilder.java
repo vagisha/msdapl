@@ -70,7 +70,7 @@ public class ModifiedSequenceBuilder {
                         throw new ModifiedSequenceBuilderException("Amino acid at index: "+i+" of sequence: "+sequence+
                                 " does not match modified residue: "+mod.getModifiedResidue());
                     }
-                    mass = mod.getModificationMass().doubleValue();
+                    mass += mod.getModificationMass().doubleValue();
                 }
             }
             
