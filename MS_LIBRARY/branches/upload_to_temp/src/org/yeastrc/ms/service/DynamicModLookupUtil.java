@@ -69,7 +69,6 @@ public class DynamicModLookupUtil {
     }
     
     private void loadStaticMods(int searchId) {
-        staticResMods.clear();
         staticResMods = DAOFactory.instance().getMsSearchDAO().loadSearch(searchId).getStaticResidueMods();
     }
 
