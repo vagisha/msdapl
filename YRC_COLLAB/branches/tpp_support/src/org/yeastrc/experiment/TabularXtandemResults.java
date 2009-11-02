@@ -29,7 +29,7 @@ public class TabularXtandemResults implements Tabular, Pageable {
             SORT_BY.CHARGE, 
             SORT_BY.MASS, 
             SORT_BY.RT, 
-            SORT_BY.XCORR_RANK,
+            SORT_BY.XTANDEM_RANK,
             SORT_BY.HYPER_SCORE, 
             SORT_BY.NEXT_SCORE, 
             SORT_BY.B_SCORE, 

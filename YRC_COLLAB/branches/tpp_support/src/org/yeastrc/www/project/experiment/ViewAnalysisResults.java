@@ -352,7 +352,7 @@ public class ViewAnalysisResults extends Action {
         Map<Integer, String> filenameMap = getFileNames(analysis.getId());
         
         MsScanDAO scanDao = DAOFactory.instance().getMsScanDAO();
-        XtandemSearchResultDAO mascotResDao = DAOFactory.instance().getXtandemResultDAO();
+        XtandemSearchResultDAO xtandemResDao = DAOFactory.instance().getXtandemResultDAO();
         
         PeptideProphetResultDAO presDao = DAOFactory.instance().getPeptideProphetResultDAO();
         List<PeptideProphetResultPlusXtandem> results = new ArrayList<PeptideProphetResultPlusXtandem>(numResultsPerPage);
@@ -361,7 +361,7 @@ public class ViewAnalysisResults extends Action {
             MsScan scan = scanDao.loadScanLite(result.getScanId());
             PeptideProphetResultPlusXtandem resPlus = new PeptideProphetResultPlusXtandem(result, scan);
             resPlus.setFilename(filenameMap.get(result.getRunSearchAnalysisId()));
-            resPlus.setXtandemData(mascotResDao.load(result.getSearchResultId()).getXtandemResultData());
+            resPlus.setXtandemData(xtandemResDao.load(result.getSearchResultId()).getXtandemResultData());
             results.add(resPlus);
         }
 

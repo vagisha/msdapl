@@ -13,6 +13,7 @@ import java.util.List;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
 import org.yeastrc.ms.domain.search.SORT_ORDER;
+import org.yeastrc.ms.service.ModifiedSequenceBuilderException;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
@@ -192,7 +193,12 @@ public class TabularPeptideProphetResults implements Tabular, Pageable {
             }
             
             String url = "viewSpectrum.do?scanID="+result.getScanId()+"&runSearchResultID="+result.getSearchResultId();
-            cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptidePS()), url, true);
+            try {
+                cell = new TableCell(String.valueOf(result.getResultPeptide().getFullModifiedPeptide()), url, true);
+            }
+            catch (ModifiedSequenceBuilderException e) {
+                cell = new TableCell("Error building peptide sequence");
+            }
             cell.setClassName("left_align");
             row.addCell(cell);
             

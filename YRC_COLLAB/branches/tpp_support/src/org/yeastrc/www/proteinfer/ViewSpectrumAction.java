@@ -41,13 +41,15 @@ import org.yeastrc.ms.domain.run.ms2file.MS2Scan;
 import org.yeastrc.ms.domain.run.ms2file.MS2ScanCharge;
 import org.yeastrc.ms.domain.search.MsResidueModification;
 import org.yeastrc.ms.domain.search.MsResultResidueMod;
+import org.yeastrc.ms.domain.search.MsResultTerminalMod;
 import org.yeastrc.ms.domain.search.MsRunSearch;
 import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.MsSearchResultPeptide;
+import org.yeastrc.ms.domain.search.MsTerminalModification;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.ms.domain.search.SORT_BY;
-import org.yeastrc.ms.domain.search.impl.SearchResultPeptideBean;
+import org.yeastrc.ms.domain.search.MsTerminalModification.Terminal;
 import org.yeastrc.ms.domain.search.mascot.MascotSearchResult;
 import org.yeastrc.ms.domain.search.sequest.SequestSearchResult;
 import org.yeastrc.ms.domain.search.xtandem.XtandemSearchResult;
@@ -526,39 +528,10 @@ public class ViewSpectrumAction extends Action {
         MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
         MsSearch search = searchDao.loadSearch(searchId);
         
-        List<MsResidueModification> dynaResMods = search.getDynamicResidueMods();
-        if(dynaResMods.size() > 3) {
-            throw new Exception("SpectrumApplet cannot handle > 3 variable modifications");
-        }
-        // TODO SpectrumApplet only works with Sequest style modifications. Need to rewrite it.
-        Map<String, Character> modSymbolMap = new HashMap<String, Character>(6);
-        if(search.getSearchProgram() != Program.SEQUEST) {
-            char[] symbols = new char[] {'*', '#', '@'};
-            int i = 0;
-            for(MsResidueModification mod: dynaResMods) {
-                char symbol = symbols[i++];
-                mod.setModificationSymbol(symbol);
-                modSymbolMap.put(mod.getModificationMass().doubleValue()+"_"+mod.getModifiedResidue(), symbol);
-            }
-        }
         
         MsSearchResultPeptide resPeptide = result.getResultPeptide();
-        String Sq = resPeptide.getModifiedPeptidePS();
-        Sq = resPeptide.getPreResidue()+"."+Sq+"."+resPeptide.getPostResidue();
-        request.setAttribute("peptideSeq", Sq);
-        if(search.getSearchProgram() != Program.SEQUEST) {
-            SearchResultPeptideBean peptBean = new SearchResultPeptideBean();
-            peptBean.setPreResidue(resPeptide.getPreResidue());
-            peptBean.setPostResidue(resPeptide.getPostResidue());
-            peptBean.setPeptideSequence(resPeptide.getPeptideSequence());
-            List<MsResultResidueMod> mods = resPeptide.getResultDynamicResidueModifications();
-            for(MsResultResidueMod mod: mods) {
-                mod.setModificationSymbol(
-                           modSymbolMap.get(mod.getModificationMass().doubleValue()+"_"+mod.getModifiedResidue()));
-            }
-            peptBean.setDynamicResidueModifications(mods);
-            Sq = peptBean.getFullModifiedPeptidePS();
-        }
+        request.setAttribute("peptideSeq", resPeptide.getFullModifiedPeptide());
+        
         
         MsRunDAO runDao = DAOFactory.instance().getMsRunDAO();
         String filename = runDao.loadFilenameForRun(runSearch.getRunId());
@@ -596,7 +569,7 @@ public class ViewSpectrumAction extends Action {
         
         // things that are required to be in the request
         request.setAttribute("filename", filename);
-        request.setAttribute("firstMass", mass);
+        request.setAttribute("firstMass", Math.round(mass*100)/100.0);
         request.setAttribute("firstCharge", charge);
         request.setAttribute("scanNumber", scanNumber);
         request.setAttribute("database", search.getSearchDatabases().get(0).getDatabaseFileName());
@@ -604,11 +577,15 @@ public class ViewSpectrumAction extends Action {
         // parameters for the applet
         List <String>params = new ArrayList<String>();
         
+        String Sq = resPeptide.getPeptideSequence();
+        Sq = resPeptide.getPreResidue()+"."+Sq+"."+resPeptide.getPostResidue();
         params.add("<PARAM NAME=\"MatchSeq\" VALUE=\"" + Sq + "\">");
+        params.add("<PARAM NAME=\"MatchModifiedSeq\" VALUE=\"" + resPeptide.getFullModifiedPeptide() + "\">");
         params.add("<PARAM NAME=\"PreMPlusH\" VALUE=\"" +mass + "\">");
         params.add("<PARAM NAME=\"PreZ\" VALUE=\"" + charge + "\">");
         
-        // dynamic modifications mod1, mod2, etc; mod1residues, mod2residues etc
+        // dynamic modifications (residue)
+        List<MsResidueModification> dynaResMods = search.getDynamicResidueMods();
         Map<String, String> modMassResidueMap = new HashMap<String, String>();
         for (MsResidueModification mod: dynaResMods) {
             String chars = modMassResidueMap.get(mod.getModificationMass().toString());
@@ -620,10 +597,35 @@ public class ViewSpectrumAction extends Action {
         }
         int i = 1;
         for (String massKey: modMassResidueMap.keySet()) {
-            params.add("<PARAM NAME=\"mod"+(i)+"\" VALUE=\"" + massKey + "\">");
-            params.add("<PARAM NAME=\"mod"+(i++)+"residues\" VALUE=\"" + modMassResidueMap.get(massKey) + "\">");
+            params.add("<PARAM NAME=\"dynamicmod_mass_"+(i)+"\" VALUE=\"" + massKey + "\">");
+            params.add("<PARAM NAME=\"dynamicmod_residues_"+(i++)+"\" VALUE=\"" + modMassResidueMap.get(massKey) + "\">");
         }
         
+        // dynamic modifications (terminal)
+        List<MsTerminalModification> dynaTermMods = search.getDynamicTerminalMods();
+        for(MsTerminalModification mod: dynaTermMods) {
+            params.add("<PARAM NAME=\"dynamicmod_mass_"+(i)+"\" VALUE=\"" + mod.getModificationMass() + "\">");
+            params.add("<PARAM NAME=\"dynamicmod_residues_"+(i++)+"\" VALUE=\"" + mod.getModifiedTerminal() + "\">");
+        }
+        
+        
+        // result dynamic residue modifications
+        List<MsResultResidueMod> resultResMods = result.getResultPeptide().getResultDynamicResidueModifications();
+        i = 1;
+        for(MsResultResidueMod mod: resultResMods) {
+            params.add("<PARAM NAME=\"modification_"+(i++)+"\" VALUE=\"" + (mod.getModifiedPosition()+1)+","+mod.getModificationMass() + "\">");
+        }
+        
+        // result dynamic terminal modifications
+        List<MsResultTerminalMod> resultTermMods = result.getResultPeptide().getResultDynamicTerminalModifications();
+        i = 1;
+        int peptideLength = result.getResultPeptide().getSequenceLength();
+        for(MsResultTerminalMod mod: resultTermMods) {
+            if(mod.getModifiedTerminal() == Terminal.NTERM)
+                params.add("<PARAM NAME=\"modification_"+(i++)+"\" VALUE=\"1,"+mod.getModificationMass() + "\">");
+            else if(mod.getModifiedTerminal() == Terminal.CTERM)
+                params.add("<PARAM NAME=\"modification_"+(i++)+"\" VALUE=\""+peptideLength+","+mod.getModificationMass() + "\">");
+        }
         
         // static residue modifications
         List<MsResidueModification> residueStaticMods = search.getStaticResidueMods();
