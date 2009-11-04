@@ -132,11 +132,12 @@ public class DynamicModLookupUtil {
         double mass = modMass.doubleValue();
         if(isMassPlusCharMass) {
             mass -= AminoAcidUtils.monoMass(modChar);
-        }
-        // if this amino acid has a static modification subtract that mass as well
-        MsResidueModification staticMod = getStaticResidueModification(modChar, modMass, isMassPlusCharMass);
-        if(staticMod != null) {
-            mass -= staticMod.getModificationMass().doubleValue();
+            
+            // if this amino acid has a static modification subtract that mass as well
+            for(MsResidueModification staticMod: staticResMods) {
+                if(staticMod.getModifiedResidue() == modChar)
+                    mass -= staticMod.getModificationMass().doubleValue();
+            }
         }
         
         for(MsResidueModification mod: this.dynaResMods) {
@@ -144,6 +145,8 @@ public class DynamicModLookupUtil {
             if(Math.abs(mm - mass) < 0.5 && modChar == mod.getModifiedResidue())
                 return mod;
         }
+//        System.out.println("No match found for mass: "+mass+" and char: "+modChar+" modMass: "+modMass+" aa mass: "+AminoAcidUtils.monoMass(modChar));
+        
         return null;
     }
     

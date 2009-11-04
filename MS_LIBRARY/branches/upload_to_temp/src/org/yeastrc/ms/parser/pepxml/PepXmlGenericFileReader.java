@@ -813,14 +813,14 @@ public abstract class PepXmlGenericFileReader <T extends PepXmlSearchScanIn<G, R
         double massDiff = getModMassDiff(modChar, mass, false);
         // If this mass difference and modChar match a static modification return null
         BigDecimal modMass = staticModMap.get(modChar);
-        if(modMass != null && Math.abs(massDiff - modMass.doubleValue()) < 0.05) {
+        if(modMass != null && Math.abs(massDiff - modMass.doubleValue()) < 0.5) {
             return null;
         }
         
         massDiff = getModMassDiff(modChar, mass, true);
         modMass = dynamicModMap.get(modChar);
         if(modMass != null) {
-            if(Math.abs(massDiff - modMass.doubleValue()) < 0.05) {
+            if(Math.abs(massDiff - modMass.doubleValue()) < 0.5) {
                 return new Modification(position, modMass);
             }
             else {
