@@ -122,6 +122,11 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     }
 
     @Override
+    public List<Integer> getProteinsForPeptide(int pinferId, String peptide, boolean exactMatch) {
+        return protDao.getProteinsForPeptide(pinferId, peptide, exactMatch); 
+    }
+    
+    @Override
     public int getProteinCount(int proteinferId) {
         return protDao.getProteinCount(proteinferId);
     }
@@ -848,4 +853,5 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
             this.groupId = groupId;
         }
     }
+
 }

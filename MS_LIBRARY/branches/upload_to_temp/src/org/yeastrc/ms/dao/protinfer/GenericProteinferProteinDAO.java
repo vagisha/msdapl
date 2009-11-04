@@ -30,6 +30,8 @@ public interface GenericProteinferProteinDAO  <P extends GenericProteinferProtei
     public abstract int getPeptideCountForProtein(int nrseqId, List<Integer> pinferIds);
     
     public abstract List<String> getPeptidesForProtein(int nrseqId, List<Integer> pinferIds);
+    
+    public abstract List<Integer> getProteinsForPeptide(int pinferId, String peptide, boolean exactMatch);
 
     public abstract List<P> loadProteins(int proteinferId);
     

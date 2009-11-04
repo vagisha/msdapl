@@ -25,6 +25,11 @@ public class ProteinFilterCriteria {
     
     private boolean groupProteins = true;
     
+    private boolean excludeIndistinGroups = false;
+    
+    private String peptide;
+    private boolean exactMatch = true;
+    
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
     private int numSpectra;
@@ -34,6 +39,12 @@ public class ProteinFilterCriteria {
     
     private String accessionLike;
     private String descriptionLike;
+    
+    private double minMolWt;
+    private double maxMolWt;
+    
+    private double minPi;
+    private double maxPi;
     
     private SORT_BY sortBy = SORT_BY.NONE;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
@@ -152,6 +163,14 @@ public class ProteinFilterCriteria {
     public void setGroupProteins(boolean groupProteins) {
         this.groupProteins = groupProteins;
     }
+    
+    public boolean isExcludeIndistinGroups() {
+        return this.excludeIndistinGroups;
+    }
+    
+    public void setExcludeIndistinGroups(boolean exclude) {
+        this.excludeIndistinGroups = exclude;
+    }
 
     public String getAccessionLike() {
         return accessionLike;
@@ -218,6 +237,57 @@ public class ProteinFilterCriteria {
         this.maxCoverage = maxCoverage;
     }
     
+    public void setMinMolecularWt(double molWt) {
+        this.minMolWt = molWt;
+    }
+    
+    public double getMinMolecularWt() {
+        return minMolWt;
+    }
+    
+    public void setMaxMolecularWt(double molWt) {
+        this.maxMolWt = molWt;
+    }
+    
+    public double getMaxMolecularWt() {
+        return maxMolWt;
+    }
+    
+    
+    public void setMinPi(double pi) {
+        this.minPi = pi;
+    }
+    
+    public double getMinPi() {
+        return minPi;
+    }
+    
+    public void setMaxPi(double pi) {
+        this.maxPi = pi;
+    }
+    
+    public double getMaxPi() {
+        return maxPi;
+    }
+    
+    
+    //-------------------------------------------------------------
+    // PEPTIDE FILTER
+    //-------------------------------------------------------------
+    public String getPeptide() {
+        return peptide;
+    }
+    public void setPeptide(String peptide) {
+        this.peptide = peptide;
+    }
+    public void setExactPeptideMatch(boolean exact) {
+        this.exactMatch = exact;
+    }
+    public boolean getExactPeptideMatch() {
+        return this.exactMatch;
+    }
+    
+    
     public boolean equals(ProteinFilterCriteria o) {
         if(this == o)
             return true;
@@ -232,6 +302,11 @@ public class ProteinFilterCriteria {
         if(this.numMaxSpectra != that.numMaxSpectra)            return false;
         if(this.coverage != that.coverage)                      return false;
         if(this.maxCoverage != that.maxCoverage)                return false;
+        if(this.minMolWt != that.minMolWt)                      return false;
+        if(this.maxMolWt != that.maxMolWt)                      return false;
+        if(this.minPi != that.minPi)                            return false;
+        if(this.maxPi != that.maxPi)                            return false;
+        if(this.excludeIndistinGroups != that.excludeIndistinGroups)    return false;
 //        if(this.groupProteins != that.groupProteins)            return false;
         if(this.parsimonious != that.parsimonious)              return false;
         if(this.nonParsimonious != that.nonParsimonious)        return false;
@@ -259,6 +334,17 @@ public class ProteinFilterCriteria {
             if(!this.descriptionLike.equalsIgnoreCase(that.descriptionLike))
                 return false;
         }
+        
+        if(peptide == null) {
+            if(that.peptide != null)  return false;
+        }
+        else {
+            if(!this.peptide.equalsIgnoreCase(that.peptide))
+                return false;
+            if(this.exactMatch != that.exactMatch)
+                return false;
+        }
+        
         return true;
     }
     
