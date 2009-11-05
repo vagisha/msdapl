@@ -21,6 +21,8 @@ public class ProteinFilterCriteria {
         NUM_UNIQ_PEPT, 
         ACCESSION, 
         COVERAGE, 
+        MOL_WT,
+        PI,
         NUM_SPECTRA, 
         GROUP_ID,
         CLUSTER_ID,
@@ -34,6 +36,8 @@ public class ProteinFilterCriteria {
             else if (sortBy.equalsIgnoreCase(NUM_PEPT.name())) return NUM_PEPT;
             else if (sortBy.equalsIgnoreCase(NUM_UNIQ_PEPT.name())) return NUM_UNIQ_PEPT;
             else if (sortBy.equalsIgnoreCase(ACCESSION.name())) return ACCESSION;
+            else if (sortBy.equalsIgnoreCase(MOL_WT.name())) return MOL_WT;
+            else if (sortBy.equalsIgnoreCase(PI.name())) return PI;
             else if (sortBy.equalsIgnoreCase(COVERAGE.name())) return COVERAGE;
             else if (sortBy.equalsIgnoreCase(NUM_SPECTRA.name())) return NUM_SPECTRA;
             else if (sortBy.equalsIgnoreCase(GROUP_ID.name())) return GROUP_ID;
@@ -84,6 +88,12 @@ public class ProteinFilterCriteria {
     
     private String peptide;
     private boolean exactMatch = true;
+    
+    private double minMolWt;
+    private double maxMolWt;
+    
+    private double minPi;
+    private double maxPi;
     
     private SORT_BY sortBy = SORT_BY.NONE;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
@@ -242,6 +252,48 @@ public class ProteinFilterCriteria {
         this.maxCoverage = maxCoverage;
     }
     
+    
+    public void setMinMolecularWt(double molWt) {
+        this.minMolWt = molWt;
+    }
+    
+    public double getMinMolecularWt() {
+        return minMolWt;
+    }
+    
+    public void setMaxMolecularWt(double molWt) {
+        this.maxMolWt = molWt;
+    }
+    
+    public double getMaxMolecularWt() {
+        return maxMolWt;
+    }
+    
+    public boolean hasMolecularWtFilter() {
+        return (minMolWt != 0 || maxMolWt != Double.MAX_VALUE);
+    }
+    
+    public void setMinPi(double pi) {
+        this.minPi = pi;
+    }
+    
+    public double getMinPi() {
+        return minPi;
+    }
+    
+    public void setMaxPi(double pi) {
+        this.maxPi = pi;
+    }
+    
+    public double getMaxPi() {
+        return maxPi;
+    }
+    
+    public boolean hasPiFilter() {
+        return (minPi != 0 || maxPi != Double.MAX_VALUE);
+    }
+    
+    
     //-------------------------------------------------------------
     // PEPTIDE FILTER
     //-------------------------------------------------------------
@@ -273,6 +325,10 @@ public class ProteinFilterCriteria {
         if(this.numMaxSpectra != that.numMaxSpectra)            return false;
         if(this.coverage != that.coverage)                      return false;
         if(this.maxCoverage != that.maxCoverage)                return false;
+        if(this.minMolWt != that.minMolWt)                      return false;
+        if(this.maxMolWt != that.maxMolWt)                      return false;
+        if(this.minPi != that.minPi)                            return false;
+        if(this.maxPi != that.maxPi)                            return false;
         if(this.excludeIndistinGroups != that.excludeIndistinGroups)    return false;
 //        if(this.groupProteins != that.groupProteins)            return false;
         if(this.showParsimonious != that.showParsimonious)      return false;

@@ -74,11 +74,15 @@ public class IdPickerResultSaver {
         // save the inferred proteins, associated peptides and spectrum matches
         saveInferredProteins(idpRun.getId(), proteins);
         
+        // save protein properties
+//        saveProteinProperties(proteins);
+        
         
         long e = System.currentTimeMillis();
         log.info("SAVED IDPickerResults in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes.");
     }
 
+    
     public <T extends SpectrumMatch> void saveAndUpdateResults(int pinferId, 
             List<IdPickerInput> inputList, List<InferredProtein<T>> proteins) {
         
@@ -88,6 +92,9 @@ public class IdPickerResultSaver {
         
         // save and update inferred proteins, associated peptides and spectrum matches
         saveAndUpdateInferredProteins(pinferId, proteins);
+        
+        // save protein properties
+//        saveProteinProperties(proteins);
         
         long e = System.currentTimeMillis();
         log.info("SAVED AND UPDATED IDPickerResults in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes.");
@@ -536,5 +543,32 @@ public class IdPickerResultSaver {
         MsSearchResult res = resDao.load(resultId);
         return res.getResultPeptide().getModifiedPeptide();
     }
+    
+    // ----------------------------------------------------------------------------------------------
+    // Save protein properties (Molecular wt and PI).
+    // ----------------------------------------------------------------------------------------------
+//    private <T extends SpectrumMatch> void saveProteinProperties(List<InferredProtein<T>> proteins) {
+//        
+//        ProteinPropertiesDAO propsDao = ProteinferDAOFactory.instance().getProteinPropertiesDao();
+//        
+//        for(InferredProtein<T> protein: proteins) {
+//            int nrseqId = protein.getProteinId();
+//            
+//            // If this protein's properties have already been saved don't save them again.
+//            if(propsDao.load(nrseqId) != null)
+//                continue;
+//            
+//            String sequence = NrSeqLookupUtil.getProteinSequence(nrseqId);
+//            if(sequence != null) {
+//                double molWt = ProteinUtils.calculateMolWt(sequence);
+//                double pi = ProteinUtils.calculatePi(sequence);
+//                ProteinProperties props = new ProteinProperties();
+//                props.setNrseqProteinId(nrseqId);
+//                props.setMolecularWt(molWt);
+//                props.setPi(pi);
+//                propsDao.save(props);
+//            }
+//        }
+//    }
    
 }

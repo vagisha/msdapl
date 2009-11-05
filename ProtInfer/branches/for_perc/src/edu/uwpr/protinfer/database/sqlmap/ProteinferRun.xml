@@ -41,6 +41,10 @@
     	SELECT * FROM msProteinInferRun WHERE id=#id#
     </select>
     
+    <select id="selectAllRunIds" resultClass="Integer" parameterClass="Integer">
+    	SELECT id FROM msProteinInferRun ORDER BY id
+    </select>
+    
     <select id="selectPinferIdsForInputIds" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT DISTINCT piRunID FROM msProteinInferInput WHERE inputID in $inputIds$ AND inputType=#inputType#
     </select>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+      "http://ibatis.apache.org/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ProteinProperties"> 
+
+	<typeAlias alias="ProteinProperties" type="edu.uwpr.protinfer.database.dto.ProteinProperties" />
+	
+	<resultMap class="ProteinProperties" id="propertiesResult" >
+		<result property="nrseqProteinId" column="nrseqProteinID" nullValue="0"/>
+		<result property="molecularWt" column="molecularWt" nullValue="0"/>
+		<result property="pi" column="pi"/>
+	</resultMap>
+		
+	<parameterMap class="ProteinProperties" id="propertiesParam">
+		<parameter property="nrseqProteinId" jdbcType="INTEGER" nullValue="0"/>
+		<parameter property="molecularWt" jdbcType="DOUBLE" />
+		<parameter property="pi" jdbcType="DOUBLE" />
+	</parameterMap>
+	
+	<select id="select" resultMap="propertiesResult" parameterClass="Integer">
+    	SELECT * FROM msProteinProperties WHERE nrseqProteinId=#id#
+    </select>
+    
+    
+    <insert id="insert" parameterMap="propertiesParam">
+    	INSERT INTO msProteinProperties (
+    	nrseqProteinID,
+    	molecularWt,
+    	pi) 
+    	VALUES (?,?,?)
+    	<selectKey resultClass="int">
+      		select last_insert_id() as id
+    	</selectKey>
+    </insert>
+    
+</sqlMap>

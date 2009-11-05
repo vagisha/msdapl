@@ -232,6 +232,52 @@
     	ORDER BY proteinGroupId, coverage DESC
     </select>
     
+    <!--  
+    <select id="filterByMolecularWt" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein AS prot, msProteinProperties AS props
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.nrseqProteinID = props.nrseqProteinID
+    	AND props.molecularWt BETWEEN #minMolWt# AND #maxMolWt#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY props.molecularWt ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterProteinGroupMolecularWt" 
+    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupMolecularWt" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id AS proteinId, iprot.groupID AS proteinGroupId, prot.coverage AS coverage 
+    	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot, msProteinProperties AS props
+    	WHERE prot.id = iprot.piProteinID 
+    	AND prot.piRunID = #pinferId# 
+    	AND prot.nrseqProteinID = props.nrseqProteinID
+    	AND props.molecularWt BETWEEN #minMolWt# AND #maxMolWt#
+    	ORDER BY proteinGroupId, molecularWt DESC
+    </select>
+    
+    <select id="filterByPi" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT id FROM msProteinInferProtein AS prot, msProteinProperties AS props
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.nrseqProteinID = props.nrseqProteinID
+    	AND props.pi BETWEEN #minPi# AND #maxPi#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY props.pi ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterProteinGroupPi" 
+    		resultClass="edu.uwpr.protinfer.database.dao.idpicker.ibatis.AbstractIdPickerProteinDAO$ProteinGroupPi" 
+    		parameterClass="java.util.Map">
+    	SELECT prot.id AS proteinId, iprot.groupID AS proteinGroupId, prot.coverage AS coverage 
+    	FROM msProteinInferProtein AS prot, IDPickerProtein AS iprot, msProteinProperties AS props
+    	WHERE prot.id = iprot.piProteinID 
+    	AND prot.piRunID = #pinferId# 
+    	AND prot.nrseqProteinID = props.nrseqProteinID
+    	AND props.pi BETWEEN #minPi# AND #maxPi#
+    	ORDER BY proteinGroupId, pi DESC
+    </select>
+    -->
+    
     <select id="filterByNsaf" resultClass="Integer" parameterClass="java.util.Map">
     	SELECT id FROM msProteinInferProtein AS prot, IDPickerProtein as idpProt
     	WHERE prot.piRunID=#pinferId#

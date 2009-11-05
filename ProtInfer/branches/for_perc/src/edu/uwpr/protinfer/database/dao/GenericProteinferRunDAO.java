@@ -14,6 +14,8 @@ public interface GenericProteinferRunDAO <S extends ProteinferInput, T extends G
 
     public abstract T loadProteinferRun(int proteinferId);
     
+    public abstract List<Integer> loadAllProteinferRunIds();
+    
     public abstract int getMaxProteinHitCount(int proteinferId);
     
     public abstract List<Integer> loadProteinferIdsForInputIds(List<Integer> inputIds, InputType inputType);
