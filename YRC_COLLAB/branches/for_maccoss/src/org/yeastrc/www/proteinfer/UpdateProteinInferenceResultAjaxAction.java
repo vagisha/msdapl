@@ -155,7 +155,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                 storedProteinIds = IdPickerResultsLoader.filterByProteinAccession(pinferId,
                         storedProteinIds, proteinAccessionMap, 
                         filterCriteria.getAccessionLike());
-                storedProteinIds = IdPickerResultsLoader.sortIdsByAccession(storedProteinIds, proteinAccessionMap);
+                if(filterCriteria.getSortBy() == SORT_BY.ACCESSION)
+                    storedProteinIds = IdPickerResultsLoader.sortIdsByAccession(storedProteinIds, proteinAccessionMap);
             }
             // filter by description, if required
             if(filterCriteria.getDescriptionLike() != null) {
