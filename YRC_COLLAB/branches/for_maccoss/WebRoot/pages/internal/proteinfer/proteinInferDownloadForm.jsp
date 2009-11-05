@@ -12,6 +12,10 @@
   <html:hidden name="proteinInferFilterForm" property="maxUniquePeptides" />
   <html:hidden name="proteinInferFilterForm" property="minCoverage" />
   <html:hidden name="proteinInferFilterForm" property="maxCoverage" />
+  <html:hidden name="proteinInferFilterForm" property="minPi" />
+  <html:hidden name="proteinInferFilterForm" property="maxPi" />
+  <html:hidden name="proteinInferFilterForm" property="minMolecularWt" />
+  <html:hidden name="proteinInferFilterForm" property="maxMolecularWt" />
   <html:hidden name="proteinInferFilterForm" property="minSpectrumMatches" />
   <html:hidden name="proteinInferFilterForm" property="maxSpectrumMatches" />
   <html:hidden name="proteinInferFilterForm" property="showAllProteins" />

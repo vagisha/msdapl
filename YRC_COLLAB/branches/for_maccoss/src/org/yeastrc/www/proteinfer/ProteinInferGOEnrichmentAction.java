@@ -132,6 +132,10 @@ public class ProteinInferGOEnrichmentAction extends Action {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(filterForm.getMinPiDouble());
+        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
         filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());

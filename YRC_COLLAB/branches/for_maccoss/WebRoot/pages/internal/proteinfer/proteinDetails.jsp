@@ -29,6 +29,8 @@
 <table align="center" cellpadding="2" style="border: 1px solid gray; border-spacing: 2px">
 <tr class="pinfer_A">
 	<td>Coverage(%)</td>
+	<td>Mol.Wt.</td>
+	<td>pI</td>
 	<td># Peptides</td>
 	<td># Uniq.Peptides</td>
 	<td># Spectra </td>
@@ -39,6 +41,8 @@
 </tr>
 <tr>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.coverage" /></td>
+  	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="molecularWeight" /></td>
+  	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="pi" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.peptideCount" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.uniquePeptideCount" /></td>
 	<td style="border: 1px #CCCCCC dotted;" align="center"><bean:write name="protein" property="protein.spectrumCount" /></td>

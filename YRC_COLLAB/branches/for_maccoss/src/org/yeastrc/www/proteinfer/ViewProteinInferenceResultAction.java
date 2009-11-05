@@ -132,6 +132,10 @@ public class ViewProteinInferenceResultAction extends Action {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(filterForm.getMinPiDouble());
+        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
         filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
@@ -163,10 +167,7 @@ public class ViewProteinInferenceResultAction extends Action {
         
         // get the protein groups 
         List<WIdPickerProteinGroup> proteinGroups = null;
-        if(filterCriteria.isGroupProteins())
-            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, peptideDef);
-        else
-            proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, false, peptideDef);
+        proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIdsPage, proteinIds, filterCriteria.isGroupProteins(), peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);
         

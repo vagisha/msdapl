@@ -18,7 +18,6 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
-import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.nr_seq.NRProtein;
@@ -75,6 +74,8 @@ public class IdPickerResultsLoader {
     private static final IdPickerInputDAO inputDao = pinferDaoFactory.getIdPickerInputDao();
     private static final IdPickerRunDAO idpRunDao = pinferDaoFactory.getIdPickerRunDao();
     
+//    private static final ProteinPropertiesDAO proteinPropsDao = pinferDaoFactory.getProteinPropertiesDao();
+    
     private static final Logger log = Logger.getLogger(IdPickerResultsLoader.class);
     
     private IdPickerResultsLoader(){}
@@ -85,6 +86,36 @@ public class IdPickerResultsLoader {
     public static List<Integer> getProteinIds(int pinferId, ProteinFilterCriteria filterCriteria) {
         long s = System.currentTimeMillis();
         List<Integer> proteinIds = idpProtBaseDao.getFilteredSortedProteinIds(pinferId, filterCriteria);
+        
+        // filter by accession, if required
+        if(filterCriteria.getAccessionLike() != null) {
+            proteinIds = IdPickerResultsLoader.filterByProteinAccession(pinferId,
+                    proteinIds, null, 
+                    filterCriteria.getAccessionLike());
+        }
+        // filter by description, if required
+        if(filterCriteria.getDescriptionLike() != null) {
+            proteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionLike(), true);
+        }
+        if(filterCriteria.getDescriptionNotLike() != null) {
+            proteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionNotLike(), false);
+        }
+        // filter by molecular wt, if required
+        if(filterCriteria.hasMolecularWtFilter()) {
+            proteinIds = ProteinPropertiesFilter.filterByMolecularWt(pinferId, proteinIds,
+                    filterCriteria.getMinMolecularWt(), filterCriteria.getMaxMolecularWt());
+            if(filterCriteria.getSortBy() == SORT_BY.MOL_WT)
+                proteinIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, filterCriteria.isGroupProteins());
+        }
+        // filter by pI, if required
+        if(filterCriteria.hasPiFilter()) {
+            proteinIds = ProteinPropertiesFilter.filterByPi(pinferId, proteinIds,
+                    filterCriteria.getMinPi(), filterCriteria.getMaxPi());
+            if(filterCriteria.getSortBy() == SORT_BY.PI)
+                proteinIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, filterCriteria.isGroupProteins());
+                    
+        }
+        
         log.info("Returned "+proteinIds.size()+" protein IDs for protein inference ID: "+pinferId);
         long e = System.currentTimeMillis();
         log.info("Time: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
@@ -174,36 +205,7 @@ public class IdPickerResultsLoader {
         
         return filtered;
         
-//        List<Integer> searchDbIds = ProteinDatabaseLookupUtil.getInstance().getDatabaseIdsForProteinInference(pinferId);
-//        List<NrDbProtein> nrProteins = NrSeqLookupUtil.getDbProteinsForDescription(searchDbIds, descriptionLike);
-//        
-//        NrDbProtComparator comparator = new NrDbProtComparator();
-//        Collections.sort(nrProteins, comparator);
-//           
-//        List<ProteinferProtein> proteins = protDao.loadProteins(pinferId);
-//        Set<Integer> accepted = new HashSet<Integer>();
-//        for(ProteinferProtein protein: proteins) {
-//            NrDbProtein nrp = new NrDbProtein();
-//            nrp.setProteinId(protein.getNrseqProteinId());
-//            int idx = Collections.binarySearch(nrProteins, nrp, comparator);
-//            if(idx >= 0) {
-//                accepted.add(protein.getId());
-//            }
-//        }
-//        
-//        List<Integer> acceptedProteinIds = new ArrayList<Integer>(accepted.size());
-//        for(int id: storedProteinIds) {
-//            if(accepted.contains(id))
-//                acceptedProteinIds.add(id);
-//        }
-//        return acceptedProteinIds;
     }
-    
-//    private static class NrDbProtComparator implements Comparator<NrDbProtein> {
-//        public int compare(NrDbProtein o1, NrDbProtein o2) {
-//            return Integer.valueOf(o1.getProteinId()).compareTo(o2.getProteinId());
-//        }
-//    }
     
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given sorting criteria
@@ -236,6 +238,14 @@ public class IdPickerResultsLoader {
         }
         else if (sortBy == SORT_BY.NUM_SPECTRA) {
             allIds = idpProtBaseDao.sortProteinIdsBySpectrumCount(pinferId, groupProteins);
+        }
+        else if (sortBy == SORT_BY.MOL_WT) {
+            List<Integer> sortedIds = ProteinPropertiesSorter.sortIdsByMolecularWt(proteinIds, pinferId, groupProteins);
+            return sortedIds;
+        }
+        else if(sortBy == SORT_BY.PI) {
+            List<Integer> sortedIds = ProteinPropertiesSorter.sortIdsByPi(proteinIds, pinferId, groupProteins);
+            return sortedIds;
         }
 //        else if (sortBy == SORT_BY.ACCESSION) {
 //            allIds = sortIdsByAccession(proteinIds);
@@ -346,6 +356,9 @@ public class IdPickerResultsLoader {
         // set the accession and description for the proteins.  
         // This requires querying the NRSEQ database
         assignProteinAccessionDescription(wProt, databaseIds);
+        
+        // get the molecular weight for the protein
+        assignProteinProperties(wProt);
         return wProt;
     }
     
@@ -376,12 +389,12 @@ public class IdPickerResultsLoader {
     //---------------------------------------------------------------------------------------------------
     // Get a list of protein groups
     //---------------------------------------------------------------------------------------------------
-    public static List<WIdPickerProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, 
+    public static List<WIdPickerProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, List<Integer> allProteinIds, 
             PeptideDefinition peptideDef) {
-        return getProteinGroups(pinferId, proteinIds, true, peptideDef);
+        return getProteinGroups(pinferId, proteinIds, allProteinIds, true, peptideDef);
     }
     
-    public static List<WIdPickerProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, boolean append, 
+    public static List<WIdPickerProteinGroup> getProteinGroups(int pinferId, List<Integer> proteinIds, List<Integer> allProteinIds, boolean append, 
             PeptideDefinition peptideDef) {
         long s = System.currentTimeMillis();
         List<WIdPickerProtein> proteins = getProteins(pinferId, proteinIds, peptideDef);
@@ -398,7 +411,7 @@ public class IdPickerResultsLoader {
             int groupId_top = proteins.get(0).getProtein().getGroupId();
             List<IdPickerProteinBase> groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId_top);
             for(IdPickerProteinBase prot: groupProteins) {
-                if(!proteinIds.contains(prot.getId())) {
+                if(!proteinIds.contains(prot.getId()) && allProteinIds.contains(prot.getId())) {
                     prot.setPeptideDefinition(peptideDef);
                     proteins.add(0, getWIdPickerProtein(prot, fastaDatabaseIds));
                 }
@@ -410,7 +423,7 @@ public class IdPickerResultsLoader {
             if(groupId_last != groupId_top) {
                 groupProteins = idpProtBaseDao.loadIdPickerGroupProteins(pinferId, groupId_last);
                 for(IdPickerProteinBase prot: groupProteins) {
-                    if(!proteinIds.contains(prot.getId())) {
+                    if(!proteinIds.contains(prot.getId()) && allProteinIds.contains(prot.getId())) {
                         prot.setPeptideDefinition(peptideDef);
                         proteins.add(getWIdPickerProtein(prot, fastaDatabaseIds));
                     }
@@ -480,6 +493,15 @@ public class IdPickerResultsLoader {
         }
         return new String[] {accession, description, commonName};
         
+    }
+    
+    private static void assignProteinProperties(WIdPickerProtein wProt) {
+        
+        ProteinProperties props = ProteinPropertiesStore.getInstance().getProteinProperties(wProt.getProtein().getProteinferId(), wProt.getProtein().getId());
+        if(props != null) {
+            wProt.setMolecularWeight( (float) (Math.round(props.getMolecularWt()*100) / 100.0));
+            wProt.setPi( (float) (Math.round(props.getPi()*100) / 100.0));
+        }
     }
     
     //---------------------------------------------------------------------------------------------------

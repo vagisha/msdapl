@@ -89,6 +89,10 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(filterForm.getMinPiDouble());
+        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
         filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
@@ -144,11 +148,14 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
             if(filterCriteria.getAccessionLike() != null) {
                 // get the protein accession map from the session if we have one
                 // but don't create a new one if it does not exist or does not match
-                // the protein inference we are looking at right now. 
-                Map<Integer, String> proteinAccessionMap = getProteinAccessionMap(request, pinferId, false);
+                // the protein inference we are looking at right now.
+                // UNLESS, we are sorting by accession
+                boolean createNew = filterCriteria.getSortBy() == SORT_BY.ACCESSION;
+                Map<Integer, String> proteinAccessionMap = getProteinAccessionMap(request, pinferId, createNew);
                 storedProteinIds = IdPickerResultsLoader.filterByProteinAccession(pinferId,
                         storedProteinIds, proteinAccessionMap, 
                         filterCriteria.getAccessionLike());
+                storedProteinIds = IdPickerResultsLoader.sortIdsByAccession(storedProteinIds, proteinAccessionMap);
             }
             // filter by description, if required
             if(filterCriteria.getDescriptionLike() != null) {
@@ -185,7 +192,7 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
         
         // get the protein groups 
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
+        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, storedProteinIds, 
                                                         filterCriteria.isGroupProteins(), peptideDef);
         
         request.setAttribute("proteinGroups", proteinGroups);

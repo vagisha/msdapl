@@ -42,6 +42,13 @@
   	Max <html:text name="proteinInferFilterForm" property="maxUniquePeptides" size="3"></html:text>
   </td>
   </tr>
+  <tr>
+  <td>Protein Mol. Wt.: </td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minMolecularWt" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxMolecularWt" size="3"></html:text>
+  </td>
+  </tr>
   </table></td>
   
   <td><table>
@@ -59,9 +66,16 @@
   	Max <html:text name="proteinInferFilterForm" property="maxSpectrumMatches" size="3"></html:text>
   </td>
   </tr>
+  <tr>
+  <td>Protein pI: </td>
+  <td>
+  	Min <html:text name="proteinInferFilterForm" property="minPi" size="3"></html:text>
+  	Max <html:text name="proteinInferFilterForm" property="maxPi" size="3"></html:text>
+  </td>
+  </tr>
   </table></td>
   
-  <td><table>
+  <td valign="top"><table>
   <tr>
   	<td colspan="2">Group Indistinguishable Proteins: </td>
   	<td>

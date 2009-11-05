@@ -822,6 +822,12 @@ function validateForm() {
     if(!valid)	return false;
     $('form#filterForm input[@name=minSpectrumMatches]').val(parseInt(value));
     
+    value = $('form#filterForm input[@name=minMolecularWt]').fieldValue();
+    valid = validateFloat(value, "Min. Molecular Wt.", 0);
+    if(!valid)	return false;
+    $('form#filterForm input[@name=minMolecularWt]').val(parseInt(value));
+    
+    
     return true;
 }
 function validateInt(value, fieldName, min, max) {
@@ -883,6 +889,12 @@ function downloadResults() {
 	$("#downloadForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
 	$("#downloadForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
 	
+	$("#downloadForm  input[name='minMolecularWt']").val($("#filterForm  input[name='minMolecularWt']").val());
+	$("#downloadForm  input[name='maxMolecularWt']").val($("#filterForm  input[name='maxMolecularWt']").val());
+	
+	$("#downloadForm  input[name='minPi']").val($("#filterForm  input[name='minPi']").val());
+	$("#downloadForm  input[name='maxPi']").val($("#filterForm  input[name='maxPi']").val());
+	
 	$("#downloadForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
 	$("#downloadForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
 	
@@ -928,6 +940,12 @@ function doGoEnrichmentAnalysis() {
 	
 	$("#goEnrichmentForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
 	$("#goEnrichmentForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
+	
+	$("#goEnrichmentForm  input[name='minMolecularWt']").val($("#filterForm  input[name='minMolecularWt']").val());
+	$("#goEnrichmentForm  input[name='maxMolecularWt']").val($("#filterForm  input[name='maxMolecularWt']").val());
+	
+	$("#goEnrichmentForm  input[name='minPi']").val($("#filterForm  input[name='minPi']").val());
+	$("#goEnrichmentForm  input[name='maxPi']").val($("#filterForm  input[name='maxPi']").val());
 	
 	$("#goEnrichmentForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
 	$("#goEnrichmentForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());

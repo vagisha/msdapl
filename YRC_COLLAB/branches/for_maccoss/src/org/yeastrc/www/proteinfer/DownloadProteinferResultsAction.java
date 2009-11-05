@@ -92,6 +92,10 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write("Max. Spectrum Matches: "+filterForm.getMaxSpectrumMatches()+"\n");
         writer.write("Min. Coverage(%): "+filterForm.getMinCoverage()+"\n");
         writer.write("Max. Coverage(%): "+filterForm.getMaxCoverage()+"\n");
+        writer.write("Min. Molecular Wt.: "+filterForm.getMinMolecularWt()+"\n");
+        writer.write("Max. Molecular Wt.: "+filterForm.getMaxMolecularWt()+"\n");
+        writer.write("Min. PI: "+filterForm.getMinPi()+"\n");
+        writer.write("Max. PI: "+filterForm.getMaxPi()+"\n");
         writer.write("Show all Proteins: "+filterForm.isShowAllProteins()+"\n");
         writer.write("Exclude indistinguishable protein groups: "+filterForm.isExcludeIndistinProteinGroups()+"\n");
         writer.write("Validation Status: "+filterForm.getValidationStatusString()+"\n");
@@ -114,6 +118,10 @@ public class DownloadProteinferResultsAction extends Action {
         ProteinFilterCriteria filterCriteria = new ProteinFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(filterForm.getMinPiDouble());
+        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
         filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());
@@ -139,19 +147,6 @@ public class DownloadProteinferResultsAction extends Action {
         // Get the protein Ids that fulfill the criteria.
         List<Integer> proteinIds = IdPickerResultsLoader.getProteinIds(pinferId, filterCriteria);
         
-        // filter by accession, if required
-        if(filterCriteria.getAccessionLike() != null) {
-            proteinIds = IdPickerResultsLoader.filterByProteinAccession(pinferId,
-                    proteinIds, null, 
-                    filterCriteria.getAccessionLike());
-        }
-        // filter by description, if required
-        if(filterCriteria.getDescriptionLike() != null) {
-            proteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionLike(), true);
-        }
-        if(filterCriteria.getDescriptionNotLike() != null) {
-            proteinIds = IdPickerResultsLoader.filterByProteinDescription(pinferId, proteinIds, filterCriteria.getDescriptionNotLike(), false);
-        }
         
         // print the parameters used for the protein inference run
         writer.write("Program Version: "+idpRun.getProgramVersion()+"\n");
@@ -216,7 +211,8 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write("Parsimonious\t");
         writer.write("FastaID\tCommonName\t");
         writer.write("Coverage\tNumSpectra\tNSAF\t");
-        writer.write("NumPeptides\tNumUniquePeptides");
+        writer.write("NumPeptides\tNumUniquePeptides\t");
+        writer.write("Mol.Wt\tpI");
         if(printPeptides)
             writer.write("\tPeptides");
 //            writer.write("Description\n");
@@ -237,7 +233,9 @@ public class DownloadProteinferResultsAction extends Action {
             writer.write(wProt.getProtein().getSpectrumCount()+"\t");
             writer.write(wProt.getProtein().getNsafFormatted()+"\t");
             writer.write(wProt.getProtein().getPeptideCount()+"\t");
-            writer.write(wProt.getProtein().getUniquePeptideCount()+"");
+            writer.write(wProt.getProtein().getUniquePeptideCount()+"\t");
+            writer.write(wProt.getMolecularWeight()+"\t");
+            writer.write(wProt.getPi()+"");
             
             if(printPeptides) {
                 writer.write("\t"+getPeptides(proteinId));

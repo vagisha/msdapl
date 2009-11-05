@@ -150,7 +150,7 @@ public class SortProteinferResultsAjaxAction extends Action{
                 filterCriteria.getSortOrder() == SORT_ORDER.DESC);
 
         // get the protein groups
-        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, 
+        List<WIdPickerProteinGroup> proteinGroups = IdPickerResultsLoader.getProteinGroups(pinferId, proteinIds, storedProteinIds, 
                 group, peptideDef);
         request.setAttribute("proteinGroups", proteinGroups);
 
