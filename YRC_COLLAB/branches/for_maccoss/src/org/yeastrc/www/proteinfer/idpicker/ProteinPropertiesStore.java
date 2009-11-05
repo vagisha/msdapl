@@ -18,6 +18,7 @@ import edu.uwpr.protinfer.ProteinInferenceProgram;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinDAO;
 import edu.uwpr.protinfer.database.dto.ProteinferRun;
+import edu.uwpr.protinfer.database.dto.idpicker.GenericIdPickerProtein;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProtein;
 import edu.uwpr.protinfer.util.ProteinUtils;
 import edu.uwpr.protinfer.util.TimeUtils;
@@ -87,12 +88,7 @@ public class ProteinPropertiesStore {
             
             s = System.currentTimeMillis();
             for(IdPickerProtein protein: proteins) {
-                String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqProteinId());
-                
-                ProteinProperties props = new ProteinProperties(protein.getId(), protein.getGroupId());
-                props.setNrseqId(protein.getNrseqProteinId());
-                props.setMolecularWt(ProteinUtils.calculateMolWt(sequence));
-                props.setPi(ProteinUtils.calculatePi(sequence));
+                ProteinProperties props = makeProteinProperties(protein);
                 
                 map.put(protein.getId(), props);
             }
@@ -102,9 +98,23 @@ public class ProteinPropertiesStore {
         
         return map;
     }
+
+    private ProteinProperties makeProteinProperties(GenericIdPickerProtein<?> protein) {
+        String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqProteinId());
+        
+        ProteinProperties props = new ProteinProperties(protein.getId(), protein.getGroupId());
+        props.setNrseqId(protein.getNrseqProteinId());
+        props.setMolecularWt(ProteinUtils.calculateMolWt(sequence));
+        props.setPi(ProteinUtils.calculatePi(sequence));
+        return props;
+    }
     
-    public ProteinProperties getProteinProperties(int pinferId, int nrseqId) {
-        Map<Integer, ProteinProperties> map = this.getPropertiesMapForProteinInference(pinferId);
-        return map.get(nrseqId);
+    public ProteinProperties getProteinProperties(int pinferId, GenericIdPickerProtein<?> protein) {
+        Map<Integer, ProteinProperties> map = this.getPropertiesMapForProteinInference(pinferId, false);
+        if(map == null) {
+            return makeProteinProperties(protein);
+        }
+        else
+            return map.get(protein.getId());
     }
 }

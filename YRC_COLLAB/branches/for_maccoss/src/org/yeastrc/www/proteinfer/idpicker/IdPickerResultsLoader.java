@@ -497,7 +497,7 @@ public class IdPickerResultsLoader {
     
     private static void assignProteinProperties(WIdPickerProtein wProt) {
         
-        ProteinProperties props = ProteinPropertiesStore.getInstance().getProteinProperties(wProt.getProtein().getProteinferId(), wProt.getProtein().getId());
+        ProteinProperties props = ProteinPropertiesStore.getInstance().getProteinProperties(wProt.getProtein().getProteinferId(), wProt.getProtein());
         if(props != null) {
             wProt.setMolecularWeight( (float) (Math.round(props.getMolecularWt()*100) / 100.0));
             wProt.setPi( (float) (Math.round(props.getPi()*100) / 100.0));
