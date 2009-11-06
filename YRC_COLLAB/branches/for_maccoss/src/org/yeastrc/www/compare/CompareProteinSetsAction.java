@@ -280,15 +280,6 @@ public class CompareProteinSetsAction extends Action {
             // Set the page number
             grpComparison.setCurrentPage(myForm.getPageNum());
             
-            // set the information for displaying normalized spectrum counts
-            ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
-            for(Dataset dataset: grpComparison.getDatasets()) {
-                if(dataset.getSource() == DatasetSource.PROT_INFER) {
-                    int spectrumCount = specDao.getSpectrumCountForPinferRun(dataset.getDatasetId());
-                    dataset.setSpectrumCount(spectrumCount);
-                }
-            }
-            
             grpComparison.initSummary(); // initialize the summary -- 
                                         // (totalProteinCount, # common proteins)
                                         // spectrum count normalization factors

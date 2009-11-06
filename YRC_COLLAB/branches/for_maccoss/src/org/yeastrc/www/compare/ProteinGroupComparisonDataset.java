@@ -59,7 +59,13 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
 //    private String davidUrl = null;
 //    private String names = "";
     
+    private boolean fullProteinName = false;
+    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
+    
+    public void setPrintFullProteinName(boolean printFull) {
+        this.fullProteinName = printFull;
+    }
     
     private int  getStartIndex() {
         
@@ -435,7 +441,7 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         return row;
     }
     
-    private int getScaledSpectrumCount(float count) {
+    protected int getScaledSpectrumCount(float count) {
         float scaled = ((count - minNormalizedSpectrumCount + 1)/maxNormalizedSpectrumCount)*100.0f;
         return (int)Math.ceil(scaled);
     }
@@ -580,7 +586,12 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
         
         List<Integer> dbIds = getFastaDatabaseIds();
         ProteinListing fastaListing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqProteinId, dbIds);
-        String accession = fastaListing.getName();
+        String accession = null;
+        
+        if(this.fullProteinName)
+            accession = fastaListing.getFullName();
+        else
+            accession = fastaListing.getName();
         
         try {
             
@@ -624,8 +635,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     public void setCurrentPage(int page) {
         this.currentPage = page;
         ResultsPager pager = ResultsPager.instance();
-        this.pageCount = pager.getPageCount(this.proteinGroups.size(), rowCount);
-        this.displayPageNumbers = pager.getPageList(this.proteinGroups.size(), currentPage, rowCount);
+        this.pageCount = pager.getPageCount(this.proteins.size(), rowCount);
+        this.displayPageNumbers = pager.getPageList(this.proteins.size(), currentPage, rowCount);
     }
     
     @Override

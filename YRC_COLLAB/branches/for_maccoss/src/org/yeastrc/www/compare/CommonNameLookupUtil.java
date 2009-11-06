@@ -145,7 +145,7 @@ public class CommonNameLookupUtil {
         
         try {
             conn = DAOFactory.instance().getConnection();
-            String sql = "SELECT proteinID FROM YRC_NRSEQ.tblProteinDatabase WHERE accessionString LIKE '"+commonName+"%'";
+            String sql = "SELECT proteinID FROM nrseqProteinCache WHERE name LIKE '"+commonName+"%'";
             stmt = conn.createStatement();
             
             rs = stmt.executeQuery(sql);

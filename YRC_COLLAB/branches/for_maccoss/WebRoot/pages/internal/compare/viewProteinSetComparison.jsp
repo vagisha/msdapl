@@ -336,6 +336,7 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <thead>
 	<tr>
 		<th>Dataset</th>
+		<th>Spectrum Count (Max)</th>
 		<th># Proteins</th>
 	</tr>
 </thead>
@@ -345,6 +346,9 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 		<th align="center">
 			<span><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></span>
 		</th>
+		<td align="center">
+			<bean:write name="dataset" property="spectrumCount" />(<bean:write name="dataset" property="maxProteinSpectrumCount" />)
+		</td>
 		<td style="color:#FFFFFF; background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> ); padding: 3 5 3 5;">
 			<%=comparison.getProteinCount(row)%>
 		</td>

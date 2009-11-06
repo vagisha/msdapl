@@ -8,7 +8,10 @@ package org.yeastrc.www.compare;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,12 +24,17 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
+import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
+import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
+import edu.uwpr.protinfer.infer.graph.GraphCollapser;
+import edu.uwpr.protinfer.infer.graph.PeptideVertex;
 import edu.uwpr.protinfer.util.TimeUtils;
 
 /**
@@ -161,6 +169,7 @@ public class DownloadComparisonResults extends Action {
         writer.write("\n\n");
         writer.write("Date: "+new Date()+"\n\n");
         
+        long startTime = System.currentTimeMillis();
         
         // Do the comparison
         long s = System.currentTimeMillis();
@@ -180,29 +189,103 @@ public class DownloadComparisonResults extends Action {
         e = System.currentTimeMillis();
         log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        // Sort by peptide count
-        s = System.currentTimeMillis();
-        ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
-        sorter.sortByPeptideCount(comparison);
-        e = System.currentTimeMillis();
-        log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+        if(!myForm.isGroupProteins()) {
+            
+            // Sort by peptide count
+            s = System.currentTimeMillis();
+            ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
+            sorter.sortByPeptideCount(comparison);
+            e = System.currentTimeMillis();
+            log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
+            
+            s = System.currentTimeMillis();
+            writeResults(writer, comparison, filters, myForm);
+            writer.close();
+            log.info("Results written in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+            
+        }
         
-        s = System.currentTimeMillis();
-        writeResults(writer, comparison, myForm);
-        writer.close();
+        else {
+            s = System.currentTimeMillis();
+            GraphBuilder graphBuilder = new GraphBuilder();
+            BipartiteGraph<ComparisonProteinGroup, PeptideVertex> graph = 
+                graphBuilder.buildGraph(comparison.getProteins(), piRunIds);
+            log.info("BEFORE collapsing graph: "+graph.getLeftVertices().size());
+            GraphCollapser<ComparisonProteinGroup, PeptideVertex> collapser = new GraphCollapser<ComparisonProteinGroup, PeptideVertex>();
+            collapser.collapseGraph(graph);
+            
+            List<ComparisonProteinGroup> proteinGroups = graph.getLeftVertices();
+            log.info("AFTER collapsing graph: "+proteinGroups.size());
+            
+            
+            // assign group IDs
+            int groupId = 1;
+            for(ComparisonProteinGroup group: proteinGroups)
+                group.setGroupId(groupId++);
+            // sort
+            Collections.sort(proteinGroups, new Comparator<ComparisonProteinGroup>() {
+                @Override
+                public int compare(ComparisonProteinGroup o1,
+                        ComparisonProteinGroup o2) {
+                    return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
+                }});
+            
+            // remove protein groups that do not have any parsimonious proteins
+            Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
+            while(iter.hasNext()) {
+                ComparisonProteinGroup proteinGroup = iter.next();
+                if(!proteinGroup.hasParsimoniousProtein())
+                    iter.remove();
+            }
+            log.info("AFTER removing non-parsimonious groups: "+proteinGroups.size());
+            
+            e = System.currentTimeMillis();
+            log.info("Time to do graph analysis: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
+            
+            ProteinGroupComparisonDataset grpComparison = new ProteinGroupComparisonDataset();
+            for(ComparisonProteinGroup grp: proteinGroups)
+                grpComparison.addProteinGroup(grp);
+            
+            grpComparison.setDatasets(datasets);
+            
+            grpComparison.initSummary(); // initialize the summary -- 
+                                         // (totalProteinCount, # common proteins)
+                                         // spectrum count normalization factors
+                                         // calculate min/max normalized spectrum counts for scaling
+            
+            s = System.currentTimeMillis();
+            writeResults(writer, grpComparison, filters, myForm);
+            writer.close();
+            log.info("Results written in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+        }
+        
         e = System.currentTimeMillis();
-        log.info("DownloadComparisonResults results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+        log.info("DownloadComparisonResults results in: "+TimeUtils.timeElapsedMinutes(startTime,e)+" minutes");
         return null;
     }
 
     
-    private void writeResults(PrintWriter writer, ProteinComparisonDataset comparison, ProteinSetComparisonForm form) {
+    private void writeResults(PrintWriter writer, ProteinComparisonDataset comparison, ProteinDatasetComparisonFilters filters,
+            ProteinSetComparisonForm form) {
         
-//        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
+        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
         writer.write("Filtered protein count: "+comparison.getFilteredProteinCount()+"\n");
         writer.write("\n\n");
+        
+        // Boolean Filters
+        writeFilters(writer, filters);
+        
+        
+        // Accession string filter
+        String searchString = form.getSearchString();
+        if(searchString != null && searchString.trim().length() > 0) {
+            writer.write("Filtering for proteins: "+searchString+"\n");
+        }
+        writer.write("\n\n");
+        
         
         // Datasets
         writer.write("Datasets: \n");
@@ -214,6 +297,20 @@ public class DownloadComparisonResults extends Action {
         }
         writer.write("\n\n");
         
+        // Common protein groups
+        writer.write("Common Proteins:\n");
+        writer.write("\t");
+        for(Dataset dataset: comparison.getDatasets()) {
+            writer.write("ID_"+dataset.getDatasetId()+"\t");
+        }
+        writer.write("\n");
+        for(int i = 0; i < comparison.getDatasetCount(); i++) {
+            writer.write("ID_"+comparison.getDatasets().get(i).getDatasetId()+"\t");
+            for(int j = 0; j < comparison.getDatasetCount(); j++) 
+                writer.write(comparison.getCommonProteinCount(i, j)+"\t");
+            writer.write("\n");
+        }
+        writer.write("\n\n");
         
         
         // legend
@@ -282,10 +379,172 @@ public class DownloadComparisonResults extends Action {
                     writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
                 }
             }
-            
             writer.write(protein.getDescription()+"\n");
         }
         
         writer.write("\n\n");
     }
+
+
+    private void writeFilters(PrintWriter writer,
+            ProteinDatasetComparisonFilters filters) {
+        
+        boolean filtersFound = false;
+        writer.write("Boolean Filters: \n");
+        
+        
+        if(filters.getAndFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("AND:\n");
+            for(Dataset ds: filters.getAndFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filters.getOrFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("OR:\n");
+            for(Dataset ds: filters.getOrFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filters.getNotFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("NOT:\n");
+            for(Dataset ds: filters.getNotFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filters.getXorFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("XOR:\n");
+            for(Dataset ds: filters.getXorFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filtersFound)
+            writer.write("\n\n");
+        else
+            writer.write("No filters found\n");
+    }
+    
+    private void writeResults(PrintWriter writer, ProteinGroupComparisonDataset comparison, ProteinDatasetComparisonFilters filters,
+            ProteinSetComparisonForm form) {
+        
+      writer.write("Total Protein Groups (Total Proteins): "+comparison.getTotalProteinGroupCount()+" ("+comparison.getTotalProteinCount()+")\n");
+      writer.write("\n\n");
+      
+      // Boolean Filters
+      writeFilters(writer, filters);
+      
+      
+      // Accession string filter
+      String searchString = form.getSearchString();
+      if(searchString != null && searchString.trim().length() > 0) {
+          writer.write("Filtering for proteins: "+searchString+"\n");
+      }
+      writer.write("\n\n");
+      
+      // Datasets
+      writer.write("Datasets: \n");
+      int idx = 0;
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+
+                  ": Proteins Groups (# Proteins)  "+comparison.getProteinGroupCount(idx)+" ("+comparison.getProteinCount(idx++)+") "+
+                  "; SpectrumCount(max.) "+dataset.getSpectrumCount()+"("+dataset.getMaxProteinSpectrumCount()+")\n");
+      }
+      writer.write("\n\n");
+      
+      // Common protein groups
+      writer.write("Common Proteins:\n");
+      writer.write("\t");
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write("ID_"+dataset.getDatasetId()+"\t");
+      }
+      writer.write("\n");
+      for(int i = 0; i < comparison.getDatasetCount(); i++) {
+          writer.write("ID_"+comparison.getDatasets().get(i).getDatasetId()+"\t");
+          for(int j = 0; j < comparison.getDatasetCount(); j++) {
+              writer.write(comparison.getCommonProteinGroupCount(i, j)+" ("+comparison.getCommonProteinGroupsPerc(i, j)+"%)\t");
+          }
+          writer.write("\n");
+      }
+      writer.write("\n\n");
+      
+      
+      // legend
+      // *  Present and Parsimonious
+      // =  Present and NOT parsimonious
+      // g  group protein
+      // -  NOT present
+      writer.write("\n\n");
+      writer.write("*  Protein present and parsimonious\n");
+      writer.write("=  Protein present and NOT parsimonious\n");
+      writer.write("-  Protein NOT present\n");
+      writer.write("g  Group protein\n");
+      writer.write("\n\n");
+      
+
+      // print the proteins in each protein group
+      writer.write("ProteinID\t");
+      writer.write("ProteinGroupID\t");
+      writer.write("Name\t");
+      writer.write("CommonName\t");
+      writer.write("NumPept\t");
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
+      }
+      // spectrum count column headers.
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write("SC("+dataset.getDatasetId()+")\t");
+      }
+      writer.write("Description\n");
+      
+      comparison.setPrintFullProteinName(true); 
+      
+      for(ComparisonProteinGroup grpProtein: comparison.getProteinsGroups()) {
+          
+          for(ComparisonProtein protein: grpProtein.getProteins()) {
+              comparison.initializeProteinInfo(protein);
+          
+              writer.write(protein.getNrseqId()+"\t");
+              writer.write(protein.getGroupId()+"\t");
+              writer.write(protein.getFastaName()+"\t");
+              writer.write(protein.getCommonName()+"\t");
+              writer.write(protein.getMaxPeptideCount()+"\t");
+         
+              for(Dataset dataset: comparison.getDatasets()) {
+                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                  if(dpi == null || !dpi.isPresent()) {
+                      writer.write("-");
+                  }
+                  else {
+                      if(dpi.isParsimonious()) {
+                          writer.write("*");
+                      }
+                      else {
+                          writer.write("=");
+                      }
+                      if(dpi.isGrouped())
+                          writer.write("g");
+                  }
+                  writer.write("\t");
+              }
+              // spectrum count information
+              for(Dataset dataset: comparison.getDatasets()) {
+
+                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                  if(dpi == null || !dpi.isPresent()) {
+                      writer.write("0\t");
+                  }
+                  else {
+                      writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                  }
+              }
+          
+              writer.write(protein.getDescription()+"\n");
+          }
+      }
+      
+      writer.write("\n\n");
+  }
 }
