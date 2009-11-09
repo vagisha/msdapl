@@ -327,7 +327,7 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
-    public static List<NrDbProtein> getProteinIdsForDescription(String description) {
+    public static List<Integer> getProteinIdsForDescription(String description) {
         
         String statementName = "NrSeq.selectProteinIdsForDescription";
         String desc = "%"+description+"%";
