@@ -327,6 +327,19 @@ private static final Logger log = Logger.getLogger(DAOFactory.class);
         }
     }
     
+    public static List<NrDbProtein> getDbProteinsForDescription(String description) {
+        
+        String statementName = "NrSeq.selectProteinIdsForDescription";
+        String desc = "%"+description+"%";
+        try {
+            return sqlMap.queryForList(statementName, desc);
+        }
+        catch (SQLException e) {
+            log.error("Failed to execute select statement: ", e);
+            throw new RuntimeException("Failed to execute select statement: "+statementName, e);
+        }
+    }
+    
     public static List<NrDbProtein> getDbProteinsForAccession(List<Integer> dbIds, String accession) {
         
         if(dbIds == null || dbIds.size() == 0)
