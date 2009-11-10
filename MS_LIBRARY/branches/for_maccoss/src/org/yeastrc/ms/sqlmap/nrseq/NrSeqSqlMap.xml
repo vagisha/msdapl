@@ -124,12 +124,6 @@
     	AND description LIKE #description#
     </select>
     
-    <select id="selectProteinIdsForDescription" resultClass="Integer" parameterClass="String">
-    	SELECT DISTINCT(proteinID) 
-    	FROM tblProteinDatabase 
-    	WHERE description LIKE #description#
-    </select>
-    
     <select id="selectDbProteinIdsForAccession" resultMap="nrDbProtResult" parameterClass="java.util.Map">
     	SELECT * 
     	FROM tblProteinDatabase 
