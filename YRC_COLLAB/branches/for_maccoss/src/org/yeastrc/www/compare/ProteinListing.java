@@ -90,7 +90,7 @@ public class ProteinListing {
     
    
     public String getDescription() {
-        return getDescription(50, ", ");
+        return getDescription(90, ", ");
     }
     
     public String getDescription(int maxLength, String separator) {

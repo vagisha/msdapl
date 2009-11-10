@@ -36,7 +36,8 @@ public class ProteinSetComparisonForm extends ActionForm {
     private boolean goEnrichment = false;
     private boolean goEnrichmentGraph = false;
     
-    private String searchString;
+    private String nameSearchString;
+    private String descriptionSearchString;
     
     private boolean onlyParsimonious = false;
     
@@ -62,12 +63,20 @@ public class ProteinSetComparisonForm extends ActionForm {
         this.onlyParsimonious = onlyParsimonious;
     }
 
-    public String getSearchString() {
-        return searchString;
+    public String getNameSearchString() {
+        return nameSearchString;
     }
 
-    public void setSearchString(String searchString) {
-        this.searchString = searchString;
+    public void setNameSearchString(String nameSearchString) {
+        this.nameSearchString = nameSearchString;
+    }
+    
+    public String getDescriptionSearchString() {
+        return descriptionSearchString;
+    }
+
+    public void setDescriptionSearchString(String descriptionSearchString) {
+        this.descriptionSearchString = descriptionSearchString;
     }
 
     public int getPageNum() {

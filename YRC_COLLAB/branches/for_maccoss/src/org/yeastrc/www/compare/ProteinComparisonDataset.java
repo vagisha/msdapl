@@ -463,15 +463,21 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         else
             accession = fastaListing.getName();
         
+        String description = null;
+        // Look for a description for this protein from the given fasta database IDs.
+        if(fastaListing.getDescription() != null && fastaListing.getDescription().length() > 0)
+            description = fastaListing.getDescription();
+        
+        
         try {
             
             ProteinListing commonListing = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId);
-            String commonName = null;
-            if(this.fullProteinName)
-                commonName = commonListing.getName(20, ",");
-            else
-                commonName = commonListing.getName();
-            String description = commonListing.getDescription(90, ", ");
+            String commonName = commonListing.getName(20, ",");
+            
+            // If we haven't already found a description from the given fasta IDs, use the description
+            // gathered from all descriptions available for this protein.
+            if(description == null)
+                description = commonListing.getDescription(90, ", ");
             
             return new String[] {accession, description, commonName};
         }
@@ -481,7 +487,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return null;
     }
     
-    private List<Integer> getFastaDatabaseIds() {
+    List<Integer> getFastaDatabaseIds() {
         if(this.fastaDatabaseIds != null)
             return fastaDatabaseIds;
         else {

@@ -19,6 +19,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
+import org.yeastrc.ms.domain.nrseq.NrDbProtein;
 import org.yeastrc.yates.YatesRun;
 
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
@@ -228,7 +229,7 @@ public class ProteinDatasetComparer {
         Set<Integer> proteinIds = new HashSet<Integer>();
         String tokens[] = searchString.split(",");
         
-        List<String> notFound = new ArrayList<String>();
+        List<String> notFound = new ArrayList<String>();    
         
         // Do a common name lookup first
         for(String token: tokens) {
@@ -249,6 +250,40 @@ public class ProteinDatasetComparer {
                 List<Integer> ids = NrSeqLookupUtil.getProteinIdsForAccession(name);
                 if(ids != null)
                     proteinIds.addAll(ids);
+            }
+        }
+        
+        // sort the matching protein ids.
+        List<Integer> sortedIds = new ArrayList<Integer>(proteinIds.size());
+        sortedIds.addAll(proteinIds);
+        Collections.sort(sortedIds);
+        
+        // Remove the ones that do not match
+        Iterator<ComparisonProtein> iter = dataset.getProteins().iterator();
+        while(iter.hasNext()) {
+            ComparisonProtein prot = iter.next();
+            if(Collections.binarySearch(sortedIds, prot.getNrseqId()) < 0)
+                iter.remove();
+        }
+    }
+    
+    public void applyDescriptionFilter(ProteinComparisonDataset dataset, String searchString) throws SQLException {
+        
+        if(searchString == null || searchString.trim().length() == 0)
+            return;
+        
+        // get the protein ids for the descriptions the user is searching for
+        Set<Integer> proteinIds = new HashSet<Integer>();
+        String tokens[] = searchString.split(",");
+        
+        List<String> notFound = new ArrayList<String>();
+        
+        for(String token: tokens) {
+            String description = token.trim();
+            if(description.length() > 0) {
+                List<NrDbProtein> proteins = NrSeqLookupUtil.getDbProteinsForDescription(dataset.getFastaDatabaseIds(), description);
+                for(NrDbProtein protein: proteins)
+                    proteinIds.add(protein.getProteinId());
             }
         }
         

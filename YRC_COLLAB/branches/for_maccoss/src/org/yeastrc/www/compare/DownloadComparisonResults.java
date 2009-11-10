@@ -178,9 +178,15 @@ public class DownloadComparisonResults extends Action {
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getSearchString();
+        String searchString = myForm.getNameSearchString();
         if(searchString != null && searchString.trim().length() > 0) {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
+        }
+        
+        // If the user is searching for some proteins by description, filter the list
+        String descSearchString = myForm.getDescriptionSearchString();
+        if(descSearchString != null && descSearchString.trim().length() > 0) {
+            ProteinDatasetComparer.instance().applyDescriptionFilter(comparison, descSearchString);
         }
         
         // Apply AND, OR, NOT, XOR filters
@@ -280,11 +286,16 @@ public class DownloadComparisonResults extends Action {
         
         
         // Accession string filter
-        String searchString = form.getSearchString();
+        String searchString = form.getNameSearchString();
         if(searchString != null && searchString.trim().length() > 0) {
-            writer.write("Filtering for proteins: "+searchString+"\n");
+            writer.write("Filtering for FASTA ID(s): "+searchString+"\n\n");
         }
-        writer.write("\n\n");
+        
+        // Description string filter
+        String descString = form.getDescriptionSearchString();
+        if(descString != null && descString.trim().length() > 0) {
+            writer.write("Filtering for description term(s): "+descString+"\n\n");
+        }
         
         
         // Datasets
@@ -424,7 +435,7 @@ public class DownloadComparisonResults extends Action {
         if(filtersFound)
             writer.write("\n\n");
         else
-            writer.write("No filters found\n");
+            writer.write("No filters found\n\n");
     }
     
     private void writeResults(PrintWriter writer, ProteinGroupComparisonDataset comparison, ProteinDatasetComparisonFilters filters,
@@ -438,11 +449,16 @@ public class DownloadComparisonResults extends Action {
       
       
       // Accession string filter
-      String searchString = form.getSearchString();
+      String searchString = form.getNameSearchString();
       if(searchString != null && searchString.trim().length() > 0) {
-          writer.write("Filtering for proteins: "+searchString+"\n");
+          writer.write("Filtering for FASTA ID(s): "+searchString+"\n\n");
       }
-      writer.write("\n\n");
+      
+      // Description string filter
+      String descString = form.getDescriptionSearchString();
+      if(descString != null && descString.trim().length() > 0) {
+          writer.write("Filtering for description term(s): "+descString+"\n\n");
+      }
       
       // Datasets
       writer.write("Datasets: \n");

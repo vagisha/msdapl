@@ -162,9 +162,15 @@ public class CompareGOEnrichmentAction extends Action {
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getSearchString();
+        String searchString = myForm.getNameSearchString();
         if(searchString != null && searchString.trim().length() > 0) {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
+        }
+        
+        // If the user is searching for some proteins by description, filter the list
+        String descSearchString = myForm.getDescriptionSearchString();
+        if(descSearchString != null && descSearchString.trim().length() > 0) {
+            ProteinDatasetComparer.instance().applyDescriptionFilter(comparison, descSearchString);
         }
         
         // Apply AND, OR, NOT filters
