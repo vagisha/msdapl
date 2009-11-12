@@ -19,6 +19,8 @@ public class ComparisonProtein {
     private String fastaName;
     private String commonName;
     private String description;
+    private float molecularWeight = -1.0f;
+    private float pi = -1.0f;
     private int maxPeptideCount;
     
     private List<DatasetProteinInformation> datasetInfo;
@@ -65,12 +67,28 @@ public class ComparisonProtein {
         return commonName;
     }
 
+    public String getShortCommonName() {
+        if(commonName == null)
+            return "No Name";
+        if(commonName.length() <= 15)
+            return commonName;
+        return commonName.substring(0, 15)+"...";
+    }
+    
     public void setCommonName(String name) {
         this.commonName = name;
     }
 
     public String getDescription() {
         return description;
+    }
+    
+    public String getShortDescription() {
+        if(description == null)
+            return "No Description";
+        if(description.length() <= 100)
+            return description;
+        return description.substring(0, 100)+"...";
     }
     
     public void setDescription(String description) {
@@ -89,6 +107,14 @@ public class ComparisonProtein {
         return fastaName;
     }
 
+    public String getShortFastaName() {
+        if(fastaName == null)
+            return "No Accession";
+        if(fastaName.length() <= 15)
+            return fastaName;
+        return fastaName.substring(0, 15)+"...";
+    }
+    
     public void setFastaName(String systematicName) {
         this.fastaName = systematicName;
     }
@@ -107,5 +133,21 @@ public class ComparisonProtein {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+    
+    public void setMolecularWeight(float weight) {
+        this.molecularWeight = weight;
+    }
+    
+    public float getMolecularWeight() {
+        return this.molecularWeight;
+    }
+    
+    public float getPi() {
+        return pi;
+    }
+    
+    public void setPi(float pi) {
+        this.pi = pi;
     }
 }

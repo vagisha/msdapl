@@ -28,7 +28,9 @@ import edu.uwpr.protinfer.util.TimeUtils;
  */
 public class ProteinPropertiesStore {
 
+    // This maps protein inference run IDs to a map of its protein IDs (protein inference IDs) and protein properties
     private LinkedHashMap<Integer, Map<Integer, ProteinProperties>> store;
+    
     private final int size = 3;
     
     private final Logger log = Logger.getLogger(ProteinPropertiesStore.class.getName());
@@ -83,6 +85,7 @@ public class ProteinPropertiesStore {
             
             List<IdPickerProtein> proteins = proteinDao.loadProteins(pinferId);
             map = new HashMap<Integer, ProteinProperties>((int) (proteins.size() * 1.5));
+            
             long e = System.currentTimeMillis();
             log.info("Time to get all proteins: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
             

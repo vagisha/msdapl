@@ -28,6 +28,7 @@ public class ProteinInferFilterForm extends ActionForm {
     private boolean showAllProteins = true;
     private boolean collapseGroups = false; // Used for downloads only
     private boolean printPeptides = false; // Used for downloads only
+    private boolean printDescription = false; // used for downloads only
     
     private String accessionLike = null;
     private String descriptionLike = null;
@@ -379,6 +380,14 @@ public class ProteinInferFilterForm extends ActionForm {
 
     public void setPrintPeptides(boolean printPeptides) {
         this.printPeptides = printPeptides;
+    }
+    
+    public boolean isPrintDescriptions() {
+        return printDescription;
+    }
+
+    public void setPrintDescriptions(boolean printDescription) {
+        this.printDescription = printDescription;
     }
    
     //-----------------------------------------------------------------------------

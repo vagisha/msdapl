@@ -203,7 +203,7 @@
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="text-decoration: underline; cursor: pointer">
-				<bean:write name="protein" property="commonName" />
+				<bean:write name="protein" property="shortCommonName" />
 			</span>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>
@@ -320,7 +320,7 @@
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"><font color="#888888"></logic:equal>
 			<span onclick="showProteinDetails(<bean:write name="protein" property="protein.id" />)" 
 					style="text-decoration: underline; cursor: pointer">
-				<bean:write name="protein" property="commonName" />
+				<bean:write name="protein" property="shortCommonName" />
 			</span>
 			<logic:equal name="protein" property="protein.isParsimonious" value="false"></font></logic:equal>
 			<logic:equal name="protein" property="protein.isParsimonious" value="true"></b></logic:equal>

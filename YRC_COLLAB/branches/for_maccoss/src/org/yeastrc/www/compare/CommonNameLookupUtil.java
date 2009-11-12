@@ -59,7 +59,7 @@ public class CommonNameLookupUtil {
                 cndList.add(cnd);
             }
             
-            listing.setCommonNameDescription(cndList);
+            listing.setNameAndDescription(cndList);
         }
         finally {
             if(conn != null) try {conn.close(); conn = null;}
@@ -71,7 +71,7 @@ public class CommonNameLookupUtil {
         }
         
         // If we did not find anything in the cache table look for it the old way
-        if(listing.getCommonNameDescription().size() == 0) {
+        if(listing.getNameCount() == 0) {
           NRProteinFactory nrpf = NRProteinFactory.getInstance();
           NRProtein nrseqProt = null;
           nrseqProt = (NRProtein)(nrpf.getProtein(nrseqProteinId));
@@ -80,7 +80,7 @@ public class CommonNameLookupUtil {
           cnd.setDescription(nrseqProt.getDescription());
           List<ProteinNameDescription> list = new ArrayList<ProteinNameDescription>();
           list.add(cnd);
-          listing.setCommonNameDescription(list);
+          listing.setNameAndDescription(list);
         }
         
         return listing;
@@ -118,7 +118,7 @@ public class CommonNameLookupUtil {
                     cndList.add(cnd);
                 }
                 
-                listing.setCommonNameDescription(cndList);
+                listing.setNameAndDescription(cndList);
                 
                 rs.close();
             }

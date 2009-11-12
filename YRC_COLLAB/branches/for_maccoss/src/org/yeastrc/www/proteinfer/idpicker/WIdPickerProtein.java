@@ -20,7 +20,7 @@ public class WIdPickerProtein {
     public String getCommonName() {
         return commonName;
     }
-    public String getCommonNameShort() {
+    public String getShortCommonName() {
         if(commonName == null)
             return "";
         if(commonName.length() <= 15)

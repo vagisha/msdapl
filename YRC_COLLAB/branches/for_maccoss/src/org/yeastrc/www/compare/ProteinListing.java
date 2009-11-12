@@ -6,7 +6,9 @@
  */
 package org.yeastrc.www.compare;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -14,35 +16,44 @@ import java.util.List;
 public class ProteinListing {
 
     private int nrseqProteinId;
-    private List<ProteinNameDescription> nameDescr;
+    private Set<String> names;
+    private Set<String> descriptions;
+//    private List<ProteinNameDescription> nameDescr;
     
-    public void setCommonNameDescription(List<ProteinNameDescription> nameDescr) {
-        this.nameDescr = nameDescr;
+    public void setNameAndDescription(List<ProteinNameDescription> nameDescr) {
+        names = new HashSet<String>(nameDescr.size() * 2);
+        descriptions = new HashSet<String>(nameDescr.size() * 2);
+        for(ProteinNameDescription nd: nameDescr) {
+            if(nd.getName() != null)
+                names.add(nd.getName());
+            if(nd.getDescription() != null)
+                descriptions.add(nd.getDescription());
+        }
     }
     
-    public List<ProteinNameDescription> getCommonNameDescription() {
-        return nameDescr;
+    public int getNameCount() {
+        return names.size();
     }
     
     public String getOneName() {
-        for(ProteinNameDescription cnd: nameDescr) {
-            if(cnd.getName() != null && cnd.getName().trim().length() > 0)
-                return cnd.getName();
+        for(String name: names) {
+            if(names != null && name.trim().length() > 0)
+                return name;
         }
         return null;
     }
     
     public String getAllNames() {
-        return getAllNames(",");
+        return getAllNames(";");
     }
     
     public String getAllNames(String separator) {
         if(separator == null)
-            separator = ", ";
+            separator = ";";
         StringBuilder buf = new StringBuilder();
-        for(ProteinNameDescription cnd: nameDescr) {
+        for(String name: names) {
             buf.append(separator);
-            buf.append(cnd.getName());
+            buf.append(name);
         }
         if(buf.length() > 0)
             buf.delete(0, separator.length());
@@ -50,17 +61,17 @@ public class ProteinListing {
     }
     
     public String getName() {
-        return getName(15, ", ");
+        return getName(15, ";");
     }
     
     public String getName(int maxLength, String separator) {
         if(separator == null)
-            separator = ", ";
+            separator = ";";
         
         StringBuilder buf = new StringBuilder();
-        for(ProteinNameDescription cnd: nameDescr) {
+        for(String name: names) {
             buf.append(separator);
-            buf.append(cnd.getName());
+            buf.append(name);
             if(buf.length() > maxLength+separator.length())
                 break;
         }
@@ -75,33 +86,19 @@ public class ProteinListing {
         return buf.toString();
     }
     
-    public String getFullName() {
-        
-        StringBuilder buf = new StringBuilder();
-        for(ProteinNameDescription cnd: nameDescr) {
-            buf.append(",");
-            buf.append(cnd.getName());
-        }
-        if(buf.length() > 0)
-            buf.deleteCharAt(0);
-        
-        return buf.toString();
-    }
-    
-   
     public String getDescription() {
         return getDescription(90, ", ");
     }
     
     public String getDescription(int maxLength, String separator) {
         if(separator == null)
-            separator = ", ";
+            separator = "; ";
         
         StringBuilder buf = new StringBuilder();
-        for(ProteinNameDescription cnd: nameDescr) {
-            if(cnd.getDescription() != null) {
+        for(String desc: descriptions) {
+            if(desc != null) {
                 buf.append(separator);
-                buf.append(cnd.getDescription());
+                buf.append(desc);
                 if(buf.length() > maxLength+separator.length())
                     break;
             }
@@ -118,12 +115,12 @@ public class ProteinListing {
     
     public String getAllDescriptions(String separator) {
         if(separator == null)
-            separator = ", ";
+            separator = "; ";
         StringBuilder buf = new StringBuilder();
-        for(ProteinNameDescription cnd: nameDescr) {
-            if(cnd.getDescription() != null) {
+        for(String desc: descriptions) {
+            if(desc != null) {
                 buf.append(separator);
-                buf.append(cnd.getDescription());
+                buf.append(desc);
             }
         }
         if(buf.length() > 0)
@@ -133,7 +130,7 @@ public class ProteinListing {
     }
     
     public String getAllDescriptions() {
-        return getAllDescriptions(", ");
+        return getAllDescriptions("; ");
     }
     
     

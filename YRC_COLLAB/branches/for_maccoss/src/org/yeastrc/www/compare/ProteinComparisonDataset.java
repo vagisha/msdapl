@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.TableCell;
@@ -20,6 +21,7 @@ import org.yeastrc.www.misc.Tabular;
 import edu.uwpr.protinfer.database.dao.ProteinferDAOFactory;
 import edu.uwpr.protinfer.database.dao.idpicker.ibatis.IdPickerProteinBaseDAO;
 import edu.uwpr.protinfer.database.dto.idpicker.IdPickerProteinBase;
+import edu.uwpr.protinfer.util.ProteinUtils;
 
 /**
  * 
@@ -44,8 +46,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
     private int pageCount = 1;
     private List<Integer> displayPageNumbers;
     
-    private boolean fullProteinName = false;
-    
     private static final Logger log = Logger.getLogger(ProteinComparisonDataset.class.getName());
     
 
@@ -54,10 +54,6 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         this.datasets = new ArrayList<Dataset>();
         this.proteins = new ArrayList<ComparisonProtein>();
         this.displayPageNumbers = new ArrayList<Integer>();
-    }
-    
-    public void setPrintFullProteinName(boolean printFull) {
-        this.fullProteinName = printFull;
     }
     
     private int  getOffset() {
@@ -258,35 +254,25 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         row.addCell(protName);
         
         // Protein common name
-        TableCell protCommonName = new TableCell(protein.getCommonName());
+        TableCell protCommonName = new TableCell(protein.getShortCommonName());
         row.addCell(protCommonName);
+        
+        // Protein molecular wt.
+        TableCell molWt = new TableCell();
+        molWt.setClassName("prot_descr left_align");
+        molWt.setData(protein.getMolecularWeight()+"");
+        row.addCell(molWt);
+        
+        // Protein pI
+        TableCell pi = new TableCell();
+        pi.setClassName("prot_descr left_align");
+        pi.setData(protein.getPi()+"");
+        row.addCell(pi);
         
         // Protein description
         TableCell protDescr = new TableCell();
         protDescr.setClassName("prot_descr left_align");
-        String descr = protein.getDescription();
-        
-        if(descr != null) {
-            
-            descr = descr.replaceAll("null", "");
-            String[] tokens = descr.split(",");
-            if(tokens.length > 0) {
-                
-                String myDescr = "";
-                for(String token: tokens) {
-                    if(token.trim().length() > 0) {
-                        myDescr += ", "+token;
-                    }
-                }
-                if(myDescr.length() > 0) {
-                    myDescr = myDescr.substring(1);
-                    if(myDescr.length() > 100) {
-                        myDescr = myDescr.substring(0, 100)+"...";
-                    }
-                    protDescr.setData(myDescr);
-                }
-            }
-        }
+        protDescr.setData(protein.getShortDescription());
         row.addCell(protDescr);
         
         // Spectrum counts in each dataset
@@ -386,6 +372,16 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         header.setSortable(false);
         headers.add(header);
         
+        header = new TableHeader("Mol. Wt.");
+        header.setWidth(8);
+        header.setSortable(false);
+        headers.add(header);
+        
+        header = new TableHeader("pI");
+        header.setWidth(5);
+        header.setSortable(false);
+        headers.add(header);
+        
         header = new TableHeader("Description");
         header.setWidth(100 - (15 + datasets.size()*2));
         header.setSortable(false);
@@ -449,35 +445,48 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             }
         }
         
+        // Get the NSAF information for the protein in the different datasets
+        // NSAF is available only for ProteinInference proteins
+        for(DatasetProteinInformation dpi: protein.getDatasetInfo()) {
+            if(dpi.getDatasetSource() == DatasetSource.PROT_INFER) {
+                List<Integer> piProteinIds = idpProtDao.getProteinIdsForNrseqIds(dpi.getDatasetId(), nrseqIds);
+                if(piProteinIds.size() == 1) {
+                    IdPickerProteinBase prot = idpProtDao.loadProtein(piProteinIds.get(0));
+                    dpi.setNsaf(prot.getNsaf());
+                }
+            }
+        }
+        
 //            // get the (max)number of peptides identified for this protein
 //            protein.setMaxPeptideCount(DatasetPeptideComparer.instance().getMaxPeptidesForProtein(protein));
+        
+        // get the protein properties
+        String sequence = NrSeqLookupUtil.getProteinSequence(protein.getNrseqId());
+        protein.setMolecularWeight( (float) (Math.round(ProteinUtils.calculateMolWt(sequence)*100) / 100.0));
+        protein.setPi((float) (Math.round(ProteinUtils.calculatePi(sequence)*100) / 100.0));
     }
     
     private String[] getProteinNames(int nrseqProteinId) {
         
         List<Integer> dbIds = getFastaDatabaseIds();
         ProteinListing fastaListing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqProteinId, dbIds);
-        String accession = null;
-        if(this.fullProteinName)
-            accession = fastaListing.getFullName();
-        else
-            accession = fastaListing.getName();
+        String accession = fastaListing.getAllNames();
         
         String description = null;
         // Look for a description for this protein from the given fasta database IDs.
-        if(fastaListing.getDescription() != null && fastaListing.getDescription().length() > 0)
-            description = fastaListing.getDescription();
+        if(fastaListing.getAllDescriptions() != null && fastaListing.getAllDescriptions().length() > 0)
+            description = fastaListing.getAllDescriptions();
         
         
         try {
             
             ProteinListing commonListing = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId);
-            String commonName = commonListing.getName(20, ",");
+            String commonName = commonListing.getAllNames();
             
             // If we haven't already found a description from the given fasta IDs, use the description
             // gathered from all descriptions available for this protein.
             if(description == null)
-                description = commonListing.getDescription(90, ", ");
+                description = commonListing.getAllDescriptions();
             
             return new String[] {accession, description, commonName};
         }

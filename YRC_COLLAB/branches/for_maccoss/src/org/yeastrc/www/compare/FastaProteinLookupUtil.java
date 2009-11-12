@@ -47,7 +47,7 @@ public class FastaProteinLookupUtil {
             cnd.setDescription(description);
             cndList.add(cnd);
         }
-        listing.setCommonNameDescription(cndList);
+        listing.setNameAndDescription(cndList);
         
         return listing;
     }

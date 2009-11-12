@@ -485,7 +485,7 @@ public class IdPickerResultsLoader {
         if(getCommonName) {
 
             try {
-                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getName();
+                commonName = CommonNameLookupUtil.getInstance().getProteinListing(nrseqProteinId).getAllNames();
             }
             catch (Exception e) {
                 log.error("Exception getting common name for protein Id: "+nrseqProteinId, e);

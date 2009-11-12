@@ -341,6 +341,7 @@ public class DownloadComparisonResults extends Action {
         writer.write("ProteinID\t");
         writer.write("Name\t");
         writer.write("CommonName\t");
+        writer.write("Mol.Wt.\tpI\t");
         writer.write("NumPept\t");
         for(Dataset dataset: comparison.getDatasets()) {
             writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
@@ -349,9 +350,11 @@ public class DownloadComparisonResults extends Action {
         for(Dataset dataset: comparison.getDatasets()) {
             writer.write("SC("+dataset.getDatasetId()+")\t");
         }
+        // NSAF column headers.
+        for(Dataset dataset: comparison.getDatasets()) {
+            writer.write("NSAF("+dataset.getDatasetId()+")\t");
+        }
         writer.write("Description\n");
-        
-        comparison.setPrintFullProteinName(true); 
         
         for(ComparisonProtein protein: comparison.getProteins()) {
             
@@ -360,6 +363,8 @@ public class DownloadComparisonResults extends Action {
             writer.write(protein.getNrseqId()+"\t");
             writer.write(protein.getFastaName()+"\t");
             writer.write(protein.getCommonName()+"\t");
+            writer.write(protein.getMolecularWeight()+"\t");
+            writer.write(protein.getPi()+"\t");
             writer.write(protein.getMaxPeptideCount()+"\t");
            
             for(Dataset dataset: comparison.getDatasets()) {
@@ -388,6 +393,17 @@ public class DownloadComparisonResults extends Action {
                 }
                 else {
                     writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                }
+            }
+            // NSAF information
+            for(Dataset dataset: comparison.getDatasets()) {
+                
+                DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                if(dpi == null || !dpi.isPresent()) {
+                    writer.write("-1.0\t");
+                }
+                else {
+                    writer.write(dpi.getNsafFormatted()+"\t");
                 }
             }
             writer.write(protein.getDescription()+"\n");
@@ -505,6 +521,7 @@ public class DownloadComparisonResults extends Action {
       writer.write("ProteinGroupID\t");
       writer.write("Name\t");
       writer.write("CommonName\t");
+      writer.write("Mol.Wt.\tpI\t");
       writer.write("NumPept\t");
       for(Dataset dataset: comparison.getDatasets()) {
           writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
@@ -513,9 +530,11 @@ public class DownloadComparisonResults extends Action {
       for(Dataset dataset: comparison.getDatasets()) {
           writer.write("SC("+dataset.getDatasetId()+")\t");
       }
+      // NSAF column headers.
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write("NSAF("+dataset.getDatasetId()+")\t");
+      }
       writer.write("Description\n");
-      
-      comparison.setPrintFullProteinName(true); 
       
       for(ComparisonProteinGroup grpProtein: comparison.getProteinsGroups()) {
           
@@ -526,6 +545,8 @@ public class DownloadComparisonResults extends Action {
               writer.write(protein.getGroupId()+"\t");
               writer.write(protein.getFastaName()+"\t");
               writer.write(protein.getCommonName()+"\t");
+              writer.write(protein.getMolecularWeight()+"\t");
+              writer.write(protein.getPi()+"\t");
               writer.write(protein.getMaxPeptideCount()+"\t");
          
               for(Dataset dataset: comparison.getDatasets()) {
@@ -554,6 +575,17 @@ public class DownloadComparisonResults extends Action {
                   }
                   else {
                       writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                  }
+              }
+              // NSAF information
+              for(Dataset dataset: comparison.getDatasets()) {
+                  
+                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                  if(dpi == null || !dpi.isPresent()) {
+                      writer.write("-1.0\t");
+                  }
+                  else {
+                      writer.write(dpi.getNsafFormatted()+"\t");
                   }
               }
           
