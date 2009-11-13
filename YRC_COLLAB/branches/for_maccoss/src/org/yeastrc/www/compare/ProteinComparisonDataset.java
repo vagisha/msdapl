@@ -249,13 +249,15 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         row.addCell(peptCount);
         
         // Protein 
-        TableCell protName = new TableCell(protein.getFastaName());
+        TableCell protName = new TableCell(protein.getShortFastaName());
         protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+        protName.setClassName("left_align");
         row.addCell(protName);
         
         // Protein common name
         TableCell protCommonName = new TableCell(protein.getShortCommonName());
         row.addCell(protCommonName);
+        protCommonName.setClassName("left_align");
         
         // Protein molecular wt.
         TableCell molWt = new TableCell();

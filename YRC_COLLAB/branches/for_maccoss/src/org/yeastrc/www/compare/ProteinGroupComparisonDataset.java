@@ -376,12 +376,14 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
             row.setStyleClass(rowCssClass);
         
         // Protein name
-        TableCell protName = new TableCell(protein.getFastaName());
+        TableCell protName = new TableCell(protein.getShortFastaName());
         protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+        protName.setClassName("left_align");
         row.addCell(protName);
         
         // Protein common name
         TableCell protCommonName = new TableCell(protein.getShortCommonName());
+        protCommonName.setClassName("left_align");
         row.addCell(protCommonName);
         
         // Protein molecular wt.
