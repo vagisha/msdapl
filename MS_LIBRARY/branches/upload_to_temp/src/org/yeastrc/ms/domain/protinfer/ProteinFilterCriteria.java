@@ -14,10 +14,10 @@ import java.util.List;
  */
 public class ProteinFilterCriteria {
 
-    private int numPeptides;
-    private int numMaxPeptides;
-    private int numUniquePeptides;
-    private int numMaxUniquePeptides;
+    private int numPeptides = 1;
+    private int numMaxPeptides = Integer.MAX_VALUE;
+    private int numUniquePeptides = 0;
+    private int numMaxUniquePeptides = Integer.MAX_VALUE;
     private PeptideDefinition peptideDefinition = new PeptideDefinition();
     
     private boolean parsimonious = true;
@@ -32,19 +32,19 @@ public class ProteinFilterCriteria {
     
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
-    private int numSpectra;
-    private int numMaxSpectra;
-    private double coverage;
-    private double maxCoverage;
+    private int numSpectra = 1;
+    private int numMaxSpectra = Integer.MAX_VALUE;
+    private double coverage = 0.0;
+    private double maxCoverage = 100.0;
     
     private String accessionLike;
     private String descriptionLike;
     
-    private double minMolWt;
-    private double maxMolWt;
+    private double minMolWt = 0.0;
+    private double maxMolWt = Double.MAX_VALUE;
     
-    private double minPi;
-    private double maxPi;
+    private double minPi = 0.0;
+    private double maxPi = Double.MAX_VALUE;
     
     private SORT_BY sortBy = SORT_BY.NONE;
     private SORT_ORDER sortOrder = SORT_ORDER.ASC;
@@ -253,6 +253,10 @@ public class ProteinFilterCriteria {
         return maxMolWt;
     }
     
+    public boolean hasMolecularWtFilter() {
+        return (minMolWt != 0 || maxMolWt != Double.MAX_VALUE);
+    }
+    
     
     public void setMinPi(double pi) {
         this.minPi = pi;
@@ -268,6 +272,10 @@ public class ProteinFilterCriteria {
     
     public double getMaxPi() {
         return maxPi;
+    }
+    
+    public boolean hasPiFilter() {
+        return (minPi != 0 || maxPi != Double.MAX_VALUE);
     }
     
     

@@ -10,7 +10,9 @@ public enum SORT_BY {
     NUM_PEPT, 
     NUM_UNIQ_PEPT, 
     ACCESSION, 
-    COVERAGE, 
+    COVERAGE,
+    MOL_WT,
+    PI,
     NUM_SPECTRA, 
     GROUP_ID,
     CLUSTER_ID,
@@ -26,6 +28,8 @@ public enum SORT_BY {
         else if (sortBy.equalsIgnoreCase(NUM_PEPT.name())) return NUM_PEPT;
         else if (sortBy.equalsIgnoreCase(NUM_UNIQ_PEPT.name())) return NUM_UNIQ_PEPT;
         else if (sortBy.equalsIgnoreCase(ACCESSION.name())) return ACCESSION;
+        else if (sortBy.equalsIgnoreCase(MOL_WT.name())) return MOL_WT;
+        else if (sortBy.equalsIgnoreCase(PI.name())) return PI;
         else if (sortBy.equalsIgnoreCase(COVERAGE.name())) return COVERAGE;
         else if (sortBy.equalsIgnoreCase(NUM_SPECTRA.name())) return NUM_SPECTRA;
         else if (sortBy.equalsIgnoreCase(GROUP_ID.name())) return GROUP_ID;
