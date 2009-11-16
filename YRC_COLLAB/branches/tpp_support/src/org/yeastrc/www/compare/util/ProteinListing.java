@@ -4,9 +4,10 @@
  * Apr 14, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.util;
 
 import java.util.List;
+
 
 /**
  * 

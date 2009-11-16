@@ -11,18 +11,14 @@ import java.util.List;
 
 import org.apache.struts.action.ActionForm;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.SelectableDataset;
 
 /**
  * 
  */
 public class DatasetFiltersForm extends ActionForm {
 
-    
-//    private List<ProteinferRunFormBean> proteinferRunList = new ArrayList<ProteinferRunFormBean>();
-    private List<ProteinProphetRunFormBean> proteinProphetRunList = new ArrayList<ProteinProphetRunFormBean>();
-//    private List<DTASelectRunFormBean> dtaRuns = new ArrayList<DTASelectRunFormBean>();
-    
-    
     private List<SelectableDataset> andList = new ArrayList<SelectableDataset>();
     private List<SelectableDataset> orList  = new ArrayList<SelectableDataset>();
     private List<SelectableDataset> notList = new ArrayList<SelectableDataset>();
@@ -43,7 +39,9 @@ public class DatasetFiltersForm extends ActionForm {
     private String accessionLike = null;
     private String descriptionLike = null;
     private String[] validationStatus = new String[]{"All"};
-    
+
+    private boolean hasProteinProphetDatasets = false;
+    private String errorRate = "0.01";
     
     public void reset() {
         minCoverage = "0.0";
@@ -54,6 +52,7 @@ public class DatasetFiltersForm extends ActionForm {
         groupProteins = true;
         accessionLike = null;
         descriptionLike = null;
+        errorRate = "0.01";
     }
     
     
@@ -364,59 +363,28 @@ public class DatasetFiltersForm extends ActionForm {
     }
 
     
-    // -------------------------------------------------------------------------------
-    // DATASET BEING COMPARED
-    // -------------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------
-    // Protein inference datasets
-    //-----------------------------------------------------------------------------
-//    public ProteinferRunFormBean getProteinferRun(int index) {
-//        while(index >= proteinferRunList.size())
-//            proteinferRunList.add(new ProteinferRunFormBean());
-//        return proteinferRunList.get(index);
-//    }
-//    
-//    public void setProteinferRunList(List <ProteinferRunFormBean> piRuns) {
-//        this.proteinferRunList = piRuns;
-//    }
-//    
-//    public List <ProteinferRunFormBean> getProteinferRunList() {
-//        return proteinferRunList;
-//    }
-//    
-//    public List<Integer> getSelectedProteinferRunIds() {
-//        List<Integer> ids = new ArrayList<Integer>();
-//        for(ProteinferRunFormBean run: proteinferRunList) {
-//            if(run != null && run.isSelected())
-//                ids.add(run.getRunId());
-//        }
-//        return ids;
-//    }
-    
     //-----------------------------------------------------------------------------
     // Protein Prophet datasets
     //-----------------------------------------------------------------------------
-    public ProteinProphetRunFormBean getProteinProphetRun(int index) {
-        while(index >= proteinProphetRunList.size())
-            proteinProphetRunList.add(new ProteinProphetRunFormBean());
-        return proteinProphetRunList.get(index);
+    public boolean hasProteinProphetDatasets() {
+        return hasProteinProphetDatasets ;
     }
     
-    public void setProteinProphetRunList(List <ProteinProphetRunFormBean> proteinProphetRuns) {
-        this.proteinProphetRunList = proteinProphetRuns;
+    public void setHasProteinProphetDatasets(boolean hasProteinProphetDatasets) {
+        this.hasProteinProphetDatasets = hasProteinProphetDatasets;
     }
     
-    public List <ProteinProphetRunFormBean> getProteinProphetRunList() {
-        return proteinProphetRunList;
+    public String getErrorRate() {
+        return errorRate;
     }
-    
-    public List<Integer> getSelectedProteinProphetRunIds() {
-        List<Integer> ids = new ArrayList<Integer>();
-        for(ProteinferRunFormBean run: proteinProphetRunList) {
-            if(run != null && run.isSelected())
-                ids.add(run.getRunId());
-        }
-        return ids;
+    public double getErrorRateDouble() {
+        if(errorRate == null || errorRate.trim().length() == 0)
+            return 0.01;
+        else
+            return Double.parseDouble(errorRate);
+    }
+    public void setErrorRate(String errorRate) {
+        this.errorRate = errorRate;
     }
     
     //-----------------------------------------------------------------------------
@@ -433,6 +401,42 @@ public class DatasetFiltersForm extends ActionForm {
             all.add(dataset.getDatasetId());
         }
         return all;
+    }
+    
+    
+    public ProteinDatasetComparisonFilters getSelectedBooleanFilters() {
+        
+        List<SelectableDataset> andDataset = getAndList();
+        List<SelectableDataset> orDataset = getOrList();
+        List<SelectableDataset> notDataset = getNotList();
+        List<SelectableDataset> xorDataset = getXorList();
+        
+        List<Dataset> andFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: andDataset) {
+            if(sds.isSelected())    andFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+        
+        List<Dataset> orFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: orDataset) {
+            if(sds.isSelected())    orFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+        
+        List<Dataset> notFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: notDataset) {
+            if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+        
+        List<Dataset> xorFilters = new ArrayList<Dataset>();
+        for(SelectableDataset sds: xorDataset) {
+            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
+        }
+        
+        ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
+        filters.setAndFilters(andFilters);
+        filters.setOrFilters(orFilters);
+        filters.setNotFilters(notFilters);
+        filters.setXorFilters(xorFilters);
+        return filters;
     }
     
 }

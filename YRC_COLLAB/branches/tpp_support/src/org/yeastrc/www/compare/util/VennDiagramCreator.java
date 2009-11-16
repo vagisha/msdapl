@@ -1,9 +1,13 @@
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import org.yeastrc.www.compare.ProteinComparisonDataset;
+import org.yeastrc.www.compare.ProteinGroupComparisonDataset;
+import org.yeastrc.www.compare.dataset.DatasetColor;
 
 public class VennDiagramCreator {
 

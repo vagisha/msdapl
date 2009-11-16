@@ -61,5 +61,18 @@ function updateResults() {
 	$("form").submit();
 }
 
+// ---------------------------------------------------------------------------------------
+// TOGGLE PROTEINS
+// ---------------------------------------------------------------------------------------
+function toggleProteins(resultId) {
+	
+	if($("#proteins_for_"+resultId).is(':visible')) {
+		$("#proteins_for_"+resultId).hide();
+	}
+	else {
+		$("#proteins_for_"+resultId).show();
+	}
+}
+
 </script>
 

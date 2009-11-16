@@ -1,4 +1,4 @@
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.dataset;
 
 public enum DatasetColor {
 

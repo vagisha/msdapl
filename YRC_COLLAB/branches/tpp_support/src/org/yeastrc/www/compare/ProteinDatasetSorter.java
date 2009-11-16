@@ -12,6 +12,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.yeastrc.www.compare.util.CommonNameLookupUtil;
+import org.yeastrc.www.compare.util.ProteinListing;
+
 /**
  * 
  */

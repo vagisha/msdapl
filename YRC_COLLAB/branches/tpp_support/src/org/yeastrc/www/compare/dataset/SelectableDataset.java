@@ -4,7 +4,8 @@
  * Apr 14, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.dataset;
+
 
 /**
  * 
@@ -20,11 +21,15 @@ public class SelectableDataset {
    
     public SelectableDataset() {}
     
+    public SelectableDataset(int datasetId, DatasetSource source) {
+        this.datasetId = datasetId;
+        this.source = source;
+    }
+    
     public SelectableDataset(Dataset dataset) {
         this.datasetId = dataset.getDatasetId();
         this.source = dataset.getSource();
         this.datasetComments = dataset.getDatasetComments();
-//        super(dataset.getDatasetId(), dataset.getSource());
     }
     
     public boolean isSelected() {
@@ -85,5 +90,21 @@ public class SelectableDataset {
 
     public void setDatasetIndex(int datasetIndex) {
         this.datasetIndex = datasetIndex;
+    }
+    
+    public boolean equals(Object o) {
+        if(this == o)
+            return true;
+        if(o == null)
+            return false;
+        if(!(o instanceof SelectableDataset))
+            return false;
+        
+        SelectableDataset that = (SelectableDataset)o;
+        return (this.datasetId == that.datasetId && this.source == that.source);
+    }
+    
+    public int hashCode() {
+        return source.hashCode() + Integer.valueOf(datasetId).hashCode();
     }
 }

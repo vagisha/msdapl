@@ -31,8 +31,6 @@ import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
 import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-import org.yeastrc.yates.YatesRun;
-import org.yeastrc.yates.YatesRunSearcher;
 
 /**
  * 
@@ -45,7 +43,7 @@ public class DatasetSelectionFormAction extends Action {
             HttpServletResponse response )
     throws Exception {
 
-     // User making this request
+        // User making this request
         User user = UserUtils.getUser(request);
         if (user == null) {
             ActionErrors errors = new ActionErrors();
@@ -67,18 +65,6 @@ public class DatasetSelectionFormAction extends Action {
         }
         catch(Exception e) {}
         
-        // If a DTASelect run id was sent with the request get it now
-//        int dtaRunId = 0;
-//        try {
-//            String idStr = request.getParameter("dtaRunId");
-//            if(idStr != null) {
-//                dtaRunId = Integer.parseInt(idStr);
-//            }
-//        }
-//        catch(Exception e) {
-//            dtaRunId = 0;
-//        }
-        
         
         // Get a list of the user's projects (all projects to which user has READ access)
         // if the user is an admin get ALL projects
@@ -89,11 +75,7 @@ public class DatasetSelectionFormAction extends Action {
         
         
         // For each experiment in the project get a list of the protein inference id
-        // and DTASelect IDs
-        
-        
         List<ProteinferRunFormBean> piRuns = new ArrayList<ProteinferRunFormBean>();
-        List<DTASelectRunFormBean> dtaRuns = new ArrayList<DTASelectRunFormBean>();
         
         ProjectExperimentDAO prExpDao = ProjectExperimentDAO.instance();
         ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
@@ -124,23 +106,15 @@ public class DatasetSelectionFormAction extends Action {
                 }
                 
             }
-            
-            // Get the DTASelect runs for this project
-            YatesRunSearcher searcher = new YatesRunSearcher();
-            searcher.setProjectID(project.getID());
-            List<YatesRun> yatesRuns = searcher.search();
-            for(YatesRun run: yatesRuns) {
-                DTASelectRunFormBean bean = new DTASelectRunFormBean(run);
-//                if(run.getId() == dtaRunId)
-//                    bean.setSelected(true);
-                dtaRuns.add(bean);
-            }
+           
         }
         
         boolean groupProteins = Boolean.parseBoolean(request.getParameter("groupProteins"));
-        DatasetSelectionForm myForm = (DatasetSelectionForm)form;
-        myForm.setProteinferRunList(piRuns);
-        myForm.setGroupProteins(groupProteins);
+        request.setAttribute("datasetList", piRuns);
+        request.setAttribute("groupProteins", groupProteins);
+//        DatasetSelectionForm myForm = (DatasetSelectionForm)form;
+//        myForm.setProteinferRunList(piRuns);
+//        myForm.setGroupProteins(groupProteins);
         
         
         return mapping.findForward("Success");

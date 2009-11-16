@@ -1,5 +1,5 @@
 /*
- * UploadYatesDataAction.java
+ * UploadMSDataAction.java
  * Created on Oct 12, 2004
  * Created by Michael Riffle <mriffle@u.washington.edu>
  */

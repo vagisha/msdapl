@@ -4,9 +4,8 @@
  * Apr 11, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.dataset;
 
-import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 
 /**
  * 
@@ -16,7 +15,6 @@ public class Dataset {
     private int datasetId;
     private String datasetComments;
     private DatasetSource source;
-    private ProteinFilterCriteria filterCriteria;
     private float spectrumCountNormalizationFactor = 1.0f;
     private int totalSpectrumCount;
     private int maxProteinSpectrumCount = 1;
@@ -38,14 +36,6 @@ public class Dataset {
     }
     public String getSourceString() {
         return source.name();
-    }
-    
-    public ProteinFilterCriteria getProteinFilterCriteria() {
-        return filterCriteria;
-    }
-    
-    public void setProteinFilterCriteria(ProteinFilterCriteria filterCriteria) {
-        this.filterCriteria = filterCriteria;
     }
     
     public float getSpectrumCountNormalizationFactor() {

@@ -4,7 +4,8 @@
  * Jun 16, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.dataset;
+
 
 /**
  * 

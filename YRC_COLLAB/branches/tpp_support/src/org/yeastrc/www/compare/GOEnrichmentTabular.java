@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.DatasetGoInformation;
 import org.yeastrc.www.go.EnrichedGOTerm;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;

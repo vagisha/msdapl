@@ -283,7 +283,8 @@ function compareSelectedProtInfer() {
 	
 	// var doCompare = confirm("Compare protein inference results: "+forDisplay);
 	// if(doCompare) {
-		var url = "<yrcwww:link path='setComparisonFilters.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+		// var url = "<yrcwww:link path='setComparisonFilters.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+		var url = "<yrcwww:link path='doProteinSetComparison.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
 		window.location.href = url;
 	// }
 }
@@ -447,15 +448,24 @@ function clearSelectedProtInfer() {
 						<tr>
 							<td><b>Search Database: </b></td>
 							<td><bean:write name="search" property="searchDatabase"/></td>
-							
 						</tr>
 						<tr>
-							<td width="33%"><b>Enzyme: </b>&nbsp;
-							<bean:write name="search" property="enzymes"/></td>
-							<td width="33%"><b>Static Modifications: </b>
-							<bean:write name="search" property="staticModifications"/></td>
-							<td width="33%"><b>Dynamic Modifications: </b>
-							<bean:write name="search" property="dynamicModifications"/></td>
+							<td><b>Enzyme: </b></td>
+							<td><bean:write name="search" property="enzymes"/></td>
+						</tr>
+						<tr>
+							<td valign="top"><b>Residue Modifications: </b></td>
+							<td width="33%" valign="top"><b>Static: </b>
+							<bean:write name="search" property="staticResidueModifications"/></td>
+							<td width="33%" valign="top"><b>Dynamic: </b>
+							<bean:write name="search" property="dynamicResidueModifications"/></td>
+						</tr>
+						<tr>
+							<td valign="top"><b>Terminal Modifications: </b></td>
+							<td width="33%" valign="top"><b>Static: </b>
+							<bean:write name="search" property="staticTerminalModifications"/></td>
+							<td width="33%" valign="top"><b>Dynamic: </b>
+							<bean:write name="search" property="dynamicTerminalModifications"/></td>
 						</tr>
 					</table>
 					</div>	
@@ -475,7 +485,7 @@ function clearSelectedProtInfer() {
 						
 						<!-- !!!!!! PERCOLATOR !!!!!! -->
 						<logic:equal name="analysis" property="analysisProgram" value="<%=Program.PERCOLATOR.toString() %>">
-						<td width="33%">
+						<td width="33%" valign="top">
 							<b>
 								<html:link action="viewPercolatorResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
 								<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
@@ -492,7 +502,7 @@ function clearSelectedProtInfer() {
 						<!-- !!!!!! PEPTIDE PROPHET !!!!!! -->
 						<logic:equal name="analysis" property="analysisProgram" value="<%=Program.PEPTIDE_PROPHET.toString() %>">
 						
-						<td width="33%">
+						<td width="33%" valign="top">
 							<b>
 								<html:link action="viewPeptideProphetResults.do" paramId="ID" paramName="analysis" paramProperty="id">[View Results]</html:link>
 								<!-- <html:link action="percolatorPepXmlDownloadForm.do" 
@@ -501,8 +511,8 @@ function clearSelectedProtInfer() {
 							</b>
 						</td>
 						
-						<td width="33%">
-							<b><bean:write name="analysis" property="analysisName" /></b>
+						<td width="33%" valign="top">
+							<b>File: <bean:write name="analysis" property="analysisName" /></b>
 						</td>
 						
 						</logic:equal>

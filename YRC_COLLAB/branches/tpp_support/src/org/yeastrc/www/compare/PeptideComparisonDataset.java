@@ -9,6 +9,8 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.DatasetPeptideInformation;
 import org.yeastrc.www.misc.TableCell;
 import org.yeastrc.www.misc.TableHeader;
 import org.yeastrc.www.misc.TableRow;

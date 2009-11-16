@@ -47,19 +47,33 @@ public class ExperimentSearch implements MsSearch{
         return search.getDynamicResidueMods();
     }
 
-    public String getDynamicModifications() {
+    public String getDynamicResidueModifications() {
         String mods = "";
         for(MsResidueModification mod: getDynamicResidueMods()) {
             mods = mods + ", "+mod.getModifiedResidue()+" ("+round(mod.getModificationMass())+")";
         }
         if(mods.length() > 0)
             mods = mods.substring(1);
+        else 
+            mods = "NONE";
         return mods;
     }
     
     @Override
     public List<MsTerminalModification> getDynamicTerminalMods() {
         return search.getDynamicTerminalMods();
+    }
+    
+    public String getDynamicTerminalModifications() {
+        String mods = "";
+        for(MsTerminalModification mod: getDynamicTerminalMods()) {
+            mods = mods + ", "+mod.getModifiedTerminal()+" ("+round(mod.getModificationMass())+")";
+        }
+        if(mods.length() > 0)
+            mods = mods.substring(1);
+        else 
+            mods = "NONE";
+        return mods;
     }
 
     @Override
@@ -102,24 +116,38 @@ public class ExperimentSearch implements MsSearch{
         return search.getStaticResidueMods();
     }
     
-    public String getStaticModifications() {
+    public String getStaticResidueModifications() {
         String mods = "";
         for(MsResidueModification mod: getStaticResidueMods()) {
             mods = mods + ", "+mod.getModifiedResidue()+" ("+round(mod.getModificationMass())+")";
         }
         if(mods.length() > 0)
             mods = mods.substring(1);
+        else 
+            mods = "NONE";
+        return mods;
+    }
+    
+    @Override
+    public List<MsTerminalModification> getStaticTerminalMods() {
+        return search.getStaticTerminalMods();
+    }
+    
+    public String getStaticTerminalModifications() {
+        String mods = "";
+        for(MsTerminalModification mod: getStaticTerminalMods()) {
+            mods = mods + ", "+mod.getModifiedTerminal()+" ("+round(mod.getModificationMass())+")";
+        }
+        if(mods.length() > 0)
+            mods = mods.substring(1);
+        else 
+            mods = "NONE";
         return mods;
     }
     
     private static double round(BigDecimal number) {
         double num = number.doubleValue();
         return Math.round(num*100.0)/100.0;
-    }
-
-    @Override
-    public List<MsTerminalModification> getStaticTerminalMods() {
-        return search.getStaticTerminalMods();
     }
 
     @Override
@@ -146,5 +174,4 @@ public class ExperimentSearch implements MsSearch{
     public String getServerDirectory() {
         return search.getServerDirectory();
     }
-
 }

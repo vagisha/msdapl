@@ -15,6 +15,12 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinferProtein;
+import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
+import org.yeastrc.www.compare.dataset.DatasetSource;
+import org.yeastrc.www.compare.util.CommonNameLookupUtil;
+import org.yeastrc.www.compare.util.FastaProteinLookupUtil;
+import org.yeastrc.www.compare.util.ProteinListing;
 import org.yeastrc.www.misc.Pageable;
 import org.yeastrc.www.misc.ResultsPager;
 import org.yeastrc.www.misc.TableCell;
@@ -27,7 +33,7 @@ import org.yeastrc.www.misc.Tabular;
  */
 public class ProteinComparisonDataset implements Tabular, Pageable {
 
-    private List<Dataset> datasets;
+    private List<? extends Dataset> datasets;
     private List<Integer> fastaDatabaseIds; // for protein name lookup
     
     // FILTERED proteins
@@ -69,7 +75,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         this.rowCount = count;
     }
 
-    public List<Dataset> getDatasets() {
+    public List<? extends Dataset> getDatasets() {
         return datasets;
     }
 
@@ -77,7 +83,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return proteins;
     }
     
-    public void setDatasets(List<Dataset> datasets) {
+    public void setDatasets(List<? extends Dataset> datasets) {
         this.datasets = datasets;
     }
     
@@ -256,10 +262,12 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         // Protein 
         TableCell protName = new TableCell(protein.getFastaName());
         protName.setHyperlink("viewProtein.do?id="+protein.getNrseqId());
+        protName.setClassName("left_align");
         row.addCell(protName);
         
         // Protein common name
         TableCell protCommonName = new TableCell(protein.getCommonName());
+        protCommonName.setClassName("left_align");
         row.addCell(protCommonName);
         
         // Protein description

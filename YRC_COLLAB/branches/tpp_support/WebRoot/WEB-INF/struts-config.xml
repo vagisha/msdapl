@@ -974,9 +974,6 @@
 	<action 
 		path="/selectComparisonDatasets"
 		type="org.yeastrc.www.compare.DatasetSelectionFormAction"
-		name="datasetSelectionForm"
-		scope="request"
-		validate="false"
 	>
 		<forward name="Success" path="/pages/internal/compare/datasetSelectionForm.jsp" redirect="false" />
 		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
@@ -994,29 +991,39 @@
 	</action>
 	
 	<action 
-		path="/compareProteinInferenceResults"
-		type="org.yeastrc.www.compare.CompareProtInferResultsAction"
+		path="/doProteinSetComparison"
+		type="org.yeastrc.www.compare.CompareProteinSetsAction"
 		name="proteinSetComparisonForm"
 		scope="request"
 		validate="false"
 	>
-		<forward name="Success" path="/doProteinSetComparison.do" redirect="false" />
-		<forward name="Failure" path="/pages/internal/front.jsp" redirect="false" />
+		<forward name="Failure" path="/selectComparisonDatasets.do" redirect="false" />
+		<forward name="DoComparison" path="/doComparison.do" redirect="false" />
 	</action>
 	
 	<action 
-		path="/doProteinSetComparison"
-		type="org.yeastrc.www.compare.CompareProteinSetsAction"
+		path="/doComparison"
+		type="org.yeastrc.www.compare.DoComparison"
 		name="proteinSetComparisonForm"
-		input="/pages/internal/compare/datasetFiltersForm.jsp"
 		scope="request"
-		validate="true"
+		validate="false"
 	>
 		<forward name="ProteinList" path="/pages/internal/compare/viewProteinSetComparison.jsp" redirect="false" />
 		<forward name="ProteinGroupList" path="/pages/internal/compare/viewProteinGroupSetComparison.jsp" redirect="false" />
 		<forward name="Failure" path="/selectComparisonDatasets.do" redirect="false" />
 		<forward name="Download" path="/downloadProteinComparisonResults.do" redirect="false" />
 		<forward name="GOAnalysis" path="/compareGoEnrichment.do" redirect="false" />
+	</action>
+	
+	<action 
+		path="/updateProteinSetComparison"
+		type="org.yeastrc.www.compare.UpdateProteinComparisonAction"
+		name="proteinSetComparisonForm"
+		scope="request"
+		validate="true"
+	>
+		<forward name="Failure" path="/selectComparisonDatasets.do" redirect="false" />
+		<forward name="DoComparison" path="/doComparison.do" redirect="false" />
 	</action>
 	
 	<action 

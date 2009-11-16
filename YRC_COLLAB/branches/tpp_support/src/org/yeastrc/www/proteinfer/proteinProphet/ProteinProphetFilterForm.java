@@ -12,6 +12,10 @@ public class ProteinProphetFilterForm extends ActionForm {
     
     private String minCoverage = "0.0";
     private String maxCoverage = "100.0";
+    private String minMolecularWt = "0.0";
+    private String maxMolecularWt;
+    private String minPi;
+    private String maxPi;
     private String minPeptides = "1";
     private String maxPeptides;
     private String minUniquePeptides = "0";
@@ -24,8 +28,13 @@ public class ProteinProphetFilterForm extends ActionForm {
     
     private String accessionLike = null;
     private String descriptionLike = null;
+    private String descriptionNotLike = null;
     private String[] validationStatus = new String[]{"All"};
     
+    private boolean excludeIndistinGroups = false;
+    
+    private String peptide = null;
+    private boolean exactMatch = true;
     
     private String minProbability = "0.0";
     private String maxProbability = "1.0";
@@ -33,13 +42,23 @@ public class ProteinProphetFilterForm extends ActionForm {
     public ProteinProphetFilterForm () {}
     
     public void reset() {
+        
+        // These need to be set to false because if a checkbox is not checked the browser does not
+        // send its value in the request.
+        // http://struts.apache.org/1.1/faqs/newbie.html#checkboxes
+        joinProphetGroupProteins = true;
+        excludeIndistinGroups = false;
+        exactMatch = false;
+        showAllProteins = true;
+        
         minCoverage = "0.0";
+        minMolecularWt = "0.0";
         minPeptides = "1";
         minUniquePeptides = "0";
         minSpectrumMatches = "1";
-        joinProphetGroupProteins = true;
-        showAllProteins = true;
         accessionLike = null;
+        descriptionLike = null;
+        descriptionNotLike = null;
         minProbability = "0.0";
         maxProbability = "1.0";
     }
@@ -118,6 +137,62 @@ public class ProteinProphetFilterForm extends ActionForm {
     }
     public void setMaxCoverage(String maxCoverage) {
         this.maxCoverage = maxCoverage;
+    }
+    
+    // MIN MOLECULAR WT.
+    public String getMinMolecularWt() {
+        return minMolecularWt;
+    }
+    public double getMinMolecularWtDouble() {
+        if(minMolecularWt == null || minMolecularWt.trim().length() == 0)
+            return 0.0;
+        else
+            return Double.parseDouble(minMolecularWt);
+    }
+    public void setMinMolecularWt(String minMolecularWt) {
+        this.minMolecularWt = minMolecularWt;
+    }
+    
+    // MAX MOLECULAR WT.
+    public String getMaxMolecularWt() {
+        return maxMolecularWt;
+    }
+    public double getMaxMolecularWtDouble() {
+        if(maxMolecularWt == null || maxMolecularWt.trim().length() == 0)
+            return Double.MAX_VALUE;
+        else
+            return Double.parseDouble(maxMolecularWt);
+    }
+    public void setMaxMolecularWt(String maxMolecularWt) {
+        this.maxMolecularWt = maxMolecularWt;
+    }
+    
+    // MIN PI
+    public String getMinPi() {
+        return minPi;
+    }
+    public double getMinPiDouble() {
+        if(minPi == null || minPi.trim().length() == 0)
+            return 0;
+        else
+            return Double.parseDouble(minPi);
+    }
+    public void setMinPi(String minPi) {
+        this.minPi = minPi;
+    }
+    
+    // MAX PI
+    public String getMaxPi() {
+        return maxPi;
+    }
+    public double getMaxPiDouble() {
+        if(maxPi == null || maxPi.trim().length() == 0)
+            return Double.MAX_VALUE;
+        else
+            return Double.parseDouble(maxPi);
+    }
+    public void setMaxPi(String maxPi) {
+        this.maxPi = maxPi;
     }
     
     // MIN PEPTIDES
@@ -201,13 +276,21 @@ public class ProteinProphetFilterForm extends ActionForm {
         this.maxSpectrumMatches = maxSpectrumMatches;
     }
 
-
+    // PROTEIN GROUPS
     public boolean isJoinProphetGroupProteins() {
         return joinProphetGroupProteins;
     }
 
     public void setJoinProphetGroupProteins(boolean joinGroupProteins) {
         this.joinProphetGroupProteins = joinGroupProteins;
+    }
+    
+    public boolean isExcludeIndistinProteinGroups() {
+        return this.excludeIndistinGroups;
+    }
+    
+    public void setExcludeIndistinProteinGroups(boolean exclude) {
+        this.excludeIndistinGroups = exclude;
     }
 
     public boolean isShowAllProteins() {
@@ -218,6 +301,7 @@ public class ProteinProphetFilterForm extends ActionForm {
         this.showAllProteins = showAllProteins;
     }
     
+    // ACCESSION
     public String getAccessionLike() {
         if(accessionLike == null || accessionLike.trim().length() == 0)
             return null;
@@ -230,6 +314,7 @@ public class ProteinProphetFilterForm extends ActionForm {
         this.accessionLike = accessionLike;
     }
     
+    // DESCRIPTION
     public String getDescriptionLike() {
         if(descriptionLike == null || descriptionLike.trim().length() == 0)
             return null;
@@ -242,6 +327,36 @@ public class ProteinProphetFilterForm extends ActionForm {
         this.descriptionLike = descriptionLike;
     }
 
+    public String getDescriptionNotLike() {
+        if(descriptionNotLike == null || descriptionNotLike.trim().length() == 0)
+            return null;
+        else
+            return descriptionNotLike.trim();
+    }
+    
+    public void setDescriptionNotLike(String descriptionNotLike) {
+        this.descriptionNotLike = descriptionNotLike;
+    }
+
+    // PEPTIDE 
+    public String getPeptide() {
+        return peptide;
+    }
+    public void setPeptide(String peptide) {
+        if(peptide != null && peptide.trim().length() == 0)
+            this.peptide = null;
+        else
+            this.peptide = peptide;
+    }
+    
+    public boolean getExactPeptideMatch() {
+        return exactMatch;
+    }
+    public void setExactPeptideMatch(boolean exact) {
+        this.exactMatch = exact;
+    }
+    
+    // VALIDATION STATUS
     public String[] getValidationStatus() {
         return validationStatus;
     }

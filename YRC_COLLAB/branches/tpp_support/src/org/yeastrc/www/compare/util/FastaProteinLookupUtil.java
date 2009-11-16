@@ -4,7 +4,7 @@
  * May 16, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.domain.nrseq.NrDbProtein;
+import org.yeastrc.www.compare.ProteinDatabaseLookupUtil;
 
 /**
  * 

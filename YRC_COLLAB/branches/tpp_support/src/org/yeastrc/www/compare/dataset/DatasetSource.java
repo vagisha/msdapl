@@ -4,7 +4,7 @@
  * Apr 11, 2009
  * @version 1.0
  */
-package org.yeastrc.www.compare;
+package org.yeastrc.www.compare.dataset;
 
 import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
 
@@ -27,6 +27,8 @@ public enum DatasetSource {
             return PROTEIN_PROPHET;
         else if(ProteinInferenceProgram.isIdPicker(program))
             return PROTINFER;
+        else if(program == ProteinInferenceProgram.DTA_SELECT)
+            return DTA_SELECT;
         else
             return null;
     }

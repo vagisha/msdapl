@@ -23,6 +23,11 @@ import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
+import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
+import org.yeastrc.www.compare.dataset.DatasetSource;
+import org.yeastrc.www.compare.dataset.FilterableDataset;
+import org.yeastrc.www.compare.util.CommonNameLookupUtil;
 import org.yeastrc.yates.YatesRun;
 
 /**
@@ -46,12 +51,12 @@ public class ProteinDatasetComparer {
         return instance;
     }
     
-    public ProteinComparisonDataset compareDatasets(List<Dataset> datasets, boolean parsimoniousOnly) throws Exception {
+    public ProteinComparisonDataset compareDatasets(List<FilterableDataset> datasets, boolean parsimoniousOnly) throws Exception {
         
         Map<Integer, ComparisonProtein> proteinMap = new HashMap<Integer, ComparisonProtein>();
         
         // First get the parsimonious proteins
-        for(Dataset dataset: datasets) {
+        for(FilterableDataset dataset: datasets) {
             
             
             List<Integer> nrseqProteinIds = new ArrayList<Integer>(0);
@@ -117,22 +122,22 @@ public class ProteinDatasetComparer {
         return run.getNrseqIds();
     }
 
-    private List<Integer> getParsimoniousProteinIdsForDataset(Dataset dataset) {
+    private List<Integer> getParsimoniousProteinIdsForDataset(FilterableDataset dataset) {
         
         if(dataset.getSource() == DatasetSource.PROTINFER) {
-            if(dataset.getProteinFilterCriteria() == null)
+            if(dataset.getProteinFilterCrteria() == null)
                 return protDao.getNrseqProteinIds(dataset.getDatasetId(), true, false); // parsimonious only
             else {
                 return protDao.getFilteredNrseqIds(dataset.getDatasetId(), 
-                        dataset.getProteinFilterCriteria());
+                        dataset.getProteinFilterCrteria());
             }
         }
         else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
-            if(dataset.getProteinFilterCriteria() == null)
+            if(dataset.getProteinFilterCrteria() == null)
                 return ppProtDao.getNrseqProteinIds(dataset.getDatasetId(), true, false); // parsimonious only
             else
                 return ppProtDao.getFilteredNrseqIds(dataset.getDatasetId(), 
-                        (ProteinProphetFilterCriteria) dataset.getProteinFilterCriteria());
+                        (ProteinProphetFilterCriteria) dataset.getProteinFilterCrteria());
         }
         else {
             return new ArrayList<Integer>(0);
@@ -170,7 +175,7 @@ public class ProteinDatasetComparer {
         
     }
     
-    private void applyAndFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+    private void applyAndFilter(List<ComparisonProtein> proteins, List<? extends Dataset> datasets) {
         
         if(datasets.size() ==0)
             return;
@@ -188,7 +193,7 @@ public class ProteinDatasetComparer {
         }
     }
     
-    private void applyOrFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+    private void applyOrFilter(List<ComparisonProtein> proteins, List<? extends Dataset> datasets) {
         
         if(datasets.size() ==0)
             return;
@@ -208,7 +213,7 @@ public class ProteinDatasetComparer {
         }
     }
     
-    private void applyNotFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+    private void applyNotFilter(List<ComparisonProtein> proteins, List<? extends Dataset> datasets) {
         
         if(datasets.size() ==0)
             return;
@@ -226,7 +231,7 @@ public class ProteinDatasetComparer {
         }
     }
     
-    private void applyXorFilter(List<ComparisonProtein> proteins, List<Dataset> datasets) {
+    private void applyXorFilter(List<ComparisonProtein> proteins, List<? extends Dataset> datasets) {
         
         if(datasets.size() ==0)
             return;

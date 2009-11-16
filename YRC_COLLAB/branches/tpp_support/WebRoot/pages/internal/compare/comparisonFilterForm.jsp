@@ -1,12 +1,11 @@
 
-<%@page import="org.yeastrc.www.compare.DatasetColor"%>
 <%@page import="org.yeastrc.bio.go.GOUtils"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
-<html:form action="doProteinSetComparison" method="POST">
+<html:form action="updateProteinSetComparison" method="POST">
 
 	<!-- Does the user want to download the results -->
 	<html:hidden name="proteinSetComparisonForm" property="download" value="false" styleId="download" />
@@ -17,15 +16,6 @@
 	<!-- Does the user want to do GO Enrichment analysis-->
 	<html:hidden name="proteinSetComparisonForm" property="goEnrichmentGraph" value="false" styleId="goEnrichmentGraph" />
 	
-	
-	
-	
-	<logic:iterate name="proteinSetComparisonForm" property="proteinProphetRunList" id="proteinProphetRun">
-		<logic:equal name="proteinProphetRun" property="selected" value="true">
-			<html:hidden name="proteinProphetRun" property="runId" indexed="true" />
-			<html:hidden name="proteinProphetRun" property="selected" indexed="true" />
-		</logic:equal>
-	</logic:iterate>
 	
 
 	<html:hidden name="proteinSetComparisonForm" property="pageNum" styleId="pageNum" />

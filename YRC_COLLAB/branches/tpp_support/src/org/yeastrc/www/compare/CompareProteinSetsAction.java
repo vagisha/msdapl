@@ -7,9 +7,6 @@
 package org.yeastrc.www.compare;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,19 +19,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
-import org.yeastrc.ms.domain.protinfer.ProteinferRun;
-import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
-import org.yeastrc.www.compare.graph.GraphBuilder;
+import org.yeastrc.www.compare.dataset.DatasetBuilder;
+import org.yeastrc.www.compare.dataset.DatasetSource;
+import org.yeastrc.www.compare.dataset.SelectableDataset;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
-
-import edu.uwpr.protinfer.infer.graph.BipartiteGraph;
-import edu.uwpr.protinfer.infer.graph.GraphCollapser;
-import edu.uwpr.protinfer.infer.graph.PeptideVertex;
 
 /**
  * 
@@ -57,237 +46,68 @@ public class CompareProteinSetsAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("authenticate");
         }
-
         
-        // Form we will use
-        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
         
-        // IS THE USER DOWNLOADING?
-        if(myForm.isDownload()) {
-            log.info("DOWNLOADING......");
-            return mapping.findForward("Download");
+        // get the protein inference ids to compare
+        // first, look for ids in the request parameters
+        List<Integer> allRunIds = null;
+        boolean groupProteins = true;
+        String idStr = request.getParameter("piRunIds");
+        if(idStr != null && idStr.trim().length() > 0) {
+            allRunIds = new ArrayList<Integer>();
+            String[] tokens = idStr.split(",");
+            for(String tok: tokens) {
+                int piRunId = Integer.parseInt(tok.trim());
+                allRunIds.add(piRunId);
+            }
+            groupProteins = Boolean.parseBoolean(request.getParameter("groupProteins"));
         }
         
-        // GO ENRICHMENT ANALYSIS?
-        if(myForm.isGoEnrichment()) {
-            log.info("DOING GENE ONTOLOGY ENRICHMENT ANALYSIS...");
-            return mapping.findForward("GOAnalysis");
-        }
-        
-        
-        // Get the selected protein inference run ids
-        List<Integer> allRunIds = myForm.getAllSelectedRunIds();
-
-        // Need atleast two datasets to compare.
-        if(allRunIds.size() < 2) {
+        if(allRunIds == null || allRunIds.size() < 2) {
             ActionErrors errors = new ActionErrors();
             errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more datasets to compare."));
-            saveErrors( request, errors );
+            saveErrors(request, errors);
             return mapping.findForward("Failure");
         }
         
-        ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
-        ProteinferRunDAO runDao = fact.getProteinferRunDao();
         
-        List<Dataset> datasets = new ArrayList<Dataset>(allRunIds.size());
+        List<SelectableDataset> datasets = new ArrayList<SelectableDataset>(allRunIds.size());
         
-        
+        int datasetIndex = 0;
         for(int piRunId: allRunIds) {
-            ProteinferRun run = runDao.loadProteinferRun(piRunId);
-            if(run == null) {
+            
+            SelectableDataset dataset = DatasetBuilder.instance().buildSelectableDataset(piRunId);
+            if(dataset == null) {
                 ActionErrors errors = new ActionErrors();
                 errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
                         "No protein inference run found with ID: "+piRunId+"."));
                 saveErrors( request, errors );
                 return mapping.findForward("Failure");
             }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId,
-                                DatasetSource.getSourceForProtinferProgram(run.getProgram()));
+            dataset.setSelected(false);
+            dataset.setDatasetIndex(datasetIndex++);
             datasets.add(dataset);
         }
-
+        
+        // Form we will use
+        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm)form; // new ProteinSetComparisonForm();
+        myForm.setGroupIndistinguishableProteins(groupProteins);
         
         // ANY AND, OR, NOT, XOR filters
-        if((myForm.getAndList().size() == 0) && 
-           (myForm.getOrList().size() == 0) && 
-           (myForm.getNotList().size() == 0) &&
-           myForm.getXorList().size() == 0) {
-            List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
-            int datasetIndex = 0;
-            for(Dataset dataset: datasets) {
-                SelectableDataset sds = new SelectableDataset(dataset);
-                sds.setSelected(false);
-                sds.setDatasetIndex(datasetIndex++);
-                sdsList.add(sds);
+        myForm.setAndList(datasets);
+        myForm.setOrList(datasets);
+        myForm.setNotList(datasets);
+        myForm.setXorList(datasets);
+        
+        // Do we have ProteinProphet datasets
+        for(SelectableDataset dataset: datasets) {
+            if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
+                myForm.setHasProteinProphetDatasets(true);
+                break;
             }
-            
-            myForm.setAndList(sdsList);
-            myForm.setOrList(sdsList);
-            myForm.setNotList(sdsList);
-            myForm.setXorList(sdsList);
-        }
-        List<SelectableDataset> andDataset = myForm.getAndList();
-        List<SelectableDataset> orDataset = myForm.getOrList();
-        List<SelectableDataset> notDataset = myForm.getNotList();
-        List<SelectableDataset> xorDataset = myForm.getXorList();
-        
-        List<Dataset> andFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: andDataset) {
-            if(sds.isSelected())    andFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
         }
         
-        List<Dataset> orFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: orDataset) {
-            if(sds.isSelected())    orFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-        
-        List<Dataset> notFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: notDataset) {
-            if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-        
-        List<Dataset> xorFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: xorDataset) {
-            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-        
-        ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
-        filters.setAndFilters(andFilters);
-        filters.setOrFilters(orFilters);
-        filters.setNotFilters(notFilters);
-        filters.setXorFilters(xorFilters);
-        
-        // Do the comparison
-        long s = System.currentTimeMillis();
-        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, !myForm.getUseAllProteins());
-        long e = System.currentTimeMillis();
-        log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        
-        // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getAccessionLike();
-        if(searchString != null && searchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
-        }
-        
-        // Apply AND, OR, NOT, XOR filters
-        s = System.currentTimeMillis();
-        ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
-        e = System.currentTimeMillis();
-        log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        
-        
-        request.setAttribute("proteinSetComparisonForm", myForm);
-        
-        // create a list of the dataset ids being compared
-        request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));
-        
-        
-        if(!myForm.getGroupIndistinguishableProteins()) {
-            // Sort by peptide count
-            s = System.currentTimeMillis();
-            ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
-            sorter.sortByPeptideCount(comparison);
-            e = System.currentTimeMillis();
-            log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-            
-            // Set the page number
-            comparison.setCurrentPage(myForm.getPageNum());
-            
-            comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
-            
-            // Create Venn Diagram only if 2 or 3 datasets are being compared
-            if(comparison.getDatasetCount() == 2 || comparison.getDatasetCount() == 3) {
-                String googleChartUrl = VennDiagramCreator.instance().getChartUrl(comparison);
-                request.setAttribute("chart", googleChartUrl);
-            }
-            
-            request.setAttribute("comparison", comparison);
-            return mapping.findForward("ProteinList");
-        }
-        
-        else {
-            s = System.currentTimeMillis();
-            GraphBuilder graphBuilder = new GraphBuilder();
-            BipartiteGraph<ComparisonProteinGroup, PeptideVertex> graph = 
-                graphBuilder.buildGraph(comparison.getProteins(), allRunIds);
-            log.info("BEFORE collapsing graph: "+graph.getLeftVertices().size());
-            GraphCollapser<ComparisonProteinGroup, PeptideVertex> collapser = new GraphCollapser<ComparisonProteinGroup, PeptideVertex>();
-            collapser.collapseGraph(graph);
-            
-            List<ComparisonProteinGroup> proteinGroups = graph.getLeftVertices();
-            log.info("AFTER collapsing graph: "+proteinGroups.size());
-            
-            
-            // assign group IDs
-            int groupId = 1;
-            for(ComparisonProteinGroup group: proteinGroups)
-                group.setGroupId(groupId++);
-            // sort
-            Collections.sort(proteinGroups, new Comparator<ComparisonProteinGroup>() {
-                @Override
-                public int compare(ComparisonProteinGroup o1,
-                        ComparisonProteinGroup o2) {
-                    return Integer.valueOf(o2.getMaxPeptideCount()).compareTo(o1.getMaxPeptideCount());
-                }});
-            
-            // remove protein groups that do not have any parsimonious proteins
-            Iterator<ComparisonProteinGroup> iter = proteinGroups.iterator();
-            while(iter.hasNext()) {
-                ComparisonProteinGroup proteinGroup = iter.next();
-                if(!proteinGroup.hasParsimoniousProtein())
-                    iter.remove();
-            }
-            log.info("AFTER removing non-parsimonious groups: "+proteinGroups.size());
-            
-            e = System.currentTimeMillis();
-            log.info("Time to do graph analysis: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-            
-            ProteinGroupComparisonDataset grpComparison = new ProteinGroupComparisonDataset();
-            for(ComparisonProteinGroup grp: proteinGroups)
-                grpComparison.addProteinGroup(grp);
-            
-            grpComparison.setDatasets(datasets);
-            
-            // Set the page number
-            grpComparison.setCurrentPage(myForm.getPageNum());
-            
-            // set the information for displaying normalized spectrum counts
-            ProteinferSpectrumMatchDAO specDao = ProteinferDAOFactory.instance().getProteinferSpectrumMatchDao();
-            for(Dataset dataset: grpComparison.getDatasets()) {
-                if(dataset.getSource() != DatasetSource.DTA_SELECT) {
-                    int spectrumCount = specDao.getSpectrumCountForPinferRun(dataset.getDatasetId());
-                    dataset.setSpectrumCount(spectrumCount);
-                }
-            }
-            
-            grpComparison.initSummary(); // initialize the summary -- 
-                                        // (totalProteinCount, # common proteins)
-                                        // spectrum count normalization factors
-                                        // calculate min/max normalized spectrum counts for scaling
-            
-            
-            // Create Venn Diagram only if 2 or 3 datasets are being compared
-            if(grpComparison.getDatasetCount() == 2 || grpComparison.getDatasetCount() == 3) {
-                String googleChartUrl = VennDiagramCreator.instance().getChartUrl(grpComparison);
-                request.setAttribute("chart", googleChartUrl);
-            }
-            
-            request.setAttribute("comparison", grpComparison);
-            return mapping.findForward("ProteinGroupList");
-        }
-    }
-
-    private String makeCommaSeparated(List<Integer> ... idLists) {
-        StringBuilder buf = new StringBuilder();
-        for(List<Integer> ids: idLists) {
-            if(ids == null)
-                continue;
-            for(int id: ids)
-                buf.append(","+id);
-            if(buf.length() > 0)
-                buf.deleteCharAt(0);
-        }
-        return buf.toString();
+        return mapping.findForward("DoComparison");
     }
     
 }

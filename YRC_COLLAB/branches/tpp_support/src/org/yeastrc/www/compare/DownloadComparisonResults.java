@@ -7,9 +7,7 @@
 package org.yeastrc.www.compare;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,12 +19,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
-import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
-import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
-import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
+import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
+import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 
 /**
  * 
@@ -42,100 +38,15 @@ public class DownloadComparisonResults extends Action {
         
         log.info("Downloading comparison results");
         
-        // User making this request
-        User user = UserUtils.getUser(request);
-        if (user == null) {
+        long startTime = System.currentTimeMillis();
+        
+        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) request.getAttribute("comparisonForm");
+        if(myForm == null) {
             ActionErrors errors = new ActionErrors();
-            errors.add("username", new ActionMessage("error.login.notloggedin"));
-            saveErrors( request, errors );
-            return mapping.findForward("authenticate");
-        }
-        
-        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
-        
-        
-        
-        // Get the selected protein inference run ids
-        List<Integer> allRunIds = myForm.getAllSelectedRunIds();
-        
-        
-        // Need atleast two datasets to compare.
-        if(allRunIds.size() < 2) {
-            ActionErrors errors = new ActionErrors();
-            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more datasets to compare."));
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Comparison form not found in request"));
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
-        
-        
-        ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
-        ProteinferRunDAO runDao = fact.getProteinferRunDao();
-        
-        List<Dataset> datasets = new ArrayList<Dataset>(allRunIds.size());
-        
-        // Protein inference datasets
-        for(int piRunId: allRunIds) {
-            ProteinferRun run = runDao.loadProteinferRun(piRunId);
-            if(run == null) {
-                ActionErrors errors = new ActionErrors();
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
-                        "No protein inference run found with ID: "+piRunId+"."));
-                saveErrors( request, errors );
-                return mapping.findForward("Failure");
-            }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, 
-                                DatasetSource.getSourceForProtinferProgram(run.getProgram()));
-            datasets.add(dataset);
-        }
-        
-        // ANY AND, OR, NOT, XOR filters
-        if((myForm.getAndList().size() == 0) && 
-           (myForm.getOrList().size() == 0) && 
-           (myForm.getNotList().size() == 0) &&
-           myForm.getXorList().size() == 0) {
-            List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
-            for(Dataset dataset: datasets) {
-                SelectableDataset sds = new SelectableDataset(dataset);
-                sds.setSelected(false);
-                sdsList.add(sds);
-            }
-            
-            myForm.setAndList(sdsList);
-            myForm.setOrList(sdsList);
-            myForm.setNotList(sdsList);
-            myForm.setXorList(sdsList);
-        }
-        List<SelectableDataset> andDataset = myForm.getAndList();
-        List<SelectableDataset> orDataset = myForm.getOrList();
-        List<SelectableDataset> notDataset = myForm.getNotList();
-        List<SelectableDataset> xorDataset = myForm.getXorList();
-        
-        List<Dataset> andFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: andDataset) {
-            if(sds.isSelected())    andFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-        
-        List<Dataset> orFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: orDataset) {
-            if(sds.isSelected())    orFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-        
-        List<Dataset> notFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: notDataset) {
-            if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-        
-        List<Dataset> xorFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: xorDataset) {
-            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-        
-        ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
-        filters.setAndFilters(andFilters);
-        filters.setOrFilters(orFilters);
-        filters.setNotFilters(notFilters);
-        filters.setXorFilters(xorFilters);
-        
         
         response.setContentType("text/plain");
         response.setHeader("Content-Disposition","attachment; filename=\"ProteinSetComparison.txt\"");
@@ -144,48 +55,69 @@ public class DownloadComparisonResults extends Action {
         writer.write("\n\n");
         writer.write("Date: "+new Date()+"\n\n");
         
+        ProteinDatasetComparisonFilters filters = myForm.getSelectedBooleanFilters();
         
-        // Do the comparison
-        long s = System.currentTimeMillis();
-        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
-        long e = System.currentTimeMillis();
-        log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        
-        // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getAccessionLike();
-        if(searchString != null && searchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
+        if(!myForm.getGroupIndistinguishableProteins()) {
+            ProteinComparisonDataset comparison = (ProteinComparisonDataset) request.getAttribute("comparisonDataset");
+            if(comparison == null) {
+                ActionErrors errors = new ActionErrors();
+                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Comparison dataset not found in request"));
+                saveErrors( request, errors );
+                return mapping.findForward("Failure");
+            }
+            
+            long s = System.currentTimeMillis();
+            writeResults(writer, comparison, filters, myForm);
+            writer.close();
+            long e = System.currentTimeMillis();
+            log.info("Results written in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+        }
+        else {
+            ProteinGroupComparisonDataset grpComparison = (ProteinGroupComparisonDataset) request.getAttribute("comparisonGroupDataset");
+            if(grpComparison == null) {
+                ActionErrors errors = new ActionErrors();
+                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Comparison dataset not found in request"));
+                saveErrors( request, errors );
+                return mapping.findForward("Failure");
+            }
+            
+            long s = System.currentTimeMillis();
+            writeResults(writer, grpComparison, filters, myForm);
+            writer.close();
+            long e = System.currentTimeMillis();
+            log.info("Results written in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
         }
         
-        // Apply AND, OR, NOT, XOR filters
-        s = System.currentTimeMillis();
-        ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
-        e = System.currentTimeMillis();
-        log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
-        // Sort by peptide count
-        s = System.currentTimeMillis();
-        ProteinDatasetSorter sorter = ProteinDatasetSorter.instance();
-        sorter.sortByPeptideCount(comparison);
-        e = System.currentTimeMillis();
-        log.info("Time to sort results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        
-        comparison.initSummary(); // initialize the summary (totalProteinCount, # common proteins)
-        
-        s = System.currentTimeMillis();
-        writeResults(writer, comparison, myForm);
-        writer.close();
-        e = System.currentTimeMillis();
-        log.info("DownloadComparisonResults results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
+        long e = System.currentTimeMillis();
+        log.info("DownloadComparisonResults results in: "+TimeUtils.timeElapsedMinutes(startTime,e)+" minutes");
         return null;
     }
 
     
-    private void writeResults(PrintWriter writer, ProteinComparisonDataset comparison, ProteinSetComparisonForm form) {
+    private void writeResults(PrintWriter writer, ProteinComparisonDataset comparison, ProteinDatasetComparisonFilters filters,
+            ProteinSetComparisonForm form) {
         
-//        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
+        writer.write("Total protein count: "+comparison.getTotalProteinCount()+"\n");
         writer.write("Filtered protein count: "+comparison.getFilteredProteinCount()+"\n");
         writer.write("\n\n");
+        
+        // Boolean Filters
+        writeFilters(writer, filters);
+        
+        
+        // Accession string filter
+        String searchString = form.getAccessionLike();
+        if(searchString != null && searchString.trim().length() > 0) {
+            writer.write("Filtering for FASTA ID(s): "+searchString+"\n\n");
+        }
+        
+        // Description string filter
+//        String descString = form.getDescriptionSearchString();
+//        if(descString != null && descString.trim().length() > 0) {
+//            writer.write("Filtering for description term(s): "+descString+"\n\n");
+//        }
+        
         
         // Datasets
         writer.write("Datasets: \n");
@@ -197,6 +129,20 @@ public class DownloadComparisonResults extends Action {
         }
         writer.write("\n\n");
         
+        // Common protein groups
+        writer.write("Common Proteins:\n");
+        writer.write("\t");
+        for(Dataset dataset: comparison.getDatasets()) {
+            writer.write("ID_"+dataset.getDatasetId()+"\t");
+        }
+        writer.write("\n");
+        for(int i = 0; i < comparison.getDatasetCount(); i++) {
+            writer.write("ID_"+comparison.getDatasets().get(i).getDatasetId()+"\t");
+            for(int j = 0; j < comparison.getDatasetCount(); j++) 
+                writer.write(comparison.getCommonProteinCount(i, j)+"\t");
+            writer.write("\n");
+        }
+        writer.write("\n\n");
         
         
         // legend
@@ -216,6 +162,7 @@ public class DownloadComparisonResults extends Action {
         writer.write("ProteinID\t");
         writer.write("Name\t");
         writer.write("CommonName\t");
+//        writer.write("Mol.Wt.\tpI\t");
         writer.write("NumPept\t");
         for(Dataset dataset: comparison.getDatasets()) {
             writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
@@ -224,9 +171,11 @@ public class DownloadComparisonResults extends Action {
         for(Dataset dataset: comparison.getDatasets()) {
             writer.write("SC("+dataset.getDatasetId()+")\t");
         }
+        // NSAF column headers.
+//        for(Dataset dataset: comparison.getDatasets()) {
+//            writer.write("NSAF("+dataset.getDatasetId()+")\t");
+//        }
         writer.write("Description\n");
-        
-        comparison.setPrintFullProteinName(true); 
         
         for(ComparisonProtein protein: comparison.getProteins()) {
             
@@ -235,6 +184,8 @@ public class DownloadComparisonResults extends Action {
             writer.write(protein.getNrseqId()+"\t");
             writer.write(protein.getFastaName()+"\t");
             writer.write(protein.getCommonName()+"\t");
+//            writer.write(protein.getMolecularWeight()+"\t");
+//            writer.write(protein.getPi()+"\t");
             writer.write(protein.getMaxPeptideCount()+"\t");
            
             for(Dataset dataset: comparison.getDatasets()) {
@@ -265,10 +216,205 @@ public class DownloadComparisonResults extends Action {
                     writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
                 }
             }
-            
+            // NSAF information
+//            for(Dataset dataset: comparison.getDatasets()) {
+//                
+//                DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+//                if(dpi == null || !dpi.isPresent()) {
+//                    writer.write("-1.0\t");
+//                }
+//                else {
+//                    writer.write(dpi.getNsafFormatted()+"\t");
+//                }
+//            }
             writer.write(protein.getDescription()+"\n");
         }
         
         writer.write("\n\n");
     }
+
+
+    private void writeFilters(PrintWriter writer,
+            ProteinDatasetComparisonFilters filters) {
+        
+        boolean filtersFound = false;
+        writer.write("Boolean Filters: \n");
+        
+        
+        if(filters.getAndFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("AND:\n");
+            for(Dataset ds: filters.getAndFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filters.getOrFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("OR:\n");
+            for(Dataset ds: filters.getOrFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filters.getNotFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("NOT:\n");
+            for(Dataset ds: filters.getNotFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filters.getXorFilters().size() > 0) {
+            filtersFound = true;
+            writer.write("XOR:\n");
+            for(Dataset ds: filters.getXorFilters()) {
+                writer.write("\t"+ds.getDatasetId()+"  "+ds.getDatasetComments()+"\n");
+            }
+        }
+        if(filtersFound)
+            writer.write("\n\n");
+        else
+            writer.write("No filters found\n\n");
+    }
+    
+    private void writeResults(PrintWriter writer, ProteinGroupComparisonDataset comparison, ProteinDatasetComparisonFilters filters,
+            ProteinSetComparisonForm form) {
+        
+      writer.write("Total Protein Groups (Total Proteins): "+comparison.getTotalProteinGroupCount()+" ("+comparison.getTotalProteinCount()+")\n");
+      writer.write("\n\n");
+      
+      // Boolean Filters
+      writeFilters(writer, filters);
+      
+      
+      // Accession string filter
+      String searchString = form.getAccessionLike();
+      if(searchString != null && searchString.trim().length() > 0) {
+          writer.write("Filtering for FASTA ID(s): "+searchString+"\n\n");
+      }
+      
+      // Description string filter
+//      String descString = form.getDescriptionSearchString();
+//      if(descString != null && descString.trim().length() > 0) {
+//          writer.write("Filtering for description term(s): "+descString+"\n\n");
+//      }
+      
+      // Datasets
+      writer.write("Datasets: \n");
+      int idx = 0;
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write(dataset.getSourceString()+" ID "+dataset.getDatasetId()+
+                  ": Proteins Groups (# Proteins)  "+comparison.getProteinGroupCount(idx)+" ("+comparison.getProteinCount(idx++)+") "+
+                  "; SpectrumCount(max.) "+dataset.getSpectrumCount()+"("+dataset.getMaxProteinSpectrumCount()+")\n");
+      }
+      writer.write("\n\n");
+      
+      // Common protein groups
+      writer.write("Common Proteins:\n");
+      writer.write("\t");
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write("ID_"+dataset.getDatasetId()+"\t");
+      }
+      writer.write("\n");
+      for(int i = 0; i < comparison.getDatasetCount(); i++) {
+          writer.write("ID_"+comparison.getDatasets().get(i).getDatasetId()+"\t");
+          for(int j = 0; j < comparison.getDatasetCount(); j++) {
+              writer.write(comparison.getCommonProteinGroupCount(i, j)+" ("+comparison.getCommonProteinGroupsPerc(i, j)+"%)\t");
+          }
+          writer.write("\n");
+      }
+      writer.write("\n\n");
+      
+      
+      // legend
+      // *  Present and Parsimonious
+      // =  Present and NOT parsimonious
+      // g  group protein
+      // -  NOT present
+      writer.write("\n\n");
+      writer.write("*  Protein present and parsimonious\n");
+      writer.write("=  Protein present and NOT parsimonious\n");
+      writer.write("-  Protein NOT present\n");
+      writer.write("g  Group protein\n");
+      writer.write("\n\n");
+      
+
+      // print the proteins in each protein group
+      writer.write("ProteinID\t");
+      writer.write("ProteinGroupID\t");
+      writer.write("Name\t");
+      writer.write("CommonName\t");
+//      writer.write("Mol.Wt.\tpI\t");
+      writer.write("NumPept\t");
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write(dataset.getSourceString()+"("+dataset.getDatasetId()+")\t");
+      }
+      // spectrum count column headers.
+      for(Dataset dataset: comparison.getDatasets()) {
+          writer.write("SC("+dataset.getDatasetId()+")\t");
+      }
+      // NSAF column headers.
+//      for(Dataset dataset: comparison.getDatasets()) {
+//          writer.write("NSAF("+dataset.getDatasetId()+")\t");
+//      }
+      writer.write("Description\n");
+      
+      for(ComparisonProteinGroup grpProtein: comparison.getProteinsGroups()) {
+          
+          for(ComparisonProtein protein: grpProtein.getProteins()) {
+              comparison.initializeProteinInfo(protein);
+          
+              writer.write(protein.getNrseqId()+"\t");
+              writer.write(protein.getGroupId()+"\t");
+              writer.write(protein.getFastaName()+"\t");
+              writer.write(protein.getCommonName()+"\t");
+//              writer.write(protein.getMolecularWeight()+"\t");
+//              writer.write(protein.getPi()+"\t");
+              writer.write(protein.getMaxPeptideCount()+"\t");
+         
+              for(Dataset dataset: comparison.getDatasets()) {
+                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                  if(dpi == null || !dpi.isPresent()) {
+                      writer.write("-");
+                  }
+                  else {
+                      if(dpi.isParsimonious()) {
+                          writer.write("*");
+                      }
+                      else {
+                          writer.write("=");
+                      }
+                      if(dpi.isGrouped())
+                          writer.write("g");
+                  }
+                  writer.write("\t");
+              }
+              // spectrum count information
+              for(Dataset dataset: comparison.getDatasets()) {
+
+                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                  if(dpi == null || !dpi.isPresent()) {
+                      writer.write("0\t");
+                  }
+                  else {
+                      writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                  }
+              }
+              // NSAF information
+//              for(Dataset dataset: comparison.getDatasets()) {
+//                  
+//                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+//                  if(dpi == null || !dpi.isPresent()) {
+//                      writer.write("-1.0\t");
+//                  }
+//                  else {
+//                      writer.write(dpi.getNsafFormatted()+"\t");
+//                  }
+//              }
+          
+              writer.write(protein.getDescription()+"\n");
+          }
+      }
+      
+      writer.write("\n\n");
+  }
+    
 }

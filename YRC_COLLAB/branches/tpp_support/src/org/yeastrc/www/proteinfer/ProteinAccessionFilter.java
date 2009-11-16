@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
-import org.yeastrc.www.compare.FastaProteinLookupUtil;
+import org.yeastrc.www.compare.util.FastaProteinLookupUtil;
 
 /**
  * 

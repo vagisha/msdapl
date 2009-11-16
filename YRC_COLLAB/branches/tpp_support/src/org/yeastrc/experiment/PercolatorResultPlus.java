@@ -109,22 +109,35 @@ public class PercolatorResultPlus implements PercolatorResult {
         return result.getProteinMatchList();
     }
     
-    public String getProteins() {
+    public String getOtherProteinsHtml() {
         if(result.getProteinMatchList() == null)
             return null;
         else {
             StringBuilder buf = new StringBuilder();
+            int i = 0;
             for(MsSearchResultProtein protein: result.getProteinMatchList()) {
-                buf.append(", "+protein.getAccession());
+                if(i == 0) {
+                    i++;
+                    continue;
+                }
+                buf.append("<br>"+protein.getAccession());
             }
             if(buf.length() > 0)
-                buf.deleteCharAt(0);
-            if(buf.length() > 15) {
-                buf.delete(15, buf.length());
-                buf.append("...");
-            }
+                buf.delete(0, "<br>".length());
             return buf.toString();
         }
+    }
+    
+    public String getOneProtein() {
+        if(result.getProteinMatchList() == null)
+            return null;
+        else {
+            return result.getProteinMatchList().get(0).getAccession();
+        }
+    }
+    
+    public int getProteinCount() {
+        return result.getProteinMatchList().size();
     }
 
     @Override

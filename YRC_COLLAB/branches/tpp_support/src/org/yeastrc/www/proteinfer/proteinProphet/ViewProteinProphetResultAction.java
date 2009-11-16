@@ -124,6 +124,10 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria();
         filterCriteria.setCoverage(filterForm.getMinCoverageDouble());
         filterCriteria.setMaxCoverage(filterForm.getMaxCoverageDouble());
+        filterCriteria.setMinMolecularWt(filterForm.getMinMolecularWtDouble());
+        filterCriteria.setMaxMolecularWt(filterForm.getMaxMolecularWtDouble());
+        filterCriteria.setMinPi(filterForm.getMinPiDouble());
+        filterCriteria.setMaxPi(filterForm.getMaxPiDouble());
         filterCriteria.setNumPeptides(filterForm.getMinPeptidesInteger());
         filterCriteria.setNumMaxPeptides(filterForm.getMaxPeptidesInteger());
         filterCriteria.setNumUniquePeptides(filterForm.getMinUniquePeptidesInteger());

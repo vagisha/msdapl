@@ -15,6 +15,10 @@ import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferPeptideDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferProteinDAO;
 import org.yeastrc.ms.domain.protinfer.ProteinferPeptide;
+import org.yeastrc.www.compare.dataset.Dataset;
+import org.yeastrc.www.compare.dataset.DatasetPeptideInformation;
+import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
+import org.yeastrc.www.compare.dataset.DatasetSource;
 
 /**
  * 

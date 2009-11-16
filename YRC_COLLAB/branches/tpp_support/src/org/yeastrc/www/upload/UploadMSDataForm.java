@@ -88,9 +88,9 @@ public class UploadMSDataForm extends ActionForm {
 			errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
 		}
 		
-		if(this.instrumentId == 0) {
-		    errors.add("upload", new ActionMessage("error.upload.noinstrument"));
-		}
+//		if(this.instrumentId == 0) {
+//		    errors.add("upload", new ActionMessage("error.upload.noinstrument"));
+//		}
 		
 		return errors;
 	}

@@ -21,15 +21,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.bio.go.GOUtils;
 import org.yeastrc.bio.taxonomy.Species;
-import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
-import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.go.GOEnrichmentCalculator;
 import org.yeastrc.www.go.GOEnrichmentInput;
 import org.yeastrc.www.go.GOEnrichmentOutput;
-import org.yeastrc.www.user.User;
-import org.yeastrc.www.user.UserUtils;
 
 /**
  * 
@@ -44,120 +39,27 @@ public class CompareGOEnrichmentAction extends Action {
             HttpServletResponse response )
     throws Exception {
         
-        // User making this request
-        User user = UserUtils.getUser(request);
-        if (user == null) {
+        
+        long s = System.currentTimeMillis();
+        
+        ProteinComparisonDataset comparison = (ProteinComparisonDataset) request.getAttribute("comparisonDataset");
+        if(comparison == null) {
             ActionErrors errors = new ActionErrors();
-            errors.add("username", new ActionMessage("error.login.notloggedin"));
-            saveErrors( request, errors );
-            return mapping.findForward("authenticate");
-        }
-        
-        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) form;
-        
-        // Get the selected protein inference run ids
-        List<Integer> allRunIds = myForm.getAllSelectedRunIds();
-        
-        
-        // Need atleast two datasets to compare.
-        if(allRunIds.size() < 2) {
-            ActionErrors errors = new ActionErrors();
-            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Please select 2 or more datasets to compare."));
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Comparison dataset not found in request"));
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
         
-        ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
-        ProteinferRunDAO runDao = fact.getProteinferRunDao();
-        
-        List<Dataset> datasets = new ArrayList<Dataset>(allRunIds.size());
-        
-        long s = System.currentTimeMillis();
-        
-        // Protein inference datasets
-        for(int piRunId: allRunIds) {
-            ProteinferRun run = runDao.loadProteinferRun(piRunId);
-            if(run == null) {
-                ActionErrors errors = new ActionErrors();
-                errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", 
-                        "No protein inference run found with ID: "+piRunId+"."));
-                saveErrors( request, errors );
-                return mapping.findForward("Failure");
-            }
-            Dataset dataset = DatasetBuilder.instance().buildDataset(piRunId, 
-                                DatasetSource.getSourceForProtinferProgram(run.getProgram()));
-            datasets.add(dataset);
-        }
-        
-        // ANY AND, OR, NOT filters
-        if((myForm.getAndList().size() == 0) && 
-                (myForm.getOrList().size() == 0) && 
-                (myForm.getNotList().size() == 0) &&
-                myForm.getXorList().size() == 0) {
-            List<SelectableDataset> sdsList = new ArrayList<SelectableDataset>(datasets.size());
-            for(Dataset dataset: datasets) {
-                SelectableDataset sds = new SelectableDataset(dataset);
-                sds.setSelected(false);
-                sdsList.add(sds);
-            }
-
-            myForm.setAndList(sdsList);
-            myForm.setOrList(sdsList);
-            myForm.setNotList(sdsList);
-            myForm.setXorList(sdsList);
-        }
-        List<SelectableDataset> andDataset = myForm.getAndList();
-        List<SelectableDataset> orDataset = myForm.getOrList();
-        List<SelectableDataset> notDataset = myForm.getNotList();
-        List<SelectableDataset> xorDataset = myForm.getXorList();
-
-        List<Dataset> andFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: andDataset) {
-            if(sds.isSelected())    andFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-
-        List<Dataset> orFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: orDataset) {
-            if(sds.isSelected())    orFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-
-        List<Dataset> notFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: notDataset) {
-            if(sds.isSelected())    notFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-
-        List<Dataset> xorFilters = new ArrayList<Dataset>();
-        for(SelectableDataset sds: xorDataset) {
-            if(sds.isSelected())    xorFilters.add(new Dataset(sds.getDatasetId(), sds.getSource()));
-        }
-
-        ProteinDatasetComparisonFilters filters = new ProteinDatasetComparisonFilters();
-        filters.setAndFilters(andFilters);
-        filters.setOrFilters(orFilters);
-        filters.setNotFilters(notFilters);
-        filters.setXorFilters(xorFilters);
-        
-        
-        // Do the comparison
-        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, false);
-        long e = System.currentTimeMillis();
-        log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        
-        // If the user is searching for some proteins by name, filter the list
-        String searchString = myForm.getAccessionLike();
-        if(searchString != null && searchString.trim().length() > 0) {
-            ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
-        }
-        
-        // Apply AND, OR, NOT filters
-        s = System.currentTimeMillis();
-        ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
-        e = System.currentTimeMillis();
-        log.info("Time to filter results: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
-        
-        comparison.initSummary();
         request.setAttribute("comparison", comparison);
         request.setAttribute("goEnrichmentView", true);
+        
+        ProteinSetComparisonForm myForm = (ProteinSetComparisonForm) request.getAttribute("comparisonForm");
+        if(myForm == null) {
+            ActionErrors errors = new ActionErrors();
+            errors.add(ActionErrors.GLOBAL_ERROR, new ActionMessage("error.general.errorMessage", "Comparison form not found in request"));
+            saveErrors( request, errors );
+            return mapping.findForward("Failure");
+        }
        
         GOEnrichmentOutput enrichment = doGoEnrichmentAnalysis(comparison, myForm);
         // Biological Process
@@ -213,7 +115,7 @@ public class CompareGOEnrichmentAction extends Action {
         request.setAttribute("species", Species.getInstance(myForm.getSpeciesId()));
         
         
-        e = System.currentTimeMillis();
+        long e = System.currentTimeMillis();
         log.info("CompareGOEnrichmentAction results in: "+TimeUtils.timeElapsedMinutes(s,e)+" minutes");
         return mapping.findForward("Success");
     }

@@ -1,7 +1,7 @@
 
 <%@page import="org.yeastrc.www.compare.ProteinGroupComparisonDataset"%>
-<%@page import="org.yeastrc.www.compare.DatasetColor"%>
-<%@page import="org.yeastrc.www.compare.Dataset"%>
+<%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
+<%@page import="org.yeastrc.www.compare.dataset.Dataset"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>

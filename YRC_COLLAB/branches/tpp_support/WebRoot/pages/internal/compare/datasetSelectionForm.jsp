@@ -1,5 +1,4 @@
 
-<%@page import="org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -12,14 +11,41 @@
 </yrcwww:notauthenticated>
 
 
-<logic:notPresent name="datasetSelectionForm" scope="request">
-	<logic:forward  name="selectComparisonDatasets" />
-</logic:notPresent>
-
-
 <%@ include file="/includes/header.jsp" %>
 
 <%@ include file="/includes/errors.jsp" %>
+
+<script>
+// ---------------------------------------------------------------------------------------
+// COMPARE SELECTED PROTEIN INFERENCE RUNS
+// --------------------------------------------------------------------------------------- 
+function compareSelectedProtInfer() {
+	var pinferIds = "";
+	var forDisplay = "\n";
+	var i = 0;
+	$("input.compare_cb:checked").each(function() {
+		if(i > 0) {
+			pinferIds += ",";
+		}
+		pinferIds += $(this).val();
+		forDisplay += $(this).val()+"\n";
+		i++;
+	});
+	if(i < 2) {
+		alert("Please select at least two protein inference results to compare");
+		return false;
+	}
+	var groupIndistinguishable = $("input#grpProts:checked").val() != null;
+	forDisplay +="Group Indistinguishable Proteins: "+groupIndistinguishable;
+	
+	// var doCompare = confirm("Compare protein inference results: "+forDisplay);
+	// if(doCompare) {
+		// var url = "<yrcwww:link path='setComparisonFilters.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+		var url = "<yrcwww:link path='doProteinSetComparison.do?'/>"+"piRunIds="+pinferIds+"&groupProteins="+groupIndistinguishable;
+		window.location.href = url;
+	// }
+}
+</script>
 
 <CENTER>
 
@@ -28,19 +54,17 @@
 
 <!-- Proceed only if we have available datasets -->
 
-<logic:empty name="datasetSelectionForm" property="proteinferRunList">
+<logic:empty name="datasetList">
 
 	<div><b>There are no available protein datasets at this time.</b></div>
 
 </logic:empty>
 
-<html:form action="setComparisonFilters" method="POST">
 <div><b>Please select 2 or more datasets from the list below</b></div>
 <br>
 
-<logic:notEmpty name="datasetSelectionForm" property="proteinferRunList">
+<logic:notEmpty name="datasetList">
 
-	<div align="center">Available Datasets</div>
 	<table width="90%" class="table_basic sortable" align="center">
 	<thead>
 		<tr align="left">
@@ -54,27 +78,26 @@
 	</thead>
 	<tbody>
 	
-		<bean:define id="hasDtaRuns" value="false" />
-		
-		<logic:iterate name="datasetSelectionForm" property="proteinferRunList" id="proteinferRun">
+		<logic:iterate name="datasetList" id="proteinferRun">
 		<yrcwww:colorrow>
 			<td>
-				<html:checkbox name="proteinferRun" property="selected" indexed="true"/>
+				<logic:equal name="proteinferRun" property="selected" value="false">
+					<input type="checkbox" class="compare_cb" 
+					value="<bean:write name='proteinferRun' property='runId'/>" />
+				</logic:equal>
+				<logic:equal name="proteinferRun" property="selected" value="true">
+					<input type="checkbox" class="compare_cb" 
+					value="<bean:write name='proteinferRun' property='runId'/>"
+					checked="checked" />
+				</logic:equal>
 			</td>
 			<td>
 				<html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="proteinferRun" paramProperty="runId">
-					<logic:equal name="proteinferRun" property="programName" 
-							value="<%=ProteinInferenceProgram.DTA_SELECT.name()%>">
-							<%hasDtaRuns = "true"; %>
-							<font color="red" style="bold">*</logic:equal>
 					<bean:write name="proteinferRun" property="runId" />
-					<logic:equal name="proteinferRun" property="programName" value=""></font</logic:equal>
 				</html:link>
-				<html:hidden name="proteinferRun" property="runId" indexed="true"/>
 			</td>
 			<td class="left_align">
 				<bean:write name="proteinferRun" property="programDisplayName" />
-				<html:hidden name="proteinferRun" property="programName" indexed="true"/>
 			</td>
 			
 			<td>
@@ -84,19 +107,16 @@
 					</html:link>
 					&nbsp;
 				</logic:iterate>
-				<html:hidden name="proteinferRun" property="projectIdString" indexed="true"/>
 			</td>
 			
 			<td>
 				<bean:write name="proteinferRun" property="runDate" />
 				<logic:notEmpty name="proteinferRun" property="runDate">
-					<html:hidden name="proteinferRun" property="runDate" indexed="true"/>
 				</logic:notEmpty>
 			</td>
 			
 			<td class="left_align">
 				<bean:write name="proteinferRun" property="comments" />
-				<html:hidden name="proteinferRun" property="comments" indexed="true"/>
 			</td>
 		</yrcwww:colorrow>
 	</logic:iterate>
@@ -104,24 +124,18 @@
 	</table>
 </logic:notEmpty>	
 
-<logic:equal name="hasDtaRuns" value="true">
-<div style="color:red; font-weight: bold;" align="center">
-* WARNING:  Comparison with DTASelect results is not yet fully supported.
-</div>
-</logic:equal>
 <br>
 
 <div align="center">
 	<br>
-	<html:checkbox name="datasetSelectionForm" property="groupProteins">Group Indistinguishable Proteins</html:checkbox><br>
-	<html:submit value="Submit" styleClass="plain_button"/>
+	<input type="checkbox" id="grpProts" value="group" checked="checked" />Group Indistinguishable Proteins<br>
+	
+	 <input type="button" class="plain_button" value="Compare" onClick="compareSelectedProtInfer()">
 </div>
 
 <br>
 
 	
-</html:form>
-
 </yrcwww:contentbox>
 </CENTER>
 
