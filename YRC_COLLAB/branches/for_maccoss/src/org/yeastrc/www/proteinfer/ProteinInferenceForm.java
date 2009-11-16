@@ -26,6 +26,7 @@ public class ProteinInferenceForm extends ActionForm {
     private ProteinInferInputSummary inputSummary;
     private InputType inputType;
     private String comments;
+    private boolean individualRuns = false;
     
     public String getComments() {
         return comments;
@@ -47,41 +48,6 @@ public class ProteinInferenceForm extends ActionForm {
         ActionErrors errors = new ActionErrors();
         
         // FORM VALIDATION WILL BE DONE VIA JAVASCRIPT.
-        
-//        boolean hasErrors = false;
-//        // Make sure at least one file was selected
-//        boolean selected = false;
-//        for(ProteinInferIputFile input: inputSummary.getInputFiles()) {
-//            if(input.getIsSelected()) {
-//                selected = true;
-//                break;
-//            }
-//        }
-//        if(!selected) {
-//            errors.add("proteinfer", new ActionMessage("error.proteinfer.noinput"));
-//            hasErrors = true;
-//        }
-//        
-//        updateProgramParameterDefaults(programParams);
-//        // Validate the parameter values
-//        StringBuilder errorMessage = new StringBuilder();
-//        if(!ProgramParameters.validateParams(this.programParams, errorMessage)) {
-//            String[] err = errorMessage.toString().split("\\n");
-//            for(String e: err)
-//                errors.add("proteinfer", new ActionMessage("error.proteinfer.invalid.param", e));
-//            hasErrors = true;
-//        }
-//        
-//        if(hasErrors) {
-//            String programName = programParams.getProgramName();
-//            ProteinInferenceProgram piProgram = ProteinInferenceProgram.getProgramForName(programName);
-//            // TODO Add a method in ProteinInferenceProgram -- something like ProteinInferenceProgram.usesSearchInput().
-//            if(piProgram == ProteinInferenceProgram.PROTINFER_PERC)
-//                request.setAttribute("useSearchInput", false);
-//            else
-//                request.setAttribute("useSearchInput", true);
-//        }
-        
         return errors;
     }
     
@@ -130,5 +96,13 @@ public class ProteinInferenceForm extends ActionForm {
     
     public void setProjectId(int projectId) {
         this.projectId = projectId;
+    }
+    
+    public boolean isIndividualRuns() {
+        return individualRuns;
+    }
+    
+    public void setIndividualRuns(boolean individual) {
+        this.individualRuns = individual;
     }
 }

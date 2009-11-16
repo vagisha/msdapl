@@ -106,7 +106,6 @@ function validateFloat(value, fieldName, min, max) {
  	
 </CENTER>
 </yrcwww:contentbox>
-/yrc/
 <script type="text/javascript">
 	function onCancel(projectID) {
 		document.location = "<yrcwww:link path='viewProject.do'/>?ID="+projectID;

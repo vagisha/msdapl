@@ -81,8 +81,14 @@ public class DoProteinInferenceAction extends Action {
             params.addParam(myParam);
         }
         
-        ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), inputSummary, params, 
+        if(prinferForm.isIndividualRuns()) {
+            ProteinferJobSaver.instance().saveMultiJobToDatabase(user.getID(), inputSummary, params, 
+                    prinferForm.getInputType(), prinferForm.getComments());
+        }
+        else {
+            ProteinferJobSaver.instance().saveJobToDatabase(user.getID(), inputSummary, params, 
                 prinferForm.getInputType(), prinferForm.getComments());
+        }
         
         // Go!
         ActionForward success = mapping.findForward( "Success" ) ;

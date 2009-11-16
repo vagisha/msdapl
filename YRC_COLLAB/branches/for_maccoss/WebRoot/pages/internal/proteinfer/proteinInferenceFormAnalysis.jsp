@@ -315,6 +315,10 @@ function validateFormForAnalysisInput() {
 	</div>
 	
 	<div>
+	<div>
+		<html:checkbox name="proteinInferenceFormAnalysis" property="individualRuns">Individual Runs</html:checkbox><br>
+		<span style="font-size: 8pt; color: red;">Check the box above if Protein Inference should be run separately on each selected file</span>
+	</div>
    	<NOBR>
  		<html:submit value="Run Protein Inference" styleClass="plain_button" />
  		<input type="button" class="plain_button" onclick="javascript:onCancel(<bean:write name="proteinInferenceFormAnalysis" property="projectId" />);" value="Cancel"/>
