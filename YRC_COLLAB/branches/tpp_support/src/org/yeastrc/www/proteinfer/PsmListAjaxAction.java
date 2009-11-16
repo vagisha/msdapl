@@ -17,10 +17,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
-import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.proteinfer.idpicker.IdPickerResultsLoader;
 import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
+import org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetResultsLoader;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -69,18 +71,27 @@ public class PsmListAjaxAction extends Action {
         System.out.println("Got request for all spectra for protein inference ion id: "+pinferIonId);
         long s = System.currentTimeMillis();
         
-        IdPickerRun run = ProteinferDAOFactory.instance().getIdPickerRunDao().loadProteinferRun(pinferId);
+        ProteinferRun run = ProteinferDAOFactory.instance().getProteinferRunDao().loadProteinferRun(pinferId);
         request.setAttribute("protInferProgram", run.getProgram().name());
         request.setAttribute("inputGenerator", run.getInputGenerator().name());
         
-        List<WIdPickerSpectrumMatch> ionsWAllSpectra = IdPickerResultsLoader.getHitsForIon(pinferIonId, run.getInputGenerator(), run.getProgram());
-        request.setAttribute("psmList", ionsWAllSpectra);
-        request.setAttribute("pinferIonId", pinferIonId);
+        if(ProteinInferenceProgram.isIdPicker(run.getProgram())) {
+            List<WIdPickerSpectrumMatch> ionsWAllSpectra = IdPickerResultsLoader.getHitsForIon(pinferIonId, run.getInputGenerator(), run.getProgram());
+            request.setAttribute("psmList", ionsWAllSpectra);
+            request.setAttribute("pinferIonId", pinferIonId);
+            long e = System.currentTimeMillis();
+            log.info("Total time (PsmListAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
+            return mapping.findForward("Success");
+        }
+        else if(run.getProgram() == ProteinInferenceProgram.PROTEIN_PROPHET) {
+            List<WIdPickerSpectrumMatch> ionsWAllSpectra = ProteinProphetResultsLoader.getHitsForIon(pinferIonId, run.getInputGenerator());
+            request.setAttribute("psmList", ionsWAllSpectra);
+            request.setAttribute("pinferIonId", pinferIonId);
+            long e = System.currentTimeMillis();
+            log.info("Total time (PsmListAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
+            return mapping.findForward("Success");
+        }
         
-        long e = System.currentTimeMillis();
-        log.info("Total time (PsmListAjaxAction): "+TimeUtils.timeElapsedSeconds(s, e));
-        
-        // Go!
-        return mapping.findForward("Success");
+        return mapping.findForward("Failure");
     }
 }

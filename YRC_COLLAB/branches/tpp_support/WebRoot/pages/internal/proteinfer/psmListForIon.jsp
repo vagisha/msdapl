@@ -30,6 +30,13 @@
 	     	<th class="sort-float" align="left">qValue</th>
 	     	<th class="sort-float" align="left">PEP</th>
 	     </logic:equal>
+     	<logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
+     		<!-- <th class="sort-float" align="left">Probability</th> -->
+     		<th class="sort-float" align="left">NET</th>
+     		<th class="sort-float" align="left">NMC</th>
+     		<th class="sort-float" align="left">Mass Diff.</th>
+     		<th class="sort-float" align="left">FVal</th>
+     	</logic:equal>
 	     
 	     <th style="text-decoration: underline;font-size: 10pt;" align="left">Spectrum</th>
 	</tr></thead>
@@ -54,25 +61,52 @@
      			<bean:define name="psm" property="spectrumMatch" id="psm_seq" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult"/>
      			<td><bean:write name="psm_seq" property="sequestResultData.deltaCN" /></td>
      			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
+     			<td>
+     			<span style="text-decoration: underline; cursor: pointer;" 
+				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="id" />)" >
+				View
+				</span>
+				</td>
      		</logic:equal>
      
      		<logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
      		 	<bean:define name="psm" property="spectrumMatch" id="psm_plc" type="org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult"/>
      		 	<td><bean:write name="psm_plc" property="prolucidResultData.primaryScore" /></td>
 				<td><bean:write name="psm_plc" property="prolucidResultData.deltaCN" /></td>
+				<td>
+     			<span style="text-decoration: underline; cursor: pointer;" 
+				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="id" />)" >
+				View
+				</span>
+				</td>
      		</logic:equal>
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      		 	<bean:define name="psm" property="spectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
      		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
      			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
-     		</logic:equal>
-     		 
-     		<td><span style="text-decoration: underline; cursor: pointer;"
+     			<td><span style="text-decoration: underline; cursor: pointer;"
 				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm" property="runSearchResultId" />)" >
 				View
 			</span>
 			</td>
+     		</logic:equal>
+     		 
+     		 <logic:equal name="inputGenerator" value="<%=Program.PEPTIDE_PROPHET.name() %>">
+     		 	<bean:define name="psm" property="spectrumMatch" id="psm_peptProphet" type="org.yeastrc.ms.domain.analysis.peptideProphet.PeptideProphetResult"/>
+     		 	<!--  <td><bean:write name="psm_peptProphet" property="probabilityRounded" /></td> -->
+	     		<td><bean:write name="psm_peptProphet" property="numEnzymaticTermini" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="numMissedCleavages" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="massDifferenceRounded" /></td>
+	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
+	     		<td>
+	     		<span style="text-decoration: underline; cursor: pointer;" 
+				onclick="viewSpectrum(<bean:write name="psm" property="scanId" />, <bean:write name="psm_peptProphet" property="searchResultId" />)" >
+				View
+				</span>
+				</td>
+     		</logic:equal>
+     		
    			</tr>
         </logic:iterate>
 	</tbody>

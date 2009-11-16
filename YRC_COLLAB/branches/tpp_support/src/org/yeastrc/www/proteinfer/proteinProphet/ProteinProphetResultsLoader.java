@@ -54,6 +54,7 @@ import org.yeastrc.www.proteinfer.MsResultLoader;
 import org.yeastrc.www.proteinfer.ProteinAccessionFilter;
 import org.yeastrc.www.proteinfer.ProteinAccessionSorter;
 import org.yeastrc.www.proteinfer.ProteinDescriptionFilter;
+import org.yeastrc.www.proteinfer.idpicker.WIdPickerSpectrumMatch;
 
 /**
  * 
@@ -509,7 +510,7 @@ public class ProteinProphetResultsLoader {
     }
     
 
-  //---------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------
     // Get a list of protein IDs with the given sorting criteria
     //---------------------------------------------------------------------------------------------------
     public static List<Integer> getSortedProteinIds(int pinferId, PeptideDefinition peptideDef, 
@@ -564,5 +565,24 @@ public class ProteinProphetResultsLoader {
         log.info("Time for resorting filtered IDs: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         
         return allIds;
+    }
+    
+    //---------------------------------------------------------------------------------------------------
+    // Get a list PSMs for a ion
+    //---------------------------------------------------------------------------------------------------
+    public static List<WIdPickerSpectrumMatch> getHitsForIon(int pinferIonId, Program inputGenerator) {
+        
+        List<? extends ProteinferSpectrumMatch> psmList = psmDao.loadSpectrumMatchesForIon(pinferIonId);
+        
+        List<WIdPickerSpectrumMatch> wPsmList = new ArrayList<WIdPickerSpectrumMatch>(psmList.size());
+        for(ProteinferSpectrumMatch psm: psmList) {
+            MsSearchResult origResult = resLoader.getResult(psm.getResultId(), inputGenerator);
+            WIdPickerSpectrumMatch wPsm = new WIdPickerSpectrumMatch(psm, origResult);
+            int scanNum = scanDao.load(origResult.getScanId()).getStartScanNum();
+            wPsm.setScanNumber(scanNum);
+            wPsmList.add(wPsm);
+        }
+        
+        return wPsmList;
     }
 }

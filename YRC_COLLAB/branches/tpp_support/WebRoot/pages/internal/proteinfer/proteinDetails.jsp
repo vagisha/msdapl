@@ -160,18 +160,37 @@
      			<bean:define name="ion" property="bestSpectrumMatch" id="psm_seq" type="org.yeastrc.ms.domain.search.sequest.SequestSearchResult"/>
      			<td><bean:write name="psm_seq" property="sequestResultData.deltaCN" /></td>
      			<td><bean:write name="psm_seq" property="sequestResultData.xCorr" /></td>
+     			<td>
+	     		<span style="text-decoration: underline; cursor: pointer;" 
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />)" >
+				View
+				</span>
+				</td>
+     			
      		</logic:equal>
      		
      		<logic:equal name="inputGenerator" value="<%=Program.PROLUCID.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_plc" type="org.yeastrc.ms.domain.search.prolucid.ProlucidSearchResult"/>
      		 	<td><bean:write name="psm_plc" property="prolucidResultData.primaryScore" /></td>
 				<td><bean:write name="psm_plc" property="prolucidResultData.deltaCN" /></td>
+				<td>
+	     		<span style="text-decoration: underline; cursor: pointer;" 
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />)" >
+				View
+				</span>
+				</td>
      		</logic:equal>
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
      		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
      			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
+     			<td>
+	     		<span style="text-decoration: underline; cursor: pointer;" 
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_perc" property="searchResultId" />)" >
+				View
+				</span>
+				</td>
      		</logic:equal>
      		 
      		 <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTEIN_PROPHET.name()%>">
@@ -188,17 +207,18 @@
 	     		<td><bean:write name="psm_peptProphet" property="numMissedCleavages" /></td>
 	     		<td><bean:write name="psm_peptProphet" property="massDifferenceRounded" /></td>
 	     		<td><bean:write name="psm_peptProphet" property="fValRounded" /></td>
+	     		<td>
+	     		<span style="text-decoration: underline; cursor: pointer;" 
+				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="psm_peptProphet" property="searchResultId" />)" >
+				View
+				</span>
+				</td>
      		</logic:equal>
      		
-     		<td><span style="text-decoration: underline; cursor: pointer;" 
-				onclick="viewSpectrum(<bean:write name="ion" property="scanId" />, <bean:write name="ion" property="bestSpectrumMatch.id" />)" >
-				View
-			</span>
-			</td>
             </tr>
             
            	<tr>
-           		<td colspan="8" align="center">
+           		<td colspan="13" align="center">
 				  <!--  peptide ion hits table will go here: psmListForIon.jsp -->
 				<div align="center" id="hitsforion_<bean:write name="ion" property="ion.id" />"></div>
 				</td>
