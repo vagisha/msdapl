@@ -34,10 +34,9 @@ public class NewProjectAction extends Action {
 		}
 
 		
-		// Make sure this user is in the MacCoss group
+		// Make sure this user is in a group
 		Groups groupMan = Groups.getInstance();
-		if (!groupMan.isMember(user.getResearcher().getID(), "MacCoss") &&
-		    !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+		if (!groupMan.isInAGroup(user.getResearcher().getID())) {
             ActionErrors errors = new ActionErrors();
             errors.add("access", new ActionMessage("error.access.invalidgroup"));
             saveErrors( request, errors );
@@ -53,8 +52,11 @@ public class NewProjectAction extends Action {
 		request.setAttribute("editProjectForm", newForm);
 		
 		// Set the default PI to this user.
-		// TODO  we are setting MacCoss as the default PI. Fix this.
-		newForm.setPI(1763);
+		if(groupMan.isMember(user.getResearcher().getID(),  "MacCoss"))
+		    newForm.setPI(1763);
+		else if(groupMan.isMember(user.getResearcher().getID(), "Goodlett"))
+		    newForm.setPI(1876);
+		
 		List<Researcher> researcherIds = new ArrayList<Researcher>();
 		Researcher tempR = new Researcher();
 		tempR = new Researcher();

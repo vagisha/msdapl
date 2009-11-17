@@ -46,10 +46,9 @@ public class UploadMSDataFormAction extends Action {
 			return mapping.findForward("authenticate");
 		}
 
-		// Restrict access to administrators and certain user groups
+		// Restrict access to researchers who are members of a grop
 		Groups groupMan = Groups.getInstance();
-		if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-		  !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
+		if (!groupMan.isInAGroup(user.getResearcher().getID())) {
 			ActionErrors errors = new ActionErrors();
 			errors.add("access", new ActionMessage("error.access.invalidgroup"));
 			saveErrors( request, errors );
