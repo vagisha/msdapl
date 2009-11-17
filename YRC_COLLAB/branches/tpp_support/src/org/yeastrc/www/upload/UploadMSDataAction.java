@@ -74,10 +74,13 @@ public class UploadMSDataAction extends Action {
         
 		boolean maccoss = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.MACCOSS);
         boolean yates = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.YATES);
+        boolean goodlett = Groups.getInstance().isMember(user.getResearcher().getID(), "Goodlett");
         if (yates)
             jobSaver.setGroupID(0);
         else if (maccoss)
             jobSaver.setGroupID(1);
+        else if( goodlett )
+            jobSaver.setGroupID(2);
 		
 		
 		jobSaver.setProjectID( projectID );
@@ -87,7 +90,7 @@ public class UploadMSDataAction extends Action {
 		jobSaver.setPipeline(uform.getPipeline());
 		jobSaver.setInstrumentId(uform.getInstrumentId());
 		
-		// TODO assuming that the data server will be accessible on web-server
+		// TODO assuming that the data server will be accessible on server running JobQueue application
 		if(!yates)
 		    jobSaver.setServerDirectory( "local:"+directory );
 		else

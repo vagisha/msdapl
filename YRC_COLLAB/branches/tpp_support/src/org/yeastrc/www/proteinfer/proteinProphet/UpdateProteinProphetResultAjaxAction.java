@@ -94,8 +94,10 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
         filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
-        filterCriteria.setMinProbability(filterForm.getMinProbabilityDouble());
-        filterCriteria.setMaxProbability(filterForm.getMaxProbabilityDouble());
+        filterCriteria.setMinGroupProbability(filterForm.getMinGroupProbabilityDouble());
+        filterCriteria.setMaxGroupProbability(filterForm.getMaxGroupProbabilityDouble());
+        filterCriteria.setMinProteinProbability(filterForm.getMinProteinProbabilityDouble());
+        filterCriteria.setMaxProteinProbability(filterForm.getMaxProteinProbabilityDouble());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(filterCritSession == null ? 
                 ProteinProphetFilterCriteria.defaultSortBy() : 
@@ -118,13 +120,21 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         // check if the protein grouping has changed. If so we may have to resort the proteins. 
         boolean resort = false;
         if(filterCritSession.isGroupProteins() != filterCriteria.isGroupProteins()) {
+            SORT_BY sortby = filterCriteria.getSortBy();
             // If the filter criteria has proteins GROUPED and the sort_by is
             // on one of the protein specific columns change it to group_id
             if(filterCriteria.isGroupProteins()) {
-                SORT_BY sortby = filterCriteria.getSortBy();
-                if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.VALIDATION_STATUS)
+                if(sortby == SORT_BY.ACCESSION || sortby == SORT_BY.VALIDATION_STATUS ||
+                   sortby == SORT_BY.PROBABILITY_PROT) {
                     filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
-                filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
+                    filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
+                }
+            }
+            else {
+                if(sortby == SORT_BY.PROBABILITY_GRP) {
+                    filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
+                    filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());
+                }
             }
             resort = true; // if the grouping has changed we will resort proteins (UNLESS the filtering criteria has also changed).
         }
@@ -155,7 +165,7 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         
         // update the list of filtered and sorted protein IDs in the session, along with the filter criteria
         request.getSession().setAttribute("proteinIds", storedProteinIds);
-        request.getSession().setAttribute("pinferFilterCriteria", filterCriteria);
+        request.getSession().setAttribute("proteinProphetFilterCriteria", filterCriteria);
         
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());

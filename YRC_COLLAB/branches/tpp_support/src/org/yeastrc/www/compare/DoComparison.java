@@ -32,7 +32,6 @@ import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.FilterableDataset;
 import org.yeastrc.www.compare.dataset.ProteinProphetDataset;
 import org.yeastrc.www.compare.dataset.ProteinferDataset;
-import org.yeastrc.www.compare.dataset.SelectableDataset;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
@@ -95,7 +94,9 @@ public class DoComparison extends Action {
             else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
                 ProteinProphetFilterCriteria filterCriteria = new ProteinProphetFilterCriteria(myForm.getFilterCriteria());
                 double minProbability = ((ProteinProphetDataset)dataset).getRoc().getMinProbabilityForError(myForm.getErrorRateDouble());
-                filterCriteria.setMinProbability(minProbability);
+                if(myForm.getUseProteinGroupProbability())
+                    filterCriteria.setMinGroupProbability(minProbability);
+                else filterCriteria.setMinProteinProbability(minProbability);
                 ((ProteinProphetDataset)dataset).setProteinFilterCriteria(filterCriteria);
             }
             datasets.add(dataset);
@@ -107,7 +108,7 @@ public class DoComparison extends Action {
         
         // Do the comparison
         long s = System.currentTimeMillis();
-        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, !myForm.getUseAllProteins());
+        ProteinComparisonDataset comparison = ProteinDatasetComparer.instance().compareDatasets(datasets, myForm.getParsimoniousParam());
         long e = System.currentTimeMillis();
         log.info("Time to compare datasets: "+TimeUtils.timeElapsedSeconds(s, e)+" seconds");
         

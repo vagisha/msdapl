@@ -17,18 +17,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.yeastrc.data.InvalidIDException;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.ms.dao.nrseq.NrSeqLookupUtil;
 import org.yeastrc.ms.dao.protinfer.idpicker.ibatis.IdPickerProteinBaseDAO;
 import org.yeastrc.ms.dao.protinfer.proteinProphet.ProteinProphetProteinDAO;
+import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetProteinInformation;
 import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.FilterableDataset;
 import org.yeastrc.www.compare.util.CommonNameLookupUtil;
-import org.yeastrc.yates.YatesRun;
 
 /**
  * 
@@ -38,6 +37,10 @@ public class ProteinDatasetComparer {
     private static final Logger log = Logger.getLogger(ProteinDatasetComparer.class.getName());
     
     private static ProteinDatasetComparer instance;
+    
+    public static final int PARSIM_NONE = 0;
+    public static final int PARSIM_ONE = 1;
+    public static final int PARSIM_ALL = 2;
     
     private ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
     private IdPickerProteinBaseDAO protDao = fact.getIdPickerProteinBaseDao();
@@ -51,22 +54,22 @@ public class ProteinDatasetComparer {
         return instance;
     }
     
-    public ProteinComparisonDataset compareDatasets(List<FilterableDataset> datasets, boolean parsimoniousOnly) throws Exception {
+    public ProteinComparisonDataset compareDatasets(List<FilterableDataset> datasets, int parsimoniousCount) throws Exception {
         
         Map<Integer, ComparisonProtein> proteinMap = new HashMap<Integer, ComparisonProtein>();
         
-        // First get the parsimonious proteins
+        boolean parsimoniousOnly = !(parsimoniousCount == PARSIM_NONE);
+        
+        // If parsimoniousCount == PARSIM_NONE this will get all the proteins that pass through the filter criteria
+        // If parsimoniousCount == PARSIM_ONE || parsimoniousCount == PARSIM_AL this will get only parsimonious proteins
+        // that pass through the filter criteria
         for(FilterableDataset dataset: datasets) {
-            
             
             List<Integer> nrseqProteinIds = new ArrayList<Integer>(0);
             
             if(dataset.getSource() != DatasetSource.DTA_SELECT)
-                nrseqProteinIds = getParsimoniousProteinIdsForDataset(dataset); // get only parsimonious
+                nrseqProteinIds = getProteinIdsForDataset(dataset, parsimoniousOnly);
             
-            else if (dataset.getSource() == DatasetSource.DTA_SELECT) 
-                nrseqProteinIds = getDtaSelectProteinIds(dataset);
-                
             for(int nrseqId: nrseqProteinIds) {
                 ComparisonProtein protein = proteinMap.get(nrseqId);
                 if(protein == null) {
@@ -80,15 +83,14 @@ public class ProteinDatasetComparer {
             }
         }
         
-        // now get the non-parsimonious proteins, if required (Protein Inference ONLY)
-        if(!parsimoniousOnly) {
+        // If we want proteins that are parsimonious in at least one but not all the datasets we get
+        // the list of non-parsimonious proteins in each dataset and keep the ones we have already seen
+        // If a proteins was parsimonious in one of the datasets it should already be in the map.
+        if(parsimoniousCount == PARSIM_ONE) {
             
             for(Dataset dataset: datasets) {
                 
-                if(dataset.getSource() == DatasetSource.DTA_SELECT)
-                    continue;
-                
-                List<Integer> nrseqProteinIds = getNonParsimoniousProteinIdsForDataset(dataset); // get only non-parsimonious
+                List<Integer> nrseqProteinIds = getAllNonParsimoniousProteinIdsForDataset(dataset); // get only non-parsimonious
                 
                 for(int nrseqId: nrseqProteinIds) {
                     ComparisonProtein protein = proteinMap.get(nrseqId);
@@ -116,35 +118,57 @@ public class ProteinDatasetComparer {
         
     }
     
-    private List<Integer> getDtaSelectProteinIds(Dataset dataset) throws InvalidIDException, SQLException, Exception {
-        YatesRun run = new YatesRun();
-        run.load(dataset.getDatasetId());
-        return run.getNrseqIds();
-    }
 
-    private List<Integer> getParsimoniousProteinIdsForDataset(FilterableDataset dataset) {
+    private List<Integer> getProteinIdsForDataset(FilterableDataset dataset, boolean parsimoniousOnly) {
+        
+        boolean getParsimonious = true;
+        boolean getNonParsimonious = !parsimoniousOnly;
         
         if(dataset.getSource() == DatasetSource.PROTINFER) {
             if(dataset.getProteinFilterCrteria() == null)
-                return protDao.getNrseqProteinIds(dataset.getDatasetId(), true, false); // parsimonious only
+                return protDao.getNrseqProteinIds(dataset.getDatasetId(), getParsimonious, getNonParsimonious);
             else {
-                return protDao.getFilteredNrseqIds(dataset.getDatasetId(), 
-                        dataset.getProteinFilterCrteria());
+                ProteinFilterCriteria filterCriteria = dataset.getProteinFilterCrteria();
+                boolean oldParsimonious = filterCriteria.getParsimonious();
+                boolean oldNonParsimonious = filterCriteria.getNonParsimonious();
+                
+                filterCriteria.setParsimonious(getParsimonious);
+                filterCriteria.setNonParsimonious(getNonParsimonious);
+                
+                List<Integer> ids = protDao.getFilteredNrseqIds(dataset.getDatasetId(), 
+                        filterCriteria);
+                
+                filterCriteria.setParsimonious(oldParsimonious);
+                filterCriteria.setNonParsimonious(oldNonParsimonious);
+                return ids;
+                
             }
         }
         else if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
             if(dataset.getProteinFilterCrteria() == null)
-                return ppProtDao.getNrseqProteinIds(dataset.getDatasetId(), true, false); // parsimonious only
-            else
-                return ppProtDao.getFilteredNrseqIds(dataset.getDatasetId(), 
+                return ppProtDao.getNrseqProteinIds(dataset.getDatasetId(), getParsimonious, getNonParsimonious);
+            else {
+                ProteinFilterCriteria filterCriteria = dataset.getProteinFilterCrteria();
+                boolean oldParsimonious = filterCriteria.getParsimonious();
+                boolean oldNonParsimonious = filterCriteria.getNonParsimonious();
+                
+                filterCriteria.setParsimonious(getParsimonious);
+                filterCriteria.setNonParsimonious(getNonParsimonious);
+                
+                List<Integer> ids = ppProtDao.getFilteredNrseqIds(dataset.getDatasetId(), 
                         (ProteinProphetFilterCriteria) dataset.getProteinFilterCrteria());
+                
+                filterCriteria.setParsimonious(oldParsimonious);
+                filterCriteria.setNonParsimonious(oldNonParsimonious);
+                return ids;
+            }
         }
         else {
             return new ArrayList<Integer>(0);
         }
     }
     
-    private List<Integer> getNonParsimoniousProteinIdsForDataset(Dataset dataset) {
+    private List<Integer> getAllNonParsimoniousProteinIdsForDataset(Dataset dataset) {
         
         if(dataset.getSource() == DatasetSource.PROTINFER) {
             return protDao.getNrseqProteinIds(dataset.getDatasetId(), false, true); // non-parsimonious only

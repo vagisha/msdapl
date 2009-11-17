@@ -141,14 +141,50 @@
 		</table>
 		</td>
 		
-		<!-- ################## PARSIMONIOUS ONLY CHECKBOX	  ########################### -->
-		<td valign="top" style="padding-right:10px;"><html:checkbox name="proteinSetComparisonForm" property="onlyParsimonious">Only Parsimonious</html:checkbox> </td>
-
+		
 		<!-- ################## GROUP PROTEINS CHECKBOX	  ########################### -->
 		<logic:notPresent name="goEnrichmentView">
 			<td valign="top"><html:checkbox name="proteinSetComparisonForm" property="groupIndistinguishableProteins">Group Indistinguishable Proteins</html:checkbox> </td>
 		</logic:notPresent>
 	</tr>
+	
+	<!-- ################## PARSIMONIOUS ONLY CHECKBOX	  ########################### -->
+	<tr>
+		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
+		<td valign="top" colspan="2" style="padding-bottom: 10px;">
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0">All</html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1">Parsimonious in > 1 Dataset</html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2">Parsimonious in ALL Datasets</html:radio>
+			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
+			<br>
+			<span style="font-size:8pt;">
+				NOTE: For ProteinProphet datasets "parsimonious" = NOT "subsumed"
+			</span>
+			</logic:equal>
+		</td>
+	</tr>
+	
+	<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
+	<tr>
+		<td valign="top" style="padding-bottom: 10px;">ProteinProphet Error: </td>
+		<td valign="top" style="padding-bottom: 10px; padding-left: 5px;">
+			<html:text name="proteinSetComparisonForm" property="errorRate"></html:text>
+			<br>
+			<span style="font-size:8pt;">
+				The error rate closest to the one entered above<br>will be used to determine the probability cutoff
+			</span>
+		</td>
+		<td colspan="2" style="padding-bottom: 10px;">
+			Cutoff on Protein Group Probability<html:checkbox property="useProteinGroupProbability" />
+			<br>
+			<span style="font-size:8pt;">
+				If checked, probability cutoff will be applied to protein group probability.
+				<br>Otherwise cutoff will be applied to individual protein probability.
+			</span>
+		</td>
+	</tr>
+	</logic:equal>
+	
 	<logic:notPresent name="goEnrichmentView">
 	<tr>
 		<!-- ################## SEARCH BOX	  ########################################### -->
@@ -159,9 +195,10 @@
 			<html:text name="proteinSetComparisonForm" property="accessionLike" size="40"></html:text><br>
  			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial identifiers</span>
  		</td>
- 		
- 		<td valign="top" align="center" colspan="2">
- 			<html:submit value="Update" onclick="javascript:updateResults();"></html:submit> &nbsp;
+ 	</tr>
+ 	<tr>
+ 		<td valign="top" align="center" colspan="4">
+ 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit> &nbsp;
 			<span style="color:red; font-size:8pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
 		</td>
 	</tr>

@@ -134,6 +134,21 @@
 			</td>
 		</tr>
 
+		<tr>
+			<td width="20%" align="left" valign="top" class="left_align">Species:</td>
+			<td width="80%" align="left" valign="top" class="left_align">
+				<logic:equal name="species" property="id" value="0">
+					<bean:write name="species" property="name"/>
+				</logic:equal>
+				
+				<logic:notEqual name="species" property="id" value="0">
+					<a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=<bean:write name="species" property="id"/>">
+    				<i><bean:write name="species" property="name" /></i></a>
+				</logic:notEqual>
+			</td>
+			
+		</tr>
+		
 		<tr >
 			<td width="20%" align="left" valign="top" class="left_align">Bait Desc:</td>
 			<td width="80%" align="left" valign="top" class="left_align">

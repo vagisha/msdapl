@@ -175,9 +175,16 @@ function onCancel(projectId) {
       <html:option value="10116">R. norvegicus (rat)</html:option>
       <html:option value="4932">S. cerevisiae (budding yeast)</html:option>
       <html:option value="4896">S. pombe (fission yeast)</html:option>
+      <html:option value="287">Pseudomonas aeruginosa</html:option>
       <html:option value="0">Not Specified/Not Applicable</html:option>
      </html:select>
     </td>
+   </tr>
+   
+   <tr>
+    <td valign="top">If target species is not listed<br>
+    enter the <a target="ncbi_window" href="http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/">NCBI Taxonomy</a> ID number:<br><br></td>
+    <td valign="top"><html:text property="otherSpecies" size="5" maxlength="7"/><br><br></td>
    </tr>
    
    <tr>

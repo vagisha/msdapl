@@ -134,8 +134,10 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         filterCriteria.setNumMaxUniquePeptides(filterForm.getMaxUniquePeptidesInteger());
         filterCriteria.setNumSpectra(filterForm.getMinSpectrumMatchesInteger());
         filterCriteria.setNumMaxSpectra(filterForm.getMaxSpectrumMatchesInteger());
-        filterCriteria.setMinProbability(filterForm.getMinProbabilityDouble());
-        filterCriteria.setMaxProbability(filterForm.getMaxProbabilityDouble());
+        filterCriteria.setMinGroupProbability(filterForm.getMinGroupProbabilityDouble());
+        filterCriteria.setMaxGroupProbability(filterForm.getMaxGroupProbabilityDouble());
+        filterCriteria.setMinProteinProbability(filterForm.getMinProteinProbabilityDouble());
+        filterCriteria.setMaxProteinProbability(filterForm.getMaxProteinProbabilityDouble());
         filterCriteria.setPeptideDefinition(peptideDef);
         filterCriteria.setSortBy(ProteinProphetFilterCriteria.defaultSortBy());
         filterCriteria.setSortOrder(ProteinProphetFilterCriteria.defaultSortOrder());

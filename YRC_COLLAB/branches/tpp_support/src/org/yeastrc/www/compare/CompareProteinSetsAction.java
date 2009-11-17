@@ -103,6 +103,7 @@ public class CompareProteinSetsAction extends Action {
         for(SelectableDataset dataset: datasets) {
             if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
                 myForm.setHasProteinProphetDatasets(true);
+                myForm.setUseProteinGroupProbability(true);
                 break;
             }
         }

@@ -11,10 +11,13 @@
 		<table CELLPADDING="5px" CELLSPACING="2px" align="center" style="border: 1px solid gray;">
 			<tr>
 				<td style="border: 1px dotted #AAAAAA;">
-					# Protein Groups (# proteins): 
+					# Indistinguishable Protein Groups (# proteins)
+				</td>
+				<td style="border: 1px dotted #AAAAAA;">
+					All: 
 					<b><bean:write name="filteredProteinGrpCount" /></b>(<bean:write name="filteredProteinCount" />)
 				</td>
-				<td style="border: 1px dotted #AAAAAA;"># Parsimonious Protein Groups (# proteins): 
+				<td style="border: 1px dotted #AAAAAA;">Exclude Subsumed: 
 					<b><bean:write name="parsimProteinGrpCount" /></b>(<bean:write name="parsimProteinCount" />)
 				</td>
 			</tr>

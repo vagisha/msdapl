@@ -86,6 +86,7 @@ public class DatasetBuilder {
         ProteinProphetDataset prDataset = new ProteinProphetDataset(dataset);
         ProteinferDAOFactory fact = ProteinferDAOFactory.instance();
         prDataset.setRoc(fact.getProteinProphetRocDao().loadRoc(dataset.getDatasetId()));
+        prDataset.setProbabilityForDefaultError();
         return prDataset;
     }
 }

@@ -692,18 +692,29 @@ function validateForm() {
     	if(!valid)	return false;
     }
 
-	// probability
-    value = $("form#filterForm input[@name='minProbability']").fieldValue();
-    valid = validateFloat(value, "Min. Probability", 0.0, 1.0);
+	// ProteinProphet group probability
+    value = $("form#filterForm input[@name='minGroupProbability']").fieldValue();
+    valid = validateFloat(value, "Min. Group Probability", 0.0, 1.0);
     if(!valid)	return false;
     var minProb = parseFloat(value);
     
-    value = $("form#filterForm input[@name='maxProbability']").fieldValue();
-    valid = validateFloat(value, "Max. Probability", minProb, 1.0);
+    value = $("form#filterForm input[@name='maxGroupProbability']").fieldValue();
+    valid = validateFloat(value, "Max. Group Probability", minProb, 1.0);
+    if(!valid)	return false;
+    
+    // ProteinProphet protein probability
+    value = $("form#filterForm input[@name='minProteinProbability']").fieldValue();
+    valid = validateFloat(value, "Min. Protein Probability", 0.0, 1.0);
+    if(!valid)	return false;
+    var minProb = parseFloat(value);
+    
+    value = $("form#filterForm input[@name='maxProteinProbability']").fieldValue();
+    valid = validateFloat(value, "Max. Protein Probability", minProb, 1.0);
     if(!valid)	return false;
     
     return true;
 }
+
 function validateInt(value, fieldName, min, max) {
 	var intVal = parseInt(value);
 	var valid = true;

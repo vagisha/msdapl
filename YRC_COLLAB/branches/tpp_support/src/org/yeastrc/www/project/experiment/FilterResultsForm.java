@@ -282,6 +282,10 @@ public class FilterResultsForm extends ActionForm {
     public void setMinCharge(String minCharge) {
         this.minCharge = minCharge;
     }
+    
+    public void setMaxCharge(String maxCharge) {
+        this.maxCharge = maxCharge;
+    }
 
     public void setMinRT(String minRT) {
         this.minRT = minRT;

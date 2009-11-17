@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.bio.taxonomy.Species;
 import org.yeastrc.jobqueue.MSJob;
 import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.project.Projects;
@@ -57,6 +58,10 @@ public class ViewJobAction extends Action {
 				return mapping.findForward( "Failure" );
 			
 			request.setAttribute( "job", job );
+			int speciesId = job.getTargetSpecies();
+			Species species = Species.getInstance(speciesId);
+			request.setAttribute("species", species);
+			
 		} catch (Exception e) {
 			return mapping.findForward( "Failure" );
 		}

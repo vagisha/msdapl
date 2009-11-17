@@ -36,8 +36,11 @@ public class ProteinProphetFilterForm extends ActionForm {
     private String peptide = null;
     private boolean exactMatch = true;
     
-    private String minProbability = "0.0";
-    private String maxProbability = "1.0";
+    private String minGroupProbability = "0.0";
+    private String maxGroupProbability = "1.0";
+    
+    private String minProteinProbability = "0.0";
+    private String maxProteinProbability = "1.0";
     
     public ProteinProphetFilterForm () {}
     
@@ -59,8 +62,10 @@ public class ProteinProphetFilterForm extends ActionForm {
         accessionLike = null;
         descriptionLike = null;
         descriptionNotLike = null;
-        minProbability = "0.0";
-        maxProbability = "1.0";
+        minGroupProbability = "0.0";
+        maxGroupProbability = "1.0";
+        minProteinProbability = "0.0";
+        maxProteinProbability = "1.0";
     }
     
     /**
@@ -83,32 +88,60 @@ public class ProteinProphetFilterForm extends ActionForm {
         this.pinferId = pinferId;
     }
 
-    // MIN PROBABILITY
-    public String getMinProbability() {
-        return minProbability;
+    // MIN PROTEIN PROPHET GROUP PROBABILITY
+    public String getMinGroupProbability() {
+        return minGroupProbability;
     }
-    public double getMinProbabilityDouble() {
-        if(minProbability == null || minProbability.trim().length() == 0)
+    public double getMinGroupProbabilityDouble() {
+        if(minGroupProbability == null || minGroupProbability.trim().length() == 0)
             return 0.0;
         else
-            return Double.parseDouble(minProbability);
+            return Double.parseDouble(minGroupProbability);
     }
-    public void setMinProbability(String minProbability) {
-        this.minProbability = minProbability;
+    public void setMinGroupProbability(String minProbability) {
+        this.minGroupProbability = minProbability;
     }
     
-    // MAX PROBABILITY
-    public String getMaxProbability() {
-        return maxProbability;
+    // MAX PROTEIN PROPHET GROUP PROBABILITY
+    public String getMaxGroupProbability() {
+        return maxGroupProbability;
     }
-    public double getMaxProbabilityDouble() {
-        if(maxProbability == null || maxProbability.trim().length() == 0)
+    public double getMaxGroupProbabilityDouble() {
+        if(maxGroupProbability == null || maxGroupProbability.trim().length() == 0)
             return 100.0;
         else
-            return Double.parseDouble(maxProbability);
+            return Double.parseDouble(maxGroupProbability);
     }
-    public void setMaxProbability(String maxProbability) {
-        this.maxProbability = maxProbability;
+    public void setMaxGroupProbability(String maxProbability) {
+        this.maxGroupProbability = maxProbability;
+    }
+    
+    // MIN PROTEIN PROPHET PROTEIN PROBABILITY
+    public String getMinProteinProbability() {
+        return minProteinProbability;
+    }
+    public double getMinProteinProbabilityDouble() {
+        if(minProteinProbability == null || minProteinProbability.trim().length() == 0)
+            return 0.0;
+        else
+            return Double.parseDouble(minProteinProbability);
+    }
+    public void setMinProteinProbability(String minProbability) {
+        this.minProteinProbability = minProbability;
+    }
+    
+    // MAX PROTEIN PROPHET PROTEIN PROBABILITY
+    public String getMaxProteinProbability() {
+        return maxProteinProbability;
+    }
+    public double getMaxProteinProbabilityDouble() {
+        if(maxProteinProbability == null || maxProteinProbability.trim().length() == 0)
+            return 100.0;
+        else
+            return Double.parseDouble(maxProteinProbability);
+    }
+    public void setMaxProteinProbability(String maxProbability) {
+        this.maxProteinProbability = maxProbability;
     }
     
     // MIN COVERAGE

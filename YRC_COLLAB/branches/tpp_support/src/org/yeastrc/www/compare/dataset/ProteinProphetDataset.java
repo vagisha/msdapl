@@ -22,8 +22,6 @@ public class ProteinProphetDataset extends FilterableDataset {
     public ProteinProphetDataset(Dataset dataset) {
         super(dataset);
         this.filterCriteria = new ProteinProphetFilterCriteria();
-        filterCriteria.setMinProbability(0.9);
-        filterCriteria.setMaxProbability(1.0);
     }
 
     @Override
@@ -45,5 +43,15 @@ public class ProteinProphetDataset extends FilterableDataset {
     
     public double getProbabilityForDefaultError() {
         return roc.getMinProbabilityForError(0.01);
+    }
+    
+    public void setProbabilityForError(double error) {
+        if(roc != null) {
+            filterCriteria.setMinGroupProbability(roc.getMinProbabilityForError(error));
+        }
+    }
+    
+    public void setProbabilityForDefaultError() {
+        setProbabilityForError(0.01);
     }
 }

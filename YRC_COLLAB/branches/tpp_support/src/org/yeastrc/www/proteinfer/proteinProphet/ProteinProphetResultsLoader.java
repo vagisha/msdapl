@@ -542,8 +542,11 @@ public class ProteinProphetResultsLoader {
         else if (sortBy == SORT_BY.NUM_SPECTRA) {
             allIds = ppProtDao.sortProteinIdsBySpectrumCount(pinferId, groupProteins);
         }
-        else if (sortBy == SORT_BY.PROBABILITY) {
-            allIds = ppProtDao.sortProteinIdsByProbability(pinferId, groupProteins);
+        else if (sortBy == SORT_BY.PROBABILITY_GRP) {
+            allIds = ppProtDao.sortProteinIdsByProbability(pinferId, true);
+        }
+        else if (sortBy == SORT_BY.PROBABILITY_PROT) {
+            allIds = ppProtDao.sortProteinIdsByProbability(pinferId, false);
         }
         if(allIds == null) {
             log.warn("Could not get sorted order for all protein IDs for protein inference run: "+pinferId);

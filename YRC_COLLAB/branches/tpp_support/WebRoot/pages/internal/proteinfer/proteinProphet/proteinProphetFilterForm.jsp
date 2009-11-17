@@ -43,12 +43,12 @@
   </td>
   </tr>
   <tr>
-  	<td>Probability:</td>
-  	<td>
-  		Min <html:text name="proteinProphetFilterForm" property="minProbability" size="3"></html:text>
-  		Max <html:text name="proteinProphetFilterForm" property="maxProbability" size="3"></html:text>
+  	<td valign="bottom">ProteinProphet<br>Group Probability:</td>
+  	<td valign="bottom">
+  		Min <html:text name="proteinProphetFilterForm" property="minGroupProbability" size="3"></html:text>
+  		Max <html:text name="proteinProphetFilterForm" property="maxGroupProbability" size="3"></html:text>
   	</td>
-  	</tr>
+  </tr>
   </table></td>
   
   <td valign="top"><table>
@@ -66,25 +66,31 @@
   	Max <html:text name="proteinProphetFilterForm" property="maxSpectrumMatches" size="3"></html:text>
   </td>
   </tr>
+  <tr>
+  	<td valign="bottom">ProteinProphet<br>Protein Probability:</td>
+  	<td valign="bottom">
+  		Min <html:text name="proteinProphetFilterForm" property="minProteinProbability" size="3"></html:text>
+  		Max <html:text name="proteinProphetFilterForm" property="maxProteinProbability" size="3"></html:text>
+  	</td>
+  </tr>
   </table></td>
   
   <td valign="top"><table>
   <tr>
-  	<td colspan="2">Show Protein Groups: </td>
-  	<td>
+  	<td colspan="2" align="left">ProteinProphet Groups: </td>
+  	<td align="left">
   		<html:radio name="proteinProphetFilterForm" property="joinProphetGroupProteins" value="true">Yes</html:radio>
   	</td>
-  	<td>
+  	<td align="left">
   		<html:radio name="proteinProphetFilterForm" property="joinProphetGroupProteins" value="false">No</html:radio>
   	</td>
   </tr>
   <tr>
-  	<td colspan="2">Show Proteins: </td>
-  	<td>
-  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="true">All</html:radio>
+  	<td colspan="2" align="left">
+  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="true">Show All Proteins</html:radio>
   	</td>
-  	<td>
-  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="false">Parsimonious</html:radio>
+  	<td colspan="2" align="left">
+  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="false">Excluding Subsumed</html:radio>
   	</td>
   </tr>
   </table></td>

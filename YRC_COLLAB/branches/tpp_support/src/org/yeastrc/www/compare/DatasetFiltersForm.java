@@ -24,8 +24,9 @@ public class DatasetFiltersForm extends ActionForm {
     private List<SelectableDataset> notList = new ArrayList<SelectableDataset>();
     private List<SelectableDataset> xorList = new ArrayList<SelectableDataset>();
     
-    private boolean useAllProteins = true;
-    private boolean groupProteins = true;
+    private int parsimoniousParam = ProteinDatasetComparer.PARSIM_ONE; // parsimonious in at least one
+    
+    private boolean groupIndistinguishableProteins = false;
     
     private String minCoverage = "0.0";
     private String maxCoverage = "100.0";
@@ -42,17 +43,20 @@ public class DatasetFiltersForm extends ActionForm {
 
     private boolean hasProteinProphetDatasets = false;
     private String errorRate = "0.01";
+    private boolean useProteinGroupProbability = false;
     
     public void reset() {
         minCoverage = "0.0";
         minPeptides = "1";
         minUniquePeptides = "0";
         minSpectrumMatches = "1";
-        useAllProteins = true;
-        groupProteins = true;
+        
         accessionLike = null;
         descriptionLike = null;
         errorRate = "0.01";
+        
+        groupIndistinguishableProteins = false;
+        useProteinGroupProbability = false;
     }
     
     
@@ -169,29 +173,22 @@ public class DatasetFiltersForm extends ActionForm {
     }
     
     // USE PARSIMONIOUS AND NON-PARSIMONIOUS PROTEINS
-    public boolean getUseAllProteins() {
-        return useAllProteins;
+    public int getParsimoniousParam() {
+        return parsimoniousParam;
     }
+    
+    public void setParsimoniousParam(int parsimParam) {
+        this.parsimoniousParam = parsimParam;
+    }
+    
 
-    public void setUseAllProteins(boolean useAllProteins) {
-        this.useAllProteins = useAllProteins;
-    }
-    
-    public boolean getOnlyParsimonious() {
-        return !useAllProteins;
-    }
-    
-    public void setOnlyParsimonious(boolean onlyParsimonious) {
-        this.useAllProteins = !onlyParsimonious;
-    }
-    
     // GROUP INDISTINGUISHABLE PROTEINS
     public boolean getGroupIndistinguishableProteins() {
-        return groupProteins;
+        return groupIndistinguishableProteins;
     }
 
     public void setGroupIndistinguishableProteins(boolean groupProteins) {
-        this.groupProteins = groupProteins;
+        this.groupIndistinguishableProteins = groupProteins;
     }
     
     // ACCESSION STRING FILTERS
@@ -267,24 +264,13 @@ public class DatasetFiltersForm extends ActionForm {
         filterCriteria.setNumMaxUniquePeptides(this.getMaxUniquePeptidesInteger());
         filterCriteria.setNumSpectra(this.getMinSpectrumMatchesInteger());
         filterCriteria.setNumMaxSpectra(this.getMaxSpectrumMatchesInteger());
-        filterCriteria.setParsimonious(this.getUseAllProteins());
+        if(this.parsimoniousParam == ProteinDatasetComparer.PARSIM_NONE)
+            filterCriteria.setParsimonious(false);
+        else
+            filterCriteria.setParsimonious(true);
         filterCriteria.setAccessionLike(this.getAccessionLike());
         filterCriteria.setDescriptionLike(this.getDescriptionLike());
         return filterCriteria;
-    }
-    
-    public void setFilterCriteria(ProteinFilterCriteria filterCriteria) {
-        this.minCoverage = String.valueOf(filterCriteria.getCoverage());
-        this.maxCoverage = String.valueOf(filterCriteria.getMaxCoverage());
-        this.minPeptides = String.valueOf(filterCriteria.getNumPeptides());
-        this.maxPeptides = String.valueOf(filterCriteria.getNumMaxPeptides());
-        this.minUniquePeptides = String.valueOf(filterCriteria.getNumUniquePeptides());
-        this.maxUniquePeptides = String.valueOf(filterCriteria.getNumMaxUniquePeptides());
-        this.minSpectrumMatches = String.valueOf(filterCriteria.getNumSpectra());
-        this.maxSpectrumMatches = String.valueOf(filterCriteria.getNumMaxSpectra());
-        this.useAllProteins = filterCriteria.getParsimonious();
-        this.accessionLike = filterCriteria.getAccessionLike();
-        this.descriptionLike = filterCriteria.getDescriptionLike();
     }
     
     // -------------------------------------------------------------------------------
@@ -366,7 +352,7 @@ public class DatasetFiltersForm extends ActionForm {
     //-----------------------------------------------------------------------------
     // Protein Prophet datasets
     //-----------------------------------------------------------------------------
-    public boolean hasProteinProphetDatasets() {
+    public boolean getHasProteinProphetDatasets() {
         return hasProteinProphetDatasets ;
     }
     
@@ -385,6 +371,14 @@ public class DatasetFiltersForm extends ActionForm {
     }
     public void setErrorRate(String errorRate) {
         this.errorRate = errorRate;
+    }
+    
+    public boolean getUseProteinGroupProbability() {
+        return this.useProteinGroupProbability;
+    }
+    
+    public void setUseProteinGroupProbability(boolean useProteinGroupProbability) {
+        this.useProteinGroupProbability = useProteinGroupProbability;
     }
     
     //-----------------------------------------------------------------------------

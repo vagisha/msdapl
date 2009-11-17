@@ -7,7 +7,6 @@
 package org.yeastrc.www.proteinfer.proteinProphet;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +22,6 @@ import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.misc.ResultsPager;
-import org.yeastrc.www.proteinfer.ProteinAccessionStore;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -75,7 +73,7 @@ public class SortProteinProphetResultsAjaxAction extends Action{
         PeptideDefinition peptideDef = filterCriteria.getPeptideDefinition();
 
 
-        // How are we displaying the results (grouped by protein group or individually)
+        // How are we displaying the results (grouped by ProteinProphet group or individually)
         boolean group = filterCriteria.isGroupProteins();
         request.setAttribute("groupProteins", group);
 
@@ -161,9 +159,5 @@ public class SortProteinProphetResultsAjaxAction extends Action{
 
         return mapping.findForward("Success");
 
-    }
-
-    private Map<Integer, String> getProteinAccessionMap(int pinferId, boolean createNew) {
-        return ProteinAccessionStore.getInstance().getAccessionMapForProteinInference(pinferId, createNew);
     }
 }

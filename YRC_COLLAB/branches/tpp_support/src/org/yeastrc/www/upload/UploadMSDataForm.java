@@ -29,7 +29,7 @@ public class UploadMSDataForm extends ActionForm {
     private String year;
     private String directory;
     private int species;
-//    private int otherSpecies;
+    private int otherSpecies;
     private String comments;
     
     
@@ -80,13 +80,16 @@ public class UploadMSDataForm extends ActionForm {
 		}
 		
 		int speciesID = this.getSpecies();
-		TaxonomySearcher ts = TaxonomySearcher.getInstance();
-		try {
-			if (ts.getName(speciesID) == null)
-				errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
-		} catch (Exception e) {
-			errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
-		}
+        // user may not have selected a species, but if a species is selected make sure we recognize it
+        if(speciesID > 0) {
+            TaxonomySearcher ts = TaxonomySearcher.getInstance();
+            try {
+                if (ts.getName(speciesID) == null)
+                    errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
+            } catch (Exception e) {
+                errors.add("upload", new ActionMessage("error.upload.invalidspecies"));
+            }
+        }
 		
 //		if(this.instrumentId == 0) {
 //		    errors.add("upload", new ActionMessage("error.upload.noinstrument"));
@@ -117,7 +120,10 @@ public class UploadMSDataForm extends ActionForm {
 
 
     public int getSpecies() {
-        return species;
+        if(species > 0)
+            return species;
+        else
+            return otherSpecies;
     }
 
 
@@ -126,14 +132,14 @@ public class UploadMSDataForm extends ActionForm {
     }
 
 
-//    public int getOtherSpecies() {
-//        return otherSpecies;
-//    }
-//
-//
-//    public void setOtherSpecies(int otherSpecies) {
-//        this.otherSpecies = otherSpecies;
-//    }
+    public int getOtherSpecies() {
+        return otherSpecies;
+    }
+
+
+    public void setOtherSpecies(int otherSpecies) {
+        this.otherSpecies = otherSpecies;
+    }
 
 
     public String getComments() {

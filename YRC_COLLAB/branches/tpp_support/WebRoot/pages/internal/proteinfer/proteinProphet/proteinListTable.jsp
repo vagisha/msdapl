@@ -60,11 +60,11 @@
 		</th>
 		
 		<% colSortedClass = "";
-			 if(sortBy == SORT_BY.PROBABILITY) colSortedClass = sortedClass;
+			 if(sortBy == SORT_BY.PROBABILITY_GRP) colSortedClass = sortedClass;
 		%>
 		
 		<logic:equal name="groupProteins" value="true">
-			<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.PROBABILITY.name()%>">
+			<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.PROBABILITY_GRP.name()%>">
 				<b><font size="2pt">Group Prob.</font></b>
 			</th>
 		</logic:equal>
@@ -74,12 +74,15 @@
 			</th>
 		</logic:equal>
 		
+		<% colSortedClass = "";
+			 if(sortBy == SORT_BY.PROBABILITY_PROT) colSortedClass = sortedClass;
+		%>
 		<th width="5%" >
 			<b><font size="2pt">Indist. Protein Group</font></b>
 		</th>
 		
 		<logic:equal name="groupProteins" value="false">
-		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.PROBABILITY.name()%>">
+		<th class="sortable def_sort_desc <%=colSortedClass %>" width="5%" id="<%=SORT_BY.PROBABILITY_PROT.name()%>">
 			<b><font size="2pt">Prob.</font></b>
 		</th>
 		</logic:equal>

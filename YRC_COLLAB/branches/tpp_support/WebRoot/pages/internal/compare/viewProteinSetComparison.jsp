@@ -97,8 +97,7 @@ $(document).ready(function() {
    						// send a request for the peptides
    						$.blockUI();
   						$("#proteins_"+nrseqId).load("<yrcwww:link path='doProteinGroupComparison.do'/>", 	//url
-  											{'piDatasetIds': 	'<bean:write name="piDatasetIds"/>', 	// data
-  									 		 'dtaDatasetIds':   '<bean:write name="dtaDatasetIds"/>',
+  											{'datasetIds': 	'<bean:write name="datasetIds"/>', 	// data
   									 		 'nrseqProteinId': 		nrseqId
   									 },
   									 function(responseText, status, xhr) {			// callback
@@ -114,7 +113,7 @@ $(document).ready(function() {
    				}
    			});
    		});
-   		                    //cell.setHyperlink("doProteinGroupComparison.do?piDatasetIds="+getCommaSeparatedDatasetIds()+"&nrseqProteinId="+protein.getNrseqId());
+   		                    //cell.setHyperlink("doProteinGroupComparison.do?datasetIds="+getCommaSeparatedDatasetIds()+"&nrseqProteinId="+protein.getNrseqId());
    		
    		
    		// ---------------------------------------------------------------
@@ -156,8 +155,7 @@ $(document).ready(function() {
    						// send a request for the peptides
    						$.blockUI();
   						$("#peptides_"+nrseqId).load("<yrcwww:link path='doPeptidesComparison.do'/>", 	//url
-  											{'piDatasetIds': 	'<bean:write name="piDatasetIds"/>', 	// data
-  									 		 'dtaDatasetIds':   '<bean:write name="dtaDatasetIds"/>',
+  											{'datasetIds': 	'<bean:write name="datasetIds"/>', 	// data
   									 		 'nrseqProteinId': 		nrseqId
   									 },
   									 function(responseText, status, xhr) {			// callback
