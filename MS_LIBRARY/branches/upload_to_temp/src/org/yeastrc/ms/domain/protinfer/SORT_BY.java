@@ -18,7 +18,8 @@ public enum SORT_BY {
     CLUSTER_ID,
     VALIDATION_STATUS,
     NSAF,
-    PROBABILITY,
+    PROBABILITY_GRP,
+    PROBABILITY_PROT,
     PROTEIN_PROPHET_GROUP,
     NONE;
     
@@ -36,7 +37,8 @@ public enum SORT_BY {
         else if (sortBy.equalsIgnoreCase(CLUSTER_ID.name())) return CLUSTER_ID;
         else if (sortBy.equalsIgnoreCase(VALIDATION_STATUS.name())) return VALIDATION_STATUS;
         else if (sortBy.equalsIgnoreCase(NSAF.name())) return NSAF;
-        else if(sortBy.equalsIgnoreCase(PROBABILITY.name()))    return PROBABILITY;
+        else if(sortBy.equalsIgnoreCase(PROBABILITY_GRP.name()))    return PROBABILITY_GRP;
+        else if(sortBy.equalsIgnoreCase(PROBABILITY_PROT.name()))    return PROBABILITY_PROT;
         else if(sortBy.equalsIgnoreCase(PROTEIN_PROPHET_GROUP.name()))    return PROTEIN_PROPHET_GROUP;
         else    return NONE;
         

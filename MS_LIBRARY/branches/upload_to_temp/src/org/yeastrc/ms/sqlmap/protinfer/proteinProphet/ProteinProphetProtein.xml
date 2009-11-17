@@ -170,9 +170,24 @@
     </select>
     
     <select id="filterByProteinGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
-    	SELECT prot.id FROM msProteinInferProtein AS prot, 
-    	               ProteinProphetProtein AS ppProt,
-    	               ProteinProphetProteinGroup AS ppProtGrp
+    	SELECT prot.id 
+    	FROM msProteinInferProtein AS prot, 
+    	     ProteinProphetProtein AS ppProt,
+    	     ProteinProphetProteinGroup AS ppProtGrp
+    	WHERE prot.piRunID=#pinferId#
+    	AND prot.id = ppProt.piProteinID
+    	AND ppProt.proteinProphetGroupID = ppProtGrp.id
+    	AND ppProtGrp.probability BETWEEN #minProbability# AND #maxProbability#
+    	<isPropertyAvailable property="sort">
+    		ORDER BY ppProtGrp.probability, ppProtGrp.id, ppProt.groupID ASC
+    	</isPropertyAvailable>
+    </select>
+    
+    <select id="filterNrseqIdsByProteinGroupProbability" resultClass="Integer" parameterClass="java.util.Map">
+    	SELECT prot.nrseqProteinID 
+    	FROM msProteinInferProtein AS prot, 
+    	     ProteinProphetProtein AS ppProt,
+    	     ProteinProphetProteinGroup AS ppProtGrp
     	WHERE prot.piRunID=#pinferId#
     	AND prot.id = ppProt.piProteinID
     	AND ppProt.proteinProphetGroupID = ppProtGrp.id

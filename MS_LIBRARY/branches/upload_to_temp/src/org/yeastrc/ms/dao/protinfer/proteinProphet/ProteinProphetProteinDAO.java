@@ -239,47 +239,70 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
                                                                  sort);
         }
         
-        // If the user is filtering on probability
-        List<Integer> ids_probability = null;
-        sort = filterCriteria.getSortBy() == SORT_BY.PROBABILITY;
-        ids_probability = proteinIdsByProbability(pinferId, 
-                filterCriteria.getMinProbability(), filterCriteria.getMaxProbability(),
-                sort, filterCriteria.isGroupProteins());
+        // If the user is filtering on protein group probability
+        List<Integer> ids_probability_grp = null;
+        sort = filterCriteria.getSortBy() == SORT_BY.PROBABILITY_GRP;
+        ids_probability_grp = proteinIdsByProbability(pinferId, 
+                filterCriteria.getMinGroupProbability(), filterCriteria.getMaxGroupProbability(),
+                sort, true); // filter proteins by ProteinProphet group probability; 
+                             // If sort is true proteins will be grouped
+        
+        // If the user is filtering on protein  probability
+        List<Integer> ids_probability_prot = null;
+        sort = filterCriteria.getSortBy() == SORT_BY.PROBABILITY_PROT;
+        ids_probability_prot = proteinIdsByProbability(pinferId, 
+                filterCriteria.getMinProteinProbability(), filterCriteria.getMaxProteinProbability(),
+                sort, false);   // filter proteins by ProteinProphet protein probability
+                                // If sort is true no grouping by ProteinProphet groupID,
+                                // group only by indistinct group ID
         
         
         // get the set of common ids; keep the order of ids returned from the query
         // that returned sorted results
         if(filterCriteria.getSortBy() == SORT_BY.COVERAGE) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, ids_probability);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, 
+                    ids_probability_grp, ids_probability_prot);
             return getCommonIds(ids_cov, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA) {
-            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, ids_probability);
+            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, 
+                    ids_probability_grp, ids_probability_prot);
             return getCommonIds(ids_spec_count, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status, ids_probability);
+            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status, 
+                    ids_probability_grp, ids_probability_prot);
             return getCommonIds(ids_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, ids_probability);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, 
+                    ids_probability_grp, ids_probability_prot);
             return getCommonIds(ids_uniq_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.PROTEIN_PROPHET_GROUP) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, ids_probability);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, 
+                    ids_probability_grp, ids_probability_prot);
             List<Integer> idsbyGroup = sortProteinIdsByProteinProphetGroup(pinferId);
             return getCommonIds(idsbyGroup, others);
         }
         else if(filterCriteria.getSortBy() == SORT_BY.VALIDATION_STATUS) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_probability);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, 
+                    ids_probability_grp, ids_probability_prot);
             return getCommonIds(ids_validation_status, others);
         }
-        else if(filterCriteria.getSortBy() == SORT_BY.PROBABILITY) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status);
-            return getCommonIds(ids_probability, others);
+        else if(filterCriteria.getSortBy() == SORT_BY.PROBABILITY_GRP) {
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status,
+                    ids_probability_prot);
+            return getCommonIds(ids_probability_grp, others);
+        }
+        else if(filterCriteria.getSortBy() == SORT_BY.PROBABILITY_PROT) {
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status,
+                    ids_probability_grp);
+            return getCommonIds(ids_probability_prot, others);
         }
         else {
-            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, ids_probability);
+            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, 
+                    ids_probability_grp, ids_probability_prot);
             return new ArrayList<Integer>(combineLists);
         }
     }
@@ -322,14 +345,24 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
             ids_validation_status = nrseqIdsByValidationStatus(pinferId, filterCriteria.getValidationStatus());
         }
         
-        // If the user is filtering on probability
-        List<Integer> ids_probability = null;
-        ids_probability = nrseqIdsByProbability(pinferId, 
-                filterCriteria.getMinProbability(), filterCriteria.getMaxProbability());
+        // If the user is filtering on protein group probability
+        List<Integer> ids_probability_grp = null;
+        ids_probability_grp = nrseqIdsByProbability(pinferId, 
+                filterCriteria.getMinGroupProbability(), filterCriteria.getMaxGroupProbability(), 
+                true); // this will filter by ProteinProphet group probability
         
+        
+        // If the user is filtering on protein probability
+        List<Integer> ids_probability_prot = null;
+        ids_probability_prot = nrseqIdsByProbability(pinferId, 
+                filterCriteria.getMinProteinProbability(), filterCriteria.getMaxProteinProbability(), 
+                false); // this will filter by ProteinProphet group probability
         
         // get the set of common ids; 
-        Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, ids_probability);
+        Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, 
+                ids_pept, ids_uniq_pept, ids_validation_status, 
+                ids_probability_grp, ids_probability_prot);
+        
         return new ArrayList<Integer>(combineLists);
     }
     
@@ -352,7 +385,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     
     private List<Integer> proteinIdsByProbability(int pinferId, 
             double minProbability, double maxProbability,
-            boolean sort, boolean groupProteins) {
+            boolean sort, boolean useGrpProbability) {
         
         // If we are NOT filtering anything AND NOT sorting on probability just return all the protein Ids
         // for this protein inference run
@@ -367,7 +400,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         if(sort)    map.put("sort", 1);
         
         // if proteins are being grouped by protein prophet group filter on group probability
-        if(groupProteins)
+        if(useGrpProbability)
             return queryForList(sqlMapNameSpace+".filterByProteinGroupProbability", map);
         // otherwise filter on individual protein probability
         // proteins in an indistinguishable protein group will have the same probability
@@ -377,7 +410,7 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
     }
     
     private List<Integer> nrseqIdsByProbability(int pinferId, 
-            double minProbability, double maxProbability) {
+            double minProbability, double maxProbability, boolean useGroupProbability) {
         
         // If we are NOT filtering anything AND NOT sorting on spectrum count just return all the protein Ids
         // for this protein inference run
@@ -390,7 +423,13 @@ public class ProteinProphetProteinDAO extends BaseSqlMapDAO
         map.put("minProbability", minProbability);
         map.put("maxProbability", maxProbability);
         
-        return queryForList(sqlMapNameSpace+".filterNrseqIdsByProteinProbability", map);
+        // if proteins are being grouped by protein prophet group filter on group probability
+        if(useGroupProbability)
+            return queryForList(sqlMapNameSpace+".filterNrseqIdsByProteinGroupProbability", map);
+        // otherwise filter on individual protein probability
+        // proteins in an indistinguishable protein group will have the same probability
+        else
+            return queryForList(sqlMapNameSpace+".filterNrseqIdsByProteinProbability", map);
        
     }
     
