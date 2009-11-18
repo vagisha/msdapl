@@ -633,6 +633,15 @@ public class ViewSpectrumAction extends Action {
             params.add("<PARAM NAME=\"static_mod_"+mod.getModifiedResidue()+"\" VALUE=\"" + mod.getModificationMass().toString() + "\">");
         }
         
+        // static terminal modifications
+        List<MsTerminalModification> terminalStaticMods = search.getStaticTerminalMods();
+        for(MsTerminalModification mod: terminalStaticMods) {
+            if(mod.getModifiedTerminal() == Terminal.NTERM)
+                params.add("<PARAM NAME=\"add_N_terminus\" VALUE=\"" + mod.getModificationMass().toString() + "\">");
+            else if(mod.getModifiedTerminal() == Terminal.CTERM)
+                params.add("<PARAM NAME=\"add_C_terminus\" VALUE=\"" + mod.getModificationMass().toString() + "\">");
+        }
+        
         
         // Need these values from the search parameters 
         MassType fragMassType = null;
