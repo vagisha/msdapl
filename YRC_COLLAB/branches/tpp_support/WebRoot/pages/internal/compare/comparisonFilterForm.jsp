@@ -153,7 +153,7 @@
 		<td valign="top" style="padding-bottom: 10px;">Include Proteins:</td>
 		<td valign="top" colspan="2" style="padding-bottom: 10px;">
 			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="0">All</html:radio>
-			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1">Parsimonious in > 1 Dataset</html:radio>
+			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="1">Parsimonious in >= 1 Dataset</html:radio>
 			<html:radio name="proteinSetComparisonForm" property="parsimoniousParam" value="2">Parsimonious in ALL Datasets</html:radio>
 			<logic:equal name="proteinSetComparisonForm" property="hasProteinProphetDatasets" value="true">
 			<br>
