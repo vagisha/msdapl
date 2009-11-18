@@ -33,6 +33,8 @@ public class ProteinSetComparisonForm extends ActionForm {
     private int pageNum = 1;
     
     private boolean download = false;
+    private boolean collapseProteinGroups = false; // used only for downloading results
+    private boolean includeDescription = false; // used only when downloading results
     private boolean goEnrichment = false;
     private boolean goEnrichmentGraph = false;
     
@@ -256,6 +258,22 @@ public class ProteinSetComparisonForm extends ActionForm {
 
     public void setDownload(boolean download) {
         this.download = download;
+    }
+    
+    public boolean isCollapseProteinGroups() {
+        return this.collapseProteinGroups;
+    }
+    
+    public void setCollapseProteinGroups(boolean collapse) {
+        this.collapseProteinGroups = collapse;
+    }
+    
+    public boolean isIncludeDescriptions() {
+        return this.includeDescription;
+    }
+    
+    public void setIncludeDescriptions(boolean include) {
+        this.includeDescription = include;
     }
 
     //-----------------------------------------------------------------------------

@@ -534,65 +534,174 @@ public class DownloadComparisonResults extends Action {
       for(Dataset dataset: comparison.getDatasets()) {
           writer.write("NSAF("+dataset.getDatasetId()+")\t");
       }
-      writer.write("Description\n");
+      if(form.isIncludeDescriptions())
+          writer.write("Description\n");
+      else
+          writer.write("\n");
       
-      for(ComparisonProteinGroup grpProtein: comparison.getProteinsGroups()) {
-          
-          for(ComparisonProtein protein: grpProtein.getProteins()) {
-              comparison.initializeProteinInfo(protein);
-          
-              writer.write(protein.getNrseqId()+"\t");
-              writer.write(protein.getGroupId()+"\t");
-              writer.write(protein.getFastaName()+"\t");
-              writer.write(protein.getCommonName()+"\t");
-              writer.write(protein.getMolecularWeight()+"\t");
-              writer.write(protein.getPi()+"\t");
-              writer.write(protein.getMaxPeptideCount()+"\t");
-         
-              for(Dataset dataset: comparison.getDatasets()) {
-                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
-                  if(dpi == null || !dpi.isPresent()) {
-                      writer.write("-");
-                  }
-                  else {
-                      if(dpi.isParsimonious()) {
-                          writer.write("*");
-                      }
-                      else {
-                          writer.write("=");
-                      }
-                      if(dpi.isGrouped())
-                          writer.write("g");
-                  }
-                  writer.write("\t");
-              }
-              // spectrum count information
-              for(Dataset dataset: comparison.getDatasets()) {
-
-                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
-                  if(dpi == null || !dpi.isPresent()) {
-                      writer.write("0\t");
-                  }
-                  else {
-                      writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
-                  }
-              }
-              // NSAF information
-              for(Dataset dataset: comparison.getDatasets()) {
-                  
-                  DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
-                  if(dpi == null || !dpi.isPresent()) {
-                      writer.write("-1.0\t");
-                  }
-                  else {
-                      writer.write(dpi.getNsafFormatted()+"\t");
-                  }
-              }
-          
-              writer.write(protein.getDescription()+"\n");
-          }
-      }
+      if(!form.isCollapseProteinGroups())
+          writeSplitProteinGroup(writer, comparison, form.isIncludeDescriptions());
+      else
+          writeCollapsedProteinGroup(writer, comparison, form.isIncludeDescriptions());
       
       writer.write("\n\n");
   }
+
+
+    private void writeSplitProteinGroup(PrintWriter writer,
+            ProteinGroupComparisonDataset comparison, boolean printDescription) {
+
+        for(ComparisonProteinGroup grpProtein: comparison.getProteinsGroups()) {
+
+            for(ComparisonProtein protein: grpProtein.getProteins()) {
+                comparison.initializeProteinInfo(protein);
+
+                writer.write(protein.getNrseqId()+"\t");
+                writer.write(protein.getGroupId()+"\t");
+                writer.write(protein.getFastaName()+"\t");
+                writer.write(protein.getCommonName()+"\t");
+                writer.write(protein.getMolecularWeight()+"\t");
+                writer.write(protein.getPi()+"\t");
+                writer.write(protein.getMaxPeptideCount()+"\t");
+
+                for(Dataset dataset: comparison.getDatasets()) {
+                    DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                    if(dpi == null || !dpi.isPresent()) {
+                        writer.write("-");
+                    }
+                    else {
+                        if(dpi.isParsimonious()) {
+                            writer.write("*");
+                        }
+                        else {
+                            writer.write("=");
+                        }
+                        if(dpi.isGrouped())
+                            writer.write("g");
+                    }
+                    writer.write("\t");
+                }
+                // spectrum count information
+                for(Dataset dataset: comparison.getDatasets()) {
+
+                    DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                    if(dpi == null || !dpi.isPresent()) {
+                        writer.write("0\t");
+                    }
+                    else {
+                        writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                    }
+                }
+                // NSAF information
+                for(Dataset dataset: comparison.getDatasets()) {
+
+                    DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                    if(dpi == null || !dpi.isPresent()) {
+                        writer.write("-1.0\t");
+                    }
+                    else {
+                        writer.write(dpi.getNsafFormatted()+"\t");
+                    }
+                }
+                
+                if(printDescription)
+                    writer.write(protein.getDescription()+"\n");
+                else
+                    writer.write("\n");
+            }
+        }
+    }
+    
+    private void writeCollapsedProteinGroup(PrintWriter writer,
+            ProteinGroupComparisonDataset comparison, boolean includeDescription) {
+
+        for(ComparisonProteinGroup grpProtein: comparison.getProteinsGroups()) {
+
+            String nrseqIdString = "";
+            String nameString = "";
+            String commonNameString = "";
+            String molWtString = "";
+            String piString = "";
+            String nsafStrings[] = new String[comparison.getDatasetCount()];
+            for(int i = 0; i < comparison.getDatasetCount(); i++)
+                nsafStrings[i] = "";
+            String descriptionString = "";
+            
+                
+            for(ComparisonProtein protein: grpProtein.getProteins()) {
+                comparison.initializeProteinInfo(protein);
+
+                nrseqIdString += ","+protein.getNrseqId();
+                nameString += ","+protein.getFastaName();
+                commonNameString += ","+protein.getCommonName();
+                molWtString += ","+protein.getMolecularWeight();
+                piString += ","+protein.getPi();
+                descriptionString += ","+protein.getDescription();
+                
+                // NSAF information
+                int dsIdx = 0;
+                for(Dataset dataset: comparison.getDatasets()) {
+
+                    DatasetProteinInformation dpi = protein.getDatasetProteinInformation(dataset);
+                    if(dpi == null || !dpi.isPresent()) {
+                        nsafStrings[dsIdx] += ",-1.0";
+                    }
+                    else {
+                        nsafStrings[dsIdx] += ","+dpi.getNsafFormatted();
+                    }
+                    dsIdx++;
+                }
+            }
+
+            writer.write(nrseqIdString.substring(1)+"\t");
+            writer.write(grpProtein.getGroupId()+"\t");
+            writer.write(nameString.substring(1)+"\t");
+            writer.write(commonNameString.substring(1)+"\t");
+            writer.write(molWtString.substring(1)+"\t");
+            writer.write(piString.substring(1)+"\t");
+            writer.write(grpProtein.getMaxPeptideCount()+"\t");
+            
+            ComparisonProtein oneProtein = grpProtein.getProteins().get(0);
+            // The value of isParsimonious will be the same for all proteins in a group
+            for(Dataset dataset: comparison.getDatasets()) {
+                DatasetProteinInformation dpi = oneProtein.getDatasetProteinInformation(dataset);
+                if(dpi == null || !dpi.isPresent()) {
+                    writer.write("-");
+                }
+                else {
+                    if(dpi.isParsimonious()) {
+                        writer.write("*");
+                    }
+                    else {
+                        writer.write("=");
+                    }
+                    if(dpi.isGrouped())
+                        writer.write("g");
+                }
+                writer.write("\t");
+            }
+            // The spectrum count information will be the same for all proteins in a group
+            for(Dataset dataset: comparison.getDatasets()) {
+
+                DatasetProteinInformation dpi = oneProtein.getDatasetProteinInformation(dataset);
+                if(dpi == null || !dpi.isPresent()) {
+                    writer.write("0\t");
+                }
+                else {
+                    writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                }
+            }
+            
+            // print the NSAF information
+            for(String nsafStr: nsafStrings) {
+                writer.write(nsafStr.substring(1)+"\t");
+            }
+            
+            // print description, if required
+            if(includeDescription)
+                writer.write(descriptionString.substring(1)+"\n");
+            else
+                writer.write("\n");
+        }
+    }
 }

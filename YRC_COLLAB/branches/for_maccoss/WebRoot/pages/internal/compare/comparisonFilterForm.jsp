@@ -169,8 +169,16 @@
 	<logic:notPresent name="goEnrichmentView">
 	<tr>
 		<td valign="top" align="center" colspan="4" style="padding-top:5px;">
- 			<html:submit value="Update" onclick="javascript:updateResults();"></html:submit> &nbsp;
-			<span style="color:red; font-size:8pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
+ 			<html:submit value="Update" onclick="javascript:updateResults();" styleClass="plain_button"></html:submit> &nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td valign="bottom" align="center" colspan="4">
+			<span style="color:red; font-size:9pt; text-decoration:underline;" class="clickable" onclick="javascript:downloadResults(); return false;">[Download Results]</span>
+			&nbsp;
+			<html:checkbox name="proteinSetComparisonForm" property="collapseProteinGroups">Collapse Protein Groups</html:checkbox>
+			&nbsp;
+			<html:checkbox name="proteinSetComparisonForm" property="includeDescriptions">Include Description</html:checkbox>
 		</td>
 	</tr>
 	</logic:notPresent>

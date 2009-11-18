@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -24,8 +25,8 @@ import org.yeastrc.experiment.ProjectExperimentDAO;
 import org.yeastrc.jobqueue.JobUtils;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectsSearcher;
-import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.proteinfer.ProteinInferJobSearcher;
+import org.yeastrc.www.proteinfer.ProteinferJob;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 import org.yeastrc.yates.YatesRun;
@@ -37,7 +38,7 @@ import edu.uwpr.protinfer.database.dao.ibatis.ProteinferRunDAO;
 /**
  * 
  */
-public class CompareProteinSetsFormAction extends org.apache.struts.action.Action {
+public class CompareProteinSetsFormAction extends Action {
 
     private static final Logger log = Logger.getLogger(CompareProteinSetsFormAction.class);
     
