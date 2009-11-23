@@ -88,6 +88,7 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write("Max. Peptides: "+filterForm.getMaxPeptides()+"\n");
         writer.write("Min. Unique Peptides: "+filterForm.getMinUniquePeptides()+"\n");
         writer.write("Max. Unique Peptides: "+filterForm.getMaxUniquePeptides()+"\n");
+        writer.write("Charge States: "+filterForm.getChargeStatesString()+"\n");
         writer.write("Min. Spectrum Matches: "+filterForm.getMinSpectrumMatches()+"\n");
         writer.write("Max. Spectrum Matches: "+filterForm.getMaxSpectrumMatches()+"\n");
         writer.write("Min. Coverage(%): "+filterForm.getMinCoverage()+"\n");
@@ -138,6 +139,8 @@ public class DownloadProteinferResultsAction extends Action {
         filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
+        filterCriteria.setChargeStates(filterForm.getChargeStateList());
+        filterCriteria.setChargeGreaterThan(filterForm.getChargeGreaterThan());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
         filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());

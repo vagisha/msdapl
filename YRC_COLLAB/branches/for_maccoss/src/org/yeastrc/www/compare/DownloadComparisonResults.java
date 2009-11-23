@@ -392,7 +392,7 @@ public class DownloadComparisonResults extends Action {
                     writer.write("0\t");
                 }
                 else {
-                    writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                    writer.write(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")\t");
                 }
             }
             // NSAF information
@@ -589,7 +589,7 @@ public class DownloadComparisonResults extends Action {
                         writer.write("0\t");
                     }
                     else {
-                        writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                        writer.write(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")\t");
                     }
                 }
                 // NSAF information
@@ -688,7 +688,7 @@ public class DownloadComparisonResults extends Action {
                     writer.write("0\t");
                 }
                 else {
-                    writer.write(dpi.getSpectrumCount()+"("+comparison.getScaledSpectrumCount(dpi.getNormalizedSpectrumCount())+")\t");
+                    writer.write(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")\t");
                 }
             }
             

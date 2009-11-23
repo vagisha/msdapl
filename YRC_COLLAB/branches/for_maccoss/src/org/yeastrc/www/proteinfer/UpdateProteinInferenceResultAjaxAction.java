@@ -106,6 +106,8 @@ public class UpdateProteinInferenceResultAjaxAction extends Action {
         filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
+        filterCriteria.setChargeStates(filterForm.getChargeStateList());
+        filterCriteria.setChargeGreaterThan(filterForm.getChargeGreaterThan());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
         filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());

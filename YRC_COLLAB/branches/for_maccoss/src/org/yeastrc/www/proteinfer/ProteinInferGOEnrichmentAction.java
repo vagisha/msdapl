@@ -152,6 +152,8 @@ public class ProteinInferGOEnrichmentAction extends Action {
         filterCriteria.setShowParsimonious(!filterForm.isShowAllProteins());
         filterCriteria.setExcludeIndistinGroups(filterForm.isExcludeIndistinProteinGroups());
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
+        filterCriteria.setChargeStates(filterForm.getChargeStateList());
+        filterCriteria.setChargeGreaterThan(filterForm.getChargeGreaterThan());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
         filterCriteria.setDescriptionNotLike(filterForm.getDescriptionNotLike());

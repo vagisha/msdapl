@@ -288,9 +288,9 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
             else {
                 String className = "prot-found";
                 cell.setClassName(className);
-                int scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
-                cell.setData(dpi.getSpectrumCount()+"("+scaledCount+")");
+                cell.setData(dpi.getSpectrumCount()+"("+dpi.getNormalizedSpectrumCountRounded()+")");
                 cell.setTextColor("#FFFFFF");
+                float scaledCount = getScaledSpectrumCount(dpi.getNormalizedSpectrumCount());
                 cell.setBackgroundColor(getScaledColor(scaledCount));
             }
             row.addCell(cell);
@@ -299,9 +299,8 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return row;
     }
     
-    protected int getScaledSpectrumCount(float count) {
-        float scaled = ((count - minNormalizedSpectrumCount + 1)/maxNormalizedSpectrumCount)*100.0f;
-        return (int)Math.ceil(scaled);
+    private float getScaledSpectrumCount(float count) {
+        return ((count - minNormalizedSpectrumCount + 1)/maxNormalizedSpectrumCount)*100.0f;
     }
     
     private String getScaledColor(float scaledSpectrumCount) {

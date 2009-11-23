@@ -16,6 +16,17 @@
 				this.checked = false;
 			});
 		});
+		
+		$("input[name='chargeStates'][value='All']").click(function() {
+			$("input[name='chargeStates'][value!='All']").each(function() {
+				this.checked = false;
+			});
+		});
+		$("input[name='chargeStates'][value!='All']").click(function() {
+			$("input[name='chargeStates'][value='All']").each(function() {
+				this.checked = false;
+			});
+		});
 	});
 </script>
 
@@ -112,6 +123,18 @@
   	</td>
   	<td>
   		Exclude Indistinguishable Groups: <html:checkbox name="proteinInferFilterForm" property="excludeIndistinProteinGroups" value="true"/>
+  	</td>
+  </tr>
+  
+  <tr>
+  	<td colspan="2">
+  		Include Charge: &nbsp;&nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="All"/> All &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="1"/> +1 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="2"/> +2 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="3"/> +3 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value="4"/> +4 &nbsp;
+  		<html:multibox name="proteinInferFilterForm" property="chargeStates" value=">4"/> &gt; +4   
   	</td>
   </tr>
   

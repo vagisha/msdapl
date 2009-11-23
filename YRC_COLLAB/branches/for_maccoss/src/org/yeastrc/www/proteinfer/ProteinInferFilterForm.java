@@ -1,5 +1,8 @@
 package org.yeastrc.www.proteinfer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.action.ActionErrors;
@@ -34,6 +37,8 @@ public class ProteinInferFilterForm extends ActionForm {
     private String descriptionLike = null;
     private String descriptionNotLike = null;
     private String[] validationStatus = new String[]{"All"};
+    
+    private String[] chargeStates = new String[]{"All"};
     
     private boolean excludeIndistinGroups = false;
     
@@ -360,6 +365,49 @@ public class ProteinInferFilterForm extends ActionForm {
         for(String status: validationStatus) {
             buf.append(",");
             buf.append(status);
+        }
+        if(buf.length() > 0)
+            buf.deleteCharAt(0);
+        return buf.toString();
+    }
+    
+    // CHARGE STATES
+    public String[] getChargeStates() {
+        return chargeStates;
+    }
+
+    public void setChargeStates(String[] chargeStates) {
+        this.chargeStates = chargeStates;
+    }
+    
+    public List<Integer> getChargeStateList() {
+        List<Integer> chgList = new ArrayList<Integer>(chargeStates.length);
+        for(String chg: chargeStates) {
+            if(chg.equals("All"))
+                return new ArrayList<Integer>(0);
+            if(!chg.startsWith(">")) {
+                chgList.add(Integer.parseInt(chg));
+            }
+        }
+        return chgList;
+    }
+    
+    public int getChargeGreaterThan() {
+        for(String chg: chargeStates) {
+            if(chg.startsWith(">")) {
+                return Integer.parseInt(chg.substring(1));
+            }
+        }
+        return -1;
+    }
+    
+    public String getChargeStatesString() {
+        if(this.chargeStates == null)
+            return null;
+        StringBuilder buf = new StringBuilder();
+        for(String chg: chargeStates) {
+            buf.append(",");
+            buf.append(chg);
         }
         if(buf.length() > 0)
             buf.deleteCharAt(0);
