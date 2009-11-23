@@ -77,6 +77,9 @@ public class ProteinFilterCriteria {
     
     private List<ProteinUserValidation> validationStatus = new ArrayList<ProteinUserValidation>();
     
+    private List<Integer> chargeStates = new ArrayList<Integer>();
+    private int chargeGreaterThan = -1;
+    
     private int numSpectra;
     private int numMaxSpectra;
     private double coverage;
@@ -219,6 +222,22 @@ public class ProteinFilterCriteria {
             }
         }
     }
+    
+    public List<Integer> getChargeStates() {
+        return this.chargeStates;
+    }
+    
+    public void setChargeStates(List<Integer> chargeStates) {
+        this.chargeStates = chargeStates;
+    }
+    
+    public int getChargeGreaterThan() {
+        return this.chargeGreaterThan;
+    }
+    
+    public void setChargeGreaterThan(int chargeGreaterThan) {
+        this.chargeGreaterThan = chargeGreaterThan;
+    }
 
     public int getNumMaxPeptides() {
         return numMaxPeptides;
@@ -332,6 +351,17 @@ public class ProteinFilterCriteria {
         if(this.excludeIndistinGroups != that.excludeIndistinGroups)    return false;
 //        if(this.groupProteins != that.groupProteins)            return false;
         if(this.showParsimonious != that.showParsimonious)      return false;
+        
+        if(this.chargeStates.size() != that.chargeStates.size())
+            return false;
+        else {
+            for(int chg: this.chargeStates) {
+                if(!that.chargeStates.contains(chg))
+                    return false;
+            }
+        }
+        if(this.chargeGreaterThan != that.chargeGreaterThan) 
+            return false;
         
         if(this.validationStatus.size() != that.validationStatus.size()) return false;
         else {

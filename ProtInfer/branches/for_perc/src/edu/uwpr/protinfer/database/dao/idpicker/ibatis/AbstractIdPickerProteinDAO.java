@@ -255,158 +255,6 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
     }
     
-    // --------------------------------------------------------------------------------------------------------------------------
-    // MOLECULAR WT
-    // --------------------------------------------------------------------------------------------------------------------------
-//    public List<Integer> sortProteinIdsByMolecularWt(int pinferId, boolean groupProteins) {
-//        return proteinIdsByMolecularWt(pinferId, 0.0, Double.MAX_VALUE, true, groupProteins);
-//    }
-//    
-//    private List<Integer> proteinIdsByMolecularWt(int pinferId, 
-//            double minMolecularWt, double maxMolecularWt,
-//            boolean sort, boolean groupProteins) {
-//        
-//        // if we are not sorting by molecular wt AND minMolWt and maxMolWt are not set simply return all the proteins
-//        if(!sort && (minMolecularWt == 0 && maxMolecularWt == Double.MAX_VALUE)) {
-//            return this.getProteinferProteinIds(pinferId);
-//        }
-//        
-//        Map<String, Number> map = new HashMap<String, Number>(10);
-//        map.put("pinferId", pinferId);
-//        map.put("minMolWt", minMolecularWt);
-//        map.put("maxMolWt", maxMolecularWt);
-//        
-//        if(!groupProteins || (groupProteins && !sort)) {
-//            if(sort)    map.put("sort", 1);
-//            return queryForList(sqlMapNameSpace+".filterByMolecularWt", map);
-//        }
-//        else { // group proteins and sort
-//            // List of protein IDs along with their groupID and molecular wt. (sorted by group, then molecular wt).
-//            List<ProteinGroupMolecularWt> prGrMolWt = queryForList(sqlMapNameSpace+".filterProteinGroupMolecularWt", map);
-//            int lastGrp = -1;
-//            double lastMaxMolWt = 0.0;
-//            // Set the molecular Wt. for each protein in a group to be the max molecular Wt. in the group.
-//            for(ProteinGroupMolecularWt pgm: prGrMolWt) {
-//                if(pgm.proteinGroupId != lastGrp) {
-//                    pgm.maxGrpMolecularWt = pgm.molecularWt;
-//                    lastGrp = pgm.proteinGroupId;
-//                    lastMaxMolWt = pgm.molecularWt; // first protein (for a group) has the max molecular wt.
-//                }
-//                else {
-//                    pgm.maxGrpMolecularWt = lastMaxMolWt;
-//                }
-//            }
-//            // Sort on molecular wt. then protein group.
-//            Collections.sort(prGrMolWt, new Comparator<ProteinGroupMolecularWt>() {
-//                @Override
-//                public int compare(ProteinGroupMolecularWt o1, ProteinGroupMolecularWt o2) {
-//                    int val = Double.valueOf(o1.maxGrpMolecularWt).compareTo(o2.maxGrpMolecularWt);
-//                    if(val != 0)    return val;
-//                    val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
-//                    if(val != 0)    return val;
-//                    return Double.valueOf(o1.molecularWt).compareTo(o2.molecularWt);
-//                }});
-//            List<Integer> proteinIds = new ArrayList<Integer>(prGrMolWt.size());
-//            
-//            // return the list of protein IDs in the sorted order above.
-//            for(ProteinGroupMolecularWt pgc: prGrMolWt)
-//                proteinIds.add(pgc.proteinId);
-//            return proteinIds;
-//        }
-//    }
-//    
-//    public static class ProteinGroupMolecularWt {
-//        private int proteinId;
-//        private int proteinGroupId;
-//        private double molecularWt;
-//        private double maxGrpMolecularWt;
-//        public void setProteinId(int proteinId) {
-//            this.proteinId = proteinId;
-//        }
-//        public void setProteinGroupId(int proteinGroupId) {
-//            this.proteinGroupId = proteinGroupId;
-//        }
-//        public void setMolecularWt(double molWt) {
-//            this.molecularWt = molWt;
-//        }
-//    }
-    
-    // --------------------------------------------------------------------------------------------------------------------------
-    // MOLECULAR WT
-    // --------------------------------------------------------------------------------------------------------------------------
-//    public List<Integer> sortProteinIdsByPi(int pinferId, boolean groupProteins) {
-//        return proteinIdsByPi(pinferId, 0.0, Double.MAX_VALUE, true, groupProteins);
-//    }
-//    
-//    private List<Integer> proteinIdsByPi(int pinferId, 
-//            double minPi, double maxPi,
-//            boolean sort, boolean groupProteins) {
-//        
-//        // if we are not sorting by PI AND minPi and maxPi are not set simply return all the proteins
-//        if(!sort && (minPi == Double.MIN_VALUE && maxPi == Double.MAX_VALUE)) {
-//            return this.getProteinferProteinIds(pinferId);
-//        }
-//        
-//        Map<String, Number> map = new HashMap<String, Number>(10);
-//        map.put("pinferId", pinferId);
-//        map.put("minPi", minPi);
-//        map.put("maxPi", maxPi);
-//        
-//        if(!groupProteins || (groupProteins && !sort)) {
-//            if(sort)    map.put("sort", 1);
-//            return queryForList(sqlMapNameSpace+".filterByPi", map);
-//        }
-//        else { // group proteins and sort
-//            // List of protein IDs along with their groupID and PI. (sorted by group, then PI).
-//            List<ProteinGroupPi> prGrpPi = queryForList(sqlMapNameSpace+".filterProteinGroupPi", map);
-//            int lastGrp = -1;
-//            double lastMaxPi = 0.0;
-//            // Set the PI for each protein in a group to be the max PI in the group.
-//            for(ProteinGroupPi pgm: prGrpPi) {
-//                if(pgm.proteinGroupId != lastGrp) {
-//                    pgm.maxGrpPi = pgm.pi;
-//                    lastGrp = pgm.proteinGroupId;
-//                    lastMaxPi = pgm.pi; // first protein (for a group) has the max molecular wt.
-//                }
-//                else {
-//                    pgm.maxGrpPi = lastMaxPi;
-//                }
-//            }
-//            // Sort on PI. then protein group.
-//            Collections.sort(prGrpPi, new Comparator<ProteinGroupPi>() {
-//                @Override
-//                public int compare(ProteinGroupPi o1, ProteinGroupPi o2) {
-//                    int val = Double.valueOf(o1.maxGrpPi).compareTo(o2.maxGrpPi);
-//                    if(val != 0)    return val;
-//                    val = Integer.valueOf(o1.proteinGroupId).compareTo(o2.proteinGroupId);
-//                    if(val != 0)    return val;
-//                    return Double.valueOf(o1.pi).compareTo(o2.pi);
-//                }});
-//            List<Integer> proteinIds = new ArrayList<Integer>(prGrpPi.size());
-//            
-//            // return the list of protein IDs in the sorted order above.
-//            for(ProteinGroupPi pgc: prGrpPi)
-//                proteinIds.add(pgc.proteinId);
-//            return proteinIds;
-//        }
-//    }
-//    
-//    public static class ProteinGroupPi {
-//        private int proteinId;
-//        private int proteinGroupId;
-//        private double pi;
-//        private double maxGrpPi;
-//        public void setProteinId(int proteinId) {
-//            this.proteinId = proteinId;
-//        }
-//        public void setProteinGroupId(int proteinGroupId) {
-//            this.proteinGroupId = proteinGroupId;
-//        }
-//        public void setPi(double pi) {
-//            this.pi = pi;
-//        }
-//    }
-    
     
     public List<Integer> sortProteinsByNSAF(int pinferId, boolean groupProteins) {
         
@@ -492,6 +340,24 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         }
         if(sort)    map.put("sort", 1);
         return queryForList(sqlMapNameSpace+".filterByValidationStatus", map);
+    }
+    
+    private List<Integer> proteinIdsByPeptideChargeState(int pinferId,
+            List<Integer> chargeStates, int chargeGreaterThan) {
+        Map<String, Object> map = new HashMap<String, Object>(6);
+        map.put("pinferId", pinferId);
+        if(chargeStates != null && chargeStates.size() > 0) {
+            String cs = "";
+            for(Integer c: chargeStates)
+                cs += ","+c;
+            if(cs.length() > 0) cs = cs.substring(1); // remove first comma
+            cs = "("+cs+")";
+            map.put("chargeStates", cs);
+        }
+        if(chargeGreaterThan != -1) {
+            map.put("chargeGreaterThan", chargeGreaterThan);
+        }
+        return queryForList(sqlMapNameSpace+".filterByChargeStates", map);
     }
     
     public List<Integer> sortProteinIdsBySpectrumCount(int pinferId, boolean groupProteins) {
@@ -812,19 +678,6 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                 filterCriteria.getCoverage(), filterCriteria.getMaxCoverage(),
                 sort, filterCriteria.isGroupProteins());
         
-        // Get a list of protein ids filtered by molecular weight
-//        sort = filterCriteria.getSortBy() == SORT_BY.MOL_WT;
-//        List<Integer> ids_molWt = proteinIdsByMolecularWt(pinferId,
-//                filterCriteria.getMinMolecularWt(), filterCriteria.getMaxMolecularWt(),
-//                sort, filterCriteria.isGroupProteins());
-        
-        
-        // Get a lit of protein ids filtered by PI
-//        sort = filterCriteria.getSortBy() == SORT_BY.PI;
-//        List<Integer> ids_Pi = proteinIdsByPi(pinferId,
-//                filterCriteria.getMinPi(), filterCriteria.getMaxPi(),
-//                sort, filterCriteria.isGroupProteins());
-        
         
         // Get a list of protein ids filtered by spectrum count
         sort = filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA;
@@ -869,6 +722,13 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
                                                                  sort);
         }
         
+        // If the user if filtering on peptide charge states
+        List<Integer> ids_chargeStates = null;
+        if(filterCriteria.getChargeStates().size() > 0 || filterCriteria.getChargeGreaterThan() != -1) {
+            ids_chargeStates = proteinIdsByPeptideChargeState(pinferId, filterCriteria.getChargeStates(),
+                    filterCriteria.getChargeGreaterThan());
+        }
+        
         // If the user wants to exclude indistinguishable protein groups get the protein IDs that are not
         // in a indistinguishable protein group.
         List<Integer> notInGroup = null;
@@ -886,45 +746,45 @@ public abstract class AbstractIdPickerProteinDAO <P extends GenericIdPickerProte
         // get the set of common ids; keep the order of ids returned from the query
         // that returned sorted results
         if(filterCriteria.getSortBy() == SORT_BY.COVERAGE) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_cov, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_SPECTRA) {
-            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_cov, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_spec_count, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.NUM_UNIQ_PEPT) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_uniq_pept, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.GROUP_ID) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             List<Integer> idsbyGroup = sortProteinIdsByGroup(pinferId);
             return getCommonIds(idsbyGroup, others);
         }
         else if (filterCriteria.getSortBy() == SORT_BY.CLUSTER_ID) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             List<Integer> idsbyCluster = sortProteinIdsByCluster(pinferId);
             return getCommonIds(idsbyCluster, others);
         }
         else if(filterCriteria.getSortBy() == SORT_BY.VALIDATION_STATUS) {
-            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, notInGroup, peptideMatches);
+            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return getCommonIds(ids_validation_status, others);
         }
-//        else if(filterCriteria.getSortBy() == SORT_BY.MOL_WT) {
-//            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches, ids_Pi);
-//            return getCommonIds(ids_molWt, others);
-//        }
-//        else if(filterCriteria.getSortBy() == SORT_BY.PI) {
-//            Set<Integer> others = combineLists(ids_spec_count, ids_pept, ids_cov, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches, ids_molWt);
-//            return getCommonIds(ids_Pi, others);
-//        }
         else {
-            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, peptideMatches);
+            Set<Integer> combineLists = combineLists(ids_cov, ids_spec_count, ids_pept, ids_uniq_pept, ids_validation_status, notInGroup, 
+                    peptideMatches, ids_chargeStates);
             return new ArrayList<Integer>(combineLists);
         }
     }
