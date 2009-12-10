@@ -119,7 +119,7 @@ public class PepXmlSequestFileReader extends PepXmlGenericFileReader<PepXmlSeque
         for (int i = 0; i < reader.getAttributeCount(); i++) {
 
             String attrib = reader.getAttributeLocalName(i);
-            String val = reader.getAttributeValue(i);
+            String val = reader.getAttributeValue(i).trim();
             if (attrib.equalsIgnoreCase("hit_rank"))
                 searchResult.getSequestResultData().setxCorrRank(Integer.parseInt(val));
             else if (attrib.equalsIgnoreCase("num_matched_ions"))
