@@ -354,7 +354,9 @@ public class InteractProtXmlParser {
         protein.setProteinName(reader.getAttributeValue(null, PROTEIN_NAME));
         protein.setProbability(Double.parseDouble(reader.getAttributeValue(null, "probability")));
         protein.setSubsumingProteinEntry(reader.getAttributeValue(null, "subsuming_protein_entry"));
-        protein.setConfidence(Double.parseDouble(reader.getAttributeValue(null, "confidence")));
+        String confidence = reader.getAttributeValue(null, "confidence");
+        if(confidence != null)
+            protein.setConfidence(Double.parseDouble(confidence));
         String coverage = reader.getAttributeValue(null, "percent_coverage");
         if(coverage != null)
             protein.setCoverage(Double.parseDouble(coverage));
