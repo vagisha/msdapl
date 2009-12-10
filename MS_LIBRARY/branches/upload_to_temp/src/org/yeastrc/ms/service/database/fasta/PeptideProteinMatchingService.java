@@ -182,12 +182,52 @@ public class PeptideProteinMatchingService {
     
     private List<Integer> getMatchingDbProteinIdsForPeptideFromDatabase(String peptide, boolean oneQuery) {
         
+        if(peptide.length() < FastaDatabaseSuffixCreator.SUFFIX_LENGTH) {
+            return getDbProteinIdsForSmallPeptide(peptide);
+        }
         if(oneQuery) {
             return getDbProteinIdsOneQuery(peptide);
         }
         else {
             return getDbProteinIdsMultiQuery(peptide);
         }
+    }
+
+    private List<Integer> getDbProteinIdsForSmallPeptide(String peptide) {
+        
+        log.info("LOOKING FOR MATCH FOR SMALL PEPTIDE: "+peptide);
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        List<Integer> dbProteinIds = new ArrayList<Integer>();
+        try {
+            conn = ConnectionFactory.getNrseqConnection();
+            String sql = "SELECT DISTINCT(db.dbProteinID) FROM "+
+            FastaDatabaseSuffixCreator.getDbSuffixTableName(databaseId)+ " AS db, "+
+            FastaDatabaseSuffixCreator.getMainSuffixTableName()+" AS s "+
+            " WHERE s.suffix LIKE \'"+peptide+"%\' AND s.id = db.suffixID";
+            
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while(rs.next()) {
+                dbProteinIds.add((rs.getInt("dbProteinID")));
+            }
+//            if(dbProteinIds.size() == 0) {
+//               System.out.println(sql);
+//            }
+        }
+        catch (SQLException e) {
+            throw new RuntimeException("Exception getting matching proteinIds for suffix: "+peptide+" and database: "+this.databaseId, e);
+        }
+        finally {
+            
+            if(conn != null)    try {conn.close();} catch(SQLException e){}
+            if(stmt != null)    try {stmt.close();} catch(SQLException e){}
+            if(rs != null)    try {rs.close();} catch(SQLException e){}
+        }
+        return dbProteinIds;
     }
 
     private List<Integer> getDbProteinIdsOneQuery(String peptide) {
@@ -300,9 +340,27 @@ public class PeptideProteinMatchingService {
     
     private List<Integer> getMatchingDbProteinIdsForPeptideFromMemory(String peptide) {
         
+        int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
+        
+        if(peptide.length() < SUFFIX_LENGTH) {
+            log.info("LOOKING FOR MATCH FOR SMALL PEPTIDE: "+peptide);
+            Set<Integer> allMatches = new HashSet<Integer>();
+            for(String suffix: suffixMap.keySet()) {
+                if(suffix.startsWith(peptide)) {
+                    allMatches.addAll(suffixMap.get(suffix));
+                }
+            }
+            
+            if(allMatches.size() > 10)
+                System.out.println("!!!# matches found: "+allMatches.size());
+            List<Integer> matchList = new ArrayList<Integer>(allMatches.size());
+            matchList.addAll(allMatches);
+            return matchList;
+        }
+        
         // suffixes we store are 5 aa long. 
         Map<Integer, Integer> matches = new HashMap<Integer, Integer>();
-        int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
+        
         int numSuffixesInSeq = 0;
         for(int i = 0; i < peptide.length(); i++) {
             int end = Math.min(i+SUFFIX_LENGTH, peptide.length());
@@ -330,7 +388,7 @@ public class PeptideProteinMatchingService {
                 break;
         }
         
-        // keep only those matched that had all the 5-mers in our peptide.
+        // keep only those matches that had all the 5-mers in our peptide.
         List<Integer> allMatches = new ArrayList<Integer>();
         for(int proteinId: matches.keySet()) {
             int cnt = matches.get(proteinId);
