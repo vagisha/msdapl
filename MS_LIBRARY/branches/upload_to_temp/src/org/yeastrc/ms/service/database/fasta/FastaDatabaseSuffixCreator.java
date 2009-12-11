@@ -176,7 +176,11 @@ public class FastaDatabaseSuffixCreator {
         Set<String> uniqSuffixes = new HashSet<String>();
         
         // Remove any '*' characters from the sequence
+        String oldSequence = sequence;
         sequence = sequence.replaceAll("\\*", "");
+        if(!oldSequence.equals(sequence)) {
+            log.warn("Sequence contains *'s : "+oldSequence);
+        }
         
         // get the unique suffixes in this sequence
         for(int i = 0; i < sequence.length(); i++) {

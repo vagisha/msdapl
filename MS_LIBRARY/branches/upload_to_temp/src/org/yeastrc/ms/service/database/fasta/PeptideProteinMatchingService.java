@@ -128,6 +128,8 @@ public class PeptideProteinMatchingService {
             List<EnzymeRule> enzymeRules, int minEnzymaticTermini) {
         
         String sequence = NrSeqLookupUtil.getProteinSequence(dbProt.getProteinId());
+        // Remove any '*' characters from the sequence
+        sequence = sequence.replaceAll("\\*", "");
         
         return getPeptideProteinMatch(dbProt, peptide, enzymeRules,
                 minEnzymaticTermini, sequence);
