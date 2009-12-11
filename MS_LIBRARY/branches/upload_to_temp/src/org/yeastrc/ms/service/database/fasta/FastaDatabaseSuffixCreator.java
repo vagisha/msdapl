@@ -175,6 +175,9 @@ public class FastaDatabaseSuffixCreator {
         
         Set<String> uniqSuffixes = new HashSet<String>();
         
+        // Remove any '*' characters from the sequence
+        sequence = sequence.replaceAll("\\*", "");
+        
         // get the unique suffixes in this sequence
         for(int i = 0; i < sequence.length(); i++) {
             int end = Math.min(i+SUFFIX_LENGTH, sequence.length());
@@ -187,7 +190,7 @@ public class FastaDatabaseSuffixCreator {
         // add the suffixes to the cache after looking up the suffixId from the suffixIdMap.
         for(String s: uniqSuffixes) {
             int suffixId = getSuffixId(s);
-            // suffixes that contain charcters that are not amino acid codes will not 
+            // suffixes that contain characters that are not amino acid codes will not 
             // have an id in the suffixIdMap. We will ignore these suffixes. 
             if(suffixId == 0) {
                 log.warn("No id found for: "+s+"; sequenceID: "+sequenceId);

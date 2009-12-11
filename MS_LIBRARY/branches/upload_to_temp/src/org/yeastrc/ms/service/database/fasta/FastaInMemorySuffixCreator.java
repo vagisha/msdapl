@@ -68,7 +68,11 @@ public class FastaInMemorySuffixCreator {
     
     private void createSuffixes(String sequence, int sequenceId, int dbProteinId) {
         
-        int SUFFIX_LENGTH = 5;
+        int SUFFIX_LENGTH = FastaDatabaseSuffixCreator.SUFFIX_LENGTH;
+        
+        // Remove any '*' characters from the sequence
+        sequence = sequence.replaceAll("\\*", "");
+        
         for(int i = 0; i < sequence.length(); i++) {
             int end = Math.min(i+SUFFIX_LENGTH, sequence.length());
             String subseq = sequence.substring(i, end);
