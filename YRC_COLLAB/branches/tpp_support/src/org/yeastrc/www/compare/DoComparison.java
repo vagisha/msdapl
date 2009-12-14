@@ -32,6 +32,7 @@ import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.FilterableDataset;
 import org.yeastrc.www.compare.dataset.ProteinProphetDataset;
 import org.yeastrc.www.compare.dataset.ProteinferDataset;
+import org.yeastrc.www.compare.dataset.SelectableDataset;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
@@ -100,6 +101,16 @@ public class DoComparison extends Action {
                 ((ProteinProphetDataset)dataset).setProteinFilterCriteria(filterCriteria);
             }
             datasets.add(dataset);
+        }
+        
+        
+        // Do we have ProteinProphet datasets
+        for(FilterableDataset dataset: datasets) {
+            if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
+                myForm.setHasProteinProphetDatasets(true);
+                myForm.setUseProteinGroupProbability(true);
+                break;
+            }
         }
         
         // ANY AND, OR, NOT, XOR filters

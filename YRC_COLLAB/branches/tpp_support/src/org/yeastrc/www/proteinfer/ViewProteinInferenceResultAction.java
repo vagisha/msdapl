@@ -1,9 +1,7 @@
 package org.yeastrc.www.proteinfer;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +22,8 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
+import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
+import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearch;
@@ -84,6 +84,7 @@ public class ViewProteinInferenceResultAction extends Action {
             saveErrors( request, errors );
             return mapping.findForward("Failure");
         }
+        
         
         // Get a list of projects for this protein inference run.  If the user making the request to view this
         // protein inference run is not affiliated with the projects, they should not be able to edit any of 

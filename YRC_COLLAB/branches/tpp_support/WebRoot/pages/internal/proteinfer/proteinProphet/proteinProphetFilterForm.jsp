@@ -90,7 +90,7 @@
   		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="true">Show All Proteins</html:radio>
   	</td>
   	<td colspan="2" align="left">
-  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="false">Excluding Subsumed</html:radio>
+  		<html:radio name="proteinProphetFilterForm" property="showAllProteins" value="false">Exclude Subsumed</html:radio>
   	</td>
   </tr>
   </table></td>

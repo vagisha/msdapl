@@ -2,6 +2,7 @@
 <%@page import="org.yeastrc.www.compare.ProteinGroupComparisonDataset"%>
 <%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
 <%@page import="org.yeastrc.www.compare.dataset.Dataset"%>
+<%@page import="org.yeastrc.www.compare.dataset.DatasetSource"%>
 <%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -367,7 +368,14 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
 	<tr>
 		<th align="center">
-			<span><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></span>
+			<span>
+				<logic:equal name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+					<html:link action="viewProteinProphetResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link>
+				</logic:equal>
+				<logic:notEqual name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+					<html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link>
+				</logic:notEqual>
+			</span>
 		</th>
 		<td align="center">
 			<bean:write name="dataset" property="spectrumCount" />(<bean:write name="dataset" property="maxProteinSpectrumCount" />)
@@ -427,7 +435,13 @@ Total Protein Groups (Total Proteins): <bean:write name="comparison" property="t
 	<td width="2%"style="background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );">
 		&nbsp;&nbsp;
 	</td>
-	<td style="font-size:8pt;text-align:left;"><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></td>
+	<logic:equal name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+		<td style="font-size:8pt;text-align:left;"><html:link action="viewProteinProphetResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></td>
+	</logic:equal>
+	<logic:notEqual name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+		<td style="font-size:8pt;text-align:left;"><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></td>
+	</logic:notEqual>
+	
 	<td width="42%" style="font-size:8pt;" ><bean:write name="dataset" property="datasetComments" /></td>
 	<logic:equal name="mod" value="1"></tr></logic:equal>
 </logic:iterate>

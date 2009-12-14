@@ -99,14 +99,14 @@ public class CompareProteinSetsAction extends Action {
         myForm.setNotList(datasets);
         myForm.setXorList(datasets);
         
-        // Do we have ProteinProphet datasets
-        for(SelectableDataset dataset: datasets) {
-            if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
-                myForm.setHasProteinProphetDatasets(true);
-                myForm.setUseProteinGroupProbability(true);
-                break;
-            }
-        }
+//        // Do we have ProteinProphet datasets
+//        for(SelectableDataset dataset: datasets) {
+//            if(dataset.getSource() == DatasetSource.PROTEIN_PROPHET) {
+//                myForm.setHasProteinProphetDatasets(true);
+//                myForm.setUseProteinGroupProbability(true);
+//                break;
+//            }
+//        }
         
         return mapping.findForward("DoComparison");
     }

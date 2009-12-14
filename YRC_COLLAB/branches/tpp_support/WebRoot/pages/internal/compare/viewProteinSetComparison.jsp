@@ -1,7 +1,8 @@
 
 <%@page import="org.yeastrc.www.compare.ProteinComparisonDataset"%>
 <%@page import="org.yeastrc.www.compare.dataset.DatasetColor"%>
-<%@page import="org.yeastrc.www.compare.dataset.Dataset"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
+<%@page import="org.yeastrc.www.compare.dataset.Dataset"%>
+<%@page import="org.yeastrc.www.compare.dataset.DatasetSource"%><%@ taglib uri="/WEB-INF/yrc-www.tld" prefix="yrcwww" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -341,7 +342,14 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 <logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
 	<tr>
 		<th align="center">
-			<span><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></span>
+			<span>
+				<logic:equal name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+					<html:link action="viewProteinProphetResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link>
+				</logic:equal>
+				<logic:notEqual name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+					<html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link>
+				</logic:notEqual>
+			</span>
 		</th>
 		<td style="color:#FFFFFF; background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> ); padding: 3 5 3 5;">
 			<%=comparison.getProteinCount(row)%>
@@ -391,7 +399,26 @@ Total Proteins: <bean:write name="comparison" property="totalProteinCount" />
 
 </table>
 
-<br>
+<table  align="center" style="border: 1px dashed gray;" width="80%">
+<tbody>
+<logic:iterate name="comparison" property="datasets" id="dataset" indexId="row">
+	<bean:define id="mod" value="<%=String.valueOf(row%2)%>"></bean:define>
+	<logic:equal name="mod" value="0"><tr></logic:equal>
+	<td width="2%"style="background-color: rgb(<%=DatasetColor.get(row).R %>,<%=DatasetColor.get(row).G %>,<%=DatasetColor.get(row).B %> );">
+		&nbsp;&nbsp;
+	</td>
+	<logic:equal name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+		<td style="font-size:8pt;text-align:left;"><html:link action="viewProteinProphetResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></td>
+	</logic:equal>
+	<logic:notEqual name="dataset" property="sourceString" value="<%= DatasetSource.PROTEIN_PROPHET.name()%>">
+		<td style="font-size:8pt;text-align:left;"><html:link action="viewProteinInferenceResult.do" paramId="pinferId" paramName="dataset" paramProperty="datasetId">ID <bean:write name="dataset" property="datasetId" /></html:link></td>
+	</logic:notEqual>
+	
+	<td width="42%" style="font-size:8pt;" ><bean:write name="dataset" property="datasetComments" /></td>
+	<logic:equal name="mod" value="1"></tr></logic:equal>
+</logic:iterate>
+</tbody>
+</table>
 
 <logic:present name="dtasWarning">
 <p style="color:red; font-weight: bold;" align="center">
