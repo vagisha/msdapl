@@ -206,7 +206,7 @@
 </table>
 </div>
 
-<yrcwww:member group="administrator">
+<logic:equal name="speciesIsYeast" value="true">
 <br>
 <div align="center"
 	style="background-color:#F0F8FF; padding: 5 0 5 0; border: 1px solid gray; width:80%">
@@ -231,6 +231,6 @@
 		<html:submit value="Create Graph" onclick="javascript:doGoEnrichmentAnalysisGraph();"></html:submit>
 	</logic:present>
 </div>
-</yrcwww:member>
+</logic:equal>
 </center>
 </html:form>

@@ -9,8 +9,10 @@ package org.yeastrc.www.compare;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,9 +24,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.jobqueue.MSJobFactory;
+import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferSpectrumMatchDAO;
+import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetFilterCriteria;
+import org.yeastrc.ms.domain.search.MsSearch;
 import org.yeastrc.ms.util.TimeUtils;
 import org.yeastrc.www.compare.dataset.Dataset;
 import org.yeastrc.www.compare.dataset.DatasetBuilder;
@@ -32,7 +40,6 @@ import org.yeastrc.www.compare.dataset.DatasetSource;
 import org.yeastrc.www.compare.dataset.FilterableDataset;
 import org.yeastrc.www.compare.dataset.ProteinProphetDataset;
 import org.yeastrc.www.compare.dataset.ProteinferDataset;
-import org.yeastrc.www.compare.dataset.SelectableDataset;
 import org.yeastrc.www.compare.graph.ComparisonProteinGroup;
 import org.yeastrc.www.compare.graph.GraphBuilder;
 import org.yeastrc.www.compare.util.VennDiagramCreator;
@@ -262,6 +269,7 @@ public class DoComparison extends Action {
             request.setAttribute("datasetIds", makeCommaSeparated(allRunIds));
             
             request.setAttribute("comparison", grpComparison);
+            request.setAttribute("speciesIsYeast", isSpeciesYeast(datasets));
             return mapping.findForward("ProteinGroupList");
         }
     }
@@ -277,5 +285,36 @@ public class DoComparison extends Action {
                 buf.deleteCharAt(0);
         }
         return buf.toString();
+    }
+    
+    private boolean isSpeciesYeast(List<? extends Dataset> datasets) throws Exception {
+        
+        
+        Set<Integer> notYeastExpts = new HashSet<Integer>();
+        
+        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        
+        for(Dataset dataset: datasets) {
+            List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(dataset.getDatasetId());
+            if(searchIds != null) {
+                for(int searchId: searchIds) {
+
+                    MsSearch search = searchDao.loadSearch(searchId);
+
+                    if(notYeastExpts.contains(search.getExperimentId())) // if we have already seen this and it is not yeast go on looking
+                        continue;
+
+                    MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+
+                    if(job.getTargetSpecies() == 4932) {
+                        return true;
+                    }
+                    else 
+                        notYeastExpts.add(search.getExperimentId());
+                }
+            }
+        }
+        return false;
     }
 }
