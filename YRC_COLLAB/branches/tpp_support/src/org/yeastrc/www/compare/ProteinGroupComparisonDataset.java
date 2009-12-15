@@ -94,6 +94,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
             int myGrp = proteins.get(endIndex-1).getGroupId();
             while(proteins.get(endIndex).getGroupId() == myGrp && endIndex < this.getTotalProteinCount()) {
                 endIndex++;
+                if(endIndex >= this.getTotalProteinCount())
+                    break;
             }
         }
         return endIndex;
@@ -614,8 +616,8 @@ public class ProteinGroupComparisonDataset implements Tabular, Pageable {
     public void setCurrentPage(int page) {
         this.currentPage = page;
         ResultsPager pager = ResultsPager.instance();
-        this.pageCount = pager.getPageCount(this.proteinGroups.size(), rowCount);
-        this.displayPageNumbers = pager.getPageList(this.proteinGroups.size(), currentPage, rowCount);
+        this.pageCount = pager.getPageCount(this.proteins.size(), rowCount);
+        this.displayPageNumbers = pager.getPageList(this.proteins.size(), currentPage, rowCount);
     }
     
     @Override
