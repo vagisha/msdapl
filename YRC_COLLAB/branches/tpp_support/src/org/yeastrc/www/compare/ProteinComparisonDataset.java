@@ -478,7 +478,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         ProteinListing fastaListing = FastaProteinLookupUtil.getInstance().getProteinListing(nrseqProteinId, dbIds);
         String accession = null;
         if(this.fullProteinName)
-            accession = fastaListing.getFullName();
+            accession = fastaListing.getAllNames();
         else
             accession = fastaListing.getName();
         
@@ -500,7 +500,7 @@ public class ProteinComparisonDataset implements Tabular, Pageable {
         return null;
     }
     
-    private List<Integer> getFastaDatabaseIds() {
+    List<Integer> getFastaDatabaseIds() {
         if(this.fastaDatabaseIds != null)
             return fastaDatabaseIds;
         else {

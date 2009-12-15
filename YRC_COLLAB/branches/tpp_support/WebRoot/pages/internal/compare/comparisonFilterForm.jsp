@@ -192,8 +192,12 @@
 			Search:
 		</td>
 		<td style="padding-left:5px;"> 
-			<html:text name="proteinSetComparisonForm" property="accessionLike" size="40"></html:text><br>
- 			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial FASTA identifiers</span>
+			Fasta ID(s): <html:text name="proteinSetComparisonForm" property="accessionLike" size="40"></html:text><br>
+ 			<span style="font-size:8pt;">Enter a comma-separated list of complete or partial FASTA identifiers.</span>
+ 		</td>
+ 		<td style="padding-left:5px;" colspan="2"> 
+			Description: <html:text name="proteinSetComparisonForm" property="descriptionLike" size="40"></html:text><br>
+ 			<span style="font-size:8pt;">Enter a comma-separated list of terms.</span>
  		</td>
  	</tr>
  	<tr>

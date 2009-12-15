@@ -136,6 +136,12 @@ public class DoComparison extends Action {
             ProteinDatasetComparer.instance().applySearchNameFilter(comparison, searchString);
         }
         
+        // If the user is searching for some proteins by description, filter the list
+        String descSearchString = myForm.getDescriptionLike();
+        if(descSearchString != null && descSearchString.trim().length() > 0) {
+            ProteinDatasetComparer.instance().applyDescriptionFilter(comparison, descSearchString);
+        }
+        
         // Apply AND, OR, NOT, XOR filters
         s = System.currentTimeMillis();
         ProteinDatasetComparer.instance().applyFilters(comparison, filters); // now apply all the filters
