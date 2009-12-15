@@ -20,8 +20,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.jobqueue.MSJob;
+import org.yeastrc.jobqueue.MSJobFactory;
 import org.yeastrc.ms.dao.DAOFactory;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
+import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
@@ -204,11 +207,34 @@ private static final Logger log = Logger.getLogger(ViewProteinProphetResultActio
         ProteinProphetROC rocSummary = proteinProphetRun.getRoc();
         request.setAttribute("rocSummary", rocSummary);
         
+        request.setAttribute("speciesIsYeast", isSpeciesYeast(pinferId));
         
         long e = System.currentTimeMillis();
         log.info("Total time (ViewProteinProphetResultAction): "+TimeUtils.timeElapsedSeconds(s, e));
         
         // Go!
         return mapping.findForward("Success");
+    }
+    
+    private boolean isSpeciesYeast(int pinferId) throws Exception {
+        
+        
+        ProteinferRunDAO runDao = ProteinferDAOFactory.instance().getProteinferRunDao();
+        MsSearchDAO searchDao = DAOFactory.instance().getMsSearchDAO();
+        
+        List<Integer> searchIds = runDao.loadSearchIdsForProteinferRun(pinferId);
+        if(searchIds != null) {
+            for(int searchId: searchIds) {
+
+                MsSearch search = searchDao.loadSearch(searchId);
+
+                MSJob job = MSJobFactory.getInstance().getJobForExperiment(search.getExperimentId());
+
+                if(!(job.getTargetSpecies() == 4932)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

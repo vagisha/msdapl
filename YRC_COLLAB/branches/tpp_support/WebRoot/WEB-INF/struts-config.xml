@@ -806,6 +806,17 @@
 	</action>
 	
 	<action 
+		path="/proteinProphetGoEnrichment"
+		name="proteinProphetFilterForm"
+		scope="request"
+		validate="true"
+		type="org.yeastrc.www.proteinfer.proteinProphet.ProteinProphetGOEnrichmentAction"
+	>
+		<forward name="Success" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetGoEnrichment.jsp" redirect="false" />
+		<forward name="Failure" path="/pages/internal/proteinfer/proteinProphet/viewProteinProphetGoEnrichment.jsp" redirect="false" />
+	</action>
+	
+	<action 
 		path="/updateProteinInferenceResult"
 		type="org.yeastrc.www.proteinfer.UpdateProteinInferenceResultAjaxAction"
 		name="proteinInferFilterForm"

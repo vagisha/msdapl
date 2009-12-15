@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
+import org.yeastrc.bio.go.GOUtils;
 
 public class ProteinProphetFilterForm extends ActionForm {
 
@@ -41,6 +42,12 @@ public class ProteinProphetFilterForm extends ActionForm {
     
     private String minProteinProbability = "0.0";
     private String maxProteinProbability = "1.0";
+    
+    
+    private int goAspect = GOUtils.BIOLOGICAL_PROCESS;  // Used for GO enrichment only
+    private int speciesId;
+    private String goEnrichmentPVal = "0.01";           // Used for GO enrichment only
+    
     
     public ProteinProphetFilterForm () {}
     
@@ -421,5 +428,32 @@ public class ProteinProphetFilterForm extends ActionForm {
         if(buf.length() > 0)
             buf.deleteCharAt(0);
         return buf.toString();
+    }
+    
+    //-----------------------------------------------------------------------------
+    // GO Enrichment
+    //-----------------------------------------------------------------------------
+    public int getGoAspect() {
+        return goAspect;
+    }
+
+    public void setGoAspect(int goAspect) {
+        this.goAspect = goAspect;
+    }
+
+    public String getGoEnrichmentPVal() {
+        return goEnrichmentPVal;
+    }
+
+    public void setGoEnrichmentPVal(String goEnrichmentPVal) {
+        this.goEnrichmentPVal = goEnrichmentPVal;
+    }
+
+    public int getSpeciesId() {
+        return speciesId;
+    }
+
+    public void setSpeciesId(int speciesId) {
+        this.speciesId = speciesId;
     }
 }

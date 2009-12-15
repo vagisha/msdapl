@@ -22,8 +22,6 @@ import org.yeastrc.ms.dao.protinfer.ibatis.ProteinferRunDAO;
 import org.yeastrc.ms.dao.search.MsSearchDAO;
 import org.yeastrc.ms.domain.protinfer.PeptideDefinition;
 import org.yeastrc.ms.domain.protinfer.ProteinFilterCriteria;
-import org.yeastrc.ms.domain.protinfer.ProteinInferenceProgram;
-import org.yeastrc.ms.domain.protinfer.ProteinferRun;
 import org.yeastrc.ms.domain.protinfer.SORT_ORDER;
 import org.yeastrc.ms.domain.protinfer.idpicker.IdPickerRun;
 import org.yeastrc.ms.domain.search.MsSearch;
@@ -214,7 +212,7 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("sortBy", filterCriteria.getSortBy());
         request.setAttribute("sortOrder", filterCriteria.getSortOrder());
         
-        request.setAttribute("showGOForm", isSpeciesYeast(pinferId));
+        request.setAttribute("speciesIsYeast", isSpeciesYeast(pinferId));
         
         long e = System.currentTimeMillis();
         log.info("Total time (ViewProteinInferenceResultAction): "+TimeUtils.timeElapsedSeconds(s, e));

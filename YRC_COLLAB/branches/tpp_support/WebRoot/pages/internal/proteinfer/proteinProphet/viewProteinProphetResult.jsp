@@ -754,6 +754,57 @@ function refreshProteinList(responseText) {
 	}
 	//setupProteinListTable();
 }
+
+// ---------------------------------------------------------------------------------------
+// GENE ONTOLOGY ENRICHMENT
+// ---------------------------------------------------------------------------------------
+function doGoEnrichmentAnalysis() {
+
+	// validate the current entries in the form
+	var validated = validateForm();
+	if(!validated)	return false;
+	// validate pvalue cutoff for enrichment calculation
+	var value = $('form#goEnrichmentForm input[@name=goEnrichmentPVal]').fieldValue();
+    var valid = validateFloat(value, "P-Value", 0.0, 1.0);
+    if(!valid)	return false;
+	
+	// copy the values from the filter form to the GO enrichment form
+	$("#goEnrichmentForm  input[name='minPeptides']").val($("#filterForm  input[name='minPeptides']").val());
+	$("#goEnrichmentForm  input[name='maxPeptides']").val($("#filterForm  input[name='maxPeptides']").val());
+	
+	$("#goEnrichmentForm  input[name='minUniquePeptides']").val($("#filterForm input[name='minUniquePeptides']").val());
+	$("#goEnrichmentForm  input[name='maxUniquePeptides']").val($("#filterForm input[name='maxUniquePeptides']").val());
+	
+	$("#goEnrichmentForm  input[name='minCoverage']").val($("#filterForm  input[name='minCoverage']").val());
+	$("#goEnrichmentForm  input[name='maxCoverage']").val($("#filterForm  input[name='maxCoverage']").val());
+	
+	$("#goEnrichmentForm  input[name='minSpectrumMatches']").val($("#filterForm  input[name='minSpectrumMatches']").val());
+	$("#goEnrichmentForm  input[name='maxSpectrumMatches']").val($("#filterForm  input[name='maxSpectrumMatches']").val());
+	
+	$("#goEnrichmentForm  input[name='minGroupProbability']").val($("#filterForm  input[name='minGroupProbability']").val());
+	$("#goEnrichmentForm  input[name='maxGroupProbability']").val($("#filterForm  input[name='maxGroupProbability']").val());
+	
+	$("#goEnrichmentForm  input[name='minProteinProbability']").val($("#filterForm  input[name='minProteinProbability']").val());
+	$("#goEnrichmentForm  input[name='maxProteinProbability']").val($("#filterForm  input[name='maxProteinProbability']").val());
+	
+	$("#goEnrichmentForm  input[name='joinProphetGroupProteins']").val($("#filterForm  input[name='joinProphetGroupProteins']:checked").val());
+	$("#goEnrichmentForm  input[name='showAllProteins']").val($("#filterForm  input[name='showAllProteins']:checked").val());
+
+	$("#goEnrichmentForm  input[name='accessionLike']").val($("#filterForm  input[name='accessionLike']").val());
+	$("#goEnrichmentForm  input[name='descriptionLike']").val($("#filterForm input[name='descriptionLike']").val());
+	
+	var validationStatus = "";
+	$("#filterForm  input[name='validationStatus']:checked").each(function() {validationStatus += ","+$(this).val();});
+	if(validationStatus.length) {
+		validationStatus = validationStatus.substring(1); // remove first comma
+	}
+	$("#goEnrichmentForm  input[name='validationStatusString']").val(validationStatus);
+	
+	
+	$("#goEnrichmentForm").submit();
+	
+}
+
 // ---------------------------------------------------------------------------------------
 // SORT RESULTS
 // ---------------------------------------------------------------------------------------
@@ -983,6 +1034,10 @@ function toggleDivVisibility(mydiv) {
 		<%@ include file="proteinProphetFilterForm.jsp" %>
 		</td></tr></table>
 		</CENTER>
+		
+		<logic:equal name="speciesIsYeast" value="true">
+		<%@include file="goEnrichmentInputForm.jsp" %>
+		</logic:equal>
 		
 		<div id="protlist_table">
     	<%@ include file="proteinlist.jsp" %>
