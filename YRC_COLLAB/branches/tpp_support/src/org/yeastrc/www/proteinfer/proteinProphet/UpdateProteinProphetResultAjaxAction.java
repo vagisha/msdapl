@@ -111,6 +111,8 @@ public class UpdateProteinProphetResultAjaxAction extends Action {
         filterCriteria.setValidationStatus(filterForm.getValidationStatus());
         filterCriteria.setAccessionLike(filterForm.getAccessionLike());
         filterCriteria.setDescriptionLike(filterForm.getDescriptionLike());
+        filterCriteria.setPeptide(filterForm.getPeptide());
+        filterCriteria.setExactPeptideMatch(filterForm.getExactPeptideMatch());
         
         
         // Get the protein IDs from the session

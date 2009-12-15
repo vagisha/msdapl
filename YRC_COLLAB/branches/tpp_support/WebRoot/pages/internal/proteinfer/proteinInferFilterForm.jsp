@@ -113,6 +113,11 @@
   			</td>
   		</tr>
   		<tr>
+  			<td valign="top">Peptide: </td>
+  			<td valign="top">
+  				<html:text name="proteinInferFilterForm" property="peptide" size="40"></html:text><br>
+  				<span style="font-size:8pt;">Exact Match:<html:checkbox property="proteinInferFilterForm" property="exactPeptideMatch"></html:checkbox></span>
+  			</td>
   		</tr>
   	</table>
   	</td>
