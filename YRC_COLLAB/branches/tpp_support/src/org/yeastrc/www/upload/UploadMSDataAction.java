@@ -64,6 +64,20 @@ public class UploadMSDataAction extends Action {
 			return mapping.findForward("adminHome");
 		}
 		
+		// If the user is uploading data from a remote server make sure the user is a member of the 
+		// lab / group the server belongs to.
+		if(!uform.getDataServer().equals("local")) {
+		    String dataServerGroup = uform.getDataServer();
+		    
+		    if(!groupMan.isMember(user.getResearcher().getID(), dataServerGroup)) {
+		        ActionErrors errors = new ActionErrors();
+		        errors.add("upload", new ActionMessage("error.upload.saveerror", 
+		                "You do not have access to upload data from the "+dataServerGroup+" server."));
+	            saveErrors( request, errors );
+	            return mapping.findForward("Failure");
+		    }
+		}
+		
 		Date runDate = uform.getExperimentDate();
 		int species = uform.getSpecies();
 		String comments = uform.getComments();
@@ -74,7 +88,7 @@ public class UploadMSDataAction extends Action {
         
 		boolean maccoss = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.MACCOSS);
         boolean yates = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.YATES);
-        boolean goodlett = Groups.getInstance().isMember(user.getResearcher().getID(), "Goodlett");
+        boolean goodlett = Groups.getInstance().isMember(user.getResearcher().getID(), Projects.GOODLETT);
         if (yates)
             jobSaver.setGroupID(0);
         else if (maccoss)
@@ -90,12 +104,7 @@ public class UploadMSDataAction extends Action {
 		jobSaver.setPipeline(uform.getPipeline());
 		jobSaver.setInstrumentId(uform.getInstrumentId());
 		
-		// TODO assuming that the data server will be accessible on server running JobQueue application
-		if(!yates)
-		    jobSaver.setServerDirectory( "local:"+directory );
-		else
-		    jobSaver.setServerDirectory(directory);
-		
+		jobSaver.setServerDirectory(uform.getDataServer()+":"+directory);
 
 		jobSaver.setSubmitter( user.getID() );
 

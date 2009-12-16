@@ -64,6 +64,9 @@ public class Projects {
 	
 	/** The definition for the MacCoss group */
 	public static final String MACCOSS = "MacCoss";
+	
+	/** The definition for the Goodlett group */
+    public static final String GOODLETT = "Goodlett";
 
 	/** The definitioni for the Noble group */
 	public static final String NOBLE = "Noble";

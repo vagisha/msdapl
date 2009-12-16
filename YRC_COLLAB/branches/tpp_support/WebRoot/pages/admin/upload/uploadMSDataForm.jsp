@@ -53,38 +53,50 @@ function onCancel(projectId) {
   <table border="0">
   
   <tr>
-  <td colspan="2">Select the pipeline that generated the data</td>
-  </tr>
+    <td colspan="2">Select the project to which this data belongs:</td>
+   </tr>
+	<tr>
+		<td valign="top" style="padding-bottom: 15px;">
+			<span><b>Project:</b></span><br>
+			<span style="font-size:8pt;color:red;">IMPORTANT: This <span style="text-decoration:underline;">must</span> be the project<br>
+					       to which this data belongs.</span>
+		</td>
+		<td valign="top">
+			<html:select property="projectID">
+				<html:option value="0">None</html:option>
+				<html:options collection="researcherProjects" property="id" labelProperty="title"/>
+ 					</html:select>
+			<!--<html:text property="projectID" size="10" maxlength="10" /><br>-->
+			<!--  <a href="javascript:projectSearcherPopUp(document.uploadMSDataForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a> -->
+		</td>
+	</tr>
+	
   <tr>
+  	<td>
+  		<b>Pipeline</b><br>
+  		<span style="font-size:8pt;color:red;">Select the pipeline that generated the data</span>
+  	</td>
   	<td colspan="2">
 		<html:radio property="pipelineName" value="<%=Pipeline.MACOSS.name() %>"><b><%=Pipeline.MACOSS.getLongName() %></b></html:radio>  
 		<html:radio property="pipelineName" value="<%=Pipeline.TPP.name() %>"><b><%=Pipeline.TPP.getLongName() %></b></html:radio>			
   	</td>
   </tr>
   <tr><td colspan="2">&nbsp;</td></tr>
-   <tr>
-    <td colspan="2">Select the project to which this data belongs:</td>
-   </tr>
-			<tr>
-				<td valign="top">
-					<span><b>Project:</b></span><br>
-					<span style="font-size:8pt;color:red;">IMPORTANT: This <span style="text-decoration:underline;">must</span> be the project<br>
-							       to which this data belongs.</span>
-				</td>
-				<td valign="top">
-					<html:select property="projectID">
-						<html:option value="0">None</html:option>
-						<html:options collection="researcherProjects" property="id" labelProperty="title"/>
-   					</html:select>
-					<!--<html:text property="projectID" size="10" maxlength="10" /><br>-->
-					<!--  <a href="javascript:projectSearcherPopUp(document.uploadMSDataForm.projectID)" style="text-decoration:none;"><span style="font-size:8pt;color:red;text-decoration:none;">[SEARCH PROJECTS]</span></a> -->
-				</td>
-			</tr>
-
+   
+	
    <tr>
     <td valign="top"><b>Data directory:</b><br>
     <font style="font-size:8pt;">e.g.: /home/maccoss/Davis/121005-digest</font></td>
     <td valign="top"><html:text property="directory" size="40" maxlength="255"/></td>
+   </tr>
+   
+   <tr>
+   	<td valign="top" style="padding-bottom: 15px;"><b>Data server:</b></td>
+   	<td valign="top">
+   		<html:radio property="dataServer" value="local"><b>Local</b></html:radio>
+   		<html:radio property="dataServer" value="Goodlett"><b>Goodlett</b></html:radio>  
+   		<html:radio property="dataServer" value="Yates"><b>Yates</b></html:radio>
+   	</td>
    </tr>
 
    <tr>

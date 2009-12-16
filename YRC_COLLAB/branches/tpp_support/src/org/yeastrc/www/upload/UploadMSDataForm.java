@@ -39,8 +39,9 @@ public class UploadMSDataForm extends ActionForm {
     
     private Pipeline pipeline;
     
+    private String dataServer = "local";
+    
 	
-
     /**
 	 * Validate the properties that have been sent from the HTTP request,
 	 * and return an ActionErrors object that encapsulates any
@@ -219,5 +220,13 @@ public class UploadMSDataForm extends ActionForm {
     
     public void setPipelineName(String pipeline) {
         this.pipeline = Pipeline.forName(pipeline);
+    }
+    
+    public String getDataServer() {
+        return dataServer;
+    }
+
+    public void setDataServer(String dataServer) {
+        this.dataServer = dataServer;
     }
 }
