@@ -749,7 +749,8 @@ public class ProtxmlDataUploadService implements ProtinferUploadService {
                 run.setInputGenerator(analysis.getAnalysisProgram());
                 run.setProgram(ProteinInferenceProgram.PROTEIN_PROPHET);
                 run.setProgramVersion(parser.getProgramVersion());
-                run.setDate(new java.sql.Date(parser.getDate().getTime()));
+                if(parser.getDate() != null)
+                    run.setDate(new java.sql.Date(parser.getDate().getTime()));
                 run.setFilename(parser.getFileName());
                 uploadedPinferId = ppRunDao.saveProteinProphetRun(run);
                 first = false;

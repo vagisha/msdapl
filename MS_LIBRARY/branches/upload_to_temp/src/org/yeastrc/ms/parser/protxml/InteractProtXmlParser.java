@@ -18,6 +18,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.log4j.Logger;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.Modification;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetGroup;
 import org.yeastrc.ms.domain.protinfer.proteinProphet.ProteinProphetParam;
@@ -50,6 +51,8 @@ public class InteractProtXmlParser {
     private List<String> equivalentResidues;
     private static final Pattern equiResPattern = Pattern.compile("([A-Z])\\s\\->\\s([A-Z])\\s?");
     private ProteinProphetROC proteinProphetRoc;
+    
+    private static final Logger log = Logger.getLogger(InteractProtXmlParser.class.getName());
     
     public void open(String filePath) throws DataProviderException {
         
@@ -137,7 +140,8 @@ public class InteractProtXmlParser {
             date = simpleDateFormat.parse(reader.getAttributeValue(null, "time"));
         }
         catch (ParseException e) {
-            throw new DataProviderException("Error parsing date", e);
+            log.warn("Error parsing data in protxml file: "+reader.getAttributeValue(null, "time"));
+//            throw new DataProviderException("Error parsing date", e);
         }
         readProteinProphetDetails();
     }
