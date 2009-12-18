@@ -310,6 +310,13 @@ function clearSelectedProtInfer() {
 		$(this).attr('checked', false);
 	});
 }
+
+function confirmDeleteExperiment(experimentId) {
+    if(confirm("Are you sure you want to delete ExperimentID "+experimentId+"?")) {
+          document.location.href="<yrcwww:link path='deleteExperiment.do?experimentId='/>" + experimentId;
+          return 1;
+    }
+ }
 </script>
 
 
@@ -339,7 +346,11 @@ function clearSelectedProtInfer() {
 			<div style="margin:0; padding:5;">
 			<table cellspacing="0" cellpadding="0">		
 				<tr>	
-					<td><b>Date Uploaded: </b></td><td style="padding-left:10"><bean:write name="experiment" property="uploadDate"/></td>
+					<td><b>Date Uploaded: </b></td>
+					<td style="padding-left:10">
+						<bean:write name="experiment" property="uploadDate"/> &nbsp; &nbsp;
+						<span class="clickable underline" style="color:red; font-weight:bold;" onClick="confirmDeleteExperiment('<bean:write name="experiment" property="id"/>')">[Delete Experiment]</span>
+					</td>
 				</tr>
 				<tr>
 					<td><b>Location: </b></td>

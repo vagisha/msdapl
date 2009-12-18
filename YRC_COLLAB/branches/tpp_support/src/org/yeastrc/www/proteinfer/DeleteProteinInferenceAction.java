@@ -20,8 +20,6 @@ import org.yeastrc.jobqueue.JobDeleter;
 import org.yeastrc.ms.dao.ProteinferDAOFactory;
 import org.yeastrc.project.Project;
 import org.yeastrc.project.ProjectDAO;
-import org.yeastrc.project.Projects;
-import org.yeastrc.www.user.Groups;
 import org.yeastrc.www.user.User;
 import org.yeastrc.www.user.UserUtils;
 
@@ -48,17 +46,6 @@ public class DeleteProteinInferenceAction extends Action {
             return mapping.findForward("authenticate");
         }
 
-        // Restrict access to yrc members
-        Groups groupMan = Groups.getInstance();
-        if (!groupMan.isMember(user.getResearcher().getID(), Projects.MACCOSS) &&
-          !groupMan.isMember( user.getResearcher().getID(), Projects.YATES) &&
-          !groupMan.isMember(user.getResearcher().getID(), "administrators")) {
-            ActionErrors errors = new ActionErrors();
-            errors.add("access", new ActionMessage("error.access.invalidgroup"));
-            saveErrors( request, errors );
-            return mapping.findForward( "Failure" );
-        }
-        
         // get the project ID so we can redirect back in case of failure
         int projectId = -1;
         if (request.getParameter("projectId") != null) {
