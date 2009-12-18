@@ -43,10 +43,14 @@ public class ExperimentDeleter {
     }
     
     public synchronized void addExperimentId(int experimentId, boolean unlinkFirst) throws SQLException {
-        if(!deletionList.contains(experimentId))
+        if(!deletionList.contains(experimentId)) {
             deletionList.add(experimentId);
-        else
+            log.info("Got request to delete experiment ID: "+experimentId);
+        }
+        else {
+            log.info("Experiment ID: "+experimentId+" already in deletion queue");
             return;
+        }
         
         if(unlinkFirst) {
             log.info("Unlinking project from experiment ID: "+experimentId);
