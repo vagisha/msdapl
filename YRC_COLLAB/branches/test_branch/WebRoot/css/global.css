@@ -1,0 +1,405 @@
+/* These are my global styling rules */
+
+#dhtmltooltip{
+	position: absolute;
+	width: 150px;
+	border: 2px solid black;
+	padding: 2px;
+	background-color: lightyellow;
+	visibility: hidden;
+	z-index: 100;
+}
+
+
+BODY    {
+                background-color: #FFFFFF;
+                color: #000000;
+                font-family: verdana, helvetica, arial;
+                font-size:10pt;
+                font-style:normal;
+                font-weight:500;
+        }
+
+PRE	{
+		color: #000000;
+		font-size: 10pt;
+		font-weight:500;
+	}
+
+TD	{
+		font-size:10pt;
+	}
+TH	{
+		font-size:12pt;
+	}
+
+A:link  {
+                color: #323232;
+        }
+
+A:visited {
+                color: #232323;
+        }
+
+A:active {
+                color: #FF0000;
+        }
+
+DIV.footer {
+        width:350;
+        border-width: 0;
+        padding: 10px;
+        background-color: #ffffff;
+        z-index:1;
+        color: #000000;
+        font-family: verdana, helvetica, arial;
+        font-size:8pt;
+        font-style:normal;
+        font-weight:300;
+        margin:0px;
+}
+
+DIV.localization, DIV.ms, DIV.y2h, DIV.progress, DIV.upload, DIV.adminSearch, DIV.groups, DIV.search, DIV.register, DIV.error, DIV.login, DIV.project, DIV.about, DIV.account {
+        border-width: 1;
+        border-style: solid;
+        padding: 10px;
+        z-index:1;
+        font-family: verdana, helvetica, arial;
+        font-size:10pt;
+        font-style:normal;
+        font-weight:500;
+        margin:0px;
+}
+
+DIV.localization_header, DIV.ms_header, DIV.y2h_header, DIV.progress_header, DIV.upload_header, DIV.adminSearch_header, DIV.groups_header, DIV.search_header, DIV.register_header, DIV.error_header, DIV.login_header, DIV.project_header, DIV.about_header, DIV.account_header {
+        border-width: 1;
+        border-style: solid;
+        padding: 10px;
+        z-index:1;
+        font-family: verdana, helvetica, arial;
+        font-size:12pt;
+        font-style:normal;
+        font-weight:900;
+        margin:0px;
+}
+
+/* Search color definitions */
+DIV.search {
+	width: 600;
+        border-color: #000960;
+        background-color: #E8EAFF;
+        color: #000960;
+}
+
+DIV.search_header {
+	width: 600;
+        border-color: #000960;
+        background-color: #000960;
+        color: #E8EAFF;
+}
+TR.search_A {
+	background-color: #E8EAFF;
+}
+TR.search_B {
+	background-color: #D8DBFE;
+}
+DIV.search .button {
+	background-color:#000960;
+	color:#E8EAFF;
+	font-size:10pt;
+	font-weight:bold;
+	margin-top:20px;	
+}
+
+
+
+/* Register color definitions */
+DIV.register {
+	width: 600;
+        border-color: #000960;
+        background-color: #E8EAFF;
+        color: #000960;
+}
+
+DIV.register_header {
+	width: 600;
+        border-color: #000960;
+        background-color: #000960;
+        color: #E8EAFF;
+}
+TR.register_A {
+	background-color: #E8EAFF;
+}
+TR.register_B {
+	background-color: #D8DBFE;
+}
+
+
+/* Error color definitions */
+DIV.error_header {
+        border-color: #B20A23;
+        background-color: #B20A23;
+        color: #FFD3DA;
+}
+DIV.error {
+        border-color: #B20A23;
+        background-color: #FFD3DA;
+        color: #B20A23;
+}
+
+
+/* Login color definitions */
+DIV.login_header {
+        border-color: #156009;
+        background-color: #156009;
+        color: #A7E5A0;
+}
+DIV.login {
+        border-color: #156009;
+        background-color: #A7E5A0;
+        color: #156009;
+}
+
+
+/* Project color definitions */
+DIV.project {
+        border-color: #1d0047;
+        background-color: #e5d3ff;
+        color: #1d0047;
+}
+DIV.project_header {
+        border-color: #1d0047;
+        background-color: #1d0047;
+        color: #e5d3ff;
+}
+TR.project_A {
+	background-color: #e5d3ff;
+}
+TR.project_B {
+	background-color: #eee2ff;
+}
+DIV.project .button {
+	background-color:#1d0047;
+	color:#e5d3ff;
+	font-size:10pt;
+	font-weight:bold;
+	margin-top:20px;	
+}
+INPUT.project_button {
+	background-color:#1d0047;
+	color:#ffffff;
+	font-size:12pt;
+	font-weight:bold;
+	margin-top:15px;
+	text-decoration:none;
+}
+
+
+
+/* About YRC page color definitions */
+DIV.about {
+        width: 600;
+        border-color: #003037;
+        background-color: #E9FCFF;
+        color: #003037;
+}
+
+DIV.about_header {
+        width: 600;
+        border-color: #003037;
+        background-color: #003037;
+        color: #E9FCFF;
+}
+
+/* account color definitions */
+DIV.account {
+        width: 600;
+        border-color: #326000;
+        background-color: #E7FCD2;
+        color: #326000;
+}
+
+DIV.account_header {
+        width: 600;
+        border-color: #326000;
+        background-color: #326000;
+        color: #E7FCD2;
+}
+
+/* admin group management color definitions */
+DIV.groups {
+        width: 600;
+        border-color: #2F4A00;
+        background-color: #D4FF8B;
+        color: #000000;
+}
+
+DIV.groups_header {
+        width: 600;
+        border-color: #2F4A00;
+        background-color: #2F4A00;
+        color: #D4FF8B;
+}
+
+/* admin search color definitions */
+DIV.adminSearch {
+        width: 600;
+        border-color: #59AFFF;
+        background-color: #EEF7FF;
+        color: #000000;
+}
+DIV.adminSearch_header {
+        width: 600;
+        border-color: #59AFFF;
+        background-color: #59AFFF;
+        color: #000000;
+}
+TR.adminSearch_A {
+	background-color: #D6EBFF;
+}
+TR.adminSearch_B {
+	background-color: #EEF7FF;
+}
+
+/* data upload color definitions */
+DIV.upload {
+        width: 600;
+        border-color: #FFBF59;
+        background-color: #FFF0D8;
+        color: #000000;
+}
+
+DIV.upload_header {
+        width: 600;
+        border-color: #FFBF59;
+        background-color: #FFBF59;
+        color: #000000;
+}
+TR.upload_A {
+	background-color: #FFF0D8;
+}
+TR.upload_B {
+	background-color: #E9E6E2;
+}
+
+/* progress report color definitions */
+DIV.progress {
+        width: 600;
+        border-color: #AF00AD;
+        background-color: #FFE5FF;
+        color: #000000;
+}
+DIV.progress_header {
+        width: 600;
+        border-color: #AF00AD;
+        background-color: #AF00AD;
+        color: #FFE5FF;
+}
+TR.progress_A {
+	background-color: #FFB4FE;
+}
+TR.progress_B {
+	background-color: #FFE5FF;
+}
+
+/* yeast two-hybrid color definitions */
+DIV.y2h {
+        width: 600;
+        border-color: #AF00AD;
+        background-color: #FFE5FF;
+        color: #000000;
+}
+DIV.y2h_header {
+        width: 600;
+        border-color: #AF00AD;
+        background-color: #AF00AD;
+        color: #FFE5FF;
+}
+TR.y2h_A {
+	background-color: #FFB4FE;
+}
+TR.y2h_B {
+	background-color: #FFE5FF;
+}
+
+DIV.ms {
+        width: 600;
+        border-color: #3D902A;
+        background-color: #EBFFE6;
+        color: #3D902A;
+}
+DIV.ms_header {
+        width: 600;
+        border-color: #3D902A;
+        background-color: #3D902A;
+        color: #EBFFE6;
+}
+TR.ms_A {
+	background-color: #D4FECA;
+}
+TR.ms_B {
+	background-color: #EBFFE6;
+}
+
+DIV.localization {
+        width: 600;
+        border-color: #BE0000;
+        background-color: #FFE1E1;
+        color: #BE0000;
+}
+DIV.localization_header {
+        width: 600;
+        border-color: #BE0000;
+        background-color: #BE0000;
+        color: #FFE1E1;
+}
+TR.localization_A {
+	background-color: #FFD5D5;
+}
+TR.localization_B {
+	background-color: #FFE1E1;
+}
+
+/* MS-specific styling rules */
+SPAN.covered_peptide {
+	color: #FF0000;
+}
+SPAN.single_star_residue {
+	color: #FF0000;
+	font-weight: bold;
+	background-color: #FFFF00;
+}
+SPAN.multiple_star_residue {
+	color: #FFFF00;
+	font-weight: bold;
+	background-color: #FF0000;
+}
+SPAN.single_at_residue {
+	color: #FF0000;
+	font-weight: bold;
+	background-color: #FFB7EA;
+}
+SPAN.multiple_at_residue {
+	color: #FFB7EA;
+	font-weight: bold;
+	background-color: #FF0000;
+}
+SPAN.single_hash_residue {
+	color: #FF0000;
+	font-weight: bold;
+	background-color: #BCB7FF;
+}
+SPAN.multiple_hash_residue {
+	color: #BCB7FF;
+	font-weight: bold;
+	background-color: #FF0000;
+}
+
+INPUT.error_button {
+	background-color:#ff0000;
+	color:#ffffff;
+	font-size:12pt;
+	font-weight:bold;
+	margin-top:15px;
+	text-decoration:none;
+}
