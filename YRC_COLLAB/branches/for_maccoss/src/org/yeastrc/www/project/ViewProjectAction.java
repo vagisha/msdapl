@@ -186,7 +186,7 @@ public class ViewProjectAction extends Action {
 
     private List<ProjectExperiment> getProjectExperiments(int projectId) throws Exception {
         
-        List<Integer> experimentIds = ProjectExperimentDAO.instance().getProjectExperimentIds(projectId);
+        List<Integer> experimentIds = ProjectExperimentDAO.instance().getExperimentIdsForProject(projectId);
         Collections.sort(experimentIds);
         
         if(experimentIds.size() == 0)

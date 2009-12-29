@@ -3,12 +3,24 @@
  */
 package org.yeastrc.www.project;
 
-import javax.servlet.http.*;
-import org.apache.struts.action.*;
+import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
 import org.yeastrc.data.InvalidIDException;
-import org.yeastrc.project.*;
-import org.yeastrc.www.user.*;
+import org.yeastrc.experiment.ProjectExperimentDAO;
+import org.yeastrc.project.ProjectDAO;
+import org.yeastrc.www.project.experiment.ExperimentDeleter;
+import org.yeastrc.www.user.Groups;
+import org.yeastrc.www.user.User;
+import org.yeastrc.www.user.UserUtils;
 
 /**
  * Implements the logic to delete a project
@@ -61,6 +73,12 @@ public class DeleteProjectAction extends Action {
 			return mapping.findForward("standardHome");
 		}
 
+	    // get all the experiment IDs for the project and mark them for deletion
+        List<Integer> experimentIds = ProjectExperimentDAO.instance().getExperimentIdsForProject(projectID);
+        ExperimentDeleter deleter = ExperimentDeleter.getInstance();
+        for(int exptId: experimentIds)
+            deleter.addExperimentId(exptId, projectID, true);
+        
 		try {
 			ProjectDAO.instance().delete(projectID);
 		} catch (InvalidIDException e) {

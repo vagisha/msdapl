@@ -31,43 +31,6 @@ public class ProjectExperimentDAO {
         return instance;
     }
     
-    public List<Integer> getProjectExperimentIds(int projectId) throws SQLException {
-        
-        Connection conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        List<Integer> experimentIds = new ArrayList<Integer>();
-        try {
-
-            // Check if this project and experiment are already linked
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT experimentID FROM tblProjectExperiment WHERE projectID="+projectId);
-            
-            while(rs.next()) {
-                experimentIds.add(rs.getInt("experimentID"));
-            }
-        }
-        finally {
-
-            // Always make sure statements are closed,
-            // and the connection is returned to the pool
-            if(rs != null) {
-                try { rs.close(); } catch (SQLException e) { ; }
-                rs = null;
-            }
-            if (stmt != null) {
-                try { stmt.close(); } catch (SQLException e) { ; }
-                stmt = null;
-            }
-            if (conn != null) {
-                try { conn.close(); } catch (SQLException e) { ; }
-                conn = null;
-            }
-        }
-        return experimentIds;
-    }
-    
     public List<Integer> getExperimentIdsForProjects(List<Project> projects) throws SQLException {
         if(projects == null || projects.size() == 0) 
             return new ArrayList<Integer>(0);
@@ -138,6 +101,30 @@ public class ProjectExperimentDAO {
                 try { rs.close(); rs = null; } catch (Exception e) { ; }
             }
 
+            if (stmt != null) {
+                try { stmt.close(); stmt = null; } catch (Exception e) { ; }
+            }
+            
+            if (conn != null) {
+                try { conn.close(); conn = null; } catch (Exception e) { ; }
+            }           
+        }
+    }
+    
+    public void deleteProjectExperiment(int experimentId) throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        
+        try {
+            
+            String sql = "DELETE FROM tblProjectExperiment WHERE experimentID="+experimentId;
+                    
+            conn = DBConnectionManager.getConnection(DBConnectionManager.MAIN_DB);
+            stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+            
+        } finally {
+            
             if (stmt != null) {
                 try { stmt.close(); stmt = null; } catch (Exception e) { ; }
             }

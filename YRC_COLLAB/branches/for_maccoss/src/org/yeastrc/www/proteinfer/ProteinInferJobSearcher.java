@@ -59,7 +59,7 @@ public class ProteinInferJobSearcher {
         return jobs;
     }
     
-    private List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
+    public List<Integer> getProteinferIdsForMsExperiment(int experimentId) {
         
         Set<Integer> pinferRunIds = new HashSet<Integer>();
         

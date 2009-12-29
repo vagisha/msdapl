@@ -324,7 +324,20 @@
 	  <forward name="Success" path="/pages/internal/project/projectDeleted.jsp" redirect="true"/>
 	</action>
 	
+	<action
+	  path="/deleteExperiment"
+	  type="org.yeastrc.www.project.experiment.DeleteExperimentAction"
+	  >
+		<forward name="Success" path="/deleteExperimentSuccess.do" redirect="true" />
+		<forward name="Failure" path="/viewProject.do" redirect="false" />
+	</action>
 	
+	<action
+	  path="/deleteExperimentSuccess"
+	  type="org.yeastrc.www.project.experiment.DeleteExperimentSuccessAction"
+	  >
+		<forward name="Success" path="/pages/internal/project/experimentDeleted.jsp" redirect="false" />
+	</action>	
 	
 	<action
 	  path="/searchProjects"
