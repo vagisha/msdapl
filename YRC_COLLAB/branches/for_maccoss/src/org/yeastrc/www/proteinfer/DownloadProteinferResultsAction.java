@@ -177,15 +177,16 @@ public class DownloadProteinferResultsAction extends Action {
         
         // print input summary
         List<WIdPickerInputSummary> inputSummary = IdPickerResultsLoader.getIDPickerInputSummary(pinferId);
-        writer.write("File\tNumHits\tNumFilteredHits\n");
+        writer.write("File\tNumHits\tNumFilteredHits\t%Filtered\n");
         int totalDecoyHits = 0;
         int totalTargetHits = 0;
         int filteredTargetHits = 0;
         for(WIdPickerInputSummary input: inputSummary) {
             writer.write(input.getFileName()+"\t");
 //            writer.write(input.getInput().getNumDecoyHits()+"\t");
-            writer.write(input.getInput().getNumTargetHits()+"\t");
-            writer.write(input.getInput().getNumFilteredTargetHits()+"\n");
+            writer.write(input.getNumHits()+"\t");
+            writer.write(input.getNumFilteredHits()+"\t");
+            writer.write(input.getPercentFilteredHits()+"%\n");
             
 //            totalDecoyHits += input.getInput().getNumDecoyHits();
             totalTargetHits += input.getInput().getNumTargetHits();
@@ -194,7 +195,8 @@ public class DownloadProteinferResultsAction extends Action {
         writer.write("TOTAL\t");
 //        writer.write(totalDecoyHits+"\t");
         writer.write(totalTargetHits+"\t");
-        writer.write(filteredTargetHits+"\n");
+        writer.write(filteredTargetHits+"\t");
+        writer.write(round((filteredTargetHits*100.0)/(double)totalTargetHits)+"%\n");
         writer.write("\n\n");
         
         
@@ -418,5 +420,9 @@ public class DownloadProteinferResultsAction extends Action {
             writer.write("\t"+descStr);
         
         writer.write("\n");
+    }
+    
+    private static double round(double num) {
+        return Math.round(num*100.0)/100.0;
     }
 }

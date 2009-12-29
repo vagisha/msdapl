@@ -86,8 +86,10 @@
     <tr class="main">
     <th class="main" style="font-size:10pt;"><b>Uniq</b></th>
     <th class="main" style="font-size:10pt;"><b>Peptide</b></th>
-    <th width="10%" align="left" class="main" style="font-size:10pt;"><b>Charge</b></th>
     <th width="10%" align="left" class="main" style="font-size:10pt;"><b># Spectra</b></th>
+    <th width="10%" align="left" class="main" style="font-size:10pt;"><b>Charge</b></th>
+	<th width="10%" align="left" class="main" style="font-size:10pt;"><b>RT</b></th>
+	
     <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      	<th class="main" style="font-size:10pt;">Best FDR</th>
      </logic:equal>
@@ -119,7 +121,6 @@
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false"></logic:equal>
      		</td>
      		<td class="left_align"><bean:write name="ion" property="ionSequence" /></td>
-     		<td><bean:write name="ion" property="charge" /></td>
      		<td>
      			<bean:write name="ion" property="spectrumCount" />
      			<span class="showAllIonHits" style="text-decoration: underline; cursor: pointer;font-size: 7pt; color: #000000;" 
@@ -127,6 +128,8 @@
 				  onclick="toggleHitsForIon(<bean:write name="ion" property="ion.id" />)"
 				  >[Show]</span>
      		</td>
+     		<td><bean:write name="ion" property="charge" /></td>
+     		<td class="left_align"><bean:write name="ion" property="retentionTime" /></td>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
@@ -152,8 +155,8 @@
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
-     		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
-     			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
+     		 	<td class="left_align"><bean:write name="psm_perc" property="qvalueRounded" /></td>
+     			<td class="left_align"><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
      		</logic:equal>
      		 
      		<td><span style="text-decoration: underline; cursor: pointer;" 

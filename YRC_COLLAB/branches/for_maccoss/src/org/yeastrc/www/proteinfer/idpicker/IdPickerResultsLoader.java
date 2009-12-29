@@ -1,5 +1,6 @@
 package org.yeastrc.www.proteinfer.idpicker;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import org.yeastrc.ms.dao.run.MsScanDAO;
 import org.yeastrc.ms.dao.search.MsRunSearchDAO;
 import org.yeastrc.ms.dao.search.prolucid.ProlucidSearchResultDAO;
 import org.yeastrc.ms.dao.search.sequest.SequestSearchResultDAO;
+import org.yeastrc.ms.domain.run.MsScan;
 import org.yeastrc.ms.domain.search.MsSearchResult;
 import org.yeastrc.ms.domain.search.Program;
 import org.yeastrc.nr_seq.NRProtein;
@@ -648,7 +650,8 @@ public class IdPickerResultsLoader {
             WIdPickerIon makeWIdPickerIon(I ion, Program inputGenerator) {
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
         MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
-        return new WIdPickerIon(ion, origResult);
+        MsScan scan = scanDao.loadScanLite(origResult.getScanId());
+        return new WIdPickerIon(ion, origResult, scan);
     }
 
     private static void sortIonList(List<? extends GenericProteinferIon<?>> ions) {
@@ -783,7 +786,8 @@ public class IdPickerResultsLoader {
             WIdPickerIonForProtein makeWIdPickerIonForProtein(I ion, Program inputGenerator) {
         ProteinferSpectrumMatch psm = ion.getBestSpectrumMatch();
         MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
-        return new WIdPickerIonForProtein(ion, origResult);
+        MsScan scan = scanDao.loadScanLite(origResult.getScanId());
+        return new WIdPickerIonForProtein(ion, origResult, scan);
     }
 
     public static List<WIdPickerSpectrumMatch> getHitsForIon(int pinferIonId, Program inputGenerator, ProteinInferenceProgram pinferProgram) {
@@ -805,12 +809,20 @@ public class IdPickerResultsLoader {
         for(ProteinferSpectrumMatch psm: psmList) {
             MsSearchResult origResult = getOriginalResult(psm.getMsRunSearchResultId(), inputGenerator);
             WIdPickerSpectrumMatch wPsm = new WIdPickerSpectrumMatch(psm, origResult);
-            int scanNum = scanDao.load(origResult.getScanId()).getStartScanNum();
-            wPsm.setScanNumber(scanNum);
+            MsScan scan = scanDao.load(origResult.getScanId());
+            wPsm.setScanNumber(scan.getStartScanNum());
+            wPsm.setRetentionTime(round(scan.getRetentionTime()));
             wPsmList.add(wPsm);
         }
         
         return wPsmList;
+    }
+    
+    private static double round(BigDecimal number) {
+        return round(number.doubleValue());
+    }
+    private static double round(double num) {
+        return Math.round(num*100.0)/100.0;
     }
     
 

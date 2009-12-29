@@ -10,10 +10,10 @@
   		</tr>
   		<logic:iterate name="idpickerRun" property="sortedParams" id="param" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerParam">
   		<tr>
-    	<td VALIGN="top" align="center" style="border: 1px #F2F2F2 solid;">
+    	<td VALIGN="top" align="left" style="border: 1px #F2F2F2 solid;">
     		<%=program.getDisplayNameForParam(param.getName()) %>
     	</td>
-    	<td VALIGN="top" align="center" style="border: 1px #F2F2F2 solid;">
+    	<td VALIGN="top" align="left" style="border: 1px #F2F2F2 solid;">
     		<bean:write name="param" property="value" />
     	</td>
    		</tr>
@@ -24,6 +24,9 @@
 	<tr><td style="background-color:#F2F2F2; font-weight:bold;">
 		# Unique peptide sequences: <bean:write name="filteredUniquePeptideCount"/>
 	</td></tr>
+	<tr>
+	<td style="background-color:#F2F2F2; font-weight:bold;">Total Hits: <bean:write name="totalTargetHits" />&nbsp;&nbsp; Filtered Hits: <bean:write name="filteredTargetHits"  /> &nbsp; (<bean:write name="filteredPercent"/>%)</td>
+	</tr>
 	</table>
 	
 	<table cellpadding="4" cellspacing="2" align="center" width="90%" class="sortable stripe_table table_basic">
@@ -34,6 +37,7 @@
 	<!-- <th class="sort-int" align="left"><b><font size="2pt">Decoy Hits</font></b></th> -->
 	<th class="sort-int" align="left"><b><font size="2pt"># Hits</font></b></th>
 	<th class="sort-int" align="left"><b><font size="2pt"># Filtered Hits</font></b></th>
+	<th class="sort-int" align="left"><b><font size="2pt">% Filtered Hits</font></b></th>
 	</tr>
 	</thead>
 	</logic:notEmpty>
@@ -48,16 +52,11 @@
  					<!-- </span> -->
  				</td>
  				<!--  <td><bean:write name="input" property="input.numDecoyHits" /></td> -->
- 				<td><bean:write name="input" property="input.numTargetHits" /></td>
- 				<td><bean:write name="input" property="input.numFilteredTargetHits" /></td>
+ 				<td class="left_align"><bean:write name="input" property="numHits" /></td>
+ 				<td class="left_align"><bean:write name="input" property="numFilteredHits" /></td>
+ 				<td class="left_align"><bean:write name="input" property="percentFilteredHits"/>%</td>
  			</tr>
 	 	</logic:iterate>
-	 	<tr>
-	 		<td class="left_align"><b>TOTAL</b></td>
-	 		<!-- <td><b><bean:write name="totalDecoyHits" /></b></td> -->
-	 		<td><b><bean:write name="totalTargetHits" /></b></td>
-	 		<td><b><bean:write name="filteredTargetHits"  /></b></td>
-	 	</tr>
 	 	</tbody>
 		</table>
 	<br><br>

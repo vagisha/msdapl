@@ -1,5 +1,6 @@
 package org.yeastrc.www.proteinfer;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -201,6 +202,7 @@ public class ViewProteinInferenceResultAction extends Action {
         request.setAttribute("totalDecoyHits", totalDecoyHits);
         request.setAttribute("totalTargetHits", totalTargetHits);
         request.setAttribute("filteredTargetHits", filteredTargetHits);
+        request.setAttribute("filteredPercent", round(filteredTargetHits*100.0/(double)totalTargetHits));
         request.setAttribute("filteredUniquePeptideCount", IdPickerResultsLoader.getUniquePeptideCount(pinferId));
         
         // Results summary
@@ -251,6 +253,10 @@ public class ViewProteinInferenceResultAction extends Action {
             }
         }
         return false;
+    }
+    
+    private static double round(double num) {
+        return Math.round(num*100.0)/100.0;
     }
 
 }

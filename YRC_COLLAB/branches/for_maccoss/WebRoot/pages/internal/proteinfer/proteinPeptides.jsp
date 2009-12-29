@@ -24,8 +24,10 @@
   	 <thead><tr>
   	 <th class="sort-alpha" align="left">Uniq</th>
      <th class="sort-alpha" align="left">Peptide</th>
-     <th class="sort-int" align="left">Charge</th>
      <th class="sort-int" align="left"># Spectra</th>
+     <th class="sort-int" align="left">Charge</th>
+     <th class="sort-int" align="left">RT</th>
+     
      <logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      	<th class="sort-float" align="left">Best FDR</th>
      </logic:equal>
@@ -64,8 +66,9 @@
      			<logic:equal name="ion" property="isUniqueToProteinGroup" value="false"></logic:equal>
      		</td>
      		<td class="left_align"><bean:write name="ion" property="ionSequence" /></td>
-     		<td><bean:write name="ion" property="charge" /></td>
      		<td><bean:write name="ion" property="spectrumCount" /></td>
+     		<td><bean:write name="ion" property="charge" /></td>
+     		<td class="left_align"><bean:write name="ion" property="retentionTime" /></td>
      		
      		<logic:equal name="protInferProgram" value="<%= ProteinInferenceProgram.PROTINFER_SEQ.name()%>">
      			<bean:define name="ion" property="ion.bestSpectrumMatch" id="psm_idp" type="edu.uwpr.protinfer.database.dto.idpicker.IdPickerSpectrumMatch"/>
@@ -91,12 +94,12 @@
      		 
      		<logic:equal name="inputGenerator" value="<%=Program.PERCOLATOR.name() %>">
      		 	<bean:define name="ion" property="bestSpectrumMatch" id="psm_perc" type="org.yeastrc.ms.domain.analysis.percolator.PercolatorResult"/>
-     		 	<td><bean:write name="psm_perc" property="qvalueRounded" /></td>
+     		 	<td class="left_align"><bean:write name="psm_perc" property="qvalueRounded" /></td>
      		 	<logic:notPresent name="oldPercolator">
-	     			<td><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
+	     			<td class="left_align"><bean:write name="psm_perc" property="posteriorErrorProbabilityRounded" /></td>
 	     		</logic:notPresent>
 	     		<logic:present name="oldPercolator">
-	     			<td><bean:write name="psm_perc" property="discriminantScoreRounded" /></td>
+	     			<td class="left_align"><bean:write name="psm_perc" property="discriminantScoreRounded" /></td>
 	     		</logic:present>
      		</logic:equal>
      		 

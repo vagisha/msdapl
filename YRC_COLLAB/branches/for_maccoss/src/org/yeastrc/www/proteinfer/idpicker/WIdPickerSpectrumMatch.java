@@ -7,6 +7,7 @@ import edu.uwpr.protinfer.database.dto.ProteinferSpectrumMatch;
 public class WIdPickerSpectrumMatch {
     
     private int scanNumber;
+    private double retentionTime;
     private MsSearchResult spectrumMatch;
     private ProteinferSpectrumMatch idpPsm;
     
@@ -21,6 +22,14 @@ public class WIdPickerSpectrumMatch {
 
     public void setScanNumber(int scanNumber) {
         this.scanNumber = scanNumber;
+    }
+
+    public double getRetentionTime() {
+        return retentionTime;
+    }
+
+    public void setRetentionTime(double retentionTime) {
+        this.retentionTime = retentionTime;
     }
 
     public int getScanId() {
